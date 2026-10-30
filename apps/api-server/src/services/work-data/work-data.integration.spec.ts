@@ -254,4 +254,21 @@ suite('Main business copies on isolated PostgreSQL',()=>{
    try{await expect(new AddAssistantStorageAuthority1793322213345().down(q)).rejects.toThrow('reviewed data migration');}
    finally{await q.rollbackTransaction();await q.release();}
  });
+ it('normalizes consent records written by old API revisions without reopening local storage',async()=>{
+   const f=await transitionFixture();await service.setConsent(f.user,f.owner,false);
+   await db.query('UPDATE assistant_work_data_consents SET enabled=true WHERE owner_key=$1',[f.owner.key]);
+   expect(await service.consent(f.user,f.owner)).toMatchObject({enabled:true,storageMode:'transferring'});
+   await expect(readWorkData(db,f.user,f.owner)).rejects.toMatchObject({code:'WORK_DATA_TRANSFERRING'});
+   expect((await service.setConsent(f.user,f.owner,true,f.device)).storageMode).toBe('transferring');
+   await db.query('UPDATE assistant_work_data_consents SET enabled=false WHERE owner_key=$1',[f.owner.key]);
+   expect(await service.consent(f.user,f.owner)).toMatchObject({enabled:false,storageMode:'stopped'});
+   await service.setConsent(f.user,f.owner,false);
+   await db.query('UPDATE assistant_work_data_consents SET enabled=true WHERE owner_key=$1',[f.owner.key]);
+   expect(await service.consent(f.user,f.owner)).toMatchObject({enabled:false,storageMode:'stopped'});
+   expect(await service.grants(f.user,f.device)).toEqual([]);
+   await expect(readWorkData(db,f.user,f.owner)).rejects.toMatchObject({code:'WORK_DATA_STOPPED'});
+   await db.query(`INSERT INTO assistant_work_data_records(owner_key,lane,kind,id,entry,mutation_id) VALUES($1,'imported','product','p1',$2::jsonb,$3)`,[f.owner.key,JSON.stringify(product()),randomUUID()]);
+   expect(await service.setConsent(f.user,f.owner,true)).toMatchObject({enabled:true,storageMode:'server',sourceDeviceId:null});
+   expect((await service.query(f.user,f.owner)).records).toEqual([]);
+ });
 });

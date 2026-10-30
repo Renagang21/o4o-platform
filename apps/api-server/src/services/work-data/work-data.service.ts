@@ -62,7 +62,15 @@ export async function resolveWorkDataOwner(db: DataSource, userId: string, workS
   return owner;
 }
 function ownerOf(row: any): WorkDataOwner { return {key:row.owner_key,userId:row.user_id,organizationId:row.organization_id}; }
-function consentOf(row: any) { return row ? { enabled: row.enabled, epoch: row.epoch, owner: row.owner_key, updatedAt: row.updated_at, storageMode:row.storage_mode, sourceDeviceId:row.source_device_id, transferError:row.transfer_error??null } : { enabled:false,epoch:null,owner:null,updatedAt:null,storageMode:'local',sourceDeviceId:null,transferError:null }; }
+function consentOf(row: any) {
+  // Old API revisions update enabled only. Normalize those records during rollout
+  // without granting local fallback or reviving a stopped server workspace.
+  let storageMode=row?.storage_mode??'local';
+  if(storageMode==='stopped' || (row && !row.enabled && storageMode!=='local'))storageMode='stopped';
+  else if(row?.enabled && storageMode==='local')storageMode='transferring';
+  return {enabled:!!row?.enabled && storageMode!=='stopped',epoch:row?.epoch??null,owner:row?.owner_key??null,
+    updatedAt:row?.updated_at??null,storageMode,sourceDeviceId:row?.source_device_id??null,transferError:row?.transfer_error??null};
+}
 function assertServerReady(consent: ReturnType<typeof consentOf>) {
   if (!consent.enabled) throw new WorkDataError('WORK_DATA_CONSENT_REQUIRED',403);
   if (consent.storageMode!=='server') throw new WorkDataError('WORK_DATA_TRANSFERRING',409);
@@ -82,17 +90,18 @@ export class WorkDataService {
       // Serialize first grant with revoke/sync, including when the row is new.
       await db.query('SELECT pg_advisory_xact_lock(hashtextextended($1,0))',[owner.key]);
       const [old] = await db.query('SELECT * FROM assistant_work_data_consents WHERE owner_key=$1 FOR UPDATE',[owner.key]);
+      const oldState=consentOf(old);
       if (sourceDeviceId!==null && !/^[a-f0-9-]{36}$/i.test(sourceDeviceId)) throw new WorkDataError('WORK_DATA_PC_SOURCE_INVALID');
-      if (enabled && sourceDeviceId && old?.storage_mode==='stopped') throw new WorkDataError('WORK_DATA_NO_LOCAL_RETURN',409);
+      if (enabled && sourceDeviceId && oldState.storageMode==='stopped') throw new WorkDataError('WORK_DATA_NO_LOCAL_RETURN',409);
       if (enabled && old?.enabled && old.source_device_id && sourceDeviceId && old.source_device_id!==sourceDeviceId) throw new WorkDataError('WORK_DATA_PC_SOURCE_UNAVAILABLE',409);
-      const storageMode=!enabled?(old && old.storage_mode!=='local'?'stopped':'local')
-        :old?.enabled?old.storage_mode:sourceDeviceId?'transferring':'server';
-      const source=enabled?(old?.storage_mode==='stopped'?null:old?.source_device_id??sourceDeviceId):old?.source_device_id??null;
-      const epoch = old?.enabled === enabled ? old.epoch : randomUUID();
+      const storageMode=!enabled?(old && oldState.storageMode!=='local'?'stopped':'local')
+        :oldState.enabled?oldState.storageMode:sourceDeviceId?'transferring':'server';
+      const source=enabled?(oldState.storageMode==='stopped'?null:old?.source_device_id??sourceDeviceId):old?.source_device_id??null;
+      const epoch = old && oldState.enabled === enabled ? old.epoch : randomUUID();
       const [row] = await db.query(`INSERT INTO assistant_work_data_consents(owner_key,user_id,organization_id,granted_by,epoch,enabled,storage_mode,source_device_id)
         VALUES($1,$2,$3,$4,$5,$6,$7,$8) ON CONFLICT(owner_key) DO UPDATE SET enabled=excluded.enabled,epoch=excluded.epoch,
         granted_by=excluded.granted_by,storage_mode=excluded.storage_mode,source_device_id=excluded.source_device_id,transfer_error=NULL,updated_at=now() RETURNING *`,[owner.key,owner.userId,owner.organizationId,userId,epoch,enabled,storageMode,source]);
-      if (!enabled) await db.query('DELETE FROM assistant_work_data_records WHERE owner_key=$1',[owner.key]);
+      if (!enabled || oldState.storageMode==='stopped') await db.query('DELETE FROM assistant_work_data_records WHERE owner_key=$1',[owner.key]);
       return consentOf(row);
     });
   }
@@ -110,7 +119,7 @@ export class WorkDataService {
     if(await getNetureMainMembershipStatus(this.db,userId)!=='active')throw new WorkDataError('WORK_DATA_FORBIDDEN',403);
     const rows = await this.db.query(`SELECT c.* FROM assistant_work_data_consents c WHERE c.enabled=true AND
       (c.user_id=$1 OR EXISTS(SELECT 1 FROM organization_members om WHERE om.organization_id=c.organization_id AND om.user_id=$1 AND om.role='owner' AND om.left_at IS NULL))`,[userId]);
-    return rows.filter(row=>row.source_device_id===deviceId).map(row => ({ owner:row.owner_key,epoch:row.epoch,storageMode:row.storage_mode,transferError:row.transfer_error??null }));
+    return rows.filter(row=>consentOf(row).enabled && row.source_device_id===deviceId).map(row => ({ owner:row.owner_key,epoch:row.epoch,storageMode:row.storage_mode,transferError:row.transfer_error??null }));
   }
   async query(userId: string, owner: WorkDataOwner, options: { kind?: string; after?: string; limit?: number } = {}) {
     return this.db.transaction(async db=>{
@@ -158,13 +167,14 @@ export class WorkDataService {
     return this.db.transaction(async db=>{
       await db.query('SELECT pg_advisory_xact_lock(hashtextextended($1,0))',[ownerKey]);
       const [consent]=await db.query('SELECT * FROM assistant_work_data_consents WHERE owner_key=$1 FOR UPDATE',[ownerKey]);
-      if (!consent?.enabled || consent.epoch!==epoch) throw new WorkDataError('WORK_DATA_CONSENT_REQUIRED',403);
+      const state=consentOf(consent);
+      if (!state.enabled || consent.epoch!==epoch) throw new WorkDataError('WORK_DATA_CONSENT_REQUIRED',403);
       const owner=ownerOf(consent);await assertWorkDataOwner(db,userId,owner,true);
       if (collector) {
         if (consent.source_device_id!==collector.deviceId) throw new WorkDataError('WORK_DATA_FORBIDDEN',403);
-        if (consent.storage_mode==='server' && changes.some(c=>c.lane!=='imported')) throw new WorkDataError('WORK_DATA_NO_LOCAL_RETURN',409);
-        if (collector.complete && (changes.length || consent.storage_mode!=='transferring')) {
-          if (!(collector.complete && !changes.length && consent.storage_mode==='server')) throw new WorkDataError('WORK_DATA_TRANSFERRING',409);
+        if (state.storageMode==='server' && changes.some(c=>c.lane!=='imported')) throw new WorkDataError('WORK_DATA_NO_LOCAL_RETURN',409);
+        if (collector.complete && (changes.length || state.storageMode!=='transferring')) {
+          if (!(collector.complete && !changes.length && state.storageMode==='server')) throw new WorkDataError('WORK_DATA_TRANSFERRING',409);
         }
       } else assertServerReady(consentOf(consent));
       const accepted: {lane:string;kind:string;id:string;mutationId:string;version:number}[]=[],conflicts: {lane:string;kind:string;id:string;version:number}[]=[];
@@ -196,7 +206,7 @@ export class WorkDataService {
       }
       if (collector) {
         await db.query("UPDATE assistant_work_data_consents SET storage_mode=CASE WHEN $2 THEN 'server' ELSE storage_mode END,transfer_error=NULL,updated_at=now() WHERE owner_key=$1",[ownerKey,collector.complete===true]);
-        return {accepted,conflicts,changes:[],cursor:0,more:false,storageMode:collector.complete?'server':consent.storage_mode};
+        return {accepted,conflicts,changes:[],cursor:0,more:false,storageMode:collector.complete?'server':state.storageMode};
       }
       return {accepted,conflicts,changes:[],cursor:0,more:false};
     });

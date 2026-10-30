@@ -18,7 +18,7 @@
 
 | 항목 | 증거/결과 |
 |---|---|
-| 실제 격리 PG 15 | Main fixture 18 PASS; 빈 신규 migration down/up, 모든 기존 prefix/new fingerprint, 최종 schema 복원, fixture DB 잔존 0 |
+| 실제 격리 PG 15 | Main fixture 19 PASS; 빈 신규 migration down/up, 모든 기존 prefix/new fingerprint, 최종 schema 복원, fixture DB 잔존 0 |
 | 새 schema | `e6fd46ae64b9aed8e41ad05927bc14968f8f840f483142ec69a53760af44fa19`, 7409 lines; 기존 상태 registry 변경 없음 |
 | PC SQLite/명령/기존 실행 | native 전체 회귀와 신규 authority 검사; 최종 수치는 PR 인계 기록에 연결 |
 | API 실행/노드/경험 재사용 | 8 suites 133 PASS; 별도 PG 결과와 중복 합산하지 않음 |
@@ -49,3 +49,5 @@
 문서 정합: Personal Assistant V2 §6-3·Evolution §25·약국 자료 설계를 사용자 결정에 맞춰 수정했다. 기존 양방향 mirror의 과거 WO/CHECK/배포 증거는 당시 기록으로 보존하며, 현재 저장 계약은 본 TODO와 정본을 따른다. 최종 CI·Codex·Git 상태는 같은 PR에 기록한다.
 
 리뷰 보완: [PR #888](https://github.com/Renagang21/o4o-platform/pull/888)의 참조 재수집 지적을 실제 SQLite로 재현했다. 서버에서 새로 시작한 후 명시적으로 재수집한 미확인 참조 행은 payload가 같아도 업로드하고, 과거 checkpoint의 자동 복원은 계속 차단한다. 알려진 자료 오류는 권한 재확인 후 기록해 백그라운드 반복을 멈추며, 사용자가 같은 지정 PC로 명시적으로 재시도할 때만 재개한다. 재수집/일시중단/원본 PC 유지 검사를 추가했다.
+
+배포 호환성: 구버전 API가 `enabled`만 변경한 기록은 상태를 정규화해 이전 안내 또는 중단으로 판정한다. 중단 기록은 구버전 flag 변경만으로 재개되지 않고, 명시적 서버 새 시작에서는 과거 사본을 복원하지 않는다. 실제 격리 PG로 legacy grant/off/regrant 상태를 검증한다.
