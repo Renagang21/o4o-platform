@@ -1,3 +1,4 @@
+import { supplierReturnPath } from '../../lib/supplierNavigation';
 /**
  * SupplierLibraryFormPage - 자료 등록/수정
  *
@@ -11,7 +12,7 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { ArrowLeft, Save, Loader2 } from 'lucide-react';
 import { supplierApi } from '../../lib/api';
 import { SUPPLIER_LIBRARY_ITEM_NOT_FOUND } from '../../lib/api/supplier';
@@ -58,6 +59,8 @@ export default function SupplierLibraryFormPage() {
 
 function SupplierLibraryForm() {
   const navigate = useNavigate();
+  const [returnParams] = useSearchParams();
+  const returnPath = supplierReturnPath(returnParams.get('returnTo'), '/supplier/library');
   const { id } = useParams<{ id: string }>();
   const isEditMode = Boolean(id);
 
@@ -206,7 +209,7 @@ function SupplierLibraryForm() {
 
       if (!mounted.current) return;
       if (result.success) {
-        navigate('/supplier/library');
+        navigate(returnPath);
       } else {
         setError(result.error || '저장에 실패했습니다.');
       }
@@ -234,7 +237,7 @@ function SupplierLibraryForm() {
     return (
       <div style={{ padding: '32px', maxWidth: '720px' }}>
         <button
-          onClick={() => navigate('/supplier/library')}
+          onClick={() => navigate(returnPath)}
           style={{
             display: 'inline-flex', alignItems: 'center', gap: '6px', marginBottom: '20px',
             background: 'none', border: 'none', color: '#64748b', fontSize: '14px', cursor: 'pointer', padding: 0,
@@ -277,7 +280,7 @@ function SupplierLibraryForm() {
       {/* Header */}
       <div style={{ marginBottom: '24px' }}>
         <button
-          onClick={() => navigate('/supplier/library')}
+          onClick={() => navigate(returnPath)}
           style={{
             display: 'flex',
             alignItems: 'center',
@@ -516,7 +519,7 @@ function SupplierLibraryForm() {
             {saving ? '저장 중...' : isEditMode ? '수정 저장' : '등록'}
           </button>
           <button
-            onClick={() => navigate('/supplier/library')}
+            onClick={() => navigate(returnPath)}
             style={{
               padding: '10px 24px',
               backgroundColor: '#f1f5f9',

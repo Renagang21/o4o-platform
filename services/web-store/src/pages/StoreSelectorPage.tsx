@@ -9,13 +9,20 @@ const ROLE_LABEL: Record<string, string> = { owner: '경영자', admin: '관리�
 export default function StoreSelectorPage() {
   const { stores, organizationId, selectStore, error } = useUnifiedStore();
   const navigate = useNavigate();
-  const returnTo = readReturnTo(useLocation().search);
+  const search = useLocation().search;
+  const returnTo = readReturnTo(search);
+  const requested = new URLSearchParams(search).get('store');
+  const matching = requested ? stores.find(store => store.organizationId === requested) : undefined;
+  const choices = requested ? (matching ? [matching] : []) : stores;
+  const resetPath = WORKSPACE_PATHS.select + (returnTo ? `?returnTo=${encodeURIComponent(returnTo)}` : '');
   return <main className="center-card"><section className="card" data-testid="store-selector">
     <h1>매장 선택</h1>
     <p>이 계정으로 접근할 수 있는 매장이 {stores.length}개 있습니다. 업무를 볼 매장을 선택해 주세요.</p>
     {error && <p className="error">{error}</p>}
+    {requested && <p role={matching ? 'status' : 'alert'}>{matching ? `협업체에서 선택한 약국: ${matching.organizationName || '이름 없는 매장'}. 이 약국으로 계속할지 확인해 주세요.` : '요청한 약국에 접근할 수 없습니다. 다른 약국으로 자동 전환하지 않았습니다.'}</p>}
+    {requested && <button type="button" onClick={() => navigate(resetPath, { replace: true })}>직접 다른 약국 선택</button>}
     <ul className="option-list">
-      {stores.map((s) => (
+      {choices.map((s) => (
         <li key={s.organizationId}>
           <button
             type="button"

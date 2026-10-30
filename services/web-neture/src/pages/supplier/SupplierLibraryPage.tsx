@@ -1,3 +1,4 @@
+import { useAuth } from '../../contexts/AuthContext';
 /**
  * SupplierLibraryPage - 공급자 콘텐츠 라이브러리 목록
  *
@@ -16,8 +17,8 @@
  * - 자료함 저장 · 커뮤니티 작성기 이동 · 협력사업 등재 요청은 독립된 선택이다.
  */
 
-import { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import SupplierContentDestinations from './SupplierContentDestinations';
 import { Plus, FolderOpen, AlertCircle, Send } from 'lucide-react';
 import { supplierApi, type SupplierLibraryItem, type SupplierLibraryHandoffTarget } from '../../lib/api';
@@ -54,7 +55,25 @@ function formatFileSize(bytes: number): string {
 type VisibilityFilter = 'all' | 'service' | 'personal';
 
 export default function SupplierLibraryPage() {
+  const { user } = useAuth();
+  return <LibraryPage key={user?.id ?? 'anonymous'} />;
+}
+function LibraryPage() {
   const navigate = useNavigate();
+  const [params, setParams] = useSearchParams();
+  const requestSource = params.get('requestSource');
+  const requestedBusiness = params.get('business') || undefined;
+  const sourceGeneration = useRef(0);
+  const [requestSourceError, setRequestSourceError] = useState('');
+  useEffect(() => {
+    let alive = true;
+    const generation = ++sourceGeneration.current;
+    setBusinessItem(null); setRequestSourceError('');
+    if (!requestSource) return;
+    supplierApi.getLibraryItem(requestSource).then(source => { if (alive && generation === sourceGeneration.current) setBusinessItem(source); })
+      .catch(() => { if (alive && generation === sourceGeneration.current) setRequestSourceError('다시 요청할 원본을 찾을 수 없습니다. 삭제되었거나 접근 권한이 변경됐을 수 있습니다.'); });
+    return () => { alive = false; };
+  }, [requestSource]);
   const [businessItem, setBusinessItem] = useState<SupplierLibraryItem | null>(null);
   const [items, setItems] = useState<SupplierLibraryItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -240,7 +259,7 @@ export default function SupplierLibraryPage() {
     createdAt: <span style={{ fontSize: '13px', color: '#64748b' }}>{formatDate(item.createdAt)}</span>,
     actions: (
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-        <button type="button" onClick={() => setBusinessItem(item)} className="text-sm text-blue-700">협력사업에 등재 요청</button>
+        <button type="button" onClick={() => { sourceGeneration.current++; setBusinessItem(item); }} className="text-sm text-blue-700">협력사업에 등재 요청</button>
         <button type="button" onClick={() => navigate(`/communities/community/forum/write?library=${encodeURIComponent(item.id)}`)} className="text-sm text-blue-700">커뮤니티에 게시</button>
         {handoffTargets.length > 0 && (
           <button
@@ -338,7 +357,8 @@ export default function SupplierLibraryPage() {
         compact
       />
 
-      <SupplierContentDestinations item={businessItem} onClose={() => setBusinessItem(null)} />
+      {requestSourceError && <p role="alert">{requestSourceError}</p>}
+      <SupplierContentDestinations item={businessItem} suggestedBusinessKey={requestedBusiness} onClose={() => { setBusinessItem(null); setParams(previous => { const next = new URLSearchParams(previous); next.delete('requestSource'); next.delete('business'); return next; }); }} />
 
       {/* Visibility Filter Bar (WO-CONTENT-META-UI-VALIDATION-V1) */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>

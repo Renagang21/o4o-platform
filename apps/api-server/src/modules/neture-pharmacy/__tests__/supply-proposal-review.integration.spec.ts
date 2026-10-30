@@ -21,6 +21,10 @@ local('Supply proposal review information — isolated real PostgreSQL', () => {
     await fixture.ds.query("INSERT INTO supplier_product_offers VALUES ($1,$2,$3,12000,'B2B summary','<p>B2B details</p>')", [offer,master,supplier]);
     await fixture.ds.query("INSERT INTO semi_franchises VALUES ($1,'carepharm','CarePharm'),($2,'other','Other')", [care,other]);
     await fixture.ds.query("INSERT INTO supply_proposals(id,offer_id,semi_franchise_id,status,unit_price) VALUES ($1,$2,$3,'pending',9000),($4,$2,$5,'pending',8000)", [proposal,offer,care,randomUUID(),other]);
+    await fixture.ds.query(`ALTER TABLE semi_franchises ADD COLUMN status text DEFAULT 'active';
+      ALTER TABLE neture_suppliers ADD COLUMN status text DEFAULT 'ACTIVE';
+      ALTER TABLE product_masters ADD COLUMN status text DEFAULT 'ACTIVE';
+      ALTER TABLE supplier_product_offers ADD COLUMN approval_status text DEFAULT 'APPROVED', ADD COLUMN is_active boolean DEFAULT true, ADD COLUMN deleted_at timestamptz;`);
   });
   afterAll(async () => { if (fixture) await fixture.close(); });
   it('returns reviewable product details and supplier conditions within the selected business only', async () => {
@@ -33,4 +37,21 @@ local('Supply proposal review information — isolated real PostgreSQL', () => {
     expect(await service.supplierList(supplier)).toHaveLength(2);
     expect(await service.operatorList({ id: care } as SemiFranchiseRow, 'approved')).toEqual([]);
   });
+  it('distinguishes approval from current business, supplier and product availability', async () => {
+    await fixture.ds.query("UPDATE supply_proposals SET status='approved' WHERE id=$1", [proposal]);
+    expect((await service.operatorList({id:care} as SemiFranchiseRow))[0].supplyReadiness).toBe('base_conditions_met');
+    const cases = [
+      ["UPDATE semi_franchises SET status='closed' WHERE id=$1", "UPDATE semi_franchises SET status='active' WHERE id=$1",care,'business_inactive'],
+      ["UPDATE neture_suppliers SET status='INACTIVE' WHERE id=$1", "UPDATE neture_suppliers SET status='ACTIVE' WHERE id=$1",supplier,'supplier_inactive'],
+      ["UPDATE supplier_product_offers SET is_active=false WHERE id=$1", "UPDATE supplier_product_offers SET is_active=true WHERE id=$1",offer,'offer_unavailable'],
+      ["UPDATE product_masters SET status='INACTIVE' WHERE id=$1", "UPDATE product_masters SET status='ACTIVE' WHERE id=$1",master,'product_inactive'],
+    ];
+    for(const [change,reset,id,reason] of cases) {
+      await fixture.ds.query(change,[id]);
+      try { expect((await service.supplierList(supplier)).find(row=>row.id===proposal).supplyReadiness).toBe(reason); }
+      finally { await fixture.ds.query(reset,[id]); }
+    }
+    await fixture.ds.query("UPDATE supply_proposals SET status='pending' WHERE id=$1",[proposal]);
+  });
+
 });

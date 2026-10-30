@@ -90,6 +90,8 @@ export interface SupplyProposalTerms {
 }
 
 export interface SupplyProposal {
+  /** Current base validity only; pharmacy membership, targeting and display are separate. */
+  supplyReadiness?: string;
   termsSnapshot?: SupplyProposalTerms | null;
   decidedBy?: string | null;
   decidedByName?: string | null;

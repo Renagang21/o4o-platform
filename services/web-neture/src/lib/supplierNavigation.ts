@@ -9,6 +9,7 @@ export function supplierReturnPath(
     "/supplier/orders/manage",
     "/supplier/orders",
     "/supplier/products",
+    "/supplier/library",
     "/supplier/store-materials-status",
   ].includes(pathname) && !value.includes("#")
     ? value

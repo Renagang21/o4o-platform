@@ -38,3 +38,19 @@ export function SupplyProposalDetails({ proposal: p }: { proposal: SupplyProposa
     {p.productDescription ? <div className="mt-3 whitespace-normal break-words"><ContentRenderer html={p.productDescription} /></div> : <p className="mt-3 text-gray-500">등록된 제품 상세 설명이 없습니다.</p>}
   </details>;
 }
+
+/** Approval never substitutes for the selected pharmacy's current purchase authorization. */
+export function SupplyProposalReadiness({ proposal }: Readonly<{ proposal: SupplyProposal }>) {
+  if (proposal.status !== 'approved') return null;
+  const labels: Record<string, string> = {
+    business_inactive: '협업체가 운영 중이 아니어서 현재 공급할 수 없습니다.',
+    offer_unavailable: '상품의 공급 승인·활성 상태를 확인해야 합니다.',
+    supplier_inactive: '공급자가 현재 활성 상태가 아니어서 공급할 수 없습니다.',
+    product_inactive: '제품 원장이 비활성 상태여서 공급할 수 없습니다.',
+    base_conditions_met: '제품·공급자의 기본 공급 조건은 충족했습니다.',
+  };
+  return <div className="mt-2 max-w-sm whitespace-normal text-xs text-gray-600">
+    <p>{labels[proposal.supplyReadiness ?? ''] ?? '승인 후에도 제품·공급자의 현재 공급 상태를 확인해야 합니다.'}</p>
+    <p>약국별 사업 가입·제안 대상·공급 조건을 별도로 확인합니다. 홈 진열 숨김은 공급 종료와 다릅니다.</p>
+  </div>;
+}
