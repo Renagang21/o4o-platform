@@ -1,3 +1,4 @@
+import { requestServiceHandoff } from '@o4o/auth-react';
 import './pharmacy-member-home.css';
 import { BUSINESS_SITE } from '../../config/businessSite';
 import { useEffect, useState, type ReactNode } from 'react';
@@ -105,7 +106,7 @@ export default function PharmacyMemberHomePage() {
         {access.canManage && <p className="text-sm text-slate-600">자료의 작성·검토·게시는 {canManageHere ? <Link to={`/operator/semi-franchises?key=${encodeURIComponent(business.key)}&tab=contents`} className="text-blue-700">사업 자료 관리 →</Link> : '해당 사업의 담당 운영 화면'}에서 진행합니다.</p>}
       </section>
       <div id="business-products" className="scroll-mt-28">
-        <BusinessHomeShowcase key={scope} client={authClient.api} externalSelection businessKey={business.key} organizationId={materialStore.organizationId} accountId={user?.id} operator={!!access.canManage} />
+        <BusinessHomeShowcase key={scope} client={authClient.api} externalSelection businessKey={business.key} organizationId={materialStore.organizationId} accountId={user?.id} operator={!!access.canManage} onEnterStore={returnPath => requestServiceHandoff(authClient.api, { workspace: 'store', origin: 'https://store.neture.co.kr', returnPath })} />
       </div>
       {showConversations && <section aria-labelledby="conversations-title" className="rounded-xl border border-slate-200 bg-white p-5 sm:p-6">
         <SectionHeading id="conversations-title" icon={<MessageSquare size={20} aria-hidden="true" />} title="회원 약국들의 이야기" to={forumPath} linkLabel="전체 게시글" />

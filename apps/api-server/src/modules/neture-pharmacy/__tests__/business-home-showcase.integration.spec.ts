@@ -1,3 +1,4 @@
+import { SupplyProposalService } from '../services/supply-proposal.service.js';
 import { randomUUID } from 'node:crypto';
 import { createCarePharmReviewDb } from '../../../__tests__/support/carepharm-review-db.js';
 import { BusinessHomeShowcaseService } from '../services/business-home-showcase.service.js';
@@ -28,6 +29,7 @@ suite('business approval → scoped home showcase (isolated PostgreSQL)', () => 
       CREATE TABLE neture_pharmacy_memberships(organization_id uuid,status text);
       CREATE TABLE semi_franchise_memberships(organization_id uuid,semi_franchise_id uuid,status text);
       CREATE TABLE service_memberships(user_id uuid,service_key text,status text);
+      CREATE TABLE kpa_pharmacist_profiles(user_id uuid,qualification_status text,license_verified boolean,license_number text,verified_at timestamptz,verified_by uuid);
       CREATE TABLE cooperatives(id uuid,semi_franchise_id uuid,status text);
       CREATE TABLE cooperative_memberships(cooperative_id uuid,user_id uuid,status text);
       CREATE TABLE product_masters(id uuid,name text,status text);
@@ -39,6 +41,7 @@ suite('business approval → scoped home showcase (isolated PostgreSQL)', () => 
       CREATE TABLE action_logs(id uuid DEFAULT gen_random_uuid(),service_key text,user_id uuid,action_key text,source text,status text,meta jsonb,created_at timestamptz DEFAULT now());`);
     await batch(`INSERT INTO organizations VALUES($1,'Business','business','{}'),($2,'Store','pharmacy','{}');
       INSERT INTO users(id) VALUES($3),($4);`,[owner,store,user,reviewer]);
+    await db.ds.query("INSERT INTO kpa_pharmacist_profiles VALUES($1,'approved',true,'SYNTHETIC',now(),$2)",[user,reviewer]);
     await batch(`INSERT INTO semi_franchises VALUES($1,'carepharm','active'),($2,'other','active');
       INSERT INTO organization_members VALUES($3,$4,'owner',NULL,true);
       INSERT INTO neture_pharmacy_memberships VALUES($3,'active');
@@ -51,6 +54,11 @@ suite('business approval → scoped home showcase (isolated PostgreSQL)', () => 
     await batch(`INSERT INTO semi_franchise_contents(id,semi_franchise_id,title,summary,body,status,source_supplier_id,source_item_id,created_by,published_at)
       VALUES($1,$2,'Review copy','Approved summary','<p>Approved body</p>','published',$3,$4,$5,now());`,[content,sf.id,supplier,randomUUID(),user]);
     await batch(`INSERT INTO cooperatives VALUES($1,$2,'active');INSERT INTO cooperative_memberships VALUES($1,$3,'active');`,[coop,sf.id,user]);
+    await db.ds.query(`ALTER TABLE supply_proposals ADD COLUMN requested_by uuid, ADD COLUMN unit_price integer DEFAULT 9000, ADD COLUMN note text, ADD COLUMN reason text, ADD COLUMN decided_by uuid, ADD COLUMN decided_at timestamptz, ADD COLUMN ended_by uuid, ADD COLUMN end_reason text, ADD COLUMN ended_at timestamptz, ADD COLUMN updated_at timestamptz, ADD COLUMN terms_snapshot jsonb;
+      ALTER TABLE neture_suppliers ADD COLUMN slug text DEFAULT 'synthetic', ADD COLUMN base_shipping_fee integer DEFAULT 0, ADD COLUMN free_shipping_threshold integer;
+      ALTER TABLE product_masters ADD COLUMN specification text, ADD COLUMN manufacturer_name text, ADD COLUMN barcode text;
+      ALTER TABLE supplier_product_offers ADD COLUMN price_general integer DEFAULT 10000, ADD COLUMN business_detail_description text;
+      ALTER TABLE semi_franchises ADD COLUMN name text DEFAULT 'Synthetic business';`);
   });
   afterAll(async()=>{if(db)await db.close();});
   it('shows only this pharmacy’s approved supply and published content, without price or target DTO',async()=>{
@@ -120,4 +128,31 @@ suite('business approval → scoped home showcase (isolated PostgreSQL)', () => 
     await expect(service.update(sf,reviewer,{id:`product:${targeted}`,hidden:true,position:0,version:before})).rejects.toThrow();
     expect((await service.operatorList(sf)).version).toBe(before);
   });
+  it('rechecks personal pharmacist qualification for pharmacy work without converting cooperative membership',async()=>{
+    await db.ds.query("UPDATE cooperative_memberships SET status='active' WHERE user_id=$1",[user]);
+    await db.ds.query("UPDATE semi_franchise_memberships SET status='active' WHERE organization_id=$1",[store]);
+    await db.ds.query("UPDATE kpa_pharmacist_profiles SET qualification_status='revoked' WHERE user_id=$1",[user]);
+    try {
+      await expect(service.memberList(sf,user,store)).rejects.toMatchObject({httpStatus:403});
+      await expect(service.memberList(sf,user,null)).resolves.toHaveProperty('businessKey','carepharm');
+    } finally { await db.ds.query("UPDATE kpa_pharmacist_profiles SET qualification_status='approved' WHERE user_id=$1",[user]); }
+  });
+
+  it('round-trips supplier proposal → independent operator decision → exact pharmacy display, then removes ended supply',async()=>{
+    const proposalService=new SupplyProposalService(db.ds);const id=randomUUID();
+    await db.ds.query("UPDATE supplier_product_offers SET is_active=true,approval_status='APPROVED',deleted_at=NULL WHERE id=$1",[offer]);
+    await db.ds.query("UPDATE semi_franchises SET status='active' WHERE id=$1",[sf.id]);
+    await db.ds.query("INSERT INTO supply_proposals(id,semi_franchise_id,offer_id,status,target_organization_id,requested_by) VALUES($1,$2,$3,'pending',$4,$5)",[id,sf.id,offer,store,user]);
+    expect((await proposalService.supplierList(supplier)).find(row=>row.id===id).status).toBe('pending');
+    expect((await service.memberList(sf,user,store)).items.some(row=>row.id===`product:${id}`)).toBe(false);
+    await expect(proposalService.operatorDecide(sf,user,id,'approve')).rejects.toMatchObject({httpStatus:403});
+    await expect(proposalService.operatorDecide(other,reviewer,id,'approve')).rejects.toMatchObject({httpStatus:404});
+    await proposalService.operatorDecide(sf,reviewer,id,'approve');
+    expect((await proposalService.supplierList(supplier)).find(row=>row.id===id)).toMatchObject({status:'approved',supplyReadiness:'base_conditions_met'});
+    expect((await service.memberList(sf,user,store)).items.some(row=>row.id===`product:${id}`)).toBe(true);
+    expect((await service.memberList(sf,user,null)).items.some(row=>row.id===`product:${id}`)).toBe(false);
+    await proposalService.operatorDecide(sf,reviewer,id,'end','Synthetic supply end');
+    expect((await service.memberList(sf,user,store)).items.some(row=>row.id===`product:${id}`)).toBe(false);
+  });
+
 });

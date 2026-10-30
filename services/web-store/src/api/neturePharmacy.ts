@@ -213,6 +213,12 @@ export const neturePharmacyApi = {
     return res.data;
   },
 
+  async getSupplyOption(kind: SupplyKind, id: string): Promise<SupplyOption> {
+    const result = await coreApiClient.get<Envelope<SupplyOption>>(`${P}/store/supply-options/${encodeURIComponent(kind)}/${encodeURIComponent(id)}`);
+    if (!result.success || !result.data || result.data.kind !== kind || result.data.optionId !== id) throw new Error('선택한 공급 제안을 확인하지 못했습니다.');
+    return result.data;
+  },
+
   async listContents(params: { sf?: string; q?: string; tag?: string; page?: number; limit?: number }): Promise<{ items: SemiFranchiseContent[]; total: number }> {
     const res = await coreApiClient.get<Envelope<{ items: SemiFranchiseContent[]; total: number }>>(`${P}/store/contents`, params);
     if (!res.success || !Array.isArray(res.data?.items) || !Number.isSafeInteger(res.data.total)) throw new Error('제공 자료를 확인하지 못했습니다.');

@@ -1,6 +1,7 @@
 import {
   SupplyProposalTermsSummary,
   SupplyProposalHistory,
+  SupplyProposalReadiness,
 } from "@o4o/operator-core-ui/modules/pharmacy-management";
 /**
  * SupplierSupplyProposalsPage — 공급 제안 (/supplier/supply-proposals)
@@ -203,6 +204,7 @@ export default function SupplierSupplyProposalsPage() {
                       </div>
                     )}
                     <SupplyProposalHistory proposal={p} />
+                    <SupplyProposalReadiness proposal={p} />
                   </td>
                   <td className={TD}>{formatDateTime(p.createdAt)}</td>
                   <td className={TD}>

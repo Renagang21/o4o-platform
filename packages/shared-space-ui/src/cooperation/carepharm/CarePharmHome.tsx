@@ -29,7 +29,7 @@ function MemberHomeNews({ notices }: { notices: ReactNode }) {
 /** Public introduction stays available independently of the protected member workspace. */
 export function CarePharmHome({ view = 'home', client, accountId, onLogin, onEnterStore, hero, notices }: {
   view?: CooperationView; client: CooperationClient; accountId?: string; onLogin: () => void;
-  onEnterStore: () => Promise<string>; hero: ReactNode; notices: ReactNode;
+  onEnterStore: (path?: string) => Promise<string>; hero: ReactNode; notices: ReactNode;
 }) {
   const isAuthenticated = !!accountId;
   const location = useLocation();
