@@ -138,8 +138,8 @@ export default function CentralOperationsPage() {
         <button onClick={logout}>로그아웃</button>
       </header>}
     >
-      {!serviceKey && <CentralOperationOverview key={user.id} roleKey={[...roles, ...menuKeys].sort((left,right)=>left.localeCompare(right)).join('|')} />}
       {!serviceKey && <CentralOperationNotifications key={`panel:${user.id}`} variant="panel" scopeKey={[...roles, ...menuKeys].sort((left,right)=>left.localeCompare(right)).join('|')} />}
+      {!serviceKey && <CentralOperationOverview key={user.id} roleKey={[...roles, ...menuKeys].sort((left,right)=>left.localeCompare(right)).join('|')} />}
       {serviceKey && <nav aria-label="서비스 운영 업무" className="mb-5 flex flex-wrap gap-2 border-b pb-4">
         {visibleMenus.filter(menu => menu.service === serviceKey).map(menu => <Link key={menu.key} aria-current={area === menu.area ? 'page' : undefined} className={`rounded border px-3 py-2 text-sm ${area === menu.area ? 'bg-blue-700 text-white' : 'bg-white text-slate-700'}`} to={`/operations/${serviceKey}/${menu.area}`}>{menu.label}</Link>)}
       </nav>}

@@ -1,3 +1,4 @@
+import { DESCRIPTION_INTAKE_LABEL } from "../neture/product-description-intake/namespace.js";
 import type { DataSource } from "typeorm";
 import type { InboxScope } from "./inbox-scope.js";
 import { FUNDING_EXCEPTION_SQL } from "../../services/funding/funding-operator-exceptions.service.js";
@@ -268,9 +269,11 @@ export function inboxTaskSources(scope: InboxScope): TaskSource[] {
     add(
       "product-candidates",
       "상품 후보 검토",
-      "/operator/product-candidates",
+      "/operator/product-candidates?status=pending",
       "product_candidates",
-      "candidate_status='pending' AND (service_key='neture' OR service_key IS NULL)",
+      "candidate_status='pending' AND deleted_at IS NULL AND (source_label IS NULL OR source_label <> $1) AND (service_key='neture' OR service_key IS NULL)",
+      "created_at",
+      [DESCRIPTION_INTAKE_LABEL],
     );
   }
   return result;
