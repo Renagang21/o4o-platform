@@ -25,10 +25,11 @@ export class AdapterRegistry {
   constructor(
     readonly db: DataSource,
     origin: URL,
+    storeOrigin?: URL,
   ) {
     this.adapters = {
       supplier: new SupplierAdapter(db, origin),
-      store: new StoreAdapter(db),
+      store: new StoreAdapter(db, storeOrigin),
       organization: new OrganizationAdapter(db, origin),
       community: new CommunityAdapter(db),
     };

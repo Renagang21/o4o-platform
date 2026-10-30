@@ -1,0 +1,71 @@
+# CHECK-O4O-CHATGPT-ISOLATED-REVIEW-DEMO-V1
+
+> 작성일: 2026-10-28 · 상태: LOCAL_VERIFIED / PUBLIC_DEPLOYMENT_PENDING · 대상: 합성 fixture를 가진 전용 DB 및 로컬 API/Neture/Store
+
+## 실제 검증 결과
+
+| 항목                                 | 결과                                                                         |
+| ------------------------------------ | ---------------------------------------------------------------------------- |
+| frozen lockfile 설치, build:packages | PASS                                                                         |
+| API TypeScript build / tsup bundle   | PASS                                                                         |
+| provision/smoke 별도 TypeScript 검사 | PASS, 브라우저 helper 포함 최종 검사 완료                                    |
+| 환경/DB/marker/origin 검사           | 7 tests PASS                                                                 |
+| 기존 external-ai focused Jest        | 5 suites / 40 tests PASS                                                     |
+| root flat ESLint 변경 TS 검사        | PASS, 브라우저 helper 포함 최종 검사 완료                                    |
+| 빈 DB 정본 bootstrap/incremental     | 49개 적용, 최종 schema fingerprint PASS                                      |
+| provision dry-run/apply/재실행       | write 0 / prepared / already-prepared(write 0)                               |
+| API readiness                        | HTTP 200, ready                                                              |
+| Neture/Store demo API 지정 build     | 두 웹 PASS                                                                   |
+| 실제 로그인/DCR/PKCE/동의/토큰 교환  | PASS                                                                         |
+| 도구 발견                            | 11개 모두 실제 실행                                                          |
+| P1~P5 API 기능                       | 작업공간/상품/자료/비공개 저장/조회/최신 revision 수정 PASS                  |
+| 추가 권한 거부                       | 읽기 전용 저장/다른 공간/이전 revision 거부 PASS                             |
+| 로컬 Chromium UI                     | 이메일 로그인/합성 자격 상태/실제 약국·쓰기 동의/데모 Store 편집기 열기 PASS |
+| 브라우저 격리                        | loopback 세 포트만 허용. 운영 API/웹 요청 없이 완료                          |
+| 임시 데이터 정리                     | 생성 초안·테스트 OAuth client/connection/credential 삭제. 초안 잔존 0 확인   |
+| Compose config / ui profile          | PASS                                                                         |
+| 전체 컨테이너 이미지/Compose 실행    | API/Neture/Store 이미지 build 및 Compose healthy PASS                        |
+| 문서 민감정보 / diff check           | PASS                                                                         |
+
+초기 전체 Compose에서는 API 10개 검사와 브라우저 3개 동선이 통과했다. 2026-10-29 새 이미지/Compose에서 상품 콘텐츠를 포함한 API 13개 검사와 일반 초안 브라우저 3개 동선도 통과했다. migrate/provision job은 exit 0이고 API와 전용 DB health가 정상이다.
+
+기준 합성 계정·자료와 로그인/보안 로그는 유지했다. 실제 사용자·면허·운영 자료를 복사하거나 기존 운영 자격을 승인하지 않았다. 비밀값은 private env에만 보관하며 로그·Public Git에 넣지 않는다. 브라우저 증거 PNG는 로컬 artifact에 보관한다.
+
+## 실패 원인과 수정
+
+- 별도 schema marker가 FRESH_EMPTY 판정을 방해했다. 기존 검사를 완화하지 않고 DB 설명 metadata로 옮긴 후 정본 초기화와 49개 incremental/fingerprint가 통과했다.
+- bundler가 NODE_ENV를 고정한다. localhost 검증은 development bundle로 분리했으며 공개 배포에는 별도 production build가 필요하다.
+- 브라우저 테스트는 상단 로그인 버튼과 form submit을 구분하고, Store 로그인 안내 링크를 통해 원래 편집기로 복귀하는 실제 동선을 사용했다.
+- 오래된 eslintrc 호출은 현행 설정과 맞지 않았다. 규칙 변경 없이 root flat config의 scoped lint로 확인했다.
+- 첫 PR CI에서 새 단위 테스트의 node:test/Jest 실행기 충돌을 재현했다. Jest 정본으로 통일해 2 suites/7 tests가 통과했다.
+- 보안 분석 지적에 따라 브라우저 artifact는 mkdtemp의 전용 디렉터리로 분리하고, 웹 이미지는 명시적 비특권 사용자 및 root 소유 정적 파일을 사용한다. API runtime은 검증된 이미지의 실제 해석 버전을 lockfile로 고정해 npm ci로 설치한다. 수정 후 이미지 build·Compose 재실행과 API 10개/브라우저 3개 동선이 다시 통과했다. 새 HEAD CI 결과는 별도로 확인한다.
+- PR #871의 Codex 리뷰에서 운영 API .dockerignore가 신규 COPY 입력을 제외하는 문제를 찾았다. lockfile/심사 CLI 허용 항목을 추가했고 실제 apps/api-server context에서 두 COPY 입력을 빌드해 포함 여부를 검증했다. 로컬 빌더도 같은 .dockerignore를 사용하게 했다.
+
+작업 PR: https://github.com/Renagang21/o4o-platform/pull/871 — CI와 자동 리뷰의 최신 결과는 해당 PR에서 확인한다.
+
+## 남은 작업과 외부 조건
+
+- 상품 콘텐츠 3개 도구는 2026-10-29 추가 검증에서 실제 실행했다. 상품 콘텐츠 편집기의 UI 동선과 공개 HTTPS 환경 동작은 아직 검증하지 않았다.
+- API 권한 거부 3개와 제출용 모델 비호출 negative prompt 3개는 다르다. 실제 ChatGPT 호출 선택은 아직 검증하지 않았다.
+- 공개 HTTPS API/Neture/Store, 별도 공개 DB/runtime identity, 시연 영상 URL은 아직 준비하지 않았다. 운영 DB/Cloud 서비스/포털 제출 상태는 변경하지 않았다. localhost/placeholder를 제출하지 않는다.
+- 초기 GitHub fetch/gh는 HTTP 401로 실패했으나 이후 인증이 복구되어 main fetch와 작업 branch push가 성공했다. PR/CI 상태와 공개 배포 완료는 별도로 확인한다.
+- 공통 My Home handoff의 운영 origin 고정은 변경하지 않았다. 검증된 reviewer 동선은 데모 로그인→동의→도구가 반환한 데모 편집기이며, 다른 이동까지 검증됐다고 보고하지 않는다.
+
+문서 정합: [WO](../work-orders/WO-O4O-CHATGPT-ISOLATED-REVIEW-DEMO-V1.md)와 [README](../../deploy/chatgpt-review-demo/README.md)에 구현/실행/미완료 경계를 기록했다. 운영 자격 정책은 변경하지 않았다.
+
+## 2026-10-29 추가 검증
+
+- 준비된 합성 심사 계정에 한정한 상품 콘텐츠 기능 자격: dry-run write 0 → apply write 1 → 재실행 write 0. 기존 비밀번호와 업무 자료 유지. 실제 결제·구독 생성 없음.
+- 11개 도구 전체 실행: API 13 checks PASS. 상품 콘텐츠 비공개 저장/동일 요청 재시도, 조회, 최신 revision 수정 포함. 일반 초안 브라우저 3개 동선 PASS.
+- 테스트 상품 콘텐츠 페이지/그룹을 포함해 임시 데이터 정리 및 잔존 0 확인. 보안·감사 로그 유지.
+- 이 추가 검증은 실제 ChatGPT 모델의 호출 선택이나 제출용 negative prompt 검증을 대신하지 않는다. 새 이미지 및 최신 HEAD의 CI/리뷰 결과는 PR #871에서 추적한다.
+
+- GitHub→GCP WIF 읽기 전용 인증 확인 PASS: https://github.com/Renagang21/o4o-platform/actions/runs/40798721740. 이 결과는 새 심사 DB/서비스 생성 또는 공개 IAM 권한까지 증명하지 않는다.
+
+
+## main 통합 재개 — 2026-10-30 (Asia/Seoul)
+
+사용자가 열린 PR 4개 전체의 main 통합·배포를 요청했다. 최신 main을 같은 PR에 반영하고 DB 표식·origin 검사 7건을 재실행해 통과했다. 재리뷰에서 로컬 데모 실행 후 일반 env-loader가 checkout의 환경파일을 다시 읽는 격리 누락을 확인하여, 기존 REVIEW_DEMO_ENVIRONMENT=isolated 모드에서는 일반 환경파일 로딩을 건너뛰게 보완한다. 일반 실행 동작은 유지한다. 실제 loader를 일회성 합성 app으로 bundle해 격리/일반 모드를 검증하며 checkout의 실제 환경파일·자격정보를 읽거나 출력하지 않는다. 최종 CI·리뷰·통합·배포 근거는 PR #871에 연결한다. 운영 DB에 데모 fixture를 주입하거나 새 공개 HTTPS/DB/클라우드 자원을 생성하지 않는다. 공개 심사 환경 구축·실제 ChatGPT 시연/제출은 기존 미완료 범위로 유지한다.
+
+
+로컬 실행 추가 보호: 비컨테이너 실행기의 HOST를 127.0.0.1로 고정하여 development API가 외부 인터페이스에 바인딩되지 않게 한다. 실제 실행기가 일회성 합성 API 자식을 시작하도록 검증하고, 부모의 외부 HOST/임의 provider 변수는 자식에게 전달되지 않음을 확인한다. Compose 내부 바인딩과 운영 기본값은 변경하지 않는다.

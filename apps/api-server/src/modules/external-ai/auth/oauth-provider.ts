@@ -52,6 +52,7 @@ export interface ConnectionConfig {
   issuer: URL;
   webOrigin: URL;
   adminOrigin?: URL;
+  storeOrigin?: URL;
   redirectUris: string[];
   credentialKey: string;
 }
@@ -72,11 +73,18 @@ export function connectionConfig(
     const adminOrigin = new URL(
       env.EXTERNAL_AI_ADMIN_ORIGIN || "https://admin.neture.co.kr",
     );
+    const storeOrigin = new URL(env.EXTERNAL_AI_STORE_ORIGIN || 'https://store.neture.co.kr');
+    if (env.REVIEW_DEMO_ENVIRONMENT === 'isolated') {
+      const productionHosts = new Set(['neture.co.kr', 'www.neture.co.kr', 'api.neture.co.kr', 'admin.neture.co.kr', 'store.neture.co.kr']);
+      if (!env.EXTERNAL_AI_STORE_ORIGIN || !env.EXTERNAL_AI_ADMIN_ORIGIN ||
+          [issuer, webOrigin, adminOrigin, storeOrigin].some(url => productionHosts.has(url.hostname)))
+        return null;
+    }
     const local = (u: URL) =>
       env.NODE_ENV !== "production" &&
       ["localhost", "127.0.0.1"].includes(u.hostname) &&
       u.protocol === "http:";
-    for (const url of [issuer, webOrigin, adminOrigin]) {
+    for (const url of [issuer, webOrigin, adminOrigin, storeOrigin]) {
       if (
         (url.protocol !== "https:" && !local(url)) ||
         url.username ||
@@ -107,6 +115,7 @@ export function connectionConfig(
       issuer,
       webOrigin,
       adminOrigin,
+      storeOrigin,
       redirectUris,
       credentialKey: env.EXTERNAL_AI_CREDENTIAL_KEY,
     };

@@ -99,6 +99,7 @@ export function createMcpRouter(
       db,
       provider.config.webOrigin,
       mailProviderFactory,
+      provider.config.storeOrigin,
     );
   router.use(
     rateLimit({
