@@ -28,11 +28,11 @@ describe('invoice business entity selection', () => {
       expect(getBusinessEntityTypeLabel(businessEntityType)).not.toBe(businessEntityType);
     },
   );
-  it('requires only the entity selection when other registration fields are optional', () => {
+  it('does not require registration fields when required is false', () => {
     const html = renderToStaticMarkup(createElement(BusinessRegistrationFields, {
       value: {}, onChange: jest.fn(),
     }));
-    expect(html).toMatch(/<select[^>]+required=""/);
+    expect(html).not.toMatch(/<select[^>]+required=""/);
     expect(html).not.toMatch(/<input[^>]+required=""/);
     expect(isSelectableBusinessEntityType(undefined)).toBe(false);
     expect(isSelectableBusinessEntityType(null)).toBe(false);

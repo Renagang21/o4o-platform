@@ -40,7 +40,12 @@ it.each([
     expect(result.status).toBe(403);
   }
   expect(transaction).not.toHaveBeenCalled();
-  expect((await (request(server()) as any)[method](path).set('x-role', 'neture:admin').send({})).status).toBe(400);
+  if (path.includes('/hard-delete/')) {
+    transaction.mockImplementationOnce(async run => run({query:jest.fn(async()=>[])}));
+    // An authorized no-reason request reaches the final existence check, rather than failing validation.
+    expect((await (request(server()) as any)[method](path).set('x-role','neture:admin').send({})).status).toBe(404);
+    expect(transaction).toHaveBeenCalledTimes(1);
+  } else expect((await (request(server()) as any)[method](path).set('x-role', 'neture:admin').send({})).status).toBe(400);
 });
 it('daily product reads and restoration remain operator actions but suspended current membership blocks them', async () => {
   expect((await request(server()).get('/cleanup/duplicate-masters').set('x-role', 'neture:operator')).status).toBe(200);

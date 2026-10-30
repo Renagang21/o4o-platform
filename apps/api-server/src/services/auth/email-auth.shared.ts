@@ -111,6 +111,7 @@ export interface EmailSignupInput extends EmailAuthRequestMeta {
   email: string;
   password: string;
   name: string;
+  nickname?: string;
   phone: string;
   consents: {
     terms: boolean;

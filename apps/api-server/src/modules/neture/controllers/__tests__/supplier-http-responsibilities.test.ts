@@ -94,6 +94,7 @@ jest.mock('../../services/product-candidate.service.js', () => ({
 }));
 jest.mock('../../services/supplier.service.js', () => ({
   SupplierProfileNameInvalidError: class extends Error {},
+  SupplierProfileEmailInvalidError: class extends Error {},
   SupplierProfileEntityTypeInvalidError: class extends Error {},
   SupplierProfileFieldUnsupportedError: class extends Error {
     constructor(public fields: string[]) {
@@ -133,7 +134,7 @@ jest.mock('../../../../utils/logger.js', () => ({
 import { createSupplierManagementController } from '../supplier-management.controller.js';
 import { createSupplierProductController } from '../supplier-product.controller.js';
 import { SupplierProfileFieldUnsupportedError } from '../../services/supplier.service.js';
-import { SupplierProfileNameInvalidError, SupplierProfileEntityTypeInvalidError } from '../../services/supplier.service.js';
+import { SupplierProfileNameInvalidError, SupplierProfileEntityTypeInvalidError, SupplierProfileEmailInvalidError } from '../../services/supplier.service.js';
 import { PolicyAcceptanceError } from '../../../policy-acceptance/policy-acceptance.service.js';
 
 const app = express();
@@ -237,6 +238,18 @@ describe('business HTTP ownership and actual supplier identity gates (resolver/s
       taxInvoiceEmail: 'fixture@example.invalid',
     });
     expect(mockMembership).not.toHaveBeenCalled();
+  });
+  it('forwards the private manager email independently from public contact', async () => {
+    mockBusiness.updateSupplierProfile.mockResolvedValueOnce({ id: 'fixture-supplier' });
+    const result = await send('patch', '/profile').send({ managerEmail: 'person@example.invalid', contactEmail: 'public@example.invalid' });
+    expect(result.status).toBe(200);
+    expect(mockBusiness.updateSupplierProfile).toHaveBeenCalledWith('fixture-supplier', expect.objectContaining({ managerEmail: 'person@example.invalid', contactEmail: 'public@example.invalid' }));
+  });
+  it('returns an actionable 400 for an invalid private manager email', async () => {
+    mockBusiness.updateSupplierProfile.mockRejectedValueOnce(new SupplierProfileEmailInvalidError());
+    const result = await send('patch', '/profile').send({ managerEmail: 'invalid' });
+    expect(result.status).toBe(400);
+    expect(result.body).toMatchObject({ success: false, error: 'INVALID_MANAGER_EMAIL' });
   });
   it('returns an actionable 400 for a legacy or invalid business classification', async () => {
     mockBusiness.updateSupplierProfile.mockRejectedValueOnce(new SupplierProfileEntityTypeInvalidError());

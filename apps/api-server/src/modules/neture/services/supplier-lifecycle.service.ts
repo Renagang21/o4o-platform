@@ -76,17 +76,8 @@ export class NetureSupplierLifecycleService {
         return { success: false, error: 'APPLICANT_NETURE_MEMBERSHIP_NOT_ACTIVE' };
       }
 
-      // Business registration details and owned evidence precede approval.
-      const businessOrganization = await this.businessService.getOrgData(supplier.organizationId);
-      if (!supplier.businessRegistrationDocumentId || !businessOrganization?.business_number?.trim() || !businessOrganization?.address?.trim() || !supplier.representativeName?.trim() || !supplier.businessType?.trim() || !supplier.businessItem?.trim()) {
-        return { success: false, error: 'BUSINESS_REGISTRATION_REQUIRED' };
-      }
-      const [proof] = await AppDataSource.query(
-        `SELECT id FROM kyc_documents WHERE id = $1 AND user_id = $2
-           AND "documentType" = 'business_registration' AND "verificationStatus" IN ('PENDING','VERIFIED')`,
-        [supplier.businessRegistrationDocumentId, supplier.userId],
-      );
-      if (!proof) return { success: false, error: 'BUSINESS_REGISTRATION_REQUIRED' };
+      // Business details and private evidence can be completed after approval.
+      // Account eligibility and the operator's explicit decision remain required.
       supplier.status = SupplierStatus.ACTIVE;
       supplier.approvedBy = approvedByUserId;
       supplier.approvedAt = new Date();
@@ -361,19 +352,6 @@ export class NetureSupplierLifecycleService {
         if (locked.user_id && (await getNetureMainMembershipStatus(manager, locked.user_id)) !== 'active') {
           return { success: false, error: 'APPLICANT_NETURE_MEMBERSHIP_NOT_ACTIVE' };
         }
-
-        const [proof] = await manager.query(
-          `SELECT d.id FROM neture_suppliers s
-             JOIN organizations o ON o.id = s.organization_id
-             JOIN kyc_documents d ON d.id = s.business_registration_document_id AND d.user_id = s.user_id
-            WHERE s.id = $1 AND d."documentType" = 'business_registration'
-              AND d."verificationStatus" IN ('PENDING','VERIFIED')
-              AND NULLIF(TRIM(o.business_number), '') IS NOT NULL AND NULLIF(TRIM(o.address), '') IS NOT NULL
-              AND NULLIF(TRIM(s.representative_name), '') IS NOT NULL
-              AND NULLIF(TRIM(s.business_type), '') IS NOT NULL AND NULLIF(TRIM(s.business_item), '') IS NOT NULL`,
-          [supplierId],
-        );
-        if (!proof) return { success: false, error: 'BUSINESS_REGISTRATION_REQUIRED' };
 
         await manager.query(
           `UPDATE neture_suppliers SET status = $2, updated_at = NOW() WHERE id = $1`,

@@ -50,7 +50,7 @@ export function centralApiMenus(service: CentralOperationService, req: Pick<Requ
     if (/\/neture\/community\/manage(?:\/|$)/.test(path)) return menu('community-advertising');
     if (/\/neture\/operator\/approval-analytics$/.test(path)) return menu('service-product-approvals');
     if (/\/neture\/operator\/products(?:\/|$)/.test(path)) return ['neture.products','neture.product-approvals'];
-    if (/\/neture\/operator\/product-cleanup\/soft-delete\//.test(path)) return ['neture.products','neture.product-approvals'];
+    if (/\/neture\/operator\/product-cleanup\/(?:soft-delete\/|batch-soft-delete$)/.test(path)) return ['neture.products','neture.product-approvals'];
     if (/\/neture\/operator\/product-cleanup\/pending-offers\//.test(path)) return menu('service-product-approvals');
     const areas: Array<[RegExp, string]> = [
       [/\/neture\/operator\/product-cleanup(?:\/|$)/, 'cleanup'],

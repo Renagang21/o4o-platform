@@ -3,7 +3,7 @@ import type {
   SupplierRequest,
   AuthenticatedRequest,
 } from '../../middleware/neture-identity.middleware.js';
-import { SupplierProfileFieldUnsupportedError, SupplierProfileNameInvalidError, SupplierProfileEntityTypeInvalidError } from '../../services/supplier.service.js';
+import { SupplierProfileFieldUnsupportedError, SupplierProfileNameInvalidError, SupplierProfileEntityTypeInvalidError, SupplierProfileEmailInvalidError } from '../../services/supplier.service.js';
 import logger from '../../../../utils/logger.js';
 import type { NetureService } from '../../neture.service.js';
 
@@ -48,6 +48,7 @@ export function createSupplierProfileHandlers(
           // WO-O4O-BUSINESS-REGISTRATION-FIELD-NAMING-STANDARD-V1
           managerName,
           managerPhone,
+          managerEmail,
           businessType,
           businessItem,
           // WO-O4O-SUPPLIER-IDENTITY-RELATIONSHIP-AND-BUSINESS-PROFILE-CANONICALIZATION-V1 §E (정책 7):
@@ -88,6 +89,7 @@ export function createSupplierProfileHandlers(
           businessAddressDetail,
           managerName,
           managerPhone,
+          managerEmail,
           businessType,
           businessItem,
           businessEntityType,
@@ -108,6 +110,7 @@ export function createSupplierProfileHandlers(
         }
         res.json({ success: true, data: result });
       } catch (error) {
+        if (error instanceof SupplierProfileEmailInvalidError) return res.status(400).json({ success: false, error: 'INVALID_MANAGER_EMAIL', message: '담당자 이메일을 확인해 주세요.' });
         if (error instanceof SupplierProfileEntityTypeInvalidError) {
           return res.status(400).json({
             success: false, error: 'SUPPLIER_PROFILE_ENTITY_TYPE_INVALID',

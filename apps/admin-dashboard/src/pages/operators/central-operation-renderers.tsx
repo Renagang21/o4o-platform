@@ -53,7 +53,7 @@ const renderers:Record<string,Renderer>={
 for(const area of ['settlements','notifications','community-advertising','actions','applications','legacy-contact','cms','orders'] as CentralNetureServiceArea[])
  renderers[`neture.${area}`]=()=> <CentralNetureServiceOperations area={area} />;
 for(const area of ['cleanup','category-mapping','product-approvals','candidates','products','service-product-approvals'] as CentralNetureProductArea[])
- renderers[`neture.${area}`]=()=> <CentralNetureProductOperations area={area} />;
+ renderers[`neture.${area}`]=c=> <CentralNetureProductOperations area={area} menuKeys={c.menuKeys} />;
 for(const area of ['forums','forum-delete','forum-deleted','forum-analytics'])
  renderers[`neture.${area}`]=()=> <CentralForumOperations area={area} />;
 for(const area of ['boards','erase-members','erase-boards'])

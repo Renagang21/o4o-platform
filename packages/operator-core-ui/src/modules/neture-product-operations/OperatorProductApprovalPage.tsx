@@ -9,7 +9,7 @@ import {useNetureProductOperations} from './runtime';
  * AdminProductApprovalPage 대비: Drawer 기반 상세, 이미지 포함.
  */
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { CheckCircle, XCircle, Trash2, AlertTriangle } from 'lucide-react';
 import { ActionBar, BulkResultModal, RowActionMenu } from '@o4o/ui';
 import { DataTable, useBatchAction, defineActionPolicy, buildRowActions } from '@o4o/operator-ux-core';
@@ -20,6 +20,8 @@ import type {DistributionType, SupplierProduct} from './supplier-product.types';
 
 
 import {OperationProductDetail as ProductDetailDrawer} from './OperationProductDetail';
+import ProductDataCleanupPage from './ProductDataCleanupPage';
+import { OperatorDialog } from '../../common/operation-support';
 import { GuideBlock } from '@o4o/shared-space-ui';
 
 
@@ -50,7 +52,7 @@ const DIST_LABELS: Record<string, string> = {
 // ─── V4: Action Policy ───
 
 const productApprovalPolicy = defineActionPolicy<AdminProduct>('neture:product-approval', {
-  inlineMax: 2,
+  inlineMax: 3,
   rules: [
     {
       key: 'approve',
@@ -79,7 +81,7 @@ const productApprovalPolicy = defineActionPolicy<AdminProduct>('neture:product-a
       key: 'delete',
       label: '삭제',
       variant: 'danger',
-      visible: (row) => row.approvalStatus === 'APPROVED',
+      visible: () => true,
       confirm: (row) => ({
         title: '삭제 확인',
         message: `"${row.marketingName}"을 삭제(휴지통 이동)하시겠습니까?`,
@@ -133,7 +135,14 @@ function toDrawerProduct(p: AdminProduct): SupplierProduct {
 // ─── Component ───
 
 export default function OperatorProductApprovalPage() {
- const {api:{operatorProductApi,productCleanupApi},fetchGuidePageContent} = useNetureProductOperations();
+ const {api:{operatorProductApi,productCleanupApi},fetchGuidePageContent,canOpenProductTrash=false} = useNetureProductOperations();
+  const [showTrash, setShowTrash] = useState(false);
+  const [deleteIds, setDeleteIds] = useState<string[]>([]);
+  const [deleteBusy, setDeleteBusy] = useState(false);
+  const [deleteError, setDeleteError] = useState('');
+  const [notice, setNotice] = useState('');
+  const deleteLock = useRef(false);
+  const heading = useRef<HTMLHeadingElement>(null);
   const [products, setProducts] = useState<AdminProduct[]>([]);
   const [loading, setLoading] = useState(true);
   // WO-O4O-NETURE-OPERATOR-PRODUCTS-AND-OFFERS-LOAD-ERROR-CONTRACT-V1:
@@ -160,7 +169,7 @@ export default function OperatorProductApprovalPage() {
       })
       .catch(() => { /* use fallback */ });
     return () => { cancelled = true; };
-  }, []);
+  }, [fetchGuidePageContent]);
 
   // V3: Batch action hook
   const batch = useBatchAction();
@@ -175,6 +184,7 @@ export default function OperatorProductApprovalPage() {
   const loadProducts = useCallback(async () => {
     setLoading(true);
     setLoadError(false);
+    setSelectedIds(new Set());
     try {
       const data = await operatorProductApi.getProducts();
       setProducts(data);
@@ -185,7 +195,7 @@ export default function OperatorProductApprovalPage() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [operatorProductApi]);
 
   useEffect(() => {
     loadProducts();
@@ -234,10 +244,25 @@ export default function OperatorProductApprovalPage() {
 
   /** V4: RowActionMenu용 삭제 핸들러 */
   const handleSoftDelete = async (id: string) => {
-    setActionLoading(id);
-    const res = await productCleanupApi.softDelete(id);
-    setActionLoading(null);
-    if (res.success) loadProducts();
+    if (deleteLock.current) return;
+    deleteLock.current = true; setActionLoading(id); setDeleteError(''); setNotice('');
+    try {
+      const res = await productCleanupApi.softDelete(id);
+      if (!res.success) throw new Error(res.error || '삭제에 실패했습니다.');
+      setDrawerProduct(null); setNotice('상품을 휴지통으로 이동했습니다.'); await loadProducts();
+    } catch (error) { setDeleteError(error instanceof Error ? error.message : '삭제에 실패했습니다.'); }
+    finally { deleteLock.current = false; setActionLoading(null); }
+  };
+
+  const handleSelectedDelete = async () => {
+    if (!deleteIds.length || deleteLock.current) return;
+    deleteLock.current = true; setDeleteBusy(true); setDeleteError(''); setNotice('');
+    try {
+      const result = await productCleanupApi.batchSoftDelete(deleteIds);
+      setNotice(`${result.moved}개 상품을 휴지통으로 이동했습니다.`);
+      setDeleteIds([]); setDrawerProduct(null); await loadProducts();
+    } catch (error) { setDeleteError(error instanceof Error ? error.message : '삭제에 실패했습니다.'); }
+    finally { deleteLock.current = false; setDeleteBusy(false); }
   };
 
   // ─── V3: Batch Actions (single API call) ───
@@ -363,7 +388,7 @@ export default function OperatorProductApprovalPage() {
       key: '_actions',
       header: '액션',
       align: 'center',
-      width: '80px',
+      width: '120px',
       system: true,
       onCellClick: () => {},
       render: (_v, row) => (
@@ -373,6 +398,7 @@ export default function OperatorProductApprovalPage() {
           </div>
         ) : (
           <RowActionMenu
+            disabled={deleteBusy || !!actionLoading || batch.loading}
             inlineMax={productApprovalPolicy.inlineMax}
             actions={buildRowActions(productApprovalPolicy, row, {
               approve: () => handleApprove(row.id),
@@ -397,13 +423,19 @@ export default function OperatorProductApprovalPage() {
       }
     : undefined;
 
+  if (showTrash && canOpenProductTrash) return <div>
+    <button type="button" className="mb-3 text-blue-700 underline" onClick={() => { setShowTrash(false); void loadProducts(); }}>상품 승인 목록으로</button>
+    <ProductDataCleanupPage initialTab="recycle-bin" />
+  </div>;
+
   return (
     <div>
       {/* Header */}
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-slate-900">상품 승인 관리</h1>
+        <h1 ref={heading} tabIndex={-1} className="text-2xl font-bold text-slate-900">상품 승인 관리</h1>
+        {canOpenProductTrash ? <button type="button" onClick={() => setShowTrash(true)} className="mt-3 border rounded px-3 py-2 text-sm">휴지통 열기</button> : <p className="mt-3 text-sm text-slate-500">휴지통 조회·완전 삭제는 접근 권한이 있는 관리자에게 요청해 주세요.</p>}
         <p className="text-sm text-slate-500 mt-1">
-          공급자가 등록한 상품을 검토하고 승인 / 반려합니다.
+          공급자가 등록한 상품을 검토합니다. 보완이 필요하면 반려하고, 잘못 등록된 상품은 삭제합니다.
         </p>
       </div>
 
@@ -437,8 +469,10 @@ export default function OperatorProductApprovalPage() {
         </div>
       ) : (
       <>
+      {notice && <p role="status" className="mb-3 text-emerald-800">{notice}</p>}
+      {deleteError && !deleteIds.length && <p role="alert" className="mb-3 text-red-700">{deleteError}</p>}
       {/* Stats Cards */}
-      <div className="grid grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
         {[
           { label: '전체', value: products.length, color: 'bg-slate-50 text-slate-700' },
           { label: '승인대기', value: pendingCount, color: 'bg-amber-50 text-amber-700' },
@@ -453,7 +487,7 @@ export default function OperatorProductApprovalPage() {
       </div>
 
       {/* Filters */}
-      <div className="flex items-center gap-4 mb-4">
+      <div className="flex flex-wrap items-center gap-4 mb-4">
         <div className="flex gap-1">
           {STATUS_TABS.map((tab) => (
             <button
@@ -485,12 +519,20 @@ export default function OperatorProductApprovalPage() {
           onClearSelection={() => setSelectedIds(new Set())}
           actions={[
             {
+              key: 'delete', label: `삭제 (${selectedIds.size})`, variant: 'danger' as const,
+              icon: <Trash2 size={14} />, group: 'actions',
+              onClick: () => { setDeleteError(''); setDeleteIds([...selectedIds]); },
+              visible: selectedIds.size > 0, disabled: deleteBusy || loading || !!actionLoading,
+              tooltip: '선택 상품을 승인 상태와 관계없이 휴지통으로 이동합니다',
+            },
+            {
               key: 'approve',
               label: `승인 (${selectedPendingCount})`,
               onClick: handleBulkApprove,
               variant: 'primary' as const,
               icon: <CheckCircle size={14} />,
               loading: batch.loading,
+              disabled: deleteBusy || !!actionLoading,
               group: 'actions',
               tooltip: '선택된 대기 상품을 일괄 승인합니다',
               visible: selectedPendingCount > 0,
@@ -502,6 +544,7 @@ export default function OperatorProductApprovalPage() {
               variant: 'danger' as const,
               icon: <XCircle size={14} />,
               loading: batch.loading,
+              disabled: deleteBusy || !!actionLoading,
               group: 'actions',
               tooltip: '선택된 대기 상품을 일괄 반려합니다',
               visible: selectedPendingCount > 0,
@@ -525,6 +568,15 @@ export default function OperatorProductApprovalPage() {
       />
       </>
       )}
+
+      {deleteIds.length > 0 && <OperatorDialog label="선택 상품 삭제" fallbackFocus={heading} busy={deleteBusy} onCancel={() => { if (!deleteLock.current) setDeleteIds([]); }} className="bg-white rounded-lg p-6 w-full max-w-lg space-y-4">
+        <h2 className="font-bold">선택 상품 삭제</h2>
+        <p>선택한 {deleteIds.length}개 상품을 휴지통으로 이동합니다. 반려 알림은 보내지 않습니다.</p>
+        <p className="text-sm text-slate-600">휴지통에서 복원하거나, 연결 관계를 확인한 뒤 완전 삭제할 수 있습니다.</p>
+        {deleteError && <p role="alert" className="text-red-700">{deleteError}</p>}
+        <button type="button" data-dialog-initial-focus disabled={deleteBusy} onClick={() => setDeleteIds([])} className="border rounded px-3 py-2">취소</button>
+        <button type="button" disabled={deleteBusy} onClick={() => void handleSelectedDelete()} className="ml-3 bg-red-600 text-white rounded px-3 py-2">{deleteBusy ? '처리 중…' : `${deleteIds.length}개 삭제`}</button>
+      </OperatorDialog>}
 
       {/* Reject Modal */}
       {rejectTarget && (

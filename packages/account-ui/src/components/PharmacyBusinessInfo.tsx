@@ -46,7 +46,7 @@ export interface PharmacyBusinessInfoProps {
 type LoadState = 'loading' | 'loaded' | 'error';
 
 // WO-O4O-KPA-PHARMACY-INFO-VIEW-EDIT-CANONICAL-ALIGNMENT-V1:
-//   "담당자 전화" (managerPhone) UI 제거. API 타입/필드는 유지 — 기존 DB 값 보존.
+//   담당자 전화는 개인·약국 전화와 별도로 선택 입력한다.
 // WO-O4O-MYPAGE-BUSINESS-INFO-EDIT-P2-P4-ADD-V1:
 //   사업자등록증 P2/P4 fields (업태/종목/사업자유형/개업일) 표시·수정 추가.
 interface FormState {
@@ -55,6 +55,7 @@ interface FormState {
   ownerPhone: string;
   ceoName: string;
   contactName: string;
+  managerPhone: string;
   taxInvoiceEmail: string;
   // 사업자 연락처 이메일 2종 — WO-O4O-KPA-BUSINESS-CONTACT-EMAIL-FIELDS-UI-EXTEND-V1
   businessEmail: string;
@@ -76,6 +77,7 @@ function dataToForm(data: PharmacyBusinessInfoData): FormState {
     ownerPhone: data.ownerPhone || '',
     ceoName: data.ceoName || '',
     contactName: data.contactName || '',
+    managerPhone: data.managerPhone || '',
     taxInvoiceEmail: data.taxInvoiceEmail || '',
     businessEmail: data.businessEmail || '',
     contactEmail: data.contactEmail || '',
@@ -107,7 +109,7 @@ export function PharmacyBusinessInfo({ loadInfo, saveInfo, theme, AddressSearch 
   const [data, setData] = useState<PharmacyBusinessInfoData | null>(null);
   const [loadState, setLoadState] = useState<LoadState>('loading');
   const [isEditMode, setIsEditMode] = useState(false);
-  const [form, setForm] = useState<FormState>({ name: '', phone: '', ownerPhone: '', ceoName: '', contactName: '', taxInvoiceEmail: '', businessEmail: '', contactEmail: '', zipCode: '', baseAddress: '', detailAddress: '', businessType: '', businessItem: '', businessEntityType: '', businessStartDate: '' });
+  const [form, setForm] = useState<FormState>({ name: '', phone: '', ownerPhone: '', ceoName: '', contactName: '', managerPhone: '', taxInvoiceEmail: '', businessEmail: '', contactEmail: '', zipCode: '', baseAddress: '', detailAddress: '', businessType: '', businessItem: '', businessEntityType: '', businessStartDate: '' });
   const [isSaving, setIsSaving] = useState(false);
   const [errors, setErrors] = useState<string[]>([]);
   const [successMsg, setSuccessMsg] = useState('');
@@ -145,7 +147,7 @@ export function PharmacyBusinessInfo({ loadInfo, saveInfo, theme, AddressSearch 
 
   const validate = (): string[] => {
     const errs: string[] = [];
-    if (!isSelectableBusinessEntityType(form.businessEntityType)) {
+    if (form.businessEntityType && !isSelectableBusinessEntityType(form.businessEntityType)) {
       errs.push('세금계산서 발행을 위한 개인 / 법인 구분을 선택해 주세요.');
     }
     if (!form.name.trim() || form.name.trim().length < 2) {
@@ -183,20 +185,20 @@ export function PharmacyBusinessInfo({ loadInfo, saveInfo, theme, AddressSearch 
           : undefined;
 
       // WO-O4O-KPA-PHARMACY-INFO-VIEW-EDIT-CANONICAL-ALIGNMENT-V1:
-      //   managerPhone payload 미전송 — backend 는 missing field 를 "변경 없음" 으로 처리하여
-      //   기존 DB 값 보존. API 계약 (UpdatePharmacyInfoPayload) 자체는 그대로.
+      //   담당자 연락처는 명시적으로 저장하며 비운 값도 반영한다.
       // WO-O4O-MYPAGE-BUSINESS-INFO-EDIT-P2-P4-ADD-V1:
       //   P2/P4 4 fields 추가 — users.businessInfo SSOT 로 저장.
       await saveInfo({
         name: form.name.trim(),
         phone: digitsOnly(form.phone) || undefined,
-        ownerPhone: digitsOnly(form.ownerPhone) || undefined,
-        ceoName: form.ceoName.trim() || undefined,
-        contactName: form.contactName.trim() || undefined,
-        taxInvoiceEmail: form.taxInvoiceEmail.trim() || undefined,
+        ownerPhone: digitsOnly(form.ownerPhone),
+        ceoName: form.ceoName.trim(),
+        contactName: form.contactName.trim(),
+        managerPhone: digitsOnly(form.managerPhone),
+        taxInvoiceEmail: form.taxInvoiceEmail.trim(),
         // WO-O4O-KPA-BUSINESS-CONTACT-EMAIL-FIELDS-UI-EXTEND-V1
-        businessEmail: form.businessEmail.trim() || undefined,
-        contactEmail: form.contactEmail.trim() || undefined,
+        businessEmail: form.businessEmail.trim(),
+        contactEmail: form.contactEmail.trim(),
         addressDetail,
         businessType: form.businessType.trim() || undefined,
         businessItem: form.businessItem.trim() || undefined,
@@ -332,6 +334,11 @@ export function PharmacyBusinessInfo({ loadInfo, saveInfo, theme, AddressSearch 
             </div>
 
             <div style={styles.formGroup}>
+              <label htmlFor={`${formId}-managerPhone`} style={styles.formLabel}>담당자 전화번호</label>
+              <input id={`${formId}-managerPhone`} type="tel" style={styles.formInput} value={form.managerPhone} onChange={e => updateField('managerPhone', digitsOnly(e.target.value))} />
+            </div>
+
+            <div style={styles.formGroup}>
               <label htmlFor={`${formId}-taxInvoiceEmail`} style={styles.formLabel}>세금계산서 이메일</label>
               <input
                 id={`${formId}-taxInvoiceEmail`}
@@ -450,6 +457,7 @@ function PharmacyInfoRows({ data, styles }: Readonly<{
     ['개설자 연락처', data.ownerPhone],
     ['대표자명', data.ceoName],
     ['담당자명', data.contactName],
+    ['담당자 전화번호', data.managerPhone],
     ['사업자등록번호', data.businessNumber],
     ['세금계산서 이메일', data.taxInvoiceEmail],
     ['약국 대표 이메일', data.businessEmail],

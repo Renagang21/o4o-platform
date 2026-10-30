@@ -14,7 +14,7 @@ it('hides unconfigured Kakao and rejects no normal login method',async()=>{
 it('Kakao callback signup requires explicit consent, then shows email verification without logging in',async()=>{
  callback={token:'state',code:'code',kind:'kakao-login',cancelled:false};const success=vi.fn();const signup=vi.fn(async()=>({success:false,nextStep:'verify-email' as const,mailSent:true}));
  render(<KakaoContinue client={{getSignupTerms:async()=>TERMS,getKakaoAuthConfig:async()=>({enabled:true}),startKakaoLogin:vi.fn()}} loginWithKakao={async()=>({success:false,nextStep:'signup',signupTicket:'ticket',email:'synthetic@fixture.invalid'})} signupWithKakao={signup} onSuccess={success} privacyHref="/old-service-privacy" />);
- await screen.findByRole('link',{name:'내용 보기 · 버전 1'});expect(screen.getByTestId('kakao-continue').querySelector('a[href="https://neture.co.kr/privacy"]')?.getAttribute('target')).toBe('_blank');await screen.findByLabelText('이메일');fireEvent.change(screen.getByLabelText('이름'),{target:{value:'Synthetic'}});fireEvent.change(screen.getByLabelText('개인 휴대전화'),{target:{value:'01000000000'}});
+ await screen.findByRole('link',{name:'내용 보기 · 버전 1'});expect(screen.getByTestId('kakao-continue').querySelector('a[href="https://neture.co.kr/privacy"]')?.getAttribute('target')).toBe('_blank');await screen.findByLabelText('이메일');fireEvent.change(screen.getByLabelText('닉네임'), { target: { value: 'Fixture nickname' } });fireEvent.change(screen.getByLabelText('이름'),{target:{value:'Synthetic'}});fireEvent.change(screen.getByLabelText('개인 휴대전화'),{target:{value:'01000000000'}});
  fireEvent.click(screen.getByLabelText(/이용약관/));fireEvent.click(screen.getByLabelText(/개인정보 처리방침/));fireEvent.submit(screen.getByRole('button',{name:'동의하고 계정 만들기'}).closest('form')!);
  await screen.findByText(/확인 메일을 보냈습니다/);expect(signup).toHaveBeenCalledWith('ticket',expect.objectContaining({consents:{terms:true,privacy:true,marketing:false,termsPolicy:{policyDocumentId:TERMS.policyDocumentId,version:TERMS.version}}}));expect(success).not.toHaveBeenCalled();
 });
@@ -53,7 +53,7 @@ it('Kakao requires fresh privacy acknowledgement after a policy version mismatch
   const signup=vi.fn(async()=>({success:false,code:'POLICY_VERSION_MISMATCH',error:'Changed'}));
   render(<KakaoContinue client={{getSignupTerms:load,getKakaoAuthConfig:async()=>({enabled:true}),startKakaoLogin:vi.fn()}} loginWithKakao={async()=>({success:false,nextStep:'signup',signupTicket:'ticket',email:'synthetic@fixture.invalid'})} signupWithKakao={signup} onSuccess={vi.fn()} />);
   await screen.findByRole('link',{name:'내용 보기 · 버전 1'});
-  fireEvent.change(screen.getByLabelText('이름'),{target:{value:'Fixture'}});fireEvent.change(screen.getByLabelText('개인 휴대전화'),{target:{value:'01012345678'}});
+  fireEvent.change(screen.getByLabelText('닉네임'), { target: { value: 'Fixture nickname' } });fireEvent.change(screen.getByLabelText('이름'),{target:{value:'Fixture'}});fireEvent.change(screen.getByLabelText('개인 휴대전화'),{target:{value:'01012345678'}});
   fireEvent.click(screen.getAllByRole('checkbox')[0]);fireEvent.click(screen.getAllByRole('checkbox')[1]);
   fireEvent.submit(screen.getByRole('button',{name:'동의하고 계정 만들기'}).closest('form')!);
   await screen.findByRole('link',{name:'내용 보기 · 버전 2'});
