@@ -1,3 +1,4 @@
+import { AiRequestInput } from '@o4o/ui';
 import { workDataRequest } from '../lib/pharmacy/work-data';
 import { useManualLibrary } from '../lib/manuals/useManualLibrary';
 import { ManualLibraryPanel, ManualReferences } from '../components/home/ManualLibraryPanel';
@@ -13,7 +14,7 @@ import { ServiceHomeHero, ServiceHomePromotion } from '@o4o/shared-space-ui';
 
 import { useEffect, useRef, useState, type ClipboardEvent, type DragEvent, type FormEvent } from 'react';
 import { Link } from 'react-router-dom';
-import { UserCircle, Loader2, ArrowUp, Plus, Paperclip, HardDrive, FileText, Image as ImageIcon, Table2, X, LogOut, ChevronDown } from 'lucide-react';
+import { UserCircle, Loader2, Plus, Paperclip, HardDrive, FileText, Image as ImageIcon, Table2, X, LogOut, ChevronDown } from 'lucide-react';
 import { useAuth, useLoginModal, useWorkScope } from '../contexts';
 import { getUserDisplayName } from '@o4o/account-ui';
 import { HOME_CHAT_MAX_MESSAGE_LENGTH } from '../lib/ai/home-chat';
@@ -186,7 +187,7 @@ export default function O4OHomePage() {
     setAttachments(next);
     setAttachError(rejected.length > 0 ? rejected.join(' ') : null);
   };
-  const handlePaste = (e: ClipboardEvent<HTMLInputElement>) => {
+  const handlePaste = (e: ClipboardEvent<HTMLTextAreaElement>) => {
     const files = Array.from(e.clipboardData?.items ?? [])
       .filter((it) => it.kind === 'file')
       .map((it) => it.getAsFile())
@@ -343,7 +344,7 @@ export default function O4OHomePage() {
     <>
       {/*
         AI 입력 — WO-O4O-AI-COMPOSER-UNIFIED-REQUEST-AND-ATTACHMENT-UX-V1 §3·§8·§9.
-        [＋] 자료 입력 · 입력창 · [↑] 하나. 요청 유형을 고르는 버튼 · 모드 스위치는 없다. 단일 행 입력이라 Enter 가 곧 submit.
+        [＋] 자료 입력 · 입력창 · [↑] 하나. 요청 유형을 고르는 버튼 · 모드 스위치는 없다. Enter 전송 · Shift+Enter 줄바꿈.
         PC · 모바일 같은 구조 — 공간만 tailwind 반응형으로 줄어든다.
       */}
       <form
@@ -355,73 +356,76 @@ export default function O4OHomePage() {
         }}
         onDragLeave={() => setDragOver(false)}
         onDrop={handleDrop}
-        className="mt-5 w-full max-w-xl"
+        className="mt-5 w-full max-w-3xl"
         data-testid="home-composer"
       >
-        <div className={`relative rounded-full transition-shadow ${dragOver ? 'ring-2 ring-slate-400' : ''}`}>
-          {/* ＋ 범용 자료 입력 진입점 — 파일 첨부 · 내 PC 자료 연결 */}
-          <div ref={plusMenuRef} className="absolute left-2 top-1/2 -translate-y-1/2">
-            <button
-              type="button"
-              onClick={() => setPlusMenuOpen((v) => !v)}
-              disabled={pending}
-              aria-label="자료 추가"
-              aria-haspopup="menu"
-              aria-expanded={plusMenuOpen}
-              title="파일 첨부 · 내 PC 자료 연결"
-              data-testid="home-composer-plus"
-              className="flex h-9 w-9 items-center justify-center rounded-full text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900 disabled:cursor-not-allowed disabled:text-slate-300"
-            >
-              <Plus className="h-5 w-5" />
-            </button>
-            {plusMenuOpen && (
-              <div role="menu" data-testid="home-composer-plus-menu" className="absolute left-0 top-11 z-40 w-64 rounded-xl border border-slate-200 bg-white py-1 text-left shadow-lg">
-                <button
-                  type="button"
-                  role="menuitem"
-                  onClick={() => {
-                    setPlusMenuOpen(false);
-                    fileInputRef.current?.click();
-                  }}
-                  className="flex w-full items-start gap-2.5 px-3 py-2 text-left hover:bg-slate-50"
-                >
-                  <Paperclip className="mt-0.5 h-4 w-4 shrink-0 text-slate-500" />
-                  <span>
-                    <span className="block text-sm text-slate-900">파일 첨부</span>
-                    <span className="block text-xs text-slate-500">이미지 · PDF · DOCX · TXT/MD · XLSX/XLS/CSV — 이번 요청에서만 사용</span>
-                  </span>
-                </button>
-                {/* PHASE 3 Local Data Source 진입 자리(§3). 반복 사용 자료 연결은 별도 계약 — 여기서는 구분만 보여준다. */}
-                <button
-                  type="button"
-                  role="menuitem"
-                  aria-disabled="true"
-                  onClick={() => {
-                    setPlusMenuOpen(false);
-                    setAttachError('내 PC 자료 연결(반복 사용 자료)은 준비 중입니다. 지금은 [파일 첨부]로 이번 요청에 사용할 수 있습니다.');
-                  }}
-                  className="flex w-full items-start gap-2.5 px-3 py-2 text-left hover:bg-slate-50"
-                >
-                  <HardDrive className="mt-0.5 h-4 w-4 shrink-0 text-slate-400" />
-                  <span>
-                    <span className="block text-sm text-slate-500">내 PC 자료 연결</span>
-                    <span className="block text-xs text-slate-400">원내 약품 목록 · 재고 · 가격표처럼 반복해서 쓰는 자료 — 준비 중</span>
-                  </span>
-                </button>
-              </div>
-            )}
-          </div>
-          <input
-            type="text"
+        <div className={`relative rounded-xl transition-shadow ${dragOver ? 'ring-2 ring-slate-400' : ''}`}>
+          <AiRequestInput
             value={input}
             onChange={(e) => setInput(e.target.value)}
             maxLength={HOME_CHAT_MAX_MESSAGE_LENGTH}
             disabled={pending}
+            busy={pending}
             onPaste={handlePaste}
             aria-label="무엇을 도와드릴까요?"
             placeholder="무엇을 도와드릴까요?"
             data-testid="home-composer-input"
-            className="w-full rounded-full border border-slate-200 bg-white py-4 pl-14 pr-14 text-base text-slate-900 shadow-sm outline-none transition-colors placeholder:text-slate-400 focus:border-slate-400 disabled:bg-slate-50 disabled:text-slate-400"
+            submitLabel="요청 실행"
+            submitDisabled={!trimmed || blocked}
+            submitTestId="home-composer-submit"
+            leading={
+                <div ref={plusMenuRef} className="relative">
+                  <button
+                    type="button"
+                    onClick={() => setPlusMenuOpen((v) => !v)}
+                    disabled={pending}
+                    aria-label="자료 추가"
+                    aria-haspopup="menu"
+                    aria-expanded={plusMenuOpen}
+                    title="파일 첨부 · 내 PC 자료 연결"
+                    data-testid="home-composer-plus"
+                    className="flex h-11 w-11 items-center justify-center rounded-full text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900 disabled:cursor-not-allowed disabled:text-slate-300"
+                  >
+                    <Plus className="h-5 w-5" />
+                  </button>
+                  {plusMenuOpen && (
+                    <div role="menu" data-testid="home-composer-plus-menu" className="absolute left-0 top-full z-40 w-64 rounded-xl border border-slate-200 bg-white py-1 text-left shadow-lg">
+                      <button
+                        type="button"
+                        role="menuitem"
+                        onClick={() => {
+                          setPlusMenuOpen(false);
+                          fileInputRef.current?.click();
+                        }}
+                        className="flex w-full items-start gap-2.5 px-3 py-2 text-left hover:bg-slate-50"
+                      >
+                        <Paperclip className="mt-0.5 h-4 w-4 shrink-0 text-slate-500" />
+                        <span>
+                          <span className="block text-sm text-slate-900">파일 첨부</span>
+                          <span className="block text-xs text-slate-500">이미지 · PDF · DOCX · TXT/MD · XLSX/XLS/CSV — 이번 요청에서만 사용</span>
+                        </span>
+                      </button>
+                      {/* PHASE 3 Local Data Source 진입 자리(§3). 반복 사용 자료 연결은 별도 계약 — 여기서는 구분만 보여준다. */}
+                      <button
+                        type="button"
+                        role="menuitem"
+                        aria-disabled="true"
+                        onClick={() => {
+                          setPlusMenuOpen(false);
+                          setAttachError('내 PC 자료 연결(반복 사용 자료)은 준비 중입니다. 지금은 [파일 첨부]로 이번 요청에 사용할 수 있습니다.');
+                        }}
+                        className="flex w-full items-start gap-2.5 px-3 py-2 text-left hover:bg-slate-50"
+                      >
+                        <HardDrive className="mt-0.5 h-4 w-4 shrink-0 text-slate-400" />
+                        <span>
+                          <span className="block text-sm text-slate-500">내 PC 자료 연결</span>
+                          <span className="block text-xs text-slate-400">원내 약품 목록 · 재고 · 가격표처럼 반복해서 쓰는 자료 — 준비 중</span>
+                        </span>
+                      </button>
+                    </div>
+                  )}
+                </div>
+            }
           />
           {/* 사용자가 고른 파일만 처리한다. 형식은 탐색기에서 고른다 — 종류별 메뉴를 두지 않는다(§3). */}
           <input
@@ -436,16 +440,7 @@ export default function O4OHomePage() {
               e.target.value = '';
             }}
           />
-          <button
-            type="submit"
-            disabled={!trimmed || blocked}
-            aria-label="요청 실행"
-            title="요청 실행"
-            data-testid="home-composer-submit"
-            className="absolute right-2 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-slate-900 text-white transition-opacity hover:opacity-80 disabled:cursor-not-allowed disabled:bg-slate-200"
-          >
-            {pending ? <Loader2 className="h-4 w-4 animate-spin" /> : <ArrowUp className="h-4 w-4" />}
-          </button>
+
         </div>
       </form>
 

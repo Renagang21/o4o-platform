@@ -1404,6 +1404,9 @@ importers:
 
   packages/content-editor:
     dependencies:
+      '@o4o/ui':
+        specifier: workspace:*
+        version: link:../ui
       '@tiptap/core':
         specifier: ^2.1.0
         version: 2.27.2(@tiptap/pm@2.27.2)

@@ -1,3 +1,4 @@
+import { AiRequestInput } from '@o4o/ui';
 import { useEffect, useRef, useState } from "react";
 import { consultationUi } from "./consultationLocale";
 import {
@@ -240,9 +241,10 @@ export function ConsultationGuidancePanel({
           void prepare({ intent: "help" });
         }}
       >
-        <input
+        <AiRequestInput
           aria-label="상담 안내 요청"
-          className="min-h-12 w-full min-w-0 rounded-lg border p-3 sm:w-auto sm:flex-1"
+          submitLabel="안내 찾기"
+          busy={busy}
           placeholder="원하는 안내를 말하거나 적어주세요"
           maxLength={1000}
           value={question}
@@ -252,9 +254,6 @@ export function ConsultationGuidancePanel({
             setError("");
           }}
         />
-        <button className={button} disabled={busy || !question.trim()}>
-          안내 찾기
-        </button>
         {voiceSupported && (
           <button
             type="button"

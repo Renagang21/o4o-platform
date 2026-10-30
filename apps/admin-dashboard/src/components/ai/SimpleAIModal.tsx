@@ -1,3 +1,4 @@
+import { AiRequestInput } from '@o4o/ui/ai';
 import React, { useState } from 'react';
 import {
   Dialog,
@@ -8,7 +9,6 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -299,14 +299,13 @@ export const SimpleAIModal: React.FC<SimpleAIModalProps> = ({
                   예시 사용
                 </Button>
               </div>
-              <Textarea
+              <AiRequestInput
                 placeholder={mode === 'new'
                   ? '어떤 페이지를 만들까요? 자세히 설명해주세요...'
                   : '어떻게 편집할까요? 구체적으로 설명해주세요...'}
+                aria-label={mode === 'new' ? '페이지 내용 설명' : '편집 요청 사항'}
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
-                rows={4}
-                className="resize-none"
               />
               <p className="text-xs text-gray-500">
                 {mode === 'new'
