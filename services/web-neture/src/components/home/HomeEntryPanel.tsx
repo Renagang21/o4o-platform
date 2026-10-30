@@ -42,6 +42,7 @@ interface HomeEntryPanelProps {
   /** 「O4O 서비스 소식」 섹션 — 내 서비스 아래 · 가입 · 이용 상태 위 */
   newsSlot?: React.ReactNode;
   summary?: boolean;
+  /** 대표 홈 전용: 일상 서비스는 업무 → 커뮤니티·강의 → 펀딩 → 협력체 순서. */
   servicesOnly?: boolean;
   /** My Home shows only workspaces the current account can actually enter. */
   workspaceOnly?: boolean;
@@ -191,21 +192,35 @@ export default function HomeEntryPanel({ user, data, loading, error, onReload, n
     // 대표 계정의 /mypage 진입은 상단 My Home에만 둔다. 전체 My Home 모델은 보존한다.
     const joinedServices = model.myServices.filter(item => item.id !== 'svc:neture');
     const stores = model.groups.find(group => group.id === 'store')?.items.filter(item => item.id.startsWith('workspace-store:') || item.id.startsWith('store:') && item.id !== 'store:management') ?? [];
+    const isCooperation = (item: EntryItem) => item.id.startsWith('business:') || item.id.startsWith('cooperative:') || ['svc:kpa-society', 'svc:carepharm', 'svc:megapharm', 'svc:cooperative'].includes(item.id);
+    const isCommunity = (item: EntryItem) => ['svc:community', 'svc:lecture', 'svc:kpa-branch'].some(id => item.id === id || item.id.startsWith(`${id}:`));
+    const dailyGroups = [
+      { title: '내 업무', items: [...joinedServices.filter(item => !isCooperation(item) && !isCommunity(item) && item.id !== 'svc:funding'), ...stores] },
+      { title: '커뮤니티·강의', items: joinedServices.filter(isCommunity).sort((a, b) => {
+        const order = (item: EntryItem) => item.id === 'svc:community' ? 0 : item.id === 'svc:lecture' ? 1 : 2;
+        return order(a) - order(b);
+      }) },
+      { title: '유통참여형 펀딩', items: joinedServices.filter(item => item.id === 'svc:funding') },
+      { title: '참여한 약국협력체', items: joinedServices.filter(isCooperation) },
+    ].filter(group => group.items.length > 0);
+    const descriptionOf = (item: EntryItem) => stores.includes(item)
+      ? '내 매장의 제품·콘텐츠와 운영 업무를 관리합니다.'
+      : data.services.find(service => item.id === `svc:${service.key}` || item.id.startsWith(`svc:${service.key}:`))?.description?.trim()
+        || (isCooperation(item) ? '사업자와 가입 약국이 공지·소식·사업 자료를 함께 나누는 공동공간입니다.' : item.id === 'svc:neture-supplier' ? '제품을 등록하고 참여 매장에 공급합니다.' : '가입한 서비스에서 활동을 이어갑니다.');
     return <section aria-labelledby="joined-services-title" className="mt-10 w-full max-w-3xl text-left">
-      <h2 id="joined-services-title" className="text-xl font-semibold text-slate-900">가입한 서비스</h2>
+      <h2 id="joined-services-title" className="text-xl font-semibold text-slate-900">일상 서비스</h2>
       <p className="mt-2 text-sm text-slate-500">이용 중인 서비스로 바로 이동하세요. 개인 활동과 계정은 상단 My Home에서 확인할 수 있습니다.</p>
       {moveError && <p role="alert" className="mt-3 text-sm text-red-700">{moveError}</p>}
-      {joinedServices.length > 0 ? <ul className="mt-5 grid list-none grid-cols-1 gap-3 p-0 sm:grid-cols-2">
-        {joinedServices.map(item => <li key={item.id} className="rounded-xl border border-slate-200 bg-slate-50 p-4">
-          <EntryButton item={item} busyId={busyId} onHandoff={handleHandoff} />
-          <p className="mb-0 mt-3 text-sm text-slate-600">{data.services.find(service => item.id === `svc:${service.key}` || item.id.startsWith(`svc:${service.key}:`))?.description?.trim() || (item.id.startsWith('business:') ? '사업자와 가입 약국이 공지·소식·사업 자료를 함께 나누는 공동공간입니다.' : item.id === 'svc:neture-supplier' ? '제품을 등록하고 참여 매장에 공급합니다.' : item.id === 'svc:neture' ? '필요한 서비스와 개인 활동을 한곳에서 확인합니다.' : '가입한 서비스에서 활동을 이어갑니다.')}</p>
-        </li>)}
-      </ul> : <p className="mt-4 text-sm text-slate-600">현재 이용 중인 서비스가 없습니다. 아래에서 서비스를 알아보세요.</p>}
-      {stores.length > 0 && <div className="mt-5 rounded-xl border border-slate-200 p-4">
-        <h3 className="text-base font-semibold">내 매장</h3>
-        <p className="my-2 text-sm text-slate-600">내 매장의 제품·콘텐츠와 운영 업무를 관리합니다.</p>
-        <div className="flex flex-wrap gap-2">{stores.map(item => <EntryButton key={item.id} item={item} busyId={busyId} onHandoff={handleHandoff} />)}</div>
-      </div>}
+      {dailyGroups.length > 0 ? dailyGroups.map(group => <section key={group.title} aria-label={group.title} className="mt-5">
+        <h3 className="mb-3 text-base font-semibold text-slate-800">{group.title}</h3>
+        <ul className="m-0 grid list-none grid-cols-1 gap-3 p-0 sm:grid-cols-2">
+          {group.items.map(item => <li key={item.id} className="min-w-0 rounded-xl border border-slate-200 bg-slate-50 p-4">
+            {stores.includes(item) && <h4 className="mb-2 text-sm font-semibold">내 매장</h4>}
+            <EntryButton item={item} busyId={busyId} onHandoff={handleHandoff} />
+            <p className="mb-0 mt-3 text-sm text-slate-600">{descriptionOf(item)}</p>
+          </li>)}
+        </ul>
+      </section>) : <p className="mt-4 text-sm text-slate-600">현재 이용 중인 서비스가 없습니다. 아래에서 서비스를 알아보세요.</p>}
       {model.statusItems.length > 0 && <div className="mt-5 rounded-xl border border-amber-200 bg-amber-50 p-4">
         <h3 className="text-sm font-semibold">가입·이용 상태</h3>
         <ul className="mt-2 list-none space-y-2 p-0 text-sm">{model.statusItems.map(item => <li key={item.id}>

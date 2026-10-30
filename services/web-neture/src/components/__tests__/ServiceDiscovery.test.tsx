@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import { cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, within } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import ServiceDiscovery from '../home/ServiceDiscovery';
 import PartnerServicePage from '../../pages/PartnerServicePage';
@@ -49,6 +49,10 @@ it('회원이 가입·신청한 항목은 다른 서비스 소개에서 중복�
   expect(screen.queryByRole('link', {name:/^약사회 분회/})).toBeNull();
   expect(screen.queryByRole('link', {name:/^공급자 /})).toBeNull();
   expect(screen.getByRole('link', {name:/^커뮤니티 /}).textContent).toContain('공개 글을 둘러보고');
+  const discovery = screen.getByRole('navigation', { name: '가입하지 않은 서비스' });
+  expect(within(discovery).getAllByRole('list')).toHaveLength(1);
+  expect(within(discovery).getAllByRole('link').length).toBeGreaterThan(4);
+  expect(within(discovery).queryByRole('heading', { name: '약국 협력사업 참여' })).toBeNull();
 });
 it('가입 정보가 없으면 미가입으로 단정하지 않고 공개 전체 목록을 유지한다', () => {
   render(<MemoryRouter><ServiceDiscovery personalized data={null}/></MemoryRouter>);
