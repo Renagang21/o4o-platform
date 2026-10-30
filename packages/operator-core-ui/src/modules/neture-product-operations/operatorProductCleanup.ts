@@ -30,8 +30,22 @@ export interface RecycleBinItem {
   supplier_name: string | null;
   deleted_by_name: string | null;
 }
+export interface TrashPreview { count: number; cutoff: string; fingerprint: string }
+export interface EmptyTrashResult { deleted: number; blocked: {id: string; reason: string}[] }
 export function createOperatorProductCleanupApi(api: AxiosInstance) {
+async function mutation<T>(path: string, payload: unknown): Promise<T> {
+  try {
+    const res = await api.post(`${BASE}/${path}`, payload);
+    if (!res.data?.success) throw new Error(res.data?.message || '요청에 실패했습니다.');
+    return res.data.data;
+  } catch (error: any) {
+    throw new Error(error?.response?.data?.message || error?.message || '요청에 실패했습니다.');
+  }
+}
 const productCleanupApi = {
+  batchSoftDelete: (ids: string[]) => mutation<{moved: number}>('batch-soft-delete', {ids}),
+  previewEmptyTrash: () => mutation<TrashPreview>('empty-trash/preview', {}),
+  emptyTrash: (preview: TrashPreview) => mutation<EmptyTrashResult>('empty-trash/execute', preview),
   async getDuplicateMasters(): Promise<DuplicateMaster[]> {
     const res = await api.get(`${BASE}/duplicate-masters`);
     if (!res.data?.success || !Array.isArray(res.data.data)) throw new Error('목록을 불러오지 못했습니다.');
@@ -103,13 +117,13 @@ const productCleanupApi = {
     }
   },
 
-  async hardDelete(offerId: string, reason: string): Promise<{ success: boolean; error?: string; blockReasons?: string[] }> {
+  async hardDelete(offerId: string, reason?: string): Promise<{ success: boolean; error?: string; blockReasons?: string[] }> {
     try {
       const res = await api.delete(`${BASE}/hard-delete/${offerId}`, { data: { reason } });
       return res.data;
     } catch (error: any) {
       const data = error?.response?.data;
-      return { success: false, error: data?.error || 'HARD_DELETE_FAILED', blockReasons: data?.blockReasons };
+      return { success: false, error: data?.message || data?.error || 'HARD_DELETE_FAILED', blockReasons: data?.blockReasons };
     }
   },
 };

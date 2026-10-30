@@ -24,7 +24,11 @@ const operatorProductApi = {
       console.warn('[Operator Product API] Unexpected products payload shape');
       throw new Error(OPERATOR_PRODUCTS_LOAD_FAILED);
     }
-    return result.data;
+    // The operator DTO uses masterName (ProductMaster.name). Never display an offer UUID as its name.
+    return result.data.map((product: AdminProduct) => ({
+      ...product,
+      marketingName: product.masterName?.trim() || product.marketingName?.trim() || '(상품명 없음)',
+    }));
   },
 
   async approveProduct(id: string): Promise<boolean> {

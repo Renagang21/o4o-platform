@@ -20,3 +20,8 @@ it('lets governance and approval duties read active funding without sharing othe
  expect(centralApiMenus('supplier',{originalUrl,method:'GET'})).toEqual(['supplier.suppliers','supplier.governance']);
  expect(centralApiMenus('supplier',{originalUrl:'/api/v1/neture/operator/suppliers/fixture/approve',method:'POST'})).toEqual(['supplier.suppliers']);
 });
+
+it('maps batch trash to the existing daily product permissions while empty-trash retains cleanup permission',()=>{
+ expect(centralApiMenus('neture',{originalUrl:'/api/v1/neture/operator/product-cleanup/batch-soft-delete',method:'POST'})).toEqual(['neture.products','neture.product-approvals']);
+ expect(centralApiMenus('neture',{originalUrl:'/api/v1/neture/operator/product-cleanup/empty-trash/execute',method:'POST'})).toEqual(['neture.cleanup']);
+});
