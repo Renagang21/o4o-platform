@@ -56,7 +56,9 @@ export class DescriptionIntakeService {
       if (candidateRevision(row) !== expected) fail('DESCRIPTION_RESOURCE_CHANGED');
       if (!['pending', 'reviewing'].includes(row.candidateStatus)) fail('DESCRIPTION_RESOURCE_CLOSED');
       const resource = resourceOf(row);
-      const prepared = prepareDescriptionEntries({ entries: [{ ...resource.entry, content }] });
+      // A free-text edit cannot silently keep now-stale structured statements.
+      const prepared = prepareDescriptionEntries({ entries: [{ ...resource.entry, content,
+        ...(content !== resource.entry.content ? { aiSections: undefined } : {}) }] });
       if (!prepared.entries.length) fail('DESCRIPTION_CONTENT_EMPTY', 400);
       resource.entry = prepared.entries[0];
       row.rawPayload = { descriptionResource: resource };
@@ -96,17 +98,20 @@ export class DescriptionIntakeService {
       }
       const descriptions = new SharedProductDescriptionService(manager);
       const applied: NonNullable<Resource['applied']> = [];
-      for (const masterId of selected) {
+      await selected.reduce(async (previous, masterId) => {
+        await previous;
         const current = targets.find(t => t.id === masterId)!.canonical;
-        if (current?.content === entry.content && (current.summary ?? null) === entry.summary) {
-          applied.push({ masterId, descriptionId: current.id }); continue;
+        if (current?.content === entry.content && (current.summary ?? null) === entry.summary &&
+            descriptionFingerprint(current.source) === descriptionFingerprint(entry.source) &&
+            descriptionFingerprint(current.aiSections ?? []) === descriptionFingerprint(entry.aiSections ?? [])) {
+          applied.push({ masterId, descriptionId: current.id }); return;
         }
         const candidate = await descriptions.createCandidate({ masterId, content: entry.content, summary: entry.summary,
           descriptionType: entry.descriptionType, language: entry.language, sourceType: entry.source.kind === 'user_contribution' ? 'store_contribution' : 'operator',
           sourceRefId: row.id, createdBy: actor });
-        const canonical = await descriptions.setCanonical(candidate.id, actor, { trackAdminEdit: true });
+        const canonical = await descriptions.setCanonical(candidate.id, actor, { trackAdminEdit: true, replaceSourceReference: true });
         applied.push({ masterId, descriptionId: canonical.id });
-      }
+      }, Promise.resolve());
       resource.applied = applied;
       row.rawPayload = { descriptionResource: resource }; row.candidateStatus = 'matched';
       row.matchedProductMasterId = applied[0]?.masterId ?? null; row.reviewedBy = actor; row.reviewedAt = new Date();

@@ -1,6 +1,9 @@
 import { ProductCandidateService } from '../services/product-candidate.service.js';
 import { DESCRIPTION_INTAKE_LABEL } from './namespace.js';
 import { randomUUID } from 'node:crypto';
+import * as XLSX from 'xlsx';
+import { readStoreProductAiContext } from './ai-context.service.js';
+import { previewStoreExcel } from './store-excel-preview.js';
 import { DataSource, Entity, PrimaryColumn, Column } from 'typeorm';
 import { Pool } from 'pg';
 import { ProductCandidate } from '../entities/ProductCandidate.entity.js';
@@ -155,4 +158,44 @@ integration('description intake — isolated PostgreSQL', () => {
     expect((await service.detail(id)).entry.content).toBe('<p>Private review body</p>');
   });
 
+  it('connects an actual workbook to registered structured B2B evidence without changing STORE/QR', async () => {
+    const id = randomUUID(), listing = randomUUID(), code = '8806541001108';
+    await db.query("INSERT INTO product_masters(id,name,barcode,status) VALUES($1,'Excel synthetic',$2,'ACTIVE')", [id, code]);
+    const source = { kind: 'government', currentness: 'retrieved', checkedOn: '2026-10-29', references: [{ url: 'https://nedrug.mfds.go.kr/synthetic' }] };
+    const section = { key: 'ingredients', title: '성분', kind: 'product-fact', text: '확인된 합성 성분', referenceUrls: [source.references[0].url] };
+    const input = entry({ name: 'Excel synthetic', barcodes: [code], content: '<p>합성 본문</p>', source, aiSections: [section] });
+    const created = await service.submit({ entries: [input] }, actor), detail = await service.detail(created.items[0].id);
+    expect((await readStoreProductAiContext(db, org, listing, 'ko'))).toBeNull();
+    await service.approve(detail.id, { expectedRevision: detail.revision, acknowledgeArchived: false, targets: [{ masterId: id, expectedCanonicalRevision: null }] }, actor);
+    await db.query('INSERT INTO organization_product_listings VALUES($1,$2,true,$3)', [listing, org, id]);
+    await db.getRepository(SharedProductDescription).save({ masterId: id, descriptionType: 'STORE', language: 'ko', status: 'canonical', content: '<p>관리자 QR 본문</p>', sourceType: 'manual' });
+    const context = await readStoreProductAiContext(db, org, listing, 'ko');
+    expect(context).toMatchObject({ state: 'structured', description: { sections: [section], source } });
+    expect(await readStoreProductAiContext(db, other, listing, 'ko')).toBeNull();
+    expect(await readStoreProductAiContext(db, org, listing, 'en')).toMatchObject({ state: 'missing', description: null });
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, XLSX.utils.aoa_to_sheet([['바코드', '상품명', '가격'], ['0' + code, 'POS 이름', 'PRIVATE-PRICE'], ['bad-code','Excel synthetic','OTHER-PRIVATE']]));
+    const file = XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' });
+    const preview = await previewStoreExcel(db, org, file, { barcodeColumn: 0, nameColumn: 1, language: 'ko' });
+    expect(preview.rows[0]).toMatchObject({ candidates: [{ id, name: 'Excel synthetic', hasAiDescription: true, registered: true }] });
+    expect(preview.rows[1]).toMatchObject({ state: 'invalid', candidates: [] });
+    expect(JSON.stringify(preview)).not.toContain('PRIVATE-PRICE');
+    const update = await service.submit({ entries: [{ ...input, key: randomUUID(), aiSections: [{ ...section, text: '수정 성분' }] }] }, actor);
+    const change = await service.detail(update.items[0].id);
+    await service.approve(change.id, { expectedRevision: change.revision, acknowledgeArchived: false, targets: [{ masterId: id, expectedCanonicalRevision: change.targets[0].canonical!.revision }] }, actor);
+    expect(await readStoreProductAiContext(db, org, listing, 'ko')).toMatchObject({ description: { sections: [{ text: '수정 성분' }] } });
+    expect(await db.query("SELECT content FROM shared_product_descriptions WHERE master_id=$1 AND description_type='STORE' AND status='canonical'", [id])).toEqual([{ content: '<p>관리자 QR 본문</p>' }]);
+    await db.query("UPDATE shared_product_descriptions SET content='<p>일반 편집으로 바뀐 본문</p>' WHERE master_id=$1 AND description_type='B2B' AND status='canonical'", [id]);
+    const legacy = await readStoreProductAiContext(db, org, listing, 'ko');
+    expect(legacy).toMatchObject({ state: 'legacy', description: { source: null, sections: [{ kind: 'unclassified', text: '일반 편집으로 바뀐 본문' }] } });
+    await db.query('UPDATE organization_product_listings SET is_active=false WHERE id=$1', [listing]);
+    expect(await readStoreProductAiContext(db, org, listing, 'ko')).toBeNull();
+  });
+
+  it('drops stale structured statements when a pending HTML body is edited', async () => {
+    const submitted = await service.submit({ entries: [entry({ aiSections: [{ key: 'one', title: '미분류', kind: 'unclassified', text: '원래 항목', referenceUrls: [] }] })] }, actor);
+    const detail = await service.detail(submitted.items[0].id);
+    const edited = await service.edit(detail.id, detail.revision, '<p>새로운 본문</p>', actor);
+    expect(edited.entry.aiSections).toBeUndefined();
+  });
 });

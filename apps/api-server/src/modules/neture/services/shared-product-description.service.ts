@@ -573,6 +573,8 @@ export class SharedProductDescriptionService {
       demotedStatus?: 'candidate' | 'hidden';
       audit?: CanonicalReplaceAuditInput;
       trackAdminEdit?: boolean;
+      /** Explicit intake approval may replace evidence/AI sections even if HTML is unchanged. */
+      replaceSourceReference?: boolean;
     },
   ): Promise<SharedProductDescription> {
     const demotedStatus = opts?.demotedStatus ?? 'candidate';
@@ -614,7 +616,7 @@ export class SharedProductDescriptionService {
           { descriptionContent: target.content, descriptionSummary: target.summary ?? null },
           ['descriptionContent', 'descriptionSummary'],
         );
-        if (previous[0] && !editChanges.length)
+        if (previous[0] && !editChanges.length && !opts.replaceSourceReference)
           return repo.findOneOrFail({ where: { id: previous[0].id } });
       }
 

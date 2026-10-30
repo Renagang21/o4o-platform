@@ -37,6 +37,7 @@ import { StoreDescriptionViewModal, type StoreDescriptionProduct } from './Store
 import { StoreProductQrModal, type StoreProductQrTarget } from './StoreProductQrModal';
 // WO-O4O-STORE-HANDLED-PRODUCTS-PRODUCTMASTER-LIST-LINK-V1: O4O 표준 상품 검색·선택·등록 모달
 import { AddO4oStandardProductModal } from './AddO4oStandardProductModal';
+import { StoreProductExcelDialog } from './StoreProductExcelDialog';
 // WO-O4O-KPA-STORE-NEW-PRODUCT-REQUEST-AND-ADMIN-APPROVAL-V1 (P1): O4O DB 등록 요청(제출·상태)
 import { StoreNewProductRequestModal } from './StoreNewProductRequestModal';
 import { StoreProductRequestsListModal } from './StoreProductRequestsListModal';
@@ -209,6 +210,7 @@ function HandledProductsSession({ workspace, navigation }: ProductPageProps) {
   const [qrTarget, setQrTarget] = useState<StoreProductQrTarget | null>(null);
   // WO-O4O-STORE-HANDLED-PRODUCTS-PRODUCTMASTER-LIST-LINK-V1: O4O 표준 상품 검색·선택·등록 모달
   const [showAddO4oModal, setShowAddO4oModal] = useState(false);
+  const [showExcel, setShowExcel] = useState(false);
   // WO-O4O-KPA-STORE-NEW-PRODUCT-REQUEST-AND-ADMIN-APPROVAL-V1 (P1): O4O DB 등록 요청 상태
   const [showNewRequestModal, setShowNewRequestModal] = useState(false);
   const [editRequest, setEditRequest] = useState<StoreProductRequest | null>(null);
@@ -347,6 +349,7 @@ function HandledProductsSession({ workspace, navigation }: ProductPageProps) {
       <StoreAiSlot />
       <StoreCommerceNavigation />
       <nav aria-label="상품 빠른 작업" className="relative mb-3 flex flex-wrap items-center gap-2">
+          <button type="button" onClick={() => setShowExcel(true)} style={styles.primaryBtn}>엑셀 상품 등록·AI 자료 준비</button>
           {/* WO-O4O-STORE-HANDLED-PRODUCTS-PRODUCTMASTER-LIST-LINK-V1:
               O4O 표준 상품 DB(ProductMaster)를 검색·선택하여 내 매장 제품으로 등록. */}
           <button onClick={() => setShowAddO4oModal(true)} style={styles.primaryBtn}>
@@ -481,6 +484,7 @@ function HandledProductsSession({ workspace, navigation }: ProductPageProps) {
 
       <HandledProductsPagination page={page} totalPages={totalPages} total={total} onPageChange={changePage} />
 
+      <StoreProductExcelDialog open={showExcel} onClose={() => setShowExcel(false)} onRegistered={reload} />
       {/* WO-O4O-STORE-HANDLED-PRODUCTS-PRODUCTMASTER-LIST-LINK-V1: O4O 표준 상품 검색·선택·등록 모달 */}
       <AddO4oStandardProductModal
         open={showAddO4oModal}
