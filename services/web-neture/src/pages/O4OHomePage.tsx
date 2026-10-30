@@ -33,7 +33,6 @@ import HomeEntryPanel from '../components/home/HomeEntryPanel';
 import HomeServiceNews from '../components/home/HomeServiceNews';
 import PharmacyOrderPanel from '../components/home/PharmacyOrderPanel';
 import AutomationPcSetup from '../components/home/AutomationPcSetup';
-import AutomationDataMaintenance from '../components/home/AutomationDataMaintenance';
 import { PublicLegalFooterInfo } from '@o4o/shared-space-ui';
 import { loadFooterLegal } from '../lib/footerLegal';
 import ServiceDiscovery from '../components/home/ServiceDiscovery';
@@ -60,7 +59,6 @@ export default function O4OHomePage() {
   const { workScope, isResolvingStore } = useWorkScope();
 
   const [input, setInput] = useState('');
-  const [maintenanceOpen, setMaintenanceOpen] = useState(false);
   const [question, setQuestion] = useState<string | null>(null);
   const [answer, setAnswer] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -153,7 +151,6 @@ export default function O4OHomePage() {
     setConfirm(null);
     setResumeAnchor(null);
     setPcSetup(null);
-    setMaintenanceOpen(false);
     setManualReferencesUsed([]);
     setManualSearchEmpty(false);
     setManualTaskQuery('');
@@ -225,7 +222,6 @@ export default function O4OHomePage() {
     }
     setPending(true);
     setPcSetup(null);
-    setMaintenanceOpen(false);
     setError(null);
     setQuestion(text);
     setAnswer(null);
@@ -467,18 +463,7 @@ export default function O4OHomePage() {
       {canUseHomeWorkspace && <ManualLibraryPanel key={user?.id} library={manuals} disabled={blocked} />}
       {manualSearchEmpty && !pending && <p role="status" className="mt-2 max-w-xl text-xs text-slate-600">선택한 매뉴얼에서 관련 내용을 찾지 못해 이번 요청에는 매뉴얼을 보내지 않았습니다. 프로그램 이름·메뉴·업무를 구체적으로 적어 주세요.</p>}
       {!pending && manuals.ready && manualReferencesUsed.length > 0 && <div className="w-full max-w-xl"><ManualReferences references={manualReferencesUsed} library={manuals} disabled={blocked} /></div>}
-      <div className="mt-2 w-full max-w-xl text-left">
-        <button type="button" disabled={blocked} aria-expanded={maintenanceOpen} onClick={() => setMaintenanceOpen(value => !value)} className="rounded-lg border border-slate-200 px-3 py-1.5 text-sm text-slate-700 disabled:opacity-40">데이터 정비</button>
-      </div>
-      {maintenanceOpen && <AutomationDataMaintenance
-        goal={resumeAnchor ? question ?? '' : ''}
-        neededInput={resumeAnchor ? workResult?.neededInput : null}
-        draft={input}
-        resuming={!!resumeAnchor}
-        disabled={blocked}
-        onClose={() => setMaintenanceOpen(false)}
-        onApply={text => { setInput(text); setConfirm(null); setMaintenanceOpen(false); }}
-      />}
+
 
       {/* 첨부 chip — 종류별 아이콘 하나로 같은 목록. 제거만 가능. */}
       {attachments.length > 0 && (

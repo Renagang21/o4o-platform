@@ -50,7 +50,7 @@ const STEPS = [
 
 test('v8 적용 — 패턴 · Candidate · run 에 owner_key 가 있다', () => {
   db.localDbHealth();
-  assert.equal(db.SCHEMA_VERSION, 9);
+  assert.equal(db.SCHEMA_VERSION, 10);
   const h = db.openLocalDb();
   for (const t of ['local_experience_patterns', 'local_workflow_candidates', 'local_work_runs', 'local_work_run_assistance']) {
     assert.ok(h.prepare(`PRAGMA table_info(${t})`).all().some((c) => c.name === 'owner_key'), t);
@@ -139,9 +139,9 @@ test('v7 → v8 업그레이드: 기존 패턴 · Candidate 행은 보존되고 
 
 test('⑤ heartbeat 보고 = 버전 + boolean capability 뿐', () => {
   const ready = buildHeartbeatReport({ agentVersion: handlers.AGENT_VERSION, extensionConnected: true, platform: 'win32', dbState: { ready: true, schemaVersion: 8 }, hasLocalData: true });
-  assert.deepEqual(ready, { agentVersion: handlers.AGENT_VERSION, capabilities: { browser: true, windowsUia: true, localData: true, ownerScopedLedger: true, taskUnit: true, pharmacyData: false } });
+  assert.deepEqual(ready, { agentVersion: handlers.AGENT_VERSION, capabilities: { browser: true, windowsUia: true, localData: true, ownerScopedLedger: true, taskUnit: true, pharmacyData: false, serverAuthority:false } });
   const cold = buildHeartbeatReport({ agentVersion: '0.2.0', extensionConnected: false, platform: 'linux', dbState: { ready: false, schemaVersion: 0 }, hasLocalData: true });
-  assert.deepEqual(cold.capabilities, { browser: false, windowsUia: false, localData: false, ownerScopedLedger: false, taskUnit: false, pharmacyData: false });
+  assert.deepEqual(cold.capabilities, { browser: false, windowsUia: false, localData: false, ownerScopedLedger: false, taskUnit: false, pharmacyData: false, serverAuthority:false });
   const v7 = buildHeartbeatReport({ agentVersion: '0.2.0', extensionConnected: true, platform: 'win32', dbState: { ready: true, schemaVersion: 7 }, hasLocalData: false });
   assert.equal(v7.capabilities.ownerScopedLedger, false);
   assert.equal(buildHeartbeatReport({agentVersion:handlers.AGENT_VERSION,dbState:{ready:true,schemaVersion:9}}).capabilities.pharmacyData,true);

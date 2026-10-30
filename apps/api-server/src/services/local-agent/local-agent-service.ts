@@ -131,6 +131,7 @@ export interface NodeCapabilities {
   ownerScopedLedger: boolean;
   taskUnit: boolean;
   pharmacyData?: boolean;
+  serverAuthority?: boolean;
 }
 
 /** 실행에 필요한 capability. 'any' = 노드면 된다(상태 · 시스템 정보 등). */
@@ -432,6 +433,7 @@ export function parseHeartbeatReport(body: unknown): HeartbeatReport | null {
   const keys = ['browser', 'windowsUia', 'localData', 'ownerScopedLedger'] as const;
   if (!keys.every((k) => typeof c[k] === 'boolean')) return null;
   if (c.taskUnit !== undefined && typeof c.taskUnit !== 'boolean') return null;
+  if (c.serverAuthority !== undefined && typeof c.serverAuthority !== 'boolean') return null;
   if (c.pharmacyData !== undefined && typeof c.pharmacyData !== 'boolean') return null;
   return {
     agentVersion: b.agentVersion,
@@ -442,6 +444,7 @@ export function parseHeartbeatReport(body: unknown): HeartbeatReport | null {
       ownerScopedLedger: c.ownerScopedLedger as boolean,
       taskUnit: c.taskUnit === true,
       pharmacyData: c.pharmacyData === true,
+      serverAuthority: c.serverAuthority === true,
     },
   };
 }
@@ -480,6 +483,7 @@ function mapCapabilities(v: unknown): NodeCapabilities | null {
     ownerScopedLedger: o.ownerScopedLedger === true,
     taskUnit: o.taskUnit === true,
     pharmacyData: o.pharmacyData === true,
+    serverAuthority: o.serverAuthority === true,
   };
 }
 

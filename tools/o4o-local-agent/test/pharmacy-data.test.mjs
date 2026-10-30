@@ -30,7 +30,7 @@ const importSample = () => importPharmacyRecords(owner, sample(), 0);
 const sheet = (status = 'draft') => ({ kind: 'sheet', data: { id: 'sheet1', title: '합성 발주 초안', status, lines: [{ id: 'l1', product_id: 'p1', product_name: '합성 상품', supplier_id: 's1', pack_id: 'k1', pack_label: '500정', pack_count: 2 }] } });
 
 test('normalized Dataset stores all program domains; repeated imports do not duplicate purchases', () => {
-  assert.equal(SCHEMA_VERSION, 9); importSample(); importPharmacyRecords(owner, sample(), 1);
+  assert.equal(SCHEMA_VERSION, 10); importSample(); importPharmacyRecords(owner, sample(), 1);
   assert.equal(pharmacySummary(owner).counts.purchase, 1);
   assert.equal(pharmacyPurchaseTotals(owner)[0].base_quantity, 1000);
   assert.equal(readPharmacyWorkspace(owner).bundle.records.find(r => r.kind === 'product').data.program_code, '0001');
@@ -241,7 +241,7 @@ test('more than 10000 useful rows accumulate across bounded imports and remain p
   assert.equal(total,12000);
 });
 
-test('sync acknowledgement cannot erase a newer local edit; reordered JSON is equal', async () => {
+test('sync acknowledgement cannot erase a newer local edit and remote payloads are refused', async () => {
   const { LocalPharmacySyncRepository: journal }=await import('../src/local-db.mjs');
   const { pharmacyDataset }=await import('../src/pharmacy-data.mjs');
   const dataset=pharmacyDataset(owner), epoch=crypto.randomUUID();
@@ -255,8 +255,8 @@ test('sync acknowledgement cannot erase a newer local edit; reordered JSON is eq
   const next=journal.pending(dataset).find(r=>r.lane==='user');
   assert.equal(next.entry.data.name,'두 번째 교정');assert.equal(next.expectedVersion,3);
   const reordered={origin:original.entry.origin,data:original.entry.data,kind:original.entry.kind};
-  const applied=journal.apply(dataset,epoch,{accepted:[],changes:[{...original,entry:reordered,version:4}],cursor:4,more:false});
-  assert.equal(applied.conflicts,0);
+  assert.throws(()=>journal.apply(dataset,epoch,{accepted:[],changes:[{...original,entry:reordered,version:4}],cursor:4,more:false}),/NO_DOWNLOAD/);
+  assert.equal(readPharmacyWorkspace(owner).bundle.records.find(r=>r.kind==='supplier').data.name,'두 번째 교정');
   journal.configure(dataset,crypto.randomUUID());
   assert.throws(()=>journal.apply(dataset,epoch,{accepted:[],changes:[],cursor:4,more:false}),/STALE_EPOCH/);
 });
@@ -288,20 +288,20 @@ test('v8 migration preserves legacy and user lanes; malformed legacy rolls back 
   if(!malformed){const workspace=readPharmacyWorkspace(owner);assert.equal(workspace.revision,7);if(scenario==='cross-lane'){assert.equal(workspace.bundle.records.find(r=>r.kind==='stock').data.product_id,'p1');assert.equal(workspace.bundle.records.find(r=>r.kind==='product').data.id,'p1');}else assert.equal(workspace.bundle.records.find(r=>r.kind==='supplier').data.name,'이전 교정');}
   closeLocalDb();const check=new DatabaseSync(path.join(home,'local.db'),{readOnly:true});
   assert.deepEqual(JSON.parse(check.prepare('SELECT data FROM local_dataset_rows WHERE dataset=?').get(dataset).data),legacy);
-  assert.equal(check.prepare('SELECT MAX(version) AS v FROM local_schema_migrations').get().v,malformed?8:9);check.close();
+  assert.equal(check.prepare('SELECT MAX(version) AS v FROM local_schema_migrations').get().v,malformed?8:10);check.close();
  }
 });
 
-test('background mirror uploads only current grants, retries safely, and stops after revocation',async()=>{
+test('background uploader sends only current grants, retries safely, and stops after revocation',async()=>{
  const {createPharmacySync}=await import('../src/pharmacy-sync.mjs');
  const {LocalPharmacySyncRepository:journal}=await import('../src/local-db.mjs');
  const {pharmacyDataset}=await import('../src/pharmacy-data.mjs');
  importSample();let allowed=false,offline=false;const epoch=crypto.randomUUID(),calls=[];
  const worker=createPharmacySync({post:async(path,body)=>{
   calls.push({path,body});
-  if(path.endsWith('grants'))return {status:200,payload:{data:allowed?[{owner,epoch}]:[]}};
+  if(path.endsWith('grants'))return {status:200,payload:{data:allowed?[{owner,epoch,storageMode:'transferring'}]:[]}};
   if(offline)return {status:0,payload:null};
-  return {status:200,payload:{success:true,data:{accepted:body.changes.map((r,i)=>({lane:r.lane,kind:r.entry.kind,id:r.entry.data.id,mutationId:r.mutationId,version:i+1})),changes:[],cursor:9,more:false}}};
+  return {status:200,payload:{success:true,data:{accepted:body.changes.map((r,i)=>({lane:r.lane,kind:r.entry.kind,id:r.entry.data.id,mutationId:r.mutationId,version:i+1})),changes:[],cursor:0,more:false,storageMode:body.complete?'server':'transferring'}}};
  }});
  await worker.tick('fixture',true);assert.equal(calls.length,1);
  allowed=true;offline=true;await worker.tick('fixture',true);assert.equal(journal.pending(pharmacyDataset(owner)).length,9);
@@ -311,27 +311,6 @@ test('background mirror uploads only current grants, retries safely, and stops a
  assert.equal(calls.some(r=>JSON.stringify(r.body).includes('fixture-program') && !r.path.endsWith('sync')),false);
 });
 
-test('conflicting local edit is preserved and quarantined rather than automatically overwriting the server',async()=>{
- const {LocalPharmacySyncRepository:journal}=await import('../src/local-db.mjs');
- const {pharmacyDataset}=await import('../src/pharmacy-data.mjs');
- const dataset=pharmacyDataset(owner),epoch=crypto.randomUUID();importSample();journal.configure(dataset,epoch);
- const row=journal.pending(dataset).find(r=>r.entry.kind==='product');
- const result=journal.apply(dataset,epoch,{accepted:[],changes:[{...row,entry:{...row.entry,data:{...row.entry.data,name:'서버 교정'}},version:10}],cursor:10,more:false});
- assert.equal(result.conflicts,1);assert.equal(journal.state(dataset).conflicts,1);
- assert.equal(readPharmacyWorkspace(owner).bundle.records.find(r=>r.kind==='product').data.name,'합성 상품');
- assert.equal(journal.pending(dataset).some(r=>r.entry.kind==='product'),false);
- const agreedPack=journal.pending(dataset).find(r=>r.entry.kind==='pack');
- journal.apply(dataset,epoch,{accepted:[{lane:agreedPack.lane,kind:'pack',id:agreedPack.entry.data.id,mutationId:agreedPack.mutationId,version:9}],changes:[],cursor:0,more:false});
- const purchase=journal.pending(dataset).find(r=>r.entry.kind==='purchase');
- journal.apply(dataset,epoch,{accepted:[],changes:[{...purchase,entry:{...purchase.entry,data:{...purchase.entry.data,pack_count:3}},version:11}],cursor:11,more:false});
- assert.equal(journal.state(dataset).conflicts,2);
- importPharmacyRecords(owner,{format:PHARMACY_FORMAT,records:[purchase.entry]},readPharmacyWorkspace(owner).revision);
- assert.equal(journal.state(dataset).conflicts,1); // The unrelated product remains quarantined.
- const retried=journal.pending(dataset).find(r=>r.entry.kind==='purchase');assert.equal(retried.expectedVersion,11);assert.notEqual(retried.mutationId,purchase.mutationId);
- assert.equal(retried.entry.data.pack_count,purchase.entry.data.pack_count);
- importPharmacyRecords(owner,{format:PHARMACY_FORMAT,records:[purchase.entry]},readPharmacyWorkspace(owner).revision);
- assert.equal(journal.pending(dataset).find(r=>r.entry.kind==='purchase').mutationId,retried.mutationId);
-});
 
 test('authenticated command contract reaches SQLite, backs up program imports, and returns only bounded typed data',async()=>{
  const {runAction}=await import('../src/handlers.mjs');
@@ -369,32 +348,7 @@ test('PC read keeps rows and summary revision in one SQLite snapshot across a co
  assert.equal(readPharmacyWorkspace(owner).bundle.records.find(r=>r.kind==='supplier').data.name,'동시 변경');
 });
 
-test('different IDs for one program code quarantine the remote batch without poisoning local references',async()=>{
- const {LocalPharmacySyncRepository:journal,openLocalDb}=await import('../src/local-db.mjs');const {pharmacyDataset}=await import('../src/pharmacy-data.mjs');
- importSample();const dataset=pharmacyDataset(owner),epoch=crypto.randomUUID();journal.configure(dataset,epoch);
- const product=sample().records[0],remote={...product,data:{...product.data,id:'remote-product'},origin:{...product.origin,source_key:'remote-product'}};
- const stock=entry('stock',{id:'remote-stock',product_id:'remote-product',quantity:null,confidence:'unknown',observed_at:stamp});
- const changes=[{lane:'imported',entry:stock,version:10,mutationId:crypto.randomUUID()},{lane:'imported',entry:remote,version:11,mutationId:crypto.randomUUID()}];
- const result=journal.apply(dataset,epoch,{accepted:[],changes,cursor:11,more:false});assert.ok(result.conflicts>0);assert.equal(journal.state(dataset).cursor,11);
- assert.equal(readPharmacyWorkspace(owner).bundle.records.length,9);assert.equal(readPharmacyWorkspace(owner).bundle.records.some(r=>r.data.id==='remote-product'),false);
- assert.equal(openLocalDb().prepare('SELECT count(*) AS n FROM local_pharmacy_sync_conflicts WHERE dataset=?').get(dataset).n,2);
- assert.equal(journal.pending(dataset).some(r=>r.entry.kind==='product'),false);
- importPharmacyRecords(owner,{format:PHARMACY_FORMAT,records:[{kind:'supplier',data:{...sample().records[2].data,name:'후속 교정'}}]},readPharmacyWorkspace(owner).revision,'user');
- assert.equal(readPharmacyWorkspace(owner).bundle.records.find(r=>r.kind==='supplier').data.name,'후속 교정');
- journal.apply(dataset,epoch,{accepted:[],changes,cursor:11,more:false});assert.equal(openLocalDb().prepare('SELECT count(*) AS n FROM local_pharmacy_sync_conflicts WHERE dataset=?').get(dataset).n,2);
-});
 
-test('pack measure conflicts hold dependent server purchases across repeated batches',async()=>{
- const {LocalPharmacySyncRepository:journal}=await import('../src/local-db.mjs');const {pharmacyDataset}=await import('../src/pharmacy-data.mjs');
- importSample();const dataset=pharmacyDataset(owner),epoch=crypto.randomUUID();journal.configure(dataset,epoch);
- const pack=sample().records.find(r=>r.kind==='pack');pack.data.units_per_pack=100;
- const purchase=sample().records.find(r=>r.kind==='purchase');purchase.data.id='server-purchase';purchase.origin.source_key='server-purchase';
- const remotePurchase={lane:'imported',entry:purchase,version:11,mutationId:crypto.randomUUID()};
- const result=journal.apply(dataset,epoch,{accepted:[],changes:[remotePurchase,{lane:'imported',entry:pack,version:10,mutationId:crypto.randomUUID()}],cursor:11,more:false});
- assert.ok(result.conflicts>0);assert.equal(pharmacyPurchaseTotals(owner).length,1);assert.equal(pharmacyPurchaseTotals(owner)[0].base_quantity,1000);
- assert.equal(readPharmacyWorkspace(owner).bundle.records.some(r=>r.data.id==='server-purchase'),false);
- journal.apply(dataset,epoch,{accepted:[],changes:[{...remotePurchase,version:12}],cursor:12,more:false});assert.equal(pharmacyPurchaseTotals(owner).length,1);assert.equal(journal.state(dataset).cursor,12);
-});
 
 test('PC CLI accumulated export restores more than 10,000 source rows under another owner',async()=>{
  const records=Array.from({length:10001},(_,i)=>entry('supplier',{id:'supplier'+i,name:'합성 거래처 '+i,enabled:true,payment_timing:'unknown',payment_required:null}));
@@ -407,31 +361,4 @@ test('PC CLI accumulated export restores more than 10,000 source rows under anot
  const malformed=path.join(home,'malformed.json');fs.writeFileSync(malformed,'DO_NOT_PRINT_FIXTURE_BODY');
  assert.equal(await runDataCommand(['pharmacy','import','--owner',target,'--file',malformed,'--revision','11'],m=>output.push(m)),2);
  assert.equal(output.join('').includes('DO_NOT'),false);assert.equal(output.join('').includes('합성 거래처'),false);
-});
-
-test('out-of-order server references stay staged while the cursor and local work continue',async()=>{
- const {LocalPharmacySyncRepository:journal}=await import('../src/local-db.mjs');const {pharmacyDataset}=await import('../src/pharmacy-data.mjs');const dataset=pharmacyDataset(owner),epoch=crypto.randomUUID();journal.configure(dataset,epoch);
- const row=(kind,version)=>({lane:'imported',entry:sample().records.find(r=>r.kind===kind),version,mutationId:crypto.randomUUID()});
- const first=journal.apply(dataset,epoch,{accepted:[],changes:[row('purchase',1),row('pack',2)],cursor:2,more:true});
- assert.equal(first.conflicts,0);assert.equal(journal.state(dataset).cursor,2);assert.equal(journal.state(dataset).pending,2);assert.equal(readPharmacyWorkspace(owner).bundle.records.length,0);
- const supplier={kind:'supplier',data:{id:'local-supplier',name:'로컬 교정',enabled:true,payment_timing:'unknown',payment_required:null}};
- importPharmacyRecords(owner,{format:PHARMACY_FORMAT,records:[supplier]},0,'user');
- journal.apply(dataset,epoch,{accepted:[],changes:[row('supplier',3)],cursor:3,more:true});assert.equal(readPharmacyWorkspace(owner).bundle.records.length,2);
- journal.apply(dataset,epoch,{accepted:[],changes:[row('product',4)],cursor:4,more:false});
- assert.equal(journal.state(dataset).cursor,4);assert.equal(readPharmacyWorkspace(owner).bundle.records.length,5);assert.equal(pharmacyPurchaseTotals(owner)[0].base_quantity,1000);
- assert.equal(readPharmacyWorkspace(owner).bundle.records.some(r=>r.data.id==='local-supplier'),true);
- assert.equal(journal.state(dataset).conflicts,0);assert.equal(journal.state(dataset).pending,1); // Only the unrelated local edit awaits upload.
-});
-
-test('remote supplier disable preserves prepared sheets until an explicit draft edit resolves the dependency',async()=>{
- const {LocalPharmacySyncRepository:journal}=await import('../src/local-db.mjs');const {pharmacyDataset}=await import('../src/pharmacy-data.mjs');
- importSample();const dataset=pharmacyDataset(owner),epoch=crypto.randomUUID();journal.configure(dataset,epoch);
- const accepted=journal.pending(dataset).map((row,index)=>({lane:row.lane,kind:row.entry.kind,id:row.entry.data.id,mutationId:row.mutationId,version:index+1}));
- journal.apply(dataset,epoch,{accepted,changes:[],cursor:9,more:false});importPharmacyRecords(owner,{format:PHARMACY_FORMAT,records:[sheet('prepared')]},1,'user');
- const supplier=sample().records.find(r=>r.kind==='supplier');supplier.data.enabled=false;
- const result=journal.apply(dataset,epoch,{accepted:[],changes:[{lane:'imported',entry:supplier,version:50,mutationId:crypto.randomUUID()}],cursor:50,more:false});
- assert.ok(result.conflicts>0);assert.equal(readPharmacyWorkspace(owner).bundle.records.find(r=>r.kind==='supplier').data.enabled,true);
- importPharmacyRecords(owner,{format:PHARMACY_FORMAT,records:[sheet('draft')]},readPharmacyWorkspace(owner).revision,'user');
- journal.apply(dataset,epoch,{accepted:[],changes:[],cursor:50,more:false});
- assert.equal(readPharmacyWorkspace(owner).bundle.records.find(r=>r.kind==='supplier').data.enabled,false);assert.equal(journal.state(dataset).conflicts,0);
 });

@@ -18,6 +18,7 @@ function validateState(state) {
   return bundle;
 }
 export function readPharmacyWorkspace(owner) {
+  assertLocalAuthority(owner);
   const state = LocalPharmacyWorkspaceRepository.read(scope(owner));
   return { revision: state.revision, bundle: effective(state), importedCount: state.imported.length, userCount: state.user.length };
 }
@@ -66,7 +67,7 @@ export function importPharmacyRecords(owner, input, expectedRevision, mode = 'pr
     // Validate source lane even when a user override masks an imported row.
     validatePharmacyBundle({ format: PHARMACY_FORMAT, records: merge(next.user, next.imported) }, { batch: false });
     validateState(next); return next;
-  }, incoming.map(r=>(mode==='program' || (mode==='restore' && r.origin)?'imported':'user')+':'+key(r)));
+  }, incoming.map(r=>(mode==='program' || (mode==='restore' && r.origin)?'imported':'user')+':'+key(r)), mode);
   return { revision: state.revision, records: effective(state).records.length, imported: state.imported.length, user: state.user.length };
 }
 export function pharmacySummary(owner) {
@@ -74,8 +75,14 @@ export function pharmacySummary(owner) {
   const sync=LocalPharmacySyncRepository.state(scope(owner));
   return { ...summary, sync:{pending:sync.pending,conflicts:sync.conflicts,lastSyncedAt:sync.synced_at??null,error:sync.error??null}, counts: Object.fromEntries(PHARMACY_KINDS.map(k => [k, summary.counts[k] ?? 0])), schema: 'pharmacy_rows_v1', externalExecutionSupported: false };
 }
-export function pharmacyRead(owner,options) { return LocalPharmacyWorkspaceRepository.snapshot(()=>({...pharmacyPage(owner,options),...pharmacySummary(owner)})); }
-export function pharmacyPage(owner, options) { return LocalPharmacyWorkspaceRepository.page(scope(owner), options); }
+function assertLocalAuthority(owner) {
+  const authority=LocalPharmacySyncRepository.state(scope(owner)).authority;
+  if(authority && authority!=='local')throw Error('PHARMACY_SERVER_AUTHORITY: 서버에서 계속 작업해 주세요.');
+}
+export function pharmacyRead(owner,options) {
+  assertLocalAuthority(owner);
+  return LocalPharmacyWorkspaceRepository.snapshot(()=>({...pharmacyPage(owner,options),...pharmacySummary(owner)})); }
+export function pharmacyPage(owner, options) { assertLocalAuthority(owner); return LocalPharmacyWorkspaceRepository.page(scope(owner), options); }
 export const pharmacyDataset = scope;
 
 export function pharmacyPurchaseTotals(owner) {
