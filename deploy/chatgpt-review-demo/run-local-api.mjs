@@ -31,6 +31,7 @@ const child = spawn(process.execPath, ["apps/api-server/dist/main.js"], {
     NODE_ENV: "development",
     GRACEFUL_STARTUP: "false",
     PORT: "13002",
+    HOST: "127.0.0.1",
     DB_TYPE: "postgres",
     DB_HOST: p.REVIEW_DEMO_DB_HOST,
     DB_PORT: p.REVIEW_DEMO_DB_PORT || "55459",
