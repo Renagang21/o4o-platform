@@ -42,6 +42,13 @@ suite('candidate whole-query workflows — dedicated local PostgreSQL',()=>{
   const intake=await new ProductCandidateService(db).findCandidates({...filter,queue:'intake',reason:'UDI_DI_MISSING'});expect(intake.total).toBe(1);
   expect(candidateTriage(intake.items[0])).toMatchObject({queue:'intake',registration:'unsupported',medicalDevice:true,reasons:expect.arrayContaining(['현재 화면의 상품 등록 경로 미지원','허가 상태 미확인','UDI 식별자 누락'])});
  });
+ it('keeps unrecognized and unlabelled external API requests in the operational queue',async()=>{
+  await seed([{...device('partner API request'),sourceLabel:'PARTNER_CANDIDATE_API',rawPayload:{}},{...device('unlabelled request'),sourceLabel:null,rawPayload:{}}]);
+  expect(await workflow.summary(filter)).toMatchObject({total:2,intake:0,review:2});
+  const {ProductCandidateService}=await import('../product-candidate.service.js');
+  const review=await new ProductCandidateService(db).findCandidates({...filter,queue:'review'});
+  expect(review.total).toBe(2);expect(review.items.every(item=>candidateTriage(item).queue==='review')).toBe(true);
+ });
  it('updates more than 10,000 matching rows in one transaction, preserving other services and registered candidates',async()=>{
   const rows=Array.from({length:10021},()=>device());
   for(let i=0;i<rows.length;i+=500)await db.getRepository(ProductCandidate).insert(rows.slice(i,i+500));

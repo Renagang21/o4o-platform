@@ -1,7 +1,12 @@
+import { MDS_SOURCE_LABEL } from '../drug-import/medical-device-standard-code-candidate.mapper.js';
+import { HFF_SOURCE_LABEL } from '../drug-import/health-functional-food-candidate.mapper.js';
+import { QUASI_DRUG_SOURCE_LABEL } from '../drug-import/quasi-drug-permit-candidate.mapper.js';
+import { EASY_DRUG_SOURCE_LABEL } from '../drug-import/easy-drug-info-candidate.mapper.js';
 import type { ProductCandidate } from '../entities/ProductCandidate.entity.js';
 
 /** Storage status remains unchanged. Intake is a preparation pool, not an approval request. */
-export const candidateIntakeSql = (alias: string) => `(${alias}.source_type='external_api' AND lower(COALESCE(${alias}.source_label,'')) NOT LIKE 'mfds-drug-master-standard-code%')`;
+export const PUBLIC_CANDIDATE_SOURCE_LABELS=[MDS_SOURCE_LABEL,HFF_SOURCE_LABEL,QUASI_DRUG_SOURCE_LABEL,EASY_DRUG_SOURCE_LABEL] as const;
+export const candidateIntakeSql = (alias: string) => `(${alias}.source_type='external_api' AND COALESCE(${alias}.source_label,'') IN (${PUBLIC_CANDIDATE_SOURCE_LABELS.map(label=>`'${label}'`).join(',')}))`;
 export const candidateUnsupportedIntakeSql=(alias:string)=>`(${candidateIntakeSql(alias)} AND COALESCE(${alias}.raw_payload->>'source','') <> 'supplier_bulk_upload')`;
 export const CANDIDATE_REVIEW_FLAGS = {
   STATUS_UNCHECKED: '허가 상태 미확인', UDI_DI_MISSING: 'UDI 식별자 누락',
@@ -10,7 +15,7 @@ export const CANDIDATE_REVIEW_FLAGS = {
   PRODUCT_NAME_MISSING: '상품명 누락', MANUFACTURER_MISSING: '제조사 누락', MODEL_MISSING: '모델 정보 누락',
 } as const;
 export function candidateTriage(candidate: ProductCandidate) {
-  const intake = candidate.sourceType === 'external_api' && !(candidate.sourceLabel ?? '').toLowerCase().startsWith('mfds-drug-master-standard-code');
+  const intake = candidate.sourceType === 'external_api' && PUBLIC_CANDIDATE_SOURCE_LABELS.some(label=>label===candidate.sourceLabel);
   const payload = candidate.rawPayload ?? {};
   const medicalDevice = candidate.sourceLabel === 'MFDS_MEDICAL_DEVICE_STANDARD_CODE' || payload.regulatoryType === 'MEDICAL_DEVICE';
   const flags = Array.isArray(payload.reviewFlags) ? payload.reviewFlags.filter((value): value is string => typeof value === 'string') : [];
