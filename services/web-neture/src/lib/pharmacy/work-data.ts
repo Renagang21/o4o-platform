@@ -3,7 +3,7 @@ import { toHomeChatScope } from '../ai/home-chat';
 import type { WorkScope } from '../work-scope';
 import type { PharmacyEntry } from './order';
 
-export interface WorkDataConsent { enabled: boolean; epoch: string | null; owner: string; updatedAt: string | null }
+export interface WorkDataConsent { enabled: boolean; epoch: string | null; owner: string; updatedAt: string | null; storageMode?: 'local'|'transferring'|'server'|'stopped'; sourceDeviceId?:string|null; transferError?:string|null; transferredRecords?:number; sourceOnline?:boolean }
 export interface WorkDataSnapshot {
   deviceId?: string;
   owner?: string;
