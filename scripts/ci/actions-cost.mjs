@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 /** Read-only Actions cost forecast. No billing/settings changes; no token or raw job logs output. */
-import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
 // USD per minute, verified 2026-10-30. Public ubuntu-latest maps to standard private Linux.
@@ -93,15 +92,13 @@ export async function audit({ get, repo, from, to, sampleSize = 10 }) {
       estimatedMinutes: minutes / n * rs.length, estimatedUsd: usd / n * rs.length });
   }
   return { repo, from, to, totalRuns: runs.size, incompleteRunsExcluded: pending,
-    method: 'Stratified sample; standard private runner rates; compute only; no billing account access',
+    method: 'Stratified sample; standard private rates; unchanged runtime assumed despite public/private hardware differences; compute only; no billing account access',
     grossEstimatedUsd: rows.reduce((sum, r) => sum + r.estimatedUsd, 0), rows };
 }
 
 export async function githubGet(endpoint) {
   const token = process.env.GITHUB_TOKEN || process.env.GH_TOKEN;
-  if (!token) {
-    return JSON.parse(execFileSync('gh', ['api', endpoint], { encoding: 'utf8', maxBuffer: 32 * 1024 * 1024, stdio: ['ignore', 'pipe', 'pipe'] }));
-  }
+  if (!token) throw new Error('GITHUB_TOKEN or GH_TOKEN is required for this read-only audit');
   const response = await fetch(`https://api.github.com/${endpoint}`, {
     headers: { Authorization: `Bearer ${token}`, Accept: 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28' },
     signal: AbortSignal.timeout(30000),
@@ -114,7 +111,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const args = process.argv.slice(2);
   if (args.includes('--help')) {
     console.log('node scripts/ci/actions-cost.mjs --repo owner/name --from YYYY-MM-DD --to YYYY-MM-DD [--sample 10]');
-    console.log('Read-only. Use existing gh authentication or GITHUB_TOKEN. JSON goes to stdout; never runs in CI automatically.');
+    console.log('Read-only. Requires GITHUB_TOKEN or GH_TOKEN. JSON goes to stdout; never runs in CI automatically.');
   } else {
     try {
       const getArg = name => args[args.indexOf(name) + 1];
@@ -123,7 +120,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
       const result = await audit({ get: githubGet, repo: getArg('--repo'), from: getArg('--from'), to: getArg('--to'), sampleSize: args.includes('--sample') ? Number(getArg('--sample')) : 10 });
       console.log(JSON.stringify(result, null, 2));
     } catch (error) {
-      // Avoid printing gh stderr or request objects: either may contain sensitive response data.
+      // Do not print request objects or headers.
       console.error(error instanceof Error && !('stderr' in error) ? error.message : 'GitHub request failed; audit incomplete');
       process.exitCode = 1;
     }

@@ -25,6 +25,8 @@
 차감 전 약 $533.69다. Pro $4 + 기본 제공 $18 차감 가정이면 약 $519.69다.
 계정의 실제 구독/청구 내역은 조회하지 않았다. 저장 공간·외부 Sonar·Code Security 구독·Copilot 등은 제외다.
 표본 기반이므로 오차 범위를 통계적으로 검증한 확정 견적이 아니다.
+또한 공개 Linux 표준 runner는 4 vCPU/16GB, 비공개는 2 vCPU/8GB이다. 위 계산은 공개 실행시간이
+그대로라는 가정이며, 비공개에서의 실행시간 증가·메모리 한계는 미실측이다. 전환 전 반드시 별도 확인한다.
 
 공식 요금 확인 출처(2026-10-30):
 
@@ -32,6 +34,7 @@
 - https://docs.github.com/en/billing/reference/product-usage-included
 - https://github.com/pricing
 - https://github.com/security/advanced-security
+- https://docs.github.com/en/actions/reference/runners/github-hosted-runners
 
 ## 2. 월 10만원의 판단 기준
 
@@ -52,6 +55,7 @@ CodeQL 자동 실행을 전부 제거한다고 가정해도 gross 약 $475.92, P
 5. Sonar 공개 API 진단을 budget/private에서 생략. 외부 App 설정·구독은 미변경.
 6. `actions-cost.mjs`: 읽기 전용 재계산. workflow·event·결과별 표본, job별 올림, 재실행 포함,
    날짜별 조회 및 밀집일 시간별 분할, pagination 누락·미지원 runner·조회 실패 시 추정 중단.
+   인증은 기존 `GITHUB_TOKEN`/`GH_TOKEN`으로 HTTPS API만 호출한다. PATH를 통해 외부 실행 파일을 찾는 방식은 제거했다.
 
 **아직 월 10만원 이하라는 판정은 아니다.** 과거 run의 당시 Draft 상태는 이번 조사에서 확보하지 못했으므로
 Draft 전환에 따른 절감률을 임의로 부여하지 않는다. 공개 여부/variables/budget/Sonar 연결은 미변경이다.

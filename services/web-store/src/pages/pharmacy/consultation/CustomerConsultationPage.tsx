@@ -1,3 +1,4 @@
+import { AiRequestInput } from '@o4o/ui/ai';
 import { consultationUi } from "./consultationLocale";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
@@ -406,25 +407,22 @@ export default function CustomerConsultationPage() {
                 {speech.listening ? copy.finish : copy.speak}
               </button>
             )}
-            <label className="block">
+            <div className="block">
               <span>{copy.message}</span>
-              <textarea
+              <AiRequestInput
                 autoComplete="off"
                 aria-label={copy.message}
-                className="mt-2 min-h-28 w-full rounded border p-3 text-xl"
+                submitLabel={copy.send}
+                busy={busy}
+                submitDisabled={speech.listening}
+                onSend={() => { void send(); }}
                 maxLength={1000}
                 value={text}
                 disabled={busy}
                 onChange={(e) => setText(e.target.value)}
               />
-            </label>
-            <button
-              className={`${button} bg-teal-700 text-white`}
-              disabled={busy || speech.listening || !text.trim()}
-              onClick={() => void send()}
-            >
-              {copy.send}
-            </button>
+            </div>
+
             <p className="text-sm text-slate-600">{copy.privacy}</p>
           </section>
         </>

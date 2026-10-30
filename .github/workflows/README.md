@@ -56,7 +56,7 @@ main/develop push·수동 전체 검사·정기 API Jest·기존 배포 게이�
 - 공개 Sonar PR 진단 조회·업로드는 budget 모드 또는 비공개에서 생략한다. **외부 Sonar App 자체를 해제하거나 구독을 취소하지 않는다.**
 - AI 리뷰는 빌드·테스트·권한/격리 검증의 통과 증거를 대신하지 않는다.
 
-읽기 전용 비용 재계산(기존 `gh` 인증 또는 `GITHUB_TOKEN`, 최대 31일):
+읽기 전용 비용 재계산(`GITHUB_TOKEN` 또는 `GH_TOKEN`, 최대 31일):
 
 ```sh
 node scripts/ci/actions-cost.mjs --repo Renagang21/o4o-platform --from 2026-09-30 --to 2026-10-29 --sample 10
@@ -64,6 +64,7 @@ node scripts/ci/actions-cost.mjs --repo Renagang21/o4o-platform --from 2026-09-3
 
 실행 건수는 전체 조회하고, workflow·event·결과별 시간 분산 표본의 job 시간을 분 단위 올림해 추정한다.
 재실행 attempt는 포함하며, 진행 중 run은 별도 집계한다. 청구 내역·저장 공간·외부 검사 구독은 포함하지 않는다.
+공개 실행시간이 그대로 유지된다는 가정이다. private 표준 runner는 public보다 CPU·메모리가 작으므로 실제 시간·비용은 증가할 수 있다.
 재현 도구는 자동 CI에 등록하지 않는다. 전환 준비와 잔여 항목은
 [`IR-O4O-PRIVATE-CI-BUDGET-V1`](../../docs/investigations/IR-O4O-PRIVATE-CI-BUDGET-V1.md)를 따른다.
 

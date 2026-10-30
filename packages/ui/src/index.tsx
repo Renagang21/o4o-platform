@@ -26,6 +26,7 @@
 
 import React, { HTMLAttributes, forwardRef, ButtonHTMLAttributes } from 'react';
 import { useTemplate } from './layout/TemplateContext';
+export { AiRequestInput, type AiRequestInputProps } from './ai/AiRequestInput';
 
 function cn(...classes: (string | undefined | false)[]) {
   return classes.filter(Boolean).join(' ');

@@ -1,3 +1,4 @@
+import { AiRequestInput } from '../ai/AiRequestInput';
 /**
  * CornerAiButton
  *
@@ -78,13 +79,6 @@ export const CornerAiButton: React.FC<CornerAiButtonProps> = ({
       setIsProcessing(false);
     }
   }, [query, onAiRequest]);
-
-  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSubmit();
-    }
-  }, [handleSubmit]);
 
   const isButtonDisabled = disabled || isLoading;
 
@@ -192,18 +186,15 @@ export const CornerAiButton: React.FC<CornerAiButtonProps> = ({
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 무엇이 궁금하신가요?
               </label>
-              <textarea
+              <AiRequestInput
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                onKeyDown={handleKeyDown}
+                aria-label="AI 상담 요청"
                 placeholder="예: 이 제품의 특징이 뭐예요? / 추천 상품 알려주세요"
-                className={cn(
-                  'w-full px-4 py-3 rounded-xl border border-gray-300',
-                  'focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent',
-                  'resize-none transition-shadow',
-                  'text-base'
-                )}
-                rows={4}
+                submitLabel={isProcessing ? '처리 중...' : '질문하기'}
+                busy={isProcessing}
+                disabled={isButtonDisabled}
+                onSend={() => { void handleSubmit(); }}
                 autoFocus
               />
               <p className="mt-2 text-sm text-gray-500">
@@ -219,28 +210,7 @@ export const CornerAiButton: React.FC<CornerAiButtonProps> = ({
               >
                 취소
               </button>
-              <button
-                onClick={handleSubmit}
-                disabled={!query.trim() || isProcessing}
-                className={cn(
-                  'px-6 py-2 text-white rounded-lg transition-all',
-                  'bg-gradient-to-r from-blue-600 to-indigo-600',
-                  'hover:from-blue-700 hover:to-indigo-700',
-                  'disabled:opacity-50 disabled:cursor-not-allowed'
-                )}
-              >
-                {isProcessing ? (
-                  <span className="flex items-center gap-2">
-                    <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                    </svg>
-                    처리 중...
-                  </span>
-                ) : (
-                  '질문하기'
-                )}
-              </button>
+
             </div>
           </div>
         </div>
