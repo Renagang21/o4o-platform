@@ -69,7 +69,7 @@ export function createStoreHubController(
   // WO-O4O-STORE-HUB-OPTIONAL-AUTH-MIGRATION-V1: serviceKey 전파 →
   //   read-only GET endpoint 도 cross-service routing 차단 (req.organizationId 미설정).
   const optionalAuth = optionalStoreAuth(dataSource, serviceKey);
-  router.post('/ai-overview', optionalAuth, requirePharmacyOwner, createStoreOverviewAiHandler(dataSource, serviceKey));
+  router.post('/ai-overview', requireAuth, optionalAuth, requirePharmacyOwner, createStoreOverviewAiHandler(dataSource, serviceKey));
 
   /**
    * GET /store-hub/overview
