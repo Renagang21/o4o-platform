@@ -52,3 +52,10 @@ it('opens the exact pending candidate queue from its banner and count', async ()
   expect(banner.getAttribute('href')).toBe('/operations/neture/candidates?status=pending');
   expect(screen.getByRole('link',{name:'상품 후보 검토 12000건 처리하기'}).getAttribute('href')).toBe(banner.getAttribute('href'));
 });
+it('keeps public intake visible but excludes it from the actual pending workload total',async()=>{
+ api.get.mockResolvedValue(response([{key:'product-candidates',service:'neture',label:'상품 후보 검토 대기',href:'/operator/product-candidates?status=pending&queue=review',count:3,available:true},{key:'product-candidate-intake',service:'neture',label:'공공 수집 자료 등록 준비',href:'/operator/product-candidates?status=active&queue=intake',count:12000,available:true,kind:'reference'}] as any));view();
+ const intake=await screen.findByRole('region',{name:'수집 자료 등록 준비'});expect(intake.textContent).toContain('12,000건');
+ expect(screen.getByRole('button',{name:/전체 대기/}).textContent).toContain('3건');
+ expect(screen.queryByLabelText('공공 수집 자료 등록 준비 선택')).toBeNull();
+ expect(screen.getByRole('link',{name:/공공 수집 자료 등록 준비 ·/}).getAttribute('href')).toBe('/operations/neture/candidates?status=active&queue=intake');
+});

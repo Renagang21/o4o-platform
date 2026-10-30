@@ -1,3 +1,4 @@
+import { AiRequestInput } from '@o4o/ui/ai';
 import { CommunitySavePanel, StoreSavePanel, ProductionMaterialSavePanel } from './AiContentSavePanels';
 /**
  * AiContentModal — AI 콘텐츠 변환 모달
@@ -478,24 +479,13 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
                 {customPrompt.length}/{CUSTOM_PROMPT_MAX}
               </span>
             </div>
-            <textarea
+            <AiRequestInput
               value={customPrompt}
               onChange={(e) => setCustomPrompt(e.target.value.slice(0, CUSTOM_PROMPT_MAX))}
               placeholder={
                 '예) A4 1장 길이 강의자료\n블로그 글처럼 정리\nPOP 문구로 짧고 강조형\nQR 안내문으로 작성\n제목 5개만 추천\n약국 고객이 이해하기 쉽게'
               }
-              rows={3}
-              style={{
-                width: '100%',
-                padding: '10px 12px',
-                border: '1px solid #d1d5db',
-                borderRadius: '6px',
-                fontSize: '13px',
-                resize: 'vertical',
-                fontFamily: 'inherit',
-                boxSizing: 'border-box',
-                background: '#fafafa',
-              }}
+              aria-label="추가 요청사항"
             />
             <p style={{ fontSize: '11px', color: '#9ca3af', margin: '4px 0 0' }}>
               비워두면 입력 원문을 깨끗한 본문으로 정리합니다. 텍스트/URL 양쪽에 공통 적용됩니다.

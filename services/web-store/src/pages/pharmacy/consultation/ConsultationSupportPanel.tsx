@@ -1,3 +1,4 @@
+import { AiRequestInput } from '@o4o/ui/ai';
 import { useEffect, useRef, useState } from 'react';
 import { prepareConsultationSupport, type ConsultationStation, type ConsultationSupportPoint,
   type ConsultationSupportResult } from '../../../api/consultationWorkspace';
@@ -59,8 +60,8 @@ export function ConsultationSupportPanel({ organizationId, mode, product, room, 
     <summary className="min-h-11 cursor-pointer content-center font-semibold">약사 판단 지원</summary>
     {!product ? <p className="mt-3 text-sm">위의 상품 찾기·제품 설명에서 상담할 상품을 먼저 선택해 주세요.</p> : <div className="mt-3 space-y-4">
       <p className="text-sm">{product.name} · 상품 사실과 전문 근거를 나누어 확인하고 고객에게 전할 설명을 준비합니다.</p>
-      <label className="block">확인할 질문<textarea aria-label="약사 판단 지원 질문" value={question} maxLength={1000}
-        disabled={busy || locked} className="mt-2 min-h-24 w-full rounded border p-3" onChange={e => change(() => setQuestion(e.target.value))} /></label>
+      <label className="block">확인할 질문<AiRequestInput aria-label="약사 판단 지원 질문" value={question} maxLength={1000}
+        disabled={busy || locked} onChange={e => change(() => setQuestion(e.target.value))} /></label>
       {inquiry && <button className={button} disabled={busy || locked} onClick={() => change(() => setQuestion(inquiry))}>현재 고객 질문 사용</button>}
       <details><summary className="min-h-11 cursor-pointer content-center">전문 참고자료 추가</summary>
         <label className="block">전문 참고자료<textarea aria-label="상담 전문 참고자료" value={reference} maxLength={5000} disabled={busy || locked}

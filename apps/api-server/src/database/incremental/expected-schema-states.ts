@@ -342,6 +342,7 @@ export const EXPECTED_SCHEMA_STATES: readonly ExpectedSchemaState[] = [
   { appliedThrough: 'CreateCentralOperationMenuGrants1793186241009', fingerprint: '3e6030d5fdd3fe6805d43ecb93c813084432d776ab0f26c11d8077eae28b1b0b', fingerprintLineCount: 7362 },
   // Isolated PostgreSQL 15: optional Main work-data mirrors, prefix and empty down/up verified.
   { appliedThrough: 'CreateAssistantWorkData1793257200000', fingerprint: '8a27034284caa9a39ed1fd6057e7f5c82b1761f78dbe77db2a2d75abb50dac31', fingerprintLineCount: 7405 },
+  { appliedThrough: 'AddAssistantStorageAuthority1793322213345', fingerprint: 'e6fd46ae64b9aed8e41ad05927bc14968f8f840f483142ec69a53760af44fa19', fingerprintLineCount: 7409 },
 ] as const;
 
 /** Expected state after `prefixLength` incremental migrations; undefined when not registered. */

@@ -1,3 +1,4 @@
+import { AiRequestInput } from '@o4o/ui/ai';
 import type { RefObject } from "react";
 import type { useConsultationSpeech } from "../useConsultationSpeech";
 export type Mode = {
@@ -165,11 +166,10 @@ export function ConsultationInput({
   return (
     <label className="block space-y-2">
       <span className="font-medium">{label}</span>
-      <textarea
-        ref={inputRef}
+      <AiRequestInput
+        inputRef={inputRef}
         aria-label={label}
         autoComplete="off"
-        className="min-h-32 w-full rounded border p-3"
         maxLength={1000}
         value={text}
         onChange={(event) => onText(event.target.value)}

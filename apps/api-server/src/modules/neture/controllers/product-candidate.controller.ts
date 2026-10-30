@@ -1,3 +1,5 @@
+import { candidateTriage } from '../services/candidate-triage.js';
+import { CandidateWorkflowService, CandidateWorkflowError, candidateFilter } from '../services/candidate-workflow.service.js';
 import { centralScopedNetureRequest } from '../../../middleware/central-operation-menu.middleware.js';
 /**
  * ProductCandidateController — Product Candidate Review Queue (Phase 3)
@@ -17,7 +19,6 @@ import type { ServiceScope } from '../../../utils/serviceScope.js';
 import { resolveOperatorScope, logCrossServiceQuery, PLATFORM_ADMIN_SCOPE_REQUIRED_RESPONSE } from '../../../utils/serviceScope.js';
 import { ProductCandidateService } from '../services/product-candidate.service.js';
 import type {
-  ProductCandidateStatus,
   ProductCandidateSourceType,
 } from '../entities/ProductCandidate.entity.js';
 import type { ProductIdentifierType } from '../entities/ProductIdentifier.entity.js';
@@ -37,16 +38,6 @@ import { SupplierPolicyError } from '../promotion/adapters/supplier/supplier-pro
  * registered(등록 완료) 하나로 묶는다. merged/archived 는 파이프라인 종료 상태이므로 rejected(제외)에 포함.
  * DB 원시 status 값·의미는 변경하지 않는다 (기존 status 파라미터도 그대로 유지).
  */
-const GROUPED_STATUS_MAP: Record<string, ProductCandidateStatus[]> = {
-  // WO-O4O-ADMIN-PRODUCT-CANDIDATE-FILTER-MINIMAL-CLEANUP-V1:
-  // 등록 흐름 3단계. before_registration = pending+reviewing (아직 기본상품 DB 미반영).
-  before_registration: ['pending', 'reviewing'],
-  registered: ['matched', 'linked', 'approved_new_master'],
-  rejected: ['rejected', 'merged', 'archived'],
-  // 이전(V2) 그룹 키 — API 호환 위해 유지 (일반 UI 는 위 3개만 사용)
-  pending: ['pending'],
-  review_required: ['reviewing'],
-};
 
 const OPERATOR_ROLES = [
   'platform:super_admin',
@@ -62,6 +53,7 @@ function userId(req: Request): string | null {
 export function createProductCandidateController(dataSource: DataSource): Router {
   const router = Router();
   const service = new ProductCandidateService(dataSource);
+  const workflow = new CandidateWorkflowService(dataSource);
   const supplierPromotion = new SupplierCandidatePromotionService(dataSource);
 
   // operator/admin guard + service scope (operator product console 과 동일 모델)
@@ -80,32 +72,39 @@ export function createProductCandidateController(dataSource: DataSource): Router
       }
       if (resolved.crossService) logCrossServiceQuery(req);
 
-      const { status, groupedStatus, sourceType, sourceLabel, search, q, serviceKey, organizationId, page, limit } = req.query;
-      // 화면용 groupedStatus 는 원시 status 배열로 변환 (기존 status 단건 필터도 계속 지원)
-      const candidateStatuses = groupedStatus
-        ? GROUPED_STATUS_MAP[String(groupedStatus)]
-        : undefined;
-      const result = await service.findCandidates({
-        candidateStatus: status as ProductCandidateStatus | undefined,
-        candidateStatuses,
-        sourceType: sourceType as ProductCandidateSourceType | undefined,
-        sourceLabel: (sourceLabel as string | undefined) || undefined,
-        search: ((search ?? q) as string | undefined) || undefined,
-        serviceKey: serviceKey as string | undefined,
-        organizationId: organizationId as string | undefined,
-        includeShared: req.query.includeShared === 'true' && serviceKey === 'neture' && resolved.serviceKeys?.includes('neture') === true,
-        scopeServiceKeys: resolved.serviceKeys,
-        page: page ? Number(page) : undefined,
-        limit: limit ? Number(limit) : undefined,
-      });
+      const filter = candidateFilter(scope, req.query);
+      const page = Number(req.query.page ?? 1), limit = Number(req.query.limit ?? 20);
+      if (!Number.isSafeInteger(page) || page < 1 || !Number.isSafeInteger(limit) || limit < 1) throw new CandidateWorkflowError(400,'INVALID_PAGINATION');
+      const result = await service.findCandidates({...filter,page,limit});
       // WO-O4O-PRODUCT-TYPE-CLASSIFICATION-WIRING-F3-V1: 분류 부착 (표시용)
       const items = await service.withClassification(result.items);
-      return res.json({ success: true, data: { items, total: result.total } });
+      return res.json({ success: true, data: { items: items.map(candidate => Object.assign(candidate,{triage:candidateTriage(candidate)})), total: result.total } });
     } catch (error) {
+      if (error instanceof CandidateWorkflowError) return res.status(error.status).json({success:false,error:error.code});
       logger.error('[ProductCandidate] list error:', error);
       return res.status(500).json({ success: false, error: 'INTERNAL_ERROR' });
     }
   }) as RequestHandler);
+
+  router.get('/workflow-summary', (async (req,res) => {
+    try {
+      const data=await workflow.summary(candidateFilter((req as any).serviceScope,req.query));
+      return res.json({success:true,data});
+    } catch (error) { return handleMutationError(res,error,'workflow-summary'); }
+  }) as RequestHandler);
+  for (const operation of ['preview','execute'] as const) {
+    router.post(`/workflow-${operation}`, (async (req,res) => {
+      try {
+        if (!req.body?.filter || typeof req.body.filter!=='object' || Array.isArray(req.body.filter)) throw new CandidateWorkflowError(400,'INVALID_FILTER');
+        const filter=candidateFilter((req as any).serviceScope,req.body.filter);
+        const selection={action:req.body.action,ids:req.body.ids,cutoff:req.body.cutoff,expectedCount:req.body.expectedCount,fingerprint:req.body.fingerprint,note:req.body.note};
+        const actor=userId(req);
+        if (!actor) throw new CandidateWorkflowError(401,'AUTH_REQUIRED');
+        const data=operation==='preview' ? await workflow.preview(filter,selection,actor) : await workflow.execute(filter,selection,actor);
+        return res.json({success:true,data});
+      } catch (error) { return handleMutationError(res,error,`workflow-${operation}`); }
+    }) as RequestHandler);
+  }
 
   // GET /:id — 후보 상세
   router.get('/:id', (async (req: Request, res: Response) => {
@@ -114,7 +113,7 @@ export function createProductCandidateController(dataSource: DataSource): Router
       if (!candidate) return res.status(404).json({ success: false, error: 'CANDIDATE_NOT_FOUND' });
       // WO-O4O-PRODUCT-TYPE-CLASSIFICATION-WIRING-F3-V1: 분류 부착 (표시용)
       const [enriched] = await service.withClassification([candidate]);
-      return res.json({ success: true, data: enriched });
+      return res.json({ success: true, data: Object.assign(enriched,{triage:candidateTriage(enriched)}) });
     } catch (error) {
       logger.error('[ProductCandidate] detail error:', error);
       return res.status(500).json({ success: false, error: 'INTERNAL_ERROR' });
@@ -305,6 +304,7 @@ export function createProductCandidateController(dataSource: DataSource): Router
 }
 
 function handleMutationError(res: Response, error: unknown, op: string): Response {
+  if (error instanceof CandidateWorkflowError) return res.status(error.status).json({success:false,error:error.code});
   const message = error instanceof Error ? error.message : String(error);
   if (message.includes('NOT_FOUND')) {
     return res.status(404).json({ success: false, error: message });

@@ -1,3 +1,4 @@
+import { AiRequestInput } from '@o4o/ui';
 import { useEffect, useId, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useStoreAiPlacement } from "./StoreAiPlacement";
@@ -143,37 +144,20 @@ function AssistantSession({
           event.preventDefault();
           void submit();
         }}
-        className="flex items-start gap-2 rounded-xl border border-teal-200 bg-white p-2 focus-within:ring-2 focus-within:ring-teal-500"
+        className="flex flex-wrap items-start gap-2"
       >
         <label className="sr-only" htmlFor={`${id}-question`}>
           지금 하고 싶은 일 또는 이어서 답할 내용
         </label>
-        <textarea
+        <AiRequestInput
           id={`${id}-question`}
           value={question}
           maxLength={2000}
-          rows={question.includes("\n") ? 3 : 1}
           onChange={(event) => setQuestion(event.target.value)}
-          onKeyDown={(event) => {
-            if (
-              event.key === "Enter" &&
-              !event.shiftKey &&
-              !event.nativeEvent.isComposing
-            ) {
-              event.preventDefault();
-              void submit();
-            }
-          }}
           placeholder="AI에게 요청하기"
-          className="min-h-11 min-w-0 flex-1 resize-none rounded-lg px-2 py-3 text-base leading-5 outline-none"
+          busy={busy}
+          submitLabel={busy ? "답변 준비 중…" : error ? "다시 요청" : "보내기"}
         />
-        <button
-          type="submit"
-          disabled={busy || !question.trim()}
-          className="min-h-11 shrink-0 rounded-lg bg-teal-700 px-3 text-sm font-semibold text-white disabled:opacity-50"
-        >
-          {busy ? "답변 준비 중…" : error ? "다시 요청" : "보내기"}
-        </button>
         <button
           type="button"
           onClick={() => setOpen((value) => !value)}

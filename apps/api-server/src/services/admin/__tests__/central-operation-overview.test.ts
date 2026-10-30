@@ -40,3 +40,11 @@ it('covers the tool inboxes already exposed under neture.inbox without including
  expect(queries.map(([,args])=>args)).toEqual([['neture'],['store'],['hospital']]);
  expect(queries.every(([sql])=>sql.includes('organization_id IS NULL'))).toBe(true);
 });
+it('exposes the intake reference only to the same delegated candidate menu',async()=>{
+ read.mockResolvedValue([{key:'product-candidates',label:'운영 검토',href:'/operator/product-candidates?queue=review',count:3,oldest:null,available:true},{key:'product-candidate-intake',label:'수집 자료',href:'/operator/product-candidates?queue=intake',count:12000,oldest:null,available:true}]);
+ expect(centralMenuForTask('neture','product-candidate-intake')).toBe('neture.candidates');
+ const allowed=await centralOperationOverview(db(),'recipient',['neture:admin'],['neture.candidates']);
+ expect(allowed.tasks).toHaveLength(2);expect(allowed.tasks[1]).toMatchObject({key:'product-candidate-intake',kind:'reference'});
+ const denied=await centralOperationOverview(db(),'recipient',['neture:admin'],['neture.inbox']);
+ expect(denied.tasks.some(task=>task.key==='product-candidate-intake'||task.key==='product-candidates')).toBe(false);
+});
