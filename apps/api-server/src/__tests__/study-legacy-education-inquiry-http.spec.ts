@@ -39,7 +39,7 @@ const operator = (method: 'get' | 'patch', path: string) => request(app)[method]
 
 beforeEach(() => {
   jest.clearAllMocks();
-  (AppDataSource.query as jest.Mock).mockResolvedValue([{ status: 'active' }]);
+  (AppDataSource.query as jest.Mock).mockImplementation(async (sql:string) => sql.includes('role_assignments') ? [] : [{status:'active'}]);
   const inquiry = { id, service_key: 'kpa-society', type: 'education', name: 'SYNTHETIC',
     organization_name: null, subject: 'Previous lecture request', status: 'pending',
     email: 'synthetic@example.invalid', phone: null, message: 'Private inquiry message', createdAt: new Date() };

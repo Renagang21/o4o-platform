@@ -78,6 +78,7 @@ export function pcReleaseStatus(
 export async function downloadPcRelease(
   release: PcRelease,
   signal: AbortSignal,
+  onProgress?: (received: number, total: number) => void,
 ): Promise<Blob> {
   const artifact = release.setup ?? release;
   const response = await fetch(PC_RELEASE_BASE + artifact.filename, {
@@ -88,6 +89,7 @@ export async function downloadPcRelease(
   if (!response.ok) throw new Error("설치 파일을 내려받지 못했습니다.");
   const reader = response.body?.getReader();
   if (!reader) throw new Error("이 브라우저에서 파일을 확인할 수 없습니다.");
+  onProgress?.(0, artifact.bytes);
   const parts: Uint8Array[] = [];
   let length = 0;
   try {
@@ -98,6 +100,7 @@ export async function downloadPcRelease(
       if (length > artifact.bytes)
         throw new Error("설치 파일 크기 검증에 실패했습니다.");
       parts.push(chunk.value);
+      onProgress?.(length, artifact.bytes);
     }
   } catch (error) {
     await reader.cancel();

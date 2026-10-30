@@ -113,7 +113,7 @@ test('Windows packaged runtime starts and health proves its release and data rea
    try{const response=await fetch('http://127.0.0.1:47821/health',{headers:{Origin:'https://neture.co.kr'},signal:AbortSignal.timeout(500)});if(response.ok){health=await response.json();break;}}catch{}
    await new Promise(resolve=>setTimeout(resolve,250));
   }
-  assert.ok(health,'installed runtime must serve health');assert.equal(health.releaseId,result.releaseId);assert.equal(health.agentVersion,'0.4.0');assert.equal(health.localData.ready,true);assert.equal(health.localData.schemaVersion,8);
+  assert.ok(health,'installed runtime must serve health');assert.equal(health.releaseId,result.releaseId);assert.equal(health.agentVersion,'0.5.0');assert.equal(health.localData.ready,true);assert.equal(health.localData.schemaVersion,9);
   assert.equal(health.connected,false);assert.equal('credentials'in health,false);
  }finally{const exited=new Promise(resolve=>child.once('exit',resolve));execFileSync(path.join(system,'System32','taskkill.exe'),['/pid',String(child.pid),'/T','/F'],{stdio:'ignore'});await exited;}
  const freshHome=options.home+'-fresh',freshData=options.dataHome+'-fresh';
@@ -126,9 +126,10 @@ test('Windows packaged runtime starts and health proves its release and data rea
  // the installed runtime automatically. First-install GUI consent is not bypassed.
  const freshSlot=installedSlot(freshHome),runtime=path.join(freshSlot,'runtime','node.exe');
  try {
-  execFileSync(path.join(source,'runtime','node.exe'),[path.join(source,'install.mjs'),'--window'],{
+  const installOutput=execFileSync(path.join(source,'runtime','node.exe'),[path.join(source,'install.mjs'),'--window'],{
    env:{...process.env,PATH:path.join(system,'System32'),O4O_PC_INSTALL_HOME:freshHome,O4O_AGENT_HOME:freshData,APPDATA:path.join(root,'roaming-fresh')},stdio:'pipe',timeout:60000,
   });
+  assert.match(installOutput.toString('utf8'),/설치와 프로그램 실행을 확인했습니다/);
   let health;
   for(let n=0;n<40;n++) {
    try{const response=await fetch('http://127.0.0.1:47821/health',{headers:{Origin:'https://neture.co.kr'},signal:AbortSignal.timeout(500)});if(response.ok){health=await response.json();break;}}catch{}
@@ -138,6 +139,18 @@ test('Windows packaged runtime starts and health proves its release and data rea
  } finally {
   execFileSync(path.join(system,'System32','WindowsPowerShell','v1.0','powershell.exe'),['-NoProfile','-Command',"Get-CimInstance Win32_Process | Where-Object { $_.ExecutablePath -eq $env:O4O_TEST_RUNTIME } | ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }"],{env:{...process.env,O4O_TEST_RUNTIME:runtime},stdio:'pipe'});
  }
+
+ // A child which spawns but immediately fails must never be reported ready.
+ const brokenFiles=files.map(([name,bytes])=>[name,name==='src/index.mjs'?Buffer.concat([Buffer.from("if (process.argv[2] === 'run') process.exit(23);\n"),bytes]):bytes]);
+ const broken=assembleRelease({sourceSha,files:brokenFiles,runtime:fs.readFileSync(process.execPath),runtimeLicense:Buffer.from('fixture license')});
+ const brokenSource=writePackage(broken,'startup failure');
+ assert.throws(()=>execFileSync(path.join(brokenSource,'runtime','node.exe'),[path.join(brokenSource,'install.mjs'),'--window'],{
+   env:{...process.env,PATH:path.join(system,'System32'),O4O_PC_INSTALL_HOME:freshHome,O4O_AGENT_HOME:freshData,APPDATA:path.join(root,'roaming-fresh')},stdio:'pipe',timeout:60000,
+ }),error=>{
+   assert.equal(error.status,1);assert.doesNotMatch(error.stdout.toString('utf8'),/설치와 프로그램 실행을 확인했습니다/);
+   assert.match(error.stderr.toString('utf8'),/설치는 끝났지만 실행하지 못했습니다/);return true;
+ });
+ assert.equal(await runningAgent(),false);
 
 });
 
@@ -151,7 +164,7 @@ test('verified packages repair missing/corrupt installed code while preserving d
  await installPackage({source:one,...options});assert.equal(verifyPackage(installedSlot(options.home)).releaseId,fixture().manifest.releaseId);
  assert.ok(fs.readdirSync(path.join(options.home,'versions')).some(n=>n.startsWith('.damaged-')));
  fs.unlinkSync(index);await installPackage({source:two,...options});assert.equal(verifyPackage(installedSlot(options.home)).releaseId,fixture('two').manifest.releaseId);
- fs.rmSync(installedSlot(options.home),{recursive:true});await installPackage({source:two,...options});assert.equal(verifyPackage(installedSlot(options.home)).version,'0.4.0');
+ fs.rmSync(installedSlot(options.home),{recursive:true});await installPackage({source:two,...options});assert.equal(verifyPackage(installedSlot(options.home)).version,'0.5.0');
  assert.deepEqual(fs.readFileSync(path.join(options.dataHome,'credentials.json')),credential);
 });
 

@@ -6,7 +6,7 @@ import type { ApprovalAnalytics, ServiceApprovalItem, ServiceApprovalStats } fro
 const api = vi.hoisted(() => ({ list: vi.fn(), stats: vi.fn(), analytics: vi.fn(), approve: vi.fn(), reject: vi.fn() }));
 const auth = vi.hoisted(() => ({ id: 'fixture-session', roles: ['neture:operator'] }));
 vi.mock('../../../lib/api/serviceApproval', () => ({ operatorServiceApprovalApi: api }));
-vi.mock('../../../contexts/AuthContext', () => ({ useAuth: () => ({ user: auth }) }));
+vi.mock('../../../contexts/AuthContext', () => ({ getAccessToken: () => null, useAuth: () => ({ user: auth }) }));
 function deferred<T>() {
   let resolve!: (value: T) => void;
   let reject!: (error: Error) => void;

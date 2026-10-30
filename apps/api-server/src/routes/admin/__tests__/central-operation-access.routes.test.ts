@@ -2,6 +2,8 @@ import express from "express";
 import request from "supertest";
 jest.mock("../../../database/connection.js", () => ({ AppDataSource: {} }));
 const roles = jest.fn();
+const menuKeys = jest.fn().mockResolvedValue(['supplier.suppliers']);
+jest.mock('../../../services/admin/central-operation-menu-grants.js', () => ({ centralOperationMenuKeys: (...args: unknown[]) => menuKeys(...args) }));
 jest.mock("../../../services/admin/central-operation-access.js", () => ({
   centralOperationRoles: (...args: unknown[]) => roles(...args),
 }));
@@ -13,6 +15,7 @@ jest.mock("../../../middleware/auth.middleware.js", () => ({
     next();
   },
 }));
+import { AppDataSource } from "../../../database/connection.js";
 import { centralOperationAccessRouter } from "../central-operation-access.routes.js";
 const app = express();
 app.use("/access", centralOperationAccessRouter);
@@ -55,4 +58,17 @@ it("returns only server-resolved current duties", async () => {
     .set("x-method", "google");
   expect(r.status).toBe(200);
   expect(r.body.data.roles).toEqual(["supplier:operator"]);
+});
+
+it('keeps recipient/service/menu isolation and prioritizes older unread alerts before the limit',async()=>{
+ roles.mockResolvedValueOnce(['supplier:admin']);menuKeys.mockResolvedValueOnce(['supplier.inbox']);
+ const query=jest.fn().mockResolvedValueOnce([{id:'older-unread',isRead:false}]).mockResolvedValueOnce([{count:21}]);
+ (AppDataSource as any).query=query;
+ const r=await request(app).get('/access/notifications').set('x-user','recipient').set('x-method','google');
+ expect(r.status).toBe(200);expect(r.body.data.unreadCount).toBe(21);
+ expect(query.mock.calls[0][0]).toContain('ORDER BY "isRead" ASC,"createdAt" DESC,id DESC LIMIT 20');
+ for(const [sql,params] of query.mock.calls){
+  expect(sql).toContain('"userId"=$1');expect(sql).toContain('"organizationId" IS NULL');expect(sql).toContain("metadata->>'operationMenu'");
+  expect(params).toEqual(['recipient',['supplier'],['supplier.inbox']]);
+ }
 });

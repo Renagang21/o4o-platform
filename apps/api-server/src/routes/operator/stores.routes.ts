@@ -1,3 +1,4 @@
+import { centralScopedNetureRequest } from '../../middleware/central-operation-menu.middleware.js';
 /**
  * Operator Store Console Routes — Extension Layer
  * WO-O4O-STORE-CONSOLE-V1
@@ -28,6 +29,7 @@ router.use(requireRole([
   'kpa:admin', 'kpa:operator',
 ]));
 router.use(injectServiceScope);
+  router.use(centralScopedNetureRequest());
 
 // Store list with slug + owner + channel_count + product_count
 router.get('/', controller.getStores);

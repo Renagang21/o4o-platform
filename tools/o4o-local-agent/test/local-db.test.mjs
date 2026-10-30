@@ -225,7 +225,7 @@ test('14. runAction: 임의 SQL tool 은 존재하지 않는다 (denied)', async
   // DOM-CONTROL-V0 의 local.browser.dom.read_text / read_table 은 등재 site 탭의 **화면 텍스트** 읽기다 —
   // 파일 · 행 · SQL 읽기가 아니므로 제외한다. 그 밖의 read_* 이름은 여전히 없어야 한다.
   assert.equal(listed.some((a) => /sql|exec|file/i.test(a)), false);
-  assert.equal(listed.filter((a) => /read/i.test(a)).every((a) => a.startsWith('local.browser.dom.read_')), true);
+  assert.equal(listed.filter((a) => /read/i.test(a)).every((a) => a.startsWith('local.browser.dom.read_') || a === 'local.data.pharmacy_read'), true);
   assert.ok(listed.includes('local.data.health'));
 });
 
@@ -399,8 +399,8 @@ test('Experience: 실패 step · runtime 실패 이벤트 · run 상태는 건�
   assert.equal(e.failures[0].layer, 'runtime');
   assert.equal(e.failures[0].step_seq, 1);
   assert.equal(e.failures[0].ui_change_suspected, 0);
-  // goal_summary 는 기존 그대로 — 복제하지 않는다.
-  assert.equal(db.LocalWorkRunRepository.get('g_exp2').goal_summary, '약학정보원 검색');
+  // Request text is not persisted in goal_summary.
+  assert.equal(db.LocalWorkRunRepository.get('g_exp2').goal_summary, null);
 });
 
 test('Experience: QUESTION 대기 → 재개는 같은 run · segment 2개 · 사용자 대기 시간 분리 · seq 이어짐', async () => {
@@ -485,7 +485,7 @@ test('Phase 2 fixture A(값 확인): context 저장 → 재개 recall 이 원래
   });
   assert.equal(saved.status, 'success');
   const candidateId = saved.data.candidateId;
-  // 원래 요청 — 불특정 표현. run 원장의 goal_summary(Phase 1 이전부터 있던 칸)에만 있다.
+  // Original request is retained only in volatile replay memory, not the run row.
   const up = await handlers.runAction('local.data.work_run_upsert', {}, { runId: 'g_as1', status: 'waiting_for_user', targetId: 'healthkr', goalSummary: '약학정보원에서 내가 먹을 약 검색해줘' });
   assert.equal(up.status, 'success');
   const ctx = await handlers.runAction('local.data.work_run_context_save', {}, {

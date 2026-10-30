@@ -1,3 +1,4 @@
+import { requireNetureScope } from '../../../middleware/neture-scope.middleware.js';
 /**
  * OperatorRegistrationController
  * WO-O4O-NETURE-REGISTRATION-SYSTEM-FIX-V1
@@ -14,7 +15,7 @@
 import { Router, Request, Response } from 'express';
 import type { DataSource } from 'typeorm';
 import type { ActionLogService } from '@o4o/action-log-core';
-import { requireAuth, requireRole } from '../../../middleware/auth.middleware.js';
+import { requireAuth } from '../../../middleware/auth.middleware.js';
 import { OperatorRegistrationService } from '../services/operator-registration.service.js';
 import logger from '../../../utils/logger.js';
 import { sendDemoAccountForbidden } from '../../../services/auth/demo-account.service.js';
@@ -23,11 +24,7 @@ import { sendDemoAccountForbidden } from '../../../services/auth/demo-account.se
  * Operator/Admin role guard — DB-based (role_assignments 실시간 조회)
  * JWT 갱신 불요: role_assignments 테이블 변경 즉시 반영
  */
-const requireOperatorOrAdmin = requireRole([
-  'admin', 'super_admin', 'operator',
-  'platform:super_admin',
-  'neture:admin', 'neture:operator',
-]);
+const requireOperatorOrAdmin = requireNetureScope('neture:operator');
 
 type AuthenticatedRequest = Request & {
   user?: { id: string; role: string };

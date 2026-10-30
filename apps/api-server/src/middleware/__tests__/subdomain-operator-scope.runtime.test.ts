@@ -1,3 +1,4 @@
+jest.mock('../../services/admin/central-operation-menu-grants.js', () => ({ assertCentralOperationRequest: jest.fn(async () => undefined) }));
 /**
  * 서브도메인 운영자 경계 — **실제 가드 판정** (역할 × 서비스 membership)
  *

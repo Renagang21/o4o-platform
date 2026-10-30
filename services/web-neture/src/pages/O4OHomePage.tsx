@@ -1,3 +1,4 @@
+import { workDataRequest } from '../lib/pharmacy/work-data';
 import { useManualLibrary } from '../lib/manuals/useManualLibrary';
 import { ManualLibraryPanel, ManualReferences } from '../components/home/ManualLibraryPanel';
 import type { ManualReference } from '../lib/manuals/knowledge';
@@ -91,6 +92,12 @@ export default function O4OHomePage() {
   const [workResult, setWorkResult] = useState<WorkAgentResult | null>(null);
   const [confirm, setConfirm] = useState<{ text: string; message: string } | null>(null);
   const [resumeAnchor, setResumeAnchor] = useState<ResumeAnchor | null>(null);
+  const [waitingTasks,setWaitingTasks]=useState<Array<{taskId:string;runId:string;targetId:string|null;updatedAt:string}>>([]);
+  useEffect(()=>{
+    let active=true;setWaitingTasks([]);
+    if(user?.id && !isResolvingStore)void workDataRequest<typeof waitingTasks>('tasks',workScope).then(rows=>{if(active)setWaitingTasks(rows);}).catch(()=>{});
+    return()=>{active=false;};
+  },[user?.id,workScope,isResolvingStore]);
   const [pcSetup, setPcSetup] = useState<{ context: string; request: { text: string; routeHint?: 'work' } | null } | null>(null);
   const setupContext = JSON.stringify([user?.id, workScope]);
   const setupContextRef = useRef(setupContext);
@@ -446,13 +453,17 @@ export default function O4OHomePage() {
         </div>
       </form>
 
+      {canUseHomeWorkspace && !resumeAnchor && waitingTasks.length>0 && <section className="mt-3 w-full max-w-xl rounded border p-3 text-left text-sm">
+        <p>도움이 필요한 이전 업무가 있어요.</p>
+        {waitingTasks.map(task=><button key={task.taskId} type="button" disabled={blocked} onClick={()=>{setResumeAnchor({runId:task.runId,targetId:task.targetId});setQuestion('이전 업무 이어하기');setAnswer('필요한 도움이나 진행한 내용을 입력해 주세요. 원래 PC가 연결되면 같은 업무를 이어갑니다.');}} className="mr-2 mt-2 rounded border px-3 py-2">{new Date(task.updatedAt).toLocaleString()} 업무 이어하기</button>)}
+      </section>}
       {canUseHomeWorkspace && <div className="mt-3 w-full max-w-xl text-left">
         <button type="button" disabled={blocked} onClick={() => setPcSetup({ context: setupContext, request: null })} className="rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 disabled:opacity-50">PC 연결 준비</button>
       </div>}
       {canUseHomeWorkspace && activePcSetup && <AutomationPcSetup key={`pc-setup:${setupContext}`} disabled={blocked} hasRequest={!!activePcSetup.request} canContinue={!!trimmed}
         onClose={() => setPcSetup(null)}
         onContinue={() => { const request = activePcSetup.request; if (request) void submit(trimmed, trimmed === request.text ? request.routeHint : undefined); }} />}
-      {canUseHomeWorkspace && <PharmacyOrderPanel key={JSON.stringify([user?.id, workScope])} disabled={blocked || isResolvingStore} resuming={!!resumeAnchor} draft={input} onApply={text => { setInput(text); setConfirm(null); }} onPcSetup={() => setPcSetup({ context: setupContext, request: null })} />}
+      {canUseHomeWorkspace && <PharmacyOrderPanel workScope={workScope} key={JSON.stringify([user?.id, workScope])} disabled={blocked || isResolvingStore} resuming={!!resumeAnchor} draft={input} onApply={text => { setInput(text); setConfirm(null); }} onPcSetup={() => setPcSetup({ context: setupContext, request: null })} />}
       {canUseHomeWorkspace && <ManualLibraryPanel key={user?.id} library={manuals} disabled={blocked} />}
       {manualSearchEmpty && !pending && <p role="status" className="mt-2 max-w-xl text-xs text-slate-600">선택한 매뉴얼에서 관련 내용을 찾지 못해 이번 요청에는 매뉴얼을 보내지 않았습니다. 프로그램 이름·메뉴·업무를 구체적으로 적어 주세요.</p>}
       {!pending && manuals.ready && manualReferencesUsed.length > 0 && <div className="w-full max-w-xl"><ManualReferences references={manualReferencesUsed} library={manuals} disabled={blocked} /></div>}

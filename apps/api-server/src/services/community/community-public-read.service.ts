@@ -1,3 +1,5 @@
+import { assertCentralOperationMenu } from '../admin/central-operation-menu-grants.js';
+import { OperationError } from '../operations/operation-audit.js';
 import { COMMUNITY_HOME_PIN_SQL } from './community-home-pins.js';
 import type { EntityManager } from 'typeorm';
 import { resolveCommunityWorkspace, type CommunityWorkspace } from './community-workspace.service.js';
@@ -33,6 +35,10 @@ async function workspace(exec: Exec, key: string, user: CommunityAccessUser | nu
   }
   if (manage && (!value.allowed || !value.canManage)) {
     throw new CommunityPublicReadError(403, 'COMMUNITY_OPERATOR_REQUIRED', '해당 커뮤니티 운영자만 공개 범위를 변경할 수 있습니다.');
+  }
+  if (manage && key === 'community' && user?.id) {
+    try { await assertCentralOperationMenu(exec,user.id,'community',['community.forums']); }
+    catch(error) { if(error instanceof OperationError) throw new CommunityPublicReadError(error.status,error.code,error.message); throw error; }
   }
   return value;
 }

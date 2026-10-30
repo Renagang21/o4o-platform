@@ -43,9 +43,11 @@ vi.mock("@o4o/operator-core-ui", () => ({
 vi.mock("@o4o/operator-core-ui/modules/pharmacy-management", () => ({
   PharmacyMembershipReviewPage: () => null,
 }));
-vi.mock("./CentralLectureReview", () => ({
+vi.mock("./CentralLectureOperations", () => ({
   default: ({ courseId }: any) => <p>course:{courseId}</p>,
 }));
+vi.mock("./CentralOperationOverview", () => ({ default: () => null }));
+vi.mock("./CentralOperationNotifications", () => ({ default: () => null }));
 import CentralOperationsPage from "./CentralOperationsPage";
 afterEach(() => {
   cleanup();
@@ -82,16 +84,16 @@ it("service roles alone do not show operating screens when server delegation is 
 });
 it("shows only current delegated services and never the platform-admin entry", async () => {
   mock.get.mockResolvedValueOnce({
-    data: { data: { roles: ["supplier:operator"] } },
+    data: { data: { roles: ["supplier:operator"], menuKeys: ["supplier.members", "supplier.inbox", "supplier.suppliers"] } },
   });
   view();
-  expect(await screen.findByText("공급자 회원 관리")).toBeTruthy();
-  expect(screen.queryByText("펀딩 회원 관리")).toBeNull();
+  expect(await screen.findByRole('heading', { name: '공급자' })).toBeTruthy();
+  expect(screen.queryByRole('heading', { name: '펀딩' })).toBeNull();
   expect(screen.queryByText("전체 관리자")).toBeNull();
 });
 it("rejects an undelegated direct URL despite a valid grant for another service", async () => {
   mock.get.mockResolvedValueOnce({
-    data: { data: { roles: ["supplier:operator"] } },
+    data: { data: { roles: ["supplier:operator"], menuKeys: ["supplier.members", "supplier.inbox", "supplier.suppliers"] } },
   });
   view("/operations/funding/members");
   await waitFor(() =>
@@ -101,7 +103,7 @@ it("rejects an undelegated direct URL despite a valid grant for another service"
 
 it("preserves unsaved work during successful background delegation checks and removes it on revocation", async () => {
   mock.get.mockResolvedValue({
-    data: { data: { roles: ["supplier:operator"] } },
+    data: { data: { roles: ["supplier:operator"], menuKeys: ["supplier.members", "supplier.inbox", "supplier.suppliers"] } },
   });
   view("/operations/supplier/members");
   const input = await screen.findByLabelText("작성 중");
@@ -131,7 +133,7 @@ it.each([
 ])(
   "resolves the fixed business area of detail route %s",
   async (path, role, content) => {
-    mock.get.mockResolvedValueOnce({ data: { data: { roles: [role] } } });
+    mock.get.mockResolvedValueOnce({ data: { data: { roles: [role], menuKeys: [`${role.split(':')[0]}.members`, `${role.split(':')[0]}.courses`] } } });
     view(path);
     expect(await screen.findByText(content)).toBeTruthy();
     expect(screen.queryByRole("alert")).toBeNull();
@@ -139,11 +141,16 @@ it.each([
 );
 it("does not let a detail-route area bypass service delegation", async () => {
   mock.get.mockResolvedValueOnce({
-    data: { data: { roles: ["supplier:operator"] } },
+    data: { data: { roles: ["supplier:operator"], menuKeys: ["supplier.members", "supplier.inbox", "supplier.suppliers"] } },
   });
   view("/operations/lecture/courses/synthetic-course");
   expect(await screen.findByRole("alert")).toHaveTextContent(
     "위임되지 않은 업무",
   );
   expect(screen.queryByText("course:synthetic-course")).toBeNull();
+});
+it("rejects a menu outside the explicit duties even when the service role is present", async () => {
+  mock.get.mockResolvedValueOnce({ data: { data: { roles: ['neture:operator'], menuKeys: ['neture.members'] } } });
+  view('/operations/neture/qualifications');
+  expect(await screen.findByRole('alert')).toHaveTextContent('위임되지 않은 업무 메뉴');
 });

@@ -25,7 +25,7 @@ const read = (rel: string) => fs.readFileSync(path.join(REPO_ROOT, rel), 'utf-8'
 // WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 Phase 2 §11/§14: LMS 화면은 services/web-lecture 단일 소유.
 const courseService = read('apps/api-server/src/modules/lms/services/CourseService.ts');
 const lectureCourseEdit = read('services/web-lecture/src/pages/instructor/InstructorCourseEditPage.tsx');
-const lectureApi = read('services/web-lecture/src/api/lecture.ts');
+const lectureApi = read('services/web-lecture/src/api/lecture.ts') + read('packages/operator-core-ui/src/modules/lecture-operations/types.ts');
 
 describe('LMS 강의 생성 태그 계약 (§10/§15 → Lecture Phase 2)', () => {
   it('backend 생성 경로가 태그를 필수로 유지한다', () => {

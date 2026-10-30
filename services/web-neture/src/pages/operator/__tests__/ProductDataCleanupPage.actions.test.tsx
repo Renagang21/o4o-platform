@@ -3,7 +3,7 @@ import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/re
 import Page from '../ProductDataCleanupPage';
 const api = vi.hoisted(() => ({ getDuplicateMasters: vi.fn(), getRecycleBin: vi.fn(), restore: vi.fn(), hardDelete: vi.fn(), mergeMasters: vi.fn() }));
 const auth = vi.hoisted(() => ({ id: 'fixture', roles: ['neture:admin'] as string[] }));
-vi.mock('../../../contexts/AuthContext', () => ({ useAuth: () => ({ user: auth }) }));
+vi.mock('../../../contexts/AuthContext', () => ({ getAccessToken: () => null, useAuth: () => ({ user: auth }) }));
 vi.mock('../../../lib/api/operatorProductCleanup', () => ({ productCleanupApi: api }));
 vi.mock('../../../lib/apiClient', () => ({ api: { get: vi.fn() } }));
 const recycle = { id: 'offer', name: '합성 상품', barcode: 'fixture', supplier_name: '합성 공급자', deleted_at: '2026-01-01', delete_reason: 'fixture' };

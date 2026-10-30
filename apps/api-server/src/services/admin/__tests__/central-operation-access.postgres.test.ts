@@ -1,3 +1,5 @@
+import { CreateCentralOperationMenuGrants1793186241009 } from '../../../database/migrations/1793186241009-CreateCentralOperationMenuGrants.js';
+import { CentralOperationMenuGrantService, centralOperationMenuKeys, assertCentralOperationMenu, assertCentralOperationRequest,validateCentralMenuKeys } from '../central-operation-menu-grants.js';
 import { AddPharmacistQualificationDecisions1793165158540 } from "../../../database/migrations/1793165158540-AddPharmacistQualificationDecisions.js";
 import {
   PharmacistQualificationService,
@@ -22,6 +24,9 @@ class User {
 }
 import { randomUUID } from "node:crypto";
 import { centralOperationRoles } from "../central-operation-access.js";
+import express from 'express';
+import request from 'supertest';
+import {centralScopedNetureRequest,centralOperationRequest} from '../../../middleware/central-operation-menu.middleware.js';
 import { consultationProfessionalConfirmed } from "../../../modules/neture-pharmacy/services/consultation-professional.js";
 
 const enabled = process.env.UNIFIED_ACCESS_TEST_PORT === "55432";
@@ -49,9 +54,11 @@ const enabled = process.env.UNIFIED_ACCESS_TEST_PORT === "55432";
         db.getRepository(RoleAssignment),
       );
       await db.query(`CREATE SCHEMA ${schema}`);
-      await db.query(`CREATE TABLE users(id uuid PRIMARY KEY,status text,"isActive" boolean,"isEmailVerified" boolean,name text DEFAULT 'Synthetic member');
+      await db.query(`CREATE TABLE users(id uuid PRIMARY KEY,status text,"isActive" boolean,"isEmailVerified" boolean,name text DEFAULT 'Synthetic member',email text);
       CREATE TABLE role_assignments(id uuid PRIMARY KEY DEFAULT gen_random_uuid(),user_id uuid,role text,is_active boolean,scope_type text,valid_from timestamp,valid_until timestamp,scope_id uuid,assigned_at timestamp DEFAULT now(),assigned_by uuid,created_at timestamp DEFAULT now(),updated_at timestamp DEFAULT now(),CONSTRAINT chk_org_scope CHECK ((scope_type='global' AND scope_id IS NULL) OR (scope_type='organization' AND scope_id IS NOT NULL) OR scope_type IS NULL));
       CREATE TABLE service_memberships(user_id uuid,service_key text,status text,id uuid DEFAULT gen_random_uuid(),role text DEFAULT 'member',updated_at timestamp DEFAULT now());
+      CREATE TABLE service_operator_invitations(id uuid PRIMARY KEY DEFAULT gen_random_uuid());
+      CREATE TABLE notifications(id uuid DEFAULT gen_random_uuid(),"userId" uuid REFERENCES users(id),"serviceKey" text,"organizationId" uuid,type text,title text,message text,metadata jsonb,channel text,"isRead" boolean DEFAULT false,"createdAt" timestamp DEFAULT now());
       CREATE TABLE demo_accounts(user_id uuid,is_active boolean);
       CREATE TABLE kpa_members(user_id uuid,license_number text,status text,identity_status text,organization_id uuid,updated_at timestamp DEFAULT now());
       CREATE TABLE organization_members(user_id uuid,organization_id uuid,left_at timestamp,role text,metadata jsonb);
@@ -66,6 +73,11 @@ const enabled = process.env.UNIFIED_ACCESS_TEST_PORT === "55432";
         ),
       );
     });
+    beforeAll(async () => {
+      // This focused RBAC fixture has no erasure ledger. Full canonical fixture checks the real fence.
+      await db.query(`CREATE OR REPLACE FUNCTION public.account_erasure_write_fence() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN RETURN NEW; END $$`);
+      await db.transaction(m => new CreateCentralOperationMenuGrants1793186241009().up(m.queryRunner!));
+    });
     afterAll(async () => {
       if (db?.isInitialized) {
         await db.query(`DROP SCHEMA ${schema} CASCADE`);
@@ -74,7 +86,7 @@ const enabled = process.env.UNIFIED_ACCESS_TEST_PORT === "55432";
     });
     beforeEach(async () => {
       await db.query(
-        "TRUNCATE users,role_assignments,service_memberships,organization_members,kpa_pharmacist_profiles,action_logs,kpa_members,demo_accounts",
+        "TRUNCATE notifications,central_operation_menu_grants,service_operator_invitations,users,role_assignments,service_memberships,organization_members,kpa_pharmacist_profiles,action_logs,kpa_members,demo_accounts",
       );
       await db.query(
         `INSERT INTO users(id,status,"isActive","isEmailVerified") VALUES($1,'active',true,true)`,
@@ -91,6 +103,83 @@ const enabled = process.env.UNIFIED_ACCESS_TEST_PORT === "55432";
         value.startsWith("neture:") ? "neture" : value.split(":")[0],
       ]);
     }
+    it('lets directory delegates see all accounts without license/reason or decision authority', async () => {
+      await role('neture:operator');
+      await db.query(`INSERT INTO kpa_pharmacist_profiles(user_id,license_number,qualification_status,qualification_reason) VALUES($1,'SYNTHETIC-LICENSE','pending','Synthetic private review')`,[user]);
+      await db.query(`INSERT INTO central_operation_menu_grants(assignment_id,menu_keys) SELECT id,ARRAY['neture.members'] FROM role_assignments WHERE user_id=$1`,[user]);
+      const service = new PharmacistQualificationService(db);
+      const directory = await service.list(user,'all',1,user,true);
+      expect(directory.items).toHaveLength(1);
+      expect(directory.items[0]).toMatchObject({userId:user,licenseNumber:null,reason:null,status:'pending'});
+      await expect(service.list(user,'all',1)).rejects.toMatchObject({status:403});
+      await expect(service.decide(user,user,{action:'reject',reason:'Synthetic decision',version:directory.items[0].version})).rejects.toMatchObject({status:403});
+    });
+    it('keeps relationship cleanup and approval revocation as distinct Admin duties',async()=>{
+      expect(()=>validateCentralMenuKeys('neture:operator',['neture.membership-cleanup'])).toThrow();
+      expect(()=>validateCentralMenuKeys('neture:operator',['neture.service-approval-management'])).toThrow();
+      await role('neture:admin');
+      await db.query(`INSERT INTO central_operation_menu_grants(assignment_id,menu_keys) SELECT id,ARRAY['neture.membership-cleanup'] FROM role_assignments WHERE user_id=$1`,[user]);
+      await expect(assertCentralOperationRequest(db,user,'neture',['neture.membership-cleanup'],'google')).resolves.toBeUndefined();
+      await expect(assertCentralOperationRequest(db,user,'neture',['neture.service-members'],'google')).rejects.toMatchObject({status:403});
+      await expect(assertCentralOperationRequest(db,user,'neture',['neture.service-approval-management'],'google')).rejects.toMatchObject({status:403});
+    });
+    it('never skips a central Neture duty check through a query-selected service',async()=>{
+      await role('neture:operator');
+      await db.query(`INSERT INTO central_operation_menu_grants(assignment_id,menu_keys) SELECT id,ARRAY['neture.members'] FROM role_assignments WHERE user_id=$1`,[user]);
+      const handler=jest.fn((_req,res)=>res.json({success:true}));
+      const app=express();
+      app.use((req,_res,next)=>{Object.assign(req,{user:{id:user},authMethod:req.header('x-method')??'google',serviceScope:{isPlatformAdmin:false,serviceKeys:req.header('x-empty-scope')?[]:['neture','kpa-society'],rolePrefixes:['neture','kpa']}});next();});
+      app.use(centralScopedNetureRequest(db));
+      app.post('/api/v1/operator/product-candidates/:id/reject',handler);
+      for(const query of ['serviceKey=lecture','serviceKey=kpa-society','serviceKey=neture','all=true','serviceKey=all','']) {
+        const result=await request(app).post(`/api/v1/operator/product-candidates/fixture/reject?${query}`);
+        expect(result.status).toBe(403);
+        expect(result.body.code).toBe('CENTRAL_MENU_NOT_DELEGATED');
+      }
+      expect(handler).not.toHaveBeenCalled();
+      expect((await request(app).post('/api/v1/operator/product-candidates/fixture/reject?serviceKey=lecture').set('x-empty-scope','yes')).status).toBe(403);
+      expect(handler).not.toHaveBeenCalled();
+      await db.query("UPDATE central_operation_menu_grants SET menu_keys=ARRAY['neture.candidates']");
+      expect((await request(app).post('/api/v1/operator/product-candidates/fixture/reject?serviceKey=lecture').set('x-method','password')).body.code).toBe('CENTRAL_GOOGLE_REQUIRED');
+      expect(handler).not.toHaveBeenCalled();
+      expect((await request(app).post('/api/v1/operator/product-candidates/fixture/reject?serviceKey=neture')).status).toBe(200);
+      expect(handler).toHaveBeenCalledTimes(1);
+    });
+    it('lets supplier governance read the funding precondition without granting approval commands',async()=>{
+      await role('supplier:admin');
+      await db.query(`INSERT INTO central_operation_menu_grants(assignment_id,menu_keys) SELECT id,ARRAY['supplier.governance'] FROM role_assignments WHERE user_id=$1`,[user]);
+      const app=express(),read=jest.fn((_req,res)=>res.json({items:[]})),write=jest.fn((_req,res)=>res.sendStatus(200));
+      app.use((req,_res,next)=>{Object.assign(req,{user:{id:user},authMethod:'google'});next();});
+      app.use(centralOperationRequest('supplier',undefined,db));
+      app.get('/api/v1/neture/operator/suppliers/fixture/active-fundings',read);
+      app.post('/api/v1/neture/operator/suppliers/fixture/approve',write);
+      expect((await request(app).get('/api/v1/neture/operator/suppliers/fixture/active-fundings')).status).toBe(200);
+      expect(read).toHaveBeenCalledTimes(1);
+      expect((await request(app).post('/api/v1/neture/operator/suppliers/fixture/approve')).status).toBe(403);
+      expect(write).not.toHaveBeenCalled();
+    });
+    it('limits menus per assignment, rejects cross-service grants, and detects concurrent edits', async () => {
+      await role('lecture:operator');
+      await db.query(`INSERT INTO users(id,status,"isActive","isEmailVerified") VALUES($1,'active',true,true)`, [reviewer]);
+      await db.query(`INSERT INTO role_assignments(user_id,role,is_active,scope_type,valid_from) VALUES($1,'platform:super_admin',true,'global',now())`, [reviewer]);
+      const grants = new CentralOperationMenuGrantService(db);
+      const original = await grants.read(reviewer, user, 'lecture:operator');
+      expect(original.menuKeys).toContain('lecture.certificates');
+      const saved = await grants.update(reviewer, user, 'lecture:operator', { menuKeys: ['lecture.instructors'], reason: 'Synthetic scoped duty', version: original.version });
+      expect(await centralOperationMenuKeys(db, user, await centralOperationRoles(db,user))).toEqual(['lecture.instructors']);
+      await expect(assertCentralOperationMenu(db,user,'lecture',['lecture.instructors'])).resolves.toBeUndefined();
+      for (const method of ['password','kakao',undefined]) await expect(assertCentralOperationRequest(db,user,'lecture',['lecture.instructors'],method)).rejects.toMatchObject({code:'CENTRAL_GOOGLE_REQUIRED'});
+      await expect(assertCentralOperationRequest(db,user,'lecture',['lecture.instructors'],'google')).resolves.toBeUndefined();
+      await expect(assertCentralOperationRequest(db,user,'lecture',['lecture.certificates'],'google')).rejects.toMatchObject({code:'CENTRAL_MENU_NOT_DELEGATED'});
+      await expect(assertCentralOperationMenu(db,user,'lecture',['lecture.certificates'])).rejects.toMatchObject({status:403});
+      await expect(grants.update(reviewer,user,'lecture:operator',{menuKeys:['supplier.suppliers'],reason:'Invalid cross-service',version:saved.version})).rejects.toMatchObject({status:400});
+      await expect(grants.update(reviewer,user,'lecture:operator',{menuKeys:[],reason:'Stale edit',version:original.version})).rejects.toMatchObject({status:409});
+      await expect(grants.update(user,user,'lecture:operator',{menuKeys:['lecture.courses'],reason:'Self expansion',version:saved.version})).rejects.toMatchObject({status:403});
+      await grants.update(reviewer,user,'lecture:operator',{menuKeys:[],reason:'Revoke all menus',version:saved.version});
+      expect(await centralOperationMenuKeys(db,user,await centralOperationRoles(db,user))).toEqual([]);
+      await db.query("UPDATE role_assignments SET valid_until=now()-interval '1 second' WHERE user_id=$1",[user]);
+      await expect(assertCentralOperationMenu(db,user,'lecture',['lecture.instructors'])).rejects.toMatchObject({status:403});
+    });
     it.each([
       "supplier:admin",
       "supplier:operator",
@@ -286,6 +375,21 @@ const enabled = process.env.UNIFIED_ACCESS_TEST_PORT === "55432";
         [reviewer],
       );
     }
+    it("lists common accounts without a pharmacist profile and filters status and literal search without changing approval", async () => {
+      await credentialReviewer();
+      const service = new PharmacistQualificationService(db);
+      await db.query('UPDATE users SET name=$2,email=$3 WHERE id=$1', [user, 'Applicant 100%', 'applicant@example.invalid']);
+      const all = await service.list(reviewer, 'all', 1);
+      expect(all.counts).toMatchObject({ all: 2, unrequested: 2, pending: 0 });
+      expect(all.items.find((item: any) => item.userId === user)).toMatchObject({ status: 'unrequested', version: null, licenseNumber: null });
+      await service.request(user, 'SYNTHETIC-SEARCH-LICENSE');
+      const pending = await service.list(reviewer, 'pending', 1, '100%');
+      expect(pending.items).toHaveLength(1);
+      expect(pending.items[0].userId).toBe(user);
+      expect(pending.counts).toMatchObject({ all: 1, pending: 1, unrequested: 0 });
+      expect((await service.list(reviewer, 'all', 1, '100_')).items).toEqual([]);
+      expect(await hasApprovedPharmacist(db, user)).toBe(false);
+    });
     it("manual qualification review requires evidence and reason, preserves common identity and supports rejection, approval and revocation", async () => {
       await credentialReviewer();
       const service = new PharmacistQualificationService(db);

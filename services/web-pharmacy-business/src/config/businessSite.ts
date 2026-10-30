@@ -1,4 +1,5 @@
 import { getCooperationExtension } from '@o4o/shared-space-ui';
+const BUSINESS_HOST_KEYS: Record<string, string> = { 'megapharm.neture.co.kr': 'megapharm', 'carepharm.neture.co.kr': 'carepharm' };
 
 /** Shared pharmacy application: business configuration never grants membership or a role. */
 export function resolveBusinessSite(
@@ -8,9 +9,7 @@ export function resolveBusinessSite(
 ) {
   const key =
     configuredKey?.trim() ||
-    (hostname.toLowerCase().replace(/^www\./, "") === "megapharm.neture.co.kr"
-      ? "megapharm"
-      : "pharmacy");
+    (BUSINESS_HOST_KEYS[hostname.toLowerCase().replace(/^www\./, '')] ?? 'pharmacy');
   if (!/^[a-z0-9][a-z0-9-]{0,79}$/.test(key))
     throw new Error("Invalid pharmacy business site key");
   const extension = getCooperationExtension(key);

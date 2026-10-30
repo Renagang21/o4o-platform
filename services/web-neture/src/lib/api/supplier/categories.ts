@@ -1,41 +1,16 @@
-import { api } from '../../apiClient';
-import type {
-  RegulatedCategory,
-  RegulatedCategoryStatus,
-  SupplierRegulatedCategory,
-} from './business.types';
 import { SUPPLIER_REGULATED_CATEGORIES_LOAD_FAILED, extractApiError } from './errors';
+import { api } from '../../apiClient';
+import type { RegulatedCategory, SupplierRegulatedCategory } from './business.types';
+export { REGULATED_CATEGORY_LABELS, REGULATED_CATEGORY_ORDER, REGULATED_CATEGORY_STATUS_LABELS } from '@o4o/operator-core-ui/modules/supplier-operations';
 
-export const REGULATED_CATEGORY_LABELS: Record<RegulatedCategory, string> = {
-  general: '일반 상품',
-  pharmaceutical: '의약품',
-  quasi_drug: '의약외품',
-  medical_device: '의료기기',
-  health_functional_food: '건강기능식품',
-  food: '식품',
-  cosmetics: '화장품',
-  other_regulated: '기타 법정 관리 품목',
-};
 
-export const REGULATED_CATEGORY_ORDER: RegulatedCategory[] = [
-  'general',
-  'pharmaceutical',
-  'quasi_drug',
-  'medical_device',
-  'health_functional_food',
-  'food',
-  'cosmetics',
-  'other_regulated',
-];
 
-export const REGULATED_CATEGORY_STATUS_LABELS: Record<RegulatedCategoryStatus, string> = {
-  not_requested: '미신청',
-  submitted: '서류 제출',
-  approved: '등록 가능',
-  rejected: '반려',
-  needs_update: '보완 필요',
-  suspended: '사용 제한',
-};
+
+
+
+
+
+
 
 export const supplierRegulatedCategoryApi = {
   /**

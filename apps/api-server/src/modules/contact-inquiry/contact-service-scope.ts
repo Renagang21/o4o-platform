@@ -1,3 +1,4 @@
+import { centralOperationRequest } from '../../middleware/central-operation-menu.middleware.js';
 import type { RequestHandler } from "express";
 import type { DataSource } from "typeorm";
 import {
@@ -155,10 +156,16 @@ export function requireContactScope(
     if (isSupportedLegalServiceKey(key) && key !== "kpa-society")
       return requireServiceLegalScope(level)(req, res, next);
     if (key === "store" || key === "hospital")
-      return requireNetureScope(`neture:${level}`)(req, res, next);
+      return requireNetureScope(`neture:${level}`)(req, res, error => {
+        if (error) return next(error);
+        return centralOperationRequest('neture', () => ['neture.inbox'], db)(req,res,next);
+      });
     try {
       const recipients = await contactRecipients(db, key, level);
-      if (recipients.some((row) => row.userId === req.user?.id)) return next();
+      if (recipients.some((row) => row.userId === req.user?.id)) {
+        if (key === 'pharmcoop') return centralOperationRequest('pharmcoop', () => ['pharmcoop.inbox'], db)(req,res,next);
+        return next();
+      }
       // Keep the KPA legal guard's existing isolation/platform policy.
       if (key === "kpa-society")
         return requireServiceLegalScope(level)(req, res, next);

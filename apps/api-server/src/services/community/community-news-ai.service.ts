@@ -47,7 +47,7 @@ async function generate(
     }),
     {
       authorize: async () => {
-        if (actor) await requireCommunityManager(AppDataSource, actor);
+        if (actor) await requireCommunityManager(AppDataSource, actor, false, 'editorial');
         else await requireNewsAutomationEnabled(AppDataSource);
         return true;
       },

@@ -30,6 +30,7 @@ export default function CustomerConsultationPage() {
   const [screen, setScreen] = useState<CustomerScreen | null>(null),
     [error, setError] = useState(""),
     [notice, setNotice] = useState("");
+  const [storageWarning, setStorageWarning] = useState(false);
   const [text, setText] = useState(""),
     [language, setLanguage] = useState("ko"),
     [busy, setBusy] = useState(false),
@@ -39,13 +40,20 @@ export default function CustomerConsultationPage() {
     lock = useRef(false),
     latest = useRef<CustomerScreen | null>(null),
     draftEpoch = useRef<string | null>(null);
+  const submission = useRef(0);
+  const invalidateSubmission = useCallback(() => {
+    submission.current++;
+    lock.current = false;
+    setBusy(false);
+  }, []);
   const reset = useCallback(() => {
+    invalidateSubmission();
     latest.current = null;
     draftEpoch.current = null;
     setScreen(null);
     setText("");
     setNotice("");
-  }, []);
+  }, [invalidateSubmission]);
   const speech = useConsultationSpeech(
     `${credential?.id}:${screen?.epoch}:${language}`,
     (words) =>
@@ -58,6 +66,14 @@ export default function CustomerConsultationPage() {
   textRef.current = text;
   const resetSpeech = speech.reset;
   const stopReading = speech.stopReading;
+  const revokeDevice = useCallback(() => {
+    generation.current++;
+    reset();
+    resetSpeech();
+    setStorageWarning(false);
+    try { localStorage.removeItem(credentialKey); } catch { /* In-memory revocation still applies. */ }
+    setCredential(null);
+  }, [reset, resetSpeech]);
   useEffect(() => {
     alive.current = true;
     const forget = () => {
@@ -81,8 +97,8 @@ export default function CustomerConsultationPage() {
     const version = ++generation.current;
     latest.current = null;
     setScreen(null);
-    setError("");
     if (!credential) return;
+    setError("");
     let cancelled = false,
       timer: number | undefined;
     const controller = new AbortController();
@@ -104,6 +120,7 @@ export default function CustomerConsultationPage() {
         if (!validCustomerScreen(value) || value.id !== credential.id)
           throw new Error("고객 화면 응답을 확인하지 못했습니다.");
         if (draftEpoch.current !== value.epoch) {
+          invalidateSubmission();
           draftEpoch.current = value.epoch;
           setText("");
           setNotice("");
@@ -127,6 +144,7 @@ export default function CustomerConsultationPage() {
         setScreen(value);
         setError("");
         if (value.state !== "active") {
+          invalidateSubmission();
           setText("");
           setNotice("");
           resetSpeech();
@@ -139,13 +157,7 @@ export default function CustomerConsultationPage() {
           resetSpeech();
           setError((e as Error).message || "연결을 확인하지 못했습니다.");
           if ([401, 403].includes((e as { status?: number }).status ?? 0)) {
-            reset();
-            try {
-              localStorage.removeItem(credentialKey);
-            } catch {
-              /* Storage may be disabled. */
-            }
-            setCredential(null);
+            revokeDevice();
           }
         }
       } finally {
@@ -167,9 +179,10 @@ export default function CustomerConsultationPage() {
       clearTimeout(timer);
       document.removeEventListener("visibilitychange", hidden);
     };
-  }, [credential, retry, reset, resetSpeech, stopReading]);
+  }, [credential, retry, reset, resetSpeech, stopReading, revokeDevice, invalidateSubmission]);
   const pair = async () => {
     if (lock.current || !code.trim()) return;
+    const request = ++submission.current;
     lock.current = true;
     setBusy(true);
     setError("");
@@ -178,28 +191,29 @@ export default function CustomerConsultationPage() {
       const value = await customerRequest<CustomerCredential>("claim", {
         code,
       });
-      if (!alive.current || generation.current !== version) return;
+      if (!alive.current || generation.current !== version || submission.current !== request) return;
       if (
         !value?.id ||
         typeof value.name !== "string" ||
         !/^[a-f0-9]{64}$/.test(value.token)
       )
         throw new Error("연결 응답을 확인하지 못했습니다.");
+      setStorageWarning(false);
       try {
         localStorage.setItem(credentialKey, JSON.stringify(value));
       } catch {
-        setNotice(
-          "이 브라우저에서는 연결이 저장되지 않습니다. 다음에 다시 연결해 주세요.",
-        );
+        setStorageWarning(true);
       }
       setCredential(value);
       setCode("");
     } catch (e) {
-      if (alive.current && generation.current === version)
+      if (alive.current && generation.current === version && submission.current === request)
         setError((e as Error).message);
     } finally {
-      lock.current = false;
-      if (alive.current) setBusy(false);
+      if (submission.current === request) {
+        lock.current = false;
+        if (alive.current) setBusy(false);
+      }
     }
   };
   const send = async () => {
@@ -212,6 +226,7 @@ export default function CustomerConsultationPage() {
     )
       return;
     const version = generation.current;
+    const request = ++submission.current;
     lock.current = true;
     setBusy(true);
     setError("");
@@ -227,6 +242,7 @@ export default function CustomerConsultationPage() {
       if (
         alive.current &&
         generation.current === version &&
+        submission.current === request &&
         latest.current?.epoch === current.epoch
       ) {
         setText("");
@@ -234,23 +250,19 @@ export default function CustomerConsultationPage() {
         setLanguage(latest.current.language);
       }
     } catch (e) {
-      if (alive.current && generation.current === version)
-        setError((e as Error).message);
+      if (alive.current && generation.current === version && submission.current === request && draftEpoch.current === current.epoch) {
+        if ([401, 403].includes((e as { status?: number }).status ?? 0)) revokeDevice();
+        setError((e as Error).message || "답변을 전달하지 못했습니다. 다시 시도해 주세요.");
+      }
     } finally {
-      lock.current = false;
-      if (alive.current) setBusy(false);
+      if (submission.current === request) {
+        lock.current = false;
+        if (alive.current) setBusy(false);
+      }
     }
   };
   const forgetDevice = () => {
-    generation.current++;
-    reset();
-    resetSpeech();
-    try {
-      localStorage.removeItem(credentialKey);
-    } catch {
-      /* In-memory reset still works. */
-    }
-    setCredential(null);
+    revokeDevice();
     setError("");
   };
   return (
@@ -419,6 +431,7 @@ export default function CustomerConsultationPage() {
       )}
       {speech.message && <p role="status">{speech.message}</p>}
       {notice && <p role="status">{notice}</p>}
+      {credential && storageWarning && <p role="status">이 브라우저에서는 연결이 저장되지 않습니다. 다음에 다시 연결해 주세요.</p>}
       {credential && (
         <details className="border-t pt-4">
           <summary className="min-h-12 cursor-pointer">
