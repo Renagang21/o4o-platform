@@ -18,4 +18,21 @@ describe('prepared public description file adapter', () => {
  it('rejects missing evidence rather than fabricating a source', () => {
   expect(() => readPublicDescriptionCatalog(catalog([{ ...description, source_evidence_ids: ['missing'] }]), 'B2B', 'ko')).toThrow();
  });
+ it('preserves typed AI sections and leaves old section semantics unclassified', () => {
+  const section = { key: 'one', title: '성분', kind: 'product-fact', text: '확인한 성분', referenceUrls: [evidence[0].source_url] };
+  const result = readPublicDescriptionCatalog(catalog([{ ...description, aiSections: [section] }]), 'B2B', 'ko');
+  expect(result.entries[0].aiSections).toEqual([section]);
+  expect(readPublicDescriptionCatalog(catalog([description]), 'B2B', 'ko').entries[0].aiSections).toBeUndefined();
+ });
+});
+
+
+it.each([
+ { Long: '본문'.repeat(12000) },
+ Object.fromEntries(Array.from({ length: 41 }, (_, i) => [`section-${i}`, `기존 본문 ${i}`])),
+])('preserves legacy content without imposing structured-section limits', sections => {
+ const entry = readPublicDescriptionCatalog(catalog([{ ...description, sections, section_html: {} }]), 'B2B', 'ko').entries[0];
+ expect(entry.aiSections).toBeUndefined();
+ for (const body of Object.values(sections)) expect(entry.content).toContain(body);
+ expect(entry.source.references[0].url).toBe(evidence[0].source_url);
 });

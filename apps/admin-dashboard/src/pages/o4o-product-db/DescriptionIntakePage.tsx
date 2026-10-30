@@ -74,6 +74,10 @@ export default function DescriptionIntakePage() {
           {detail.entry.source.references.map(ref => <a key={ref.url} href={ref.url} target="_blank" rel="noopener noreferrer" className="block text-blue-700 break-all">{ref.label || ref.url}</a>)}
           {detail.entry.source.currentness === 'archived' && <label className="block bg-amber-50 p-3"><input type="checkbox" checked={archived} disabled={busy || !mutable} onChange={e => setArchived(e.target.checked)} /> 현행성이 재확인되지 않은 보관자료임을 확인했습니다.</label>}
           {detail.authorContext && <div className="rounded border p-3 whitespace-pre-wrap"><h4>작성자가 입력한 근거 (별도 검토 필요)</h4><p>상품 사실: {detail.authorContext.facts}</p><p>출처: {detail.authorContext.factSource}</p><p>전문 참고: {detail.authorContext.reference}</p><p>출처: {detail.authorContext.referenceSource}</p></div>}
+          {!!detail.entry.aiSections?.length && <details className="rounded border p-3"><summary>AI 구조화 항목·근거 ({detail.entry.aiSections.length})</summary>
+            <p className="text-sm">자유 HTML 본문을 수정하면 이전 구조화 항목은 해제됩니다. 항목을 보완하려면 수정한 원천 JSON을 다시 접수하세요.</p>
+            {detail.entry.aiSections.map(section => <section key={section.key} className="my-2 whitespace-pre-wrap break-words"><h4>{section.kind} · {section.title}</h4><p>{section.text}</p>{section.referenceUrls.map(url => <p key={url}>{url}</p>)}</section>)}
+          </details>}
           <label className="block">검토 본문 (HTML)<textarea aria-label="검토 본문" className={`${box} h-48 font-mono text-sm`} value={body} disabled={!mutable || busy} onChange={e => setBody(e.target.value)} /></label>
           <button className={button} disabled={!mutable || busy || body === detail.entry.content} onClick={() => void run(async () => show(await api.edit(detail.id, detail.revision, body)))}>수정 본문 저장</button>
           <Html html={body} />

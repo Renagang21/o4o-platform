@@ -17,11 +17,17 @@ export function readPublicDescriptionCatalog(raw: unknown, descriptionType: Desc
     if (!content) { excludedEmpty++; continue; }
     const refs = (Array.isArray(d.source_evidence_ids) ? d.source_evidence_ids : []).map(id => evidence.get(str(id)));
     if (!refs.length || refs.some(e => !e || !str(e.source_url))) throw new Error('설명 본문의 근거 자료가 누락됐습니다.');
-    const references = [...new Map(refs.map(e => [str(e!.source_url), { url: str(e!.source_url), label: str(e!.kind), sha256: str(e!.sha256) }])).values()];
+    const references = [...new Map(refs.map(e => [str(e!.source_url), { url: str(e!.source_url), label: str(e!.kind), ...(str(e!.sha256) ? { sha256: str(e!.sha256) } : {}) }])).values()];
     const archived = /archive|not_current/.test(str(d.source_currentness)) || refs.some(e => /archive/.test(str(e!.currentness)));
     const official = record(d.official_identifiers);
     entries.push({ key: str(d.description_key), name: str(d.name), manufacturer: str(d.manufacturer) || null, category: str(d.category) || null,
       content, descriptionType, language, barcodes: Array.isArray(d.verified_barcodes) ? d.verified_barcodes.map(str) : [],
+      ...(Array.isArray(d.aiSections) ? { aiSections: d.aiSections.map(raw => {
+        const section = record(raw), kind = str(section.kind);
+        if (!['product-fact','professional-reference','counseling-support','unclassified'].includes(kind)) throw new Error('AI 항목의 정보 구분을 확인해 주세요.');
+        return { key: str(section.key), title: str(section.title), kind: kind as NonNullable<DescriptionEntry['aiSections']>[number]['kind'],
+          text: str(section.text), referenceUrls: Array.isArray(section.referenceUrls) ? section.referenceUrls.map(str) : [] };
+      }) } : {}),
       identifiers: { ...(str(official.mfds_item_seq) ? { mfdsItemSeq: str(official.mfds_item_seq) } : {}), ...(str(official.statement_no) ? { statementNo: str(official.statement_no) } : {}) },
       source: { kind: references.every(r => { try { return new URL(r.url).hostname.endsWith('.go.kr'); } catch { return false; } }) ? 'government' : 'manufacturer',
         currentness: archived ? 'archived' : 'retrieved', checkedOn: archived ? null : str(root.generated_on) || null, references } });

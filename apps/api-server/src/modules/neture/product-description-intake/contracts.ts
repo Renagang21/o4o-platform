@@ -71,7 +71,22 @@ export const descriptionEntrySchema = z.object({
     statementNo: z.string().regex(/^\d{8,20}$/).optional(),
   }).strict().default({}),
   source: descriptionSourceSchema,
-}).strict();
+  aiSections: z.array(z.object({
+    key: z.string().trim().min(1).max(100),
+    title: z.string().trim().min(1).max(300),
+    kind: z.enum(['product-fact', 'professional-reference', 'counseling-support', 'unclassified']),
+    text: z.string().trim().min(1).max(20000),
+    referenceUrls: z.array(z.string().url().max(2048)).max(20),
+  }).strict()).max(40).optional(),
+}).strict().superRefine((entry, ctx) => {
+  const urls = new Set(entry.source.references.map(r => r.url));
+  if (entry.aiSections?.some(s => s.referenceUrls.some(url => !urls.has(url))))
+    ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'SECTION_SOURCE_NOT_DECLARED' });
+  if (entry.aiSections?.some(s => s.kind !== 'unclassified' && !s.referenceUrls.length))
+    ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'SECTION_SOURCE_REQUIRED' });
+  if (new Set(entry.aiSections?.map(s => s.key)).size !== (entry.aiSections?.length ?? 0))
+    ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'DUPLICATE_SECTION_KEY' });
+});
 export type DescriptionEntry = z.infer<typeof descriptionEntrySchema>;
 export const intakeBatchSchema = z.object({ entries: z.array(descriptionEntrySchema).max(20) }).strict();
 
