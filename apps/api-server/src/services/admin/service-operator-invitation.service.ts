@@ -1,3 +1,5 @@
+import { centralMenusForRole } from '@o4o/types';
+import { validateCentralMenuKeys } from './central-operation-menu-grants.js';
 import { resolvePlatformInvitationRole, CENTRAL_DELEGATION_SCOPE } from "../../config/operator-role-catalog.js";
 import { buildOperatorInvitationMail, invitationScopeLabel } from './operator-invitation-mail.js';
 import { ServiceOperatorInvitationError } from "./operator-invitation-error.js";
@@ -76,6 +78,7 @@ async function defaultMailer(
 }
 
 export type InviteInput = {
+  menuKeys?: unknown;
   email?: string;
   targetUserId?: string;
   serviceKey: string;
@@ -129,7 +132,12 @@ export class ServiceOperatorInvitationService {
         FROM service_operator_invitations ORDER BY created_at DESC LIMIT 200`);
     });
   }
-  private scope(invite: OperatorInvite): InvitationScope {
+  private scope(invite: OperatorInvite, cancelling = false): InvitationScope {
+    // Historical platform roles may be retired. A live root Admin may close the invitation,
+    // but accepting/resending still resolves the current role contract.
+    if (cancelling && invite.scope_type === 'platform') return {
+      scope_type:'platform',scope_key:invite.scope_key,role:invite.role,service_key:invite.service_key,
+    };
     const s = invitationScope(
       invite.scope_type ?? "platform",
       invite.scope_key ?? "",
@@ -145,10 +153,11 @@ export class ServiceOperatorInvitationService {
     scope: InvitationScope,
     actor: string,
     target?: string,
+    cancelling = false,
   ) {
     if (!UUID.test(actor)) fail("FORBIDDEN", 403);
     try {
-      await authorizeInvitation(m, scope, actor, target);
+      await authorizeInvitation(m, scope, actor, target, cancelling);
     } catch (e) {
       if (e instanceof Error && e.message === "INVITATION_ACTOR_FORBIDDEN")
         fail("FORBIDDEN", 403);
@@ -216,6 +225,9 @@ export class ServiceOperatorInvitationService {
       input.role,
       input.serviceKey,
     );
+    const central = scope.scope_type === 'platform' && scope.scope_key === CENTRAL_DELEGATION_SCOPE;
+    if (!central && input.menuKeys !== undefined) fail('INVALID_INVITATION_INPUT', 400);
+    const menuKeys = central ? validateCentralMenuKeys(scope.role, input.menuKeys ?? centralMenusForRole(scope.role).map(menu => menu.key)) : null;
     // Target lock precedes every role/cooperative mutation, including acceptance and revocation.
     if (input.targetUserId)
       await lockOperatorAssignments(m, input.targetUserId);
@@ -261,7 +273,9 @@ export class ServiceOperatorInvitationService {
       const prior = pending[0] as OperatorInvite;
       // Same permission and same selected account only. Never rebind another pending invitation.
       if ((prior.target_user_id ?? null) !== (user?.id ?? null)) fail("INVITATION_ACCOUNT_MISMATCH", 403);
-      return this.rotate(m, prior, input.actorId);
+      const rotated = await this.rotate(m, prior, input.actorId);
+      if (menuKeys !== null) await this.saveInvitationMenus(m, prior.id, menuKeys);
+      return rotated;
     }
     const token = randomBytes(32).toString("hex"),
       now = this.now(),
@@ -283,6 +297,7 @@ export class ServiceOperatorInvitationService {
         now,
       ],
     );
+    if (menuKeys !== null) await this.saveInvitationMenus(m, invite.id, menuKeys);
     return {
       invite,
       url: `${getServiceOrigin("neture")}/operator-invite#token=${token}`,
@@ -335,13 +350,13 @@ export class ServiceOperatorInvitationService {
       if (!pre) fail("INVITATION_NOT_FOUND", 404);
       if (pre.target_user_id)
         await lockOperatorAssignments(m, pre.target_user_id);
-      await this.authority(m, this.scope(pre), actor);
+      await this.authority(m, this.scope(pre, action === 'cancel'), actor, undefined, action === 'cancel');
       const [row]: OperatorInvite[] = await m.query(
         `SELECT ${COLUMNS} FROM service_operator_invitations WHERE id=$1 FOR UPDATE`,
         [id],
       );
       if (!row) fail("INVITATION_NOT_FOUND", 404);
-      await this.authority(m, this.scope(row), actor);
+      await this.authority(m, this.scope(row, action === 'cancel'), actor, undefined, action === 'cancel');
       if (row.status !== "pending" || new Date(row.expires_at) <= this.now())
         fail("INVITATION_NOT_PENDING");
       if (action === "cancel") {
@@ -424,7 +439,11 @@ export class ServiceOperatorInvitationService {
         );
         scopeName = context?.name;
       }
+      const central = i.scope_type === 'platform' && i.scope_key === CENTRAL_DELEGATION_SCOPE;
+      const [grant] = central ? await m.query('SELECT menu_keys FROM central_operation_menu_grants WHERE invitation_id=$1', [i.id]) : [];
+      const menus = central ? centralMenusForRole(i.role).filter(menu => !grant || grant.menu_keys.includes(menu.key)) : [];
       return {
+        ...(central ? { menuKeys: menus.map(menu => menu.key), menuLabels: menus.map(menu => menu.label) } : {}),
         serviceKey: i.service_key,
         role: i.role,
         purpose: i.purpose,
@@ -432,6 +451,10 @@ export class ServiceOperatorInvitationService {
         ...(scopeName ? { scopeName } : {}),
       };
     });
+  }
+  private async saveInvitationMenus(m: EntityManager, invitationId: string, keys: string[]) {
+    await m.query(`INSERT INTO central_operation_menu_grants(invitation_id,menu_keys) VALUES($1,$2)
+      ON CONFLICT(invitation_id) DO UPDATE SET menu_keys=$2,updated_at=clock_timestamp()`, [invitationId, keys]);
   }
   async accept(
     token: string,
@@ -483,6 +506,17 @@ export class ServiceOperatorInvitationService {
         i.invited_by_user_id ?? "",
         user.id,
       );
+      let acceptedMenuKeys: string[] | undefined;
+      if (scope.scope_type === 'platform' && scope.scope_key === CENTRAL_DELEGATION_SCOPE) {
+        const [pending] = await m.query('SELECT menu_keys FROM central_operation_menu_grants WHERE invitation_id=$1 FOR UPDATE', [i.id]);
+        const menus = validateCentralMenuKeys(i.role, pending?.menu_keys ?? centralMenusForRole(i.role).map(menu => menu.key));
+        acceptedMenuKeys = menus;
+        const [assignment] = await m.query(`SELECT id FROM role_assignments WHERE user_id=$1 AND role=$2 AND scope_type=$3 AND is_active=true FOR UPDATE`, [user.id, i.role, CENTRAL_DELEGATION_SCOPE]);
+        if (!assignment) fail('OPERATOR_ROLE_REVOKED', 409);
+        await m.query('DELETE FROM central_operation_menu_grants WHERE invitation_id=$1', [i.id]);
+        await m.query(`INSERT INTO central_operation_menu_grants(assignment_id,menu_keys) VALUES($1,$2)
+          ON CONFLICT(assignment_id) DO UPDATE SET menu_keys=$2,updated_at=clock_timestamp()`, [assignment.id, menus]);
+      }
       await m.query(
         `UPDATE service_operator_invitations SET status='accepted',accepted_user_id=$2,target_user_id=NULL,
         accepted_at=$3,updated_at=$3,invited_email=NULL,token_hash=NULL WHERE id=$1`,
@@ -508,7 +542,7 @@ export class ServiceOperatorInvitationService {
         i.service_key,
         i.invited_by_user_id,
         "admin.service_operator_assigned",
-        { scope: i.scope_key, targetUserId: user.id, role: i.role },
+        { scope: i.scope_key, targetUserId: user.id, role: i.role, ...(acceptedMenuKeys ? {menuKeys:acceptedMenuKeys} : {}) },
       );
       return {
         serviceKey: i.service_key,

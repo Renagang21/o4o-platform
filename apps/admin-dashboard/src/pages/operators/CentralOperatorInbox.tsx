@@ -1,3 +1,4 @@
+import { CentralServiceContactInquiry } from './CentralSharedWork';
 import { useMemo } from "react";
 import { OperatorInbox, type InboxClient } from "@o4o/operator-core-ui";
 import { authClient } from "@o4o/auth-client";
@@ -33,9 +34,9 @@ export default function CentralOperatorInbox({
     [serviceKey],
   );
   return (
-    <OperatorInbox
+    <section className="space-y-6"><OperatorInbox
       client={client}
       endpoint={`/operator-inbox/service/${serviceKey}`}
-    />
+    />{serviceKey === "neture" && <><details className="rounded border bg-white p-4"><summary className="cursor-pointer font-semibold">내 매장 도구 문의</summary><CentralServiceContactInquiry serviceKey="store" /></details><details className="rounded border bg-white p-4"><summary className="cursor-pointer font-semibold">원내 약품 파일 도구 문의</summary><CentralServiceContactInquiry serviceKey="hospital" /></details></>}</section>
   );
 }

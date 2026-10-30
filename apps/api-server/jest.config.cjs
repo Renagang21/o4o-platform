@@ -13,6 +13,7 @@ module.exports = {
     '/__tests__/setup/'
   ],
   transform: {
+    "^.+\\.mjs$": '<rootDir>/jest.mjs-transformer.cjs',
     '^.+\\.tsx?$': ['ts-jest', {
       tsconfig: {
         esModuleInterop: true,
@@ -61,7 +62,7 @@ module.exports = {
     '^@/(.*)$': '<rootDir>/src/$1',
     '^(\\.{1,2}/.*)\\.js$': '$1',
   },
-  moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
+  moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'mjs', 'json', 'node'],
   coverageDirectory: 'coverage',
   collectCoverageFrom: [
     'src/**/*.{ts,tsx}',

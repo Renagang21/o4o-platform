@@ -1,3 +1,5 @@
+import { assertCentralOperationRequest } from '../services/admin/central-operation-menu-grants.js';
+import { centralApiMenus } from './central-operation-menu.middleware.js';
 import type { RequestHandler } from 'express';
 import { AppDataSource } from '../database/connection.js';
 import { getServiceMembershipStatusFromDb } from '../utils/service-membership.js';
@@ -15,6 +17,7 @@ export const forumOperationAccess = (tier: 'operator' | 'admin'): RequestHandler
   try {
     const status = await getServiceMembershipStatusFromDb(AppDataSource, (req as any).user.id, service);
     if (status !== 'active') { res.status(403).json({ success: false, code: 'MEMBERSHIP_NOT_ACTIVE', error: '현재 서비스의 활성 가입이 필요합니다.' }); return; }
+    if (service === 'neture') await assertCentralOperationRequest(AppDataSource, (req as any).user.id, 'neture', centralApiMenus('neture', req), (req as any).authMethod);
     next();
   } catch { res.status(503).json({ success: false, error: '현재 서비스 권한을 확인하지 못했습니다.' }); }
 };

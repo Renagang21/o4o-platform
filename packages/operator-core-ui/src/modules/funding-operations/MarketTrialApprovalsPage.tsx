@@ -1,0 +1,702 @@
+import { useFundingOperations } from './runtime';
+/**
+ * Market Trial Approvals Page (Neture Operator)
+ *
+ * WO-O4O-MARKET-TRIAL-PHASE1-V1
+ * WO-MARKET-TRIAL-OPERATOR-CONSOLIDATED-REFINE-V1
+ * WO-MARKET-TRIAL-OPERATION-READINESS-V1
+ * WO-MONITOR-UI-1: 포럼 연계 실패 탭 추가
+ *
+ * 탭 구조:
+ *   - Trial 관리: 기존 운영자 승인/목록
+ *   - 포럼 연계 실패: 포럼 자동 연계 실패 이력 조회 + resolve
+ */
+
+import FundingExceptionsPanel from './FundingExceptionsPanel';
+import { OperatorDialog } from '../../common/operation-support/OperatorDialog';
+import { useLatestRequest } from '../../common/operation-support/useLatestRequest';
+import { useState, useEffect, useCallback, useRef, type RefObject } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import { useOperationNavigate as useNavigate } from './runtime';
+
+import type { OperatorTrial, ForumSyncFailure, MarketTrialKpiSnapshot } from './types';
+
+// ============================================================================
+// 상수
+// ============================================================================
+
+const STATUS_CONFIG: Record<string, { label: string; color: string }> = {
+  draft: { label: '작성 중', color: 'bg-gray-100 text-gray-700' },
+  submitted: { label: '심사 대기', color: 'bg-yellow-100 text-yellow-800' },
+  recruiting: { label: '모집 중', color: 'bg-green-100 text-green-800' },
+  development: { label: '준비 중', color: 'bg-purple-100 text-purple-800' },
+  outcome_confirming: { label: '결과 확정', color: 'bg-indigo-100 text-indigo-800' },
+  fulfilled: { label: '이행 완료', color: 'bg-teal-100 text-teal-800' },
+  closed: { label: '종료', color: 'bg-red-100 text-red-700' },
+};
+
+const FILTER_TABS: { label: string; value: string }[] = [
+  { label: '전체', value: '' },
+  { label: '심사 대기', value: 'submitted' },
+  { label: '모집 중', value: 'recruiting' },
+  { label: '준비 중', value: 'development' },
+  { label: '결과 확정', value: 'outcome_confirming' },
+  { label: '이행 완료', value: 'fulfilled' },
+  { label: '종료', value: 'closed' },
+];
+
+type PageTab = 'trials' | 'forum-failures' | 'exceptions';
+
+// ============================================================================
+// 메인 페이지
+// ============================================================================
+
+export default function MarketTrialApprovalsPage() {
+
+
+  const dialogFallback = useRef<HTMLHeadingElement>(null);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const pageTab: PageTab = ['forum-failures','exceptions'].includes(searchParams.get('tab')??'') ? searchParams.get('tab') as PageTab : 'trials';
+  const setPageTab = (tab:PageTab) => setSearchParams(tab==='trials'?{}:{tab});
+
+  return (
+    <div className="p-6">
+      <div className="flex items-center justify-between mb-5">
+        <h1 ref={dialogFallback} tabIndex={-1} className="text-xl font-bold text-gray-900">유통참여형 펀딩 관리</h1>
+      </div>
+
+      {/* 상단 페이지 탭 */}
+      <div className="flex flex-wrap gap-1 mb-6 border-b border-gray-200">
+        <PageTabButton active={pageTab === 'trials'} onClick={() => setPageTab('trials')}>
+          유통참여형 펀딩 관리
+        </PageTabButton>
+        <PageTabButton active={pageTab === 'exceptions'} onClick={() => setPageTab('exceptions')}>
+          입금·이행 확인 대상
+        </PageTabButton>
+        <PageTabButton active={pageTab === 'forum-failures'} onClick={() => setPageTab('forum-failures')}>
+          포럼 연계 실패
+        </PageTabButton>
+      </div>
+
+      {pageTab === 'trials' ? <TrialsPanel /> : pageTab === 'exceptions' ? <FundingExceptionsPanel /> : <ForumSyncFailuresPanel dialogFallback={dialogFallback} />}
+    </div>
+  );
+}
+
+function PageTabButton({
+  active,
+  onClick,
+  children,
+}: {
+  active: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
+
+
+  return (
+    <button
+      onClick={onClick}
+      className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+        active
+          ? 'border-blue-600 text-blue-600'
+          : 'border-transparent text-gray-500 hover:text-gray-700'
+      }`}
+    >
+      {children}
+    </button>
+  );
+}
+
+// ============================================================================
+// Trial 관리 패널 (기존 로직 분리)
+// ============================================================================
+
+function TrialsPanel() {
+ const { api: { getOperatorTrials, getOperatorMarketTrialKpi } } = useFundingOperations();
+
+
+
+  const navigate = useNavigate();
+  const [trials, setTrials] = useState<OperatorTrial[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [filter, setFilter] = useState('');
+  const [kpi, setKpi] = useState<MarketTrialKpiSnapshot | null>(null);
+  const beginTrials = useLatestRequest('funding-operator-list');
+
+  useEffect(() => {
+    void loadKpi();
+  }, []);
+
+  useEffect(() => {
+    void loadTrials();
+  }, [filter]);
+
+  const loadKpi = async () => {
+    try {
+      const data = await getOperatorMarketTrialKpi();
+      setKpi(data);
+    } catch {
+      // best-effort: KPI bar is non-blocking
+    }
+  };
+
+  const loadTrials = async () => {
+    const current = beginTrials();
+    setLoading(true);
+    setError('');
+    try {
+      const data = await getOperatorTrials(filter || undefined);
+      if (current()) setTrials(data);
+    } catch (err: any) {
+      if (current()) setError(err.message || '유통참여형 펀딩 목록을 불러오는데 실패했습니다.');
+    } finally {
+      if (current()) setLoading(false);
+    }
+  };
+
+  return (
+    <>
+      {/* KPI 요약 바 (백엔드 집계) */}
+      {kpi && <KpiBar kpi={kpi} />}
+
+      {/* 상태 필터 탭 */}
+      <div className="flex gap-2 mb-6 flex-wrap">
+        {FILTER_TABS.map((tab) => (
+          <button
+            key={tab.value}
+            onClick={() => setFilter(tab.value)}
+            className={`px-3 py-1.5 rounded-full text-sm border transition ${
+              filter === tab.value
+                ? 'bg-blue-600 text-white border-blue-600'
+                : 'bg-white text-gray-600 border-gray-300 hover:border-blue-400'
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
+        <span className="ml-auto text-sm text-gray-400 self-center">{trials.length}건</span>
+      </div>
+
+      {error && (
+        <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">
+          {error}
+        </div>
+      )}
+
+      {loading ? (
+        <div className="text-center py-12 text-gray-500">불러오는 중...</div>
+      ) : trials.length === 0 ? (
+        <div className="text-center py-12 text-gray-400">
+          {filter
+            ? `"${FILTER_TABS.find((t) => t.value === filter)?.label}" 상태의 유통참여형 펀딩이 없습니다.`
+            : '유통참여형 펀딩이 없습니다.'}
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {trials.map((trial) => (
+            <TrialCard
+              key={trial.id}
+              trial={trial}
+              onClick={() => navigate(`/operator/market-trial/${trial.id}`)}
+            />
+          ))}
+        </div>
+      )}
+    </>
+  );
+}
+
+// ── KPI Bar (backend aggregate) ──
+
+function KpiBar({ kpi }: { kpi: MarketTrialKpiSnapshot }) {
+
+
+  const fmt = (n: number) => n.toLocaleString('ko-KR');
+  const fmtRate = (r: number | null) => (r == null ? '-' : `${r}%`);
+
+  return (
+    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
+      <div className="bg-white border border-gray-200 rounded-lg p-3 text-center">
+        <p className="text-lg font-bold text-gray-900">{fmt(kpi.totalTrials)}</p>
+        <p className="text-xs text-gray-500 mt-0.5">전체 유통참여형 펀딩</p>
+        <p className="text-xs text-gray-400 mt-0.5">
+          모집 중 <span className="font-medium text-green-600">{kpi.recruitingTrials}</span>
+          {' · '}심사 <span className="font-medium text-yellow-600">
+            {kpi.totalTrials - kpi.recruitingTrials - kpi.developmentTrials - kpi.outcomeConfirmingTrials - kpi.fulfilledTrials - kpi.closedTrials}
+          </span>
+        </p>
+      </div>
+      <div className="bg-white border border-gray-200 rounded-lg p-3 text-center">
+        <p className="text-lg font-bold text-blue-700">{fmt(kpi.totalParticipants)}</p>
+        <p className="text-xs text-gray-500 mt-0.5">누적 참여자</p>
+        <p className="text-xs text-gray-400 mt-0.5">
+          입금 확인 완료 <span className="font-medium text-blue-600">{fmt(kpi.paidParticipantCount)}</span>
+        </p>
+      </div>
+      <div className="bg-white border border-gray-200 rounded-lg p-3 text-center">
+        <p className="text-lg font-bold text-emerald-700">{fmtRate(kpi.successRate)}</p>
+        <p className="text-xs text-gray-500 mt-0.5">모집 성공률</p>
+        <p className="text-xs text-gray-400 mt-0.5">
+          성공 {kpi.successfulTrials} · 실패 {kpi.failedTrials}
+        </p>
+      </div>
+      <div className="bg-white border border-gray-200 rounded-lg p-3 text-center">
+        <p className="text-lg font-bold text-purple-700">{fmtRate(kpi.paymentCompletionRate)}</p>
+        <p className="text-xs text-gray-500 mt-0.5">입금 확인 완료율</p>
+        <p className="text-xs text-gray-400 mt-0.5">
+          환불 <span className="font-medium text-red-500">{kpi.refundCount}</span>건
+        </p>
+      </div>
+    </div>
+  );
+}
+
+// ── Trial Card ──
+
+function TrialCard({ trial, onClick }: { trial: OperatorTrial; onClick: () => void }) {
+
+
+  const statusCfg = STATUS_CONFIG[trial.status] || {
+    label: trial.status,
+    color: 'bg-gray-100 text-gray-700',
+  };
+  const recruitRate =
+    trial.maxParticipants && trial.maxParticipants > 0
+      ? Math.round((trial.currentParticipants / trial.maxParticipants) * 100)
+      : null;
+
+  return (
+    <div
+      onClick={onClick}
+      role="button"
+      tabIndex={0}
+      onKeyDown={event=>{if(event.key==='Enter' || event.key===' '){event.preventDefault();onClick();}}}
+      className="p-4 bg-white border border-gray-200 rounded-lg hover:border-blue-300 hover:shadow-sm cursor-pointer transition"
+    >
+      <div className="flex items-start justify-between gap-2">
+        <h3 className="font-medium text-gray-900 truncate min-w-0 flex-1">{trial.title}</h3>
+        <span
+          className={`px-2.5 py-1 rounded-full text-xs font-medium whitespace-nowrap shrink-0 ${statusCfg.color}`}
+        >
+          {statusCfg.label}
+        </span>
+      </div>
+
+      <p className="text-sm text-gray-500 mt-1">
+        {trial.supplierName || '공급자'} ·{' '}
+        {new Date(trial.createdAt).toLocaleDateString('ko-KR')}
+      </p>
+
+      <div className="flex items-center gap-3 mt-2 flex-wrap">
+        <span className="text-xs text-gray-600">
+          참여 <span className="font-semibold text-gray-900">{trial.currentParticipants}</span>
+          {trial.maxParticipants ? `/${trial.maxParticipants}` : ''}명
+        </span>
+        {recruitRate !== null && (
+          <span
+            className={`text-xs font-medium ${
+              recruitRate >= 80
+                ? 'text-red-600'
+                : recruitRate >= 50
+                ? 'text-yellow-600'
+                : 'text-gray-500'
+            }`}
+          >
+            ({recruitRate}%)
+          </span>
+        )}
+        {trial.outcomeSnapshot?.expectedType && (
+          <span
+            className={`text-xs px-1.5 py-0.5 rounded ${
+              trial.outcomeSnapshot.expectedType === 'product'
+                ? 'bg-green-50 text-green-700'
+                : 'bg-yellow-50 text-yellow-700'
+            }`}
+          >
+            {trial.outcomeSnapshot.expectedType === 'product' ? '제품' : '현금'}
+          </span>
+        )}
+      </div>
+
+    </div>
+  );
+}
+
+// ============================================================================
+// 포럼 연계 실패 패널
+// ============================================================================
+
+const STAGE_LABEL: Record<string, string> = {
+  category_check: '카테고리 확인',
+  forum_post_create: '게시글 생성',
+  forum_mapping_save: '매핑 저장',
+};
+
+type ResolvedFilter = 'all' | 'unresolved' | 'resolved';
+
+function ForumSyncFailuresPanel({ dialogFallback }: { dialogFallback: RefObject<HTMLElement | null> }) {
+ const { api: { getForumSyncFailures, resolveForumSyncFailure } } = useFundingOperations();
+
+
+
+  const navigate = useNavigate();
+  const [items, setItems] = useState<ForumSyncFailure[]>([]);
+  const [total, setTotal] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [trialIdInput, setTrialIdInput] = useState('');
+  const [query, setQuery] = useState({ resolvedFilter: 'unresolved' as ResolvedFilter, trialId: '', page: 1, revision: 0 });
+  const { resolvedFilter, page } = query;
+  const beginList = useLatestRequest(JSON.stringify(query));
+  const beginResolve = useLatestRequest('funding-failure-resolution');
+  const submitting = useRef(false);
+  const [notice, setNotice] = useState('');
+  const limit = 20;
+
+  // resolve 모달 상태
+  const [resolveTarget, setResolveTarget] = useState<ForumSyncFailure | null>(null);
+  const [resolveNote, setResolveNote] = useState('');
+  const [resolving, setResolving] = useState(false);
+  const [resolveError, setResolveError] = useState('');
+
+  // 에러 메시지 전체보기 모달
+  const [errorDetailTarget, setErrorDetailTarget] = useState<ForumSyncFailure | null>(null);
+
+  const load = useCallback(async () => {
+    const current = beginList();
+    setLoading(true);
+    setError('');
+    setItems([]);
+    try {
+      const resolved: 'true' | 'false' | undefined =
+        resolvedFilter === 'resolved' ? 'true' : resolvedFilter === 'unresolved' ? 'false' : undefined;
+      const result = await getForumSyncFailures({
+        resolved,
+        trialId: query.trialId || undefined,
+        page,
+        limit,
+      });
+      if (!current()) return;
+      const lastPage = Math.max(1, Math.ceil(result.meta.total / limit));
+      if (page > lastPage) {
+        beginList();
+        setQuery(previous => ({ ...previous, page: lastPage }));
+        return;
+      }
+      setItems(result.data);
+      setTotal(result.meta.total);
+    } catch (err: any) {
+      if (current()) setError(err.message || '데이터를 불러오는데 실패했습니다.');
+    } finally {
+      if (current()) setLoading(false);
+    }
+  }, [query, beginList]);
+
+  useEffect(() => { void load(); }, [load]);
+
+  const handleSearch = () => {
+    if (submitting.current) return;
+    setQuery(previous => ({ ...previous, page: 1, trialId: trialIdInput.trim(), revision: previous.revision + 1 }));
+  };
+
+  const handleResolve = async () => {
+    if (!resolveTarget || submitting.current) return;
+    submitting.current = true;
+    const current = beginResolve();
+    setResolving(true);
+    setResolveError('');
+    try {
+      await resolveForumSyncFailure(resolveTarget.id, resolveNote.trim() || undefined);
+      if (!current()) return;
+      setResolveTarget(null);
+      setResolveNote('');
+      setNotice('해결 처리했습니다. 현재 조건의 목록을 다시 조회합니다.');
+      setQuery(previous => ({ ...previous, revision: previous.revision + 1 }));
+    } catch (err: any) {
+      if (current()) setResolveError(err.message || '처리에 실패했습니다.');
+    } finally {
+      submitting.current = false;
+      if (current()) setResolving(false);
+    }
+  };
+
+  const totalPages = Math.ceil(total / limit);
+
+  return (
+    <div>
+      {/* 필터 바 */}
+      <div className="flex flex-wrap items-end gap-3 mb-4">
+        {/* resolved 필터 */}
+        <div className="flex gap-1">
+          {(['unresolved', 'all', 'resolved'] as ResolvedFilter[]).map((v) => (
+            <button
+              key={v}
+              disabled={resolving}
+              onClick={() => setQuery(previous => ({ ...previous, resolvedFilter: v, page: 1 }))}
+              className={`px-3 py-1.5 text-xs rounded-full border transition ${
+                resolvedFilter === v
+                  ? 'bg-blue-600 text-white border-blue-600'
+                  : 'bg-white text-gray-600 border-gray-300 hover:border-blue-400'
+              }`}
+            >
+              {v === 'unresolved' ? '미해결' : v === 'all' ? '전체' : '해결됨'}
+            </button>
+          ))}
+        </div>
+
+        {/* trial ID 검색 */}
+        <div className="flex gap-1 flex-1 max-w-xs">
+          <input
+            type="text"
+            placeholder="Trial ID 검색"
+            aria-label="Trial ID 검색"
+            disabled={resolving}
+            value={trialIdInput}
+            onChange={(e) => setTrialIdInput(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+            className="min-w-0 flex-1 px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:border-blue-400"
+          />
+          <button
+            onClick={handleSearch}
+            disabled={resolving}
+            className="px-3 py-1.5 text-xs bg-gray-100 border border-gray-300 rounded-lg hover:bg-gray-200"
+          >
+            검색
+          </button>
+        </div>
+
+        {!loading && !error && <span className="text-xs text-gray-400 ml-auto">총 {total}건</span>}
+      </div>
+
+      {error && (
+        <div role="alert" className="mb-3 p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">
+          {error}
+          <button type="button" onClick={() => void load()} disabled={resolving} className="ml-3 rounded border px-3 py-2">다시 조회</button>
+        </div>
+      )}
+      {notice && <output className="block mb-3 text-sm text-green-700">{notice}</output>}
+
+      {loading && (
+        <div className="text-center py-12 text-gray-500">불러오는 중...</div>
+      )}
+      {!loading && !error && items.length === 0 && (
+        <div className="text-center py-12 text-gray-400">
+          {resolvedFilter === 'unresolved' ? '미해결 실패 건이 없습니다.' : '실패 이력이 없습니다.'}
+        </div>
+      )}
+      {!loading && !error && items.length > 0 && (
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm border-collapse">
+            <thead>
+              <tr className="bg-gray-50 border-b border-gray-200">
+                <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 whitespace-nowrap">상태</th>
+                <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 whitespace-nowrap">심각도</th>
+                <th className="px-3 py-2 text-left text-xs font-medium text-gray-500">유통참여형 펀딩</th>
+                <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 whitespace-nowrap">단계</th>
+                <th className="px-3 py-2 text-left text-xs font-medium text-gray-500">에러 메시지</th>
+                <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 whitespace-nowrap">발생 시각</th>
+                <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 whitespace-nowrap">해결 시각</th>
+                <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 whitespace-nowrap">액션</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {items.map((item) => (
+                <ForumFailureRow
+                  key={item.id}
+                  item={item}
+                  onNavigate={() => navigate(`/operator/market-trial/${item.trialId}`)}
+                  onResolve={() => { setResolveTarget(item); setResolveNote(''); setResolveError(''); }}
+                  onShowError={() => setErrorDetailTarget(item)}
+                  disabled={resolving}
+                />
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {/* Pagination */}
+      {!loading && !error && totalPages > 1 && (
+        <div className="flex justify-center gap-1 mt-4">
+          <button
+            onClick={() => setQuery(previous => ({ ...previous, page: Math.max(1, previous.page - 1) }))}
+            disabled={page === 1 || resolving}
+            className="px-3 py-1.5 text-xs border border-gray-300 rounded disabled:opacity-40 hover:bg-gray-50"
+          >
+            이전
+          </button>
+          <span className="px-3 py-1.5 text-xs text-gray-600">
+            {page} / {totalPages}
+          </span>
+          <button
+            onClick={() => setQuery(previous => ({ ...previous, page: Math.min(totalPages, previous.page + 1) }))}
+            disabled={page === totalPages || resolving}
+            className="px-3 py-1.5 text-xs border border-gray-300 rounded disabled:opacity-40 hover:bg-gray-50"
+          >
+            다음
+          </button>
+        </div>
+      )}
+
+      {/* Resolve 모달 */}
+      {resolveTarget && (
+        <OperatorDialog label="해결 처리" fallbackFocus={dialogFallback} busy={resolving} onCancel={() => setResolveTarget(null)} className="bg-white rounded-xl shadow-xl max-w-md p-6">
+            <h3 className="font-semibold text-gray-900 mb-1">해결 처리</h3>
+            <p className="text-sm text-gray-500 mb-4 truncate">
+              {resolveTarget.trialTitle}
+            </p>
+            <textarea data-dialog-initial-focus
+              value={resolveNote}
+              onChange={(e) => setResolveNote(e.target.value)}
+              placeholder="운영 메모 (선택)"
+              aria-label="운영 메모"
+              disabled={resolving}
+              rows={3}
+              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg resize-none focus:outline-none focus:border-blue-400 mb-3"
+            />
+            {resolveError && (
+              <p role="alert" className="text-xs text-red-600 mb-3">{resolveError}</p>
+            )}
+            <div className="flex gap-2 justify-end">
+              <button
+                onClick={() => setResolveTarget(null)}
+                disabled={resolving}
+                className="px-4 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50"
+              >
+                취소
+              </button>
+              <button
+                onClick={handleResolve}
+                disabled={resolving}
+                className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+              >
+                {resolving ? '처리 중...' : '해결 완료'}
+              </button>
+            </div>
+          </OperatorDialog>
+      )}
+
+      {/* 에러 메시지 전체보기 모달 */}
+      {errorDetailTarget && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-lg p-6">
+            <h3 className="font-semibold text-gray-900 mb-3">에러 메시지</h3>
+            <div className="bg-gray-50 rounded-lg p-3 text-xs text-gray-700 font-mono break-all whitespace-pre-wrap max-h-60 overflow-y-auto mb-4">
+              {errorDetailTarget.errorMessage}
+            </div>
+            <div className="text-right">
+              <button
+                onClick={() => setErrorDetailTarget(null)}
+                className="px-4 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50"
+              >
+                닫기
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── 실패 행 컴포넌트 ──
+
+function ForumFailureRow({
+  item,
+  onNavigate,
+  onResolve,
+  onShowError,
+  disabled,
+}: {
+  item: ForumSyncFailure;
+  onNavigate: () => void;
+  onResolve: () => void;
+  onShowError: () => void;
+  disabled: boolean;
+}) {
+
+
+  const isResolved = !!item.resolvedAt;
+
+  return (
+    <tr className={isResolved ? 'opacity-50' : ''}>
+      {/* 상태 */}
+      <td className="px-3 py-2.5 whitespace-nowrap">
+        {isResolved ? (
+          <span className="px-2 py-0.5 bg-gray-100 text-gray-500 rounded-full text-xs">해결됨</span>
+        ) : (
+          <span className="px-2 py-0.5 bg-red-50 text-red-600 rounded-full text-xs font-medium">미해결</span>
+        )}
+      </td>
+
+      {/* severity */}
+      <td className="px-3 py-2.5 whitespace-nowrap">
+        {item.severity === 'critical' ? (
+          <span className="px-2 py-0.5 bg-red-100 text-red-700 rounded-full text-xs font-medium">critical</span>
+        ) : (
+          <span className="px-2 py-0.5 bg-yellow-100 text-yellow-700 rounded-full text-xs">warning</span>
+        )}
+      </td>
+
+      {/* Trial 제목 */}
+      <td className="px-3 py-2.5 max-w-[180px]">
+        <button
+          onClick={onNavigate}
+          disabled={disabled}
+          className="text-blue-600 hover:underline text-xs text-left truncate block w-full"
+          title={item.trialTitle}
+        >
+          {item.trialTitle}
+        </button>
+      </td>
+
+      {/* 단계 */}
+      <td className="px-3 py-2.5 whitespace-nowrap text-xs text-gray-600">
+        {STAGE_LABEL[item.stage] ?? item.stage}
+      </td>
+
+      {/* 에러 메시지 */}
+      <td className="px-3 py-2.5 max-w-[200px]">
+        <button
+          onClick={onShowError}
+          className="text-xs text-gray-700 text-left truncate block w-full hover:text-blue-600"
+          title="클릭하여 전체 보기"
+        >
+          {item.errorMessage}
+        </button>
+      </td>
+
+      {/* 발생 시각 */}
+      <td className="px-3 py-2.5 whitespace-nowrap text-xs text-gray-500">
+        {new Date(item.occurredAt).toLocaleString('ko-KR', { dateStyle: 'short', timeStyle: 'short' })}
+      </td>
+
+      {/* 해결 시각 */}
+      <td className="px-3 py-2.5 whitespace-nowrap text-xs text-gray-500">
+        {item.resolvedAt
+          ? new Date(item.resolvedAt).toLocaleString('ko-KR', { dateStyle: 'short', timeStyle: 'short' })
+          : '-'}
+      </td>
+
+      {/* 액션 */}
+      <td className="px-3 py-2.5 whitespace-nowrap">
+        {!isResolved && (
+          <button
+            onClick={onResolve}
+            disabled={disabled}
+            className="px-2.5 py-1 text-xs bg-blue-50 text-blue-600 border border-blue-200 rounded hover:bg-blue-100"
+          >
+            해결 처리
+          </button>
+        )}
+        {isResolved && item.resolutionNote && (
+          <span className="text-xs text-gray-400 italic truncate block max-w-[100px]" title={item.resolutionNote}>
+            {item.resolutionNote}
+          </span>
+        )}
+      </td>
+    </tr>
+  );
+}

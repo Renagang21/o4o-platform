@@ -6,10 +6,10 @@ it.each([
   "/operator/market-trial?tab=forum-failures",
   "/operator/market-trial/synthetic-project/offline-operations",
 ])(
-  "preserves the existing funding specialist workflow and its selection: %s",
+  "opens the native funding workflow without losing its selection: %s",
   (path) => {
     expect(centralTaskHref("funding", path)).toBe(
-      `https://funding.neture.co.kr${path}`,
+      path.replace('/operator/market-trial', '/operations/funding/funding').replace('/offline-operations',''),
     );
   },
 );
@@ -25,14 +25,14 @@ it.each([
 it.each([
   [
     "/operator/courses/synthetic-course",
-    "https://study.neture.co.kr/operator/courses/synthetic-course",
+    "/operations/lecture/courses/synthetic-course",
   ],
   [
     "/operator/courses?status=submitted#review",
-    "https://study.neture.co.kr/operator/courses?status=submitted#review",
+    "/operations/lecture/courses?status=submitted#review",
   ],
 ])(
-  "does not silently replace a specialist target with a list: %s",
+  "preserves the native detail and query target: %s",
   (path, target) => expect(centralTaskHref("lecture", path)).toBe(target),
 );
 it.each([
@@ -41,4 +41,9 @@ it.each([
   "//elsewhere.invalid/path",
 ])("never forwards a foreign origin or unsafe scheme: %s", (path) => {
   expect(centralTaskHref("funding", path)).toBe("/operations/funding/members");
+});
+
+it('keeps common account lookup separate from Neture service membership work',()=>{
+ expect(centralTaskHref('neture','/operator/users')).toBe('/operations/neture/service-members');
+ expect(centralTaskHref('neture','/operator/users/synthetic-member')).toBe('/operations/neture/service-members/synthetic-member');
 });

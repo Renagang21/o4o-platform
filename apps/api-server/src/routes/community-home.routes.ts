@@ -1,3 +1,4 @@
+import { centralOperationRequest } from '../middleware/central-operation-menu.middleware.js';
 import {
   collectNews,
   getNewsCollection,
@@ -97,6 +98,7 @@ export function createCommunityHomeRoutes(
     "/community/management/home-items",
     apiLimiter,
     authenticate,
+    centralOperationRequest('community', () => ['community.editorial']),
     handle((req) =>
       managedHomeItems(
         AppDataSource,
@@ -110,6 +112,7 @@ export function createCommunityHomeRoutes(
     "/community/management/home-items",
     apiLimiter,
     authenticate,
+    centralOperationRequest('community', () => ['community.editorial']),
     handle((req) =>
       AppDataSource.transaction((m) =>
         saveEditorial(m, req.user!.id, null, req.body ?? {}),
@@ -120,6 +123,7 @@ export function createCommunityHomeRoutes(
     "/community/management/home-items/:id",
     apiLimiter,
     authenticate,
+    centralOperationRequest('community', () => ['community.editorial']),
     handle((req) =>
       AppDataSource.transaction((m) =>
         saveEditorial(m, req.user!.id, req.params.id, req.body ?? {}),
@@ -130,6 +134,7 @@ export function createCommunityHomeRoutes(
     "/community/management/home-forum",
     apiLimiter,
     authenticate,
+    centralOperationRequest('community', () => ['community.editorial']),
     handle(async (req) => {
       return managedHomeForum(
         AppDataSource,
@@ -143,6 +148,7 @@ export function createCommunityHomeRoutes(
     "/community/management/home-forum/:id",
     apiLimiter,
     authenticate,
+    centralOperationRequest('community', () => ['community.editorial']),
     handle((req) =>
       AppDataSource.transaction((m) =>
         pinHomeForum(m, req.user!.id, req.params.id, req.body?.isPinned),
@@ -153,12 +159,14 @@ export function createCommunityHomeRoutes(
     "/community/management/news-review",
     apiLimiter,
     authenticate,
+    centralOperationRequest('community', () => ['community.editorial']),
     handle((req) => getNewsReview(AppDataSource, req.user!.id)),
   );
   router.post(
     "/community/management/news-review",
     apiLimiter,
     authenticate,
+    centralOperationRequest('community', () => ['community.editorial']),
     handle((req) =>
       reviewNews(AppDataSource, req.user!.id, generateNewsSuggestions),
     ),
@@ -167,12 +175,14 @@ export function createCommunityHomeRoutes(
     "/community/management/news-collection",
     apiLimiter,
     authenticate,
+    centralOperationRequest('community', () => ['community.editorial']),
     handle((req) => getNewsCollection(AppDataSource, req.user!.id)),
   );
   router.post(
     "/community/management/news-collection",
     apiLimiter,
     authenticate,
+    centralOperationRequest('community', () => ['community.editorial']),
     handle((req) => collectNews(AppDataSource, req.user!.id)),
   );
   return router;

@@ -29,6 +29,8 @@ COPY packages/forum-core/package.json ./packages/forum-core/
 COPY packages/ui/package.json ./packages/ui/
 COPY packages/operator-ux-core/package.json ./packages/operator-ux-core/
 COPY packages/operator-core-ui/package.json ./packages/operator-core-ui/
+COPY packages/lms-ui/package.json ./packages/lms-ui/
+COPY packages/lms-client/package.json ./packages/lms-client/
 COPY packages/shared-space-ui/package.json ./packages/shared-space-ui/
 COPY packages/store-ui-core/package.json ./packages/store-ui-core/
 COPY packages/tablet-kiosk-core/package.json ./packages/tablet-kiosk-core/
@@ -58,6 +60,8 @@ COPY packages/forum-core/ ./packages/forum-core/
 COPY packages/ui/ ./packages/ui/
 COPY packages/operator-ux-core/ ./packages/operator-ux-core/
 COPY packages/operator-core-ui/ ./packages/operator-core-ui/
+COPY packages/lms-ui/ ./packages/lms-ui/
+COPY packages/lms-client/ ./packages/lms-client/
 COPY packages/shared-space-ui/ ./packages/shared-space-ui/
 COPY packages/store-ui-core/ ./packages/store-ui-core/
 COPY packages/tablet-kiosk-core/ ./packages/tablet-kiosk-core/

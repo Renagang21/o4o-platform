@@ -2,7 +2,7 @@ import express from "express";
 import request from "supertest";
 const collect = jest.fn(),
   read = jest.fn();
-jest.mock("../../database/connection", () => ({ AppDataSource: {} }));
+jest.mock("../../database/connection", () => ({ AppDataSource: {query: jest.fn(async () => [])} }));
 jest.mock("../../middleware/rateLimiter", () => ({
   apiLimiter: (_req: any, _res: any, next: any) => next(),
 }));
@@ -71,5 +71,5 @@ it("POST takes actor from authenticated identity, never from request body", asyn
     .set("Authorization", "fixture")
     .send({ actor: "someone-else", source: "https://evil.invalid" })
     .expect(200);
-  expect(collect).toHaveBeenCalledWith({}, "manager");
+  expect(collect).toHaveBeenCalledWith(expect.objectContaining({query:expect.any(Function)}), "manager");
 });

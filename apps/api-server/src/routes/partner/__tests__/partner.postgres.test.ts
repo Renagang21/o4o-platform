@@ -102,8 +102,7 @@ suite("Partner API / isolated PostgreSQL transactions and ACL", () => {
     const target = new URL(url!);
     if (
       !["localhost", "127.0.0.1"].includes(target.hostname) ||
-      target.port !== "55439" ||
-      target.pathname !== "/partner_test"
+      !((target.port === "55439" && target.pathname === "/partner_test") || (target.port === "55432" && target.pathname === "/o4o_unified_partner_fixture"))
     )
       throw new Error(
         "Only the disposable local Partner test database is allowed",

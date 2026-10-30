@@ -7,7 +7,7 @@ import type { ServiceApprovalDecision } from '../serviceApprovalDecisionResult';
 const api = vi.hoisted(() => ({ list: vi.fn(), stats: vi.fn(), analytics: vi.fn(), approve: vi.fn(), reject: vi.fn(), batchApprove: vi.fn(), batchReject: vi.fn() }));
 const auth = vi.hoisted(() => ({ roles: ['neture:operator'] as string[] }));
 vi.mock('../../../lib/api/serviceApproval', () => ({ operatorServiceApprovalApi: api }));
-vi.mock('../../../contexts/AuthContext', () => ({ useAuth: () => ({ user: auth }) }));
+vi.mock('../../../contexts/AuthContext', () => ({ getAccessToken: () => null, useAuth: () => ({ user: auth }) }));
 function item(id: string, approvalStatus: string): ServiceApprovalItem {
   return { id, approvalStatus, offerId: `offer-${id}`, serviceKey: 'kpa-society', productName: `검증상품-${id}`, barcode: '', supplierName: '검증공급자', decidedBy: null, decidedAt: null, reason: null, createdAt: '2026-01-01', regulatoryType: 'GENERAL', mfdsPermitNumber: null, isMfdsVerified: false, offerApprovalStatus: 'approved', distributionType: 'PUBLIC', completenessScore: 80, imageUrl: null, brandName: null, priceGeneral: 100, hasShortDescription: true, hasDetailDescription: true, imageCount: 0, isStale: false, isLowQualitySupplier: false, priority: 'LOW' };
 }

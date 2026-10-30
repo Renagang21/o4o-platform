@@ -1,3 +1,4 @@
+import { WorkDataService, WorkDataError } from '../services/work-data/work-data.service.js';
 /**
  * Local Work Agent — HTTP 경계
  *
@@ -70,6 +71,18 @@ async function authenticateAgent(
   req.agent = agent;
   next();
 }
+
+// Uses the existing PC session and the signed-in member's explicit grants.
+router.post('/work-data/grants', authenticateAgent, async (req: AgentRequest,res: Response) => {
+  res.setHeader('Cache-Control','no-store');
+  try {res.json({success:true,data:await new WorkDataService(AppDataSource).grants(req.agent.userId)});}
+  catch {res.status(503).json({success:false,code:'WORK_DATA_UNAVAILABLE'});}
+});
+router.post('/work-data/sync', authenticateAgent, async (req: AgentRequest,res: Response) => {
+  res.setHeader('Cache-Control','no-store');
+  try {const b=req.body??{};res.json({success:true,data:await new WorkDataService(AppDataSource).sync(req.agent.userId,b.owner,b.epoch,b.changes,b.cursor)});}
+  catch(error){const known=error instanceof WorkDataError;res.status(known?error.status:503).json({success:false,code:known?error.code:'WORK_DATA_UNAVAILABLE'});}
+});
 
 // ─── 사용자 축 ────────────────────────────────────────────────────────────────
 

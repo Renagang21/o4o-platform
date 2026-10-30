@@ -34,6 +34,8 @@ COPY packages/organization-core/package.json ./packages/organization-core/
 COPY packages/forum-core/package.json ./packages/forum-core/
 COPY packages/ui/package.json ./packages/ui/
 COPY packages/operator-core-ui/package.json ./packages/operator-core-ui/
+COPY packages/lms-ui/package.json ./packages/lms-ui/
+COPY packages/lms-client/package.json ./packages/lms-client/
 COPY packages/hub-core/package.json ./packages/hub-core/
 COPY packages/operator-ux-core/package.json ./packages/operator-ux-core/
 COPY packages/admin-ux-core/package.json ./packages/admin-ux-core/
@@ -71,6 +73,8 @@ COPY packages/organization-core/ ./packages/organization-core/
 COPY packages/forum-core/ ./packages/forum-core/
 COPY packages/ui/ ./packages/ui/
 COPY packages/operator-core-ui/ ./packages/operator-core-ui/
+COPY packages/lms-ui/ ./packages/lms-ui/
+COPY packages/lms-client/ ./packages/lms-client/
 COPY packages/hub-core/ ./packages/hub-core/
 COPY packages/operator-ux-core/ ./packages/operator-ux-core/
 COPY packages/admin-ux-core/ ./packages/admin-ux-core/

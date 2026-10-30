@@ -350,3 +350,7 @@ export type { WorkflowProps, WorkflowClient } from './cooperation/CooperationWor
 
 export { CooperationMaterialAttachments } from "./cooperation/CooperationMaterialAttachments";
 export { CooperationMaterialDetails } from "./cooperation/CooperationWorkflows";
+
+export { CarePharmHome, CAREPHARM_HERO } from './cooperation/carepharm/CarePharmHome';
+export { CarePharmNoticeView, CarePharmNewsView } from './cooperation/carepharm/CarePharmNotices';
+export { CarePharmWorkspaces } from './cooperation/carepharm/CarePharmWorkspaces';

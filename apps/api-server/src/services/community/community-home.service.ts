@@ -208,7 +208,7 @@ export async function managedHomeItems(
   kind: HomeKind,
   page = 1,
 ) {
-  await requireCommunityManager(db, actor);
+  await requireCommunityManager(db, actor, false, 'editorial');
   const rows = await db.query(
     `SELECT ${COLUMNS},body FROM cms_contents WHERE ${SCOPE} AND metadata->>'kind'=$1
       ORDER BY "isPinned" DESC,"sortOrder","createdAt" DESC,id LIMIT 21 OFFSET $2`,
@@ -223,7 +223,7 @@ export async function saveEditorial(
   id: string | null,
   input: Record<string, unknown>,
 ) {
-  await requireCommunityManager(db, actor);
+  await requireCommunityManager(db, actor, false, 'editorial');
   const item = parseEditorial(input);
   await db.query(
     "SELECT pg_advisory_xact_lock(hashtext('community-editorial'))",
@@ -316,7 +316,7 @@ export async function managedHomeForum(
   page = 1,
   search: unknown = "",
 ) {
-  await requireCommunityManager(db, actor);
+  await requireCommunityManager(db, actor, false, 'editorial');
   if (typeof search !== "string" || search.length > 200)
     fail(400, "INVALID_HOME_SEARCH", "검색어는 200자 이내로 입력해 주세요.");
   const pinned =
@@ -350,7 +350,7 @@ export async function pinHomeForum(
   id: string,
   pinned: unknown,
 ) {
-  await requireCommunityManager(db, actor);
+  await requireCommunityManager(db, actor, false, 'editorial');
   id = homeUuid(id);
   if (typeof pinned !== "boolean")
     fail(400, "INVALID_HOME_ITEM", "상시 노출 설정을 확인해 주세요.");

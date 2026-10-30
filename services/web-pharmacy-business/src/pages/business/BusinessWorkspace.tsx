@@ -45,9 +45,10 @@ export default function BusinessWorkspace({ defaultBusinessKey, memberLayout = f
   const base = businessBase(businessKey);
   const requestedStore = new URLSearchParams(location.search).get('store');
   const storeSearch = requestedStore ? `?store=${encodeURIComponent(requestedStore)}` : '';
+  const standardHomeEditor = businessKey === 'pharmacy' ? '/home-presentation' : `${base}/home-presentation`;
   const operatorNavigation = state.access?.canManage ? <nav aria-label="담당 사업 운영" className="mb-5 flex flex-wrap gap-3 text-sm text-blue-700">
       <NavLink to={`/operator/inbox/business/${businessKey}`}>운영 알림·문의함</NavLink>
-      <NavLink to={businessKey === 'pharmacy' ? '/home-presentation' : `${base}/home-presentation`}>Hero · 광고 관리</NavLink>
+      <NavLink to={businessKey === 'carepharm' ? '/operator/home-presentation/carepharm' : standardHomeEditor}>Hero · 광고 관리</NavLink>
       <NavLink to={`${businessPath(businessKey, 'forum')}/manage`}>게시판 운영</NavLink>
       {businessKey === BUSINESS_SITE.key && <NavLink to={`/operator/semi-franchises?key=${encodeURIComponent(businessKey)}&tab=contents`}>사업 자료 관리</NavLink>}
     </nav> : null;
@@ -57,7 +58,7 @@ export default function BusinessWorkspace({ defaultBusinessKey, memberLayout = f
   else if (state.access?.allowed && memberStore.organizationId) supportHref = `${homePath}?store=${encodeURIComponent(memberStore.organizationId)}#cooperation-support`;
   const memberNavigation = <CooperationMemberNavigation items={[
     { key: 'home', label: '홈', to: homePath + storeSearch, end: true },
-    { key: 'news', label: '소식', to: homePath + storeSearch + '#business-news', end: true },
+    { key: 'news', label: '소식', to: homePath + storeSearch + (businessKey === 'carepharm' ? '#news' : '#business-news'), end: true },
     { key: 'materials', label: '자료', to: businessPath(businessKey, 'materials') + storeSearch },
     { key: 'participation', label: '참여 안내', to: businessPath(businessKey, 'participation') + storeSearch },
     { key: 'community', label: '회원 교류', to: businessPath(businessKey, 'forum') + storeSearch },

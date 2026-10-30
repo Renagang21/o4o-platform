@@ -150,6 +150,7 @@ export function dataPreflight(slot, dataHome) {
     encoding: "utf8",
     stdio: ["ignore", "pipe", "pipe"],
     timeout: 60000,
+    windowsHide: true,
   };
   // Existing backup/bootstrap chain owns SQLite. No credential reads, file copies or DB resets here.
   if (fs.existsSync(path.join(dataHome, "local.db")))

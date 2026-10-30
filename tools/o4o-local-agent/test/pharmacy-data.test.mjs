@@ -29,8 +29,8 @@ afterEach(() => { closeLocalDb(); fs.rmSync(home, { recursive: true, force: true
 const importSample = () => importPharmacyRecords(owner, sample(), 0);
 const sheet = (status = 'draft') => ({ kind: 'sheet', data: { id: 'sheet1', title: '합성 발주 초안', status, lines: [{ id: 'l1', product_id: 'p1', product_name: '합성 상품', supplier_id: 's1', pack_id: 'k1', pack_label: '500정', pack_count: 2 }] } });
 
-test('existing v8 Dataset stores all program domains; repeated imports do not duplicate purchases', () => {
-  assert.equal(SCHEMA_VERSION, 8); importSample(); importPharmacyRecords(owner, sample(), 1);
+test('normalized Dataset stores all program domains; repeated imports do not duplicate purchases', () => {
+  assert.equal(SCHEMA_VERSION, 9); importSample(); importPharmacyRecords(owner, sample(), 1);
   assert.equal(pharmacySummary(owner).counts.purchase, 1);
   assert.equal(pharmacyPurchaseTotals(owner)[0].base_quantity, 1000);
   assert.equal(readPharmacyWorkspace(owner).bundle.records.find(r => r.kind === 'product').data.program_code, '0001');
@@ -227,4 +227,211 @@ test('per-supplier receipts preserve evidence while allowing remaining supplier 
   work.data.receipts.push({supplier_id:'s2',reference:'receipt-b',confirmed_at:stamp});work.data.status='receipt_recorded';
   importPharmacyRecords(owner,{format:PHARMACY_FORMAT,records:[work]},2,'user');
   assert.equal(readPharmacyWorkspace(owner).bundle.records.find(r=>r.kind==='sheet').data.receipts.length,2);
+});
+
+test('more than 10000 useful rows accumulate across bounded imports and remain pageable', async () => {
+  const { pharmacyPage } = await import('../src/pharmacy-data.mjs');
+  for (let batch=0;batch<3;batch++) {
+    const records=Array.from({length:4000},(_,i)=>entry('product',{id:`p${batch*4000+i}`,name:'합성 상품',program:'fixture-program',program_code:String(batch*4000+i),kind:'dispensing'}));
+    importPharmacyRecords(owner,{format:PHARMACY_FORMAT,records},batch);
+  }
+  assert.equal(pharmacySummary(owner).counts.product,12000);
+  let after='',total=0;
+  do { const page=pharmacyPage(owner,{kind:'product',after,limit:500}); total+=page.records.length;after=page.next; } while(after);
+  assert.equal(total,12000);
+});
+
+test('sync acknowledgement cannot erase a newer local edit; reordered JSON is equal', async () => {
+  const { LocalPharmacySyncRepository: journal }=await import('../src/local-db.mjs');
+  const { pharmacyDataset }=await import('../src/pharmacy-data.mjs');
+  const dataset=pharmacyDataset(owner), epoch=crypto.randomUUID();
+  importSample();journal.configure(dataset,epoch);
+  const pending=journal.pending(dataset),original=pending.find(r=>r.entry.kind==='supplier');
+  const replacement={kind:'supplier',data:{...original.entry.data,name:'교정 거래처'}};
+  importPharmacyRecords(owner,{format:PHARMACY_FORMAT,records:[replacement]},1,'user');
+  const user=journal.pending(dataset).find(r=>r.lane==='user');
+  importPharmacyRecords(owner,{format:PHARMACY_FORMAT,records:[{...replacement,data:{...replacement.data,name:'두 번째 교정'}}]},2,'user');
+  journal.apply(dataset,epoch,{accepted:[{lane:'user',kind:'supplier',id:'s1',mutationId:user.mutationId,version:3}],changes:[],cursor:3,more:false});
+  const next=journal.pending(dataset).find(r=>r.lane==='user');
+  assert.equal(next.entry.data.name,'두 번째 교정');assert.equal(next.expectedVersion,3);
+  const reordered={origin:original.entry.origin,data:original.entry.data,kind:original.entry.kind};
+  const applied=journal.apply(dataset,epoch,{accepted:[],changes:[{...original,entry:reordered,version:4}],cursor:4,more:false});
+  assert.equal(applied.conflicts,0);
+  journal.configure(dataset,crypto.randomUUID());
+  assert.throws(()=>journal.apply(dataset,epoch,{accepted:[],changes:[],cursor:4,more:false}),/STALE_EPOCH/);
+});
+
+
+test('actual order entry accepts relative ReturnUrl but rejects credentials and external redirects', async()=>{
+ const {normalizeOrderSiteUrl}=await import('../src/pharmacy-order-contract.mjs');
+ assert.equal(normalizeOrderSiteUrl('https://order.geoweb.kr/Member/Login?ReturnUrl=%2f'),'https://order.geoweb.kr/Member/Login?ReturnUrl=%2f');
+ for(const value of ['https://example.com/?token=secret','https://example.com/?ReturnUrl=https%3A%2F%2Fother.example.com','https://127.0.0.1/order','https://example.com/?ReturnUrl=%2F%2Fevil.example.com','https://example.com/?ReturnUrl=%2Flogin%3Ftoken%3Dx'])assert.throws(()=>normalizeOrderSiteUrl(value));
+});
+
+test('v8 migration preserves legacy and user lanes; malformed legacy rolls back with backup', async()=>{
+ const {DatabaseSync}=await import('node:sqlite');
+ const {MIGRATIONS}=await import('../src/local-db.mjs');
+ const {pharmacyDataset}=await import('../src/pharmacy-data.mjs');
+ for(const scenario of ['valid','malformed','cross-lane','dangling']){
+  const malformed=['malformed','dangling'].includes(scenario);
+  closeLocalDb();fs.rmSync(path.join(home,'local.db'),{force:true});
+  const raw=new DatabaseSync(path.join(home,'local.db'));
+  for(const migration of MIGRATIONS.filter(m=>m.version<=8)){
+    migration.up(raw);raw.prepare('INSERT INTO local_schema_migrations(version,name,applied_at) VALUES(?,?,?)').run(migration.version,migration.name,stamp);
+  }
+  const dataset=pharmacyDataset(owner),legacy={revision:7,imported:sample().records,user:scenario==='malformed'?[{kind:'supplier',data:{}}]:[{kind:'supplier',data:{...sample().records[2].data,name:'이전 교정'}}]};
+  if(scenario==='cross-lane' || scenario==='dangling'){legacy.imported=[sample().records.find(r=>r.kind==='stock')];legacy.user=scenario==='cross-lane'?[{kind:'product',data:sample().records[0].data}]:[];}
+  raw.prepare('INSERT INTO local_datasets(name,fields,row_count,created_at,updated_at) VALUES(?,?,1,?,?)').run(dataset,'[]',stamp,stamp);
+  raw.prepare('INSERT INTO local_dataset_rows(dataset,row_key,data,imported_at) VALUES(?,?,?,?)').run(dataset,'workspace',JSON.stringify(legacy),stamp);raw.close();
+  const result=bootstrapLocalDb({backup:(db,reason)=>createBackup(db,reason)});
+  assert.equal(result.ready,!malformed);assert.ok(listBackups().length>0);
+  if(!malformed){const workspace=readPharmacyWorkspace(owner);assert.equal(workspace.revision,7);if(scenario==='cross-lane'){assert.equal(workspace.bundle.records.find(r=>r.kind==='stock').data.product_id,'p1');assert.equal(workspace.bundle.records.find(r=>r.kind==='product').data.id,'p1');}else assert.equal(workspace.bundle.records.find(r=>r.kind==='supplier').data.name,'이전 교정');}
+  closeLocalDb();const check=new DatabaseSync(path.join(home,'local.db'),{readOnly:true});
+  assert.deepEqual(JSON.parse(check.prepare('SELECT data FROM local_dataset_rows WHERE dataset=?').get(dataset).data),legacy);
+  assert.equal(check.prepare('SELECT MAX(version) AS v FROM local_schema_migrations').get().v,malformed?8:9);check.close();
+ }
+});
+
+test('background mirror uploads only current grants, retries safely, and stops after revocation',async()=>{
+ const {createPharmacySync}=await import('../src/pharmacy-sync.mjs');
+ const {LocalPharmacySyncRepository:journal}=await import('../src/local-db.mjs');
+ const {pharmacyDataset}=await import('../src/pharmacy-data.mjs');
+ importSample();let allowed=false,offline=false;const epoch=crypto.randomUUID(),calls=[];
+ const worker=createPharmacySync({post:async(path,body)=>{
+  calls.push({path,body});
+  if(path.endsWith('grants'))return {status:200,payload:{data:allowed?[{owner,epoch}]:[]}};
+  if(offline)return {status:0,payload:null};
+  return {status:200,payload:{success:true,data:{accepted:body.changes.map((r,i)=>({lane:r.lane,kind:r.entry.kind,id:r.entry.data.id,mutationId:r.mutationId,version:i+1})),changes:[],cursor:9,more:false}}};
+ }});
+ await worker.tick('fixture',true);assert.equal(calls.length,1);
+ allowed=true;offline=true;await worker.tick('fixture',true);assert.equal(journal.pending(pharmacyDataset(owner)).length,9);
+ offline=false;await worker.tick('fixture',true);assert.equal(journal.pending(pharmacyDataset(owner)).length,0);
+ const uploads=calls.filter(r=>r.path.endsWith('sync')).length;
+ allowed=false;await worker.tick('fixture',true);assert.equal(calls.filter(r=>r.path.endsWith('sync')).length,uploads);
+ assert.equal(calls.some(r=>JSON.stringify(r.body).includes('fixture-program') && !r.path.endsWith('sync')),false);
+});
+
+test('conflicting local edit is preserved and quarantined rather than automatically overwriting the server',async()=>{
+ const {LocalPharmacySyncRepository:journal}=await import('../src/local-db.mjs');
+ const {pharmacyDataset}=await import('../src/pharmacy-data.mjs');
+ const dataset=pharmacyDataset(owner),epoch=crypto.randomUUID();importSample();journal.configure(dataset,epoch);
+ const row=journal.pending(dataset).find(r=>r.entry.kind==='product');
+ const result=journal.apply(dataset,epoch,{accepted:[],changes:[{...row,entry:{...row.entry,data:{...row.entry.data,name:'서버 교정'}},version:10}],cursor:10,more:false});
+ assert.equal(result.conflicts,1);assert.equal(journal.state(dataset).conflicts,1);
+ assert.equal(readPharmacyWorkspace(owner).bundle.records.find(r=>r.kind==='product').data.name,'합성 상품');
+ assert.equal(journal.pending(dataset).some(r=>r.entry.kind==='product'),false);
+ const agreedPack=journal.pending(dataset).find(r=>r.entry.kind==='pack');
+ journal.apply(dataset,epoch,{accepted:[{lane:agreedPack.lane,kind:'pack',id:agreedPack.entry.data.id,mutationId:agreedPack.mutationId,version:9}],changes:[],cursor:0,more:false});
+ const purchase=journal.pending(dataset).find(r=>r.entry.kind==='purchase');
+ journal.apply(dataset,epoch,{accepted:[],changes:[{...purchase,entry:{...purchase.entry,data:{...purchase.entry.data,pack_count:3}},version:11}],cursor:11,more:false});
+ assert.equal(journal.state(dataset).conflicts,2);
+ importPharmacyRecords(owner,{format:PHARMACY_FORMAT,records:[purchase.entry]},readPharmacyWorkspace(owner).revision);
+ assert.equal(journal.state(dataset).conflicts,1); // The unrelated product remains quarantined.
+ const retried=journal.pending(dataset).find(r=>r.entry.kind==='purchase');assert.equal(retried.expectedVersion,11);assert.notEqual(retried.mutationId,purchase.mutationId);
+ assert.equal(retried.entry.data.pack_count,purchase.entry.data.pack_count);
+ importPharmacyRecords(owner,{format:PHARMACY_FORMAT,records:[purchase.entry]},readPharmacyWorkspace(owner).revision);
+ assert.equal(journal.pending(dataset).find(r=>r.entry.kind==='purchase').mutationId,retried.mutationId);
+});
+
+test('authenticated command contract reaches SQLite, backs up program imports, and returns only bounded typed data',async()=>{
+ const {runAction}=await import('../src/handlers.mjs');
+ const {pickPharmacyResult}=await import('../src/pharmacy-order-contract.mjs');
+ const write=await runAction('local.data.pharmacy_write',{}, {owner,mode:'program',records:sample().records,expectedRevision:0});
+ assert.equal(write.status,'success');assert.equal(write.data.revision,1);assert.ok(listBackups().length>0);
+ const read=await runAction('local.data.pharmacy_read',{}, {owner,kind:'purchase',limit:1});
+ assert.equal(read.status,'success');assert.equal(read.data.records.length,1);assert.equal(read.data.records[0].kind,'purchase');
+ const clean=pickPharmacyResult({...read.data,credential:'must-not-pass',sync:{pending:0,conflicts:0,lastSyncedAt:null,error:'raw-detail'}});
+ assert.equal('credential' in clean,false);assert.equal(clean.sync.error,null);
+ const stale=await runAction('local.data.pharmacy_write',{}, {owner,mode:'user',records:[],expectedRevision:0});
+ assert.equal(stale.status,'failed');assert.equal(stale.errorCode,'PHARMACY_REVISION_CONFLICT');
+ assert.equal((await runAction('local.data.pharmacy_read',{}, {owner,sql:'SELECT 1'})).status,'denied');
+ assert.equal((await runAction('local.data.pharmacy_read',{}, {owner:'user:other',limit:1})).data.records.length,0);
+});
+
+ test('mixed file restore commits cross-lane references once and rolls back all rows on invalid links',async()=>{
+  const {runAction}=await import('../src/handlers.mjs');
+  const product={kind:'product',data:sample().records[0].data};
+  const stock=sample().records.find(r=>r.kind==='stock');
+  const result=await runAction('local.data.pharmacy_write',{}, {owner,mode:'restore',records:[stock,product],expectedRevision:0});
+  assert.equal(result.status,'success');assert.equal(readPharmacyWorkspace(owner).revision,1);
+  assert.equal(readPharmacyWorkspace(owner).importedCount,1);assert.equal(readPharmacyWorkspace(owner).userCount,1);assert.ok(listBackups().length>0);
+  const before=readPharmacyWorkspace(owner);
+  const invalid={...stock,data:{...stock.data,id:'missing-stock',product_id:'missing-product'}};
+  const failed=await runAction('local.data.pharmacy_write',{}, {owner,mode:'restore',records:[invalid,{kind:'product',data:{...product.data,id:'p2',program_code:'002'}}],expectedRevision:1});
+  assert.notEqual(failed.status,'success');assert.deepEqual(readPharmacyWorkspace(owner),before);
+ });
+
+test('PC read keeps rows and summary revision in one SQLite snapshot across a concurrent writer',async()=>{
+ const {openLocalDb}=await import('../src/local-db.mjs');const {DatabaseSync}=await import('node:sqlite');const {pharmacyDataset}=await import('../src/pharmacy-data.mjs');const {runAction}=await import('../src/handlers.mjs');
+ importSample();const db=openLocalDb(),other=new DatabaseSync(path.join(home,'local.db'));const prepare=db.prepare.bind(db);let written=false;
+ db.prepare=sql=>{const statement=prepare(sql);if(sql.startsWith('SELECT r.kind,r.id,r.payload')){const all=statement.all.bind(statement);statement.all=(...args)=>{const rows=all(...args);if(!written){written=true;other.exec('BEGIN IMMEDIATE');const supplier=sample().records.find(r=>r.kind==='supplier');supplier.data.name='동시 변경';other.prepare("UPDATE local_pharmacy_records SET payload=? WHERE dataset=? AND lane='imported' AND kind='supplier'").run(JSON.stringify(supplier),pharmacyDataset(owner));other.prepare('UPDATE local_pharmacy_workspaces SET revision=revision+1 WHERE dataset=?').run(pharmacyDataset(owner));other.exec('COMMIT');}return rows;};}return statement;};
+ try{const read=await runAction('local.data.pharmacy_read',{}, {owner,kind:'supplier',limit:10});assert.equal(read.status,'success');assert.equal(read.data.records[0].data.name,'합성 거래처');assert.equal(read.data.revision,1);assert.throws(()=>importPharmacyRecords(owner,{format:PHARMACY_FORMAT,records:[{kind:'supplier',data:{...read.data.records[0].data,payment_timing:'at_order'}}]},read.data.revision,'user'),/REVISION_CONFLICT/);}finally{db.prepare=prepare;other.close();}
+ assert.equal(readPharmacyWorkspace(owner).bundle.records.find(r=>r.kind==='supplier').data.name,'동시 변경');
+});
+
+test('different IDs for one program code quarantine the remote batch without poisoning local references',async()=>{
+ const {LocalPharmacySyncRepository:journal,openLocalDb}=await import('../src/local-db.mjs');const {pharmacyDataset}=await import('../src/pharmacy-data.mjs');
+ importSample();const dataset=pharmacyDataset(owner),epoch=crypto.randomUUID();journal.configure(dataset,epoch);
+ const product=sample().records[0],remote={...product,data:{...product.data,id:'remote-product'},origin:{...product.origin,source_key:'remote-product'}};
+ const stock=entry('stock',{id:'remote-stock',product_id:'remote-product',quantity:null,confidence:'unknown',observed_at:stamp});
+ const changes=[{lane:'imported',entry:stock,version:10,mutationId:crypto.randomUUID()},{lane:'imported',entry:remote,version:11,mutationId:crypto.randomUUID()}];
+ const result=journal.apply(dataset,epoch,{accepted:[],changes,cursor:11,more:false});assert.ok(result.conflicts>0);assert.equal(journal.state(dataset).cursor,11);
+ assert.equal(readPharmacyWorkspace(owner).bundle.records.length,9);assert.equal(readPharmacyWorkspace(owner).bundle.records.some(r=>r.data.id==='remote-product'),false);
+ assert.equal(openLocalDb().prepare('SELECT count(*) AS n FROM local_pharmacy_sync_conflicts WHERE dataset=?').get(dataset).n,2);
+ assert.equal(journal.pending(dataset).some(r=>r.entry.kind==='product'),false);
+ importPharmacyRecords(owner,{format:PHARMACY_FORMAT,records:[{kind:'supplier',data:{...sample().records[2].data,name:'후속 교정'}}]},readPharmacyWorkspace(owner).revision,'user');
+ assert.equal(readPharmacyWorkspace(owner).bundle.records.find(r=>r.kind==='supplier').data.name,'후속 교정');
+ journal.apply(dataset,epoch,{accepted:[],changes,cursor:11,more:false});assert.equal(openLocalDb().prepare('SELECT count(*) AS n FROM local_pharmacy_sync_conflicts WHERE dataset=?').get(dataset).n,2);
+});
+
+test('pack measure conflicts hold dependent server purchases across repeated batches',async()=>{
+ const {LocalPharmacySyncRepository:journal}=await import('../src/local-db.mjs');const {pharmacyDataset}=await import('../src/pharmacy-data.mjs');
+ importSample();const dataset=pharmacyDataset(owner),epoch=crypto.randomUUID();journal.configure(dataset,epoch);
+ const pack=sample().records.find(r=>r.kind==='pack');pack.data.units_per_pack=100;
+ const purchase=sample().records.find(r=>r.kind==='purchase');purchase.data.id='server-purchase';purchase.origin.source_key='server-purchase';
+ const remotePurchase={lane:'imported',entry:purchase,version:11,mutationId:crypto.randomUUID()};
+ const result=journal.apply(dataset,epoch,{accepted:[],changes:[remotePurchase,{lane:'imported',entry:pack,version:10,mutationId:crypto.randomUUID()}],cursor:11,more:false});
+ assert.ok(result.conflicts>0);assert.equal(pharmacyPurchaseTotals(owner).length,1);assert.equal(pharmacyPurchaseTotals(owner)[0].base_quantity,1000);
+ assert.equal(readPharmacyWorkspace(owner).bundle.records.some(r=>r.data.id==='server-purchase'),false);
+ journal.apply(dataset,epoch,{accepted:[],changes:[{...remotePurchase,version:12}],cursor:12,more:false});assert.equal(pharmacyPurchaseTotals(owner).length,1);assert.equal(journal.state(dataset).cursor,12);
+});
+
+test('PC CLI accumulated export restores more than 10,000 source rows under another owner',async()=>{
+ const records=Array.from({length:10001},(_,i)=>entry('supplier',{id:'supplier'+i,name:'합성 거래처 '+i,enabled:true,payment_timing:'unknown',payment_required:null}));
+ importPharmacyRecords(owner,{format:PHARMACY_FORMAT,records:records.slice(0,10000)},0);
+ importPharmacyRecords(owner,{format:PHARMACY_FORMAT,records:records.slice(10000)},1);
+ const file=path.join(home,'large-export.json'),target='organization:fixture-restore';const output=[];
+ assert.equal(await runDataCommand(['pharmacy','export','--owner',owner,'--out',file],m=>output.push(m)),0);
+ assert.equal(await runDataCommand(['pharmacy','import','--owner',target,'--file',file,'--revision','0'],m=>output.push(m)),0);
+ assert.equal(pharmacySummary(target).counts.supplier,10001);assert.equal(readPharmacyWorkspace(target).bundle.records.length,10001);
+ const malformed=path.join(home,'malformed.json');fs.writeFileSync(malformed,'DO_NOT_PRINT_FIXTURE_BODY');
+ assert.equal(await runDataCommand(['pharmacy','import','--owner',target,'--file',malformed,'--revision','11'],m=>output.push(m)),2);
+ assert.equal(output.join('').includes('DO_NOT'),false);assert.equal(output.join('').includes('합성 거래처'),false);
+});
+
+test('out-of-order server references stay staged while the cursor and local work continue',async()=>{
+ const {LocalPharmacySyncRepository:journal}=await import('../src/local-db.mjs');const {pharmacyDataset}=await import('../src/pharmacy-data.mjs');const dataset=pharmacyDataset(owner),epoch=crypto.randomUUID();journal.configure(dataset,epoch);
+ const row=(kind,version)=>({lane:'imported',entry:sample().records.find(r=>r.kind===kind),version,mutationId:crypto.randomUUID()});
+ const first=journal.apply(dataset,epoch,{accepted:[],changes:[row('purchase',1),row('pack',2)],cursor:2,more:true});
+ assert.equal(first.conflicts,0);assert.equal(journal.state(dataset).cursor,2);assert.equal(journal.state(dataset).pending,2);assert.equal(readPharmacyWorkspace(owner).bundle.records.length,0);
+ const supplier={kind:'supplier',data:{id:'local-supplier',name:'로컬 교정',enabled:true,payment_timing:'unknown',payment_required:null}};
+ importPharmacyRecords(owner,{format:PHARMACY_FORMAT,records:[supplier]},0,'user');
+ journal.apply(dataset,epoch,{accepted:[],changes:[row('supplier',3)],cursor:3,more:true});assert.equal(readPharmacyWorkspace(owner).bundle.records.length,2);
+ journal.apply(dataset,epoch,{accepted:[],changes:[row('product',4)],cursor:4,more:false});
+ assert.equal(journal.state(dataset).cursor,4);assert.equal(readPharmacyWorkspace(owner).bundle.records.length,5);assert.equal(pharmacyPurchaseTotals(owner)[0].base_quantity,1000);
+ assert.equal(readPharmacyWorkspace(owner).bundle.records.some(r=>r.data.id==='local-supplier'),true);
+ assert.equal(journal.state(dataset).conflicts,0);assert.equal(journal.state(dataset).pending,1); // Only the unrelated local edit awaits upload.
+});
+
+test('remote supplier disable preserves prepared sheets until an explicit draft edit resolves the dependency',async()=>{
+ const {LocalPharmacySyncRepository:journal}=await import('../src/local-db.mjs');const {pharmacyDataset}=await import('../src/pharmacy-data.mjs');
+ importSample();const dataset=pharmacyDataset(owner),epoch=crypto.randomUUID();journal.configure(dataset,epoch);
+ const accepted=journal.pending(dataset).map((row,index)=>({lane:row.lane,kind:row.entry.kind,id:row.entry.data.id,mutationId:row.mutationId,version:index+1}));
+ journal.apply(dataset,epoch,{accepted,changes:[],cursor:9,more:false});importPharmacyRecords(owner,{format:PHARMACY_FORMAT,records:[sheet('prepared')]},1,'user');
+ const supplier=sample().records.find(r=>r.kind==='supplier');supplier.data.enabled=false;
+ const result=journal.apply(dataset,epoch,{accepted:[],changes:[{lane:'imported',entry:supplier,version:50,mutationId:crypto.randomUUID()}],cursor:50,more:false});
+ assert.ok(result.conflicts>0);assert.equal(readPharmacyWorkspace(owner).bundle.records.find(r=>r.kind==='supplier').data.enabled,true);
+ importPharmacyRecords(owner,{format:PHARMACY_FORMAT,records:[sheet('draft')]},readPharmacyWorkspace(owner).revision,'user');
+ journal.apply(dataset,epoch,{accepted:[],changes:[],cursor:50,more:false});
+ assert.equal(readPharmacyWorkspace(owner).bundle.records.find(r=>r.kind==='supplier').data.enabled,false);assert.equal(journal.state(dataset).conflicts,0);
 });

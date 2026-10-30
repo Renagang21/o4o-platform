@@ -1,11 +1,11 @@
-vi.mock('../../components/supplier/SupplierActiveFundings',()=>({default:()=>null}));
+vi.mock('../../../../../packages/operator-core-ui/src/modules/supplier-operations/SupplierActiveFundings',()=>({default:()=>null}));
 import { supplierReviewApi } from '../../lib/api/supplierReview';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render, screen, within, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import Page from './OperatorSupplierApprovalPage';
 const api = vi.hoisted(() => ({ getSuppliersPaged: vi.fn(), rejectSupplier: vi.fn(), downloadDocument: vi.fn(), approveSupplier: vi.fn(), updateBasicInfo: vi.fn(), batchProcess: vi.fn() }));
-vi.mock('../../lib/api', () => ({ operatorSupplierApi: api, PROFILE_FIELD_LABELS: {} }));
+vi.mock('../../lib/api/admin', () => ({ operatorSupplierApi: api, adminSupplierApi: {}, PROFILE_FIELD_LABELS: {} }));
 const supplier = { id: 'supplier', name: '합성 공급자', status: 'PENDING', createdAt: '2026-01-01', businessRegistrationDocumentId: 'document', profileComplete: true };
 beforeEach(() => { vi.resetAllMocks(); api.getSuppliersPaged.mockResolvedValue({ items: [supplier], pagination: { page: 1, limit: 20, total: 1, totalPages: 1 } }); });
 afterEach(cleanup);

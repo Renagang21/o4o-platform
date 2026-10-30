@@ -1,3 +1,5 @@
+import { assertCentralOperationMenu, centralServiceMenuRestrictions } from '../../services/admin/central-operation-menu-grants.js';
+import { OperationError } from '../../services/operations/operation-audit.js';
 import type { DataSource, EntityManager } from "typeorm";
 import { PartnerError } from "./partner.service.js";
 import {
@@ -12,6 +14,10 @@ const fail = (status: number, code: string): never => {
 };
 export class PartnerCommunityService {
   constructor(private db: DataSource) {}
+  private async menu(m: EntityManager,user: string,...areas: string[]) {
+    try { await assertCentralOperationMenu(m,user,'partner-support',areas.map(area=>`partner-support.${area}`)); }
+    catch(error) { if(error instanceof OperationError) fail(error.status,error.code); throw error; }
+  }
   boards() {
     return this.db.query(
       "SELECT id,name,description,operator_only,revision FROM partner_community_boards WHERE active=true ORDER BY created_at,id",
@@ -32,19 +38,17 @@ export class PartnerCommunityService {
       "SELECT id,status FROM service_memberships WHERE user_id=$1 AND service_key=$2 FOR SHARE",
       [user, SERVICE],
     );
-    const roles =
-      membership?.status === "active"
-        ? await m.query(
+    const roles = await m.query(
             `SELECT role FROM role_assignments WHERE user_id=$1 AND is_active=true
       AND (valid_from IS NULL OR valid_from<=now()) AND (valid_until IS NULL OR valid_until>=now())
-      AND role IN ('partner-support:admin','partner-support:operator') FOR SHARE`,
-            [user],
-          )
-        : [];
-    if (member && membership?.status !== "active")
+      AND (role='platform:super_admin' OR (role IN ('partner-support:admin','partner-support:operator') AND $2::boolean)) FOR SHARE`,
+            [user, membership?.status === 'active'],
+          );
+    const platformAdmin = roles.some((r: { role: string }) => r.role === 'platform:super_admin');
+    if (member && membership?.status !== "active" && !(operator && platformAdmin))
       fail(403, "COMMUNITY_MEMBERSHIP_REQUIRED");
     if (operator && !roles.length) fail(403, "COMMUNITY_OPERATOR_REQUIRED");
-    return { status: membership?.status ?? null, operator: roles.length > 0, admin: roles.some((r: { role: string }) => r.role === "partner-support:admin") };
+    return { status: membership?.status ?? null, operator: roles.length > 0, admin: platformAdmin || roles.some((r: { role: string }) => r.role === "partner-support:admin") };
   }
   status(user: string) {
     return this.db.transaction((m) => this.identity(m, user, false));
@@ -150,6 +154,13 @@ export class PartnerCommunityService {
   detail(user: string, id: string, operator = false) {
     return this.db.transaction(async (m) => {
       await this.identity(m, user, true, operator);
+      if (operator) {
+        await this.menu(m,user,'posts','reports');
+        const restrictions = await centralServiceMenuRestrictions(m,user,'partner-support');
+        if (restrictions !== null && !restrictions.includes('partner-support.posts')) {
+          if (!(await m.query('SELECT 1 FROM partner_community_reports WHERE post_id=$1 LIMIT 1',[id])).length) fail(404,'COMMUNITY_NOT_FOUND');
+        }
+      }
       const p = await this.post(m, id, operator);
       const [author] = await m.query(
         "SELECT COALESCE(NULLIF(nickname,''),'파트너 회원') name FROM users WHERE id=$1",
@@ -289,24 +300,28 @@ export class PartnerCommunityService {
   operatorOverview(user: string) {
     return this.db.transaction(async (m) => {
       await this.identity(m, user, true, true);
-      const boards = await m.query(
+      const restrictions = await centralServiceMenuRestrictions(m,user,'partner-support');
+      const allowed = (area: string) => restrictions === null || restrictions.includes(`partner-support.${area}`);
+      const availableAreas = ['reports','posts','members','boards','events'].filter(allowed);
+      if (!availableAreas.length) fail(403,'CENTRAL_MENU_NOT_DELEGATED');
+      const boards = allowed('boards') ? await m.query(
         "SELECT * FROM partner_community_boards ORDER BY created_at,id",
-      );
-      const members = await m.query(
+      ) : [];
+      const members = allowed('members') ? await m.query(
         `SELECT sm.user_id id,sm.status,sm.created_at,sm.updated_at,to_char(sm.updated_at,'YYYY-MM-DD"T"HH24:MI:SS.US') version,COALESCE(NULLIF(u.nickname,''),'파트너 회원') name
         FROM service_memberships sm JOIN users u ON u.id=sm.user_id WHERE sm.service_key=$1 ORDER BY sm.created_at DESC,sm.id LIMIT 100`,
         [SERVICE],
-      );
-      const posts = await m.query(
+      ) : [];
+      const posts = allowed('posts') ? await m.query(
         `SELECT p.*,COALESCE(NULLIF(u.nickname,''),'파트너 회원') author_name FROM partner_community_posts p LEFT JOIN users u ON u.id=p.author_id WHERE p.state<>'deleted' ORDER BY p.updated_at DESC,p.id LIMIT 100`,
-      );
-      const reports = await m.query(
+      ) : [];
+      const reports = allowed('reports') ? await m.query(
         "SELECT id,post_id,comment_id,reason,status,resolution,revision,created_at FROM partner_community_reports ORDER BY created_at DESC,id LIMIT 100",
-      );
-      const events = await m.query(
+      ) : [];
+      const events = allowed('events') ? await m.query(
         "SELECT e.id,e.kind,e.target_id,e.reason,e.created_at,COALESCE(NULLIF(u.nickname,''),'탈퇴 회원') actor_name FROM partner_community_events e LEFT JOIN users u ON u.id=e.actor_id ORDER BY e.created_at DESC,e.id LIMIT 100",
-      );
-      return { boards, members, posts, reports, events };
+      ) : [];
+      return { boards, members, posts, reports, events, availableAreas };
     });
   }
   moderate(
@@ -322,6 +337,7 @@ export class PartnerCommunityService {
   ) {
     return this.db.transaction(async (m) => {
       await this.identity(m, user, true, true);
+      await this.menu(m,user,'posts');
       const table =
         kind === "post"
           ? "partner_community_posts"
@@ -368,6 +384,7 @@ export class PartnerCommunityService {
         [id, SERVICE],
       );
       await this.identity(m, user, true, true);
+      await this.menu(m,user,'members');
       if (id === user) fail(403, "COMMUNITY_SELF_ACTION");
       if (!target) fail(404, "COMMUNITY_NOT_FOUND");
       if (target.version !== expected) fail(409, "REVISION_CONFLICT");
@@ -395,6 +412,7 @@ export class PartnerCommunityService {
   ) {
     return this.db.transaction(async (m) => {
       await this.identity(m, user, true, true);
+      await this.menu(m,user,'boards');
       let target = id;
       if (id) {
         const [b] = await m.query(
@@ -432,6 +450,7 @@ export class PartnerCommunityService {
   ) {
     return this.db.transaction(async (m) => {
       await this.identity(m, user, true, true);
+      await this.menu(m,user,'reports');
       const rows = await m.query(
         "WITH updated AS (UPDATE partner_community_reports SET status='resolved',resolution=$3,revision=revision+1 WHERE id=$1 AND revision=$2 AND status='open' RETURNING id) SELECT id FROM updated",
         [id, revision, resolution],

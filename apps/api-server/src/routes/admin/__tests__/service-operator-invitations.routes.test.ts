@@ -120,3 +120,9 @@ describe('operator invitation HTTP boundary', () => {
     expect(accept).toHaveBeenCalledWith('a'.repeat(64), 'fixture-user');
   });
 });
+
+it.each(['-'.repeat(36),'111111111111-4111-8111-111111111111','invalid-user'])('rejects malformed menu grant account IDs: %s',async userId=>{
+ const headers={'x-fixture-role':'platform:super_admin'};
+ expect((await request(app).get('/admin/menu-grants').set(headers).query({userId,role:'lecture:operator'})).status).toBe(400);
+ expect((await request(app).patch('/admin/menu-grants').set(headers).send({userId,role:'lecture:operator',menuKeys:[],reason:'Synthetic reason',version:null})).status).toBe(400);
+});

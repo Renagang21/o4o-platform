@@ -1100,22 +1100,24 @@ test('§23b. Web 서비스의 직접 @o4o 선언은 전부 src 에서 실제로 
   assert.deepEqual(failures, [], `DECLARED_UNUSED (선언만 있고 src 에서 import 하지 않음):\n${failures.join('\n')}`);
 });
 
-test('§23c. Lecture 전용 package 변경은 약국 앱을 배포하지 않고, 약국 앱 · 실사용 공통 모듈 변경은 감지한다', () => {
+test('§23c. 중앙 강의 운영의 공유 모듈 의존성과 약국 앱의 실사용 공통 모듈 변경을 감지한다', () => {
   for (const pkg of ['@o4o/lms-ui', '@o4o/lms-client']) {
     const v = webOf([`M\t${graph.byName.get(pkg).dir}/src/index.ts`]);
-    assert.equal(v.services['kpa-society'], false, `${pkg} → 약국 앱 배포 안 함`);
-    assert.equal(v.services.store, false, `${pkg} → store 배포 안 함`);
+    // operator-core-ui now reuses Lecture operations. Package-level detection
+    // must include its transitive consumers rather than suppress required builds.
+    assert.ok(consumersOf(pkg).includes('kpa-society'), `${pkg} → shared operator UI consumer`);
+    assert.deepEqual(onOf(v), consumersOf(pkg));
     assert.equal(v.services.lecture, true, `${pkg} → lecture 는 계속 배포`);
     assert.equal(v.fallback, false);
   }
-  // 42dddc91b 의 Web 쪽 변경 그대로 — lecture 만 나와야 한다.
+  // The historical Lecture-only change now also affects shared UI consumers.
   assert.deepEqual(
     onOf(webOf([
       'M\tpackages/lms-ui/src/views/LessonPlayerView.tsx',
       'M\tpackages/lms-core/src/entities/InstructorApplication.ts',
       'M\tservices/web-lecture/src/App.tsx',
     ])),
-    ['lecture'],
+    consumersOf('@o4o/lms-ui'),
   );
   assert.equal(webOf(['M\tservices/web-pharmacy-business/src/App.tsx']).services['kpa-society'], true);
   assert.equal(webOf(['M\tservices/web-pharmacy-business/package.json']).services['kpa-society'], true);

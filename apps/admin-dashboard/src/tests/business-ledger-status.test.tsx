@@ -10,8 +10,8 @@ vi.mock('@o4o/auth-client', () => ({ authClient: { api: { get: vi.fn(), post: vi
 
 const users = [
   { id: 'u-care', email: 'care@example.invalid', roles: ['neture:carepharm_admin'], status: 'active' },
-  { id: 'u-mega', email: 'mega@example.invalid', firstName: '합성', lastName: '담당', roles: ['neture:megapharm_operator'], status: 'active' },
-  { id: 'u-neture', email: 'neture@example.invalid', name: '합성 운영자', roles: ['neture:operator'], status: 'active' },
+  { id: 'u-mega', email: 'mega@example.invalid', firstName: '합성', lastName: '담당', roles: ['neture:megapharm_admin'], status: 'active' },
+  { id: 'u-neture', email: 'neture@example.invalid', name: '합성 운영자', roles: ['neture:admin'], status: 'active' },
 ];
 
 function mockGet(ledger: () => Promise<unknown>) {
@@ -36,8 +36,7 @@ describe('business ledger status is separate from account status', () => {
     const care = rowOf('care@example.invalid');
     expect(care.textContent).toContain('Active');
     expect(care.querySelector('a')?.getAttribute('href')).toBe('/admin/pharmacy-service-settings?register=carepharm');
-    expect(screen.queryByText('mega@example.invalid')).toBeNull();
-    fireEvent.click(screen.getByLabelText('기존 Operator 권한 함께 보기'));
+    expect(screen.queryByLabelText('Operator 권한 함께 보기')).toBeNull();
     expect(rowOf('mega@example.invalid').textContent).toContain('사업 마감');
     expect(rowOf('neture@example.invalid').textContent).not.toMatch(/사업 (미등록|운영|마감)/);
     expect(authClient.api.post).not.toHaveBeenCalled();

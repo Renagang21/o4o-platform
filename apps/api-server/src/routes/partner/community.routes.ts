@@ -1,3 +1,4 @@
+import { centralOperationRequest } from '../../middleware/central-operation-menu.middleware.js';
 import { Router, json, type RequestHandler } from "express";
 import rateLimit from "express-rate-limit";
 import type { DataSource } from "typeorm";
@@ -89,6 +90,12 @@ export function createPartnerCommunityRoutes(
     handle(() => getEnrollmentPolicies(db.manager, "partner-support")),
   );
   router.use(requireAuth);
+  router.use('/operator', centralOperationRequest('partner-support',req => {
+    const match = /^\/(?:boards|posts|comments|members|reports)(?:\/|$)/.exec(req.path);
+    if (!match) return ['reports','posts','members','boards','events'].map(area => `partner-support.${area}`);
+    if (req.method === 'GET' && req.path.startsWith('/posts/')) return ['partner-support.posts','partner-support.reports'];
+    return [`partner-support.${match[0].split('/')[1] === 'comments' ? 'posts' : match[0].split('/')[1]}`];
+  },db));
   router.use(
     rateLimit({
       windowMs: 60000,

@@ -338,6 +338,10 @@ export const EXPECTED_SCHEMA_STATES: readonly ExpectedSchemaState[] = [
   { appliedThrough: 'CreateSettlementNotificationJobs1793087685658', fingerprint: '4bd5d4e71e2656241a20e63fc226cbc571228dd4634294f0d3772bb3bff115e1', fingerprintLineCount: 7338 },
   { appliedThrough: 'AllowCentralOperatingDelegation1793164501481', fingerprint: '87885d94fe587b71f64fc1f59a20ae6677bf6c6ab5b0f079fe0f8cd362e6658c', fingerprintLineCount: 7338 },
   { appliedThrough: 'AddPharmacistQualificationDecisions1793165158540', fingerprint: '0834c1f1d5911e4a12ef86b24997a4b3038685d46821edfcc99020802fd0a986', fingerprintLineCount: 7344 },
+  // Isolated PostgreSQL 15: all prior prefixes and new empty down/up/reapply + erasure writer fence verified.
+  { appliedThrough: 'CreateCentralOperationMenuGrants1793186241009', fingerprint: '3e6030d5fdd3fe6805d43ecb93c813084432d776ab0f26c11d8077eae28b1b0b', fingerprintLineCount: 7362 },
+  // Isolated PostgreSQL 15: optional Main work-data mirrors, prefix and empty down/up verified.
+  { appliedThrough: 'CreateAssistantWorkData1793257200000', fingerprint: '8a27034284caa9a39ed1fd6057e7f5c82b1761f78dbe77db2a2d75abb50dac31', fingerprintLineCount: 7405 },
 ] as const;
 
 /** Expected state after `prefixLength` incremental migrations; undefined when not registered. */
