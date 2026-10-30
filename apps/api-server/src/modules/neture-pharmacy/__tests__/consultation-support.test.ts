@@ -4,16 +4,24 @@ import { ConsultationGuidanceService } from '../services/consultation-guidance.j
 import { ConsultationSupportService } from '../services/consultation-support.js';
 import { consultationWorkspaceRoutes } from '../consultation-workspace.routes.js';
 import { NeturePharmacyError } from '../constants.js';
+import { consultationSupportExtension } from '../services/consultation-support.extension.js';
 
 const id = '55555555-5555-4555-8555-555555555555';
 const input = { mode: 'floor-pharmacist', productKind: 'local', productId: id, question: '상품 근거와 확인할 사항은?' };
 function fixture() {
-  const state = { allowed: true, published: true, version: 'v1' };
+  const state = { allowed: true, published: true, version: 'v1', aiText: '', aiCount: 1 };
   const authorize = jest.fn(async (actor: string, org: string) => {
     if (!state.allowed || actor !== 'pharmacist' || org !== 'store')
       throw new NeturePharmacyError(403, 'STORE_ACCESS_REQUIRED', 'denied');
   });
   const query = jest.fn(async (sql: string, args: unknown[]) => {
+    if (sql.includes('SELECT p.master_id,p.id,m.name')) return [{ master_id: id, id, name: 'Fixture product' }];
+    if (sql.includes('FROM shared_product_descriptions d')) return state.aiText ? [{ id, content: '<p>B2B body</p>', summary: null, updated_at: new Date('2026-10-29'),
+      entry: { key: 'b2b', name: 'Fixture product', content: '<p>B2B body</p>', descriptionType: 'B2B', language: 'ko',
+        source: { kind: 'manufacturer', currentness: 'retrieved', references: [{ url: 'https://example.com/product' }] }, aiSections: [
+          ...Array.from({ length: state.aiCount }, (_, index) => ({ key: `fact${index}`, title: '성분', kind: 'product-fact', text: state.aiText, referenceUrls: ['https://example.com/product'] })),
+          { key: 'reference', title: '전문 참고', kind: 'professional-reference', text: '전문 정보', referenceUrls: ['https://example.com/product'] },
+        ] } }] : [];
     if (sql.includes('WITH products')) return args[0] === 'store' ? [{ id, kind: 'local', name: 'Fixture product', location: 'A' }] : [];
     if (sql.includes('FROM store_multilingual_product_content_groups')) return state.published ? [{ id: 'group', title: 'Published source', defaultLocale: 'ko', publicKey: 'public', updatedAt: state.version }] : [];
     if (sql.includes('FROM store_multilingual_product_content_pages')) return [{ id: 'page', locale: 'ko', title: '원문', summary: null,
@@ -69,6 +77,29 @@ it('rechecks a draft before use without invoking AI again, and refuses a withdra
   f.state.published = false;
   await expect(f.service.prepare('pharmacist', 'store', { ...input, verifyOnly: true, sourceVersion: result.sourceVersion })).rejects.toHaveProperty('httpStatus', 409);
   expect(f.run).toHaveBeenCalledTimes(1);
+});
+it('uses registered structured B2B separately and invalidates a prepared draft when its AI evidence changes', async () => {
+  const f = fixture(); f.state.published = false; f.state.aiText = '확인된 B2B 성분';
+  const requestInput = { ...input, productKind: 'listing' };
+  const result = await f.service.prepare('pharmacist', 'store', requestInput);
+  expect(result.state).toBe('ready');
+  expect(f.run.mock.calls[0][0].sources.map((s: any) => s.kind)).toEqual(['product-fact', 'professional-reference']);
+  expect(f.run.mock.calls[0][0].sources[0].text).toBe('확인된 B2B 성분');
+  expect(() => consultationSupportExtension.prepare(f.run.mock.calls[0][0])).not.toThrow();
+  const response = { productFacts: [{ text: '확인된 B2B 성분', sourceIds: ['p11'] }], professionalNotes: [], nextQuestion: null, customerDraft: { text: '확인한 설명', sourceIds: ['p11'] } };
+  expect(() => consultationSupportExtension.parse(JSON.stringify(response))).not.toThrow();
+  f.state.aiText = '변경된 B2B 성분';
+  await expect(f.service.prepare('pharmacist', 'store', { ...requestInput, verifyOnly: true, sourceVersion: result.sourceVersion })).rejects.toHaveProperty('httpStatus', 409);
+  expect(f.run).toHaveBeenCalledTimes(1);
+});
+it('fits combined published/B2B/user evidence within the real runner budget and preserves citation namespaces', async () => {
+  const f = fixture(); f.state.aiText = '가'.repeat(4750); f.state.aiCount = 4;
+  await f.service.prepare('pharmacist', 'store', { ...input, productKind: 'listing', reference: { text: '나'.repeat(5000), source: '검토한 자료', reviewed: true } });
+  const prepared = f.run.mock.calls[0][0];
+  expect(prepared.sources.reduce((sum: number, s: { text: string }) => sum + s.text.length, 0)).toBeLessThanOrEqual(18000);
+  expect(prepared.sources.find((s: { id: string }) => s.id === 'r1').text).toHaveLength(5000);
+  expect(prepared.sources.every((s: { id: string }) => /^[pr][0-9]{1,2}$/.test(s.id))).toBe(true);
+  expect(() => consultationSupportExtension.prepare(prepared)).not.toThrow();
 });
 it('uses authenticated actor/store values in HTTP and checks the counter epoch before and after preparing', async () => {
   const f = fixture(), app = express(), validate = jest.fn(async () => {});

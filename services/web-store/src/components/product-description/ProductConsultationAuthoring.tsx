@@ -2,6 +2,7 @@ import { sanitizeRichHtml } from '@o4o/content-editor';
 import { useState } from 'react';
 import { ProductDescriptionAssist } from './ProductDescriptionAssist';
 import { ProductEvidencePicker, type ProductEvidenceSelection } from './ProductEvidencePicker';
+import { ApprovedProductAiContext } from './ApprovedProductAiContext';
 import { consultationLanguages, type ProductConsultationDraft } from './productConsultationDraft';
 
 export function ProductConsultationAuthoring({ value, title, html, disabled, isCurrent, onChange, onApplyHtml }: Readonly<{
@@ -20,6 +21,13 @@ export function ProductConsultationAuthoring({ value, title, html, disabled, isC
         {Object.entries(consultationLanguages).map(([code, name]) => <option key={code} value={code}>{name}</option>)}
       </select>
     </label>
+    {value.product.sourceType === 'listing' && <ApprovedProductAiContext key={`${value.product.sourceId}:${value.language}`}
+      listingId={value.product.sourceId} language={value.language} disabled={disabled} isCurrent={isCurrent} onUse={data => {
+        if (!isCurrent()) return;
+        if ((value.assist.facts.trim() || value.assist.reference.trim()) && !window.confirm('작성 중인 근거를 확인한 AI 상담자료로 바꾸시겠습니까?')) return;
+        onChange({ ...value, assist: { ...value.assist, facts: data.facts.slice(0, 20000), factSource: data.source.slice(0, 1000), factsReviewed: false,
+          reference: data.references.slice(0, 20000), referenceSource: data.source.slice(0, 1000), reviewed: false } });
+      }} />}
     <ProductEvidencePicker key={`${value.product.sourceType}:${value.product.sourceId}:${value.language}`}
       mode="evidence" kind={value.product.sourceType} id={value.product.sourceId} locale={value.language}
       disabled={disabled} isCurrent={isCurrent} onLoaded={setSource} onInsert={body => {

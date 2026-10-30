@@ -12,7 +12,7 @@ interface MasterRow {
 export interface DescriptionTarget {
   id: string; name: string; barcode: string | null; manufacturer: string | null;
   matchedBy: 'barcode' | 'official_id' | 'name';
-  canonical: { source?: DescriptionEntry['source'] | null; id: string; content: string; summary: string | null; revision: string } | null;
+  canonical: { source?: DescriptionEntry['source'] | null; aiSections?: DescriptionEntry['aiSections']; id: string; content: string; summary: string | null; revision: string } | null;
 }
 const MASTER_COLUMNS = 'pm.id,pm.name,pm.barcode,pm.manufacturer_name,pm.regulatory_name,pm.mfds_product_id,pm.mfds_permit_number';
 const CODE_TYPES = ['GTIN', 'EAN13', 'UPC', 'JAN', 'KOREA_DRUG_CODE', 'UDI_DI'];
@@ -62,9 +62,10 @@ export async function findDescriptionTargets(db: Db, entries: LookupEntry[]): Pr
     return (exact.length ? exact : byOfficial.length ? byOfficial : byName).slice(0, 50).map(master => ({ master, matchedBy }));
   });
   const selected = [...new Set(candidates.flatMap(rows => rows.map(r => r.master.id)))];
-  const descriptions: Array<{ id: string; master_id: string; description_type: string; language: string; content: string; summary: string | null; updated_at: Date; source: DescriptionEntry['source'] | null }> = selected.length ? await db.query(
+  const descriptions: Array<{ id: string; master_id: string; description_type: string; language: string; content: string; summary: string | null; updated_at: Date; source: DescriptionEntry['source'] | null; ai_sections: DescriptionEntry['aiSections'] }> = selected.length ? await db.query(
     `SELECT d.id,d.master_id,d.description_type,COALESCE(d.language,'ko') AS language,d.content,d.summary,d.updated_at,
-       c.raw_payload->'descriptionResource'->'entry'->'source' AS source FROM shared_product_descriptions d
+       c.raw_payload->'descriptionResource'->'entry'->'source' AS source,
+       c.raw_payload->'descriptionResource'->'entry'->'aiSections' AS ai_sections FROM shared_product_descriptions d
        LEFT JOIN product_candidates c ON c.id=d.source_ref_id AND c.source_label='PRODUCT_DESCRIPTION_RESOURCE_V1' AND c.deleted_at IS NULL
      WHERE d.master_id=ANY($1::uuid[]) AND d.description_type=ANY($2::text[]) AND COALESCE(d.language,'ko')=ANY($3::text[]) AND d.status='canonical' AND d.deleted_at IS NULL`,
     [selected, [...new Set(entries.map(e => e.descriptionType))], [...new Set(entries.map(e => e.language))]],
@@ -72,7 +73,7 @@ export async function findDescriptionTargets(db: Db, entries: LookupEntry[]): Pr
   return candidates.map((rows, i) => rows.map(({ master, matchedBy }) => {
     const d = descriptions.find(d => d.master_id === master.id && d.description_type === entries[i].descriptionType && d.language === entries[i].language);
     const canonical = d && hasProductDescriptionText(sanitizeDescriptionHtml(d.content)) ? {
-      id: d.id, source: d.source ?? null, content: sanitizeDescriptionHtml(d.content), summary: d.summary ? sanitizeDescriptionHtml(d.summary) : null,
+      id: d.id, source: d.source ?? null, aiSections: d.ai_sections ?? undefined, content: sanitizeDescriptionHtml(d.content), summary: d.summary ? sanitizeDescriptionHtml(d.summary) : null,
       revision: canonicalRevision({ id: d.id, content: d.content, summary: d.summary, updatedAt: d.updated_at })!,
     } : null;
     return { id: master.id, name: master.name, barcode: master.barcode, manufacturer: master.manufacturer_name, matchedBy, canonical };
