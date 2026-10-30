@@ -36,7 +36,7 @@ export type CooperationView = 'home' | 'participation' | 'materials' | 'tools';
 /** A model-specific service uses the same organization approval and content contracts as Pharmacy. */
 export function CooperationMemberSpace(props: {
   model: CooperationModel; client: CooperationClient; accountId?: string; materialsGuide?: Readonly<CooperationMaterialGuide>;
-  homeNews?: ReactNode; view?: CooperationView; onLogin: () => void; onEnterStore: () => Promise<string>;
+  homeNews?: ReactNode; view?: CooperationView; onLogin: () => void; onEnterStore: (path?: string) => Promise<string>;
 }) {
   const { model, accountId, view = 'home' } = props;
   const scope = `${accountId ?? ''}:${model.key}`;
@@ -79,10 +79,10 @@ function MemberSpace({ model, client, accountId, view, onLogin, onEnterStore, ma
     })().catch((error: unknown) => { if (alive) setIssue(loadIssue(error, stage)); });
     return () => { alive = false; };
   }, [model.key, accountId, client, version]);
-  const enterStore = async () => {
+  const enterStore = async (path?: string) => {
     if (moving.current) return;
     moving.current = true; setBusy(true); setEntryError('');
-    try { const href = await onEnterStore(); if (mounted.current) window.location.assign(href); }
+    try { const href = await onEnterStore(path); if (mounted.current) window.location.assign(href); }
     catch { if (mounted.current) setEntryError('내 매장으로 이동하지 못했습니다. 약국 소속과 승인 상태를 확인해 주세요.'); }
     finally { if (mounted.current) { moving.current = false; setBusy(false); } }
   };
@@ -109,7 +109,7 @@ function MemberSpace({ model, client, accountId, view, onLogin, onEnterStore, ma
     {!state && !issue && <p role="status">회원 이용 상태를 확인하고 있습니다…</p>}
     {state && <>
       {!state.access.canManage && (state.stores.length ? <label className="block">이용할 약국<select aria-label="이용할 약국" className="mt-2 block rounded border p-3" value={organizationId ?? ''} onChange={event => setParams(previous => { const next = new URLSearchParams(previous); if (event.target.value) next.set('store', event.target.value); else next.delete('store'); return next; })}><option value="">약국을 선택해 주세요</option>{state.stores.map(store => <option key={store.organizationId} value={store.organizationId}>{store.organizationName}</option>)}</select></label> : <a href="https://store.neture.co.kr/start-pharmacy">약국 개설 · 소속 확인</a>)}
-      {view === 'participation' ? (organizationId || state.access.canManage ? <Participation key={`${model.key}:${organizationId}:${version}`} model={model} business={state.business} access={state.access} client={scopedClient} onChanged={() => setVersion(n => n + 1)} /> : <p>가입 상태를 확인할 약국을 선택해 주세요.</p>) : state.access.canManage ? <div className="space-y-4 rounded-xl border p-6"><p>담당 서비스 운영자입니다. 회원 업무는 승인된 약국을 기준으로 이용합니다.</p><Link className="block underline" to="/operator/semi-franchises?tab=contents">사업 자료 등록 · 관리</Link><Link to={model.communityPath}>회원 게시글 관리</Link></div> : organizationId ? <SelectedMemberResources onAccess={setMemberAccess} materialsGuide={materialsGuide} homeNews={homeNews} accountId={accountId} key={`${model.key}:${organizationId}:${version}`} model={model} organizationId={organizationId} client={scopedClient} view={view} storeSearch={storeSearch} busy={busy} onEnterStore={enterStore} /> : <p>회원 업무를 이용할 약국을 선택해 주세요.</p>}
+      {view === 'participation' ? (organizationId || state.access.canManage ? <Participation key={`${model.key}:${organizationId}:${version}`} model={model} business={state.business} access={state.access} client={scopedClient} onChanged={() => setVersion(n => n + 1)} /> : <p>가입 상태를 확인할 약국을 선택해 주세요.</p>) : state.access.canManage ? <div className="space-y-4 rounded-xl border p-6"><p>담당 서비스 운영자입니다. 회원 업무는 승인된 약국을 기준으로 이용합니다.</p><Link className="block underline" to="/operator/semi-franchises?tab=contents">사업 자료 등록 · 관리</Link><Link to={model.communityPath}>회원 게시글 관리</Link></div> : organizationId ? <SelectedMemberResources onAccess={setMemberAccess} materialsGuide={materialsGuide} homeNews={homeNews} accountId={accountId} key={`${model.key}:${organizationId}:${version}`} model={model} organizationId={organizationId} client={scopedClient} view={view} storeSearch={storeSearch} busy={busy} onEnterStore={enterStore} resolveStoreEntry={onEnterStore} /> : <p>회원 업무를 이용할 약국을 선택해 주세요.</p>}
 
       {view === 'home' && state.access.canManage && <BusinessHomeShowcase client={client} businessKey={model.key} accountId={accountId} operator />}
       {state.access.canManage && <Link to="/operator/semi-franchises" className="block underline">참여 약국 · 공급 승인 · 콘텐츠 운영</Link>}
@@ -118,10 +118,11 @@ function MemberSpace({ model, client, accountId, view, onLogin, onEnterStore, ma
 
   </section>;
 }
-function SelectedMemberResources({ onAccess, model, organizationId, client, view, storeSearch, busy, onEnterStore, accountId, materialsGuide, homeNews }: {
+function SelectedMemberResources({ onAccess, model, organizationId, client, view, storeSearch, busy, onEnterStore, accountId, materialsGuide, homeNews, resolveStoreEntry }: {
   onAccess: (access: { organizationId: string; allowed: boolean } | null) => void;
   model: CooperationModel; organizationId: string; client: CooperationClient; view?: CooperationView; accountId?: string; homeNews?: ReactNode; materialsGuide?: Readonly<CooperationMaterialGuide>;
-  storeSearch: string; busy: boolean; onEnterStore: () => Promise<void>;
+  resolveStoreEntry: (path?: string) => Promise<string>;
+  storeSearch: string; busy: boolean; onEnterStore: (path?: string) => Promise<void>;
 }) {
   const [access, setAccess] = useState<StoreAccess | null>(null);
   const [error, setError] = useState('');
@@ -158,7 +159,7 @@ function SelectedMemberResources({ onAccess, model, organizationId, client, view
     </>}>
       {accountId && <CooperationMemberWorkflows client={client} accountId={accountId} kind="business" scopeKey={model.key} organizationId={organizationId} />}
       {homeNews}
-      <BusinessHomeShowcase client={client} businessKey={model.key} organizationId={organizationId} accountId={accountId} />
+      <BusinessHomeShowcase client={client} businessKey={model.key} organizationId={organizationId} accountId={accountId} onEnterStore={resolveStoreEntry} />
     </CooperationMemberHomeLayout>}
     {view === 'materials' && <Materials model={model} client={client} guide={materialsGuide} />}
     {view === 'tools' && <div className="rounded-xl border p-6"><h2 className="text-xl font-semibold">내 약국 업무</h2><p className="my-4">승인된 공급 상품·콘텐츠와 이 사업이 제공하는 약국 업무는 내 약국에서 이용합니다.</p><button disabled={busy} onClick={() => void onEnterStore()} className="rounded-lg bg-teal-800 px-5 py-3 text-white disabled:opacity-50">{busy ? '이동 중…' : '내 약국으로'}</button></div>}

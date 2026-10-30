@@ -1,6 +1,6 @@
 import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
-import { MemoryRouter, Route, Routes, useNavigate } from 'react-router-dom';
+import { MemoryRouter, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import SupplierLibraryFormPage from '../SupplierLibraryFormPage';
 const api = vi.hoisted(() => ({ getLibraryItem: vi.fn(), createLibraryItem: vi.fn(), updateLibraryItem: vi.fn() }));
 const session = vi.hoisted(() => ({ user: { id: 'supplier-a' } as { id: string } | null }));
@@ -15,11 +15,12 @@ beforeEach(() => { vi.resetAllMocks(); session.user = { id: 'supplier-a' }; });
 afterEach(() => { cleanup(); vi.restoreAllMocks(); });
 const documentItem = (title: string) => ({ title, contentType: 'document', description: '합성 참고자료', blocks: [{ type: 'html', content: '<p>기존 문서</p>' }], category: '안내', isPublic: false });
 function Switch() { const navigate = useNavigate(); return <button onClick={() => navigate('/supplier/library/new')}>새 문서로 이동</button>; }
+function LibraryDestination() { const location = useLocation(); return <p>자료함 목록{location.search}</p>; }
 function LibraryRoutes({ path }: { path: string }) {
   return <MemoryRouter initialEntries={[path]}><Switch /><Routes>
     <Route path="/supplier/library/:id/edit" element={<SupplierLibraryFormPage />} />
     <Route path="/supplier/library/new" element={<SupplierLibraryFormPage />} />
-    <Route path="/supplier/library" element={<p>자료함 목록</p>} />
+    <Route path="/supplier/library" element={<LibraryDestination />} />
   </Routes></MemoryRouter>;
 }
 function show(path = '/supplier/library/one/edit') {
@@ -106,4 +107,16 @@ it('discards document and external AI drafts on account replacement and logout',
   session.user = null;
   view.refreshSession();
   expect(screen.queryByPlaceholderText('자료 제목을 입력하세요')).toBeNull();
+});
+
+it('returns a saved original to the same source and business request without submitting a review', async () => {
+  const destination = '/supplier/library?requestSource=one&business=carepharm';
+  api.getLibraryItem.mockResolvedValue(documentItem('반려 원본'));
+  api.updateLibraryItem.mockResolvedValue({ success: true });
+  show('/supplier/library/one/edit?returnTo=' + encodeURIComponent(destination));
+  await screen.findByDisplayValue('반려 원본');
+  fireEvent.change(screen.getByPlaceholderText('자료 제목을 입력하세요'), { target: { value: '보완 원본' } });
+  fireEvent.click(screen.getByRole('button', { name: '수정 저장' }));
+  await screen.findByText('자료함 목록?requestSource=one&business=carepharm');
+  expect(api.updateLibraryItem).toHaveBeenCalledWith('one', expect.objectContaining({ title: '보완 원본', isPublic: false }));
 });
