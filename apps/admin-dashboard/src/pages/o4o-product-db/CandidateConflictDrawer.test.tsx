@@ -1,5 +1,5 @@
 import {afterEach,beforeEach,expect,it,vi} from 'vitest';
-import {cleanup,fireEvent,render,screen,waitFor} from '@testing-library/react';
+import {act,cleanup,fireEvent,render,screen,waitFor} from '@testing-library/react';
 const mocks=vi.hoisted(()=>({getCandidateConflictInfo:vi.fn(),bulkCandidateAction:vi.fn(),promoteCandidateToMaster:vi.fn(),promoteSupplierCandidateToMaster:vi.fn(),writer:true}));
 vi.mock('@/api/o4o-product-db.api',()=>mocks);
 vi.mock('./useProductDbWriteAccess',()=>({useProductDbWriteAccess:()=>mocks.writer}));
@@ -23,4 +23,13 @@ it('explains an unsupported medical dataset without exposing a registration acti
 it('preserves the platform-only registration UI boundary',async()=>{
  mocks.writer=false;render(<Drawer candidateId="synthetic" open onClose={vi.fn()} onProcessed={vi.fn()}/>);
  await screen.findByText(/O4O 전체 관리자가 수행/);expect(screen.queryByRole('button',{name:/신규 기본상품으로 등록/})).toBeNull();
+});
+
+it('sends a confirmed supplier registration only once while the request is pending',async()=>{
+ let finish!:(value:unknown)=>void;mocks.promoteSupplierCandidateToMaster.mockImplementationOnce(()=>new Promise(resolve=>{finish=resolve;}));
+ render(<Drawer candidateId="synthetic" open onClose={vi.fn()} onProcessed={vi.fn()}/>);
+ fireEvent.click(await screen.findByRole('button',{name:/신규 기본상품으로 등록/}));
+ const confirm=screen.getByRole('button',{name:'등록',exact:true});fireEvent.click(confirm);fireEvent.click(confirm);
+ expect(mocks.promoteSupplierCandidateToMaster).toHaveBeenCalledTimes(1);expect(screen.getByRole('button',{name:/처리 중/})).toBeDisabled();
+ await act(async()=>finish({outcome:'create'}));
 });

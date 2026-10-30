@@ -10,7 +10,7 @@
  * 모든 쓰기 액션은 ConfirmActionDialog 확인을 거친다.
  */
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { BaseDetailDrawer, ConfirmActionDialog } from '@o4o/ui';
 import { PackagePlus } from 'lucide-react';
 import { toast } from 'react-hot-toast';
@@ -46,6 +46,7 @@ export default function CandidateConflictDrawer({ candidateId, open, onClose, on
   const [error, setError] = useState<string | null>(null);
   const [confirm, setConfirm] = useState<ConfirmState | null>(null);
   const [busy, setBusy] = useState(false);
+  const mutationLock=useRef(false);
 
   useEffect(() => {
     if (!open || !candidateId) return;
@@ -59,7 +60,8 @@ export default function CandidateConflictDrawer({ candidateId, open, onClose, on
   }, [open, candidateId]);
 
   const runConfirmed = useCallback(async () => {
-    if (!confirm) return;
+    if (!confirm || mutationLock.current) return;
+    mutationLock.current=true;
     setBusy(true);
     try {
       await confirm.run();
@@ -69,6 +71,7 @@ export default function CandidateConflictDrawer({ candidateId, open, onClose, on
     } catch (e: any) {
       setError(e?.response?.data?.error || e?.message || '처리에 실패했습니다');
     } finally {
+      mutationLock.current=false;
       setBusy(false);
     }
   }, [confirm, onProcessed, onClose]);
@@ -187,6 +190,7 @@ export default function CandidateConflictDrawer({ candidateId, open, onClose, on
 
       <ConfirmActionDialog
         open={!!confirm}
+        loading={busy}
         onClose={() => { if (!busy) setConfirm(null); }}
         onConfirm={runConfirmed}
         title={confirm?.title || ''}
