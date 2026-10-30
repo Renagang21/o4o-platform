@@ -102,6 +102,7 @@ export interface GoogleSignupConsents {
   marketing?: boolean;
   phone: string;
   name: string;
+  nickname?: string;
 }
 
 /** GET /auth/google/config — 공개 Client ID(secret 아님). enabled=false 면 Google 버튼을 "준비 중"으로 표시. */
@@ -124,8 +125,9 @@ export interface EmailSignupRequest {
   email: string;
   password: string;
   name: string;
+  nickname?: string;
   phone: string;
-  consents: Omit<GoogleSignupConsents, 'phone' | 'name'>;
+  consents: Omit<GoogleSignupConsents, 'phone' | 'name' | 'nickname'>;
 }
 
 /** 가입·재발송·찾기 등 세션을 열지 않는 이메일 인증 요청의 결과(서버 `data`). */
@@ -148,7 +150,7 @@ export interface SocialProof { token: string; idToken?: string; code?: string }
 export interface SocialGrant { token: string; nonce?: string; authorizationUrl?: string; provider?: SocialProvider }
 export interface SignupTermsReference { policyDocumentId: string; version: number }
 export interface SignupTermsDocument extends SignupTermsReference { title: string; termsHref: string; privacyHref?: string; privacyPolicy?: SignupTermsReference & { title: string } }
-export interface KakaoSignupRequest { email: string; name: string; phone: string; consents: { terms: boolean; privacy: boolean; marketing?: boolean; termsPolicy: SignupTermsReference; privacyPolicy?: SignupTermsReference } }
+export interface KakaoSignupRequest { email: string; name: string; nickname?: string; phone: string; consents: { terms: boolean; privacy: boolean; marketing?: boolean; termsPolicy: SignupTermsReference; privacyPolicy?: SignupTermsReference } }
 export interface KakaoAuthResponse extends GoogleAuthResponse {
   nextStep?: 'signup' | 'verify-email'; signupTicket?: string; email?: string; maskedEmail?: string; mailSent?: boolean;
 }

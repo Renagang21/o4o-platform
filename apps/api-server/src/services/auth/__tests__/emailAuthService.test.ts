@@ -282,6 +282,7 @@ const signupInput = (over: Partial<Record<string, any>> = {}) => ({
   email: 'New.User@Example.com',
   password: GOOD_PW,
   name: '홍길동',
+  nickname: ' 합성닉네임 ',
   phone: '010-1234-5678',
   consents: { terms: true, privacy: true, termsPolicy: { policyDocumentId: '11111111-1111-4111-8111-111111111111', version: 1 } },
   ...META,
@@ -296,6 +297,12 @@ describe('EmailAuthService', () => {
   beforeAll(() => {
     process.env.JWT_SECRET = process.env.JWT_SECRET || 'test-jwt-secret-email-auth';
     process.env.JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || 'test-jwt-refresh-secret-email-auth';
+  });
+
+  it('persists a distinct trimmed nickname on signup', async () => {
+    const h = makeHarness();
+    await h.service.signup(signupInput());
+    expect(h.store.users[0].nickname).toBe('합성닉네임');
   });
 
   describe('token lifecycle hardening', () => {

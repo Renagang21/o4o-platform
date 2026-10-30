@@ -24,6 +24,7 @@ export interface SupplierProfile {
   businessAddressDetail: string | null;
   managerName: string | null;
   managerPhone: string | null;
+  managerEmail?: string | null;
   businessType: string | null;
   businessItem: string | null;
   // WO-O4O-NETURE-SUPPLIER-PROFILE-P4-FIELDS-ADD-V1

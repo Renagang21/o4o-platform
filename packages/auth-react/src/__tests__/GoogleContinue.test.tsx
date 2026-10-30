@@ -118,7 +118,7 @@ describe('GoogleContinue — 로그인 · 가입 전이', () => {
     await act(async () => { captured!.onCredential('id-token'); });
 
     await screen.findByTestId('google-continue-consent');
-    fireEvent.change(screen.getByLabelText('이름 (필수)'), { target: { value: '테스트회원' } });
+    fireEvent.change(screen.getByLabelText('닉네임 (필수)'), { target: { value: 'Fixture nickname' } });fireEvent.change(screen.getByLabelText('이름 (필수)'), { target: { value: '테스트회원' } });
     fireEvent.change(screen.getByLabelText('개인 휴대전화 (필수)'), { target: { value: '01012345678' } });
     fireEvent.click(screen.getByText('동의하고 계정 만들기'));
     expect((screen.getByRole('button', { name: '동의하고 계정 만들기' }) as HTMLButtonElement).disabled).toBe(true);
@@ -140,12 +140,12 @@ describe('GoogleContinue — 로그인 · 가입 전이', () => {
     const boxes = screen.getAllByRole('checkbox');
     fireEvent.click(boxes[0]); // 이용약관
     fireEvent.click(boxes[1]); // 개인정보
-    fireEvent.change(screen.getByLabelText('이름 (필수)'), { target: { value: '테스트회원' } });
+    fireEvent.change(screen.getByLabelText('닉네임 (필수)'), { target: { value: 'Fixture nickname' } });fireEvent.change(screen.getByLabelText('이름 (필수)'), { target: { value: '테스트회원' } });
     fireEvent.change(screen.getByLabelText('개인 휴대전화 (필수)'), { target: { value: '01012345678' } });
     fireEvent.click(screen.getByText('동의하고 계정 만들기'));
 
     await waitFor(() => expect(p.onSuccess).toHaveBeenCalledWith({ user: USER, isNewUser: true }));
-    expect(p.signupWithGoogle).toHaveBeenCalledWith('id-token', { terms: true, privacy: true, marketing: false, name: '테스트회원', phone: '01012345678', termsPolicy: { policyDocumentId: TERMS.policyDocumentId, version: TERMS.version } });
+    expect(p.signupWithGoogle).toHaveBeenCalledWith('id-token', { terms: true, privacy: true, marketing: false, nickname: 'Fixture nickname', name: '테스트회원', phone: '01012345678', termsPolicy: { policyDocumentId: TERMS.policyDocumentId, version: TERMS.version } });
   });
 
   it('signup 이 EMAIL_IN_USE 로 실패하면 onError 에 code 를 전달하고 동의 화면에 머문다 (자동 연결 없음)', async () => {
@@ -159,7 +159,7 @@ describe('GoogleContinue — 로그인 · 가입 전이', () => {
     const boxes = screen.getAllByRole('checkbox');
     fireEvent.click(boxes[0]);
     fireEvent.click(boxes[1]);
-    fireEvent.change(screen.getByLabelText('이름 (필수)'), { target: { value: '테스트회원' } });
+    fireEvent.change(screen.getByLabelText('닉네임 (필수)'), { target: { value: 'Fixture nickname' } });fireEvent.change(screen.getByLabelText('이름 (필수)'), { target: { value: '테스트회원' } });
     fireEvent.change(screen.getByLabelText('개인 휴대전화 (필수)'), { target: { value: '01012345678' } });
     fireEvent.click(screen.getByText('동의하고 계정 만들기'));
 
@@ -227,11 +227,11 @@ describe('GoogleContinue — 불안정한 콜백 prop 참조에 대한 안전성
     const boxes = screen.getAllByRole('checkbox');
     fireEvent.click(boxes[0]);
     fireEvent.click(boxes[1]);
-    fireEvent.change(screen.getByLabelText('이름 (필수)'), { target: { value: '테스트회원' } });
+    fireEvent.change(screen.getByLabelText('닉네임 (필수)'), { target: { value: 'Fixture nickname' } });fireEvent.change(screen.getByLabelText('이름 (필수)'), { target: { value: '테스트회원' } });
     fireEvent.change(screen.getByLabelText('개인 휴대전화 (필수)'), { target: { value: '01012345678' } });
     fireEvent.click(screen.getByText('동의하고 계정 만들기'));
     await waitFor(() => expect(third.onSuccess).toHaveBeenCalledWith({ user: USER, isNewUser: true }));
-    expect(third.signupWithGoogle).toHaveBeenCalledWith('id-token', { terms: true, privacy: true, marketing: false, name: '테스트회원', phone: '01012345678', termsPolicy: { policyDocumentId: TERMS.policyDocumentId, version: TERMS.version } });
+    expect(third.signupWithGoogle).toHaveBeenCalledWith('id-token', { terms: true, privacy: true, marketing: false, nickname: 'Fixture nickname', name: '테스트회원', phone: '01012345678', termsPolicy: { policyDocumentId: TERMS.policyDocumentId, version: TERMS.version } });
     expect(first.signupWithGoogle).not.toHaveBeenCalled();
   });
 
@@ -290,7 +290,7 @@ it('requires fresh privacy acknowledgement after a signup policy version mismatc
   mount({ getSignupTerms: load, signupWithGoogle: signup, loginWithGoogle: async () => ({ success: false, code: 'GOOGLE_SIGNUP_REQUIRED', status: 404, error: 'x' }) });
   await waitFor(() => expect(captured).not.toBeNull()); await act(async () => { captured!.onCredential('id-token'); });
   await screen.findByRole('link', { name: '내용 보기 · 버전 1' });
-  fireEvent.change(screen.getByLabelText('이름 (필수)'), { target: { value: 'Fixture' } });
+  fireEvent.change(screen.getByLabelText('닉네임 (필수)'), { target: { value: 'Fixture nickname' } });fireEvent.change(screen.getByLabelText('이름 (필수)'), { target: { value: 'Fixture' } });
   fireEvent.change(screen.getByLabelText('개인 휴대전화 (필수)'), { target: { value: '01012345678' } });
   const boxes = screen.getAllByRole('checkbox'); fireEvent.click(boxes[0]); fireEvent.click(boxes[1]);
   fireEvent.click(screen.getByRole('button', { name: '동의하고 계정 만들기' }));
