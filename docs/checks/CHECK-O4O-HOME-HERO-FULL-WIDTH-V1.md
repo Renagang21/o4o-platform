@@ -1,5 +1,8 @@
 # Hero 상단 배치·전체 폭 검증
 
+> **진행 현황 안내 (2026-10-30)**: 전체 폭·상단 배치는 PR #675(`9eb5b19592`)로 main에 반영됐다. 이후 순서는 [Hero·AI 순서 CHECK](CHECK-O4O-HOME-HERO-AI-ORDER-V1.md)와 [대표 홈 정본](../baseline/O4O-HOME-SERVICE-DISCOVERY-V1.md)을 따른다. 아래 통합 대기와 정본 미반영 설명은 당시 기록이다. 배포 근거는 후속 [Hero 운영 정비 CHECK](CHECK-O4O-SERVICE-HERO-OPERATOR-COMPLETION-V1.md)를 참조한다.
+> 전체 경과와 남은 확인은 [디자인 정비 진행 현황](../guides/O4O-PUBLIC-DESIGN-PROGRESS-V1.md)을 참조한다. 아래 기존 본문·수치·실행일은 과거 회차 기록으로 보존한다.
+
 > 2026-10-17 · 기준 main `900f8043af` · branch `wo/home-hero-full-width`
 > [WO](../work-orders/WO-O4O-HOME-HERO-FULL-WIDTH-V1.md)
 

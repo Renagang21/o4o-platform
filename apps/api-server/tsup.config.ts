@@ -52,7 +52,7 @@ const jsToTsPlugin: Plugin = {
 export default defineConfig({
   // Separate API server, migration CLI, provisioning and bounded correction worker entries.
   // The correction worker is not the migration job and does not start an HTTP server.
-  entry: ['src/main.ts', 'src/migrate.ts', 'src/scripts/provision-test-cooperative.ts', 'src/product-correction-worker.ts', 'src/personal-mail-worker.ts'],
+  entry: ['src/main.ts', 'src/migrate.ts', 'src/scripts/provision-test-cooperative.ts', 'src/scripts/provision-chatgpt-review-demo.ts', 'src/product-correction-worker.ts', 'src/personal-mail-worker.ts'],
   format: ['esm'],
   target: 'node22',
   platform: 'node',

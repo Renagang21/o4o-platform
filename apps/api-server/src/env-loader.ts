@@ -29,7 +29,8 @@ const possiblePaths = [
 ];
 
 let envLoaded = false;
-for (const envPath of possiblePaths) {
+// Review instances receive an explicit allowlisted environment; never reload ambient credentials.
+for (const envPath of process.env.REVIEW_DEMO_ENVIRONMENT === 'isolated' ? [] : possiblePaths) {
   try {
     const result = dotenv.config({ path: envPath });
     if (!result.error) {

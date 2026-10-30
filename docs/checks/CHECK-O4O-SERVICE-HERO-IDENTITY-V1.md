@@ -1,5 +1,8 @@
 # CHECK-O4O-SERVICE-HERO-IDENTITY-V1
 
+> **진행 현황 안내 (2026-10-30)**: 서비스별 Hero 디자인은 PR #732(`71340f3b7f`)로 main에 반영됐다. 아래 LOCAL_VALIDATING은 통합 전 기록이다. 후속 [Hero 운영 정비 CHECK](CHECK-O4O-SERVICE-HERO-OPERATOR-COMPLETION-V1.md)의 2026-10-20 배포 대상은 #732를 포함한 main이다. 해당 배포와 실제 운영 계정의 편집·게시 검증은 구분한다.
+> 전체 경과와 남은 확인은 [디자인 정비 진행 현황](../guides/O4O-PUBLIC-DESIGN-PROGRESS-V1.md)을 참조한다. 아래 기존 본문·수치·실행일은 과거 회차 기록으로 보존한다.
+
 2026-10-20 · LOCAL_VALIDATING · 기준 main `0b9821122a`.
 이 문서는 통합 전 실행 기록이다. 아래 진행 중 검사의 최종 결과·CI·배포 증거는 해당 PR에 기록한다.
 

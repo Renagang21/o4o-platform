@@ -73,7 +73,7 @@ export function createExternalAiRoutes(
     management = Router(),
     user = Router();
   root.use(createExternalAiDomainVerificationRouter(config?.issuer));
-  const adapter = config ? new AdapterRegistry(db, config.webOrigin) : null;
+  const adapter = config ? new AdapterRegistry(db, config.webOrigin, config.storeOrigin) : null;
   const provider = config
     ? new ExternalAiOAuthProvider(
         db,
