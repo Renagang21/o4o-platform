@@ -172,9 +172,16 @@ export class PharmacyMembershipService {
       const saveProfile = async (organizationId: string) => m.query(
         `UPDATE organizations SET metadata = COALESCE(metadata, '{}'::jsonb) || $3::jsonb || jsonb_build_object('businessProfile', COALESCE(metadata->'businessProfile', '{}'::jsonb) || $2::jsonb) WHERE id = $1`,
         [organizationId, JSON.stringify({ applicationPolicies: policies, businessRegistrationDocumentId: raw.businessRegistrationDocumentId !== undefined ? (input.businessRegistrationDocumentId ?? null) : undefined,
-          businessName: input.pharmacyName, businessNumber: input.businessNumber, representativeName: input.representativeName,
-          businessType: input.businessType, businessCategory: input.businessCategory, address: input.address }),
-          JSON.stringify({ contactName: input.contactName, managerPhone: input.managerPhone, contactEmail: input.contactEmail, taxInvoiceEmail: input.taxInvoiceEmail })],
+          businessName: input.pharmacyName, businessNumber: input.businessNumber, representativeName: raw.representativeName !== undefined ? (input.representativeName ?? null) : undefined,
+          businessType: raw.businessType !== undefined ? (input.businessType ?? null) : undefined,
+          businessCategory: raw.businessCategory !== undefined ? (input.businessCategory ?? null) : undefined,
+          address: raw.address !== undefined ? (input.address ?? null) : undefined }),
+          JSON.stringify({
+            contactName: raw.contactName !== undefined ? (input.contactName ?? null) : undefined,
+            managerPhone: raw.managerPhone !== undefined ? (input.managerPhone ?? null) : undefined,
+            contactEmail: raw.contactEmail !== undefined ? (input.contactEmail ?? null) : undefined,
+            taxInvoiceEmail: raw.taxInvoiceEmail !== undefined ? (input.taxInvoiceEmail ?? null) : undefined,
+          })],
       );
       if (existing) {
         await saveProfile(existing.organization_id);

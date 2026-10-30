@@ -71,3 +71,14 @@ it('allows explicit evidence detachment without deleting the stored document', a
   expect(JSON.parse(write[1][1])).toHaveProperty('businessRegistrationDocumentId', null);
   expect(query.mock.calls.some(([sql]) => sql.includes('kyc_documents'))).toBe(false);
 });
+
+
+it('distinguishes omitted contacts from explicitly cleared contacts', async () => {
+  await service.apply('user', input);
+  let write = query.mock.calls.find(([sql]) => sql.includes('UPDATE organizations SET metadata'))!;
+  expect(JSON.parse(write[1][2])).toEqual({});
+  query.mockClear();
+  await service.apply('user', { ...input, contactName: '', managerPhone: '', contactEmail: '', taxInvoiceEmail: '' });
+  write = query.mock.calls.find(([sql]) => sql.includes('UPDATE organizations SET metadata'))!;
+  expect(JSON.parse(write[1][2])).toEqual({ contactName: null, managerPhone: null, contactEmail: null, taxInvoiceEmail: null });
+});

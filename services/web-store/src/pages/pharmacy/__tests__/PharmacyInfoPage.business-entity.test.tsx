@@ -20,6 +20,15 @@ describe('pharmacy business entity classification', () => {
     fireEvent.click(screen.getByRole('button', { name: '저장' }));
     await waitFor(() => expect(api.update).toHaveBeenCalledWith(expect.objectContaining({ managerPhone: '01000000000', businessEntityType: undefined })));
   });
+  it('sends explicit empty values when the owner phone and representative name are cleared', async () => {
+    api.get.mockResolvedValue({ name: '검증 약국', ownerPhone: '01000000000', ceoName: '합성 대표자' });
+    render(<PharmacyInfoPage />);
+    fireEvent.click(await screen.findByRole('button', { name: '수정' }));
+    fireEvent.change(screen.getByLabelText('개설자 연락처'), { target: { value: '' } });
+    fireEvent.change(screen.getByLabelText('대표자명'), { target: { value: '' } });
+    fireEvent.click(screen.getByRole('button', { name: '저장' }));
+    await waitFor(() => expect(api.update).toHaveBeenCalledWith(expect.objectContaining({ ownerPhone: '', ceoName: '' })));
+  });
   it('requires reselecting legacy tax categories and saves an explicit individual choice', async () => {
     render(<PharmacyInfoPage />);
     fireEvent.click(await screen.findByRole('button', { name: '수정' }));

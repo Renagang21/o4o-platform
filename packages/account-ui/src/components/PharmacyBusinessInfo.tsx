@@ -191,13 +191,13 @@ export function PharmacyBusinessInfo({ loadInfo, saveInfo, theme, AddressSearch 
       await saveInfo({
         name: form.name.trim(),
         phone: digitsOnly(form.phone) || undefined,
-        ownerPhone: digitsOnly(form.ownerPhone) || undefined,
-        ceoName: form.ceoName.trim() || undefined,
+        ownerPhone: digitsOnly(form.ownerPhone),
+        ceoName: form.ceoName.trim(),
         contactName: form.contactName.trim(),
         managerPhone: digitsOnly(form.managerPhone),
         taxInvoiceEmail: form.taxInvoiceEmail.trim(),
         // WO-O4O-KPA-BUSINESS-CONTACT-EMAIL-FIELDS-UI-EXTEND-V1
-        businessEmail: form.businessEmail.trim() || undefined,
+        businessEmail: form.businessEmail.trim(),
         contactEmail: form.contactEmail.trim(),
         addressDetail,
         businessType: form.businessType.trim() || undefined,

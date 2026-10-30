@@ -33,7 +33,7 @@ const ORG_ID = '33333333-4444-4555-8666-777777777777';
 
 type Call = { sql: string; params: any[] };
 
-function makeHarness(options: { failOnBizWrite?: boolean } = {}) {
+function makeHarness(options: { failOnBizWrite?: boolean; legacyContacts?: boolean } = {}) {
   const calls: Call[] = [];
   const org: any = {
     id: ORG_ID, name: '테스트약국', phone: '0212345678',
@@ -60,8 +60,9 @@ function makeHarness(options: { failOnBizWrite?: boolean } = {}) {
       calls.push({ sql: n, params });
       if (options.failOnBizWrite && /^UPDATE users/i.test(n)) throw new Error('INJECTED_FAILURE');
       if (/^SELECT "businessInfo" FROM users/i.test(n)) {
-        return [{ businessInfo: { businessType: 'OLD-TYPE', sentinelRoot: 'KEEP-ME' } }];
+        return [{ businessInfo: { businessType: 'OLD-TYPE', sentinelRoot: 'KEEP-ME', ...(options.legacyContacts ? { ceoName: 'legacy representative', contactName: 'legacy contact', managerPhone: '0000000000', taxInvoiceEmail: 'legacy@example.invalid' } : {}) } }];
       }
+      if (options.legacyContacts && /^SELECT pharmacy_name/.test(n)) return [{ owner_phone: '0000000000', tax_invoice_email: 'legacy@example.invalid' }];
       return [];
     },
   };
@@ -75,7 +76,9 @@ function makeHarness(options: { failOnBizWrite?: boolean } = {}) {
     (l: any) => l.route?.path === '/info' && l.route?.methods?.put,
   );
   const stack = layer.route.stack;
-  return { handler: stack[stack.length - 1].handle, calls, orgRepo, auditRepo };
+  const getLayer = router.stack.find((l: any) => l.route?.path === '/info' && l.route?.methods?.get);
+  const getStack = getLayer.route.stack;
+  return { handler: stack[stack.length - 1].handle, getHandler: getStack[getStack.length - 1].handle, calls, orgRepo, auditRepo };
 }
 
 function makeRes() {
@@ -210,4 +213,18 @@ describe('optional organization contacts', () => {
     expect(next).not.toHaveBeenCalled();
     expect(org.metadata).toMatchObject({ contactName: null, managerPhone: null, contactEmail: null, taxInvoiceEmail: null });
   });
+});
+
+
+it('does not restore explicitly cleared contacts from registration or legacy snapshots', async () => {
+  const h = makeHarness({ legacyContacts: true });
+  const org = await h.orgRepo.findOne();
+  org.phone = null; org.business_number = null;
+  org.metadata = { businessProfile: { representativeName: 'registration representative' } };
+  const next = jest.fn();
+  await invoke(h.handler, req({ ownerPhone: '', ceoName: '', contactName: '', managerPhone: '', taxInvoiceEmail: '' }), makeRes(), next);
+  const response = makeRes();
+  await invoke(h.getHandler, req({}), response, next);
+  expect(next).not.toHaveBeenCalled();
+  expect(response.json.mock.calls[0][0].data).toMatchObject({ ownerPhone: null, ceoName: null, contactName: null, managerPhone: null, taxInvoiceEmail: null });
 });
