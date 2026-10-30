@@ -1,5 +1,8 @@
 # CHECK-O4O-SERVICE-HEADER-ACCOUNT-DISPLAY-V1
 
+> **진행 현황 안내 (2026-10-30)**: 이름+계정 메뉴 변경은 PR #695(`5abc453695`)로 main에 반영됐다. 아래 「이 CHECK는 main 병합 성공을 주장하지 않는다」는 개발 당시의 증거 범위다. 후속 [관리자 정비 CHECK](CHECK-O4O-ADMIN-PLATFORM-MENU-ROLE-CLEANUP-V1.md)의 2026-10-21 누적 main 배포 기록을 참조한다. 이 문서의 합성 브라우저 결과는 실제 Google 로그인 검증이 아니다.
+> 전체 경과와 남은 확인은 [디자인 정비 진행 현황](../guides/O4O-PUBLIC-DESIGN-PROGRESS-V1.md)을 참조한다. 아래 기존 본문·수치·실행일은 과거 회차 기록으로 보존한다.
+
 > 상태: ACTIVE · 검증일: 2026-10-18 · 범위: 로그인 서비스의 계정 표시
 > 작업서: [WO](../work-orders/WO-O4O-SERVICE-HEADER-ACCOUNT-DISPLAY-V1.md) · 기준: [Global Header](../architecture/ui/GLOBAL-HEADER-STANDARD-V1.md)
 

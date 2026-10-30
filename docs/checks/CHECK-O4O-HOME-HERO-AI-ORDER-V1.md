@@ -1,5 +1,8 @@
 # CHECK-O4O-HOME-HERO-AI-ORDER-V1
 
+> **진행 현황 안내 (2026-10-30)**: 헤더 → 전체 폭 Hero → AI → 서비스 목록 → 소식 순서는 PR #702(`186c1d3593`)로 main에 반영됐다. 아래 로컬 검증·병합 결과 후속 기록 예정 문구는 당시 기록이다. 후속 [Hero 운영 정비 CHECK](CHECK-O4O-SERVICE-HERO-OPERATOR-COMPLETION-V1.md)에 누적 main의 2026-10-20 배포 결과가 있으며, 실계정 AI 호출 검증과 구분한다.
+> 전체 경과와 남은 확인은 [디자인 정비 진행 현황](../guides/O4O-PUBLIC-DESIGN-PROGRESS-V1.md)을 참조한다. 아래 기존 본문·수치·실행일은 과거 회차 기록으로 보존한다.
+
 2026-10-18 · 로컬 검증. 기준 main `d830f200df8edfba5710933fb2b21b901d17d1fb`.
 
 - 로그인 전·후: 헤더 → 전체 폭 Hero → AI → 서비스 목록 → 소식.
