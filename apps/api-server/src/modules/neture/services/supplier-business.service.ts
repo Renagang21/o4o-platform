@@ -565,7 +565,7 @@ export class NetureSupplierBusinessService {
   }
 
 
-  /** 정산 전 필수 — 정산 계좌/통장사본 + 세금계산서 이메일. */
+  /** 실제 정산에 필요한 계좌·세금계산서 이메일. 증빙 파일은 선택. */
   getMissingSettlementFields(supplier: NetureSupplier): string[] {
     const missing: string[] = [];
     if (!supplier.settlementBankName?.trim()) missing.push('settlementBankName');
