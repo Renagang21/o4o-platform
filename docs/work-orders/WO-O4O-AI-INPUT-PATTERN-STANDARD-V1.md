@@ -43,10 +43,12 @@ API, 권한, Task/Memory, AI 제공업체 호출, 저장·승인·게시 흐름�
 ## 로컬 검증 결과
 
 - 공통 입력·Main·첨부/PC 연결/업무 재개·콘텐츠 모달/외부 보조·공급자 입력: 77 PASS. 내 매장 AI/portal·상담/번역/음성/약사 지원: 72 PASS. 기존 외부 LLM raw-source 계약: 28 PASS.
-- 공통 패키지 빌드, 전체 frontend type-check, 웹 서비스 9개와 관리자 production build 통과. 새 의존 경로에 맞춰 UI를 content-editor보다 먼저 빌드하며, 관리자 dist 별칭 호환용 `ai/index` 진입점을 둔다.
+- 공통 패키지 빌드, 전체 frontend type-check, 웹 서비스 9개와 관리자 production build 통과. 새 의존 경로에 맞춰 UI → content-editor → utils 순서로 빌드하며, 관리자 dist 별칭 호환용 `ai/index` 진입점을 둔다.
 - Chromium PC 1365px / 모바일 390px: 공통 입력·실제 StoreAiAssistant·번역 입력·LlmAssistPanel·AiContentModal·CornerAiButton 6종 × 실제 배포용 서비스 CSS 7종 × 2크기 = 84조합의 테두리/글자/기본 높이/최대 너비/overflow PASS. 동일 12화면의 focus·여러 줄 확장/상한 PASS. 실제 Main production 번들 2크기의 입력/첨부 메뉴 PASS. 격리 fixture와 합성 API 응답을 사용했으며 실제 계정/모델 호출·작업 제출 없음.
 - 여러 줄 placeholder가 빈 입력창을 확장하지 않도록 보완. 화면 너비 변경은 ResizeObserver로 재측정한다. 요청 대기 중 다음 초안을 입력할 수 있는 기존 내 매장 동작은 유지하고 전송만 차단한다.
 - 변경 파일 lint error 0(관리자 기존 unused 경고 5), diff check PASS, 문서 민감정보 검사 0건.
 - 문서 정합: Design Core 정본에 현행 입력 패턴을 기록. 기존 단일행 입력 구현은 새 사용자 지시에 따라 자동 확장 textarea로 대체하며, 이전 CHECK의 수치는 당시 증거로 보존한다. AI 설정 폼·원문/결과 편집과 권한·업무 실행 계약은 변경 없음.
 
 WORKTREE_DISPOSITION: 전용 `wo/ai-composer-standard` / `ai-composer-standard`, base `d851da872d`. main 미병합·미배포. 검증 기록과 PR 후속 통합을 위해 KEEP.
+
+CI 보완: 첫 HEAD의 Code Quality 준비 단계에서 utils가 콘텐츠 편집기보다 먼저 빌드되는 오류를 확인했다. 선행 의존 순서를 바로잡고 UI/편집기/utils의 기존 dist와 TypeScript 증분 캐시 없이 순차 빌드하여 재현 검증했다. 새 HEAD의 CI·리뷰 결과는 PR #896에 기록한다.
