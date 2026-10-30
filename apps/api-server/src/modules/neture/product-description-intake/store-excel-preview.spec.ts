@@ -48,3 +48,18 @@ it.each([undefined, '00000000000000'])('matches numeric XLSX barcodes while pres
   expect(result.rows[0]).toMatchObject({ barcode: format ? '08806541001115' : '8806541001115', valid: true, state: 'review', candidates: [{ matchedBy: 'barcode' }] });
   expect(db.query.mock.calls.every(([sql]) => sql.startsWith('SELECT'))).toBe(true);
 });
+
+
+it('keeps leading blank sheet rows aligned with explicit header selection and result row numbers', async () => {
+  const file = workbook([[], [], ['상품명', '바코드'], ['첫 상품', 8806541001115], ['다음 상품', '08806541001115']]);
+  expect(readProductWorkbook(file).headerRow).toBe(2);
+  const explicit = readProductWorkbook(file, 2);
+  expect(explicit.columns.map(column => column.label)).toEqual(['상품명', '바코드']);
+  expect(explicit.rows).toHaveLength(2);
+  const db = { query: jest.fn(async () => []) };
+  const result = await previewStoreExcel(db as never, 'store', file, { nameColumn: 0, barcodeColumn: 1, language: 'ko' }, 2);
+  expect(result.rows.map(row => ({ row: row.row, name: row.name, barcode: row.barcode }))).toEqual([
+    { row: 4, name: '첫 상품', barcode: '8806541001115' },
+    { row: 5, name: '다음 상품', barcode: '08806541001115' },
+  ]);
+});

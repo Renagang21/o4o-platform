@@ -18,8 +18,8 @@ export function readProductWorkbook(buffer: Buffer, requestedHeaderRow?: number)
   const workbook = XLSX.read(buffer, { type: 'buffer', sheets: 0, sheetRows: MAX_EXCEL_PRODUCTS + 22, cellDates: false, cellFormula: false });
   const sheet = workbook.Sheets[workbook.SheetNames[0]];
   if (!sheet) throw new DescriptionIntakeError('NO_SHEET');
-  const rows = XLSX.utils.sheet_to_json<unknown[]>(sheet, { header: 1, defval: '', raw: false, blankrows: true });
-  const rawRows = XLSX.utils.sheet_to_json<unknown[]>(sheet, { header: 1, defval: '', raw: true, blankrows: true });
+  const rows = XLSX.utils.sheet_to_json<unknown[]>(sheet, { header: 1, defval: '', raw: false, blankrows: true, range: 0 });
+  const rawRows = XLSX.utils.sheet_to_json<unknown[]>(sheet, { header: 1, defval: '', raw: true, blankrows: true, range: 0 });
   const normalize = (value: unknown) => cellText(value).replace(/\s/g, '').toLowerCase();
   const detected = rows.slice(0, 20).findIndex(row => row.some(value => /^(상품명|제품명|품명|품목명|name|product_name)$/.test(normalize(value))) &&
     row.some(value => /^(바코드|관리번호\(바코드\)|표준코드|barcode|gtin|ean13)$/.test(normalize(value))));
