@@ -2,10 +2,7 @@ import { Link } from 'react-router-dom';
 import type { CentralOperationMenu } from '@o4o/types';
 import { ChevronDown } from 'lucide-react';
 
-const groups = [
-  ['members', '회원·승인'], ['service', '콘텐츠·커뮤니티'],
-  ['business', '상품·사업'], ['settings', '운영·설정'],
-] as const;
+import {centralGroups} from './central-operation-groups';
 export default function CentralOperationDirectory({ services, menus }: {
   services: readonly (readonly [string, string])[]; menus: readonly CentralOperationMenu[];
 }) {
@@ -18,12 +15,12 @@ export default function CentralOperationDirectory({ services, menus }: {
         const items = menus.filter(menu => menu.service === key);
         if (key === 'neture') return <section key={key} className="rounded-xl border bg-white p-4 md:col-span-2">
           <h3 className="mb-3 font-semibold">{name}</h3>
-          <div className="grid items-start gap-3 md:grid-cols-2">{groups.map(([group, label]) => {
-            const groupItems = items.filter(menu => menu.group === group);
-            return groupItems.length > 0 && <details key={group} className="group rounded-lg border p-3"><summary className="flex cursor-pointer list-none items-center justify-between gap-3 text-sm font-medium"><span>{label}</span><span className="flex items-center gap-2 text-xs text-slate-500">{groupItems.length}개<ChevronDown className="h-4 w-4 group-open:rotate-180" aria-hidden /></span></summary>{links(groupItems)}</details>;
+          <div className="grid items-start gap-3 md:grid-cols-2">{centralGroups(items).map(({key:group,label,menus:groupItems}) => {
+            if (groupItems.length === 1) return <section key={group} className="rounded-lg border p-3"><h4 className="text-sm font-medium">{label}</h4>{links(groupItems)}</section>;
+            return <details key={group} className="group rounded-lg border p-3"><summary className="flex cursor-pointer list-none items-center justify-between gap-3 text-sm font-medium"><span>{label}</span><span className="flex items-center gap-2 text-xs text-slate-500">{groupItems.length}개<ChevronDown className="h-4 w-4 group-open:rotate-180" aria-hidden /></span></summary>{links(groupItems)}</details>;
           })}</div>
         </section>;
-        return <details key={key} className="group rounded-xl border bg-white p-4"><summary className="flex cursor-pointer list-none items-center justify-between gap-3"><h3 className="font-semibold">{name}</h3><span className="flex items-center gap-2 text-xs text-slate-500">{items.length}개 업무<ChevronDown className="h-4 w-4 group-open:rotate-180" aria-hidden /></span></summary>{links(items)}</details>;
+        return <details key={key} className="group rounded-xl border bg-white p-4"><summary className="flex cursor-pointer list-none items-center justify-between gap-3"><h3 className="font-semibold">{name}</h3><span className="flex items-center gap-2 text-xs text-slate-500">{items.length}개 업무<ChevronDown className="h-4 w-4 group-open:rotate-180" aria-hidden /></span></summary><div className="mt-3 space-y-2">{centralGroups(items).map(group => group.menus.length === 1 ? <div key={group.key}>{links(group.menus)}</div> : <details key={group.key} className="group rounded border p-3"><summary className="flex cursor-pointer list-none items-center justify-between gap-2 text-sm font-medium"><span>{group.label}</span><ChevronDown aria-hidden size={16} className="group-open:rotate-180"/></summary>{links(group.menus)}</details>)}</div></details>;
       })}
     </div>
     {!services.length && <p>현재 연결된 운영 업무가 없습니다.</p>}
