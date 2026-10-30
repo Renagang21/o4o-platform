@@ -1,0 +1,67 @@
+name: 'Build API workspace dependencies with verified cache'
+description: 'Reuse exact-input compiled dependency outputs; never reuse test results'
+outputs:
+  cache-hit:
+    description: 'true only after exact-key restore and output checksum verification'
+    value: ${{ steps.verify.outputs.valid == 'true' }}
+runs:
+  using: composite
+  steps:
+    - name: Fingerprint dependency build inputs
+      id: plan
+      continue-on-error: true
+      shell: bash
+      run: |
+        set -euo pipefail
+        git ls-files -z | PNPM_VERSION="$(pnpm --version)" node scripts/ci/api-build-cache.mjs plan
+
+    - name: Restore compiled dependencies (exact key)
+      id: restore
+      if: steps.plan.outputs.enabled == 'true' && env.CI_BUILD_CACHE_DISABLED != 'true'
+      uses: actions/cache/restore@v4
+      continue-on-error: true
+      with:
+        key: ${{ steps.plan.outputs.key }}
+        path: ${{ steps.plan.outputs.paths }}
+
+    - name: Verify restored output checksums
+      id: verify
+      if: steps.restore.outputs.cache-hit == 'true'
+      shell: bash
+      run: node scripts/ci/api-build-cache.mjs verify
+
+    - name: Remove stale outputs before rebuilding
+      if: steps.plan.outputs.enabled == 'true' && steps.verify.outputs.valid != 'true'
+      shell: bash
+      run: node scripts/ci/api-build-cache.mjs clean
+
+    - name: Build API dependencies on cache miss
+      if: steps.verify.outputs.valid != 'true'
+      shell: bash
+      run: pnpm --fail-if-no-match --filter '@o4o/api-server^...' run build
+
+    - name: Record successful compiled outputs
+      id: record
+      if: steps.plan.outputs.enabled == 'true' && steps.verify.outputs.valid != 'true' && env.CI_BUILD_CACHE_DISABLED != 'true'
+      continue-on-error: true
+      shell: bash
+      run: node scripts/ci/api-build-cache.mjs record
+
+    - name: Save compiled dependencies
+      if: steps.record.outcome == 'success'
+      uses: actions/cache/save@v4
+      continue-on-error: true
+      with:
+        key: ${{ steps.plan.outputs.key }}
+        path: ${{ steps.plan.outputs.paths }}
+
+    - name: Report dependency build reuse
+      shell: bash
+      env:
+        VERIFIED_CACHE_HIT: ${{ steps.verify.outputs.valid }}
+      run: |
+        if [ "$VERIFIED_CACHE_HIT" = 'true' ]; then
+          echo 'API dependency build: verified cache hit' | tee -a "$GITHUB_STEP_SUMMARY"
+        else
+          echo 'API dependency build: rebuilt; tests are still executed normally' | tee -a "$GITHUB_STEP_SUMMARY"
+        fi

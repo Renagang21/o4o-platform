@@ -29,7 +29,8 @@ permissions:
   contents: read
 
 env:
-  NODE_VERSION: '22'
+  NODE_VERSION: '22.18.0'
+  CI_BUILD_CACHE_DISABLED: ${{ vars.CI_BUILD_CACHE_DISABLED }}
 
 jobs:
   full-jest:
@@ -50,7 +51,7 @@ jobs:
         build-packages: 'false'
 
     - name: Build api-server workspace dependencies
-      run: pnpm --filter '@o4o/api-server^...' run build
+      uses: ./.github/actions/api-dependency-build
 
     # 선별하지 않는다. 전체 suite 를 그대로 돌린다.
     - name: Run tests (api-server Jest, serial to prevent OOM)

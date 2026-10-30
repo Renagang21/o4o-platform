@@ -711,6 +711,12 @@ export function classifyApiDeploy(changedFiles, graph, opts = {}) {
       reasons.push(`deploy workflow 자체: ${file}`);
       continue;
     }
+    // This action builds CI dependencies only. The cache regression test locks its
+    // consumers to CI + scheduled Jest; deployment adoption must revisit this exemption.
+    if (file === '.github/actions/api-dependency-build/action.yml') {
+      reasons.push(`CI 전용 의존성 빌드 — 배포 무영향: ${file}`);
+      continue;
+    }
     if (hasPrefix(file, API_DEPLOY_BUILD_PREFIXES)) {
       affected = true;
       reasons.push(`배포가 사용하는 composite action: ${file}`);

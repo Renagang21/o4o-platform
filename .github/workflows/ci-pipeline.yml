@@ -5,6 +5,7 @@ on:
     branches: [ main, develop ]
   pull_request:
     branches: [ main ]
+    types: [opened, synchronize, reopened, ready_for_review, converted_to_draft]
   workflow_dispatch:
     # WO-O4O-ADMIN-CI-CD-AFFECTED-SCOPE-AND-DUPLICATE-WORK-REDUCTION-V1
     # affected 판정을 **실제 GitHub Actions 에서** 재현하기 위한 입력.
@@ -36,6 +37,7 @@ concurrency:
 
 env:
   NODE_VERSION: '22.18.0'
+  CI_BUILD_CACHE_DISABLED: ${{ vars.CI_BUILD_CACHE_DISABLED }}
 
 jobs:
   # 0. Affected scope 판정
@@ -55,6 +57,8 @@ jobs:
     name: Detect affected scope
     runs-on: ubuntu-latest
     outputs:
+      # Opt-in only. Draft CI must never count as a merge-ready full validation.
+      defer_full: ${{ vars.CI_COST_PROFILE == 'budget' && github.event_name == 'pull_request' && github.event.pull_request.draft }}
       admin_affected: ${{ steps.scope.outputs.admin_affected }}
       admin_only: ${{ steps.scope.outputs.admin_only }}
       api_affected: ${{ steps.scope.outputs.api_affected }}
@@ -83,7 +87,7 @@ jobs:
     needs: [detect]
     # Admin-only 변경은 아래 admin-fast-* 두 잡이, 문서 Markdown 추가·수정만인 변경은
     # docs-fast-validate 가 대체한다. 그 외에는 전부 여기로 온다.
-    if: needs.detect.outputs.admin_only != 'true' && needs.detect.outputs.docs_fast_eligible != 'true'
+    if: needs.detect.outputs.defer_full != 'true' && needs.detect.outputs.admin_only != 'true' && needs.detect.outputs.docs_fast_eligible != 'true'
 
     steps:
     - uses: actions/checkout@v6
@@ -210,6 +214,8 @@ jobs:
       run: >-
         node --test
         scripts/ci/__tests__/detect-affected.test.mjs
+        scripts/ci/__tests__/actions-cost.test.mjs
+        scripts/ci/__tests__/api-build-cache.test.mjs
         scripts/ci/__tests__/deploy-risk.test.mjs
         scripts/ci/__tests__/ci-gate.test.mjs
         scripts/ci/__tests__/cloud-run-rollout.test.mjs
@@ -223,14 +229,14 @@ jobs:
       run: node --test scripts/ops/github-app-token.test.mjs
 
     - name: Collect public Sonar PR findings (read-only diagnostics)
-      if: always() && github.event_name == 'pull_request'
+      if: always() && github.event_name == 'pull_request' && !github.event.repository.private && vars.CI_COST_PROFILE != 'budget'
       continue-on-error: true
       env:
         SONAR_PR_NUMBER: ${{ github.event.pull_request.number }}
         SONAR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
       run: node scripts/ci/read-sonar-pr-findings.mjs
     - name: Upload Sonar PR diagnostics
-      if: always() && github.event_name == 'pull_request'
+      if: always() && github.event_name == 'pull_request' && !github.event.repository.private && vars.CI_COST_PROFILE != 'budget'
       uses: actions/upload-artifact@v4
       with:
         name: sonar-pr-findings
@@ -390,7 +396,7 @@ jobs:
     # Admin-only 변경에서는 전체 suite 대신 admin-fast-guards 가
     # **Admin 소스를 읽는 정적 guard spec** 만 선별해 돌린다(범위 축소가 아니라 선별).
     # docs fast 도 같은 원리다 — docs-fast-validate 가 **그 문서를 읽는 test** 만 선별한다.
-    if: needs.detect.outputs.admin_only != 'true' && needs.detect.outputs.docs_fast_eligible != 'true'
+    if: needs.detect.outputs.defer_full != 'true' && needs.detect.outputs.admin_only != 'true' && needs.detect.outputs.docs_fast_eligible != 'true'
     strategy:
       fail-fast: false
       matrix:
@@ -428,7 +434,7 @@ jobs:
         build-packages: 'false'
 
     - name: Build api-server workspace dependencies
-      run: pnpm --filter '@o4o/api-server^...' run build
+      uses: ./.github/actions/api-dependency-build
 
     # WO-O4O-API-JEST-AFFECTED-TEST-EXECUTION-PHASE0-SHADOW-V1 §14 · §15
     #
@@ -490,7 +496,7 @@ jobs:
     name: Build Applications
     runs-on: ubuntu-latest
     needs: [detect]
-    if: needs.detect.outputs.admin_only != 'true' && needs.detect.outputs.docs_fast_eligible != 'true'
+    if: needs.detect.outputs.defer_full != 'true' && needs.detect.outputs.admin_only != 'true' && needs.detect.outputs.docs_fast_eligible != 'true'
 
     # build matrix 대상은 배포되는 앱만 유지한다.
     # WO-O4O-MAIN-SITE-FULL-SOURCE-DELETION-V1 에서 은퇴 앱이 소스째 삭제되어
@@ -563,6 +569,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [detect]
     if: >-
+      needs.detect.outputs.defer_full != 'true' &&
       needs.detect.outputs.admin_only != 'true' && needs.detect.outputs.docs_fast_eligible != 'true' &&
       needs.detect.outputs.web_build_dirs != '' && needs.detect.outputs.web_build_dirs != '[]'
     timeout-minutes: 30
@@ -629,7 +636,7 @@ jobs:
     name: Docs Fast — docs consumer tests
     runs-on: ubuntu-latest
     needs: [detect]
-    if: needs.detect.outputs.docs_fast_eligible == 'true'
+    if: needs.detect.outputs.defer_full != 'true' && needs.detect.outputs.docs_fast_eligible == 'true'
 
     steps:
     - uses: actions/checkout@v6
@@ -707,7 +714,7 @@ jobs:
     name: Admin Fast — validate & build
     runs-on: ubuntu-latest
     needs: [detect]
-    if: needs.detect.outputs.admin_only == 'true'
+    if: needs.detect.outputs.defer_full != 'true' && needs.detect.outputs.admin_only == 'true'
 
     steps:
     - uses: actions/checkout@v6
@@ -782,7 +789,7 @@ jobs:
     name: Admin Fast — repo static guards
     runs-on: ubuntu-latest
     needs: [detect]
-    if: needs.detect.outputs.admin_only == 'true'
+    if: needs.detect.outputs.defer_full != 'true' && needs.detect.outputs.admin_only == 'true'
 
     steps:
     - uses: actions/checkout@v6
@@ -858,7 +865,7 @@ jobs:
       contents: read
     runs-on: windows-latest
     needs: [detect]
-    if: needs.detect.outputs.docs_fast_eligible != 'true' && needs.detect.outputs.admin_only != 'true'
+    if: needs.detect.outputs.defer_full != 'true' && needs.detect.outputs.docs_fast_eligible != 'true' && needs.detect.outputs.admin_only != 'true'
     timeout-minutes: 10
     steps:
     - uses: actions/checkout@v6
@@ -875,7 +882,7 @@ jobs:
     name: Central operator PostgreSQL integration
     runs-on: ubuntu-latest
     needs: [detect]
-    if: needs.detect.outputs.api_affected == 'true' || needs.detect.outputs.global_or_unknown == 'true'
+    if: needs.detect.outputs.defer_full != 'true' && (needs.detect.outputs.api_affected == 'true' || needs.detect.outputs.global_or_unknown == 'true')
     timeout-minutes: 25
     services:
       postgres:
@@ -903,7 +910,7 @@ jobs:
         build-packages: 'false'
         strict-lockfile: 'true'
     - name: Build API dependency closure
-      run: pnpm run build:api-deps
+      uses: ./.github/actions/api-dependency-build
     - name: Verify every schema prefix in a fresh disposable database
       env:
         OPERATOR_INVITE_TEST_PORT: '55432'
@@ -935,6 +942,11 @@ jobs:
       if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')
       run: |
         echo "::error::CI Gate FAIL — failure 또는 cancelled 인 upstream job 이 있다 (위 결과 참조)"
+        exit 1
+    - name: Draft PR requires final validation
+      if: needs.detect.outputs.defer_full == 'true'
+      run: |
+        echo '::error::Budget profile: draft validation deferred. Mark this PR ready for review to run all required checks.'
         exit 1
     - name: CI Gate PASS
       run: echo "모든 upstream CI job 이 success 또는 skipped"
