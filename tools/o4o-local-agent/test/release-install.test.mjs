@@ -113,7 +113,7 @@ test('Windows packaged runtime starts and health proves its release and data rea
    try{const response=await fetch('http://127.0.0.1:47821/health',{headers:{Origin:'https://neture.co.kr'},signal:AbortSignal.timeout(500)});if(response.ok){health=await response.json();break;}}catch{}
    await new Promise(resolve=>setTimeout(resolve,250));
   }
-  assert.ok(health,'installed runtime must serve health');assert.equal(health.releaseId,result.releaseId);assert.equal(health.agentVersion,'0.5.0');assert.equal(health.localData.ready,true);assert.equal(health.localData.schemaVersion,9);
+  assert.ok(health,'installed runtime must serve health');assert.equal(health.releaseId,result.releaseId);assert.equal(health.agentVersion,'0.6.0');assert.equal(health.localData.ready,true);assert.equal(health.localData.schemaVersion,10);
   assert.equal(health.connected,false);assert.equal('credentials'in health,false);
  }finally{const exited=new Promise(resolve=>child.once('exit',resolve));execFileSync(path.join(system,'System32','taskkill.exe'),['/pid',String(child.pid),'/T','/F'],{stdio:'ignore'});await exited;}
  const freshHome=options.home+'-fresh',freshData=options.dataHome+'-fresh';
@@ -164,7 +164,7 @@ test('verified packages repair missing/corrupt installed code while preserving d
  await installPackage({source:one,...options});assert.equal(verifyPackage(installedSlot(options.home)).releaseId,fixture().manifest.releaseId);
  assert.ok(fs.readdirSync(path.join(options.home,'versions')).some(n=>n.startsWith('.damaged-')));
  fs.unlinkSync(index);await installPackage({source:two,...options});assert.equal(verifyPackage(installedSlot(options.home)).releaseId,fixture('two').manifest.releaseId);
- fs.rmSync(installedSlot(options.home),{recursive:true});await installPackage({source:two,...options});assert.equal(verifyPackage(installedSlot(options.home)).version,'0.5.0');
+ fs.rmSync(installedSlot(options.home),{recursive:true});await installPackage({source:two,...options});assert.equal(verifyPackage(installedSlot(options.home)).version,'0.6.0');
  assert.deepEqual(fs.readFileSync(path.join(options.dataHome,'credentials.json')),credential);
 });
 

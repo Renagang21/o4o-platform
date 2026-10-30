@@ -123,6 +123,7 @@ import { AddPharmacistQualificationDecisions1793165158540 } from '../migrations/
 import { CreateCentralOperationMenuGrants1793186241009 } from '../migrations/1793186241009-CreateCentralOperationMenuGrants.js';
 
 import { CreateAssistantWorkData1793257200000 } from '../migrations/1793257200000-CreateAssistantWorkData.js';
+import { AddAssistantStorageAuthority1793322213345 } from '../migrations/1793322213345-AddAssistantStorageAuthority.js';
 
 export const INCREMENTAL_MIGRATIONS: readonly MigrationClass[] = [
   CreateStoreOwnerTerminationCases1789701000000,
@@ -176,6 +177,7 @@ export const INCREMENTAL_MIGRATIONS: readonly MigrationClass[] = [
   AddPharmacistQualificationDecisions1793165158540,
   CreateCentralOperationMenuGrants1793186241009,
   CreateAssistantWorkData1793257200000,
+  AddAssistantStorageAuthority1793322213345,
 ];
 
 export function incrementalMigrationNames(): string[] {

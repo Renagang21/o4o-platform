@@ -6,6 +6,8 @@ import { pickPharmacyResult } from './contract.js';
 
 export async function pcWorkData(db: DataSource,userId: string,owner: WorkDataOwner,mode: 'read'|'write',args: Record<string,unknown>,boundDeviceId?:unknown) {
   await assertWorkDataOwner(db,userId,owner,mode==='write');
+  const permission=await new WorkDataService(db).consent(userId,owner);
+  if(permission.storageMode!=='local')throw new WorkDataError(permission.storageMode==='transferring'?'WORK_DATA_TRANSFERRING':'WORK_DATA_NO_LOCAL_RETURN',409);
   if(mode==='write' && boundDeviceId===undefined)throw new WorkDataError('WORK_DATA_PC_SOURCE_REQUIRED');
   let device;
   if(boundDeviceId!==undefined){
@@ -34,6 +36,9 @@ export async function readWorkData(db:DataSource,userId:string,owner:WorkDataOwn
   if(location!==undefined && location!=='pc' && location!=='server')throw new WorkDataError('WORK_DATA_SOURCE_INVALID');
   if(location==='server' && !consent.enabled)throw new WorkDataError('WORK_DATA_CONSENT_REQUIRED',403);
   if(location==='pc' && !deviceId)throw new WorkDataError('WORK_DATA_PC_SOURCE_REQUIRED');
-  if(consent.enabled && location!=='pc')return service.query(userId,owner,query as any);
+  if(consent.storageMode==='transferring')throw new WorkDataError('WORK_DATA_TRANSFERRING',409);
+  if(consent.storageMode==='stopped')throw new WorkDataError('WORK_DATA_STOPPED',409);
+  if(consent.enabled && location==='pc')throw new WorkDataError('WORK_DATA_NO_LOCAL_RETURN',409);
+  if(consent.enabled)return service.query(userId,owner,query as any);
   return {...await pcWorkData(db,userId,owner,'read',query,deviceId),consent};
 }

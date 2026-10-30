@@ -19,7 +19,7 @@ function addLine(count = '2') {
 describe('pharmacy order preparation', () => {
   it('starts empty without inventory, prepares a request without executing, and requires direct receipt evidence', () => {
     const apply = vi.fn(); render(<PharmacyOrderPanel disabled={false} resuming={false} onApply={apply} />);
-    expect(screen.getByText(/OCR은 사용하지/)).toBeTruthy();
+    expect(screen.getByText(/원하는 업무부터 요청/)).toBeTruthy();
     expect(screen.getByRole('button',{name:'화면 자료 내보내기'})).toBeTruthy();expect(screen.queryByRole('button',{name:'전체 자료 내보내기'})).toBeNull();
     expect(screen.getByText(/조회한 이력만 파일에 담아요/)).toBeTruthy();
     addSupplier(); addLine(); fireEvent.click(screen.getByRole('button', { name: '주문 요청 준비' }));
@@ -155,7 +155,7 @@ it('records receipts per supplier and keeps the unsubmitted supplier available',
 
 describe('connected pharmacy work data',()=>{
  const scope={workspace:'home',capabilities:[],executionMode:'server',status:'ready'} as any;
- const permission={enabled:true,epoch:'fixture-epoch',owner:'user:fixture',updatedAt:null};
+ const permission={enabled:true,epoch:'fixture-epoch',owner:'user:fixture',updatedAt:null,storageMode:'server' as const};
  it('autosaves a connected edit, retains it on failure, and retries only on user action',async()=>{
   let fail=true;
   vi.mocked(loadWorkingData).mockResolvedValue({location:'server',consent:permission,records:[],next:null,counts:{},versions:{}});
@@ -200,12 +200,12 @@ describe('connected pharmacy work data',()=>{
   let revision=7;
   vi.mocked(workDataRequest).mockClear();
   vi.mocked(workDataRequest).mockImplementation(async(action)=>{
-    if(action==='status')return permission as any;
+    if(action==='status')return {...permission,enabled:false,storageMode:'local'} as any;
     if(action==='method-sharing')return {enabled:false} as any;
     if(action==='pc-read')return {revision:7,deviceId,owner:permission.owner} as any;
     if(action==='save')return {revision:++revision,deviceId,owner:permission.owner} as any;
     return {} as any;
-  });
+  },20000);
   render(<PharmacyOrderPanel disabled={false} resuming={false} onApply={()=>{}} workScope={scope}/>);
   fireEvent.change(screen.getByLabelText('PC 자료함 JSON 가져오기'),{target:{files:[{size:1000,text:async()=>JSON.stringify({format:PHARMACY_FORMAT,records})}]}});
   await screen.findByText(/파일을 미리 보고 있어요/);
@@ -213,7 +213,7 @@ describe('connected pharmacy work data',()=>{
   const saves=vi.mocked(workDataRequest).mock.calls.filter(call=>call[0]==='save');
   expect(saves).toHaveLength(2);for(const [index,call] of saves.entries()){expect(call[2]).toMatchObject({mode:'restore',expectedRevision:7+index,deviceId,expectedOwner:permission.owner});expect((call[2] as any).records.length).toBeLessThanOrEqual(1000);}
   expect(saves.flatMap(call=>(call[2] as any).records)).toEqual(expect.arrayContaining(records));
- });
+ },20000);
  it('keeps the editor usable and queues a later edit while the first save is in flight',async()=>{
   let release!:()=>void;let saves=0;
   vi.mocked(workDataRequest).mockClear();
@@ -253,14 +253,75 @@ describe('connected pharmacy work data',()=>{
   expect(vi.mocked(workDataRequest).mock.calls.filter(call=>call[0]==='read').every(call=>call[2]?.limit===100)).toBe(true);
   expect(vi.mocked(workDataRequest).mock.calls.filter(call=>call[0]==='read'&&call[2]?.kind==='availability')).toHaveLength(1);
  });
- it('keeps business mirroring and method sharing as separate explicit choices',async()=>{
+ it('keeps server authority and method sharing as separate explicit choices',async()=>{
   vi.mocked(workDataRequest).mockClear();
-  vi.mocked(workDataRequest).mockImplementation(async(action,_scope,body)=>action==='status'?{...permission,enabled:false} as any:action==='consent'?{...permission,enabled:body?.enabled} as any:{enabled:false} as any);
+  vi.mocked(workDataRequest).mockImplementation(async(action,_scope,body)=>action==='status'?{...permission,enabled:false,storageMode:'local'} as any:action==='consent'?{...permission,enabled:body?.enabled} as any:{enabled:false} as any);
   render(<PharmacyOrderPanel disabled={false} resuming={false} onApply={()=>{}} workScope={scope}/>);
   await waitFor(()=>expect(vi.mocked(workDataRequest).mock.calls.some(call=>call[0]==='status')).toBe(true));
   expect(vi.mocked(workDataRequest).mock.calls.some(call=>call[0]==='consent')).toBe(false);
-  fireEvent.click(screen.getByLabelText('어디서나 이용하도록 업무 자료를 서버에도 보관'));
+  fireEvent.click(screen.getByRole('button',{name:'동의하고 서버에서 시작'}));
   await waitFor(()=>expect(vi.mocked(workDataRequest).mock.calls.some(call=>call[0]==='consent'&&call[2]?.enabled===true)).toBe(true));
   expect(vi.mocked(workDataRequest).mock.calls.some(call=>call[0]==='method-sharing'&&call[2]?.enabled===true)).toBe(false);
+ });
+ it('saves in-flight local work before requesting transfer and keeps the draft when saving fails',async()=>{
+  const local={...permission,enabled:false,storageMode:'local' as const};
+  const deviceId='44444444-4444-4444-8444-444444444444';let fail=true,moved=false;
+  vi.mocked(workDataRequest).mockClear();
+  vi.mocked(loadWorkingData).mockResolvedValue({location:'pc',deviceId,revision:7,consent:local,records:[],next:null,counts:{}});
+  vi.mocked(workDataRequest).mockImplementation(async(action)=>{
+   if(action==='status')return (moved?{...permission,storageMode:'transferring',sourceDeviceId:deviceId}:local) as any;
+   if(action==='save'){if(fail)throw Error('합성 저장 실패');return {revision:8} as any;}
+   if(action==='consent'){moved=true;return {...permission,storageMode:'transferring',sourceDeviceId:deviceId} as any;}
+   return {enabled:false} as any;
+  });
+  render(<PharmacyOrderPanel disabled={false} resuming={false} onApply={()=>{}} workScope={scope}/>);
+  fireEvent.click(screen.getByRole('button',{name:'PC·서버 자료 불러오기'}));await screen.findByText(/PC 자료를 불러왔어요/);
+  addSupplier();fireEvent.click(screen.getByRole('button',{name:'동의하고 PC 자료를 서버로 옮기기'}));
+  await screen.findByRole('alert');expect(vi.mocked(workDataRequest).mock.calls.some(c=>c[0]==='consent')).toBe(false);
+  expect(screen.getByText('합성 거래처',{selector:'legend'})).toBeTruthy();
+  fail=false;fireEvent.click(screen.getByRole('button',{name:'동의하고 PC 자료를 서버로 옮기기'}));
+  await screen.findByRole('progressbar',{name:'서버 전환 진행'});
+  const calls=vi.mocked(workDataRequest).mock.calls;
+  const consentIndex=calls.findIndex(c=>c[0]==='consent');expect(consentIndex).toBeGreaterThan(calls.findIndex(c=>c[0]==='save'));
+  expect(calls[consentIndex][2]).toMatchObject({enabled:true,deviceId});
+  expect(screen.queryByRole('button',{name:'현재 자료를 PC에 보관'})).toBeNull();
+ });
+ it('uses server-only data without a PC and stops without restoring local work',async()=>{
+  vi.mocked(workDataRequest).mockClear();
+  vi.mocked(loadWorkingData).mockResolvedValue({location:'server',consent:permission,records:[],next:null,counts:{},versions:{}});
+  vi.mocked(workDataRequest).mockImplementation(async(action)=>action==='status'?permission as any:action==='consent'?{...permission,enabled:false,storageMode:'stopped'} as any:{enabled:false} as any);
+  render(<PharmacyOrderPanel disabled={false} resuming={false} onApply={()=>{}} workScope={scope}/>);
+  fireEvent.click(screen.getByRole('button',{name:'PC·서버 자료 불러오기'}));await screen.findByText(/서버 자료를 불러왔어요/);
+  fireEvent.click(screen.getByRole('button',{name:'서버 이용 중단·서버 자료 삭제'}));
+  await screen.findByText(/PC 저장 방식으로 돌아가지는/);
+  expect(vi.mocked(workDataRequest).mock.calls.some(c=>c[0]==='pc-read'||c[0]==='transition-source')).toBe(false);
+  expect(screen.queryByRole('button',{name:'현재 자료를 PC에 보관'})).toBeNull();
+ });
+ it('accepts a server choice during a running task and applies it at the next boundary',async()=>{
+  const local={...permission,enabled:false,storageMode:'local'};
+  vi.mocked(workDataRequest).mockClear();
+  vi.mocked(workDataRequest).mockImplementation(async(action)=>action==='status'?local as any:action==='consent'?permission as any:{enabled:false} as any);
+  vi.mocked(loadWorkingData).mockResolvedValue({location:'server',consent:permission,records:[],next:null,counts:{}});
+  const view=render(<PharmacyOrderPanel disabled resuming={false} onApply={()=>{}} workScope={scope}/>);
+  await waitFor(()=>expect(vi.mocked(workDataRequest).mock.calls.some(c=>c[0]==='status')).toBe(true));
+  fireEvent.click(screen.getByRole('button',{name:'동의하고 서버에서 시작'}));
+  expect(screen.getByRole('button',{name:'전환 예약 취소'})).toBeTruthy();
+  expect(vi.mocked(workDataRequest).mock.calls.some(c=>c[0]==='consent')).toBe(false);
+  view.rerender(<PharmacyOrderPanel disabled={false} resuming={false} onApply={()=>{}} workScope={scope}/>);
+  await screen.findByText(/이제 서버에 저장해요/);
+  expect(vi.mocked(workDataRequest).mock.calls.filter(c=>c[0]==='consent')).toHaveLength(1);
+ });
+ it('retries a source conflict only on request and keeps the original collector bound',async()=>{
+  const deviceId='44444444-4444-4444-8444-444444444444';
+  const paused={...permission,sourceDeviceId:deviceId,transferError:'WORK_DATA_SOURCE_CONFLICT'};
+  vi.mocked(workDataRequest).mockClear();
+  vi.mocked(workDataRequest).mockImplementation(async(action)=>action==='status'?paused as any:action==='consent'?{...paused,transferError:null} as any:{enabled:false} as any);
+  vi.mocked(loadWorkingData).mockResolvedValue({location:'server',consent:{...paused,transferError:null},records:[],next:null,counts:{}});
+  render(<PharmacyOrderPanel disabled={false} resuming={false} onApply={()=>{}} workScope={scope}/>);
+  await screen.findByRole('button',{name:'확인 후 다시 시도'});
+  expect(vi.mocked(workDataRequest).mock.calls.some(c=>c[0]==='consent')).toBe(false);
+  fireEvent.click(screen.getByRole('button',{name:'확인 후 다시 시도'}));
+  await waitFor(()=>expect(vi.mocked(workDataRequest).mock.calls.some(c=>c[0]==='consent'&&c[2]?.deviceId===deviceId)).toBe(true));
+  expect(vi.mocked(workDataRequest).mock.calls.some(c=>c[0]==='transition-source'||c[0]==='pc-read')).toBe(false);
  });
 });

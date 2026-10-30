@@ -115,15 +115,15 @@ test('already latest → no-op: 재기동해도 migration 행·백업이 늘지 
 
 test('unknown future version → SCHEMA_TOO_NEW 로 멈춘다 · 내리지 않는다 · 데이터 축 호출은 그 코드로 거절', async () => {
   boot();
-  db.openLocalDb().prepare("INSERT INTO local_schema_migrations(version, name, applied_at) VALUES(10, 'future_v10', ?)").run('2030-01-01T00:00:00.000Z');
+  db.openLocalDb().prepare("INSERT INTO local_schema_migrations(version, name, applied_at) VALUES(?, 'future_version', ?)").run(db.SCHEMA_VERSION+1,'2030-01-01T00:00:00.000Z');
   db.closeLocalDb();
   const s = boot();
   assert.equal(s.ready, false);
   assert.equal(s.errorCode, 'LOCAL_DB_SCHEMA_TOO_NEW');
-  assert.equal(s.schemaVersion, 10);
+  assert.equal(s.schemaVersion, db.SCHEMA_VERSION+1);
   // 파일은 그대로 — 행이 지워지지 않았다
   const raw = new DatabaseSync(dbFile(), { readOnly: true });
-  // 코드의 모든 migration + 주입한 미래 버전(9) 1개.
+  // 코드의 모든 migration + 주입한 미래 버전 1개.
   assert.equal(raw.prepare('SELECT COUNT(*) AS n FROM local_schema_migrations').get().n, db.MIGRATIONS.length + 1);
   raw.close();
   assert.throws(() => db.LocalMetaRepository.get('schema_version'), (e) => e.code === 'LOCAL_DB_SCHEMA_TOO_NEW');
