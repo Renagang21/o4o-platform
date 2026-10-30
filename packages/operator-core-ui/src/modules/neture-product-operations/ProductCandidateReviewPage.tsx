@@ -11,22 +11,23 @@ import {useNetureProductOperations} from './runtime';
  * 금지: 신규 ProductMaster 생성 UI, 자동 승인 UI.
  */
 
-import { useState, useCallback, useEffect, useRef } from 'react';
-import { ActionBar, BulkResultModal } from '@o4o/ui';
+import { useState, useCallback, useEffect, useRef, useMemo } from 'react';
+import { ActionBar } from '@o4o/ui';
 import { useSearchParams } from 'react-router-dom';
-import { DataTable, useBatchAction } from '@o4o/operator-ux-core';
+import { DataTable } from '@o4o/operator-ux-core';
 import type { ListColumnDef } from '@o4o/operator-ux-core';
 import { GuideBlock } from '@o4o/shared-space-ui';
 import type {
   ProductCandidate,
   ProductCandidateStatus,
   ProductCandidateSourceType,
-  ProductTypeClass,
+  CandidateQueue, CandidateWorkflowAction, CandidateWorkflowPreview, CandidateWorkflowSummary, ProductCandidateListFilter,
 } from './operatorProductCandidates';
 
 // ─── Constants ───
 
-const STATUS_TABS: { key: 'all' | ProductCandidateStatus; label: string }[] = [
+const STATUS_TABS: { key: 'all' | 'active' | ProductCandidateStatus; label: string }[] = [
+  { key: 'active', label: '등록 전' },
   { key: 'all', label: '전체' },
   { key: 'pending', label: '대기' },
   { key: 'reviewing', label: '검토중' },
@@ -58,14 +59,6 @@ const PRODUCT_TYPE_BADGE: Record<string, { label: string; cls: string }> = {
   unknown: { label: '미상', cls: 'bg-slate-100 text-slate-400' },
 };
 
-const PRODUCT_TYPE_FILTERS: { key: 'all' | ProductTypeClass; label: string }[] = [
-  { key: 'all', label: '분류 전체' },
-  { key: 'non_drug', label: '비의약품' },
-  { key: 'otc_drug', label: '비처방의약품' },
-  { key: 'rx_drug', label: '처방의약품' },
-  { key: 'drug_unspecified', label: '의약품 미분류' },
-  { key: 'quasi_drug', label: '의약외품' },
-];
 
 const SOURCE_LABEL: Record<ProductCandidateSourceType, string> = {
   supplier_web: '공급자',
@@ -79,6 +72,11 @@ const SOURCE_LABEL: Record<ProductCandidateSourceType, string> = {
   unknown: '미상',
 };
 
+function sourceDisplayName(value?:string|null) {
+  if(value==='MFDS_MEDICAL_DEVICE_STANDARD_CODE') return '식약처 의료기기 표준코드';
+  if(value?.toLowerCase().startsWith('mfds-drug-master-standard-code')) return '식약처 의약품 표준코드';
+  return value || '';
+}
 function Badge({ map, value }: { map: Record<string, { label: string; cls: string }>; value: string }) {
   const b = map[value] || { label: value, cls: 'bg-slate-100 text-slate-600' };
   return <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${b.cls}`}>{b.label}</span>;
@@ -135,7 +133,7 @@ function getBulkInfo(c: ProductCandidate): BulkInfo {
 // ─── Component ───
 
 export default function ProductCandidateReviewPage() {
- const {api:{operatorProductCandidateApi}} = useNetureProductOperations();
+ const {api:{operatorProductCandidateApi}, user, renderCandidateRegistrationReview} = useNetureProductOperations();
   const [searchParams] = useSearchParams();
   const initialStatus = searchParams.get('status');
   const [page, setPage] = useState(1);
@@ -145,20 +143,27 @@ export default function ProductCandidateReviewPage() {
   const sequence = useRef(0);
   const mounted = useRef(false);
   const batchLock = useRef(false);
-  const batch = useBatchAction();
-  const [batchAction, setBatchAction] = useState<'archive' | 'reject'>('archive');
+  const [allMatching,setAllMatching]=useState(false);
+  const [summary,setSummary]=useState<CandidateWorkflowSummary|null>(null);
+  const [queue,setQueue]=useState<CandidateQueue>((searchParams.get('queue') as CandidateQueue) || 'all');
+  const [reason,setReason]=useState('');
+  const [reasonCaption,setReasonCaption]=useState('');
+  const [sourceLabel,setSourceLabel]=useState('');
+  const [notice,setNotice]=useState('');
+  const [dialog,setDialog]=useState<{action:CandidateWorkflowAction;note:string;preview:CandidateWorkflowPreview|null;error:string}|null>(null);
+  const [registration,setRegistration]=useState<string|null>(null);
   const [items, setItems] = useState<ProductCandidate[]>([]);
   const [loading, setLoading] = useState(true);
-  const [statusFilter, setStatusFilter] = useState<'all' | ProductCandidateStatus>(STATUS_TABS.some(tab => tab.key === initialStatus) ? initialStatus as ProductCandidateStatus : 'all');
-  const [typeFilter, setTypeFilter] = useState<'all' | ProductTypeClass>('all');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | ProductCandidateStatus>(STATUS_TABS.some(tab => tab.key === initialStatus) ? initialStatus as 'active' | ProductCandidateStatus : 'active');
   const [bulkOnly, setBulkOnly] = useState(false); // WO-..-BULK-OPERATOR-REVIEW-V4: 공급자 대량 등록만
   const [searchTerm, setSearchTerm] = useState('');
   const [actionLoading, setActionLoading] = useState(false);
 
   useEffect(() => {
-    const next = STATUS_TABS.find(tab => tab.key === initialStatus)?.key ?? 'all';
+    const next = STATUS_TABS.find(tab => tab.key === initialStatus)?.key ?? 'active';
     setStatusFilter(next); setPage(1); setSelected(new Set());
-  }, [initialStatus]);
+    setQueue(['review','intake'].includes(searchParams.get('queue') ?? '') ? searchParams.get('queue') as CandidateQueue : 'all');
+  }, [initialStatus, searchParams]);
 
   const [detail, setDetail] = useState<ProductCandidate | null>(null);
   const [rejectReason, setRejectReason] = useState('');
@@ -174,23 +179,32 @@ export default function ProductCandidateReviewPage() {
   const [refineNote, setRefineNote] = useState('');
   const [refineMessage, setRefineMessage] = useState<string | null>(null);
 
+  const filter = useMemo<ProductCandidateListFilter>(()=>({
+    status:statusFilter==='all'||statusFilter==='active'?undefined:statusFilter,groupedStatus:statusFilter==='active'?'before_registration':undefined,search:searchTerm.trim()||undefined,
+    queue,reason:reason||undefined,sourceLabel:sourceLabel||undefined,bulkOnly,
+  }),[statusFilter,searchTerm,queue,reason,sourceLabel,bulkOnly]);
+  const reasonLabel = reason==='registration_path_unavailable'?'공공 수집 자료 등록 경로 미지원':reason==='identifier_missing'?'식별자 미등록':summary?.reasons.find(item=>item.code===reason)?.label || (reason ? reasonCaption || '선택한 검증 사유' : '전체 사유');
+  const scopeKey = `${user?.id ?? ''}:${(user?.roles ?? []).join('|')}`;
+  const activeScope=useRef(scopeKey);activeScope.current=scopeKey;
+  useEffect(()=>{setSelected(new Set());setAllMatching(false);setDialog(null);setNotice('');},[filter,scopeKey]);
+
   const load = useCallback(async () => {
     const seq = ++sequence.current;
     setLoading(true);
     setSelected(new Set());
     try {
-      const res = await operatorProductCandidateApi.list({
-        status: statusFilter === 'all' ? undefined : statusFilter,
-        page, limit: 50, search: searchTerm.trim() || undefined,
-      });
-      if (seq !== sequence.current) return;
+      const [res,stats] = await Promise.all([
+        operatorProductCandidateApi.list({...filter,page,limit:50}),
+        operatorProductCandidateApi.workflowSummary(filter),
+      ]);
+      if (seq !== sequence.current || activeScope.current!==scopeKey) return;
       const lastPage = Math.max(1, Math.ceil(res.total / 50));
       if (page > lastPage) { setPage(lastPage); return; }
-      setItems(res.items); setTotal(res.total); setError('');
+      setItems(res.items); setTotal(res.total); setSummary(stats); setError('');
     } catch {
-      if (seq === sequence.current) { setItems([]); setError('상품 후보를 조회하지 못했습니다. 다시 조회해 주세요.'); }
+      if (seq === sequence.current) { setItems([]); setSummary(null); setError('상품 후보를 조회하지 못했습니다. 다시 조회해 주세요.'); }
     } finally { if (seq === sequence.current) setLoading(false); }
-  }, [statusFilter, page, searchTerm, operatorProductCandidateApi]);
+  }, [filter, page, operatorProductCandidateApi, scopeKey]);
 
   useEffect(() => {
     mounted.current = true;
@@ -198,13 +212,12 @@ export default function ProductCandidateReviewPage() {
     return () => { mounted.current = false; sequence.current++; };
   }, [load]);
 
-  // 검색은 서버 전체 범위, 분류/대량등록 필터는 현재 페이지에만 적용한다.
-  const filtered = items.filter((c) => {
-    if (typeFilter !== 'all' && (c.classification?.productTypeClass ?? 'unknown') !== typeFilter) return false;
-    if (bulkOnly && !getBulkInfo(c).isBulk) return false;
-    return true;
-  });
+  const filtered = items;
+  const effectiveSelected = allMatching ? new Set(items.map(item=>item.id)) : selected;
+  const selectedCount = allMatching ? total : selected.size;
+  const clearSelection = () => {if(!batchLock.current){setSelected(new Set());setAllMatching(false);setDialog(null);}};
 
+  const refreshAfterMutation = async () => {setAllMatching(false);setSelected(new Set());setDialog(null);await load();};
   // ─── Actions ───
 
   const refreshDetail = async (id: string) => {
@@ -219,7 +232,7 @@ export default function ProductCandidateReviewPage() {
       await operatorProductCandidateApi.reject(detail.id, rejectReason || undefined);
       setRejectReason('');
       setDetail(null);
-      await load();
+      await refreshAfterMutation();
     } finally {
       setActionLoading(false);
     }
@@ -231,7 +244,7 @@ export default function ProductCandidateReviewPage() {
     try {
       await operatorProductCandidateApi.archive(detail.id);
       setDetail(null);
-      await load();
+      await refreshAfterMutation();
     } finally {
       setActionLoading(false);
     }
@@ -247,7 +260,7 @@ export default function ProductCandidateReviewPage() {
       if (result) {
         setRefineMessage('분류가 저장되었습니다.');
         await refreshDetail(detail.id);
-        await load();
+        await refreshAfterMutation();
       } else {
         setRefineMessage('분류 저장에 실패했습니다.');
       }
@@ -280,7 +293,7 @@ export default function ProductCandidateReviewPage() {
       if (result) {
         setLinkMessage(result.alreadyExisted ? '이미 추가된 활용 상품입니다.' : '활용 상품으로 추가되었습니다.');
         await refreshDetail(detail.id);
-        await load();
+        await refreshAfterMutation();
       } else {
         setLinkMessage('연결에 실패했습니다.');
       }
@@ -297,37 +310,42 @@ export default function ProductCandidateReviewPage() {
     }
   };
 
-  const handleBatch = async (action: 'archive' | 'reject', retryIds?: string[]) => {
-    if (batchLock.current || loading || error || actionLoading) return;
-    const ids = filtered.filter(item => (retryIds ? retryIds.includes(item.id) : selected.has(item.id))).map(item => item.id);
-    if (!ids.length || !window.confirm(`선택한 후보 ${ids.length}건을 ${action === 'archive' ? '보관(삭제)' : '반려'}하시겠습니까? 정식 상품은 삭제되지 않습니다.`)) return;
-    batchLock.current = true; setActionLoading(true); setBatchAction(action);
+  const openCandidate = (row: ProductCandidate) => {
+    if(actionLoading) return;
+    setDetail(row);setRejectReason('');setLinkOrgId(row.organizationId||'');setLinkServiceKey(row.serviceKey||'');
+    setLinkDisplayName('');setLinkMessage(null);setRefineCategory(row.classification?.drugCategory||'');setRefineNote('');setRefineMessage(null);
+  };
+  const workflowLabels: Record<CandidateWorkflowAction,string> = {review:'검토 시작',hold:'보완 사항 기록',archive:'보관(삭제)',reject:'반려'};
+  const prepareWorkflow = async () => {
+    if(!dialog || batchLock.current || loading || error) return;
+    batchLock.current=true;setActionLoading(true);
+    const seq=sequence.current;
     try {
-      const outcome = await batch.executeBatch(async (targets: string[]) => {
-        const results = [];
-        for (const id of targets) {
-          if (!mounted.current) { results.push({ id, status: 'skipped', error: '화면을 이동하여 중단했습니다.' }); continue; }
-          try {
-            const result = await operatorProductCandidateApi[action](id);
-            if (!result) throw new Error('EMPTY_RESULT');
-            results.push({ id, status: 'success' });
-          } catch { results.push({ id, status: 'failed', error: '처리에 실패했습니다. 다시 시도해 주세요.' }); }
-        }
-        return { data: { results } };
-      }, ids);
-      if (mounted.current) {
+      const preview=await operatorProductCandidateApi.workflowPreview({filter,action:dialog.action,ids:allMatching?undefined:[...selected],note:dialog.note});
+      if(mounted.current && sequence.current===seq) setDialog(previous=>previous?{...previous,preview,error:''}:null);
+    } catch {if(mounted.current && sequence.current===seq) setDialog(previous=>previous?{...previous,preview:null,error:'대상 건수를 확인하지 못했습니다. 다시 확인해 주세요.'}:null);}
+    finally {batchLock.current=false;if(mounted.current)setActionLoading(false);}
+  };
+  const executeWorkflow = async () => {
+    if(!dialog?.preview || !dialog.preview.count || batchLock.current || loading || error) return;
+    batchLock.current=true;setActionLoading(true);
+    const seq=sequence.current;
+    try {
+      const result=await operatorProductCandidateApi.workflowExecute({filter,action:dialog.action,ids:allMatching?undefined:[...selected],note:dialog.note,cutoff:dialog.preview.cutoff,fingerprint:dialog.preview.fingerprint,expectedCount:dialog.preview.count});
+      if(mounted.current && sequence.current===seq){
+        setDialog(null);setAllMatching(false);setSelected(new Set());
+        setNotice(`${result.updated.toLocaleString()}건 ${workflowLabels[dialog.action]} 처리 완료. 정식 상품은 자동 생성·삭제하지 않았습니다.`);
         await load();
-        if (mounted.current) setSelected(new Set(outcome.results.filter(item => item.status === 'failed').map(item => item.id)));
       }
-    } finally {
-      batchLock.current = false;
-      if (mounted.current) setActionLoading(false);
-    }
+    } catch (failure: any) {if(mounted.current && sequence.current===seq) setDialog(previous=>previous?{...previous,preview:null,error:failure?.response?.status===409?'후보가 변경됐거나 확인 시간이 지났습니다. 대상 건수를 다시 확인해 주세요.':'처리 결과를 확인하지 못했습니다. 목록과 대상 건수를 다시 확인해 주세요.'}:null);}
+    finally {batchLock.current=false;if(mounted.current)setActionLoading(false);}
   };
 
   // ─── Columns ───
 
   const columns: ListColumnDef<ProductCandidate>[] = [
+    {key:'_select',header:'',system:true,width:'44px',render:(_,row)=><input type="checkbox" aria-label={`${row.candidateName||'이름 없는 후보'} 선택`} checked={effectiveSelected.has(row.id)} disabled={loading||actionLoading} onClick={event=>event.stopPropagation()} onChange={event=>{if(batchLock.current)return;const next=new Set(effectiveSelected);if(event.target.checked)next.add(row.id);else next.delete(row.id);setAllMatching(false);setSelected(next);setDialog(null);}}/>},
+
     {
       key: 'candidateName',
       header: '후보명',
@@ -353,6 +371,7 @@ export default function ProductCandidateReviewPage() {
         );
       },
     },
+    {key:'_reviewReason',header:'대기 사유 · 다음 작업',minWidth:220,render:(_,row)=><div className="whitespace-normal text-xs"><span className="font-medium">{row.triage?.queue==='intake'?'수집 자료 등록 준비':'운영 검토'}</span><p className="mt-1 text-amber-800">{row.triage?.reasons.join(' · ') || '후보 정보 확인 필요'}</p><p className="mt-1 text-slate-500">{row.triage?.nextStep}</p></div>},
     {
       key: 'identifierValue',
       header: '식별자',
@@ -372,7 +391,7 @@ export default function ProductCandidateReviewPage() {
       width: '110px',
       render: (v, row) => (
         <span className="text-xs text-slate-600">
-          {row.sourceLabel || SOURCE_LABEL[v as ProductCandidateSourceType] || v}
+          {sourceDisplayName(row.sourceLabel) || SOURCE_LABEL[v as ProductCandidateSourceType] || v}
         </span>
       ),
     },
@@ -382,6 +401,7 @@ export default function ProductCandidateReviewPage() {
       align: 'center',
       width: '110px',
       render: (_v, row) => {
+        if(row.triage?.medicalDevice) return <span className="text-xs text-teal-700">의료기기</span>;
         const cls = row.classification?.productTypeClass ?? 'unknown';
         return <Badge map={PRODUCT_TYPE_BADGE} value={cls} />;
       },
@@ -411,55 +431,39 @@ export default function ProductCandidateReviewPage() {
     },
   ];
 
-  // ─── Counts ───
-  const pendingCount = items.filter((c) => c.candidateStatus === 'pending').length;
-  const registeredCount = items.filter(
-    (c) => c.candidateStatus === 'matched' || c.candidateStatus === 'linked' || c.candidateStatus === 'approved_new_master',
-  ).length;
-
   return (
     <div>
       {/* Header */}
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-slate-900">상품 후보 검토</h1>
         <p className="text-sm text-slate-500 mt-1">
-          모바일·공급자·웹·import 로 수집된 상품 후보를 검토하고, 매칭된 상품은 활용 상품으로 추가하거나 반려/보관합니다.
+          출처와 대기 사유를 확인하고, 검토·보완·등록 준비를 진행합니다. 검색 결과 전체를 선택해 한 번에 처리할 수 있습니다.
         </p>
       </div>
 
       <GuideBlock
         variant="info"
         title="상품 후보 검토 절차를 안내합니다."
-        description="후보는 아직 정식 상품(ProductMaster)으로 확정되지 않은 수집 데이터입니다. 중복 방지는 상품 등록(승격) 시점 dedup 이 처리하며, 이 화면에서는 별도 사전 매칭을 하지 않습니다."
+        description="후보는 정식 상품 등록 전의 수집 자료입니다. 출처·식별자·허가 정보를 확인하고 유형에 맞는 등록 경로를 검토합니다. 같은 상품이 있는지는 등록 과정에서 확인합니다."
         steps={[
-          '대기/검토중 후보를 선택해 식별자·이름·출처를 확인합니다',
-          '등록된 O4O 상품이 있는 후보는 활용 상품(내 약국/매장)으로 추가할 수 있습니다',
-          '부적합한 후보는 사유와 함께 반려하거나 보관합니다',
+          '출처와 사유로 대상을 좁힌 뒤 페이지 또는 검색 결과 전체를 선택합니다',
+          '대량 작업은 대상 건수를 먼저 확인하며, 등록은 허용된 유형과 전체 관리자 권한으로 검토합니다',
+          '수집 자료의 검증·보완 사유를 기록하고 해당 제품군 등록 경로를 확인합니다',
         ]}
         compact
       />
 
-      {/* Stats */}
-      <div className="grid grid-cols-3 gap-4 my-6">
-        {[
-          { label: '조회 조건 전체', value: total, color: 'bg-slate-50 text-slate-700' },
-          { label: '현재 페이지 대기', value: pendingCount, color: 'bg-amber-50 text-amber-700' },
-          { label: '현재 페이지 등록완료', value: registeredCount, color: 'bg-green-50 text-green-700' },
-        ].map((s) => (
-          <div key={s.label} className={`rounded-lg p-4 ${s.color}`}>
-            <div className="text-sm font-medium">{s.label}</div>
-            <div className="text-2xl font-bold mt-1">{s.value}</div>
-          </div>
-        ))}
-      </div>
-
+      <section aria-label="후보 업무 구분" className="my-4 grid gap-3 sm:grid-cols-3">
+        {([['all','조회 조건 전체',summary?.total],['review','운영 검토',summary?.review],['intake','수집 자료 등록 준비',summary?.intake]] as const).map(([key,label,count])=><button key={key} type="button" disabled={actionLoading} aria-pressed={queue===key} className={`rounded-lg border p-4 text-left ${queue===key?'border-blue-600 bg-blue-50':'bg-white'}`} onClick={()=>{setQueue(key);setPage(1);}}><span className="text-sm">{label}</span><strong className="mt-1 block text-2xl">{error||count==null?'—':count.toLocaleString()}</strong></button>)}
+      </section>
+      <p className="mb-4 text-sm text-slate-600">수집 자료는 미등록 원천 데이터입니다. 운영자가 모두 승인해야 한다는 뜻이 아닙니다. 아래 사유와 등록 경로를 먼저 확인하세요. 사유별 건수는 중복될 수 있습니다.</p>
       {/* Filters */}
       <div className="flex flex-wrap items-center gap-4 mb-4">
         <div className="flex flex-wrap gap-1">
           {STATUS_TABS.map((tab) => (
             <button
               key={tab.key}
-              disabled={actionLoading} onClick={() => { setStatusFilter(tab.key); setPage(1); batch.clearResult(); }}
+              disabled={actionLoading} onClick={() => { setStatusFilter(tab.key); setPage(1); }}
               className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                 statusFilter === tab.key ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
               }`}
@@ -468,21 +472,14 @@ export default function ProductCandidateReviewPage() {
             </button>
           ))}
         </div>
-        <select
-          value={typeFilter}
-          disabled={actionLoading} onChange={(e) => { setSelected(new Set()); batch.clearResult(); setTypeFilter(e.target.value as 'all' | ProductTypeClass); }}
-          className="px-3 py-1.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-        >
-          {PRODUCT_TYPE_FILTERS.map((f) => (
-            <option key={f.key} value={f.key}>{f.label}</option>
-          ))}
-        </select>
+        <label className="min-w-0 max-w-full text-sm">출처 <select aria-label="후보 출처" disabled={actionLoading} value={sourceLabel} onChange={e=>{setSourceLabel(e.target.value);setPage(1);}} className="block max-w-full rounded border p-2"><option value="">전체 출처</option>{sourceLabel&&!summary?.sources.some(source=>source.sourceLabel===sourceLabel)&&<option value={sourceLabel}>{sourceDisplayName(sourceLabel)} (0건)</option>}{summary?.sources.filter(source=>source.sourceLabel).map(source=><option key={source.sourceLabel!} value={source.sourceLabel!}>{sourceDisplayName(source.sourceLabel)} ({source.count.toLocaleString()})</option>)}</select></label>
+        <label className="min-w-0 max-w-full text-sm">대기 사유 <select aria-label="후보 대기 사유" disabled={actionLoading} value={reason} onChange={e=>{setReasonCaption(summary?.reasons.find(item=>item.code===e.target.value)?.label||'');setReason(e.target.value);setPage(1);}} className="block max-w-full rounded border p-2"><option value="">전체 사유</option>{reason&&!summary?.reasons.some(item=>item.code===reason)&&<option value={reason}>{reasonLabel} (0건)</option>}{summary?.reasons.map(item=><option key={item.code} value={item.code}>{item.label} ({item.count.toLocaleString()})</option>)}</select></label>
         {/* WO-..-BULK-OPERATOR-REVIEW-V4: 공급자 대량 등록만 */}
         <label className="flex items-center gap-1.5 text-sm text-slate-600 cursor-pointer select-none">
           <input
             type="checkbox"
             checked={bulkOnly}
-            disabled={actionLoading} onChange={(e) => { setBulkOnly(e.target.checked); setSelected(new Set()); batch.clearResult(); }}
+            disabled={actionLoading} onChange={(e) => { setBulkOnly(e.target.checked); setSelected(new Set()); }}
             className="rounded border-slate-300 text-violet-600 focus:ring-violet-500"
           />
           공급자 대량 등록만
@@ -491,48 +488,51 @@ export default function ProductCandidateReviewPage() {
           type="text"
           aria-label="전체 후보 검색" placeholder="전체 후보명, 제조사, 식별자 검색..."
           value={searchTerm}
-          disabled={actionLoading} onChange={(e) => { setSearchTerm(e.target.value); setPage(1); batch.clearResult(); }}
+          disabled={actionLoading} onChange={(e) => { setSearchTerm(e.target.value); setPage(1); }}
           className="flex-1 max-w-xs px-3 py-1.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
       </div>
 
       {error && <p role="alert" className="mb-3 rounded bg-red-50 p-3 text-red-700">{error}</p>}
-      <p className="mb-3 text-sm text-slate-500">전체 {error ? '—' : total.toLocaleString()}건 · {page}페이지 · 분류와 공급자 대량 등록 필터는 현재 페이지에 적용됩니다.</p>
-      <div className="[&>div>div]:flex-wrap"><ActionBar selectedCount={selected.size} onClearSelection={() => { if (!batchLock.current) setSelected(new Set()); }} actions={[
-        { key: 'archive', label: '선택 보관(삭제)', disabled: loading || actionLoading || !!error, onClick: () => handleBatch('archive') },
-        { key: 'reject', label: '선택 반려', disabled: loading || actionLoading || !!error, onClick: () => handleBatch('reject') },
+      <p className="mb-3 text-sm text-slate-500">전체 {error ? '—' : total.toLocaleString()}건 · {page}페이지 · 검색·출처·사유·대량 등록 필터는 전체 후보에 적용됩니다.</p>
+      <div className="mb-3 flex flex-wrap items-center gap-3 rounded border bg-white p-3 text-sm">
+        <span>{allMatching?`검색 결과 전체 ${total.toLocaleString()}건 선택 중`:'표의 체크박스는 현재 페이지를 선택합니다.'}</span>
+        <button type="button" className="rounded border px-3 py-2 text-blue-800" disabled={loading||actionLoading||!!error||!total} onClick={()=>{setAllMatching(true);setSelected(new Set());setDialog(null);}}>검색 결과 전체 {total.toLocaleString()}건 선택</button>
+        {allMatching&&<button type="button" disabled={actionLoading} onClick={clearSelection}>전체 선택 해제</button>}
+      </div>
+      {notice&&<p role="status" className="mb-3 rounded bg-blue-50 p-3 text-sm text-blue-900">{notice}</p>}
+      <div className="[&>div>div]:flex-wrap"><ActionBar selectedCount={selectedCount} onClearSelection={clearSelection} actions={[
+        {key:'detail',label:'선택 후보 확인',disabled:loading||actionLoading||selectedCount!==1,onClick:()=>{const row=items.find(item=>effectiveSelected.has(item.id));if(row)openCandidate(row);}},
+        ...(['review','hold','archive','reject'] as const).map(action=>({key:action,label:action==='archive'?'선택 보관(삭제)':`선택 ${workflowLabels[action]}`,disabled:loading||actionLoading||!!error,onClick:()=>setDialog({action,note:'',preview:null,error:''})})),
       ]} /></div>
-      <BulkResultModal open={batch.showResult} result={batch.result} onClose={batch.clearResult} title="선택 후보 처리 결과" onRetry={actionLoading || loading || !!error ? undefined : ids => { void handleBatch(batchAction, ids); }} />
+      {dialog&&<div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/50 p-4"><section role="dialog" aria-modal="true" aria-label="선택 후보 일괄 처리 확인" className="max-h-[90vh] w-full max-w-xl space-y-4 overflow-y-auto rounded-xl bg-white p-5">
+        <h2 className="text-lg font-semibold">{workflowLabels[dialog.action]} 대상 확인</h2><p className="text-sm">{allMatching?'검색 결과 전체':'체크한 현재 페이지'} {selectedCount.toLocaleString()}건 중 실행 가능한 후보를 서버에서 확인합니다. 검토 시작은 대기 후보만, 나머지는 대기·검토중 후보만 처리합니다.</p>
+        <p className="break-words rounded bg-slate-50 p-3 text-sm">범위: {queue==='intake'?'수집 자료':queue==='review'?'운영 검토':'전체 후보'} / {STATUS_TABS.find(tab=>tab.key===statusFilter)?.label} / {sourceDisplayName(sourceLabel)||'전체 출처'} / {reasonLabel}{searchTerm&&` / 검색: ${searchTerm}`}</p>
+        <label className="block text-sm">검토 기록 {(dialog.action==='hold'||dialog.action==='reject')?'(필수)':'(선택)'}<textarea aria-label="일괄 처리 검토 기록" className="mt-1 w-full rounded border p-2" value={dialog.note} maxLength={2000} disabled={actionLoading} onChange={e=>setDialog({...dialog,note:e.target.value,preview:null})}/></label>
+        {dialog.error&&<p role="alert" className="text-sm text-red-700">{dialog.error}</p>}
+        {dialog.preview&&<p role="status" className="rounded bg-blue-50 p-3 text-sm">실행 대상 {dialog.preview.count.toLocaleString()}건. 새 후보는 확인 범위에 포함하지 않으며, 확인 후 대상이 바뀌면 실행을 중단하고 다시 확인합니다. 정식 상품 등록·삭제·알림 발송은 실행하지 않습니다.</p>}
+        <div className="flex flex-wrap justify-end gap-2"><button type="button" disabled={actionLoading} onClick={()=>setDialog(null)} className="rounded border px-3 py-2">취소</button><button type="button" disabled={actionLoading||((dialog.action==='hold'||dialog.action==='reject')&&!dialog.note.trim())} className="rounded border px-3 py-2" onClick={()=>void prepareWorkflow()}>대상 건수 확인</button>{dialog.preview&&<button type="button" disabled={actionLoading||!dialog.preview.count} className="rounded bg-blue-700 px-3 py-2 text-white" onClick={()=>void executeWorkflow()}>확인한 {dialog.preview.count.toLocaleString()}건 실행</button>}</div>
+      </section></div>}
       {/* DataTable */}
       <DataTable<ProductCandidate>
         selectable
-        selectedKeys={selected}
-        onSelectionChange={keys => { if (!batchLock.current) setSelected(new Set([...keys].filter(id => filtered.some(item => item.id === id)))); }}
+        selectedKeys={effectiveSelected}
+        onSelectionChange={keys => { if (!batchLock.current) {setAllMatching(false);setSelected(new Set([...keys].filter(id => filtered.some(item => item.id === id))));setDialog(null);} }}
         columns={columns}
         data={filtered}
         rowKey="id"
         loading={loading}
-        emptyMessage={items.length === 0 ? '검토할 상품 후보가 없습니다' : '검색 결과가 없습니다'}
-        onRowClick={(row) => {
-          if (actionLoading) return;
-          setDetail(row);
-          setRejectReason('');
-          setLinkOrgId(row.organizationId || '');
-          setLinkServiceKey(row.serviceKey || '');
-          setLinkDisplayName('');
-          setLinkMessage(null);
-          setRefineCategory(row.classification?.drugCategory || '');
-          setRefineNote('');
-          setRefineMessage(null);
-        }}
+        emptyMessage={error ? '상품 후보를 다시 조회해 주세요.' : items.length === 0 ? '검토할 상품 후보가 없습니다' : '검색 결과가 없습니다'}
+        onRowClick={openCandidate}
         tableId="neture-product-candidates"
       />
 
       <nav aria-label="상품 후보 페이지" className="my-4 flex flex-wrap items-center justify-between gap-3">
-        <button type="button" className="rounded border px-3 py-2 text-sm" disabled={loading || actionLoading || page <= 1} onClick={() => { setPage(value => value - 1); batch.clearResult(); }}>이전 페이지</button>
-        <button type="button" className="rounded border px-3 py-2 text-sm" disabled={loading || actionLoading} onClick={() => { batch.clearResult(); void load(); }}>목록 새로고침</button>
-        <button type="button" className="rounded border px-3 py-2 text-sm" disabled={loading || actionLoading || page * 50 >= total} onClick={() => { setPage(value => value + 1); batch.clearResult(); }}>다음 페이지</button>
+        <button type="button" className="rounded border px-3 py-2 text-sm" disabled={loading || actionLoading || page <= 1} onClick={() => { setPage(value => value - 1); }}>이전 페이지</button>
+        <button type="button" className="rounded border px-3 py-2 text-sm" disabled={loading || actionLoading} onClick={() => { clearSelection();void load(); }}>목록 새로고침</button>
+        <button type="button" className="rounded border px-3 py-2 text-sm" disabled={loading || actionLoading || page * 50 >= total} onClick={() => { setPage(value => value + 1); }}>다음 페이지</button>
       </nav>
+      {registration&&user?.roles?.includes('platform:super_admin')&&renderCandidateRegistrationReview?.({candidateId:registration,onClose:()=>setRegistration(null),onProcessed:()=>{setRegistration(null);void refreshAfterMutation();}})}
       {/* Detail Modal */}
       {detail && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[60] p-4">
@@ -549,6 +549,7 @@ export default function ProductCandidateReviewPage() {
             </div>
 
             <div className="p-5 space-y-4">
+              <section aria-label="후보 대기 사유" className="rounded border border-amber-200 bg-amber-50 p-3 text-sm"><h4 className="font-semibold">{detail.triage?.queue==='intake'?'수집 자료 등록 준비':'운영 검토'}</h4><p className="mt-1">{detail.triage?.reasons.join(' · ')||'원천 정보 확인 필요'}</p><p className="mt-1">{detail.triage?.nextStep}</p>{(detail.triage?.registration==='drug'||detail.triage?.registration==='supplier')&&renderCandidateRegistrationReview&&user?.roles?.includes('platform:super_admin')&&<button type="button" className="mt-3 rounded bg-blue-700 px-3 py-2 text-white" onClick={()=>{setRegistration(detail.id);setDetail(null);}}>기본상품 등록 검토</button>}{detail.triage?.registration==='unsupported'&&<p className="mt-2">이 자료는 현재 일반 등록 경로에서 처리할 수 없습니다. 원천 식별자·허가·필수 정보를 검증하고 보완 사항을 기록하세요.</p>}</section>
               {/* F3: 상품 분류 + 기본 노출/판매 정책 (표시용 — 권한 변경 아님) */}
               {detail.classification && (
                 <div className="rounded-lg border border-slate-100 bg-slate-50 p-3">

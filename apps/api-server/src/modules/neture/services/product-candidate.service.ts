@@ -16,6 +16,7 @@
 
 import type { DataSource, Repository, FindOptionsWhere } from 'typeorm';
 import { IsNull, In, Raw } from 'typeorm';
+import { candidateIntakeSql, candidateUnsupportedIntakeSql, CANDIDATE_REVIEW_FLAGS } from './candidate-triage.js';
 import { DESCRIPTION_INTAKE_LABEL } from '../product-description-intake/namespace.js';
 import { resolveCanonicalServiceKey } from '@o4o/security-core';
 import { ProductCandidate } from '../entities/ProductCandidate.entity.js';
@@ -110,6 +111,10 @@ export interface FindCandidatesFilter {
   serviceKey?: string;
   /** Include unassigned common candidates within the explicitly authorized service queue. */
   includeShared?: boolean;
+  queue?: 'review' | 'intake';
+  bulkOnly?: boolean;
+  reason?: string;
+  unregisteredOnly?: boolean;
   organizationId?: string;
   /** operator scope: null = cross-service(platform admin), 배열 = 제한 */
   scopeServiceKeys?: string[] | null;
@@ -236,9 +241,7 @@ export class ProductCandidateService {
     });
   }
 
-  async findCandidates(filter: FindCandidatesFilter): Promise<{ items: ProductCandidate[]; total: number }> {
-    const page = Math.max(1, filter.page ?? 1);
-    const limit = Math.min(100, Math.max(1, filter.limit ?? 20));
+  candidateQuery(filter: FindCandidatesFilter) {
 
     const where: FindOptionsWhere<ProductCandidate> = { deletedAt: IsNull() };
     // 다중 상태(그룹) 우선, 없으면 단건 상태
@@ -261,9 +264,7 @@ export class ProductCandidateService {
       .where(where)
       .andWhere('(pc.source_label IS NULL OR pc.source_label <> :descriptionIntakeLabel)', { descriptionIntakeLabel: DESCRIPTION_INTAKE_LABEL })
       .orderBy('pc.created_at', 'DESC')
-      .addOrderBy('pc.id', 'DESC')
-      .skip((page - 1) * limit)
-      .take(limit);
+      .addOrderBy('pc.id', 'DESC');
 
     if (filter.serviceKey && filter.includeShared) {
       qb.andWhere('(pc.service_key = :queueService OR pc.service_key IS NULL)', { queueService: filter.serviceKey });
@@ -286,6 +287,20 @@ export class ProductCandidateService {
       );
     }
 
+    if (filter.unregisteredOnly) qb.andWhere('pc.matched_product_master_id IS NULL');
+    if (filter.queue) qb.andWhere(filter.queue === 'intake' ? candidateIntakeSql('pc') : `NOT ${candidateIntakeSql('pc')}`);
+    if (filter.bulkOnly) qb.andWhere("(pc.raw_payload->>'source'='supplier_bulk_upload' OR pc.source_label LIKE :bulkLabel)", {bulkLabel:'%대량 등록%'});
+    if (filter.reason) qb.andWhere("pc.candidate_status IN ('pending','reviewing')").andWhere('pc.matched_product_master_id IS NULL');
+    if (filter.reason === 'identifier_missing') qb.andWhere("(pc.identifier_value IS NULL OR pc.identifier_value='')");
+    else if (filter.reason === 'registration_path_unavailable') qb.andWhere(candidateUnsupportedIntakeSql('pc'));
+    else if (filter.reason && Object.hasOwn(CANDIDATE_REVIEW_FLAGS,filter.reason)) qb.andWhere("pc.raw_payload->'reviewFlags' @> :reviewFlag::jsonb", {reviewFlag:JSON.stringify([filter.reason])});
+    return qb;
+  }
+
+  async findCandidates(filter: FindCandidatesFilter): Promise<{ items: ProductCandidate[]; total: number }> {
+    const page = Math.max(1, filter.page ?? 1);
+    const limit = Math.min(100, Math.max(1, filter.limit ?? 20));
+    const qb = this.candidateQuery(filter).skip((page - 1) * limit).take(limit);
     const [items, total] = await qb.getManyAndCount();
     return { items, total };
   }

@@ -1,3 +1,4 @@
+import { candidateIntakeSql } from '../neture/services/candidate-triage.js';
 import { DESCRIPTION_INTAKE_LABEL } from "../neture/product-description-intake/namespace.js";
 import type { DataSource } from "typeorm";
 import type { InboxScope } from "./inbox-scope.js";
@@ -268,13 +269,16 @@ export function inboxTaskSources(scope: InboxScope): TaskSource[] {
     );
     add(
       "product-candidates",
-      "상품 후보 검토",
-      "/operator/product-candidates?status=pending",
+      "상품 후보 검토 대기",
+      "/operator/product-candidates?status=pending&queue=review",
       "product_candidates",
-      "candidate_status='pending' AND deleted_at IS NULL AND (source_label IS NULL OR source_label <> $1) AND (service_key='neture' OR service_key IS NULL)",
+      `candidate_status='pending' AND deleted_at IS NULL AND (source_label IS NULL OR source_label <> $1) AND (service_key='neture' OR service_key IS NULL) AND NOT ${candidateIntakeSql('product_candidates')}`,
       "created_at",
       [DESCRIPTION_INTAKE_LABEL],
     );
+    add('product-candidate-intake','공공 수집 자료 등록 준비','/operator/product-candidates?status=active&queue=intake','product_candidates',
+      `candidate_status IN ('pending','reviewing') AND matched_product_master_id IS NULL AND deleted_at IS NULL AND (source_label IS NULL OR source_label <> $1) AND (service_key='neture' OR service_key IS NULL) AND ${candidateIntakeSql('product_candidates')}`,
+      'created_at',[DESCRIPTION_INTAKE_LABEL]);
   }
   return result;
 }

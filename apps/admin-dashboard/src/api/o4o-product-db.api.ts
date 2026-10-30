@@ -854,3 +854,10 @@ export async function getProductLandingQr(masterId: string, size = 320): Promise
   );
   return res.data.data;
 }
+
+/** Existing supplier promotion adapter; the server preserves the platform-only write guard. */
+export async function promoteSupplierCandidateToMaster(id:string):Promise<{outcome:'create'|'link'|'hold'|'conflict';reason?:string}> {
+  const res=await authClient.api.post(`/operator/product-candidates/${encodeURIComponent(id)}/promote-supplier`,{});
+  if(res.data?.success!==true || !res.data?.data) throw new Error('SUPPLIER_PROMOTION_FAILED');
+  return res.data.data;
+}

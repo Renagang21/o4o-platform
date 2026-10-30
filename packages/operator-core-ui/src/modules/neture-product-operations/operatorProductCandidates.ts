@@ -78,7 +78,13 @@ export interface CandidateClassification {
   /** WO-O4O-PRODUCT-DRUG-EXTENSION-PERSISTENCE-V1: 저장된 의약품 확장 요약 (없으면 null) */
   drugExtension?: CandidateDrugExtensionSummary | null;
 }
+export type CandidateQueue = 'all' | 'review' | 'intake';
+export type CandidateWorkflowAction = 'review' | 'hold' | 'archive' | 'reject';
+export interface CandidateWorkflowPreview {count:number;cutoff:string;action:CandidateWorkflowAction;fingerprint:string}
+export interface CandidateWorkflowSummary {total:number;review:number;intake:number;sources:Array<{sourceLabel:string|null;count:number}>;reasons:Array<{code:string;label:string;count:number}>}
+export interface CandidateWorkflowRequest {filter:ProductCandidateListFilter;action:CandidateWorkflowAction;ids?:string[];note?:string;cutoff?:string;fingerprint?:string;expectedCount?:number}
 export interface ProductCandidate {
+  triage?: {queue:'review'|'intake';registration:'drug'|'supplier'|'unsupported'|'linked';medicalDevice:boolean;reasons:string[];nextStep:string};
   id: string;
   serviceKey: string | null;
   organizationId: string | null;
@@ -111,9 +117,14 @@ export interface ProductCandidate {
 }
 export interface ProductCandidateListFilter {
   status?: ProductCandidateStatus;
+  groupedStatus?: 'before_registration';
   sourceType?: ProductCandidateSourceType;
   serviceKey?: string;
   includeShared?: boolean;
+  queue?: CandidateQueue;
+  reason?: string;
+  sourceLabel?: string;
+  bulkOnly?: boolean;
   search?: string;
   organizationId?: string;
   page?: number;
@@ -126,10 +137,33 @@ export interface ProductCandidateListResult {
 const BASE = '/operator/product-candidates';
 export function createProductCandidatesApi(api:AxiosInstance) {
 const operatorProductCandidateApi = {
+  async workflowSummary(filter: ProductCandidateListFilter): Promise<CandidateWorkflowSummary> {
+    const res=await api.get(`${BASE}/workflow-summary`,{params:filter});
+    const data=res.data?.data;
+    if(res.data?.success!==true || !data || !['total','review','intake'].every(key=>Number.isSafeInteger(data[key]) && data[key]>=0) || !Array.isArray(data.sources) || !Array.isArray(data.reasons)) throw new Error('INVALID_WORKFLOW_SUMMARY');
+    return data;
+  },
+  async workflowPreview(payload: CandidateWorkflowRequest): Promise<CandidateWorkflowPreview> {
+    const res=await api.post(`${BASE}/workflow-preview`,payload);
+    const data=res.data?.data;
+    if(res.data?.success!==true || !Number.isSafeInteger(data?.count) || data.count<0 || typeof data.cutoff!=='string' || typeof data.fingerprint!=='string' || !/^[a-f0-9]{64}$/.test(data.fingerprint)) throw new Error('INVALID_WORKFLOW_PREVIEW');
+    return data;
+  },
+  async workflowExecute(payload: CandidateWorkflowRequest): Promise<{updated:number;status:ProductCandidateStatus}> {
+    const res=await api.post(`${BASE}/workflow-execute`,payload);
+    const data=res.data?.data;
+    if(res.data?.success!==true || !Number.isSafeInteger(data?.updated) || data.updated<1) throw new Error('INVALID_WORKFLOW_RESULT');
+    return data;
+  },
   /** GET /operator/product-candidates — 후보 목록 (scope 는 backend 가 적용) */
   async list(filter: ProductCandidateListFilter = {}): Promise<ProductCandidateListResult> {
     try {
       const params: Record<string, string | number> = {};
+      if (filter.groupedStatus) params.groupedStatus=filter.groupedStatus;
+      if (filter.queue) params.queue = filter.queue;
+      if (filter.reason) params.reason = filter.reason;
+      if (filter.sourceLabel) params.sourceLabel = filter.sourceLabel;
+      if (filter.bulkOnly) params.bulkOnly = 'true';
       if (filter.includeShared) params.includeShared = 'true';
       if (filter.search) params.search = filter.search;
       if (filter.status) params.status = filter.status;
