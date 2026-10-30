@@ -30,6 +30,10 @@ jobs:
   # 판정은 CI Pipeline 과 동일한 SSOT(`scripts/ci/detect-affected.mjs`)다.
   detect:
     name: Detect affected scope
+    # CodeQL licensing for private code must be confirmed before explicitly enabling it.
+    if: >-
+      (!github.event.repository.private || vars.CODEQL_PRIVATE_ENABLED == 'true') &&
+      (vars.CI_COST_PROFILE != 'budget' || github.event_name == 'workflow_dispatch')
     runs-on: ubuntu-latest
     outputs:
       docs_fast_eligible: ${{ steps.scope.outputs.docs_fast_eligible }}
@@ -56,9 +60,10 @@ jobs:
     # schedule 은 변경 영향과 무관한 정기 보안 전수 검사다 — 판정 결과와 관계없이 항상 돈다.
     # workflow_dispatch(수동 실행)도 full Analyze 가 안전한 기본값이다.
     if: >-
-      github.event_name == 'schedule' ||
+      needs.detect.result == 'success' &&
+      (github.event_name == 'schedule' ||
       github.event_name == 'workflow_dispatch' ||
-      needs.detect.outputs.docs_fast_eligible != 'true'
+      needs.detect.outputs.docs_fast_eligible != 'true')
     timeout-minutes: 60
     permissions:
       actions: read

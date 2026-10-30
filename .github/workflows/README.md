@@ -42,7 +42,32 @@ GCP 인증은 WIF(`workload_identity_provider` + `service_account` · 장기 key
 | `automation-pr-labeler.yml` | PR 크기 라벨 |
 | `automation-repo-setup.yml` | 저장소 설정 자동화 |
 
-## 공통 액션
+## 비공개 전환 비용 준비
+
+`CI_COST_PROFILE=budget` repository variable을 **명시적으로 설정한 경우에만** Draft PR의 무거운 검사를 미룬다.
+진행 중에는 Draft PR을 사용하고, 최종 commit을 올린 뒤 Ready for review로 전환한다.
+`ready_for_review`에서 기존 전체/affected 검사를 다시 실행하며, Ready 상태에서 추가 push하면 다시 검증한다.
+미룬 Draft의 `CI Gate`는 **실패**로 표시한다. 검사 없이 병합 가능한 green을 만들지 않는다.
+main/develop push·수동 전체 검사·정기 API Jest·기존 배포 게이트는 유지된다.
+변수를 제거하면 기존 자동 실행 방식으로 복귀한다. 이 설정만으로 월 예산 달성을 보장하지 않는다.
+
+- budget 모드에서는 자동 CodeQL을 생략한다. 수동 실행은 공개 저장소에서 가능하다.
+- 비공개 CodeQL은 기본 생략한다. 사용 자격·라이선스를 확인한 뒤 `CODEQL_PRIVATE_ENABLED=true`로 명시적으로 켠 경우에만 실행한다.
+- 공개 Sonar PR 진단 조회·업로드는 budget 모드 또는 비공개에서 생략한다. **외부 Sonar App 자체를 해제하거나 구독을 취소하지 않는다.**
+- AI 리뷰는 빌드·테스트·권한/격리 검증의 통과 증거를 대신하지 않는다.
+
+읽기 전용 비용 재계산(기존 `gh` 인증 또는 `GITHUB_TOKEN`, 최대 31일):
+
+```sh
+node scripts/ci/actions-cost.mjs --repo Renagang21/o4o-platform --from 2026-09-30 --to 2026-10-29 --sample 10
+```
+
+실행 건수는 전체 조회하고, workflow·event·결과별 시간 분산 표본의 job 시간을 분 단위 올림해 추정한다.
+재실행 attempt는 포함하며, 진행 중 run은 별도 집계한다. 청구 내역·저장 공간·외부 검사 구독은 포함하지 않는다.
+재현 도구는 자동 CI에 등록하지 않는다. 전환 준비와 잔여 항목은
+[`IR-O4O-PRIVATE-CI-BUDGET-V1`](../../docs/investigations/IR-O4O-PRIVATE-CI-BUDGET-V1.md)를 따른다.
+
+## 공통 액션 구성
 
 `.github/actions/setup-build-env/action.yml` — pnpm/Node 셋업 + 의존성 설치 + 공유 패키지 빌드.
 `strict-lockfile: 'true'` 로 opt-in 하면 lockfile drift 를 실패로 만든다(CI Pipeline 이 사용).
