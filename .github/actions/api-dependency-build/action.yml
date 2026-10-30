@@ -13,7 +13,7 @@ runs:
       shell: bash
       run: |
         set -euo pipefail
-        git ls-files -z | PNPM_VERSION="$(pnpm --version)" node scripts/ci/api-build-cache.mjs plan > "$RUNNER_TEMP/api-build-plan.json"
+        git ls-files -z | PNPM_VERSION="$(pnpm --version)" node scripts/ci/api-build-cache.mjs plan
 
     - name: Restore compiled dependencies (exact key)
       id: restore
@@ -28,12 +28,12 @@ runs:
       id: verify
       if: steps.restore.outputs.cache-hit == 'true'
       shell: bash
-      run: node scripts/ci/api-build-cache.mjs verify "$RUNNER_TEMP/api-build-plan.json"
+      run: node scripts/ci/api-build-cache.mjs verify
 
     - name: Remove stale outputs before rebuilding
       if: steps.plan.outputs.enabled == 'true' && steps.verify.outputs.valid != 'true'
       shell: bash
-      run: node scripts/ci/api-build-cache.mjs clean "$RUNNER_TEMP/api-build-plan.json"
+      run: node scripts/ci/api-build-cache.mjs clean
 
     - name: Build API dependencies on cache miss
       if: steps.verify.outputs.valid != 'true'
@@ -45,7 +45,7 @@ runs:
       if: steps.plan.outputs.enabled == 'true' && steps.verify.outputs.valid != 'true' && env.CI_BUILD_CACHE_DISABLED != 'true'
       continue-on-error: true
       shell: bash
-      run: node scripts/ci/api-build-cache.mjs record "$RUNNER_TEMP/api-build-plan.json"
+      run: node scripts/ci/api-build-cache.mjs record
 
     - name: Save compiled dependencies
       if: steps.record.outcome == 'success'

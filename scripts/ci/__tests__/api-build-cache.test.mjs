@@ -3,6 +3,8 @@ import assert from 'node:assert/strict';
 import { mkdtempSync, mkdirSync, readFileSync, readdirSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
+import { spawnSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
 import { makePlan, isBuildInput, recordBuild, verifyBuild, clearBuild } from '../api-build-cache.mjs';
 import { buildWorkspaceGraph, classifyApiDeploy, classify, REPO_ROOT } from '../detect-affected.mjs';
 
@@ -85,6 +87,19 @@ test('tracked path traversal and output-delimiter injection are rejected', t => 
   for (const p of ['../outside', '/outside', 'packages/evil\nO4O_BUILD_CACHE', 'packages\\outside']) {
     assert.throws(() => makePlan(f.root, [...f.tracked, p], runtime), /Invalid tracked/);
   }
+});
+test('CLI reads only its fixed workspace plan, never a caller-supplied file path', t => {
+  const f = fixture(t); const plan = f.plan();
+  f.put('packages/test-dep/dist/index.js', 'compiled JS', false);
+  recordBuild(f.root, plan);
+  f.put('node_modules/.cache/o4o-api-build/plan.json', JSON.stringify(plan), false);
+  f.put('untrusted.json', JSON.stringify({ enabled: false }), false);
+  const output = path.join(f.root, 'outputs.txt');
+  const result = spawnSync(process.execPath, [fileURLToPath(new URL('../api-build-cache.mjs', import.meta.url)), 'verify', 'untrusted.json'], {
+    cwd: f.root, env: { ...process.env, GITHUB_OUTPUT: output }, encoding: 'utf8',
+  });
+  assert.equal(result.status, 0, result.stderr);
+  assert.match(readFileSync(output, 'utf8'), /valid<<O4O_BUILD_CACHE\ntrue\n/);
 });
 test('symlink sources or cached outputs are not reusable and cleanup never follows links', t => {
   const f = fixture(t); const plan = f.plan();

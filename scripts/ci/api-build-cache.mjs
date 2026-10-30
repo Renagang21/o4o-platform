@@ -6,8 +6,10 @@ import { fileURLToPath } from 'node:url';
 import { buildWorkspaceGraph, dependencyClosure } from './detect-affected.mjs';
 
 const RECEIPT = 'node_modules/.cache/o4o-api-build/receipt.json';
+const PLAN = 'node_modules/.cache/o4o-api-build/plan.json';
 const VERSION = 'api-deps-v1';
 const sha = bytes => createHash('sha256').update(bytes).digest('hex');
+const comparePaths = (a, b) => a.localeCompare(b, 'en');
 const safeRelative = p => typeof p === 'string' && p !== '' && !path.isAbsolute(p) && !/[\\\x00-\x1f\x7f]/.test(p) && !p.split('/').some(s => s === '..' || s === '.' || s === '');
 
 // API implementation/tests are consumers of these packages. Everything else tracked is
@@ -16,43 +18,55 @@ export function isBuildInput(p) {
   return !p.startsWith('docs/') && !p.startsWith('apps/api-server/src/');
 }
 
-export function makePlan(root, tracked, runtime) {
-  if (!/^\d+\.\d+\.\d+(?:-[\w.-]+)?$/.test(runtime.pnpm || '')) throw new Error('Unknown package manager version');
+function dependencyDirs(root) {
   const graph = buildWorkspaceGraph(root);
   const closure = [...dependencyClosure(graph, '@o4o/api-server')].filter(n => n !== '@o4o/api-server');
   if (closure.length === 0) throw new Error('No API workspace dependency closure');
-  const dirs = closure.map(n => graph.byName.get(n)?.dir).sort();
+  const dirs = closure.map(n => graph.byName.get(n).dir).sort(comparePaths);
   for (const dir of dirs) {
     if (!safeRelative(dir) || !dir.startsWith('packages/')) throw new Error('Non-package dependency requires a fresh build');
     const manifest = JSON.parse(readFileSync(path.join(root, dir, 'package.json'), 'utf8'));
     // Custom build scripts may read arbitrary application files. Do not cache them.
-    const commands = (manifest.scripts?.build || '').split(/\s*&&\s*/);
+    const commands = (manifest.scripts?.build || '').split('&&').map(c => c.trim());
     if (!commands.every(c => /^(?:npx )?(?:tsc|tsup)(?: [A-Za-z0-9_./@=,:-]+)*$/.test(c))) {
       throw new Error('Custom dependency build requires a fresh build');
     }
   }
-  const outputs = dirs.map(d => `${d}/dist`);
-  const inputs = [...new Set(tracked)].filter(isBuildInput).sort();
-  if (!inputs.includes('pnpm-lock.yaml') || !inputs.includes('package.json')) throw new Error('Missing build manifest inputs');
-  const digest = createHash('sha256').update(JSON.stringify({ version: VERSION, runtime, dirs }));
-  for (const p of inputs) {
+  return dirs;
+}
+
+function assertApplicationBoundary(p, text) {
+  if (p.startsWith('packages/') && /\.(?:[cm]?[jt]sx?|json)$/.test(p)) {
+    const imports = [...text.matchAll(/(?:\bfrom|\bimport\s*\(|\brequire\s*\()\s*['"]([^'"]+)['"]/g)].map(m => m[1]);
+    if (imports.some(s => s.startsWith('@o4o/api-server') || path.posix.normalize(path.posix.join(path.posix.dirname(p), s)).startsWith('apps/api-server/')) ||
+        (p.endsWith('.json') && /["'][^"']*apps\/api-server/.test(text))) throw new Error('Dependency references API application inputs');
+  }
+  if (/^tsconfig[^/]*\.json$/.test(p)) {
+    const paths = /"paths"\s*:\s*\{([\s\S]*?)\}/.exec(text)?.[1] || '';
+    if (paths.includes('apps/api-server')) throw new Error('Compiler alias references API application inputs');
+  }
+}
+
+function readBuildInput(root, p, outputs) {
     if (!safeRelative(p)) throw new Error('Invalid tracked input path');
     if (outputs.some(d => p === d || p.startsWith(`${d}/`)) || p.endsWith('.tsbuildinfo')) throw new Error('Tracked build output cannot be cached');
     const stat = lstatSync(path.join(root, p));
     if (!stat.isFile() || stat.isSymbolicLink()) throw new Error('Non-regular build input requires a fresh build');
     const data = readFileSync(path.join(root, p));
-    // Enforce the package -> application boundary for this optimization as well.
-    if (p.startsWith('packages/') && /\.(?:[cm]?[jt]sx?|json)$/.test(p)) {
-      const text = data.toString('utf8');
-      const imports = [...text.matchAll(/(?:\bfrom\s*|\bimport\s*\(|\brequire\s*\()\s*['"]([^'"]+)['"]/g)].map(m => m[1]);
-      if (imports.some(s => s.startsWith('@o4o/api-server') || path.posix.normalize(path.posix.join(path.posix.dirname(p), s)).startsWith('apps/api-server/')) ||
-          (p.endsWith('.json') && /["'][^"']*apps\/api-server/.test(text))) throw new Error('Dependency references API application inputs');
-    }
-    if (/^tsconfig[^/]*\.json$/.test(p)) {
-      const paths = /"paths"\s*:\s*\{([\s\S]*?)\}/.exec(data.toString('utf8'))?.[1] || '';
-      if (paths.includes('apps/api-server')) throw new Error('Compiler alias references API application inputs');
-    }
-    digest.update(`${p}\0${stat.mode & 0o111}\0${data.length}\0`).update(data);
+    assertApplicationBoundary(p, data.toString('utf8'));
+    return { data, mode: stat.mode & 0o111 };
+}
+
+export function makePlan(root, tracked, runtime) {
+  if (!/^\d+\.\d+\.\d+(?:-[\w.-]+)?$/.test(runtime.pnpm || '')) throw new Error('Unknown package manager version');
+  const dirs = dependencyDirs(root);
+  const outputs = dirs.map(d => `${d}/dist`);
+  const inputs = [...new Set(tracked)].filter(isBuildInput).sort(comparePaths);
+  if (!inputs.includes('pnpm-lock.yaml') || !inputs.includes('package.json')) throw new Error('Missing build manifest inputs');
+  const digest = createHash('sha256').update(JSON.stringify({ version: VERSION, runtime, dirs }));
+  for (const p of inputs) {
+    const { data, mode } = readBuildInput(root, p, outputs);
+    digest.update(`${p}\0${mode}\0${data.length}\0`).update(data);
   }
   return { enabled: true, root, key: `${VERSION}-${digest.digest('hex')}`, dirs, outputs, receipt: RECEIPT };
 }
@@ -69,7 +83,7 @@ export function snapshot(root, outputs) {
     const absolute = path.join(root, rel);
     const stat = lstatSync(absolute);
     if (stat.isSymbolicLink()) throw new Error('Symlink in cached build output');
-    if (stat.isDirectory()) for (const name of readdirSync(absolute).sort()) walk(`${rel}/${name}`);
+    if (stat.isDirectory()) for (const name of readdirSync(absolute).sort(comparePaths)) walk(`${rel}/${name}`);
     else if (stat.isFile()) files.push({ path: rel, sha256: sha(readFileSync(absolute)) });
     else throw new Error('Unsupported cached build output');
   };
@@ -118,6 +132,7 @@ function output(name, value) {
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const root = process.cwd();
   const operation = process.argv[2];
+  const planFile = path.join(root, PLAN);
   if (operation === 'plan') {
     let plan;
     try {
@@ -127,12 +142,14 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
         ci: process.env.CI, github: process.env.GITHUB_ACTIONS, nodeEnv: process.env.NODE_ENV || '', cwd: root,
       });
     } catch { plan = { enabled: false }; }
+    mkdirSync(path.dirname(planFile), { recursive: true });
+    writeFileSync(planFile, JSON.stringify(plan));
     output('enabled', String(plan.enabled));
     output('key', plan.key || '');
     output('paths', plan.enabled ? [...plan.outputs, plan.receipt].join('\n') : '');
-    console.log(JSON.stringify(plan));
+    console.log(plan.enabled ? 'API dependency cache inputs fingerprinted' : 'API dependency cache bypassed; fresh build required');
   } else {
-    const plan = JSON.parse(readFileSync(process.argv[3], 'utf8'));
+    const plan = JSON.parse(readFileSync(planFile, 'utf8'));
     if (operation === 'verify') output('valid', String(verifyBuild(root, plan)));
     else if (operation === 'record') recordBuild(root, plan);
     else if (operation === 'clean' && process.env.GITHUB_ACTIONS === 'true') clearBuild(root, plan);
