@@ -15,7 +15,7 @@ import { apiV1Base } from '../../lib/serviceContext';
  *
  * `/start-pharmacy`(StoreGate 밖 — 매장이 아직 없는 사용자)와 내 매장 메뉴(`/store/pharmacy/membership`) 두 곳에서 연다.
  */
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { PLATFORM_ORIGIN, WORKSPACE_PATHS } from '../../config/workspace';
 import { useAuth } from '../../contexts/AuthContext';
@@ -50,6 +50,7 @@ export default function PharmacyMembershipPage() {
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [form, setForm] = useState<PharmacyMembershipInput>(EMPTY);
+  const documentInput = useRef<HTMLInputElement>(null);
   const [documentFile, setDocumentFile] = useState<File | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -181,7 +182,8 @@ export default function PharmacyMembershipPage() {
                 <label htmlFor="business-category">종목 (선택)</label>
                 <input id="business-category" value={form.businessCategory || ''} onChange={set('businessCategory')} disabled={busy} />
                 <label htmlFor="registration-document">사업자등록증 사본 (선택)</label>
-                <input id="registration-document" type="file" accept="application/pdf,image/jpeg,image/png" disabled={busy} onChange={(e) => setDocumentFile(e.target.files?.[0] || null)} />
+                <input ref={documentInput} id="registration-document" type="file" accept="application/pdf,image/jpeg,image/png" disabled={busy} onChange={(e) => setDocumentFile(e.target.files?.[0] || null)} />
+                {(documentFile || form.businessRegistrationDocumentId) && <button type="button" disabled={busy} onClick={() => { setDocumentFile(null); if (documentInput.current) documentInput.current.value = ''; setForm((f) => ({ ...f, businessRegistrationDocumentId: null })); }}>증빙 첨부 해제</button>}
                 <p>PDF, JPG, PNG · 최대 10MB. 약사면허증 파일은 받지 않습니다.{form.businessRegistrationDocumentId ? ' 기존 등록증을 재사용합니다.' : ''}</p>
                 <label htmlFor="pharmacy-address">등록증의 사업장 주소 (선택)</label>
                 <input id="pharmacy-address" type="text" value={form.address ?? ''} onChange={set('address')} disabled={busy} />

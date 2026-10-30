@@ -63,3 +63,11 @@ it('still prevents approval without the matching personal qualification', async 
   await expect(service.decide('operator', 'application', 'approve')).rejects.toMatchObject({ code: 'PHARMACIST_QUALIFICATION_REQUIRED' });
   expect(provisioner.activate).not.toHaveBeenCalled();
 });
+
+
+it('allows explicit evidence detachment without deleting the stored document', async () => {
+  await service.apply('user', { ...input, businessRegistrationDocumentId: null });
+  const write = query.mock.calls.find(([sql]) => sql.includes('UPDATE organizations SET metadata'))!;
+  expect(JSON.parse(write[1][1])).toHaveProperty('businessRegistrationDocumentId', null);
+  expect(query.mock.calls.some(([sql]) => sql.includes('kyc_documents'))).toBe(false);
+});

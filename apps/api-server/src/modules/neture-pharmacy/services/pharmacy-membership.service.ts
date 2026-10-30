@@ -34,7 +34,7 @@ export interface PharmacyApplicationInput {
   pharmacyName: string;
   businessNumber: string;
   pharmacistLicenseNumber: string;
-  businessRegistrationDocumentId?: string;
+  businessRegistrationDocumentId?: string | null;
   contactName?: string;
   managerPhone?: string;
   contactEmail?: string;
@@ -171,7 +171,7 @@ export class PharmacyMembershipService {
       const policies = await recordEnrollmentPolicies(m, userId, 'kpa-society', raw.policyReferences);
       const saveProfile = async (organizationId: string) => m.query(
         `UPDATE organizations SET metadata = COALESCE(metadata, '{}'::jsonb) || $3::jsonb || jsonb_build_object('businessProfile', COALESCE(metadata->'businessProfile', '{}'::jsonb) || $2::jsonb) WHERE id = $1`,
-        [organizationId, JSON.stringify({ applicationPolicies: policies, businessRegistrationDocumentId: input.businessRegistrationDocumentId,
+        [organizationId, JSON.stringify({ applicationPolicies: policies, businessRegistrationDocumentId: raw.businessRegistrationDocumentId !== undefined ? (input.businessRegistrationDocumentId ?? null) : undefined,
           businessName: input.pharmacyName, businessNumber: input.businessNumber, representativeName: input.representativeName,
           businessType: input.businessType, businessCategory: input.businessCategory, address: input.address }),
           JSON.stringify({ contactName: input.contactName, managerPhone: input.managerPhone, contactEmail: input.contactEmail, taxInvoiceEmail: input.taxInvoiceEmail })],
