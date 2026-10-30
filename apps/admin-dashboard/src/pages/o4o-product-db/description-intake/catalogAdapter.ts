@@ -22,12 +22,12 @@ export function readPublicDescriptionCatalog(raw: unknown, descriptionType: Desc
     const official = record(d.official_identifiers);
     entries.push({ key: str(d.description_key), name: str(d.name), manufacturer: str(d.manufacturer) || null, category: str(d.category) || null,
       content, descriptionType, language, barcodes: Array.isArray(d.verified_barcodes) ? d.verified_barcodes.map(str) : [],
-      aiSections: Array.isArray(d.aiSections) ? d.aiSections.map(raw => {
+      ...(Array.isArray(d.aiSections) ? { aiSections: d.aiSections.map(raw => {
         const section = record(raw), kind = str(section.kind);
         if (!['product-fact','professional-reference','counseling-support','unclassified'].includes(kind)) throw new Error('AI 항목의 정보 구분을 확인해 주세요.');
         return { key: str(section.key), title: str(section.title), kind: kind as NonNullable<DescriptionEntry['aiSections']>[number]['kind'],
           text: str(section.text), referenceUrls: Array.isArray(section.referenceUrls) ? section.referenceUrls.map(str) : [] };
-      }) : sectionNames.map(key => ({ key: key.slice(0, 100), title: key.slice(0, 300), kind: 'unclassified', text: str(sections[key]), referenceUrls: references.map(r => r.url) })),
+      }) } : {}),
       identifiers: { ...(str(official.mfds_item_seq) ? { mfdsItemSeq: str(official.mfds_item_seq) } : {}), ...(str(official.statement_no) ? { statementNo: str(official.statement_no) } : {}) },
       source: { kind: references.every(r => { try { return new URL(r.url).hostname.endsWith('.go.kr'); } catch { return false; } }) ? 'government' : 'manufacturer',
         currentness: archived ? 'archived' : 'retrieved', checkedOn: archived ? null : str(root.generated_on) || null, references } });
