@@ -12,30 +12,30 @@ const url = process.env.PARTNER_TEST_DATABASE_URL;
     let db: DataSource, app: express.Express, boards: any[];
     const schema = `partner_community_it_${randomUUID().replaceAll("-", "")}`;
     const actors = new Set<string>();
-    const call = (user?: string) => ({
+    const call = (user?: string, authMethod = "google") => ({
       get: (path: string) =>
         request(app)
           .get("/community" + path)
-          .set("x-test-user", user ?? ""),
+          .set("x-test-user", user ?? "").set("x-test-method",authMethod),
       post: (path: string, body: unknown) =>
         request(app)
           .post("/community" + path)
-          .set("x-test-user", user ?? "")
+          .set("x-test-user", user ?? "").set("x-test-method",authMethod)
           .send(body),
       put: (path: string, body: unknown) =>
         request(app)
           .put("/community" + path)
-          .set("x-test-user", user ?? "")
+          .set("x-test-user", user ?? "").set("x-test-method",authMethod)
           .send(body),
       patch: (path: string, body: unknown) =>
         request(app)
           .patch("/community" + path)
-          .set("x-test-user", user ?? "")
+          .set("x-test-user", user ?? "").set("x-test-method",authMethod)
           .send(body),
       delete: (path: string, body: unknown) =>
         request(app)
           .delete("/community" + path)
-          .set("x-test-user", user ?? "")
+          .set("x-test-user", user ?? "").set("x-test-method",authMethod)
           .send(body),
     });
     const account = async (member = false, operator = false) => {
@@ -73,8 +73,7 @@ const url = process.env.PARTNER_TEST_DATABASE_URL;
       const target = new URL(url!);
       if (
         !["127.0.0.1", "localhost"].includes(target.hostname) ||
-        target.port !== "55439" ||
-        target.pathname !== "/partner_test"
+        !((target.port === "55439" && target.pathname === "/partner_test") || (target.port === "55432" && target.pathname === "/o4o_unified_partner_fixture"))
       )
         throw new Error("Disposable local Partner database only");
       db = new DataSource({
@@ -93,7 +92,7 @@ const url = process.env.PARTNER_TEST_DATABASE_URL;
         `CREATE TABLE service_memberships(id uuid PRIMARY KEY DEFAULT gen_random_uuid(),user_id uuid REFERENCES users(id),service_key text,status text,role text DEFAULT 'member',created_at timestamptz DEFAULT now(),updated_at timestamptz DEFAULT now(),UNIQUE(user_id,service_key))`,
       );
       await db.query(
-        `CREATE TABLE role_assignments(user_id uuid REFERENCES users(id),role text,is_active boolean DEFAULT true,valid_from timestamptz DEFAULT now(),valid_until timestamptz)`,
+        `CREATE TABLE role_assignments(id uuid PRIMARY KEY DEFAULT gen_random_uuid(),scope_type text DEFAULT 'global',scope_id uuid,user_id uuid REFERENCES users(id),role text,is_active boolean DEFAULT true,valid_from timestamptz DEFAULT now(),valid_until timestamptz)`,
       );
       await db.query(
         `CREATE TABLE platform_services(code text UNIQUE,name text,entry_url text,service_type text,approval_required boolean,status text)`,
@@ -121,6 +120,7 @@ const url = process.env.PARTNER_TEST_DATABASE_URL;
       } finally {
         await q.release();
       }
+      await db.query(`CREATE TABLE central_operation_menu_grants(assignment_id uuid REFERENCES role_assignments(id),menu_keys text[])`);
       boards = await db.query("SELECT * FROM partner_community_boards");
       app = express();
       app.use(
@@ -131,7 +131,7 @@ const url = process.env.PARTNER_TEST_DATABASE_URL;
             res.status(401).json({ success: false, code: "UNAUTHENTICATED" });
             return;
           }
-          Object.assign(req, { user: { id } });
+          Object.assign(req, { user: { id }, authMethod: req.get("x-test-method") || "google" });
           next();
         }),
       );
@@ -141,6 +141,18 @@ const url = process.env.PARTNER_TEST_DATABASE_URL;
         await db.query(`DROP SCHEMA "${schema}" CASCADE`);
         await db.destroy();
       }
+    });
+    it('limits central duties on both the overview and original API, requires Google, and honors revocation', async () => {
+      const op=await account(true,true);
+      await db.query("UPDATE role_assignments SET scope_type='o4o-direct' WHERE user_id=$1",[op]);
+      await db.query("INSERT INTO central_operation_menu_grants SELECT id,ARRAY['partner-support.reports'] FROM role_assignments WHERE user_id=$1",[op]);
+      const overview=await call(op).get('/operator');
+      expect(overview.status).toBe(200);
+      expect(overview.body.data).toMatchObject({availableAreas:['reports'],members:[],posts:[],boards:[],events:[]});
+      expect((await call(op,'password').get('/operator')).status).toBe(403);
+      expect((await call(op).post('/operator/boards',{name:'Forbidden board',slug:'forbidden'})).status).toBe(403);
+      await db.query("UPDATE central_operation_menu_grants SET menu_keys='{}'");
+      expect((await call(op).get('/operator')).status).toBe(403);
     });
     it("distinguishes service Admin from Operator using current membership and role validity", async () => {
       const user = await account(true, true);

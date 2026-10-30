@@ -130,10 +130,11 @@ export interface NodeCapabilities {
   localData: boolean;
   ownerScopedLedger: boolean;
   taskUnit: boolean;
+  pharmacyData?: boolean;
 }
 
 /** 실행에 필요한 capability. 'any' = 노드면 된다(상태 · 시스템 정보 등). */
-export type NodeNeed = 'any' | 'browser' | 'windows_uia' | 'local_data';
+export type NodeNeed = 'any' | 'browser' | 'windows_uia' | 'local_data' | 'pharmacy_data';
 
 /** 왜 이 노드를 골랐는가 — 로그 · 테스트용(사용자에게 노드 선택을 묻지 않는다). */
 export type NodeSelectionReason = 'only_online' | 'preferred' | 'capable' | 'capability_unknown' | 'most_recent';
@@ -431,6 +432,7 @@ export function parseHeartbeatReport(body: unknown): HeartbeatReport | null {
   const keys = ['browser', 'windowsUia', 'localData', 'ownerScopedLedger'] as const;
   if (!keys.every((k) => typeof c[k] === 'boolean')) return null;
   if (c.taskUnit !== undefined && typeof c.taskUnit !== 'boolean') return null;
+  if (c.pharmacyData !== undefined && typeof c.pharmacyData !== 'boolean') return null;
   return {
     agentVersion: b.agentVersion,
     capabilities: {
@@ -439,6 +441,7 @@ export function parseHeartbeatReport(body: unknown): HeartbeatReport | null {
       localData: c.localData as boolean,
       ownerScopedLedger: c.ownerScopedLedger as boolean,
       taskUnit: c.taskUnit === true,
+      pharmacyData: c.pharmacyData === true,
     },
   };
 }
@@ -476,6 +479,7 @@ function mapCapabilities(v: unknown): NodeCapabilities | null {
     localData: o.localData === true,
     ownerScopedLedger: o.ownerScopedLedger === true,
     taskUnit: o.taskUnit === true,
+    pharmacyData: o.pharmacyData === true,
   };
 }
 
@@ -504,6 +508,7 @@ export function nodeSatisfies(device: DeviceRow, need: NodeNeed): boolean | null
   if (!c) return null;
   if (need === 'browser') return c.browser;
   if (need === 'windows_uia') return c.windowsUia;
+  if (need === 'pharmacy_data') return c.pharmacyData === true;
   return c.localData;
 }
 
@@ -682,6 +687,11 @@ export async function claimPendingCommands(
   deviceId: string,
   limit = 5,
 ): Promise<LocalCommand[]> {
+  // Discard orphaned business transfer payloads after their command TTL as well.
+  // An interrupted HTTP waiter must not turn the transient transport into a mirror.
+  await dataSource.query(`UPDATE local_agent_commands SET result_data=NULL
+    WHERE device_id=$1 AND action IN ($2,$3) AND expires_at<=now() AND result_data IS NOT NULL`,
+    [deviceId,LOCAL_AGENT_ACTIONS.DATA_PHARMACY_READ,LOCAL_AGENT_ACTIONS.DATA_PHARMACY_WRITE]);
   // COMPUTER-USE-V0: 발행 시 result_data 에 실린 args 를 **집어가는 같은 문장에서 지운다**.
   // RETURNING 은 FROM 목록의 p.args(갱신 전 값)를 돌려주므로 agent 는 인자를 받고 DB 에는 남지 않는다.
   const rows = returnedRows(

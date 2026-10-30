@@ -133,6 +133,10 @@ export function makeDb() {
     }
 
     // ── commands
+    if(s.startsWith('UPDATE local_agent_commands SET result_data=NULL') && s.includes('device_id=$1')) {
+      for(const command of commands)if(command.device_id===params[0] && params.slice(1).includes(command.action) && new Date(command.expires_at).getTime()<=Date.now())command.result_data=null;
+      return [];
+    }
     if (s.startsWith('INSERT INTO local_agent_commands')) {
       commands.push({
         command_id: params[0],

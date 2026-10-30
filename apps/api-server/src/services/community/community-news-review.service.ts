@@ -49,7 +49,7 @@ export async function getNewsReview(
   actor: string,
   now = new Date(),
 ) {
-  await requireCommunityManager(db, actor);
+  await requireCommunityManager(db, actor, false, 'editorial');
   return read(db, newsDay(now));
 }
 async function candidates(db: Query): Promise<NewsCandidate[]> {
@@ -103,7 +103,7 @@ export function reviewNews(
     db,
     actor,
     (items) => generate(items, actor),
-    (m) => requireCommunityManager(m, actor),
+    (m) => requireCommunityManager(m, actor, false, 'editorial'),
     now,
   );
 }

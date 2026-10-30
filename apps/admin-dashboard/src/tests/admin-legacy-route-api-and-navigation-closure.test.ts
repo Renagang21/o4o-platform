@@ -36,15 +36,16 @@ const ROUTE_FILES = [
   'appearance', 'apps', 'content', 'dashboard', 'lms-marketing',
   'o4o-product-db', 'platform', 'public', 'test', 'users',
 ];
-const ALL_ROUTES = ROUTE_FILES.map((f) => stripAllComments(read(`routes/${f}.routes.tsx`))).join('\n');
+const ROUTE_SOURCES=[...ROUTE_FILES.map(f=>`routes/${f}.routes.tsx`),'App.tsx'];
+const ALL_ROUTES = ROUTE_SOURCES.map(file=>stripAllComments(read(file))).join('\n');
 
 /**
  * route path 목록. 절대 path(`path="/…"`) 에 더해, 부모 `<Route path="/x">` 아래
  * 상대 child(`path="y"`) 는 `/x/y` 로 펼친다 (o4o-product-db.routes 가 이 형태).
  */
 const ROUTE_PATHS: string[] = [];
-for (const file of ROUTE_FILES) {
-  const src = stripAllComments(read(`routes/${file}.routes.tsx`));
+for (const file of ROUTE_SOURCES) {
+  const src = stripAllComments(read(file));
   const parents: string[] = [];
   const tag = /<Route\b([^>]*?)(\/?)>|<\/Route>/g;
   let m: RegExpExecArray | null;
@@ -54,7 +55,8 @@ for (const file of ROUTE_FILES) {
     const p = pathMatch?.[1];
     const parent = parents[parents.length - 1] ?? '';
     const abs = p === undefined ? undefined : p.startsWith('/') ? p : `${parent}/${p}`;
-    if (abs) ROUTE_PATHS.push(abs);
+    // App's layout and 404 catch-alls do not prove that a retired leaf exists.
+    if (abs && !(file === 'App.tsx' && p?.includes('*'))) ROUTE_PATHS.push(abs);
     if (m[2] !== '/') parents.push(abs ?? parent);
   }
 }

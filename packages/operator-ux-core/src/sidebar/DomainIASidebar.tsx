@@ -213,6 +213,31 @@ export function DomainIASidebar({
     });
   };
 
+  const domainPaths = resolvedDomains.map(domain => `${domain.key}:${domain.groups.flatMap(group => group.items.map(item => item.path)).join(',')}`).join('|');
+  const [openDomains, setOpenDomains] = useState<Set<string>>(() => new Set(
+    resolvedDomains.filter(domain => domain.groups.some(isGroupActive)).map(domain => domain.key),
+  ));
+  useEffect(() => {
+    if (!domainIAConfig.collapsibleDomains) return;
+    const active = resolvedDomains.filter(domain => domain.groups.some(isGroupActive));
+    setOpenDomains(previous => {
+      if (active.every(domain => previous.has(domain.key))) return previous;
+      return new Set([...previous, ...active.map(domain => domain.key)]);
+    });
+    setOpenGroups(previous => {
+      const groups = active.flatMap(domain => domain.groups.filter(isGroupActive).map(group => group.id));
+      if (groups.every(key => previous.has(key))) return previous;
+      return new Set([...previous, ...groups]);
+    });
+    // Open the destination on navigation; a manual collapse must remain possible on the current route.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pathname, domainPaths, domainIAConfig.collapsibleDomains]);
+  const toggleDomain = (key: string) => setOpenDomains(previous => {
+    const next = new Set(previous);
+    if (next.has(key)) next.delete(key); else next.add(key);
+    return next;
+  });
+
   // ── Mobile drawer open state ──
   // WO-O4O-OPERATOR-MOBILE-NAV-DRAWER-V1: 모바일 가로 스크롤 탭 → 햄버거 drawer.
   // WO-O4O-RESPONSIVE-SIDEBAR-OPERATOR-ADMIN-LG-STANDARDIZATION-V1: breakpoint md→lg + ESC close.
@@ -306,6 +331,14 @@ export function DomainIASidebar({
 
       {resolvedDomains.map((domain, domainIdx) => (
         <div key={domain.key}>
+          {domainIAConfig.collapsibleDomains ? (
+            <button type="button" aria-expanded={openDomains.has(domain.key)}
+              onClick={() => toggleDomain(domain.key)}
+              className={`flex w-full items-center justify-between gap-3 border-t px-4 py-3 text-left text-sm font-semibold ${domain.groups.some(isGroupActive) ? 'bg-blue-50 text-blue-800' : 'bg-slate-50 text-slate-700 hover:bg-slate-100'}`}>
+              <span>{domain.label}</span>
+              <ChevronDown aria-hidden className={`h-4 w-4 shrink-0 transition-transform ${openDomains.has(domain.key) ? 'rotate-180' : ''}`} />
+            </button>
+          ) : <>
           {/* Domain heading — top-pinned 존재 여부와 관계 없이 첫 도메인부터 separator */}
           <div
             className={`px-4 py-2 ${
@@ -330,8 +363,10 @@ export function DomainIASidebar({
             </div>
           </div>
 
+          </>}
+
           {/* Groups inside domain */}
-          {domain.groups.map((group) => {
+          {(!domainIAConfig.collapsibleDomains || openDomains.has(domain.key)) && domain.groups.map((group) => {
             const Icon = group.icon;
             const active = isGroupActive(group);
             const isOpen = openGroups.has(group.id);

@@ -1159,6 +1159,7 @@ describe('11차 P2-33 운영자 검토 화면 — 읽기 전용 · enrollment 0'
 describe('11차 P2-33 운영자 검토 권한 — role 만으로는 열리지 않는다', () => {
   const guard = async (opts: any) => {
     const req = makeReq(opts);
+    req.originalUrl='/api/v1/lms/operator/courses';req.method='GET';
     const res = makeRes();
     let passed = false;
     await requireLectureOperator(req, res, (() => { passed = true; }) as any);
@@ -1307,7 +1308,7 @@ describe('정적 계약', () => {
     const page = read('services/web-lecture/src/pages/instructor/InstructorCourseEditPage.tsx');
     expect(page).not.toContain('q.questions.map(({ id: _id, ...rest }) => rest)');
     expect(page).toContain('setQuestions(q.questions.map((qq) => ({ ...qq })));');
-    const api = read('services/web-lecture/src/api/lecture.ts');
+    const api = read('packages/operator-core-ui/src/modules/lecture-operations/types.ts');
     // 새 문항은 id 없이(서버 발급), 기존 문항은 id 를 실어 보낼 수 있어야 한다
     expect(api).toMatch(/export interface QuizQuestionDraft \{[\s\S]*?id\?: string;/);
   });
@@ -1349,18 +1350,18 @@ describe('정적 계약', () => {
   it('11차 P2-33: 운영자 검토 route 는 requireLectureOperator 를 거치고, 운영 목록은 검토 화면으로 연결된다', () => {
     const r = read('apps/api-server/src/modules/lms/routes/lms.routes.ts');
     expect(r).toContain("router.get('/operator/courses/:courseId/review', ipBurstLimiter, requireAuth, apiLimiter, requireLectureOperator, asyncHandler(CourseController.operatorCourseReview))");
-    const page = read('services/web-lecture/src/pages/operator/OperatorCoursesPage.tsx');
+    const page = read('packages/operator-core-ui/src/modules/lecture-operations/OperatorCoursesPage.tsx');
     expect(page).toContain('to={`/operator/courses/${c.id}/review`}');
     expect(page).not.toContain('coursePath(c.id)');   // learner 경로로 보내지 않는다
     const app = read('services/web-lecture/src/App.tsx');
     expect(app).toContain('path="/operator/courses/:courseId/review"');
     // 검토 화면은 편집 진입점을 두지 않는다
-    const review = read('services/web-lecture/src/pages/operator/OperatorCourseReviewPage.tsx');
+    const review = read('packages/operator-core-ui/src/modules/lecture-operations/OperatorCourseReviewPage.tsx');
     expect(review).not.toContain('instructorApi');
     expect(review).not.toContain('/instructor/courses/');
   });
   it('13차 P2: 운영자 검토 화면은 영상·첨부를 실제로 열람할 수 있게 렌더한다 (문항·정답은 아님)', () => {
-    const page = read('services/web-lecture/src/pages/operator/OperatorCourseReviewPage.tsx');
+    const page = read('packages/operator-core-ui/src/modules/lecture-operations/OperatorCourseReviewPage.tsx');
     expect(page).toContain('<video');                       // 영상 재생
     expect(page).toContain('영상 원본 열기');
     expect(page).toContain('l.attachments.map');            // 첨부 링크

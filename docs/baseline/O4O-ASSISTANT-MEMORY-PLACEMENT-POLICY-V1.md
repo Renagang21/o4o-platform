@@ -110,7 +110,7 @@
 | 서비스 회원 탈퇴(`withdrawMembership`) | membership withdrawn · users 유지 | 사용자 기억은 사용자에 귀속 — 서비스 탈퇴만으로는 지우지 않는다(사용자가 남아 있으므로) |
 | 조직 구성원 이탈 | `organization_members.left_at` (member 는 행 삭제) | 원칙 3 과 일치 — 조직 기억 유지 |
 | 매장 경영자 해지 | case flow → 종료 +7일 purge · 조직 익명화 | 조직 소유 Assistant 기억은 **purge 대상 목록에 들어가야 한다**(구현 범위 §9) |
-| Local `local.db` | 보존 · 삭제 없음 · `goal_summary` 원문 무기한 | M10 축소 · 노드 보존 규칙은 구현 범위(§9) |
+| Local `local.db` | 기존 버전의 `goal_summary`는 v9 migration에서 비우고 신규 원문 요약을 저장하지 않는다. 같은 프로세스 재생 입력은 한정된 메모리에서만 유지하며 종료·재시작 시 재생 대신 탐색으로 돌아간다. 이전 백업은 기존 복구/보존 규칙을 따른다 | [Main 리팩터링 TODO](../work-orders/TODO-O4O-MAIN-AUTOMATION-EVOLUTION-V1.md)의 branch 구현·검증과 운영 적용을 구분 |
 
 ---
 

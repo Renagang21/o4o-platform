@@ -1,3 +1,4 @@
+export type { RegulatedCategory, RegulatedCategoryStatus, SupplierRegulatedCategory } from '@o4o/operator-core-ui/modules/supplier-operations';
 import type { ContactVisibility } from '../neture.js';
 
 // ==================== Supplier Profile Types ====================
@@ -98,39 +99,3 @@ export interface SupplierOrderCondition {
 
 // ==================== Supplier Regulated Category API ====================
 // WO-O4O-SUPPLIER-REGULATED-CATEGORY-DOCUMENTS-V1
-
-export type RegulatedCategory =
-  | 'general'
-  | 'pharmaceutical'
-  | 'quasi_drug'
-  | 'medical_device'
-  | 'health_functional_food'
-  | 'food'
-  | 'cosmetics'
-  | 'other_regulated';
-
-export type RegulatedCategoryStatus =
-  | 'not_requested'
-  | 'submitted'
-  | 'approved'
-  | 'rejected'
-  | 'needs_update'
-  | 'suspended';
-
-export interface SupplierRegulatedCategory {
-  id: string;
-  category: RegulatedCategory;
-  status: RegulatedCategoryStatus;
-  registrationNumber: string | null;
-  reviewNote: string | null;
-  reviewedAt: string | null;
-  createdAt: string;
-  updatedAt: string;
-  evidenceDocument: {
-    id: string;
-    fileName: string;
-    fileSize: number | null;
-    mimeType: string | null;
-    createdAt: string;
-  } | null;
-}

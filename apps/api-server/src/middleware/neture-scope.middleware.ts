@@ -1,3 +1,4 @@
+import { withCentralOperationMenus } from './central-operation-menu.middleware.js';
 /**
  * Neture Service Scope Guard Middleware
  *
@@ -10,7 +11,7 @@ import { NETURE_SCOPE_CONFIG } from '@o4o/security-core';
 import { PHARMACY_COLLABORATOR_ROLES } from '@o4o/types';
 import { createMembershipScopeGuard } from '../common/middleware/membership-guard.middleware.js';
 
-export const requireNetureScope = createMembershipScopeGuard(NETURE_SCOPE_CONFIG);
+export const requireNetureScope = withCentralOperationMenus('neture', createMembershipScopeGuard(NETURE_SCOPE_CONFIG));
 
 /** Only business routes opt into these roles; Neture-wide guards stay unchanged. */
 export const requireNetureBusinessScope = createMembershipScopeGuard({

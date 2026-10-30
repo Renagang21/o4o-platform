@@ -136,6 +136,7 @@ export function describeExecutionIntent(intent: ExecutionIntent): string {
   const u = intent.understanding;
   const lines = [
     '## 실행 지시 (Assistant · 구조)',
+    intent.sharedCandidates?.length ? '다른 사용자에서 검증된 동작 순서 추천(현재 화면으로 검증, 강제·재생 권한 아님): '+JSON.stringify(intent.sharedCandidates) : '',
     `- 시작: ${start}`,
     intent.taskTypeHint ? `- 이어가는 업무 키: ${intent.taskTypeHint} (같은 업무면 이 키를 task 로 쓴다 — 절차를 고정하는 키가 아니다)` : '',
     `- 근거: ${own?.available ? '이 사용자의 확인된 방법이 있으면 먼저 쓰되 현재 화면으로 다시 확인한다' : '이 사용자의 확인된 방법 없음'}${shared?.available ? ' · 다른 사용자 후보는 참고만(강제 아님)' : ''}`,

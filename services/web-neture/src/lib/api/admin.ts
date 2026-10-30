@@ -1,20 +1,21 @@
+import { createAdminServiceApprovalApi } from '@o4o/operator-core-ui/modules/neture-product-operations';
+import { createNetureServiceApi } from '@o4o/operator-core-ui/modules/neture-service-operations';
+import { createSupplierOperatorApi } from '@o4o/operator-core-ui/modules/supplier-operations';
+import { api } from './client.js';
+import {createAdminSettlementApi} from '@o4o/operator-core-ui/modules/neture-service-operations';
+import { PROFILE_FIELD_LABELS } from '@o4o/operator-core-ui/modules/supplier-operations';
+
+export type { AdminSupplier, SupplierApproveResult, SupplierGovernanceResult, GovernanceSupplier, SupplierListSummary, SupplierPagedResult, SupplierBatchResultItem } from '@o4o/operator-core-ui/modules/supplier-operations';
+
+export { PROFILE_FIELD_LABELS };
 /**
  * Admin APIs - Operator, Supplier, Product, Master, Service Approval, Registration, Settlement
  *
  * WO-O4O-AUTH-AUTO-REFRESH-IMPLEMENTATION-V1: authClient.api 기반 자동 갱신
  */
-import { api } from './client.js';
-import type {
-  SettlementStatus,
-  SettlementsResponse,
-  SettlementDetail,
-  AdminSettlementKpi,
-} from './store.js';
-import type {
-  SupplierRegulatedCategory,
-  RegulatedCategory,
-  RegulatedCategoryStatus,
-} from './supplier.js';
+
+
+
 
 // WO-O4O-NETURE-LEGACY-ADMIN-OPERATOR-API-RETIREMENT-V1:
 //   Neture 전용 운영자 관리 API(`adminOperatorApi` 4개 함수 · `NetureOperatorInfo` ·
@@ -24,187 +25,27 @@ import type {
 
 // ==================== Admin Supplier ====================
 
-export interface AdminSupplier {
-  id: string;
-  name: string;
-  representativeName: string;
-  status: string;
-  email: string;
-  businessNumber?: string;
-  taxInvoiceEmail?: string;
-  businessRegistrationDocumentId?: string | null;
-  settlementBankName?: string | null;
-  settlementAccountNumberMasked?: string | null;
-  settlementAccountHolder?: string | null;
-  settlementBankbookDocumentId?: string | null;
-  settlementContactName?: string | null;
-  settlementContactEmail?: string | null;
-  mailOrderSalesStatus?: string | null;
-  mailOrderSalesRegistrationNumber?: string | null;
-  mailOrderSalesDocumentId?: string | null;
-  createdAt: string;
-  // WO-O4O-NETURE-OPERATOR-MEMBER-SUPPLIER-STATUS-VISIBILITY-V1:
-  // backend(getAllSuppliers)는 userId 를 내려주나 타입에 누락돼 있던 것을 명시 (회원 목록 매핑용).
-  userId?: string;
-  // WO-O4O-NETURE-SUPPLIER-APPROVAL-AND-PROFILE-COMPLETION-SEPARATION-V1:
-  // 프로필 완성 상태의 단일 권위 — backend(getMissingProfileFields) 산출. 승인 게이트 아님. 프론트 재계산 금지.
-  managerName?: string | null;
-  managerPhone?: string | null;
-  profileComplete?: boolean;
-  missingProfileFields?: string[];
-  /** @deprecated profileComplete 사용 */
-  activationReady?: boolean;
-  /** @deprecated missingProfileFields 사용 */
-  missingActivationFields?: string[];
-}
+
 
 // WO-O4O-NETURE-SUPPLIER-APPROVAL-AND-PROFILE-COMPLETION-SEPARATION-V1:
 // 프로필 필드 코드 → 한글 라벨 (운영자/공급자 화면 공용 — 승인 차단이 아닌 보완 안내용)
-export const PROFILE_FIELD_LABELS: Record<string, string> = {
-  representativeName: '대표자명',
-  managerName: '담당자명',
-  managerPhone: '담당자 연락처',
-};
+
 /** @deprecated PROFILE_FIELD_LABELS 사용 */
 export const ACTIVATION_FIELD_LABELS = PROFILE_FIELD_LABELS;
 
-export interface SupplierApproveResult {
-  success: boolean;
-  code?: string;
-  missingFields?: string[];
-}
+
 
 // WO-O4O-NETURE-SUPPLIER-APPROVAL-CONSOLE-AND-ADMIN-GOVERNANCE-SEPARATION-V1 §6/§7:
 // 상태 관리(비활성화/재활성화) 결과. 409(SUPPLIER_DEACTIVATION_BLOCKED) 시 차단 건수를 함께 전달.
-export interface SupplierGovernanceResult {
-  success: boolean;
-  code?: string;
-  message?: string;
-  blocked?: {
-    activeOrderCount: number;
-    unsettledCount: number;
-    settlementInProgressCount: number;
-  };
-}
+
 
 // §5: 상태 관리 목록 행 (ACTIVE/INACTIVE 전용).
-export interface GovernanceSupplier {
-  id: string;
-  name: string;
-  status: string;
-  lastStatusChangedAt: string | null;
-  lastChangedBy: string | null;
-  lastChangeReason: string | null;
-  activeOrderCount: number;
-  unsettledCount: number;
-  hasActiveOrders: boolean;
-  hasUnsettled: boolean;
-  createdAt: string;
-}
+
 
 // WO-O4O-FINAL-CODE-ONLY-RETIREMENT-CLOSURE-V1 §8:
 // admin 전용 승인 API(adminSupplierApi.getPendingSuppliers/approveSupplier/rejectSupplier, adminProductApi)는 은퇴했다.
 // canonical 승인 client 는 operatorSupplierApi / operatorProductApi 이다.
-export const adminSupplierApi = {
-  async getSuppliers(status?: string): Promise<AdminSupplier[]> {
-    try {
-      const qs = status ? `?status=${status}` : '';
-      const response = await api.get(`/neture/admin/suppliers${qs}`);
-      return response.data.data || [];
-    } catch (error: any) {
-      if (error?.response?.status === 403) throw new Error('접근 권한이 없습니다');
-      console.warn('[Admin API] Failed to fetch suppliers:', error);
-      return [];
-    }
-  },
 
-  // §5: 상태 관리(governance) 목록 — ACTIVE/INACTIVE + 최근 변경/주문·정산 지표.
-  async getGovernanceSuppliers(): Promise<GovernanceSupplier[]> {
-    try {
-      const response = await api.get('/neture/admin/suppliers/governance');
-      if (!Array.isArray(response.data.data)) throw new Error('Invalid governance list');
-      return response.data.data;
-    } catch (error: any) {
-      if (error?.response?.status === 403) throw new Error('접근 권한이 없습니다');
-      throw new Error('공급자 상태 목록을 불러오지 못했습니다. 다시 시도해 주세요.');
-    }
-  },
-
-  // §6: 사유 필수. 진행 주문·미정산·정산 진행 시 backend 가 409 로 차단(강제 override 없음).
-  async deactivateSupplier(id: string, reason: string): Promise<SupplierGovernanceResult> {
-    try {
-      await api.post(`/neture/admin/suppliers/${id}/deactivate`, { reason });
-      return { success: true };
-    } catch (error: any) {
-      const err = error?.response?.data?.error;
-      if (error?.response?.status === 409 && err?.code === 'SUPPLIER_DEACTIVATION_BLOCKED') {
-        return {
-          success: false,
-          code: err.code,
-          message: err.message,
-          blocked: {
-            activeOrderCount: err.activeOrderCount ?? 0,
-            unsettledCount: err.unsettledCount ?? 0,
-            settlementInProgressCount: err.settlementInProgressCount ?? 0,
-          },
-        };
-      }
-      return { success: false, code: err?.code, message: err?.message };
-    }
-  },
-
-  // §7: 재활성화(INACTIVE → ACTIVE). 사유 필수. 접근 상태만 복구.
-  async reactivateSupplier(id: string, reason: string): Promise<SupplierGovernanceResult> {
-    try {
-      await api.post(`/neture/admin/suppliers/${id}/reactivate`, { reason });
-      return { success: true };
-    } catch (error: any) {
-      const err = error?.response?.data?.error;
-      return { success: false, code: err?.code, message: err?.message };
-    }
-  },
-
-  async downloadDocument(id: string, documentType: 'business_registration' | 'bank_statement' | 'mail_order_report'): Promise<Blob | null> {
-    try {
-      const response = await api.get(`/neture/admin/suppliers/${id}/documents/${documentType}/download`, {
-        responseType: 'blob',
-      });
-      return response.data as Blob;
-    } catch {
-      return null;
-    }
-  },
-
-  // WO-O4O-SUPPLIER-REGULATED-CATEGORY-DOCUMENTS-V1
-  async listRegulatedCategories(id: string): Promise<SupplierRegulatedCategory[]> {
-    const response = await api.get(`/neture/admin/suppliers/${id}/regulated-categories`);
-    return response.data?.data ?? [];
-  },
-
-  async reviewRegulatedCategory(
-    id: string,
-    category: RegulatedCategory,
-    body: { status: RegulatedCategoryStatus; reviewNote?: string },
-  ): Promise<{ success: boolean; error?: string }> {
-    try {
-      const response = await api.patch(`/neture/admin/suppliers/${id}/regulated-categories/${category}`, body);
-      return response.data;
-    } catch (error: any) {
-      return { success: false, error: error?.response?.data?.error?.code || 'REVIEW_FAILED' };
-    }
-  },
-
-  async downloadRegulatedEvidence(id: string, category: RegulatedCategory): Promise<Blob | null> {
-    try {
-      const response = await api.get(`/neture/admin/suppliers/${id}/regulated-categories/${category}/document/download`, {
-        responseType: 'blob',
-      });
-      return response.data as Blob;
-    } catch {
-      return null;
-    }
-  },
-};
 
 // ==================== Operator Supplier ====================
 // WO-O4O-NETURE-SUPPLIER-ACTIVATION-VISIBILITY-AND-ACTION-QUEUE-FIX-V1
@@ -214,272 +55,21 @@ export const adminSupplierApi = {
 
 // WO-O4O-NETURE-OPERATOR-SUPPLIER-APPROVAL-STANDARD-LIST-AND-MEMBER-IA-V1
 // O4O 표준 리스트(paged) + 일괄 처리(batch) 응답 계약.
-export interface SupplierListSummary {
-  total: number;
-  pending: number;
-  active: number;
-  rejected: number;
-  inactive: number;
-}
 
-export interface SupplierPagedResult {
-  items: AdminSupplier[];
-  pagination: {
-    page: number;
-    limit: number;
-    total: number;
-    totalPages: number;
-    hasNextPage: boolean;
-    hasPreviousPage: boolean;
-  };
-  summary: SupplierListSummary;
-}
 
-export interface SupplierBatchResultItem {
-  id: string;
-  status: 'success' | 'failed';
-  error?: string;
-}
 
-export const operatorSupplierApi = {
-  async getSuppliers(status?: string): Promise<AdminSupplier[]> {
-    try {
-      const qs = status ? `?status=${status}` : '';
-      const response = await api.get(`/neture/operator/suppliers${qs}`);
-      return response.data.data || [];
-    } catch (error: any) {
-      if (error?.response?.status === 403) throw new Error('접근 권한이 없습니다');
-      console.warn('[Operator API] Failed to fetch suppliers:', error);
-      throw error;
-    }
-  },
 
-  // O4O 표준 리스트용 paged 조회. 조회 실패는 빈 배열로 은폐하지 않고 throw 하여
-  // useStandardListQuery.error 로 전달한다(WO 8.3).
-  async getSuppliersPaged(params: {
-    page?: number;
-    limit?: number;
-    search?: string;
-    status?: string;
-    sortBy?: string;
-    sortOrder?: string;
-  }): Promise<SupplierPagedResult> {
-    const sp = new URLSearchParams();
-    if (params.page) sp.append('page', String(params.page));
-    if (params.limit) sp.append('limit', String(params.limit));
-    if (params.search) sp.append('search', params.search);
-    if (params.status && params.status !== 'all') sp.append('status', params.status);
-    if (params.sortBy) sp.append('sortBy', params.sortBy);
-    if (params.sortOrder) sp.append('sortOrder', params.sortOrder);
-    const qs = sp.toString();
-    const response = await api.get(`/neture/operator/suppliers/list${qs ? `?${qs}` : ''}`);
-    return response.data.data;
-  },
 
-  // 일괄 승인/거절. useBatchAction.executeBatch 가 res.data.results 를 읽도록 본문(response.data)을 반환.
-  async batchProcess(
-    ids: string[],
-    action: 'approve' | 'reject',
-    reason?: string,
-  ): Promise<{ success: boolean; data: { results: SupplierBatchResultItem[] } }> {
-    const response = await api.post('/neture/operator/suppliers/batch', { ids, action, reason });
-    return response.data;
-  },
 
-  async getPendingSuppliers(): Promise<AdminSupplier[]> {
-    try {
-      const response = await api.get('/neture/operator/suppliers/pending');
-      return response.data.data || [];
-    } catch (error: any) {
-      if (error?.response?.status === 403) throw new Error('접근 권한이 없습니다');
-      console.warn('[Operator API] Failed to fetch pending suppliers:', error);
-      throw error;
-    }
-  },
 
-  async approveSupplier(id: string): Promise<SupplierApproveResult> {
-    try {
-      await api.post(`/neture/operator/suppliers/${id}/approve`);
-      return { success: true };
-    } catch (error: any) {
-      const err = error?.response?.data?.error;
-      return { success: false, code: err?.code, missingFields: err?.missingFields ?? [] };
-    }
-  },
-
-  async rejectSupplier(id: string, reason?: string): Promise<boolean> {
-    try {
-      await api.post(`/neture/operator/suppliers/${id}/reject`, { reason });
-      return true;
-    } catch { return false; }
-  },
-
-  // WO-O4O-NETURE-OPERATOR-SUPPLIER-BASIC-INFO-COMPLETION-V1:
-  // 운영자가 승인 전 미흡한 기본 정보를 직접 보완/수정. 저장 후 화면은 목록 refetch 로
-  // 갱신된 activationReady/missingActivationFields 를 재수신한다(프론트 재계산 금지).
-  async updateBasicInfo(
-    id: string,
-    data: Partial<{
-      representativeName: string;
-      managerName: string;
-      managerPhone: string;
-      businessNumber: string;
-      taxInvoiceEmail: string;
-    }>,
-  ): Promise<{ success: boolean; error?: string }> {
-    try {
-      const response = await api.patch(`/neture/operator/suppliers/${id}`, data);
-      return { success: !!response.data?.success };
-    } catch (error: any) {
-      return { success: false, error: error?.response?.data?.error?.code || 'UPDATE_FAILED' };
-    }
-  },
-
-  async downloadDocument(id: string, documentType: 'business_registration' | 'bank_statement' | 'mail_order_report'): Promise<Blob | null> {
-    try {
-      const response = await api.get(`/neture/operator/suppliers/${id}/documents/${documentType}/download`, {
-        responseType: 'blob',
-      });
-      return response.data as Blob;
-    } catch {
-      return null;
-    }
-  },
-
-  // WO-O4O-SUPPLIER-REGULATED-CATEGORY-DOCUMENTS-V1
-  async listRegulatedCategories(id: string): Promise<SupplierRegulatedCategory[]> {
-    const response = await api.get(`/neture/operator/suppliers/${id}/regulated-categories`);
-    return response.data?.data ?? [];
-  },
-
-  async reviewRegulatedCategory(
-    id: string,
-    category: RegulatedCategory,
-    body: { status: RegulatedCategoryStatus; reviewNote?: string },
-  ): Promise<{ success: boolean; error?: string }> {
-    try {
-      const response = await api.patch(`/neture/operator/suppliers/${id}/regulated-categories/${category}`, body);
-      return response.data;
-    } catch (error: any) {
-      return { success: false, error: error?.response?.data?.error?.code || 'REVIEW_FAILED' };
-    }
-  },
-
-  async downloadRegulatedEvidence(id: string, category: RegulatedCategory): Promise<Blob | null> {
-    try {
-      const response = await api.get(`/neture/operator/suppliers/${id}/regulated-categories/${category}/document/download`, {
-        responseType: 'blob',
-      });
-      return response.data as Blob;
-    } catch {
-      return null;
-    }
-  },
-};
 
 // ==================== Admin Settlement ====================
 
-const ADMIN_SETTLEMENT_KPI_DEFAULT: AdminSettlementKpi = {
-  calculated_count: 0, calculated_amount: 0,
-  approved_count: 0, approved_amount: 0,
-  paid_count: 0, paid_amount: 0,
-};
-
-export const adminSettlementApi = {
-  async getSettlements(
-    params?: { page?: number; limit?: number; status?: SettlementStatus }
-  ): Promise<SettlementsResponse> {
-    try {
-      const sp = new URLSearchParams();
-      if (params?.page) sp.append('page', String(params.page));
-      if (params?.limit) sp.append('limit', String(params.limit));
-      if (params?.status) sp.append('status', params.status);
-      const qs = sp.toString() ? `?${sp}` : '';
-
-      const response = await api.get(`/neture/admin/settlements${qs}`);
-      const result = response.data;
-      return { data: result.data || [], meta: result.meta || { page: 1, limit: 20, total: 0, totalPages: 0 } };
-    } catch (error) {
-      console.warn('[Admin Settlement API] Failed to fetch settlements:', error);
-      throw error;
-    }
-  },
-
-  async getKpi(): Promise<AdminSettlementKpi> {
-    try {
-      const response = await api.get('/neture/admin/settlements/kpi');
-      return response.data.data || ADMIN_SETTLEMENT_KPI_DEFAULT;
-    } catch {
-      return ADMIN_SETTLEMENT_KPI_DEFAULT;
-    }
-  },
-
-  async getDetail(id: string): Promise<SettlementDetail | null> {
-    try {
-      const response = await api.get(`/neture/admin/settlements/${id}`);
-      return response.data.data || null;
-    } catch { return null; }
-  },
-
-  async calculate(periodStart: string, periodEnd: string): Promise<{ success: boolean; data?: any; error?: string; message?: string }> {
-    try {
-      const response = await api.post('/neture/admin/settlements/calculate', {
-        period_start: periodStart,
-        period_end: periodEnd,
-      });
-      return response.data;
-    } catch (error: unknown) {
-      const response = (error as { response?: { status?: number; data?: { error?: string; message?: string } } })?.response;
-      const conflict = response?.data;
-      if (response?.status === 409 && conflict?.error &&
-          ['DUPLICATE_SETTLEMENT', 'SETTLEMENT_ORDER_SUPPLIER_CONFLICT'].includes(conflict.error)) {
-        return { success: false, error: conflict.error, message: typeof conflict.message === 'string' ? conflict.message : undefined };
-      }
-      return { success: false, error: 'NETWORK_ERROR' };
-    }
-  },
-
-  async approve(id: string, notes?: string): Promise<boolean> {
-    try {
-      await api.patch(`/neture/admin/settlements/${id}/approve`, { notes });
-      return true;
-    } catch { return false; }
-  },
-
-  async pay(id: string, notes?: string): Promise<boolean> {
-    try {
-      await api.patch(`/neture/admin/settlements/${id}/pay`, { notes });
-      return true;
-    } catch { return false; }
-  },
-
-  async cancel(id: string, notes?: string): Promise<boolean> {
-    try {
-      await api.patch(`/neture/admin/settlements/${id}/status`, { status: 'cancelled', notes });
-      return true;
-    } catch { return false; }
-  },
-};
+export const adminSettlementApi = createAdminSettlementApi(api);
 
 // ==================== Admin Product ====================
 
-export interface AdminProduct {
-  id: string;
-  masterId: string;
-  marketingName: string;
-  // WO-O4O-ADMIN-PRODUCT-APPROVAL-BACKEND-PAGINATION-V1: backend 가 함께 반환(field contract 정합)
-  masterName?: string;
-  supplierName: string;
-  category: string | null;
-  distributionType: string;
-  approvalStatus: string;
-  isActive: boolean;
-  createdAt: string;
-  consumerShortDescription?: string | null;
-  consumerDetailDescription?: string | null;
-  businessShortDescription?: string | null;
-  businessDetailDescription?: string | null;
-}
+export type { AdminProduct } from '@o4o/operator-core-ui/modules/neture-product-operations';
 
 // WO-O4O-ADMIN-PRODUCT-APPROVAL-BACKEND-PAGINATION-V1
 export interface AdminProductPagination {
@@ -572,52 +162,8 @@ export const adminMasterApi = {
 
 // ==================== Admin Service Approval ====================
 
-export interface ServiceApproval {
-  id: string;
-  productName: string;
-  supplierName: string;
-  sellerOrg: string;
-  serviceId: string;
-  status: string;
-  requestedAt: string;
-  decidedAt?: string;
-  rejectReason?: string;
-}
-
-export const adminServiceApprovalApi = {
-  async getServiceApprovals(status?: string): Promise<ServiceApproval[]> {
-    try {
-      const qs = status ? `?status=${status}` : '';
-      const response = await api.get(`/neture/admin/service-approvals${qs}`);
-      return response.data.data || [];
-    } catch (error: any) {
-      if (error?.response?.status === 403) throw new Error('접근 권한이 없습니다');
-      console.warn('[Admin API] Failed to fetch service approvals:', error);
-      return [];
-    }
-  },
-
-  async approveServiceApproval(id: string): Promise<boolean> {
-    try {
-      await api.post(`/neture/admin/service-approvals/${id}/approve`);
-      return true;
-    } catch { return false; }
-  },
-
-  async rejectServiceApproval(id: string, reason?: string): Promise<boolean> {
-    try {
-      await api.post(`/neture/admin/service-approvals/${id}/reject`, { reason });
-      return true;
-    } catch { return false; }
-  },
-
-  async revokeServiceApproval(id: string, reason?: string): Promise<boolean> {
-    try {
-      await api.post(`/neture/admin/service-approvals/${id}/revoke`, { reason });
-      return true;
-    } catch { return false; }
-  },
-};
+export type {ServiceApproval} from '@o4o/operator-core-ui/modules/neture-product-operations';
+export const adminServiceApprovalApi = createAdminServiceApprovalApi(api);
 
 // (은퇴) Admin Commission · Admin Partner Settlement · Admin Partner Monitoring — WO-O4O-LEGACY-PARTNER-RUNTIME-RETIREMENT-AND-SELLER-RECRUITMENT-EXTRACTION-V1
 
@@ -640,141 +186,7 @@ export const adminRegistrationApi = {
 // ==================== Operator Registration (users + service_memberships) ====================
 // WO-O4O-NETURE-REGISTRATION-SYSTEM-FIX-V1
 
-export interface RegistrationRecord {
-  id: string;
-  email: string;
-  name: string;
-  phone: string;
-  role: string;
-  status: string;
-  service: string;
-  companyName?: string;
-  businessNumber?: string;
-  licenseNumber?: string;
-  // WO-O4O-NETURE-SUPPLIER-REGISTRATION-BUSINESS-INFO-V1
-  representativeName?: string;
-  taxInvoiceEmail?: string;
-  contactName?: string;
-  managerPhone?: string;
-  businessAddress?: string;
-  businessAddressDetail?: string;
-  businessType?: string;
-  // WO-O4O-OPERATOR-BUSINESS-REGISTRATION-DISPLAY-ALIGNMENT-V1:
-  //   사업자등록증 3 canonical 추가 필드 (업태 businessType 는 기존). users.businessInfo 출처.
-  businessItem?: string;
-  businessEntityType?: string;
-  businessStartDate?: string;
-  createdAt: string;
-  processedAt?: string;
-  processedBy?: string;
-  rejectReason?: string;
-  operatorNotes?: string;
-  supplierStatus?: string;
-}
+export type { RegistrationRecord, OperatorContactMessage, OperatorContactPagination, OperatorContactListParams } from '@o4o/operator-core-ui/modules/neture-service-operations';
+export const { operatorRegistrationApi, operatorContactApi } = createNetureServiceApi(api);
 
-export const operatorRegistrationApi = {
-  async getRegistrations(filters?: { status?: string }): Promise<RegistrationRecord[]> {
-    const qs = filters?.status ? `?status=${filters.status}` : '';
-    const response = await api.get(`/neture/operator/registrations${qs}`);
-    return response.data.data || [];
-  },
-
-  async approve(userId: string): Promise<{ success: boolean }> {
-    const response = await api.post(
-      `/neture/operator/registrations/${userId}/approve`,
-      {},
-    );
-    return response.data;
-  },
-
-  async reject(userId: string, reason: string): Promise<{ success: boolean }> {
-    const response = await api.post(
-      `/neture/operator/registrations/${userId}/reject`,
-      { reason },
-    );
-    return response.data;
-  },
-
-  async updateNotes(userId: string, notes: string): Promise<{ success: boolean }> {
-    const response = await api.patch(
-      `/neture/operator/registrations/${userId}/notes`,
-      { notes },
-    );
-    return response.data;
-  },
-
-  async batchProcess(ids: string[], action: 'approve' | 'reject', reason?: string): Promise<any> {
-    const response = await api.post('/neture/operator/registrations/batch', {
-      ids,
-      action,
-      ...(reason ? { reason } : {}),
-    });
-    return response.data;
-  },
-};
-
-// ==================== Operator Contact Messages ====================
-// WO-O4O-NETURE-OPERATOR-CONTACT-MESSAGES-OPERATOR-SCOPE-V1
-//   /admin/contact-messages 와 의도적으로 분리한 별도 endpoint. operator 화면 노출
-//   안전 필드만 응답. adminNotes / ipAddress / userAgent 없음. message 는 preview 만.
-
-export interface OperatorContactMessage {
-  id: string;
-  contactType: string;
-  name: string;
-  email: string;
-  phone: string | null;
-  subject: string;
-  /** 본문 preview (앞 160자). 상세 처리는 admin 화면. */
-  messagePreview: string;
-  status: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface OperatorContactPagination {
-  page: number;
-  limit: number;
-  total: number;
-  totalPages: number;
-}
-
-export interface OperatorContactListParams {
-  contactType?: 'supplier' | 'partner' | 'service' | 'other';
-  status?: 'new' | 'in_progress' | 'resolved';
-  page?: number;
-  limit?: number;
-}
-
-export const operatorContactApi = {
-  async list(params: OperatorContactListParams = {}): Promise<{ items: OperatorContactMessage[]; pagination: OperatorContactPagination } | null> {
-    try {
-      const qs = new URLSearchParams();
-      if (params.contactType) qs.set('contactType', params.contactType);
-      if (params.status) qs.set('status', params.status);
-      if (params.page) qs.set('page', String(params.page));
-      if (params.limit) qs.set('limit', String(params.limit));
-      const suffix = qs.toString() ? `?${qs}` : '';
-      const response = await api.get(`/neture/operator/contact-messages${suffix}`);
-      return response.data?.data ?? null;
-    } catch (error: any) {
-      if (error?.response?.status === 403) throw new Error('접근 권한이 없습니다');
-      console.warn('[Operator Contact API] Failed to list:', error);
-      if ((error as any)?.response?.status === 404) return null;
-      throw error;
-    }
-  },
-
-  /** supplier/partner 유형 문의 일괄 mark-read (status='new' → 'in_progress'). */
-  async bulkMarkRead(): Promise<{ updated: number; scope: string[] } | null> {
-    try {
-      const response = await api.post('/neture/operator/actions/execute/inquiries-mark-read');
-      return response.data?.data ?? null;
-    } catch (error: any) {
-      if (error?.response?.status === 403) throw new Error('접근 권한이 없습니다');
-      console.warn('[Operator Contact API] Failed to mark-read:', error);
-      if ((error as any)?.response?.status === 404) return null;
-      throw error;
-    }
-  },
-};
+export const { operatorSupplierApi, adminSupplierApi } = createSupplierOperatorApi(api);

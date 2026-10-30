@@ -37,6 +37,13 @@ const input = {
   version: "2026-10-28T00:00:00.123456",
   licenseEvidenceChecked: true,
 };
+it("uses the common-account list by default and passes explicit status, page and search to the authorized service", async () => {
+  list.mockResolvedValue({ items: [], counts: { all: 0 } });
+  expect((await request(app).get('/qualifications/review').set('x-user', actor).set('x-method', 'google')).status).toBe(200);
+  expect(list).toHaveBeenLastCalledWith(actor, 'all', 1, '', false);
+  await request(app).get('/qualifications/review?status=pending&page=2&q=member').set('x-user', actor).set('x-method', 'google');
+  expect(list).toHaveBeenLastCalledWith(actor, 'pending', 2, 'member', false);
+});
 beforeEach(() => {
   jest.clearAllMocks();
   mine.mockResolvedValue({ status: "unrequested" });

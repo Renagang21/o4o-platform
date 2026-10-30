@@ -99,8 +99,11 @@ it('never sends mail when invitation creation commits unsuccessfully', async () 
   expect(service.prepare).toHaveBeenCalledTimes(1);expect(mail).not.toHaveBeenCalled();
 });
 
-it.each(['lecture:operator', 'partner-support:operator', 'neture:pharmacy_operator'])('central invitation rejects %s before DB or mail', async role => {
-  const h = harness();
-  await expect(h.service.create({ actorId: USER, targetUserId: OTHER, serviceKey: role.startsWith('neture:') ? 'neture' : role.split(':')[0], role })).rejects.toMatchObject({ code: 'ROLE_NOT_ASSIGNABLE' });
-  expect(h.db.transaction).not.toHaveBeenCalled();
+it.each(['', 'o4o-direct'])('central invitation rejects every Operator role before DB or mail (scope=%s)', async scopeKey => {
+  for (const role of ['lecture:operator', 'partner-support:operator', 'community:operator', 'supplier:operator', 'funding:operator', 'neture:operator', 'neture:pharmcoop_operator', 'neture:pharmacy_operator']) {
+    const h = harness();
+    await expect(h.service.create({ actorId: USER, targetUserId: OTHER, serviceKey: role.startsWith('neture:') ? 'neture' : role.split(':')[0], role, scopeKey })).rejects.toMatchObject({ code: 'ROLE_NOT_ASSIGNABLE' });
+    expect(h.db.transaction).not.toHaveBeenCalled();
+    expect(h.query).not.toHaveBeenCalled();
+  }
 });

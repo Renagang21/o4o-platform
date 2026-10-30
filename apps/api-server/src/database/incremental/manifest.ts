@@ -120,6 +120,9 @@ import { CreatePartnerCommunity1793020000000 } from '../migrations/1793020000000
 import { CreateSettlementNotificationJobs1793087685658 } from '../migrations/1793087685658-CreateSettlementNotificationJobs.js';
 import { AllowCentralOperatingDelegation1793164501481 } from '../migrations/1793164501481-AllowCentralOperatingDelegation.js';
 import { AddPharmacistQualificationDecisions1793165158540 } from '../migrations/1793165158540-AddPharmacistQualificationDecisions.js';
+import { CreateCentralOperationMenuGrants1793186241009 } from '../migrations/1793186241009-CreateCentralOperationMenuGrants.js';
+
+import { CreateAssistantWorkData1793257200000 } from '../migrations/1793257200000-CreateAssistantWorkData.js';
 
 export const INCREMENTAL_MIGRATIONS: readonly MigrationClass[] = [
   CreateStoreOwnerTerminationCases1789701000000,
@@ -171,6 +174,8 @@ export const INCREMENTAL_MIGRATIONS: readonly MigrationClass[] = [
   CreateSettlementNotificationJobs1793087685658,
   AllowCentralOperatingDelegation1793164501481,
   AddPharmacistQualificationDecisions1793165158540,
+  CreateCentralOperationMenuGrants1793186241009,
+  CreateAssistantWorkData1793257200000,
 ];
 
 export function incrementalMigrationNames(): string[] {

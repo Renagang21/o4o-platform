@@ -19,9 +19,11 @@ const api = createPartnerCommunityApi(
 export default function CentralPartnerModeration({
   userId,
   admin = false,
+  area,
 }: {
   userId: string;
   admin?: boolean;
+  area: string;
 }) {
   const [busy, setBusy] = useState(false),
     [error, setError] = useState("");
@@ -49,6 +51,7 @@ export default function CentralPartnerModeration({
         busy={busy}
         run={run}
         admin={admin}
+        allowedTabs={[area]}
       />
     </section>
   );

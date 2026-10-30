@@ -1,3 +1,4 @@
+import { centralOperationRequest } from '../middleware/central-operation-menu.middleware.js';
 import { Router, type Request, type RequestHandler } from 'express';
 import { AppDataSource } from '../database/connection.js';
 import { asyncHandler } from '../middleware/error-handler.js';
@@ -11,6 +12,8 @@ import {
 /** Separate guest reads never relax the authenticated forum mount or write guards. */
 export function createCommunityPublicReadRoutes(authenticate: RequestHandler, resolveUser: (req: Request) => Promise<CommunityAccessUser | null>) {
   const router = Router({ mergeParams: true });
+  const restrict = centralOperationRequest('community', () => ['community.forums']);
+  const delegated: RequestHandler = (req,res,next) => req.params.communityKey === 'community' ? restrict(req,res,next) : next();
   const handle = (run: (req: Request) => Promise<unknown>): RequestHandler => asyncHandler(async (req, res) => {
     res.set('Cache-Control', 'no-store');
     try { res.json({ success: true, data: await run(req) }); }
@@ -27,12 +30,12 @@ export function createCommunityPublicReadRoutes(authenticate: RequestHandler, re
     return listPublicCommunityPosts(AppDataSource, req.params.communityKey, +rawPage);
   }));
   router.get('/:communityKey/public/posts/:id', apiLimiter, handle(req => getPublicCommunityPost(AppDataSource, req.params.communityKey, req.params.id)));
-  router.get('/:communityKey/public-read-settings', apiLimiter, authenticate, handle(async req => {
+  router.get('/:communityKey/public-read-settings', apiLimiter, authenticate, delegated, handle(async req => {
     const user = await resolveUser(req);
     if (!user?.id) throw new CommunityPublicReadError(401, 'AUTH_REQUIRED', '로그인이 필요합니다.');
     return listCommunityPublicReadSettings(AppDataSource, req.params.communityKey, user);
   }));
-  router.put('/:communityKey/boards/:boardId/public-read', apiLimiter, authenticate, handle(async req => {
+  router.put('/:communityKey/boards/:boardId/public-read', apiLimiter, authenticate, delegated, handle(async req => {
     const user = await resolveUser(req);
     if (!user?.id) throw new CommunityPublicReadError(401, 'AUTH_REQUIRED', '로그인이 필요합니다.');
     return AppDataSource.transaction(m => setCommunityPublicRead(m, req.params.communityKey, user, req.params.boardId, req.body ?? {}));

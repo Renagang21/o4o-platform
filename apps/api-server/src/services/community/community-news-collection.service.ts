@@ -41,7 +41,7 @@ export async function getNewsCollection(
   actor: string,
   now = new Date(),
 ) {
-  await requireCommunityManager(db, actor);
+  await requireCommunityManager(db, actor, false, 'editorial');
   return read(db, newsDay(now));
 }
 function sourceFailure(error: unknown): string {
@@ -114,7 +114,7 @@ async function collect(
 ): Promise<NewsCollection> {
   const day = newsDay(now);
   const reservation = await db.transaction(async (m) => {
-    if (actor !== null) await requireCommunityManager(m, actor);
+    if (actor !== null) await requireCommunityManager(m, actor, false, 'editorial');
     const [lock] = await m.query(
       `SELECT pg_try_advisory_xact_lock(hashtext('community-news-collection')) AS locked`,
     );
@@ -154,7 +154,7 @@ async function collect(
     try {
       const items = await loader(source.id);
       const added = await db.transaction(async (m) => {
-        if (actor !== null) await requireCommunityManager(m, actor);
+        if (actor !== null) await requireCommunityManager(m, actor, false, 'editorial');
         await m.query(
           `SELECT pg_advisory_xact_lock(hashtext('community-editorial'))`,
         );
@@ -172,7 +172,7 @@ async function collect(
     sources,
   };
   await db.transaction(async (m) => {
-    if (actor !== null) await requireCommunityManager(m, actor);
+    if (actor !== null) await requireCommunityManager(m, actor, false, 'editorial');
     await m.query(
       `UPDATE cms_contents SET metadata=metadata||$2::jsonb,"updatedAt"=NOW() WHERE ${CONTROL} AND id=$1`,
       [result.id, JSON.stringify(result)],

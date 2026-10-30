@@ -12,7 +12,7 @@ import CentralOperatorInbox from './CentralOperatorInbox';
 afterEach(()=>{cleanup();vi.clearAllMocks();});
 it.each([
  ['supplier','/operator/suppliers','/operations/supplier/suppliers'],
- ['funding','/operator/market-trial?tab=exceptions&type=payment_unconfirmed','https://funding.neture.co.kr/operator/market-trial?tab=exceptions&type=payment_unconfirmed'],
+ ['funding','/operator/market-trial?tab=exceptions&type=payment_unconfirmed','/operations/funding/funding?tab=exceptions&type=payment_unconfirmed'],
 ])('maps actual manage response tasks for %s',(async(service,path,target)=>{
  mock.get.mockResolvedValueOnce({data:{data:{tasks:[{key:'task',href:path,label:'미처리 업무'}]}}});
  render(<CentralOperatorInbox serviceKey={service}/>);

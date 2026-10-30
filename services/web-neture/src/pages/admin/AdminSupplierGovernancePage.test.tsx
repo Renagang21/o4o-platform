@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { act, cleanup, fireEvent, render, screen, within, waitFor } from '@testing-library/react';
 const mocks = vi.hoisted(() => ({ get: vi.fn(), list: vi.fn(), deactivate: vi.fn(), reactivate: vi.fn() }));
-vi.mock('../../lib/api', () => ({ adminSupplierApi: { getGovernanceSuppliers: mocks.list, deactivateSupplier: mocks.deactivate, reactivateSupplier: mocks.reactivate } }));
+vi.mock('../../lib/api/admin', () => ({ operatorSupplierApi: {}, adminSupplierApi: { getGovernanceSuppliers: mocks.list, deactivateSupplier: mocks.deactivate, reactivateSupplier: mocks.reactivate } }));
 vi.mock('../../lib/apiClient', () => ({ api: { get: mocks.get } }));
 import AdminSupplierGovernancePage from './AdminSupplierGovernancePage';
 const supplier = { id: 'fixture-supplier', name: '검증 공급자', status: 'ACTIVE', hasActiveOrders: false, hasUnsettled: false, activeOrderCount: 0, unsettledCount: 0, lastStatusChangedAt: null, lastChangedBy: null, lastChangeReason: null };

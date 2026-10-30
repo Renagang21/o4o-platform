@@ -96,10 +96,10 @@ describe('§12 LNA 안내 UX', () => {
     );
 
     render(<LocalAgentCard />);
-    await userEvent.click(await screen.findByRole('button', { name: '이 PC 연결' }));
+    await userEvent.click(await screen.findByRole('button', { name: '이미 설치했어요 · 연결 확인' }));
 
     expect(await screen.findByText('이 PC 연결됨')).toBeTruthy();
-    expect(screen.getByText('이 PC 가 연결되었습니다.')).toBeTruthy();
+    expect(screen.getByRole('button', { name: '연결 상태 확인' })).toBeTruthy();
   });
 
   it('2. agent 미실행(권한은 허용됨) → Agent 실행 안내가 나온다', async () => {
@@ -149,7 +149,7 @@ describe('§12 LNA 안내 UX', () => {
       ),
     );
 
-    await userEvent.click(screen.getByRole('button', { name: '다시 연결' }));
+    await userEvent.click(screen.getByRole('button', { name: '이미 설치했어요 · 연결 확인' }));
 
     // 버튼 한 번으로 재관측 + 연결까지 끝난다 (§7).
     expect(await screen.findByText('이 PC 연결됨')).toBeTruthy();
@@ -186,7 +186,7 @@ describe('§12 LNA 안내 UX', () => {
     expect(await screen.findByText('이 PC 연결됨')).toBeTruthy();
     // 이미 연결된 상태에서 승인권을 새로 발급하지 않는다.
     expect(apiPost).not.toHaveBeenCalled();
-    expect(screen.queryByRole('button', { name: '이 PC 연결' })).toBeNull();
+    expect(screen.queryByRole('button', { name: '이미 설치했어요 · 연결 확인' })).toBeNull();
   });
 
   it('실패해도 1회용 nonce 를 재사용하지 않는다 (replay 여지 0)', async () => {
@@ -200,12 +200,11 @@ describe('§12 LNA 안내 UX', () => {
     );
 
     render(<LocalAgentCard />);
-    await userEvent.click(await screen.findByRole('button', { name: '이 PC 연결' }));
+    await userEvent.click(await screen.findByRole('button', { name: '이미 설치했어요 · 연결 확인' }));
 
     expect(await screen.findByText(/연결 승인 시간이 지났습니다/)).toBeTruthy();
     // 실패한 nonce 로 다시 누를 수 있는 버튼을 남기지 않는다. 남은 경로는 재관측뿐이다.
-    expect(screen.queryByRole('button', { name: '이 PC 연결' })).toBeNull();
-    expect(screen.getByRole('button', { name: '다시 연결' })).toBeTruthy();
+    expect(screen.getAllByRole('button', { name: '이미 설치했어요 · 연결 확인' })).toHaveLength(1);
   });
 });
 
@@ -221,7 +220,7 @@ describe('보안 경계 — 이 카드가 하지 않는 일', () => {
     );
 
     render(<LocalAgentCard />);
-    await userEvent.click(await screen.findByRole('button', { name: '이 PC 연결' }));
+    await userEvent.click(await screen.findByRole('button', { name: '이미 설치했어요 · 연결 확인' }));
     await screen.findByText('이 PC 연결됨');
 
     for (const [url, init] of fetchMock.mock.calls as Array<[string, RequestInit]>) {
@@ -255,4 +254,30 @@ describe('안내 문구는 원인마다 다르다', () => {
     expect(new Set(values).size).toBe(values.length);
     await waitFor(() => expect(values.every((v) => v.length > 0)).toBe(true));
   });
+});
+
+it('after explicit installer download, matching runtime connects once without another connection click',async()=>{
+ const {createHash,webcrypto}=await import('node:crypto');
+ const payload=new TextEncoder().encode('@echo off\r\nrem synthetic');
+ const filename=`o4o-pc-connection-${'b'.repeat(12)}-${'a'.repeat(12)}.zip`;
+ const setup={filename:filename.replace('.zip','-setup.cmd'),sha256:createHash('sha256').update(payload).digest('hex'),bytes:payload.length};
+ const release={format:'o4o-pc-release-v1',releaseId:'a'.repeat(64),sourceSha:'b'.repeat(40),version:'0.4.0',nodeVersion:'22.18.0',dataSchemaVersion:8,filename,sha256:'c'.repeat(64),bytes:100,setup};
+ setPermission('granted');let ready=false,pairs=0;
+ vi.stubGlobal('crypto',webcrypto);vi.stubGlobal('URL',{createObjectURL:vi.fn().mockReturnValue('blob:fixture'),revokeObjectURL:vi.fn()});
+ const click=vi.spyOn(HTMLAnchorElement.prototype,'click').mockImplementation(()=>{});
+ fetchMock.mockImplementation((url:string)=>{
+  if(url.endsWith('release.json'))return Promise.resolve(jsonResponse(release));
+  if(url.endsWith('-setup.cmd'))return Promise.resolve(new Response(payload));
+  if(url.endsWith('/health'))return ready?Promise.resolve(jsonResponse({...HEALTH_BODY,agentVersion:'0.4.0',releaseId:release.releaseId,localData:{ready:true,schemaVersion:8}})):failedToFetch();
+  pairs++;return Promise.resolve(jsonResponse({ok:true,status:'connected'}));
+ });
+ render(<LocalAgentCard/>);
+ await waitFor(()=>expect((screen.getByRole('button',{name:'설치 파일 받기'}) as HTMLButtonElement).disabled).toBe(false));
+ await userEvent.click(screen.getByRole('button',{name:'설치 파일 받기'}));
+ await screen.findByText('이제 받은 파일을 열어 주세요.');
+ expect(apiPost).not.toHaveBeenCalled();ready=true;
+ await screen.findByText('이 PC 연결됨',{}, {timeout:6000});
+ expect(apiPost).toHaveBeenCalledOnce();expect(pairs).toBe(1);expect(click.mock.instances[0].download).toBe('O4O-PC-Setup.cmd');
+ expect(screen.queryByRole('button',{name:'자동 연결 중지'})).toBeNull();
+ click.mockRestore();
 });

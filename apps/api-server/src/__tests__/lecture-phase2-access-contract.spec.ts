@@ -38,7 +38,7 @@ import { requireInstructor } from '../modules/lms/middleware/requireInstructor.j
 type Snapshot = { serviceKey: string; status: string };
 
 function makeReq(roles: string[], snapshot: Snapshot[] = [], id = 'u1'): any {
-  return { user: { id, roles, memberships: snapshot } };
+  return { originalUrl:'/api/v1/lms/operator/courses',method:'GET',user: { id, roles, memberships: snapshot } };
 }
 function makeRes() {
   const res: any = { statusCode: 0, body: null };

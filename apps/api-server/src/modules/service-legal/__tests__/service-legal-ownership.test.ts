@@ -4,7 +4,7 @@ const query = jest.fn();
 jest.mock('../../../database/connection.js', () => ({ AppDataSource: { isInitialized: true, query: (...args: any[]) => query(...args) } }));
 import { requireServiceLegalScope } from '../service-legal-scope.js';
 function app(service: string, roles: string[], snapshot = 'active', current: string | null = 'active', level: 'admin' | 'operator' = 'admin') {
-  query.mockResolvedValue(current ? [{ status: current }] : []);
+  query.mockImplementation(async (sql:string) => sql.includes('role_assignments') ? [] : current ? [{status:current}] : []);
   const a = express();
   a.use((req, _res, next) => { (req as any).user = { id: 'fixture', roles, memberships: [{ serviceKey: service, status: snapshot }] }; next(); });
   a.get('/:serviceKey', requireServiceLegalScope(level), (_req, res) => res.json({ success: true }));

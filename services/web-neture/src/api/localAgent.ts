@@ -196,39 +196,59 @@ export type ConnectOutcome =
  *
  * 사용자가 입력하는 것은 **아무것도 없다.**
  */
-export async function connectThisPc(health: LocalAgentHealth): Promise<ConnectOutcome> {
+export async function connectThisPc(
+  health: LocalAgentHealth,
+  signal?: AbortSignal,
+): Promise<ConnectOutcome> {
+  if (signal?.aborted) return { ok: false, code: "CONNECTION_CANCELLED" };
   let grant: string;
   try {
-    const { data } = await api.post(`${API_BASE_URL}/api/local-agent/pairing-grants`, {});
+    const { data } = await (signal
+      ? api.post(
+          `${API_BASE_URL}/api/local-agent/pairing-grants`,
+          {},
+          { signal },
+        )
+      : api.post(`${API_BASE_URL}/api/local-agent/pairing-grants`, {}));
+    if (signal?.aborted) return { ok: false, code: "CONNECTION_CANCELLED" };
     grant = data?.data?.grant;
-    if (!grant) return { ok: false, code: 'GRANT_ISSUE_FAILED' };
+    if (!grant) return { ok: false, code: "GRANT_ISSUE_FAILED" };
   } catch (err: any) {
+    if (signal?.aborted) return { ok: false, code: "CONNECTION_CANCELLED" };
     // 서버 guard — Neture 가입 승인 전에는 이 PC 연결 승인권을 발급하지 않는다(CHECK-NETURE-PHARMACY §10 E5).
-    if (err?.response?.data?.code === 'NETURE_MEMBERSHIP_REQUIRED') return { ok: false, code: 'NETURE_MEMBERSHIP_REQUIRED' };
-    return { ok: false, code: 'GRANT_ISSUE_FAILED' };
+    if (err?.response?.data?.code === "NETURE_MEMBERSHIP_REQUIRED")
+      return { ok: false, code: "NETURE_MEMBERSHIP_REQUIRED" };
+    return { ok: false, code: "GRANT_ISSUE_FAILED" };
   }
 
   try {
     const res = await fetch(`${LOCAL_AGENT_ORIGIN}/pair`, {
-      method: 'POST',
+      method: "POST",
+      ...(signal ? { signal } : {}),
       // application/json 이라 단순 요청이 아니다 — preflight 를 강제해 origin 검사를 통과시킨다.
-      headers: { 'Content-Type': 'application/json' },
+      headers: { "Content-Type": "application/json" },
       credentials: 'omit',
       body: JSON.stringify({ grant, nonce: health.nonce }),
     });
     const body = await res.json().catch(() => null);
+    if (signal?.aborted) return { ok: false, code: "CONNECTION_CANCELLED" };
     if (!res.ok || !body?.ok) {
       return { ok: false, code: String(body?.code ?? res.status) };
     }
     return {
       ok: true,
-      status: body.status === 'already_connected' ? 'already_connected' : 'connected',
+      status:
+        body.status === "already_connected" ? "already_connected" : "connected",
     };
   } catch {
+    if (signal?.aborted) return { ok: false, code: "CONNECTION_CANCELLED" };
     // health 는 통과했는데 pair 에서 막혔다. 그 사이 agent 가 꺼졌을 수도, 권한이
     // 아직 없을 수도 있다 — 여기서도 같은 근거로 구분한다.
     const permission = await queryLocalNetworkPermission();
-    return { ok: false, code: classifyLocalAgentFailure('network', permission) };
+    return {
+      ok: false,
+      code: classifyLocalAgentFailure("network", permission),
+    };
   }
 }
 

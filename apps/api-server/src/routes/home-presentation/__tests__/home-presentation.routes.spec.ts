@@ -106,7 +106,7 @@ beforeEach(() => {
   mockBusinessOperator.mockResolvedValue({ id: "business", status: "active" });
   app = express();
   app.use(express.json());
-  app.use("/home", createHomePresentationRoutes({} as DataSource));
+  app.use("/home", createHomePresentationRoutes({query:jest.fn(async()=>[])} as unknown as DataSource));
 });
 afterEach(() => jest.restoreAllMocks());
 it.each([
@@ -288,6 +288,8 @@ it("federation management requires its live role, not the Neture-wide operator r
   expect(mockFederationAuthorization).toHaveBeenCalledWith(
     expect.anything(),
     user,
+    false,
+    'home',
   );
   mockFederationAuthorization.mockRejectedValueOnce(new Error("revoked"));
   expect(

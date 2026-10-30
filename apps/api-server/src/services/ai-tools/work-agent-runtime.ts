@@ -390,10 +390,10 @@ export async function runWorkAgent(
     runCreated = true;
   }
   surfaceReady = true;
-  // Local SQLite 정본에 run 을 기록한다(cloud→local write only). semantic 만 — 대상 id·짧은 목표 요약(원문 관찰/DOM 없음).
+  // Record structural run state. v9 nodes keep the replay request only in bounded process memory; older nodes receive no request summary.
   await issueWorkRunUpsert(dataSource, { userId: ctx.userId, deviceId, ownerKey: ledgerOwner }, {
     // 재개 답변(짧은 답)으로 원래 목표 요약을 덮지 않는다.
-    runId: goal.runId, status: 'active', targetId: siteId, goalSummary: resumedRun ? undefined : goal.request.slice(0, 200),
+    runId: goal.runId, status: 'active', targetId: siteId, goalSummary: !resumedRun && executionNode.capabilities?.pharmacyData === true ? goal.request.slice(0, 200) : undefined,
   });
 
   // Bind Task recall only after owner/node verification and successful run claim.

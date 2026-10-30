@@ -5,6 +5,8 @@ import type { AuthProvider } from '../../types/account-linking.js';
 import { getNetureMainMembershipStatus } from '../../modules/neture/services/neture-main-membership.js';
 import { CALENDAR_EXPIRY_SQL } from './calendar-retention.js';
 import { ERASURE_WRITER_GAPS_SQL } from './erasure-writer-manifest.js';
+import { CENTRAL_MENU_GRANT_OWNER_SQL } from './central-menu-grant-ownership.js';
+import { CENTRAL_MENU_AUDIT_SUBJECT_SQL, minimizeCentralMenuAudit } from './central-menu-audit-evidence.js';
 
 // CORE_CHANGE_REQUIRED — explicit code/local approval of WO-O4O-TWO-STAGE-ACCOUNT-ERASURE-CORE-V1.
 // Production account/file execution remains opt-in and requires its own approved rollout.
@@ -43,6 +45,7 @@ const PRIVATE_OWNERS: Readonly<Record<string, readonly string[]>> = {
   member_qualifications: ['user_id'], qualification_requests: ['user_id'], kyc_documents: ['user_id'],
   instructor_profiles: ['user_id'], forum_bookmark: ['userId'], forum_like: ['userId'],
   forum_notifications: ['userId'], forum_category_members: ['user_id'],
+  assistant_method_sharing_consents:['user_id'], assistant_work_data_consents:['user_id'],
   assistant_run_frames: ['user_id'], assistant_procedural_patterns: ['user_id'], assistant_tasks: ['requested_by_user_id'],
   role_migration_log: ['user_id'], service_memberships: ['user_id'], role_assignments: ['user_id'],
   community_memberships: ['user_id'],
@@ -200,9 +203,11 @@ export class AccountErasureService {
     const ids = new Set<string>([userId]);
     for (const t of await this.tables(m)) {
       const owners = t.schema_name === 'public' ? PRIVATE_OWNERS[t.table_name] : undefined;
-      const where = owners?.filter(c => t.columns.includes(c)).map(c => `${quote(c)}::text=$1`).join(' OR ');
+      const where = t.schema_name === 'public' && t.table_name === 'central_operation_menu_grants'
+        ? CENTRAL_MENU_GRANT_OWNER_SQL
+        : owners?.filter(c => t.columns.includes(c)).map(c => `r.${quote(c)}::text=$1`).join(' OR ');
       if (!where || !t.columns.includes('id')) continue;
-      const rows = await m.query(`SELECT id FROM public.${quote(t.table_name)} WHERE ${where}`, [userId]);
+      const rows = await m.query(`SELECT r.id FROM public.${quote(t.table_name)} r WHERE ${where}`, [userId]);
       for (const r of rows) if (UUID.test(String(r.id))) ids.add(r.id);
     }
     for (const id of ids) await m.query(`INSERT INTO account_erasure_reference_keys(operation_id,reference_id,key_hash)
@@ -242,7 +247,8 @@ export class AccountErasureService {
     });
     const shortTokens=tokens.filter(v=>v.length<2);
     // Search attributed identifier values, not JSON column/key names or another actor’s profile.
-    const leaf=(alias:string)=>`jsonb_path_query_array(to_jsonb(${alias})
+    const leaf=(alias:string, attributionOnly=false)=>`jsonb_path_query_array(to_jsonb(${alias})
+      ${attributionOnly ? "- ARRAY['assigned_by','granted_by']" : ''}
       - ARRAY['role','status','action','service_key','serviceKey','provider','mime_type','mimeType','asset_type','type'],
       '$.** ? (@.type() == "string")')`;
     // Provider IDs belong to a namespace. Unattributed copies still need domain review,
@@ -265,13 +271,13 @@ export class AccountErasureService {
       }
       return false;
     };
-    const providerReview=async(table:string, exclusion:string):Promise<boolean> => {
+    const providerReview=async(table:string, exclusion:string, attributionOnly=false):Promise<boolean> => {
       if(!identities.providers.length)return false;
       // SQL boundaries remove short-ID timestamp candidates. A transaction cursor bounds
       // Node memory even when many genuine candidates require namespace/domain inspection.
       await m.query(`DECLARE erasure_provider_scan NO SCROLL CURSOR FOR
-        SELECT to_jsonb(r) AS payload FROM ${table} r WHERE $1::text IS NOT NULL AND
-        jsonb_path_query_array(to_jsonb(r),'$.** ? (@.type() == "string")')::text
+        SELECT (to_jsonb(r) ${attributionOnly ? "- ARRAY['assigned_by','granted_by']" : ''}) AS payload FROM ${table} r WHERE $1::text IS NOT NULL AND
+        jsonb_path_query_array(to_jsonb(r) ${attributionOnly ? "- ARRAY['assigned_by','granted_by']" : ''},'$.** ? (@.type() == "string")')::text
         ~* ANY($2::text[]) ${exclusion}`,[user.id,identities.providers.map(p=>
           `(^|[^[:alnum:]_.-])${p.id.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')}($|[^[:alnum:]_.-])`)]);
       try {
@@ -299,6 +305,15 @@ export class AccountErasureService {
       const table = `${quote(t.schema_name)}.${quote(t.table_name)}`;
       const owners = t.schema_name === 'public' ? PRIVATE_OWNERS[t.table_name] : undefined;
       let predicate = owners?.filter(c => t.columns.includes(c)).map(c => `r.${quote(c)}::text=$1`).join(' OR ');
+      // Personal work copies cascade with the user's consent row; organizational
+      // copies are reviewed independently and never erased as the grant actor's data.
+      if(t.schema_name==='public' && t.table_name==='assistant_work_data_records')predicate="r.owner_key='user:'||$1::text";
+      if (t.schema_name === 'public' && t.table_name === 'central_operation_menu_grants') {
+        predicate = CENTRAL_MENU_GRANT_OWNER_SQL;
+      }
+      if (t.schema_name === 'public' && t.table_name === 'action_logs') {
+        predicate = `COALESCE((${CENTRAL_MENU_AUDIT_SUBJECT_SQL}),false)`;
+      }
       if (t.schema_name === 'public' && t.table_name === 'service_operator_invitations') {
         predicate = `(${predicate}) OR (r.target_user_id IS NULL AND lower(r.invited_email)=(SELECT lower(email) FROM users WHERE id::text=$1))`;
         // Typed invitation ownership: preserve peer invitations. The inviter FK is attribution only
@@ -323,10 +338,13 @@ export class AccountErasureService {
         }
         continue;
       }
+      // The grant belongs to user_id. assigned_by is attribution only and its
+      // existing ON DELETE SET NULL FK clears it; every other field is still scanned.
+      const roleAttribution = t.schema_name === 'public' && ['role_assignments','assistant_work_data_consents'].includes(t.table_name);
       const [r] = await m.query(`SELECT count(*)::int AS n FROM ${table} r
-        WHERE $1::text IS NOT NULL AND (${leaf('r')}::text ~* ANY($2::text[]) OR ${leaf('r')} ?| $3::text[])
+        WHERE $1::text IS NOT NULL AND (${leaf('r',roleAttribution)}::text ~* ANY($2::text[]) OR ${leaf('r',roleAttribution)} ?| $3::text[])
         ${predicate ? `AND NOT (${predicate})` : ''}`, [user.id, patterns,shortTokens]);
-      if (r.n || await providerReview(table,predicate ? `AND NOT (${predicate})` : '')) codes.push(`REVIEW:${t.schema_name}.${t.table_name}`);
+      if (r.n || await providerReview(table,predicate ? `AND NOT (${predicate})` : '',roleAttribution)) codes.push(`REVIEW:${t.schema_name}.${t.table_name}`);
     }
     // Verify the migration's writer fence on every scanned table and users, including tables added later.
     const [missing] = await m.query(`SELECT count(*)::int AS n FROM (${ERASURE_WRITER_GAPS_SQL}) missing`);
@@ -360,6 +378,14 @@ export class AccountErasureService {
 
   private async removePrivateRows(m: EntityManager, userId: string): Promise<void> {
     const tables = await this.tables(m);
+    if (tables.some(t => t.schema_name === 'public' && t.table_name === 'action_logs')) {
+      await minimizeCentralMenuAudit(m,userId,hash(userId));
+    }
+    // Remove only this subject's settings before role parents disappear or invitations
+    // become retained anonymous events. A peer's invitation/grant remains untouched.
+    if (tables.some(t => t.schema_name === 'public' && t.table_name === 'central_operation_menu_grants')) {
+      await m.query(`DELETE FROM central_operation_menu_grants r WHERE ${CENTRAL_MENU_GRANT_OWNER_SQL}`, [userId]);
+    }
     for (const [table, owners] of Object.entries(PRIVATE_OWNERS)) {
       const t = tables.find(x => x.schema_name === 'public' && x.table_name === table);
       if (!t) continue;

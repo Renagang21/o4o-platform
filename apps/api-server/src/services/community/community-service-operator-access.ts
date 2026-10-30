@@ -4,7 +4,11 @@ import type { EntityManager } from 'typeorm';
 /** Central assignment is effective only with current active service membership and role. */
 export async function hasCommunityServiceOperator(exec: Pick<EntityManager, 'query'>, userId: string, adminOnly = false): Promise<boolean> {
   const member = await readCommunityServiceMembership(exec, userId);
-  if (!member.eligible || member.status !== 'active') return false;
+  if (!member.eligible) return false;
+  const root = await exec.query(`SELECT 1 FROM role_assignments WHERE user_id=$1 AND role='platform:super_admin'
+    AND is_active=true AND (valid_from IS NULL OR valid_from<=now()) AND (valid_until IS NULL OR valid_until>=now()) LIMIT 1`, [userId]);
+  if (root.length) return true; // O4O direct community only; no independent business or membership creation.
+  if (member.status !== 'active') return false;
   const rows = await exec.query(
     `SELECT 1 FROM role_assignments ra
       JOIN service_memberships sm ON sm.user_id = ra.user_id

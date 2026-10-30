@@ -1,4 +1,4 @@
-import { CENTRAL_OPERATION_ROLES } from '../../config/operator-role-catalog.js';
+import { CENTRAL_OPERATION_ROLES, CENTRAL_DELEGATION_SCOPE } from '../../config/operator-role-catalog.js';
 import { recordOperatorRevocation } from './operator-invitation-retention.js';
 import type { DataSource, EntityManager } from "typeorm";
 import { resolveNetureMainMembershipStatus } from "../../modules/neture/services/neture-main-membership.js";
@@ -74,6 +74,11 @@ export class ServiceOperatorManagementService {
       : sm?.status === "active";
   }
   private async authorize(m: EntityManager, actor: string, scope: Scope) {
+    if (CENTRAL_OPERATION_ROLES.includes(scope.operatorRole)) {
+      const rows = await m.query(`SELECT 1 FROM role_assignments WHERE user_id=$1 AND scope_type=$2
+        AND role=$3 AND is_active=true LIMIT 1`, [actor,CENTRAL_DELEGATION_SCOPE,scope.adminRole]);
+      if (rows.length) throw new OperationError(403,'CENTRAL_OPERATOR_MANAGEMENT_REQUIRED','직영 업무 위임은 중앙 Admin이 통합 관리자에서 지정·회수합니다.');
+    }
     // Live DB authority, locked through commit. Platform-only actors use the unchanged central console.
     const rows = await m.query(
       `SELECT ra.id FROM role_assignments ra
@@ -220,6 +225,8 @@ export class ServiceOperatorManagementService {
         );
       // Same lock as every canonical operator writer; includes preflight and audit ownership.
       await lockOperatorAssignments(m, userId);
+      const [central] = await m.query(`SELECT 1 FROM role_assignments WHERE user_id=$1 AND role=$2 AND scope_type=$3 AND is_active=true LIMIT 1`,[userId,scope.operatorRole,CENTRAL_DELEGATION_SCOPE]);
+      if (central) throw new OperationError(403,'CENTRAL_OPERATOR_MANAGEMENT_REQUIRED','중앙 위임은 통합 관리자에서 회수해 주세요.');
       await demoAccountService.assertNotDemoAccount(userId, m);
       let changed = false;
 

@@ -3,7 +3,7 @@ import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/re
 import { MemoryRouter } from 'react-router-dom';
 import RegistrationRequestsPage from '../RegistrationRequestsPage';
 const api = vi.hoisted(() => ({ getRegistrations: vi.fn(), batchProcess: vi.fn(), approve: vi.fn(), reject: vi.fn(), updateNotes: vi.fn() }));
-vi.mock('../../../../lib/api', () => ({ operatorRegistrationApi: api }));
+vi.mock('../../../../lib/api/admin', () => ({ operatorRegistrationApi: api, operatorContactApi: {}, adminSettlementApi: {} }));
 const records = [
   { id: 'pending-a', name: '검증대기회원', email: 'pending@example.invalid', role: 'supplier', service: 'neture', status: 'pending', createdAt: '2026-01-01' },
   { id: 'active-b', name: '검증승인회원', email: 'active@example.invalid', role: 'user', service: 'neture', status: 'active', createdAt: '2026-01-01' },

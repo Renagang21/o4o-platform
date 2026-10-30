@@ -13,9 +13,9 @@ export function PharmacyOperatorPage() {
       <ServiceOperatorManagement key={`${user.id}:${BUSINESS_SITE.key}`} client={authClient.api} scope={BUSINESS_SITE.key} />}
     <OperatorSemiFranchisePage key={user.id} businessKey={BUSINESS_SITE.key}
       contactHref={key => `/operator/inbox/business/${encodeURIComponent(key)}`}
-      renderOverview={business => <BusinessOperationsOverview business={business} client={authClient.api} accountKey={user.id} forumHref="/community" homeEditorHref="/home-presentation" />}
+      renderOverview={business => <BusinessOperationsOverview business={business} client={authClient.api} accountKey={user.id} forumHref="/community" homeEditorHref={BUSINESS_SITE.key === 'carepharm' ? '/operator/home-presentation/carepharm' : '/home-presentation'} />}
       forumHref={() => '/community'} renderBusinessHome={() => <>
-        <Link to="/">사업 홈 확인</Link><Link to="/home-presentation">Hero · 광고 관리</Link>
+        <Link to="/">사업 홈 확인</Link><Link to={BUSINESS_SITE.key === 'carepharm' ? '/operator/home-presentation/carepharm' : '/home-presentation'}>Hero · 광고 관리</Link>
       </>} />
   </>;
 }
