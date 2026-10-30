@@ -61,3 +61,8 @@
 - 이 추가 검증은 실제 ChatGPT 모델의 호출 선택이나 제출용 negative prompt 검증을 대신하지 않는다. 새 이미지 및 최신 HEAD의 CI/리뷰 결과는 PR #871에서 추적한다.
 
 - GitHub→GCP WIF 읽기 전용 인증 확인 PASS: https://github.com/Renagang21/o4o-platform/actions/runs/40798721740. 이 결과는 새 심사 DB/서비스 생성 또는 공개 IAM 권한까지 증명하지 않는다.
+
+
+## main 통합 재개 — 2026-10-30 (Asia/Seoul)
+
+사용자가 열린 PR 4개 전체의 main 통합·배포를 요청했다. 최신 main을 같은 PR에 반영하고 DB 표식·origin 검사 7건을 재실행해 통과했다. 재리뷰에서 로컬 데모 실행 후 일반 env-loader가 checkout의 환경파일을 다시 읽는 격리 누락을 확인하여, 기존 REVIEW_DEMO_ENVIRONMENT=isolated 모드에서는 일반 환경파일 로딩을 건너뛰게 보완한다. 일반 실행 동작은 유지한다. 실제 loader를 일회성 합성 app으로 bundle해 격리/일반 모드를 검증하며 checkout의 실제 환경파일·자격정보를 읽거나 출력하지 않는다. 최종 CI·리뷰·통합·배포 근거는 PR #871에 연결한다. 운영 DB에 데모 fixture를 주입하거나 새 공개 HTTPS/DB/클라우드 자원을 생성하지 않는다. 공개 심사 환경 구축·실제 ChatGPT 시연/제출은 기존 미완료 범위로 유지한다.
