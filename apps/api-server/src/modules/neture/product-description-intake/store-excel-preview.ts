@@ -19,6 +19,7 @@ export function readProductWorkbook(buffer: Buffer, requestedHeaderRow?: number)
   const sheet = workbook.Sheets[workbook.SheetNames[0]];
   if (!sheet) throw new DescriptionIntakeError('NO_SHEET');
   const rows = XLSX.utils.sheet_to_json<unknown[]>(sheet, { header: 1, defval: '', raw: false, blankrows: true });
+  const rawRows = XLSX.utils.sheet_to_json<unknown[]>(sheet, { header: 1, defval: '', raw: true, blankrows: true });
   const normalize = (value: unknown) => cellText(value).replace(/\s/g, '').toLowerCase();
   const detected = rows.slice(0, 20).findIndex(row => row.some(value => /^(상품명|제품명|품명|품목명|name|product_name)$/.test(normalize(value))) &&
     row.some(value => /^(바코드|관리번호\(바코드\)|표준코드|barcode|gtin|ean13)$/.test(normalize(value))));
@@ -28,7 +29,7 @@ export function readProductWorkbook(buffer: Buffer, requestedHeaderRow?: number)
   const data = rows.slice(headerRow + 1);
   if (data.length > MAX_EXCEL_PRODUCTS) throw new DescriptionIntakeError('TOO_MANY_PRODUCTS');
   if (!header?.length || header.length > 100) throw new DescriptionIntakeError('INVALID_COLUMNS');
-  return { headerRow, columns: header.map((value, index) => ({ index, label: cellText(value).slice(0, 100) || `${index + 1}열` })), rows: data };
+  return { headerRow, columns: header.map((value, index) => ({ index, label: cellText(value).slice(0, 100) || `${index + 1}열` })), rows: data, rawRows: rawRows.slice(headerRow + 1) };
 }
 async function previewPage(db: DataSource, organizationId: string, page: InputRow[], language: Mapping['language']) {
   const matches = await findDescriptionTargets(db, page.map(row => ({
@@ -55,7 +56,10 @@ export async function previewStoreExcel(db: DataSource, organizationId: string, 
   if (!indices.length || indices.some(i => i! >= workbook.columns.length) || new Set(indices).size !== indices.length)
     throw new DescriptionIntakeError('INVALID_COLUMNS');
   const inputs = workbook.rows.map((row, index) => {
-    const barcode = mapping.barcodeColumn === undefined ? '' : cellText(row[mapping.barcodeColumn]).trim();
+    const displayedBarcode = mapping.barcodeColumn === undefined ? '' : cellText(row[mapping.barcodeColumn]).trim();
+    const rawBarcode = mapping.barcodeColumn === undefined ? undefined : workbook.rawRows[index]?.[mapping.barcodeColumn];
+    // General-format numeric GTINs may display as exponents; keep explicit zero padding when present.
+    const barcode = typeof rawBarcode === 'number' && Number.isSafeInteger(rawBarcode) && !/^\d+$/.test(displayedBarcode) ? String(rawBarcode) : displayedBarcode;
     const name = mapping.nameColumn === undefined ? '' : cellText(row[mapping.nameColumn]).trim();
     return { row: index + workbook.headerRow + 2, barcode: barcode.slice(0, 128), name: name.slice(0, 1000),
       valid: !barcode || !!normalizeProductBarcode(barcode),

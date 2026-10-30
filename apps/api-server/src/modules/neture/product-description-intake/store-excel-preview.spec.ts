@@ -35,3 +35,16 @@ describe('store product input boundaries', () => {
     expect(() => prepareDescriptionEntries({ entries: [{ ...entry, aiSections: [valid, valid] }] })).toThrow();
   });
 });
+
+
+it.each([undefined, '00000000000000'])('matches numeric XLSX barcodes while preserving explicit padding (%s)', async format => {
+  const sheet = XLSX.utils.aoa_to_sheet([['상품명', '바코드'], ['합성 상품', 8806541001115]]);
+  if (format) sheet.B2.z = format;
+  const book = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(book, sheet);
+  const file = XLSX.write(book, { type: 'buffer', bookType: 'xlsx' });
+  const db = { query: jest.fn(async (sql: string) => sql.includes('pm.barcode=ANY')
+    ? [{ id: '11111111-1111-4111-8111-111111111111', name: '합성 상품', barcode: '8806541001115' }] : []) };
+  const result = await previewStoreExcel(db as never, 'store', file, { nameColumn: 0, barcodeColumn: 1, language: 'ko' });
+  expect(result.rows[0]).toMatchObject({ barcode: format ? '08806541001115' : '8806541001115', valid: true, state: 'review', candidates: [{ matchedBy: 'barcode' }] });
+  expect(db.query.mock.calls.every(([sql]) => sql.startsWith('SELECT'))).toBe(true);
+});
