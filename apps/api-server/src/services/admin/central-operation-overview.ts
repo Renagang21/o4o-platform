@@ -12,7 +12,7 @@ const taskAreas: Record<string, Record<string, string>> = {
   'partner-support': { 'partner-reports': 'reports' },
 };
 export function centralMenuForTask(service: string, key: string): string | null {
-  const area = service === 'funding' ? 'funding' : taskAreas[service]?.[key];
+  const area = ['contact-inquiries', 'contact-inquiries-store', 'contact-inquiries-hospital'].includes(key) ? 'inbox' : service === 'funding' ? 'funding' : taskAreas[service]?.[key];
   return area ? `${service}.${area}` : null;
 }
 
@@ -31,7 +31,27 @@ export async function centralOperationOverview(db: Pick<DataSource, 'query'>, us
       }
     }
     const scope: InboxScope = { kind: 'service', key: service, name: service, serviceKey: service, organizationId: null, publicPath: '/contact', managePath: '/operator', taskPath: '/operator' };
-    return (await readInboxTasks(db, scope)).map(task => ({ ...task, service }));
+    const serviceTasks = (await readInboxTasks(db, scope)).map(task => ({ ...task, service }));
+    // The lecture contact screen already counts this same service inbox. Never add it twice.
+    if (allowed.has(`${service}.inbox`) && !(service === 'lecture' && allowed.has('lecture.contact'))) {
+      const sources = service === 'neture'
+        ? [{ key: service, label: '새 문의 처리 대기' }, { key: 'store', label: '내 매장 도구 문의 대기' }, { key: 'hospital', label: '원내 약품 파일 도구 문의 대기' }]
+        : [{ key: service, label: '새 문의 처리 대기' }];
+      for (const source of sources) {
+        // CentralOperatorInbox already exposes these two tool inboxes under neture.inbox.
+        const contact = { key: source.key === service ? 'contact-inquiries' : `contact-inquiries-${source.key}`, label: source.label, href: '/operator/inbox', service };
+        try {
+          const [row] = await db.query(`SELECT COUNT(*)::int count,MIN(created_at) oldest FROM contact_inquiries
+            WHERE service_key=$1 AND organization_id IS NULL AND status IN ('received','in_review')`, [source.key]);
+          const count = Number(row.count);
+          if (!Number.isSafeInteger(count) || count < 0) throw new Error('INVALID_CONTACT_COUNT');
+          serviceTasks.push({ ...contact, count, oldest: row.oldest, available: true });
+        } catch {
+          serviceTasks.push({ ...contact, count: null, oldest: null, available: false });
+        }
+      }
+    }
+    return serviceTasks;
   }))).flat().filter(task => {
     const menu = centralMenuForTask(task.service, task.key);
     return menu !== null && allowed.has(menu);

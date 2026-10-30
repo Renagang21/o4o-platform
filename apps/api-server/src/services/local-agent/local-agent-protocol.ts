@@ -1,3 +1,4 @@
+import { validatePharmacyCommand, pickPharmacyResult } from '../work-data/contract.js';
 /**
  * Local Work Agent — 프로토콜 계약 (순수)
  *
@@ -156,6 +157,8 @@ export const LOCAL_AGENT_ACTIONS = {
    * 필드만. HOSPITAL-DRUG-COMPOSITE §7(성분→함량→제형→제조사) 매칭의 로컬 축.
    */
   DATA_QUERY: 'local.data.query',
+  DATA_PHARMACY_READ: 'local.data.pharmacy_read',
+  DATA_PHARMACY_WRITE: 'local.data.pharmacy_write',
   /** allowlist 된 setting 키에 검증된 값을 쓴다(§10·§11). 범용 KV 저장이 아니다. */
   DATA_SET_SETTING: 'local.data.set_setting',
   // ── same-run resume 정본 원장 (WEB-AUTOMATION-RESUME-V1 PHASE 1) ────────────
@@ -299,6 +302,8 @@ export function isUiaTargetAction(base: string): boolean {
  * 그래서 allowlist 에 조합 없이 그대로 들어간다(아래 `LOCAL_AGENT_ACTION_ALLOWLIST`).
  */
 export const DATA_TARGET_ACTIONS: readonly string[] = Object.freeze([
+  LOCAL_AGENT_ACTIONS.DATA_PHARMACY_READ,
+  LOCAL_AGENT_ACTIONS.DATA_PHARMACY_WRITE,
   LOCAL_AGENT_ACTIONS.DATA_HEALTH,
   LOCAL_AGENT_ACTIONS.DATA_GET_META,
   LOCAL_AGENT_ACTIONS.DATA_QUERY,
@@ -685,6 +690,10 @@ export function validateLocalCommandArgs(
   base: string,
   args: unknown,
 ): { ok: true; args: Record<string, never> | ComputerActionArgs | DataActionArgs | DomActionArgs | DomRunUnitArgs | UiaActionArgs } | { ok: false } {
+  if (base === LOCAL_AGENT_ACTIONS.DATA_PHARMACY_READ || base === LOCAL_AGENT_ACTIONS.DATA_PHARMACY_WRITE) {
+    const r=validatePharmacyCommand(base === LOCAL_AGENT_ACTIONS.DATA_PHARMACY_READ ? 'read' : 'write', args);
+    return r.ok ? {ok:true,args:r.args as any} : {ok:false};
+  }
   // BROWSER-DOM-CONTROL-V0 §13·§15: elementRef/snapshotId/구조화 조건만. selector · JS 칸은 형상에 없다.
   if (base === LOCAL_AGENT_ACTIONS.DOM_FIND) {
     const r = validateDomFindArgs(args);
@@ -1479,6 +1488,7 @@ export function pickSafeTargetInfo(data: unknown): Record<string, unknown> {
 
 export function pickSafeResultData(action: string, data: unknown): Record<string, unknown> {
   const { base } = parseLocalAction(action);
+  if (base===LOCAL_AGENT_ACTIONS.DATA_PHARMACY_READ || base===LOCAL_AGENT_ACTIONS.DATA_PHARMACY_WRITE) return pickPharmacyResult(data);
   if (TARGET_ACTIONS.includes(base)) {
     return pickSafeTargetInfo(data);
   }

@@ -540,11 +540,18 @@ describe('14. 연결된 PC 가 여러 대여도 Assistant 가 노드를 고른�
     expect(r.status === 'ok' && r.reason).toBe('most_recent');
   });
 
+  it('pharmacy data selects a capable PC before a newer incompatible PC',()=>{
+    const resolution=selectExecutionNode([node('old',1,caps()),node('new',20,{...caps(),pharmacyData:true})],{need:'pharmacy_data'});
+    expect(resolution.status==='ok'&&resolution.device.id).toBe('new');
+  });
+
   it('heartbeat 보고는 형식이 맞는 값만 받는다 — 이전 에이전트의 {} 는 null', () => {
     expect(parseHeartbeatReport({})).toBeNull();
     expect(parseHeartbeatReport({ agentVersion: '0.2.0', capabilities: { browser: true } })).toBeNull();
     expect(parseHeartbeatReport({ agentVersion: '../etc', capabilities: caps() })).toBeNull();
-    expect(parseHeartbeatReport({ agentVersion: '0.2.0', capabilities: { ...caps(), extra: 'x' } })).toEqual({ agentVersion: '0.2.0', capabilities: caps() });
+    expect(parseHeartbeatReport({ agentVersion: '0.2.0', capabilities: { ...caps(), extra: 'x' } })).toEqual({ agentVersion: '0.2.0', capabilities: {...caps(),pharmacyData:false} });
+    expect(parseHeartbeatReport({agentVersion:'0.5.0',capabilities:{...caps(),pharmacyData:true}})?.capabilities.pharmacyData).toBe(true);
+    expect(parseHeartbeatReport({agentVersion:'0.5.0',capabilities:{...caps(),pharmacyData:'yes'}})).toBeNull();
   });
 
   it('한 대만 online 이면 그 기기로 확정된다', async () => {
@@ -649,6 +656,8 @@ describe('15~16. 원격 제어 수단이 존재하지 않는다', () => {
     // 늘었다 — 그 모듈이 node:sqlite·node:fs 를 캡슐화하므로 handler 자신은 여전히
     // node 표준 모듈로 os 만 가진다. 외부 프로세스 실행은 windows-window-control.mjs 한 곳뿐이다.
     expect(imports).toEqual([
+      './pharmacy-order-contract.mjs',
+      './pharmacy-data.mjs',
       'node:os',
       './windows-app-registry.mjs',
       './browser-site-registry.mjs',

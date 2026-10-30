@@ -3,7 +3,8 @@ import { useNetureServiceOperations } from './runtime';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import OperatorContactDetail from './OperatorContactDetail';
 import { useLatestRequest } from '../../common/operation-support';
-import { DataTable, type ListColumnDef } from '@o4o/operator-ux-core';
+import { DataTable, useBatchAction, type ListColumnDef } from '@o4o/operator-ux-core';
+import { ActionBar, BulkResultModal } from '@o4o/ui';
 import type { OperatorContactMessage, OperatorContactPagination } from './api';
 
 const typeLabels: Record<string, string> = {
@@ -33,11 +34,25 @@ const statusColors: Record<string, string> = {
   resolved: 'bg-green-100 text-green-700',
 };
 
+function contactError(error: any, fallback: string): string {
+  const value = error?.response?.data?.error;
+  return typeof value === 'string' ? value : typeof value?.message === 'string' ? value.message : error?.message || fallback;
+}
+
 type ContactTypeFilter = '' | 'supplier' | 'partner' | 'service' | 'other';
 type StatusFilter = '' | 'new' | 'in_progress' | 'resolved';
 
 export default function OperatorContactMessagesPage() {
   const { api: { operatorContactApi } } = useNetureServiceOperations();
+  const [compact, setCompact] = useState(false);
+  useEffect(() => {
+    if (typeof window.matchMedia !== 'function') return;
+    const media = window.matchMedia('(max-width: 640px)');
+    const update = () => setCompact(media.matches);
+    update();
+    media.addEventListener?.('change', update);
+    return () => media.removeEventListener?.('change', update);
+  }, []);
   const [detailId, setDetailId] = useState<string | null>(null);
   const [detailBusy, setDetailBusy] = useState(false);
   const [messages, setMessages] = useState<OperatorContactMessage[]>([]);
@@ -48,6 +63,8 @@ export default function OperatorContactMessagesPage() {
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('');
   const [markingRead, setMarkingRead] = useState(false);
   const markLock = useRef(false);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const batch = useBatchAction();
   const [actionError, setActionError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const beginLoad = useLatestRequest(`operator-contact:${contactTypeFilter}:${statusFilter}`);
@@ -67,13 +84,14 @@ export default function OperatorContactMessagesPage() {
       if (!current()) return false;
       if (result && Array.isArray(result.items) && result.pagination) {
         setMessages(result.items);
+        setSelectedIds(previous => new Set([...previous].filter(id => result.items.some(item => item.id === id))));
         setPagination(result.pagination);
         return true;
       } else {
         throw new Error('목록을 불러오지 못했습니다. 다시 시도해 주세요.');
       }
     } catch (e: any) {
-      if (current()) setError(e?.response?.data?.error || e?.message || '목록을 불러오지 못했습니다.');
+      if (current()) setError(contactError(e, '목록을 불러오지 못했습니다.'));
       return false;
     } finally {
       if (current()) setLoading(false);
@@ -84,19 +102,31 @@ export default function OperatorContactMessagesPage() {
     load(1);
   }, [load]);
 
-  const handleBulkMarkRead = async () => {
-    if (markLock.current || detailBusy || loading || error) return;
+  const handleBulkMarkRead = async (ids = [...selectedIds]) => {
+    if (markLock.current || detailBusy || loading || error || !ids.length) return;
     markLock.current = true;
     const current = beginMark();
     setMarkingRead(true); setActionError(null); setNotice(null);
     try {
-      const result = await operatorContactApi.bulkMarkRead();
+      const result = await batch.executeBatch(async requested => {
+        const results = [];
+        for (const id of requested) {
+          if (!current()) break;
+          const item = messages.find(message => message.id === id);
+          if (!item || item.status !== 'new') { results.push({ id, status: 'skipped' }); continue; }
+          try {
+            const value = await operatorContactApi.markRead(item);
+            results.push({ id, status: value.skipped ? 'skipped' : 'success' });
+          } catch (err: any) {
+            results.push({ id, status: 'failed', error: contactError(err, '문의 확인에 실패했습니다.') });
+          }
+        }
+        return { data: { results } };
+      }, ids);
       if (!current()) return;
-      if (!result) throw new Error('일괄 확인에 실패했습니다. 다시 시도해 주세요.');
-      setNotice('공급자 신규 문의 일괄 확인이 완료되었습니다.');
-      await load(pagination.page);
-    } catch (err: any) {
-      if (current()) setActionError(err?.response?.data?.error || err?.message || '일괄 확인에 실패했습니다. 다시 시도해 주세요.');
+      setSelectedIds(new Set(result.results.filter(item => item.status === 'failed').map(item => item.id)));
+      setNotice(`선택 문의 확인 완료: ${result.successCount}건 성공 · ${result.failedCount}건 실패 · ${result.skippedCount}건 건너뜀`);
+      if (!(await load(pagination.page)) && current()) setActionError('처리 결과는 저장됐지만 목록을 갱신하지 못했습니다. 다시 시도는 목록만 조회합니다.');
     } finally { markLock.current = false; if (current()) setMarkingRead(false); }
   };
 
@@ -122,64 +152,17 @@ export default function OperatorContactMessagesPage() {
   //   수동 <table> + expandedId → 공용 DataTable 확장 API (uncontrolled).
   //   본문 미리보기는 확장행으로 이전. 상태는 read-only 표시(운영자 개별 변경 불가).
   const columns: ListColumnDef<OperatorContactMessage>[] = [
-    {
-      key: 'contactType',
-      header: '유형',
-      width: '90px',
-      render: (_v, m) => (
-        <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${typeColors[m.contactType] || 'bg-slate-100 text-slate-600'}`}>
-          {typeLabels[m.contactType] || m.contactType}
-        </span>
-      ),
-    },
-    {
-      key: 'name',
-      header: '이름',
-      minWidth: 100,
-      render: (_v, m) => <span className="text-sm text-slate-800 font-medium">{m.name}</span>,
-    },
-    {
-      key: 'email',
-      header: '이메일',
-      minWidth: 160,
-      render: (_v, m) => <span className="text-sm text-slate-600">{m.email}</span>,
-    },
-    {
-      key: 'phone',
-      header: '연락처',
-      width: '130px',
-      render: (_v, m) => <span className="text-sm text-slate-600">{m.phone || '-'}</span>,
-    },
-    {
-      key: 'subject',
-      header: '제목',
-      minWidth: 200,
-      render: (_v, m) => (
-        <span className="block text-sm text-slate-700 max-w-[260px] truncate" title={m.subject}>{m.subject}</span>
-      ),
-    },
-    {
-      key: 'status',
-      header: '상태',
-      width: '80px',
-      render: (_v, m) => (
-        <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${statusColors[m.status] || 'bg-slate-100 text-slate-600'}`}>
-          {statusLabels[m.status] || m.status}
-        </span>
-      ),
-    },
-    {
-      key: 'createdAt',
-      header: '등록일',
-      width: '150px',
-      render: (_v, m) => <span className="text-xs text-slate-500 whitespace-nowrap">{formatDate(m.createdAt)}</span>,
-    },
+    { key: '_select', header: '', system: true, width: '44px', render: (_, item) => <input type="checkbox" aria-label={`${item.subject || item.name} 문의 선택`} checked={selectedIds.has(item.id)} disabled={markingRead || detailBusy} onClick={e => e.stopPropagation()} onChange={e => setSelectedIds(previous => { const next = new Set(previous); if (e.target.checked) next.add(item.id); else next.delete(item.id); return next; })} /> },
+    { key: 'subject', header: '문의', render: (_, item) => <div className="min-w-0 space-y-1"><button type="button" disabled={detailBusy || markingRead} onClick={() => setDetailId(item.id)} className="block break-words text-left text-sm font-medium text-slate-900 hover:text-emerald-700">{item.subject || '제목 없음'}</button><span className={`inline-flex rounded-full px-2 py-0.5 text-xs ${statusColors[item.status] || 'bg-slate-100 text-slate-600'}`}>{statusLabels[item.status] || item.status}</span>{compact && <div className="space-y-1 text-xs text-slate-500"><p>{item.name} · {typeLabels[item.contactType] || item.contactType}</p><p className="break-all">{item.email}</p><p>{formatDate(item.createdAt)}</p></div>}</div> },
+    { key: 'name', header: '접수자', render: (_, item) => <div className="min-w-0"><p className="break-words text-sm font-medium text-slate-800">{item.name}</p><p className="break-all text-xs text-slate-500">{item.email}</p></div> },
+    { key: 'contactType', header: '유형', width: '90px', render: (_, item) => <span className={`inline-flex rounded-full px-2 py-0.5 text-xs ${typeColors[item.contactType] || 'bg-slate-100 text-slate-600'}`}>{typeLabels[item.contactType] || item.contactType}</span> },
+    { key: 'createdAt', header: '접수일', width: '125px', render: (_, item) => <span className="text-xs text-slate-500">{formatDate(item.createdAt)}</span> },
   ];
 
   const renderExpandedRow = (m: OperatorContactMessage) => (
     <div className="space-y-2 text-sm text-slate-700">
       <div>
-        <span className="text-xs text-slate-500 mr-2">본문 미리보기:</span>
+        <p className="mb-2 text-xs text-slate-500">연락처: {m.phone || '—'}</p><span className="text-xs text-slate-500 mr-2">본문 미리보기:</span>
         <span className="whitespace-pre-wrap">{m.messagePreview || '-'}</span>
       </div>
       <p className="text-xs text-slate-400">
@@ -205,7 +188,7 @@ export default function OperatorContactMessagesPage() {
             aria-label="문의 유형"
             disabled={markingRead || detailBusy}
             value={contactTypeFilter}
-            onChange={(e) => { if (!markLock.current && !detailBusy) { setNotice(null); setActionError(null); setContactTypeFilter(e.target.value as ContactTypeFilter); } }}
+            onChange={(e) => { if (!markLock.current && !detailBusy) { setNotice(null); setActionError(null); setSelectedIds(new Set()); setContactTypeFilter(e.target.value as ContactTypeFilter); } }}
             className="px-3 py-2 border border-slate-300 rounded-lg text-sm"
           >
             {contactTypeOptions.map((o) => (
@@ -216,32 +199,21 @@ export default function OperatorContactMessagesPage() {
             aria-label="문의 상태"
             disabled={markingRead || detailBusy}
             value={statusFilter}
-            onChange={(e) => { if (!markLock.current && !detailBusy) { setNotice(null); setActionError(null); setStatusFilter(e.target.value as StatusFilter); } }}
+            onChange={(e) => { if (!markLock.current && !detailBusy) { setNotice(null); setActionError(null); setSelectedIds(new Set()); setStatusFilter(e.target.value as StatusFilter); } }}
             className="px-3 py-2 border border-slate-300 rounded-lg text-sm"
           >
             {statusOptions.map((o) => (
               <option key={o.value || 'all'} value={o.value}>{o.label}</option>
             ))}
           </select>
-          <div className="flex-1" />
-          <button
-            type="button"
-            onClick={handleBulkMarkRead}
-            disabled={markingRead || detailBusy || loading || !!error}
-            className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-60 text-white rounded-lg text-sm font-medium"
-            title="공급자 문의(과거 파트너 문의 포함) 중 status='new' 항목을 한 번에 처리중으로 전환합니다."
-          >
-            {markingRead ? '처리 중...' : '공급자 신규 문의 일괄 확인'}
-          </button>
         </div>
-        <p className="text-xs text-slate-400 mt-3">
-          ※ 일괄 확인은 공급자 contactType(과거 접수된 파트너 문의 포함)의 신규(`new`) 문의만 대상입니다. 서비스/기타 문의는 개별 상세에서 처리합니다.
-        </p>
+        <p className="mt-3 text-xs text-slate-500">문의에 체크하면 상단 작업이 표시됩니다. 선택한 신규 문의만 처리중으로 전환하며, 이미 처리한 문의는 건너뜁니다.</p>
       </div>
 
+      <div className="[&>div>div]:flex-wrap"><ActionBar selectedCount={selectedIds.size} onClearSelection={() => { if (!markLock.current) setSelectedIds(new Set()); }} actions={[{ key: 'confirm', label: '선택 문의 확인', variant: 'primary', loading: markingRead, disabled: markingRead || detailBusy || loading || !!error || !messages.some(item => selectedIds.has(item.id) && item.status === 'new'), onClick: () => handleBulkMarkRead() }, { key: 'detail', label: '선택 문의 상세', disabled: markingRead || detailBusy || selectedIds.size !== 1, onClick: () => { const id = [...selectedIds][0]; if (id) setDetailId(id); } }]} /></div>
+      <BulkResultModal open={batch.showResult} result={batch.result} onClose={batch.clearResult} onRetry={loading || markingRead || !!error ? undefined : ids => { if (!markLock.current) void handleBulkMarkRead(ids); }} title="선택 문의 처리 결과" />
       {notice && <p role="status" className="text-emerald-700">{notice}</p>}
-      {actionError && <p role="alert" className="text-red-600">{actionError}<button className="ml-3 underline" disabled={loading || markingRead} onClick={() => { setActionError(null); void load(pagination.page); }}>다시 시도</button></p>}
-      {notice && error && <p role="alert" className="text-amber-700">처리는 완료했지만 최신 목록을 확인하지 못했습니다. 조회만 다시 시도해 주세요.</p>}
+      {actionError && <p role="alert" className="text-red-600">{actionError}{!error && <button className="ml-3 underline" disabled={loading || markingRead} onClick={() => { setActionError(null); void load(pagination.page); }}>다시 시도</button>}</p>}
       {detailId && <OperatorContactDetail key={detailId} id={detailId} onClose={() => setDetailId(null)} onBusy={setDetailBusy}
         onSaved={async () => { setNotice('문의 처리는 완료했습니다.'); await load(pagination.page); }} />}
       {/* List */}
@@ -253,10 +225,14 @@ export default function OperatorContactMessagesPage() {
         <div role="alert" className="bg-white rounded-xl border border-slate-100 shadow-sm text-center py-16 text-red-500 text-sm">{error}<button className="ml-3 underline" onClick={() => void load(pagination.page)}>다시 시도</button></div>
       ) : (
         <DataTable<OperatorContactMessage>
-          columns={columns}
+          className="[&_td]:px-3 [&_th]:px-3 [&_td]:whitespace-normal [&_th]:whitespace-normal"
+          columns={compact ? columns.filter(column => !['name', 'contactType', 'createdAt'].includes(column.key)) : columns}
           data={messages}
           rowKey={(m) => m.id}
           emptyMessage="조건에 맞는 문의가 없습니다."
+          selectable
+          selectedKeys={selectedIds}
+          onSelectionChange={keys => { if (!markLock.current && !detailBusy) setSelectedIds(keys); }}
           expandable
           renderExpandedRow={renderExpandedRow}
         />

@@ -113,6 +113,8 @@ export interface OperatorDomainIAConfig {
   displayOrder: string[];
   /** sidebar 최상단 고정 그룹 */
   topPinnedGroups: OperatorGroupKey[];
+  /** Opt-in service headings that expand their menu tree. Existing hosts keep their current layout. */
+  collapsibleDomains?: boolean;
 }
 
 /**
