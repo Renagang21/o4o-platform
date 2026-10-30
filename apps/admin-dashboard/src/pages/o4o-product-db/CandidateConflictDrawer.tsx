@@ -6,7 +6,7 @@
  *   후보 상세는 원천 정보 + 원천 식별자 + rawPayload + 등록(승격)/제외 액션만 제공한다.
  *   중복 방지는 승격(등록) 트랜잭션 내부 dedup 이 담당한다(운영자 사전 매칭 없음).
  *  - 처리: archive / ignore(rejected) / manual_review(reviewing) — hard delete 없음
- *  - 등록: 신규 기본상품 승격(drug 소스만, 내부 dedup) → 신규 생성 또는 기존 동일 코드 상품에 연결
+ *  - 등록: 신규 기본상품 승격(의약품 표준코드 또는 기존 공급자 Adapter, 내부 dedup) → 신규 생성 또는 기존 동일 코드 상품에 연결
  * 모든 쓰기 액션은 ConfirmActionDialog 확인을 거친다.
  */
 
@@ -19,6 +19,7 @@ import {
   getCandidateConflictInfo,
   bulkCandidateAction,
   promoteCandidateToMaster,
+  promoteSupplierCandidateToMaster,
   type CandidateConflictInfo,
   type CandidateBulkAction,
 } from '@/api/o4o-product-db.api';
@@ -87,20 +88,23 @@ export default function CandidateConflictDrawer({ candidateId, open, onClose, on
     if (!candidateId || !c) return;
     setConfirm({
       title: '신규 기본상품으로 등록',
-      message: `이 후보를 O4O 기본상품(ProductMaster)으로 등록합니다.\n\n등록 정보:\n상품명: ${c.candidateName || '—'}\n제조/업체: ${c.candidateManufacturer || '—'}\n식별자/바코드: ${c.identifierValue || '—'}\n규격: ${c.candidateSpec || '—'}\n\n동일한 공식 식별자의 기본상품이 이미 있으면 신규 생성하지 않고 기존 상품에 연결합니다(중복 방지 dedup). 원천 rawPayload 는 삭제되지 않습니다. 계속할까요?`,
+      message: `이 후보를 O4O 기본상품(ProductMaster)으로 등록합니다.\n\n등록 정보:\n상품명: ${c.candidateName || '—'}\n제조/업체: ${c.candidateManufacturer || '—'}\n식별자/바코드: ${c.identifierValue || '—'}\n규격: ${c.candidateSpec || '—'}\n\n해당 등록 경로의 중복 검사에서 동일 상품이 확인되면 신규 생성하지 않고 기존 상품에 연결합니다(중복 방지 dedup). 원천 rawPayload 는 삭제되지 않습니다. 계속할까요?`,
       confirmText: '등록',
       variant: 'default',
       run: async () => {
-        const r = await promoteCandidateToMaster(candidateId);
+        const c=info.candidate;
+        const supplier=c.sourceType==='supplier_web' || c.rawPayload?.source==='supplier_bulk_upload';
+        const r = supplier ? await promoteSupplierCandidateToMaster(candidateId) : await promoteCandidateToMaster(candidateId);
         if (r.outcome === 'create') toast.success('신규 기본상품이 등록되었습니다');
         else if (r.outcome === 'link') toast.success('기존 동일 코드 기본상품에 연결되었습니다');
-        else if (r.outcome === 'conflict') toast.error(`등록 충돌: ${r.conflictReason || '식별자 불일치'} (생성 안 함)`);
-        else toast(`등록 건너뜀: ${r.skipReason || '자격 미달'}`);
+        else if (r.outcome === 'conflict') toast.error(`등록 충돌: ${('reason' in r ? r.reason : 'conflictReason' in r ? r.conflictReason : undefined) || '식별자 불일치'} (생성 안 함)`);
+        else toast(`등록 건너뜀: ${('reason' in r ? r.reason : 'skipReason' in r ? r.skipReason : undefined) || '자격 미달'}`);
       },
     });
   };
 
   const c = info?.candidate;
+  const supplierRegistrable=!!c && ['pending','reviewing'].includes(c.candidateStatus) && !c.matchedProductMasterId && (c.sourceType==='supplier_web' || c.rawPayload?.source==='supplier_bulk_upload');
   const canWrite = useProductDbWriteAccess();
 
   return (
@@ -153,14 +157,14 @@ export default function CandidateConflictDrawer({ candidateId, open, onClose, on
                 <div className="text-xs text-gray-500 bg-gray-50 border border-gray-200 rounded p-2.5">
                   신규 기본상품 등록(승격)은 O4O 전체 관리자가 수행합니다. 후보 검토·보류·제외는 계속 가능합니다.
                 </div>
-              ) : info.promotable?.eligible ? (
+              ) : (info.promotable?.eligible || supplierRegistrable) ? (
                 <button onClick={askPromote} className="flex items-center gap-1.5 text-sm px-3 py-2 rounded bg-admin-blue text-white">
                   <PackagePlus size={14} /> 신규 기본상품으로 등록
                 </button>
               ) : (
                 <div className="text-xs text-gray-500 bg-gray-50 border border-gray-200 rounded p-2.5">
                   {info.promotable?.reason === 'NOT_DRUG_SOURCE'
-                    ? '이 후보 유형(의료기기·의약외품·건강기능식품·e약은요 등)은 신규 등록을 지원하지 않습니다. 현재 등록 파이프라인은 의약품 표준코드 전용이며, 비-의약품 등록은 별도 트랙(후속 WO)에서 처리합니다. 보류/제외/archive 로 처리하세요.'
+                    ? '이 후보 유형(의료기기·의약외품·건강기능식품·e약은요 등)은 신규 등록을 지원하지 않습니다. 이 자료는 일반 의약품 등록 API의 대상이 아닙니다. 원천 식별자·허가 상태·필수 정보를 검증하고 해당 제품군의 등록 경로를 준비해야 합니다. 검증·보완 내역을 기록하고 수집 자료로 관리하세요.'
                     : info.promotable?.reason === 'ALREADY_LINKED'
                       ? '이미 O4O 상품에 등록·연결된 후보입니다.'
                       : '현재 상태(pending/reviewing)가 아니어서 등록할 수 없습니다.'}

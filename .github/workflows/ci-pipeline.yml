@@ -913,6 +913,12 @@ jobs:
         OPERATOR_INVITE_TEST_PORT: '55432'
       run: pnpm --filter @o4o/api-server exec jest --runInBand --runTestsByPath src/services/admin/__tests__/service-operator-invitation.integration.test.ts
 
+    - name: Verify candidate whole-query workflows in disposable PostgreSQL
+      env:
+        CI: 'true'
+        CANDIDATE_WORKFLOW_CI_PORT: '55432'
+      run: pnpm --filter @o4o/api-server exec jest --runInBand --runTestsByPath src/modules/neture/services/__tests__/candidate-workflow.postgres.spec.ts
+
   ci-gate:
     name: CI Gate
     runs-on: ubuntu-latest
