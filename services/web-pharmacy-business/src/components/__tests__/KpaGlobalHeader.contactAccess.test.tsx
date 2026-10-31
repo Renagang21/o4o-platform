@@ -51,6 +51,7 @@ vi.mock("@o4o/ui", () => ({
   buildCommunityPrimaryNav: () => [],
 }));
 vi.mock("@o4o/auth-react", () => ({
+  ServiceSpaceSwitcher: () => null,
   MyHomeButton: () => null,
   O4OHomeButton: () => null,
   ServiceAccountMenu: () => null,

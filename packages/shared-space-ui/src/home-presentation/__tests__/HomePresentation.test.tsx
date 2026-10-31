@@ -63,7 +63,7 @@ describe("home presentation contract and public display", () => {
     config.slides[0].imageUrl = url;
     expect(() => parseHomePresentation(config)).toThrow();
   });
-  it("requires an advertiser and disallows advertisements in the hero", () => {
+  it("requires an advertiser for promotions and operator-selected Hero advertisements", () => {
     const config = initialHomePresentation("neture");
     config.promotions[0].kind = "advertisement";
     expect(() => parseHomePresentation(config)).toThrow();
@@ -71,6 +71,8 @@ describe("home presentation contract and public display", () => {
     expect(() => parseHomePresentation(config)).not.toThrow();
     config.slides[0].kind = "advertisement";
     expect(() => parseHomePresentation(config)).toThrow();
+    config.slides[0].sponsor = "합성 광고주";
+    expect(() => parseHomePresentation(config)).not.toThrow();
   });
   it("uses inclusive starts and exclusive ends and rejects invalid/reversed periods", () => {
     const config = initialHomePresentation("neture");
@@ -85,31 +87,41 @@ describe("home presentation contract and public display", () => {
     config.slides[0].endsAt = new Date(now - 1000).toISOString();
     expect(() => parseHomePresentation(config)).toThrow();
   });
-  it("switches manually with buttons, never starts an automatic rotation, and preserves entry actions", () => {
+  it("rotates every eight seconds, pauses on interaction, and preserves entry actions", () => {
     vi.useFakeTimers();
     const config = initialHomePresentation("supplier");
-    render(
-      <HomeHeroView
-        surface="supplier"
-        config={config}
-        actions={<button>원래 업무 진입</button>}
-      />,
-    );
+    render(<HomeHeroView surface="supplier" config={config} actions={<button>원래 업무 진입</button>} />);
     const heading = screen.getByRole("heading", { level: 1 });
+    const hero = screen.getByRole("region");
+    act(() => vi.advanceTimersByTime(7999));
     expect(heading.textContent).toBe(config.slides[0].title);
-    act(() => vi.advanceTimersByTime(120_000));
-    expect(heading.textContent).toBe(config.slides[0].title);
-    fireEvent.click(screen.getByRole("button", { name: "다음 안내" }));
+    act(() => vi.advanceTimersByTime(1));
     expect(heading.textContent).toBe(config.slides[1].title);
-    expect(screen.getByRole("button", { name: "원래 업무 진입" })).toBeTruthy();
+    fireEvent.mouseEnter(hero);
+    act(() => vi.advanceTimersByTime(16000));
+    expect(heading.textContent).toBe(config.slides[1].title);
+    fireEvent.mouseLeave(hero);
     fireEvent.click(screen.getByRole("button", { name: "이전 안내" }));
     expect(heading.textContent).toBe(config.slides[0].title);
+    act(() => vi.advanceTimersByTime(16000));
+    expect(heading.textContent).toBe(config.slides[0].title);
+    expect(screen.getByRole("button", { name: "원래 업무 진입" })).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: "2번 안내 보기" }));
-    expect(
-      screen
-        .getByRole("button", { name: "2번 안내 보기" })
-        .getAttribute("aria-pressed"),
-    ).toBe("true");
+    expect(screen.getByRole("button", { name: "2번 안내 보기" }).getAttribute("aria-pressed")).toBe("true");
+  });
+  it("respects reduced motion and allows manual navigation with advertiser attribution", () => {
+    vi.useFakeTimers();
+    vi.stubGlobal('matchMedia', () => ({ matches: true, addEventListener: vi.fn(), removeEventListener: vi.fn() }));
+    try {
+      const config = initialHomePresentation('supplier');
+      config.slides[0].kind = 'advertisement';config.slides[0].sponsor = '합성 광고주';
+      render(<HomeHeroView surface="supplier" config={config} />);
+      expect(screen.getByText('광고 · 합성 광고주')).toBeTruthy();
+      act(() => vi.advanceTimersByTime(16000));
+      expect(screen.getByRole('heading', { level: 1 }).textContent).toBe(config.slides[0].title);
+      fireEvent.click(screen.getByRole('button', { name: '다음 안내' }));
+      expect(screen.getByRole('heading', { level: 1 }).textContent).toBe(config.slides[1].title);
+    } finally { vi.unstubAllGlobals(); }
   });
   it("distinguishes advertisements from service notices and hides disabled promotions", () => {
     const config = initialHomePresentation("lecture");
@@ -156,7 +168,7 @@ describe("home presentation contract and public display", () => {
   });
 });
 
-it("refreshes scheduled public content without rotating slides and stops polling after unmount", async () => {
+it("refreshes scheduled public content while paused and stops polling after unmount", async () => {
   vi.useFakeTimers();
   const scheduled = initialHomePresentation("supplier");
   scheduled.slides[0].title = "게시 시간이 된 안내";
@@ -173,6 +185,7 @@ it("refreshes scheduled public content without rotating slides and stops polling
     await Promise.resolve();
   });
   expect(client.get).toHaveBeenCalledTimes(1);
+  fireEvent.click(screen.getByRole("button", { name: "자동 넘김 정지" }));
   await act(async () => {
     await vi.advanceTimersByTimeAsync(60_000);
   });

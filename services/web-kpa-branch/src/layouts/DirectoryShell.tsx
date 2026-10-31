@@ -1,3 +1,4 @@
+import { ServiceSpaceSwitcher } from '@o4o/auth-react';
 import { ServiceContactInboxLink } from '@o4o/shared-space-ui';
 /**
  * DirectoryShell — 공용 도메인 `/`(분회 찾기)의 헤더 · 푸터
@@ -34,7 +35,7 @@ export default function DirectoryShell({ children }: { children: ReactNode }) {
             <span className="text-lg font-semibold text-gray-900">{BRAND.nameKo}</span>
           </Link>
           <div className="flex items-center gap-3 text-sm">
-            <span className="inline-flex flex-col items-end gap-1 sm:flex-row sm:items-center sm:gap-3"><MyHomeButton accountId={user?.id} api={authClient.api} isAuthenticated={isAuthenticated} authLoading={isLoading} className="o4o-home-link" /><O4OHomeButton api={authClient.api} isAuthenticated={isAuthenticated} authLoading={isLoading} className="o4o-home-link" /></span>
+            <span className="inline-flex flex-col items-end gap-1 sm:flex-row sm:items-center sm:gap-3"><ServiceSpaceSwitcher api={authClient.api} accountId={user?.id} isAuthenticated={isAuthenticated} authLoading={isLoading} /><MyHomeButton accountId={user?.id} api={authClient.api} isAuthenticated={isAuthenticated} authLoading={isLoading} className="o4o-home-link" /><O4OHomeButton api={authClient.api} isAuthenticated={isAuthenticated} authLoading={isLoading} className="o4o-home-link" /></span>
             {!isLoading && (isAuthenticated ? (
               <ServiceAccountMenu key={user?.id} displayName={user?.name || '사용자'} email={user?.email} onLogout={logout} />
             ) : (

@@ -1,0 +1,23 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/mcp.schema.json",
+  "mcpServers": {
+    "o4o": {
+      "type": "streamable-http",
+      "url": "https://api.neture.co.kr/api/external-ai/mcp",
+      "extensions": {
+        "com.openai": {
+          "auth": {
+            "type": "oauth",
+            "client": {
+              "mode": "dcr"
+            },
+            "baseScopes": [
+              "o4o:read",
+              "o4o:draft:write"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

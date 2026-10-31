@@ -112,7 +112,7 @@ export function StoreDashboardLayout({
           id="store-work-drawer"
           className={`fixed left-0 z-40 w-64 bg-white shadow-xl transform transition-transform duration-300 lg:sticky lg:z-auto lg:shadow-none lg:border-r lg:border-slate-200 lg:shrink-0 lg:translate-x-0 ${
             hideTopBar
-              ? 'top-16 h-[calc(100vh-4rem)] lg:top-16'
+              ? 'top-[var(--o4o-global-header-height,4rem)] h-[calc(100vh-var(--o4o-global-header-height,4rem))] lg:top-[var(--o4o-global-header-height,4rem)]'
               : 'top-14 h-[calc(100vh-3.5rem)] lg:top-14'
           } ${
             sidebarOpen ? 'translate-x-0' : '-translate-x-full'

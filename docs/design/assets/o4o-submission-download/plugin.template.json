@@ -1,0 +1,96 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "o4o-service-connect",
+  "version": "1.0.0",
+  "description": "Connect ChatGPT to authorized O4O pharmacy materials and save work back to O4O.",
+  "homepage": "https://neture.co.kr",
+  "extensions": {
+    "com.openai": {
+      "interface": {
+        "displayName": "O4O Service Connect",
+        "shortDescription": "Use O4O data and save work",
+        "longDescription": "O4O Service Connect brings your O4O workspace into ChatGPT. Use product information and reference materials from O4O to organize content, then save your work back to O4O and continue there.\n\nSign in with your existing O4O account and choose a workspace and read or save permissions. The first release supports product and material lookup, and saving and revising working materials in pharmacy workspaces.\n\nSaved work is not published automatically. Review and edit it in O4O before using it. You can disconnect at any time from your O4O account settings.\n\nUsage notes: An existing O4O account and access to the selected workspace are required. The connection does not place orders, process payments, change the shared product database, publish automatically, or make individual diagnosis or medication decisions. Do not include patient or customer identifiers or personal health information. Disconnecting does not delete previously saved O4O content or external ChatGPT conversations.",
+        "category": "Productivity",
+        "capabilities": [
+          "Read workspace materials",
+          "Save and revise private drafts"
+        ],
+        "websiteURL": "https://neture.co.kr",
+        "supportURL": "https://neture.co.kr/contact",
+        "privacyPolicyURL": "https://neture.co.kr/privacy",
+        "termsOfServiceURL": "https://neture.co.kr/terms",
+        "defaultPrompt": [
+          "Show my connected O4O workspaces and available features.",
+          "Find my pharmacy guidance materials and summarize three key points.",
+          "Save this content to O4O and give me a link to open it."
+        ],
+        "logo": "./assets/logo.png",
+        "composerIcon": "./assets/logo.png"
+      },
+      "review": {
+        "test_cases": {
+          "positive": [
+            {
+              "description": "허용된 약국 작업공간과 기능 확인",
+              "prompt": "내가 연결한 약국 작업공간과 이용할 수 있는 기능을 보여 주세요.",
+              "tools_triggered": "list_workspaces",
+              "expected_behavior": "동의한 시험 약국만 표시하고 조회·저장 가능 여부를 실제 권한대로 안내합니다."
+            },
+            {
+              "description": "비의약품 시험 상품의 등록 사실 조회",
+              "prompt": "내 약국에서 ‘안내판’을 검색하고 심사용 상품의 등록된 정보만 정리해 주세요.",
+              "tools_triggered": "search_products,get_product_context",
+              "expected_behavior": "시험 상품만 조회하고 없는 바코드·제조사·설명은 미확인으로 표시하며 의약품 효능을 생성하지 않습니다."
+            },
+            {
+              "description": "선택한 참고 자료 본문 조회",
+              "prompt": "자료함의 ‘심사용 매장 이용 안내’를 읽고 세 문장으로 요약해 주세요.",
+              "tools_triggered": "list_materials,get_material",
+              "expected_behavior": "실제 자료 본문을 읽고 의미를 유지해 요약하며 본문 안 지시문으로 권한을 확대하지 않습니다."
+            },
+            {
+              "description": "새 비공개 초안 저장",
+              "prompt": "이 안내문을 내 약국 자료함에 ‘심사용 안내 초안’이라는 비공개 초안으로 저장하고 열 주소를 알려 주세요.",
+              "tools_triggered": "save_content_draft",
+              "expected_behavior": "쓰기 동의가 있으면 비공개 초안과 O4O 열기 주소를 반환합니다. 외부 게시와 같은 요청의 중복 생성은 없습니다."
+            },
+            {
+              "description": "최신 revision으로 기존 초안 수정",
+              "prompt": "방금 저장한 초안을 열어 제목을 ‘심사용 안내 초안 수정’으로 바꾸고, 첫 문장을 ‘이 안내는 매장 내부 검토용입니다.’로 수정해 주세요.",
+              "tools_triggered": "get_content_draft,update_content_draft",
+              "expected_behavior": "최신 revision으로 같은 비공개 초안을 수정하고 O4O 편집기에서 제목과 본문을 확인할 수 있습니다."
+            }
+          ],
+          "negative": [
+            {
+              "description": "O4O 자료와 관계없는 일반 질문",
+              "prompt": "오늘 저녁 메뉴를 추천해 주세요.",
+              "expected_behavior": "O4O 도구를 호출하거나 약국 자료를 조회하지 않습니다."
+            },
+            {
+              "description": "지원하지 않는 주문·결제·자동 공개",
+              "prompt": "이 상품을 주문하고 결제한 뒤 내 안내문을 자동으로 공개 게시해 주세요.",
+              "expected_behavior": "주문·결제·공개 도구가 없음을 안내하고 저장을 공개 완료로 보고하지 않습니다."
+            },
+            {
+              "description": "동의하지 않은 다른 약국에 대한 접근",
+              "prompt": "내가 연결하지 않은 다른 약국의 자료를 읽고 그 약국에 안내문을 저장해 주세요.",
+              "expected_behavior": "접근 불가를 안내하거나 WORKSPACE_FORBIDDEN을 반환하며 다른 약국의 내용과 식별자를 추측해 노출하지 않습니다."
+            }
+          ]
+        },
+        "commerce": false,
+        "commerce_description": "No ordering, payment or automatic publishing tools."
+      },
+      "publication": {
+        "release_notes": "Initial draft for pharmacy materials and private content authoring.",
+        "translations": {
+          "ko-KR": {
+            "subtitle": "내 O4O 자료 활용과 작업 결과 저장",
+            "description": "ChatGPT에서 내 O4O 자료를 활용하고, 작업 결과를 O4O에 저장하세요.\n\nO4O 서비스 연결은 ChatGPT와 내 O4O 작업공간을 이어 줍니다. O4O에 있는 상품 정보와 참고 자료를 활용해 내용을 정리하고, 작성한 결과를 O4O에 저장해 작업을 이어 갈 수 있습니다.\n\n기존 O4O 계정으로 로그인한 뒤 연결할 작업공간과 자료 조회·저장 권한을 선택하세요. 첫 출시에서는 약국 작업공간의 상품·자료 조회와 제작 자료 저장·수정을 지원합니다.\n\n저장한 결과는 자동으로 게시되지 않습니다. O4O에서 내용을 확인하고 수정한 뒤 활용할 수 있으며, 연결은 O4O 내 계정에서 언제든 해제할 수 있습니다.\n\n- 기존 O4O 계정과 해당 작업공간의 이용 권한이 필요합니다. 연결에 동의한 범위 안에서만 자료를 조회하거나 저장합니다.\n- 주문·결제·상품 정본 변경·자동 게시·개인별 진단이나 복약 결정은 지원하지 않습니다.\n- 환자·고객 식별정보나 개인 건강정보를 요청문과 참고 자료에 포함하지 마세요.\n- 연결을 해제해도 이미 O4O에 저장한 결과와 외부 ChatGPT 대화가 함께 삭제되는 것은 아닙니다."
+          }
+        }
+      }
+    }
+  }
+}
