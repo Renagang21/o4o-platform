@@ -44,7 +44,7 @@ export const KPA_BASE_NAV: GlobalHeaderNavItem[] = BUSINESS_SITE.key === 'careph
 /**
  * WO-O4O-KPA-PHARMACYHUB-COMMUNITY-HOME-AND-NAV-CANONICAL-CONVERGENCE-V1 §14
  *
- * 푸터 링크 SSOT. View 는 공통 `CommunitySiteFooter`(@o4o/shared-space-ui) 이고
+ * 푸터 링크 SSOT. View 는 공통 `ServiceFooter`(@o4o/auth-react) 이고
  * Pharmacy-Hub(PH_FOOTER_SECTIONS) 와 같은 구조를 쓴다.
  *
  * 데드링크 0: 여기 등재하는 href 는 전부 App.tsx 에 실제 route 가 있는 경로다.

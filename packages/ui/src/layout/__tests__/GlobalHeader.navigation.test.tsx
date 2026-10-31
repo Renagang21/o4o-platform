@@ -4,6 +4,14 @@ import { MemoryRouter } from 'react-router-dom';
 import { GlobalHeader } from '../GlobalHeader';
 
 afterEach(cleanup);
+it('keeps one service-owned account control when the mobile navigation is opened', () => {
+  const logout = vi.fn();
+  render(<MemoryRouter><GlobalHeader brand={{ name: '합성 서비스', icon: 'S' }} publicNav={[]} user={{ displayName: '회원', email: '' }} showMobileUserMenu={false} accountSlot={<button onClick={logout}>서비스 계정 종료</button>} /></MemoryRouter>);
+  fireEvent.click(screen.getByRole('button', { name: '메뉴 열기' }));
+  expect(screen.getAllByRole('button', { name: '서비스 계정 종료' })).toHaveLength(1);
+  fireEvent.click(screen.getByRole('button', { name: '서비스 계정 종료' }));
+  expect(logout).toHaveBeenCalledTimes(1);
+});
 it('shares the actual responsive header height with drawers and restores the previous shell value', () => {
   const property = '--o4o-global-header-height';
   document.documentElement.style.setProperty(property, '72px');

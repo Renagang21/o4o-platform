@@ -17,7 +17,9 @@
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-router-dom": "^7.9.6",
-    "@o4o/shared-space-ui": "workspace:*"
+    "@o4o/shared-space-ui": "workspace:*",
+    "@o4o/ui": "workspace:*",
+    "@o4o/auth-utils": "workspace:*"
   },
   "devDependencies": {
     "@types/react": "^19.2.0",

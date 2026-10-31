@@ -1,3 +1,4 @@
+import { isRepresentativeReturnPath } from '@o4o/auth-utils';
 import { getHandoffServiceAlias, isCarePharmHandoffPath } from '../../../config/handoff-service-aliases.js';
 import { getNetureMainMembershipStatus } from '../../neture/services/neture-main-membership.js';
 import { Request, Response } from 'express';
@@ -199,11 +200,7 @@ export class HandoffIssuanceController extends BaseController {
     if (!alias && isRepresentativeEntryTarget(targetService.key)) {
       // Only representative home and the personal home, with a finite informational source.
       const representativePath = safeReturnPath || '/';
-      if (
-        !/^(?:\/|\/mypage(?:\?from=(?:store|study|community|funding|supplier|pharmacy|kpa|admin))?)$/.test(
-          representativePath,
-        )
-      ) {
+      if (!isRepresentativeReturnPath(representativePath)) {
         return BaseController.error(
           res,
           'Invalid representative entry path',

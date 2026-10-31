@@ -7,7 +7,8 @@ import {
   MyPageAuthRequired,
   MyPageLoadingState,
 } from "@o4o/account-ui";
-import { MY_HOME_SOURCES, MyHomeButton } from "@o4o/auth-react";
+import { MY_HOME_SOURCES, MyHomeButton, ServiceReturnLink } from "@o4o/auth-react";
+import { isMyHomeSource, safeServiceReturnPath } from "@o4o/auth-utils";
 import { useAuth } from "../../contexts";
 import { useLoginModal } from "../../contexts/LoginModalContext";
 import { api } from "../../lib/apiClient";
@@ -37,33 +38,30 @@ function MyHomeContent({ view }: { view: View }) {
   const entry = useHomeEntry(!!user, user?.id);
   const requestedSource = new URLSearchParams(search).get("from") ?? "";
   let sourceKey = requestedSource;
+  let returnPath = safeServiceReturnPath(new URLSearchParams(search).get("returnPath")) ?? "/";
   if (!Object.prototype.hasOwnProperty.call(MY_HOME_SOURCES, sourceKey)) {
     try {
       const previous = JSON.parse(
         sessionStorage.getItem("o4o_my_home_source") ?? "null",
       );
       sourceKey = previous?.accountId === user?.id ? previous.sourceKey : "";
+      returnPath = previous?.accountId === user?.id ? safeServiceReturnPath(previous.returnPath) ?? "/" : "/";
     } catch {
       sourceKey = "";
     }
   }
-  const source = Object.prototype.hasOwnProperty.call(
-    MY_HOME_SOURCES,
-    sourceKey,
-  )
-    ? MY_HOME_SOURCES[sourceKey]
-    : undefined;
+  const source = isMyHomeSource(sourceKey) ? MY_HOME_SOURCES[sourceKey] : undefined;
   useEffect(() => {
     if (!source || !user) return;
     try {
       sessionStorage.setItem(
         "o4o_my_home_source",
-        JSON.stringify({ accountId: user.id, sourceKey }),
+        JSON.stringify({ accountId: user.id, sourceKey, returnPath }),
       );
     } catch {
       /* Optional return context. */
     }
-  }, [source, sourceKey, user]);
+  }, [source, sourceKey, returnPath, user]);
 
   if (!user) return null;
   const model = entry.data && buildHomeEntryModel(user, entry.data);
@@ -85,9 +83,7 @@ function MyHomeContent({ view }: { view: View }) {
           {user.name}님의 개인 공간입니다. 필요한 업무로 이동하고 내 소식을 확인하세요.
         </p>
         {source && (
-          <a className="text-sm text-blue-700 underline" href={source.origin}>
-            {source.label}로 돌아가기
-          </a>
+          <ServiceReturnLink sourceKey={sourceKey} returnPath={returnPath} api={api} accountId={user.id} />
         )}
       </div>
       {view === "overview" ? (

@@ -59,6 +59,27 @@ suite('CarePharm issuer → actual client → exchange, isolated PostgreSQL', ()
   });
   afterAll(async () => { if (close) await close(); });
   beforeEach(async () => { generateTokens.mockClear(); await query('TRUNCATE handoff_tokens, browser_session_revocations'); });
+  it.each(['pharmcoop', 'megapharm'])('transports %s accounts to exactly that origin without creating business membership', async key => {
+    const origin = `https://${key}.neture.co.kr`;
+    const path = key === 'pharmcoop' ? '/one/community?page=2' : '/materials';
+    const href = new URL(await requestServiceHandoff(api, { serviceKey: key, origin, returnPath: path }));
+    expect(href.searchParams.get('returnTo')).toBe(path);
+    const token = href.searchParams.get('token')!;
+    const result = await exchange(token, origin);
+    expect(result.statusCode).toBe(200);
+    expect(result.body.data.targetServiceKey).toBe('neture');
+    expect(await query('SELECT * FROM service_memberships')).toHaveLength(0);
+    expect((await exchange(token, origin)).statusCode).toBe(401);
+    const second = await issue({ targetServiceKey: key, returnPath: path });
+    const wrongOrigin = await exchange(second.body.data.handoffToken, 'https://neture.co.kr');
+    expect(wrongOrigin.statusCode).toBe(401);
+  });
+  it.each(['/#news', '/community/posts?page=2', '/news/fixture-notice', '/operator', '/operator/semi-franchises?key=carepharm&tab=overview', '/operator/home-presentation/carepharm', '/operator/inbox/business/carepharm', '/operator/semi-franchises/carepharm/contents/new', `/operator/semi-franchises/carepharm/contents/${actor}/edit`])('returns to current CarePharm screen %s without granting an operator role', async returnPath => {
+    const href = new URL(await requestServiceHandoff(api, { serviceKey: 'carepharm', origin: 'https://carepharm.neture.co.kr', returnPath }));
+    expect((await exchange(href.searchParams.get('token')!, href.origin)).statusCode).toBe(200);
+    expect(await query('SELECT * FROM role_assignments WHERE role LIKE $1', ['%operator%'])).toHaveLength(0);
+    expect(await query('SELECT * FROM service_memberships')).toHaveLength(0);
+  });
   it.each(['home', 'participation', 'community'] as const)('preserves Store-selected pharmacy through CarePharm %s and canonical account session', async section => {
     const target = cooperationDestination('carepharm', section);
     target.returnPath += `?store=${actor}`;
@@ -77,7 +98,7 @@ suite('CarePharm issuer → actual client → exchange, isolated PostgreSQL', ()
     expect((await exchange(issued.body.data.handoffToken, origin)).statusCode).toBe(401);
     expect(generateTokens).not.toHaveBeenCalled();
   });
-  it.each(['/operator', '/my/participation?next=https://evil.test', '//evil.test', '/communities/business%3Apharmacy/forum', '/?store=bad', `/?store=${actor}&store=${actor}`, '/%2e%2e/operator', '/materials#evil'])('rejects an unsupported CarePharm path %s before ledger insert', async returnPath => {
+  it.each(['/operator/products', '/my/participation?next=https://evil.test', '//evil.test', '/communities/business%3Apharmacy/forum', '/?store=bad', `/?store=${actor}&store=${actor}`, '/%2e%2e/operator', '/materials#evil', '/operator/semi-franchises?key=other', '/operator/inbox/business/other', '/operator/semi-franchises/other/contents/new', '/operator/semi-franchises/carepharm/contents/not-an-id/edit', '/admin', '/community?next=https://evil.test'])('rejects an unsupported CarePharm path %s before ledger insert', async returnPath => {
     expect((await issue({ targetServiceKey: 'carepharm', returnPath })).statusCode).toBe(400);
     expect(await query('SELECT * FROM handoff_tokens')).toHaveLength(0);
   });

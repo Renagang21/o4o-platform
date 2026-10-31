@@ -18,6 +18,9 @@
     "@o4o/auth-react": "workspace:*",
     "@o4o/auth-client": "workspace:*",
     "react-router-dom": "7.9.6",
-    "@o4o/operator-core-ui": "workspace:*"
+    "@o4o/operator-core-ui": "workspace:*",
+    "@o4o/ui": "workspace:*",
+    "@o4o/shared-space-ui": "workspace:*",
+    "@o4o/auth-utils": "workspace:*"
   }
 }

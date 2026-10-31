@@ -2,6 +2,7 @@ module.exports = {
   content: [
     "./index.html",
     "./src/**/*.{ts,tsx}",
+    "../../packages/auth-react/src/**/*.{ts,tsx}",
     "../../packages/operator-core-ui/src/**/*.{ts,tsx}",
     "../../packages/operator-ux-core/src/**/*.{ts,tsx}",
     "../../packages/shared-space-ui/src/**/*.{ts,tsx}",

@@ -50,6 +50,7 @@ describe("federation and cooperative route boundaries", () => {
           "/home-presentation/cooperative/sample-coop-b",
           "/notifications/unread-count?serviceKey=pharmcoop",
           "/neture/businesses/business-preview-b/legal/footer-legal",
+          "/neture/businesses/pharmcoop/legal/footer-legal",
         ].includes(path),
       ),
     ).toBe(true);
@@ -58,8 +59,8 @@ describe("federation and cooperative route boundaries", () => {
   it("renders the federation as an organization of cooperatives", () => {
     open("/");
     expect(
-      screen.getByRole("link", { name: "회원가입" }).getAttribute("href"),
-    ).toBe("https://neture.co.kr/signup");
+      screen.getByRole("button", { name: "회원가입" }),
+    ).toBeTruthy();
     expect(screen.getByRole("heading", { level: 1 }).textContent).toContain(
       "조합의 힘",
     );

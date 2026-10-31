@@ -1,15 +1,24 @@
-import { COOPERATION_EXTENSIONS, ServiceContactInboxLink } from '@o4o/shared-space-ui';
+import { safeServiceReturnPath } from "@o4o/auth-utils";
+import {
+  COOPERATION_EXTENSIONS,
+  ServiceContactInboxLink,
+} from "@o4o/shared-space-ui";
 import { useEffect, useState } from "react";
-import { Link, Route, Routes, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { AuthClient, getAccessToken } from "@o4o/auth-client";
 import {
   EmailLoginForm,
   O4O_ACCOUNT_LINKS,
   useServiceAuth,
+  ServiceSpaceSwitcher,
+  MyHomeButton,
+  O4OHomeButton,
+  ServiceAccountMenu,
 } from "@o4o/auth-react";
 import { App } from "./App";
 import {
   anonymousSession,
+  canManageFederation,
   type Cooperative,
   type SessionSnapshot,
 } from "./domain";
@@ -20,7 +29,29 @@ const apiOrigin = (
 const authClient = new AuthClient(`${apiOrigin}/api/v1`, {
   strategy: "localStorage",
 });
-const toUser = (user: Record<string, unknown>) => ({ id: String(user.id) });
+const toUser = (user: Record<string, unknown>) => ({
+  id: String(user.id),
+  displayName: String(user.displayName || user.name || "회원"),
+});
+
+function isSessionSnapshot(value: unknown): value is SessionSnapshot {
+  if (!value || typeof value !== "object") return false;
+  const row = value as Record<string, unknown>;
+  if (typeof row.userId !== "string") return false;
+  const assignments = (items: unknown, cooperative: boolean) =>
+    Array.isArray(items) &&
+    items.every(
+      (item) =>
+        item &&
+        typeof item.userId === "string" &&
+        (!cooperative || typeof item.cooperativeId === "string"),
+    );
+  return (
+    assignments(row.memberships, true) &&
+    assignments(row.cooperativeOperators, true) &&
+    assignments(row.federationOperators, false)
+  );
+}
 
 /** Authentication is common O4O authentication; all cooperative grants come from the API. */
 export function ConnectedApp() {
@@ -31,6 +62,11 @@ export function ConnectedApp() {
   const [revision, setRevision] = useState(0);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const location = useLocation();
+  const returnTo =
+    safeServiceReturnPath(
+      new URLSearchParams(location.search).get("returnTo"),
+    ) ?? "/cooperatives/mine";
   useEffect(() => {
     let current = true;
     setLoading(true);
@@ -44,8 +80,11 @@ export function ConnectedApp() {
     ])
       .then(([directory, session]) => {
         if (!current) return;
+        const next = session?.data.data;
+        if (auth.user && !isSessionSnapshot(next))
+          throw new Error("Invalid cooperative session");
         setCooperatives(directory.data.data);
-        setSnapshot(session?.data.data ?? anonymousSession);
+        setSnapshot(next ?? anonymousSession);
       })
       .catch(() => {
         if (current) {
@@ -85,51 +124,72 @@ export function ConnectedApp() {
       </main>
     );
   return (
-    <>
-      <div className="container" aria-label="계정">
-        <ServiceContactInboxLink client={authClient.api} serviceKey={COOPERATION_EXTENSIONS.pharmcoop.model.key} accountId={auth.user?.id} enabled={!!auth.user?.id} />
-        {auth.user ? (
-          <button onClick={() => void auth.logout()}>로그아웃</button>
-        ) : (
-          <Link to="/login">로그인</Link>
-        )}
-      </div>
-      <Routes>
-        <Route
-          path="/login"
-          element={
-            <main className="container">
-              <h1>협동조합 로그인</h1>
-              {auth.user ? (
-                <>
-                  <p>로그인했습니다.</p>
-                  <Link to="/cooperatives/mine">내 협동조합으로 이동</Link>
-                </>
-              ) : (
-                <EmailLoginForm
-                  links={O4O_ACCOUNT_LINKS}
-                  onLogin={auth.loginWithEmail}
-                  api={authClient}
-                  onSuccess={() =>
-                    navigate("/cooperatives/mine", { replace: true })
-                  }
-                />
-              )}
-            </main>
-          }
-        />
-        <Route
-          path="*"
-          element={
-            <App
-              onSessionChanged={() => setRevision((v) => v + 1)}
-              cooperatives={cooperatives}
-              session={session}
-              businessClient={authClient.api}
+    <App
+      onSessionChanged={() => setRevision((v) => v + 1)}
+      cooperatives={cooperatives}
+      session={session}
+      businessClient={authClient.api}
+      headerHome={
+        <span className="coop-account-tools">
+          <ServiceSpaceSwitcher
+            api={authClient.api}
+            accountId={auth.user?.id}
+            isAuthenticated={!!auth.user}
+            authLoading={auth.isLoading}
+          />
+          <MyHomeButton
+            className="o4o-home-link"
+            api={authClient.api}
+            accountId={auth.user?.id}
+            isAuthenticated={!!auth.user}
+            authLoading={auth.isLoading}
+          />
+          <O4OHomeButton
+            className="o4o-home-link"
+            api={authClient.api}
+            isAuthenticated={!!auth.user}
+            authLoading={auth.isLoading}
+          />
+          <ServiceContactInboxLink
+            client={authClient.api}
+            serviceKey={COOPERATION_EXTENSIONS.pharmcoop.model.key}
+            accountId={auth.user?.id}
+            enabled={!!auth.user?.id}
+          />
+        </span>
+      }
+      headerAccount={
+        auth.user ? (
+          <ServiceAccountMenu
+            displayName={auth.user.displayName || "회원"}
+            onLogout={auth.logout}
+          >
+            <Link to="/notifications">알림</Link>
+            <Link to="/cooperatives/mine">내 협동조합</Link>
+            {canManageFederation(session) && (
+              <Link to="/operator/inbox">연합회 운영 알림</Link>
+            )}
+          </ServiceAccountMenu>
+        ) : undefined
+      }
+      loginContent={
+        <section className="section">
+          <h1>협동조합 로그인</h1>
+          {auth.user ? (
+            <>
+              <p>로그인했습니다.</p>
+              <Link to={returnTo}>원래 화면으로 이동</Link>
+            </>
+          ) : (
+            <EmailLoginForm
+              links={O4O_ACCOUNT_LINKS}
+              onLogin={auth.loginWithEmail}
+              api={authClient}
+              onSuccess={() => navigate(returnTo, { replace: true })}
             />
-          }
-        />
-      </Routes>
-    </>
+          )}
+        </section>
+      }
+    />
   );
 }

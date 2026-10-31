@@ -10,7 +10,7 @@ export async function requestServiceHandoff(
   const href = response.data.data?.targetUrl;
   if (!href) throw new Error('Missing service handoff');
   const url = new URL(href);
-  if (url.protocol !== 'https:' || url.origin !== target.origin || url.pathname !== '/handoff') {
+  if (url.protocol !== 'https:' || url.origin !== target.origin || url.pathname !== '/handoff' || url.searchParams.get('returnTo') !== target.returnPath) {
     throw new Error('Invalid service handoff');
   }
   return href;
