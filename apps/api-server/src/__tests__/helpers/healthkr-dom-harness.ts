@@ -3,7 +3,7 @@
  * 노드 명령에 정해진 결과로 답한다(planner 는 각본). 판정 · 완료 계약 테스트가 화면 각본만 바꿔 쓴다.
  */
 
-import { runWithCommandDriver, waitForTestCommand } from './run-with-command-driver.js';
+import { runWithCommandDriver, driveTestCommands } from './run-with-command-driver.js';
 import { LOCAL_AGENT_ACTIONS, parseLocalAction } from '../../services/local-agent/local-agent-protocol.js';
 import { submitCommandResult } from '../../services/local-agent/local-agent-service.js';
 import { runWorkAgent, type PlannerInput, type WorkPlanner } from '../../services/ai-tools/work-agent-runtime.js';
@@ -55,9 +55,7 @@ const NOT_FOUND: DomOutcome = { status: 'failed', errorCode: 'DOM_ELEMENT_NOT_FO
 /** 노드 역할 — 쌓이는 명령에 차례로 답한다. 같은 동작이 반복되면 각본의 다음 결과(끝나면 마지막 결과)를 낸다. */
 export async function answerNodeCommands(db: LocalAgentDb, script: DomScript, limit = 80, isFinished: () => boolean = () => false): Promise<void> {
   const used = new Map<string, number>();
-  for (let index = 0; index < limit; index += 1) {
-    const cmd = await waitForTestCommand(db.commands, index, 400, isFinished);
-    if (!cmd) return;
+  await driveTestCommands(db.commands, limit, 400, isFinished, async (cmd) => {
     const base = parseLocalAction(String(cmd.action)).base.replace('local.browser.dom.', '');
     const fixed = FIXED_REPLIES.find(([match]) => match(base));
     let outcome: DomOutcome;
@@ -72,7 +70,7 @@ export async function answerNodeCommands(db: LocalAgentDb, script: DomScript, li
     await submitCommandResult(db.dataSource, cmd.device_id, {
       commandId: cmd.command_id, status: outcome.status, errorCode: outcome.errorCode, data: outcome.data,
     } as any);
-  }
+  });
 }
 
 /** 각본 planner — 제안을 차례로 내고(끝나면 마지막 것) 받은 입력을 남긴다. */

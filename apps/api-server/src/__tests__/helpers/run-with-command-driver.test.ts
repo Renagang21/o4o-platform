@@ -1,4 +1,4 @@
-import { runWithCommandDriver, waitForTestCommand } from './run-with-command-driver.js';
+import { runWithCommandDriver, waitForTestCommand, driveTestCommands } from './run-with-command-driver.js';
 
 describe('test command driver completion', () => {
   it('exposes producer completion and preserves both results', async () => {
@@ -57,4 +57,11 @@ describe('test command polling boundaries', () => {
     expect(await waitForTestCommand([], 0, 2, isFinished)).toBeUndefined();
     expect(isFinished).toHaveBeenCalledTimes(2);
   });
+});
+
+it('retains the command-count limit and accumulated trace order', async () => {
+  const result = await driveTestCommands(['first', 'second', 'third'], 2, 200, () => true, async (base, seen) => {
+    seen.push({ base, args: {} });
+  });
+  expect(result.map((entry) => entry.base)).toEqual(['first', 'second']);
 });

@@ -14,7 +14,7 @@ jest.mock('../utils/logger.js', () => ({
   default: { warn: jest.fn(), error: jest.fn(), info: jest.fn(), debug: jest.fn() },
 }));
 
-import { runWithCommandDriver, waitForTestCommand } from './helpers/run-with-command-driver.js';
+import { runWithCommandDriver, driveTestCommands } from './helpers/run-with-command-driver.js';
 import { readFileSync, readdirSync } from 'fs';
 import { join } from 'path';
 import logger from '../utils/logger.js';
@@ -60,25 +60,19 @@ type Outcome = { status: 'success' | 'failed' | 'denied'; errorCode?: string; da
 type Script = Record<string, Outcome[]>;
 
 async function drive(db: LocalAgentDb, script: Script, max = 40, isFinished: () => boolean = () => false) {
-  const seen: { base: string; args: Record<string, unknown> }[] = [];
-  const cursors: Record<string, number> = {};
-  let k = 0;
-  while (k < max) {
-    const cmd = await waitForTestCommand(db.commands, k, 200, isFinished);
-    if (!cmd) break;
-    k += 1;
+  return driveTestCommands(db.commands, max, 200, isFinished, async (cmd, seen, cursors) => {
     const base = parseLocalAction(String(cmd.action)).base.replace('local.browser.dom.', '');
     // WORK-TARGET-DISCOVERY-V0 §34: loop 앞에 대상 준비 명령이 하나 선행한다. 이 spec 은 loop 를 보므로
     // "탭이 이미 열려 있어 재사용" 으로 응답하고 seen 에는 넣지 않는다(대상 축은 work-target-discovery.spec 이 본다).
     if (base === 'local.target.prepare') {
       await submitCommandResult(db.dataSource, cmd.device_id, { commandId: cmd.command_id, status: 'success', data: { targetId: 'healthkr', targetType: 'browser_site', state: 'ready', reusedExisting: true, openedByO4O: false, tabCount: 1, path: '/' } } as any);
-      continue;
+      return;
     }
     // PHASE 1 same-run resume: logical run 을 Local SQLite 에 남기는 ledger 명령(local.data.work_run_*)은 대상 준비처럼
     // loop 관찰 밖의 부수 채널이다 — 이 spec 은 DOM loop 를 보므로 success 로 답하고 seen 에는 넣지 않는다.
     if (base.startsWith('local.data.work_run_')) {
       await submitCommandResult(db.dataSource, cmd.device_id, { commandId: cmd.command_id, status: 'success', data: { runId: 'r_test', runStatus: 'active', saved: true } } as any);
-      continue;
+      return;
     }
     seen.push({ base, args: cmd.result_data ? JSON.parse(String(cmd.result_data)) : {} });
     const queue = script[base] ?? [{ status: 'failed', errorCode: 'DOM_ELEMENT_NOT_FOUND' }];
@@ -86,8 +80,7 @@ async function drive(db: LocalAgentDb, script: Script, max = 40, isFinished: () 
     cursors[base] = (cursors[base] ?? 0) + 1;
     const o = queue[idx];
     await submitCommandResult(db.dataSource, cmd.device_id, { commandId: cmd.command_id, status: o.status, errorCode: o.errorCode, data: o.data } as any);
-  }
-  return seen;
+  });
 }
 
 /** proposal 목록을 순서대로 돌려주는 scripted planner. 다 쓰면 마지막을 반복한다. 호출 입력을 기록한다. */

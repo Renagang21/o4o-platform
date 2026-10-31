@@ -17,3 +17,20 @@ export async function waitForTestCommand<Command>(
   }
   return commands[index];
 }
+
+export type TestCommandTrace = { base: string; args: Record<string, unknown> };
+
+/** Share queue iteration as well as polling; individual harnesses still own their replies. */
+export async function driveTestCommands<Command>(
+  commands: readonly Command[], maxCommands: number, maxPolls: number, isFinished: () => boolean,
+  answer: (command: Command, seen: TestCommandTrace[], cursors: Record<string, number>) => Promise<void>,
+): Promise<TestCommandTrace[]> {
+  const seen: TestCommandTrace[] = [];
+  const cursors: Record<string, number> = {};
+  for (let index = 0; index < maxCommands; index += 1) {
+    const command = await waitForTestCommand(commands, index, maxPolls, isFinished);
+    if (!command) break;
+    await answer(command, seen, cursors);
+  }
+  return seen;
+}

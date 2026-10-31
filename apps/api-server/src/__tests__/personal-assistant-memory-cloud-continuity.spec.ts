@@ -38,7 +38,7 @@ jest.mock('../services/assistant/assistant-task-store.js', () => {
   };
 });
 
-import { runWithCommandDriver, waitForTestCommand } from './helpers/run-with-command-driver.js';
+import { runWithCommandDriver, driveTestCommands } from './helpers/run-with-command-driver.js';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { LOCAL_AGENT_ACTIONS, parseLocalAction } from '../services/local-agent/local-agent-protocol.js';
@@ -347,32 +347,25 @@ const DONE = { assessment: 'progress', action: { kind: 'takeover', reason: 'goal
 interface Node { contextReply: Record<string, unknown>; patterns: Record<string, unknown>[]; contextSaves: unknown[]; ledger: { base: string; args: Record<string, unknown> }[] }
 
 async function drive(db: LocalAgentDb, script: Script, node: Node, max = 60, isFinished: () => boolean = () => false) {
-  const seen: { base: string; args: Record<string, unknown> }[] = [];
-  const cursors: Record<string, number> = {};
-  let k = 0;
-  while (k < max) {
-    const cmd = await waitForTestCommand(db.commands, k, 200, isFinished);
-    if (!cmd) break;
-    k += 1;
+  return driveTestCommands(db.commands, max, 200, isFinished, async (cmd, seen, cursors) => {
     const base = parseLocalAction(String(cmd.action)).base.replace('local.browser.dom.', '');
     const args = cmd.result_data ? JSON.parse(String(cmd.result_data)) : {};
     const reply = (data: unknown) => submitCommandResult(db.dataSource, cmd.device_id, { commandId: cmd.command_id, status: 'success', data } as any);
     if (base.startsWith('local.data.work_run_')) node.ledger.push({ base, args });
-    if (base === 'local.target.prepare') { await reply(READY); continue; }
-    if (base === A.DATA_WORK_RUN_CONTEXT_SAVE) { node.contextSaves.push(args); await reply({ saved: true }); continue; }
-    if (base === A.DATA_WORK_RUN_CONTEXT_RECALL) { await reply(node.contextReply); continue; }
-    if (base === A.DATA_WORK_RUN_ASSISTANCE_RECORD) { await reply({ saved: true, patternCount: 0 }); continue; }
-    if (base === A.DATA_WORK_RUN_EXPERIENCE_RECALL) { await reply(args.taskKey === null ? { taskKeys: [] } : { patterns: node.patterns }); continue; }
-    if (base === A.DATA_WORK_RUN_CANDIDATE_MATCH) { await reply({ matched: false }); continue; }
-    if (base.startsWith('local.data.work_run_')) { await reply({ runId: 'r_test', runStatus: 'active', saved: true }); continue; }
+    if (base === 'local.target.prepare') { await reply(READY); return; }
+    if (base === A.DATA_WORK_RUN_CONTEXT_SAVE) { node.contextSaves.push(args); await reply({ saved: true }); return; }
+    if (base === A.DATA_WORK_RUN_CONTEXT_RECALL) { await reply(node.contextReply); return; }
+    if (base === A.DATA_WORK_RUN_ASSISTANCE_RECORD) { await reply({ saved: true, patternCount: 0 }); return; }
+    if (base === A.DATA_WORK_RUN_EXPERIENCE_RECALL) { await reply(args.taskKey === null ? { taskKeys: [] } : { patterns: node.patterns }); return; }
+    if (base === A.DATA_WORK_RUN_CANDIDATE_MATCH) { await reply({ matched: false }); return; }
+    if (base.startsWith('local.data.work_run_')) { await reply({ runId: 'r_test', runStatus: 'active', saved: true }); return; }
     seen.push({ base, args });
     const queue = script[base] ?? [{ status: 'failed', errorCode: 'DOM_ELEMENT_NOT_FOUND' } as Outcome];
     const idx = Math.min(cursors[base] ?? 0, queue.length - 1);
     cursors[base] = (cursors[base] ?? 0) + 1;
     const o = queue[idx];
     await submitCommandResult(db.dataSource, cmd.device_id, { commandId: cmd.command_id, status: o.status, errorCode: o.errorCode, data: o.data } as any);
-  }
-  return seen;
+  });
 }
 
 function waitingRun(db: LocalAgentDb, runId: string, lastAskedDeviceId: string | null = null) {
