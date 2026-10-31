@@ -80,11 +80,26 @@ describe('커뮤니티 — 전체 관리자만 만들고 전역 operator 는 만
 });
 
 
-describe('중앙 지정은 직영 위임을 포함해 Admin 전용', () => {
+describe('중앙 지정은 서비스 Admin과 명시적으로 위임된 직영 Operator만 허용', () => {
   it.each(['lecture:admin', 'community:admin', 'supplier:admin', 'neture:pharmcoop_admin'])('%s의 직영 위임을 유지한다', role => {
     expect(resolvePlatformInvitationRole(role, role.split(':')[0], 'o4o-direct').role).toBe(role);
   });
   it('기존 중앙 Operator 권한의 해석은 보존한다', () => {
     expect(resolveCentralOperationRole('lecture:operator', 'lecture').role).toBe('lecture:operator');
+  });
+});
+
+
+describe('central Operator invitation boundaries', () => {
+  it.each(['lecture:operator', 'community:operator', 'supplier:operator', 'neture:pharmcoop_operator'])('%s requires central provenance', role => {
+    const service = role.split(':')[0];
+    expect(resolvePlatformInvitationRole(role, service, 'o4o-direct').role).toBe(role);
+    expect(() => resolvePlatformInvitationRole(role, service)).toThrow();
+  });
+  it.each(['neture:megapharm_operator', 'neture:carepharm_operator', 'kpa:operator', 'platform:operator'])('does not centrally delegate %s', role => {
+    expect(() => resolvePlatformInvitationRole(role, role.split(':')[0], 'o4o-direct')).toThrow();
+  });
+  it('rejects a mismatched service for central operators', () => {
+    expect(() => resolvePlatformInvitationRole('supplier:operator', 'lecture', 'o4o-direct')).toThrow();
   });
 });

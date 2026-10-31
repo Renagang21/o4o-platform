@@ -72,6 +72,15 @@ integration(
         JOIN central_operation_menu_grants g ON g.assignment_id=ra.id WHERE ra.user_id=$1 AND ra.role='lecture:admin'`,[target]);
       expect(rows).toEqual([{scope_type:'o4o-direct',menu_keys:['lecture.instructors'],invitation_id:null}]);
     });
+    it('keeps central Operator duties and provenance through acceptance', async () => {
+      await service.create({targetUserId:target,serviceKey:'lecture',role:'lecture:operator',actorId:admin,scopeKey:'o4o-direct',menuKeys:['lecture.instructors']});
+      const preview = await service.inspect(token(),target);
+      expect(preview).toMatchObject({centralDelegation:true,menuKeys:['lecture.instructors']});
+      await service.accept(token(),target);
+      const rows = await query(`SELECT ra.scope_type,g.menu_keys,g.invitation_id FROM role_assignments ra
+        JOIN central_operation_menu_grants g ON g.assignment_id=ra.id WHERE ra.user_id=$1 AND ra.role='lecture:operator'`,[target]);
+      expect(rows).toEqual([{scope_type:'o4o-direct',menu_keys:['lecture.instructors'],invitation_id:null}]);
+    });
     it('rejects cross-service duties and menu selection on ordinary invitations before persisting an invite',async()=>{
       await expect(service.create({targetUserId:target,serviceKey:'lecture',role:'lecture:admin',actorId:admin,scopeKey:'o4o-direct',menuKeys:['supplier.suppliers']})).rejects.toMatchObject({status:400});
       await expect(service.create({targetUserId:target,serviceKey:'lecture',role:'lecture:admin',actorId:admin,menuKeys:['lecture.instructors']})).rejects.toMatchObject({statusCode:400});
@@ -373,7 +382,7 @@ integration(
         service.manage(invite.id, admin, 'resend'),
       ).rejects.toMatchObject({ code: 'INVITATION_RESEND_TOO_SOON' });
     });
-    it.each(['', 'o4o-direct'])('keeps legacy central Operator invitations cancellable but refuses new acceptance or resend (scope=%s)', async scopeKey => {
+    it.each([''])('keeps unscoped legacy Operator invitations cancellable but refuses acceptance or resend (scope=%s)', async scopeKey => {
       const oldToken = 'b'.repeat(64);
       const [legacy] = await query(`INSERT INTO service_operator_invitations(invited_email,service_key,role,purpose,target_user_id,invited_by_user_id,token_hash,expires_at,created_at,updated_at)
         SELECT email,'lecture','lecture:operator','assignment',id,$2,$3,$4,$5,$5 FROM users WHERE id=$1 RETURNING id`,

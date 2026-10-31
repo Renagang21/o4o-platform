@@ -101,10 +101,10 @@ export const CENTRAL_OPERATION_ROLES = new Set([
   'neture:pharmcoop_admin', 'neture:pharmcoop_operator',
 ]);
 export const ASSIGNABLE_ROLES: Record<string, OperatorRoleOption[]> = Object.fromEntries(
-  Object.entries(OPERATOR_ROLE_CATALOG).map(([service, roles]) => [service, roles.filter(role => /(?:[:_])admin$/.test(role.value))]),
+  Object.entries(OPERATOR_ROLE_CATALOG).map(([service, roles]) => [service, roles.filter(role => /(?:[:_])admin$/.test(role.value) || CENTRAL_OPERATION_ROLES.has(role.value))]),
 );
 
-/** 부여 가능한 role 전체 — 서버 `ASSIGNABLE_SERVICE_ADMIN_ROLES` 와 같은 순서·같은 집합이어야 한다. */
+/** 부여 가능한 role 전체 — 서버 `ASSIGNABLE_PLATFORM_INVITATION_ROLES` 와 같은 순서·같은 집합이어야 한다. */
 export const ASSIGNABLE_ROLE_VALUES: readonly string[] = Object.values(ASSIGNABLE_ROLES).flatMap((rs) =>
   rs.map((r) => r.value),
 );

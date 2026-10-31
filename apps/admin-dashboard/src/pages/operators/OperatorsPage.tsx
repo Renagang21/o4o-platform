@@ -60,7 +60,6 @@ import { resolveCanonicalServiceKey } from '@o4o/security-core';
 import {
   ASSIGNABLE_ROLES,
   CENTRAL_OPERATION_ROLES,
-  ASSIGNABLE_ROLE_VALUES,
   CATALOG_ROLE_VALUES,
   REGISTRABLE_SERVICE_KEYS,
 } from '@/lib/operator-role-catalog';
@@ -72,8 +71,6 @@ import {
   type BusinessLedgerState,
   type BusinessLedgerStatus,
 } from '@/lib/business-ledger';
-
-const SERVICE_ADMIN_ROLE_VALUES = new Set(ASSIGNABLE_ROLE_VALUES);
 
 const LEDGER_BADGE: Record<Exclude<BusinessLedgerStatus, 'not_applicable'>, { label: string; className: string }> = {
   loading: { label: '확인 중', className: 'bg-gray-100 text-gray-500' },
@@ -269,10 +266,10 @@ export default function OperatorsPage() {
     if (previous !== null && previous !== accepted) void fetchUsers();
   }, [fetchUsers]);
 
-  // Central assignment management is Admin-only; existing Operator grants remain untouched.
+  // Show service Admins and Operators, including existing grants without central provenance.
   const allRows = useMemo<AssignmentRow[]>(
     () => flattenUsersToAssignments(users).filter((row) =>
-      SERVICE_ADMIN_ROLE_VALUES.has(row.role)),
+      CATALOG_ROLE_VALUES.has(row.role)),
     [users],
   );
 
@@ -296,10 +293,8 @@ export default function OperatorsPage() {
   //   row 단위 active 표시는 status 컬럼이 계속 담당.
   const stats = useMemo(() => {
     const uniqueUsers = new Set(allRows.map((r) => r.userId));
-    const adminCount = allRows.filter((r) => r.parsedRole.roleKey === 'admin' || r.parsedRole.roleKey === 'super_admin').length;
     return {
       users: uniqueUsers.size,
-      admins: adminCount,
     };
   }, [allRows]);
 
@@ -640,8 +635,8 @@ export default function OperatorsPage() {
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <PageHeader
-        title="서비스 관리자"
-        subtitle="서비스 Admin을 지정하고 운영 범위를 관리합니다."
+        title="서비스 관리자·운영자"
+        subtitle="서비스 Admin과 직영 Operator를 초대하고 위임 업무와 권한을 관리합니다."
         backUrl="/"
         backLabel="Dashboard"
         actions={[
@@ -662,7 +657,7 @@ export default function OperatorsPage() {
       {/* Stats — WO-O4O-ADMIN-OPERATORS-REDUNDANT-ACTIVE-KPI-REMOVE-V1: Active KPI 제거 */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
         <StatCard label="표시 계정" value={stats.users} color="text-gray-900" Icon={Users} />
-        <StatCard label="Admin 권한" value={stats.admins} color="text-orange-600" Icon={Shield} />
+        <StatCard label="운영 권한" value={allRows.length} color="text-orange-600" Icon={Shield} />
       </div>
 
       {/* WO-O4O-GOOGLE-ONLY-AUTH-CLEANUP-V1: 운영 권한과 초대 대기를 분리해 표시한다. */}
@@ -683,7 +678,7 @@ export default function OperatorsPage() {
       </div>
 
       <div className="mb-4 space-y-3 rounded border bg-white p-4 text-sm">
-        <p>전체 관리자에서는 서비스 Admin만 지정·관리합니다. Operator는 해당 서비스 Admin이 관리하며 기존 Operator 권한은 유지됩니다. 직영 서비스 Admin은 초대 수락 후 위임받은 중앙 업무를 이용합니다. 전체 관리자 계정은 <Link to="/settings/admin-accounts" className="text-blue-700 underline">전체 관리자 계정</Link>에서 관리합니다.</p>
+        <p>전체 관리자는 서비스 Admin과 직영 업무 Operator를 초대하고 권한을 회수합니다. 직영 담당자는 초대 수락 후 선택한 위임 업무를 이용합니다. 기존 서비스 Admin의 자기 서비스 Operator 관리 권한은 유지되며, 서비스 역할만으로 중앙 업무가 위임되지는 않습니다. 독립 사업·조직의 Operator 지정은 해당 서비스 Admin 화면에서 관리합니다. 전체 관리자 계정은 <Link to="/settings/admin-accounts" className="text-blue-700 underline">전체 관리자 계정</Link>에서 관리합니다.</p>
         <p className="text-gray-600">서비스 역할만 보유한 기존 사용자는 중앙 진입 권한을 자동으로 얻지 않습니다. 초대 수락 후 목록을 새로고침해 주세요. 계정 활성 여부와 실제 서비스 접근 가능 여부는 다릅니다.</p>
       </div>
       <details className="mb-4 rounded border bg-white p-4" onToggle={e => setShowLegacy(e.currentTarget.open)}><summary className="cursor-pointer font-medium">기존·기타 권한 정리</summary>{showLegacy && <UsersListClean />}</details>

@@ -70,13 +70,11 @@ it.each([
 ])("never treats independent/retired %s as a central duty", (role) => {
   expect(() => resolveCentralOperationRole(role, role.split(":")[0])).toThrow();
 });
-it("central invitations require Admin even with explicit delegation provenance", () => {
+it("central Operator invitations require explicit delegation provenance", () => {
   expect(() =>
     resolvePlatformInvitationRole("supplier:operator", "supplier", ""),
   ).toThrow();
-  expect(() =>
-    resolvePlatformInvitationRole("supplier:operator", "supplier", "o4o-direct"),
-  ).toThrow();
+  expect(resolvePlatformInvitationRole("supplier:operator", "supplier", "o4o-direct")).toEqual({ role: "supplier:operator", serviceKey: "supplier" });
   expect(
     resolvePlatformInvitationRole("supplier:admin", "supplier", "o4o-direct"),
   ).toMatchObject({ role: "supplier:admin", serviceKey: "supplier" });

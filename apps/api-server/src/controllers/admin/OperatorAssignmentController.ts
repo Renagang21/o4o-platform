@@ -16,7 +16,7 @@ import {
   operatorAssignmentService,
   OperatorAssignmentError,
 } from '../../services/admin/operator-assignment.service.js';
-import { OperatorRoleContractError, ASSIGNABLE_SERVICE_ADMIN_ROLES } from '../../config/operator-role-catalog.js';
+import { OperatorRoleContractError, ASSIGNABLE_PLATFORM_INVITATION_ROLES } from '../../config/operator-role-catalog.js';
 import logger from '../../utils/logger.js';
 import { ServiceOperatorInvitationError } from '../../services/admin/service-operator-invitation.service.js';
 import { DemoAccountForbiddenError } from '../../services/auth/demo-account.service.js';
@@ -53,7 +53,7 @@ function fail(res: Response, error: unknown, context: string): void {
 export class OperatorAssignmentController {
   /** GET /api/v1/admin/operator-assignments/roles — 부여 가능한 역할 카탈로그(서버 SSOT). */
   listRoles = async (_req: AuthRequest, res: Response): Promise<void> => {
-    res.json({ success: true, data: { roles: ASSIGNABLE_SERVICE_ADMIN_ROLES } });
+    res.json({ success: true, data: { roles: ASSIGNABLE_PLATFORM_INVITATION_ROLES } });
   };
 
   /** GET /api/v1/admin/operator-assignments/candidates?q=... — 지정 후보 검색. */

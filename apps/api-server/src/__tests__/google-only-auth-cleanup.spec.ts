@@ -184,7 +184,7 @@ describe('Google-only 인증 정리 — 되살아나면 먼저 깨진다', () =>
       const f = path.join(SRC, 'controllers/admin/OperatorAssignmentController.ts');
       expect(fs.existsSync(f)).toBe(true);
       const code = codeOnly(read(f));
-      expect(code).toMatch(/roles:\s*ASSIGNABLE_SERVICE_ADMIN_ROLES/);
+      expect(code).toMatch(/roles:\s*ASSIGNABLE_PLATFORM_INVITATION_ROLES/);
       expect(code).not.toMatch(/roles:\s*ASSIGNABLE_OPERATOR_ROLES\b/);
     });
 

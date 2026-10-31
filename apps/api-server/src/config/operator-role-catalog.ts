@@ -104,12 +104,12 @@ export function resolveOperatorRole(role: unknown, serviceKey: unknown): Operato
   return { serviceKey: derived, role: roleValue };
 }
 
-/** The platform administrator assigns service Admins only, including direct central delegation. */
+/** Ordinary service invitations are Admin-only; central Operator delegation is resolved separately below. */
 export const ASSIGNABLE_SERVICE_ADMIN_ROLES = ASSIGNABLE_OPERATOR_ROLES.filter(role => /(?:[:_])admin$/.test(role));
 export function resolveServiceAdminRole(role: unknown, serviceKey: unknown): OperatorRoleResolution {
   const resolved = resolveOperatorRole(role, serviceKey);
   if (!ASSIGNABLE_SERVICE_ADMIN_ROLES.includes(resolved.role)) {
-    throw new OperatorRoleContractError('ROLE_NOT_ASSIGNABLE', '전체관리자는 서비스 Admin만 지정합니다. Operator는 해당 서비스 Admin이 지정하세요.');
+    throw new OperatorRoleContractError('ROLE_NOT_ASSIGNABLE', 'Operator의 중앙 초대에는 직영 업무 위임이 필요합니다. 일반 서비스 Operator는 해당 서비스 Admin이 지정하세요.');
   }
   return resolved;
 }
@@ -128,9 +128,11 @@ export function resolveCentralOperationRole(role: unknown, serviceKey: unknown) 
   }
   return resolved;
 }
+/** Central Operators require explicit direct-operation provenance; independent service operators stay service-admin managed. */
+export const ASSIGNABLE_PLATFORM_INVITATION_ROLES = ASSIGNABLE_OPERATOR_ROLES.filter(role =>
+  ASSIGNABLE_SERVICE_ADMIN_ROLES.includes(role) || CENTRAL_OPERATION_ROLES.includes(role));
 export function resolvePlatformInvitationRole(role: unknown, serviceKey: unknown, scopeKey = '') {
-  const resolved = resolveServiceAdminRole(role, serviceKey);
   return scopeKey === CENTRAL_DELEGATION_SCOPE
-    ? resolveCentralOperationRole(resolved.role, resolved.serviceKey)
-    : resolved;
+    ? resolveCentralOperationRole(role, serviceKey)
+    : resolveServiceAdminRole(role, serviceKey);
 }
