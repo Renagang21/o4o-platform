@@ -38,6 +38,7 @@ jest.mock('../services/assistant/assistant-task-store.js', () => {
   };
 });
 
+import { runWithCommandDriver } from './helpers/run-with-command-driver.js';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { LOCAL_AGENT_ACTIONS, parseLocalAction } from '../services/local-agent/local-agent-protocol.js';
@@ -423,10 +424,10 @@ async function runOn(
   const node: Node = { contextReply: { found: false }, patterns: [], contextSaves: [], ledger: [], ...opts.node };
   const ctx: VerifiedToolContext = { userId: 'user-1', workspace: 'home', localAgentStatus: 'connected', localDeviceId: deviceId };
   const input = { request, ...(opts.runId ? { runId: opts.runId, targetHint: SITE } : {}), ...(opts.intent ? { intent: opts.intent } : {}) };
-  // Stop idle polling only after the producer settles; queued commands still drain.
-  let finished = false;
-  const work = runWorkAgent(db.dataSource, ctx, input, planner).finally(() => { finished = true; });
-  const [result, seen] = await Promise.all([work, drive(db, script, node, 60, () => finished)]);
+  const [result, seen] = await runWithCommandDriver(
+    () => runWorkAgent(db.dataSource, ctx, input, planner),
+    (isFinished) => drive(db, script, node, 60, isFinished),
+  );
   return { result, seen, node };
 }
 

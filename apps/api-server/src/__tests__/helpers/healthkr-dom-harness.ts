@@ -3,6 +3,7 @@
  * 노드 명령에 정해진 결과로 답한다(planner 는 각본). 판정 · 완료 계약 테스트가 화면 각본만 바꿔 쓴다.
  */
 
+import { runWithCommandDriver } from './run-with-command-driver.js';
 import { LOCAL_AGENT_ACTIONS, parseLocalAction } from '../../services/local-agent/local-agent-protocol.js';
 import { submitCommandResult } from '../../services/local-agent/local-agent-service.js';
 import { runWorkAgent, type PlannerInput, type WorkPlanner } from '../../services/ai-tools/work-agent-runtime.js';
@@ -96,13 +97,9 @@ export async function runOnHealthkr(planner: WorkPlanner, script: DomScript, int
   const db = makeDb();
   await pairAndRegister(db);
   await connected(db);
-  // Stop idle polling only after the producer settles; queued commands still drain.
-  let finished = false;
-  const work = runWorkAgent(db.dataSource, userContext(), { request: HEALTHKR.request, ...(intent ? { intent } : {}), ...(judge ? { judge } : {}) }, planner)
-    .finally(() => { finished = true; });
-  const [result] = await Promise.all([
-    work,
-    answerNodeCommands(db, script, 80, () => finished),
-  ]);
+  const [result] = await runWithCommandDriver(
+    () => runWorkAgent(db.dataSource, userContext(), { request: HEALTHKR.request, ...(intent ? { intent } : {}), ...(judge ? { judge } : {}) }, planner),
+    (isFinished) => answerNodeCommands(db, script, 80, isFinished),
+  );
   return result;
 }

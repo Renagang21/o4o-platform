@@ -14,6 +14,7 @@ jest.mock('../utils/logger.js', () => ({
   default: { warn: jest.fn(), error: jest.fn(), info: jest.fn(), debug: jest.fn() },
 }));
 
+import { runWithCommandDriver } from './helpers/run-with-command-driver.js';
 import { readFileSync, readdirSync } from 'fs';
 import { join } from 'path';
 import logger from '../utils/logger.js';
@@ -111,10 +112,10 @@ async function run(request: string, planner: WorkPlanner, script: Script, extra:
   const db = makeDb();
   await pairAndRegister(db);
   await connected(db);
-  // Stop idle polling only after the producer settles; queued commands still drain.
-  let finished = false;
-  const work = runWorkAgent(db.dataSource, ctx(), { request, ...extra }, planner).finally(() => { finished = true; });
-  const [result, seen] = await Promise.all([work, drive(db, script, 40, () => finished)]);
+  const [result, seen] = await runWithCommandDriver(
+    () => runWorkAgent(db.dataSource, ctx(), { request, ...extra }, planner),
+    (isFinished) => drive(db, script, 40, isFinished),
+  );
   return { result, seen, db };
 }
 
