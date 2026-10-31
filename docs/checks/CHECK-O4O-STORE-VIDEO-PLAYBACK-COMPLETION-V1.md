@@ -1,7 +1,7 @@
 # CHECK-O4O-STORE-VIDEO-PLAYBACK-COMPLETION-V1
 
 - 작성일: 2026-10-31
-- 상태: LOCAL_VERIFIED — PR CI·Codex 검증 진행, main 병합 전
+- 상태: IMPLEMENTATION_VERIFIED — 코드 HEAD CI·Sonar·CodeQL·Codex PASS, main 병합 전(문서 기록 후 최종 PR HEAD gate 재확인)
 - 기준 main: `0ab734a68c599e63e00c6f4d972243b77df03416`
 - 범위: [TODO](../work-orders/TODO-O4O-STORE-VIDEO-PLAYBACK-COMPLETION-V1.md), 기존 매장 영상 저장·목록 재생·태블릿 ScreenSet 연결
 
@@ -46,7 +46,7 @@ DB 검증은 이 작업 전용 Docker PostgreSQL에서만 수행하며 운영 DB
 
 - PR: https://github.com/Renagang21/o4o-platform/pull/901
 - 초기 Codex P1: 강제 편성 payload의 mediaType 생략을 이미지 기본값보다 앞서 hosted URL로 판별하고, 영상에는 이미지 타이머를 적용하지 않도록 수정했다. 실제 forced payload 형식과 60초 경과·종료 이벤트 회귀 테스트 PASS.
-- 초기 Codex P2: 영상 picker는 기존 `storageType=internal` 필터를 Store API까지 전달하고, 관리 GCS 파일·MP4/WebM·비보관(archived 아님) 조건으로 선택 결과를 제한한다. 외부 영상 링크/지원하지 않는 형식은 보관 파일로 표시하지 않는다. 필터로 빈 페이지가 되더라도 다음 자료 확인을 제공한다. 기본 image 모드 계약은 유지한다.
+- 초기 Codex P2: 영상 picker는 기존 `storageType=internal` 필터를 Store API까지 전달하고, 관리 GCS 파일·MP4/WebM·비보관 처리 아님(archived 제외) 조건으로 선택 결과를 제한한다. 외부 영상 링크/지원하지 않는 형식은 보관 파일로 표시하지 않는다. 필터로 빈 페이지가 되더라도 다음 자료 확인을 제공한다. 기본 image 모드 계약은 유지한다.
 - CI/Codex 최종 상태는 PR의 최종 HEAD에서 확인한다. main merge·배포는 실행하지 않는다.
 
 ## Sonar 보완 검증
@@ -56,3 +56,32 @@ DB 검증은 이 작업 전용 Docker PostgreSQL에서만 수행하며 운영 DB
 - 자산 row lock은 UUID 정렬 비교를 명시하고 Promise chain으로 순차 획득한다. 순서를 병렬화하지 않는다. 영상은 기존 무음 시작 동작을 명시하고, 상태·터치 버튼 의미와 편집 행의 UI key를 보완했다. UI key는 DB에 저장하지 않는다.
 - 브라우저 fixture의 ffmpeg는 고정 절대 실행 경로를 사용하며 PC/모바일은 독립 context에서 검증한다. 태블릿 영상 picker 기본 폴더는 실제 기존 `general`을 사용한다.
 - 보완 후 Store 전체 917 tests, 관련 서버 32 tests, 실제 Chromium 1365px/390px 재생·선택, 코드 lint 오류 0을 확인했다. 서버·소비처 타입과 최종 CI/Sonar는 PR의 해당 HEAD에서 확인한다.
+
+## 코드 최종 검증 / 인계 기록
+
+| 항목 | 결과 |
+|---|---|
+| 코드 HEAD | `098990f49c86d57a097fb2924402269fcb0a19cb` |
+| CI Pipeline | [41182145498](https://github.com/Renagang21/o4o-platform/actions/runs/41182145498), CI Gate 포함 모든 실행 job PASS(범위별 의도된 SKIP 제외) |
+| CodeQL | [41182145567](https://github.com/Renagang21/o4o-platform/actions/runs/41182145567) PASS |
+| Sonar | check `124482687519` PASS; 신규 이슈 0, accepted 이슈 0, 보안 점검 항목 0, 신규 코드 중복률 0.0% |
+| Codex | 같은 코드 HEAD 재검토 완료, 추가 지적·미해결 finding 없음 |
+| 로컬 Store 회귀 | 88 suites / 917 tests PASS |
+| 로컬 추가 검증 | 관련 서버 32 tests, API·Store·Neture·약국업무 타입, Store production build, Chromium 1365px/390px PASS |
+| main / deployment | 미병합 / 미배포. 사용자 지정 개발 종료점 유지 |
+
+이 commit은 위 결과를 기록하는 문서 변경이다. 최종 인계 전 PR의 최신 HEAD에서도 CI와 리뷰 상태를 다시 확인한다. 과거 코드 HEAD의 PASS를 새 코드 수정의 검증으로 대신하지 않는다.
+
+```text
+WORKTREE_DISPOSITION
+worktree: /workspace/o4o-wt/store-video-playback-completion
+branch: wo/store-video-playback-completion
+base: 0ab734a68c599e63e00c6f4d972243b77df03416
+main integration: NOT_MERGED (PR #901 OPEN)
+deployment: NOT_RUN_BY_SCOPE
+smoke: synthetic Chromium PASS / physical pharmacy NOT_RUN (field check)
+other session usage: none observed; other worktrees untouched
+verdict: KEEP — main 병합 전 통합 담당 인계용
+```
+
+`/tmp/o4o-video-*`의 검증 로그·스크린샷은 로컬 임시 자료이며 Git에 포함하지 않았다. 환경 폐기 시 필요하면 별도 보존한다. 재현 가능한 테스트 소스와 검증 요약은 이 branch에 commit/push한다.

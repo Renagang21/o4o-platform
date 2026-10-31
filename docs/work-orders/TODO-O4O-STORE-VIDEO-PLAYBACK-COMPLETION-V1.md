@@ -1,6 +1,6 @@
 # TODO-O4O-STORE-VIDEO-PLAYBACK-COMPLETION-V1
 
-- 상태: LOCAL_VERIFIED — 구현·로컬 검증 완료, PR CI·리뷰 진행 후 main 병합 전 인계
+- 상태: IMPLEMENTATION_VERIFIED — 코드 검증·리뷰 보완 완료, main 병합 전 인계(문서 기록 후 최종 PR HEAD gate 재확인)
 - 작성일: 2026-10-31
 - 기준 main: `0ab734a68c599e63e00c6f4d972243b77df03416`
 - 사용자 지시: TODO를 만들고 코드·문서로 보정한 뒤, 영상 저장·목록 재생 흐름을 한 업무 묶음으로 개발한다.
@@ -40,7 +40,7 @@
 - [x] 지정 YouTube 채널 업로드 진입과 완료된 개별 영상 등록·검증·수정 연결
 - [x] 보관 자산의 삭제/사용처 경계를 기존 연결 원장으로 유지하고 임시 VIDEO output과 혼동하지 않게 표시
 - [x] 기능/격리 API 계약·PC/모바일 브라우저·소비 서비스 타입/build·오류/매장 전환/중복 요청 회귀 검증
-- [ ] TODO/CHECK·정본 정합, 정확한 scope commit/push, 동일 PR CI·Codex 지적 보완 후 병합 직전 인계
+- [x] TODO/CHECK·정본 정합, 정확한 scope commit/push, 동일 PR CI·Codex 지적 보완 및 코드 HEAD 병합 준비 확인
 
 ## 경계
 
@@ -49,3 +49,10 @@
 ## 로컬 검증
 
 [CHECK](../checks/CHECK-O4O-STORE-VIDEO-PLAYBACK-COMPLETION-V1.md)에 실제 검증 결과·합성 fixture 범위·YouTube 수동 업로드 및 현장 점검 경계를 기록했다.
+
+## 병합 전 인계
+
+- PR: https://github.com/Renagang21/o4o-platform/pull/901
+- 검증한 코드 HEAD: `098990f49c86d57a097fb2924402269fcb0a19cb`.
+- CI Gate `41182145498`, CodeQL `41182145567`, Sonar gate(신규 이슈/보안 점검 항목/중복률 0), Codex 재검토 PASS. 상세는 CHECK를 따른다.
+- 이 결과를 기록하는 문서 commit 뒤에도 최종 PR HEAD의 gate를 재확인한다. main 병합·배포는 실행하지 않는다.
