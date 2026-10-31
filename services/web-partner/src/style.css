@@ -1,3 +1,7 @@
+@import "../../../packages/auth-react/src/public-brand/tokens.css";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 :root {
   font-family:
     Pretendard,
@@ -145,11 +149,11 @@ p {
   color: #89958c;
   margin: 0 15px 20px;
 }
-nav {
+.app nav {
   display: grid;
   gap: 7px;
 }
-nav a {
+.app nav a {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -158,15 +162,15 @@ nav a {
   color: #66736a;
   font-weight: 550;
 }
-nav a > span {
+.app nav a > span {
   font-size: 20px;
   width: 22px;
   text-align: center;
 }
-nav a:hover {
+.app nav a:hover {
   background: #eaf0e7;
 }
-nav a[aria-current="page"] {
+.app nav a[aria-current="page"] {
   background: #193f34;
   color: white;
 }
@@ -799,7 +803,7 @@ fieldset > .button {
   background: #faeee5;
   color: #9b4e25;
 }
-footer {
+.app footer {
   margin-top: 50px;
   display: flex;
   gap: 16px;
@@ -809,15 +813,15 @@ footer {
   color: #98a18f;
   font-size: 10px;
 }
-footer > span:first-child {
+.app footer > span:first-child {
   font-weight: 700;
   font-size: 16px;
   color: #8a9b7d;
 }
-footer p {
+.app footer p {
   margin: 0;
 }
-footer > span:last-child {
+.app footer > span:last-child {
   margin-left: auto;
 }
 @media (min-width: 1500px) {
@@ -888,18 +892,18 @@ footer > span:last-child {
   .sidebar-note {
     display: none;
   }
-  nav {
+  .app nav {
     display: flex;
     overflow-x: auto;
     gap: 5px;
     padding-bottom: 3px;
   }
-  nav a {
+  .app nav a {
     white-space: nowrap;
     font-size: 12px;
     padding: 9px 12px;
   }
-  nav a > span {
+  .app nav a > span {
     font-size: 16px;
     width: auto;
   }
@@ -1069,16 +1073,16 @@ footer > span:last-child {
   .empty {
     padding: 35px 20px;
   }
-  footer {
+  .app footer {
     margin-top: 32px;
     flex-wrap: wrap;
     gap: 8px;
   }
-  footer > span:last-child {
+  .app footer > span:last-child {
     margin-left: 0;
     width: 100%;
   }
-  footer > p {
+  .app footer > p {
     font-size: 9px;
   }
 }
@@ -1414,3 +1418,8 @@ th {
 .community-search {display:flex;gap:10px;align-items:end;margin:20px 0}.community-search label {display:grid;gap:8px;flex:1}.community-check {display:flex;gap:10px;align-items:flex-start;margin:18px 0}.community-check input {width:auto;flex:0 0 auto;margin-top:5px}
 .community-tabs {margin:16px 0}.community-operation {border:2px solid #31584a;margin:20px 0}.community-footer {padding:28px 24px;text-align:center;color:#63726a;border-top:1px solid #dce5df}.community-shell textarea {max-width:100%}
 @media(max-width:700px) {.partner-header {padding:16px;gap:16px}.partner-header nav {order:3;width:100%;gap:20px;font-size:14px}.community-shell {padding:20px 16px 40px}.community-grid {grid-template-columns:1fr;gap:16px}.community-grid aside nav {display:flex;flex-wrap:wrap;gap:16px;margin:12px 0 20px}.community-hero {padding:24px 0}.community-search {align-items:stretch;flex-direction:column}.community-grid .panel {padding:20px}.community-tabs {gap:8px}}
+
+.partner-account-tools { display: inline-flex; flex-wrap: wrap; justify-content: flex-end; align-items: center; gap: 10px; }
+.app > .topbar { height: auto; min-height: 56px; justify-content: flex-end; }
+.shell > section { min-width: 0; padding: 24px; }
+@media (max-width: 620px) { .shell > section { padding: 16px; } }

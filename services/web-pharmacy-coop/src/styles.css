@@ -1,3 +1,4 @@
+@import "../../../packages/auth-react/src/public-brand/tokens.css";
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -622,3 +623,5 @@ button:disabled { opacity: .55; cursor: not-allowed; }
   .header-row nav { min-width: 0; width: 100%; overflow-x: auto; flex-wrap: nowrap; gap: 20px; }
   .header-row nav a { flex-shrink: 0; white-space: nowrap; }
 }
+
+.coop-account-tools { display: inline-flex; flex-wrap: wrap; justify-content: flex-end; align-items: center; gap: 10px; }
