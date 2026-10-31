@@ -40,3 +40,9 @@ PR 검증 결과는 [PR #911](https://github.com/Renagang21/o4o-platform/pull/91
 ### 리뷰 보완 — 과거 관측 대상
 
 PR #911의 P1 지적에 따라 과거 WO/CHECK/IR 84건의 본문에서 현재 호스트를 과거 관측 대상으로 표시하지 않도록 보완했다. 현재 이름·주소는 별도 현행 안내에만 두고, 과거 증적은 “당시 구명칭·구호스트”로 구분한다. 이전 이름·URL을 전부 제거하라는 사용자 지시를 따르면서 현재 도메인을 과거에 검증한 것으로 오인하지 않게 한다. 원문·실제 당시 호스트는 Git 이력에 보존되어 있으며 이력 재작성은 없다.
+
+### 최신 main 공통 UI 통합
+
+main `c7c5cd100c`(PR #907)을 작업 branch에 통합했다. 공통 서비스 목록 충돌은 main의 `serviceKey`·세션 복귀 기능을 유지하면서 드럭스토어형 약국의 새 키·표시명·주소를 적용했다. 새 `serviceReturnContext`와 API handoff 별칭도 새 키로 정렬했다. 추가 원장·권한 승인은 없다.
+
+통합 후 API 인증/대표 진입 75 tests PASS, 별도 실제 로컬 PostgreSQL handoff 38 tests PASS(처음에는 해당 PG suite를 건너뛰었으며 전용 DB 준비 후 실제 실행했다). 약국 앱 172 tests·서비스 전환 21 tests·auth-utils 43 tests, Pharmacy/Neture production build·API type-check, PC/390px 합성 브라우저 4흐름을 재검증했다. 이전 커밋의 검증으로 최종 HEAD 성공을 대신하지 않으며 최종 CI/리뷰는 PR에서 확인한다.
