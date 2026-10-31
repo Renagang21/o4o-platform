@@ -91,6 +91,49 @@ describe('EmailSignupForm', () => {
   }
   const submit = () => screen.getByRole('button', { name: '가입하고 확인 메일 받기' }) as HTMLButtonElement;
 
+  it.each(['+82 10-1234-5678', '+82 (0)10 1234 5678', '010-1234-5678'])(
+    '국내 연락처 자동완성 형식 %s → 국내 번호로 한 번 제출', async (phone) => {
+      const signup = vi.fn(async () => ({ mailSent: true }));
+      render(<EmailSignupForm api={{ getSignupTerms: async () => TERMS, signupWithEmail: signup, resendVerificationEmail: vi.fn() }} termsHref="/terms" privacyHref="/privacy" />);
+      await screen.findByRole('link', { name: '내용 보기 · 버전 1' });
+      fill({ phone });
+      screen.getAllByRole('checkbox').slice(0, 2).forEach(box => fireEvent.click(box));
+      expect(submit().disabled).toBe(false);
+      fireEvent.click(submit());
+      await screen.findByTestId('email-sent-notice');
+      expect(signup).toHaveBeenCalledTimes(1);
+      expect(signup).toHaveBeenCalledWith(expect.objectContaining({ phone: '01012345678' }));
+    },
+  );
+
+  it.each(['+1 202-555-0100', '+82 2-1234-5678', '+82 10-123'])('잘못된 연락처 %s는 전송하지 않고 이유를 안내', async (phone) => {
+    const signup = vi.fn();
+    render(<EmailSignupForm api={{ getSignupTerms: async () => TERMS, signupWithEmail: signup, resendVerificationEmail: vi.fn() }} termsHref="/terms" privacyHref="/privacy" />);
+    await screen.findByRole('link', { name: '내용 보기 · 버전 1' });
+    fill({ phone });
+    screen.getAllByRole('checkbox').slice(0, 2).forEach(box => fireEvent.click(box));
+    expect(submit().disabled).toBe(true);
+    expect(screen.getByRole('status').textContent).toContain('국내 휴대전화 번호 입력');
+    fireEvent.submit(screen.getByTestId('email-signup-form'));
+    expect(signup).not.toHaveBeenCalled();
+  });
+
+  it('닉네임 누락과 필수 동의를 버튼 바로 위에 안내하고 해결하면 안내를 지운다', async () => {
+    render(<EmailSignupForm api={{ getSignupTerms: async () => TERMS, signupWithEmail: vi.fn(), resendVerificationEmail: vi.fn() }} termsHref="/terms" privacyHref="/privacy" />);
+    await screen.findByRole('link', { name: '내용 보기 · 버전 1' });
+    fill();
+    fireEvent.change(screen.getByLabelText('닉네임'), { target: { value: ' ' } });
+    expect(submit().getAttribute('aria-describedby')).toBe('o4o-signup-requirements');
+    expect(screen.getByRole('status').textContent).toContain('닉네임 입력');
+    expect(screen.getByRole('status').textContent).toContain('이용약관 동의');
+    expect(screen.getByRole('status').textContent).toContain('개인정보 처리방침 동의');
+    fireEvent.change(screen.getByLabelText('닉네임'), { target: { value: 'Fixture nickname' } });
+    screen.getAllByRole('checkbox').slice(0, 2).forEach(box => fireEvent.click(box));
+    expect(submit().disabled).toBe(false);
+    expect(submit().hasAttribute('aria-describedby')).toBe(false);
+    expect(screen.queryByText(/가입 버튼을 누르려면/)).toBeNull();
+  });
+
   it('필수 약관 전까지 제출 불가 → 동의 후 가입 → 확인 메일 안내', async () => {
     const signup = vi.fn(async () => ({ maskedEmail: 'n**@x.com', mailSent: true }));
     render(
