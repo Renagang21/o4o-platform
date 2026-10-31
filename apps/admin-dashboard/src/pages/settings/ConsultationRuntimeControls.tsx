@@ -23,7 +23,7 @@ export function ConsultationRuntimeControls({ control }: { control: ModelControl
         <div><p>Google 음성 자동 감지 후보 · 최대 3개</p><div className="flex flex-wrap gap-3">{languages.map(([code, label]) => <label key={code} className="flex min-h-11 items-center gap-1"><input type="checkbox" checked={settings.speechLanguages.includes(code)}
           disabled={!settings.speechLanguages.includes(code) && settings.speechLanguages.length >= 3}
           onChange={event => setSettings(previous => ({ ...previous, speechLanguages: event.target.checked ? [...previous.speechLanguages, code] : previous.speechLanguages.filter(value => value !== code) }))} />{label}</label>)}</div></div>
-        <button className="min-h-11 rounded border px-4 disabled:opacity-50" disabled={!settings.speechLanguages.length}>상담 실행 수단 저장</button>
+        <button type="submit" className="min-h-11 rounded border px-4 disabled:opacity-50" disabled={!settings.speechLanguages.length}>상담 실행 수단 저장</button>
       </fieldset>
     </form>
     <p className="text-sm">브라우저 음성 인식은 선택 언어를 사용합니다. Chrome 텍스트 언어 감지는 기기별 지원 확인이 필요하며 모바일에서 보장되지 않습니다. Google은 서버 ADC·프로젝트와 모델별 가격/한도 준비가 필요합니다. STT는 음성 초, 번역·TTS는 문자 단위로 측정합니다.</p>

@@ -87,7 +87,7 @@ export function ConsultationSupportPanel({ organizationId, mode, product, room, 
         disabled={busy || locked} onChange={e => change(() => setQuestion(e.target.value))} /></label>
       {inquiry && <button className={button} disabled={busy || locked} onClick={() => change(() => setQuestion(inquiry))}>현재 고객 질문 사용</button>}
       {onSelectProduct && <button className={button} disabled={busy || locked || !question.trim()} onClick={() => void find()}>상담 맥락으로 매장 상품 찾기</button>}
-      {!!turns.length && <details><summary>이번 상담에서 확인할 질문 ({turns.length})</summary><ul>{turns.map((turn, i) => <li key={i}>{turn}</li>)}</ul><button className={button} disabled={busy || locked} onClick={() => change(() => { setTurns([]); setSearch(null); })}>이번 상담 맥락 비우기</button></details>}
+      {!!turns.length && <details><summary>이번 상담에서 확인할 질문 ({turns.length})</summary><ul>{turns.map(turn => <li key={turn}>{turn}</li>)}</ul><button className={button} disabled={busy || locked} onClick={() => change(() => { setTurns([]); setSearch(null); })}>이번 상담 맥락 비우기</button></details>}
       {search && <div role="status" className="space-y-2 rounded border p-3"><p>{search.message}</p>{search.candidates.map(item => <button className={button} key={`${item.kind}:${item.id}`} disabled={busy || locked} onClick={() => { change(() => setSearch(null)); onSelectProduct?.(item); }}>{item.name} · 상품 확인</button>)}</div>}
       {product ? <p className="text-sm">선택 상품: {product.name} · 상품 사실과 전문 근거를 나누어 검토합니다.{product.kind === 'local' && ' 매장 자체 상품은 공통 표준자료가 연결되지 않을 수 있습니다.'}</p> : <p className="text-sm">상품 자료가 필요하면 맥락으로 후보를 찾거나 위의 상품 찾기를 사용할 수 있습니다. 상품이 필요 없는 상담은 그대로 이어가세요.</p>}
       {product && <details><summary className="min-h-11 cursor-pointer content-center">검토한 자료 보완·재사용</summary>
