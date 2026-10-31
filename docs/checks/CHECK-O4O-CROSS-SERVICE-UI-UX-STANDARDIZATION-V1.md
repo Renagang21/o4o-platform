@@ -87,3 +87,28 @@ Git HTTPS 조회는 성공했다. 그러나 `gh pr list`·ruleset 조회는 Forb
 - 구현 commit `20cf1c327819c1735b40293fafb538558aa8e043`의 전용 branch push가 성공했다. GitHub가 반환한 PR 생성 경로는 `https://github.com/Renagang21/o4o-platform/pull/new/wo/cross-service-ui-ux-standardization`이며 실제 PR 번호/생성 증거가 아니다.
 - PR 본문 초안은 로컬 `/tmp/o4o-ui-pr.md`에 준비했다. API 목적지 차단 때문에 PR 생성·실제 ruleset·필수 CI·Codex 리뷰는 미확인이다. access token을 새로 요구하거나 main 보호를 우회하지 않는다.
 - WORKTREE_DISPOSITION: 이번 작업 worktree와 branch는 후속 PR/CI 보완에 필요하므로 KEEP. 작업용 worktree와 기준 checkout의 추적 파일은 clean을 확인하며 다른 세션의 자원은 정리하지 않는다.
+
+
+## 9. 2026-10-31 최신 main 통합 후속 검증
+
+이 절은 앞선 10월 29일 로컬 결과와 원격 차단 기록을 보존한 후속 확인이다. 환경 재연결 후 GitHub API·실제 ruleset·owner CLI 접근이 정상임을 확인했다. 전체 미반영 조사에 따라 [통합 WO](../work-orders/WO-O4O-PENDING-WORK-INTEGRATION-20261031.md)의 전용 branch `wo/pending-work-integration-20261031`에서 최신 main `0ab734a68c`에 원래 UI 이력을 normal merge했다. 기존 UI 전용 branch에는 열린 PR이 없었다.
+
+### Consumer Impact Matrix — 통합본 재실행
+
+| 소비처 | 변경 영향 | route/role/capability 확인 | 실제 검증 | 결과 |
+|---|---|---|---|---|
+| Neture 대표 홈·커뮤니티·My Home·공급자 등 공통 shell | 직접: 전환기·디렉터리·헤더/푸터 | 기존 서버 원장·handoff 사용, 최신 Main 일상 업무와 자료 authority 유지 | Vitest 1,493·typecheck·build·PC/모바일 shell/Main smoke | PASS |
+| 강의 | 직접: 전환기·헤더/푸터·Hero | 기존 서비스 가입과 handoff 판정 유지 | Vitest 83·typecheck·build·PC/모바일 smoke | PASS |
+| 내 매장 | 직접: 전환기·헤더/푸터 | 기존 매장 접근, 복수 매장 선택·상담 복구 유지 | Vitest 896·typecheck·build·PC/모바일 smoke | PASS |
+| 약국 협력사업·분회·협동조합 | 전환기/공통 Hero·CSS 직접·간접 | 자체 가입·업무 route·게시 scope 유지 | Vitest 169/25/85·각 typecheck/build | PASS |
+| Admin·Operator·API | Hero 편집기와 type parser | 광고주·URL·게시 범위·동시 수정 검증 유지 | frontend/API typecheck·API Jest 24 | PASS |
+| Partner·병원 도구·계정 앱 | 공통 barrel/CSS 간접, 자체 shell 미교체 | 기존 route 유지 | 전체 frontend typecheck | PASS; 자체 shell 전체 이관은 원래 후속 범위 |
+| 퇴역 K-Cosmetics·PharmacyHub | 재도입 없음 | 서비스 디렉터리에 복원하지 않음 | diff·공개 디렉터리 검토 | PASS |
+
+- 공통 Vitest: auth-react 245, shared-space-ui 222, ui 40, store-ui-core 156 PASS. 위 소비처 테스트와 API 24건을 합쳐 3,438건 PASS이며 이전 실행과 중복 합산하지 않는다.
+- frozen install·전체 package build·위 웹앱 6개 build PASS. 전체 frontend typecheck와 API typecheck PASS.
+- 공통 shell 실제 Chromium 8개 조합 PASS, desktop/mobile 스크린샷으로 header·줄바꿈·footer 배치를 확인했다. API·외부 요청은 합성 응답/차단이며 실계정 세션 교환은 미검증이다.
+- 기존 Main browser 스크립트는 제거된 체크박스를 찾고 있었다. 현행 PC→서버 전환 상태와 버튼으로 보완하고 PC·모바일 2개 시나리오를 통과했다. 동의 시 원본 PC 식별과 이후 server authority·자동 저장·수량/품절 이력·내보내기를 확인했다.
+- 변경 파일 ESLint 오류 0; 기존 공급자 레이아웃 hook dependency 경고 1개는 변경 전부터 존재하며 이번에는 drawer offset만 바꿨다. `--max-warnings 0`의 초기 경고 실패를 숨기지 않는다. 민감정보·JSON·diff 검사 PASS.
+- 계정/원문 대화/업무 자료를 영구 학습 이력으로 추가하지 않았고 외부 ChatGPT 제출·운영 계정 변경·실제 PC/주문·유료 AI를 실행하지 않았다.
+- 최종 원격 CI·리뷰·병합·배포 결과는 위 통합 WO의 PR에서 동일 HEAD/SHA로 후속 기록한다.
