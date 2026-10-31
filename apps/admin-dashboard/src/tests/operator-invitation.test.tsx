@@ -25,6 +25,29 @@ afterEach(() => {
   vi.clearAllMocks();
 });
 describe('operator invitation admin UI', () => {
+  it('플랫폼 홈 배너 경로는 직영 담당자 지정 모달을 열고 독립·퇴역 서비스는 제외한다', async () => {
+    h.get.mockResolvedValue({ data: { data: [] } });
+    render(<MemoryRouter initialEntries={['/operators?assignment=central']}><OperatorsPage /></MemoryRouter>);
+    expect(screen.getByRole('heading', { name: '중앙 운영 담당자 지정', exact: true })).toBeTruthy();
+    expect(screen.getByRole('radio', { name: /Neture/ })).toBeTruthy();
+    expect(screen.queryByRole('radio', { name: /약국 경영지원/ })).toBeNull();
+    expect(screen.queryByRole('radio', { name: /MegaPharm/ })).toBeNull();
+    expect(screen.queryByRole('radio', { name: /^분회/ })).toBeNull();
+    expect(screen.queryByRole('radio', { name: /CarePharm/ })).toBeNull();
+    expect(h.post).not.toHaveBeenCalled();
+    await act(async () => {});
+  });
+
+  it('일반 서비스 지정에서도 kpa-society를 제거하고 독립 서비스·분회는 유지한다', async () => {
+    h.get.mockResolvedValue({ data: { data: [] } });
+    render(<MemoryRouter><OperatorsPage /></MemoryRouter>);
+    fireEvent.click(screen.getByRole('button', { name: '서비스 담당자 지정' }));
+    expect(screen.queryByRole('radio', { name: /약국 경영지원/ })).toBeNull();
+    expect(screen.getByRole('radio', { name: /MegaPharm/ })).toBeTruthy();
+    expect(screen.getByRole('radio', { name: /분회/ })).toBeTruthy();
+    expect(h.post).not.toHaveBeenCalled();
+    await act(async () => {});
+  });
   it('does not let an older list response remove a newly accepted administrator', async () => {
     let finishInitial!: (value: unknown) => void;
     const initial = new Promise(resolve => { finishInitial = resolve; });

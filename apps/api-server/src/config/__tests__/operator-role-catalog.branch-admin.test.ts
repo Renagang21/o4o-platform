@@ -81,6 +81,11 @@ describe('커뮤니티 — 전체 관리자만 만들고 전역 operator 는 만
 
 
 describe('중앙 지정은 직영 위임을 포함해 Admin 전용', () => {
+  it('퇴역 kpa-society의 신규 지정·초대는 거절하고 기존 역할 해석은 유지한다', () => {
+    expect(() => resolvePlatformInvitationRole('kpa:admin', 'kpa-society')).toThrow(/제거된 kpa-society/);
+    expect(resolveOperatorRole('kpa:admin', 'kpa-society').role).toBe('kpa:admin');
+    expect(resolvePlatformInvitationRole('kpa-branch:admin', 'kpa-branch').role).toBe('kpa-branch:admin');
+  });
   it.each(['lecture:admin', 'community:admin', 'supplier:admin', 'neture:pharmcoop_admin'])('%s의 직영 위임을 유지한다', role => {
     expect(resolvePlatformInvitationRole(role, role.split(':')[0], 'o4o-direct').role).toBe(role);
   });

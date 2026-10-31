@@ -15,6 +15,9 @@ async function mockApi(page: Page, roles: string[] | null = ['platform:super_adm
     if (path === '/api/v1/auth/google/config') return json({ success: true, data: { enabled: false, clientId: null } });
     if (path === '/api/v1/admin/pending-tasks/summary') return json({ success: true, data: { total: 0, productRegistrationRequests: 0, manualReviews: 0 } });
     if (path === '/api/v1/admin/platform-accounts') return json({ success: true, data: [] });
+    if (path === '/api/v1/admin/users') return json({ success: true, users: [] });
+    if (path === '/api/v1/admin/service-operator-invitations') return json({ success: true, data: [] });
+    if (path === '/api/v1/neture/admin/semi-franchises') return json({ success: true, data: [] });
     if (path === '/api/v1/admin/platform-users') return json({ success: true, data: [], pagination: { total: 0, totalPages: 1, page: 1, limit: 20 } });
     if (path === '/api/v1/admin/users/erasure-capabilities') return json({ success: true, data: { enabled: false } });
     return json({ success: false, error: 'Unmocked test API' }, 404);
@@ -25,13 +28,30 @@ for (const viewport of [{ name: 'desktop', width: 1280, height: 800 }, { name: '
   test.describe(viewport.name, () => {
     test.use({ viewport: { width: viewport.width, height: viewport.height } });
     test('remaining navigation and old bookmarks work after refresh without retired API calls', async ({ page }) => {
+      test.setTimeout(60_000);
       const api = await mockApi(page);
       const errors: string[] = [];
       page.on('pageerror', error => errors.push(error.message));
       await page.goto('/admin/platform');
       const nav = page.getByRole('navigation', { name: '플랫폼 관리 메뉴' });
       await expect(nav.getByRole('link')).toHaveText(['플랫폼 홈', '전체 관리자 계정', '사용자 조회']);
-      await expect(page.getByRole('link', { name: /서비스 관리자·운영자.*서비스별 관리자/ })).toHaveAttribute('href', '/operators');
+      await expect(page.getByRole('link', { name: /서비스 관리자·운영자/ })).toHaveAttribute('href', '/operators');
+      await page.getByRole('link', { name: '중앙 운영 담당자 지정', exact: true }).click();
+      // OperatorsPage is lazy loaded; a cold development build needs longer than the default 5 seconds.
+      await expect(page.getByRole('heading', { name: '중앙 운영 담당자 지정', exact: true })).toBeVisible({ timeout: 20_000 });
+      await expect(page.getByRole('radio', { name: /Neture/ })).toBeVisible();
+      await expect(page.getByRole('radio', { name: /약국 경영지원|kpa-society|MegaPharm|CarePharm/ })).toHaveCount(0);
+      await page.getByRole('radio', { name: /Neture/ }).check();
+      await page.getByRole('radio', { name: /^Admin/ }).check();
+      await expect(page.getByRole('group', { name: '위임할 운영 업무' })).toBeVisible();
+      await page.getByRole('button', { name: '담당자 지정 창 닫기' }).click();
+      await expect(page).toHaveURL(/\/operators$/);
+      await page.getByRole('button', { name: '서비스 담당자 지정' }).click();
+      await expect(page.getByRole('radio', { name: /분회/ })).toBeVisible();
+      await expect(page.getByRole('radio', { name: /MegaPharm/ })).toBeVisible();
+      await expect(page.getByRole('radio', { name: /약국 경영지원|kpa-society/ })).toHaveCount(0);
+      await page.getByRole('button', { name: '담당자 지정 창 닫기' }).click();
+      await page.goto('/admin/platform');
       await nav.getByRole('link', { name: '전체 관리자 계정', exact: true }).click();
       await expect(page.getByRole('heading', { name: '전체 관리자 계정', exact: true })).toBeVisible();
       await page.goto('/admin/platform/users');

@@ -101,7 +101,9 @@ export const CENTRAL_OPERATION_ROLES = new Set([
   'neture:pharmcoop_admin', 'neture:pharmcoop_operator',
 ]);
 export const ASSIGNABLE_ROLES: Record<string, OperatorRoleOption[]> = Object.fromEntries(
-  Object.entries(OPERATOR_ROLE_CATALOG).map(([service, roles]) => [service, roles.filter(role => /(?:[:_])admin$/.test(role.value))]),
+  // Retired kpa-society stays in historical metadata, never in new assignments.
+  Object.entries(OPERATOR_ROLE_CATALOG).filter(([service]) => service !== 'kpa')
+    .map(([service, roles]) => [service, roles.filter(role => /(?:[:_])admin$/.test(role.value))]),
 );
 
 /** 부여 가능한 role 전체 — 서버 `ASSIGNABLE_SERVICE_ADMIN_ROLES` 와 같은 순서·같은 집합이어야 한다. */
