@@ -14,17 +14,57 @@ import OperatorInvitationsPanel from '../pages/operators/OperatorInvitationsPane
 const h = vi.hoisted(() => ({
   get: vi.fn(),
   post: vi.fn(async () => ({ data: { success: true } })),
+  del: vi.fn(async () => ({ data: { success: true } })),
 }));
 vi.mock('@o4o/auth-client', () => ({
   authClient: {
-    api: { get: h.get, post: h.post, put: vi.fn(), delete: vi.fn() },
+    api: { get: h.get, post: h.post, put: vi.fn(), delete: h.del },
   },
 }));
 afterEach(() => {
   cleanup();
   vi.clearAllMocks();
+  vi.restoreAllMocks();
 });
 describe('operator invitation admin UI', () => {
+  it('퇴역 서비스의 기존 Admin은 조회·회수하고 새 초대 선택지는 제공하지 않는다', async () => {
+    h.get.mockImplementation(async (path: string) => ({ data: path === '/admin/users'
+      ? { success: true, users: [{ id: 'historical-kpa-admin', name: 'Historical KPA Admin', roles: ['kpa:admin'], isActive: true }] }
+      : { data: [] } }));
+    vi.spyOn(window, 'confirm').mockReturnValue(true);
+    render(<MemoryRouter><OperatorsPage /></MemoryRouter>);
+    expect(await screen.findByText('Historical KPA Admin')).toBeTruthy();
+    fireEvent.click(screen.getByTitle('더보기'));
+    fireEvent.click(screen.getByRole('button', { name: '권한 해제 (Admin)' }));
+    await waitFor(() => expect(h.del).toHaveBeenCalledWith('/admin/users/historical-kpa-admin/role-assignments/kpa%3Aadmin'));
+    fireEvent.click(screen.getByRole('button', { name: '서비스 담당자 지정' }));
+    expect(screen.queryByRole('radio', { name: /약국 경영지원|kpa-society/ })).toBeNull();
+    expect(h.post).not.toHaveBeenCalled();
+    await act(async () => {});
+  });
+  it('플랫폼 홈 배너 경로는 직영 담당자 지정 모달을 열고 독립·퇴역 서비스는 제외한다', async () => {
+    h.get.mockResolvedValue({ data: { data: [] } });
+    render(<MemoryRouter initialEntries={['/operators?assignment=central']}><OperatorsPage /></MemoryRouter>);
+    expect(screen.getByRole('heading', { name: '중앙 운영 담당자 지정', exact: true })).toBeTruthy();
+    expect(screen.getByRole('radio', { name: /Neture/ })).toBeTruthy();
+    expect(screen.queryByRole('radio', { name: /약국 경영지원/ })).toBeNull();
+    expect(screen.queryByRole('radio', { name: /MegaPharm/ })).toBeNull();
+    expect(screen.queryByRole('radio', { name: /^분회/ })).toBeNull();
+    expect(screen.queryByRole('radio', { name: /CarePharm/ })).toBeNull();
+    expect(h.post).not.toHaveBeenCalled();
+    await act(async () => {});
+  });
+
+  it('일반 서비스 지정에서도 kpa-society를 제거하고 독립 서비스·분회는 유지한다', async () => {
+    h.get.mockResolvedValue({ data: { data: [] } });
+    render(<MemoryRouter><OperatorsPage /></MemoryRouter>);
+    fireEvent.click(screen.getByRole('button', { name: '서비스 담당자 지정' }));
+    expect(screen.queryByRole('radio', { name: /약국 경영지원/ })).toBeNull();
+    expect(screen.getByRole('radio', { name: /MegaPharm/ })).toBeTruthy();
+    expect(screen.getByRole('radio', { name: /분회/ })).toBeTruthy();
+    expect(h.post).not.toHaveBeenCalled();
+    await act(async () => {});
+  });
   it('does not let an older list response remove a newly accepted administrator', async () => {
     let finishInitial!: (value: unknown) => void;
     const initial = new Promise(resolve => { finishInitial = resolve; });

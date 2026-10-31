@@ -61,10 +61,11 @@ import {
   ASSIGNABLE_ROLES,
   CENTRAL_OPERATION_ROLES,
   ASSIGNABLE_ROLE_VALUES,
+  MANAGED_SERVICE_ADMIN_ROLE_VALUES,
   CATALOG_ROLE_VALUES,
   REGISTRABLE_SERVICE_KEYS,
 } from '@/lib/operator-role-catalog';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import {
   parseBusinessLedgerResponse,
   registerPresetPath,
@@ -73,7 +74,7 @@ import {
   type BusinessLedgerStatus,
 } from '@/lib/business-ledger';
 
-const SERVICE_ADMIN_ROLE_VALUES = new Set(ASSIGNABLE_ROLE_VALUES);
+const SERVICE_ADMIN_ROLE_VALUES = new Set(MANAGED_SERVICE_ADMIN_ROLE_VALUES);
 
 const LEDGER_BADGE: Record<Exclude<BusinessLedgerStatus, 'not_applicable'>, { label: string; className: string }> = {
   loading: { label: '확인 중', className: 'bg-gray-100 text-gray-500' },
@@ -138,6 +139,9 @@ interface UserFormState {
 }
 
 export default function OperatorsPage() {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const centralEntry = searchParams.get('assignment') === 'central';
+  const [centralOnly, setCentralOnly] = useState(centralEntry);
   const [showLegacy, setShowLegacy] = useState(false);
   const [users, setUsers] = useState<AdminUserDto[]>([]);
   const [loading, setLoading] = useState(true);
@@ -153,7 +157,7 @@ export default function OperatorsPage() {
   const batch = useBatchAction();
 
   // Create/Edit modal
-  const [showModal, setShowModal] = useState(false);
+  const [showModal, setShowModal] = useState(centralEntry);
   const [editingUserId, setEditingUserId] = useState<string | null>(null);
   const [formData, setFormData] = useState<UserFormState>({ email: '', lastName: '', firstName: '', roles: [] });
   // 대상 서비스는 **기본값 없이 시작**한다. 첫 서비스를 자동 확정하면 관리자가 고르지 않은 서비스로
@@ -304,7 +308,8 @@ export default function OperatorsPage() {
   }, [allRows]);
 
   // ─── Create / Edit 모달 ───
-  const openCreateModal = () => {
+  const openCreateModal = (central = false) => {
+    setCentralOnly(central);
     setEditingUserId(null);
     setFormData({ email: '', lastName: '', firstName: '', roles: [] });
     setTargetServiceKey('');
@@ -341,6 +346,11 @@ export default function OperatorsPage() {
   };
 
   const closeModal = () => {
+    if (searchParams.has('assignment')) {
+      const next = new URLSearchParams(searchParams);
+      next.delete('assignment');
+      setSearchParams(next, { replace: true });
+    }
     setShowModal(false);
     setEditingUserId(null);
     setFormData({ email: '', lastName: '', firstName: '', roles: [] });
@@ -645,7 +655,7 @@ export default function OperatorsPage() {
         backUrl="/"
         backLabel="Dashboard"
         actions={[
-          { id: 'add', label: '서비스 담당자 지정', onClick: openCreateModal, variant: 'primary', icon: <Plus className="w-4 h-4" /> },
+          { id: 'add', label: '서비스 담당자 지정', onClick: () => openCreateModal(), variant: 'primary', icon: <Plus className="w-4 h-4" /> },
           { id: 'refresh', label: 'Refresh', onClick: refreshAssignments, variant: 'secondary', icon: <RefreshCw className="w-4 h-4" /> },
         ]}
       />
@@ -674,7 +684,7 @@ export default function OperatorsPage() {
           searchValue={search}
           onSearchChange={setSearch}
           filters={[
-            { key: 'service', placeholder: '서비스 전체', options: [...getServiceOptions().filter(option => option.value !== 'platform'), ...['pharmacy','carepharm','megapharm','pharmcoop'].map(key => ({ value: key, label: SERVICES[key as keyof typeof SERVICES].label }))] },
+            { key: 'service', placeholder: '서비스 전체', options: [...getServiceOptions(), ...['pharmacy','carepharm','megapharm','pharmcoop'].map(key => ({ value: key, label: SERVICES[key as keyof typeof SERVICES].label }))] },
             { key: 'role', placeholder: '역할 전체', options: operatorRoleOptions },
           ]}
           filterValues={facets as unknown as Record<string, string>}
@@ -683,6 +693,8 @@ export default function OperatorsPage() {
       </div>
 
       <div className="mb-4 space-y-3 rounded border bg-white p-4 text-sm">
+        <h2 className="font-semibold">중앙 운영 담당자 지정·업무 위임</h2>
+        <button type="button" onClick={() => openCreateModal(true)} className="rounded bg-blue-700 px-3 py-2 text-white">중앙 운영 담당자 지정</button>
         <p>전체 관리자에서는 서비스 Admin만 지정·관리합니다. Operator는 해당 서비스 Admin이 관리하며 기존 Operator 권한은 유지됩니다. 직영 서비스 Admin은 초대 수락 후 위임받은 중앙 업무를 이용합니다. 전체 관리자 계정은 <Link to="/settings/admin-accounts" className="text-blue-700 underline">전체 관리자 계정</Link>에서 관리합니다.</p>
         <p className="text-gray-600">서비스 역할만 보유한 기존 사용자는 중앙 진입 권한을 자동으로 얻지 않습니다. 초대 수락 후 목록을 새로고침해 주세요. 계정 활성 여부와 실제 서비스 접근 가능 여부는 다릅니다.</p>
       </div>
@@ -862,9 +874,9 @@ export default function OperatorsPage() {
           <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between p-4 border-b">
               <h2 className="text-lg font-semibold">
-                {editingUserId ? '운영자 편집' : '서비스 운영자 지정'}
+                {editingUserId ? '운영자 편집' : centralOnly ? '중앙 운영 담당자 지정' : '서비스 운영자 지정'}
               </h2>
-              <button onClick={closeModal} className="p-1 hover:bg-gray-100 rounded">
+              <button aria-label="담당자 지정 창 닫기" onClick={closeModal} className="p-1 hover:bg-gray-100 rounded">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -1022,7 +1034,7 @@ export default function OperatorsPage() {
                       1. 대상 서비스 <span className="text-red-500">*</span>
                     </label>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                      {REGISTRABLE_SERVICE_KEYS.map((key) => {
+                      {REGISTRABLE_SERVICE_KEYS.filter(key => !centralOnly || ASSIGNABLE_ROLES[key].some(role => CENTRAL_OPERATION_ROLES.has(role.value))).map((key) => {
                         const meta = SERVICES[key as keyof typeof SERVICES];
                         const selected = targetServiceKey === key;
                         return (
@@ -1129,14 +1141,14 @@ export default function OperatorsPage() {
                     {formErrors.roles}
                   </p>
                 )}
-                {/* 카탈로그 밖 role(예: platform:super_admin, user)은 이 화면이 다루지 않는다.
-                    체크박스에 없다고 해서 저장 시 사라지면 안 되므로 읽기 전용으로 보존·표시한다. */}
-                {formData.roles.filter((r) => !CATALOG_ROLE_VALUES.has(r)).length > 0 && (
+                {/* 신규 지정 목록 밖 role(퇴역 Admin, 기존 Operator, platform 역할 등)은
+                    지정 체크박스와 별도로 읽기 전용 보존·표시한다. */}
+                {formData.roles.filter((r) => !ASSIGNABLE_ROLE_VALUES.includes(r)).length > 0 && (
                   <div className="mb-3 rounded-lg bg-slate-50 border border-slate-200 px-3 py-2">
                     <div className="text-xs font-semibold text-slate-500 mb-1">이 화면에서 변경하지 않는 권한 (유지됨)</div>
                     <div className="flex flex-wrap gap-1">
                       {formData.roles
-                        .filter((r) => !CATALOG_ROLE_VALUES.has(r))
+                        .filter((r) => !ASSIGNABLE_ROLE_VALUES.includes(r))
                         .map((r) => (
                           <span key={r} className="inline-flex items-center px-2 py-0.5 rounded text-xs font-mono bg-gray-100 text-gray-700">
                             {r}

@@ -101,13 +101,19 @@ export const CENTRAL_OPERATION_ROLES = new Set([
   'neture:pharmcoop_admin', 'neture:pharmcoop_operator',
 ]);
 export const ASSIGNABLE_ROLES: Record<string, OperatorRoleOption[]> = Object.fromEntries(
-  Object.entries(OPERATOR_ROLE_CATALOG).map(([service, roles]) => [service, roles.filter(role => /(?:[:_])admin$/.test(role.value))]),
+  // Retired kpa-society stays in historical metadata, never in new assignments.
+  Object.entries(OPERATOR_ROLE_CATALOG).filter(([service]) => service !== 'kpa')
+    .map(([service, roles]) => [service, roles.filter(role => /(?:[:_])admin$/.test(role.value))]),
 );
 
 /** 부여 가능한 role 전체 — 서버 `ASSIGNABLE_SERVICE_ADMIN_ROLES` 와 같은 순서·같은 집합이어야 한다. */
 export const ASSIGNABLE_ROLE_VALUES: readonly string[] = Object.values(ASSIGNABLE_ROLES).flatMap((rs) =>
   rs.map((r) => r.value),
 );
+
+/** Existing Admin assignments remain visible/revocable even after new issuance retires. */
+export const MANAGED_SERVICE_ADMIN_ROLE_VALUES: readonly string[] = Object.values(OPERATOR_ROLE_CATALOG)
+  .flatMap(roles => roles.filter(role => /(?:[:_])admin$/.test(role.value)).map(role => role.value));
 
 /** 등록 카탈로그에 존재하는 role 집합 (편집 시 비카탈로그 role 보존 판정용) */
 export const CATALOG_ROLE_VALUES: ReadonlySet<string> = new Set(Object.values(OPERATOR_ROLE_CATALOG).flatMap(roles => roles.map(role => role.value)));

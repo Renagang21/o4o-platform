@@ -105,9 +105,15 @@ export function resolveOperatorRole(role: unknown, serviceKey: unknown): Operato
 }
 
 /** The platform administrator assigns service Admins only, including direct central delegation. */
-export const ASSIGNABLE_SERVICE_ADMIN_ROLES = ASSIGNABLE_OPERATOR_ROLES.filter(role => /(?:[:_])admin$/.test(role));
+// kpa-society is retired. Keep old role interpretation for history/revocation,
+// but reject new invitations, resends and acceptance through the platform path.
+export const ASSIGNABLE_SERVICE_ADMIN_ROLES = ASSIGNABLE_OPERATOR_ROLES.filter(role =>
+  /(?:[:_])admin$/.test(role) && !role.startsWith('kpa:'));
 export function resolveServiceAdminRole(role: unknown, serviceKey: unknown): OperatorRoleResolution {
   const resolved = resolveOperatorRole(role, serviceKey);
+  if (resolved.role.startsWith('kpa:')) {
+    throw new OperatorRoleContractError('ROLE_NOT_ASSIGNABLE', '제거된 kpa-society 서비스에는 새 관리자를 지정할 수 없습니다.');
+  }
   if (!ASSIGNABLE_SERVICE_ADMIN_ROLES.includes(resolved.role)) {
     throw new OperatorRoleContractError('ROLE_NOT_ASSIGNABLE', '전체관리자는 서비스 Admin만 지정합니다. Operator는 해당 서비스 Admin이 지정하세요.');
   }

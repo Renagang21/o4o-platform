@@ -27,6 +27,13 @@ function harness(row?: any) {
   };
 }
 describe('operator invitation fail-closed boundaries', () => {
+  it('does not create an invitation or write data for retired kpa-society', async () => {
+    const h = harness();
+    await expect(h.service.create({ actorId: USER, targetUserId: OTHER, serviceKey: 'kpa-society', role: 'kpa:admin' }))
+      .rejects.toMatchObject({ code: 'ROLE_NOT_ASSIGNABLE' });
+    expect(h.db.transaction).not.toHaveBeenCalled();
+    expect(h.query).not.toHaveBeenCalled();
+  });
   it('does not query or accept a malformed token', async () => {
     const h = harness();
     await expect(h.service.accept('invalid', USER)).rejects.toMatchObject({
