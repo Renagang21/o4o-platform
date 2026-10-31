@@ -1,5 +1,5 @@
-import { ServiceFooter } from '@o4o/auth-react';
-import { ServiceSpaceSwitcher } from '@o4o/auth-react';
+import { ServiceFooter, ServiceSpaceSwitcher, MyHomeButton, O4OHomeButton, ServiceAccountMenu } from '@o4o/auth-react';
+
 import { OperatorInboxLink } from '@o4o/operator-core-ui';
 /**
  * 공통 root shell — WO-O4O-UNIFIED-STORE-WORKSPACE-FOUNDATION-V1 §3-⑥
@@ -11,7 +11,7 @@ import { PublicLegalFooterInfo } from '@o4o/shared-space-ui';
 import { getUserDisplayName } from '@o4o/account-ui';
 import { BRAND, PLATFORM_LEGAL_SERVICE_KEY, PLATFORM_ORIGIN, ROOT_NAV_ITEMS, WORKSPACE_PATHS } from '../config/workspace';
 import { loadFooterLegal } from '../lib/footerLegal';
-import { MyHomeButton, O4OHomeButton, ServiceAccountMenu } from '@o4o/auth-react';
+
 import { useAuth } from '../contexts/AuthContext';
 import { authClient } from '../lib/apiClient';
 import { useUnifiedStore } from '../contexts/StoreContext';

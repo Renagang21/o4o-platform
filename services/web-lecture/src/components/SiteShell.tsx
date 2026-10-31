@@ -1,11 +1,11 @@
-import { ServiceFooter } from '@o4o/auth-react';
-import { ServiceSpaceSwitcher } from '@o4o/auth-react';
+import { ServiceFooter, ServiceSpaceSwitcher, MyHomeButton, O4OHomeButton, ServiceAccountMenu } from '@o4o/auth-react';
+
 import { OperatorInboxLink, OperatorNotificationLink } from '@o4o/operator-core-ui';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import { PublicLegalFooterInfo, ServiceContactInboxLink } from '@o4o/shared-space-ui';
 import { BRAND, SERVICE_KEY } from '../config/service';
 import { loadFooterLegal } from '../lib/footerLegal';
-import { MyHomeButton, O4OHomeButton, ServiceAccountMenu } from '@o4o/auth-react';
+
 import { useAuth } from '../contexts/AuthContext';
 import { authClient } from '../lib/apiClient';
 import { canAccess } from './AccessGate';

@@ -122,6 +122,34 @@ export interface NavigationAccess {
   stores: { organizationId: string; organizationName: string }[];
   supplier: boolean;
 }
+interface BusinessParticipation {
+  key: string;
+  canParticipate: boolean;
+  membershipStatus?: string | null;
+}
+function participationStatus(business: BusinessParticipation): string {
+  if (business.canParticipate) return "active";
+  if (business.membershipStatus === "active") return "unverified";
+  return business.membershipStatus ?? "none";
+}
+function applyBusinessParticipation(
+  statuses: Record<string, string>,
+  businesses: BusinessParticipation[] | undefined,
+): void {
+  if (!businesses) return;
+  // The business ledger overrides ordinary membership without granting access.
+  for (const [businessKey, serviceKey] of [
+    ["pharmacy", "kpa-society"],
+    ["carepharm", "carepharm"],
+    ["megapharm", "megapharm"],
+  ]) {
+    const business = businesses.find((item) => item.key === businessKey);
+    if (business) statuses[serviceKey] = participationStatus(business);
+    // Pharmacy also has personal membership. The other independent businesses
+    // have no generic membership fallback when their current ledger is present.
+    else if (businessKey !== "pharmacy") statuses[serviceKey] = "none";
+  }
+}
 /** Always read actual ledgers. A failed read must not become "not joined". */
 export async function loadNavigationAccess(
   api: NavigationClient,
@@ -134,9 +162,7 @@ export async function loadNavigationAccess(
   const services = catalog.data?.data?.services;
   const stores = workspace.data?.data?.stores;
   const supplier = entry.data?.data?.serviceStates?.supplier?.status;
-  const businesses = entry.data?.data?.businesses as
-    | { key: string; canParticipate: boolean; membershipStatus?: string | null }[]
-    | undefined;
+  const businesses = entry.data?.data?.businesses as BusinessParticipation[] | undefined;
   if (
     [catalog, workspace, entry].some(
       (response) => response.data?.success === false,
@@ -170,28 +196,7 @@ export async function loadNavigationAccess(
   const statuses: Record<string, string> = Object.fromEntries(
     services.filter((s) => s.membership).map((s) => [s.key, s.membership.status]),
   );
-  // Independent pharmacy businesses use their own participation ledger. An
-  // ordinary service membership neither creates nor overrides that eligibility.
-  if (businesses !== undefined) {
-    for (const [businessKey, serviceKey] of [
-      ["pharmacy", "kpa-society"],
-      ["carepharm", "carepharm"],
-      ["megapharm", "megapharm"],
-    ]) {
-      const business = businesses.find((item) => item.key === businessKey);
-      if (business) {
-        statuses[serviceKey] = business.canParticipate
-          ? "active"
-          : business.membershipStatus === "active"
-            ? "unverified"
-            : (business.membershipStatus ?? "none");
-      } else if (businessKey !== "pharmacy") {
-        // Pharmacy also has ordinary personal membership; the other businesses
-        // have no membership fallback when the current business ledger is present.
-        statuses[serviceKey] = "none";
-      }
-    }
-  }
+  applyBusinessParticipation(statuses, businesses);
   return { statuses: { ...statuses, supplier }, stores, supplier: supplier === "active" };
 }
 

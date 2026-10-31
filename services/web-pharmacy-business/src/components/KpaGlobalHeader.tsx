@@ -1,4 +1,4 @@
-import { ServiceSpaceSwitcher } from '@o4o/auth-react';
+import { ServiceSpaceSwitcher, MyHomeButton, O4OHomeButton, O4O_LOGOUT_LABEL, ServiceAccountMenu } from '@o4o/auth-react';
 import { OperatorInboxLink } from '@o4o/operator-core-ui';
 import { useServiceContactCount } from '@o4o/shared-space-ui';
 import { pharmacyCollaboratorRoles } from '@o4o/types';
@@ -22,7 +22,7 @@ import { useCallback } from 'react';
 import { GlobalHeader, buildCommunityPrimaryNav } from '@o4o/ui';
 import { NotificationBell, useNotifications, getUserDisplayName } from '@o4o/account-ui';
 import type { NotificationItem } from '@o4o/account-ui';
-import { MyHomeButton, O4OHomeButton, O4O_LOGOUT_LABEL, ServiceAccountMenu } from '@o4o/auth-react';
+
 import { getKpaServiceRoleLabel, KpaUserMenuItems } from './KpaUserMenu';
 import { openNotificationTarget } from '../lib/notificationRouting';
 import { useAuth } from '../contexts';

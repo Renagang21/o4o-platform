@@ -1,11 +1,15 @@
 /** Synthetic browser coverage only. All API and outbound requests are intercepted. */
 import { chromium } from "playwright";
 import assert from "node:assert/strict";
-import { mkdir, writeFile } from "node:fs/promises";
+import { mkdtemp, chmod, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { existsSync } from "node:fs";
 
-const output = process.env.O4O_UI_SMOKE_OUTPUT || "/tmp/o4o-ui-shell-smoke";
-await mkdir(output, { recursive: true });
+// A caller may select the prefix, but every run creates its own private directory.
+const output = await mkdtemp(`${process.env.O4O_UI_SMOKE_OUTPUT || join(tmpdir(), "o4o-ui-shell-smoke")}-`);
+await chmod(output, 0o700);
+console.log("Evidence directory:", output);
 const browser = await chromium.launch({
   ...(existsSync("/usr/bin/chromium")
     ? { executablePath: "/usr/bin/chromium" }
@@ -27,8 +31,8 @@ const user = {
   id: "00000000-0000-4000-8000-000000000010",
   name: "합성 사용자",
   email: "synthetic@example.test",
-  roles: ["kpa:store_owner", "supplier:supplier"],
-  memberships: [{ serviceKey: "lecture", status: "active" }],
+  roles: ["kpa:store_owner", "supplier:supplier", "neture:operator"],
+  memberships: [{ serviceKey: "lecture", status: "active" }, { serviceKey: "neture", status: "active" }],
   status: "active",
 };
 const slides = ["합성 홍보 첫 화면", "합성 홍보 두 번째 화면"].map(
@@ -48,6 +52,36 @@ const slides = ["합성 홍보 첫 화면", "합성 홍보 두 번째 화면"].m
   }),
 );
 
+
+const fixtures = {
+  "/auth/me": { user },
+  "/auth/services": { services: directory },
+  "/work-scope/accessible-stores": { stores },
+  "/work-scope/operator-services": { services: [] },
+  "/neture/home/entry": {
+    serviceStates: { supplier: { status: "active" } }, stores: [], branches: [],
+    businesses: [
+      { key: "pharmacy", name: "약국 경영지원", canParticipate: true, membershipStatus: null },
+      { key: "carepharm", name: "만성질환관리", canParticipate: true, membershipStatus: "active" },
+    ],
+    cooperatives: [],
+  },
+  "/lms/courses": [],
+  "/communities": { communities: [] },
+};
+function mockApiData(endpoint, request, handoffs) {
+  if (Object.hasOwn(fixtures, endpoint)) return fixtures[endpoint];
+  if (endpoint.startsWith("/home-presentation/")) return { enabled: true, slides, promotions: [] };
+  if (endpoint === "/auth/handoff") {
+    const body = request.postDataJSON();
+    handoffs.push(body);
+    const host = body.targetWorkspace === "store" ? "store" : ({ lecture: "study", "kpa-society": "pharmacy" }[body.targetServiceKey] ?? body.targetServiceKey);
+    return { targetUrl: `https://${host}.neture.co.kr/handoff?returnTo=${encodeURIComponent(body.returnPath)}` };
+  }
+  if (endpoint.includes("footer-legal")) return null;
+  return { items: [], courses: [], total: 0, notifications: [], unreadCount: 0 };
+}
+
 try {
   for (const width of [1280, 390]) {
     for (const [app, port, path] of [
@@ -55,6 +89,7 @@ try {
       ["community-shell", 4300, "/contact"],
       ["lecture", 4301, "/courses"],
       ["store", 4302, "/"],
+      ["operator", 4300, "/operator/home-presentation/neture"],
     ]) {
       const context = await browser.newContext({
         viewport: { width, height: 900 },
@@ -89,53 +124,45 @@ try {
             body: "<main>합성 서비스 이동 완료</main>",
           });
         if (!url.pathname.startsWith("/api/v1/")) return route.abort();
-        const endpoint = url.pathname.slice("/api/v1".length);
-        let data = {
-          items: [],
-          courses: [],
-          total: 0,
-          notifications: [],
-          unreadCount: 0,
-        };
-        if (endpoint === "/auth/me") data = { user };
-        else if (endpoint === "/auth/services") data = { services: directory };
-        else if (endpoint === "/work-scope/accessible-stores")
-          data = { stores };
-        else if (endpoint === "/work-scope/operator-services")
-          data = { services: [] };
-        else if (endpoint === "/neture/home/entry")
-          data = {
-            serviceStates: { supplier: { status: "active" } },
-            stores: [],
-            branches: [],
-            businesses: [
-              { key: "pharmacy", name: "약국 경영지원", canParticipate: true, membershipStatus: null },
-              { key: "carepharm", name: "만성질환관리", canParticipate: true, membershipStatus: "active" },
-            ],
-            cooperatives: [],
-          };
-        else if (endpoint === "/lms/courses") data = [];
-        else if (endpoint === "/communities") data = { communities: [] };
-        else if (endpoint.startsWith("/home-presentation/"))
-          data = { enabled: true, slides, promotions: [] };
-        else if (endpoint === "/auth/handoff") {
-          const body = request.postDataJSON();
-          handoffs.push(body);
-          const host =
-            body.targetWorkspace === "store"
-              ? "store"
-              : body.targetServiceKey === "lecture"
-                ? "study"
-                : body.targetServiceKey === "kpa-society"
-                  ? "pharmacy"
-                  : body.targetServiceKey;
-          data = {
-            targetUrl: `https://${host}.neture.co.kr/handoff?returnTo=${encodeURIComponent(body.returnPath)}`,
-          };
-        } else if (endpoint.includes("footer-legal")) data = null;
+        const data = mockApiData(url.pathname.slice("/api/v1".length), request, handoffs);
         await route.fulfill({ headers, json: { success: true, data } });
       });
       await page.goto(`http://127.0.0.1:${port}${path}`);
+      if (app === "operator") {
+        await page.getByRole("button", { name: "서비스·공간", exact: true }).waitFor();
+        if (width >= 1024) {
+          const sidebar = page.locator("aside > nav.sticky").first();
+          await sidebar.waitFor();
+          // A long work page must preserve the first menu after the sidebar sticks.
+          await page.locator("main").first().evaluate(node => { node.style.minHeight = "4000px"; });
+          await page.evaluate(() => window.scrollTo(0, 600));
+          await page.waitForFunction(() => {
+            const header = document.querySelector("header"), sidebar = document.querySelector("aside > nav.sticky");
+            if (!header || !sidebar) return false;
+            const headerBottom = header.getBoundingClientRect().bottom, top = sidebar.getBoundingClientRect().top;
+            return top >= headerBottom + 15 && top <= headerBottom + 17;
+          });
+        } else {
+          await page.getByRole("button", { name: "운영자 메뉴 열기", exact: true }).click();
+          const firstMenu = page.locator("#operator-mobile-drawer").getByRole("link").first();
+          await firstMenu.waitFor();
+          await page.waitForFunction(() => {
+            const first = document.querySelector("#operator-mobile-drawer a");
+            return first && first.getBoundingClientRect().x >= 0;
+          });
+          await firstMenu.evaluate(node => {
+            const bounds = node.getBoundingClientRect();
+            if (bounds.x < 0 || bounds.y < 0) throw new Error("first operator menu is outside the viewport");
+          });
+          await page.getByRole("button", { name: "메뉴 닫기", exact: true }).click();
+        }
+        assert.deepEqual(failures, []);
+        await page.screenshot({ path: `${output}/${app}-${width}.png`, fullPage: false });
+        results.push({ app, width, result: "PASS", evidence: "operator first menu remains below measured sticky header or opens in mobile drawer" });
+        console.log("PASS", app, width);
+        await context.close();
+        continue;
+      }
       if (app === "neture" && width === 1280) {
         await page
           .getByRole("heading", { name: "합성 홍보 첫 화면", exact: true })

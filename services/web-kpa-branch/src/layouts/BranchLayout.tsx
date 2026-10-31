@@ -1,4 +1,4 @@
-import { ServiceSpaceSwitcher } from '@o4o/auth-react';
+import { ServiceSpaceSwitcher, MyHomeButton, O4OHomeButton, ServiceAccountMenu } from '@o4o/auth-react';
 /**
  * BranchLayout — 분회 홈페이지 고정 템플릿 셸 ('classic')
  * WO-O4O-PHARMACIST-BRANCH-SERVICE-FOUNDATION-DESIGN-AND-IMPLEMENTATION-V1
@@ -19,7 +19,7 @@ import { ServiceSpaceSwitcher } from '@o4o/auth-react';
 import { useEffect, useState } from 'react';
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
 import { getPublicSite, getOperatorSite, type BranchSite } from '../lib/api/branch';
-import { MyHomeButton, O4OHomeButton, ServiceAccountMenu } from '@o4o/auth-react';
+
 import { useAuth } from '../contexts/AuthContext';
 import { authClient } from '../lib/apiClient';
 import { ROLES, satisfiesRole } from '../config/service';

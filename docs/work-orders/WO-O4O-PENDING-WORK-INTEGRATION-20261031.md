@@ -79,3 +79,19 @@ Main 브라우저 스크립트의 첫 cold-start `networkidle` 시간 초과 뒤
 [통합 PR #900](https://github.com/Renagang21/o4o-platform/pull/900)의 첫 Codex 리뷰는 독립 사업 참여자가 일반 `service_memberships` 없이 전환기의 이용 서비스에서 누락되는 문제를 지적했다. 이미 읽는 `/neture/home/entry.businesses`를 사용하고 `pharmacy → kpa-society`로 연결한다. `canParticipate`가 사업 이용 판정의 우선 출처이며, 신청·정지·거절·탈퇴·종료 상태나 자격이 확인되지 않은 active 원장을 이용 권한으로 승격하지 않는다. 약국 개인 회원의 기존 진입과 별도 handoff alias가 없는 메가팜의 공개 진입을 유지한다.
 
 사업 원장 전용 참여·약국/CarePharm handoff·여섯 비참여 상태·기존 개인 가입·잘못된 응답에 관한 회귀 9건을 추가했다. auth-react 전체 254건 PASS이며 다른 초기 테스트와 중복을 빼면 통합 검증 합계는 3,447건이다. PC·모바일 8개 브라우저 조합에서 사업 전용 참여 표시를 확인하고 모바일에서는 약국 handoff 요청을 실제 UI로 검증했다. 보완 후 전체 frontend typecheck와 영향 웹앱 6개 build 재실행 PASS. 마지막 결과는 같은 PR의 최종 HEAD 검증 기록을 따른다.
+
+
+## 8. PR #900 운영자 sticky sidebar 리뷰 보완
+
+두 줄 GlobalHeader의 실측 높이가 기존 운영자 sidebar 기본 offset 80px보다 커지는 문제를 추가 확인했다. 공통 `OperatorAreaShell`의 기본 offset과 현행 `SupplierOpsLayout`을 `--o4o-global-header-height + 1rem`에 맞췄다. 기존 64px 헤더의 fallback과 호출자가 지정한 offset, 헤더 없이 직접 쓰는 `DomainIASidebar`의 기본 24px는 보존한다.
+
+공통 shell의 실제 소비처는 Neture operator/admin·서브도메인 operator/admin·CarePharm wrapper다. 중앙 Admin은 DomainIASidebar를 직접 소비하며 메뉴 표시/이동 회귀 3건을 재실행했다. Neture의 관련 wrapper 회귀 35건과 production build 재실행 PASS. 다른 영향 헤더 소비처도 고정 offset을 검색했다. 내 매장 주문 요약은 relative 헤더 아래의 별도 sticky 요소, AGAppLayout은 자체 고정 64px 헤더 계약이므로 이번 가림 문제의 소비처로 오인해 바꾸지 않는다.
+
+공통 UI 합성 브라우저에 운영자 화면을 추가해 10개 PC/모바일 조합 PASS. 실제 UI에서 긴 본문을 스크롤한 뒤 첫 메뉴가 sticky 헤더 아래 16px에 남는지 측정하고 모바일 메뉴 접근을 확인했다. 외부 API·운영 소재 게시·실계정은 사용하지 않았다. 단위 테스트에 같은 class 문자열만 단언하는 것으로 대신하지 않는다. 전체 원격 CI와 Codex는 새 보완 HEAD에서 다시 확인한다.
+
+
+## 9. SonarCloud 보안·품질 보완
+
+기존 HEAD `e1920f046a`의 CI Gate·API 세 shard·웹/Admin build·PostgreSQL·Windows·CodeQL은 통과했다. 별도 SonarCloud는 새 코드 보안 등급 D로 실패했다. 직접 분석 API는 403이어서 GitHub check-run의 실제 주석으로 원인을 확인했다. 공통 브라우저 검사 결과를 예측 가능한 임시 디렉터리에 쓰던 부분을 매 실행 `mkdtemp` 고유 디렉터리·0700 권한으로 바꿨다. `O4O_UI_SMOKE_OUTPUT`은 이제 결과 디렉터리의 prefix이고 실제 경로는 실행 로그에 출력한다.
+
+사업 참여 상태 반영과 합성 API 응답을 작은 순수 helper로 분리해 복잡도를 낮추고, 이번 UI에서 중복된 auth-react import를 합쳤다. 서비스 원장·handoff·검사 assertion·직렬 브라우저 흐름과 품질 기준은 유지했다. 실제 외부 AI·운영 소재 게시는 실행하지 않는다. auth-react 254건과 보안 저장 방식을 포함한 실제 Chromium 10개 조합 재실행 PASS이며, 마지막 원격 결과는 같은 PR의 새 HEAD에서 확인한다.

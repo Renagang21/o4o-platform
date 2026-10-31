@@ -119,3 +119,20 @@ Git HTTPS 조회는 성공했다. 그러나 `gh pr list`·ruleset 조회는 Forb
 공통 전환기도 대표 홈과 같이 일반 서비스 가입과 독립 사업 참여를 구별한다. 이미 조회한 사업 원장의 참여·신청 상태를 우선 반영하고 `pharmacy`를 `kpa-society`로 대응했다. 참여하지 못하는 active 원장은 ‘이용 자격 확인 필요’이며 실제 이용·handoff 자격으로 승격하지 않는다. 기존 개인 약국 회원과 메가팜 공개 진입은 유지한다.
 
 추가 회귀 9건을 포함한 auth-react 254건 PASS, 사업 원장만 가진 약국/CarePharm의 참여 표시·모바일 약국 handoff를 포함해 PC/모바일 8개 브라우저 조합 재실행 PASS. 기존 3,438건에 이전 auth-react 245건을 다시 더하지 않고 신규 9건만 더하면 3,447건이다. 보완 후 frontend typecheck·웹앱 6개 build 재실행 PASS. 최종 원격 HEAD의 CI·리뷰 결과는 같은 통합 PR에 기록한다.
+
+
+### PR #900 운영자 sidebar 보완
+
+| 소비처 | 변경·호환 경계 | 통합 후 검증 |
+|---|---|---|
+| Neture operator/admin·서브도메인·CarePharm | 공통 OperatorAreaShell 기본 offset을 실제 헤더 높이 + 16px로 조정, 명시 override 유지 | 관련 wrapper 35건·Neture build PASS |
+| 기존 공급자 운영 `/workspace` shell | 같은 GlobalHeader를 쓰는 sidebar의 80px 가정 제거 | 타입/build·기존 route/role 확인 |
+| 중앙 Admin의 직접 DomainIASidebar | 기존 24px 기본값과 메뉴 계약 유지 | 기존 메뉴 회귀 3건 PASS |
+| 내 매장·강의의 relative header / AGAppLayout 자체 header | 다른 고정 높이 계약, 이번 가림 문제 없음 | sticky offset·실제 소비처 검색; 불필요한 변경 없음 |
+
+실제 Chromium 1280/390px 검사를 운영자 화면까지 확장해 10개 조합 PASS. 운영자 데스크톱 본문을 600px 스크롤한 뒤 sidebar 상단이 헤더 bottom보다 16px 아래인지 측정했고, 모바일 첫 메뉴도 drawer에서 접근 가능함을 확인했다. 최초 중앙 Admin 집중 실행은 저장소 루트에서 앱 전용 config를 사용해 setup 경로를 찾지 못했으며, 올바른 앱 작업 디렉터리에서 3개가 실제 실행·통과했다. 원래 테스트 실패를 통과로 세지 않는다.
+
+
+### SonarCloud 후속 보완
+
+필수 CI가 성공한 `e1920f046a`에서도 별도 SonarCloud 새 코드 보안 등급은 D였다. GitHub 분석 주석에서 임시 경로 보안과 두 함수의 복잡도 지적을 확인해 결과 디렉터리를 고유 `mkdtemp`·0700으로 보호하고 사업 상태·합성 API helper를 분리했다. `O4O_UI_SMOKE_OUTPUT`은 prefix이며 실제 결과 경로는 로그를 따른다. 기존 버전의 고정 경로 기록을 이번 실행 경로로 오인하지 않는다. 중복 import도 정리했고 경고·품질 기준을 낮추지 않았다. 최종 HEAD의 CI·Codex·Sonar 및 배포 증거는 같은 통합 PR에서 확인한다.

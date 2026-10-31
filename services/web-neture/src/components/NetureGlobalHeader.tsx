@@ -1,4 +1,4 @@
-import { ServiceSpaceSwitcher } from '@o4o/auth-react';
+import { ServiceSpaceSwitcher, MyHomeButton, O4OHomeButton, ServiceAccountMenu } from '@o4o/auth-react';
 import { OperatorInboxLink } from '@o4o/operator-core-ui';
 import { useServiceContactCount } from '@o4o/shared-space-ui';
 /**
@@ -18,7 +18,7 @@ import { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { GlobalHeader, filterContextualNav } from '@o4o/ui';
 import { NotificationBell, useNotifications, getUserDisplayName } from '@o4o/account-ui';
-import { MyHomeButton, O4OHomeButton, ServiceAccountMenu } from '@o4o/auth-react';
+
 import { api } from '../lib/apiClient';
 import type { NotificationItem } from '@o4o/account-ui';
 import { notificationsApi, NOTIFICATION_SERVICE_KEY } from '../lib/api/notifications';
