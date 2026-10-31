@@ -16,6 +16,7 @@ jest.mock('../utils/logger.js', () => ({
   default: { warn: jest.fn(), error: jest.fn(), info: jest.fn(), debug: jest.fn() },
 }));
 
+import { runWithCommandDriver, driveTestCommands } from './helpers/run-with-command-driver.js';
 import { readFileSync } from 'fs';
 import { join } from 'path';
 import logger from '../utils/logger.js';
@@ -53,15 +54,8 @@ type Outcome = { status: 'success' | 'failed' | 'denied'; errorCode?: string; da
 /** 명령 base 별 응답 큐. 같은 base 가 여러 번 오면 순서대로, 다 쓰면 마지막을 반복한다. */
 type Script = Record<string, Outcome[]>;
 
-async function drive(db: LocalAgentDb, script: Script, max = 40) {
-  const seen: { base: string; args: Record<string, unknown> }[] = [];
-  const cursors: Record<string, number> = {};
-  let k = 0;
-  while (k < max) {
-    for (let i = 0; i < 200 && db.commands.length <= k; i += 1) await new Promise((r) => setTimeout(r, 5));
-    const cmd = db.commands[k];
-    if (!cmd) break;
-    k += 1;
+async function drive(db: LocalAgentDb, script: Script, max = 40, isFinished: () => boolean = () => false) {
+  return driveTestCommands(db.commands, max, 200, isFinished, async (cmd, seen, cursors) => {
     const base = parseLocalAction(String(cmd.action)).base.replace('local.browser.dom.', '');
     seen.push({ base, args: cmd.result_data ? JSON.parse(String(cmd.result_data)) : {} });
     const queue = script[base] ?? [{ status: 'failed', errorCode: 'DOM_ELEMENT_NOT_FOUND' }];
@@ -69,15 +63,17 @@ async function drive(db: LocalAgentDb, script: Script, max = 40) {
     cursors[base] = (cursors[base] ?? 0) + 1;
     const o = queue[idx];
     await submitCommandResult(db.dataSource, cmd.device_id, { commandId: cmd.command_id, status: o.status, errorCode: o.errorCode, data: o.data } as any);
-  }
-  return seen;
+  });
 }
 
 async function run(entryPointId: string, input: Record<string, unknown>, script: Script) {
   const db = makeDb();
   await pairAndRegister(db);
   await connected(db);
-  const [result, seen] = await Promise.all([executeAiTool(db.dataSource, TOOL, { entryPointId, input }, ctx()), drive(db, script)]);
+  const [result, seen] = await runWithCommandDriver(
+    () => executeAiTool(db.dataSource, TOOL, { entryPointId, input }, ctx()),
+    (isFinished) => drive(db, script, 40, isFinished),
+  );
   return { result, seen, data: (result.data ?? {}) as Record<string, unknown>, db };
 }
 const render = (data: Record<string, unknown>) => renderToolContext({ ok: true, tool: TOOL, data }) ?? '';
