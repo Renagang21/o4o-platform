@@ -11,7 +11,7 @@ import { apiV1Base } from '../../lib/serviceContext';
  * 로그인만 된 사용자가 약국 매장을 여는 유일한 경로다(약국은 `/start-store` 자가 가입 대상이 아니다).
  *   GET  /api/v1/neture/pharmacy/membership  → 내 신청 원장(없으면 null)
  *   POST /api/v1/neture/pharmacy/membership  → 신청 · 재신청(반려 · 종료 상태에서 같은 행)
- * 자격 확인은 Neture 운영자가 한다(자동 검증 없음). 기본 승인은 세미프랜차이즈 가입을 만들지 않는다.
+ * 약국 승인 시 Pharmacy 기본 회원을 함께 연결한다. 다른 협력사업 가입은 별도다.
  *
  * `/start-pharmacy`(StoreGate 밖 — 매장이 아직 없는 사용자)와 내 매장 메뉴(`/store/pharmacy/membership`) 두 곳에서 연다.
  */
@@ -33,8 +33,8 @@ import { MEMBERSHIP_STATUS_LABEL, StatusBadge, formatDate } from './shared';
 const EMPTY: PharmacyMembershipInput = { pharmacyName: '', businessNumber: '', pharmacistLicenseNumber: '', address: '', phone: '' };
 
 const STATUS_HELP: Record<string, string> = {
-  pending: 'Neture 운영자가 약국 정보와 약사 자격를 확인하고 있습니다. 승인되면 내 매장을 이용할 수 있습니다.',
-  active: '내 매장(약국) 신청이 승인되었습니다. 내 매장 기본 기능을 이용할 수 있습니다. 세미프랜차이즈는 내 매장에서 따로 가입 신청합니다.',
+  pending: 'Neture 운영자가 약국 정보와 약사 자격을 확인하고 있습니다. 승인되면 내 매장과 Pharmacy 기본 회원을 함께 이용할 수 있습니다.',
+  active: '내 매장(약국) 신청이 승인되었습니다. Pharmacy 기본 회원은 별도 가입 심사 없이 연결됩니다. 기존 이용 정지·반려·탈퇴는 자동으로 해제되지 않습니다. 다른 협력사업은 별도로 신청합니다.',
   rejected: '신청이 반려되었습니다. 정보를 확인한 뒤 다시 신청할 수 있습니다.',
   suspended: '이용이 정지되었습니다. Neture 운영자에게 문의해 주세요.',
   terminated: '이용이 종료되었습니다. 다시 신청할 수 있습니다.',
@@ -198,6 +198,7 @@ export default function PharmacyMembershipPage() {
                 <label htmlFor="pharmacy-taxInvoiceEmail">세금계산서 이메일 (선택)</label>
                 <input id="pharmacy-taxInvoiceEmail" type="email" value={form.taxInvoiceEmail ?? ''} onChange={set('taxInvoiceEmail')} disabled={busy} />
                 <ServiceEnrollmentPolicyAgreement agreement={agreement} />
+                <p>약국 경영자 승인을 받으면 Pharmacy 기본 회원으로 함께 연결됩니다. 다른 협력사업 가입과 상품 거래 조건 동의는 별도입니다.</p>
                 <button type="submit" disabled={busy || !ready}>
                   {busy ? '처리 중...' : membership ? '다시 신청' : '가입 신청'}
                 </button>

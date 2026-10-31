@@ -54,7 +54,7 @@ describe('사업 서비스의 참가자 공간', () => {
     mount('/businesses/pharmacy/forum');
     expect(await screen.findByText('사업 참여 승인 후 게시판을 이용할 수 있습니다.')).toBeTruthy();
     expect(screen.queryByText('게시판 데이터 화면')).toBeNull();
-    expect(screen.getByRole('status').textContent).toContain('참여 신청·승인 상태');
+    expect(screen.getByRole('status').textContent).toContain('약국 승인과 Pharmacy 기본 회원 연결 상태');
     expect(mocks.get.mock.calls.every(([path]) => !path.includes('/forum/posts'))).toBe(true);
   });
   it('승인 사용자는 해당 사업의 게시판을 이용한다', async () => {
@@ -74,14 +74,12 @@ describe('사업 서비스의 참가자 공간', () => {
     expect(screen.queryByText('아직 참여 신청하지 않았습니다.')).toBeNull();
     expect(screen.queryByRole('button', { name: '참여 신청' })).toBeNull();
   });
-  it('조건 확인 후 기존 신청 API에 해당 사업의 신청만 전달한다', async () => {
-    mocks.post.mockResolvedValue(response({ status: 'pending' })); mount('/businesses/pharmacy/participation');
-    await screen.findByText('privacy · 버전 1');
-    for (const check of screen.getAllByRole('checkbox')) fireEvent.click(check);
-    fireEvent.click(screen.getByRole('button', { name: '참여 신청' }));
-    await waitFor(() => expect(mocks.post).toHaveBeenCalledWith('/neture/pharmacy/semi-franchises/pharmacy/apply', {
-      acceptedConditions: true, conditions: '참여 조건', note: '', policyReferences: policies.map(({ policyDocumentId, version, documentType }) => ({ policyDocumentId, version, documentType })),
-    }, { headers: { 'X-Store-Organization-Id': 'store-a' } }));
+  it('약국 승인 후 별도 동의나 심사 없이 Pharmacy 기본 회원 연결을 확인한다', async () => {
+    mocks.post.mockResolvedValue(response({ status: 'active' })); mount('/businesses/pharmacy/participation');
+    fireEvent.click(await screen.findByRole('button', { name: '기본 회원 연결 확인' }));
+    await waitFor(() => expect(mocks.post).toHaveBeenCalledWith('/neture/pharmacy/semi-franchises/pharmacy/apply', {}, { headers: { 'X-Store-Organization-Id': 'store-a' } }));
+    expect(mocks.get.mock.calls.some(([path]) => path.endsWith('/enrollment-policies'))).toBe(false);
+    expect(screen.queryByRole('checkbox')).toBeNull();
   });
   it('담당 운영자에게 약국 소유자 전용 가입 조회를 요구하지 않는다', async () => {
     mocks.get.mockImplementation(async (path: string) => response(path.endsWith('/access') ? { ...access, allowed: true, canManage: true } : business));

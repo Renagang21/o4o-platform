@@ -20,9 +20,10 @@ export default function BusinessParticipationPage() {
 
 function ParticipationForm({ organizationId, onBusyChange }: Readonly<{ organizationId?: string; onBusyChange?: (busy: boolean) => void }>) {
   const { business, access } = useBusiness();
+  const defaultPharmacy = business.key === 'pharmacy';
   const current = useRef(false);
   useLayoutEffect(() => { current.current = true; return () => { current.current = false; }; }, []);
-  const agreement = useServiceEnrollmentPolicies(business.policyScope, () => businessApi.get(`/neture/businesses/${encodeURIComponent(business.key)}/legal/enrollment-policies`), business.key);
+  const agreement = useServiceEnrollmentPolicies(business.policyScope, () => defaultPharmacy ? Promise.resolve([]) : businessApi.get(`/neture/businesses/${encodeURIComponent(business.key)}/legal/enrollment-policies`), business.key);
   const [conditions, setConditions] = useState(business.registrationConditions ?? '');
   const [membership, setMembership] = useState<BusinessMembership | null>(null);
   const [error, setError] = useState('');
@@ -43,10 +44,10 @@ function ParticipationForm({ organizationId, onBusyChange }: Readonly<{ organiza
     return () => { alive = false; };
   }, [business.key, business.registrationConditions, access?.canManage, organizationId, version]);
   const apply = async () => {
-    if (!accepted || !agreement.ready || busy || !membership) return;
+    if (busy || !membership || (!defaultPharmacy && (!accepted || !agreement.ready))) return;
     setBusy(true); onBusyChange?.(true); setError(''); setApplicationError(true);
     try {
-      await businessApi.post(`${pharmacyApiBase}/semi-franchises/${encodeURIComponent(business.key)}/apply`, {
+      await businessApi.post(`${pharmacyApiBase}/semi-franchises/${encodeURIComponent(business.key)}/apply`, defaultPharmacy ? {} : {
         acceptedConditions: true, conditions, note, policyReferences: agreement.references,
       }, organizationId);
       if (current.current) setVersion(n => n + 1);
@@ -69,14 +70,17 @@ function ParticipationForm({ organizationId, onBusyChange }: Readonly<{ organiza
     catch (e) { if (current.current) { setError(businessError(e)); setBusy(false); onBusyChange?.(false); } }
   };
   return <section className="rounded-xl border bg-white p-6">
-    <h2 className="text-lg font-semibold">참여 신청 · 이용 상태</h2>
+    <h2 className="text-lg font-semibold">{defaultPharmacy ? 'Pharmacy 회원 상태' : '참여 신청 · 이용 상태'}</h2>
+    {defaultPharmacy && <p className="mt-3">약국 경영자 승인을 받으면 Pharmacy 기본 회원으로 함께 연결됩니다. 별도 가입 심사는 없습니다. 기존 이용 정지·반려·탈퇴는 자동으로 해제되지 않습니다.</p>}
     {loading && <output aria-live="polite" className="mt-4">가입 상태를 확인하고 있습니다…</output>}
     {error && <div className="mt-4"><p role="alert">{error}</p><button type="button" className="mt-3 text-blue-700" onClick={() => applicationError ? setError('') : setVersion(n => n + 1)}>다시 확인</button><a href="https://store.neture.co.kr/start-pharmacy" className="ml-4 text-blue-700">내 매장 신청 · 승인 상태 확인</a></div>}
     {!loading && (!error || applicationError) && <>
-      <p className="my-4">{access?.canManage ? '이 사업의 담당 운영자입니다.' : STATUS[membership?.membershipStatus ?? ''] ?? '아직 참여 신청하지 않았습니다.'}</p>
+      <p className="my-4">{access?.canManage ? '이 사업의 담당 운영자입니다.' : STATUS[membership?.membershipStatus ?? ''] ?? (defaultPharmacy ? 'Pharmacy 기본 회원 연결을 확인해 주세요.' : '아직 참여 신청하지 않았습니다.')}</p>
       {membership?.reason && <p className="mb-4">처리 사유: {membership.reason}</p>}
-      {conditions && <div className="my-4 rounded-lg bg-slate-50 p-4"><h3 className="font-semibold">참여 조건</h3><p className="mt-2 whitespace-pre-wrap">{conditions}</p></div>}
-      {membership && !['active', 'pending', 'suspended'].includes(membership.membershipStatus ?? '') && !access?.canManage && <div className="space-y-4">
+      {!defaultPharmacy && conditions && <div className="my-4 rounded-lg bg-slate-50 p-4"><h3 className="font-semibold">참여 조건</h3><p className="mt-2 whitespace-pre-wrap">{conditions}</p></div>}
+      {defaultPharmacy && membership && (!membership.membershipStatus || membership.membershipStatus === 'pending') && !access?.canManage && <button type="button" disabled={busy} onClick={apply} className="min-h-11 rounded-lg bg-blue-700 px-4 py-2 text-white disabled:opacity-50">{busy ? '연결 확인 중…' : '기본 회원 연결 확인'}</button>}
+      {defaultPharmacy && membership?.membershipStatus === 'active' && !access?.allowed && <a href={businessPath(business.key, 'forum') + (organizationId ? `?store=${encodeURIComponent(organizationId)}` : '')} className="mt-4 mr-4 inline-flex min-h-11 items-center text-blue-700">Pharmacy 회원 공간 이용하기 →</a>}
+      {!defaultPharmacy && membership && !['active', 'pending', 'suspended'].includes(membership.membershipStatus ?? '') && !access?.canManage && <div className="space-y-4">
         <label className="block"><input type="checkbox" checked={accepted} onChange={e => setAccepted(e.target.checked)} className="mr-2" />참여 조건을 확인했습니다.</label>
         <label className="block">추가 신청 내용 (선택)<textarea value={note} maxLength={2000} onChange={e => setNote(e.target.value)} className="mt-2 block w-full rounded border p-3" /></label>
         <ServiceEnrollmentPolicyAgreement agreement={agreement} />

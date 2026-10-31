@@ -34,12 +34,13 @@ it('requires a choice for multiple pharmacies and never uses a default enrollmen
 it.each(['pharmacy', 'megapharm'])('reads and applies only the selected pharmacy for %s, preserving query and hash', async key => {
   mocks.key = key; mount('?other=keep#status');
   fireEvent.change(await screen.findByRole('combobox'), { target: { value: 'store-b' } });
-  await screen.findByText('privacy · 버전 1');
+  await screen.findByRole('button', { name: key === 'pharmacy' ? '기본 회원 연결 확인' : '참여 신청' });
   expect(mocks.get).toHaveBeenCalledWith('/neture/pharmacy/semi-franchises', { params: undefined, headers: { 'X-Store-Organization-Id': 'store-b' } });
-  for (const checkbox of screen.getAllByRole('checkbox')) fireEvent.click(checkbox);
+  for (const checkbox of screen.queryAllByRole('checkbox')) fireEvent.click(checkbox);
   let resolve!: (value: ReturnType<typeof envelope>) => void;
   mocks.post.mockReturnValueOnce(new Promise(r => { resolve = r; }));
-  fireEvent.click(screen.getByRole('button', { name: '참여 신청' }));
+  fireEvent.click(screen.getByRole('button', { name: key === 'pharmacy' ? '기본 회원 연결 확인' : '참여 신청' }));
+  if (key === 'pharmacy') { expect(mocks.post.mock.calls[0][1]).toEqual({}); expect(mocks.get.mock.calls.some(([path]) => path.endsWith('/enrollment-policies'))).toBe(false); }
   expect(mocks.post.mock.calls[0][0]).toBe(`/neture/pharmacy/semi-franchises/${key}/apply`);
   expect(mocks.post.mock.calls[0][2]).toEqual({ headers: { 'X-Store-Organization-Id': 'store-b' } });
   expect((screen.getByRole('combobox') as HTMLSelectElement).disabled).toBe(true);
@@ -81,13 +82,14 @@ it('clears another pharmacy status and ignores its late enrollment response', as
   mocks.get.mockImplementation((path, config) => path.endsWith('/semi-franchises') && config?.headers?.['X-Store-Organization-Id'] === 'store-a' ? new Promise(r => { resolve = r; }) : initial(path, config));
   mount('?store=store-a'); await waitFor(() => expect(resolve).toBeDefined());
   fireEvent.change(screen.getByRole('combobox'), { target: { value: 'store-b' } });
-  await screen.findByText('아직 참여 신청하지 않았습니다.');
+  await screen.findByText('Pharmacy 기본 회원 연결을 확인해 주세요.');
   await act(async () => resolve(envelope([{ key: 'pharmacy', membershipStatus: 'active' }])));
   expect(screen.queryByText('참여 중')).toBeNull();
 });
 it('clears consent and draft input when a different pharmacy is selected, even after an in-flight application', async () => {
+  mocks.key = 'megapharm';
   const initial = mocks.get.getMockImplementation()!;
-  mocks.get.mockImplementation((path, config) => path.endsWith('/semi-franchises') ? Promise.resolve(envelope([{ key: 'pharmacy', membershipStatus: null }])) : initial(path, config));
+  mocks.get.mockImplementation((path, config) => path.endsWith('/semi-franchises') ? Promise.resolve(envelope([{ key: mocks.key, membershipStatus: null }])) : initial(path, config));
   let reject!: (reason: Error) => void;
   mocks.post.mockReturnValueOnce(new Promise((_resolve, r) => { reject = r; }));
   mount('?store=store-a'); await screen.findByText('privacy · 버전 1');
@@ -108,6 +110,7 @@ it('clears consent and draft input when a different pharmacy is selected, even a
   expect((screen.getByRole('combobox') as HTMLSelectElement).disabled).toBe(false);
 });
 it('keeps enrollment disabled when the selected business policies are unavailable', async () => {
+  mocks.key = 'megapharm';
   const initial = mocks.get.getMockImplementation()!;
   mocks.get.mockImplementation((path, config) => path.endsWith('/enrollment-policies') ? Promise.reject({ response: { status: 503, data: { code: 'POLICY_UNAVAILABLE' } } }) : initial(path, config));
   mount('?store=store-b'); await screen.findByRole('button', { name: '참여 신청' });
@@ -119,4 +122,14 @@ it('keeps enrollment disabled when the selected business policies are unavailabl
 it('preserves the selected pharmacy when entering the participant forum', async () => {
   mocks.allowed = true; mount('?store=store-a');
   expect((await screen.findByRole('link', { name: '참여자 게시판 이용하기 →' })).getAttribute('href')).toBe('/community?store=store-a');
+});
+
+it.each(['rejected', 'suspended', 'terminated'])('never offers automatic reconnection for an existing Pharmacy %s membership', async status => {
+  const initial = mocks.get.getMockImplementation()!;
+  mocks.get.mockImplementation((path, config) => path.endsWith('/semi-franchises') ? Promise.resolve(envelope([{ key: 'pharmacy', membershipStatus: status }])) : initial(path, config));
+  mount('?store=store-b'); await screen.findByText(/기존 이용 정지·반려·탈퇴는 자동으로 해제되지 않습니다/);
+  await waitFor(() => expect(screen.queryByText('가입 상태를 확인하고 있습니다…')).toBeNull());
+  expect(screen.queryByRole('button', { name: '기본 회원 연결 확인' })).toBeNull();
+  expect(screen.queryByRole('button', { name: '참여 신청' })).toBeNull();
+  expect(mocks.post).not.toHaveBeenCalled();
 });
