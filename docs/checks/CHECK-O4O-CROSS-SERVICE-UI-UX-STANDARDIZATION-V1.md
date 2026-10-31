@@ -112,3 +112,10 @@ Git HTTPS 조회는 성공했다. 그러나 `gh pr list`·ruleset 조회는 Forb
 - 변경 파일 ESLint 오류 0; 기존 공급자 레이아웃 hook dependency 경고 1개는 변경 전부터 존재하며 이번에는 drawer offset만 바꿨다. `--max-warnings 0`의 초기 경고 실패를 숨기지 않는다. 민감정보·JSON·diff 검사 PASS.
 - 계정/원문 대화/업무 자료를 영구 학습 이력으로 추가하지 않았고 외부 ChatGPT 제출·운영 계정 변경·실제 PC/주문·유료 AI를 실행하지 않았다.
 - 최종 원격 CI·리뷰·병합·배포 결과는 위 통합 WO의 PR에서 동일 HEAD/SHA로 후속 기록한다.
+
+
+### PR #900 사업 참여 상태 리뷰 보완
+
+공통 전환기도 대표 홈과 같이 일반 서비스 가입과 독립 사업 참여를 구별한다. 이미 조회한 사업 원장의 참여·신청 상태를 우선 반영하고 `pharmacy`를 `kpa-society`로 대응했다. 참여하지 못하는 active 원장은 ‘이용 자격 확인 필요’이며 실제 이용·handoff 자격으로 승격하지 않는다. 기존 개인 약국 회원과 메가팜 공개 진입은 유지한다.
+
+추가 회귀 9건을 포함한 auth-react 254건 PASS, 사업 원장만 가진 약국/CarePharm의 참여 표시·모바일 약국 handoff를 포함해 PC/모바일 8개 브라우저 조합 재실행 PASS. 기존 3,438건에 이전 auth-react 245건을 다시 더하지 않고 신규 9건만 더하면 3,447건이다. 보완 후 frontend typecheck·웹앱 6개 build 재실행 PASS. 최종 원격 HEAD의 CI·리뷰 결과는 같은 통합 PR에 기록한다.

@@ -16,6 +16,8 @@ const statusLabel: Record<string, string> = {
   rejected: "신청 반려",
   suspended: "이용 정지",
   withdrawn: "탈퇴",
+  terminated: "이용 종료",
+  unverified: "이용 자격 확인 필요",
 };
 const preferenceKey = (id: string) =>
   `o4o:service-navigation:v1:${encodeURIComponent(id)}`;

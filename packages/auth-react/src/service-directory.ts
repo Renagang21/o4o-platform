@@ -134,12 +134,25 @@ export async function loadNavigationAccess(
   const services = catalog.data?.data?.services;
   const stores = workspace.data?.data?.stores;
   const supplier = entry.data?.data?.serviceStates?.supplier?.status;
+  const businesses = entry.data?.data?.businesses as
+    | { key: string; canParticipate: boolean; membershipStatus?: string | null }[]
+    | undefined;
   if (
     [catalog, workspace, entry].some(
       (response) => response.data?.success === false,
     ) ||
     !Array.isArray(services) ||
     !Array.isArray(stores) ||
+    (businesses !== undefined &&
+      (!Array.isArray(businesses) ||
+        !businesses.every(
+          (business) =>
+            business &&
+            typeof business.key === "string" &&
+            typeof business.canParticipate === "boolean" &&
+            (business.membershipStatus == null ||
+              typeof business.membershipStatus === "string"),
+        ))) ||
     typeof supplier !== "string" ||
     !services.every(
       (s) =>
@@ -154,18 +167,32 @@ export async function loadNavigationAccess(
   ) {
     throw new Error("Invalid service navigation response");
   }
-  return {
-    statuses: {
-      ...Object.fromEntries(
-        services
-          .filter((s) => s.membership)
-          .map((s) => [s.key, s.membership.status]),
-      ),
-      supplier,
-    },
-    stores,
-    supplier: supplier === "active",
-  };
+  const statuses: Record<string, string> = Object.fromEntries(
+    services.filter((s) => s.membership).map((s) => [s.key, s.membership.status]),
+  );
+  // Independent pharmacy businesses use their own participation ledger. An
+  // ordinary service membership neither creates nor overrides that eligibility.
+  if (businesses !== undefined) {
+    for (const [businessKey, serviceKey] of [
+      ["pharmacy", "kpa-society"],
+      ["carepharm", "carepharm"],
+      ["megapharm", "megapharm"],
+    ]) {
+      const business = businesses.find((item) => item.key === businessKey);
+      if (business) {
+        statuses[serviceKey] = business.canParticipate
+          ? "active"
+          : business.membershipStatus === "active"
+            ? "unverified"
+            : (business.membershipStatus ?? "none");
+      } else if (businessKey !== "pharmacy") {
+        // Pharmacy also has ordinary personal membership; the other businesses
+        // have no membership fallback when the current business ledger is present.
+        statuses[serviceKey] = "none";
+      }
+    }
+  }
+  return { statuses: { ...statuses, supplier }, stores, supplier: supplier === "active" };
 }
 
 /** The server decides access; the browser validates the returned destination before navigation. */

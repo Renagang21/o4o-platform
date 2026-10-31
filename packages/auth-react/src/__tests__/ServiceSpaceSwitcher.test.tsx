@@ -51,7 +51,7 @@ const client = (): NavigationClient => ({
   post: vi.fn(async (_path, body: any) => ({
     data: {
       data: {
-        targetUrl: `https://${body.targetWorkspace ? "store" : body.targetServiceKey === "lecture" ? "study" : body.targetServiceKey}.neture.co.kr/handoff?returnTo=${encodeURIComponent(body.returnPath)}`,
+        targetUrl: `https://${body.targetWorkspace ? "store" : body.targetServiceKey === "lecture" ? "study" : body.targetServiceKey === "kpa-society" ? "pharmacy" : body.targetServiceKey}.neture.co.kr/handoff?returnTo=${encodeURIComponent(body.returnPath)}`,
       },
     },
   })),
@@ -222,6 +222,75 @@ describe("service and workspace navigation", () => {
       }),
     );
     expect(navigate).not.toHaveBeenCalled();
+  });
+  it("shows independent pharmacy businesses without generic membership and hands off their sessions", async () => {
+    const api = client(), get = api.get, navigate = vi.fn();
+    api.get = vi.fn(async (path) => path === "/neture/home/entry" ? {
+      data: { success: true, data: {
+        serviceStates: { supplier: { status: "none" } },
+        businesses: [
+          { key: "pharmacy", canParticipate: true, membershipStatus: null },
+          { key: "carepharm", canParticipate: true, membershipStatus: "active" },
+          { key: "megapharm", canParticipate: true, membershipStatus: null },
+        ],
+      } },
+    } : get(path));
+    mount(api, { navigate }); open();
+    await waitFor(() => expect(panel().getByText("이용 중인 서비스")).toBeTruthy());
+    const joined = screen.getByText("이용 중인 서비스").nextElementSibling as HTMLElement;
+    expect(within(joined).getByRole("button", { name: "O4O 약국 경영지원 이용 중" })).toBeTruthy();
+    expect(within(joined).getByRole("button", { name: "창고형 약국 이용 중" })).toBeTruthy();
+    fireEvent.click(within(joined).getByRole("button", { name: "만성질환관리 이용 중" }));
+    await waitFor(() => expect(api.post).toHaveBeenCalledWith("/auth/handoff", {
+      targetServiceKey: "carepharm", returnPath: "/",
+    }));
+    await waitFor(() => expect(navigate).toHaveBeenCalledWith("https://carepharm.neture.co.kr/handoff?returnTo=%2F"));
+    await waitFor(() => expect((within(joined).getByRole("button", { name: "O4O 약국 경영지원 이용 중" }) as HTMLButtonElement).disabled).toBe(false));
+    fireEvent.click(within(joined).getByRole("button", { name: "O4O 약국 경영지원 이용 중" }));
+    await waitFor(() => expect(api.post).toHaveBeenCalledWith("/auth/handoff", {
+      targetServiceKey: "kpa-society", returnPath: "/",
+    }));
+    await waitFor(() => expect(navigate).toHaveBeenCalledWith("https://pharmacy.neture.co.kr/handoff?returnTo=%2F"));
+  });
+  it.each(["pending", "suspended", "rejected", "withdrawn", "terminated", "active"])(
+    "does not turn a non-participating business %s record into active service access",
+    async (status) => {
+      const api = client(), get = api.get;
+      api.get = vi.fn(async (path) => path === "/auth/services" ? {
+        data: { data: { services: [{ key: "carepharm", membership: { status: "active" } }] } },
+      } : path === "/neture/home/entry" ? {
+        data: { data: { serviceStates: { supplier: { status: "none" } }, businesses: [
+          { key: "carepharm", canParticipate: false, membershipStatus: status },
+        ] } },
+      } : get(path));
+      const access = await loadNavigationAccess(api);
+      expect(access.statuses.carepharm).toBe(status === "active" ? "unverified" : status);
+      const navigate = vi.fn();
+      mount(api, { navigate }); open();
+      await waitFor(() => expect(panel().getByText("이용 중인 서비스")).toBeTruthy());
+      const joined = screen.getByText("이용 중인 서비스").nextElementSibling as HTMLElement;
+      expect(within(joined).queryByText("만성질환관리")).toBeNull();
+      const labels: Record<string, string> = { pending: "신청 중", suspended: "이용 정지", rejected: "신청 반려", withdrawn: "탈퇴", terminated: "이용 종료", active: "이용 자격 확인 필요" };
+      fireEvent.click(panel().getByRole("button", { name: `만성질환관리 ${labels[status]}`, exact: true }));
+      await waitFor(() => expect(navigate).toHaveBeenCalledWith("https://carepharm.neture.co.kr/"));
+      expect(api.post).not.toHaveBeenCalled();
+    },
+  );
+  it("keeps personal pharmacy membership but does not invent independent business participation", async () => {
+    const api = client(), get = api.get;
+    api.get = vi.fn(async (path) => path === "/auth/services" ? {
+      data: { data: { services: ["kpa-society", "carepharm"].map(key => ({ key, membership: { status: "active" } })) } },
+    } : path === "/neture/home/entry" ? {
+      data: { data: { serviceStates: { supplier: { status: "none" } }, businesses: [] } },
+    } : get(path));
+    expect((await loadNavigationAccess(api)).statuses).toMatchObject({ "kpa-society": "active", carepharm: "none" });
+  });
+  it("rejects malformed business participation instead of inferring membership", async () => {
+    const api = client(), get = api.get;
+    api.get = vi.fn(async (path) => path === "/neture/home/entry" ? {
+      data: { data: { serviceStates: { supplier: { status: "none" } }, businesses: [{ key: "carepharm", canParticipate: "yes" }] } },
+    } : get(path));
+    await expect(loadNavigationAccess(api)).rejects.toThrow();
   });
   it("validates response shape instead of treating malformed access as an empty list", async () => {
     const api = client();

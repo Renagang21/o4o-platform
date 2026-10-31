@@ -108,7 +108,10 @@ try {
             serviceStates: { supplier: { status: "active" } },
             stores: [],
             branches: [],
-            businesses: [],
+            businesses: [
+              { key: "pharmacy", name: "약국 경영지원", canParticipate: true, membershipStatus: null },
+              { key: "carepharm", name: "만성질환관리", canParticipate: true, membershipStatus: "active" },
+            ],
             cooperatives: [],
           };
         else if (endpoint === "/lms/courses") data = [];
@@ -123,7 +126,9 @@ try {
               ? "store"
               : body.targetServiceKey === "lecture"
                 ? "study"
-                : body.targetServiceKey;
+                : body.targetServiceKey === "kpa-society"
+                  ? "pharmacy"
+                  : body.targetServiceKey;
           data = {
             targetUrl: `https://${host}.neture.co.kr/handoff?returnTo=${encodeURIComponent(body.returnPath)}`,
           };
@@ -178,6 +183,9 @@ try {
         bounds && bounds.x >= 0 && bounds.x + bounds.width <= width + 1,
         "switcher must fit viewport",
       );
+      const joinedServices = panel.getByRole("heading", { name: "이용 중인 서비스", exact: true }).locator("+ ul");
+      await joinedServices.getByRole("button", { name: "O4O 약국 경영지원 이용 중", exact: true }).waitFor();
+      await joinedServices.getByRole("button", { name: "만성질환관리 이용 중", exact: true }).waitFor();
       await panel.getByRole("textbox", { name: "서비스 검색" }).fill("공급자");
       assert.equal(
         await panel.getByText("O4O 강의 · 교육·학습", { exact: true }).count(),
@@ -228,17 +236,18 @@ try {
       await panel
         .getByRole("heading", { name: "이용 중인 서비스", exact: true })
         .waitFor();
-      await panel.getByRole("textbox", { name: "서비스 검색" }).fill("강의");
+      const handoffService = width === 1280 ? "lecture" : "kpa-society";
+      await panel.getByRole("textbox", { name: "서비스 검색" }).fill(width === 1280 ? "강의" : "약국 경영지원");
       await panel
         .getByRole("button", {
-          name: "O4O 강의 · 교육·학습 이용 중",
+          name: width === 1280 ? "O4O 강의 · 교육·학습 이용 중" : "O4O 약국 경영지원 이용 중",
           exact: true,
         })
         .first()
         .click();
       await page.getByText("합성 서비스 이동 완료").waitFor();
       assert.deepEqual(handoffs.at(-1), {
-        targetServiceKey: "lecture",
+        targetServiceKey: handoffService,
         returnPath: "/",
       });
       assert.deepEqual(failures, []);

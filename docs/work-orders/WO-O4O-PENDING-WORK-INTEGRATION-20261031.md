@@ -72,3 +72,10 @@ Main 브라우저 스크립트의 첫 cold-start `networkidle` 시간 초과 뒤
 ## 6. 문서 정합
 
 기존 공통 UI CHECK에 이번 최신 main 통합 검증을 후속 절로 추가한다. ChatGPT 준비 자료와 통합 운영자 배포 기록은 원래 승인·실행 시점의 기록으로 유지한다. 새 통합 WO에서 이번 실행·이전 기록·남은 실제 계정/현장 검수의 경계를 명시한다.
+
+
+## 7. PR #900 원격 리뷰 보완
+
+[통합 PR #900](https://github.com/Renagang21/o4o-platform/pull/900)의 첫 Codex 리뷰는 독립 사업 참여자가 일반 `service_memberships` 없이 전환기의 이용 서비스에서 누락되는 문제를 지적했다. 이미 읽는 `/neture/home/entry.businesses`를 사용하고 `pharmacy → kpa-society`로 연결한다. `canParticipate`가 사업 이용 판정의 우선 출처이며, 신청·정지·거절·탈퇴·종료 상태나 자격이 확인되지 않은 active 원장을 이용 권한으로 승격하지 않는다. 약국 개인 회원의 기존 진입과 별도 handoff alias가 없는 메가팜의 공개 진입을 유지한다.
+
+사업 원장 전용 참여·약국/CarePharm handoff·여섯 비참여 상태·기존 개인 가입·잘못된 응답에 관한 회귀 9건을 추가했다. auth-react 전체 254건 PASS이며 다른 초기 테스트와 중복을 빼면 통합 검증 합계는 3,447건이다. PC·모바일 8개 브라우저 조합에서 사업 전용 참여 표시를 확인하고 모바일에서는 약국 handoff 요청을 실제 UI로 검증했다. 보완 후 전체 frontend typecheck와 영향 웹앱 6개 build 재실행 PASS. 마지막 결과는 같은 PR의 최종 HEAD 검증 기록을 따른다.
