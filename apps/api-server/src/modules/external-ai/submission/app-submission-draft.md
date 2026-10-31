@@ -1,9 +1,13 @@
 # O4O ChatGPT 앱 등록안 (공개 제출 전 확인용)
 
+> **2026-10-28 공식 안내 본문 확인:** 사용자 제공 제출 안내·필드 참조와 실제 포털로 plugin.json·mcp.json·ZIP, 정상5/거부3, 아이콘 규격을 확인했다. 아래 10월 27일 미확인 표시는 당시 접근 실패 기록이다. [첫 출시 준비](../../../../../../docs/design/DESIGN-O4O-CHATGPT-FIRST-RELEASE-PREPARATION-V1.md) §2를 우선한다. 확정 소개는 44자로 최대30자 부제에는 부적합해 상세 설명에 보존한다. 실제 패키지·인증 필드·심사 자료 실행은 별도 검증 전이며 기존 예시를 그대로 업로드하지 않는다.
+
+> **2026-10-27 우선 안내:** [첫 출시 준비](../../../../../../docs/design/DESIGN-O4O-CHATGPT-FIRST-RELEASE-PREPARATION-V1.md)를 먼저 사용한다. 아래 10월 24일 ZIP/plugin.json 안내는 당시 기록으로, 현행 제출 규격·redirect를 재확인하지 못했다. 공식 페이지 접속 실패를 구형 플러그인 증거로 취급하지 않는다. 이 문서나 기존 JSON을 확정된 업로드 파일로 사용하지 않는다.
+
 > **2026-10-26 개발 정합:** 아래 8개 목록과 JSON은 당시 제출 초안 기록이다. 현재 콘텐츠 계약은 상품별 3개를 포함한 11개이며, 신규 개인 메일은 기본 OFF다. 메일을 활성화하면 도구 10개·별도 조회/관리/본문 scope가 추가된다. [메일 계약](../../../../../../docs/design/DESIGN-O4O-PERSONAL-MAIL-MCP-V1.md)을 참조하고 실제 제출 전에 현재 활성 도구·동의·개인정보 고지·제공자 공개 조건으로 다시 검증한다. 메일 개발·fixture 성공은 공개 제출이나 승인을 뜻하지 않는다.
 
 > 상태: DRAFT — 공개 제출 전 사용자 확인 필요 · 작성일: 2026-10-23 · 최종 갱신: 2026-10-24
-> **2026-10-24 등록 절차 확인**: 현재 공식 안내는 plugin.json·mcp.json·참조 자산을 포함한 ZIP 제출이다. [현재 등록 준비 자료](../../../../../../docs/design/DESIGN-O4O-CHATGPT-PUBLIC-SUBMISSION-PACK-V1.md)의 문안·패키지 초안·심사 안내를 먼저 사용한다. 이 문서와 같은 폴더의 [기존 JSON](chatgpt-app-submission.json)은 도구·옛 양식 참고 자료이며, 그대로 현재 제출 파일로 올리지 않는다. 현재 운영 대상은 약국이며 아래 넓은 adapter 범위를 전부 활성화한 것으로 소개하지 않는다.
+> **2026-10-24 당시 등록 절차 기록**: plugin.json·mcp.json·참조 자산을 포함한 ZIP 제출로 기록했다. 현행 여부는 미확인이다. [기존 등록 준비 자료](../../../../../../docs/design/DESIGN-O4O-CHATGPT-PUBLIC-SUBMISSION-PACK-V1.md)의 패키지 예시와 같은 폴더의 [기존 JSON](chatgpt-app-submission.json)은 재검토용 참고 자료이며 확정된 제출 파일로 올리지 않는다. 첫 출시 소개 대상은 약국이며 아래 넓은 adapter 범위를 전부 검증·활성화한 것으로 소개하지 않는다.
 > 근거: 도구 정의·annotation 은 `../mcp/mcp.routes.ts`, 동작은 `../tools/tool.service.ts` · `../adapters/*` 를 직접 확인했다.
 > 원래 로컬 scratchpad 의 `app-submission-draft.md` 는 이 PC 에서 찾지 못했다. 이 문서는 코드·CHECK 기준으로 새로 작성했다 — 원본이 다른 PC 에 있으면 차이를 대조한다.
 

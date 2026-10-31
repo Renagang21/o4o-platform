@@ -135,6 +135,8 @@ interface HeroViewProps {
   fallbackTitle?: string;
   accent?: string;
   className?: string;
+  /** Operator previews remain stable while reviewing content. */
+  autoRotate?: boolean;
 }
 export function HomeHeroView({
   surface,
@@ -147,10 +149,16 @@ export function HomeHeroView({
   fallbackTitle,
   accent,
   className = "",
+  autoRotate = true,
 }: HeroViewProps) {
   const identity = heroIdentity(surface, businessKey);
   const identityName = identity === "megapharm" ? "메가팜 · 창고형약국" : HOME_SURFACE_INFO[surface].name;
   const [index, setIndex] = useState(0);
+  const [paused, setPaused] = useState(false);
+  const [interacting, setInteracting] = useState(false);
+  const [focused, setFocused] = useState(false);
+  const [visible, setVisible] = useState(() => typeof document === 'undefined' || document.visibilityState !== 'hidden');
+  const [reducedMotion, setReducedMotion] = useState(() => typeof window !== 'undefined' && typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
   const [, refreshSchedule] = useState(0);
   useEffect(() => {
     const timer = window.setInterval(
@@ -165,9 +173,26 @@ export function HomeHeroView({
   const items = visibleHomePresentation(config).slides;
   const activeIndex = Math.min(index, Math.max(items.length - 1, 0));
   const active = items[activeIndex];
+  const slideIds = items.map(item => item.id).join('|');
+  useEffect(() => {
+    const onVisible = () => setVisible(document.visibilityState !== 'hidden');
+    const media = typeof window.matchMedia === 'function' ? window.matchMedia('(prefers-reduced-motion: reduce)') : null;
+    const onMotion = () => setReducedMotion(media?.matches ?? false);
+    document.addEventListener('visibilitychange', onVisible);
+    media?.addEventListener('change', onMotion);
+    return () => { document.removeEventListener('visibilitychange', onVisible); media?.removeEventListener('change', onMotion); };
+  }, []);
+  const rotating = autoRotate && items.length > 1 && !paused && !interacting && !focused && visible && !reducedMotion;
+  useEffect(() => {
+    if (!rotating) return;
+    const timer = window.setInterval(() => setIndex(value => (Math.min(value, items.length - 1) + 1) % items.length), 8000);
+    return () => window.clearInterval(timer);
+  }, [rotating, slideIds, items.length]);
   const Heading = heading;
-  const move = (amount: number) =>
+  const move = (amount: number) => {
+    setPaused(true);
     setIndex((activeIndex + amount + items.length) % items.length);
+  };
   const style = {
     "--home-accent": accent ?? HOME_SURFACE_INFO[surface].accent,
     ...(accent ? { "--hero-primary": accent } : {}),
@@ -189,6 +214,10 @@ export function HomeHeroView({
       style={style}
       aria-labelledby={id}
       aria-roledescription={items.length > 1 ? "슬라이드" : undefined}
+      onMouseEnter={() => setInteracting(true)}
+      onMouseLeave={() => setInteracting(false)}
+      onFocusCapture={() => setFocused(true)}
+      onBlurCapture={event => { if (!event.currentTarget.contains(event.relatedTarget as Node)) setFocused(false); }}
       onPointerDown={(event) => {
         if (event.pointerType === "touch")
           touch.current = { x: event.clientX, y: event.clientY };
@@ -207,7 +236,8 @@ export function HomeHeroView({
       }}
     >
       <div className="home-hero-main">
-        <div className="home-hero-copy" aria-live="polite" aria-atomic="true">
+        <div className="home-hero-copy" aria-live={rotating ? 'off' : 'polite'} aria-atomic="true">
+          {active.kind === 'advertisement' && <p className="home-promotion-label">광고 · {active.sponsor}</p>}
           <p className="home-hero-eyebrow">
             {active.eyebrow || identityName}
           </p>
@@ -243,7 +273,7 @@ export function HomeHeroView({
                 type="button"
                 aria-label={`${position + 1}번 안내 보기`}
                 aria-pressed={position === activeIndex}
-                onClick={() => setIndex(position)}
+                onClick={() => { setPaused(true); setIndex(position); }}
               >
                 <span />
               </button>
@@ -258,6 +288,10 @@ export function HomeHeroView({
           <button type="button" aria-label="다음 안내" onClick={() => move(1)}>
             →
           </button>
+          {autoRotate && !reducedMotion && <button type="button" aria-label={paused ? '자동 넘김 시작' : '자동 넘김 정지'} onClick={() => setPaused(value => !value)}>
+            {paused ? '재생' : '정지'}
+          </button>}
+          {reducedMotion && <span className="home-hero-motion-note">동작 줄이기 설정 · 수동 이동</span>}
         </div>
       )}
       {children && <div className="home-hero-context">{children}</div>}

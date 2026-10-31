@@ -72,3 +72,8 @@ export { useHandoffExchange, type HandoffExchangeState } from './useHandoffExcha
 
 export { LoginCard, LoginLayout } from './LoginPresentation';
 export { ServiceAccountMenu } from './ServiceAccountMenu';
+export { ServiceSpaceSwitcher } from './ServiceSpaceSwitcher';
+export type { ServiceSpaceSwitcherProps } from './ServiceSpaceSwitcher';
+export { ServiceFooter } from './ServiceFooter';
+export { O4O_SERVICE_DIRECTORY, loadNavigationAccess, resolveServiceDestination } from './service-directory';
+export type { ServiceDestination, NavigationClient, NavigationAccess } from './service-directory';

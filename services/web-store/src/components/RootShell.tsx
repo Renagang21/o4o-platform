@@ -1,3 +1,5 @@
+import { ServiceFooter, ServiceSpaceSwitcher, MyHomeButton, O4OHomeButton, ServiceAccountMenu } from '@o4o/auth-react';
+
 import { OperatorInboxLink } from '@o4o/operator-core-ui';
 /**
  * 공통 root shell — WO-O4O-UNIFIED-STORE-WORKSPACE-FOUNDATION-V1 §3-⑥
@@ -9,7 +11,7 @@ import { PublicLegalFooterInfo } from '@o4o/shared-space-ui';
 import { getUserDisplayName } from '@o4o/account-ui';
 import { BRAND, PLATFORM_LEGAL_SERVICE_KEY, PLATFORM_ORIGIN, ROOT_NAV_ITEMS, WORKSPACE_PATHS } from '../config/workspace';
 import { loadFooterLegal } from '../lib/footerLegal';
-import { MyHomeButton, O4OHomeButton, ServiceAccountMenu } from '@o4o/auth-react';
+
 import { useAuth } from '../contexts/AuthContext';
 import { authClient } from '../lib/apiClient';
 import { useUnifiedStore } from '../contexts/StoreContext';
@@ -41,7 +43,7 @@ export default function RootShell() {
   const navItems = ROOT_NAV_ITEMS;
   const { organizationId } = useUnifiedStore();
   return <div className="site">
-    <header className="header">
+    <header className="header o4o-service-header">
       <div className="header-left">
         <Link className="brand" to={WORKSPACE_PATHS.home}>{BRAND.name}</Link>
         <StoreSwitcher />
@@ -59,21 +61,13 @@ export default function RootShell() {
           세션 복구 중에는 O4O 홈을 비활성으로 둔다(authLoading — 다른 서비스 헤더와 같은 공통 패턴). */}
       <div className="header-actions">
         {/* WO-O4O-REPRESENTATIVE-ENTRY-RETURN-HANDOFF-AND-HOME-NAVIGATION-V1: O4O 홈(로그인 유지) · 로그아웃 = 해당 서브도메인의 현재 브라우저 세션 종료 */}
-        <span className="inline-flex flex-col items-end gap-1 sm:flex-row sm:items-center sm:gap-3"><MyHomeButton accountId={user?.id} api={authClient.api} isAuthenticated={isAuthenticated} authLoading={authLoading} className="o4o-home-link" /><O4OHomeButton api={authClient.api} isAuthenticated={isAuthenticated} authLoading={authLoading} className="o4o-home-link" /></span>
+        <span className="inline-flex flex-col items-end gap-1 sm:flex-row sm:items-center sm:gap-3"><ServiceSpaceSwitcher showStoreShortcut={false} api={authClient.api} accountId={user?.id} isAuthenticated={isAuthenticated} authLoading={authLoading} /><MyHomeButton accountId={user?.id} api={authClient.api} isAuthenticated={isAuthenticated} authLoading={authLoading} className="o4o-home-link" /><O4OHomeButton api={authClient.api} isAuthenticated={isAuthenticated} authLoading={authLoading} className="o4o-home-link" /></span>
         {isAuthenticated && user
           ? <ServiceAccountMenu key={user.id} displayName={getUserDisplayName(user)} email={user.email} onLogout={logout} />
           : <Link to={withReturnTo(WORKSPACE_PATHS.login, `${pathname}${search}${hash}`)}>로그인</Link>}
       </div>
     </header>
     <div className="content"><Outlet key={organizationId ?? 'no-store'} /></div>
-    <footer className="footer">
-      <div className="footer-links"><Link to="/contact">문의하기</Link>
-        <a href={`${PLATFORM_ORIGIN}/terms`}>이용약관</a>
-        <a href={`${PLATFORM_ORIGIN}/privacy`}>개인정보처리방침</a>
-        <O4OHomeButton api={authClient.api} isAuthenticated={isAuthenticated} authLoading={authLoading} className="link-button footer-o4o-home" />
-      </div>
-      <PublicLegalFooterInfo serviceKey={PLATFORM_LEGAL_SERVICE_KEY} loadProfile={loadFooterLegal} />
-      <p>© {new Date().getFullYear()} Neture · {BRAND.name}</p>
-    </footer>
+    <ServiceFooter brand={BRAND.name} links={<><Link to="/contact">문의하기</Link><a href={`${PLATFORM_ORIGIN}/terms`}>이용약관</a><a href={`${PLATFORM_ORIGIN}/privacy`}>개인정보처리방침</a><O4OHomeButton api={authClient.api} isAuthenticated={isAuthenticated} authLoading={authLoading} className="o4o-home-link" /></>}><PublicLegalFooterInfo serviceKey={PLATFORM_LEGAL_SERVICE_KEY} loadProfile={loadFooterLegal} /></ServiceFooter>
   </div>;
 }

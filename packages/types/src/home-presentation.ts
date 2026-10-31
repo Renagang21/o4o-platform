@@ -232,7 +232,7 @@ export function parseHomePresentation(value: unknown): HomePresentation {
     config.promotions.length > 3
   )
     throw new Error("Hero와 홍보는 각각 최대 3개입니다.");
-  const parse = (item: HomeMessage, hero: boolean): HomeMessage => {
+  const parse = (item: HomeMessage): HomeMessage => {
     if (!item || typeof item !== "object" || typeof item.enabled !== "boolean")
       throw new Error("노출 설정을 확인해 주세요.");
     for (const [field, limit] of Object.entries({
@@ -256,11 +256,10 @@ export function parseHomePresentation(value: unknown): HomePresentation {
     if (
       !item.id ||
       !item.title.trim() ||
-      !["service", "advertisement"].includes(item.kind) ||
-      (hero && item.kind !== "service")
+      !["service", "advertisement"].includes(item.kind)
     )
       throw new Error(
-        "제목과 콘텐츠 종류를 확인해 주세요. Hero에는 서비스 안내만 등록합니다.",
+        "제목과 콘텐츠 종류를 확인해 주세요.",
       );
     if (
       !safeHomeUrl(item.linkUrl) ||
@@ -296,8 +295,8 @@ export function parseHomePresentation(value: unknown): HomePresentation {
       sponsor: item.sponsor,
     };
   };
-  const slides = config.slides.map((item) => parse(item, true)),
-    promotions = config.promotions.map((item) => parse(item, false));
+  const slides = config.slides.map((item) => parse(item)),
+    promotions = config.promotions.map((item) => parse(item));
   if (
     [slides, promotions].some(
       (items) => new Set(items.map((item) => item.id)).size !== items.length,

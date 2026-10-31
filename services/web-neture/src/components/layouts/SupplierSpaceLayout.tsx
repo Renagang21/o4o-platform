@@ -333,7 +333,7 @@ export default function SupplierSpaceLayout() {
         {/* Mobile drawer backdrop */}
         {mobileOpen && (
           <div
-            className="lg:hidden fixed inset-x-0 top-16 bottom-0 bg-black/40 z-30"
+            className="lg:hidden fixed inset-x-0 top-[var(--o4o-global-header-height,4rem)] bottom-0 bg-black/40 z-30"
             onClick={closeMobile}
             aria-hidden="true"
           />
@@ -342,7 +342,7 @@ export default function SupplierSpaceLayout() {
         <div className="flex gap-6">
           {/* Desktop Sidebar (>=lg) */}
           <aside className="w-60 flex-shrink-0 hidden lg:block">
-            <nav className="bg-white rounded-xl border border-gray-200 overflow-hidden sticky top-20">
+            <nav className="bg-white rounded-xl border border-gray-200 overflow-hidden sticky top-[calc(var(--o4o-global-header-height,4rem)+1rem)]">
               {renderNav()}
             </nav>
           </aside>
@@ -350,7 +350,7 @@ export default function SupplierSpaceLayout() {
           {/* Mobile drawer (<lg) — 전체 메뉴(중첩 포함) */}
           <aside
             id="supplier-sidebar"
-            className={`lg:hidden fixed left-0 top-16 bottom-0 z-40 w-72 max-w-[85%] bg-white border-r border-gray-200 overflow-y-auto transition-transform duration-200 ease-out ${
+            className={`lg:hidden fixed left-0 top-[var(--o4o-global-header-height,4rem)] bottom-0 z-40 w-72 max-w-[85%] bg-white border-r border-gray-200 overflow-y-auto transition-transform duration-200 ease-out ${
               mobileOpen ? 'translate-x-0' : '-translate-x-full'
             }`}
           >

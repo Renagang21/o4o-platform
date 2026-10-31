@@ -422,3 +422,5 @@ JSX AST에서 운영·관리 route 선언 164개를 추출했다. 별도 route �
 - 플랫폼 AI·메일·상품 DB 설정은 서비스의 일상 Operator 업무와 구분하여 기존 보호 화면을 보존했다. 이 항목을 중앙 native 메뉴 구현이나 서비스 Operator 위임 완료로 계산하지 않는다.
 
 최종 테스트·CI·배포 결과는 통합 운영 WO에 시점별로 기록한다. 자동 census는 동작 검증을 대체하지 않는다.
+
+최종 구현은 PR #878로 main `307e86ffe7b5901f27b375e1cbcebf3003cf15bb`에 반영됐다. 72개 native 업무, 165개 route 및 내부 메뉴·탭의 판정은 유지하며 [운영 반영 CHECK](../checks/CHECK-O4O-UNIFIED-MEMBERSHIP-ADMIN-DELIVERY-V1.md)에 CI·배포·read-only 확인과 실계정 미검증 범위를 기록했다. 이 대조표를 실제 Google 로그인·모든 업무 명령의 운영 실행 증적으로 해석하지 않는다.

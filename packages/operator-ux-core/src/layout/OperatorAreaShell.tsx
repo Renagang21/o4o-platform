@@ -12,7 +12,7 @@
  *   - outer `min-h-screen flex flex-col bg-gray-50`
  *   - `max-w-[1400px]` content container
  *   - `flex gap-6` 구조
- *   - DomainIASidebar (sidebarTopOffset 기본 'top-20')
+ *   - DomainIASidebar (sidebarTopOffset 기본: 실제 GlobalHeader 높이 + 1rem)
  *   - `main flex-1 min-w-0` + Outlet/children
  *
  * 공통화 제외 (서비스별 유지):
@@ -39,7 +39,7 @@ export interface OperatorAreaShellProps {
   menuItems: Partial<Record<OperatorGroupKey, OperatorMenuItem[]>>;
   /** 서비스 활성 capability */
   capabilities: OperatorCapability[];
-  /** sidebar sticky offset (default 'top-20' — GlobalHeader 사용 기준) */
+  /** sidebar sticky offset (default: measured GlobalHeader height + 1rem; 64px header fallback) */
   sidebarTopOffset?: string;
   /** content. 미지정 시 <Outlet/> (route element layout 기본) */
   children?: ReactNode;
@@ -54,7 +54,7 @@ export function OperatorAreaShell({
   header,
   menuItems,
   capabilities,
-  sidebarTopOffset = 'top-20',
+  sidebarTopOffset = 'top-[calc(var(--o4o-global-header-height,4rem)+1rem)]',
   children,
   domainIAConfig,
   menuLabel,

@@ -1,5 +1,6 @@
 import { AiRequestInput } from '@o4o/ui';
 import { workDataRequest } from '../lib/pharmacy/work-data';
+import { ServiceFooter, ServiceSpaceSwitcher } from '@o4o/auth-react';
 import { useManualLibrary } from '../lib/manuals/useManualLibrary';
 import { ManualLibraryPanel, ManualReferences } from '../components/home/ManualLibraryPanel';
 import type { ManualReference } from '../lib/manuals/knowledge';
@@ -604,6 +605,7 @@ export default function O4OHomePage() {
           모바일도 같은 메뉴(작은 계정 메뉴). */}
       <div className="mx-auto flex w-full max-w-7xl items-center justify-end gap-4 px-4 py-4 text-sm sm:px-6">
         <Link to="/" aria-label="O4O 대표 홈" className="mr-auto text-2xl font-semibold tracking-tight text-slate-900 no-underline">O4O</Link>
+        <ServiceSpaceSwitcher api={homePresentationApi} accountId={user?.id} isAuthenticated={isAuthenticated} authLoading={authLoading} />
         {isAuthenticated && user && <Link to="/mypage" className="rounded-full border border-slate-200 px-4 py-2 font-medium text-slate-800 no-underline hover:bg-slate-50">My Home</Link>}
         {isAuthenticated && user ? (
           <div className="relative" ref={accountMenuRef}>
@@ -668,7 +670,7 @@ export default function O4OHomePage() {
         )}
       </div>
 
-      <nav aria-label="대표 홈 메뉴" className="flex justify-center gap-6 px-4 py-3 text-sm"><a href="#all-services-title">전체 서비스</a><Link to="/contact">Contact Us</Link></nav>
+      <nav aria-label="대표 홈 메뉴" className="mx-auto flex w-full max-w-7xl justify-start gap-6 px-4 py-3 text-sm sm:px-6"><a href="#all-services-title">전체 서비스</a><Link to="/contact">Contact Us</Link></nav>
 
       <main className="flex flex-1 flex-col items-center px-4 pb-16 [word-break:keep-all]">
         <ServiceHomeHero surface="neture" client={homePresentationApi} heading="h1" />
@@ -715,24 +717,9 @@ export default function O4OHomePage() {
       <div className="mx-auto w-full max-w-5xl px-4"><ServiceHomePromotion surface="neture" client={homePresentationApi} /></div>
 
       {/* 법정 고지 링크만. 홍보·뉴스·통계 섹션 없음. */}
-      <footer className="px-4 pb-6 text-center text-xs text-slate-400 sm:px-6">
-        <Link to="/terms" className="no-underline hover:text-slate-600">
-          이용약관
-        </Link>
-        <span className="mx-2">·</span>
-        <Link to="/privacy" className="no-underline hover:text-slate-600">
-          개인정보처리방침
-        </Link>
-        <span className="mx-2">·</span>
-        <Link to="/contact" className="no-underline hover:text-slate-600">
-          Contact Us
-        </Link>
-        {/* WO-O4O-HOME-LEGAL-FOOTER-ADOPTION-V1: 대표 홈도 NetureLayout 과 같은 축으로
-            법정정보 노출 — 하드코딩 없이 public footer-legal API 값만(미설정 시 비표시). */}
-        <div className="mx-auto mt-3 max-w-3xl text-slate-400">
-          <PublicLegalFooterInfo serviceKey="neture" loadProfile={loadFooterLegal} />
-        </div>
-      </footer>
+      <ServiceFooter brand="O4O" links={<><Link to="/terms">이용약관</Link><Link to="/privacy">개인정보처리방침</Link><Link to="/contact">Contact Us</Link></>}>
+        <PublicLegalFooterInfo serviceKey="neture" loadProfile={loadFooterLegal} />
+      </ServiceFooter>
     </div>
   );
 }
