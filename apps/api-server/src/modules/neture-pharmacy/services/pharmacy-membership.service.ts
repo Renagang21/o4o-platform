@@ -28,6 +28,7 @@ import {
 import logger from '../../../utils/logger.js';
 import { createPharmacyStoreOrganization, updatePharmacyStoreProfile } from './pharmacy-store-link.js';
 import { assertNetureMainMembershipActive } from '../../neture/services/neture-main-membership.js';
+import { connectDefaultPharmacyMembership } from './default-pharmacy-membership.js';
 
 export interface PharmacyApplicationInput {
   policyReferences?: EnrollmentPolicyReference[];
@@ -273,6 +274,12 @@ export class PharmacyMembershipService {
         RETURNING ${SELECT_COLUMNS}`,
         [membershipId, next, operatorId, reason?.trim()?.slice(0, 1000) || null],
       ));
+      if (next === 'active') {
+        await connectDefaultPharmacyMembership(m, {
+          organizationId: row.organization_id, applicantId: row.applicant_user_id,
+          approvedBy: operatorId, actorId: operatorId,
+        });
+      }
       return row as PharmacyMembershipRow;
     });
 
