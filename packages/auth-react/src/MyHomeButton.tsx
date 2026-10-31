@@ -1,26 +1,8 @@
 import { useCallback, useEffect, useSyncExternalStore } from "react";
 import type { O4OHomeApiLike } from "./useO4OHomeReturn";
 
-/** Informational return context only. This list grants no service permissions. */
-export const MY_HOME_SOURCES: Record<
-  string,
-  { origin: string; label: string }
-> = {
-  store: { origin: "https://store.neture.co.kr", label: "매장 관리" },
-  study: { origin: "https://study.neture.co.kr", label: "Study" },
-  community: { origin: "https://community.neture.co.kr", label: "커뮤니티" },
-  funding: { origin: "https://funding.neture.co.kr", label: "Funding" },
-  supplier: { origin: "https://supplier.neture.co.kr", label: "공급자" },
-  pharmacy: { origin: "https://pharmacy.neture.co.kr", label: "약사 서비스" },
-  kpa: { origin: "https://kpa.neture.co.kr", label: "분회 서비스" },
-  admin: { origin: "https://admin.neture.co.kr", label: "플랫폼 관리" },
-};
-export function getMyHomePath(origin: string): string {
-  const source = Object.entries(MY_HOME_SOURCES).find(
-    ([, value]) => value.origin === origin,
-  )?.[0];
-  return source ? `/mypage?from=${source}` : "/mypage";
-}
+import { MY_HOME_SOURCES, getMyHomePath } from '@o4o/auth-utils';
+export { MY_HOME_SOURCES, getMyHomePath };
 
 type Options = {
   api: O4OHomeApiLike;
@@ -75,7 +57,7 @@ export function useMyHomeReturn({
   }, [isAuthenticated, accountId]);
   const go = useCallback(async () => {
     if (!isAuthenticated || authLoading || snapshot.busy) return;
-    const path = getMyHomePath(window.location.origin);
+    const path = getMyHomePath(window.location.origin, `${window.location.pathname}${window.location.search}${window.location.hash}`);
     if (
       local ||
       ["https://neture.co.kr", "https://www.neture.co.kr"].includes(

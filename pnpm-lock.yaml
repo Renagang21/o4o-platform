@@ -2606,6 +2606,15 @@ importers:
 
   services/web-partner:
     dependencies:
+      '@o4o/auth-utils':
+        specifier: workspace:*
+        version: link:../../packages/auth-utils
+      '@o4o/shared-space-ui':
+        specifier: workspace:*
+        version: link:../../packages/shared-space-ui
+      '@o4o/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
       '@o4o/auth-client':
         specifier: workspace:*
         version: link:../../packages/auth-client
@@ -2721,6 +2730,12 @@ importers:
 
   services/web-pharmacy-coop:
     dependencies:
+      '@o4o/auth-utils':
+        specifier: workspace:*
+        version: link:../../packages/auth-utils
+      '@o4o/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
       '@o4o/ai-components':
         specifier: workspace:*
         version: link:../../packages/o4o-ai-components

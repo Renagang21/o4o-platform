@@ -136,7 +136,7 @@ it("조합 operator 역할만으로 연합회 Hero에 접근할 수 없다", () 
   expect(screen.getByText("연합회 운영 권한이 필요합니다.")).toBeTruthy();
   expect(
     client.get.mock.calls.every(
-      ([path]) => path === "/notifications/unread-count?serviceKey=pharmcoop",
+      ([path]) => ["/notifications/unread-count?serviceKey=pharmcoop", "/neture/businesses/pharmcoop/legal/footer-legal"].includes(path),
     ),
   ).toBe(true);
 });

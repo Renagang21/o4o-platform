@@ -272,8 +272,8 @@ describe("service and workspace navigation", () => {
       expect(within(joined).queryByText("만성질환관리")).toBeNull();
       const labels: Record<string, string> = { pending: "신청 중", suspended: "이용 정지", rejected: "신청 반려", withdrawn: "탈퇴", terminated: "이용 종료", active: "이용 자격 확인 필요" };
       fireEvent.click(panel().getByRole("button", { name: `만성질환관리 ${labels[status]}`, exact: true }));
-      await waitFor(() => expect(navigate).toHaveBeenCalledWith("https://carepharm.neture.co.kr/"));
-      expect(api.post).not.toHaveBeenCalled();
+      await waitFor(() => expect(navigate).toHaveBeenCalledWith("https://carepharm.neture.co.kr/handoff?returnTo=%2F"));
+      expect(api.post).toHaveBeenCalledWith("/auth/handoff", { targetServiceKey: "carepharm", returnPath: "/" });
     },
   );
   it("keeps personal pharmacy membership but does not invent independent business participation", async () => {

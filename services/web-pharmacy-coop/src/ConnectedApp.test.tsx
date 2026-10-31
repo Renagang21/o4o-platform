@@ -1,7 +1,8 @@
 import React from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { cleanup, render, screen, waitFor } from "@testing-library/react";
-import { MemoryRouter } from "react-router-dom";
+import { fireEvent } from "@testing-library/react";
+import { MemoryRouter, useLocation } from "react-router-dom";
 const mocks = vi.hoisted(() => ({
   get: vi.fn(),
   auth: {
@@ -18,14 +19,15 @@ vi.mock("@o4o/auth-client", () => ({
   },
   getAccessToken: () => null,
 }));
-vi.mock("@o4o/auth-react", () => ({
+vi.mock("@o4o/auth-react", async (importOriginal) => ({
+  ...await importOriginal<typeof import("@o4o/auth-react")>(),
   useServiceAuth: () => mocks.auth,
   O4O_ACCOUNT_LINKS: { signup: "https://neture.co.kr/signup" },
-  EmailLoginForm: ({ links }: { links?: { signup?: string } }) => <><p>공통 로그인</p>{links?.signup && <a href={links.signup}>회원가입</a>}</>,
+  EmailLoginForm: ({ links, onSuccess }: { links?: { signup?: string }; onSuccess?: () => void }) => <><p>공통 로그인</p>{links?.signup && <a href={links.signup}>회원가입</a>}<button onClick={onSuccess}>합성 로그인 완료</button></>,
 }));
 vi.mock("./App", () => ({
-  App: ({ session }: { session: { userId: string | null } }) => (
-    <p>세션:{session.userId ?? "anonymous"}</p>
+  App: ({ session, loginContent }: { session: { userId: string | null }; loginContent?: React.ReactNode }) => (
+    <><p>세션:{session.userId ?? "anonymous"}</p>{loginContent}</>
   ),
 }));
 import { ConnectedApp } from "./ConnectedApp";
@@ -75,7 +77,7 @@ describe("server-backed cooperative session", () => {
     mocks.auth.user = { id: "new-person" };
     mocks.get.mockImplementation((path: string) =>
       Promise.resolve({
-        data: { data: path.endsWith("/me") ? { userId: "old-person" } : [] },
+        data: { data: path.endsWith("/me") ? { userId: "old-person", memberships: [], cooperativeOperators: [], federationOperators: [] } : [] },
       }),
     );
     open();
@@ -92,7 +94,7 @@ describe("server-backed cooperative session", () => {
     mocks.auth.user = { id: "first" };
     mocks.get.mockImplementation((path: string) =>
       Promise.resolve({
-        data: { data: path.endsWith("/me") ? { userId: "first" } : [] },
+        data: { data: path.endsWith("/me") ? { userId: "first", memberships: [], cooperativeOperators: [], federationOperators: [] } : [] },
       }),
     );
     const view = open();
@@ -106,4 +108,23 @@ describe("server-backed cooperative session", () => {
     );
     await waitFor(() => expect(screen.queryByText("세션:first")).toBeNull());
   });
+});
+
+function Destination() { const location = useLocation(); return <output aria-label="현재 경로">{location.pathname + location.search + location.hash}</output>; }
+it.each([
+  ['/fixture-coop/community?page=2#recent', '/fixture-coop/community?page=2#recent'],
+  ['https://evil.test', '/cooperatives/mine'],
+])('restores a safe cooperative login destination %s', async (requested, expected) => {
+  mocks.get.mockResolvedValue({ data: { data: [] } });
+  render(<MemoryRouter initialEntries={[`/login?returnTo=${encodeURIComponent(requested)}`]}><ConnectedApp /><Destination /></MemoryRouter>);
+  fireEvent.click(await screen.findByRole('button', { name: '합성 로그인 완료' }));
+  expect(screen.getByRole('status', { name: '현재 경로' }).textContent).toBe(expected);
+});
+
+it('does not render grants from a malformed authenticated session', async () => {
+  mocks.auth.user = { id: 'person' };
+  mocks.get.mockResolvedValue({ data: { data: { userId: 'person', federationOperators: [{userId: 'person'}] } } });
+  open();
+  expect(await screen.findByRole('alert')).toBeTruthy();
+  expect(screen.queryByText('세션:person')).toBeNull();
 });

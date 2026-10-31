@@ -32,6 +32,7 @@ export const O4O_SERVICE_DIRECTORY: readonly ServiceDestination[] = [
   },
   {
     key: "cooperative",
+    serviceKey: "pharmcoop",
     label: "약국/약사협동조합",
     description: "약국·약사 협동조합을 둘러보고 조합별 활동을 확인합니다.",
     href: "https://pharmcoop.neture.co.kr/",
@@ -39,8 +40,9 @@ export const O4O_SERVICE_DIRECTORY: readonly ServiceDestination[] = [
   },
   {
     key: "drugstore",
+    serviceKey: "drugstore",
     label: "드럭스토어형 약국",
-    description: "드럭스토어형 약국의 드럭스토어형 약국 협력사업과 참여 정보를 확인합니다.",
+    description: "드럭스토어형 약국 협력사업과 참여 정보를 확인합니다.",
     href: "https://drugstore.neture.co.kr/",
     category: "약국 협력사업 참여",
   },

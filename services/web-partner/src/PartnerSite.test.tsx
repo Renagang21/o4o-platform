@@ -82,11 +82,12 @@ describe("Partner public entry, login, opt-in and community", () => {
     );
     mount();
     await screen.findByRole("link", { name: "운영 관리" });
-    fireEvent.click(screen.getByRole("button", { name: "로그아웃" }));
+    fireEvent.click(screen.getByRole("button", { name: "계정 메뉴" }));
+    fireEvent.click(screen.getByRole("button", { name: "O4O 로그아웃" }));
     await screen.findByRole("alert");
     expect(screen.queryByRole("link", { name: "운영 관리" })).toBeNull();
     expect(
-      screen.getByRole("link", { name: "로그인", exact: true }),
+      screen.getByRole("button", { name: "로그인", exact: true }),
     ).toBeTruthy();
   });
 
@@ -181,7 +182,7 @@ describe("Partner public entry, login, opt-in and community", () => {
     fireEvent.change(screen.getByLabelText("비밀번호"), {
       target: { value: "test-only-random-input" },
     });
-    fireEvent.click(screen.getByRole("button", { name: "로그인" }));
+    fireEvent.submit(screen.getByLabelText("이메일").closest("form")!);
     await screen.findByRole("button", { name: "커뮤니티 가입하기" });
     expect(partnerApi.login).toHaveBeenCalledWith(
       "member@example.invalid",
@@ -288,4 +289,16 @@ describe("Partner public entry, login, opt-in and community", () => {
       }),
     );
   });
+});
+
+it('returns to the requested workspace tab after login without replacing the invitation/session handler', async () => {
+  vi.mocked(partnerApi.me).mockRejectedValueOnce(new ApiError(401, 'UNAUTHENTICATED')).mockResolvedValue(user);
+  vi.mocked(partnerApi.login).mockResolvedValue({});
+  mount('/login?returnTo=%2Fworkspace%3Fmode%3Dlocal%23assets');
+  await screen.findByRole('heading', { name: 'O4O 계정 로그인' });
+  fireEvent.change(screen.getByLabelText('이메일'), { target: { value: 'fixture@example.test' } });
+  fireEvent.change(screen.getByLabelText('비밀번호'), { target: { value: 'synthetic-input-only' } });
+  fireEvent.submit(screen.getByLabelText('이메일').closest('form')!);
+  await screen.findByText('資料作業空間');
+  expect(partnerApi.login).toHaveBeenCalledTimes(1);
 });
