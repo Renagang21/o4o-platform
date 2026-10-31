@@ -233,7 +233,7 @@ export function HomePresentationEditor({
         {surface === "carepharm"
           ? "공지·안내 목록에는 현재 게시 기간에 해당하는 항목을 모두 표시합니다."
           : "홍보 영역은 현재 게시 기간에 해당하는 첫 번째 항목을 보여줍니다."}{" "}
-        광고는 광고주를 표시하며, 초기 콘텐츠는 자체 서비스 안내입니다.
+        Hero는 매장 경영자를 위한 주요 홍보 통로입니다. 운영자는 내용·디자인·연결 화면·노출 기간을 검토한 뒤 채택하고 게시합니다. 광고는 Hero에서도 광고주를 표시하며, 초기 콘텐츠는 자체 서비스 안내입니다.
       </p>
       <aside
         className="home-editor-design-guide"
@@ -441,7 +441,7 @@ export function HomePresentationEditor({
                         update(section, item.id, { linkText })
                       }
                     />
-                    {section === "promotions" && (
+                    {(
                       <>
                         <label>
                           콘텐츠 종류
@@ -509,6 +509,7 @@ export function HomePresentationEditor({
             {preview && (
               <>
                 <HomeHeroView
+                  autoRotate={false}
                   businessKey={businessKey}
                   key={`${surface}:${previewPublished}`}
                   surface={surface}

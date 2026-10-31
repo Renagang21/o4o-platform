@@ -1,3 +1,5 @@
+import { ServiceFooter } from '@o4o/auth-react';
+import { ServiceSpaceSwitcher } from '@o4o/auth-react';
 import { OperatorInboxLink, OperatorNotificationLink } from '@o4o/operator-core-ui';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import { PublicLegalFooterInfo, ServiceContactInboxLink } from '@o4o/shared-space-ui';
@@ -13,7 +15,7 @@ export default function SiteShell() {
   const { user, isAuthenticated, isLoading: authLoading, logout } = useAuth();
   const location = useLocation();
   return <div className="site">
-    <header className="header">
+    <header className="header o4o-service-header">
       <Link className="brand" to="/">{BRAND.name}</Link>
       <nav className="nav">
         <Link to="/courses">강의</Link>
@@ -29,16 +31,12 @@ export default function SiteShell() {
       </nav>
       <div className="header-actions" aria-label="계정">
         {/* WO-O4O-REPRESENTATIVE-ENTRY-RETURN-HANDOFF-AND-HOME-NAVIGATION-V1: O4O 홈(로그인 유지) · 로그아웃 = 해당 서브도메인의 현재 브라우저 세션 종료 */}
-        <span className="inline-flex flex-wrap items-center gap-3"><MyHomeButton accountId={user?.id} api={authClient.api} isAuthenticated={isAuthenticated} authLoading={authLoading} className="o4o-home-link" /><O4OHomeButton api={authClient.api} isAuthenticated={isAuthenticated} authLoading={authLoading} className="o4o-home-link" /></span>
+        <span className="inline-flex flex-wrap items-center gap-3"><ServiceSpaceSwitcher api={authClient.api} accountId={user?.id} isAuthenticated={isAuthenticated} authLoading={authLoading} /><MyHomeButton accountId={user?.id} api={authClient.api} isAuthenticated={isAuthenticated} authLoading={authLoading} className="o4o-home-link" /><O4OHomeButton api={authClient.api} isAuthenticated={isAuthenticated} authLoading={authLoading} className="o4o-home-link" /></span>
         {isAuthenticated && user && <OperatorNotificationLink key={user.id} client={authClient.api} serviceKey="lecture" href="/notifications" title="알림"/>}
         {isAuthenticated && user ? <ServiceAccountMenu key={user.id} displayName={user.name || '사용자'} email={user.email} onLogout={logout} /> : <><Link to="/login" state={{ from: `${location.pathname}${location.search}` }}>로그인</Link><a href="https://neture.co.kr/signup">회원가입</a></>}
       </div>
     </header>
     <div className="content"><Outlet /></div>
-    <footer className="footer">
-      <div className="footer-links"><Link to="/terms">이용약관</Link><Link to="/privacy">개인정보처리방침</Link><O4OHomeButton api={authClient.api} isAuthenticated={isAuthenticated} authLoading={authLoading} className="link-button footer-o4o-home" /></div>
-      <PublicLegalFooterInfo serviceKey={SERVICE_KEY} loadProfile={loadFooterLegal} />
-      <p>© {new Date().getFullYear()} Neture · {BRAND.name}</p>
-    </footer>
+    <ServiceFooter brand={BRAND.name} links={<><Link to="/contact">문의하기</Link><Link to="/terms">이용약관</Link><Link to="/privacy">개인정보처리방침</Link><O4OHomeButton api={authClient.api} isAuthenticated={isAuthenticated} authLoading={authLoading} className="o4o-home-link" /></>}><PublicLegalFooterInfo serviceKey={SERVICE_KEY} loadProfile={loadFooterLegal} /></ServiceFooter>
   </div>;
 }

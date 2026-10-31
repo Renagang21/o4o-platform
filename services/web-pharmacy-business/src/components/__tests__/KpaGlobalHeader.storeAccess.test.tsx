@@ -9,7 +9,7 @@ vi.mock('../../contexts/LoginModalContext', () => ({ useAuthModal: () => ({ open
 vi.mock('../../api/notifications', () => ({ notificationsApi: {} }));
 vi.mock('@o4o/account-ui', () => ({ NotificationBell: () => null, useNotifications: () => ({}), getUserDisplayName: () => '검증 사용자' }));
 vi.mock('@o4o/ui', () => ({ GlobalHeader: ({ homeSlot }: { homeSlot: ReactNode }) => <header>{homeSlot}</header>, GlobalHeaderMenuItem: () => null, buildCommunityPrimaryNav: mocks.nav }));
-vi.mock('@o4o/auth-react', () => ({ MyHomeButton: () => null, O4OHomeButton: () => null, ServiceAccountMenu: () => null, O4O_LOGOUT_LABEL: '로그아웃', requestServiceHandoff: vi.fn() }));
+vi.mock('@o4o/auth-react', () => ({ ServiceSpaceSwitcher: () => null, MyHomeButton: () => null, O4OHomeButton: () => null, ServiceAccountMenu: () => null, O4O_LOGOUT_LABEL: '로그아웃', requestServiceHandoff: vi.fn() }));
 import { KpaGlobalHeader } from '../KpaGlobalHeader';
 beforeEach(() => { mocks.nav.mockClear(); mocks.user = { id: 'member', roles: ['kpa:pharmacist'] }; });
 afterEach(cleanup);
