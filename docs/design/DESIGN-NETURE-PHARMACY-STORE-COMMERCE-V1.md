@@ -131,7 +131,7 @@ supply_proposals
 ```
 
 - `kpa-society` 가입 · `kpa_members` · `kpa_pharmacist_profiles` 를 자격 근거로 읽지 않는다(재해석 금지). 기존 가입자를 자동 전환하지 않는다.
-- 기본 승인은 어떤 약국 협력사업 가입도 만들지 않는다.
+- **2026-10-31 사용자 확정:** 기본 승인은 `pharmacy` 기본 회원 가입을 함께 연결한다. 기존 정지·반려·탈퇴는 유지하고, MegaPharm·CarePharm 등 독립 사업 가입과 Pharmcoop 개인 가입은 만들지 않는다. 약국 승인과 기본 회원 연결은 동일 transaction이다. 이전 승인 약국의 연결 누락·동의·운영 반영 상태는 [전용 WO](../work-orders/WO-O4O-PHARMACY-APPROVAL-AUTO-MEMBERSHIP-V1.md)를 따른다.
 - 내 매장(약국) 승인 · 반려 · 정지 · 재활성화는 Neture 가입 원장(`service_memberships` 'neture')을 만들거나 바꾸지 않는다. 거꾸로 Neture 메인 자격 충족 · 재활성화도 내 매장 · 약국 협력사업 · 공급자 원장과 역할을 만들거나 복구하지 않는다(원장 분리 기록 — [CHECK §10](../checks/CHECK-NETURE-PHARMACY-STORE-COMMERCE-LOCAL-BROWSER-V1.md), 현행 자격은 위 정본).
 - 상태 전이: `pending→active|rejected`, `active→suspended|terminated`, `suspended→active|terminated`, `rejected|terminated→pending`(재신청, 같은 행).
 

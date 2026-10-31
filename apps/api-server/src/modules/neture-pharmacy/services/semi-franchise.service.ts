@@ -1,4 +1,5 @@
 import {hasApprovedPharmacist} from '../../../services/qualifications/pharmacist-qualification.service.js';
+import { connectDefaultPharmacyMembership } from './default-pharmacy-membership.js';
 import { BUSINESS_OPERATOR_PREDICATE, hasBusinessOperatorAccess } from './business-operator-access.js';
 import { recordOperation } from '../../../services/operations/operation-audit.js';
 import { hasCooperativeOperatorAccess } from './cooperative-operator-access.js';
@@ -95,6 +96,18 @@ export class SemiFranchiseService {
     return this.dataSource.transaction(async (m) => {
       await assertNetureMainMembershipActive(m, userId);
       await this.requireApplicant(m, userId, organizationId);
+      if (key === 'pharmacy') {
+        const [basic] = await m.query(
+          "SELECT applicant_user_id,decided_by FROM neture_pharmacy_memberships WHERE organization_id=$1 AND status='active' FOR SHARE",
+          [organizationId],
+        );
+        const linked = await connectDefaultPharmacyMembership(m, {
+          organizationId, applicantId: basic.applicant_user_id, approvedBy: basic.decided_by, actorId: userId,
+        });
+        if (linked.status !== 'active')
+          throw new NeturePharmacyError(409, 'PHARMACY_MEMBERSHIP_RESTRICTED', '기존 Pharmacy 이용 정지·반려·탈퇴 상태는 자동으로 변경하지 않습니다. 운영자에게 문의해 주세요.');
+        return linked;
+      }
       const [sf]: SemiFranchiseRow[] = await m.query(`SELECT sf.id, sf.key, sf.name, sf.organization_id, sf.status, sf.payment_receiver_key, sf.community_key, owner.metadata->>'registrationConditions' AS registration_conditions FROM semi_franchises sf JOIN organizations owner ON owner.id = sf.organization_id WHERE sf.key = $1 FOR SHARE OF sf, owner`, [key]);
       if (!sf || sf.status !== 'active') throw new NeturePharmacyError(404, 'SEMI_FRANCHISE_NOT_FOUND', '세미프랜차이즈를 찾을 수 없습니다.');
       if (sf.registration_conditions && application.acceptedConditions !== true)
