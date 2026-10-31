@@ -135,6 +135,8 @@ export interface PlaylistItemResponseDto {
 
 // ========== Media DTOs ==========
 export interface CreateMediaDto {
+  /** Existing O4O Media Library video; URL is resolved server-side. */
+  mediaLibraryAssetId?: string;
   name: string;
   description?: string;
   mediaType: 'video' | 'image' | 'html' | 'text' | 'rich_text' | 'link';

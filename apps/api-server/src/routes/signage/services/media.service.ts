@@ -1,3 +1,5 @@
+import { lockStoredVideo } from '../../../modules/media/services/stored-video.js';
+import { SignageMedia } from '@o4o-apps/digital-signage-core/entities';
 import type { DataSource } from 'typeorm';
 import { SignageMediaRepository } from '../repositories/media.repository.js';
 import { SignageMediaUsageService, type MediaUsageResult } from './media-usage.service.js';
@@ -12,35 +14,30 @@ import type {
   MediaLibraryResponseDto,
 } from '../dto/index.js';
 
-function detectVideoSourceType(url: string): 'youtube' | 'vimeo' | null {
+function parseHostedVideo(value: string): { sourceType: 'youtube' | 'vimeo'; embedId: string; sourceUrl: string } | null {
   try {
-    const u = new URL(url);
-    if (u.hostname.includes('youtube.com') || u.hostname.includes('youtu.be')) return 'youtube';
-    if (u.hostname.includes('vimeo.com')) return 'vimeo';
-  } catch { /* invalid URL */ }
+    const u = new URL(value), host = u.hostname.toLowerCase(), parts = u.pathname.split('/').filter(Boolean);
+    if (!['http:', 'https:'].includes(u.protocol) || u.username || u.password) return null;
+    if (['youtube.com', 'www.youtube.com', 'm.youtube.com', 'youtu.be', 'www.youtu.be', 'www.youtube-nocookie.com'].includes(host)) {
+      const id = host.endsWith('youtu.be') ? parts[0] : u.searchParams.get('v') || (['shorts', 'embed', 'live'].includes(parts[0]) ? parts[1] : null);
+      return id && /^[\w-]{11}$/.test(id) ? { sourceType: 'youtube', embedId: id, sourceUrl: `https://www.youtube.com/watch?v=${id}` } : null;
+    }
+    if (['vimeo.com', 'www.vimeo.com', 'player.vimeo.com'].includes(host)) {
+      const id = parts.find(part => /^\d+$/.test(part));
+      return id ? { sourceType: 'vimeo', embedId: id, sourceUrl: `https://vimeo.com/${id}` } : null;
+    }
+  } catch { /* Invalid addresses are reported to the editor. */ }
   return null;
 }
-
-function extractEmbedId(sourceType: 'youtube' | 'vimeo', url: string): string | null {
-  try {
-    const u = new URL(url);
-    if (sourceType === 'youtube') {
-      if (u.hostname.includes('youtu.be')) return u.pathname.slice(1).split('?')[0];
-      return u.searchParams.get('v');
-    }
-    if (sourceType === 'vimeo') {
-      const m = u.pathname.match(/\/(\d+)/);
-      return m ? m[1] : null;
-    }
-  } catch { /* invalid URL */ }
-  return null;
+function videoInputError(message: string, code = 'UNSUPPORTED_VIDEO_SOURCE') {
+  return Object.assign(new Error(message), { code, statusCode: 400 });
 }
 
 export class SignageMediaService {
   private repository: SignageMediaRepository;
   private usageService: SignageMediaUsageService;
 
-  constructor(dataSource: DataSource) {
+  constructor(private dataSource: DataSource) {
     this.repository = new SignageMediaRepository(dataSource);
     this.usageService = new SignageMediaUsageService(dataSource);
   }
@@ -91,13 +88,9 @@ export class SignageMediaService {
     scope: ScopeFilter,
     userId?: string,
   ): Promise<MediaResponseDto> {
-    // Core V1: Video media must use YouTube or Vimeo only
-    if (dto.mediaType === 'video' && !['youtube', 'vimeo'].includes(dto.sourceType)) {
-      throw Object.assign(new Error('유튜브 또는 비메오 URL만 등록할 수 있습니다'), {
-        code: 'UNSUPPORTED_VIDEO_SOURCE',
-        statusCode: 400,
-      });
-    }
+    if (dto.mediaType === 'video' && dto.sourceType === 'url') return this.createLibraryVideo(dto, scope, userId);
+    const hosted = dto.mediaType === 'video' ? parseHostedVideo(dto.sourceUrl) : null;
+    if (dto.mediaType === 'video' && !hosted) throw videoInputError('YouTube/Vimeo 개별 영상 주소 또는 O4O 보관 영상을 선택해 주세요.');
 
     // Tags validation
     if (!dto.tags || dto.tags.length === 0) {
@@ -109,6 +102,8 @@ export class SignageMediaService {
 
     const media = await this.repository.createMedia({
       ...dto,
+      ...(hosted ?? {}),
+      metadata: { ...dto.metadata, mediaLibraryAssetId: null },
       serviceKey: scope.serviceKey,
       organizationId: scope.organizationId || null,
       createdByUserId: userId || null,
@@ -122,23 +117,48 @@ export class SignageMediaService {
     dto: UpdateMediaDto,
     scope: ScopeFilter,
   ): Promise<MediaResponseDto | null> {
-    // WO-O4O-STORE-SIGNAGE-SOURCEURL-EDIT-ENABLE-V1
-    // When sourceUrl is provided, derive sourceType and embedId automatically.
-    const updateData: UpdateMediaDto & { embedId?: string | null } = { ...dto };
-    if (dto.sourceUrl) {
-      const detected = detectVideoSourceType(dto.sourceUrl);
-      if (!detected) {
-        throw Object.assign(new Error('유튜브 또는 비메오 URL만 등록할 수 있습니다'), {
-          code: 'UNSUPPORTED_VIDEO_SOURCE',
-          statusCode: 400,
-        });
+    const existing = await this.repository.findMediaById(id, scope);
+    if (!existing) return null;
+    const updateData: UpdateMediaDto & { embedId?: string | null } = {
+      ...dto, sourceType: existing.sourceType,
+      metadata: { ...existing.metadata, ...dto.metadata, mediaLibraryAssetId: existing.metadata?.mediaLibraryAssetId ?? null },
+    };
+    if (existing.metadata?.mediaLibraryAssetId && 'mediaType' in dto && dto.mediaType !== 'video') throw videoInputError('보관 영상의 자료 종류는 변경할 수 없습니다.');
+    if (dto.sourceUrl !== undefined && existing.mediaType === 'video') {
+      if (existing.metadata?.mediaLibraryAssetId) {
+        if (dto.sourceUrl !== existing.sourceUrl) throw videoInputError('보관 영상은 미디어 라이브러리에서 새로 선택해 등록해 주세요.');
+      } else {
+        const hosted = parseHostedVideo(dto.sourceUrl);
+        if (!hosted) throw videoInputError('YouTube 또는 Vimeo 개별 영상 주소를 입력해 주세요.');
+        Object.assign(updateData, hosted);
       }
-      updateData.sourceType = detected;
-      updateData.embedId = extractEmbedId(detected, dto.sourceUrl);
     }
     const media = await this.repository.updateMedia(id, updateData, scope);
     if (!media) return null;
     return toMediaResponse(media);
+  }
+
+  private async createLibraryVideo(dto: CreateMediaDto, scope: ScopeFilter, userId?: string): Promise<MediaResponseDto> {
+    const assetId = dto.mediaLibraryAssetId;
+    if (!scope.organizationId || !userId || typeof assetId !== 'string' || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(assetId))
+      throw videoInputError('미디어 라이브러리에서 보관 영상을 선택해 주세요.', 'MEDIA_LIBRARY_VIDEO_REQUIRED');
+    return this.dataSource.transaction(async manager => {
+      // Same row lock as MediaLibrary deletion: a selected file cannot disappear during registration.
+      const asset = await lockStoredVideo(manager, assetId, userId);
+      const repository = manager.getRepository(SignageMedia);
+      const existing = await repository.createQueryBuilder('m')
+        .where('m.serviceKey = :serviceKey AND m.organizationId = :organizationId', scope)
+        .andWhere("m.metadata->>'mediaLibraryAssetId' = :assetId", { assetId }).getOne();
+      if (existing) return toMediaResponse(existing);
+      const media = repository.create({
+        name: dto.name?.trim() || asset.originalName, description: dto.description,
+        mediaType: 'video', sourceType: 'url', sourceUrl: asset.url,
+        mimeType: asset.mimeType, fileSize: Number(asset.fileSize),
+        metadata: { mediaLibraryAssetId: asset.id }, tags: dto.tags?.length ? dto.tags : ['매장 영상'],
+        serviceKey: scope.serviceKey, organizationId: scope.organizationId, createdByUserId: userId, status: 'active',
+      });
+      return toMediaResponse(await repository.save(media));
+    });
   }
 
   async deleteMedia(id: string, scope: ScopeFilter): Promise<boolean> {

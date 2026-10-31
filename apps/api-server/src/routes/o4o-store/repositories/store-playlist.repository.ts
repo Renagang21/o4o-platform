@@ -1,3 +1,4 @@
+import { lockStoredVideo, storedVideoUnavailable } from '../../../modules/media/services/stored-video.js';
 /**
  * StorePlaylistRepository — Store Playlist 데이터 접근 계층
  *
@@ -527,49 +528,58 @@ export class StorePlaylistRepository {
 
     const media = mediaRows[0];
 
-    // Create or reuse snapshot
-    const assetCopyService = new AssetCopyService(this.dataSource);
-    let snapshotId: string;
-    try {
-      const copyResult = await assetCopyService.copyResolved({
-        sourceService: 'signage-media',
-        sourceAssetId: mediaId,
-        assetType: 'signage',
-        targetOrganizationId: organizationId,
-        createdBy: userId,
-        title: media.name,
-        contentJson: {
+    const copyAndAdd = async () => {
+      // Create or reuse snapshot
+      const assetCopyService = new AssetCopyService(this.dataSource);
+      let snapshotId: string;
+      try {
+        const copyResult = await assetCopyService.copyResolved({
+          sourceService: 'signage-media',
+          sourceAssetId: mediaId,
+          assetType: 'signage',
+          targetOrganizationId: organizationId,
+          createdBy: userId,
           title: media.name,
-          mediaType: media.mediaType,
-          sourceType: media.sourceType,
-          sourceUrl: media.sourceUrl,
-          thumbnailUrl: media.thumbnailUrl,
-          duration: media.duration,
-          resolution: media.resolution,
-          content: media.content,
-          tags: media.tags,
-          category: media.category,
-          description: media.description,
-          metadata: media.metadata,
-          source: 'signage-media',
-        },
-      });
-      snapshotId = copyResult.snapshot.id;
-    } catch (err: any) {
-      if (err.message === 'DUPLICATE_SNAPSHOT') {
-        const existing = await this.dataSource.query(
-          `SELECT id FROM o4o_asset_snapshots
-           WHERE organization_id = $1 AND source_asset_id = $2 AND asset_type = 'signage'
-           LIMIT 1`,
-          [organizationId, mediaId],
-        );
-        snapshotId = existing[0].id;
-      } else {
-        throw err;
+          contentJson: {
+            title: media.name,
+            mediaType: media.mediaType,
+            sourceType: media.sourceType,
+            sourceUrl: media.sourceUrl,
+            thumbnailUrl: media.thumbnailUrl,
+            duration: media.duration,
+            resolution: media.resolution,
+            content: media.content,
+            tags: media.tags,
+            category: media.category,
+            description: media.description,
+            metadata: media.metadata,
+            source: 'signage-media',
+          },
+        });
+        snapshotId = copyResult.snapshot.id;
+      } catch (err: any) {
+        if (err.message === 'DUPLICATE_SNAPSHOT') {
+          const existing = await this.dataSource.query(
+            `SELECT id FROM o4o_asset_snapshots
+             WHERE organization_id = $1 AND source_asset_id = $2 AND asset_type = 'signage'
+             LIMIT 1`,
+            [organizationId, mediaId],
+          );
+          snapshotId = existing[0].id;
+        } else {
+          throw err;
+        }
       }
-    }
 
-    return this.addItem(playlistId, snapshotId);
+      return this.addItem(playlistId, snapshotId);
+    };
+    const libraryId = media.metadata?.mediaLibraryAssetId;
+    if (typeof libraryId === 'string') return this.dataSource.transaction(async manager => {
+      const asset = await lockStoredVideo(manager, libraryId, userId);
+      if (asset.url !== media.sourceUrl) throw storedVideoUnavailable();
+      return copyAndAdd();
+    });
+    return copyAndAdd();
   }
 
   /**

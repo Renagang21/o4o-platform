@@ -458,6 +458,14 @@ export class MediaLibraryService {
       throw err;
     }
 
+    // Keep immutable playlist snapshots playable even after their source media was archived.
+    if (asset.url) {
+      const signage = await manager.query(`SELECT 1 FROM signage_media WHERE "sourceUrl"=$1 AND "deletedAt" IS NULL
+        UNION ALL SELECT 1 FROM o4o_asset_snapshots WHERE asset_type='signage' AND
+          (content_json->>'sourceUrl'=$1 OR content_json->>'fileUrl'=$1 OR content_json->>'url'=$1) LIMIT 1`, [asset.url]);
+      if (signage.length) throw Object.assign(new Error('MEDIA_IN_USE_SIGNAGE'), { code: 'MEDIA_IN_USE_SIGNAGE' });
+    }
+
     // GCS 삭제 (gcsPath가 있는 경우만) — 실패하면 DB 삭제도 하지 않는다.
     if (asset.gcsPath) {
       try {

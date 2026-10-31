@@ -1,3 +1,5 @@
+import { VideoPlayback } from '@o4o/tablet-kiosk-core';
+import { hostedVideo } from '@o4o/tablet-kiosk-core/video-embed';
 import { videoPreviewUrl } from './signage/videoPreview';
 import { useId, useState } from "react";
 import { BaseDetailDrawer } from "@o4o/ui";
@@ -30,7 +32,8 @@ export function StoreSignageMediaEditor({
   const fieldId = useId();
   const targetKey = target?.kind === 'direct' ? `media:${target.media.id}` : `snapshot:${target?.snapshot.id}`;
   const [preview, setPreview] = useState<{ target: string; url: string } | null>(null);
-  const previewUrl = videoPreviewUrl(draft.sourceUrl);
+  const storedVideo = target?.kind === 'direct' ? target.media.sourceType === 'url' : target?.snapshot.contentJson?.sourceType === 'url';
+  const previewUrl = storedVideo ? draft.sourceUrl : videoPreviewUrl(draft.sourceUrl);
   const close = () => { if (!editSaving) handleCloseEditDrawer(); };
   const editingMedia = target?.kind === "direct" ? target.media : null;
   const editingSnapshot = target?.kind === "snapshot" ? target.snapshot : null;
@@ -131,11 +134,13 @@ export function StoreSignageMediaEditor({
                   id={`${fieldId}-url`}
                   type="url"
                   disabled={editSaving}
+                  readOnly={storedVideo}
                   value={editSourceUrl}
                   onChange={(e) => setEditSourceUrl(e.target.value)}
                   className="w-full px-3 py-2 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
                   placeholder="https://www.youtube.com/watch?v=..."
                 />
+                {storedVideo && <p className="text-sm text-slate-600">O4O 보관 영상입니다. 다른 영상으로 바꾸려면 라이브러리에서 새로 선택해 등록하세요.</p>}
                 <p className="mt-1 text-[11px] text-slate-400">
                   {target.kind === 'direct'
                     ? '등록 영상을 수정합니다. 재생목록에 가져온 매장 사본은 자동 갱신되지 않으므로, 사용 중인 안내의 사본을 확인해 수정하세요.'
@@ -149,7 +154,7 @@ export function StoreSignageMediaEditor({
                   className="min-h-11 px-3 border rounded text-sm disabled:opacity-50">입력한 영상 미리보기</button>
                 {!previewUrl && <p className="text-xs text-amber-700">올바른 YouTube 또는 Vimeo 영상 URL을 입력해 주세요.</p>}
                 {preview && preview.target === targetKey && preview.url === previewUrl && <div>
-                  <iframe title="입력한 동영상 미리보기" src={preview.url} className="w-full aspect-video border-0" sandbox="allow-scripts allow-same-origin allow-presentation" allow="fullscreen" />
+                  <div className="aspect-video w-full"><VideoPlayback url={storedVideo ? draft.sourceUrl : hostedVideo(draft.sourceUrl)?.url ?? draft.sourceUrl} kind={storedVideo ? 'video' : hostedVideo(draft.sourceUrl)?.provider ?? 'video'} title="입력한 동영상 미리보기" /></div>
                   <button type="button" onClick={() => setPreview(null)} className="min-h-11 underline text-sm">영상 미리보기 닫기</button>
                 </div>}
               </section>

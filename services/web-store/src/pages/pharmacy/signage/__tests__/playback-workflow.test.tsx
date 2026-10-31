@@ -26,7 +26,7 @@ it('plays the store model returned by selection through its existing published s
   expect(m.get).toHaveBeenCalledWith('/store-playlists/public/store-guide');
   expect(network).not.toHaveBeenCalled(); expect(m.publicCatalog).not.toHaveBeenCalled();
   fireEvent.click(screen.getByRole('button', { name: /일반 화면으로 재생/ }));
-  expect(document.querySelector('iframe')?.title).toBe('제품 안내');
+  expect(screen.getByLabelText('제품 안내')).toBeTruthy();
 });
 it('never uses a public catalog fallback for access failures, and offers a deliberate retry', async () => {
   const network = vi.fn(); vi.stubGlobal('fetch', network);
@@ -70,4 +70,16 @@ it('clears the previous schedule when a store switch receives an empty result', 
   m.store = 'B'; view.rerender(<MemoryRouter><SignagePlayerSelectPage /></MemoryRouter>);
   await waitFor(() => expect(screen.queryByText('현재 시간의 재생 일정: 매장 A 일정')).toBeNull());
   await screen.findByText('현재 시간에 적용된 일정이 없습니다.');
+});
+
+it('applies a changed saved list only on an explicit reload, never on an ended event', async () => {
+  vi.spyOn(HTMLMediaElement.prototype, 'play').mockResolvedValue(undefined);
+  m.get.mockResolvedValue({ success: true, data: { name: 'Stored A', items: [{ ...snapshot, contentJson: { sourceUrl: '/a.mp4', mediaType: 'video' } }] } });
+  render(app()); await screen.findByText('Stored A');
+  fireEvent.click(screen.getByRole('button', { name: /일반 화면으로 재생/ }));
+  fireEvent.ended(document.querySelector('video')!); expect(m.get).toHaveBeenCalledTimes(1);
+  m.get.mockResolvedValue({ success: true, data: { name: 'Stored B', items: [snapshot] } });
+  fireEvent.click(screen.getByRole('button', { name: '변경한 목록 다시 적용' }));
+  await screen.findByText('Stored B'); expect(m.get).toHaveBeenCalledTimes(2);
+  vi.restoreAllMocks();
 });

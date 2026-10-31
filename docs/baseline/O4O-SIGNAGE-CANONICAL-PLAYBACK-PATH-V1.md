@@ -9,14 +9,16 @@
 
 ## 1. 이 문서가 정하는 것
 
-**매장 태블릿에서 영상(YouTube/Vimeo)을 재생하는 canonical 경로는 하나다.**
+**매장 태블릿에서 영상(YouTube/Vimeo/O4O 미디어 라이브러리)을 재생하는 canonical 경로는 하나다.**
+
+> 2026-10-31 사용자 결정: 영상 종료 → 다음 영상 → 목록 마지막에서 처음으로 반복한다. 영상 길이를 잘라 넘기는 타이머와 개별 영상 loop를 목록 반복으로 대체하지 않는다. 목록 변경·적용은 약국 사용자가 수동으로 하며 주기적 목록 갱신/회차별 자동 교체는 추가하지 않는다. 실제 약국 기기 검증은 개발 완료 후 현장 점검이다. 구현·검증 상태는 [현재 TODO](../work-orders/TODO-O4O-STORE-VIDEO-PLAYBACK-COMPLETION-V1.md)를 따른다.
 
 ```text
 StoreTablet
   └ current_screen_set_id
      └ ScreenSet (store_tablet_screen_sets)
         └ ScreenBlock (store_tablet_screen_blocks, block_type = 'idle_media')
-           └ config.items[].url        ← YouTube / Vimeo URL
+           └ config.items[].url        ← YouTube / Vimeo / O4O 보관 영상 URL
 ```
 
 이 경로 밖의 재생 축은 신설하지 않는다.
@@ -59,14 +61,13 @@ StoreTablet
 // store_tablet_screen_blocks.config  (block_type = 'idle_media')
 {
   "source": "custom_media",
-  "items": [ { "mediaType": "youtube" | "vimeo", "url": "https://..." } ]
+  "items": [ { "mediaType": "youtube" | "vimeo" | "video", "url": "https://..." } ]
 }
 ```
 
 - 입력 UI 정본: `packages/tablet-screen-set-editor`
-- **youtube / vimeo 만 허용**한다. 그 외 URL 은 invalid 로 처리한다 (편집기 검증 유지 — §7)
-- 현재 재생기는 `items[0]` 하나만 읽는다. **다중 URL 순서 재생은 현행 요구가 아니다.**
-  필요해지면 별도 playlist 테이블을 만들지 말고 이 `items` 배열을 확장한다.
+- YouTube/Vimeo 개별 영상과 사용자가 선택한 기존 O4O Media Library 보관 영상을 사용한다. 임의의 외부 파일 URL을 O4O 보관 자산으로 등록하지 않는다.
+- 목록은 기존 `items` 배열을 재사용한다. 영상은 종료 이벤트로 진행하고 목록이 끝나면 처음부터 반복한다. 이미지 자료의 표시 시간은 별도다. 새 playlist/Display/Channel 테이블은 만들지 않는다.
 
 ---
 

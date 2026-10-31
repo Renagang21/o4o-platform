@@ -344,11 +344,9 @@ function props() {
 it("preview is explicit and does not save, and changing the URL hides the old player", () => {
   const p = props(),
     h = render(<StoreSignageMediaEditor {...p} />);
-  expect(screen.queryByTitle("입력한 동영상 미리보기")).toBeNull();
+  expect(screen.queryByLabelText("입력한 동영상 미리보기")).toBeNull();
   fireEvent.click(screen.getByRole("button", { name: "입력한 영상 미리보기" }));
-  expect(
-    screen.getByTitle("입력한 동영상 미리보기").getAttribute("src"),
-  ).toContain("youtube-nocookie.com");
+  expect(screen.getByLabelText("입력한 동영상 미리보기")).toBeTruthy();
   expect(p.handleSaveEdit).not.toHaveBeenCalled();
   h.rerender(
     <StoreSignageMediaEditor
@@ -356,7 +354,7 @@ it("preview is explicit and does not save, and changing the URL hides the old pl
       draft={{ ...p.draft, sourceUrl: "https://vimeo.com/12345" }}
     />,
   );
-  expect(screen.queryByTitle("입력한 동영상 미리보기")).toBeNull();
+  expect(screen.queryByLabelText("입력한 동영상 미리보기")).toBeNull();
 });
 it("a saving media drawer locks all fields and close/cancel actions", () => {
   const p = props();

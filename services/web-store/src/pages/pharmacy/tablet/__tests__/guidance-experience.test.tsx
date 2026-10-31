@@ -255,3 +255,25 @@ it('사이니지의 기본 일정과 상세 설정은 같은 상태를 보존한
   fireEvent.click(screen.getByRole('button', { name: '저장' }));
   expect(save).toHaveBeenCalledWith({ name: '안내 모음 재생', playlist: 'playlist', priority: 7 });
 });
+
+it('saves and reopens the existing idle list with retained file identity and the selected order', async () => {
+  const api = builderApi(), saved = vi.fn();
+  let pick!: (asset: { id: string; url: string; title: string }) => void;
+  const props = { api, onSaved: saved, onCancel: vi.fn(), onToast: vi.fn(), onVideoLibraryPick: (select: typeof pick) => { pick = select; } };
+  const view = render(<TabletContentStepBuilder initialDetail={null} {...props} />);
+  fireEvent.change(screen.getByLabelText('코너 제목'), { target: { value: '영상 안내' } });
+  const openIdle = () => { const details = [...view.container.querySelectorAll('details')].find(node => node.querySelector('summary')?.textContent?.startsWith('대기 화면'))!; details.open = true; return within(details); };
+  const idle = openIdle(); fireEvent.click(idle.getByRole('button', { name: '영상 주소 추가' }));
+  fireEvent.change(screen.getByLabelText('영상 주소 1'), { target: { value: 'https://youtu.be/abcdefghijk' } });
+  fireEvent.click(idle.getByRole('button', { name: 'O4O 보관 영상 선택' }));
+  act(() => pick({ id: 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', url: '/retained.mp4', title: 'Stored' }));
+  fireEvent.click(idle.getAllByRole('button', { name: '위로' })[1]);
+  fireEvent.click(screen.getByRole('button', { name: '저장' })); await act(async () => {});
+  const blocks = vi.mocked(api.saveBlocks).mock.calls[0][1];
+  const items = (blocks.find(block => block.blockType === 'idle_media')!.config as any).items;
+  expect(items).toEqual([{ mediaType: 'video', url: '/retained.mp4', mediaAssetId: 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' }, { mediaType: 'youtube', url: 'https://youtu.be/abcdefghijk' }]);
+  view.unmount(); render(<TabletContentStepBuilder initialDetail={{ ...header(), blocks } as ScreenSetDetail} {...props} />);
+  expect((screen.getByLabelText('영상 주소 1') as HTMLInputElement).value).toBe('/retained.mp4');
+  expect((screen.getByLabelText('영상 주소 2') as HTMLInputElement).value).toBe('https://youtu.be/abcdefghijk');
+  expect(api.create).toHaveBeenCalledTimes(1); expect(saved).toHaveBeenCalledTimes(1);
+});
