@@ -43,7 +43,7 @@ export function isCarePharmHandoffPath(path: string): boolean {
       pathname,
     );
   const operatorPage =
-    /^\/operator(?:\/semi-franchises(?:\/[A-Fa-f0-9-]{36})?|\/home-presentation\/carepharm|\/inbox\/business\/carepharm)?$/.test(
+    /^\/operator(?:\/semi-franchises(?:\/carepharm\/contents\/(?:new|[A-Fa-f0-9-]{36}\/edit))?|\/home-presentation\/carepharm|\/inbox\/business\/carepharm)?$/.test(
       pathname,
     );
   const currentForumPage =

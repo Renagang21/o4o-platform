@@ -74,7 +74,7 @@ suite('CarePharm issuer → actual client → exchange, isolated PostgreSQL', ()
     const wrongOrigin = await exchange(second.body.data.handoffToken, 'https://neture.co.kr');
     expect(wrongOrigin.statusCode).toBe(401);
   });
-  it.each(['/#news', '/community/posts?page=2', '/news/fixture-notice', '/operator', '/operator/semi-franchises?key=carepharm&tab=overview', '/operator/home-presentation/carepharm', '/operator/inbox/business/carepharm'])('returns to current CarePharm screen %s without granting an operator role', async returnPath => {
+  it.each(['/#news', '/community/posts?page=2', '/news/fixture-notice', '/operator', '/operator/semi-franchises?key=carepharm&tab=overview', '/operator/home-presentation/carepharm', '/operator/inbox/business/carepharm', '/operator/semi-franchises/carepharm/contents/new', `/operator/semi-franchises/carepharm/contents/${actor}/edit`])('returns to current CarePharm screen %s without granting an operator role', async returnPath => {
     const href = new URL(await requestServiceHandoff(api, { serviceKey: 'carepharm', origin: 'https://carepharm.neture.co.kr', returnPath }));
     expect((await exchange(href.searchParams.get('token')!, href.origin)).statusCode).toBe(200);
     expect(await query('SELECT * FROM role_assignments WHERE role LIKE $1', ['%operator%'])).toHaveLength(0);
@@ -98,7 +98,7 @@ suite('CarePharm issuer → actual client → exchange, isolated PostgreSQL', ()
     expect((await exchange(issued.body.data.handoffToken, origin)).statusCode).toBe(401);
     expect(generateTokens).not.toHaveBeenCalled();
   });
-  it.each(['/operator/products', '/my/participation?next=https://evil.test', '//evil.test', '/communities/business%3Apharmacy/forum', '/?store=bad', `/?store=${actor}&store=${actor}`, '/%2e%2e/operator', '/materials#evil', '/operator/semi-franchises?key=other', '/operator/inbox/business/other', '/admin', '/community?next=https://evil.test'])('rejects an unsupported CarePharm path %s before ledger insert', async returnPath => {
+  it.each(['/operator/products', '/my/participation?next=https://evil.test', '//evil.test', '/communities/business%3Apharmacy/forum', '/?store=bad', `/?store=${actor}&store=${actor}`, '/%2e%2e/operator', '/materials#evil', '/operator/semi-franchises?key=other', '/operator/inbox/business/other', '/operator/semi-franchises/other/contents/new', '/operator/semi-franchises/carepharm/contents/not-an-id/edit', '/admin', '/community?next=https://evil.test'])('rejects an unsupported CarePharm path %s before ledger insert', async returnPath => {
     expect((await issue({ targetServiceKey: 'carepharm', returnPath })).statusCode).toBe(400);
     expect(await query('SELECT * FROM handoff_tokens')).toHaveLength(0);
   });

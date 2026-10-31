@@ -276,9 +276,9 @@ export function GlobalHeader({
             ))}
           </nav>
 
-          <div className="ml-auto flex max-w-full flex-wrap items-center gap-2 md:gap-3">
+          <div className="contents md:ml-auto md:flex md:max-w-full md:flex-wrap md:items-center md:gap-3">
           {/* ── HomeSlot (desktop + mobile, 로그인 무관) ── */}
-          {homeSlot}
+          {homeSlot && <div className="order-last flex basis-full justify-end md:order-none md:basis-auto">{homeSlot}</div>}
 
           {/* ── UtilityArea + UserArea (desktop) ── */}
           <div className="hidden md:flex items-center gap-3">
