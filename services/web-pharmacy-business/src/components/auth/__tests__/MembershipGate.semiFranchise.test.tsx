@@ -60,11 +60,11 @@ describe('MembershipGate — 세미프랜차이즈 자격', () => {
     expect(get).toHaveBeenCalledWith('/neture/pharmacy/service-access/kpa-society');
   });
 
-  it('G3 미충족(apply_semi_franchise) → 서버 문구 + 세미프랜차이즈 신청 버튼', async () => {
-    get.mockResolvedValueOnce(access({ pharmacyMembershipStatus: 'active', next: 'apply_semi_franchise', message: '세미프랜차이즈 가입을 신청해 주세요.' }));
+  it('G3 미충족(apply_semi_franchise) → 서버 문구 + Pharmacy 회원 연결 버튼', async () => {
+    get.mockResolvedValueOnce(access({ pharmacyMembershipStatus: 'active', next: 'apply_semi_franchise', message: 'Pharmacy 기본 회원 연결을 확인해 주세요.' }));
     renderGate();
-    expect(await screen.findByText('세미프랜차이즈 가입을 신청해 주세요.')).toBeTruthy();
-    expect(screen.getByRole('button', { name: '약국 협력사업 참여 신청' })).toBeTruthy();
+    expect(await screen.findByText('Pharmacy 기본 회원 연결을 확인해 주세요.')).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Pharmacy 기본 회원 연결 확인' })).toBeTruthy();
     expect(screen.queryByText('보호된 화면')).toBeNull();
   });
 

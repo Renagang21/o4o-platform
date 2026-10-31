@@ -61,7 +61,7 @@ function SemiFranchiseRecords({ organizationId, canEnterCommunity }: { organizat
   return (
     <PharmacyPage
       title="이용 사업 · 가입 관리"
-      description="각 약국 협력사업의 가입 상태를 확인하고 해당 서비스에서 가입을 신청합니다. 공급 상품과 자료는 내 매장에서 사업별로 이용합니다. 이미 복사한 자료는 탈퇴 후에도 내 매장에 남습니다."
+      description="Pharmacy 기본 회원은 약국 승인 시 함께 연결됩니다. 다른 약국 협력사업은 해당 서비스에서 별도로 신청합니다. 공급 상품과 자료는 내 매장에서 사업별로 이용하며, 이미 복사한 자료는 탈퇴 후에도 남습니다."
       actions={<button className={btn.secondary} onClick={load} disabled={loading}><RefreshCw size={14} className={`inline ${loading ? 'animate-spin' : ''}`} /> 새로고침</button>}
     >
       {error && <Notice tone="error">{error}</Notice>}
@@ -101,7 +101,7 @@ function SemiFranchiseRecords({ organizationId, canEnterCommunity }: { organizat
             <tbody>
               {rows.map((r) => {
                 const st = r.membershipStatus;
-                const participantStatus = !canEnterCommunity ? '약국 경영자 이용' : r.communityKey ? '가입 승인 후 이용' : '-';
+                const participantStatus = !canEnterCommunity ? '약국 경영자 이용' : r.communityKey ? (r.key === 'pharmacy' ? '약국 승인 후 기본 회원 연결' : '가입 승인 후 이용') : '-';
                 return (
                   <tr key={r.key} className="border-b border-gray-100 last:border-0" data-testid={`semi-franchise-${r.key}`}>
                     <td className="px-4 py-3 font-medium text-gray-900">{r.name}{r.registrationConditions && <p className="text-xs font-normal whitespace-pre-wrap">{r.registrationConditions}</p>}</td>
@@ -117,7 +117,7 @@ function SemiFranchiseRecords({ organizationId, canEnterCommunity }: { organizat
                       {r.communityKey && canEnterCommunity && st === 'active' ? <button className="text-blue-700" disabled={busyKey === r.key} onClick={() => enterCommunity(r)}>참여자 공간</button> : participantStatus}
                     </td>
                     <td className="px-4 py-3 text-center">
-                      {canEnterCommunity ? <button className={btn.primary} disabled={busyKey !== null} onClick={() => void enterCommunity(r, 'participation')}>서비스에서 가입 · 상태 관리</button> : <span className="text-gray-500">약국 경영자 이용</span>}
+                      {canEnterCommunity ? <button className={btn.primary} disabled={busyKey !== null} onClick={() => void enterCommunity(r, 'participation')}>{r.key === 'pharmacy' ? 'Pharmacy 회원 상태 확인' : '서비스에서 가입 · 상태 관리'}</button> : <span className="text-gray-500">약국 경영자 이용</span>}
                     </td>
                   </tr>
                 );

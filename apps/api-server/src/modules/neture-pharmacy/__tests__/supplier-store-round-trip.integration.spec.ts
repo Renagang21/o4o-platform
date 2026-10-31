@@ -136,17 +136,17 @@ integration('supplier → store → payment → shipment → settlement (real Po
       VALUES ($1,'business_registration','gcs://local-it/synthetic.pdf','synthetic.pdf') RETURNING id`, [ownerId]);
     const applied = await membership.apply(ownerId, {
       pharmacyName: `Store-${tag}`, businessNumber: String(1000000000 + Math.floor(Math.random() * 8999999999)),
-      pharmacistLicenseNumber: 'Synthetic license', businessRegistrationDocumentId: proof.id,
+      pharmacistLicenseNumber: `SYNTH-${ownerId.slice(0, 18)}`, businessRegistrationDocumentId: proof.id,
       representativeName: 'Synthetic owner', businessType: 'Synthetic', businessCategory: 'Synthetic',
       address: 'Synthetic address', phone: '0212345678',
     });
+    await ds.query(`INSERT INTO kpa_pharmacist_profiles(user_id,license_number,license_verified,verified_at,verified_by,qualification_status,qualification_reason) VALUES($1,$2,true,now(),$3,'approved','Synthetic fixture qualification reviewed')`, [ownerId, applied.pharmacist_license_number, operatorId]);
     await membership.decide(operatorId, applied.id, 'approve');
     organizationId = applied.organization_id;
     const franchises = new SemiFranchiseService(ds);
     await franchises.assignOperator('pharmacy', operatorId, operatorId);
-    const franchise = (await franchises.getByKey('pharmacy'))!;
     const joined = await franchises.apply(organizationId, ownerId, 'pharmacy', { policyReferences: await fixtureBusinessPolicies(ds, 'pharmacy') });
-    await franchises.decideMembership(franchise, operatorId, joined.id, 'approve');
+    expect(joined.status).toBe('active');
   });
 
   afterAll(async () => {

@@ -44,11 +44,11 @@ const STATUS_RANK: Record<string, number> = { active: 0, pending: 1, suspended: 
 const rank = (s: string | null) => (s === null ? 9 : STATUS_RANK[s] ?? 8);
 
 export const SEMI_FRANCHISE_ACCESS_MESSAGES: Record<SemiFranchiseAccessNext, string> = {
-  apply_pharmacy: '약국 서비스는 내 매장(약국) 신청 승인과 pharmacy 세미프랜차이즈 가입 승인 후 이용할 수 있습니다. 내 매장(약국) 신청을 먼저 해 주세요.',
-  pharmacy_pending: '내 매장(약국) 신청 승인을 기다리고 있습니다. 승인 후 pharmacy 세미프랜차이즈 가입을 신청할 수 있습니다.',
+  apply_pharmacy: '약국 경영자 신청이 승인되면 Pharmacy 기본 회원으로 함께 연결됩니다. 내 매장(약국) 신청을 먼저 해 주세요.',
+  pharmacy_pending: '내 매장(약국) 신청 승인을 기다리고 있습니다. 승인 시 Pharmacy 기본 회원으로 함께 연결됩니다.',
   pharmacy_suspended: '내 매장(약국) 이용이 정지된 상태입니다. 운영자에게 문의해 주세요.',
-  apply_semi_franchise: 'pharmacy 세미프랜차이즈 가입 승인 후 이용할 수 있습니다. 세미프랜차이즈 가입을 신청해 주세요.',
-  semi_franchise_pending: 'pharmacy 세미프랜차이즈 가입 승인을 기다리고 있습니다.',
+  apply_semi_franchise: '승인된 약국의 Pharmacy 기본 회원 연결을 확인해 주세요. 별도 가입 심사는 없습니다.',
+  semi_franchise_pending: '약국 승인 상태와 Pharmacy 기본 회원 연결을 확인해 주세요.',
   semi_franchise_suspended: 'pharmacy 세미프랜차이즈 가입이 정지된 상태입니다. 운영자에게 문의해 주세요.',
 };
 

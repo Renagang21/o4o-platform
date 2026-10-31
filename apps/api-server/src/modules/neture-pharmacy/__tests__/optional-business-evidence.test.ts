@@ -19,6 +19,8 @@ let qualified: boolean;
 beforeEach(() => {
   jest.clearAllMocks(); qualified = true;
   query = jest.fn(async (sql: string) => {
+    if (sql.includes("FROM semi_franchises WHERE key='pharmacy'")) return [{ id: 'default-business', status: 'active' }];
+    if (sql.includes('INSERT INTO semi_franchise_memberships')) return [{ id: 'default-membership', status: 'active' }];
     if (sql.includes('FOR UPDATE')) return [row];
     if (sql.includes('kpa_pharmacist_profiles')) return qualified ? [{ id: 'qualification' }] : [];
     if (sql.includes('INSERT INTO neture_pharmacy_memberships')) return [row];
