@@ -19,6 +19,25 @@ export interface VideoEmbed {
   provider: "youtube" | "vimeo" | "unknown";
 }
 
+/** A video address, never a channel/playlist address or an arbitrary iframe host. */
+export function hostedVideo(value: string): { provider: 'youtube' | 'vimeo'; id: string; url: string } | null {
+  try {
+    const u = new URL(value.trim());
+    if (!['https:', 'http:'].includes(u.protocol) || u.username || u.password) return null;
+    const host = u.hostname.toLowerCase(), parts = u.pathname.split('/').filter(Boolean);
+    if (['youtube.com', 'www.youtube.com', 'm.youtube.com', 'youtu.be', 'www.youtu.be', 'www.youtube-nocookie.com'].includes(host)) {
+      const pathId = ['shorts', 'embed', 'live'].includes(parts[0]) ? parts[1] : null;
+      const id = host.endsWith('youtu.be') ? parts[0] : u.searchParams.get('v') || pathId;
+      return id && /^[\w-]{11}$/.test(id) ? { provider: 'youtube', id, url: `https://www.youtube.com/watch?v=${id}` } : null;
+    }
+    if (['vimeo.com', 'www.vimeo.com', 'player.vimeo.com'].includes(host)) {
+      const id = parts.find(part => /^\d+$/.test(part));
+      return id ? { provider: 'vimeo', id, url: `https://vimeo.com/${id}` } : null;
+    }
+  } catch { /* Keep invalid input in its editor for correction. */ }
+  return null;
+}
+
 export function extractYouTubeId(url: string): string | null {
   // youtu.be/ID
   let m = url.match(/youtu\.be\/([\w-]{6,})/);

@@ -1,3 +1,5 @@
+import { VideoPlayback } from '@o4o/tablet-kiosk-core';
+import { hostedVideo } from '@o4o/tablet-kiosk-core/video-embed';
 import { StoreAiSlot } from '../../../components/store/StoreAiPlacement';
 import { useId, useRef, useState } from 'react';
 import { AuthoringDialog } from '../authoring/AuthoringDialog';
@@ -80,10 +82,12 @@ export function SignageQuickStart({ videos: sourceVideos, organizationId, isCurr
         <ol className="list-inside list-decimal space-y-2 text-sm">{selected.map(key => {
           const video = videos.find(item => item.id === key);
           const source = video?.sourceUrl ?? video?._snapshot?.contentJson?.sourceUrl;
-          const url = typeof source === 'string' ? videoPreviewUrl(source) : null;
+          const stored = video?._media?.sourceType === 'url' || video?._snapshot?.contentJson?.sourceType === 'url';
+          const supportedUrl = typeof source === 'string' ? videoPreviewUrl(source) : null;
+          const url = stored && typeof source === 'string' ? source : supportedUrl;
           return <li key={key}>{video?.title ?? '선택한 자료'}{url && <button type="button" onClick={() => setPreview(previous => previous === url ? null : url)} className="ml-2 min-h-11 px-2 text-teal-800 underline">영상 확인</button>}</li>;
         })}</ol>
-        {preview && <iframe src={preview} title="선택 영상 미리보기" className="aspect-video w-full rounded-lg" allowFullScreen />}
+        {preview && <div className="aspect-video w-full"><VideoPlayback url={preview} kind={hostedVideo(preview)?.provider ?? 'video'} title="선택 영상 미리보기" /></div>}
       </section>}
       <p className="text-xs text-slate-500">등록 영상은 매장 사본으로 추가됩니다. 원본 영상을 수정해도 기존 사본은 자동 갱신되지 않습니다.</p>
       </div>

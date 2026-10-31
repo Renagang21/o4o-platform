@@ -1,3 +1,4 @@
+import MediaPickerModal, { type MediaAssetItem } from '../../components/common/MediaPickerModal';
 import { StoreAiSlot } from '../../components/store/StoreAiPlacement';
 import { videoPreviewUrl } from './signage/videoPreview';
 import { SignageQuickStart } from './signage/SignageQuickStart';
@@ -250,6 +251,12 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
     acceptCreatedPlaylist,
   } = useSignagePlaylists(organizationId);
   const [quickStart, setQuickStart] = useState(false);
+  const [videoLibraryOpen, setVideoLibraryOpen] = useState(false);
+  const [libraryPending, setLibraryPending] = useState<MediaAssetItem | null>(null);
+  const [libraryError, setLibraryError] = useState('');
+  const [librarySaving, setLibrarySaving] = useState(false);
+  const libraryLock = useRef(false);
+
   const [playlistPreview, setPlaylistPreview] = useState(false);
   const [savedGuide, setSavedGuide] = useState<string | null>(null);
   const consumedEntry = useRef('');
@@ -316,6 +323,23 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
     loadSignageMedia();
   }, [loadSignageMedia]);
 
+  const registerLibraryVideo = async (asset: MediaAssetItem) => {
+    if (libraryLock.current || mediaMutation.current || !isCurrent()) return;
+    const store = organizationId;
+    libraryLock.current = true; mediaMutation.current = true;
+    setLibraryPending(asset); setLibrarySaving(true); setLibraryError(''); setVideoLibraryOpen(false);
+    try {
+      await createSignageMedia(store, { name: asset.originalName, mediaType: 'video', sourceType: 'url', sourceUrl: asset.url, mediaLibraryAssetId: asset.id, tags: ['매장 영상'] });
+      if (!isCurrent() || organizationRef.current !== store) return;
+      setLibraryPending(null); await loadSignageMedia();
+    } catch (error) {
+      if (isCurrent() && organizationRef.current === store) setLibraryError(error instanceof Error ? error.message : '영상은 라이브러리에 보관됐지만 목록 등록을 확인하지 못했습니다. 다시 등록해 주세요.');
+    } finally {
+      libraryLock.current = false; mediaMutation.current = false;
+      if (isCurrent() && organizationRef.current === store) setLibrarySaving(false);
+    }
+  };
+
   // ── Video registration handler ──
   const handleRegisterVideo = async () => {
     setRegVideoError('');
@@ -337,7 +361,7 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
         sourceType,
         sourceUrl: regVideoUrl.trim(),
         description: regVideoDescription.trim() || undefined,
-        tags: tags.length > 0 ? tags : undefined,
+        tags: tags.length > 0 ? tags : ['매장 영상'],
         status: regVideoStatus,
       });
       if (organizationRef.current !== store || !isCurrent()) return;
@@ -1174,6 +1198,14 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
           동영상 등록
         </button>
       </div>
+      <div className="mb-3 flex flex-wrap items-center gap-3">
+        <button type="button" disabled={librarySaving} onClick={() => setVideoLibraryOpen(true)} className="min-h-11 rounded-lg bg-teal-700 px-4 text-sm text-white">O4O에 보관 · 영상 선택</button>
+        <a href="https://studio.youtube.com/channel/UCG9wb2OKmCBZ63g_ONuFkzg/videos/upload" target="_blank" rel="noopener noreferrer" onClick={() => setShowVideoRegForm(true)} className="inline-flex min-h-11 items-center rounded-lg border px-4 text-sm">YouTube에 저장</a>
+      </div>
+      <p className="mb-3 text-sm text-slate-600">O4O 보관은 미디어 라이브러리를 사용합니다. YouTube는 업로드를 마친 뒤 개별 영상 주소를 등록하세요. 채널 주소 자체는 재생할 수 없습니다.</p>
+      {librarySaving && <output>보관 영상을 내 동영상에 연결하고 있습니다…</output>}
+      {libraryError && <div role="alert" className="mb-3 rounded-lg bg-amber-50 p-3 text-sm">{libraryError}{libraryPending && <button type="button" disabled={librarySaving} onClick={() => void registerLibraryVideo(libraryPending)} className="min-h-11 px-3 underline">같은 보관 영상 다시 등록</button>}</div>}
+      <MediaPickerModal open={videoLibraryOpen} onClose={() => setVideoLibraryOpen(false)} onSelect={asset => void registerLibraryVideo(asset)} assetType="video" contextKey={organizationId} title="O4O 보관 영상" defaultFolder="general" />
       {/* Video registration form — modal */}
       {showVideoRegForm && (
         <div
@@ -1364,7 +1396,7 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
             <>
               <Monitor className="w-10 h-10 mx-auto mb-3 text-slate-300" />
               <p className="text-sm">동영상이 없습니다.</p>
-              <p className="text-xs mt-1">'동영상 등록' 버튼으로 YouTube 또는 Vimeo 동영상을 등록하세요.</p>
+              <p className="text-xs mt-1">O4O 보관 영상을 선택하거나 YouTube/Vimeo 영상 주소를 등록하세요.</p>
             </>
           ) : (
             <p className="text-sm">선택한 필터 조건에 해당하는 동영상이 없습니다.</p>

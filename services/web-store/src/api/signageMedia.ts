@@ -36,7 +36,8 @@ export interface SignageMediaItem {
 export interface CreateSignageMediaPayload {
   name: string;
   mediaType: 'video';
-  sourceType: 'youtube' | 'vimeo';
+  sourceType: 'youtube' | 'vimeo' | 'url';
+  mediaLibraryAssetId?: string;
   sourceUrl: string;
   description?: string;
   tags?: string[];

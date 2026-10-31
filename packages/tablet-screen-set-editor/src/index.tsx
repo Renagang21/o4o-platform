@@ -1,3 +1,4 @@
+import { hostedVideo } from '@o4o/tablet-kiosk-core/video-embed';
 /**
  * @o4o/tablet-screen-set-editor — 공유 태블릿 Screen Set authoring 편집기
  *
@@ -25,7 +26,7 @@ import {
   selectedProductsOf, withSelectedProducts, withProductQr,
   type ScreenBlock, type ScreenBlockType, type ContentListItem, type SelectedProductRef,
 } from '@o4o/screen-content-core';
-import { TabletKioskPage, detectIdleMediaType, type TabletKioskApi, type TabletScreenResponse } from '@o4o/tablet-kiosk-core';
+import { TabletKioskPage, type TabletKioskApi, type TabletScreenResponse } from '@o4o/tablet-kiosk-core';
 import { RichTextEditor, LlmAssistPanel, type MediaInsert } from '@o4o/content-editor';
 
 // ── API-DTO 타입(소비처 tabletDisplays 와 구조적 동일 — 계약 변경 없음) ──
@@ -962,7 +963,7 @@ function EditorSection({ title, note, children, optional = false }: { title: str
 //   api/contentSources 미주입 시 매장 기본값(회귀 0). 운영자는 operator API + spd 출처만 주입.
 export function TabletContentStepBuilder({
   initialDetail, onCancel, onSaved, onToast, previewApi, storeSlug, api,
-  contentSources = DEFAULT_CONTENT_SOURCES, fetchProductPool, fetchStoreQrCodes, onImageUpload, onMediaLibraryPick,
+  contentSources = DEFAULT_CONTENT_SOURCES, fetchProductPool, fetchStoreQrCodes, onImageUpload, onMediaLibraryPick, onVideoLibraryPick,
   renderMobilePreview, showInternalAi,
 }: {
   initialDetail: ScreenSetDetail | null;
@@ -989,6 +990,7 @@ export function TabletContentStepBuilder({
   onImageUpload?: (file: File) => Promise<string>;
   /** §4.3: 코너 설명 편집기 미디어 라이브러리 선택(표준 편집기 props 를 그대로 전달). */
   onMediaLibraryPick?: (insertMedia: (media: MediaInsert) => void) => void;
+  onVideoLibraryPick?: (select: (asset: { id: string; url: string; title: string }) => void) => void;
   /**
    * WO-O4O-KPA-STORE-QR-SCREENSET-STATE-ALIGNMENT-V1 §4:
    *   'QR 모바일 화면' 미리보기를 **실제 `/qr/:slug` 와 동일한 렌더러**로 그린다.
@@ -1162,9 +1164,17 @@ export function TabletContentStepBuilder({
   //   복사/붙여넣기 전용 — LLM API 호출·계정 연동·대화 저장 없음. 모델·서비스는 사용자가 고른다.
 
   // 저장 요약 — 업무 항목 기준(블록 수 미노출).
+  const idleItemsRef = useRef<Array<{ mediaType: string; url: string; mediaAssetId?: string }>>([]);
+  const idleItemKeys = useRef(new WeakMap<object, string>());
+  const idleKeySequence = useRef(0);
+  const keyForIdleItem = (item: object) => {
+    let key = idleItemKeys.current.get(item);
+    if (!key) { key = `idle-${++idleKeySequence.current}`; idleItemKeys.current.set(item, key); }
+    return key;
+  };
   const idleCfg = configOf('idle_media');
-  const idleUrl: string = idleCfg.source === 'custom_media' && Array.isArray(idleCfg.items) ? (idleCfg.items[0]?.url ?? '') : '';
-  const idleSummary = idleUrl ? `동영상 1개 (${detectIdleMediaType(idleUrl) === 'vimeo' ? 'Vimeo' : 'YouTube'})` : '지정 안 함 (기본 화면)';
+  idleItemsRef.current = idleCfg.source === 'custom_media' && Array.isArray(idleCfg.items) ? idleCfg.items : [];
+  const idleSummary = idleItemsRef.current.length ? `동영상 ${idleItemsRef.current.length}개` : '지정 안 함 (기본 화면)';
   const cornerDescCfg = configOf('corner_description');
   const cornerSummary = (cornerDescCfg.title || cornerDescCfg.body) ? (cornerDescCfg.title || '(제목 없음)') : '작성 안 함';
   const extraCount = (Array.isArray(configOf('content_list').items) ? configOf('content_list').items : []).length;
@@ -1174,6 +1184,7 @@ export function TabletContentStepBuilder({
 
   const handleSave = async () => {
     if (saveLock.current) return;
+    if (idleItemsRef.current.some(item => !item.url.trim() || (!['video', 'image'].includes(item.mediaType) && !hostedVideo(item.url)))) { onToast({ type: 'error', message: '재생할 개별 영상 주소를 확인하거나 사용하지 않는 빈 항목을 제거해 주세요.' }); return; }
     if (!nameValid) { onToast({ type: 'error', message: '코너 제목 또는 콘텐츠 관리 이름을 입력해 주세요.' }); return; }
     saveLock.current = true;
     setSaveError(null);
@@ -1219,43 +1230,37 @@ export function TabletContentStepBuilder({
   //    URL 을 비우면 custom_media 는 items ≥ 1 을 요구해 저장이 400 → 유효한 'legacy_idle_playlist'
   //    (= 영상 지정 없음)으로 되돌린다. 이때 대기 화면은 기본 대체 화면이 된다.
   const renderIdleStep = () => {
-    const c = configOf('idle_media');
-    const url: string = c.source === 'custom_media' && Array.isArray(c.items) ? (c.items[0]?.url ?? '') : '';
-    const trimmed = url.trim();
-    const detected = trimmed ? detectIdleMediaType(trimmed) : null;
-    const invalid = !!trimmed && detected !== 'youtube' && detected !== 'vimeo';
-    const setUrl = (next: string) => {
-      const v = next.trim();
-      if (!v) { replaceConfigOf('idle_media', { source: 'legacy_idle_playlist' }); return; }
-      const t = detectIdleMediaType(v);
-      // 판별 실패(youtube/vimeo 아님)여도 입력값은 유지 — 저장 전 안내로 교정하게 한다.
-      replaceConfigOf('idle_media', { source: 'custom_media', items: [{ mediaType: t, url: v }] });
-    };
-    return (
-      <div className="space-y-3">
-        <div>
-          <label className="text-xs font-semibold text-slate-600">대기 동영상 URL</label>
-          <input
-            value={url}
-            onChange={(e) => setUrl(e.target.value)}
-            placeholder="YouTube 또는 Vimeo 주소를 붙여 넣으세요"
-            className={`w-full mt-1 px-3 py-2 rounded-lg border text-sm focus:outline-none focus:ring-2 ${
-              invalid ? 'border-amber-400 focus:ring-amber-400' : 'border-slate-200 focus:ring-indigo-400'
-            }`}
-          />
-          {invalid ? (
-            <p className="text-[11px] text-amber-600 mt-1">
-              YouTube 또는 Vimeo 주소만 사용할 수 있습니다. 주소를 다시 확인해 주세요.
-            </p>
-          ) : (
-            <p className="text-[11px] text-slate-400 mt-1">
-              소리 없이 자동 재생되고, 끝나면 다시 처음부터 반복됩니다. 손님이 화면을 터치하면 안내 화면으로 넘어갑니다.
-              비워 두면 대기 화면에 기본 안내가 표시됩니다.
-            </p>
-          )}
-        </div>
+    const items = idleItemsRef.current;
+    const saveItems = (next: typeof items) => replaceConfigOf('idle_media', next.length ? { source: 'custom_media', items: next } : { source: 'legacy_idle_playlist' });
+    return <div className="space-y-3">
+      <p className="text-sm">영상이 끝나면 다음 영상을 재생하고, 목록 마지막에서 처음으로 반복합니다. 목록 변경은 저장 후 직접 적용해 주세요.</p>
+      {items.map((item, index) => {
+        const hosted = hostedVideo(item.url);
+        const stored = item.mediaType === 'video' || item.mediaType === 'image';
+        return <div key={keyForIdleItem(item)} className="space-y-2 rounded-lg border border-slate-200 p-3">
+          <label className="block text-xs font-semibold">{index + 1}. {stored ? 'O4O 보관 영상' : 'YouTube / Vimeo 영상 주소'}
+            <input aria-label={`영상 주소 ${index + 1}`} value={item.url} readOnly={stored} placeholder="YouTube 또는 Vimeo 개별 영상 주소"
+              onChange={event => saveItems(items.map((row, i) => {
+                if (i !== index) return row;
+                const next = { mediaType: hostedVideo(event.target.value)?.provider ?? 'youtube', url: event.target.value };
+                idleItemKeys.current.set(next, keyForIdleItem(row));
+                return next;
+              }))}
+              className="mt-1 min-h-11 w-full rounded-lg border px-3 text-sm" />
+          </label>
+          {!stored && item.url.trim() && !hosted && <p role="alert" className="text-sm text-amber-700">채널 주소 대신 개별 영상 주소를 입력해 주세요.</p>}
+          <div className="flex flex-wrap gap-2">
+            <button type="button" disabled={index === 0} onClick={() => { const next = [...items]; [next[index - 1], next[index]] = [next[index], next[index - 1]]; saveItems(next); }} className="min-h-11 rounded border px-3 text-sm">위로</button>
+            <button type="button" onClick={() => saveItems(items.filter((_, i) => i !== index))} className="min-h-11 rounded border px-3 text-sm">영상 제거</button>
+          </div>
+        </div>;
+      })}
+      <div className="flex flex-wrap gap-2">
+        <button type="button" onClick={() => saveItems([...items, { mediaType: 'youtube', url: '' }])} className="min-h-11 rounded-lg border px-3 text-sm">영상 주소 추가</button>
+        {onVideoLibraryPick && <button type="button" onClick={() => onVideoLibraryPick(asset => saveItems([...idleItemsRef.current.filter(item => item.url.trim()), { mediaType: 'video', url: asset.url, mediaAssetId: asset.id }]))} className="min-h-11 rounded-lg border px-3 text-sm">O4O 보관 영상 선택</button>}
       </div>
-    );
+      <p className="text-xs text-slate-500">무음으로 시작합니다. 손님이 화면을 터치하면 안내 화면으로 넘어갑니다. 영상이 없으면 기본 안내를 표시합니다.</p>
+    </div>;
   };
 
   // 2) 코너 제목 + 짧은 안내. 본문은 기존 표준 HTML 편집기와 공개 ContentRenderer를 재사용한다.
@@ -1389,7 +1394,7 @@ export function TabletContentStepBuilder({
       </EditorSection>
 
       {/* 대기 화면 */}
-      <EditorSection optional title={`대기 화면 · ${idleUrl ? '영상 설정됨' : '선택'}`} note="손님이 화면을 만지지 않을 때 자동으로 재생할 영상입니다(YouTube·Vimeo URL). “화면을 터치하세요” 안내는 자동으로 표시됩니다.">
+      <EditorSection optional title={`대기 화면 · ${idleItemsRef.current.length ? '영상 설정됨' : '선택'}`} note="손님이 화면을 만지지 않을 때 재생할 영상 목록입니다(YouTube·Vimeo·O4O 보관 영상). “화면을 터치하세요” 안내는 자동으로 표시됩니다.">
         {renderIdleStep()}
       </EditorSection>
 
