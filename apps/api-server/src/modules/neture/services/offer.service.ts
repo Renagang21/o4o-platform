@@ -154,7 +154,7 @@ export class NetureOfferService {
     supplierId: string,
     userId: string,
     input: import('./supplier-offer-distribution.service.js').SupplierPublicationInput,
-  ): Promise<{ success: boolean; error?: string; data?: Record<string, unknown> }> {
+  ): Promise<import('./supplier-offer-distribution.service.js').SupplierPublicationResult> {
     return this.supplierOfferDistributionService.updateDistribution(offerId, supplierId, userId, input);
   }
 

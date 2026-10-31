@@ -431,6 +431,46 @@ describe('products and bulk Candidate contracts', () => {
     mockBusiness.getServicePrices.mockResolvedValue({ success: false, error: 'NOT_OWNED' });
     expect((await send('get', '/products/fixture/service-prices')).status).toBe(403);
   });
+  it('returns only publication state, including approval status/reason, after a successful write', async () => {
+    const approvals = [
+      { serviceKey: 'fixture-pending', status: 'pending', reason: null, futureInternal: 'private approval' },
+      { serviceKey: 'fixture-rejected', status: 'rejected', reason: 'Fixture correction requested' },
+      { serviceKey: 'fixture-cancelled', status: 'cancelled', reason: '' },
+    ];
+    const internal = {
+      success: true, futureInternal: 'private envelope',
+      data: {
+        isPublic: false, serviceKeys: ['fixture-pending', 'fixture-rejected'], defaultSupplyEnabled: false,
+        priceGeneral: 0, distributionType: 'SERVICE', serviceApprovals: approvals,
+        added: ['fixture-pending'], removed: ['fixture-cancelled'],
+        addedResult: { insertedServiceKeys: ['fixture-pending'] },
+        removedResult: { deactivatedListings: 3 },
+        sync: { previousStatus: 'PRIVATE', derivedStatus: 'SERVICE', changed: true, autoListedCount: 7 },
+        futureInternal: 'private result',
+      },
+    };
+    const original = structuredClone(internal);
+    mockBusiness.updateDistribution.mockResolvedValue(internal);
+    const res = await send('patch', '/products/fixture/distribution').send({ isPublic: false });
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual({ success: true, data: {
+      isPublic: false, serviceKeys: ['fixture-pending', 'fixture-rejected'], defaultSupplyEnabled: false,
+      priceGeneral: 0, distributionType: 'SERVICE',
+      serviceApprovals: approvals.map(a => ({ serviceKey: a.serviceKey, status: a.status, reason: a.reason })),
+    } });
+    expect(Object.keys(res.body.data).sort()).toEqual([
+      'isPublic', 'serviceKeys', 'defaultSupplyEnabled', 'priceGeneral', 'distributionType', 'serviceApprovals',
+    ].sort());
+    expect(Object.keys(res.body.data.serviceApprovals[0]).sort()).toEqual(['reason', 'serviceKey', 'status']);
+    expect(internal).toEqual(original);
+  });
+  it('does not turn a malformed publication success into a successful empty state', async () => {
+    mockBusiness.updateDistribution.mockResolvedValue({ success: true });
+    const res = await send('patch', '/products/fixture/distribution').send({ isPublic: false });
+    expect(res.status).toBe(500);
+    expect(res.body).toMatchObject({ success: false, error: 'INTERNAL_ERROR' });
+    expect(res.body.data).toBeUndefined();
+  });
   it.each([
     [{ productType: 'invalid', rows: [] }, 'INVALID_PRODUCT_TYPE'],
     [{ productType: 'non_drug', rows: [] }, 'ROWS_REQUIRED'],
