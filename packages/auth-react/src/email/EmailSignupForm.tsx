@@ -25,6 +25,13 @@ export interface EmailSignupFormProps {
 
 const PHONE_SHAPE = /^01\d{8,9}$/;
 
+// iOS contact autofill may supply +82 instead of the domestic leading zero.
+// Send the same domestic format the API already accepts; other countries stay invalid.
+function signupPhoneDigits(value: string) {
+  const digits = value.replace(/\D/g, '');
+  return value.trim().startsWith('+82') ? `0${digits.slice(2).replace(/^0/, '')}` : digits;
+}
+
 export function EmailSignupForm({ api, links, className }: EmailSignupFormProps) {
   const [policy, setPolicy] = useState<SignupTermsDocument | null>(null);
   const [policyReload, setPolicyReload] = useState(0);
@@ -41,12 +48,23 @@ export function EmailSignupForm({ api, links, className }: EmailSignupFormProps)
   const [error, setError] = useState<string | null>(null);
   const [sentTo, setSentTo] = useState<{ email: string; masked?: string; mailSent?: boolean } | null>(null);
 
-  const phoneDigits = phone.replace(/\D/g, '');
+  const phoneDigits = signupPhoneDigits(phone);
   const emailOk = isLoginEmailShapeValid(email);
   const phoneOk = PHONE_SHAPE.test(phoneDigits);
   const policyOk = checkPasswordPolicy(password).length === 0;
   const confirmOk = confirm.length > 0 && confirm === password;
   const ready = !!policy && emailOk && name.trim().length > 0 && nickname.trim().length > 0 && phoneOk && policyOk && confirmOk && terms && privacy && !submitting;
+  const missing = [
+    !nickname.trim() && '닉네임 입력',
+    !emailOk && '올바른 이메일 입력',
+    !name.trim() && '이름 입력',
+    !phoneOk && '국내 휴대전화 번호 입력',
+    !policyOk && '비밀번호 조건 충족',
+    !confirmOk && '비밀번호 확인 일치',
+    !policy && '이용약관 불러오기',
+    !terms && '이용약관 동의',
+    !privacy && '개인정보 처리방침 동의',
+  ].filter(Boolean);
 
   if (sentTo) {
     return (
@@ -91,12 +109,13 @@ export function EmailSignupForm({ api, links, className }: EmailSignupFormProps)
     <form onSubmit={handleSubmit} style={styles.box} className={className} noValidate data-testid="email-signup-form">
       <div style={styles.field}>
         <label htmlFor="o4o-signup-nickname" style={styles.label}>닉네임</label>
-        <input id="o4o-signup-nickname" type="text" maxLength={50} value={nickname} onChange={(e) => setNickname(e.target.value)} style={styles.input} />
+        <input id="o4o-signup-nickname" name="nickname" autoComplete="nickname" type="text" maxLength={50} value={nickname} onChange={(e) => setNickname(e.target.value)} style={styles.input} />
       </div>
       <div style={styles.field}>
         <label htmlFor="o4o-signup-email" style={styles.label}>이메일 (로그인 아이디)</label>
         <input
           id="o4o-signup-email"
+          name="email"
           type="email"
           inputMode="email"
           autoComplete="email"
@@ -113,6 +132,7 @@ export function EmailSignupForm({ api, links, className }: EmailSignupFormProps)
         <label htmlFor="o4o-signup-name" style={styles.label}>이름</label>
         <input
           id="o4o-signup-name"
+          name="name"
           type="text"
           autoComplete="name"
           maxLength={50}
@@ -125,9 +145,10 @@ export function EmailSignupForm({ api, links, className }: EmailSignupFormProps)
         <label htmlFor="o4o-signup-phone" style={styles.label}>휴대전화</label>
         <input
           id="o4o-signup-phone"
+          name="phone"
           type="tel"
-          inputMode="numeric"
-          autoComplete="tel"
+          inputMode="tel"
+          autoComplete="tel-national"
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
           aria-invalid={phone.length > 0 && !phoneOk ? true : undefined}
@@ -142,6 +163,7 @@ export function EmailSignupForm({ api, links, className }: EmailSignupFormProps)
       </div>
       <PasswordInput
         label="비밀번호"
+        name="password"
         value={password}
         onChange={setPassword}
         autoComplete="new-password"
@@ -151,6 +173,7 @@ export function EmailSignupForm({ api, links, className }: EmailSignupFormProps)
       />
       <PasswordInput
         label="비밀번호 확인"
+        name="passwordConfirmation"
         value={confirm}
         onChange={setConfirm}
         autoComplete="new-password"
@@ -174,7 +197,12 @@ export function EmailSignupForm({ api, links, className }: EmailSignupFormProps)
       </fieldset>
 
       {error && <p role="alert" style={styles.error}>{error}</p>}
-      <button type="submit" disabled={!ready} style={{ ...styles.primaryBtn, opacity: ready ? 1 : 0.6 }}>
+      {!submitting && missing.length > 0 && (
+        <p id="o4o-signup-requirements" role="status" style={styles.hintBad}>
+          가입 버튼을 누르려면 다음 항목을 확인해 주세요: {missing.join(' · ')}
+        </p>
+      )}
+      <button type="submit" disabled={!ready} aria-describedby={!submitting && missing.length > 0 ? 'o4o-signup-requirements' : undefined} style={{ ...styles.primaryBtn, opacity: ready ? 1 : 0.6 }}>
         {submitting ? '가입 처리 중…' : '가입하고 확인 메일 받기'}
       </button>
       {links?.login && (
