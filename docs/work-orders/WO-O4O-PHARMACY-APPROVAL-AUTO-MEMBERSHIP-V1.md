@@ -1,6 +1,6 @@
 # Pharmacy 약국 승인·기본 회원 자동 연결
 
-> **상태**: ACTIVE — 개발 인계, main 통합·운영 적용 미실행. 최신 CI·리뷰 상태는 PR을 따른다.
+> **상태**: COMPLETED — 개발·main 통합·API/Pharmacy Business/Store 배포 완료. 개별 자격 승인과 MegaPharm 공개 DNS는 별도.
 > **작성일**: 2026-10-31 (Asia/Seoul)
 > **사용자 지시**: 약국 경영자 승인 시 pharmacy.neture.co.kr 회원 자동 연결. TODO → 보완 → 개발 → main 병합 전까지.
 
@@ -9,6 +9,8 @@
 Pharmacy 기본 사업(`pharmacy`)만 약국 승인과 자동 연결한다. MegaPharm·CarePharm의 독립 신청과 Pharmcoop 개인 조합원 자격은 유지한다. 공통 계정·약사 자격·약국 경영 권한·운영자 권한은 변경하지 않는다. 기존 가입 원장 재사용이며 새 schema·role·인증 우회는 없다. 사용자 지시에 따른 가입 orchestration 변경이며 공통 Auth/Membership Core 구조 변경은 없다.
 
 최신 main `b27f0dc4dd`에서 `wo/pharmacy-approval-auto-membership-20261031`로 시작했다. 준비된 격리 클라우드 checkout을 사용한다. 운영 DB write·약관 게시·main 병합·auto-merge·배포는 범위 밖이다.
+
+위 범위는 최초 개발 단계의 종료점이다. 이후 사용자의 main 병합·배포·운영 데이터 변경 지시에 따라 아래 통합·배포 단계까지 확장했다. 기존 기록의 개발 종료점과 후속 실행 결과를 구분한다.
 
 ## 최초 TODO
 
@@ -45,3 +47,13 @@ Store 신청 안내·사업 목록, Pharmacy 참여 안내·접근 안내를 수
 [PR #903](https://github.com/Renagang21/o4o-platform/pull/903)에서 동일 branch로 CI·리뷰를 추적한다. 자동 리뷰의 UPDATE 반환 형식 지적을 `rowsOf` 정규화로 보완하고 기존 pending 연결·감사 ID를 실제 PostgreSQL에서 추가 검증했다. 인계 시의 required CI·최신 HEAD 리뷰 판정은 PR Checks/리뷰가 실행 증적이며 이 TODO의 완료를 병합·배포 완료로 해석하지 않는다.
 
 별도 DB를 쓰는 기존 약국 commerce·공급자/매장 통합 fixture의 가입 전제도 정비했다. 합성 약사 자격을 준비하고 Pharmacy 가입 후 중복 승인을 요구하지 않도록 했다. 범위에 맞는 실제 DB 시나리오 4개를 선택 검증했으며 나머지 거래 흐름의 검증 완료로 확대하지 않는다.
+
+## 2026-10-31 main 통합·운영 배포 완료
+
+- 사용자 추가 지시에 따라 최신 main을 반영한 PR HEAD `87522125f8`의 CI·Codex 완료/지적 0·스레드 해결을 확인하고 [PR #903](https://github.com/Renagang21/o4o-platform/pull/903)을 main `21301b7e5610f867e4983060f6f8ade8206cdb97`에 정상 병합했다. 저장소 auto-merge는 비활성 상태여서 설정 변경·bypass 없이 PR merge를 사용했다.
+- [병합 후 CI 41205408613](https://github.com/Renagang21/o4o-platform/actions/runs/41205408613)와 CodeQL이 성공했다. [Delivery 41206410479](https://github.com/Renagang21/o4o-platform/actions/runs/41206410479)는 LEVEL_3/API 의존 보류를 확인했다.
+- [Promote 41206528204](https://github.com/Renagang21/o4o-platform/actions/runs/41206528204)를 같은 SHA, `services=api,kpa-society,store`로 실행해 성공했다. API 준비·트래픽 전환 후 검증, 두 웹 revision smoke·트래픽 전환·서빙 SHA 검증이 모두 성공했다. `production=DEPLOYED · api,kpa-society,store`. 새 migration·IAM/DNS 변경은 없다.
+- Pharmacy·Store 공개 HTML과 실제 JavaScript MIME의 새 자산 HTTP 200, 기본 회원 안내 코드, API `ready`를 확인했다. MegaPharm은 공개 DNS 해석 실패와 proxy CONNECT 403을 관측해 공개 접근 정상으로 보고하지 않는다. 같은 프런트 배포 성공과 해당 도메인의 접근 확인은 구분한다.
+- 지정 점주의 약국 승인·Pharmacy 이용 자격 판정은 이미 active였다. 중복 회원 생성·강제 재가입·별도 약관 동의를 쓰지 않았다. 개인 약사 자격은 미신청이고 회원 업무는 403으로 유지된다. 자격 승인·제재/탈퇴 복원·전체 약국 일괄 backfill은 실행하지 않았다. Pharmcoop 개인/조합 관리자 권한 분리와 기존 역할·매장 연결도 재확인했다.
+
+이 WO의 자동 연결 구현·선택 서비스 배포는 완료다. [전체 협업 공간 운영 개통](WO-O4O-COOPERATION-OPERATIONAL-READINESS-V1.md)의 약사 자격·운영자·약관·실매장 조건은 별도로 유지한다. 세부 증거와 한계는 CHECK 후속 절을 따른다.
