@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { getStoreAiReadiness, type StoreAiReadiness } from '../../api/storeProductAi';
 
-export function StoreAiReadinessNotice({ organizationId, language }: { organizationId: string; language: string }) {
+export function StoreAiReadinessNotice({ organizationId, language }: Readonly<{ organizationId: string; language: string }>) {
   const [data, setData] = useState<StoreAiReadiness | null>(null), [error, setError] = useState(false), [retry, setRetry] = useState(0);
   useEffect(() => {
     let alive = true; setData(null); setError(false);

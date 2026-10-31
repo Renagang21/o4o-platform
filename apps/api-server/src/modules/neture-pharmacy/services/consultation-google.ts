@@ -50,7 +50,7 @@ export function readConsultationWav(base64: unknown) {
 
 /** Google native adapters share the existing price/quota ledger; no fallback to another provider. */
 export class ConsultationGoogleService {
-  constructor(private db: DataSource, private request: GoogleConsultationRequest = googleRequest(), private account = new AiAccountedExecution(db)) {}
+  constructor(db: DataSource, private readonly request: GoogleConsultationRequest = googleRequest(), private readonly account = new AiAccountedExecution(db)) {}
   async translate(input: ConsultationTranslationInput, access: ConsultationCloudAccess): Promise<ConsultationTranslationOutput> {
     await authorize(access);
     return this.account.invokeNative({ kind: 'translation', provider: 'google-cloud', model: 'general-nmt',

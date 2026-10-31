@@ -13,11 +13,13 @@ const runtime = { recognition: 'browser', translation: 'policy', synthesis: 'bro
 const source = `
 import React,{useState} from 'react';import {createRoot} from 'react-dom/client';import {MemoryRouter} from 'react-router-dom';
 import Page from '/services/web-store/src/pages/pharmacy/StoreMultilingualConsultationPage.tsx';
+import Customer from '/services/web-store/src/pages/pharmacy/consultation/CustomerConsultationPage.tsx';
 import {ConsultationRuntimeControls} from '/apps/admin-dashboard/src/pages/settings/ConsultationRuntimeControls.tsx';
 import {StoreAiReadinessNotice} from '/services/web-store/src/pages/pharmacy/StoreAiReadinessNotice.tsx';
 import '/services/web-store/src/index.css';
 function Admin(){const [data,setData]=useState({revision:7,consultation:${JSON.stringify(runtime)}}),[notice,setNotice]=useState('');return <><ConsultationRuntimeControls control={{data,busy:false,loading:false,run:async(action,message)=>{setData(await action());setNotice(message);return true;}}}/><output>{notice}</output></>}
-createRoot(document.getElementById('root')).render(<MemoryRouter><Page/><StoreAiReadinessNotice organizationId="fixture-store" language="ko"/><Admin/></MemoryRouter>);`;
+function App(){const [customer,setCustomer]=useState(false);return <><button onClick={()=>setCustomer(true)}>고객 화면 검증 열기</button>{customer?<Customer/>:<><Page/><StoreAiReadinessNotice organizationId="fixture-store" language="ko"/><Admin/></>}</>}
+createRoot(document.getElementById('root')).render(<MemoryRouter><App/></MemoryRouter>);`;
 const server = await createServer({ root, configFile: false, appType: 'custom', logLevel: 'error',
   css: { postcss: { plugins: [tailwindcss({ ...storeTailwind, content: [path.join(root, 'services/web-store/src/**/*.{ts,tsx}'), path.join(root, 'apps/admin-dashboard/src/pages/settings/ConsultationRuntimeControls.tsx'), path.join(root, 'packages/*/src/**/*.{ts,tsx}')] }), autoprefixer()] } },
   esbuild: { jsx: 'automatic' }, resolve: { dedupe: ['react', 'react-dom', 'react-router', 'react-router-dom'] },
@@ -50,7 +52,7 @@ let browser;
 try {
   await server.listen();
   browser = await chromium.launch({ executablePath: process.env.O4O_BROWSER_EXECUTABLE || '/usr/bin/chromium', args: ['--no-sandbox'], headless: true });
-  for (const width of [1440, 820, 390]) {
+  async function verifyWidth(width) {
     const context = await browser.newContext({ viewport: { width, height: 1000 } }), page = await context.newPage();
     const errors = [], external = [], requests = []; let denial = false;
     page.setDefaultTimeout(30000);
@@ -58,6 +60,11 @@ try {
     await context.route('**/*', async route => {
       const req = route.request(), url = new URL(req.url());
       if (url.origin !== origin) { external.push(url.origin); return route.abort(); }
+      if (url.pathname.endsWith('/consultation-device/read')) return route.fulfill({ json: { success: true, data: {
+        id: '11111111-1111-4111-8111-111111111111', name: 'Fixture counter', epoch: 'fixture-epoch', version: 1,
+        state: 'active', language: 'ko', languages: [{ key: 'ko', label: '한국어' }, { key: 'ja', label: '日本語' }], shared: null,
+        runtime: { ...runtime, recognition: 'google-cloud', speechLanguages: ['ko','en','zh'] },
+      } } });
       if (!url.pathname.startsWith('/fixture')) return route.continue();
       const body = req.postDataJSON(), json = data => route.fulfill({ json: { success: true, data } });
       if (url.pathname === '/fixture/readiness') return route.fulfill({ json: { organizationId: 'fixture-store', purpose: 'B2B', language: 'ko', listingCount: 22, masterCount: 21, localCount: 9, states: { structured: 0, legacy: 3, unclassified: 0, missing: 18 } } });
@@ -105,8 +112,21 @@ try {
     await page.getByRole('button', { name: '상담 맥락으로 매장 상품 찾기' }).click();
     await page.getByText('개인의 승인된 약사 자격과 현재 약국의 약사 업무 허용', { exact: false }).first().waitFor();
     assert.equal(await page.getByRole('button', { name: '합성 성분 제품 · 10정 · 상품 확인' }).count(), 0);
+    await page.evaluate(() => localStorage.setItem('o4o:consultation-customer-device:v1', JSON.stringify({ id: '11111111-1111-4111-8111-111111111111', name: 'Fixture counter', token: 'a'.repeat(64) })));
+    await page.getByRole('button', { name: '고객 화면 검증 열기' }).click();
+    const automatic = page.getByRole('checkbox', { name: '음성 언어 자동 감지' });
+    assert.equal(await automatic.isChecked(), true);
+    await page.getByRole('combobox', { name: '언어', exact: true }).selectOption('ja');
+    assert.equal(await automatic.isChecked(), false);
+    await automatic.check();
+    assert.equal(await automatic.isChecked(), true);
+    assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1), 'customer horizontal overflow');
+    await page.screenshot({ path: `/tmp/o4o-consultation-customer-language-${width}.png`, fullPage: true });
     assert.deepEqual(errors, []); assert.deepEqual(external, []);
     await context.close();
     console.log(`PASS consultation/admin/readiness UI ${width}px: detect → context → confirm → reset → settings → access revoke`);
   }
+  await verifyWidth(1440);
+  await verifyWidth(820);
+  await verifyWidth(390);
 } finally { await browser?.close(); await server.close(); }

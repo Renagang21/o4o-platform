@@ -9,7 +9,7 @@ type Props = { organizationId: string; mode: string; product: ConsultationProduc
   room: ConsultationStation | null; locked: boolean; inquiry?: string; onUseDraft: (text: string, source: ConsultationSupportSourceProof) => void; onAccessDenied?: () => void;
   onSelectProduct?: (product: ConsultationProduct) => void };
 /** Private, transient pharmacist review; only an explicitly accepted customer draft leaves this panel. */
-export function ConsultationSupportPanel({ organizationId, mode, product, room, locked, inquiry, onUseDraft, onAccessDenied, onSelectProduct }: Props) {
+export function ConsultationSupportPanel({ organizationId, mode, product, room, locked, inquiry, onUseDraft, onAccessDenied, onSelectProduct }: Readonly<Props>) {
   const [question, setQuestion] = useState(''), [reference, setReference] = useState(''),
     [source, setSource] = useState(''), [reviewed, setReviewed] = useState(false);
   const [result, setResult] = useState<ConsultationSupportResult | null>(null),

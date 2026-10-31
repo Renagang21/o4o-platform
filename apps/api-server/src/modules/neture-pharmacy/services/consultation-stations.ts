@@ -436,6 +436,18 @@ export class ConsultationStationService {
     if (!this.verifySupport) fail(503, 'GUIDANCE_UNAVAILABLE', '상담 근거를 확인하지 못했습니다.');
     await this.verifySupport!(row.operator_user_id, row.organization_id, row.mode, proof as Json);
   }
+  private async visibleShared(row: Row, active: boolean) {
+    if (!active || !Object.keys(row.shared).length) return null;
+    try {
+      const proof = row.translation['shared-guidance'];
+      if (proof && this.verifyGuidance) await this.verifyGuidance(row.operator_user_id, row.organization_id, proof as unknown as GuidanceProof);
+      await this.verifySharedSupport(row);
+      return row.shared;
+    } catch (error) {
+      if (error instanceof NeturePharmacyError && [403, 404, 409].includes(error.httpStatus)) return null;
+      throw error;
+    }
+  }
   async deviceSpeechAccess(input: Json) {
     const row = await this.peer(input);
     if (!row.active || !recent(row.operator_seen_at) || row.epoch !== input.epoch)
@@ -491,32 +503,7 @@ export class ConsultationStationService {
         "상담이 변경되었습니다. 다시 확인해 주세요.",
       );
     const active = current.active && recent(current.operator_seen_at);
-    let visible =
-      active && Object.keys(current.shared).length ? current.shared : null;
-    const proof = current.translation["shared-guidance"];
-    if (visible && proof && this.verifyGuidance) {
-      try {
-        await this.verifyGuidance(
-          current.operator_user_id,
-          current.organization_id,
-          proof as unknown as GuidanceProof,
-        );
-      } catch (error) {
-        if (
-          error instanceof NeturePharmacyError &&
-          [403, 404, 409].includes(error.httpStatus)
-        )
-          visible = null;
-        else throw error;
-      }
-    }
-    if (visible && current.translation['shared-support']) {
-      try { await this.verifySharedSupport(current); }
-      catch (error) {
-        if (error instanceof NeturePharmacyError && [403, 404, 409].includes(error.httpStatus)) visible = null;
-        else throw error;
-      }
-    }
+    const visible = await this.visibleShared(current, active);
     const [unchanged] = await this.query(
       "SELECT id FROM store_consultation_stations WHERE id=$1 AND device_hash=$2 AND epoch=$3 AND language=$4 AND active=$5 AND shared=$6::jsonb",
       [

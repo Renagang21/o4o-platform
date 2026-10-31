@@ -498,9 +498,10 @@ export class ConsultationGuidanceService {
   }
 
   async searchSupportProducts(actor: string, org: string, input: Json) {
-    if (!['counter-pharmacist', 'floor-pharmacist'].includes(String(input.mode)))
-      fail(403, 'PHARMACIST_CONFIRMATION_REQUIRED', '약사 상담의 사용 확인이 필요합니다.');
-    const authorize = async () => { await this.access(actor, org, String(input.mode)); return true; };
+    if (typeof input.mode !== 'string' || !['counter-pharmacist', 'floor-pharmacist'].includes(input.mode))
+      return fail(403, 'PHARMACIST_CONFIRMATION_REQUIRED', '약사 상담의 사용 확인이 필요합니다.');
+    const mode = input.mode;
+    const authorize = async () => { await this.access(actor, org, mode); return true; };
     return new ConsultationContextService(this.db, createConsultationContextPlanner(this.db))
       .search(input, { actorId: actor, organizationId: org, authorize });
   }

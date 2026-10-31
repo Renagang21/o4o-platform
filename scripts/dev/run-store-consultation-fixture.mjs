@@ -511,9 +511,11 @@ async function tests(db) {
       await db.query("INSERT INTO organization_product_listings(id,organization_id,master_id,service_key,is_active) VALUES($1,$2,$3,$5,$4)", [id, organization, m, active, key]);
     await db.query("INSERT INTO shared_product_descriptions(master_id,content,source_type,status,language,description_type) VALUES($1,'<p>합성 상담 성분</p>','operator','canonical','ko','B2B')", [master]);
     const context = new ConsultationContextService(db, async () => ({ needsProduct: true, terms: ['합성 상담'], clarification: null }));
+    await db.query("UPDATE product_masters SET specification='합성 10정' WHERE id=$1", [master]);
     const access = { actorId: actor, organizationId: org, authorize: async () => { await authorize(actor, org); return true; } };
     const result = await context.search({ question: '합성 상담 성분 자료가 필요합니다' }, access);
     assert.equal(result.state, 'candidates'); assert.equal(result.candidates.length, 1);
+    assert.equal(result.candidates[0].name, '합성 상담 성분 · 합성 10정 · 합성 제조사');
     const coverage = await readStoreAiReadiness(db, org, 'ko');
     assert.equal(coverage.masterCount, 1); assert.equal(coverage.listingCount, 2); assert.equal(coverage.states.legacy, 1);
     assert.equal((await readStoreAiReadiness(db, org, 'ja')).states.missing, 1);

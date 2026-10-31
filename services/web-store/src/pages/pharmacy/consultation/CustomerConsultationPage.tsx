@@ -32,6 +32,7 @@ export default function CustomerConsultationPage() {
     [error, setError] = useState(""),
     [notice, setNotice] = useState("");
   const [storageWarning, setStorageWarning] = useState(false);
+  const [autoLanguage, setAutoLanguage] = useState(true);
   const [text, setText] = useState(""),
     [language, setLanguage] = useState("ko"),
     [busy, setBusy] = useState(false),
@@ -54,6 +55,7 @@ export default function CustomerConsultationPage() {
     setScreen(null);
     setText("");
     setNotice("");
+    setAutoLanguage(true);
   }, [invalidateSubmission]);
   const speech = useConsultationAudio(
     `${credential?.id}:${screen?.epoch}:${language}`,
@@ -65,7 +67,7 @@ export default function CustomerConsultationPage() {
       recognize: async (audioBase64, spokenLanguage) => {
         if (!credential || !screen) throw new Error('상담 화면을 다시 연결해 주세요.');
         return customerRequest<{ text: string; language: string }>('speech/recognize', { ...credential, epoch: screen.epoch, audioBase64,
-          language: screen.runtime?.detectLanguage ? 'auto' : spokenLanguage });
+          language: autoLanguage && screen.runtime?.detectLanguage ? 'auto' : spokenLanguage });
       },
       synthesize: async () => {
         if (!credential || !screen) throw new Error('상담 화면을 다시 연결해 주세요.');
@@ -138,6 +140,7 @@ export default function CustomerConsultationPage() {
           setText("");
           setNotice("");
           setLanguage(value.language);
+          setAutoLanguage(value.runtime?.detectLanguage === true);
           resetSpeech();
         }
         if (
@@ -396,6 +399,7 @@ export default function CustomerConsultationPage() {
                 onChange={(e) => {
                   resetSpeech();
                   setLanguage(e.target.value);
+                  setAutoLanguage(false);
                 }}
               >
                 {screen.languages.map((l) => (
@@ -405,6 +409,10 @@ export default function CustomerConsultationPage() {
                 ))}
               </select>
             </label>
+            {screen.runtime?.recognition === 'google-cloud' && screen.runtime.detectLanguage && <label className="flex min-h-14 items-center gap-3">
+              <input type="checkbox" checked={autoLanguage} disabled={busy || speech.listening}
+                onChange={event => { resetSpeech(); setAutoLanguage(event.target.checked); }} />{copy.autoLanguage}
+            </label>}
             {speech.inputSupported && (
               <button
                 className={button}

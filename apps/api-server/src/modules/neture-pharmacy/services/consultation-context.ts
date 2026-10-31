@@ -54,7 +54,8 @@ export class ConsultationContextService {
     if (plan.clarification || !plan.terms.length) return { state: 'clarify', message: plan.clarification ?? '어떤 내용을 확인하고 싶은지 조금 더 알려 주세요.', candidates: [] };
     // Scope before ranking/limit. Global catalog top-N and unhandled-product recommendations are not used.
     const candidates = await this.db.query(`WITH eligible AS (
-      SELECT DISTINCT ON (l.master_id) l.id,'listing'::text AS kind,m.name,
+      SELECT DISTINCT ON (l.master_id) l.id,'listing'::text AS kind,
+        concat_ws(' · ',m.name,NULLIF(m.specification,''),NULLIF(m.manufacturer_name,'')) AS name,
         concat_ws(' ',m.name,m.regulatory_name,m.specification,
           (SELECT string_agg(t.tag,' ') FROM product_ai_tags t WHERE t.product_id=m.id),d.content) AS searchable
       FROM organization_product_listings l JOIN product_masters m ON m.id=l.master_id AND m.status='ACTIVE'

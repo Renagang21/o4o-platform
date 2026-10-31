@@ -10,7 +10,7 @@ export interface ConsultationAudioOptions {
 }
 export function pcmWav(samples: Float32Array, sampleRate = 16000): ArrayBuffer {
   const data = new ArrayBuffer(44 + samples.length * 2), view = new DataView(data);
-  const write = (offset: number, value: string) => [...value].forEach((char, i) => view.setUint8(offset + i, char.charCodeAt(0)));
+  const write = (offset: number, value: string) => [...value].forEach((char, i) => view.setUint8(offset + i, char.codePointAt(0)!));
   write(0, 'RIFF'); view.setUint32(4, data.byteLength - 8, true); write(8, 'WAVE'); write(12, 'fmt ');
   view.setUint32(16, 16, true); view.setUint16(20, 1, true); view.setUint16(22, 1, true); view.setUint32(24, sampleRate, true);
   view.setUint32(28, sampleRate * 2, true); view.setUint16(32, 2, true); view.setUint16(34, 16, true); write(36, 'data'); view.setUint32(40, samples.length * 2, true);
@@ -19,7 +19,7 @@ export function pcmWav(samples: Float32Array, sampleRate = 16000): ArrayBuffer {
 }
 function encoded(data: ArrayBuffer) {
   const bytes = new Uint8Array(data); let text = '';
-  for (let i = 0; i < bytes.length; i += 8192) text += String.fromCharCode(...bytes.subarray(i, i + 8192));
+  for (let i = 0; i < bytes.length; i += 8192) text += String.fromCodePoint(...bytes.subarray(i, i + 8192));
   return btoa(text);
 }
 
@@ -39,7 +39,8 @@ export function useConsultationAudio(scope: string, onTranscript: (text: string)
     if (previous?.state === 'recording') previous.stop();
     stream.current?.getTracks().forEach(track => track.stop()); stream.current = null;
     player.current?.pause(); player.current = null;
-    if (url.current) URL.revokeObjectURL(url.current); url.current = null;
+    if (url.current) { URL.revokeObjectURL(url.current); }
+    url.current = null;
     browser.reset(); setListening(false); setSpeaking(false); setMessage('');
   };
   const resetRef = useRef(reset); resetRef.current = reset;
@@ -97,7 +98,7 @@ export function useConsultationAudio(scope: string, onTranscript: (text: string)
     void callbacks.current.options.synthesize!(text, language).then(result => {
       if (version !== generation.current) return;
       if (result.mimeType !== 'audio/mpeg') throw new Error('음성 형식을 확인하지 못했습니다.');
-      const bytes = Uint8Array.from(atob(result.audioBase64), char => char.charCodeAt(0));
+      const bytes = Uint8Array.from(atob(result.audioBase64), char => char.codePointAt(0)!);
       const address = URL.createObjectURL(new Blob([bytes], { type: 'audio/mpeg' })); url.current = address;
       const audio = new Audio(address); player.current = audio;
       audio.onended = () => { if (version === generation.current) resetRef.current(); };

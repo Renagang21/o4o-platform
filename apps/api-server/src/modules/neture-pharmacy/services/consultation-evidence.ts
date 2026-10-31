@@ -2,6 +2,7 @@ import type { readStoreProductAiContext } from '../../neture/product-description
 import type { ConsultationSupportSource } from './consultation-support.extension.js';
 
 const caution = /주의|금기|상호작용|부작용|임신|수유|알레르기|caution|contraindicat|interaction|warning/i;
+const labels = { 'product-fact': '상품 사실', 'professional-reference': '전문 참고', 'counseling-support': '상담 보조', unclassified: '미분류' };
 export function safeEvidenceUrls(urls: string[]): string[] {
   return [...new Set(urls)].filter(value => {
     try { return ['https:', 'http:'].includes(new URL(value).protocol); } catch { return false; }
@@ -44,7 +45,7 @@ export function approvedAiSupportSources(
     remaining -= text.length;
     const omitted = text.length < section.text.length || sections.length > 16;
     sources.push({ id: section.kind === 'product-fact' ? `p${index + 11}` : `r${index + 2}`, kind: section.kind as ConsultationSupportSource['kind'],
-      title: `O4O B2B · ${section.kind} · ${section.title}${omitted ? ' · 일부 근거 생략' : ''}`,
+      title: `O4O B2B · ${labels[section.kind]} · ${section.title}${omitted ? ' · 일부 근거 생략' : ''}`,
       text, urls: safeEvidenceUrls(section.referenceUrls), checkedOn: description.source?.checkedOn ?? null,
       revision: description.revision, currentness: description.source?.currentness ?? 'unknown' });
   }

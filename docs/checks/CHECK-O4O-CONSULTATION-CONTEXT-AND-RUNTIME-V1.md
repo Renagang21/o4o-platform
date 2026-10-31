@@ -55,3 +55,16 @@
 ## PR 인계 gate
 
 기술 gate 조회에서 `main`은 PR 필수·required `CI Gate`·필수 승인 수 0이며 삭제/non-fast-forward를 금지한다. 개발 공간에서는 merge/auto-merge/deploy를 실행하지 않는다. 최종 commit·원격 일치·CI·Codex·미해결 스레드는 [PR #910](https://github.com/Renagang21/o4o-platform/pull/910)의 최신 HEAD와 완료 인계 보고를 따른다. 이 기록의 로컬 검증 완료를 아직 진행 중인 CI·review의 성공으로 간주하지 않는다.
+
+
+## 후속 리뷰 보완
+
+Codex가 `b9d5170dd5`의 고객 화면에서 수동 언어 선택 후에도 Google STT에 `auto`를 반복 전송하는 P2를 지적했다. 고객별 자동 감지 선택을 분리하고 수동 선택 시 해당 언어를 전송한다. 다음 고객/상담 세대에서 초기화하며 관리자 자동 후보 밖의 일본어도 수동 인식 요청이 가능하다. 일곱 언어의 선택 문구와 음성 전송 안내도 현재 실행 수단에 맞췄다.
+
+- 고객/음성/지원 focused Vitest **6 files / 46 tests PASS**: 실제 고객 요청 함수의 cookie/header 경계, 수동 일본어·자동 전환·다음 고객 초기화를 합성 전송으로 확인했다.
+- 맥락/근거/번역/접근 focused Jest **8 suites / 76 tests PASS**. 후보 이름에 실제 규격·제조사를 함께 표시하고 근거 분류는 사용자에게 한국어로 표시한다.
+- PostgreSQL 상담 fixture **23 checks PASS**, 정리 후 DB 0건. 후보의 규격/제조사 식별과 변경된 공유 근거 보호를 재확인했다.
+- Store production 빌드·API 빌드와 Chromium 1440/820/390px를 재확인했다. 브라우저 검사에는 고객 화면의 자동/수동 선택·가로 넘침 검사를 추가했고 고객 언어 캡처도 `/tmp/o4o-consultation-customer-language-{1440,820,390}.png`에 남겼다.
+- SonarCloud의 신규 신뢰성/복잡도 지적에서 음성 정리의 조건문 범위를 명시하고 현재 공유 근거 확인·번역 입력 검증을 작은 함수로 분리했다. 테스트는 화면 크기별 순서를 유지하는 함수 호출로 정리했다. 실제 권한·반환 계약을 유지하며 해당 검증을 다시 실행했다. 최종 분석 판정은 PR 최신 HEAD에서 확인한다.
+
+- 전체 CI가 발견한 기존 계약 테스트 3건은 새 GET 권한 거절/401 계약과 인증·조직 resolver fixture를 반영해 수정했다. 읽기·변경/QR 경로의 `kpa` 고정 검사를 유지하며 권한 우회/기존 타 매장 fallback을 허용하지 않는다. 해당 **2 suites / 34 tests PASS** 후 새 HEAD의 전체 CI를 재확인한다.

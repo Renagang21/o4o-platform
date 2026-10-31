@@ -1,6 +1,6 @@
 import type { DataSource } from 'typeorm';
 import { resolveStoreAccess, isStoreOwner, storeOwnerRejection } from './store-owner.utils.js';
-import { resolveApprovedStoreMemberOrganization, findApprovedStoreMemberCandidates } from './store-member-access.js';
+import { findApprovedStoreMemberCandidates } from './store-member-access.js';
 import type { StoreOwnerServiceKey } from './store-organization.resolver.js';
 
 /** Product requests must not use another store when an explicit selection is ignored. */

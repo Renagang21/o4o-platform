@@ -234,7 +234,7 @@ export function consultationWorkspaceRoutes(
     const cloud = new ConsultationGoogleService(db), access = { actorId: owner.actorId, authorize };
     return operation === 'recognize'
       ? cloud.recognize(input.audioBase64, input.language === 'auto' && runtime.detectLanguage ? runtime.speechLanguages : [String(input.language)], access)
-      : cloud.synthesize(typeof owner.shared.text === 'string' ? owner.shared.text : '', String(owner.shared.language ?? owner.language), access);
+      : cloud.synthesize(typeof owner.shared.text === 'string' ? owner.shared.text : '', typeof owner.shared.language === 'string' ? owner.shared.language : owner.language, access);
   }));
   router.post(
     "/pharmacy/consultation-device/claim",

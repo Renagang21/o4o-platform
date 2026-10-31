@@ -5,8 +5,7 @@ import { runAiExtension, AiExtensionError } from '@o4o/ai-core';
 import { createPolicyExecutor } from '../../ai-policy/ai-policy-factory.js';
 import logger from '../../../utils/logger.js';
 import { NeturePharmacyError } from '../constants.js';
-import { consultationTranslationExtension, type ConsultationTranslationInput } from './consultation-translation.extension.js';
-import type { ConsultationTranslationOutput } from './consultation-translation.extension.js';
+import { consultationTranslationExtension, type ConsultationTranslationInput, type ConsultationTranslationOutput } from './consultation-translation.extension.js';
 import { ModelControlService } from '../../../services/ai-management/model-controls.js';
 import { ConsultationGoogleService } from './consultation-google.js';
 
