@@ -71,7 +71,6 @@ export interface SupplyOption {
   termsSnapshot?: { version: 1; baseShippingFee: number; freeShippingThreshold: number | null; minOrderAmount: number } | null;
   kind: SupplyKind;
   optionId: string;
-  offerId: string;
   productName: string;
   supplierName: string;
   semiFranchiseKey: string | null;
@@ -84,7 +83,6 @@ export interface SupplyOption {
   totalQuantity: number | null;
   perStoreLimit: number | null;
   perOrderLimit: number | null;
-  availableStock: number | null;
 }
 
 export interface PharmacyRecruitment {

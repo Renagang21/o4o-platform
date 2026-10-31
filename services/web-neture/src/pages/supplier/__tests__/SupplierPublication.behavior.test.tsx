@@ -1,8 +1,9 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, renderHook, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter, useNavigate } from 'react-router-dom';
 import SupplierProductPublicationPage from '../SupplierProductPublicationPage';
 import SupplierProductFromMasterPage from '../SupplierProductFromMasterPage';
+import { useSupplierPublication } from '../publication/useSupplierPublication';
 
 const mocks = vi.hoisted(() => ({ getProducts: vi.fn(), getServicePrices: vi.fn(), updateDistribution: vi.fn(), createOfferFromMaster: vi.fn(), getMasterById: vi.fn() }));
 vi.mock('../../../lib/api', () => ({ supplierApi: mocks, productApi: { getMasterById: mocks.getMasterById } }));
@@ -15,7 +16,10 @@ beforeEach(() => {
   vi.resetAllMocks();
   mocks.getProducts.mockResolvedValue([approved, { ...approved, id:'product-b', name:'검토 제품', approvalStatus:'PENDING' }]);
   mocks.getServicePrices.mockResolvedValue({ success: true, data: { priceGeneral:0, prices:[] } });
-  mocks.updateDistribution.mockResolvedValue({ success:true, data: {} });
+  mocks.updateDistribution.mockResolvedValue({ success:true, data: {
+    isPublic:false, serviceKeys:[], defaultSupplyEnabled:false, priceGeneral:0,
+    distributionType:'PRIVATE', serviceApprovals:[],
+  } });
 });
 afterEach(cleanup);
 
@@ -47,6 +51,58 @@ describe('registration and publication are independent supplier jobs', () => {
     expect((screen.getByLabelText('기본 B2B 공급가 (원)') as HTMLInputElement).value).toBe('1000');
     fireEvent.click(screen.getByRole('button',{name:'게시 설정 저장'}));
     await waitFor(() => expect(mocks.updateDistribution).toHaveBeenCalledTimes(2));
+  });
+  it.each([
+    ['pending', null, '승인 대기'],
+    ['rejected', '검토용 수정 요청', '반려'],
+    ['cancelled', null, '게시 철회'],
+  ])('refreshes %s status and reason from the six-field save response', async (status, reason, label) => {
+    mocks.getProducts.mockResolvedValue([{ ...approved, priceGeneral: 1000,
+      serviceApprovals: [{ serviceKey:'kpa-society', status:'approved', reason:'이전 사유' }],
+    }]);
+    mocks.updateDistribution.mockResolvedValue({success:true,data:{
+      isPublic:false, serviceKeys:status === 'cancelled' ? [] : ['kpa-society'],
+      defaultSupplyEnabled:true, priceGeneral:1200, distributionType:'SERVICE',
+      serviceApprovals:[{serviceKey:'kpa-society',status,reason}],
+    }});
+    mount();
+    await waitFor(() => expect(screen.getByRole('button',{name:'게시 설정 저장'}).closest('fieldset')?.disabled).toBe(false));
+    expect(screen.getByText(/서비스 게시 승인: 승인 완료/)).toBeTruthy();
+    fireEvent.click(screen.getByRole('button',{name:'게시 설정 저장'}));
+    await screen.findByText(new RegExp('서비스 게시 승인: ' + label));
+    expect(screen.queryByText('이전 사유')).toBeNull();
+    if (reason) expect(screen.getByText(reason)).toBeTruthy();
+    await waitFor(() => {
+      expect((screen.getByLabelText('기본 B2B 공급가 (원)') as HTMLInputElement).value).toBe('1200');
+      expect((screen.getByLabelText(/Neture 약국 기본 공급/) as HTMLInputElement).checked).toBe(true);
+      expect((screen.getByLabelText('KPA Society') as HTMLInputElement).checked).toBe(status !== 'cancelled');
+    });
+  });
+  it('copies only publication state from an older API with diagnostic and unrelated fields', async () => {
+    const state = { isPublic:true,serviceKeys:['kpa-society'],defaultSupplyEnabled:true,priceGeneral:1200,
+      distributionType:'PUBLIC',serviceApprovals:[{serviceKey:'kpa-society',status:'pending',reason:null}] };
+    mocks.updateDistribution.mockResolvedValue({success:true,data:{
+      ...state, name:'must not replace product name', added:['private'], removed:[],
+      addedResult:{private:true},removedResult:{private:true},sync:{autoListedCount:7},futureInternal:'private',
+      serviceApprovals:[{...state.serviceApprovals[0],futureInternal:'private approval'}],
+    }});
+    const { result } = renderHook(() => useSupplierPublication(), {
+      wrapper: ({ children }) => <MemoryRouter initialEntries={['/supplier/products/publication?offer=product-a']}>{children}</MemoryRouter>,
+    });
+    await waitFor(() => expect(result.current.pricesReady).toBe(true));
+    await act(async () => { await result.current.save(); });
+    expect(result.current.product).toEqual({...approved,...state});
+    expect(result.current.message?.error).toBe(false);
+  });
+  it.each([undefined, {}])('does not report success or lose input with incomplete save data %s', async data => {
+    mocks.updateDistribution.mockResolvedValue({success:true,data});
+    mount();
+    await waitFor(() => expect(screen.getByRole('button',{name:'게시 설정 저장'}).closest('fieldset')?.disabled).toBe(false));
+    fireEvent.change(screen.getByLabelText('기본 B2B 공급가 (원)'),{target:{value:'1000'}});
+    fireEvent.click(screen.getByRole('button',{name:'게시 설정 저장'}));
+    await screen.findByRole('alert');
+    expect((screen.getByLabelText('기본 B2B 공급가 (원)') as HTMLInputElement).value).toBe('1000');
+    expect(screen.queryByText(/게시 설정을 저장했습니다/)).toBeNull();
   });
   it('blocks unapproved products and invalid URL targets without keeping the previous editor', async () => {
     mount('/supplier/products/publication?offer=product-b');
