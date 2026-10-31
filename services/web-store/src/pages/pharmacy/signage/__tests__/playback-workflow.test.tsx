@@ -83,3 +83,16 @@ it('applies a changed saved list only on an explicit reload, never on an ended e
   await screen.findByText('Stored B'); expect(m.get).toHaveBeenCalledTimes(2);
   vi.restoreAllMocks();
 });
+
+it('plays forced-content hosted URLs without mediaType as videos and never starts an image cutoff timer', async () => {
+  let events: any; const destroy = vi.fn();
+  (window as any).YT = { Player: class { constructor(_node: unknown, options: any) { events = options.events; } playVideo() {} destroy = destroy; } };
+  m.get.mockResolvedValue({ success: true, data: { name: 'Forced', items: [{ ...snapshot, contentJson: { url: 'https://youtu.be/abcdefghijk', sourceType: 'youtube', embedId: 'abcdefghijk' } }] } });
+  render(app()); await screen.findByText('Forced');
+  fireEvent.click(screen.getByRole('button', { name: /일반 화면으로 재생/ })); await act(async () => {});
+  expect(screen.getByLabelText('제품 안내')).toBeTruthy(); expect(document.querySelector('img')).toBeNull();
+  vi.useFakeTimers(); act(() => { events.onStateChange({ data: 1 }); vi.advanceTimersByTime(60000); });
+  expect(destroy).not.toHaveBeenCalled(); expect(m.get).toHaveBeenCalledTimes(1);
+  act(() => events.onStateChange({ data: 0 })); expect(destroy).toHaveBeenCalledTimes(1);
+  cleanup(); delete (window as any).YT; vi.useRealTimers();
+});

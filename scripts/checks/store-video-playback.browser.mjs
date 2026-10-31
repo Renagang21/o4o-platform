@@ -17,7 +17,7 @@ import {MediaPickerModal} from '/packages/store-ui-core/src/components/media/Med
 window.ended=[]; document.addEventListener('ended', event=>window.ended.push(new URL(event.target.currentSrc).pathname),true);
 const mode=new URLSearchParams(location.search).get('mode');
 const props={resetKey:'manual',items:[{id:'a',type:'video',url:'/a.webm'},{id:'b',type:'video',url:'/b.webm'}]};
-const asset={id:'video',url:'/a.webm',originalName:'Pharmacy video',assetType:'video',folder:'general'};
+const asset={id:'video',url:'/a.webm',originalName:'Pharmacy video',assetType:'video',mimeType:'video/webm',storageType:'internal',gcsPath:'media/video.webm',folder:'general'};
 const api={list:async()=>({success:true,data:[asset]}),upload:async()=>({success:true,data:asset})};
 function App(){const[open,setOpen]=React.useState(true);return mode==='library'?<MediaPickerModal open={open} api={api} assetType="video" onClose={()=>setOpen(false)} onSelect={asset=>window.selected=asset.id}/>:<div style={{width:'100%',height:'80vh',background:'#000'}}><MediaSequence {...props}/></div>}
 createRoot(document.getElementById('root')).render(<App/>);`;

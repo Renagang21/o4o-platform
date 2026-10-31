@@ -31,6 +31,9 @@ export interface MediaAssetItem {
   mimeType: string;
   fileSize: number;
   assetType: string;
+  storageType?: string;
+  gcsPath?: string | null;
+  status?: string | null;
   width: number | null;
   height: number | null;
   folder: string;
@@ -47,7 +50,7 @@ export interface MediaAssetItem {
  * (서비스별 mediaApi 는 이미 이 형태와 구조적으로 호환)
  */
 export interface MediaPickerApi {
-  list(options?: { page?: number; limit?: number; assetType?: string; folder?: string }): Promise<{
+  list(options?: { page?: number; limit?: number; assetType?: string; folder?: string; storageType?: string }): Promise<{
     success: boolean; data?: MediaAssetItem[]; total?: number; error?: string;
   }>;
   upload(file: File, consent: boolean, serviceKey?: string, folder?: string): Promise<{
@@ -103,6 +106,11 @@ export interface MediaPickerModalProps {
 }
 
 type Tab = 'upload' | 'library';
+function isStoredVideo(asset: MediaAssetItem) {
+  return asset.assetType === 'video' && asset.storageType === 'internal' && !!asset.gcsPath
+    && ['video/mp4', 'video/webm'].includes(asset.mimeType) && asset.status !== 'archived';
+}
+
 type ViewMode = 'grid' | 'list';
 
 export function MediaPickerModal({
@@ -172,18 +180,19 @@ export function MediaPickerModal({
 
   const loadAssets = useCallback(async (pageNum: number, append = false, folder?: string | null) => {
     setLoadingAssets(true);
-    const opts: { page: number; limit: number; assetType: string; folder?: string } = {
+    const opts: { page: number; limit: number; assetType: string; folder?: string; storageType?: string } = {
       page: pageNum,
       limit: 20,
       assetType,
     };
     if (folder) opts.folder = folder;
+    if (assetType === 'video') opts.storageType = 'internal';
     const key = requestKey.current, request = ++listRequest.current;
     try {
       const res = await api.list(opts);
       if (key !== requestKey.current || request !== listRequest.current) return;
       if (!res.success || !res.data) throw new Error(res.error || '라이브러리를 불러오지 못했습니다.');
-      const data = assetType === 'video' ? res.data.filter(asset => asset.assetType === 'video') : res.data;
+      const data = assetType === 'video' ? res.data.filter(isStoredVideo) : res.data;
       setAssets(previous => append ? [...previous, ...data] : data);
       setTotal(res.total || 0); setHasMore(res.data.length >= 20); setLibraryError(null);
     } catch (error) {
@@ -241,7 +250,7 @@ export function MediaPickerModal({
     try {
       const res = await api.upload(file, true, undefined, uploadFolder);
       if (key !== requestKey.current) return;
-      if (!res.success || !res.data || (assetType === 'video' && res.data.assetType !== 'video'))
+      if (!res.success || !res.data || (assetType === 'video' && !isStoredVideo(res.data)))
         throw new Error(res.error || '업로드 결과를 확인하지 못했습니다. 라이브러리에서 먼저 확인해 주세요.');
       setUploadedAsset(res.data);
     } catch (error) { if (key === requestKey.current) setUploadError(error instanceof Error ? error.message : '업로드를 확인하지 못했습니다.'); }
@@ -545,6 +554,7 @@ export function MediaPickerModal({
                   <ImageIcon size={32} className="mx-auto text-slate-200 mb-2" />
                   <p className="text-sm text-slate-400">등록된 {label}이 없습니다</p>
                   <p className="text-xs text-slate-300 mt-1">새 {label}을 올리면 여기에 표시됩니다</p>
+                  {hasMore && <button type="button" onClick={handleLoadMore} disabled={loadingAssets} className="min-h-11 text-sm text-blue-600">다음 자료 확인</button>}
                 </div>
               ) : viewMode === 'grid' ? (
                 <>

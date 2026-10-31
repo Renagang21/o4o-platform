@@ -22,13 +22,13 @@
 |---|---|
 | 의존성 설치 | `pnpm install --frozen-lockfile --offline` PASS |
 | 공통 의존 패키지 빌드 | `pnpm run build:packages` PASS |
-| Store 전체 회귀 | 87 suites / 914 tests PASS; 이후 추가한 목록 저장·재열기 포함 대상 8 suites / 102 tests PASS |
+| Store 전체 회귀 | 87 suites / 914 tests PASS; 이후 추가한 목록 저장·재열기 포함 대상 8 suites / 103 tests PASS |
 | API 주변 회귀 | signage / store-tablet / screen-set / media-library / stored-video: 20 suites, 329 PASS, 선택적 DB 등 12 SKIP |
 | 격리 PostgreSQL 실제 검증 | `MEDIA_V2_TEST_PORT=55439`로 관련 6 suites / 97 tests PASS. 기존 migration을 일회용 로컬 DB에 적용; 실제 row lock 및 참조/삭제 경합 확인 |
 | Chromium 실제 코덱 | `node scripts/checks/store-video-playback.browser.mjs` PASS. 1365px/390px, 합성 WebM 실제 ended A→B→A, 개별 loop 없음, 보관 영상 선택 |
 | 외부 SDK 계약 | 합성 YouTube SDK ended/중복/cleanup, Vimeo origin+window 검증, autoplay 제한·로드 오류 테스트 PASS |
-| 공통 소비처 | literal consumer 조사 + Store/Neture/약국업무/API/Admin 타입 검사. 실제 번들 결과는 아래 PR 검증에 기록 |
-| 코드·문서 가드 | 변경 경로 eslint 오류 0, diff whitespace 및 문서 민감정보 검사 수행 |
+| 공통 소비처 | literal consumer 조사 + Store/Neture/약국업무/API/Admin 타입 검사. Store/Neture/약국업무 production 번들 PASS |
+| 코드·문서 가드 | 변경 경로 eslint 오류 0(기존 store-tablet 미사용 경고 6건), diff whitespace·문서 민감정보 검사 PASS |
 
 DB 검증은 이 작업 전용 Docker PostgreSQL에서만 수행하며 운영 DB·실계정·실사용자 파일을 사용하지 않는다. 브라우저 테스트는 로컬 합성 영상과 API fixture만 사용한다. YouTube/Vimeo 실서비스 품질·채널 권한·실제 업로드를 검증한 것으로 간주하지 않는다.
 
@@ -41,3 +41,10 @@ DB 검증은 이 작업 전용 Docker PostgreSQL에서만 수행하며 운영 DB
 - 실제 약국 TV·태블릿의 장시간 재생, 전원/브라우저 복구·네트워크 상태·YouTube 퍼가기/영상 공개 권한은 사용자 결정대로 개발 완료 후 현장 점검 대상이다.
 - main 병합·배포·외부 계정 업로드·운영 변경은 이 개발 작업에서 수행하지 않는다.
 - PR/HEAD·CI·Codex와 소비 서비스 최종 빌드 결과를 확인하고 병합 직전 상태로 인계한다.
+
+## PR 리뷰 보완
+
+- PR: https://github.com/Renagang21/o4o-platform/pull/901
+- 초기 Codex P1: 강제 편성 payload의 mediaType 생략을 이미지 기본값보다 앞서 hosted URL로 판별하고, 영상에는 이미지 타이머를 적용하지 않도록 수정했다. 실제 forced payload 형식과 60초 경과·종료 이벤트 회귀 테스트 PASS.
+- 초기 Codex P2: 영상 picker는 기존 `storageType=internal` 필터를 Store API까지 전달하고, 관리 GCS 파일·MP4/WebM·비보관(archived 아님) 조건으로 선택 결과를 제한한다. 외부 영상 링크/지원하지 않는 형식은 보관 파일로 표시하지 않는다. 필터로 빈 페이지가 되더라도 다음 자료 확인을 제공한다. 기본 image 모드 계약은 유지한다.
+- CI/Codex 최종 상태는 PR의 최종 HEAD에서 확인한다. main merge·배포는 실행하지 않는다.

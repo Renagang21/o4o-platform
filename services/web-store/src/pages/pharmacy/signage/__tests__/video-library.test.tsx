@@ -1,7 +1,7 @@
 import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { MediaPickerModal, type MediaAssetItem, type MediaPickerApi } from '@o4o/store-ui-core';
-const asset = { id: 'video-one', url: '/file.mp4', originalName: 'Pharmacy video', assetType: 'video', folder: 'general' } as MediaAssetItem;
+const asset = { id: 'video-one', url: '/file.mp4', originalName: 'Pharmacy video', assetType: 'video', mimeType: 'video/mp4', storageType: 'internal', gcsPath: 'media/video.mp4', folder: 'general' } as MediaAssetItem;
 let api: MediaPickerApi;
 beforeEach(() => {
   api = { list: vi.fn().mockResolvedValue({ success: true, data: [asset] }), upload: vi.fn().mockResolvedValue({ success: true, data: asset }), moveToFolder: vi.fn(), deleteAsset: vi.fn() };
@@ -9,10 +9,10 @@ beforeEach(() => {
 });
 afterEach(cleanup);
 it('filters the library to videos and selects an existing retained asset', async () => {
-  vi.mocked(api.list).mockResolvedValue({ success: true, data: [asset, { ...asset, id: 'image', assetType: 'image', originalName: 'Image' }] });
+  vi.mocked(api.list).mockResolvedValue({ success: true, data: [asset, { ...asset, id: 'image', assetType: 'image', originalName: 'Image' }, { ...asset, id: 'external', storageType: 'external', mimeType: 'video/external', gcsPath: null, originalName: 'External link' }, { ...asset, id: 'unsupported', mimeType: 'video/quicktime', originalName: 'Unsupported file' }] });
   const select = vi.fn(); render(<MediaPickerModal open api={api} assetType="video" onSelect={select} onClose={vi.fn()} />);
   fireEvent.click(screen.getByRole('button', { name: /라이브러리/ })); await screen.findByText('Pharmacy video');
-  expect(api.list).toHaveBeenCalledWith(expect.objectContaining({ assetType: 'video' })); expect(screen.queryByText('Image')).toBeNull();
+  expect(api.list).toHaveBeenCalledWith(expect.objectContaining({ assetType: 'video', storageType: 'internal' })); expect(screen.queryByText('Image')).toBeNull(); expect(screen.queryByText('External link')).toBeNull(); expect(screen.queryByText('Unsupported file')).toBeNull();
   fireEvent.click(screen.getByText('Pharmacy video')); fireEvent.click(screen.getByRole('button', { name: '선택' })); expect(select).toHaveBeenCalledWith(asset);
 });
 it('requires the existing shared-library consent, prevents double upload, and retains the completed result', async () => {

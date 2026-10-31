@@ -56,10 +56,11 @@ interface PlaybackData {
 // ── Store item → PlaybackItem adapter ───────────────────────────────────────
 function storeItemToPlaybackItem(item: StorePlaylistActiveItem): PlaybackItem {
   const cj = item.contentJson || {};
-  const mediaType = (cj.mediaType as string)
-    || ((cj.mimeType as string)?.startsWith('video') ? 'video' : 'image');
   const url = (cj.sourceUrl as string) || (cj.fileUrl as string)
     || (cj.url as string) || (cj.imageUrl as string) || '';
+  // Forced-content payloads carry a hosted URL without mediaType/mimeType.
+  const mediaType = hostedVideo(url) ? 'video' : (cj.mediaType as string)
+    || ((cj.mimeType as string)?.startsWith('video') ? 'video' : 'image');
   return {
     id: item.id,
     displayOrder: item.displayOrder,
@@ -82,7 +83,7 @@ function MediaRenderer({ item, onEnded, onError }: { item: PlaybackItem; onEnded
   const error = useRef(onError); error.current = onError;
   useEffect(() => { if (!supported) error.current('재생할 수 없는 자료입니다.'); }, [supported, item.id]);
   if (!media || !supported) return <p className="text-white">재생할 자료를 확인해 주세요.</p>;
-  if (media.mediaType === 'image') return <img src={url} alt={media.name} className="h-full w-full object-contain" onError={() => onError('이미지를 불러오지 못했습니다.')} />;
+  if (media.mediaType === 'image' && !provider) return <img src={url} alt={media.name} className="h-full w-full object-contain" onError={() => onError('이미지를 불러오지 못했습니다.')} />;
   return <VideoPlayback url={url} kind={provider ?? 'video'} title={media.name} onEnded={onEnded} onError={onError} />;
 }
 
@@ -197,7 +198,7 @@ function PlaybackSession() {
   const currentItem = items[currentIdx] ?? null;
   // Images keep their display duration; videos advance only on their ended event.
   useEffect(() => {
-    if (phase !== 'playing' || currentItem?.media?.mediaType !== 'image' || failedCurrent) return;
+    if (phase !== 'playing' || currentItem?.media?.mediaType !== 'image' || hostedVideo(currentItem.media.url) || failedCurrent) return;
     const duration = ((currentItem.displayDuration ?? playbackData?.defaultDuration) || 10) * 1000;
     const timer = setTimeout(() => next(token), duration);
     return () => clearTimeout(timer);
