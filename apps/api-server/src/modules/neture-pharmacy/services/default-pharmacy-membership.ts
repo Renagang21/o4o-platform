@@ -1,5 +1,5 @@
 import type { EntityManager } from 'typeorm';
-import { NeturePharmacyError } from '../constants.js';
+import { NeturePharmacyError, rowsOf } from '../constants.js';
 import { recordOperation } from '../../../services/operations/operation-audit.js';
 
 /** The caller must hold the approved pharmacy ledger lock in the same transaction.
@@ -33,12 +33,12 @@ export async function connectDefaultPharmacyMembership(
     // Existing rejection, suspension and withdrawal remain authoritative.
     if (existing.status !== 'pending') return existing;
     previousStatus = existing.status;
-    [result] = await manager.query(
+    [result] = rowsOf(await manager.query(
       `UPDATE semi_franchise_memberships SET status='active',decided_by=$2,decided_at=NOW(),
        reason='약국 승인에 따른 Pharmacy 기본 회원 연결',updated_at=NOW()
        WHERE id=$1 RETURNING id,status`,
       [existing.id, input.approvedBy],
-    );
+    ));
   }
   await recordOperation(manager, 'neture', input.actorId, 'pharmacy.default_membership.connect', {
     organizationId: input.organizationId, businessId: business.id, membershipId: result.id,

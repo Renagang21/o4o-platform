@@ -1,6 +1,6 @@
 # Pharmacy 약국 승인·기본 회원 자동 연결
 
-> **상태**: ACTIVE
+> **상태**: ACTIVE — 개발 인계, main 통합·운영 적용 미실행. 최신 CI·리뷰 상태는 PR을 따른다.
 > **작성일**: 2026-10-31 (Asia/Seoul)
 > **사용자 지시**: 약국 경영자 승인 시 pharmacy.neture.co.kr 회원 자동 연결. TODO → 보완 → 개발 → main 병합 전까지.
 
@@ -18,7 +18,7 @@ Pharmacy 기본 사업(`pharmacy`)만 약국 승인과 자동 연결한다. Mega
 - [x] 기존 승인 약국 누락의 명시적 점검·보완 경로 준비
 - [x] 중복 신청 안내와 회원 화면을 자동 연결 정책에 맞춤
 - [x] 관련 API·UI·실DB 검증 및 필요한 브라우저 검증
-- [ ] CHECK·정본·범위 검사·commit/push·PR/CI·리뷰 후 병합 전 인계
+- [x] CHECK·정본·범위 검사·commit/push·PR 작성, 지적 보완·회귀 검증
 
 ## 조사에서 확인한 문제
 
@@ -41,3 +41,5 @@ Pharmacy 기본 사업(`pharmacy`)만 약국 승인과 자동 연결한다. Mega
 Store 신청 안내·사업 목록, Pharmacy 참여 안내·접근 안내를 수정했다. 기존 승인 약국은 선택 약국 header를 유지한 ‘기본 회원 연결 확인’으로 누락을 연결한다. 정지·반려·탈퇴에는 자동 연결 버튼을 제공하지 않으며 API도 자동 복원을 거절한다. 독립 사업은 기존 조건·동의·신청을 유지한다.
 
 검증·실행 실패와 보완·미확인 사항은 [CHECK](../checks/CHECK-O4O-PHARMACY-APPROVAL-AUTO-MEMBERSHIP-V1.md)에 기록한다. **DEPLOYMENT=MANUAL/GATED (권한·가입 처리 변경)**이며 이후 통합 담당이 API 호환성 확보 후 Pharmacy Business·Store를 배포해야 한다. 신규 migration은 없다. 이 작업은 운영 데이터 보완이나 배포를 실행하지 않는다.
+
+[PR #903](https://github.com/Renagang21/o4o-platform/pull/903)에서 동일 branch로 CI·리뷰를 추적한다. 자동 리뷰의 UPDATE 반환 형식 지적을 `rowsOf` 정규화로 보완하고 기존 pending 연결·감사 ID를 실제 PostgreSQL에서 추가 검증했다. 인계 시의 required CI·최신 HEAD 리뷰 판정은 PR Checks/리뷰가 실행 증적이며 이 TODO의 완료를 병합·배포 완료로 해석하지 않는다.

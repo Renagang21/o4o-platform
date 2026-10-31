@@ -83,6 +83,13 @@ suite('default Pharmacy enrollment with real approval transactions', () => {
     expect((await db.query("SELECT count(*)::int AS n FROM action_logs WHERE action_key='pharmacy.default_membership.connect' AND meta->>'organizationId'=$1", [p.organization]))[0].n).toBe(1);
     expect((await db.query("SELECT count(*)::int AS n FROM action_logs WHERE action_key='service:application_policy' AND user_id=$1", [owner]))[0].n).toBe(0);
   });
+  it('connects a previously pending membership for an approved pharmacy and audits its actual membership ID', async () => {
+    const p = await pharmacy('active');
+    const [prior] = await db.query("INSERT INTO semi_franchise_memberships(semi_franchise_id,organization_id,status,applied_by) VALUES($1,$2,'pending',$3) RETURNING id", [business, p.organization, owner]);
+    expect(await participation.apply(p.organization, owner, 'pharmacy')).toMatchObject({ id: prior.id, status: 'active' });
+    const [audit] = await db.query("SELECT meta->>'membershipId' AS id FROM action_logs WHERE action_key='pharmacy.default_membership.connect' AND meta->>'organizationId'=$1", [p.organization]);
+    expect(audit.id).toBe(prior.id);
+  });
   it.each(['megapharm', 'carepharm'])('does not use automatic Pharmacy enrollment for %s', async key => {
     const p = await pharmacy('active');
     const id = randomUUID(), organization = randomUUID();
@@ -103,9 +110,10 @@ suite('default Pharmacy enrollment with real approval transactions', () => {
     const p = await pharmacy();
     await db.query("INSERT INTO semi_franchise_memberships(semi_franchise_id,organization_id,status,applied_by,reason) VALUES($1,$2,$3,$4,'prior decision')", [business, p.organization, state, owner]);
     await approval.decide(reviewer, p.id, 'approve');
-    const [row] = await db.query('SELECT status,reason FROM semi_franchise_memberships WHERE organization_id=$1', [p.organization]);
+    const [row] = await db.query('SELECT id,status,reason FROM semi_franchise_memberships WHERE organization_id=$1', [p.organization]);
     expect(row.status).toBe(state === 'pending' ? 'active' : state);
     if (state !== 'pending') expect(row.reason).toBe('prior decision');
+    else expect((await db.query("SELECT meta->>'membershipId' AS id FROM action_logs WHERE action_key='pharmacy.default_membership.connect' AND meta->>'organizationId'=$1", [p.organization]))[0].id).toBe(row.id);
     if (['rejected', 'suspended', 'terminated'].includes(state))
       await expect(participation.apply(p.organization, owner, 'pharmacy')).rejects.toMatchObject({ code: 'PHARMACY_MEMBERSHIP_RESTRICTED' });
   });
