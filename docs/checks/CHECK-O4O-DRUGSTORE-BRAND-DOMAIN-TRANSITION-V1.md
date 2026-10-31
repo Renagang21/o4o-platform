@@ -1,6 +1,6 @@
 # 드럭스토어형 약국 전환 검증
 
-> **상태**: IN_PROGRESS — 로컬 검증 완료 / PR CI·리뷰 대기 / main 병합·운영 적용 미실행
+> **상태**: COMPLETED — 구현·로컬 검증 범위 / main 병합·운영 적용 미실행
 > **작성일**: 2026-10-31
 > **작업**: [WO](../work-orders/WO-O4O-DRUGSTORE-BRAND-DOMAIN-TRANSITION-V1.md)
 
@@ -14,6 +14,7 @@
 - 공통 공간 UI: 24 files / 222 tests PASS.
 - 운영자 공통 UI: 35 files / 233 tests PASS.
 - Store 관련 UI: 2 files / 24 tests PASS.
+- Admin 운영자 지정·역할·사업 원장: 4 files / 45 tests PASS.
 - 공통 서비스 전환: 1 file / 21 tests PASS.
 - API 기존 인증·호스트·운영·health와 실제 PostgreSQL 전환: 6 suites / 83 tests PASS. 추가 순수 전환 테스트는 별도 기록하며 합산 중복을 주의한다.
 - canonical PostgreSQL baseline과 incremental 53개 순차 적용 PASS. 전환 후 실제 schema fingerprint `aab4a2e779cbdcfe5948dbbcd2e71539d365ac05cad42902066a018ca105ca82` / 7410 lines. 사업 key 설명 comment 변경 포함.
@@ -23,6 +24,8 @@
 - PC 1440px·모바일 390px Pharmacy/드럭스토어형 약국 4개 합성 브라우저 흐름 PASS: 선택 약국 scope, 신청·승인 대기, 약국 전환·탈퇴, query/hash, pageerror 0·가로 넘침 0. 운영 로그인 검증은 아니다.
 - API type-check, Pharmacy·Neture·Store·Admin production build PASS.
 - 테스트는 일회성 로컬 PostgreSQL과 합성 계정/응답을 사용한다. 운영 원장 변경·실제 신규 승인·동의 기록 생성 없음.
+
+PR 검증 결과는 [PR #911](https://github.com/Renagang21/o4o-platform/pull/911)의 최종 HEAD checks/review를 기준으로 한다. 초기 구현 HEAD `59b4d2b585`의 Codex 리뷰는 지적 없이 완료했다.
 
 ## 운영 확인과 배포
 
