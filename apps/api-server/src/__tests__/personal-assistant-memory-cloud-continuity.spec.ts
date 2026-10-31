@@ -345,12 +345,12 @@ const DONE = { assessment: 'progress', action: { kind: 'takeover', reason: 'goal
 
 interface Node { contextReply: Record<string, unknown>; patterns: Record<string, unknown>[]; contextSaves: unknown[]; ledger: { base: string; args: Record<string, unknown> }[] }
 
-async function drive(db: LocalAgentDb, script: Script, node: Node, max = 60) {
+async function drive(db: LocalAgentDb, script: Script, node: Node, max = 60, isFinished: () => boolean = () => false) {
   const seen: { base: string; args: Record<string, unknown> }[] = [];
   const cursors: Record<string, number> = {};
   let k = 0;
   while (k < max) {
-    for (let i = 0; i < 200 && db.commands.length <= k; i += 1) await new Promise((r) => setTimeout(r, 5));
+    for (let i = 0; i < 200 && db.commands.length <= k && !isFinished(); i += 1) await new Promise((r) => setTimeout(r, 5));
     const cmd = db.commands[k];
     if (!cmd) break;
     k += 1;
@@ -423,7 +423,10 @@ async function runOn(
   const node: Node = { contextReply: { found: false }, patterns: [], contextSaves: [], ledger: [], ...opts.node };
   const ctx: VerifiedToolContext = { userId: 'user-1', workspace: 'home', localAgentStatus: 'connected', localDeviceId: deviceId };
   const input = { request, ...(opts.runId ? { runId: opts.runId, targetHint: SITE } : {}), ...(opts.intent ? { intent: opts.intent } : {}) };
-  const [result, seen] = await Promise.all([runWorkAgent(db.dataSource, ctx, input, planner), drive(db, script, node)]);
+  // Stop idle polling only after the producer settles; queued commands still drain.
+  let finished = false;
+  const work = runWorkAgent(db.dataSource, ctx, input, planner).finally(() => { finished = true; });
+  const [result, seen] = await Promise.all([work, drive(db, script, node, 60, () => finished)]);
   return { result, seen, node };
 }
 

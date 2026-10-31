@@ -53,12 +53,12 @@ type Outcome = { status: 'success' | 'failed' | 'denied'; errorCode?: string; da
 /** 명령 base 별 응답 큐. 같은 base 가 여러 번 오면 순서대로, 다 쓰면 마지막을 반복한다. */
 type Script = Record<string, Outcome[]>;
 
-async function drive(db: LocalAgentDb, script: Script, max = 40) {
+async function drive(db: LocalAgentDb, script: Script, max = 40, isFinished: () => boolean = () => false) {
   const seen: { base: string; args: Record<string, unknown> }[] = [];
   const cursors: Record<string, number> = {};
   let k = 0;
   while (k < max) {
-    for (let i = 0; i < 200 && db.commands.length <= k; i += 1) await new Promise((r) => setTimeout(r, 5));
+    for (let i = 0; i < 200 && db.commands.length <= k && !isFinished(); i += 1) await new Promise((r) => setTimeout(r, 5));
     const cmd = db.commands[k];
     if (!cmd) break;
     k += 1;
@@ -77,7 +77,10 @@ async function run(entryPointId: string, input: Record<string, unknown>, script:
   const db = makeDb();
   await pairAndRegister(db);
   await connected(db);
-  const [result, seen] = await Promise.all([executeAiTool(db.dataSource, TOOL, { entryPointId, input }, ctx()), drive(db, script)]);
+  // Stop idle polling only after the producer settles; queued commands still drain.
+  let finished = false;
+  const work = executeAiTool(db.dataSource, TOOL, { entryPointId, input }, ctx()).finally(() => { finished = true; });
+  const [result, seen] = await Promise.all([work, drive(db, script, 40, () => finished)]);
   return { result, seen, data: (result.data ?? {}) as Record<string, unknown>, db };
 }
 const render = (data: Record<string, unknown>) => renderToolContext({ ok: true, tool: TOOL, data }) ?? '';

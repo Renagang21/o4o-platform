@@ -50,16 +50,16 @@ const FIXED_REPLIES: ReadonlyArray<[match: (base: string) => boolean, data: (arg
 
 const NOT_FOUND: DomOutcome = { status: 'failed', errorCode: 'DOM_ELEMENT_NOT_FOUND' };
 
-async function nextCommand(db: LocalAgentDb, index: number) {
-  for (let waited = 0; waited < 400 && db.commands.length <= index; waited += 1) await new Promise((r) => setTimeout(r, 5));
+async function nextCommand(db: LocalAgentDb, index: number, isFinished: () => boolean) {
+  for (let waited = 0; waited < 400 && db.commands.length <= index && !isFinished(); waited += 1) await new Promise((r) => setTimeout(r, 5));
   return db.commands[index];
 }
 
 /** 노드 역할 — 쌓이는 명령에 차례로 답한다. 같은 동작이 반복되면 각본의 다음 결과(끝나면 마지막 결과)를 낸다. */
-export async function answerNodeCommands(db: LocalAgentDb, script: DomScript, limit = 80): Promise<void> {
+export async function answerNodeCommands(db: LocalAgentDb, script: DomScript, limit = 80, isFinished: () => boolean = () => false): Promise<void> {
   const used = new Map<string, number>();
   for (let index = 0; index < limit; index += 1) {
-    const cmd = await nextCommand(db, index);
+    const cmd = await nextCommand(db, index, isFinished);
     if (!cmd) return;
     const base = parseLocalAction(String(cmd.action)).base.replace('local.browser.dom.', '');
     const fixed = FIXED_REPLIES.find(([match]) => match(base));
@@ -96,9 +96,13 @@ export async function runOnHealthkr(planner: WorkPlanner, script: DomScript, int
   const db = makeDb();
   await pairAndRegister(db);
   await connected(db);
+  // Stop idle polling only after the producer settles; queued commands still drain.
+  let finished = false;
+  const work = runWorkAgent(db.dataSource, userContext(), { request: HEALTHKR.request, ...(intent ? { intent } : {}), ...(judge ? { judge } : {}) }, planner)
+    .finally(() => { finished = true; });
   const [result] = await Promise.all([
-    runWorkAgent(db.dataSource, userContext(), { request: HEALTHKR.request, ...(intent ? { intent } : {}), ...(judge ? { judge } : {}) }, planner),
-    answerNodeCommands(db, script),
+    work,
+    answerNodeCommands(db, script, 80, () => finished),
   ]);
   return result;
 }

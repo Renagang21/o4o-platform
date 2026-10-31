@@ -58,12 +58,12 @@ const ctx = (over: Partial<VerifiedToolContext> = {}): VerifiedToolContext => ({
 type Outcome = { status: 'success' | 'failed' | 'denied'; errorCode?: string; data?: unknown };
 type Script = Record<string, Outcome[]>;
 
-async function drive(db: LocalAgentDb, script: Script, max = 40) {
+async function drive(db: LocalAgentDb, script: Script, max = 40, isFinished: () => boolean = () => false) {
   const seen: { base: string; args: Record<string, unknown> }[] = [];
   const cursors: Record<string, number> = {};
   let k = 0;
   while (k < max) {
-    for (let i = 0; i < 200 && db.commands.length <= k; i += 1) await new Promise((r) => setTimeout(r, 5));
+    for (let i = 0; i < 200 && db.commands.length <= k && !isFinished(); i += 1) await new Promise((r) => setTimeout(r, 5));
     const cmd = db.commands[k];
     if (!cmd) break;
     k += 1;
@@ -111,7 +111,10 @@ async function run(request: string, planner: WorkPlanner, script: Script, extra:
   const db = makeDb();
   await pairAndRegister(db);
   await connected(db);
-  const [result, seen] = await Promise.all([runWorkAgent(db.dataSource, ctx(), { request, ...extra }, planner), drive(db, script)]);
+  // Stop idle polling only after the producer settles; queued commands still drain.
+  let finished = false;
+  const work = runWorkAgent(db.dataSource, ctx(), { request, ...extra }, planner).finally(() => { finished = true; });
+  const [result, seen] = await Promise.all([work, drive(db, script, 40, () => finished)]);
   return { result, seen, db };
 }
 
