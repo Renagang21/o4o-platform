@@ -16,7 +16,7 @@
 | 항목 | 결과 |
 |---|---|
 | 빈 격리 PostgreSQL 15 canonical baseline + incremental | 52 prefixes fingerprint PASS |
-| API 도메인/원장 회귀 | 30 suites / 263 tests PASS, 별도 DB 환경 미설정 14 suites / 204 tests skipped. 전용 실DB 추가 확장 전 결과이며 아래 13 tests를 별도로 재검증 |
+| API 도메인/원장 회귀 | 30 suites / 263 tests PASS, 별도 DB 환경 미설정 14 suites / 204 tests skipped. 전용 실DB 추가 확장 전 결과이며 아래 14 tests를 별도로 재검증 |
 | 전용 실DB 승인·가입 검증 최종 | 14 tests PASS — 동시 실행/멱등, 승인과 연결 원자성, 기본 사업 닫힘 시 rollback, 현행 자격·소속, 기존 제재/탈퇴, 약국 정지·재활성화, 실제 회원 업무 접근, 타 사업 미자동가입, 기존 pending 복구와 감사 ID |
 | API type-check | PASS |
 | 약국 앱 전체 UI | 23 files / 172 tests PASS |
