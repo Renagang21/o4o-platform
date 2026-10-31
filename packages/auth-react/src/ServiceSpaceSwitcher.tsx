@@ -247,7 +247,7 @@ function Switcher({
                     }
                   : {
                       ...item,
-                      serviceKey: available(item) ? item.serviceKey : undefined,
+                      serviceKey: item.serviceKey,
                       workspace: available(item) ? item.workspace : undefined,
                     },
               )

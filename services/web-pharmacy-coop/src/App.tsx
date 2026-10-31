@@ -1,3 +1,6 @@
+import { safeServiceReturnPath } from '@o4o/auth-utils';
+import { GlobalHeader } from '@o4o/ui';
+import { ServiceFooter } from '@o4o/auth-react';
 import {
   CooperativeNotificationLink,
   CooperativeNotifications,
@@ -54,6 +57,7 @@ import {
   useOutletContext,
   useParams,
   useSearchParams,
+  useNavigate,
 } from "react-router-dom";
 import {
   anonymousSession,
@@ -71,6 +75,9 @@ interface AppContext {
   session: SessionSnapshot;
   preview: boolean;
   onSessionChanged?: () => void;
+  headerHome?: React.ReactNode;
+  headerAccount?: React.ReactNode;
+  loginContent?: React.ReactNode;
 }
 const Context = createContext<AppContext>({
   cooperatives: [],
@@ -107,7 +114,11 @@ export function App({
   cooperatives,
   session = anonymousSession,
   preview = false,
+  headerHome, headerAccount, loginContent,
 }: {
+  headerHome?: React.ReactNode;
+  headerAccount?: React.ReactNode;
+  loginContent?: React.ReactNode;
   onSessionChanged?: () => void;
   businessClient?: PharmacyManagementClient;
   cooperatives: readonly Cooperative[];
@@ -120,15 +131,18 @@ export function App({
       session,
       preview,
       businessClient,
-      onSessionChanged,
+      onSessionChanged, headerHome, headerAccount, loginContent,
     }),
-    [cooperatives, session, preview, businessClient, onSessionChanged],
+    [cooperatives, session, preview, businessClient, onSessionChanged, headerHome, headerAccount, loginContent],
   );
   return (
     <Context.Provider value={context}>
       <Routes>
         <Route element={<Layout />}>
           <Route index element={<FederationHome />} />
+          <Route path="login" element={loginContent ?? <p>실제 계정 연결 후 로그인할 수 있습니다.</p>} />
+          <Route path="about/terms" element={<FederationPolicy documentType="terms" />} />
+          <Route path="about/privacy" element={<FederationPolicy documentType="privacy" />} />
           <Route path="cooperatives" element={<Directory />} />
           <Route path="cooperatives/mine" element={<PersonalSpace />} />
           <Route
@@ -195,7 +209,8 @@ export function App({
 }
 
 function Layout() {
-  const { preview, session, businessClient } = useContext(Context);
+  const { preview, session, businessClient, headerHome, headerAccount } = useContext(Context);
+  const navigate = useNavigate();
   const location = useLocation();
   useEffect(() => {
     // Explicit anchors are restored by their page; do not reset them afterwards.
@@ -211,60 +226,27 @@ function Layout() {
           약국의 협력, 조합의 자율, 함께 만드는 연결
         </div>
       </div>
-      <header className="site-header">
-        <div className="container header-row">
-          <SiteLink to="/" className="brand">
-            <span className="brand-mark" aria-hidden="true">
-              ＋
-            </span>
-            <span>
-              약국 협동조합<span className="brand-sub">연합회</span>
-            </span>
-          </SiteLink>
-          <nav aria-label="연합회 메뉴">
-            <SiteLink to="/">연합회 홈</SiteLink>
-            <SiteLink to="/cooperatives">소속 협동조합</SiteLink>
-            <SiteLink to="/about">연합회 소개</SiteLink>
-            <SiteLink to="/contact">문의하기</SiteLink>
-            {session.userId && (
-              <>
-                <SiteLink to="/cooperatives/mine">내 협동조합</SiteLink>
-                <SiteLink to="/cooperatives/updates">내 처리 소식</SiteLink>
-                {businessClient && !preview && (
-                  <CooperativeNotificationLink
-                    key={session.userId}
-                    client={businessClient}
-                  />
-                )}
-              </>
-            )}
-            {canManageFederation(session) && (
-              <>
-                <SiteLink to="/operator">연합회 운영</SiteLink>
-                {businessClient && (
-                  <OperatorInboxLink
-                    key={session.userId}
-                    client={businessClient}
-                    endpoint="/operator-inbox/service/pharmcoop"
-                    href="/operator/inbox"
-                  />
-                )}
-              </>
-            )}
-          </nav>
-          <span className="account-status">
-            {session.userId ? (
-              "로그인됨"
-            ) : (
-              <>
-                <span>로그인 후 조합 이용</span>
-                {" · "}
-                <a href="https://neture.co.kr/signup">회원가입</a>
-              </>
-            )}
-          </span>
-        </div>
-      </header>
+      <GlobalHeader
+        brand={{ name: '약국 협동조합 연합회', icon: '＋', href: '/' }}
+        publicNav={[
+          { label: '연합회 홈', href: '/' }, { label: '소속 협동조합', href: '/cooperatives' },
+          { label: '연합회 소개', href: '/about' }, { label: '문의하기', href: '/contact' },
+        ]}
+        contextualNav={[
+          ...(session.userId ? [{ label: '내 협동조합', href: '/cooperatives/mine' }, { label: '내 처리 소식', href: '/cooperatives/updates' }] : []),
+          ...(canManageFederation(session) ? [{ label: '연합회 운영', href: '/operator' }] : []),
+        ]}
+        user={session.userId ? { displayName: '회원', email: '' } : null}
+        onLogin={() => navigate(`/login?returnTo=${encodeURIComponent(safeServiceReturnPath(location.pathname + location.search + location.hash) ?? "/cooperatives/mine")}`)}
+        onRegister={() => window.location.assign('https://neture.co.kr/signup')}
+        homeSlot={headerHome}
+        accountSlot={headerAccount}
+        showMobileUserMenu={false}
+        utilitySlot={session.userId && businessClient && !preview ? <>
+          <CooperativeNotificationLink key={`notifications:${session.userId}`} client={businessClient} />
+          {canManageFederation(session) && <OperatorInboxLink key={`inbox:${session.userId}`} client={businessClient} endpoint="/operator-inbox/service/pharmcoop" href="/operator/inbox" />}
+        </> : null}
+      />
       {preview && (
         <div role="status" className="preview-banner">
           구조 미리보기 · 예시 조합입니다. 가입·승인·게시물은 저장되지 않습니다.
@@ -273,17 +255,33 @@ function Layout() {
       <main id="main" className="container main">
         <Outlet />
       </main>
-      <footer className="site-footer">
-        <div className="container footer-row">
-          <div>
-            <strong>약국 협동조합 연합회</strong>
-            <p>각 조합의 자율적인 운영을 연결합니다.</p>
-          </div>
-          <span>조합의 자율적인 가입·운영을 지원합니다.</span>
-        </div>
-      </footer>
+      <ServiceFooter brand="약국 협동조합 연합회" copyright={null} links={<>
+        <SiteLink to="/contact">문의하기</SiteLink><SiteLink to="/about/terms">이용약관</SiteLink><SiteLink to="/about/privacy">개인정보처리방침</SiteLink>
+      </>}><FederationLegal /></ServiceFooter>
     </>
   );
+}
+
+function LoginLink() {
+  const location = useLocation();
+  return <Link to={`/login?returnTo=${encodeURIComponent(safeServiceReturnPath(location.pathname + location.search + location.hash) ?? "/cooperatives/mine")}`}>로그인</Link>;
+}
+function FederationLegal() {
+  const { businessClient, preview } = useContext(Context);
+  const loadProfile = useCallback(async () => {
+    if (!businessClient || preview) return null;
+    return (await businessClient.get('/neture/businesses/pharmcoop/legal/footer-legal')).data.data;
+  }, [businessClient, preview]);
+  return <PublicLegalFooterInfo serviceKey="pharmcoop" loadProfile={loadProfile} />;
+}
+function FederationPolicy({ documentType }: { documentType: 'terms' | 'privacy' }) {
+  const { businessClient, preview } = useContext(Context);
+  const loadPolicy = useCallback(async () => {
+    if (!businessClient || preview) return null;
+    try { return (await businessClient.get(`/neture/businesses/pharmcoop/legal/policies/${documentType}`)).data.data; }
+    catch (error) { if ((error as { response?: { status?: number } }).response?.status === 404) return null; throw error; }
+  }, [businessClient, preview, documentType]);
+  return <PolicyDocumentViewer serviceKey="pharmcoop" documentType={documentType} heading={documentType === 'terms' ? '이용약관' : '개인정보처리방침'} loadPolicy={loadPolicy} />;
 }
 
 function PersonalSpace({ updates = false }: { updates?: boolean }) {
@@ -293,7 +291,7 @@ function PersonalSpace({ updates = false }: { updates?: boolean }) {
       <section className="section">
         <h1>{updates ? "내 처리 소식" : "내 협동조합"}</h1>
         <p>로그인 후 확인할 수 있습니다.</p>
-        <Link to="/login">로그인</Link>
+        <LoginLink />
       </section>
     );
   if (!businessClient || preview)
@@ -592,7 +590,8 @@ function CooperativeLegal({ cooperative }: { cooperative: Cooperative }) {
     ).data.data;
   }, [businessClient, cooperative.businessKey, preview]);
   return (
-    <aside className="section">
+    <aside className="section" aria-label={`${cooperative.name} 이용 안내`}>
+      <strong>{cooperative.name} 이용 안내</strong><br />
       <SiteLink to={`/${cooperative.slug}/policy`}>이용약관</SiteLink>
       {" · "}
       <SiteLink to={`/${cooperative.slug}/privacy`}>개인정보처리방침</SiteLink>

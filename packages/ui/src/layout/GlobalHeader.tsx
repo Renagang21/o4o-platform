@@ -286,7 +286,7 @@ export function GlobalHeader({
             {isAuthenticated && utilitySlot}
 
             {/* UserArea */}
-            {isAuthenticated && user ? accountSlot ?? (
+            {isAuthenticated && user ? accountSlot == null && (
               <div className="relative" ref={userMenuRef}>
                 <button
                   onClick={() => setUserMenuOpen(!userMenuOpen)}
@@ -380,6 +380,9 @@ export function GlobalHeader({
               </div>
             )}
           </div>
+
+          {/* The service account menu is a single shared control on desktop and mobile. */}
+          {isAuthenticated && user && accountSlot}
 
           {/* ── Mobile Menu Toggle ── */}
           <button

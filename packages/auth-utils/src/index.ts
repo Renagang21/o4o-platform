@@ -39,3 +39,5 @@ export { PUBLIC_DEMO_ACCOUNTS } from './demoAccounts.js';
 export type { PublicDemoAccountType } from './demoAccounts.js';
 
 export { resolveHandoffReturnTo, buildHandoffDestination } from './resolveHandoffReturnTo.js';
+export { MY_HOME_SOURCES, isMyHomeSource, getMyHomePath, safeServiceReturnPath, isRepresentativeReturnPath } from './serviceReturnContext.js';
+export type { MyHomeSource } from './serviceReturnContext.js';

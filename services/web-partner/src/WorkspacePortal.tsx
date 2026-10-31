@@ -264,7 +264,7 @@ export default function WorkspacePortal({
     return (
       <>
         {toolbar}
-        <App />
+        <App embedded />
       </>
     );
   return (
@@ -721,6 +721,7 @@ export default function WorkspacePortal({
       </section>
       {selected && user && (
         <App
+          embedded
           key={`${selected.id}-${epoch}`}
           remote={{
             spaceId: selected.id,
