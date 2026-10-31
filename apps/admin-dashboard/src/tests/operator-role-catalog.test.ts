@@ -16,6 +16,7 @@ import {
   CENTRAL_OPERATION_ROLES,
   CATALOG_ROLE_VALUES,
   ASSIGNABLE_ROLE_VALUES,
+  MANAGED_SERVICE_ADMIN_ROLE_VALUES,
   REGISTRABLE_SERVICE_KEYS,
   findRoleOption,
 } from '@/lib/operator-role-catalog';
@@ -70,6 +71,8 @@ describe('운영자 역할 카탈로그 — 서버 allowlist 와 일치', () => 
 it('퇴역 kpa-society는 신규 지정에서 제외하고 기존 역할 설명은 보존한다', () => {
   expect(REGISTRABLE_SERVICE_KEYS).not.toContain('kpa');
   expect(ASSIGNABLE_ROLE_VALUES).not.toContain('kpa:admin');
+  expect(MANAGED_SERVICE_ADMIN_ROLE_VALUES).toContain('kpa:admin');
+  expect(MANAGED_SERVICE_ADMIN_ROLE_VALUES).not.toContain('kpa:operator');
   expect(findRoleOption('kpa:admin')?.label).toBe('Admin');
   expect(ASSIGNABLE_ROLE_VALUES).toContain('kpa-branch:admin');
   expect(ASSIGNABLE_ROLE_VALUES).toContain('neture:pharmacy_admin');

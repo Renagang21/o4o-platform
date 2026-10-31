@@ -61,6 +61,7 @@ import {
   ASSIGNABLE_ROLES,
   CENTRAL_OPERATION_ROLES,
   ASSIGNABLE_ROLE_VALUES,
+  MANAGED_SERVICE_ADMIN_ROLE_VALUES,
   CATALOG_ROLE_VALUES,
   REGISTRABLE_SERVICE_KEYS,
 } from '@/lib/operator-role-catalog';
@@ -73,7 +74,7 @@ import {
   type BusinessLedgerStatus,
 } from '@/lib/business-ledger';
 
-const SERVICE_ADMIN_ROLE_VALUES = new Set(ASSIGNABLE_ROLE_VALUES);
+const SERVICE_ADMIN_ROLE_VALUES = new Set(MANAGED_SERVICE_ADMIN_ROLE_VALUES);
 
 const LEDGER_BADGE: Record<Exclude<BusinessLedgerStatus, 'not_applicable'>, { label: string; className: string }> = {
   loading: { label: '확인 중', className: 'bg-gray-100 text-gray-500' },
@@ -683,7 +684,7 @@ export default function OperatorsPage() {
           searchValue={search}
           onSearchChange={setSearch}
           filters={[
-            { key: 'service', placeholder: '서비스 전체', options: [...getServiceOptions().filter(option => REGISTRABLE_SERVICE_KEYS.includes(option.value)), ...['pharmacy','carepharm','megapharm','pharmcoop'].map(key => ({ value: key, label: SERVICES[key as keyof typeof SERVICES].label }))] },
+            { key: 'service', placeholder: '서비스 전체', options: [...getServiceOptions(), ...['pharmacy','carepharm','megapharm','pharmcoop'].map(key => ({ value: key, label: SERVICES[key as keyof typeof SERVICES].label }))] },
             { key: 'role', placeholder: '역할 전체', options: operatorRoleOptions },
           ]}
           filterValues={facets as unknown as Record<string, string>}
@@ -1140,14 +1141,14 @@ export default function OperatorsPage() {
                     {formErrors.roles}
                   </p>
                 )}
-                {/* 카탈로그 밖 role(예: platform:super_admin, user)은 이 화면이 다루지 않는다.
-                    체크박스에 없다고 해서 저장 시 사라지면 안 되므로 읽기 전용으로 보존·표시한다. */}
-                {formData.roles.filter((r) => !CATALOG_ROLE_VALUES.has(r)).length > 0 && (
+                {/* 신규 지정 목록 밖 role(퇴역 Admin, 기존 Operator, platform 역할 등)은
+                    지정 체크박스와 별도로 읽기 전용 보존·표시한다. */}
+                {formData.roles.filter((r) => !ASSIGNABLE_ROLE_VALUES.includes(r)).length > 0 && (
                   <div className="mb-3 rounded-lg bg-slate-50 border border-slate-200 px-3 py-2">
                     <div className="text-xs font-semibold text-slate-500 mb-1">이 화면에서 변경하지 않는 권한 (유지됨)</div>
                     <div className="flex flex-wrap gap-1">
                       {formData.roles
-                        .filter((r) => !CATALOG_ROLE_VALUES.has(r))
+                        .filter((r) => !ASSIGNABLE_ROLE_VALUES.includes(r))
                         .map((r) => (
                           <span key={r} className="inline-flex items-center px-2 py-0.5 rounded text-xs font-mono bg-gray-100 text-gray-700">
                             {r}

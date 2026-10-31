@@ -111,6 +111,10 @@ export const ASSIGNABLE_ROLE_VALUES: readonly string[] = Object.values(ASSIGNABL
   rs.map((r) => r.value),
 );
 
+/** Existing Admin assignments remain visible/revocable even after new issuance retires. */
+export const MANAGED_SERVICE_ADMIN_ROLE_VALUES: readonly string[] = Object.values(OPERATOR_ROLE_CATALOG)
+  .flatMap(roles => roles.filter(role => /(?:[:_])admin$/.test(role.value)).map(role => role.value));
+
 /** 등록 카탈로그에 존재하는 role 집합 (편집 시 비카탈로그 role 보존 판정용) */
 export const CATALOG_ROLE_VALUES: ReadonlySet<string> = new Set(Object.values(OPERATOR_ROLE_CATALOG).flatMap(roles => roles.map(role => role.value)));
 

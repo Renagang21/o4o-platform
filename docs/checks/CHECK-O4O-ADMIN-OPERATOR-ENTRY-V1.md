@@ -8,7 +8,7 @@
 
 새 전역 Operator 역할이나 권한 부여 경로는 만들지 않는다. 중앙에서는 서비스 Admin 초대·본인 수락·직영 업무 메뉴 위임을 재사용하고, 서비스 Operator는 서비스 Admin이 관리하는 현재 정책을 유지한다. 기존 담당자의 ‘위임 업무 설정’ 위치를 배너에서 안내한다.
 
-사용자가 제거를 확인한 `kpa-society`는 신규 서비스 관리자 선택과 필터에서 제외한다. API도 플랫폼 초대 생성·재발송·미수락 초대 수락을 거절한다. 기존 역할 해석·권한 이력·취소·회수와 `kpa-branch`, 약국 협력사업은 별개로 보존한다. 정책 정본은 `O4O-CURRENT-ADMIN-ROLE-POLICY-V1`의 2026-10-31 추가 절을 따른다.
+사용자가 제거를 확인한 `kpa-society`는 신규 서비스 관리자 선택에서 제외한다. API도 플랫폼 초대 생성·재발송·미수락 초대 수락을 거절한다. 기존 할당의 조회·필터·회수는 신규 지정 목록과 별도로 유지하고 편집 창에서도 보존되는 과거 역할을 표시한다. 기존 역할 해석·권한 이력·취소와 `kpa-branch`, 약국 협력사업도 보존한다. 정책 정본은 `O4O-CURRENT-ADMIN-ROLE-POLICY-V1`의 2026-10-31 추가 절을 따른다.
 
 ## Shared Module Change Verification
 
@@ -30,7 +30,7 @@
 ## 검증
 
 - 공유 패키지 빌드, Admin TypeScript·Vite build, API build tsconfig `--noEmit`: PASS.
-- 관련 Admin Vitest: 37 tests PASS.
+- 관련 Admin Vitest: 38 tests PASS (자동 리뷰에서 지적한 과거 Admin 조회·회수 회귀 포함).
 - API 카탈로그·초대 service·route: 34 tests PASS. 퇴역 서비스 요청은 DB query/transaction 전에 차단됨을 확인.
 - 인증/초대 source contract Jest: 17 tests PASS.
 - Chromium 실제 앱 E2E: 4 tests PASS (desktop/mobile 배너→모달→서비스/업무 선택, 닫기 후 query 정리, 일반 지정의 분회·독립 사업 보존, 기존 bookmark, 비로그인·서비스 Operator 접근 차단).

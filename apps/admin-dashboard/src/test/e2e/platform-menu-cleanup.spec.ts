@@ -15,7 +15,7 @@ async function mockApi(page: Page, roles: string[] | null = ['platform:super_adm
     if (path === '/api/v1/auth/google/config') return json({ success: true, data: { enabled: false, clientId: null } });
     if (path === '/api/v1/admin/pending-tasks/summary') return json({ success: true, data: { total: 0, productRegistrationRequests: 0, manualReviews: 0 } });
     if (path === '/api/v1/admin/platform-accounts') return json({ success: true, data: [] });
-    if (path === '/api/v1/admin/users') return json({ success: true, users: [] });
+    if (path === '/api/v1/admin/users') return json({ success: true, users: [{ id: 'historical-kpa-admin', name: 'Historical KPA Admin', roles: ['kpa:admin'], isActive: true }] });
     if (path === '/api/v1/admin/service-operator-invitations') return json({ success: true, data: [] });
     if (path === '/api/v1/neture/admin/semi-franchises') return json({ success: true, data: [] });
     if (path === '/api/v1/admin/platform-users') return json({ success: true, data: [], pagination: { total: 0, totalPages: 1, page: 1, limit: 20 } });
@@ -46,6 +46,9 @@ for (const viewport of [{ name: 'desktop', width: 1280, height: 800 }, { name: '
       await expect(page.getByRole('group', { name: '위임할 운영 업무' })).toBeVisible();
       await page.getByRole('button', { name: '담당자 지정 창 닫기' }).click();
       await expect(page).toHaveURL(/\/operators$/);
+      await expect(page.getByText('Historical KPA Admin', { exact: true })).toBeVisible();
+      await page.getByTitle('더보기', { exact: true }).click();
+      await expect(page.getByRole('button', { name: '권한 해제 (Admin)', exact: true })).toBeVisible();
       await page.getByRole('button', { name: '서비스 담당자 지정' }).click();
       await expect(page.getByRole('radio', { name: /분회/ })).toBeVisible();
       await expect(page.getByRole('radio', { name: /MegaPharm/ })).toBeVisible();
