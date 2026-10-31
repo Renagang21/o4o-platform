@@ -1,6 +1,7 @@
 # 약국 협력사업 4곳 동급 독립 정비
 
-> 명칭 정합(2026-10-31): 사용자 지시에 따라 협업체 표시명·기술 키·문서 링크를 현행 이름으로 정규화했다. 과거 검증·배포 기록은 당시 관측이며 새 도메인의 재검증을 뜻하지 않는다.
+> 현행 안내(2026-10-31): 협업체 이름은 **드럭스토어형 약국**, 현재 주소는 `https://drugstore.neture.co.kr`다.
+> **과거 증적의 대상 보존:** 아래 “해당 협업체(당시 구명칭)”·“당시 협업체 구호스트”는 개명·주소 변경 전의 관측 대상이다. 아래 성공·실패·배포 결과를 현재 이름·주소의 운영 검증으로 읽지 않는다. 사용자 지시로 이전 표시명·주소 문자열은 재게시하지 않으며, 문서 경로와 기술 키의 현행 참조 정합은 과거 재실행을 뜻하지 않는다. 당시 원문·실제 호스트 식별자는 기존 Git 이력에서 확인하며 이력을 변경하지 않는다.
 
 > **상태**: OPEN
 > **작성일**: 2026-10-20
@@ -34,7 +35,7 @@ D1 과 D5 를 합치면 로그인 계정 · 세션은 네 사업 모두 O4O 공�
 | 사업 | 앱 | 도메인 | 세션 키 (Origin 판정) |
 |---|---|---|---|
 | pharmacy | `services/web-kpa-society` (Cloud Run `kpa-society-web`) | `pharmacy.neture.co.kr` | `kpa-society` |
-| drugstore | 같은 이미지, hostname 으로 사업 판정 | `drugstore.neture.co.kr` | `neture` |
+| drugstore | 같은 이미지, hostname 으로 사업 판정 | `[당시 협업체 구호스트]` | `neture` |
 | carepharm | `services/web-neture` host profile | `carepharm.neture.co.kr` | `neture` |
 | pharmcoop | `services/web-pharmacy-coop` (Cloud Run `cooperative-web`) | `pharmcoop.neture.co.kr` | `coop` (catalog 밖 · 가입 Origin 거절) |
 
@@ -162,8 +163,8 @@ D1 과 D5 를 합치면 로그인 계정 · 세션은 네 사업 모두 O4O 공�
 4. drugstore · pharmacy 도메인에서 각자 쓴 포럼 · 콘텐츠 · 미디어 · 사이니지 데이터가 서로 보이지 않음을 실브라우저와 API 응답으로 확인한다.
 5. 남은 명칭 잔재(단계 6)는 목록과 처리 여부를 CHECK 에 기록한다.
 
-## 2026-10-22 연결 작업 — 드럭스토어형 약국 운영 완성 WO
+## 2026-10-22 연결 작업 — 해당 협업체(당시 구명칭) 운영 완성 WO
 
-[드럭스토어형 약국 운영 완성 WO](WO-O4O-DRUGSTORE-OPERATIONAL-COMPLETION-V1.md)에서 D1/D3 일부와 D8의 상담 판정을 연결한다. 네 사업 호스트의 세션은 neture로 정렬하고, 사업별 법정정보·약관은 기존 테이블의 business:<사업 UUID> 범위로 관리·공개·동의한다. 매장 약사 사용 확인에서 kpa_pharmacist_profiles 읽기를 제거한다. PR #760의 옛 운영·설문·로컬 매장 사본 제거는 보존한다.
+[해당 협업체(당시 구명칭) 운영 완성 WO](WO-O4O-DRUGSTORE-OPERATIONAL-COMPLETION-V1.md)에서 D1/D3 일부와 D8의 상담 판정을 연결한다. 네 사업 호스트의 세션은 neture로 정렬하고, 사업별 법정정보·약관은 기존 테이블의 business:<사업 UUID> 범위로 관리·공개·동의한다. 매장 약사 사용 확인에서 kpa_pharmacist_profiles 읽기를 제거한다. PR #760의 옛 운영·설문·로컬 매장 사본 제거는 보존한다.
 
 이 연결로 본 WO 전체가 완료되는 것은 아니다. 기존 kpa-society catalog/공통 Store 및 내 매장 신청의 legacy 정책 키, 남은 backend 소비처 정리·운영 데이터 삭제·인프라 이름 변경은 이 WO의 후속 범위로 남는다. 실제 사업 약관 게시·경영자의 사용 확인·현장 음성 품질은 자동 설정하지 않는다. 이번 검증과 Delivery 결과는 연결 WO/CHECK와 해당 PR에서 추적한다.

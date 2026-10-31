@@ -1,6 +1,7 @@
 # TODO-O4O-PHARMACY-MEMBER-HOME-REORGANIZATION-V1
 
-> 명칭 정합(2026-10-31): 사용자 지시에 따라 협업체 표시명·기술 키·문서 링크를 현행 이름으로 정규화했다. 과거 검증·배포 기록은 당시 관측이며 새 도메인의 재검증을 뜻하지 않는다.
+> 현행 안내(2026-10-31): 협업체 이름은 **드럭스토어형 약국**, 현재 주소는 `https://drugstore.neture.co.kr`다.
+> **과거 증적의 대상 보존:** 아래 “해당 협업체(당시 구명칭)”·“당시 협업체 구호스트”는 개명·주소 변경 전의 관측 대상이다. 아래 성공·실패·배포 결과를 현재 이름·주소의 운영 검증으로 읽지 않는다. 사용자 지시로 이전 표시명·주소 문자열은 재게시하지 않으며, 문서 경로와 기술 키의 현행 참조 정합은 과거 재실행을 뜻하지 않는다. 당시 원문·실제 호스트 식별자는 기존 Git 이력에서 확인하며 이력을 변경하지 않는다.
 
 > **상태**: COMPLETED
 > **작성일**: 2026-10-18 · **최종 갱신**: 2026-10-18 (KST)
@@ -72,7 +73,7 @@ WORKTREE_DISPOSITION: KEEP — 구현·검증·push 및 후속 통합 인계 전
 모바일 drawer 닫힘 후 실제 헤더 높이에 맞춘 anchor 이동도 보완했다.
 
 검증 결과는 [이 트랙 CHECK](../checks/CHECK-O4O-PHARMACY-MEMBER-HOME-REORGANIZATION-V1.md)에 기록한다.
-전체 26 files / 177 tests·TypeScript 포함 production build·변경 lint·약국/드럭스토어형 약국 PC/mobile 28흐름 PASS.
+전체 26 files / 177 tests·TypeScript 포함 production build·변경 lint·약국/해당 협업체(당시 구명칭) PC/mobile 28흐름 PASS.
 실제 OAuth·실제 업무 데이터 검증은 하지 않았으며 PR CI·통합·배포는 이번 요청 밖으로 미실행이다.
 
 DEPLOYMENT: REQUIRED — 후속 통합 담당이 actual Delivery 판정 후 진행한다. 이번 완료는 개발·검증·push 범위다.

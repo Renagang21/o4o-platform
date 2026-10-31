@@ -1,6 +1,7 @@
 # WO-O4O-BUSINESS-HOME-SHOWCASE-V1
 
-> 명칭 정합(2026-10-31): 사용자 지시에 따라 협업체 표시명·기술 키·문서 링크를 현행 이름으로 정규화했다. 과거 검증·배포 기록은 당시 관측이며 새 도메인의 재검증을 뜻하지 않는다.
+> 현행 안내(2026-10-31): 협업체 이름은 **드럭스토어형 약국**, 현재 주소는 `https://drugstore.neture.co.kr`다.
+> **과거 증적의 대상 보존:** 아래 “해당 협업체(당시 구명칭)”·“당시 협업체 구호스트”는 개명·주소 변경 전의 관측 대상이다. 아래 성공·실패·배포 결과를 현재 이름·주소의 운영 검증으로 읽지 않는다. 사용자 지시로 이전 표시명·주소 문자열은 재게시하지 않으며, 문서 경로와 기술 키의 현행 참조 정합은 과거 재실행을 뜻하지 않는다. 당시 원문·실제 호스트 식별자는 기존 Git 이력에서 확인하며 이력을 변경하지 않는다.
 
 상태: 개발·검증 완료 (종료점 push) · 2026-10-19 · 기준 main 491be1bb82
 
@@ -22,7 +23,7 @@
 - Supplier 경계/ROLE-WORKSPACE/B2B 정본 및 DESIGN-SUPPLIER-BUSINESS-TERMS-V1 확인. 기본 공급/주문/조건 원장은 유지.
 - 승인: neture-pharmacy.routes.ts, SupplyProposalService, SemiFranchiseContentService, 공통 OperatorSemiFranchisePage 재사용.
 - 홈: PharmacyMemberHomePage/BusinessProductsPreview는 최신 3개 미리보기일 뿐 진열 설정이 없다. CarePharmHomePage/CooperationMemberSpace는 별도 구현. Pharmcoop App의 CooperativeHome/MemberSection은 placeholder다.
-- 드럭스토어형 약국은 BUSINESS_SITE가 선택하는 공용 약국 앱이며 별도 앱을 만들지 않는다.
+- 해당 협업체(당시 구명칭)은 BUSINESS_SITE가 선택하는 공용 약국 앱이며 별도 앱을 만들지 않는다.
 - 진열 설정은 사업 운영 조직 metadata의 businessHomeShowcase에 사업 ID별 저장한다. 승인 원장/가격을 복제하지 않으며 SQL 행 잠금으로 개별 수정과 낙관적 버전 검사를 적용한다. 기존 action_logs에 같은 트랜잭션으로 변경 이력 저장. 새 schema/migration 없음.
 - 승인 즉시 메인에 자동 진열한다. operator가 항목별 순서/숨김을 조절한다. 기본 공급 옵션은 거래 경로에만 남고 메인 상품은 approved 제안만 사용.
 - 약국은 선택 조직의 활성 가입/권한을 매 조회 확인. 조합원은 해당 개별 조합의 활성 개인 가입으로 콘텐츠·전체 대상 제품 소개만 열람. 대상 약국 한정 제안/가격/첨부는 일반 조합원 소개 DTO로 유출하지 않는다. 구매는 기존 내 매장에서만.

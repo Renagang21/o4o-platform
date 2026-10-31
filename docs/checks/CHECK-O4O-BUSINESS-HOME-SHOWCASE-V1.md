@@ -1,6 +1,7 @@
 # CHECK-O4O-BUSINESS-HOME-SHOWCASE-V1
 
-> 명칭 정합(2026-10-31): 사용자 지시에 따라 협업체 표시명·기술 키·문서 링크를 현행 이름으로 정규화했다. 과거 검증·배포 기록은 당시 관측이며 새 도메인의 재검증을 뜻하지 않는다.
+> 현행 안내(2026-10-31): 협업체 이름은 **드럭스토어형 약국**, 현재 주소는 `https://drugstore.neture.co.kr`다.
+> **과거 증적의 대상 보존:** 아래 “해당 협업체(당시 구명칭)”·“당시 협업체 구호스트”는 개명·주소 변경 전의 관측 대상이다. 아래 성공·실패·배포 결과를 현재 이름·주소의 운영 검증으로 읽지 않는다. 사용자 지시로 이전 표시명·주소 문자열은 재게시하지 않으며, 문서 경로와 기술 키의 현행 참조 정합은 과거 재실행을 뜻하지 않는다. 당시 원문·실제 호스트 식별자는 기존 Git 이력에서 확인하며 이력을 변경하지 않는다.
 
 2026-10-19 · 기준 main 491be1bb82 · branch wo/business-home-showcase
 
@@ -12,7 +13,7 @@ WO 최초 TODO 작성 → 정본/코드 소비처 재검증 → 구현 전 TODO 
 - 검증 내용: 선택 약국/개별 조합원 범위, 특정 약국 제안 비노출, 가격/첨부 DTO 제외, 같은 조직의 타 사업 설정 보존, 동시 version 충돌, 종료/비활성/가입 정지 후 비노출, 감사 실패 rollback, 요청자 및 canonical 공급자 owner의 콘텐츠 자기 승인 금지, 독립 운영자 승인·보관 이력.
 - operator-core-ui 약국 관리 7 files / 50 tests PASS. 새 진열 관리자 테스트는 입력 보존·버전 충돌 오류·중복 실행·사업 변경 후 늦은 완료 폐기를 확인한다.
 - shared-space-ui 전체 12 files / 126 tests PASS. 신규 회원 진열 6개는 로그인 전 조회 금지·복수 약국 선택·계정/사업 변경 후 늦은 응답 폐기·오류와 빈 목록 구분·담당 미리보기/숨김 비노출을 확인한다.
-- Pharmacy/드럭스토어형 약국 공용 사업 화면 6 files / 68 tests PASS. 기존 홈 기대값은 원장 최근 목록 대신 새 사업별 진열 API·회원 범위로 정합화했다. CarePharm 1 file / 29 tests PASS. Pharmcoop 4 files / 39 tests PASS.
+- Pharmacy/해당 협업체(당시 구명칭) 공용 사업 화면 6 files / 68 tests PASS. 기존 홈 기대값은 원장 최근 목록 대신 새 사업별 진열 API·회원 범위로 정합화했다. CarePharm 1 file / 29 tests PASS. Pharmcoop 4 files / 39 tests PASS.
 - 합계 385 tests PASS. API TypeScript production build, Neture·Pharmacy 공용 앱·Pharmcoop production build PASS. 공통 패키지 build:packages 및 frozen-lockfile 설치 PASS. 새 외부 의존성 없음. 협동조합 앱의 기존 shared-space-ui workspace 참조만 추가.
 - 실제 Chromium에서 production 산출물에 합성 API만 연결하여 16 cases PASS: 네 사업 × 회원/운영자 × 1440/390px. 회원 승인 제품/콘텐츠 본문 열람, 운영자 숨김 저장 후 갱신, viewport 가로 넘침/JS 오류 없음. 회원 쓰기 0, 운영자 클릭당 진열 PUT 1. 실제 운영 API/계정에 쓰지 않았다. 검증 스크립트·로그는 저장소 밖 /tmp/showcase-*에 보관한다.
 - 변경 TS/TSX ESLint error 0. neture-pharmacy.routes.ts의 기존 _next 미사용 warning 1개는 이번 변경 전부터 존재한다. 새 warning 없음.

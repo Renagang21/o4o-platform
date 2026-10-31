@@ -1,6 +1,7 @@
 # 약국 협업체 회원·운영자 업무 통합 — 2단계
 
-> 명칭 정합(2026-10-31): 사용자 지시에 따라 협업체 표시명·기술 키·문서 링크를 현행 이름으로 정규화했다. 과거 검증·배포 기록은 당시 관측이며 새 도메인의 재검증을 뜻하지 않는다.
+> 현행 안내(2026-10-31): 협업체 이름은 **드럭스토어형 약국**, 현재 주소는 `https://drugstore.neture.co.kr`다.
+> **과거 증적의 대상 보존:** 아래 “해당 협업체(당시 구명칭)”·“당시 협업체 구호스트”는 개명·주소 변경 전의 관측 대상이다. 아래 성공·실패·배포 결과를 현재 이름·주소의 운영 검증으로 읽지 않는다. 사용자 지시로 이전 표시명·주소 문자열은 재게시하지 않으며, 문서 경로와 기술 키의 현행 참조 정합은 과거 재실행을 뜻하지 않는다. 당시 원문·실제 호스트 식별자는 기존 Git 이력에서 확인하며 이력을 변경하지 않는다.
 
 > **상태**: COMPLETED — 개발·main 통합·운영 migration·네 공간 배포 완료. 실계정·실매장 검증은 별도
 > **작성일**: 2026-10-25 · **최종 갱신**: 2026-10-25 (Asia/Seoul)
@@ -29,7 +30,7 @@
 ## Core·adapter·권한 경계
 
 - `cooperation-workflows` API는 기존 `resolveInboxScope`, `scopeGuard`, `assertInboxWriter`, 선택 약국 접근 판정을 재사용한다. business/cooperative 두 공간만 받으며 service 전체 관리 공간은 추가하지 않는다.
-- Pharmacy·드럭스토어형 약국·CarePharm은 선택 약국의 현재 가입과 경영 권한을 확인한다. 개인 조합원 자격으로 약국 업무를 수행할 수 없다.
+- Pharmacy·해당 협업체(당시 구명칭)·CarePharm은 선택 약국의 현재 가입과 경영 권한을 확인한다. 개인 조합원 자격으로 약국 업무를 수행할 수 없다.
 - Pharmcoop은 조합 slug→기존 cooperative/business의 연결과 개인 가입·현행 조합 운영 관계를 사용한다. business alias 진입은 기존 resolver가 차단한다.
 - 읽기는 현재 scope·계정·가입 단위에 한정하고 `private, no-store`를 적용한다. 쓰기는 transaction 안에서 현재 권한·사업·가입 단위를 다시 확인하고 버전 충돌을 검사한다. 계정·사업·선택 약국 변경 시 이전 요청 응답을 화면에 반영하지 않는다.
 - 공통 회원 UI와 운영자 UI는 host가 제공한 인증 transport와 scope를 받는다. 신규 role·자동 가입·운영자 seed·서비스 간 자격 변환을 만들지 않는다.
@@ -69,7 +70,7 @@
 ## 2026-10-25 통합·운영 배포 결과
 
 - [PR #808](https://github.com/Renagang21/o4o-platform/pull/808)을 정상 PR 경로로 병합했다. 실행 코드·운영 배포 SHA는 `7a75dcf6664b6b538846b117fbf355676d1a0f3a`다. [main CI 40193561845](https://github.com/Renagang21/o4o-platform/actions/runs/40193561845) 전체 PASS. 최종 기능 HEAD `0bfcaad868`의 Codex completed·finding0·미해결0을 확인했다.
-- [Promote 40194525136](https://github.com/Renagang21/o4o-platform/actions/runs/40194525136)에서 운영 migration·API 준비 상태 검증·트래픽 전환·전환 후 검증이 성공했다. API·Admin·Neture·Pharmacy/드럭스토어형 약국·강의·Store·분회의 serving SHA 검증이 성공했고 해당 commit의 `production`은 `DEPLOYED`다.
+- [Promote 40194525136](https://github.com/Renagang21/o4o-platform/actions/runs/40194525136)에서 운영 migration·API 준비 상태 검증·트래픽 전환·전환 후 검증이 성공했다. API·Admin·Neture·Pharmacy/해당 협업체(당시 구명칭)·강의·Store·분회의 serving SHA 검증이 성공했고 해당 commit의 `production`은 `DEPLOYED`다.
 - [Pharmcoop 40195429634](https://github.com/Renagang21/o4o-platform/actions/runs/40195429634)는 같은 SHA의 `frontend_only=true`, `apply=false`로 성공했다. API 호환성·인증된 private HTML smoke·트래픽 전환 검증 PASS. 조합/회원 fixture provision은 skipped이며 계정·가입·권한 seed와 IAM/DNS 변경은 없다.
 - 네 도메인의 공개 홈 200, 운영 API ready JSON 200, 새 business/cooperative 회원 API의 비로그인 요청 401을 확인했다. 실계정 로그인·실제 공지/신청/문의 생성·메일 발송·실매장 기기 검증은 수행하지 않았다.
 - 문서 기록용 후속 변경은 runtime 무영향이며 실행 코드 재배포 대상이 아니다. 상세 증적은 연결된 CHECK를 따른다.

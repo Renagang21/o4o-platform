@@ -1,10 +1,11 @@
 # 약국 협업 사업 통합 개발 · Core + Extension 정비
 
-> 명칭 정합(2026-10-31): 사용자 지시에 따라 협업체 표시명·기술 키·문서 링크를 현행 이름으로 정규화했다. 과거 검증·배포 기록은 당시 관측이며 새 도메인의 재검증을 뜻하지 않는다.
+> 현행 안내(2026-10-31): 협업체 이름은 **드럭스토어형 약국**, 현재 주소는 `https://drugstore.neture.co.kr`다.
+> **과거 증적의 대상 보존:** 아래 “해당 협업체(당시 구명칭)”·“당시 협업체 구호스트”는 개명·주소 변경 전의 관측 대상이다. 아래 성공·실패·배포 결과를 현재 이름·주소의 운영 검증으로 읽지 않는다. 사용자 지시로 이전 표시명·주소 문자열은 재게시하지 않으며, 문서 경로와 기술 키의 현행 참조 정합은 과거 재실행을 뜻하지 않는다. 당시 원문·실제 호스트 식별자는 기존 Git 이력에서 확인하며 이력을 변경하지 않는다.
 
 > **상태**: COMPLETED — 승인된 개발·main 통합·배포 완료. 실제 운영 준비는 아래 별도 항목
 > **작성일**: 2026-10-23 (Asia/Seoul)
-> **근거**: 사용자 지시 — Pharmacy·드럭스토어형 약국·Pharmcoop·CarePharm의 분리 작업을 이 공간에서 이어가고 잔여 작업을 마무리하며 core + extension으로 정리
+> **근거**: 사용자 지시 — Pharmacy·해당 협업체(당시 구명칭)·Pharmcoop·CarePharm의 분리 작업을 이 공간에서 이어가고 잔여 작업을 마무리하며 core + extension으로 정리
 
 ## 현재 기준
 
@@ -19,17 +20,17 @@
 - `packages/shared-space-ui/src/cooperation/core.ts`: 순수 설정 계약·등록 검증·불변 스냅샷. 사업 extension을 import하지 않는다. 계정·role·약관·기능 이용권을 발급하지 않는다.
 - `cooperation/extensions/{pharmacy,drugstore,carepharm,pharmcoop}.ts`: 사업별 표시명·공식 origin·회원 진입·자료 작성 도움·가입 단위. `extensions/index.ts`만 네 extension을 조합한다.
 - 기존 회원 자료 UI·운영 콘텐츠 편집은 입력된 작성 도움 설정을 소비한다. CarePharm 조건문으로 공통 화면을 분기하지 않는다.
-- Pharmacy/드럭스토어형 약국 공유 앱, CarePharm(Neture), Pharmcoop의 문의 진입, Neture 서비스 탐색이 같은 registry를 소비한다.
+- Pharmacy/해당 협업체(당시 구명칭) 공유 앱, CarePharm(Neture), Pharmcoop의 문의 진입, Neture 서비스 탐색이 같은 registry를 소비한다.
 - 공통 세션은 neture이나 가입 원장은 합치지 않는다. 앞 세 사업은 약국 조직 가입, Pharmcoop는 조합별 개인 가입이다. 조합의 API·회원/역할·slug 해석은 기존 adapter에 둔다.
-- 기존 Pharmacy/CarePharm handoff는 그대로 유지한다. 별도 alias가 없는 드럭스토어형 약국/Pharmcoop는 자기 공개 호스트에서 로그인하며 임의의 handoff 대상/Origin 권한을 추가하지 않는다.
+- 기존 Pharmacy/CarePharm handoff는 그대로 유지한다. 별도 alias가 없는 해당 협업체(당시 구명칭)/Pharmcoop는 자기 공개 호스트에서 로그인하며 임의의 handoff 대상/Origin 권한을 추가하지 않는다.
 
 ## TODO
 
 - [x] 최신 main·인계 PR·네 사업 문서·소비처 대조
 - [x] 공통 계약과 네 사업 extension 분리
 - [x] 공유 자료 UI의 CarePharm 하드코딩을 설정 주입으로 전환
-- [x] 드럭스토어형 약국 게시판 이동이 Pharmacy fallback으로 향하는 경로 보완
-- [x] 공유 UI·운영 UI·Pharmacy/드럭스토어형 약국·CarePharm·Pharmcoop 회귀 검증
+- [x] 해당 협업체(당시 구명칭) 게시판 이동이 Pharmacy fallback으로 향하는 경로 보완
+- [x] 공유 UI·운영 UI·Pharmacy/해당 협업체(당시 구명칭)·CarePharm·Pharmcoop 회귀 검증
 - [x] 영향 앱 빌드·제품 타입·lint·정적 소비처 검사. 공유 패키지 전체 tsc의 미변경 테스트 타입 오류는 CHECK에 별도 기록
 - [x] 구현/병합/배포/실제 운영 준비를 구분한 [결과 기록](../checks/CHECK-O4O-COOPERATION-CORE-EXTENSIONS-CONSOLIDATION-V1.md)
 - [x] 검증한 변경만 commit·push — 구현 `f6d9429468`, 전용 branch 원격 push 성공
@@ -46,7 +47,7 @@ ERP Assistant는 확보 가능한 POS·발주 자료와 지원 업무가 확정�
 ## 완료 확인 — 2026-10-24 (Asia/Seoul)
 
 - 구현·통합: PR #784 및 승인된 배포 설정 후속 PR #787. 후속 main `1bbf7fd4fd63289c0db4a93cf1bc5cdb8c7fc145`의 CI PASS, 최신 PR Codex 리뷰 지적 없음.
-- 배포: 일반 Delivery `39969310284` 성공으로 Pharmacy/드럭스토어형 약국 및 공유 소비 앱 반영. 이후 main에 먼저 포함된 PR #785의 외부 AI API 변경을 포함해 일반 promote `40039498391`로 API·Neture 배포 성공. production status `DEPLOYED`.
+- 배포: 일반 Delivery `39969310284` 성공으로 Pharmacy/해당 협업체(당시 구명칭) 및 공유 소비 앱 반영. 이후 main에 먼저 포함된 PR #785의 외부 AI API 변경을 포함해 일반 promote `40039498391`로 API·Neture 배포 성공. production status `DEPLOYED`.
 - Pharmcoop: `40040518137`에서 frontend_only 배포 성공. API 호환성·revision readiness·인증 HTTP smoke·트래픽 전환 검증 PASS, 조합 fixture 단계 skipped.
 - 사용자는 후속으로 CarePharm 약관 초안 작성을 요청했고, 별도 회사가 아직 없으므로 법정정보를 빈칸으로 두도록 확인했다. 초안 두 문서는 main에 반영했으며 운영 게시·신규 가입 차단 해제는 미실행이다. 이는 위 초기 운영 준비 절의 문안 생성 제외 범위를 사용자 지시로 확장한 후속이다.
 - 사용자가 승인한 배포 설정 수정은 Pharmcoop 프런트의 API 호환성 확인과 전체 Git 이력 조회에 한정했다. DB schema·새 migration·신규 역할을 추가하지 않았다.

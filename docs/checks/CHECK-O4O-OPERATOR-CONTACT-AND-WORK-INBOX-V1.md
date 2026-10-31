@@ -1,6 +1,7 @@
 # 서비스별 문의·운영자 업무함 검증
 
-> 명칭 정합(2026-10-31): 사용자 지시에 따라 협업체 표시명·기술 키·문서 링크를 현행 이름으로 정규화했다. 과거 검증·배포 기록은 당시 관측이며 새 도메인의 재검증을 뜻하지 않는다.
+> 현행 안내(2026-10-31): 협업체 이름은 **드럭스토어형 약국**, 현재 주소는 `https://drugstore.neture.co.kr`다.
+> **과거 증적의 대상 보존:** 아래 “해당 협업체(당시 구명칭)”·“당시 협업체 구호스트”는 개명·주소 변경 전의 관측 대상이다. 아래 성공·실패·배포 결과를 현재 이름·주소의 운영 검증으로 읽지 않는다. 사용자 지시로 이전 표시명·주소 문자열은 재게시하지 않으며, 문서 경로와 기술 키의 현행 참조 정합은 과거 재실행을 뜻하지 않는다. 당시 원문·실제 호스트 식별자는 기존 Git 이력에서 확인하며 이력을 변경하지 않는다.
 
 - 상태: ACTIVE
 - 작성일: 2026-10-21
@@ -11,7 +12,7 @@
 
 ## 구현 범위
 
-서비스(Neture·공급자·펀딩·커뮤니티·강의·내 매장), 약국 협력사업(Pharmacy·CarePharm·드럭스토어형 약국),
+서비스(Neture·공급자·펀딩·커뮤니티·강의·내 매장), 약국 협력사업(Pharmacy·CarePharm·해당 협업체(당시 구명칭)),
 Pharmcoop 연합회와 개별 조합에 문의함/미처리 업무 표시를 연결한다.
 기존 Neture/KPA/강의 문의 원장은 그대로 두고 기존 화면에서 계속 처리한다.
 새 공급자·펀딩·커뮤니티·사업·조합·내 매장 문의는 기존 contact_inquiries를 사용한다.
@@ -110,7 +111,7 @@ WORKTREE_DISPOSITION: `/workspace/o4o-wt/operator-contact-and-work-inbox` / `wo/
 - Codex 재검토 P2 2건: service 범위 ScopedContactForm은 설정을 조회하는 PublicServiceContact에 위임하여 Pharmcoop/Store의 비활성 유형·개인정보/완료 안내를 반영한다. business/cooperative 범위는 조직 전용 endpoint와 권한 경계를 유지하며 응답의 접수번호를 표시한다. 설정·접수번호 집중 회귀 10개 PASS.
 - CarePharm 수정 후 실제 production bundle의 공개 `/contact`를 1440/390에서 합성 응답으로 검증: 정확한 business endpoint POST 각각 1회·동의 true·pageerror 0·문서 가로 넘침 0 PASS. 운영 문의 데이터 생성 0, 자기 preview 종료.
 
-- Codex 추가 P2: Pharmacy/드럭스토어형 약국 조직 문의 알림이 Neture 범위·Neture 전용 bridge로 저장되어 해당 앱 알림 목록에서 보이지 않았다. 문의 원장의 조직 경계는 유지하면서 business 알림 serviceKey를 실제 호스트(Pharmacy=`kpa-society`, 드럭스토어형 약국=`drugstore`, CarePharm=`carepharm`)와 자체 문의함 route에 맞췄다. 실제 PostgreSQL 조직별 접수·수신자·알림 payload 포함 16개 PASS, KPA 알림 조회 범위·클릭 소비처 14개 PASS. 초기 fixture의 baseline 약국 사업 key 중복은 격리 DB 준비만 보완해 재검증했다. 운영 원장은 수정하지 않았다.
+- Codex 추가 P2: Pharmacy/해당 협업체(당시 구명칭) 조직 문의 알림이 Neture 범위·Neture 전용 bridge로 저장되어 해당 앱 알림 목록에서 보이지 않았다. 문의 원장의 조직 경계는 유지하면서 business 알림 serviceKey를 실제 호스트(Pharmacy=`kpa-society`, 해당 협업체(당시 구명칭)=`drugstore`, CarePharm=`carepharm`)와 자체 문의함 route에 맞췄다. 실제 PostgreSQL 조직별 접수·수신자·알림 payload 포함 16개 PASS, KPA 알림 조회 범위·클릭 소비처 14개 PASS. 초기 fixture의 baseline 약국 사업 key 중복은 격리 DB 준비만 보완해 재검증했다. 운영 원장은 수정하지 않았다.
 - 최종 설정·접수번호 보완 후 공통 UI 전체 169개와 영향 4개 앱 타입 검사 PASS. API 타입 검사도 재확인한다.
 
 - Codex P2 추가: CarePharm의 기존 central operator/admin + live business assignment가 신규 헤더의 역할 후보에서 누락됐다. 사업 문의함 링크는 해당 후보와 사업 전용 역할을 대상으로 실제 `/manage` 응답으로 노출을 확정한다. 401/403/404는 숨기고, 권한 확인 후 원장 조회 장애는 확인 필요 상태로 유지한다. KPA business 헤더도 같은 서버 판정을 적용해 배정 없는 central 운영자에게 링크가 남지 않게 했다. 링크 부여·철회 7개, Neture 헤더 10개, KPA 헤더 11개 PASS; 집중 ESLint 오류/경고 0.
