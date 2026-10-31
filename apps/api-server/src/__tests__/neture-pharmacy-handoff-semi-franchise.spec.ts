@@ -72,7 +72,7 @@ describe('authenticated entry does not grant service access', () => {
     expect(res.body.data.targetServiceKey).toBe('neture');
     expect(generateTokens.mock.calls[0][5]).toBe(resolveSessionServiceKey('https://pharmacy.neture.co.kr'));
   });
-  it.each(['https://neture.co.kr', 'https://megapharm.neture.co.kr', 'https://pharmacy.neture.co.kr.evil.test'])('does not exchange the pharmacy transport target at %s', async origin => {
+  it.each(['https://neture.co.kr', 'https://drugstore.neture.co.kr', 'https://pharmacy.neture.co.kr.evil.test'])('does not exchange the pharmacy transport target at %s', async origin => {
     query.mockResolvedValueOnce([[{ user_id: USER.id, source_service_key: 'neture', source_session_id: '00000000-0000-4000-8000-000000000001', source_token_family: 'fam-1', target_service_key: 'kpa-society', created_at: new Date(), source_auth_method: 'google' }], 1]).mockResolvedValueOnce([]);
     findOne.mockResolvedValue(USER);
     const res = mockHandoffRes();

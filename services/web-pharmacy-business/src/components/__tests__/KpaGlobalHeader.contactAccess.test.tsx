@@ -14,7 +14,7 @@ const state = vi.hoisted(() => ({
   } | null,
 }));
 vi.mock("../../config/businessSite", () => ({
-  BUSINESS_SITE: { key: "megapharm" },
+  BUSINESS_SITE: { key: "drugstore" },
 }));
 vi.mock("../../contexts", () => ({
   useAuth: () => ({ user: state.user, logout: vi.fn(), isLoading: false }),
@@ -73,7 +73,7 @@ beforeEach(() => {
 });
 afterEach(cleanup);
 it.each(["neture:operator", "neture:admin"])(
-  "shows the MegaPharm inbox for server-confirmed legacy %s",
+  "shows the 드럭스토어형 약국 inbox for server-confirmed legacy %s",
   async (role) => {
     state.user!.roles = [role];
     state.get.mockResolvedValue({ data: { data: { newCount: 4 } } });
@@ -86,12 +86,12 @@ it.each(["neture:operator", "neture:admin"])(
       await screen.findByRole("link", { name: "문의 관리 · 새 문의 4" }),
     ).toHaveProperty(
       "href",
-      "https://neture.co.kr/operator/service-contact/megapharm",
+      "https://neture.co.kr/operator/service-contact/drugstore",
     );
   },
 );
 it("hides an apparently eligible local role when the server denies access", async () => {
-  state.user!.roles = ["neture:megapharm_operator"];
+  state.user!.roles = ["neture:drugstore_operator"];
   render(
     <MemoryRouter>
       <KpaGlobalHeader />

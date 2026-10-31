@@ -192,7 +192,7 @@ export default function HomeEntryPanel({ user, data, loading, error, onReload, n
     // 대표 계정의 /mypage 진입은 상단 My Home에만 둔다. 전체 My Home 모델은 보존한다.
     const joinedServices = model.myServices.filter(item => item.id !== 'svc:neture');
     const stores = model.groups.find(group => group.id === 'store')?.items.filter(item => item.id.startsWith('workspace-store:') || item.id.startsWith('store:') && item.id !== 'store:management') ?? [];
-    const isCooperation = (item: EntryItem) => item.id.startsWith('business:') || item.id.startsWith('cooperative:') || ['svc:kpa-society', 'svc:carepharm', 'svc:megapharm', 'svc:cooperative'].includes(item.id);
+    const isCooperation = (item: EntryItem) => item.id.startsWith('business:') || item.id.startsWith('cooperative:') || ['svc:kpa-society', 'svc:carepharm', 'svc:drugstore', 'svc:cooperative'].includes(item.id);
     const isCommunity = (item: EntryItem) => ['svc:community', 'svc:lecture', 'svc:kpa-branch'].some(id => item.id === id || item.id.startsWith(`${id}:`));
     const dailyGroups = [
       { title: '내 업무', items: [...joinedServices.filter(item => !isCooperation(item) && !isCommunity(item) && item.id !== 'svc:funding'), ...stores] },

@@ -1,5 +1,7 @@
 # 약국 앱 잔재의 안전한 정리와 GCP 전환 준비
 
+> 명칭 정합(2026-10-31): 사용자 지시에 따라 협업체 표시명·기술 키·문서 링크를 현행 이름으로 정규화했다. 과거 검증·배포 기록은 당시 관측이며 새 도메인의 재검증을 뜻하지 않는다.
+
 > **상태**: ACTIVE
 > **작성일**: 2026-10-26 · **최종 갱신**: 2026-10-26
 > **근거 WO/IR**: 사용자 제거 진행·환경 보완 요청, WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1 단계 6
@@ -19,7 +21,7 @@
 
 ## 구현 경계
 
-기존 #817은 선언 의존성과 불필요 배포 경로를 수정했다. 이번 작업은 기존 CHECK가 남긴 Docker 복사 잔재를 제거한다. manifest·lockfile·역할·route·권한·서비스 키는 바꾸지 않는다. 운영 중인 pharmacy·megapharm 앱을 삭제하지 않는다.
+기존 #817은 선언 의존성과 불필요 배포 경로를 수정했다. 이번 작업은 기존 CHECK가 남긴 Docker 복사 잔재를 제거한다. manifest·lockfile·역할·route·권한·서비스 키는 바꾸지 않는다. 운영 중인 pharmacy·drugstore 앱을 삭제하지 않는다.
 
 Dockerfile 변경은 기존 deploy-risk의 LEVEL_3 대상이다. 이번 결과는 개발 branch에 검증·push하며, 운영 배포·리소스 삭제는 미실행이다. 소스 변경이 없어도 실제 이미지 빌드가 완료되기 전에는 이미지 검증 완료로 보고하지 않는다.
 
@@ -69,7 +71,7 @@ Dockerfile 변경은 기존 deploy-risk의 LEVEL_3 대상이다. 이번 결과�
 이 절은 앞 절의 실행 당시 기록을 대체하지 않고 이후 결과를 추가한다. 같은 WO의 연속 Phase로 기존 branch를 유지한다.
 
 - PR #826은 main `7e9c1c99d6`에 병합했고 Promote 40261699942에서 Neture와 약국 앱의 이미지 빌드·smoke·트래픽 전환이 성공했다. 두 공개 도메인의 HTML과 주 JS asset은 200이다. 전체 production 상태의 Partner LEVEL_3 hold는 별개이며 해제하지 않았다.
-- PR #828은 main `792b3d0f6e`에 병합했고 main CI 40262900391이 통과했다. 읽기 전용 인벤토리 40262910814에서 실제 연결을 확인했다: `pharmacy.neture.co.kr` 및 `megapharm.neture.co.kr` → `o4o-global-lb` → `backend-kpa-society-web` → `neg-kpa-society-web` → `kpa-society-web`. 기존 서비스는 삭제 가능한 미사용 자원이 아니다.
+- PR #828은 main `792b3d0f6e`에 병합했고 main CI 40262900391이 통과했다. 읽기 전용 인벤토리 40262910814에서 실제 연결을 확인했다: `pharmacy.neture.co.kr` 및 `drugstore.neture.co.kr` → `o4o-global-lb` → `backend-kpa-society-web` → `neg-kpa-society-web` → `kpa-society-web`. 기존 서비스는 삭제 가능한 미사용 자원이 아니다.
 - 기술 이름을 `services/web-pharmacy-business`, `@o4o/web-pharmacy-business`로 정한다. 119개 tracked 앱 파일을 이동하고 Docker·pnpm importer·CI matrix·영향도 detector·테스트의 실제 파일 경로와 현행 안내 링크를 함께 전환한다. 신규 사업 서비스 키를 만드는 변경이 아니다.
 - 소비처 0인 workflow `VITE_KPA_URL`을 제거한다. Cloud Run/이미지/배포 선택 키와 API serviceKey·JWT·membership·역할은 이번 단계에서 유지한다. 일반 소스의 과거 출처 주석과 과거 WO/CHECK는 사실 기록으로 남기므로 KPA literal 전체 0건을 완료 기준으로 삼지 않는다.
 - lockfile은 pnpm으로 재생성한 뒤 무관한 peer snapshot 변경을 제외했다. YAML 구조 비교로 importer 키 이동 외 dependency·snapshot 변경 0을 확인했고 frozen 설치를 다시 통과했다.

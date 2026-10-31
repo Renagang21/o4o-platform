@@ -1,5 +1,7 @@
 # 서비스·연합회·개별 협동조합 Hero 운영 정비
 
+> 명칭 정합(2026-10-31): 사용자 지시에 따라 협업체 표시명·기술 키·문서 링크를 현행 이름으로 정규화했다. 과거 검증·배포 기록은 당시 관측이며 새 도메인의 재검증을 뜻하지 않는다.
+
 - 작성일: 2026-10-20
 - 상태: 구현·검증 완료 · 개발 branch 인계
 - 기준: main `0b9821122a`, branch `wo/service-hero-operator-completion`
@@ -10,11 +12,11 @@
 - [x] 기존 Hero 작업서, 역할 Architecture, 서비스 카탈로그, 공통 모듈 변경 절차 대조
 - [x] 대표/공급자/펀딩/커뮤니티/CarePharm/강의/약국사업/분회 메뉴·공개 소비·저장 API 확인
 - [x] 연합회 고정 Hero, 개별 조합 고정 소개 및 누락 편집 메뉴 확인
-- [x] Pharmacy/MegaPharm의 상단 고정 제목과 사업 소식 Hero 분리, 대표 홈 옛 CMS Hero 중복 확인
+- [x] Pharmacy/드럭스토어형 약국의 상단 고정 제목과 사업 소식 Hero 분리, 대표 홈 옛 CMS Hero 중복 확인
 - [x] 연합회 및 조합별 Hero 조회·편집·공개 연결
 - [x] 현재 연합회 역할과 현재 개별 조합 역할을 분리 검사. 연합회 역할만으로 조합 편집 불가
 - [x] inactive/없는 조합, 다른 조합, 권한 회수, 초안 비노출, 수정 충돌·예약·숨김 검증
-- [x] Pharmacy/MegaPharm의 기존 사업별 게시 원장을 홈 상단에 연결하고 Hero 중복 제거
+- [x] Pharmacy/드럭스토어형 약국의 기존 사업별 게시 원장을 홈 상단에 연결하고 Hero 중복 제거
 - [x] 옛 대표 홈 CMS의 Hero 편집 진입을 현행 화면으로 안내. 기존 데이터 임의 삭제/이관 없음
 - [x] 공통 소비처 회귀·API·타입·운영 빌드·PC/모바일 검증 및 기록 후 commit/push
 
@@ -34,6 +36,6 @@
 - 저장 트랜잭션에서 권한을 재확인한다. 개별 조합 저장은 기존 조합 관리와 동일 조합 row를 잠근 뒤 확인한다. 기존 CMS revision 충돌·초안/공개 분리·예약·안전 URL 검증을 유지한다.
 - 저장은 `neture` CMS의 별도 surface(`pharmcoop`/`cooperative`)와 조직 ID로 분리한다. 기존 semi_franchises.organization_id unique, cooperatives.semi_franchise_id unique 제약을 확인했다. schema/migration 없음.
 - 연합회/조합 공용 Hero와 공개한 홍보를 각각의 홈에 연결했다. 개별 조합 편집은 기존 조합 제목 아래 h2로 구성한다.
-- Pharmacy/MegaPharm 기존 게시 Hero는 상단 h1에 한 번 표시한다. 미게시·숨김·조회 실패 때는 기존 간결한 제목을 유지한다. 광고는 하단 사업 소식에 유지한다.
+- Pharmacy/드럭스토어형 약국 기존 게시 Hero는 상단 h1에 한 번 표시한다. 미게시·숨김·조회 실패 때는 기존 간결한 제목을 유지한다. 광고는 하단 사업 소식에 유지한다.
 - 대표 메인의 옛 CMS에서 Hero Slides 편집 탭을 제거하고 현행 Hero 관리 링크를 제공한다. 기존 CMS row·API·광고/로고 기능은 삭제/이관하지 않는다.
 - 과거 Hero 작업서의 연합회/조합 누락과 대표 홈의 대상 선택 안내는 과거 기록으로 보존하고 현행 구현 경로는 본 문서에 기록한다. 상세 검증은 [CHECK](../checks/CHECK-O4O-SERVICE-HERO-OPERATOR-COMPLETION-V1.md).

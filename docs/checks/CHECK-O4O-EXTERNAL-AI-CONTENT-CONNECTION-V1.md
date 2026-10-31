@@ -1,5 +1,7 @@
 # CHECK-O4O-EXTERNAL-AI-CONTENT-CONNECTION-V1
 
+> 명칭 정합(2026-10-31): 사용자 지시에 따라 협업체 표시명·기술 키·문서 링크를 현행 이름으로 정규화했다. 과거 검증·배포 기록은 당시 관측이며 새 도메인의 재검증을 뜻하지 않는다.
+
 > 상태: ACTIVE — 개발 검증·push 인계, 운영 활성화 전
 > 작성일: 2026-10-22 · 기준 main: `7dc02646dab2808258133139b3ca0714ec3cc14b`
 > Branch: `wo/external-ai-content-connection`
@@ -45,7 +47,7 @@ Zod 소스 직접 소비처는 `rg -l "from ['\"]zod['\"]" apps packages service
 | OrganizationAdapter | 사업/조합 운영 관계·기존 콘텐츠 서비스 | 기존 scoped 권한 및 draft 저장, 게시/검수/공급자 handoff 보호 |
 | CommunityAdapter | 독립/사업 커뮤니티 resolver·forum_post 원장 | 가입/폐쇄 게시판·작성자별 격리, 게시판 UUID별 동의, 새 역할/원장 없음 |
 | ForumWritePage / forumApi | Neture 번들의 공동·CarePharm·기존 forum 작성 UI | draft에서만 명시적 publish 전이. 게시글 수정 동작 유지. HTML 형식 보존 |
-| BusinessForumPage | 약국/메가팜 공통 앱의 사업 게시판 | 기존 초안 검토·게시, 기존 글 ID 유지 |
+| BusinessForumPage | 약국/드럭스토어형 약국 공통 앱의 사업 게시판 | 기존 초안 검토·게시, 기존 글 ID 유지 |
 | MemberForum | 조합별 회원 게시판 | 로그인 사용자 ID를 통한 본인 초안 편집 UI, 서버는 기존 작성자 검증. 다른 조합 권한 부여 없음 |
 | Store App 신규 진입 | 내 매장 단일 앱·기존 편집기 | 접근 목록 안에서만 지정 매장 선택. desktop/mobile 실제 route smoke |
 | ForumPostController 일반 목록/상세·최초 게시 시각 | generic forum 및 service-forum router 전체(독립/사업 커뮤니티·KPA·펀딩 등), admin/operator의 별도 검수 경로는 유지 | draft는 작성자만 조회. 기존 공지/내 글/서비스 경계 회귀 73건과 실제 DB 확인. enum·역할·Core 스키마 무변경 |
@@ -103,7 +105,7 @@ Playwright 기본 browser가 없으면 `O4O_TEST_CHROMIUM_PATH`로 설치된 Chr
 | admin 전체 Vitest | 31파일, 446 PASS |
 | Neture 동의/계정 전환/해제/초안 검토/기존 자료 복사·MyPage | 5파일, 24 PASS |
 | Store 진입·기존 매장 선택 | 2파일, 6 PASS |
-| 약국/메가팜 공통 사업 게시판 | 1파일, 9 PASS |
+| 약국/드럭스토어형 약국 공통 사업 게시판 | 1파일, 9 PASS |
 | 조합 게시판·기존 앱 | 2파일, 16 PASS |
 | 격리 PostgreSQL + 공식 SDK OAuth/HTTP/MCP | 40 PASS (최초 24건 포함, 중복 합산하지 않음) |
 | browser desktop/mobile | admin 2 + Neture 8 + Store 2 = 12 PASS |
@@ -144,7 +146,7 @@ pnpm --filter store-web exec playwright test --config playwright.external-ai.con
 
 1. 통합 담당이 PR·CI·review·병합을 진행하고 신규 migration 1개(6개 테이블·인덱스)를 별도로 검토한다.
    기존 콘텐츠·계정·역할 데이터 backfill은 없다. 빈 상태 이외의 down은 삭제를 거부한다.
-2. 승인된 표준 migration/배포 절차로 운영에 적용한다. API·admin·Neture·Store·약국/메가팜 공통 웹·협동조합 웹이 변경 대상이다.
+2. 승인된 표준 migration/배포 절차로 운영에 적용한다. API·admin·Neture·Store·약국/드럭스토어형 약국 공통 웹·협동조합 웹이 변경 대상이다.
 3. API 환경에 canonical `EXTERNAL_AI_ISSUER_URL`, `EXTERNAL_AI_WEB_ORIGIN`, connector의 exact
    `EXTERNAL_AI_REDIRECT_URIS`, 별도 지속 보관 Secret `EXTERNAL_AI_CREDENTIAL_KEY`를 연결한다.
    키 값은 생성·보관 담당의 Secret 저장소에서 관리하고 문서/채팅/Git에 기록하지 않는다.
@@ -185,7 +187,7 @@ verdict: KEEP — push 후 통합·운영 확인 및 후속 수정에 필요
 
 이후 사용자가 main 병합·배포를 지시하여 이 공간에서 PR #766을 생성했다. 앞 절은 개발 push 당시 기록이다.
 최신 main `05f63d8865`를 merge한 `6b11fc1956`에서 API build, 전체 frontend 타입, 관리자 446건,
-API 164건, Store 6건, 약국 사업 게시판 9건, 조합 16건을 재검증했다. Store·약국/메가팜·조합 웹 build와
+API 164건, Store 6건, 약국 사업 게시판 9건, 조합 16건을 재검증했다. Store·약국/드럭스토어형 약국·조합 웹 build와
 Store desktop/mobile 브라우저 2건도 통과했다. 로컬 PostgreSQL 통합 40건 및 테스트 데이터 삭제를 확인했다.
 
 PR의 Codex 지적 2건을 보완했다.
@@ -193,11 +195,11 @@ PR의 Codex 지적 2건을 보완했다.
 - 공개 등록: SDK에 이미 IP당 시간당 20회 제한이 있음을 확인했고, 이를 명시하면서 기존 trusted-client-IP를
   사용했다. DB 전역 1,000개/시간당 신규 100개 저장 상한과 동시 요청 lock을 추가했다.
 - 공통 내 계정: CarePharm·www의 정확한 Origin을 추가하여 해당 호스트에서도 연결 해제가 가능하다.
-- main 통합 영향 확인 중 약국·MegaPharm 초안 URL을 현재 사업 서브도메인의 기존 편집 route로 정렬했다.
+- main 통합 영향 확인 중 약국·드럭스토어형 약국 초안 URL을 현재 사업 서브도메인의 기존 편집 route로 정렬했다.
 
 보완 후 API compile, 관련 Jest 18건(공통 계정 Origin 6곳의 허용·유사 도메인 거부 포함), 변경 코드 lint가
 통과했다. PostgreSQL/공식 SDK 통합은 기존 40건에 등록 429·동시 전역 상한·시간당 상한을 더해 **43건 PASS**다.
-기존 사업 게시판 사례에서 약국·MegaPharm 실제 결과 URL을 함께 확인했다. fixture DB 0개를 확인했다.
+기존 사업 게시판 사례에서 약국·드럭스토어형 약국 실제 결과 URL을 함께 확인했다. fixture DB 0개를 확인했다.
 운영 DB·실제 외부 연결은 아직 변경하지 않았다. 병합/배포의 최종 상태는 PR 및 통합 완료 보고에서 확인한다.
 
 재리뷰의 인증 전 `/authorize` 저장 상한 지적도 보완했다. SDK의 기존 IP당 15분 100회 제한을 명시하고,
@@ -206,9 +208,9 @@ compile·변경 lint 및 공식 HTTP 429/추가 저장 없음·client별 상한/
 동시 요청을 검증했다. 기존 사례를 포함한 격리 DB/SDK **46건 PASS**, fixture DB 0개를 확인했다.
 
 후속 재리뷰 2건도 반영했다. 사용자 연결 해제와 전역 설정 변경의 Origin guard를 분리해 관리자 PUT은
-admin Origin에서만 허용한다. MegaPharm의 사업 콘텐츠 편집 링크도 해당 사업 호스트로 반환한다.
+admin Origin에서만 허용한다. 드럭스토어형 약국의 사업 콘텐츠 편집 링크도 해당 사업 호스트로 반환한다.
 관련 Jest는 관리자/계정 Origin 분리를 포함하여 **25건 PASS**, compile·변경 lint PASS다. DB 통합 46건에서
-사업 콘텐츠와 게시판 양쪽의 약국/MegaPharm 결과 URL을 확인했다.
+사업 콘텐츠와 게시판 양쪽의 약국/드럭스토어형 약국 결과 URL을 확인했다.
 
 CI `39751638821`의 웹 job에서 기존 `consultation-speech.test.tsx` 47행의 음성 텍스트 단언 실패를 확인했다.
 이번 변경에 포함하지 않은 파일이다. 로컬에서 동일 Store 전체 테스트 **63파일/765건 PASS**를 확인했으며

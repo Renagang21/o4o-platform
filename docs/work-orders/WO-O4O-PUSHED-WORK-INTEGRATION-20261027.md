@@ -1,5 +1,7 @@
 # Push된 작업의 main 통합 조사와 실행
 
+> 명칭 정합(2026-10-31): 사용자 지시에 따라 협업체 표시명·기술 키·문서 링크를 현행 이름으로 정규화했다. 과거 검증·배포 기록은 당시 관측이며 새 도메인의 재검증을 뜻하지 않는다.
+
 > **상태**: ACTIVE · **작성일**: 2026-10-27 (Asia/Seoul)
 > **근거**: 사용자 요청 — push됐지만 main에 반영되지 않은 작업의 통합
 > **DEPLOYMENT**: main 반영과 구분. 운영 배포는 기존 Delivery 판정 및 DB write 승인 범위를 따른다.
@@ -22,7 +24,7 @@ GitHub 원격 branch 전체를 가져와 main 조상 관계를 비교했다. 최
 | `wo/frontend-design-accessibility` | 이미 반영 | 같은 head의 PR MERGED 확인. squash로 commit 조상 관계가 달라도 재적용하지 않음. |
 | `wo/github-app-token-issuer` | 통합 대상 | 기존 PR #842/#833 재사용 또는 이번 통합 branch에서 원래 commit 이력을 보존해 병합. |
 | `wo/home-discovery-doc-status` | 구버전 보존 / 자동 재개 제외 | #409 종료 상태. 현재 구현·색인의 후속 상태와 충돌하는 구버전 문서 변경을 되돌리지 않음. |
-| `wo/megapharm-requirements-documentation` | 통합 대상 | 기존 PR #842/#833 재사용 또는 이번 통합 branch에서 원래 commit 이력을 보존해 병합. |
+| `wo/drugstore-requirements-documentation` | 통합 대상 | 기존 PR #842/#833 재사용 또는 이번 통합 branch에서 원래 commit 이력을 보존해 병합. |
 | `wo/my-home-document-alignment` | 이미 반영 | 같은 head의 PR MERGED 확인. squash로 commit 조상 관계가 달라도 재적용하지 않음. |
 | `wo/neture-host-static-seo` | 이미 반영 | 같은 head의 PR MERGED 확인. squash로 commit 조상 관계가 달라도 재적용하지 않음. |
 | `wo/neture-service-realignment-v1` | 구버전 보존 / 자동 재개 제외 | #364 이후 상태 기록. 현재 체크리스트와 충돌하는 과거 완료/미완료 판정은 복원하지 않음. |
@@ -49,7 +51,7 @@ GitHub 원격 branch 전체를 가져와 main 조상 관계를 비교했다. 최
 
 - #833: 최신 main 동기화·CI Gate·Sonar PASS, head `0458ec0366` Codex 무지적·미해결 thread 0 확인 후 정상 merge `c6693aed7a`.
 - #842: draft 해제. SSH remote와 기존 Authorization extraHeader의 신원 우회를 수정하고 해석된 remote URL도 검사했다. 실제 Git 회귀 포함 14/14 PASS. 최신 main 동기화 및 재리뷰·CI 진행 중.
-- 추가 4개 branch: Assistant 명칭 정합, MegaPharm 요구 문서, 상담 정리 관찰, 약국 리소스 전환 실행 기록을 기존 commit 이력으로 충돌 없이 통합.
+- 추가 4개 branch: Assistant 명칭 정합, 드럭스토어형 약국 요구 문서, 상담 정리 관찰, 약국 리소스 전환 실행 기록을 기존 commit 이력으로 충돌 없이 통합.
 - 펀딩 조사 결과는 코드 수정·push 작업이 아니므로 이번 통합의 신규 기능으로 포함하지 않는다.
 
 운영 DB·GCP·App 설치·토큰 Secret·다른 PC worktree·다른 공간의 의도된 삭제 100건은 변경하지 않는다. 오래된 폐기/대체 branch 전체를 머지해서 퇴역 기능·옛 권한·철회된 테스트 보존 계획을 되살리지 않는다.

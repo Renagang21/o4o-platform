@@ -1,5 +1,7 @@
 # 약국 협업체 회원·운영자 통합 업무 검증
 
+> 명칭 정합(2026-10-31): 사용자 지시에 따라 협업체 표시명·기술 키·문서 링크를 현행 이름으로 정규화했다. 과거 검증·배포 기록은 당시 관측이며 새 도메인의 재검증을 뜻하지 않는다.
+
 > **상태**: COMPLETED — 개발·통합·운영 배포 검증 기록. 실계정·실매장 검증은 미실행
 > **작성일**: 2026-10-25 · **최종 갱신**: 2026-10-25 (Asia/Seoul)
 > **근거 WO**: [WO-O4O-COOPERATION-MEMBER-OPERATOR-WORKFLOWS-V2](../work-orders/WO-O4O-COOPERATION-MEMBER-OPERATOR-WORKFLOWS-V2.md)
@@ -17,7 +19,7 @@
 | web-kpa-society 전체 | 20파일·148건 PASS |
 | web-neture 전체 | 151파일·1,313건 PASS |
 | web-pharmacy-coop 전체 | 11파일·85건 PASS |
-| 제품 build | API `tsc -p tsconfig.build.json`, Pharmacy/MegaPharm·Neture/CarePharm·Pharmcoop 및 Store·Lecture·KPA Branch·Admin 소비 앱 build PASS. 직접 영향 3개 웹은 최종 UI 변경 후 재빌드 |
+| 제품 build | API `tsc -p tsconfig.build.json`, Pharmacy/드럭스토어형 약국·Neture/CarePharm·Pharmcoop 및 Store·Lecture·KPA Branch·Admin 소비 앱 build PASS. 직접 영향 3개 웹은 최종 UI 변경 후 재빌드 |
 | 품질·구조 | 신규 모듈 집중 ESLint 오류/경고 0, migration contract 21 PASS / 0 FAIL, diff·문서 민감정보 검사 PASS |
 
 테스트 수는 중복 실행을 합산하지 않은 2,012건이다. 일부 기존 Neture 펀딩 테스트는 실패 응답 시나리오에서 jsdom network stderr를 출력하지만 assertion은 PASS다. 기존 bundle 크기·Browserslist 경고와 API Jest의 기존 forceExit 안내는 이번 기능 실패로 계산하지 않는다.
@@ -52,7 +54,7 @@
 - 리뷰에서 발견한 모집 대상 회원 정지 후 활동 상태 변경 차단을 수정했다. 약국 단위와 개인 조합원 각각의 실제 SQL 회귀 2건을 추가했고 신규 대상 선택·모집 후 대상 변경의 차단은 유지했다.
 - 재리뷰 지적도 수정했다. CarePharm 지원 메뉴는 선택 약국의 실제 활성 승인 확인 후에만 회원 문의로 연결한다(약국 없음·승인 대기·조회 실패는 공개 문의). 종료된 활동은 immutable 개정 이력에 진행 상태가 있어야 완료 기록을 허용하며 API·운영자 UI 양쪽에 적용했다. 실제 SQL 2건·회원 공간 4건·운영 화면 2건의 회귀를 추가했다.
 - SonarCloud의 명시적 정렬 비교 함수·저장 함수 복잡도 지적은 UUID 정렬 비교 함수 지정과 기존 상태 검증 함수 분리로 정리했다. 동작·schema 변경 없이 관련 모델·SQL 회귀와 API build를 재검증했다.
-- Pharmacy·MegaPharm도 계정 단위 승인과 선택 약국을 구분한다. 기존 활성 가입 약국 선택 hook을 재사용해 다중 약국 미선택·잘못된 명시 선택은 공개 문의로 연결하고, 단일 자동 선택·유효한 선택은 해당 약국의 회원 문의로 연결했다. 두 사업의 8개 회귀를 추가했다. 상품 정정 main `bcb89b863c`의 별도 변경도 보존했다.
+- Pharmacy·드럭스토어형 약국도 계정 단위 승인과 선택 약국을 구분한다. 기존 활성 가입 약국 선택 hook을 재사용해 다중 약국 미선택·잘못된 명시 선택은 공개 문의로 연결하고, 단일 자동 선택·유효한 선택은 해당 약국의 회원 문의로 연결했다. 두 사업의 8개 회귀를 추가했다. 상품 정정 main `bcb89b863c`의 별도 변경도 보존했다.
 - 최신 main 반영 후 공통 UI 2개·직접 소비 앱 3개의 전체 suite와 API 통합, 직접 영향 웹·API build를 다시 확인했다.
 
 ## 소비처와 인계
@@ -76,9 +78,9 @@
 | Migration·API | 단일 migration Job의 `Run database migrations` SUCCESS. API revision readiness·traffic switch·post-switch 검증 SUCCESS. 별도 DB 접속·seed·이력 수정·rollback 강행 없음 |
 | 공유 소비처 | API·Admin·Neture·KPA Society·Lecture·Store·KPA Branch 배포와 최종 serving SHA 검사 SUCCESS. `production`: `DEPLOYED` |
 | Pharmcoop | [40195429634](https://github.com/Renagang21/o4o-platform/actions/runs/40195429634), 같은 SHA·`frontend_only=true`·`apply=false`, SUCCESS. API 호환성·private smoke·트래픽 전환 SUCCESS, fixture provision skipped |
-| 공개 smoke | Pharmacy·MegaPharm·CarePharm·Pharmcoop 홈 HTTP 200. 준비 상태 JSON HTTP 200. 새 business/cooperative 회원 API의 비로그인 요청 HTTP 401 `AUTH_REQUIRED` |
+| 공개 smoke | Pharmacy·드럭스토어형 약국·CarePharm·Pharmcoop 홈 HTTP 200. 준비 상태 JSON HTTP 200. 새 business/cooperative 회원 API의 비로그인 요청 HTTP 401 `AUTH_REQUIRED` |
 
-추가 통합 검증에서 Pharmacy/MegaPharm 지원 메뉴의 다중 약국 미선택·잘못된 선택·단일 자동 선택·유효 선택을 8건 검증했다. 전체 Pharmacy 20파일148 PASS와 production build PASS. 로컬 병렬 실행 중 기존 UI 대기 1건이 만료됐지만 같은 assertion의 집중30건·전체 순차148건이 재통과했고 CI에서도 통과했다. assertion이나 timeout을 완화하지 않았다.
+추가 통합 검증에서 Pharmacy/드럭스토어형 약국 지원 메뉴의 다중 약국 미선택·잘못된 선택·단일 자동 선택·유효 선택을 8건 검증했다. 전체 Pharmacy 20파일148 PASS와 production build PASS. 로컬 병렬 실행 중 기존 UI 대기 1건이 만료됐지만 같은 assertion의 집중30건·전체 순차148건이 재통과했고 CI에서도 통과했다. assertion이나 timeout을 완화하지 않았다.
 
 실제 production bundle과 합성 API로 두 호스트 × PC/390px의 4개 추가 브라우저 흐름이 PASS다. 공지 게시/확인·활동 신청/승인/진행/완료·지원 메뉴/문의/배정·자료 개정/교육과 pageerror/수평 넘침0을 재확인했다. 앞의 4호스트8개 결과와 별도 기록이며 실계정 결과가 아니다.
 

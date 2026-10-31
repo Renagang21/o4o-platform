@@ -6,7 +6,7 @@ describe("cooperative session boundary", () => {
     expect(resolveSessionServiceKey("https://pharmacy.neture.co.kr")).toBe(
       "neture",
     );
-    for (const key of ["megapharm", "carepharm"]) expect(resolveSessionServiceKey(`https://${key}.neture.co.kr`)).toBe("neture");
+    for (const key of ["drugstore", "carepharm"]) expect(resolveSessionServiceKey(`https://${key}.neture.co.kr`)).toBe("neture");
     expect(resolveSessionServiceKey("https://neture.co.kr")).toBe("neture");
   });
   it.each([

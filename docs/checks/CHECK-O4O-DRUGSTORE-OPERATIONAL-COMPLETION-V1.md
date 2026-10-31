@@ -1,16 +1,16 @@
-# 메가팜 협업체 운영 완성 검증
+# 드럭스토어형 약국 협업체 운영 완성 검증
 
 - 작성일: 2026-10-22
 > **상태**: COMPLETED
 > **최종 갱신**: 2026-10-22
 
 - 결과: 기능 PR #761·보완 PR #763 병합, 최종 main CI·Promote·운영 공개 읽기 확인 완료. 실계정 로그인·실기기 음성은 미검증
-- 작업: [WO](../work-orders/WO-O4O-MEGAPHARM-OPERATIONAL-COMPLETION-V1.md)
+- 작업: [WO](../work-orders/WO-O4O-DRUGSTORE-OPERATIONAL-COMPLETION-V1.md)
 - 정본: [약국 설계 §15-9](../design/DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1.md#15-9-사업-운영-도구와-사업별-약관-2026-10-22), [My Home](../baseline/O4O-MY-HOME-CANONICAL-V1.md)
 
 ## 결과
 
-사업별 법정정보·약관과 가입 동의, 담당 사업 월별 고객 요구, 직원 숙지 자료 선택을 기존 운영 화면·정책 테이블·태그에 연결했다. 새 DB 구조·역할·정책 엔진은 만들지 않았다. pharmacy·megapharm·carepharm·pharmcoop는 공통 neture 계정 세션을 사용하며 사업 가입 권한은 별도로 확인한다. 약사 상담은 해당 매장 경영자의 확인만 읽는다.
+사업별 법정정보·약관과 가입 동의, 담당 사업 월별 고객 요구, 직원 숙지 자료 선택을 기존 운영 화면·정책 테이블·태그에 연결했다. 새 DB 구조·역할·정책 엔진은 만들지 않았다. pharmacy·drugstore·carepharm·pharmcoop는 공통 neture 계정 세션을 사용하며 사업 가입 권한은 별도로 확인한다. 약사 상담은 해당 매장 경영자의 확인만 읽는다.
 
 | 검증 | 결과 | 확인 범위 |
 |---|---|---|
@@ -44,7 +44,7 @@ API 선택 회귀에는 별도 격리 DB로 실행한 새 운영 API 8건과 담
 
 ## Git·Delivery
 
-전용 branch wo/megapharm-operational-completion, 기준 main 7dc02646da. 정상 PR·CI·리뷰를 통과한 뒤 병합·Delivery 결과를 기록한다. 새 migration이 없어 이 작업의 운영 DDL은 없다. [PR #761](https://github.com/Renagang21/o4o-platform/pull/761)에서 통합·배포 상태를 추적한다.
+전용 branch wo/drugstore-operational-completion, 기준 main 7dc02646da. 정상 PR·CI·리뷰를 통과한 뒤 병합·Delivery 결과를 기록한다. 새 migration이 없어 이 작업의 운영 DDL은 없다. [PR #761](https://github.com/Renagang21/o4o-platform/pull/761)에서 통합·배포 상태를 추적한다.
 
 최종 교차 점검 보완: CarePharm 공개 정책만 business endpoint를 읽도록 loader의 명시적 serviceKey를 따른다. 같은 호스트의 공통 계정 재동의·My Home 약관은 neture 문서를 유지한다. 이 경우와 미게시 fallback 차단 회귀 3개를 추가했고, 관련 계정 gate/패널 테스트 및 Neture production build를 다시 통과했다.
 
@@ -99,10 +99,10 @@ CI 전체 회귀 보완: 첫 전체 실행에서 관리자 guard 인벤토리 2�
 | API health/ready | 200 |
 | 사업 정보 및 새 운영 집계/약관 API의 비로그인 요청 | 401 AUTH_REQUIRED |
 | generic UUID 사업 scope 우회 | 404 UNKNOWN_SERVICE |
-| pharmacy/megapharm/carepharm 가입용 정책 조회 | 503 POLICY_UNAVAILABLE — 실제 약관 미게시 상태에서 신청 차단 유지 |
+| pharmacy/drugstore/carepharm 가입용 정책 조회 | 503 POLICY_UNAVAILABLE — 실제 약관 미게시 상태에서 신청 차단 유지 |
 | 협동조합 공개 directory | 200, 공개 항목 0개. 실제 개별 조합의 운영 약관 페이지 확인은 제외 |
-| pharmacy/megapharm/carepharm/pharmcoop 홈 | 1440/390px 총 8개 PASS, HTTP 200·page error 0·가로 넘침 0 |
-| pharmacy/megapharm/carepharm 약관·개인정보 직접 URL | 1440/390px 총 12개 PASS. 자기 사업의 문서 API만 조회, 타 사업/legacy 정책 요청 0 |
+| pharmacy/drugstore/carepharm/pharmcoop 홈 | 1440/390px 총 8개 PASS, HTTP 200·page error 0·가로 넘침 0 |
+| pharmacy/drugstore/carepharm 약관·개인정보 직접 URL | 1440/390px 총 12개 PASS. 자기 사업의 문서 API만 조회, 타 사업/legacy 정책 요청 0 |
 | 미게시 문서 표시 | 문서 API 404 뒤 중립 empty 상태 표시. 가짜 문안·다른 사업 문서 대체 없음 |
 
 운영 브라우저 최초 실행은 이 클라우드 검사 프록시의 CA를 Chromium이 신뢰하지 않아 실패했다. 시스템 HTTPS 검증으로 환경 CA임을 확인하고 해당 환경 CA의 공개키만 허용한 별도 브라우저로 재실행했다. 서버 인증서·시스템 신뢰 저장소·운영 설정은 바꾸지 않았다. 약관 페이지의 networkidle 대기는 시간 초과하여, 재실행은 문서 응답 수신과 실제 empty 상태 표시를 완료 기준으로 삼았다. 홈 8개 및 정책 페이지 12개 모두 통과했다.

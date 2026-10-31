@@ -1,5 +1,7 @@
 # TODO-O4O-EXTERNAL-AI-CONTENT-CONNECTION-V1
 
+> 명칭 정합(2026-10-31): 사용자 지시에 따라 협업체 표시명·기술 키·문서 링크를 현행 이름으로 정규화했다. 과거 검증·배포 기록은 당시 관측이며 새 도메인의 재검증을 뜻하지 않는다.
+
 > 상태: ACTIVE — 전체 작업공간 개발·검증 완료, 같은 branch push 인계 · 운영 활성화 전 · 작성일: 2026-10-22
 > 사용자 승인: 외부 AI 콘텐츠 제작 설계 전체 개발, 검증·commit·push까지. PR·병합·배포·운영 DB 적용은 이번 범위 밖.
 > 기준: main `7dc02646da`. 전용 branch `wo/external-ai-content-connection`.
@@ -48,7 +50,7 @@ O4O는 외부 ChatGPT 모델·구독·비용·토큰·대화 이력을 관리하
 
 개발 검증 결과와 운영 적용 조건은 [CHECK](../checks/CHECK-O4O-EXTERNAL-AI-CONTENT-CONNECTION-V1.md)에 기록한다.
 현재 로컬 검증: 격리 DB/MCP 40건, API 164건, admin 446건, Neture 24건,
-Store 6건, 약국/메가팜 공통 게시판 9건, 조합 16건, desktop/mobile 12건 PASS.
+Store 6건, 약국/드럭스토어형 약국 공통 게시판 9건, 조합 16건, desktop/mobile 12건 PASS.
 frontend 전체 타입·API 타입/컴파일·bundle, 변경 5개 웹 build, 정적 검사와 문서 검사를 완료했다.
 일반 게시판의 draft 비공개 누락도 보완하여 실제 원장 저장부터 본인의 게시까지 검증했다.
 테스트 DB 0개 및 전용 컨테이너 제거를 확인했다. 실제 ChatGPT·Google 인증, PR·병합·배포·운영 DB 적용은 미실행이다.
@@ -63,7 +65,7 @@ frontend 전체 타입·API 타입/컴파일·bundle, 변경 5개 웹 build, 정
 - [x] 최신 main merge 및 변경된 공통 소비처 재검증
 - [x] PR #766 생성, Codex 지적 2건 보완 및 43개 격리 DB 통합 검증
 - [x] 재리뷰의 동의 요청 저장 상한 보완 및 HTTP/DB 동시성 포함 46개 통합 검증
-- [x] 관리자 쓰기 Origin 분리·MegaPharm 사업 콘텐츠 링크 보완, 관련 Jest 25건 및 Store 전체 765건 검증
+- [x] 관리자 쓰기 Origin 분리·드럭스토어형 약국 사업 콘텐츠 링크 보완, 관련 Jest 25건 및 Store 전체 765건 검증
 - [x] MCP 요청/저장/오류 상한·인증 HTTP 오류 보완, 동시성/재시도 포함 50개 DB/SDK 통합 검증
 - [x] 해제/cleanup/재연결 시 사용자 저장 이력 보존 및 기록 만료 후 회복 검증
 - [ ] 최종 HEAD의 필수 CI·재리뷰·미해결 스레드 확인 후 PR merge

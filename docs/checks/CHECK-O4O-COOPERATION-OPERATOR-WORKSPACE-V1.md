@@ -1,5 +1,7 @@
 # 약국 협업체 운영 공간 개발·통합·배포 검증
 
+> 명칭 정합(2026-10-31): 사용자 지시에 따라 협업체 표시명·기술 키·문서 링크를 현행 이름으로 정규화했다. 과거 검증·배포 기록은 당시 관측이며 새 도메인의 재검증을 뜻하지 않는다.
+
 > **상태**: COMPLETED — 기존 업무 연결 단계의 개발·main 통합·배포 검증 완료. 실계정 운영 검증은 미실행
 > **작성일**: 2026-10-24 · **최종 갱신**: 2026-10-24 (Asia/Seoul)
 > **근거 WO**: [WO-O4O-COOPERATION-OPERATOR-WORKSPACE-V1](../work-orders/WO-O4O-COOPERATION-OPERATOR-WORKSPACE-V1.md)
@@ -22,7 +24,7 @@
 ## 브라우저
 
 - 로컬 빌드 preview와 합성 계정·API fixture를 사용했다. 운영 API는 호출하지 않았고 실계정 데이터는 사용하지 않았다.
-- Pharmacy·MegaPharm·CarePharm·Pharmcoop × PC 1440px / 모바일 390px의 8개 조합에서 운영 홈·집계·자료 처리 링크·해당 공간 문의함 이동 PASS.
+- Pharmacy·드럭스토어형 약국·CarePharm·Pharmcoop × PC 1440px / 모바일 390px의 8개 조합에서 운영 홈·집계·자료 처리 링크·해당 공간 문의함 이동 PASS.
 - 실제 대기 3건 및 조회 불가 표시를 확인했다. 운영 홈에서 약국 가입 심사 목록을 숨겨 조회하지 않았다. 페이지 오류·가로 넘침·쓰기 요청은 각각 0건이다.
 - 합성 약국 사업 계정은 각 호스트의 사업 한정 운영자 역할로 조회했다. CarePharm은 활성 Neture 자격과 CarePharm 운영자 역할만으로 전용 문의함까지 이동했다. Pharmcoop은 조합별 개인 운영 관계를 사용했다.
 - 초기 fixture의 CarePharm 활성 자격 누락으로 화면 대기 timeout이 발생했다. fixture에 기존 필수 자격을 넣어 재검증했으며 실제 guard의 자격 조건을 완화하지 않았다.
@@ -52,7 +54,7 @@
 | 자동 배포 | [Delivery 40082335409](https://github.com/Renagang21/o4o-platform/actions/runs/40082335409) SUCCESS. admin·kpa-society·lecture·store의 새 revision smoke·traffic 전환·배포 검증 PASS. Neture는 역할 경로 변경으로 LEVEL 3 보류 |
 | 통제 배포 | [Promote 40082664241](https://github.com/Renagang21/o4o-platform/actions/runs/40082664241) SUCCESS. main HEAD·CI·기존 freeze gate 유지. 자동 배포 대상과 겹치지 않는 neture,kpa-branch를 지정했고 실제 배포 필요 대상은 neture 하나. Neture revision smoke·traffic 전환·배포 검증·최종 serving 보고 PASS, commit status production=DEPLOYED |
 | Pharmcoop | [40082684528](https://github.com/Renagang21/o4o-platform/actions/runs/40082684528) SUCCESS. `frontend_only=true`, `apply=false`. 기존 serving API 호환성·revision readiness·인증 private smoke·트래픽 전환 PASS. 조합 fixture 등록 단계 skipped |
-| 공개 응답 | Pharmacy·MegaPharm·CarePharm·Pharmcoop의 `/` HTML과 참조 앱 JS 각각 HTTP 200. Pharmacy/MegaPharm의 같은 앱 JS 응답도 확인 |
+| 공개 응답 | Pharmacy·드럭스토어형 약국·CarePharm·Pharmcoop의 `/` HTML과 참조 앱 JS 각각 HTTP 200. Pharmacy/드럭스토어형 약국의 같은 앱 JS 응답도 확인 |
 
 API는 재배포 불필요로 판정되어 배포 job이 skipped였다. migration·조합 등록·회원/업무 데이터 write 없이 프런트엔드만 갱신했다. production workflow의 revision/serving 검증과 공개 HTTP 검사는 실계정의 업무 처리 검증과 구분한다. 화면의 실제 대기 데이터·심사·답변 발송을 실계정으로 실행하지 않았다.
 

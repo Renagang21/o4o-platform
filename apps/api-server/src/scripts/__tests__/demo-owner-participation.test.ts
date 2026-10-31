@@ -40,7 +40,7 @@ const enabled=process.env.O4O_DEMO_PARTICIPATION_TEST_DB==='o4o_demo_participati
     await pg.query("INSERT INTO organization_members(organization_id,user_id,role) VALUES($1,$2,'owner')",[org,owner]);
     await pg.query("INSERT INTO neture_pharmacy_memberships(organization_id,applicant_user_id,status) VALUES($1,$2,'active')",[org,owner]);
     await pg.query("INSERT INTO service_memberships(user_id,service_key,status,role) VALUES($1,'neture','active','customer'),($2,'community','suspended','member')",[owner,other]);
-    await pg.query("INSERT INTO semi_franchises(key,status) VALUES('carepharm','active'),('megapharm','active')");
+    await pg.query("INSERT INTO semi_franchises(key,status) VALUES('carepharm','active'),('drugstore','active')");
     await pg.query("INSERT INTO protected_fixture_data VALUES('sentinel','never-touch','platform:super_admin',$1)",[other]);
   });
   const count=async(table:string)=>Number((await pg.query(`SELECT count(*) AS n FROM ${table}`)).rows[0].n);

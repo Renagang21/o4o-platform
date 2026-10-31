@@ -46,7 +46,7 @@ function isRateLimited(err: any): boolean {
 
 const SERVICE_KEY = 'kpa';
 
-// Each business reads its own notifications; legacy pharmacy history is not a MegaPharm source.
+// Each business reads its own notifications; legacy pharmacy history is not a 드럭스토어형 약국 source.
 function scopeParams(serviceKey?: string) {
   return { serviceKey };
 }

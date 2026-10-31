@@ -1,5 +1,7 @@
 # 다국어 상담 음성 입력·읽어주기 검증
 
+> 명칭 정합(2026-10-31): 사용자 지시에 따라 협업체 표시명·기술 키·문서 링크를 현행 이름으로 정규화했다. 과거 검증·배포 기록은 당시 관측이며 새 도메인의 재검증을 뜻하지 않는다.
+
 > **상태**: COMPLETED — 코드·문서·로컬 검증·작업 branch push 범위
 > **작성일**: 2026-10-18
 > **작업**: [TODO](../work-orders/TODO-O4O-PHARMACY-CONSULTATION-VOICE-V1.md)
@@ -34,7 +36,7 @@
 
 ## 소비처와 통합 인계
 
-- 상담 페이지와 그 전용 hook만 변경했다. Pharmacy·Megapharm·CarePharm·Cooperative는 같은 Store 상담 기능을 사용한다. 공통 메뉴/route/권한/관리자/My Home 코드·비약국 Store에는 변경이 없다. literal 소비처는 상담 페이지 테스트와 App route import이며 신규 hook은 상담 페이지만 소비한다.
+- 상담 페이지와 그 전용 hook만 변경했다. Pharmacy·Drugstore·CarePharm·Cooperative는 같은 Store 상담 기능을 사용한다. 공통 메뉴/route/권한/관리자/My Home 코드·비약국 Store에는 변경이 없다. literal 소비처는 상담 페이지 테스트와 App route import이며 신규 hook은 상담 페이지만 소비한다.
 - branch `wo/pharmacy-multilingual-consultation`, 후속 기준 `36bd4b8d14`, 선행 서비스 설정 `9af97a9413` 포함. fetch 시 main `f8a849ba6e`를 확인했으며 자동 통합하지 않았다. 통합 담당은 최신 main 병합·관련 재검증 후 PR CI/리뷰·병합·배포를 진행한다.
 - 운영 설정/DB/배포는 변경하지 않았다. 미커밋 변경 없이 후속 commit을 같은 branch에 push하며 worktree는 `KEEP`한다. 환경 도구/의존성은 기존 설치를 재사용하므로 환경 설정 초안 변경은 없다.
 

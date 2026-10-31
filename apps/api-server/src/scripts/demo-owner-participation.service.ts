@@ -5,7 +5,7 @@ import { PUBLIC_DEMO_ACCOUNTS } from '@o4o/auth-utils';
 type Row = Record<string, any>;
 type Client = { query(sql: string, params?: unknown[]): Promise<Row[]> };
 const services = ['community', 'funding'] as const;
-const businesses = ['carepharm', 'megapharm'] as const;
+const businesses = ['carepharm', 'drugstore'] as const;
 const migration = 'demo-owner-participation-v1';
 const hash = (value: unknown) => createHash('sha256').update(JSON.stringify(value)).digest('hex');
 const stop = (code: string): never => { throw new Error(code); };

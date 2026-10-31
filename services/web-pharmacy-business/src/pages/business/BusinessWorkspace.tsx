@@ -38,7 +38,7 @@ export default function BusinessWorkspace({ defaultBusinessKey, memberLayout = f
     return () => { alive = false; };
   }, [businessKey, user?.id, isLoading, retry]);
   if (isLoading) return <output className="p-6" aria-live="polite">로그인 상태를 확인하고 있습니다…</output>;
-  if (!user && location.pathname === '/') return <PublicServiceEntry serviceKey={BUSINESS_SITE.key === 'megapharm' ? 'megapharm' : 'pharmacy'} loginHref={`/login?returnTo=${encodeURIComponent(location.pathname+location.search+location.hash)}`} contactHref="/contact" />;
+  if (!user && location.pathname === '/') return <PublicServiceEntry serviceKey={BUSINESS_SITE.key === 'drugstore' ? 'drugstore' : 'pharmacy'} loginHref={`/login?returnTo=${encodeURIComponent(location.pathname+location.search+location.hash)}`} contactHref="/contact" />;
   if (!user) return <Navigate to={`/login?returnTo=${encodeURIComponent(location.pathname + location.search + location.hash)}`} state={{ from: location.pathname + location.search + location.hash }} replace />;
   if (error) return <section className="p-6"><p role="alert">{error}</p><button type="button" onClick={() => setRetry(n => n + 1)}>다시 시도</button></section>;
   if (state?.loadedFor !== `${user.id}:${businessKey}`) return <output className="p-6" aria-live="polite">사업 정보를 확인하고 있습니다…</output>;

@@ -8,7 +8,7 @@ export const BUSINESS_OPERATOR_PREDICATE = `(
       (ra.role IN ('neture:admin','neture:operator') AND EXISTS (
         SELECT 1 FROM semi_franchise_operators op WHERE op.semi_franchise_id = sf.id
           AND op.user_id = $1 AND op.revoked_at IS NULL))
-      OR (sf.key IN ('pharmacy','carepharm','megapharm','pharmcoop')
+      OR (sf.key IN ('pharmacy','carepharm','drugstore','pharmcoop')
         AND ra.role IN ('neture:' || sf.key || '_admin', 'neture:' || sf.key || '_operator'))
 
     )

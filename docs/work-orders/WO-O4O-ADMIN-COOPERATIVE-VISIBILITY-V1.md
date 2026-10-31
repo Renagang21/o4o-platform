@@ -1,5 +1,7 @@
 # WO-O4O-ADMIN-COOPERATIVE-VISIBILITY-V1
 
+> 명칭 정합(2026-10-31): 사용자 지시에 따라 협업체 표시명·기술 키·문서 링크를 현행 이름으로 정규화했다. 과거 검증·배포 기록은 당시 관측이며 새 도메인의 재검증을 뜻하지 않는다.
+
 - 상태: ACTIVE
 - 작성·최종 갱신: 2026-10-19 (KST)
 - 기준: main `491be1bb82c5b9788ff97020d0e0430939be11b6`
@@ -18,7 +20,7 @@
 
 ## 조사 결과
 
-- `AdminSemiFranchisePage`의 등록 선택은 pharmacy/carepharm/megapharm 3개이며 pharmcoop을 의도적으로 제외한다.
+- `AdminSemiFranchisePage`의 등록 선택은 pharmacy/carepharm/drugstore 3개이며 pharmcoop을 의도적으로 제외한다.
 - 운영자 지정에는 `neture:pharmcoop_admin`과 `neture:pharmcoop_operator`가 이미 있다. 역할만으로 사업이나 조합 행이 생성되지는 않는다.
 - 일반 사업은 `semi_franchises`, 개별 조합은 `cooperatives.semi_franchise_id`로 그 사업에 연결한다. 개인 조합원은 별도 `cooperative_memberships`이며 약국 조직 가입과 구분한다.
 - 기존 `GET /neture/cooperatives`는 조합과 연결 사업이 모두 활성인 공개 디렉토리다. 관리자 연합회 현황의 근거로 사용하지 않는다. 조사 시 공개 조회는 HTTP 200/활성 조합 0건이었으며 전체 조합 부재를 뜻하지 않는다.

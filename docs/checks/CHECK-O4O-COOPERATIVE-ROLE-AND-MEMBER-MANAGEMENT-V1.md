@@ -1,5 +1,7 @@
 # CHECK-O4O-COOPERATIVE-ROLE-AND-MEMBER-MANAGEMENT-V1
 
+> 명칭 정합(2026-10-31): 사용자 지시에 따라 협업체 표시명·기술 키·문서 링크를 현행 이름으로 정규화했다. 과거 검증·배포 기록은 당시 관측이며 새 도메인의 재검증을 뜻하지 않는다.
+
 - 작성: 2026-10-18
 - 상태: LOCAL_VERIFIED · PUSHED · 운영 미적용
 - branch: `wo/cooperative-role-management`
@@ -26,7 +28,7 @@
 | API tsc --noEmit / tsc build / production tsup bundle | 통과 |
 | 조합 PostgreSQL 실제 SQL 검증 | 19 통과: 역할 분리·타 조합 차단·자격 전이·동시 마지막 admin 해제·CLI dry-run/멱등성·계정 삭제 중 쓰기 차단 |
 | HTTP/기존 사업관리 경계 | 5 suites 37 통과 (조합 PostgreSQL 19 포함) |
-| 기존 협업체 역할 PostgreSQL 회귀 | 12 통과 (pharmacy/carepharm/megapharm/pharmcoop, 해제·만료·전역 역할 경계) |
+| 기존 협업체 역할 PostgreSQL 회귀 | 12 통과 (pharmacy/carepharm/drugstore/pharmcoop, 해제·만료·전역 역할 경계) |
 | 기존 사업 접근·community workspace·개인정보 storage | 3 suites 10 통과 (사업 접근 검증은 위 관련 suite와 중복) |
 | 홈 개인 조합/약국 조직 분리 | 2 suites 3 통과, 약국 정지가 독립된 개인 조합 자격을 정지시키지 않음 |
 | 협동조합 Vitest / build | 5 files 43 통과 / 통과 |

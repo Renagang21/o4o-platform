@@ -537,7 +537,7 @@ const GuideBusinessPharmacyCoopPage = lazy(() => import('./pages/guide').then(m 
 const GuideBusinessTouristStorePage = lazy(() => import('./pages/guide').then(m => ({ default: m.GuideBusinessTouristStorePage })));
 // WO-O4O-NETURE-BUSINESS-FOREIGN-CUSTOMER-STORE-DETAIL-PAGE-V1: 외국인 고객 지역 매장 전용 상세 페이지
 const GuideBusinessForeignCustomerStorePage = lazy(() => import('./pages/guide').then(m => ({ default: m.GuideBusinessForeignCustomerStorePage })));
-// WO-O4O-NETURE-BUSINESS-WAREHOUSE-PHARMACY-DETAIL-PAGE-V1: 창고형 약국 전용 상세 페이지
+// WO-O4O-NETURE-BUSINESS-WAREHOUSE-PHARMACY-DETAIL-PAGE-V1: 드럭스토어형 약국 전용 상세 페이지
 const GuideBusinessWarehousePharmacyPage = lazy(() => import('./pages/guide').then(m => ({ default: m.GuideBusinessWarehousePharmacyPage })));
 // WO-O4O-NETURE-GUIDE-FOREIGN-CUSTOMER-SUPPORT-V1: 외국인 고객 응대 운영 매뉴얼
 const GuideForeignCustomerSupportPage = lazy(() => import('./pages/guide').then(m => ({ default: m.GuideForeignCustomerSupportPage })));

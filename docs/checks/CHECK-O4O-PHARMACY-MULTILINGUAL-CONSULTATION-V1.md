@@ -1,5 +1,7 @@
 # 내 매장 다국어 상담 검증
 
+> 명칭 정합(2026-10-31): 사용자 지시에 따라 협업체 표시명·기술 키·문서 링크를 현행 이름으로 정규화했다. 과거 검증·배포 기록은 당시 관측이며 새 도메인의 재검증을 뜻하지 않는다.
+
 > **상태**: COMPLETED — 코드·문서·로컬 검증·작업 branch push 범위
 > **작성일**: 2026-10-18
 > **작업**: [전체 TODO](../work-orders/TODO-O4O-PHARMACY-MULTILINGUAL-CONSULTATION-V1.md)
@@ -45,7 +47,7 @@ PostgreSQL은 운영과 분리한 loopback 전용 fixture다. 정책·사업·�
 | Admin·공통 operator UI | 기존 동적 기능 목록에 상담 세 기능 표시, 새 설정 화면 없음 | 전체 공통 UI 177 tests·실제 설정 화면 fixture |
 | Neture My Home | 직원 허용·최종 승인에 약사 확인, 본인 확인 | 13 tests·SQL/HTTP 실제 승인·타입 포함 build·PC/모바일 |
 | 공통 Store·서비스 지정 Store | 한 메뉴·세 기능 any-of 진입·모드별 실행 | 13 tests·접근/raw-source 계약·타입 포함 build·PC/모바일 |
-| Pharmacy·Megapharm·CarePharm·Cooperative | 공통 설정/가입 원장과 Store 소비, 도메인별 상담 분기 없음 | 공통 UI·SQL/HTTP·공통 route/메뉴 검증. 개별 운영 호스트 로그인은 미실행 |
+| Pharmacy·Drugstore·CarePharm·Cooperative | 공통 설정/가입 원장과 Store 소비, 도메인별 상담 분기 없음 | 공통 UI·SQL/HTTP·공통 route/메뉴 검증. 개별 운영 호스트 로그인은 미실행 |
 | 비약국 Store·기존 직원 지원 | 약국 adapter에서만 상담 메뉴 표시, 기존 기능 계약 유지 | StaffSupport·접근·메뉴/raw-source 회귀 |
 
 심볼·route·파일 경로 literal 소비처를 함께 조사했다. `App.tsx`와 `UnifiedStoreLayout.tsx`를 읽는 `pharmacy-hub-retirement.spec.ts`, `store-service-scoped-owner-entry.spec.ts`도 실행했다. 공통 메뉴 변경에 사업별 조건이나 직원 Role을 추가하지 않았다.

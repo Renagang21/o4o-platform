@@ -5,7 +5,7 @@
 ```text
 core.ts                         순수 계약, 설정 검증, 불변 registry 생성
 extensions/pharmacy.ts          전체 약국 경영협업
-extensions/megapharm.ts          창고형 약국 협업
+extensions/drugstore.ts          드럭스토어형 약국 협업
 extensions/carepharm.ts          만성질환관리 자료·작성 도움
 extensions/pharmcoop.ts          협동조합 개인 가입·조합 선택
 extensions/index.ts             네 extension 조합
@@ -21,7 +21,7 @@ cooperation-member-presentation.css 공통 메뉴·PC 2열·모바일 참여 상
 | 사업 | 앱 | 가입 단위 | 기존 인증 이동 |
 |---|---|---|---|
 | pharmacy | web-pharmacy-business | 약국 조직 | kpa-society transport alias → neture 세션 |
-| megapharm | web-pharmacy-business | 약국 조직 | 자기 호스트의 공통 계정 로그인 |
+| drugstore | web-pharmacy-business | 약국 조직 | 자기 호스트의 공통 계정 로그인 |
 | carepharm | web-pharmacy-business (전환 구현, 운영 결과는 아래 WO 참조) | 약국 조직 | carepharm transport alias → neture 세션 |
 | pharmcoop | web-pharmacy-coop | 조합별 개인 | 자기 호스트 로그인·조합 선택 |
 

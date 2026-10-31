@@ -12,7 +12,7 @@ const notice = (
   createdAt: "2026-10-21T00:00:00Z",
   metadata: targetUrl ? { targetUrl } : {},
 });
-it.each(["kpa-society", "megapharm"])(
+it.each(["kpa-society", "drugstore"])(
   "opens the real shared inquiry inbox for %s",
   (key) => {
     const navigate = vi.fn(),
@@ -72,7 +72,7 @@ it("retains existing KPA internal store navigation", () => {
 it("leaves the caller fallback available when a notification has no target", () => {
   expect(openNotificationTarget(notice(), vi.fn(), vi.fn())).toBe(false);
 });
-it.each(['pharmacy','megapharm'])('opens organization inquiry alerts inside the %s app',key=>{
+it.each(['pharmacy','drugstore'])('opens organization inquiry alerts inside the %s app',key=>{
  const navigate=vi.fn(),assign=vi.fn();
  const path=`/operator/inbox/business/${key}`;
  expect(openNotificationTarget(notice(path),navigate,assign)).toBe(true);

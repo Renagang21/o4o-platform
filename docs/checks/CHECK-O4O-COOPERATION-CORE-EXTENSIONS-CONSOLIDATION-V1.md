@@ -1,5 +1,7 @@
 # 네 약국 협업 사업 Core + Extension 통합 정비 검증
 
+> 명칭 정합(2026-10-31): 사용자 지시에 따라 협업체 표시명·기술 키·문서 링크를 현행 이름으로 정규화했다. 과거 검증·배포 기록은 당시 관측이며 새 도메인의 재검증을 뜻하지 않는다.
+
 > **상태**: ACTIVE — 로컬 구현·검증 완료, Git 전달·원격 CI·병합·운영 배포는 별도 기록
 > **작성일**: 2026-10-23 (Asia/Seoul)
 > **근거 WO**: [통합 정비](../work-orders/WO-O4O-COOPERATION-CORE-EXTENSIONS-CONSOLIDATION-V1.md)
@@ -13,7 +15,7 @@
 | 인계 PR #765 | merge `772296cb6d`, pull ref HEAD가 main의 조상 | 미사용 KPA API 정리는 재개발/중복 통합하지 않음 |
 | 인계 PR #772 | merge `8c44ffde13`, pull ref HEAD가 main의 조상 | 상담 초안·사용처·QR/태블릿 동선은 기존 구현 재사용 |
 | #772 배포 | 기존 [종료 CHECK](CHECK-O4O-STORE-WORKFLOW-STATUS-COMPLETION-V1.md)의 2026-10-23 후속: Delivery 39894078073, api/store DEPLOYED | 과거 인계의 미병합/미배포 표기를 현재 잔여로 세지 않음. 이번 세션에서 운영 상태를 재조회한 근거는 아님 |
-| 공통 세션·사업 약관·운영 요구 집계 | PR #761·#763 및 [메가팜 완료 기록](CHECK-O4O-MEGAPHARM-OPERATIONAL-COMPLETION-V1.md) | 이전 조사에서 지적한 기능이 현재 존재함. 운영 문안·설정은 별도 |
+| 공통 세션·사업 약관·운영 요구 집계 | PR #761·#763 및 [드럭스토어형 약국 완료 기록](CHECK-O4O-DRUGSTORE-OPERATIONAL-COMPLETION-V1.md) | 이전 조사에서 지적한 기능이 현재 존재함. 운영 문안·설정은 별도 |
 | CarePharm | #686·#690·#717·#729·#749가 main 병합 이력에 존재 | 운영자·회원 자료·내 매장 연결을 재구현하지 않음 |
 | Pharmcoop 포럼 배치 | PR #774가 main에 포함 | 조합원 포럼·운영 소식·작업별 운영 화면 유지. 이력 문서의 push-only 표기를 최신 현황으로 오독하지 않음 |
 | 회원 홈·전체 관리자 설정 | 이전 후속 CHECK에 #704·#746 배포 완료 증거 | 옛 COMPLETED 문서 체크박스는 당시 기록으로 보존 |
@@ -22,7 +24,7 @@
 
 공통 순수 계약/검증과 네 extension을 분리하고 세 앱·서비스 탐색·공통 운영 편집기에 연결했다. CarePharm 작성 도움과 회원 자료 태그는 extension 입력으로 제공한다. 계정·사업·약국/조합 원장, 가입 승인·기능 이용권·실제 약관 게시를 변경하지 않았다. 별도 package/dependency/lockfile/schema/migration/배포 설정 변경은 없다.
 
-MegaPharm 사업 게시판을 Neture의 호환 주소에서 열 때 Pharmacy fallback 대신 MegaPharm `/community`로 직접 이동한다. 존재하지 않는 handoff alias를 발급하지 않는다. Pharmcoop의 사업 공동공간 진입은 조합 목록으로 보내며 조합 slug 없이 다른 사업의 글 경로를 붙이지 않는다.
+드럭스토어형 약국 사업 게시판을 Neture의 호환 주소에서 열 때 Pharmacy fallback 대신 드럭스토어형 약국 `/community`로 직접 이동한다. 존재하지 않는 handoff alias를 발급하지 않는다. Pharmcoop의 사업 공동공간 진입은 조합 목록으로 보내며 조합 slug 없이 다른 사업의 글 경로를 붙이지 않는다.
 
 ## 로컬 검증 결과
 
@@ -32,7 +34,7 @@ Node 22.18.0 / pnpm 10.25.0, frozen lockfile·store integrity 설치와 `pnpm ru
 |---|---|
 | shared-space-ui 전체 Vitest | 18 files / 175 tests PASS |
 | operator-core-ui 전체 Vitest | 28 files / 201 tests PASS |
-| Pharmacy/MegaPharm 앱 전체 Vitest | 19 files / 140 tests PASS |
+| Pharmacy/드럭스토어형 약국 앱 전체 Vitest | 19 files / 140 tests PASS |
 | Pharmcoop 전체 Vitest | 11 files / 81 tests PASS |
 | Neture/CarePharm 전체 Vitest | 146 files / 1,262 tests PASS |
 | 합계 | 222 files / 1,859 tests PASS |
@@ -49,7 +51,7 @@ Pharmcoop의 기존 ForumLayout fixture에서 중복 React key 경고가 나온�
 
 ## Chromium 실제 production bundle 검증
 
-1440×900 / 390×900에서 네 사업 공개 홈 8건, CarePharm 회원 자료 태그 조회/변경 2건 PASS. JS pageerror 0·문서 가로 넘침 0. 별도 MegaPharm 게시판 진입은 실제 community 호스트 화면 → MegaPharm `/community` 이동을 확인했고 handoff 발급 요청은 0건이다. 총 11흐름 PASS.
+1440×900 / 390×900에서 네 사업 공개 홈 8건, CarePharm 회원 자료 태그 조회/변경 2건 PASS. JS pageerror 0·문서 가로 넘침 0. 별도 드럭스토어형 약국 게시판 진입은 실제 community 호스트 화면 → 드럭스토어형 약국 `/community` 이동을 확인했고 handoff 발급 요청은 0건이다. 총 11흐름 PASS.
 
 auth/API/도착 문서는 메모리 fixture이며 운영 요청·쓰기·실제 자격 부여가 아니다. 최초 harness는 Vite preview의 공식 hostname 허용 설정이 빠져 차단됐고, 로컬 전용 preview 설정에 대상 hostname만 명시해 재검증했다. 처음 Neture 호스트에서 시작한 community 이동 검사는 기존 host boundary가 먼저 이동시켜 완료되지 않았으며, 실제 소유자인 community 호스트에서 다시 검사했다. 제품의 guard·host boundary·인가를 끄지 않았다.
 
@@ -74,14 +76,14 @@ auth/API/도착 문서는 메모리 fixture이며 운영 요청·쓰기·실제 
 ## 통합 후속 — 2026-10-23
 
 - GitHub API 접근 복구 후 최신 main `5423efa3b8`을 충돌 없이 병합하고 [PR #784](https://github.com/Renagang21/o4o-platform/pull/784)를 생성했다. 최초 HEAD의 CI Gate·API 3개 shard·영향 앱 빌드·CodeQL·SonarCloud가 통과했다.
-- Codex 리뷰의 Store 메가팜 이동 경로 지적을 반영했다. 직접 로그인 사업은 handoff 요청 없이 목적 URL로 이동하며 CarePharm의 기존 handoff는 유지한다. 가입자 공간·신청 관리 회귀 테스트를 포함한 해당 파일 6개 테스트가 통과했다. 수정 HEAD는 재검증·리뷰 대상이다.
+- Codex 리뷰의 Store 드럭스토어형 약국 이동 경로 지적을 반영했다. 직접 로그인 사업은 handoff 요청 없이 목적 URL로 이동하며 CarePharm의 기존 handoff는 유지한다. 가입자 공간·신청 관리 회귀 테스트를 포함한 해당 파일 6개 테스트가 통과했다. 수정 HEAD는 재검증·리뷰 대상이다.
 - 사용자 요청으로 [CarePharm 이용약관](../design/DRAFT-CAREPHARM-BUSINESS-TERMS-V1.md)과 [개인정보처리방침](../design/DRAFT-CAREPHARM-BUSINESS-PRIVACY-V1.md) 초안을 작성했다. 사용자는 별도 사업자 사용 및 아직 회사가 없으므로 사업자 정보를 빈칸으로 유지하도록 확인했다. O4O 법정정보로 대체하지 않았으며 운영 게시·가입 차단 해제는 하지 않았다.
 - 문서 정합: 위 Git 전달 절은 당시 기록이다. 현재 PR 생성 완료, main 통합·배포는 아직 미완료다. 약관은 문서 초안 작성 완료와 실제 운영 게시 미완료를 구분한다.
 
 ## 배포 확인 및 승인된 Pharmcoop 후속 — 2026-10-24 (Asia/Seoul)
 
 - [PR #784](https://github.com/Renagang21/o4o-platform/pull/784)는 `6cfb1c0b3b7df95cfa6f46119e8423e7c2ecee39`로 main 병합됐다. 최신 PR·main CI와 Codex 리뷰를 통과했고 Store 이동 지적은 수정·해결됐다.
-- [Delivery 39969310284](https://github.com/Renagang21/o4o-platform/actions/runs/39969310284)가 성공했다. `production=success / DEPLOYED`이며 admin, neture(CarePharm 포함), kpa-society(Pharmacy/MegaPharm), lecture, store, kpa-branch 배포·검증을 완료했다. API는 런타임 변경이 없어 배포 대상이 아니었다.
+- [Delivery 39969310284](https://github.com/Renagang21/o4o-platform/actions/runs/39969310284)가 성공했다. `production=success / DEPLOYED`이며 admin, neture(CarePharm 포함), kpa-society(Pharmacy/드럭스토어형 약국), lecture, store, kpa-branch 배포·검증을 완료했다. API는 런타임 변경이 없어 배포 대상이 아니었다.
 - [Pharmcoop 39970209879](https://github.com/Renagang21/o4o-platform/actions/runs/39970209879)는 API 동일 SHA 확인 단계에서 실패했다. fixture 생성·프런트 배포·트래픽 전환은 skipped였으며 이 실행의 데이터 변경은 없다.
 - 사용자는 Pharmcoop 배포 설정 수정안을 승인했다. 같은 WO의 연속 배포 보완으로 기존 격리 checkout/branch를 유지한다. 전체 이력을 fetch하고, frontend_only에서는 기존 Delivery 판정기의 API serving→target 결과가 `UP_TO_DATE` 또는 `BEHIND_NO_RUNTIME_CHANGE`이며 배포 불필요일 때만 허용한다. API 변경·알 수 없는 serving·분기된 이력은 차단하며 fixture 경로의 동일 SHA·이미지 고정 조건은 유지한다.
 - 신규 migration·운영 DB 데이터·권한·freeze·CI gate·revision 검증 조건은 변경하지 않는다. 이 후속의 main 반영·Pharmcoop 실제 배포 결과는 아직 미확인이다.

@@ -222,11 +222,11 @@ for (const viewport of [
       await add.click();
       await dialog
         .getByRole("combobox", { name: "대상 서비스" })
-        .selectOption("megapharm");
+        .selectOption("drugstore");
       await expect(dialog.getByRole("checkbox")).toHaveCount(0);
       await dialog.getByRole("button", { name: "사업 등록" }).click();
       await expect(dialog).toHaveCount(0);
-      await expect(target).toHaveValue("business:megapharm");
+      await expect(target).toHaveValue("business:drugstore");
       await expect(
         page.getByRole("checkbox", { name: "태블릿" }),
       ).not.toBeChecked();

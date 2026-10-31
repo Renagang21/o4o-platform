@@ -15,7 +15,7 @@ afterEach(cleanup);
 it.each([
   "",
   "?register=carepharm",
-  "?register=megapharm",
+  "?register=drugstore",
   "?register=pharmcoop",
   "?section=cooperatives",
   "?target=business%3Asynthetic",

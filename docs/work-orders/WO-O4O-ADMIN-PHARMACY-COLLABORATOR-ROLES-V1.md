@@ -1,12 +1,14 @@
 # WO-O4O-ADMIN-PHARMACY-COLLABORATOR-ROLES-V1
 
+> 명칭 정합(2026-10-31): 사용자 지시에 따라 협업체 표시명·기술 키·문서 링크를 현행 이름으로 정규화했다. 과거 검증·배포 기록은 당시 관측이며 새 도메인의 재검증을 뜻하지 않는다.
+
 > **상태**: ACTIVE
 > **작성일**: 2026-10-18 · **최종 갱신**: 2026-10-18
 > **근거**: 전체 관리자 공간의 사용자 요청 — 누락된 네 약국 협업체, 동일한 Admin·Operator 역할
 
 ## 문제와 결정
 
-`admin.neture.co.kr/operators`의 지정 대상에 pharmacy·carepharm·megapharm·pharmcoop가 없다.
+`admin.neture.co.kr/operators`의 지정 대상에 pharmacy·carepharm·drugstore·pharmcoop가 없다.
 이 사업들은 기존 Neture 사업/협동조합 데이터 행으로 운영되므로 별도 service membership을 도입하지 않는다.
 기존 `neture` namespace 안에서 여덟 개의 사업 한정 역할을 추가한다.
 지정·수정·해제·목록 필터·운영 API·서비스 진입을 같은 역할 계약으로 연결한다.
@@ -28,7 +30,7 @@
 ## 영향 범위와 검증
 
 공통 역할 메타데이터는 기존 모든 소비처가 의존하는 `@o4o/types`에 둔다.
-관리자 UI/API allowlist, 사업 운영 전용 guard, Neture/CarePharm·약국/MegaPharm 진입,
+관리자 UI/API allowlist, 사업 운영 전용 guard, Neture/CarePharm·약국/드럭스토어형 약국 진입,
 사업 커뮤니티 관리와 협동조합 세션에서 사용한다. 일반 Neture/KPA 운영 guard와 다른 서비스 권한은 확장하지 않는다.
 Admin은 해당 사업의 Operator 기능을 포함한다. 별도 새 관리자 기능은 이번 범위에 없다.
 
@@ -55,7 +57,7 @@ Admin은 해당 사업의 Operator 기능을 포함한다. 별도 새 관리자 
 최신 main의 계정 메뉴 변경을 반영한 뒤 Neture·약국 웹을 재빌드하여 통과했다.
 
 리뷰 보완: 대표 Neture의 사업 운영 주소는 Pharmacy 호스트로 이동하므로 pharmacy 역할에만 표시한다.
-CarePharm 호스트는 CarePharm 역할만 로컬 사업 운영으로 진입한다. MegaPharm·Pharmcoop는 각 앱의 운영 진입을 사용한다.
+CarePharm 호스트는 CarePharm 역할만 로컬 사업 운영으로 진입한다. 드럭스토어형 약국·Pharmcoop는 각 앱의 운영 진입을 사용한다.
 호스트 이동과 역할의 대응 회귀 2개 파일 52개 테스트가 통과했다.
 
 CI 재현 보완: 기존 Neture IA 정적 계약이 조건부 scoped 메뉴를 허용하도록 갱신했다.

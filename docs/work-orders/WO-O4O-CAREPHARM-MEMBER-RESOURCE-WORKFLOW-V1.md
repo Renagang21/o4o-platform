@@ -1,5 +1,7 @@
 # CarePharm 회원자료·약국 운영 지원 흐름
 
+> 명칭 정합(2026-10-31): 사용자 지시에 따라 협업체 표시명·기술 키·문서 링크를 현행 이름으로 정규화했다. 과거 검증·배포 기록은 당시 관측이며 새 도메인의 재검증을 뜻하지 않는다.
+
 > **상태**: COMPLETED
 > **작성일**: 2026-10-21
 > **근거**: 사용자 지시 — TODO 작성 → 코드·문서 대조로 보완 → 개발·검증 → commit·push까지만
@@ -30,7 +32,7 @@ CarePharm은 독립 협업체다. 다른 사업의 가입·승인·운영자 권
 - `semi_franchise_contents.tags`는 이미 저장·복사되지만 회원 목록의 태그 필터는 없다. 제목·요약 검색은 내 매장에만 있다. 기존 원장에 정확한 태그 필터를 추가하고 CarePharm 자료실과 내 매장에서 같은 검색 조건을 사용한다. 새 분류·자료 묶음 테이블은 만들지 않는다.
 - 자료 묶음은 하나의 회원자료에 목적·포함 자료·활용 순서·갱신 안내를 작성하는 방식이다. CarePharm 운영자에게 신규 초안용 작성 양식과 권장 태그를 제공하고 실제 저장·게시·공급자 심사는 기존 절차를 따른다.
 - 회원 게시판은 이미 개설·글쓰기·댓글을 제공한다. CarePharm 신규 글쓰기에 운영 사례·자료 요청·제품/공급 문의 가이드와 명시적인 게시판 선택을 제공한다. 게시판 자동 개설·새 문의 원장·공지/글의 자동 자료화는 추가하지 않는다.
-- `CooperationMemberSpace`, 운영자 콘텐츠 편집기, Store 자료 가져오기, Neture 포럼 작성기의 import·route·source assertion 소비처를 조사했다. CarePharm 전용 안내는 사업 키/호스트의 기존 게이트 안에서만 제공하고 pharmacy·megapharm·pharmcoop·일반 Neture·community·funding의 기존 경로를 회귀 검증한다.
+- `CooperationMemberSpace`, 운영자 콘텐츠 편집기, Store 자료 가져오기, Neture 포럼 작성기의 import·route·source assertion 소비처를 조사했다. CarePharm 전용 안내는 사업 키/호스트의 기존 게이트 안에서만 제공하고 pharmacy·drugstore·pharmcoop·일반 Neture·community·funding의 기존 경로를 회귀 검증한다.
 - 인증·약관 독립화 잔여: base의 catalog는 CarePharm을 `neture.sessionDomains`에 연결하고, `AuthContext`는 neture로 복구하며, 사업 신청 약관은 pharmacy 전용 분기다. 독립화 WO의 공통 세션 해석을 이 작업에서 정본으로 승격하지 않는다. 플랫폼 전체의 인증·약관 저장 계약 변경은 이 자료 기능의 완료에 포함하지 않으며 통합 담당에게 미해결로 인계한다.
 - 공통 B2B의 대상 약국 가입 확인·미결제 주문 자격 재검증도 별도 잔여다. 이번 자료 기능에 주문/결제 코드를 섞지 않는다.
 
@@ -59,7 +61,7 @@ CarePharm은 독립 협업체다. 다른 사업의 가입·승인·운영자 권
 |---|---|
 | Neture 대표·CarePharm·supplier·community·funding | CarePharm에서만 작성 가이드·명시적 게시판 선택, Neture 전체 테스트와 production build |
 | Store | 기존 자료 조회 API에 선택 태그 추가, 조직·사업 전환/복사/다른 서비스 회귀와 전체 테스트·production build |
-| pharmacy·megapharm | 공통 운영자 편집기를 소비하지만 CarePharm 양식은 숨김, 같은 앱 production build |
+| pharmacy·drugstore | 공통 운영자 편집기를 소비하지만 CarePharm 양식은 숨김, 같은 앱 production build |
 | pharmcoop | 기존 운영자 편집·독립 사업 키 유지, production build |
 | API | 기존 조직·가입·담당 운영자 gate 불변, 실제 PG 자료 SQL·기존 handoff 회귀·type-check |
 
@@ -71,7 +73,7 @@ CarePharm은 독립 협업체다. 다른 사업의 가입·승인·운영자 권
 - 운영자 pharmacy-management **7 파일 / 54 PASS**: 신규 CarePharm 양식·제목/요약 보존·태그 중복 방지·본문 교체 취소·다른 사업 미노출과 기존 저장/사업 전환 포함. shared-space-ui 전체 **13 파일 / 142 PASS**.
 - 격리 localhost PostgreSQL 15의 `business-store-access.integration.spec.ts`와 `carepharm-handoff.integration.spec.ts` **2 suite / 33 PASS**. 실제 가입·조직 SQL과 태그/검색 조합·정확한 비교·페이지별 목록/전체 수·미게시/타 사업 제외·정지 후 상세/복사 거절, 기존 issuer → client → exchange 계약을 실행했다. 인증 토큰 생성과 성공 사본 저장기는 기존 fixture이며 운영 로그인·전체 HTTP 주문/자료 저장 E2E로 표현하지 않는다.
 - PG 테스트 schema 잔존 **0** 확인 후 이번 작업의 컨테이너와 임시 자격 파일을 제거했다. 운영 DB·업무 데이터 write·실계정 권한 변경 없음.
-- Neture·Store·pharmacy/megapharm·pharmcoop production build 성공, API `tsc --noEmit` 성공. 변경 TS/TSX ESLint **오류 0**, 기존 route handler의 사용하지 않는 `_next` 경고 1건은 유지했다. `git diff --check`, docs 민감정보 검사 성공. 기존 번들 크기/Browserslist·Store Vitest Tailwind 안내는 남아 있다.
+- Neture·Store·pharmacy/drugstore·pharmcoop production build 성공, API `tsc --noEmit` 성공. 변경 TS/TSX ESLint **오류 0**, 기존 route handler의 사용하지 않는 `_next` 경고 1건은 유지했다. `git diff --check`, docs 민감정보 검사 성공. 기존 번들 크기/Browserslist·Store Vitest Tailwind 안내는 남아 있다.
 - 실제 production 번들을 설치된 Chromium에서 **1440px·390px**, 회원 자료 검색/빈 결과/초기화·내 매장 태그/사본·운영자 신규 양식·회원 글 작성 가이드/게시판 선택·미승인 차단 **5종 × 2 = 10 PASS**. 화면 스크린샷 확인, pageerror·가로 넘침 0. API와 로그인은 전부 합성 응답이며 모든 요청을 가로채 실제 운영 API에 전송하지 않았다. 현재 PC의 브라우저 다운로드는 네트워크 정책으로 거절돼 기존 `/usr/bin/chromium`을 사용했다. 운영 HTTPS·실제 승인 회원의 사업 운영 검증은 하지 않았다.
 - 로그·화면은 task별 `/tmp/carepharm-resources-*`에 두며 저장소에 추가하지 않는다.
 

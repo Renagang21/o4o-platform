@@ -40,7 +40,7 @@ async function fixture(
   const targets = [
     ["pharmacy", "O4O 약국 경영지원"],
     ["carepharm", "CarePharm"],
-    ["megapharm", "MegaPharm"],
+    ["drugstore", "드럭스토어형 약국"],
     ["pharmcoop", "협동조합 연합회"],
     ["supplier", "공급자"],
     ["community", "커뮤니티"],

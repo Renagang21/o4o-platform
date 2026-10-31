@@ -15,7 +15,7 @@ from pharmacy_prepare import (BACKEND, COMPUTE, MARKER, NEG, NEW, OLD, PROJECT, 
                               RUN, cloud_api, digest, emit_summary)
 
 MAP = f'{COMPUTE}/global/urlMaps/o4o-global-lb'
-HOSTS = {'pharmacy.neture.co.kr', 'megapharm.neture.co.kr'}
+HOSTS = {'pharmacy.neture.co.kr', 'drugstore.neture.co.kr'}
 MATCHER = 'path-matcher-pharmacy'
 CUTOVER_MARKER = MARKER + ';cutover='
 PRODUCTION_WORKFLOWS = {'delivery.yml', 'promote.yml', 'deploy-api.yml', 'deploy-admin.yml',

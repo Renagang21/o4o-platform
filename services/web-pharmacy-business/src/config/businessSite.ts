@@ -1,5 +1,5 @@
 import { getCooperationExtension } from '@o4o/shared-space-ui';
-const BUSINESS_HOST_KEYS: Record<string, string> = { 'megapharm.neture.co.kr': 'megapharm', 'carepharm.neture.co.kr': 'carepharm' };
+const BUSINESS_HOST_KEYS: Record<string, string> = { 'drugstore.neture.co.kr': 'drugstore', 'carepharm.neture.co.kr': 'carepharm' };
 
 /** Shared pharmacy application: business configuration never grants membership or a role. */
 export function resolveBusinessSite(

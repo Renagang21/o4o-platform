@@ -80,7 +80,7 @@ def make_plan(service, revision, neg, backend, url_map, policy):
     matchers = [m for m in url_map.get('pathMatchers', []) if m.get('name') == 'path-matcher-pharmacy']
     if len(matchers) != 1 or matchers[0].get('defaultService', '').replace('https://www.googleapis.com/', 'https://compute.googleapis.com/') != f'{BACKEND}/backend-{OLD}':
         raise ValueError('Live pharmacy URL map topology changed')
-    for host in ('pharmacy.neture.co.kr', 'megapharm.neture.co.kr'):
+    for host in ('pharmacy.neture.co.kr', 'drugstore.neture.co.kr'):
         if not any(host in h.get('hosts', []) and h.get('pathMatcher') == 'path-matcher-pharmacy'
                    for h in url_map.get('hostRules', [])):
             raise ValueError('Live pharmacy host mapping changed')

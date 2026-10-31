@@ -22,7 +22,7 @@ it.each(Object.keys(OPERATOR_DELEGATION_SCOPES))(
     expect(scope.membershipKey).toBe(
       key === "kpa-society"
         ? "kpa-society"
-        : ["pharmacy", "carepharm", "megapharm", "pharmcoop"].includes(key)
+        : ["pharmacy", "carepharm", "drugstore", "pharmcoop"].includes(key)
           ? "neture"
           : key,
     );

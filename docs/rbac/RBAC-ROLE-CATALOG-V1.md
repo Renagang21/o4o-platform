@@ -170,7 +170,7 @@ Layer A와 Layer B는 혼합 금지:
 |---|---|---|
 | pharmacy | `neture:pharmacy_admin` | `neture:pharmacy_operator` |
 | carepharm | `neture:carepharm_admin` | `neture:carepharm_operator` |
-| megapharm | `neture:megapharm_admin` | `neture:megapharm_operator` |
+| drugstore | `neture:drugstore_admin` | `neture:drugstore_operator` |
 | pharmcoop | `neture:pharmcoop_admin` | `neture:pharmcoop_operator` |
 
 두 역할은 해당 사업의 기존 운영 기능을 이용한다. Neture 전체 관리·플랫폼 관리·다른 사업 운영 권한은 부여하지 않는다.

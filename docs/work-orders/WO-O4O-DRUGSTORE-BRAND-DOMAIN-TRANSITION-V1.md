@@ -1,0 +1,34 @@
+# 드럭스토어형 약국 이름·도메인·사업 키 전환
+
+> **상태**: IN_PROGRESS — 구현·로컬 검증 완료, PR CI·리뷰 대기 / 운영 적용 미실행
+> **작성일**: 2026-10-31
+> **근거**: 사용자의 O4O 전체 협업체 이름·주소 변경 지시 및 개발 데이터 상태 설명
+
+## 목표와 범위
+
+공식 이름은 **드럭스토어형 약국**, 공식 호스트는 `drugstore.neture.co.kr`, 사업 키는 `drugstore`다. 화면·공통 extension·서비스 전환·Admin 역할·문의·알림·AI 목적지·CORS·인증 호스트·운영 전환 스크립트와 문서를 함께 정렬한다. 약국 조직 단위 가입은 유지하며 Pharmcoop 개인 조합원 가입과 합치지 않는다.
+
+## TODO와 보완
+
+- [x] 전체 추적 파일에서 이전 표기·주소·기술 식별자 소비처 조사
+- [x] 공통 config, 사업 extension, 메뉴·공개 안내·로그인·가입·문의·알림·목적지 정합
+- [x] `neture:drugstore_admin` / `neture:drugstore_operator`와 원장 조회 키 정합
+- [x] 기존 사업 UUID·회원 결정·관련 FK를 유지하는 전환 migration 준비
+- [x] 양쪽 사업이 이미 존재하거나 고유 scope/JSON key 충돌이면 중단·롤백
+- [x] 문서 파일·디렉터리·상호 링크 및 과거 기록의 이름 정규화 주석
+- [x] 로컬 PostgreSQL·회귀 테스트·소비 앱 빌드·PC/모바일 합성 브라우저 검증
+- [ ] PR HEAD의 required CI와 자동 리뷰 확인·보완
+- [ ] 통합 시점에 main 포함 및 migration→API→소비 웹 배포 검증
+- [ ] 새 도메인의 실제 DNS·TLS·HTML·JS와 운영 권한/회원 상태 확인
+
+## 데이터·배포 경계
+
+새 migration은 기존 사업과 운영 조직을 갱신하며 회원 상태를 승인하거나 다른 협업체 역할을 부여하지 않는다. 명시된 live routing/config 테이블에서 키·역할·문의 scope·중첩 metadata의 기존 식별자와 목적지를 변환한다. 법정 동의·재무·보안·업무 감사 로그와 과거 snapshot은 개작하지 않는다. 이전 문자열은 전환 migration과 해당 전환 테스트의 입력에서만 필요하다. `down`으로 이름만 되돌려 새 데이터 연결을 손상시키지 않도록 forward-only다.
+
+이번 checkout은 기존에 준비된 격리 클라우드 checkout이며 새 작업 branch를 최신 main에서 시작했다. 별도 worktree 중복 생성 없이 사용하고 작업 로그는 저장소 밖 비공개 영역에 보존한다.
+
+## 문서 정합
+
+사용자 명시 지시에 따라 과거 WO/CHECK/IR도 표시명과 문서 참조를 정규화했다. 과거 기록에 명칭 정규화 주석을 붙였으며 당시 성공·실패는 새 호스트의 검증 증거가 아니다. 요구사항 문서와 extension 파일도 현행 이름으로 이동했다. 개발 완료와 통합·배포·운영 확인 상태는 구분한다.
+
+[검증 기록](../checks/CHECK-O4O-DRUGSTORE-BRAND-DOMAIN-TRANSITION-V1.md)

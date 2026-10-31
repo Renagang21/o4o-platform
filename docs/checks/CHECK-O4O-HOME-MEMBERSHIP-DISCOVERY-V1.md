@@ -1,5 +1,7 @@
 # CHECK-O4O-HOME-MEMBERSHIP-DISCOVERY-V1
 
+> 명칭 정합(2026-10-31): 사용자 지시에 따라 협업체 표시명·기술 키·문서 링크를 현행 이름으로 정규화했다. 과거 검증·배포 기록은 당시 관측이며 새 도메인의 재검증을 뜻하지 않는다.
+
 > 상태: **COMPLETED** · 확인: 2026-10-20 (KST) · 범위: [WO](../work-orders/WO-O4O-HOME-MEMBERSHIP-DISCOVERY-V1.md)의 승인된 보정
 
 ## 로컬 및 CI
@@ -17,7 +19,7 @@
 | --- | --- | --- |
 | 초기 별도 경로 plan | 39428287852 | WIF 조건 거부. DB proxy·SQL 전 실패, 데이터 변경 없음 |
 | 기존 경로 read-only census | 39429261764 | 성공, 현행 인증/연결 확인 |
-| 승인 범위 plan | 39430935546 | community/funding + CarePharm/megapharm 네 행 INSERT 예정, 공급자/분회 후보 0 |
+| 승인 범위 plan | 39430935546 | community/funding + CarePharm/drugstore 네 행 INSERT 예정, 공급자/분회 후보 0 |
 | 정확한 digest apply | 39432654235 | 성공, verified=true, 참여 4행 + 비공개 복구 기록 1행, 총 writes=5 |
 | 사후 plan | 39433015053 | 성공, 네 항목 preserve, 추가 참여 변경 0 |
 
@@ -28,8 +30,8 @@
 매장 경영자 테스트 로그인 버튼의 코드 정본으로 일반 인증 API에 새 로그인했다.
 
 - service memberships: neture, kpa-society, lecture, community, funding 모두 active.
-- pharmacy, carepharm, megapharm 사업 참여 모두 active 및 canParticipate=true.
-- CarePharm/megapharm의 실제 선택 약국 접근 API 모두 allowed=true. UI badge만 조작한 결과가 아니다.
+- pharmacy, carepharm, drugstore 사업 참여 모두 active 및 canParticipate=true.
+- CarePharm/drugstore의 실제 선택 약국 접근 API 모두 allowed=true. UI badge만 조작한 결과가 아니다.
 - 공급자 상태 none, 내 분회 0, 내 조합 0 유지. 이 세 항목은 실제 미가입/자격 미준비이므로 다른 서비스 소개에 남는다. 모든 서비스 가입 완료로 보고하지 않는다.
 
 ## 운영 브라우저

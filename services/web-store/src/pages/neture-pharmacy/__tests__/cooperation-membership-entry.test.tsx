@@ -16,13 +16,13 @@ afterEach(() => { cleanup(); vi.unstubAllGlobals(); });
 it.each([
   ['가입자 공간', '/'],
   ['서비스에서 가입 · 상태 관리', '/my/participation'],
-])('opens MegaPharm %s directly without requesting an unsupported handoff', async (label, path) => {
+])('opens 드럭스토어형 약국 %s directly without requesting an unsupported handoff', async (label, path) => {
   const assign = vi.fn();
   vi.stubGlobal('window', Object.create(window, { location: { value: { assign } } }));
-  state.list.mockResolvedValue([{ key: 'megapharm', name: '메가팜', membershipStatus: 'active', communityKey: 'business:megapharm' }]);
+  state.list.mockResolvedValue([{ key: 'drugstore', name: '드럭스토어형 약국', membershipStatus: 'active', communityKey: 'business:drugstore' }]);
   render(<MemoryRouter><SemiFranchisesPage /></MemoryRouter>);
   fireEvent.click((await screen.findAllByRole('button', { name: label }))[0]);
-  expect(assign).toHaveBeenCalledWith(`https://megapharm.neture.co.kr${path}?store=store-a`);
+  expect(assign).toHaveBeenCalledWith(`https://drugstore.neture.co.kr${path}?store=store-a`);
   expect(state.handoff).not.toHaveBeenCalled();
 });
 it('moves application management to the independent model and never applies from Store', async () => {

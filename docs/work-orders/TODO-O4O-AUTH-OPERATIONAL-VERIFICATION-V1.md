@@ -1,5 +1,7 @@
 # TODO-O4O-AUTH-OPERATIONAL-VERIFICATION-V1
 
+> 명칭 정합(2026-10-31): 사용자 지시에 따라 협업체 표시명·기술 키·문서 링크를 현행 이름으로 정규화했다. 과거 검증·배포 기록은 당시 관측이며 새 도메인의 재검증을 뜻하지 않는다.
+
 > **상태**: ACTIVE
 > **작성일**: 2026-10-23 · **최종 갱신**: 2026-10-23 (KST)
 > **근거**: 사용자의 인증 잔여 작업 진행 지시 · [인증 보완 TODO](TODO-O4O-AUTH-TOKEN-MEMBERSHIP-HARDENING-V1.md)
@@ -62,7 +64,7 @@
 | 정리 | 이번 두 차례 runner 실행 모두 전용 DB 6개 제거·잔존 0 확인·자기 서버 종료·임시 cluster 제거. 이미 사용 중인 포트에서는 시작 전에 거절함을 별도 확인했다. |
 
 공개 origin은 Neture·supplier·community·funding·pharmacy·store·study·kpa다.
-CarePharm/MegaPharm/Pharmcoop 별도 호스트는 현재 환경의 허용 목록에 없어 브라우저 검증하지 않았다.
+CarePharm/드럭스토어형 약국/Pharmcoop 별도 호스트는 현재 환경의 허용 목록에 없어 브라우저 검증하지 않았다.
 이들의 업무/조직 범위는 격리 DB 문의·업무함 검증과 별개로 운영 브라우저 후속에 남긴다.
 
 Chromium은 관리 proxy CA를 직접 사용하지 못해 최초 공개 탐색에서 인증서 오류가 났다.

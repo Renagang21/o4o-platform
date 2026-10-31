@@ -60,7 +60,7 @@ const homeProps: GuideFeaturesPageProps = {
       { title: '약국들의 협동조합', audience: '약국 네트워크', summary: '회원 약국이 함께 활용할 상품 · 콘텐츠 · 매장 안내 자료를 운영합니다.', to: '/guide/business/pharmacy-coop' },
       { title: '관광지 약국 / 화장품 가게', audience: '판매자 · 매장', summary: '관광객에게 제품 설명과 사용법을 쉽게 안내합니다.', to: '/guide/business/tourist-store' },
       { title: '외국인 고객이 많은 지역 매장', audience: '판매자 · 매장', summary: '외국인 고객에게 제품 정보와 사용법을 여러 언어로 안내합니다.', to: '/guide/business/foreign-customer-store' },
-      { title: '창고형 약국', audience: '약국 네트워크', summary: '많은 상품을 고객이 쉽게 찾고 이해하도록 안내합니다.', to: '/guide/business/warehouse-pharmacy' },
+      { title: '드럭스토어형 약국', audience: '약국 네트워크', summary: '많은 상품을 고객이 쉽게 찾고 이해하도록 안내합니다.', to: '/guide/business/warehouse-pharmacy' },
       { title: '내 사업에 맞는 운영 방식 상담하기', audience: '문의', summary: '내 사업 구조에 맞는 O4O 적용 방식을 상담합니다.', to: '/contact' },
     ],
   },
@@ -95,7 +95,7 @@ const homeProps: GuideFeaturesPageProps = {
       title: '서비스 운영자 안내',
       primaryRoute: '/guide/for-operator',
       description:
-        'O4O 기반 서비스를 운영하려는 사업자를 위한 안내입니다. 협동조합 준비 그룹 · 약국 네트워크 · 전문약사 그룹 · 관광객/창고형 약국 네트워크 · 화장품 전문매장 네트워크 · 도매상/제조사/브랜드사 주도 서비스 · 마케팅 사업자 등이 해당합니다. Business Guide 에서 실제 사업 운영 방법을 확인하세요.',
+        'O4O 기반 서비스를 운영하려는 사업자를 위한 안내입니다. 협동조합 준비 그룹 · 약국 네트워크 · 전문약사 그룹 · 관광객/드럭스토어형 약국 네트워크 · 화장품 전문매장 네트워크 · 도매상/제조사/브랜드사 주도 서비스 · 마케팅 사업자 등이 해당합니다. Business Guide 에서 실제 사업 운영 방법을 확인하세요.',
       items: [
         { label: '운영자 이용 안내', route: '/guide/for-operator' },
         { label: 'Business Guide (사업 운영 안내 모음)', route: '/guide/business' },

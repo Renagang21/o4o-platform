@@ -1,5 +1,7 @@
 # 약국 프런트 GCP 리소스 전환·정리
 
+> 명칭 정합(2026-10-31): 사용자 지시에 따라 협업체 표시명·기술 키·문서 링크를 현행 이름으로 정규화했다. 과거 검증·배포 기록은 당시 관측이며 새 도메인의 재검증을 뜻하지 않는다.
+
 > **상태**: ACTIVE
 > **작성일**: 2026-10-26
 > **근거**: [잔재 정리 WO](WO-O4O-PHARMACY-RESIDUE-SAFE-CLEANUP-V1.md), 사용자의 리소스 정리 진행 지시
@@ -83,7 +85,7 @@ URL map을 함께 정렬한다. 기존 backend로 즉시 복귀할 수 있도록
   `7166005df54231e00999673fecdf83e596e1bb3a`의 immutable digest를 재사용했다.
   새 준비 workflow의 main SHA와 앱 serving SHA는 서로 다른 식별자다.
 - 기존 LB routing·IAM·옛 리소스·DB는 변경하지 않았다. 기존 `pharmacy.neture.co.kr`의 HTML·동일 host JS는 200.
-  `megapharm.neture.co.kr`은 Codex 프록시의 CONNECT 403으로 HTTP smoke 미검증이며 성공으로 판정하지 않았다.
+  `drugstore.neture.co.kr`은 Codex 프록시의 CONNECT 403으로 HTTP smoke 미검증이며 성공으로 판정하지 않았다.
 
 새 서비스의 최초 공개 invoker 설정은 아직 미실행이다. 소유자가 다음 명령을 실행한 뒤
 도메인 검증·전환·참조/트래픽 확인·옛 자원 정리를 이어간다. 배포 계정에 IAM 변경 권한을
@@ -103,7 +105,7 @@ worktree disposition은 `KEEP`이다. 소유자 bootstrap 및 후속 전환이 �
 PR #838은 실행 기록과 후속 전환 코드를 함께 반영하는 연속 phase다. 배포 선택 키
 `kpa-society`는 호환 유지하고, 실제 Run·image·serving registry 대상만 `pharmacy-business-web`로 정렬한다.
 JWT·membership·사업 서비스 키는 변경하지 않는다. API 정적 CORS 목록은 기존 Run origin 하나를
-같은 프로젝트의 새 Run origin 하나로 바꾸며 pharmacy·megapharm 등 나머지 origin과 credentials 정책은 유지한다.
+같은 프로젝트의 새 Run origin 하나로 바꾸며 pharmacy·drugstore 등 나머지 origin과 credentials 정책은 유지한다.
 
 | 모드 | 실행 계약 |
 |---|---|
@@ -156,7 +158,7 @@ fingerprint로 복구하므로, 이후 main 이동·다른 배포의 대기 때�
   digest: `2d92dacaa5e6e210170e5a3b40a9f4ae3d19c34bf46bc7d14bfb1fe3c8a131a5`.
 - cutover [40327360298](https://github.com/Renagang21/o4o-platform/actions/runs/40327360298) PASS.
   main `e18664f89a8e4a1533bfa5103b648ef491ec2956`의 정확한 CI green을 확인하고 실행했다.
-  pharmacy·megapharm 두 host의 matcher를 새 backend로 전환했고 다른 matcher는 유지했다.
+  pharmacy·drugstore 두 host의 matcher를 새 backend로 전환했고 다른 matcher는 유지했다.
   새 Run `pharmacy-business-web-00001-4zd`와 두 도메인의 실제 JS digest가 일치했다.
 - 전환 직후 브라우저의 데스크톱 홈 요청 1회가 502였으며 다음 전체 재검사는 4/4 HTTP 200.
   홈·로그인 각 390/1440px에서 가로 넘침·페이지 JS 예외가 없었다.

@@ -1,5 +1,7 @@
 # 약국 서비스 설정·My Home 직원 허용 검증
 
+> 명칭 정합(2026-10-31): 사용자 지시에 따라 협업체 표시명·기술 키·문서 링크를 현행 이름으로 정규화했다. 과거 검증·배포 기록은 당시 관측이며 새 도메인의 재검증을 뜻하지 않는다.
+
 > **상태**: COMPLETED
 > **작성일**: 2026-10-18
 > **작업**: [전체 TODO](../work-orders/TODO-O4O-PHARMACY-SERVICE-POLICY-V1.md)
@@ -44,7 +46,7 @@ SQL 검증은 운영 DB와 분리한 전용 로컬 fixture DB만 사용했다. �
 | Admin | 새 서비스 설정 메뉴/화면 | `/admin/pharmacy-service-settings`, platform super admin | 전체 공통 UI·build·PC/모바일 fixture PASS |
 | Neture | 관리자 호환 wrapper·My Home | 관리자 호스트 이동·메뉴 권한·직원 승인/수정 | 관련 57 tests·타입 포함 build·PC/모바일 fixture PASS |
 | 공통 Store/서비스 지정 Store | 사용자별 기능 제한 | 계정/조직 scope·메뉴·직접 URL·실행 API | 6 tests·타입 포함 build·PC/모바일 fixture PASS |
-| Pharmacy/Megapharm | 공통 사업/내 매장 API 재사용 | 사업별 코드 분기 추가 없음 | 사업 문맥·SQL/HTTP·공통 모듈 검증 PASS |
+| Pharmacy/Drugstore | 공통 사업/내 매장 API 재사용 | 사업별 코드 분기 추가 없음 | 사업 문맥·SQL/HTTP·공통 모듈 검증 PASS |
 | CarePharm | Neture/Store 공통 기능 소비 | 기존 사업 가입과 비공개 자료 guard 유지 | 호스트 분기·Neture build·SQL/HTTP PASS |
 | Cooperative | 공통 pharmacy-management export 소비 | 조합의 명시적 businessKey·가입 원장 유지 | 전체 39 tests PASS |
 | 비약국 Store·은퇴 서비스 | 새 약국 정책 적용 없음 | 공개 QR/보유 사본·기존 기기 계약 유지 | 기존 접근·메뉴 raw-source 계약 PASS |

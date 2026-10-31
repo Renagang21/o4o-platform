@@ -1,5 +1,7 @@
 # 서비스 Admin의 Operator 지정·해제
 
+> 명칭 정합(2026-10-31): 사용자 지시에 따라 협업체 표시명·기술 키·문서 링크를 현행 이름으로 정규화했다. 과거 검증·배포 기록은 당시 관측이며 새 도메인의 재검증을 뜻하지 않는다.
+
 > **상태**: COMPLETED
 > **완료 범위**: 개발·로컬 검증·push
 > **작성일**: 2026-10-20 · **최종 갱신**: 2026-10-20
@@ -35,7 +37,7 @@ Neture `/admin/operators`는 중앙 관리자 링크만 제공한다. 공통
 | funding | funding:admin 전용 지정 화면/API 없음 | 펀딩 운영 메뉴에 Admin 전용 관리, funding:operator만 |
 | community | 중앙 지정에만 의존, Admin 메뉴는 민감 조치만 | Admin 메뉴 운영자 지정 추가, community:operator만 |
 | study / lecture | operator 업무·회원 관리는 있으나 지정 없음 | Admin 전용 `/operator/operators` 및 업무 메뉴 |
-| pharmacy / megapharm | 사업 Admin/Operator 역할은 있으나 사업 Admin의 직접 지정 기능 없음 | 해당 사업 업무 화면 위에 사업 한정 지정·해제 |
+| pharmacy / drugstore | 사업 Admin/Operator 역할은 있으나 사업 Admin의 직접 지정 기능 없음 | 해당 사업 업무 화면 위에 사업 한정 지정·해제 |
 | carepharm | 지정 업무 공통 화면 사용, 중앙 지정을 안내 | CarePharm 업무 화면 안에 해당 사업 한정 지정·해제 |
 | pharmcoop 연합회 | 산하 조합 Admin 지정은 있으나 연합회 자신의 Operator 지정 없음 | 연합회 Admin 화면에 연합회 Operator 지정·해제 |
 | 개별 협동조합 | `cooperative_roles`, 조합 Admin → 자기 조합 Operator 지정·해제 이미 있음 | 기존 UI/API 유지·회귀; 전역 사업 역할로 대체하지 않음 |
@@ -55,7 +57,7 @@ Neture `/admin/operators`는 중앙 관리자 링크만 제공한다. 공통
 - 사용자 입력 role/serviceKey를 허용하지 않고 서버 allowlist에서 scope별 정확한 Operator 하나를 결정.
 - DB의 현재 Admin·활성 계정·소속·역할 유효기간을 트랜잭션 안에서 확인하고 잠근다.
 - 후보는 해당 서비스 이용 자격이 있는 사람만 검색. Google 연결 없는 회원은 연결 필요 표시.
-- 독립 서비스는 active membership 필수. **Neture 원장을 쓰는 대표·Pharmacy·CarePharm·MegaPharm·Pharmcoop
+- 독립 서비스는 active membership 필수. **Neture 원장을 쓰는 대표·Pharmacy·CarePharm·드럭스토어형 약국·Pharmcoop
   범위는 canonical 메인 resolver와 같은 이메일 확인·정상 계정·명시적 Neture 정지/탈퇴 차단의
   자동 메인 자격을 유지**한다.
 - 개인 조합과 연결된 사업은 전역 사업 역할 신규 지정으로 우회하지 않는다.
@@ -77,17 +79,17 @@ Neture `/admin/operators`는 중앙 관리자 링크만 제공한다. 공통
 | operator-core-ui 전체 | 203 PASS |
 | Neture 관련 셸·메뉴·호스트 경계 | 76 PASS |
 | 강의 전체 | 41 PASS |
-| Pharmacy/MegaPharm 사업 화면·권한·공통 IA | 80 PASS |
+| Pharmacy/드럭스토어형 약국 사업 화면·권한·공통 IA | 80 PASS |
 | Pharmcoop 전체 | 44 PASS |
 | 분회 웹 전체 | 39 PASS |
 | 합계 | 554 PASS |
 | API TypeScript 및 tsup 운영 빌드 | PASS |
-| Neture·Lecture·Pharmacy/MegaPharm·Pharmcoop 각 TypeScript 포함 운영 빌드 | 4개 PASS |
+| Neture·Lecture·Pharmacy/드럭스토어형 약국·Pharmcoop 각 TypeScript 포함 운영 빌드 | 4개 PASS |
 | 신규/직접 수정 핵심 코드 ESLint | 오류 0·경고 0 |
 | 문서 민감정보 검사·diff 공백 검사 | PASS |
 
 브라우저는 **최종 운영 빌드 산출물**에 합성 계정/API 응답을 연결하고 외부 요청을 가로채는 격리
-검증이다. Neture·supplier·funding·community·study·pharmacy·carepharm·megapharm·Pharmcoop 연합회 및
+검증이다. Neture·supplier·funding·community·study·pharmacy·carepharm·drugstore·Pharmcoop 연합회 및
 기존 KPA 운영 영역, 10개 범위 × 1440/390 = **20 PASS**. 직접 URL 진입, 자기 범위 후보 조회·지정·해제,
 각 2회의 정확한 합성 mutation, console error 0·가로 넘침 0을 확인했다. 메뉴 노출/숨김은 셸·IA 테스트로
 추가 검증했다. 실제 계정 로그인·운영 역할 변경·운영 서버 smoke로 보고하지 않는다.
@@ -121,7 +123,7 @@ WORKTREE_DISPOSITION: 전용 worktree/branch 유지(KEEP), 통합 전 후속 수
 ### PR #719 통합 검토 보완
 
 - 최신 main #717 (`b54074d038`)을 통합하고 CarePharm·호스트/셸 회귀 89개 및 API/Neture 빌드 통과.
-- Codex P1: 메인 자동 이용 자격이 Pharmcoop에만 적용되어 Neture/Pharmacy/CarePharm/MegaPharm의
+- Codex P1: 메인 자동 이용 자격이 Pharmcoop에만 적용되어 Neture/Pharmacy/CarePharm/드럭스토어형 약국의
   정상 Admin/후보를 차단하는 문제를 수정. 모든 `membershipKey=neture` 범위의 인가·후보·목록 상태를 일치시킴.
 - 5개 범위 × 가입 원장 없음/pending/rejected/active 허용, 명시적 suspended/withdrawn 차단을
   실제 PostgreSQL로 회귀 검증하며 가입 상태를 변경하지 않는 것도 확인한다.

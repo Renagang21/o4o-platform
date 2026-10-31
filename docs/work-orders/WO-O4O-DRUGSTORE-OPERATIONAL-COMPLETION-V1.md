@@ -1,4 +1,4 @@
-# 메가팜 협업체 1차 운영 완성
+# 드럭스토어형 약국 협업체 1차 운영 완성
 
 > **상태**: COMPLETED
 > **작성일**: 2026-10-22 (Asia/Seoul)
@@ -7,7 +7,7 @@
 
 ## 전체 TODO와 코드·문서 대조
 
-기준 main: 7dc02646da. 전용 branch: wo/megapharm-operational-completion. 기준 checkout과 다른 세션의 작업공간을 보존한다.
+기준 main: 7dc02646da. 전용 branch: wo/drugstore-operational-completion. 기준 checkout과 다른 세션의 작업공간을 보존한다.
 
 - [x] 최신 main, OPEN 독립 정비 WO, 정본·실제 소비처·배포 경계를 대조한다.
 - [x] PR #760의 옛 KPA 운영/설문/매장 사본 제거를 보존한다. 앞선 조사에서 확인한 이미 제거된 화면은 복원하지 않는다.
@@ -41,7 +41,7 @@
 
 ## 로컬 구현·검증 결과 (2026-10-22)
 
-새 migration 없음. 기존 승인·유료·직원 허용 원장은 유지하고 사업별 정책 범위/운영 패널을 연결했다. 격리 PostgreSQL의 canonical bootstrap과 36개 incremental 적용 뒤 schema fingerprint 일치를 확인했다. 로컬 API·UI·PC/모바일 결과와 한계는 [CHECK](../checks/CHECK-O4O-MEGAPHARM-OPERATIONAL-COMPLETION-V1.md)를 따른다. push/PR/CI/병합/운영 배포 상태는 후속 기록으로 보완한다.
+새 migration 없음. 기존 승인·유료·직원 허용 원장은 유지하고 사업별 정책 범위/운영 패널을 연결했다. 격리 PostgreSQL의 canonical bootstrap과 36개 incremental 적용 뒤 schema fingerprint 일치를 확인했다. 로컬 API·UI·PC/모바일 결과와 한계는 [CHECK](../checks/CHECK-O4O-DRUGSTORE-OPERATIONAL-COMPLETION-V1.md)를 따른다. push/PR/CI/병합/운영 배포 상태는 후속 기록으로 보완한다.
 
 PR: https://github.com/Renagang21/o4o-platform/pull/761. 최종 교차 점검에서 CarePharm 호스트의 공통 계정 약관 loader가 사업 문서를 선택할 수 있는 경로를 수정했다. 요청한 serviceKey를 기준으로 계정/사업 문서를 선택하며 3개 회귀를 추가했다.
 
@@ -61,6 +61,6 @@ Codex P1의 기존 Pharmacy handoff도 고정 alias로 보완했다. 최종 교�
 
 [최종 main CI](https://github.com/Renagang21/o4o-platform/actions/runs/39723002629) PASS 뒤 자동 Delivery의 LEVEL 3 보류를 확인하고, 기존 사용자 배포 승인 범위에서 [Promote](https://github.com/Renagang21/o4o-platform/actions/runs/39724170327)를 실행했다. 전체 실행과 Report가 PASS이며 production 상태는 DEPLOYED다. api/admin/neture/kpa-society/lecture/store/kpa-branch 7개 대상의 serving SHA가 efcf96ec28f431eafab033454ae1bd7fe24a9571임을 Report로 확인했다. 물리 서비스 이름은 기존 이름을 유지했다.
 
-운영 공개 읽기와 비로그인 차단, 네 사업 도메인의 PC/390px 홈 8개, pharmacy/megapharm/carepharm의 약관·개인정보 직접 URL 12개를 확인했다. 실제 사업 문서는 미게시 상태이며 공개 뷰는 다른 문서로 대체하지 않고, 가입용 정책 API는 503으로 신규 사업 신청을 차단한다. 실제 약관 두 문서·법정정보 게시와 사업 등록/자격 설정은 담당 관리자의 운영 입력으로 남는다. 실계정 로그인 및 실기기 음성 품질을 완료했다고 보고하지 않는다.
+운영 공개 읽기와 비로그인 차단, 네 사업 도메인의 PC/390px 홈 8개, pharmacy/drugstore/carepharm의 약관·개인정보 직접 URL 12개를 확인했다. 실제 사업 문서는 미게시 상태이며 공개 뷰는 다른 문서로 대체하지 않고, 가입용 정책 API는 503으로 신규 사업 신청을 차단한다. 실제 약관 두 문서·법정정보 게시와 사업 등록/자격 설정은 담당 관리자의 운영 입력으로 남는다. 실계정 로그인 및 실기기 음성 품질을 완료했다고 보고하지 않는다.
 
-이 종료 문서 변경은 같은 WO의 결과 기록이며 실행 코드·DB·배포 설정을 추가로 바꾸지 않는다. 세부 증거·미확인 범위는 [CHECK](../checks/CHECK-O4O-MEGAPHARM-OPERATIONAL-COMPLETION-V1.md)를 따른다.
+이 종료 문서 변경은 같은 WO의 결과 기록이며 실행 코드·DB·배포 설정을 추가로 바꾸지 않는다. 세부 증거·미확인 범위는 [CHECK](../checks/CHECK-O4O-DRUGSTORE-OPERATIONAL-COMPLETION-V1.md)를 따른다.

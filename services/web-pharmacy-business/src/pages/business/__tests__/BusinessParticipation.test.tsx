@@ -31,7 +31,7 @@ it('requires a choice for multiple pharmacies and never uses a default enrollmen
   expect(screen.queryByRole('button', { name: '참여 신청' })).toBeNull();
   expect(mocks.post).not.toHaveBeenCalled();
 });
-it.each(['pharmacy', 'megapharm'])('reads and applies only the selected pharmacy for %s, preserving query and hash', async key => {
+it.each(['pharmacy', 'drugstore'])('reads and applies only the selected pharmacy for %s, preserving query and hash', async key => {
   mocks.key = key; mount('?other=keep#status');
   fireEvent.change(await screen.findByRole('combobox'), { target: { value: 'store-b' } });
   await screen.findByRole('button', { name: key === 'pharmacy' ? '기본 회원 연결 확인' : '참여 신청' });
@@ -87,7 +87,7 @@ it('clears another pharmacy status and ignores its late enrollment response', as
   expect(screen.queryByText('참여 중')).toBeNull();
 });
 it('clears consent and draft input when a different pharmacy is selected, even after an in-flight application', async () => {
-  mocks.key = 'megapharm';
+  mocks.key = 'drugstore';
   const initial = mocks.get.getMockImplementation()!;
   mocks.get.mockImplementation((path, config) => path.endsWith('/semi-franchises') ? Promise.resolve(envelope([{ key: mocks.key, membershipStatus: null }])) : initial(path, config));
   let reject!: (reason: Error) => void;
@@ -110,7 +110,7 @@ it('clears consent and draft input when a different pharmacy is selected, even a
   expect((screen.getByRole('combobox') as HTMLSelectElement).disabled).toBe(false);
 });
 it('keeps enrollment disabled when the selected business policies are unavailable', async () => {
-  mocks.key = 'megapharm';
+  mocks.key = 'drugstore';
   const initial = mocks.get.getMockImplementation()!;
   mocks.get.mockImplementation((path, config) => path.endsWith('/enrollment-policies') ? Promise.reject({ response: { status: 503, data: { code: 'POLICY_UNAVAILABLE' } } }) : initial(path, config));
   mount('?store=store-b'); await screen.findByRole('button', { name: '참여 신청' });

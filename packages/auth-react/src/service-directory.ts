@@ -38,10 +38,10 @@ export const O4O_SERVICE_DIRECTORY: readonly ServiceDestination[] = [
     category: "약국 협력사업 참여",
   },
   {
-    key: "megapharm",
-    label: "창고형 약국",
-    description: "메가팜의 창고형 약국 협력사업과 참여 정보를 확인합니다.",
-    href: "https://megapharm.neture.co.kr/",
+    key: "drugstore",
+    label: "드럭스토어형 약국",
+    description: "드럭스토어형 약국의 드럭스토어형 약국 협력사업과 참여 정보를 확인합니다.",
+    href: "https://drugstore.neture.co.kr/",
     category: "약국 협력사업 참여",
   },
   {
@@ -141,7 +141,7 @@ function applyBusinessParticipation(
   for (const [businessKey, serviceKey] of [
     ["pharmacy", "kpa-society"],
     ["carepharm", "carepharm"],
-    ["megapharm", "megapharm"],
+    ["drugstore", "drugstore"],
   ]) {
     const business = businesses.find((item) => item.key === businessKey);
     if (business) statuses[serviceKey] = participationStatus(business);

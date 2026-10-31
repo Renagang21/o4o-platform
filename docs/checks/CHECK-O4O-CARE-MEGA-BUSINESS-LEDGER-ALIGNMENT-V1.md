@@ -1,13 +1,15 @@
 # CHECK-O4O-CARE-MEGA-BUSINESS-LEDGER-ALIGNMENT-V1
 
-- 작성: 2026-10-18 · branch `wo/carepharm-megapharm-business-ledger-alignment` · base `d830f200df`
+> 명칭 정합(2026-10-31): 사용자 지시에 따라 협업체 표시명·기술 키·문서 링크를 현행 이름으로 정규화했다. 과거 검증·배포 기록은 당시 관측이며 새 도메인의 재검증을 뜻하지 않는다.
+
+- 작성: 2026-10-18 · branch `wo/carepharm-drugstore-business-ledger-alignment` · base `d830f200df`
 - 최종 갱신: 2026-10-18 (KST) — 클라우드 후속 검증·서비스 선택 등록 보완
 - 상태: ACTIVE · PR #701 main 병합·배포 완료 · 후속 화면 검증 완료 · 운영 사업 등록/실계정 시나리오는 미실행(§6~8)
-- 범위: CarePharm(`carepharm`) · MegaPharm(`megapharm`). 협동조합(`pharmcoop`)은 별도 작업이라 제외
+- 범위: CarePharm(`carepharm`) · 드럭스토어형 약국(`drugstore`). 협동조합(`pharmcoop`)은 별도 작업이라 제외
 
 ## 1. 증상
 
-- admin.neture.co.kr `/operators` 에서 CarePharm · MegaPharm Admin/Operator 가 Active 로 보인다.
+- admin.neture.co.kr `/operators` 에서 CarePharm · 드럭스토어형 약국 Admin/Operator 가 Active 로 보인다.
 - 일부 사용자 이름이 Unknown 이다.
 - 매장 경영자로 두 사업 상세 API 를 부르면 404, 가입 대상 목록에는 pharmacy 만 나온다.
 
@@ -24,8 +26,8 @@
 
 | 항목 | 값 |
 |---|---|
-| `semi_franchises` | `pharmacy` active 1행뿐. **carepharm · megapharm 행 0** · `semi-franchise-*` 운영 조직도 pharmacy 1개뿐 |
-| 유효 사업 역할 | carepharm admin/operator 각 1 · megapharm admin/operator 각 1 · pharmcoop admin/operator 각 1 |
+| `semi_franchises` | `pharmacy` active 1행뿐. **carepharm · drugstore 행 0** · `semi-franchise-*` 운영 조직도 pharmacy 1개뿐 |
+| 유효 사업 역할 | carepharm admin/operator 각 1 · drugstore admin/operator 각 1 · pharmcoop admin/operator 각 1 |
 | Care/Mega 역할 보유자 | 4개 역할 모두 **같은 사용자 1명**. 이름 · 성/이름 · 닉네임 모두 비어 있음(Unknown 의 원인). 광역 역할(platform/neture 운영)도 보유 |
 | 개별 담당 지정 | 0건 |
 | 사업 가입 | pharmacy active 1 · 내 매장(약국) 기본 가입 active 1 |
@@ -37,8 +39,8 @@
 
 | 파일 | 내용 |
 |---|---|
-| `apps/api-server/.../semi-franchise.service.ts` | `listAll()` 에 `roleOperators` 추가 — 사업 한정 역할(`neture:{key}_admin · _operator`, pharmacy · carepharm · megapharm) 보유자. 접근 판정 `BUSINESS_OPERATOR_PREDICATE` 의 key 역할 분기와 같은 조건. 기존 `operators` 는 그대로 |
-| `packages/operator-core-ui/.../AdminSemiFranchisePage.tsx` · `api.ts` · `BusinessFeatureSummary.tsx` | `?register=carepharm|megapharm` 등록 양식 프리셋(저장은 "만들기" 클릭 시에만, 이미 등록 시 안내) · 지정 역할 보유자를 조회 전용으로 별도 표시(해제 버튼 없음) · 둘 다 없을 때만 담당 지정 안내 |
+| `apps/api-server/.../semi-franchise.service.ts` | `listAll()` 에 `roleOperators` 추가 — 사업 한정 역할(`neture:{key}_admin · _operator`, pharmacy · carepharm · drugstore) 보유자. 접근 판정 `BUSINESS_OPERATOR_PREDICATE` 의 key 역할 분기와 같은 조건. 기존 `operators` 는 그대로 |
+| `packages/operator-core-ui/.../AdminSemiFranchisePage.tsx` · `api.ts` · `BusinessFeatureSummary.tsx` | `?register=carepharm|drugstore` 등록 양식 프리셋(저장은 "만들기" 클릭 시에만, 이미 등록 시 안내) · 지정 역할 보유자를 조회 전용으로 별도 표시(해제 버튼 없음) · 둘 다 없을 때만 담당 지정 안내 |
 | `apps/admin-dashboard/src/lib/business-ledger.ts` (신규) · `OperatorsPage.tsx` | "계정 상태" 열과 별도로 "사업 원장" 열 — 확인 중 · 조회 실패 · 사업 미등록 · 사업 운영 · 사업 마감. 조회 실패 · 형식 오류를 미등록으로 표시하지 않음. 미등록이면 등록 화면 링크 |
 | `apps/admin-dashboard/src/lib/assignment-row.ts` | 이름 fallback: name → 성·이름 → 닉네임 → `이름 미등록`. 사용자 DB 프로필 변경 없음 |
 
@@ -74,7 +76,7 @@ PR #701 리뷰 반영:
 | key | name | 생성 |
 |---|---|---|
 | carepharm | CarePharm · 만성질환관리 | 운영 조직 1 · active 사업 1 · `business.admin.create` 감사 1 |
-| megapharm | MegaPharm · 창고형약국 | 운영 조직 1 · active 사업 1 · `business.admin.create` 감사 1 |
+| drugstore | 드럭스토어형 약국 | 운영 조직 1 · active 사업 1 · `business.admin.create` 감사 1 |
 
 합계 조직 2 · 사업 2 · 감사 2. 기존 사용자 · 역할 · Neture 주 가입은 바꾸지 않는다. 결제 수취 주체 · 유료 기능 · community · 모듈은 비워 둔다.
 현재 운영 관리 화면(`/admin/semi-franchises`)의 등록 양식으로도 같은 API 가 호출되므로 이번 배포 전에도 실행할 수 있다.
@@ -122,7 +124,7 @@ PR #701 리뷰 반영:
 
 사용자는 내부 key를 기억해서 입력할 수 없으므로 서비스 선택 방식으로 바꾸도록 지시했다.
 
-- 새 사업 등록의 기본 입력을 **대상 서비스 선택 메뉴**로 변경한다. pharmacy/CarePharm/MegaPharm을 정본 표시 이름으로 선택하면 내부 key와 기본 이름이 자동 지정된다. 기본 선택·자동 저장·자동 기능 부여는 없다.
+- 새 사업 등록의 기본 입력을 **대상 서비스 선택 메뉴**로 변경한다. pharmacy/CarePharm/드럭스토어형 약국을 정본 표시 이름으로 선택하면 내부 key와 기본 이름이 자동 지정된다. 기본 선택·자동 저장·자동 기능 부여는 없다.
 - 선택한 서비스의 제공 기능을 체크한 뒤 맨 아래 `만들기`를 누른다. 실제 생성은 기존 감사·권한 판정 API를 그대로 사용한다.
 - 이미 등록된 서비스는 운영/마감 상태와 함께 선택 불가로 표시한다. 기존 사업 프리셋도 중복 생성 버튼을 비활성화하며 기존 목록에서 수정하도록 안내한다. 서버의 중복 판정도 유지한다.
 - 별도 사업 직접 등록 기능은 `기타 협력사업 직접 등록`을 명시적으로 선택할 때만 식별자 입력을 보여 기존 기능을 유지한다.

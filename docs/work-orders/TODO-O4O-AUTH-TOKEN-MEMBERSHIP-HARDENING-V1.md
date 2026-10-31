@@ -1,5 +1,7 @@
 # TODO-O4O-AUTH-TOKEN-MEMBERSHIP-HARDENING-V1
 
+> 명칭 정합(2026-10-31): 사용자 지시에 따라 협업체 표시명·기술 키·문서 링크를 현행 이름으로 정규화했다. 과거 검증·배포 기록은 당시 관측이며 새 도메인의 재검증을 뜻하지 않는다.
+
 > **상태**: COMPLETED (승인된 구현·검증·branch push 범위)
 > **작성일**: 2026-10-22 · **최종 갱신**: 2026-10-23 (KST)
 > **근거**: 사용자 인증 잔여 조사 후 TODO 작성 → 문서·코드 대조·계획 보완 → 구현·검증 → commit·push 지시
@@ -101,7 +103,7 @@ PG 검사는 고정된 전용 테스트 DB와 비표준 loopback 포트만 받�
 종료 후 전용 fixture DB를 제거해 `pg_database` 잔존0을 확인하고 이번 PostgreSQL process를 종료했다.
 
 공통 소비처는 이메일·Google·카카오 인증을 쓰는 Neture/공급자/펀딩/커뮤니티,
-약국/CarePharm/MegaPharm, 분회, Store, 강의, 협동조합과 별도 Google 전용 전체 관리자다.
+약국/CarePharm/드럭스토어형 약국, 분회, Store, 강의, 협동조합과 별도 Google 전용 전체 관리자다.
 공통 transport/UI의 공개 field/method는 바꾸지 않으며 토큰 수명 보완은 서버 내부다.
 실제 분회 가입 write 소비처는 `BranchJoinController`이고 승인 Core의 행 잠금 계약을 함께 대조했다.
 비밀번호 세션/관리자 경계·provider 증명·가입/역할/소유권 및 HTTP 오류 계약은 기존 회귀와

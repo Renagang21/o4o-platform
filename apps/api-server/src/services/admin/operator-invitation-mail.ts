@@ -7,7 +7,7 @@ export function invitationScopeLabel(role: string, serviceKey?: string): string 
   const businessLabels: Record<string, string> = {
     pharmacy: '약국 협력사업',
     carepharm: 'CarePharm · 만성질환관리',
-    megapharm: 'MegaPharm · 창고형약국',
+    drugstore: '드럭스토어형 약국',
     pharmcoop: '약국·약사 협동조합',
   };
   if (business && businessLabels[business]) return businessLabels[business];

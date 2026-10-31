@@ -1,5 +1,7 @@
 # CHECK-O4O-PHARMACY-APP-NAME-RESIDUE-AND-DEPLOY-SCOPE-V1
 
+> 명칭 정합(2026-10-31): 사용자 지시에 따라 협업체 표시명·기술 키·문서 링크를 현행 이름으로 정규화했다. 과거 검증·배포 기록은 당시 관측이며 새 도메인의 재검증을 뜻하지 않는다.
+
 - 작성: 2026-10-25 · branch `wo/pharmacy-stage6-name-residue` · base `42dddc91b5`
 - 상태: ACTIVE · PR #817 main 통합(`c63e370594`) · 운영 배포 완료(§7) · 운영 이름 전환은 미실행(§5)
 - 연결: [WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1](../work-orders/WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1.md) 단계 6 · DONE_CRITERIA 5
@@ -62,7 +64,7 @@
 |---|---|---|---|---|
 | R1 | 약국 앱 manifest 의 미사용 선언 9개 | 판정기 closure | **처리**(§2) | 불필요 배포의 직접 원인 |
 | R2 | 앱 디렉터리 `services/web-kpa-society` · package 이름 `@o4o/web-kpa-society` | 비문서 파일 56개(api-server raw-path spec 21개 포함) · Dockerfile · `deploy-web-services.yml` · 판정기 registry · lockfile importer | **유지** | 새 이름이 정해지지 않았다(WO OUT_OF_SCOPE "네 사업 상위 분류 이름 결정"). 이름 없이 옮기면 절반 rename 이 된다 |
-| R3 | Cloud Run 서비스 · 이미지 `kpa-society-web` | `deploy-web-services.yml` build · deploy · rollout · describe, LB backend(`scripts/README.md` 기준 pharmacy · megapharm host — 이번에 운영 LB 는 조회하지 않았다) | **유지 · 전환안만**(§5) | 운영 인프라 변경 — 이번 요청 범위 밖 |
+| R3 | Cloud Run 서비스 · 이미지 `kpa-society-web` | `deploy-web-services.yml` build · deploy · rollout · describe, LB backend(`scripts/README.md` 기준 pharmacy · drugstore host — 이번에 운영 LB 는 조회하지 않았다) | **유지 · 전환안만**(§5) | 운영 인프라 변경 — 이번 요청 범위 밖 |
 | R4 | run.app 주소 `kpa-society-web-…run.app` | `apps/api-server/src/bootstrap/setup-middlewares.ts:78` CORS 허용, `deploy-web-services.yml:75` `VITE_KPA_URL` | **유지 · R3 와 함께** | `VITE_KPA_URL` 소비처 0, CORS 항목은 ingress 가 LB 전용이면 쓰이지 않는다. 다만 workflow 수정은 판정기에서 전 서비스 배포가 되고, CORS 는 API 계약이라 R3 전환 작업에 묶는다 |
 | R5 | 서비스 키 `kpa-society` | 비문서 파일 412개, 운영 DB(`service_memberships` · `platform_services` · 콘텐츠 행 등) | **유지** | 단계 3(서비스 키 일반화) · 단계 5(테스트 데이터 정리) 범위. 문자열 치환 금지 |
 | R6 | 문서 · 주석의 `kpa-society-web` 서술(`scripts/README.md`, `.github/workflows/README.md`, `setup-middlewares.ts:74` 주석) | 현행 이름 그대로 맞다 | **유지** | 실제 Cloud Run 이름이 바뀌기 전까지는 정확한 서술 |
@@ -86,7 +88,7 @@ Cloud Run 이름을 바꾸는 것은 **새 서비스를 만들고 트래픽을 �
 
 1. 사전: 새 이름 결정(R2 와 같은 결정) · 현재 `kpa-society-web` 의 env · secret 참조 · 서비스 계정 · ingress · 최소 인스턴스 · revision label 기록.
 2. 새 서비스 배포: 같은 SHA 이미지로 새 이름 서비스를 만들고 LB 가 아닌 경로로는 접근할 수 없게 ingress 를 같게 둔다.
-3. LB: 새 serverless NEG · backend service 를 만들고 pharmacy · megapharm host rule 을 새 backend 로 바꾼다(`validate` 후 import).
+3. LB: 새 serverless NEG · backend service 를 만들고 pharmacy · drugstore host rule 을 새 backend 로 바꾼다(`validate` 후 import).
 4. 코드: `deploy-web-services.yml` 의 이름 · 이미지 경로 · `VITE_KPA_URL` 제거, CORS run.app 항목 제거, `scripts/ci/__tests__/deploy-workflow-diff.test.mjs` fixture, README 2곳. 이 commit 은 판정기에서 전 서비스 배포가 된다.
 5. 검증: 두 host 200 · 새 revision 이 serving · 옛 서비스 트래픽 0.
 6. 복구: 3단계 전이면 새 서비스 삭제만. 3단계 뒤 문제가 생기면 host rule 을 옛 backend 로 되돌린다(옛 서비스는 검증 기간 동안 지우지 않는다).
@@ -112,7 +114,7 @@ Cloud Run 이름을 바꾸는 것은 **새 서비스를 만들고 트래픽을 �
 |---|---|---|---|---|
 | neture | Delivery | `neture-web-02061-guf` | 100% | neture.co.kr 200 |
 | kpa-branch | Delivery | `kpa-branch-web-00346-soq` | 100% | kpa.neture.co.kr 200 |
-| kpa-society | promote | `kpa-society-web-02284-cug` | 100% | pharmacy · megapharm 200, 새 JS asset 200 |
+| kpa-society | promote | `kpa-society-web-02284-cug` | 100% | pharmacy · drugstore 200, 새 JS asset 200 |
 | store | promote | `store-web-00335-qer` | 100% | store.neture.co.kr 200, 새 JS asset 200 |
 
 - 실브라우저 smoke: 미실행 — UI 이름 · 메뉴 · 경로 변경이 없는 의존성 선언 정리라 HTTP · asset 확인으로 갈음했다.

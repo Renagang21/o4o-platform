@@ -84,7 +84,7 @@ const LEDGER_BADGE: Record<Exclude<BusinessLedgerStatus, 'not_applicable'>, { la
   closed: { label: '사업 마감', className: 'bg-gray-200 text-gray-700' },
 };
 
-/** 역할 행의 사업 원장 상태. 사업 한정 역할(pharmacy · carepharm · megapharm)이 아니면 '-'. */
+/** 역할 행의 사업 원장 상태. 사업 한정 역할(pharmacy · carepharm · drugstore)이 아니면 '-'. */
 function BusinessLedgerCell({ serviceKey, ledger }: { serviceKey: string; ledger: BusinessLedgerState }) {
   const status = resolveBusinessLedgerStatus(serviceKey, ledger);
   if (status === 'not_applicable') return <span className="text-xs text-gray-400">-</span>;
@@ -684,7 +684,7 @@ export default function OperatorsPage() {
           searchValue={search}
           onSearchChange={setSearch}
           filters={[
-            { key: 'service', placeholder: '서비스 전체', options: [...getServiceOptions(), ...['pharmacy','carepharm','megapharm','pharmcoop'].map(key => ({ value: key, label: SERVICES[key as keyof typeof SERVICES].label }))] },
+            { key: 'service', placeholder: '서비스 전체', options: [...getServiceOptions(), ...['pharmacy','carepharm','drugstore','pharmcoop'].map(key => ({ value: key, label: SERVICES[key as keyof typeof SERVICES].label }))] },
             { key: 'role', placeholder: '역할 전체', options: operatorRoleOptions },
           ]}
           filterValues={facets as unknown as Record<string, string>}

@@ -1,5 +1,7 @@
 # 관리자 서비스 상태·권한 화면 정비 검증
 
+> 명칭 정합(2026-10-31): 사용자 지시에 따라 협업체 표시명·기술 키·문서 링크를 현행 이름으로 정규화했다. 과거 검증·배포 기록은 당시 관측이며 새 도메인의 재검증을 뜻하지 않는다.
+
 > **상태**: COMPLETED
 > **작성일**: 2026-10-21 · **최종 갱신**: 2026-10-21 (Asia/Seoul)
 > **근거 WO/IR**: [정비 TODO](../work-orders/TODO-O4O-ADMIN-HEALTH-AUTHORITY-CONSOLIDATION-V1.md)
@@ -27,7 +29,7 @@
 
 | 종류 | 대상/의미 |
 |---|---|
-| 약국 협력사업·연합회 | pharmacy, carepharm, megapharm, pharmcoop. 주소는 기존 `PHARMACY_COLLABORATORS` 사용 |
+| 약국 협력사업·연합회 | pharmacy, carepharm, drugstore, pharmcoop. 주소는 기존 `PHARMACY_COLLABORATORS` 사용 |
 | 독립 서비스 | supplier, community, kpa.neture.co.kr(분회), study, funding. 주소는 기존 service catalog 사용 |
 | 공통 공간 | neture 대표 홈, store 내 매장, admin 전체 관리자 |
 | 외부 요청 | 서버 소유 고정 HTTPS 주소와 그 HTML의 동일 origin `/assets/` JS만 GET. cookie/Authorization 전달 없음. redirect를 따라가지 않음 |

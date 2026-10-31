@@ -13,7 +13,7 @@ afterEach(() => jest.restoreAllMocks());
 it("uses a stable namespace within existing policy column limits, rejecting display keys", () => {
   expect(businessPolicyScope(id)).toHaveLength(45);
   expect(isBusinessPolicyScope(`business:${id}`)).toBe(true);
-  expect(() => businessPolicyScope("megapharm")).toThrow();
+  expect(() => businessPolicyScope("drugstore")).toThrow();
   expect(isBusinessPolicyScope("neture")).toBe(false);
 });
 it("does not translate authorization or query failure to an empty list", async () => {
@@ -31,7 +31,7 @@ it("does not offer settings for a closed business", async () => {
     .spyOn(SemiFranchiseService.prototype, "requireOperatorOf")
     .mockResolvedValue({ id, status: "closed" } as any);
   await expect(
-    businessOperationsAccess({ query: jest.fn() } as any, "actor", "megapharm"),
+    businessOperationsAccess({ query: jest.fn() } as any, "actor", "drugstore"),
   ).rejects.toHaveProperty("httpStatus", 404);
 });
 it.each(["2026-13", "", undefined, ["2026-10"]])(
@@ -39,7 +39,7 @@ it.each(["2026-13", "", undefined, ["2026-10"]])(
   async (month) => {
     const query = jest.fn();
     await expect(
-      businessDemandSummary({ query } as any, "actor", "megapharm", month),
+      businessDemandSummary({ query } as any, "actor", "drugstore", month),
     ).rejects.toHaveProperty("code", "INVALID_MONTH");
     expect(query).not.toHaveBeenCalled();
   },

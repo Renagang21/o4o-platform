@@ -40,7 +40,7 @@ for (const viewport of [{ name: 'desktop', width: 1280, height: 800 }, { name: '
       // OperatorsPage is lazy loaded; a cold development build needs longer than the default 5 seconds.
       await expect(page.getByRole('heading', { name: '중앙 운영 담당자 지정', exact: true })).toBeVisible({ timeout: 20_000 });
       await expect(page.getByRole('radio', { name: /Neture/ })).toBeVisible();
-      await expect(page.getByRole('radio', { name: /약국 경영지원|kpa-society|MegaPharm|CarePharm/ })).toHaveCount(0);
+      await expect(page.getByRole('radio', { name: /약국 경영지원|kpa-society|드럭스토어형 약국|CarePharm/ })).toHaveCount(0);
       await page.getByRole('radio', { name: /Neture/ }).check();
       await page.getByRole('radio', { name: /^Admin/ }).check();
       await expect(page.getByRole('group', { name: '위임할 운영 업무' })).toBeVisible();
@@ -51,7 +51,7 @@ for (const viewport of [{ name: 'desktop', width: 1280, height: 800 }, { name: '
       await expect(page.getByRole('button', { name: '권한 해제 (Admin)', exact: true })).toBeVisible();
       await page.getByRole('button', { name: '서비스 담당자 지정' }).click();
       await expect(page.getByRole('radio', { name: /분회/ })).toBeVisible();
-      await expect(page.getByRole('radio', { name: /MegaPharm/ })).toBeVisible();
+      await expect(page.getByRole('radio', { name: /드럭스토어형 약국/ })).toBeVisible();
       await expect(page.getByRole('radio', { name: /약국 경영지원|kpa-society/ })).toHaveCount(0);
       await page.getByRole('button', { name: '담당자 지정 창 닫기' }).click();
       await page.goto('/admin/platform');
