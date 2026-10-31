@@ -1,7 +1,7 @@
 # 현재 전체 관리자와 폐기 역할 정책
 
 > **상태**: ACTIVE
-> **작성일**: 2026-10-20 · **최종 갱신**: 2026-10-29 (Asia/Seoul)
+> **작성일**: 2026-10-20 · **최종 갱신**: 2026-10-31 (Asia/Seoul)
 > **근거 WO**: [통합 운영 책임 정비](../work-orders/WO-O4O-UNIFIED-OPERATING-RESPONSIBILITY-V1.md) · [관리자 메뉴·역할 정비](../work-orders/WO-O4O-ADMIN-PLATFORM-MENU-ROLE-CLEANUP-V1.md)
 > **부분 대체 대상**: [ROLE-POLICY-AND-GUARD-V1](ROLE-POLICY-AND-GUARD-V1.md)의 전체 관리자 역할·역할 종류 편집·폐기 역할 취급 범위
 
@@ -23,6 +23,8 @@
 위 역할은 DB의 활성 이력 행이 남아 있더라도 현재 카탈로그·권한 목록·권한 판정에 사용하지 않는다. 관리자 사용자 목록과 서비스 회원 콘솔의 목록·상세도 같은 퇴역 판정을 따른다. cosmetics·PharmacyHub의 기존 퇴역 경계는 유지한다.
 
 ## 유지하는 경계
+
+2026-10-31 사용자 확인: 제거된 `kpa-society`는 중앙의 신규 서비스 관리자 지정·초대 대상에서 제외한다. 기존 역할 설명·할당 이력은 보존하며 `kpa-branch` 분회와 `neture:pharmacy_admin` 약국 협력사업은 이 제외 범위에 포함하지 않는다. 기존 미수락 초대도 신규 권한을 만들 수 없고 재발송하지 않는다. 중앙 담당자 지정은 위 Admin 초대·본인 수락·직영 업무 위임 계약을 유지한다.
 
 - 현재 `platform:super_admin`, 각 서비스의 admin/operator, `kpa:store_owner`, `kpa-branch:*`, `lecture:*`는 이 문서의 폐기 대상이 아니다.
 - 중앙 관리자 역할은 다른 서비스 업무를 수행할 권한을 자동으로 만들지 않는다. 서비스별 scope·조직 소속 검사를 유지한다.
