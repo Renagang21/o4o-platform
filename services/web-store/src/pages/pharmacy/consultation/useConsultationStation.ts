@@ -81,14 +81,14 @@ export function useConsultationStation(
     [release],
   );
   const open = useCallback(
-    (replace = false) =>
+    (replace = false, initialLanguage = language) =>
       run(
         () =>
           openConsultationStation({
             stationKey,
             name: stationKey === "counter-1" ? "매대 1" : stationKey,
             mode,
-            language,
+            language: initialLanguage,
             replace,
           }),
         (data) => {
@@ -152,5 +152,8 @@ export function useConsultationStation(
     if (!captured?.active) return Promise.resolve(false);
     return run(() => createConsultationPairing(captured), setPairing);
   }, [run]);
-  return { room, busy, error: error || heartbeatError, conflict, pairing, open, action, pair };
+  const acceptPreparedStation = useCallback((data: ConsultationStation) => {
+    if (data.id === current.current?.id && data.epoch === current.current?.epoch) apply(data);
+  }, [apply]);
+  return { room, busy, error: error || heartbeatError, conflict, pairing, open, action, pair, acceptPreparedStation };
 }

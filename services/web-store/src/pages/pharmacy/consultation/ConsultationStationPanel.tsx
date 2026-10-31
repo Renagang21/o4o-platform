@@ -5,9 +5,11 @@ const button = "min-h-12 rounded-lg border px-4 py-3 disabled:opacity-50";
 export function ConsultationStationPanel({
   station,
   onStarted,
+  initialLanguage,
 }: {
   station: Station;
   onStarted: () => void;
+  initialLanguage?: string;
 }) {
   const { room, busy, error, conflict, pairing } = station;
   const seen =
@@ -90,7 +92,7 @@ export function ConsultationStationPanel({
             className={button}
             disabled={busy}
             onClick={() =>
-              void station.open(true).then((ok) => {
+              void station.open(true, initialLanguage).then((ok) => {
                 if (ok) onStarted();
               })
             }

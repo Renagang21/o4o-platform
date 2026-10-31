@@ -7,6 +7,7 @@ import { apiLimiter } from '../../../middleware/rateLimiter.js';
 import { aiContextLanguage, readStoreProductAiContext } from '../../../modules/neture/product-description-intake/ai-context.service.js';
 import { MAX_PRODUCT_FILE_BYTES, previewStoreExcel } from '../../../modules/neture/product-description-intake/store-excel-preview.js';
 import { DescriptionIntakeError } from '../../../modules/neture/product-description-intake/contracts.js';
+import { readStoreAiReadiness } from '../../../modules/neture/product-description-intake/store-ai-readiness.js';
 
 // Authenticated store members only; shared parser byte cap plus sheet/column/row bounds and API rate limit.
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: MAX_PRODUCT_FILE_BYTES, files: 1, fields: 4, parts: 5 } }).single('file');
@@ -35,6 +36,10 @@ export function registerStoreProductAiRoutes(router: Router, db: DataSource, sto
     const input = z.object({ barcodeColumn: column, nameColumn: column, headerRow: z.coerce.number().int().min(0).max(19).optional(), language: aiContextLanguage.default('ko') }).strict().parse(req.body);
     const mapping = input.barcodeColumn === undefined && input.nameColumn === undefined ? undefined : { ...input, language: input.language ?? 'ko' };
     res.json({ success: true, data: await previewStoreExcel(db, org, req.file.buffer, mapping, input.headerRow) });
+  }));
+  router.get('/ai-context/readiness', requireAuth, storeAccess, apiLimiter, handle(async (req, res, org) => {
+    const language = aiContextLanguage.parse(req.query.language ?? 'ko');
+    res.json({ success: true, data: await readStoreAiReadiness(db, org, language) });
   }));
   router.get('/ai-context/:listingId', requireAuth, storeAccess, apiLimiter, handle(async (req, res, org) => {
     const id = z.string().uuid().parse(req.params.listingId);

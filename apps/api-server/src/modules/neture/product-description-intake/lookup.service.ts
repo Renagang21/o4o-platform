@@ -65,7 +65,10 @@ export async function findDescriptionTargets(db: Db, entries: LookupEntry[]): Pr
   const descriptions: Array<{ id: string; master_id: string; description_type: string; language: string; content: string; summary: string | null; updated_at: Date; source: DescriptionEntry['source'] | null; ai_sections: DescriptionEntry['aiSections'] }> = selected.length ? await db.query(
     `SELECT d.id,d.master_id,d.description_type,COALESCE(d.language,'ko') AS language,d.content,d.summary,d.updated_at,
        c.raw_payload->'descriptionResource'->'entry'->'source' AS source,
-       c.raw_payload->'descriptionResource'->'entry'->'aiSections' AS ai_sections FROM shared_product_descriptions d
+       CASE WHEN c.raw_payload->'descriptionResource'->'entry'->>'content'=d.content
+         AND c.raw_payload->'descriptionResource'->'entry'->>'descriptionType'=d.description_type
+         AND c.raw_payload->'descriptionResource'->'entry'->>'language'=COALESCE(d.language,'ko')
+       THEN c.raw_payload->'descriptionResource'->'entry'->'aiSections' END AS ai_sections FROM shared_product_descriptions d
        LEFT JOIN product_candidates c ON c.id=d.source_ref_id AND c.source_label='PRODUCT_DESCRIPTION_RESOURCE_V1' AND c.deleted_at IS NULL
      WHERE d.master_id=ANY($1::uuid[]) AND d.description_type=ANY($2::text[]) AND COALESCE(d.language,'ko')=ANY($3::text[]) AND d.status='canonical' AND d.deleted_at IS NULL`,
     [selected, [...new Set(entries.map(e => e.descriptionType))], [...new Set(entries.map(e => e.language))]],

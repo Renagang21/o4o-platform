@@ -6,10 +6,13 @@ import { createPolicyExecutor } from '../../ai-policy/ai-policy-factory.js';
 import logger from '../../../utils/logger.js';
 import { NeturePharmacyError } from '../constants.js';
 import { consultationTranslationExtension, type ConsultationTranslationInput } from './consultation-translation.extension.js';
+import type { ConsultationTranslationOutput } from './consultation-translation.extension.js';
+import { ModelControlService } from '../../../services/ai-management/model-controls.js';
+import { ConsultationGoogleService } from './consultation-google.js';
 
 export type ConsultationTranslator = (input: ConsultationTranslationInput, access: {
   actorId: string; organizationId: string; authorize: () => Promise<boolean>;
-}) => Promise<{ translation: string }>;
+}) => Promise<ConsultationTranslationOutput>;
 
 const quantityUnits = new Set(['mcg', 'mg', 'kg', 'ml', 'iu', 'meq', 'mmol', 'μg', 'µg', 'ug', 'g', 'l', '%']);
 function numericSignatures(text: string) {
@@ -33,11 +36,21 @@ export function createConsultationTranslator(db: DataSource): ConsultationTransl
   const policy = createPolicyExecutor(db);
   return async (input, access) => {
     try {
+      const settings = await new ModelControlService(db).read();
+      const validate = (output: ConsultationTranslationOutput) => {
+        if (numericSignatures(input.text) !== numericSignatures(output.translation)) throw new Error('Invalid numeric translation');
+        if (input.source === 'auto' && (!output.detectedLanguage || output.detectedLanguage === 'unknown'))
+          throw new NeturePharmacyError(422, 'CONSULTATION_LANGUAGE_UNCERTAIN', '입력 언어를 확인하지 못했습니다. 고객 언어를 직접 선택해 주세요.');
+        return output;
+      };
+      if (settings.consultation?.translation === 'google-cloud') {
+        await policy.assertEnabled('CONTENT_TRANSLATION');
+        return validate(consultationTranslationExtension.parse(JSON.stringify(await new ConsultationGoogleService(db).translate(input, access))));
+      }
       const result = await runAiExtension({
         extension: { ...consultationTranslationExtension, parse: content => {
           const output = consultationTranslationExtension.parse(content);
-          if (numericSignatures(input.text) !== numericSignatures(output.translation)) throw new Error('Invalid numeric translation');
-          return output;
+          return validate(output);
         } }, input, materials: [], funding: { payer: 'platform' },
         context: { requestId: randomUUID(), serviceId: 'store', featureId: consultationTranslationExtension.id,
           actorId: access.actorId, organizationId: access.organizationId, audience: 'staff' },
@@ -46,6 +59,14 @@ export function createConsultationTranslator(db: DataSource): ConsultationTransl
       }), { authorize: () => access.authorize(), record: event => { logger.info('[AI_EXTENSION]', event); return Promise.resolve(); } });
       return result.output;
     } catch (error) {
+      if (error instanceof NeturePharmacyError) throw error;
+      const reason = error instanceof Error ? error.message : '';
+      if (reason === 'QUOTA_EXCEEDED')
+        throw new NeturePharmacyError(429, 'CONSULTATION_QUOTA_EXCEEDED', '번역 이용 한도에 도달했습니다. 잠시 후 다시 시도해 주세요.');
+      if (reason.startsWith('AI_PRICING_'))
+        throw new NeturePharmacyError(503, 'CONSULTATION_PRICING_REQUIRED', '선택한 번역 수단의 가격 설정을 관리자에게 확인해 주세요.');
+      if (reason.startsWith('AI_DISABLED'))
+        throw new NeturePharmacyError(503, 'CONSULTATION_AI_DISABLED', '관리자가 현재 번역 실행을 중지했습니다.');
       if (error instanceof AiExtensionError && error.code === 'QUOTA_EXCEEDED') {
         throw new NeturePharmacyError(429, 'CONSULTATION_QUOTA_EXCEEDED', '번역 이용 한도에 도달했습니다. 잠시 후 다시 시도해 주세요.');
       }

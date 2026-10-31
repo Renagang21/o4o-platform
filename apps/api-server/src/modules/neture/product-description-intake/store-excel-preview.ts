@@ -45,7 +45,10 @@ async function previewPage(db: DataSource, organizationId: string, page: InputRo
     else if (!matches[index].length) state = 'not_found';
     return { ...row, state, candidates: matches[index].map(item => ({
       id: item.id, name: item.name, barcode: item.barcode, manufacturer: item.manufacturer, matchedBy: item.matchedBy,
-      hasAiDescription: !!item.canonical, registered: listed.some(l => l.master_id === item.id),
+      hasAiDescription: !!item.canonical?.aiSections?.some(section => section.kind !== 'unclassified' && section.referenceUrls.length > 0),
+      aiState: !item.canonical ? 'missing' : !item.canonical.aiSections?.length ? 'legacy'
+        : item.canonical.aiSections.some(section => section.kind !== 'unclassified' && section.referenceUrls.length > 0) ? 'structured' : 'unclassified',
+      registered: listed.some(l => l.master_id === item.id),
     })) };
   });
 }

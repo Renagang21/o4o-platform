@@ -44,6 +44,8 @@ export interface StoreMlcPage {
 }
 
 export interface StoreMlcGroup {
+  /** Current store listing state; publication and public keys are independent. */
+  targetActive?: boolean;
   id: string;
   organizationId: string;
   serviceKey?: string | null;

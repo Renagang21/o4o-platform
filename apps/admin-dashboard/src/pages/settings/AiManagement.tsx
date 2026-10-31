@@ -1,5 +1,6 @@
 import { AiModelCatalog, ModelControlStatus, UsageModelSelection, useAiModelControls } from './AiModelControls';
 import ExternalAiConnections from './external-ai/ExternalAiConnections';
+import { ConsultationRuntimeControls } from './ConsultationRuntimeControls';
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import {
@@ -127,6 +128,7 @@ function InternalAiManagement() {
         </p>
       </div>
       <ModelControlStatus control={modelControl} />
+      <ConsultationRuntimeControls control={modelControl} />
       <div
         role="tablist"
         aria-label="AI 운영 관리 화면"

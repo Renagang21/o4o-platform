@@ -28,7 +28,9 @@ export async function registerProductFileSelection(rows: ProductFileRow[], selec
 }
 export function fileRowLabels(row: ProductFileRow, target: ProductFileRow['candidates'][number] | undefined, outcome: string) {
   let material = '선택 대기', registration = '', missing = '식별 대기·자동 생성 안 함';
-  if (target) material = target.hasAiDescription ? '승인 자료 있음' : '공개 근거 준비 필요';
+  if (target) material = target.hasAiDescription ? '승인 구조화 자료 준비됨'
+    : target.aiState === 'legacy' ? '기존 설명만 있음 · 구조화 자료 준비 필요'
+    : target.aiState === 'unclassified' ? '미분류 자료 · 근거 검토 필요' : '공개 근거 준비 필요';
   if (row.state === 'invalid') missing = '바코드·입력 확인 필요';
   if (outcome === 'registered') registration = '매장 등록 완료';
   else if (outcome === 'failed') registration = '등록 실패·다시 시도 가능';

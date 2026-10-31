@@ -20,7 +20,8 @@ import type { ConsultationProduct } from './consultation/ConsultationProducts';
 import { coreApiClient } from "../../api/client";
 import { useAuth } from "../../contexts/AuthContext";
 import { useUnifiedStore } from "../../contexts/StoreContext";
-import { useConsultationSpeech } from "./useConsultationSpeech";
+import { useConsultationAudio } from './useConsultationAudio';
+import { prepareConsultationSupport, type ConsultationSupportSourceProof } from '../../api/consultationWorkspace';
 import {
   useConsultationDrafts,
   type ConsultationDirection,
@@ -29,6 +30,9 @@ import {
 const base = "/neture/pharmacy/multilingual-consultation";
 function translationErrorMessage(code?: string) {
   if (code === "CONSULTATION_QUOTA_EXCEEDED") return "번역 이용 한도에 도달했습니다. 잠시 후 다시 시도해 주세요.";
+  if (code === 'CONSULTATION_LANGUAGE_UNCERTAIN') return '입력 언어가 불확실합니다. 고객 문장 언어를 직접 선택하고 자동 감지를 끈 뒤 다시 시도해 주세요.';
+  if (code === 'CONSULTATION_PRICING_REQUIRED') return '선택한 번역 수단의 가격 설정을 관리자에게 확인해 주세요. 입력 문장은 유지했습니다.';
+  if (code === 'CONSULTATION_AI_DISABLED') return '관리자가 현재 번역 실행을 중지했습니다. 입력 문장은 유지했습니다.';
   return consultationAccessError(code) ?? "번역을 완료하지 못했습니다. 입력 문장을 유지했습니다. 다시 시도해 주세요.";
 }
 function matchingResult(
@@ -90,6 +94,11 @@ function Consultation({
   const [mode, setMode] = useState("");
   const [language, setLanguage] = useState("en");
   const [replyLanguage, setReplyLanguage] = useState("");
+  const [autoLanguage, setAutoLanguage] = useState(false);
+  const autoDefault = useRef(false);
+  const defaultLanguage = useRef('en');
+  const languageWasDetected = useRef(false);
+  const supportSource = useRef<ConsultationSupportSourceProof | null>(null);
   const [direction, setDirection] =
     useState<ConsultationDirection>("to-customer");
   const {
@@ -139,7 +148,7 @@ function Consultation({
   const fixedResponse = mode === "floor-staff" && direction === "to-customer";
   const inputLanguage =
     direction === "to-staff" ? replyLanguage || language : language;
-  const speech = useConsultationSpeech(
+  const speech = useConsultationAudio(
     `${organizationId}:${mode}:${inputLanguage}:${direction}`,
     (words) => {
       if (voiceTarget.current === "guidance") {
@@ -157,6 +166,25 @@ function Consultation({
       setText((previous) =>
         [previous.trim(), words].filter(Boolean).join(" ").slice(0, 1000),
       );
+    }, {
+      recognition: context?.runtime?.recognition, synthesis: context?.runtime?.synthesis,
+      recognize: async (audioBase64, spokenLanguage) => {
+        const response = await coreApiClient.post<{ success: boolean; data: { organizationId: string; mode: string; text: string; language: string } }>('/neture/pharmacy/consultation-speech/recognize', {
+          mode, audioBase64, language: direction === 'to-staff' && autoLanguage ? 'auto' : spokenLanguage,
+          ...(connected ? { stationId: connected.id, epoch: connected.epoch } : {}),
+        });
+        if (!response.success || response.data.organizationId !== organizationId || response.data.mode !== mode || !response.data.text || !context?.languages.some(item => item.key === response.data.language)) throw new Error('음성 인식 결과를 확인하지 못했습니다.');
+        return response.data;
+      },
+      synthesize: async (words, spokenLanguage) => {
+        const response = await coreApiClient.post<{ success: boolean; data: { organizationId: string; mode: string; audioBase64: string; mimeType: string } }>('/neture/pharmacy/consultation-speech/synthesize', {
+          mode, text: words, language: spokenLanguage, ...(connected ? { stationId: connected.id, epoch: connected.epoch } : {}),
+        });
+        if (!response.success || response.data.organizationId !== organizationId || response.data.mode !== mode) throw new Error('음성 재생 결과를 확인하지 못했습니다.');
+        return response.data;
+      },
+      onLanguage: detected => { if (direction === 'to-staff' && context?.languages.some(item => item.key === detected)) setReplyLanguage(detected); },
+      onAccessDenied: () => { clear(); setContext(null); setRetry(value => value + 1); },
     },
   );
   const startListening = speech.startListening;
@@ -176,6 +204,7 @@ function Consultation({
       setGuidanceVoice(null);
       setGuidanceReset((value) => value + 1);
       setSupportProduct(null);
+      supportSource.current = null;
       setBusy(false);
       focusReply.current = false;
       dialog.current?.close();
@@ -212,6 +241,8 @@ function Consultation({
         )
           throw new Error("Invalid context");
         setContext(data);
+        autoDefault.current = data.runtime?.detectLanguage === true;
+        setAutoLanguage(autoDefault.current);
         setMode(
           (
             data.modes.find((item) => item.key === initialMode) ??
@@ -221,6 +252,8 @@ function Consultation({
           ).key,
         );
         setLanguage(data.languages[0].key);
+        defaultLanguage.current = data.languages[0].key;
+        languageWasDetected.current = false;
         setPhrase(data.phrases[0]?.key ?? "");
       })
       .catch((cause: { code?: string }) => {
@@ -237,9 +270,13 @@ function Consultation({
     version.current++;
     clearDrafts();
     setReplyLanguage("");
+    setAutoLanguage(autoDefault.current);
+    if (languageWasDetected.current) setLanguage(defaultLanguage.current);
+    languageWasDetected.current = false;
     setGuidanceVoice(null);
     setGuidanceReset((value) => value + 1);
     setSupportProduct(null);
+    supportSource.current = null;
     setError("");
     setBusy(false);
     setPendingVoice(null);
@@ -294,8 +331,10 @@ function Consultation({
         data: Result;
       }>(`${base}/translate`, {
         ...captured,
+        ...(captured.direction === 'to-customer' && supportSource.current ? { supportSource: supportSource.current } : {}),
+        ...(captured.direction === 'to-staff' && autoLanguage ? { detectLanguage: true } : {}),
         ...(connected
-          ? { stationId: connected.id, epoch: connected.epoch }
+          ? { stationId: connected.id, epoch: connected.epoch, stationLanguage: connected.language }
           : {}),
         ...(fixedResponse ? { phrase } : { text }),
       });
@@ -303,6 +342,15 @@ function Consultation({
       const data = response.data;
       if (!response.success || !matchingResult(data, organizationId, captured))
         throw new Error("Invalid result");
+      if (captured.direction === 'to-staff' && autoLanguage && !data.detectedLanguage)
+        throw new Error('감지된 언어를 확인해 주세요.');
+      if (data.detectedLanguage) {
+        if (!context?.languages.some(item => item.key === data.detectedLanguage)) throw new Error('감지된 언어를 확인해 주세요.');
+        clearResults();
+        languageWasDetected.current = true;
+        setLanguage(data.detectedLanguage); setReplyLanguage(data.detectedLanguage);
+        if (connected && data.station) station.acceptPreparedStation(data.station);
+      }
       setResult(data);
     } catch (error_) {
       if (alive.current && request === version.current) {
@@ -316,6 +364,26 @@ function Consultation({
       if (alive.current && request === version.current) setBusy(false);
     }
   };
+  const verifyCustomerResult = async (currentResult: Result) => {
+    if (!currentResult.supportSource) return true;
+    const request = version.current;
+    try {
+      const checked = await prepareConsultationSupport({ ...currentResult.supportSource, verifyOnly: true,
+        ...(connected ? { stationId: connected.id, epoch: connected.epoch } : {}) });
+      return alive.current && request === version.current && checked.state === 'verified' && checked.sourceVersion === currentResult.supportSource.sourceVersion;
+    } catch (cause) {
+      if (alive.current && request === version.current) {
+        const failure = cause as { status?: number; code?: string; message?: string };
+        if ([401, 403].includes(failure.status ?? 0)) { clear(); setContext(null); setError(consultationAccessError(failure.code) ?? '상담 이용 권한을 다시 확인해 주세요.'); }
+        else { setResult(null); setError(failure.message || '상담 근거가 변경되었습니다. 다시 준비해 주세요.'); }
+      }
+      return false;
+    }
+  };
+  const resultSpeech = { ...speech, read: (words: string, spokenLanguage: string) => {
+    if (!result?.supportSource) { speech.read(words, spokenLanguage); return; }
+    void verifyCustomerResult(result).then(valid => { if (valid) speech.read(words, spokenLanguage); });
+  } };
   return (
     <main className="mx-auto max-w-4xl space-y-5 p-4 sm:p-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -355,7 +423,7 @@ function Consultation({
               className="min-h-11 rounded border px-3 py-2"
               disabled={station.busy}
               onClick={() =>
-                void station.open().then((ok) => {
+                void station.open(false, languageWasDetected.current ? defaultLanguage.current : language).then((ok) => {
                   if (ok) clear();
                 })
               }
@@ -428,6 +496,7 @@ function Consultation({
                 setMode(value);
               }}
               onLanguage={(value) => {
+                setAutoLanguage(false);
                 if (connected)
                   void station
                     .action({ action: "language", language: value })
@@ -458,7 +527,7 @@ function Consultation({
                       : "연결 필요"
                     : "상담 시작 전"}
                 </summary>
-                <ConsultationStationPanel station={station} onStarted={clear} />
+                <ConsultationStationPanel station={station} onStarted={clear} initialLanguage={languageWasDetected.current ? defaultLanguage.current : language} />
               </details>
               <ConsultationIncomingReply
                 station={station}
@@ -506,7 +575,7 @@ function Consultation({
               voice={guidanceVoice}
               inquiry={
                 direction === "to-staff"
-                  ? result?.translation || (inputLanguage === "ko" ? text : "")
+                  ? result?.translation || (inputLanguage === "ko" && !autoLanguage ? text : "")
                   : undefined
               }
             />
@@ -514,10 +583,12 @@ function Consultation({
           {current?.allowed && current.professional && context.supportAllowed === true && (
             <ConsultationSupportPanel key={`support:${organizationId}:${mode}:${guidanceReset}`}
               organizationId={organizationId} mode={mode} product={supportProduct} room={connected}
+              onSelectProduct={setSupportProduct}
               locked={station.busy || speech.listening}
               onAccessDenied={() => { clear(); setContext(null); setRetry(value => value + 1); }}
-              inquiry={direction === 'to-staff' ? result?.translation || (inputLanguage === 'ko' ? text : '') : undefined}
-              onUseDraft={(words) => {
+              inquiry={direction === 'to-staff' ? result?.translation || (inputLanguage === 'ko' && !autoLanguage ? text : '') : undefined}
+              onUseDraft={(words, proof) => {
+                supportSource.current = proof;
                 speech.reset(); version.current++; setBusy(false); setError('');
                 setDirection('to-customer'); receiveText('to-customer', words);
                 input.current?.closest('section')?.scrollIntoView?.({ block: 'start', behavior: 'smooth' });
@@ -549,6 +620,8 @@ function Consultation({
                 ))}
               </div>
               {direction === "to-staff" && (
+                <div className="space-y-2">
+                {context.runtime?.detectLanguage && <label className="flex min-h-11 items-center gap-2"><input type="checkbox" checked={autoLanguage} onChange={event => { version.current++; setBusy(false); setResult(null); setAutoLanguage(event.target.checked); }} />고객 문장 언어 자동 감지</label>}
                 <label className="block text-sm">
                   고객 문장 언어{" "}
                   <select
@@ -560,6 +633,7 @@ function Consultation({
                       setBusy(false);
                       setResult(null);
                       setReplyLanguage(event.target.value);
+                      setAutoLanguage(false);
                     }}
                   >
                     {context.languages.map((l) => (
@@ -569,6 +643,9 @@ function Consultation({
                     ))}
                   </select>
                 </label>
+                <p className="text-xs text-slate-500">{context.runtime?.recognition === 'google-cloud' ? `음성 자동 감지는 관리자 후보 언어(${context.runtime.speechLanguages.join(', ')})에서 선택합니다.` : '브라우저 음성은 선택한 언어로 인식합니다. 문자 번역의 자동 감지와 다르며, 모바일에서 Chrome 언어 감지를 보장하지 않습니다.'}</p>
+                {result?.detectedLanguage && <p role="status">감지한 고객 언어: {context.languages.find(item => item.key === result.detectedLanguage)?.label} · 잘못 감지되면 직접 수정하세요.</p>}
+                </div>
               )}
               <p className="text-xs text-slate-500">
                 같은 상담 중에는 양쪽의 마지막 입력과 번역을 유지합니다. 다른
@@ -677,7 +754,7 @@ function Consultation({
               >
                 {busy
                   ? "준비 중…"
-                  : language === "ko"
+                  : language === "ko" && !(direction === 'to-staff' && autoLanguage)
                     ? "안내 준비"
                     : "번역하기"}
               </button>
@@ -687,15 +764,18 @@ function Consultation({
               {result && (
                 <TranslationResult
                   result={result}
-                  speech={speech}
+                  speech={resultSpeech}
                   onShow={() => {
-                    if (connected && result.deliveryId)
-                      void station.action({
+                    const show = () => {
+                      if (connected && result.deliveryId) void station.action({
                         action: "share",
                         kind: "translation",
                         deliveryId: result.deliveryId,
                       });
-                    else dialog.current?.showModal();
+                      else dialog.current?.showModal();
+                    };
+                    if (result.supportSource) void verifyCustomerResult(result).then(valid => { if (valid) show(); });
+                    else show();
                   }}
                 />
               )}
@@ -707,7 +787,7 @@ function Consultation({
         dialogRef={dialog}
         result={result}
         language={language}
-        speech={speech}
+        speech={resultSpeech}
         onReply={() => {
           focusReply.current = true;
           changeDirection("to-staff");

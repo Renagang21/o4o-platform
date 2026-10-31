@@ -17,6 +17,9 @@ import { ConsultationLayoutService } from "../../apps/api-server/dist/modules/ne
 import { consultationWorkspaceRoutes } from "../../apps/api-server/dist/modules/neture-pharmacy/consultation-workspace.routes.js";
 import { ConsultationGuidanceService } from "../../apps/api-server/dist/modules/neture-pharmacy/services/consultation-guidance.js";
 import { NeturePharmacyError } from "../../apps/api-server/dist/modules/neture-pharmacy/constants.js";
+import { ConsultationContextService } from "../../apps/api-server/dist/modules/neture-pharmacy/services/consultation-context.js";
+import { readStoreAiReadiness } from "../../apps/api-server/dist/modules/neture/product-description-intake/store-ai-readiness.js";
+import { CreateStoreConsultationStations1792815861315 } from "../../apps/api-server/dist/database/migrations/1792815861315-CreateStoreConsultationStations.js";
 const options = {
   type: "postgres",
   host: "127.0.0.1",
@@ -60,6 +63,7 @@ const stations = (db) =>
       return { name: "Fixture product", location: "A-1", publicKey: null };
     },
     (a, o, p) => guidanceFor(db).verify(a, o, p),
+    (a, o, m, p) => guidanceFor(db).verifySupportSource(a, o, m, p),
   );
 const input = {
   stationKey: "counter-1",
@@ -482,7 +486,7 @@ async function tests(db) {
     await q.startTransaction();
     try {
       await assert.rejects(
-        new (INCREMENTAL_MIGRATIONS.at(-1))().down(q),
+        new CreateStoreConsultationStations1792815861315().down(q),
         /STORE_CONSULTATION_DATA_EXISTS/,
       );
     } finally {
@@ -499,6 +503,43 @@ async function tests(db) {
     );
   });
   await guidanceTests(db);
+  await check('context search scopes before ranking, deduplicates masters and excludes inactive or foreign products', async () => {
+    const master = randomUUID(), foreignMaster = randomUUID(), disabledMaster = randomUUID();
+    for (const [id, status] of [[master, 'ACTIVE'], [foreignMaster, 'ACTIVE'], [disabledMaster, 'INACTIVE']])
+      await db.query("INSERT INTO product_masters(id,name,regulatory_name,manufacturer_name,status) VALUES($1,'합성 상담 성분','합성 상담 성분','합성 제조사',$2)", [id, status]);
+    for (const [id, organization, m, active, key] of [[randomUUID(), org, master, true, 'kpa-society'], [randomUUID(), org, master, true, 'neture'], [randomUUID(), otherOrg, foreignMaster, true, 'kpa-society'], [randomUUID(), org, disabledMaster, true, 'kpa-society'], [randomUUID(), org, foreignMaster, false, 'kpa-society']])
+      await db.query("INSERT INTO organization_product_listings(id,organization_id,master_id,service_key,is_active) VALUES($1,$2,$3,$5,$4)", [id, organization, m, active, key]);
+    await db.query("INSERT INTO shared_product_descriptions(master_id,content,source_type,status,language,description_type) VALUES($1,'<p>합성 상담 성분</p>','operator','canonical','ko','B2B')", [master]);
+    const context = new ConsultationContextService(db, async () => ({ needsProduct: true, terms: ['합성 상담'], clarification: null }));
+    const access = { actorId: actor, organizationId: org, authorize: async () => { await authorize(actor, org); return true; } };
+    const result = await context.search({ question: '합성 상담 성분 자료가 필요합니다' }, access);
+    assert.equal(result.state, 'candidates'); assert.equal(result.candidates.length, 1);
+    const coverage = await readStoreAiReadiness(db, org, 'ko');
+    assert.equal(coverage.masterCount, 1); assert.equal(coverage.listingCount, 2); assert.equal(coverage.states.legacy, 1);
+    assert.equal((await readStoreAiReadiness(db, org, 'ja')).states.missing, 1);
+    await db.query("UPDATE product_masters SET status='INACTIVE' WHERE id=$1", [master]);
+    assert.equal((await context.search({ question: '합성 상담 성분 자료' }, access)).candidates.length, 0);
+    assert.equal((await readStoreAiReadiness(db, org, 'ko')).masterCount, 0);
+  });
+  await check('detected language updates atomically, manual corrections and ended epochs reject old voice access', async () => {
+    let active = await service.open(actor, org, { ...input, replace: true });
+    const paired = await service.pairing(actor, org, active.id, { epoch: active.epoch });
+    const device = await service.claim({ code: paired.code });
+    const request = { id: active.id, token: device.token, epoch: active.epoch };
+    assert.equal((await service.deviceSpeechAccess(request)).organizationId, org);
+    const detected = await service.recordTranslation(actor, org, active.id, active.epoch, {
+      mode: input.mode, language: 'ko', direction: 'to-staff', source: '合成質問', translation: '합성 질문', detectedLanguage: 'ja', initialStationLanguage: 'ko',
+    });
+    assert.equal(detected.station.language, 'ja');
+    assert.equal((await service.read(device)).language, 'ja');
+    active = await service.action(actor, org, active.id, { epoch: active.epoch, action: 'language', language: 'en' });
+    await assert.rejects(service.recordTranslation(actor, org, active.id, active.epoch, { mode: input.mode, language: 'ko', direction: 'to-staff', translation: '늦은 결과', detectedLanguage: 'ja', initialStationLanguage: 'ko' }), { code: 'CONSULTATION_CHANGED' });
+    await service.action(actor, org, active.id, { epoch: active.epoch, action: 'end' });
+    await assert.rejects(service.deviceSpeechAccess(request), { code: 'CONSULTATION_CHANGED' });
+    revoked = true;
+    await assert.rejects(service.deviceSpeechAccess(request), { code: 'STORE_ACCESS_REQUIRED' });
+    revoked = false;
+  });
   await db.query("DELETE FROM store_consultation_stations");
   console.log(`Consultation SQL fixture ${count} checks PASS`);
 }
@@ -676,6 +717,20 @@ async function guidanceTests(db) {
     assert.equal(renewed.language, "ja");
     assert.equal(renewed.active, true);
     assert.equal(renewed.connected, true);
+  });
+  await check('pharmacist source versions survive translation/share and withdraw customer reads and speech after a source edit', async () => {
+    const material = await guides.supportMaterial(actor, org, { mode: input.mode, productKind: 'local', productId: '55555555-5555-4555-8555-555555555555' });
+    const proof = { mode: input.mode, productKind: 'local', productId: '55555555-5555-4555-8555-555555555555', sourceVersion: material.sourceVersion };
+    const draft = await service.recordTranslation(actor, org, room.id, room.epoch, { mode: input.mode, language: room.language, direction: 'to-customer', source: '합성 근거 설명', translation: '合成説明', supportSource: proof });
+    await service.action(actor, org, room.id, { epoch: room.epoch, action: 'share', kind: 'translation', deliveryId: draft.deliveryId });
+    assert.equal((await service.read(peer)).shared.text, '合成説明');
+    await db.query("UPDATE store_multilingual_product_content_pages SET summary='Changed synthetic source' WHERE group_id=$1", [group]);
+    assert.equal((await service.read(peer)).shared, null);
+    await assert.rejects(service.deviceSpeechAccess({ ...peer, epoch: room.epoch }), { code: 'GUIDANCE_SOURCE_CHANGED' });
+    await assert.rejects(service.action(actor, org, room.id, { epoch: room.epoch, action: 'share', kind: 'translation', deliveryId: draft.deliveryId }), { code: 'GUIDANCE_SOURCE_CHANGED' });
+    await service.action(actor, org, room.id, { epoch: room.epoch, action: 'share', kind: 'notice', phrase: 'pharmacist' });
+    assert.ok((await service.read(peer)).shared);
+    assert.ok(await service.deviceSpeechAccess({ ...peer, epoch: room.epoch }));
   });
 }
 async function serve(db) {

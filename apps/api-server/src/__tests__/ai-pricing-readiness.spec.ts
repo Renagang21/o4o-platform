@@ -57,6 +57,10 @@ it.each([
     input: 0, output: 0, profile: { maxInputTokens: 0, maxOutputTokens: 0, unit: 'image', perUnit: 0.05 }, cost: 0.05 },
   { kind: 'tts', provider: 'openai', request: { unit: 'character', units: 10 },
     input: 0, output: 0, profile: { maxInputTokens: 0, maxOutputTokens: 0, unit: 'character', perUnit: 0.01 }, cost: 0.1 },
+  { kind: 'translation', provider: 'google-cloud', request: { unit: 'character', units: 10, maxOutputTokens: 0 },
+    input: 0, output: 0, profile: { maxInputTokens: 0, maxOutputTokens: 0, unit: 'character', perUnit: 0.01 }, cost: 0.1 },
+  { kind: 'stt', provider: 'google-cloud', request: { unit: 'second', units: 10, maxOutputTokens: 0 },
+    input: 0, output: 0, profile: { maxInputTokens: 0, maxOutputTokens: 0, unit: 'second', perUnit: 0.01 }, cost: 0.1 },
 ])('checks $kind unit budgets with the actual native planner and leaves new draft fees unconfirmed', item => {
   const cases = parseAiPricingManifest({ version: 'ai-pricing-check-v1', cases: [{ id: 'specialist', scope: 'AI_PROXY',
     request: { kind: item.kind, provider: item.provider, model: 'synthetic-specialist', ...item.request } }] });

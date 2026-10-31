@@ -5,6 +5,7 @@ import {
   GEMINI_CANONICAL_MODEL,
 } from "../../types/ai-proxy.types.js";
 import { AI_USAGE_CATALOG } from "./catalog.js";
+import { consultationRuntimeSchema, type ConsultationRuntime } from './consultation-runtime.js';
 
 export const MODEL_CONTROL_KEY = "ai:model-controls:v1";
 export const MODEL_PROVIDERS = [
@@ -27,7 +28,8 @@ export interface ModelSelection {
   model: string;
 }
 interface ModelMutation {
-  action: "create" | "update" | "delete" | "select";
+  action: "create" | "update" | "delete" | "select" | "consultation-runtime";
+  runtime?: unknown;
   provider?: string;
   id?: string;
   model?: unknown;
@@ -39,6 +41,7 @@ interface Control {
   models: ManagedModel[];
   deleted: string[];
   selections: Record<string, ModelSelection>;
+  consultation?: ConsultationRuntime;
 }
 interface ModelReference {
   kind: "usage" | "policy" | "runtime";
@@ -109,6 +112,7 @@ const multiProvider = new Set([
   "policy.PRODUCT_CONTENT",
   "store.translation",
   "pharmacy.consultation",
+  "pharmacy.support",
   "store.overview",
   "supplier.overview",
   "cooperative.overview",
@@ -258,6 +262,7 @@ function parse(input: unknown): Control {
     models,
     deleted: [...value.deleted],
     selections: { ...value.selections },
+    consultation: consultationRuntimeSchema.parse(value.consultation ?? {}),
   };
   const legacyTranslation = parsed.selections["policy.CONTENT_TRANSLATION"];
   if (legacyTranslation) {
@@ -351,7 +356,7 @@ export class ModelControlService {
         row.source === "query"
           ? queryPolicyTargets
           : row.source === "scope" && row.scope === "PRODUCT_CONTENT"
-            ? ["policy.PRODUCT_CONTENT"]
+            ? ["policy.PRODUCT_CONTENT", "pharmacy.support"]
             : row.source === 'scope' && row.scope === 'STORE_INSIGHT'
               ? ['store.overview']
               : row.source === 'scope' && row.scope === 'OPERATOR_INSIGHT'
@@ -464,7 +469,11 @@ export class ModelControlService {
         "현재 실행 설정을 확인하지 못해 변경하지 않았습니다.",
       );
     }
-    if (mutation.action === "select") {
+    if (mutation.action === 'consultation-runtime') {
+      const parsed = consultationRuntimeSchema.safeParse(mutation.runtime);
+      if (!parsed.success) return fail(400, 'CONSULTATION_RUNTIME_INVALID', '상담 실행 수단과 음성 후보 언어를 확인해 주세요.');
+      control.consultation = parsed.data;
+    } else if (mutation.action === "select") {
       // Old clients may still submit the former shared target during a rolling release.
       const targets =
         mutation.target === "policy.CONTENT_TRANSLATION"

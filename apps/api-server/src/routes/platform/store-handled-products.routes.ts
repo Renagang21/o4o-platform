@@ -21,7 +21,7 @@
 import { Router, Request, Response, RequestHandler } from 'express';
 import { DataSource } from 'typeorm';
 import type { AuthRequest } from '../../types/auth.js';
-import { resolveStoreProductAccess } from '../../utils/store-product-access.js';
+import { resolveStoreProductAccess, resolveStoreProductAccessResult } from '../../utils/store-product-access.js';
 import { readPreferredStoreOrganizationId } from '../../utils/store-organization.resolver.js';
 // WO-O4O-KPA-STORE-PRODUCT-QR-ALWAYS-AVAILABLE-V1: 상품 기준 고정 QR(ProductMaster Landing) — 다국어 무관 항상 발급.
 import { ProductLandingService } from '../../modules/neture/services/product-landing.service.js';
@@ -89,14 +89,15 @@ export function createStoreHandledProductsRoutes(dataSource: DataSource): Router
    * GET /handled-products
    * Query: page, limit, search, source(all|listing|local)
    */
-  router.get('/handled-products', async (req: Request, res: Response): Promise<void> => {
+  router.get('/handled-products', (req, res, next) => {
+    void getAuth().then(auth => auth(req, res, next)).catch(next);
+  }, async (req: Request, res: Response): Promise<void> => {
     try {
-      const organizationId = await resolveProductOrganization(req, res, true);
-      if (res.headersSent) return;
-      if (!organizationId) {
-        res.json({ success: true, data: { items: [], pagination: { page: 1, limit: 20, total: 0 } } });
-        return;
-      }
+      const user = (req as AuthRequest).user;
+      if (!user?.id) { res.status(401).json({ success: false, code: 'AUTH_REQUIRED' }); return; }
+      const access = await resolveStoreProductAccessResult(dataSource, user.id, 'kpa', readPreferredStoreOrganizationId(req));
+      if (access.rejection) { res.status(access.rejection.status).json(access.rejection.body); return; }
+      const organizationId = access.organizationId!;
 
       // 조회 계약(UNION·검색·분류 파생·기본 managePath)은 공통 service 함수가 SSOT 다.
       const data = await listHandledProducts(dataSource, organizationId, {

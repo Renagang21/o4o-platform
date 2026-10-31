@@ -13,7 +13,7 @@ export class StoreStaffSupportService {
       throw new NeturePharmacyError(400,'INVALID_PRODUCT','상품을 확인해 주세요.');
     const [product] = await this.db.query(`WITH products AS (
       SELECT id,'local'::text AS kind,name FROM store_local_products WHERE organization_id=$1 AND is_active=true
-      UNION ALL SELECT l.id,'listing'::text AS kind,m.name FROM organization_product_listings l JOIN product_masters m ON m.id=l.master_id WHERE l.organization_id=$1 AND l.is_active=true
+      UNION ALL SELECT l.id,'listing'::text AS kind,m.name FROM organization_product_listings l JOIN product_masters m ON m.id=l.master_id AND m.status='ACTIVE' WHERE l.organization_id=$1 AND l.is_active=true
     ) SELECT p.*,COALESCE(o.metadata#>>ARRAY['staffSupport','locations',p.kind||':'||p.id::text],'') AS location,
       (SELECT g.public_key FROM store_multilingual_product_content_groups g WHERE g.organization_id=$1 AND g.target_kind=p.kind AND g.target_id=p.id AND g.status<>'archived' AND g.public_key IS NOT NULL
         AND EXISTS(SELECT 1 FROM store_multilingual_product_content_pages page WHERE page.group_id=g.id AND page.status='published') ORDER BY g.updated_at DESC LIMIT 1) AS "publicKey"
@@ -27,7 +27,7 @@ export class StoreStaffSupportService {
     return await this.db.query(
       `WITH products AS (
       SELECT id,'local'::text AS kind,name FROM store_local_products WHERE organization_id=$1 AND is_active=true
-      UNION ALL SELECT l.id,'listing'::text AS kind,m.name AS name FROM organization_product_listings l JOIN product_masters m ON m.id=l.master_id WHERE l.organization_id=$1 AND l.is_active=true
+      UNION ALL SELECT l.id,'listing'::text AS kind,m.name AS name FROM organization_product_listings l JOIN product_masters m ON m.id=l.master_id AND m.status='ACTIVE' WHERE l.organization_id=$1 AND l.is_active=true
     ) SELECT p.*, COALESCE(o.metadata#>>ARRAY['staffSupport','locations',p.kind||':'||p.id::text],'') AS location,
       (SELECT g.public_key FROM store_multilingual_product_content_groups g
         WHERE g.organization_id=$1 AND g.target_kind=p.kind AND g.target_id=p.id

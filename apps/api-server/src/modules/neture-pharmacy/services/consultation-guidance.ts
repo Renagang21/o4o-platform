@@ -15,20 +15,8 @@ import type { ConsultationSupportSource } from "./consultation-support.extension
 import { StoreStaffSupportService } from "./store-staff-support.js";
 import { readStoreProductAiContext } from '../../neture/product-description-intake/ai-context.service.js';
 type Json = Record<string, unknown>;
-function approvedAiSupportSources(ai: Awaited<ReturnType<typeof readStoreProductAiContext>>): ConsultationSupportSource[] {
-  if (ai?.state !== 'structured' || !ai.description) return [];
-  const sources: ConsultationSupportSource[] = [];
-  let remaining = 18000, factId = 11, referenceId = 2;
-  for (const section of ai.description.sections.slice(0, 10)) {
-    if (!remaining) break;
-    const text = section.text.slice(0, Math.min(5000, remaining)); remaining -= text.length;
-    const fact = section.kind === 'product-fact';
-    const partial = text.length < section.text.length ? ' · 일부' : '';
-    sources.push({ id: fact ? `p${factId++}` : `r${referenceId++}`, kind: fact ? 'product-fact' : 'professional-reference',
-      title: `O4O B2B · ${section.kind} · ${section.title} · ${ai.description.source?.currentness ?? '출처 확인 필요'}${partial}`, text });
-  }
-  return sources;
-}
+import { approvedAiSupportSources } from './consultation-evidence.js';
+import { ConsultationContextService, createConsultationContextPlanner } from './consultation-context.js';
 export type GuidanceIntent =
   | "find-product"
   | "location"
@@ -497,6 +485,26 @@ export class ConsultationGuidanceService {
       );
   }
 
+  async verifySupportSource(actor: string, org: string, mode: string, raw: unknown) {
+    const proof = raw as Json | null;
+    if (!proof || typeof proof !== 'object' || Array.isArray(proof) || proof.mode !== mode ||
+      Object.keys(proof).some(key => !['mode', 'productKind', 'productId', 'sourceVersion'].includes(key)) ||
+      typeof proof.sourceVersion !== 'string' || !/^[a-f0-9]{64}$/.test(proof.sourceVersion))
+      fail(409, 'GUIDANCE_SOURCE_CHANGED', '판단 지원의 현재 근거를 다시 확인해 주세요.');
+    const current = await this.supportMaterial(actor, org, { mode, productKind: proof.productKind, productId: proof.productId });
+    if (proof.sourceVersion !== current.sourceVersion)
+      fail(409, 'GUIDANCE_SOURCE_CHANGED', '상품 또는 상담 근거가 변경되었습니다. 현재 자료로 다시 준비해 주세요.');
+    await current.authorize();
+  }
+
+  async searchSupportProducts(actor: string, org: string, input: Json) {
+    if (!['counter-pharmacist', 'floor-pharmacist'].includes(String(input.mode)))
+      fail(403, 'PHARMACIST_CONFIRMATION_REQUIRED', '약사 상담의 사용 확인이 필요합니다.');
+    const authorize = async () => { await this.access(actor, org, String(input.mode)); return true; };
+    return new ConsultationContextService(this.db, createConsultationContextPlanner(this.db))
+      .search(input, { actorId: actor, organizationId: org, authorize });
+  }
+
   async supportMaterial(actor: string, org: string, input: Json) {
     if (input.mode !== 'counter-pharmacist' && input.mode !== 'floor-pharmacist')
       fail(403, 'PHARMACIST_CONFIRMATION_REQUIRED', '약사 상담 방식과 사용 확인이 필요합니다.');
@@ -524,7 +532,7 @@ export class ConsultationGuidanceService {
     }));
     // Only approved, typed B2B sections enter this existing request. Never consume STORE/QR,
     // unpublished candidates or a legacy HTML body as proven product facts.
-    sources.push(...approvedAiSupportSources(ai));
+    sources.unshift(...approvedAiSupportSources(ai, typeof input.question === 'string' ? input.question : ''));
     return { productName: product.name as string, sources, sourceVersion, authorize };
   }
 }

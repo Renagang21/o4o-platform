@@ -69,6 +69,13 @@ async function loadGroupWithPages(
        service_key AS "serviceKey",
        target_kind AS "targetKind",
        target_id AS "targetId",
+       CASE WHEN target_kind='listing' THEN EXISTS (
+         SELECT 1 FROM organization_product_listings l JOIN product_masters m ON m.id=l.master_id AND m.status='ACTIVE'
+         WHERE l.id=store_multilingual_product_content_groups.target_id AND l.organization_id=store_multilingual_product_content_groups.organization_id AND l.is_active=true
+       ) WHEN target_kind='local' THEN EXISTS (
+         SELECT 1 FROM store_local_products p WHERE p.id=store_multilingual_product_content_groups.target_id
+         AND p.organization_id=store_multilingual_product_content_groups.organization_id AND p.is_active=true
+       ) ELSE false END AS "targetActive",
        content_key AS "contentKey",
        title,
        default_locale AS "defaultLocale",
@@ -259,6 +266,13 @@ export function createMultilingualProductContentController(
            service_key AS "serviceKey",
            target_kind AS "targetKind",
            target_id AS "targetId",
+       CASE WHEN target_kind='listing' THEN EXISTS (
+         SELECT 1 FROM organization_product_listings l JOIN product_masters m ON m.id=l.master_id AND m.status='ACTIVE'
+         WHERE l.id=store_multilingual_product_content_groups.target_id AND l.organization_id=store_multilingual_product_content_groups.organization_id AND l.is_active=true
+       ) WHEN target_kind='local' THEN EXISTS (
+         SELECT 1 FROM store_local_products p WHERE p.id=store_multilingual_product_content_groups.target_id
+         AND p.organization_id=store_multilingual_product_content_groups.organization_id AND p.is_active=true
+       ) ELSE false END AS "targetActive",
            content_key AS "contentKey",
            title,
            default_locale AS "defaultLocale",

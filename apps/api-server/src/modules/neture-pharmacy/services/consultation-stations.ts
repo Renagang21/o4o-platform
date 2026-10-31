@@ -3,6 +3,8 @@ import {
   validConsultationLanguage,
 } from "./consultation-copy.js";
 import type { GuidanceProof } from "./consultation-guidance.js";
+import { ModelControlService } from '../../../services/ai-management/model-controls.js';
+import { consultationRuntimeSchema } from '../../../services/ai-management/consultation-runtime.js';
 import { createHash, randomBytes, randomUUID } from "node:crypto";
 import type { DataSource } from "typeorm";
 import { NeturePharmacyError } from "../constants.js";
@@ -62,6 +64,7 @@ export class ConsultationStationService {
       org: string,
       proof: GuidanceProof,
     ) => Promise<void>,
+    private readonly verifySupport?: (actor: string, org: string, mode: string, proof: Json) => Promise<void>,
   ) {}
   private async query(sql: string, values: unknown[]) {
     const result = await this.db.query(sql, values);
@@ -224,6 +227,9 @@ export class ConsultationStationService {
       "연결 코드를 만들지 못했습니다. 다시 시도해 주세요.",
     );
   }
+  async authorizeSpeech(actor: string, org: string, mode: string) {
+    await this.authorize(actor, org, mode);
+  }
   async recordTranslation(
     actor: string,
     org: string,
@@ -232,6 +238,10 @@ export class ConsultationStationService {
     result: Json,
   ) {
     const row = await this.owned(actor, org, id, epoch);
+    if (result.supportSource) {
+      if (!this.verifySupport) fail(503, 'GUIDANCE_UNAVAILABLE', '상담 근거를 확인하지 못했습니다.');
+      await this.verifySupport!(actor, org, row.mode, result.supportSource as Json);
+    }
     if (
       result.mode !== row.mode ||
       !CONSULTATION_SCREEN_LANGUAGES.some((l) => l.key === result.language) ||
@@ -241,12 +251,15 @@ export class ConsultationStationService {
     )
       fail(409, "CONSULTATION_CHANGED", "상담 방식이나 언어가 변경되었습니다.");
     const deliveryId = randomUUID();
-    await this.update(
-      row,
-      "translation=jsonb_set(translation,ARRAY[$5::text],$6::jsonb),operator_seen_at=now()",
-      [result.direction, JSON.stringify({ ...result, deliveryId })],
-    );
-    return { ...result, deliveryId };
+    if (result.detectedLanguage !== undefined && (!validConsultationLanguage(result.detectedLanguage) ||
+      result.direction !== 'to-staff' || result.initialStationLanguage !== row.language))
+      fail(409, 'CONSULTATION_CHANGED', '상담 언어가 변경되었습니다. 현재 언어로 다시 준비해 주세요.');
+    const detected = typeof result.detectedLanguage === 'string' ? result.detectedLanguage : null;
+    const updated = await this.update(row,
+      detected ? "language=$7,shared='{}',translation=jsonb_set('{}'::jsonb,ARRAY[$5::text],$6::jsonb),operator_seen_at=now()"
+        : "translation=jsonb_set(translation,ARRAY[$5::text],$6::jsonb),operator_seen_at=now()",
+      [result.direction, JSON.stringify({ ...result, deliveryId }), ...(detected ? [detected] : [])]);
+    return { ...result, deliveryId, ...(detected ? { station: this.snapshot(updated) } : {}) };
   }
   async recordGuidance(
     actor: string,
@@ -313,6 +326,7 @@ export class ConsultationStationService {
       case "share": {
         let shared: Json;
         let sharedProof: Json | null = null;
+        let supportProof: Json | null = null;
         if (input.kind === "guidance") {
           const prepared = row.translation.guidance;
           if (
@@ -343,6 +357,11 @@ export class ConsultationStationService {
             text: draft.translation,
             language: draft.language,
           };
+          if (draft.supportSource) {
+            if (!this.verifySupport) fail(503, 'GUIDANCE_UNAVAILABLE', '상담 근거를 확인하지 못했습니다.');
+            supportProof = draft.supportSource as Json;
+            await this.verifySupport!(actor, org, row.mode, supportProof);
+          }
         } else if (input.kind === "product") {
           const product = await this.product(actor, org, input);
           shared = {
@@ -376,10 +395,11 @@ export class ConsultationStationService {
         return this.snapshot(
           await this.update(
             row,
-            "shared=$5::jsonb,translation=CASE WHEN $6::jsonb IS NULL THEN translation-'shared-guidance' ELSE jsonb_set(translation,'{shared-guidance}',$6::jsonb) END,operator_seen_at=now()",
+            "shared=$5::jsonb,translation=(CASE WHEN $6::jsonb IS NULL THEN translation-'shared-guidance' ELSE jsonb_set(translation,'{shared-guidance}',$6::jsonb) END)-'shared-support'||CASE WHEN $7::jsonb IS NULL THEN '{}'::jsonb ELSE jsonb_build_object('shared-support',$7::jsonb) END,operator_seen_at=now()",
             [
               JSON.stringify(shared),
               sharedProof ? JSON.stringify(sharedProof) : null,
+              supportProof ? JSON.stringify(supportProof) : null,
             ],
           ),
         );
@@ -409,6 +429,21 @@ export class ConsultationStationService {
       );
     await this.authorize(row.operator_user_id, row.organization_id, row.mode);
     return row;
+  }
+  private async verifySharedSupport(row: Row) {
+    const proof = row.translation['shared-support'];
+    if (!proof) return;
+    if (!this.verifySupport) fail(503, 'GUIDANCE_UNAVAILABLE', '상담 근거를 확인하지 못했습니다.');
+    await this.verifySupport!(row.operator_user_id, row.organization_id, row.mode, proof as Json);
+  }
+  async deviceSpeechAccess(input: Json) {
+    const row = await this.peer(input);
+    if (!row.active || !recent(row.operator_seen_at) || row.epoch !== input.epoch)
+      fail(409, 'CONSULTATION_CHANGED', '현재 상담을 다시 연결해 주세요.');
+    const proof = row.translation['shared-guidance'];
+    if (proof && this.verifyGuidance) await this.verifyGuidance(row.operator_user_id, row.organization_id, proof as unknown as GuidanceProof);
+    await this.verifySharedSupport(row);
+    return { actorId: row.operator_user_id, organizationId: row.organization_id, mode: row.mode, language: row.language, shared: row.shared };
   }
   async claim(input: Json) {
     const code =
@@ -475,6 +510,13 @@ export class ConsultationStationService {
         else throw error;
       }
     }
+    if (visible && current.translation['shared-support']) {
+      try { await this.verifySharedSupport(current); }
+      catch (error) {
+        if (error instanceof NeturePharmacyError && [403, 404, 409].includes(error.httpStatus)) visible = null;
+        else throw error;
+      }
+    }
     const [unchanged] = await this.query(
       "SELECT id FROM store_consultation_stations WHERE id=$1 AND device_hash=$2 AND epoch=$3 AND language=$4 AND active=$5 AND shared=$6::jsonb",
       [
@@ -500,6 +542,7 @@ export class ConsultationStationService {
       language: current.language,
       state: active ? "active" : "waiting",
       shared: visible,
+      runtime: consultationRuntimeSchema.parse((await new ModelControlService(this.db).read()).consultation ?? {}),
       languages: CONSULTATION_SCREEN_LANGUAGES,
     };
   }

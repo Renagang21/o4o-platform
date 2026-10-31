@@ -14,6 +14,21 @@ const output = (body: any) => ({ success: true, data: {
 } });
 beforeEach(() => { vi.clearAllMocks(); api.post.mockImplementation(async (_path, body) => output(body)); });
 afterEach(cleanup);
+it('starts with a question without requiring a product and only selects a store candidate after confirmation', async () => {
+  const select = vi.fn();
+  api.post.mockResolvedValueOnce({ success: true, data: { organizationId: 'store', mode: props.mode, state: 'candidates', message: '현재 매장 후보',
+    candidates: [{ id: 'listing-a', kind: 'listing', name: '선택할 후보', location: '' }] } });
+  render(<ConsultationSupportPanel {...props} product={null} onSelectProduct={select} />);
+  fireEvent.click(screen.getByText('약사 판단 지원'));
+  fireEvent.change(screen.getByLabelText('약사 판단 지원 질문'), { target: { value: '이 조건의 상품이 필요할까요?' } });
+  fireEvent.click(screen.getByRole('button', { name: '상담 맥락으로 매장 상품 찾기' }));
+  await screen.findByText('현재 매장 후보');
+  expect(select).not.toHaveBeenCalled();
+  expect(api.post.mock.calls[0][0]).toContain('consultation-products/prepare');
+  expect(api.post.mock.calls[0][1]).not.toHaveProperty('productId');
+  fireEvent.click(screen.getByRole('button', { name: '선택할 후보 · 상품 확인' }));
+  expect(select).toHaveBeenCalledWith(expect.objectContaining({ id: 'listing-a', kind: 'listing' }));
+});
 function open() { render(<ConsultationSupportPanel {...props} />); fireEvent.click(screen.getByText('약사 판단 지원')); }
 function ask() { fireEvent.change(screen.getByLabelText('약사 판단 지원 질문'), { target: { value: '상품을 어떻게 설명할까요?' } });
   fireEvent.click(screen.getByRole('button', { name: '근거로 판단 지원 준비' })); }
@@ -23,7 +38,7 @@ it('makes no initial call, separates evidence/results and waits for review and a
   expect(screen.getByRole('heading', { name: '전문 참고·판단할 사항' })).toBeTruthy();
   expect(useDraft).not.toHaveBeenCalled();
   fireEvent.click(screen.getByRole('button', { name: '검토한 고객 설명 사용' }));
-  await waitFor(() => expect(useDraft).toHaveBeenCalledWith('검토할 고객 설명'));
+  await waitFor(() => expect(useDraft).toHaveBeenCalledWith('검토할 고객 설명', { mode: props.mode, productKind: 'local', productId: product.id, sourceVersion: 'v1' }));
   expect(api.post.mock.calls[1][1]).toMatchObject({ verifyOnly: true, sourceVersion: 'v1' });
   expect(api.post.mock.calls[1][1]).not.toHaveProperty('question');
 });

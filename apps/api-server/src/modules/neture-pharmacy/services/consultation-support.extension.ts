@@ -8,9 +8,13 @@ import { NeturePharmacyError } from '../constants.js';
 
 export interface ConsultationSupportSource {
   id: string;
-  kind: 'product-fact' | 'professional-reference';
+  kind: 'product-fact' | 'professional-reference' | 'counseling-support';
   title: string;
   text: string;
+  urls?: string[];
+  checkedOn?: string | null;
+  revision?: string;
+  currentness?: string;
 }
 export interface ConsultationSupportPoint { text: string; sourceIds: string[] }
 export interface ConsultationSupportBrief {
@@ -89,7 +93,7 @@ export function createConsultationSupportRunner(db: DataSource): ConsultationSup
         context: { requestId: randomUUID(), serviceId: 'store', featureId: consultationSupportExtension.id,
           actorId: access.actorId, organizationId: access.organizationId, audience: 'staff' },
       }, createPolicyExtensionRuntime(policy, 'PRODUCT_CONTENT', {
-        maxTokens: 2400, temperature: 0, responseMode: 'json',
+        maxTokens: 2400, temperature: 0, responseMode: 'json', usage: 'pharmacy.support',
       }), { authorize: () => access.authorize(), record: event => {
         logger.info('[AI_EXTENSION]', event); return Promise.resolve();
       } });
