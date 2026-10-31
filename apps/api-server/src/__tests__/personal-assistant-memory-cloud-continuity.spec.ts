@@ -38,7 +38,7 @@ jest.mock('../services/assistant/assistant-task-store.js', () => {
   };
 });
 
-import { runWithCommandDriver } from './helpers/run-with-command-driver.js';
+import { runWithCommandDriver, waitForTestCommand } from './helpers/run-with-command-driver.js';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { LOCAL_AGENT_ACTIONS, parseLocalAction } from '../services/local-agent/local-agent-protocol.js';
@@ -351,8 +351,7 @@ async function drive(db: LocalAgentDb, script: Script, node: Node, max = 60, isF
   const cursors: Record<string, number> = {};
   let k = 0;
   while (k < max) {
-    for (let i = 0; i < 200 && db.commands.length <= k && !isFinished(); i += 1) await new Promise((r) => setTimeout(r, 5));
-    const cmd = db.commands[k];
+    const cmd = await waitForTestCommand(db.commands, k, 200, isFinished);
     if (!cmd) break;
     k += 1;
     const base = parseLocalAction(String(cmd.action)).base.replace('local.browser.dom.', '');
