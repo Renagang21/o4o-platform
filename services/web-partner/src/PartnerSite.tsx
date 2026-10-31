@@ -1,3 +1,4 @@
+import { PARTNER_PUBLIC_NAV, PARTNER_OPERATOR_NAV } from "./config/navigation";
 import {
   useEffect,
   useRef,
@@ -200,13 +201,8 @@ export default function PartnerSite() {
     <>
       <GlobalHeader
         brand={{ name: "O4O Partner", icon: "p.", href: "/" }}
-        publicNav={[
-          { label: "파트너 커뮤니티", href: "/community" },
-          { label: "홍보 작업공간", href: "/workspace" },
-        ]}
-        contextualNav={
-          membership.operator ? [{ label: "운영 관리", href: "/operator" }] : []
-        }
+        publicNav={PARTNER_PUBLIC_NAV}
+        contextualNav={membership.operator ? PARTNER_OPERATOR_NAV : []}
         user={
           !ready
             ? { displayName: "계정 확인 중", email: "" }

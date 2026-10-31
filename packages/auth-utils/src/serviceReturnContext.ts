@@ -63,7 +63,7 @@ export const MY_HOME_SOURCES = {
 } as const;
 export type MyHomeSource = keyof typeof MY_HOME_SOURCES;
 export function isMyHomeSource(value: unknown): value is MyHomeSource {
-  return typeof value === "string" && Object.hasOwn(MY_HOME_SOURCES, value);
+  return typeof value === "string" && Object.prototype.hasOwnProperty.call(MY_HOME_SOURCES, value);
 }
 
 /** Never forward login credentials or invitation tokens as return context. */

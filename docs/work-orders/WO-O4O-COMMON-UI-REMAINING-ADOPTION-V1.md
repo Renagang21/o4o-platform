@@ -76,3 +76,11 @@ Neture 전체 검사 후 공통 헤더의 모바일 계정 슬롯을 보완하�
 
 최종 브라우저 결과와 스크린샷은 실행 로그가 출력한 고유 임시 디렉터리에 보관한다. 공개 저장소에는 운영 응답·계정·credential을 기록하지 않는다.
 원격 필수 gate는 실제 main ruleset의 `CI Gate`다. PR·최종 HEAD의 CI·Codex 리뷰는 PR에서 기록하고, 병합·auto-merge·배포는 통합 담당에게 남긴다.
+
+## 최신 main 정렬
+
+작업 중 아이폰 가입 UI·매장 영상 작업이 main에 반영돼 아직 push하지 않은 자기 branch를 `086fbabda3d8eec37f7fe63d13d949df99abd5a3` 위로 정렬했다. 충돌은 없었고 다른 작업의 이력을 변경하지 않았다.
+새 영상 공통 패키지를 포함해 frozen install·전체 package build를 다시 통과했다. 정렬 후 auth-react 전체는 신규 main 회귀를 포함해 282건, 실제 PostgreSQL/대표 복귀 API는 84건 PASS다.
+이전 실행과 중복 합산하지 않으며, 기존 2,260건에서 새 main의 auth-react 7건만 추가하면 2,267건이다.
+Partner·협동조합의 공개/업무 메뉴 metadata는 각 앱의 `src/config/navigation.ts`에 두고 서버가 확인한 기존 운영 자격으로만 업무 메뉴를 조립한다.
+임시 PostgreSQL 스키마 잔존 개수는 0을 확인했다. 최종 PR HEAD의 필수 CI·리뷰 판정은 PR을 따른다.

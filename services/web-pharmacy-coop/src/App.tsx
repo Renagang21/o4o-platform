@@ -1,3 +1,4 @@
+import { COOPERATIVE_PUBLIC_NAV, COOPERATIVE_MEMBER_NAV, FEDERATION_OPERATOR_NAV } from "./config/navigation";
 import { safeServiceReturnPath } from '@o4o/auth-utils';
 import { GlobalHeader } from '@o4o/ui';
 import { ServiceFooter } from '@o4o/auth-react';
@@ -228,13 +229,10 @@ function Layout() {
       </div>
       <GlobalHeader
         brand={{ name: '약국 협동조합 연합회', icon: '＋', href: '/' }}
-        publicNav={[
-          { label: '연합회 홈', href: '/' }, { label: '소속 협동조합', href: '/cooperatives' },
-          { label: '연합회 소개', href: '/about' }, { label: '문의하기', href: '/contact' },
-        ]}
+        publicNav={COOPERATIVE_PUBLIC_NAV}
         contextualNav={[
-          ...(session.userId ? [{ label: '내 협동조합', href: '/cooperatives/mine' }, { label: '내 처리 소식', href: '/cooperatives/updates' }] : []),
-          ...(canManageFederation(session) ? [{ label: '연합회 운영', href: '/operator' }] : []),
+          ...(session.userId ? COOPERATIVE_MEMBER_NAV : []),
+          ...(canManageFederation(session) ? FEDERATION_OPERATOR_NAV : []),
         ]}
         user={session.userId ? { displayName: '회원', email: '' } : null}
         onLogin={() => navigate(`/login?returnTo=${encodeURIComponent(safeServiceReturnPath(location.pathname + location.search + location.hash) ?? "/cooperatives/mine")}`)}
