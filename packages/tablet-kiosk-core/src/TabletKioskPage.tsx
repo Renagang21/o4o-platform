@@ -1,3 +1,4 @@
+import { MediaSequence } from './MediaSequence';
 /**
  * TabletKioskPage — In-Store Tablet Kiosk View (canonical)
  *
@@ -68,7 +69,6 @@ import type {
   TabletContentCard,
 } from './types';
 // WO-O4O-KPA-TABLET-CORNER-IDLE-YOUTUBE-VIMEO-AUTO-RETURN-V1: idle 대기화면 YouTube/Vimeo embed.
-import { toIdleEmbedUrl } from './idleMedia';
 
 // WO-O4O-KPA-TABLET-INLINE-MULTILINGUAL-DESCRIPTION-BRIDGE-V1:
 //   선택 콘텐츠에 게시 가능(검수 완료) 번역이 있으면 상세에서 언어 버튼으로 전환.
@@ -1230,7 +1230,7 @@ export function TabletKioskPage({
 // 자체 minimal player. signage runtime 을 import 하지 않음.
 //   - image: durationMs (default 5000) 후 다음 항목
 //   - video: onEnded 시 다음 항목
-//   - youtube/vimeo: iframe 무음 자동재생 + loop. durationMs 지정 시 그 시간 후 다음 항목(미지정=단일 반복)
+//   - video/youtube/vimeo: 종료 이벤트 후 다음 항목, 마지막 항목 뒤 처음부터 반복
 //   - 빈 playlist: "화면을 터치해주세요" placeholder
 //   - 컨테이너 onPointerDown → IDLE_EXIT (window-level handler 와 이중 안전망)
 //   - iframe(youtube/vimeo)은 pointer 이벤트를 삼키므로 투명 tap-catcher 를 위에 덮어 터치 복귀 보장.
@@ -1250,7 +1250,7 @@ export function QrImage({ url, size = 72 }: { url: string; size?: number }) {
 }
 
 // WO-O4O-KPA-TABLET-TEMPLATE-THREE-PATTERNS-V1 — 대기 영상형 hero.
-//   idle_media 첫 항목을 상단 배너 영상/이미지로 재생(브라우즈 모드, 단일 loop) + 한/영 터치 유도 오버레이 + QR chip.
+//   idle_media 목록을 상단 배너 영상/이미지로 순환 재생 + 한/영 터치 유도 오버레이 + QR chip.
 //   오버레이는 pointerEvents:none 으로 하단 콘텐츠 터치를 막지 않는다. 항목 없으면 안내 문구만.
 /** 하단 안내 바용 약한 터치 아이콘(WO-O4O-KPA-TABLET-IDLE-TOUCH-HINT-BAR-V1).
  *  이 패키지는 인라인 스타일만 쓰므로(@keyframes 주입 없음) 애니메이션 대신 정적 아이콘을 쓴다. */
@@ -1267,22 +1267,9 @@ function TouchHintIcon() {
 
 function IdleTouchHero({ items, qrUrl, qrLabel, qrUnavailable }: { items: IdlePlaylistItem[] | null; qrUrl?: string; qrLabel?: string; qrUnavailable?: boolean }) {
   const first = items && items.length > 0 ? items[0] : null;
-  const embedUrl =
-    first && (first.type === 'youtube' || first.type === 'vimeo') ? toIdleEmbedUrl(first.url) : null;
   return (
     <div style={styles.heroWrap}>
-      {first?.type === 'image' && <img src={first.url} alt="" style={styles.heroMedia} draggable={false} />}
-      {first?.type === 'video' && (
-        <video src={first.url} autoPlay muted loop playsInline style={styles.heroMedia} />
-      )}
-      {(first?.type === 'youtube' || first?.type === 'vimeo') && embedUrl && (
-        <iframe
-          src={embedUrl}
-          title="대기화면 영상"
-          allow="autoplay; encrypted-media; picture-in-picture"
-          style={styles.heroMedia}
-        />
-      )}
+      {first && <MediaSequence items={(items ?? []).map((item, index) => ({ ...item, id: `${index}:${item.url}` }))} resetKey="tablet-hero" style={styles.heroMedia} />}
       {!first && <div style={styles.heroPlaceholder} aria-hidden />}
       {/* WO-O4O-KPA-TABLET-IDLE-TOUCH-HINT-BAR-V1:
           영상/이미지가 있으면 **중앙 대형 안내를 쓰지 않는다** — 광고·홍보 영상을 가리기 때문.
@@ -1332,33 +1319,7 @@ interface IdleOverlayProps {
 }
 
 function IdleOverlay({ items, onUserInteraction, defaultDurationMs, qrUrl, qrLabel, qrUnavailable }: IdleOverlayProps) {
-  const [index, setIndex] = useState(0);
-  const safeIndex = items.length > 0 ? index % items.length : 0;
-  const current = items.length > 0 ? items[safeIndex] : null;
-
-  // 자동 진행:
-  //   - image: durationMs → defaultDurationMs → 패키지 기본값
-  //   - youtube/vimeo: durationMs 지정 시에만(미지정이면 iframe loop 로 단일 반복 — V1 허용)
-  //   - video: onEnded 로 진행(여기서 타이머 없음)
-  useEffect(() => {
-    if (!current || items.length <= 1) return;
-    let ms: number | null = null;
-    if (current.type === 'image') {
-      ms = current.durationMs ?? defaultDurationMs ?? DEFAULT_IDLE_IMAGE_DURATION_MS;
-    } else if (current.type === 'youtube' || current.type === 'vimeo') {
-      ms = current.durationMs ?? null;
-    }
-    if (ms == null) return;
-    const t = setTimeout(() => {
-      setIndex((i) => (i + 1) % items.length);
-    }, ms);
-    return () => clearTimeout(t);
-  }, [current, items.length, defaultDurationMs]);
-
-  const embedUrl =
-    current && (current.type === 'youtube' || current.type === 'vimeo')
-      ? toIdleEmbedUrl(current.url)
-      : null;
+  const current = items[0] ?? null;
 
   return (
     <div
@@ -1373,50 +1334,10 @@ function IdleOverlay({ items, onUserInteraction, defaultDurationMs, qrUrl, qrLab
           </span>
         </div>
       )}
-      {current?.type === 'image' && (
-        <img src={current.url} alt="" style={styles.idleMedia} draggable={false} />
-      )}
-      {current?.type === 'video' && (
-        <video
-          src={current.url}
-          autoPlay
-          muted
-          playsInline
-          /* WO-O4O-KPA-TABLET-IDLE-VIDEO-URL-ONLY-V1:
-             단일 항목이면 onEnded 의 (0+1)%1=0 → setIndex(0) 이 같은 값이라 리렌더가 없어
-             영상이 끝난 뒤 멈춰 있었다. 항목이 1개일 때는 loop 로 계속 재생한다.
-             (2개 이상이면 loop 시 onEnded 가 안 와 순환이 멈추므로 기존 onEnded 유지) */
-          loop={items.length <= 1}
-          onEnded={() => {
-            if (items.length > 1) setIndex((i) => (i + 1) % items.length);
-          }}
-          style={styles.idleMedia}
-        />
-      )}
-      {(current?.type === 'youtube' || current?.type === 'vimeo') && (
-        embedUrl ? (
-          <div style={styles.idleEmbedWrap}>
-            <iframe
-              src={embedUrl}
-              title="대기화면 영상"
-              allow="autoplay; encrypted-media; picture-in-picture"
-              style={styles.idleEmbed}
-            />
-            {/* iframe 이 터치를 삼키므로 투명 캐처로 터치 → idle 종료(상품 안내로 복귀) */}
-            <div
-              style={styles.idleTapCatcher}
-              onPointerDown={onUserInteraction}
-              role="presentation"
-            />
-          </div>
-        ) : (
-          <div style={styles.idleEmpty}>
-            <span style={{ fontSize: '16px', color: '#cbd5e1' }}>
-              화면을 터치해주세요
-            </span>
-          </div>
-        )
-      )}
+      {current && <div style={styles.idleEmbedWrap}>
+        <MediaSequence items={items.map((item, index) => ({ ...item, id: `${index}:${item.url}` }))} resetKey="tablet-idle" defaultImageDurationMs={defaultDurationMs ?? DEFAULT_IDLE_IMAGE_DURATION_MS} style={styles.idleMedia} />
+        <button type="button" aria-label="안내 화면 열기" style={{ ...styles.idleTapCatcher, border: 0, padding: 0 }} onPointerDown={onUserInteraction} onClick={onUserInteraction} />
+      </div>}
       {/* WO-O4O-KPA-TABLET-IDLE-VIDEO-URL-ONLY-V1: 영상이 재생될 때만 하단의 작은 터치 안내.
           중앙 대형 문구는 쓰지 않는다(광고·홍보 영상을 가림). pointerEvents:none 이라
           화면 전체가 그대로 터치 영역(iframe 은 idleTapCatcher 가 처리). */}

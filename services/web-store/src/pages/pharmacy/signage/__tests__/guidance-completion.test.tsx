@@ -59,7 +59,7 @@ it('preserves selected order through filtering and makes video preview an explic
   expect(screen.getByText('검색 결과가 없습니다.')).toBeTruthy();
   expect(screen.getByRole('region', { name: '선택한 자료 확인' }).textContent).toContain('고객 안내제품 영상');
   fireEvent.click(screen.getByRole('button', { name: '영상 확인' }));
-  expect(document.querySelector('iframe')?.src).toBe('https://www.youtube-nocookie.com/embed/abcdefghijk');
+  expect(screen.getByLabelText('선택 영상 미리보기')).toBeTruthy();
 });
 it('shows actual saved snapshot order and does not embed arbitrary origins in the preview', () => {
   const item = (id: string, title: string, url: string, displayOrder: number): StorePlaylistItem => ({
@@ -73,7 +73,7 @@ it('shows actual saved snapshot order and does not embed arbitrary origins in th
   ]} onClose={closed} />);
   expect(document.querySelector('iframe')).toBeNull();
   fireEvent.click(screen.getByRole('button', { name: '2. 둘째 안내' }));
-  expect(document.querySelector('iframe')?.title).toBe('둘째 안내 미리보기');
+  expect(screen.getByLabelText('둘째 안내 미리보기')).toBeTruthy();
 });
 
 it('excludes protected materials and refuses a selection whose protection changed before saving', () => {

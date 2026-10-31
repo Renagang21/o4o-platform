@@ -1,3 +1,4 @@
+import { lockScreenSetVideos } from '../../modules/media/services/stored-video.js';
 import { checkPharmacyFeature } from '../../modules/neture-pharmacy/service-feature-access.js';
 /**
  * Store Tablet Routes — Tablet Device & Display Management + Interest Requests
@@ -1784,6 +1785,7 @@ export function createStoreTabletRoutes(
       //   실패하면 블록 저장까지 롤백되고 오류로 응답한다(부분 성공 없음. 편집 내용은 클라이언트에 그대로 남는다).
       let qrLink: Record<string, unknown> = {};
       await dataSource.transaction(async (manager) => {
+        await lockScreenSetVideos(manager, blocks, req.user?.id);
         await manager.query(`DELETE FROM store_tablet_screen_blocks WHERE screen_set_id = $1`, [id]);
         for (let i = 0; i < blocks.length; i++) {
           const b = blocks[i];
@@ -1800,6 +1802,7 @@ export function createStoreTabletRoutes(
       //   data(blocks 배열)는 그대로 두고 publicQrSlug/publicQrUrl 를 top-level additive 로 병합(프론트 호환).
       res.json({ success: true, data: updated, ...qrLink });
     } catch (error: any) {
+      if (error?.code === 'MEDIA_LIBRARY_VIDEO_UNAVAILABLE') { res.status(400).json({ success: false, code: error.code, error: error.message }); return; }
       if (error?.code === 'SCREEN_SET_QR_FAILED') { respondQrFailure(res); return; }
       console.error('[StoreTablet] PUT /screen-sets/:id/blocks error:', error);
       res.status(500).json({ success: false, error: 'Failed to save blocks', code: 'INTERNAL_ERROR' });

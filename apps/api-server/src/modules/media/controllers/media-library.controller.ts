@@ -276,6 +276,9 @@ export function createMediaLibraryRouter(dataSource: DataSource): Router {
         res.status(502).json({ success: false, code: 'MEDIA_STORAGE_DELETE_FAILED', error: 'storage 삭제에 실패해 자산을 보존했습니다. 다시 시도해 주세요.' });
         return;
       }
+      if (error.code === 'MEDIA_IN_USE_SIGNAGE') {
+        res.status(409).json({ success: false, code: error.code, error: '사이니지 자료 또는 재생목록에서 사용 중입니다. 연결 자료를 먼저 제거해 주세요.' }); return;
+      }
       if (error.code === 'MEDIA_IN_USE_SCREEN_SET') {
         res.status(409).json({
           success: false,

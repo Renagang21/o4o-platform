@@ -148,6 +148,7 @@ function ScreenSetManagerSession({ onToast: notify, tablets, previewApi, storeSl
   //   코너 내용 편집기(RichTextEditor)에 이미지 업로드 / 공용 미디어 라이브러리를 연결한다.
   //   업로드 경로·sanitize 기준은 기존 상품 설명 편집기와 동일(신규 저장소 없음).
   const [mediaPickerTarget, setMediaPickerTarget] = useState<((media: MediaInsert) => void) | null>(null);
+  const [videoPickerTarget, setVideoPickerTarget] = useState<((asset: { id: string; url: string; title: string }) => void) | null>(null);
 
   const handleImageUpload = useCallback(async (file: File): Promise<string> => {
     if (!builder?.current()) throw new Error('편집 대상이 변경되었습니다.');
@@ -170,7 +171,7 @@ function ScreenSetManagerSession({ onToast: notify, tablets, previewApi, storeSl
     };
     return { ...session, create: (input: Parameters<typeof session.create>[0]) => remember(session.create(input)), update: (id: string, input: Parameters<typeof session.update>[1]) => remember(session.update(id, input)) };
   }, [builder]);
-  const closeBuilder = () => { sessions.cancel(); setBuilder(null); setMediaPickerTarget(null); };
+  const closeBuilder = () => { sessions.cancel(); setBuilder(null); setMediaPickerTarget(null); setVideoPickerTarget(null); };
 
   // WO-...-CONTENT-LIBRARY-TAB-SPLIT-V1: library 모드 — 세트 id → 적용 중인 코너 이름 목록.
   const usageBySet = (() => {
@@ -283,6 +284,7 @@ function ScreenSetManagerSession({ onToast: notify, tablets, previewApi, storeSl
           fetchProductPool={builderOptions.pool}
           // WO-O4O-SCREEN-SET-PRODUCT-QR-SELECTION-V1
           fetchStoreQrCodes={builderOptions.qr}
+          onVideoLibraryPick={select => { if (builder.current()) setVideoPickerTarget(() => select); }}
           onImageUpload={handleImageUpload}
           onMediaLibraryPick={(insertMedia) => { if (builder.current()) setMediaPickerTarget(() => insertMedia); }}
           // WO-O4O-KPA-STORE-QR-SCREENSET-STATE-ALIGNMENT-V1 §4: 실제 /qr/:slug 뷰어 주입.
@@ -290,6 +292,9 @@ function ScreenSetManagerSession({ onToast: notify, tablets, previewApi, storeSl
           // WO-O4O-STORE-AI-FIRST-EDITOR-BOUNDARY-V1: 내 매장 = 내부 AI OFF
           showInternalAi={false}
         />
+        <MediaPickerModal open={!!videoPickerTarget} onClose={() => setVideoPickerTarget(null)} assetType="video" contextKey={`${storeSlug ?? ''}:${builder.detail?.id ?? 'new'}`} title="태블릿 보관 영상" defaultFolder="general"
+          onSelect={asset => { if (builder.current()) { videoPickerTarget?.({ id: asset.id, url: asset.url, title: asset.originalName }); }
+            setVideoPickerTarget(null); }} />
         <MediaPickerModal
           open={!!mediaPickerTarget}
           onClose={() => setMediaPickerTarget(null)}

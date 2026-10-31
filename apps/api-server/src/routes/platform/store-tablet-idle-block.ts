@@ -22,6 +22,7 @@ export interface IdleMediaItem {
   mediaType: IdleMediaType;
   url: string;
   durationMs?: number;
+  mediaAssetId?: string;
 }
 
 export interface NormalizedIdleMedia {
@@ -80,6 +81,10 @@ export function parseIdleMediaConfig(config: unknown): ParseIdleMediaResult {
         return { ok: false, error: `config.items[${i}].url must be a non-empty string` };
       }
       const item: IdleMediaItem = { mediaType: it.mediaType as IdleMediaType, url: it.url.trim() };
+      if (it.mediaAssetId !== undefined) {
+        if (typeof it.mediaAssetId !== 'string' || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(it.mediaAssetId)) return { ok: false, error: 'mediaAssetId must be a UUID' };
+        item.mediaAssetId = it.mediaAssetId;
+      }
       if (it.durationMs !== undefined) {
         if (!isValidDuration(it.durationMs)) return { ok: false, error: `config.items[${i}].durationMs must be a number in [${DURATION_MIN_MS}, ${DURATION_MAX_MS}]` };
         item.durationMs = it.durationMs as number;

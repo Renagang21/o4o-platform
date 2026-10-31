@@ -1,6 +1,7 @@
 ﻿import 'reflect-metadata';
 import { DataSource } from 'typeorm';
 import { randomUUID } from 'crypto';
+import { lockStoredVideo } from '../modules/media/services/stored-video.js';
 import { MediaAsset } from '../modules/media/entities/MediaAsset.entity.js';
 import {
   MediaCatalogService,
@@ -106,6 +107,8 @@ integration('Media V2 PostgreSQL migration and service regression', () => {
     await q.query(
       'CREATE TABLE store_tablet_screen_blocks(screen_set_id uuid,config jsonb)',
     );
+    await q.query('CREATE TABLE signage_media(id uuid PRIMARY KEY DEFAULT uuid_generate_v4(), "sourceUrl" text, "deletedAt" timestamptz)');
+    await q.query("CREATE TABLE o4o_asset_snapshots(id uuid PRIMARY KEY DEFAULT uuid_generate_v4(), asset_type text, content_json jsonb)");
     await q.release();
     catalog = new MediaCatalogService(ds);
     library = new MediaLibraryService(ds);
@@ -367,6 +370,31 @@ integration('Media V2 PostgreSQL migration and service regression', () => {
       'SELECT count(*)::int AS n FROM media_entity_links l LEFT JOIN media_assets m ON m.id=l.media_asset_id WHERE m.id IS NULL',
     );
     expect(rows[0].n).toBe(0);
+  });
+  test('signage and immutable snapshots keep the stored file until every reference is removed', async () => {
+    const a = await external();
+    a.url = 'https://example.test/stored-' + a.id;
+    await ds.query('UPDATE media_assets SET url=$2 WHERE id=$1', [a.id, a.url]);
+    await ds.query('INSERT INTO signage_media("sourceUrl") VALUES($1)', [a.url]);
+    await expect(library.deleteAsset(a.id)).rejects.toMatchObject({ code: 'MEDIA_IN_USE_SIGNAGE' });
+    await ds.query('DELETE FROM signage_media WHERE "sourceUrl"=$1', [a.url]);
+    await ds.query("INSERT INTO o4o_asset_snapshots(asset_type,content_json) VALUES('signage',$1)", [JSON.stringify({ sourceUrl: a.url })]);
+    await expect(library.deleteAsset(a.id)).rejects.toMatchObject({ code: 'MEDIA_IN_USE_SIGNAGE' });
+    await ds.query("DELETE FROM o4o_asset_snapshots WHERE content_json->>'sourceUrl'=$1", [a.url]);
+    await library.deleteAsset(a.id); expect(await library.getById(a.id)).toBeNull();
+  });
+  test('managed-video reference creation and file deletion cannot both succeed', async () => {
+    const a = await external();
+    await ds.query("UPDATE media_assets SET url='https://example.test/'||id,storage_type='internal',provider='gcs',external_url=NULL,external_id=NULL,gcs_path='fixture/video.mp4',asset_type='video',mime_type='video/mp4' WHERE id=$1", [a.id]);
+    const results = await Promise.allSettled([
+      ds.transaction(async manager => {
+        const video = await lockStoredVideo(manager, a.id, actor);
+        await manager.query('INSERT INTO signage_media("sourceUrl") VALUES($1)', [video.url]);
+      }), library.deleteAsset(a.id),
+    ]);
+    expect(results.every(result => result.status === 'fulfilled')).toBe(false);
+    const broken = await ds.query('SELECT 1 FROM signage_media s LEFT JOIN media_assets a ON a.url=s."sourceUrl" WHERE a.id IS NULL');
+    expect(broken).toHaveLength(0);
   });
   test('100k synthetic query plans: pagination, target lookup, metadata scan', async () => {
     await ds.query('SET synchronous_commit = off');

@@ -1,3 +1,5 @@
+import { VideoPlayback, useMediaSequence } from '@o4o/tablet-kiosk-core';
+import { hostedVideo } from '@o4o/tablet-kiosk-core/video-embed';
 /**
  * SignagePlaybackPage — KPA Society
  * WO-KPA-STORE-SIGNAGE-IA-RESTRUCTURE-V2
@@ -15,7 +17,7 @@
  *   requestFullscreen이 동일 DOM 요소에서 동작.
  */
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { X, Loader2, AlertCircle, List, Calendar, Maximize, Minimize, Play, MonitorPlay } from 'lucide-react';
 import { publicContentApi, type SignagePlaylist } from '../../lib/api/signageV2';
@@ -29,7 +31,6 @@ import { useStoreOperationScope } from '../../hooks/useStoreOperationScope';
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
 const SERVICE_KEY = () => getActiveServiceKey();
 const SIGNAGE_BASE = () => `${API_BASE_URL}/api/signage/${SERVICE_KEY()}`;
-const DEFAULT_DURATION_MS = 10_000;
 
 // ── Playback item type (unified for both modes) ─────────────────────────────
 interface PlaybackItem {
@@ -55,10 +56,11 @@ interface PlaybackData {
 // ── Store item → PlaybackItem adapter ───────────────────────────────────────
 function storeItemToPlaybackItem(item: StorePlaylistActiveItem): PlaybackItem {
   const cj = item.contentJson || {};
-  const mediaType = (cj.mediaType as string)
-    || ((cj.mimeType as string)?.startsWith('video') ? 'video' : 'image');
   const url = (cj.sourceUrl as string) || (cj.fileUrl as string)
     || (cj.url as string) || (cj.imageUrl as string) || '';
+  // Forced-content payloads carry a hosted URL without mediaType/mimeType.
+  const defaultType = (cj.mimeType as string)?.startsWith('video') ? 'video' : 'image';
+  const mediaType = hostedVideo(url) ? 'video' : (cj.mediaType as string) || defaultType;
   return {
     id: item.id,
     displayOrder: item.displayOrder,
@@ -73,102 +75,16 @@ function storeItemToPlaybackItem(item: StorePlaylistActiveItem): PlaybackItem {
   };
 }
 
-// ── YouTube embed URL 변환 ──────────────────────────────────────────────────
-function toYouTubeEmbed(url: string): string | null {
-  try {
-    const u = new URL(url);
-    let videoId: string | null = null;
-    if (u.hostname.includes('youtube.com')) {
-      videoId = u.searchParams.get('v');
-    } else if (u.hostname.includes('youtu.be')) {
-      videoId = u.pathname.slice(1);
-    }
-    if (!videoId) return null;
-    return `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&controls=0&loop=1&playlist=${videoId}&mute=1`;
-  } catch {
-    return null;
-  }
-}
-
-function toVimeoEmbed(embedId: string): string {
-  return `https://player.vimeo.com/video/${embedId}?autoplay=1&loop=1&title=0&byline=0&portrait=0&muted=1`;
-}
-
-// ── 미디어 렌더러 ────────────────────────────────────────────────────────────
-function MediaRenderer({ item }: { item: PlaybackItem }) {
+function MediaRenderer({ item, onEnded, onError }: Readonly<{ item: PlaybackItem; onEnded: () => void; onError: (message: string) => void }>) {
   const media = item.media;
-  if (!media) return null;
-
-  const url = media.url ?? '';
-  const embedId = media.embedId ?? '';
-  const mediaType = media.mediaType;
-
-  // YouTube
-  if (mediaType === 'youtube' || (url && url.includes('youtu'))) {
-    const src = embedId
-      ? `https://www.youtube.com/embed/${embedId}?autoplay=1&rel=0&controls=0&loop=1&playlist=${embedId}&mute=1`
-      : toYouTubeEmbed(url);
-    if (src) {
-      return (
-        <iframe
-          key={item.id}
-          src={src}
-          className="w-full h-full"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowFullScreen
-          title={media.name}
-        />
-      );
-    }
-  }
-
-  // Vimeo
-  if (mediaType === 'vimeo' || (url && url.includes('vimeo'))) {
-    const vid = embedId || url.split('/').pop() || '';
-    return (
-      <iframe
-        key={item.id}
-        src={toVimeoEmbed(vid)}
-        className="w-full h-full"
-        allow="autoplay; fullscreen; picture-in-picture"
-        allowFullScreen
-        title={media.name}
-      />
-    );
-  }
-
-  // Video file
-  if (mediaType === 'video' && url) {
-    return (
-      <video
-        key={item.id}
-        src={url}
-        autoPlay
-        loop
-        muted
-        className="w-full h-full object-contain"
-      />
-    );
-  }
-
-  // Image
-  if ((mediaType === 'image' || !mediaType) && url) {
-    return (
-      <img
-        key={item.id}
-        src={url}
-        alt={media.name}
-        className="w-full h-full object-contain"
-      />
-    );
-  }
-
-  // Fallback
-  return (
-    <div className="flex items-center justify-center w-full h-full text-white/40 text-sm">
-      {media.name}
-    </div>
-  );
+  const url = media?.url ?? '';
+  const provider = hostedVideo(url)?.provider;
+  const supported = !!url && (media?.mediaType === 'image' || media?.mediaType === 'video' || !!provider);
+  const error = useRef(onError); error.current = onError;
+  useEffect(() => { if (!supported) error.current('재생할 수 없는 자료입니다.'); }, [supported, item.id]);
+  if (!media || !supported) return <p className="text-white">재생할 자료를 확인해 주세요.</p>;
+  if (media.mediaType === 'image' && !provider) return <img src={url} alt={media.name} className="h-full w-full object-contain" onError={() => onError('이미지를 불러오지 못했습니다.')} />;
+  return <VideoPlayback url={url} kind={provider ?? 'video'} title={media.name} onEnded={onEnded} onError={onError} />;
 }
 
 // ── SignagePlaylist → PlaybackData adapter ──────────────────────────────────
@@ -222,12 +138,10 @@ function PlaybackSession() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [retry, setRetry] = useState(0);
-  const [currentIdx, setCurrentIdx] = useState(0);
   const [showControls, setShowControls] = useState(true);
   // WO-O4O-SIGNAGE-PLAYLIST-FULLSCREEN-CORE-PROMOTION-V1
   const [phase, setPhase] = useState<'start' | 'playing'>('start');
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const mouseMoveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   // Single persistent container — requestFullscreen operates on same element across phase changes
   const containerRef = useRef<HTMLDivElement>(null);
@@ -236,7 +150,7 @@ function PlaybackSession() {
   useEffect(() => {
     if (!playlistId) return;
     let current = true;
-    setLoading(true); setError(null); setPlaybackData(null); setCurrentIdx(0); setPhase('start');
+    setLoading(true); setError(null); setPlaybackData(null); setPhase('start');
     if (storeOrgLoading) return () => { current = false; };
     const load = async (): Promise<PlaybackData> => {
       if (isScheduleMode) {
@@ -278,29 +192,17 @@ function PlaybackSession() {
 
   // ── 아이템 순서 정렬 ────────────────────────────────────────────────────────
   const items = playbackData?.items ?? [];
+  const sequence = useMediaSequence(items.map(item => item.id), `${playlistId}:${retry}:${phase}`, playbackData?.isLoop ?? true);
+  const { next, token, failedCurrent } = sequence;
+  const currentIdx = sequence.index;
   const currentItem = items[currentIdx] ?? null;
-
-  // ── 타이머 기반 자동 전환 (playing 단계에서만) ─────────────────────────────
-  const goNext = useCallback(() => {
-    if (!playbackData || items.length === 0) return;
-    setCurrentIdx((prev) => {
-      const next = prev + 1;
-      if (next >= items.length) {
-        return playbackData.isLoop ? 0 : prev;
-      }
-      return next;
-    });
-  }, [playbackData, items.length]);
-
+  // Images keep their display duration; videos advance only on their ended event.
   useEffect(() => {
-    if (!currentItem || !playbackData || phase !== 'playing') return;
-    const durationMs =
-      ((currentItem.displayDuration ?? playbackData.defaultDuration ?? 0) || 10) * 1000;
-    const ms = durationMs > 0 ? durationMs : DEFAULT_DURATION_MS;
-
-    timerRef.current = setTimeout(goNext, ms);
-    return () => { if (timerRef.current) clearTimeout(timerRef.current); };
-  }, [currentIdx, currentItem, playbackData, goNext, phase]);
+    if (phase !== 'playing' || currentItem?.media?.mediaType !== 'image' || hostedVideo(currentItem.media.url) || failedCurrent) return;
+    const duration = ((currentItem.displayDuration ?? playbackData?.defaultDuration) || 10) * 1000;
+    const timer = setTimeout(() => next(token), duration);
+    return () => clearTimeout(timer);
+  }, [currentItem, playbackData?.defaultDuration, phase, next, token, failedCurrent]);
 
   // ── 마우스 이동 시 컨트롤 표시 ─────────────────────────────────────────────
   const handleMouseMove = () => {
@@ -454,7 +356,12 @@ function PlaybackSession() {
       {!loading && !error && playbackData && items.length > 0 && phase === 'playing' && (
         <>
           {/* Media */}
-          {currentItem && <MediaRenderer item={currentItem} />}
+          {currentItem && !sequence.allFailed && <MediaRenderer key={sequence.token} item={currentItem} onEnded={() => sequence.next(sequence.token)} onError={message => sequence.fail(message, sequence.token)} />}
+          {sequence.failedCount > 0 && <output className="absolute left-4 right-4 top-16 rounded bg-slate-900 p-3 text-white">
+            <p>{sequence.allFailed ? '재생할 수 있는 영상이 없습니다.' : '재생하지 못한 자료를 건너뜁니다.'} {sequence.error}</p>
+            <button type="button" onClick={sequence.retry} className="min-h-11 underline">다시 재생</button>
+          </output>}
+          <button type="button" onClick={() => setRetry(value => value + 1)} className="absolute right-4 bottom-20 min-h-11 rounded bg-slate-800 px-3 text-sm text-white">변경한 목록 다시 적용</button>
 
           {/* Progress dots */}
           {items.length > 1 && showControls && (
@@ -462,7 +369,8 @@ function PlaybackSession() {
               {items.map((_, i) => (
                 <button
                   key={i}
-                  onClick={() => setCurrentIdx(i)}
+                  aria-label={`${i + 1}번 자료 재생`}
+                  onClick={() => sequence.select(i)}
                   className={`w-2 h-2 rounded-full transition-all ${
                     i === currentIdx ? 'bg-white scale-125' : 'bg-white/40'
                   }`}

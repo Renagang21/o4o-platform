@@ -10,15 +10,15 @@
  * 주입된 `api`(list/upload/moveToFolder/deleteAsset) 로 위임하고, 권한 판정은
  * `isOperator` prop 으로 받는다. store-ui-core 는 auth/서비스 apiClient 에 의존하지 않는다.
  *
- * - 새 이미지 업로드 (동의 필수, 폴더 선택)
+ * - 새 이미지/영상 업로드 (동의 필수, 폴더 선택)
  * - 라이브러리에서 기존 이미지 선택 (폴더 필터, 그리드/리스트 보기)
  * - 운영자: 폴더 이동 / 삭제
- * - 단일 선택, 이미지 중심
+ * - 단일 선택, 이미지 기본 / 선택적 영상 모드
  */
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import {
-  X, Upload, ImageIcon, Loader2, Check,
+  X, Upload, ImageIcon, Film, Loader2, Check,
   LayoutGrid, List, MoreHorizontal, FolderInput, Trash2,
 } from 'lucide-react';
 
@@ -31,6 +31,9 @@ export interface MediaAssetItem {
   mimeType: string;
   fileSize: number;
   assetType: string;
+  storageType?: string;
+  gcsPath?: string | null;
+  status?: string | null;
   width: number | null;
   height: number | null;
   folder: string;
@@ -47,7 +50,7 @@ export interface MediaAssetItem {
  * (서비스별 mediaApi 는 이미 이 형태와 구조적으로 호환)
  */
 export interface MediaPickerApi {
-  list(options?: { page?: number; limit?: number; assetType?: string; folder?: string }): Promise<{
+  list(options?: { page?: number; limit?: number; assetType?: string; folder?: string; storageType?: string }): Promise<{
     success: boolean; data?: MediaAssetItem[]; total?: number; error?: string;
   }>;
   upload(file: File, consent: boolean, serviceKey?: string, folder?: string): Promise<{
@@ -98,9 +101,16 @@ export interface MediaPickerModalProps {
   isOperator?: boolean;
   title?: string;
   defaultFolder?: string;
+  assetType?: 'image' | 'video';
+  contextKey?: string;
 }
 
 type Tab = 'upload' | 'library';
+function isStoredVideo(asset: MediaAssetItem) {
+  return asset.assetType === 'video' && asset.storageType === 'internal' && !!asset.gcsPath
+    && ['video/mp4', 'video/webm'].includes(asset.mimeType) && asset.status !== 'archived';
+}
+
 type ViewMode = 'grid' | 'list';
 
 export function MediaPickerModal({
@@ -109,9 +119,20 @@ export function MediaPickerModal({
   onSelect,
   api,
   isOperator = false,
-  title = '이미지 선택',
+  title,
   defaultFolder,
+  assetType = 'image',
+  contextKey = '',
 }: MediaPickerModalProps) {
+  const label = assetType === 'video' ? '영상' : '이미지';
+  const identity = JSON.stringify([open, contextKey, assetType]);
+  const requestKey = useRef(''), requestEpoch = useRef(0);
+  const renderedIdentity = useRef('');
+  if (renderedIdentity.current !== identity) {
+    renderedIdentity.current = identity;
+    requestKey.current = `${identity}:${++requestEpoch.current}`;
+  }
+  const listRequest = useRef(0), uploadLock = useRef(false), objectUrl = useRef<string | null>(null);
   const [tab, setTab] = useState<Tab>('upload');
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
 
@@ -143,22 +164,41 @@ export function MediaPickerModal({
   const [movingId, setMovingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
+  const invalidateRequests = useCallback(() => {
+    requestKey.current = ''; ++listRequest.current;
+    if (objectUrl.current) { URL.revokeObjectURL(objectUrl.current); objectUrl.current = null; }
+  }, []);
+  const [libraryError, setLibraryError] = useState<string | null>(null);
+  useEffect(() => {
+    requestKey.current = `${identity}:${++requestEpoch.current}`;
+    ++listRequest.current; uploadLock.current = false;
+    setLoadingAssets(false); setPage(1); setHasMore(false); setTotal(0);
+    setFile(null); setPreview(null); setConsent(false); setUploadedAsset(null); setUploading(false); setUploadError(null); setSelectedId(null); setAssets([]); setLibraryError(null);
+    if (objectUrl.current) { URL.revokeObjectURL(objectUrl.current); objectUrl.current = null; }
+    return invalidateRequests;
+  }, [identity, invalidateRequests]);
+
   const loadAssets = useCallback(async (pageNum: number, append = false, folder?: string | null) => {
     setLoadingAssets(true);
-    const opts: { page: number; limit: number; assetType: string; folder?: string } = {
+    const opts: { page: number; limit: number; assetType: string; folder?: string; storageType?: string } = {
       page: pageNum,
       limit: 20,
-      assetType: 'image',
+      assetType,
     };
     if (folder) opts.folder = folder;
-    const res = await api.list(opts);
-    if (res.success && res.data) {
-      setAssets((prev) => append ? [...prev, ...res.data!] : res.data!);
-      setTotal(res.total || 0);
-      setHasMore((res.data.length || 0) >= 20);
-    }
-    setLoadingAssets(false);
-  }, [api]);
+    if (assetType === 'video') opts.storageType = 'internal';
+    const key = requestKey.current, request = ++listRequest.current;
+    try {
+      const res = await api.list(opts);
+      if (key !== requestKey.current || request !== listRequest.current) return;
+      if (!res.success || !res.data) throw new Error(res.error || '라이브러리를 불러오지 못했습니다.');
+      const data = assetType === 'video' ? res.data.filter(isStoredVideo) : res.data;
+      setAssets(previous => append ? [...previous, ...data] : data);
+      setTotal(res.total || 0); setHasMore(res.data.length >= 20); setLibraryError(null);
+    } catch (error) {
+      if (key === requestKey.current && request === listRequest.current) setLibraryError(error instanceof Error ? error.message : '목록을 불러오지 못했습니다.');
+    } finally { if (key === requestKey.current && request === listRequest.current) setLoadingAssets(false); }
+  }, [api, assetType]);
 
   useEffect(() => {
     if (open && tab === 'library') {
@@ -166,9 +206,11 @@ export function MediaPickerModal({
       setSelectedId(null);
       loadAssets(1, false, folderFilter);
     }
-  }, [open, tab, folderFilter, loadAssets]);
+  }, [open, tab, folderFilter, loadAssets, identity]);
 
   const handleClose = () => {
+    requestKey.current = ''; uploadLock.current = false; ++listRequest.current;
+    if (objectUrl.current) { URL.revokeObjectURL(objectUrl.current); objectUrl.current = null; }
     setFile(null);
     setPreview(null);
     setConsent(false);
@@ -187,26 +229,32 @@ export function MediaPickerModal({
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0];
     if (!f) return;
+    if (objectUrl.current) { URL.revokeObjectURL(objectUrl.current); objectUrl.current = null; }
+    setPreview(null); setUploadedAsset(null); setUploadError(null);
+    if (assetType === 'video' && (!['video/mp4', 'video/webm'].includes(f.type) || f.size > 30 * 1024 * 1024)) {
+      setFile(null); setUploadError('MP4/WebM 영상 30MB까지 올릴 수 있습니다. 큰 영상은 YouTube에 저장한 뒤 영상 주소를 등록해 주세요.'); return;
+    }
     setFile(f);
-    setUploadError(null);
-    setUploadedAsset(null);
-    const reader = new FileReader();
-    reader.onload = () => setPreview(reader.result as string);
-    reader.readAsDataURL(f);
+    if (assetType === 'video') { objectUrl.current = URL.createObjectURL(f); setPreview(objectUrl.current); }
+    else {
+      const key = requestKey.current, reader = new FileReader();
+      reader.onload = () => { if (key === requestKey.current) setPreview(reader.result as string); };
+      reader.readAsDataURL(f);
+    }
   };
 
   const handleUpload = async () => {
-    if (!file || !consent) return;
-    setUploading(true);
-    setUploadError(null);
-
-    const res = await api.upload(file, true, undefined, uploadFolder);
-    if (res.success && res.data) {
+    if (!file || !consent || uploadLock.current) return;
+    const key = requestKey.current;
+    uploadLock.current = true; setUploading(true); setUploadError(null);
+    try {
+      const res = await api.upload(file, true, undefined, uploadFolder);
+      if (key !== requestKey.current) return;
+      if (!res.success || !res.data || (assetType === 'video' && !isStoredVideo(res.data)))
+        throw new Error(res.error || '업로드 결과를 확인하지 못했습니다. 라이브러리에서 먼저 확인해 주세요.');
       setUploadedAsset(res.data);
-    } else {
-      setUploadError(res.error || '업로드에 실패했습니다.');
-    }
-    setUploading(false);
+    } catch (error) { if (key === requestKey.current) setUploadError(error instanceof Error ? error.message : '업로드를 확인하지 못했습니다.'); }
+    finally { if (key === requestKey.current) { uploadLock.current = false; setUploading(false); } }
   };
 
   const handleSelectUploaded = () => {
@@ -323,7 +371,7 @@ export function MediaPickerModal({
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-xl mx-4 max-h-[80vh] flex flex-col" onClick={(e) => e.stopPropagation()}>
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-slate-200">
-          <h3 className="text-sm font-semibold text-slate-800">{title}</h3>
+          <h3 className="text-sm font-semibold text-slate-800">{title ?? `${label} 선택`}</h3>
           <button onClick={handleClose} className="p-1 hover:bg-slate-100 rounded-lg">
             <X size={16} className="text-slate-400" />
           </button>
@@ -338,7 +386,7 @@ export function MediaPickerModal({
                 tab === 'upload' ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500 hover:text-slate-700'
               }`}
             >
-              <Upload size={12} /> 새 이미지 업로드
+              <Upload size={12} /> 새 {label} 업로드
             </button>
             <button
               onClick={() => setTab('library')}
@@ -354,6 +402,8 @@ export function MediaPickerModal({
 
         {/* Body */}
         <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4">
+          {libraryError && <div role="alert">{libraryError}<button type="button" onClick={() => void loadAssets(1, false, folderFilter)} className="min-h-11 underline">다시 불러오기</button></div>}
+          {assetType === 'video' && selectedId && assets.find(asset => asset.id === selectedId) && <video muted src={assets.find(asset => asset.id === selectedId)!.url} controls preload="metadata" aria-label="선택 영상 미리보기" className="max-h-48 w-full" />}
           {tab === 'upload' ? (
             <>
               {!uploadedAsset ? (
@@ -372,23 +422,21 @@ export function MediaPickerModal({
                   </div>
 
                   <div
-                    onClick={() => fileInputRef.current?.click()}
+                    onClick={(event) => { if (!(event.target instanceof HTMLVideoElement)) fileInputRef.current?.click(); }}
                     className="border-2 border-dashed border-slate-200 rounded-xl p-6 text-center cursor-pointer hover:border-blue-300 hover:bg-blue-50/30 transition-colors"
                   >
-                    {preview ? (
-                      <img src={preview} alt="미리보기" className="max-h-40 mx-auto rounded-lg object-contain" />
-                    ) : (
-                      <>
+                    {preview && assetType === 'video' && <video muted src={preview} controls preload="metadata" aria-label="업로드 영상 미리보기" className="max-h-40 mx-auto" />}
+                    {preview && assetType !== 'video' && <img src={preview} alt="미리보기" className="max-h-40 mx-auto rounded-lg object-contain" />}
+                    {!preview && <>
                         <Upload size={24} className="mx-auto text-slate-300 mb-2" />
-                        <p className="text-sm text-slate-500">클릭하여 이미지를 선택하세요</p>
-                        <p className="text-xs text-slate-400 mt-1">JPEG, PNG, WebP, GIF</p>
-                      </>
-                    )}
+                        <p className="text-sm text-slate-500">클릭하여 {label}을 선택하세요</p>
+                        <p className="text-xs text-slate-400 mt-1">{assetType === 'video' ? 'MP4, WebM · 30MB까지 · 일반 보관 자산으로 저장' : 'JPEG, PNG, WebP, GIF'}</p>
+                      </>}
                   </div>
                   <input
                     ref={fileInputRef}
                     type="file"
-                    accept="image/jpeg,image/png,image/webp,image/gif"
+                    accept={assetType === 'video' ? 'video/mp4,video/webm' : 'image/jpeg,image/png,image/webp,image/gif'}
                     onChange={handleFileChange}
                     className="hidden"
                   />
@@ -428,7 +476,7 @@ export function MediaPickerModal({
                   <div className="bg-emerald-50 rounded-xl p-4">
                     <Check size={24} className="mx-auto text-emerald-600 mb-2" />
                     <p className="text-sm font-medium text-emerald-700">업로드 완료</p>
-                    <img src={uploadedAsset.url} alt="업로드됨" className="max-h-32 mx-auto mt-3 rounded-lg object-contain" />
+                    {assetType === 'video' ? <video muted src={uploadedAsset.url} controls preload="metadata" aria-label="보관 영상 미리보기" className="max-h-32 mx-auto" /> : <img src={uploadedAsset.url} alt="업로드됨" className="max-h-32 mx-auto mt-3 rounded-lg object-contain" />}
                     <p className="text-xs text-slate-500 mt-2">{uploadedAsset.originalName}</p>
                     <p className="text-[10px] text-slate-400 mt-1">
                       폴더: {FOLDER_LABEL_MAP[uploadedAsset.folder] || uploadedAsset.folder}
@@ -438,13 +486,13 @@ export function MediaPickerModal({
                     onClick={handleSelectUploaded}
                     className="w-full px-4 py-2.5 text-sm font-medium text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg transition-colors"
                   >
-                    이 이미지 선택
+                    이 {label} 선택
                   </button>
                   <button
                     onClick={() => { setUploadedAsset(null); setFile(null); setPreview(null); setConsent(false); }}
                     className="w-full px-4 py-2 text-xs text-slate-500 hover:text-slate-700"
                   >
-                    다른 이미지 업로드
+                    다른 {label} 업로드
                   </button>
                 </div>
               )}
@@ -502,8 +550,9 @@ export function MediaPickerModal({
               ) : assets.length === 0 ? (
                 <div className="text-center py-12">
                   <ImageIcon size={32} className="mx-auto text-slate-200 mb-2" />
-                  <p className="text-sm text-slate-400">등록된 이미지가 없습니다</p>
-                  <p className="text-xs text-slate-300 mt-1">새 이미지를 업로드하면 여기에 표시됩니다</p>
+                  <p className="text-sm text-slate-400">등록된 {label}이 없습니다</p>
+                  <p className="text-xs text-slate-300 mt-1">새 {label}을 올리면 여기에 표시됩니다</p>
+                  {hasMore && <button type="button" onClick={handleLoadMore} disabled={loadingAssets} className="min-h-11 text-sm text-blue-600">다음 자료 확인</button>}
                 </div>
               ) : viewMode === 'grid' ? (
                 <>
@@ -519,12 +568,12 @@ export function MediaPickerModal({
                           }`}
                         >
                           <div className="aspect-square">
-                            <img
+                            {assetType === 'video' ? <Film className="h-full w-full p-4 text-slate-500" /> : <img
                               src={asset.url}
                               alt={asset.originalName}
                               className="w-full h-full object-cover"
                               loading="lazy"
-                            />
+                            />}
                           </div>
                           {selectedId === asset.id && (
                             <div className="absolute top-1 right-1 w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center">
@@ -567,12 +616,12 @@ export function MediaPickerModal({
                         }`}
                       >
                         <div className="w-10 h-10 rounded overflow-hidden flex-shrink-0 bg-slate-100">
-                          <img
+                          {assetType === 'video' ? <Film className="h-full w-full p-4 text-slate-500" /> : <img
                             src={asset.url}
                             alt={asset.originalName}
                             className="w-full h-full object-cover"
                             loading="lazy"
-                          />
+                          />}
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="text-xs text-slate-700 truncate">{asset.originalName}</p>

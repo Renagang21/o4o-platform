@@ -20,6 +20,8 @@ export interface MediaPickerModalProps {
   onSelect: (asset: MediaAssetItem) => void;
   title?: string;
   defaultFolder?: string;
+  assetType?: 'image' | 'video';
+  contextKey?: string;
 }
 
 export default function MediaPickerModal(props: MediaPickerModalProps) {
@@ -31,6 +33,7 @@ export default function MediaPickerModal(props: MediaPickerModalProps) {
   return (
     <SharedMediaPickerModal
       {...props}
+      contextKey={`${user?.id ?? ''}:${props.contextKey ?? ''}`}
       api={mediaApi}
       isOperator={isOperator}
     />

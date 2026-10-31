@@ -67,7 +67,7 @@ export const mediaApi = {
   },
 
   async list(
-    options?: { page?: number; limit?: number; assetType?: string; folder?: string },
+    options?: { page?: number; limit?: number; assetType?: string; folder?: string; storageType?: string },
   ): Promise<{ success: boolean; data?: MediaAssetItem[]; total?: number; error?: string }> {
     try {
       const params = new URLSearchParams();
@@ -75,6 +75,7 @@ export const mediaApi = {
       if (options?.limit) params.set('limit', String(options.limit));
       if (options?.assetType) params.set('assetType', options.assetType);
       if (options?.folder) params.set('folder', options.folder);
+      if (options?.storageType) params.set('storageType', options.storageType);
 
       return await platformFetch(`/platform/media-library?${params.toString()}`, {
         method: 'GET',
