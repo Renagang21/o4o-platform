@@ -1203,7 +1203,7 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
         <a href="https://studio.youtube.com/channel/UCG9wb2OKmCBZ63g_ONuFkzg/videos/upload" target="_blank" rel="noopener noreferrer" onClick={() => setShowVideoRegForm(true)} className="inline-flex min-h-11 items-center rounded-lg border px-4 text-sm">YouTube에 저장</a>
       </div>
       <p className="mb-3 text-sm text-slate-600">O4O 보관은 미디어 라이브러리를 사용합니다. YouTube는 업로드를 마친 뒤 개별 영상 주소를 등록하세요. 채널 주소 자체는 재생할 수 없습니다.</p>
-      {librarySaving && <p role="status">보관 영상을 내 동영상에 연결하고 있습니다…</p>}
+      {librarySaving && <output>보관 영상을 내 동영상에 연결하고 있습니다…</output>}
       {libraryError && <div role="alert" className="mb-3 rounded-lg bg-amber-50 p-3 text-sm">{libraryError}{libraryPending && <button type="button" disabled={librarySaving} onClick={() => void registerLibraryVideo(libraryPending)} className="min-h-11 px-3 underline">같은 보관 영상 다시 등록</button>}</div>}
       <MediaPickerModal open={videoLibraryOpen} onClose={() => setVideoLibraryOpen(false)} onSelect={asset => void registerLibraryVideo(asset)} assetType="video" contextKey={organizationId} title="O4O 보관 영상" defaultFolder="general" />
       {/* Video registration form — modal */}

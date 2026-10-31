@@ -95,9 +95,11 @@ runtime 을 먼저 죽이고 dead 상태를 확정한 뒤, schema drop 은 **마
 
 ---
 
-## 5. Signage 축 (`/api/signage/:serviceKey/*`) — 축소 대상, 이번에 제거하지 않음
+## 5. Signage 축 (`/api/signage/:serviceKey/*`) — 기존 조사 기록과 유지 경계
 
-| 대상 | 프로덕션 | 판정 |
+> 아래 건수·제공업체는 이 문서 최초 조사 시점의 관측값이며 현재 운영 건수로 재사용하지 않는다. 2026-10-31 보관 파일 지원 범위는 §3과 현재 TODO를 따른다.
+
+| 대상 | 최초 조사 당시 관측 | 판정 |
 |---|---|---|
 | `/media` 계열 (`signage_media` 7건, 전부 YouTube) | 사용 중 | **KEEP** — 이미 정규화된 simple-video 모델(`mediaType·sourceType·sourceUrl·embedId`) |
 | `/playlists` 계열 | playlist 1 / items 3 | **SIMPLIFY** |

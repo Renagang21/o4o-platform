@@ -1165,6 +1165,13 @@ export function TabletContentStepBuilder({
 
   // 저장 요약 — 업무 항목 기준(블록 수 미노출).
   const idleItemsRef = useRef<Array<{ mediaType: string; url: string; mediaAssetId?: string }>>([]);
+  const idleItemKeys = useRef(new WeakMap<object, string>());
+  const idleKeySequence = useRef(0);
+  const keyForIdleItem = (item: object) => {
+    let key = idleItemKeys.current.get(item);
+    if (!key) { key = `idle-${++idleKeySequence.current}`; idleItemKeys.current.set(item, key); }
+    return key;
+  };
   const idleCfg = configOf('idle_media');
   idleItemsRef.current = idleCfg.source === 'custom_media' && Array.isArray(idleCfg.items) ? idleCfg.items : [];
   const idleSummary = idleItemsRef.current.length ? `동영상 ${idleItemsRef.current.length}개` : '지정 안 함 (기본 화면)';
@@ -1230,10 +1237,15 @@ export function TabletContentStepBuilder({
       {items.map((item, index) => {
         const hosted = hostedVideo(item.url);
         const stored = item.mediaType === 'video' || item.mediaType === 'image';
-        return <div key={index} className="space-y-2 rounded-lg border border-slate-200 p-3">
+        return <div key={keyForIdleItem(item)} className="space-y-2 rounded-lg border border-slate-200 p-3">
           <label className="block text-xs font-semibold">{index + 1}. {stored ? 'O4O 보관 영상' : 'YouTube / Vimeo 영상 주소'}
             <input aria-label={`영상 주소 ${index + 1}`} value={item.url} readOnly={stored} placeholder="YouTube 또는 Vimeo 개별 영상 주소"
-              onChange={event => saveItems(items.map((row, i) => i === index ? { mediaType: hostedVideo(event.target.value)?.provider ?? 'youtube', url: event.target.value } : row))}
+              onChange={event => saveItems(items.map((row, i) => {
+                if (i !== index) return row;
+                const next = { mediaType: hostedVideo(event.target.value)?.provider ?? 'youtube', url: event.target.value };
+                idleItemKeys.current.set(next, keyForIdleItem(row));
+                return next;
+              }))}
               className="mt-1 min-h-11 w-full rounded-lg border px-3 text-sm" />
           </label>
           {!stored && item.url.trim() && !hosted && <p role="alert" className="text-sm text-amber-700">채널 주소 대신 개별 영상 주소를 입력해 주세요.</p>}

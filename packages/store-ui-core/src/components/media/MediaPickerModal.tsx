@@ -403,7 +403,7 @@ export function MediaPickerModal({
         {/* Body */}
         <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4">
           {libraryError && <div role="alert">{libraryError}<button type="button" onClick={() => void loadAssets(1, false, folderFilter)} className="min-h-11 underline">다시 불러오기</button></div>}
-          {assetType === 'video' && selectedId && assets.find(asset => asset.id === selectedId) && <video src={assets.find(asset => asset.id === selectedId)!.url} controls preload="metadata" aria-label="선택 영상 미리보기" className="max-h-48 w-full" />}
+          {assetType === 'video' && selectedId && assets.find(asset => asset.id === selectedId) && <video muted src={assets.find(asset => asset.id === selectedId)!.url} controls preload="metadata" aria-label="선택 영상 미리보기" className="max-h-48 w-full" />}
           {tab === 'upload' ? (
             <>
               {!uploadedAsset ? (
@@ -425,15 +425,13 @@ export function MediaPickerModal({
                     onClick={(event) => { if (!(event.target instanceof HTMLVideoElement)) fileInputRef.current?.click(); }}
                     className="border-2 border-dashed border-slate-200 rounded-xl p-6 text-center cursor-pointer hover:border-blue-300 hover:bg-blue-50/30 transition-colors"
                   >
-                    {preview ? (
-                      assetType === 'video' ? <video src={preview} controls preload="metadata" aria-label="업로드 영상 미리보기" className="max-h-40 mx-auto" /> : <img src={preview} alt="미리보기" className="max-h-40 mx-auto rounded-lg object-contain" />
-                    ) : (
-                      <>
+                    {preview && assetType === 'video' && <video muted src={preview} controls preload="metadata" aria-label="업로드 영상 미리보기" className="max-h-40 mx-auto" />}
+                    {preview && assetType !== 'video' && <img src={preview} alt="미리보기" className="max-h-40 mx-auto rounded-lg object-contain" />}
+                    {!preview && <>
                         <Upload size={24} className="mx-auto text-slate-300 mb-2" />
                         <p className="text-sm text-slate-500">클릭하여 {label}을 선택하세요</p>
                         <p className="text-xs text-slate-400 mt-1">{assetType === 'video' ? 'MP4, WebM · 30MB까지 · 일반 보관 자산으로 저장' : 'JPEG, PNG, WebP, GIF'}</p>
-                      </>
-                    )}
+                      </>}
                   </div>
                   <input
                     ref={fileInputRef}
@@ -478,7 +476,7 @@ export function MediaPickerModal({
                   <div className="bg-emerald-50 rounded-xl p-4">
                     <Check size={24} className="mx-auto text-emerald-600 mb-2" />
                     <p className="text-sm font-medium text-emerald-700">업로드 완료</p>
-                    {assetType === 'video' ? <video src={uploadedAsset.url} controls preload="metadata" aria-label="보관 영상 미리보기" className="max-h-32 mx-auto" /> : <img src={uploadedAsset.url} alt="업로드됨" className="max-h-32 mx-auto mt-3 rounded-lg object-contain" />}
+                    {assetType === 'video' ? <video muted src={uploadedAsset.url} controls preload="metadata" aria-label="보관 영상 미리보기" className="max-h-32 mx-auto" /> : <img src={uploadedAsset.url} alt="업로드됨" className="max-h-32 mx-auto mt-3 rounded-lg object-contain" />}
                     <p className="text-xs text-slate-500 mt-2">{uploadedAsset.originalName}</p>
                     <p className="text-[10px] text-slate-400 mt-1">
                       폴더: {FOLDER_LABEL_MAP[uploadedAsset.folder] || uploadedAsset.folder}

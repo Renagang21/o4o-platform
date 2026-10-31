@@ -13,7 +13,8 @@ export function SignagePlaylistPreview({ name, items, onClose }: Readonly<{ name
   const index = item ? items.findIndex(row => row.id === item.id) : -1;
   const raw = item?.contentJson?.sourceUrl ?? item?.contentJson?.url ?? item?.contentJson?.fileUrl;
   const stored = item?.contentJson?.sourceType === 'url';
-  const url = typeof raw === 'string' ? stored ? raw : videoPreviewUrl(raw) : null;
+  const supportedUrl = typeof raw === 'string' ? videoPreviewUrl(raw) : null;
+  const url = stored && typeof raw === 'string' ? raw : supportedUrl;
   return <AuthoringDialog labelId={id} onClose={onClose} className="max-w-3xl">
     <div className="space-y-4 p-5">
       <h2 id={id} className="text-lg font-semibold">{name} · 저장된 안내 미리보기</h2>

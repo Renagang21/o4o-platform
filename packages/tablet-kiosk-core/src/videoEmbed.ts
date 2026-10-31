@@ -26,7 +26,8 @@ export function hostedVideo(value: string): { provider: 'youtube' | 'vimeo'; id:
     if (!['https:', 'http:'].includes(u.protocol) || u.username || u.password) return null;
     const host = u.hostname.toLowerCase(), parts = u.pathname.split('/').filter(Boolean);
     if (['youtube.com', 'www.youtube.com', 'm.youtube.com', 'youtu.be', 'www.youtu.be', 'www.youtube-nocookie.com'].includes(host)) {
-      const id = host.endsWith('youtu.be') ? parts[0] : u.searchParams.get('v') || (['shorts', 'embed', 'live'].includes(parts[0]) ? parts[1] : null);
+      const pathId = ['shorts', 'embed', 'live'].includes(parts[0]) ? parts[1] : null;
+      const id = host.endsWith('youtu.be') ? parts[0] : u.searchParams.get('v') || pathId;
       return id && /^[\w-]{11}$/.test(id) ? { provider: 'youtube', id, url: `https://www.youtube.com/watch?v=${id}` } : null;
     }
     if (['vimeo.com', 'www.vimeo.com', 'player.vimeo.com'].includes(host)) {

@@ -292,8 +292,9 @@ function ScreenSetManagerSession({ onToast: notify, tablets, previewApi, storeSl
           // WO-O4O-STORE-AI-FIRST-EDITOR-BOUNDARY-V1: 내 매장 = 내부 AI OFF
           showInternalAi={false}
         />
-        <MediaPickerModal open={!!videoPickerTarget} onClose={() => setVideoPickerTarget(null)} assetType="video" contextKey={`${storeSlug ?? ''}:${builder.detail?.id ?? 'new'}`} title="태블릿 보관 영상" defaultFolder="signage-video"
-          onSelect={asset => { if (builder.current()) videoPickerTarget?.({ id: asset.id, url: asset.url, title: asset.originalName }); setVideoPickerTarget(null); }} />
+        <MediaPickerModal open={!!videoPickerTarget} onClose={() => setVideoPickerTarget(null)} assetType="video" contextKey={`${storeSlug ?? ''}:${builder.detail?.id ?? 'new'}`} title="태블릿 보관 영상" defaultFolder="general"
+          onSelect={asset => { if (builder.current()) { videoPickerTarget?.({ id: asset.id, url: asset.url, title: asset.originalName }); }
+            setVideoPickerTarget(null); }} />
         <MediaPickerModal
           open={!!mediaPickerTarget}
           onClose={() => setMediaPickerTarget(null)}

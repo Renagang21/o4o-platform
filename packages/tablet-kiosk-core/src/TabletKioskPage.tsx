@@ -1336,7 +1336,7 @@ function IdleOverlay({ items, onUserInteraction, defaultDurationMs, qrUrl, qrLab
       )}
       {current && <div style={styles.idleEmbedWrap}>
         <MediaSequence items={items.map((item, index) => ({ ...item, id: `${index}:${item.url}` }))} resetKey="tablet-idle" defaultImageDurationMs={defaultDurationMs ?? DEFAULT_IDLE_IMAGE_DURATION_MS} style={styles.idleMedia} />
-        <div style={styles.idleTapCatcher} onPointerDown={onUserInteraction} role="presentation" />
+        <button type="button" aria-label="안내 화면 열기" style={{ ...styles.idleTapCatcher, border: 0, padding: 0 }} onPointerDown={onUserInteraction} onClick={onUserInteraction} />
       </div>}
       {/* WO-O4O-KPA-TABLET-IDLE-VIDEO-URL-ONLY-V1: 영상이 재생될 때만 하단의 작은 터치 안내.
           중앙 대형 문구는 쓰지 않는다(광고·홍보 영상을 가림). pointerEvents:none 이라

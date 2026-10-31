@@ -9,7 +9,7 @@ import { createServer } from 'vite';
 import { chromium } from '@playwright/test';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const temp = mkdtempSync(path.join(tmpdir(), 'o4o-video-'));
-execFileSync('ffmpeg', ['-loglevel', 'error', '-f', 'lavfi', '-i', 'color=c=teal:s=320x180:d=0.6', '-c:v', 'libvpx', '-an', path.join(temp, 'fixture.webm')]);
+execFileSync('/usr/bin/ffmpeg', ['-loglevel', 'error', '-f', 'lavfi', '-i', 'color=c=teal:s=320x180:d=0.6', '-c:v', 'libvpx', '-an', path.join(temp, 'fixture.webm')]);
 const fixture = `
 import React from 'react'; import {createRoot} from 'react-dom/client';
 import {MediaSequence, VideoPlayback} from '/packages/tablet-kiosk-core/src/index.ts';
@@ -31,7 +31,7 @@ let browser;
 try {
   await server.listen(); const address = server.httpServer.address(); assert(address && typeof address !== 'string');
   browser = await chromium.launch({ executablePath: process.env.O4O_BROWSER_EXECUTABLE || '/usr/bin/chromium', headless: true, args: ['--no-sandbox'] });
-  for (const width of [1365, 390]) {
+  const verifyViewport = async (width) => {
     const context = await browser.newContext({ viewport: { width, height: 850 } }); const page = await context.newPage();
     await page.route('https://**/*', route => route.abort());
     await page.goto(`http://127.0.0.1:${address.port}/`);
@@ -43,5 +43,10 @@ try {
     await page.getByRole('button', { name: /라이브러리/ }).click(); await page.getByText('Pharmacy video', { exact: true }).click();
     await page.getByRole('button', { name: '선택', exact: true }).click(); assert.equal(await page.evaluate(() => window.selected), 'video');
     await context.close(); console.log('PASS', width, 'native codec ended A/B/A, no per-video loop, retained library selection');
-  }
-} finally { if (browser) await browser.close(); await server.close(); rmSync(temp, { recursive: true, force: true }); }
+  };
+  await Promise.all([1365, 390].map(verifyViewport));
+} finally {
+  if (browser) { await browser.close(); }
+  await server.close();
+  rmSync(temp, { recursive: true, force: true });
+}

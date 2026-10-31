@@ -59,8 +59,8 @@ function storeItemToPlaybackItem(item: StorePlaylistActiveItem): PlaybackItem {
   const url = (cj.sourceUrl as string) || (cj.fileUrl as string)
     || (cj.url as string) || (cj.imageUrl as string) || '';
   // Forced-content payloads carry a hosted URL without mediaType/mimeType.
-  const mediaType = hostedVideo(url) ? 'video' : (cj.mediaType as string)
-    || ((cj.mimeType as string)?.startsWith('video') ? 'video' : 'image');
+  const defaultType = (cj.mimeType as string)?.startsWith('video') ? 'video' : 'image';
+  const mediaType = hostedVideo(url) ? 'video' : (cj.mediaType as string) || defaultType;
   return {
     id: item.id,
     displayOrder: item.displayOrder,
@@ -75,7 +75,7 @@ function storeItemToPlaybackItem(item: StorePlaylistActiveItem): PlaybackItem {
   };
 }
 
-function MediaRenderer({ item, onEnded, onError }: { item: PlaybackItem; onEnded: () => void; onError: (message: string) => void }) {
+function MediaRenderer({ item, onEnded, onError }: Readonly<{ item: PlaybackItem; onEnded: () => void; onError: (message: string) => void }>) {
   const media = item.media;
   const url = media?.url ?? '';
   const provider = hostedVideo(url)?.provider;
@@ -357,10 +357,10 @@ function PlaybackSession() {
         <>
           {/* Media */}
           {currentItem && !sequence.allFailed && <MediaRenderer key={sequence.token} item={currentItem} onEnded={() => sequence.next(sequence.token)} onError={message => sequence.fail(message, sequence.token)} />}
-          {sequence.failedCount > 0 && <div role="status" className="absolute left-4 right-4 top-16 rounded bg-slate-900 p-3 text-white">
+          {sequence.failedCount > 0 && <output className="absolute left-4 right-4 top-16 rounded bg-slate-900 p-3 text-white">
             <p>{sequence.allFailed ? '재생할 수 있는 영상이 없습니다.' : '재생하지 못한 자료를 건너뜁니다.'} {sequence.error}</p>
             <button type="button" onClick={sequence.retry} className="min-h-11 underline">다시 재생</button>
-          </div>}
+          </output>}
           <button type="button" onClick={() => setRetry(value => value + 1)} className="absolute right-4 bottom-20 min-h-11 rounded bg-slate-800 px-3 text-sm text-white">변경한 목록 다시 적용</button>
 
           {/* Progress dots */}

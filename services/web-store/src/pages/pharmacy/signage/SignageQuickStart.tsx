@@ -83,7 +83,8 @@ export function SignageQuickStart({ videos: sourceVideos, organizationId, isCurr
           const video = videos.find(item => item.id === key);
           const source = video?.sourceUrl ?? video?._snapshot?.contentJson?.sourceUrl;
           const stored = video?._media?.sourceType === 'url' || video?._snapshot?.contentJson?.sourceType === 'url';
-          const url = typeof source === 'string' ? stored ? source : videoPreviewUrl(source) : null;
+          const supportedUrl = typeof source === 'string' ? videoPreviewUrl(source) : null;
+          const url = stored && typeof source === 'string' ? source : supportedUrl;
           return <li key={key}>{video?.title ?? '선택한 자료'}{url && <button type="button" onClick={() => setPreview(previous => previous === url ? null : url)} className="ml-2 min-h-11 px-2 text-teal-800 underline">영상 확인</button>}</li>;
         })}</ol>
         {preview && <div className="aspect-video w-full"><VideoPlayback url={preview} kind={hostedVideo(preview)?.provider ?? 'video'} title="선택 영상 미리보기" /></div>}

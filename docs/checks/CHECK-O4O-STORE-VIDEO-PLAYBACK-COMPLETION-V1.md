@@ -22,7 +22,7 @@
 |---|---|
 | 의존성 설치 | `pnpm install --frozen-lockfile --offline` PASS |
 | 공통 의존 패키지 빌드 | `pnpm run build:packages` PASS |
-| Store 전체 회귀 | 87 suites / 914 tests PASS; 이후 추가한 목록 저장·재열기 포함 대상 8 suites / 103 tests PASS |
+| Store 전체 회귀 | 최종 88 suites / 917 tests PASS(강제 편성·보관 파일 필터·목록 재열기 포함) |
 | API 주변 회귀 | signage / store-tablet / screen-set / media-library / stored-video: 20 suites, 329 PASS, 선택적 DB 등 12 SKIP |
 | 격리 PostgreSQL 실제 검증 | `MEDIA_V2_TEST_PORT=55439`로 관련 6 suites / 97 tests PASS. 기존 migration을 일회용 로컬 DB에 적용; 실제 row lock 및 참조/삭제 경합 확인 |
 | Chromium 실제 코덱 | `node scripts/checks/store-video-playback.browser.mjs` PASS. 1365px/390px, 합성 WebM 실제 ended A→B→A, 개별 loop 없음, 보관 영상 선택 |
@@ -48,3 +48,11 @@ DB 검증은 이 작업 전용 Docker PostgreSQL에서만 수행하며 운영 DB
 - 초기 Codex P1: 강제 편성 payload의 mediaType 생략을 이미지 기본값보다 앞서 hosted URL로 판별하고, 영상에는 이미지 타이머를 적용하지 않도록 수정했다. 실제 forced payload 형식과 60초 경과·종료 이벤트 회귀 테스트 PASS.
 - 초기 Codex P2: 영상 picker는 기존 `storageType=internal` 필터를 Store API까지 전달하고, 관리 GCS 파일·MP4/WebM·비보관(archived 아님) 조건으로 선택 결과를 제한한다. 외부 영상 링크/지원하지 않는 형식은 보관 파일로 표시하지 않는다. 필터로 빈 페이지가 되더라도 다음 자료 확인을 제공한다. 기본 image 모드 계약은 유지한다.
 - CI/Codex 최종 상태는 PR의 최종 HEAD에서 확인한다. main merge·배포는 실행하지 않는다.
+
+## Sonar 보완 검증
+
+- 코드 HEAD `b3bf44bec2`의 CI Pipeline `41181219122`는 CI Gate 포함 전체 PASS, CodeQL `41181219121` PASS, Codex 재검토는 추가 지적 없이 완료했다. 별도 Sonar 분석은 신뢰성/보안 등급 조건에서 실패했으므로 병합 준비 완료로 판정하지 않았다.
+- 공개 Sonar API는 이 환경에서 403이었으나 GitHub check annotation으로 상세 지적을 확인했다. 환경/품질 gate 설정은 변경하지 않았다.
+- 자산 row lock은 UUID 정렬 비교를 명시하고 Promise chain으로 순차 획득한다. 순서를 병렬화하지 않는다. 영상은 기존 무음 시작 동작을 명시하고, 상태·터치 버튼 의미와 편집 행의 UI key를 보완했다. UI key는 DB에 저장하지 않는다.
+- 브라우저 fixture의 ffmpeg는 고정 절대 실행 경로를 사용하며 PC/모바일은 독립 context에서 검증한다. 태블릿 영상 picker 기본 폴더는 실제 기존 `general`을 사용한다.
+- 보완 후 Store 전체 917 tests, 관련 서버 32 tests, 실제 Chromium 1365px/390px 재생·선택, 코드 lint 오류 0을 확인했다. 서버·소비처 타입과 최종 CI/Sonar는 PR의 해당 HEAD에서 확인한다.

@@ -19,7 +19,8 @@ function parseHostedVideo(value: string): { sourceType: 'youtube' | 'vimeo'; emb
     const u = new URL(value), host = u.hostname.toLowerCase(), parts = u.pathname.split('/').filter(Boolean);
     if (!['http:', 'https:'].includes(u.protocol) || u.username || u.password) return null;
     if (['youtube.com', 'www.youtube.com', 'm.youtube.com', 'youtu.be', 'www.youtu.be', 'www.youtube-nocookie.com'].includes(host)) {
-      const id = host.endsWith('youtu.be') ? parts[0] : u.searchParams.get('v') || (['shorts', 'embed', 'live'].includes(parts[0]) ? parts[1] : null);
+      const pathId = ['shorts', 'embed', 'live'].includes(parts[0]) ? parts[1] : null;
+      const id = host.endsWith('youtu.be') ? parts[0] : u.searchParams.get('v') || pathId;
       return id && /^[\w-]{11}$/.test(id) ? { sourceType: 'youtube', embedId: id, sourceUrl: `https://www.youtube.com/watch?v=${id}` } : null;
     }
     if (['vimeo.com', 'www.vimeo.com', 'player.vimeo.com'].includes(host)) {
@@ -102,7 +103,7 @@ export class SignageMediaService {
 
     const media = await this.repository.createMedia({
       ...dto,
-      ...(hosted ?? {}),
+      ...hosted,
       metadata: { ...dto.metadata, mediaLibraryAssetId: null },
       serviceKey: scope.serviceKey,
       organizationId: scope.organizationId || null,
@@ -142,7 +143,7 @@ export class SignageMediaService {
     const assetId = dto.mediaLibraryAssetId;
     if (!scope.organizationId || !userId || typeof assetId !== 'string' || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(assetId))
       throw videoInputError('미디어 라이브러리에서 보관 영상을 선택해 주세요.', 'MEDIA_LIBRARY_VIDEO_REQUIRED');
-    return this.dataSource.transaction(async manager => {
+    return await this.dataSource.transaction(async manager => {
       // Same row lock as MediaLibrary deletion: a selected file cannot disappear during registration.
       const asset = await lockStoredVideo(manager, assetId, userId);
       const repository = manager.getRepository(SignageMedia);
