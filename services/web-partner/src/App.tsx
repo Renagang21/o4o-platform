@@ -191,7 +191,7 @@ export type RemoteWorkspace = {
   name: string;
   save: (workspace: Workspace) => Promise<Workspace>;
 };
-export default function App({ remote }: { remote?: RemoteWorkspace } = {}) {
+export default function App({ remote, embedded = false }: { remote?: RemoteWorkspace; embedded?: boolean } = {}) {
   const [initial] = useState(() => {
     if (remote) return { data: remote.workspace, error: "" };
     try {
@@ -545,6 +545,7 @@ export default function App({ remote }: { remote?: RemoteWorkspace } = {}) {
       if (result instanceof Promise) return result.then(() => setEditing(null));
       setEditing(null);
     });
+  const Content = embedded ? "section" : "main";
   return (
     <div className="app">
       {editing && (
@@ -557,16 +558,16 @@ export default function App({ remote }: { remote?: RemoteWorkspace } = {}) {
           onClose={() => setEditing(null)}
         />
       )}
-      <a className="skip" href="#main">
+      <a className="skip" href={embedded ? "#workspace-main" : "#main"}>
         본문으로 이동
       </a>
-      <header className="topbar">
-        <a className="brand" href="#home">
+      <div className="topbar" role="group" aria-label="작업공간 도구">
+        {!embedded && <a className="brand" href="#home">
           <span className="brand-mark">o4o</span>
           <span>
             partner<span className="brand-dot">.</span>
           </span>
-        </a>
+        </a>}
         <span className="edition">CREATOR & BUSINESS</span>
         <button
           className="button quiet backup"
@@ -585,7 +586,7 @@ export default function App({ remote }: { remote?: RemoteWorkspace } = {}) {
         >
           자료 백업 ↓
         </button>
-      </header>
+      </div>
       <div className="shell">
         <aside className="sidebar">
           <p className="nav-label">PARTNER SPACE</p>
@@ -611,7 +612,7 @@ export default function App({ remote }: { remote?: RemoteWorkspace } = {}) {
             </p>
           </div>
         </aside>
-        <main id="main" tabIndex={-1}>
+        <Content id={embedded ? "workspace-main" : "main"} tabIndex={-1}>
           <div className="local-banner">
             <span className="status-dot" />
             <span>
@@ -1720,7 +1721,7 @@ export default function App({ remote }: { remote?: RemoteWorkspace } = {}) {
             </>
           )}
 
-          <footer>
+          {!embedded && <footer>
             <span>o4o partner.</span>
             <p>사업자와 크리에이터를 위한 홍보 지원 서비스</p>
             <span>
@@ -1728,8 +1729,8 @@ export default function App({ remote }: { remote?: RemoteWorkspace } = {}) {
                 ? "서버 공동공간 · 실제 송금은 별도 처리"
                 : "브라우저 로컬 저장"}
             </span>
-          </footer>
-        </main>
+          </footer>}
+        </Content>
       </div>
     </div>
   );

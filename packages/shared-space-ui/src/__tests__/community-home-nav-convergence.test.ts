@@ -57,9 +57,10 @@ describe('primary nav 공통 조립기 채택 (§9)', () => {
 
 describe('공개 푸터 공통 View 채택 (§14)', () => {
   for (const [name, path] of [['KPA-Society', KPA_FOOTER],] as const) {
-    it(`${name} 푸터가 공통 CommunitySiteFooter 를 쓴다`, () => {
-      const src = read(path);
-      expect(src).toContain('CommunitySiteFooter');
+    it(`${name} 푸터가 공통 ServiceFooter와 기존 법정정보·메뉴 출처를 쓴다`, () => {
+      const src = stripComments(read(path));
+      expect(src).toContain('ServiceFooter');
+      expect(src).toContain("from '@o4o/auth-react'");
       expect(src).toContain('FOOTER_SECTIONS');
       expect(src).toContain('PublicLegalFooterInfo');
     });

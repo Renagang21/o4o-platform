@@ -171,7 +171,7 @@ describe('B. generateHandoff', () => {
     expect(query).not.toHaveBeenCalled();
   });
 
-  it.each(['/mypage', ...['store', 'study', 'community', 'funding', 'supplier', 'pharmacy', 'kpa', 'admin'].map(key => `/mypage?from=${key}`)])('My Home %s: 활성 계정의 세션만 전달 · membership 생성/검사 없음', async path => {
+  it.each(['/mypage', '/mypage?from=cooperative&returnPath=%2Fone%2Fcommunity%3Fpage%3D2', ...['store', 'study', 'community', 'funding', 'supplier', 'pharmacy', 'kpa', 'admin', 'partner', 'cooperative', 'carepharm', 'megapharm'].map(key => `/mypage?from=${key}`)])('My Home %s: 활성 계정의 세션만 전달 · membership 생성/검사 없음', async path => {
     query.mockResolvedValueOnce([{ id: uuid }]).mockResolvedValueOnce([]);
     const res = mockRes();
     await HandoffController.generateHandoff(mockReq({ targetServiceKey: 'neture', returnPath: path }), res);

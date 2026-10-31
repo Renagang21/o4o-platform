@@ -125,18 +125,18 @@ it("keeps the previous service across personal subviews, but never carries it in
   const { rerender } = render(app("/mypage?from=store"));
   expect(
     screen
-      .getByRole("link", { name: "매장 관리로 돌아가기" })
-      .getAttribute("href"),
-  ).toBe("https://store.neture.co.kr");
+      .getByRole("button", { name: "매장 관리로 돌아가기" })
+      .textContent,
+  ).toBe("매장 관리로 돌아가기");
   fireEvent.click(screen.getAllByRole("link", { name: "커뮤니티 활동" })[0]);
   expect(screen.getByText("본인 커뮤니티 활동")).toBeTruthy();
   expect(
-    screen.getByRole("link", { name: "매장 관리로 돌아가기" }),
+    screen.getByRole("button", { name: "매장 관리로 돌아가기" }),
   ).toBeTruthy();
   auth.user.id = "second";
   rerender(app("/mypage?from=store"));
   expect(
-    screen.queryByRole("link", { name: "매장 관리로 돌아가기" }),
+    screen.queryByRole("button", { name: "매장 관리로 돌아가기" }),
   ).toBeNull();
 });
 it.each(["https://evil.test", "__proto__", "constructor", "toString"])(

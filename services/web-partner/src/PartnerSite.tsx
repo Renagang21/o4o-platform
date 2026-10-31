@@ -1,3 +1,4 @@
+import { PARTNER_PUBLIC_NAV, PARTNER_OPERATOR_NAV } from "./config/navigation";
 import {
   useEffect,
   useRef,
@@ -6,11 +7,24 @@ import {
   type ReactNode,
 } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { PasswordInput } from "@o4o/auth-react";
+import { GlobalHeader } from "@o4o/ui";
+import {
+  PublicLegalFooterInfo,
+  PolicyDocumentViewer,
+} from "@o4o/shared-space-ui";
+import { safeServiceReturnPath } from "@o4o/auth-utils";
+import {
+  PasswordInput,
+  ServiceSpaceSwitcher,
+  MyHomeButton,
+  O4OHomeButton,
+  ServiceAccountMenu,
+  ServiceFooter,
+} from "@o4o/auth-react";
 import WorkspacePortal, {
   type WorkspaceSessionChange,
 } from "./WorkspacePortal";
-import { ApiError, partnerApi } from "./api";
+import { ApiError, partnerApi, request } from "./api";
 import {
   communityApi,
   type CommunityBoard,
@@ -20,6 +34,34 @@ import {
 } from "./community-api";
 import CommunityOperator from "./CommunityOperator";
 
+const navigationApi = {
+  get: async (path: string) => ({
+    data: { data: await request(`/api/v1${path}`) },
+  }),
+  post: async (path: string, body: unknown) => ({
+    data: {
+      data: await request<{ targetUrl?: string }>(
+        `/api/v1${path}`,
+        "POST",
+        body,
+      ),
+    },
+  }),
+};
+const loadPartnerLegal = async () =>
+  request<import("@o4o/shared-space-ui").PublicLegalProfileDto | null>(
+    "/api/v1/public/services/partner-support/footer-legal",
+  );
+async function loadPartnerPolicy(_key: string, type: string) {
+  try {
+    return await request<import("@o4o/shared-space-ui").PolicyDocumentDto>(
+      `/api/v1/public/services/partner-support/policies/${type}`,
+    );
+  } catch (error) {
+    if (error instanceof ApiError && error.status === 404) return null;
+    throw error;
+  }
+}
 export type Run = (work: () => Promise<void>) => Promise<void>;
 export type PartnerUser = { id: string; name?: string; displayName?: string };
 const resyncWorkspaceSession = (token?: string) => {
@@ -125,7 +167,17 @@ export default function PartnerSite() {
       await partnerApi.login(String(data.get("email")), secret);
       setUser(await partnerApi.me());
       await reloadMembership();
-      nav("/community");
+      const invite = location.state?.workspaceInvite;
+      if (typeof invite === "string" && /^[a-f0-9]{64}$/.test(invite)) {
+        resyncWorkspaceSession(invite);
+        return;
+      }
+      nav(
+        safeServiceReturnPath(
+          new URLSearchParams(location.search).get("returnTo"),
+        ) ?? "/community",
+        { replace: true },
+      );
     });
   };
   const onWorkspaceSessionChange = (change: WorkspaceSessionChange) => {
@@ -147,44 +199,80 @@ export default function PartnerSite() {
   const member = membership.status === "active";
   return (
     <>
-      <header className="partner-header">
-        <Link className="partner-brand" to="/">
-          O4O Partner
-        </Link>
-        <nav aria-label="Partner 메뉴">
-          <Link to="/community">파트너 커뮤니티</Link>
-          <Link to="/workspace">홍보 작업공간</Link>
-          {membership.operator && <Link to="/operator">운영 관리</Link>}
-        </nav>
-        <div className="button-row">
-          {user ? (
-            <>
-              <span>{user.displayName || user.name || "회원"}</span>
-              <button
-                className="button quiet"
-                disabled={busy || !ready}
-                onClick={() =>
-                  void run(async () => {
-                    try {
-                      await partnerApi.logout();
-                    } finally {
-                      setUser(null);
-                      setMembership({ status: null, operator: false });
-                      nav("/community");
-                    }
-                  })
+      <GlobalHeader
+        brand={{ name: "O4O Partner", icon: "p.", href: "/" }}
+        publicNav={PARTNER_PUBLIC_NAV}
+        contextualNav={membership.operator ? PARTNER_OPERATOR_NAV : []}
+        user={
+          !ready
+            ? { displayName: "계정 확인 중", email: "" }
+            : user
+              ? {
+                  displayName: user.displayName || user.name || "회원",
+                  email: "",
                 }
-              >
-                로그아웃
-              </button>
-            </>
-          ) : (
-            <Link className="button primary" to="/login">
-              로그인
-            </Link>
-          )}
-        </div>
-      </header>
+              : null
+        }
+        onLogin={() => {
+          const invite = location.hash.startsWith("#join=")
+            ? location.hash.slice(6)
+            : "";
+          const returnTo =
+            safeServiceReturnPath(
+              location.pathname + location.search + location.hash,
+            ) ?? (workspace ? "/workspace" : "/community");
+          nav(`/login?returnTo=${encodeURIComponent(returnTo)}`, {
+            state: /^[a-f0-9]{64}$/.test(invite)
+              ? { workspaceInvite: invite }
+              : undefined,
+          });
+        }}
+        onRegister={() => window.location.assign("https://neture.co.kr/signup")}
+        showMobileUserMenu={false}
+        homeSlot={
+          <span className="partner-account-tools">
+            <ServiceSpaceSwitcher
+              api={navigationApi}
+              accountId={user?.id}
+              isAuthenticated={!!user}
+              authLoading={!ready}
+            />
+            <MyHomeButton
+              className="o4o-home-link"
+              api={navigationApi}
+              accountId={user?.id}
+              isAuthenticated={!!user}
+              authLoading={!ready}
+            />
+            <O4OHomeButton
+              className="o4o-home-link"
+              api={navigationApi}
+              isAuthenticated={!!user}
+              authLoading={!ready}
+            />
+          </span>
+        }
+        accountSlot={
+          user ? (
+            <ServiceAccountMenu
+              displayName={user.displayName || user.name || "회원"}
+              onLogout={() =>
+                run(async () => {
+                  try {
+                    await partnerApi.logout();
+                  } finally {
+                    setUser(null);
+                    setMembership({ status: null, operator: false });
+                    nav("/community");
+                  }
+                })
+              }
+            />
+          ) : !ready ? (
+            <span role="status">계정 확인 중…</span>
+          ) : undefined
+        }
+      />
       <main className="community-shell" aria-busy={busy}>
         {error && (
           <p role="alert" className="message failure">
@@ -197,7 +285,16 @@ export default function PartnerSite() {
           </p>
         )}
         {!ready && <p role="status">계정 연결을 확인하고 있습니다…</p>}
-        {workspace ? (
+        {location.pathname === "/terms" || location.pathname === "/privacy" ? (
+          <PolicyDocumentViewer
+            serviceKey="partner-support"
+            documentType={location.pathname === "/terms" ? "terms" : "privacy"}
+            heading={
+              location.pathname === "/terms" ? "이용약관" : "개인정보처리방침"
+            }
+            loadPolicy={loadPartnerPolicy}
+          />
+        ) : workspace ? (
           <WorkspacePortal onSessionChange={onWorkspaceSessionChange} />
         ) : loginPage ? (
           <section className="community-auth panel">
@@ -233,7 +330,13 @@ export default function PartnerSite() {
             {!ready ? (
               <p>운영 권한 확인 중…</p>
             ) : membership.operator ? (
-              <CommunityOperator key={user!.id} user={user!} busy={busy} run={run} admin={membership.admin === true} />
+              <CommunityOperator
+                key={user!.id}
+                user={user!}
+                busy={busy}
+                run={run}
+                admin={membership.admin === true}
+              />
             ) : (
               <section className="panel">
                 <h1>Partner 운영 관리</h1>
@@ -272,7 +375,10 @@ export default function PartnerSite() {
                       O4O 계정으로 로그인한 뒤 커뮤니티에 별도로 가입하세요.
                       작업공간 초대와 커뮤니티 가입은 각각 관리됩니다.
                     </p>
-                    <Link className="button primary" to="/login">
+                    <Link
+                      className="button primary"
+                      to={`/login?returnTo=${encodeURIComponent(safeServiceReturnPath(location.pathname + location.search + location.hash) ?? "/community")}`}
+                    >
                       로그인하고 참여하기
                     </Link>
                   </>
@@ -365,9 +471,23 @@ export default function PartnerSite() {
           </>
         )}
       </main>
-      <footer className="community-footer">
-        O4O Partner · 파트너들의 콘텐츠와 홍보 활동을 지원합니다.
-      </footer>
+      <ServiceFooter
+        brand="O4O Partner"
+        links={
+          <>
+            <a href="https://neture.co.kr/contact?service=partner-support">
+              Contact Us
+            </a>
+            <Link to="/terms">이용약관</Link>
+            <Link to="/privacy">개인정보처리방침</Link>
+          </>
+        }
+      >
+        <PublicLegalFooterInfo
+          serviceKey="partner-support"
+          loadProfile={loadPartnerLegal}
+        />
+      </ServiceFooter>
     </>
   );
 }
