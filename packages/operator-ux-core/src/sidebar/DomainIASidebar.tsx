@@ -91,7 +91,7 @@ export interface DomainIASidebarProps {
   menuItems: Partial<Record<OperatorGroupKey, OperatorMenuItem[]>>;
   /** 서비스 활성 Capability 목록 (그룹 visibility 필터) */
   capabilities: OperatorCapability[];
-  /** sidebar sticky 오프셋 Tailwind 클래스 (default: 'top-6'). GlobalHeader 사용 시 'top-20' */
+  /** sidebar sticky 오프셋 Tailwind 클래스 (default: 'top-6'). GlobalHeader는 OperatorAreaShell이 실제 높이를 전달 */
   sidebarTopOffset?: string;
   /** 서비스별 domain IA. 미주입 시 DEFAULT_OPERATOR_DOMAIN_IA (KPA 계열) 사용 — 기존 3 서비스 무변화.
    *  WO-O4O-OPERATOR-UX-CORE-DOMAINIASIDEBAR-IA-CONFIG-PARAM-V1 */

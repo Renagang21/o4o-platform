@@ -5,7 +5,7 @@
  * 표준: docs/architecture/ui/GLOBAL-HEADER-STANDARD-V1.md
  *
  * 4-슬롯 구조: BrandSlot / PrimaryNav / UtilityArea / UserArea
- * 높이: 64px 고정
+ * 유틸리티 줄 + 서비스 메뉴 줄; 실제 높이를 업무 drawer와 공유한다.
  * 스타일: Tailwind CSS
  *
  * 이 컴포넌트는 서비스별 컨텍스트(Auth, LoginModal 등)에 의존하지 않는다.
@@ -138,6 +138,25 @@ export function GlobalHeader({
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const userMenuRef = useRef<HTMLDivElement>(null);
+  const headerRef = useRef<HTMLElement>(null);
+  useEffect(() => {
+    const header = headerRef.current;
+    if (!header) return;
+    const property = '--o4o-global-header-height';
+    const root = document.documentElement;
+    const previous = root.style.getPropertyValue(property);
+    const measure = () => root.style.setProperty(property, `${Math.max(64, Math.ceil(header.getBoundingClientRect().height))}px`);
+    measure();
+    const observer = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(measure);
+    observer?.observe(header);
+    window.addEventListener('resize', measure);
+    return () => {
+      observer?.disconnect();
+      window.removeEventListener('resize', measure);
+      if (previous) root.style.setProperty(property, previous);
+      else root.style.removeProperty(property);
+    };
+  }, []);
 
   const primaryColor = brand.primaryColor || '#2563eb';
 
@@ -176,7 +195,7 @@ export function GlobalHeader({
   const hasContextualNav = contextualNav && contextualNav.length > 0;
 
   return (
-    <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-slate-200/50">
+    <header ref={headerRef} className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-slate-200/50">
       <div className="max-w-[1280px] mx-auto px-4">
         <div className="flex min-h-16 flex-wrap items-center justify-between gap-2 py-2">
 
@@ -208,7 +227,7 @@ export function GlobalHeader({
           </Link>
 
           {/* ── PrimaryNav (desktop) ── */}
-          <nav className="hidden md:flex items-center gap-1">
+          <nav className="order-3 hidden w-full md:flex items-center gap-1 border-t border-slate-100 pt-2">
             {publicNav.map((item) =>
               item.href.startsWith('http') ? (
                 <a

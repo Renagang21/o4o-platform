@@ -117,7 +117,7 @@ export function StoreHubShell({
         {/* Mobile drawer backdrop */}
         {mobileOpen && (
           <div
-            className="lg:hidden fixed inset-x-0 top-16 bottom-0 bg-black/40 z-30"
+            className="lg:hidden fixed inset-x-0 top-[var(--o4o-global-header-height,4rem)] bottom-0 bg-black/40 z-30"
             onClick={closeMobile}
             aria-hidden="true"
           />
@@ -127,7 +127,7 @@ export function StoreHubShell({
           {/* ── 좌측 사이드바 (mobile drawer / desktop sticky) ── */}
           <aside
             id={sidebarId}
-            className={`bg-white border border-slate-200 overflow-y-auto z-40 w-72 max-w-[85%] fixed left-0 top-16 bottom-0 transition-transform duration-200 ease-out lg:static lg:top-20 lg:bottom-auto lg:left-auto lg:z-auto lg:w-60 lg:max-w-none lg:shrink-0 lg:self-start lg:rounded-xl lg:overflow-hidden lg:transition-none lg:translate-x-0 lg:sticky ${
+            className={`bg-white border border-slate-200 overflow-y-auto z-40 w-72 max-w-[85%] fixed left-0 top-[var(--o4o-global-header-height,4rem)] bottom-0 transition-transform duration-200 ease-out lg:static lg:top-[calc(var(--o4o-global-header-height,4rem)+1rem)] lg:bottom-auto lg:left-auto lg:z-auto lg:w-60 lg:max-w-none lg:shrink-0 lg:self-start lg:rounded-xl lg:overflow-hidden lg:transition-none lg:translate-x-0 lg:sticky ${
               mobileOpen ? 'translate-x-0' : '-translate-x-full'
             }`}
           >
