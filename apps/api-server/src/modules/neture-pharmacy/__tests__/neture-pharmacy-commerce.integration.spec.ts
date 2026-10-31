@@ -56,6 +56,11 @@ async function user(): Promise<string> {
   const [r] = await ds.query(`INSERT INTO users (email, status, "isActive", "isEmailVerified") VALUES ($1, 'active', true, true) RETURNING id`, [`${uniq('u')}@example.test`]);
   return r.id;
 }
+async function qualifyPharmacist(owner: string, license: string) {
+  await ds.query(`INSERT INTO kpa_pharmacist_profiles(user_id,license_number,license_verified,verified_at,verified_by,qualification_status,qualification_reason)
+    VALUES($1,$2,true,now(),$3,'approved','Synthetic fixture qualification reviewed')
+    ON CONFLICT(user_id) DO NOTHING`, [owner, license, operatorId]);
+}
 async function applicationProof(owner: string) {
   const [doc] = await ds.query(`INSERT INTO kyc_documents (user_id, "documentType", "fileUrl", "fileName")
     VALUES ($1, 'business_registration', 'gcs://local-it/synthetic.pdf', 'synthetic.pdf') RETURNING id`, [owner]);
@@ -128,7 +133,8 @@ let operatorId: string;
 async function approvedPharmacy() {
   const owner = await user();
   const bizno = randomBizno();
-  const row = await membership.apply(owner, { ...await applicationProof(owner), pharmacyName: uniq('약국'), businessNumber: bizno, pharmacistLicenseNumber: 'L-1' });
+  const row = await membership.apply(owner, { ...await applicationProof(owner), pharmacyName: uniq('약국'), businessNumber: bizno, pharmacistLicenseNumber: `SYNTH-${owner.slice(0, 18)}` });
+  await qualifyPharmacist(owner, row.pharmacist_license_number);
   await membership.decide(operatorId, row.id, 'approve');
   return { owner, orgId: row.organization_id as string, membershipId: row.id as string };
 }
@@ -136,7 +142,8 @@ async function approvedPharmacy() {
 async function joinSemiFranchise(orgId: string, owner: string, key: string, sfOperator: string) {
   const sf = (await sfs.getByKey(key))!;
   const app = await sfs.apply(orgId, owner, key, { policyReferences: await fixtureBusinessPolicies(ds, key) });
-  await sfs.decideMembership(sf, sfOperator, app.id, 'approve');
+  if (key === 'pharmacy') expect(app.status).toBe('active');
+  else await sfs.decideMembership(sf, sfOperator, app.id, 'approve');
   return app.id as string;
 }
 
@@ -248,10 +255,11 @@ d('Neture 약국 매장 commerce — 격리 PostgreSQL 통합 검증', () => {
     it('신청(pending)은 매장 권한이 없고, 운영자 승인 후에만 매장이 열린다', async () => {
       const owner = await user();
       const bizno = randomBizno();
-      const row = await membership.apply(owner, { ...await applicationProof(owner), pharmacyName: uniq('약국'), businessNumber: `${bizno.slice(0, 3)}-${bizno.slice(3, 5)}-${bizno.slice(5)}`, pharmacistLicenseNumber: 'L-9' });
+      const row = await membership.apply(owner, { ...await applicationProof(owner), pharmacyName: uniq('약국'), businessNumber: `${bizno.slice(0, 3)}-${bizno.slice(3, 5)}-${bizno.slice(5)}`, pharmacistLicenseNumber: `SYNTH-${owner.slice(0, 18)}` });
       expect(row.status).toBe('pending');
       expect((await isStoreOwner(ds, owner, 'kpa')).isOwner).toBe(false);
 
+      await qualifyPharmacist(owner, row.pharmacist_license_number);
       const approved = await membership.decide(operatorId, row.id, 'approve');
       expect(approved.status).toBe('active');
       const check = await isStoreOwner(ds, owner, 'kpa');
@@ -296,15 +304,15 @@ d('Neture 약국 매장 commerce — 격리 PostgreSQL 통합 검증', () => {
       expect(list.total).toBe(0);
     });
 
-    it('기본 승인은 세미프랜차이즈 가입을 자동 승인하지 않고, 비담당 운영자는 처리할 수 없다', async () => {
+    it('기본 승인은 Pharmacy 회원을 자동 연결하고 비담당 운영자 권한은 만들지 않는다', async () => {
       const p = await approvedPharmacy();
       const app = await sfs.apply(p.orgId, p.owner, 'pharmacy', { policyReferences: await fixtureBusinessPolicies(ds, 'pharmacy') });
-      expect(app.status).toBe('pending');
+      expect(app.status).toBe('active');
       const stranger = await user();
       await role(stranger, 'neture:operator');
       await expect(sfs.requireOperatorOf(stranger, 'pharmacy')).rejects.toMatchObject({ httpStatus: 403 });
       const sf = await sfs.requireOperatorOf(pharmacyOperator, 'pharmacy');
-      expect((await sfs.decideMembership(sf, pharmacyOperator, app.id, 'approve')).status).toBe('active');
+      await expect(sfs.decideMembership(sf, pharmacyOperator, app.id, 'approve')).rejects.toMatchObject({ code: 'INVALID_TRANSITION' });
     });
   });
 
@@ -334,15 +342,15 @@ d('Neture 약국 매장 commerce — 격리 PostgreSQL 통합 검증', () => {
       const owner = await user();
       expect(await access(owner)).toMatchObject({ allowed: false, next: 'apply_pharmacy', pharmacyMembershipStatus: null });
 
-      const row = await membership.apply(owner, { ...await applicationProof(owner), pharmacyName: uniq('약국'), businessNumber: randomBizno(), pharmacistLicenseNumber: 'L-2' });
+      const row = await membership.apply(owner, { ...await applicationProof(owner), pharmacyName: uniq('약국'), businessNumber: randomBizno(), pharmacistLicenseNumber: `SYNTH-${owner.slice(0, 18)}` });
       expect(await access(owner)).toMatchObject({ allowed: false, next: 'pharmacy_pending', pharmacyMembershipStatus: 'pending' });
+      await qualifyPharmacist(owner, row.pharmacist_license_number);
       await membership.decide(operatorId, row.id, 'approve');
-      expect(await access(owner)).toMatchObject({ allowed: false, next: 'apply_semi_franchise', pharmacyMembershipStatus: 'active', semiFranchiseMembershipStatus: null });
+      expect(await access(owner)).toMatchObject({ allowed: true, next: null, pharmacyMembershipStatus: 'active', semiFranchiseMembershipStatus: 'active' });
 
       const sf = (await sfs.getByKey('pharmacy'))!;
       const app = await sfs.apply(row.organization_id, owner, 'pharmacy', { policyReferences: await fixtureBusinessPolicies(ds, 'pharmacy') });
-      expect(await access(owner)).toMatchObject({ allowed: false, next: 'semi_franchise_pending', semiFranchiseMembershipStatus: 'pending' });
-      await sfs.decideMembership(sf, pharmacyOperator, app.id, 'approve');
+      expect(app.status).toBe('active');
       expect(await access(owner)).toMatchObject({ allowed: true, next: null, pharmacyMembershipStatus: 'active', semiFranchiseMembershipStatus: 'active' });
 
       await sfs.decideMembership(sf, pharmacyOperator, app.id, 'suspend');

@@ -43,3 +43,5 @@ Store 신청 안내·사업 목록, Pharmacy 참여 안내·접근 안내를 수
 검증·실행 실패와 보완·미확인 사항은 [CHECK](../checks/CHECK-O4O-PHARMACY-APPROVAL-AUTO-MEMBERSHIP-V1.md)에 기록한다. **DEPLOYMENT=MANUAL/GATED (권한·가입 처리 변경)**이며 이후 통합 담당이 API 호환성 확보 후 Pharmacy Business·Store를 배포해야 한다. 신규 migration은 없다. 이 작업은 운영 데이터 보완이나 배포를 실행하지 않는다.
 
 [PR #903](https://github.com/Renagang21/o4o-platform/pull/903)에서 동일 branch로 CI·리뷰를 추적한다. 자동 리뷰의 UPDATE 반환 형식 지적을 `rowsOf` 정규화로 보완하고 기존 pending 연결·감사 ID를 실제 PostgreSQL에서 추가 검증했다. 인계 시의 required CI·최신 HEAD 리뷰 판정은 PR Checks/리뷰가 실행 증적이며 이 TODO의 완료를 병합·배포 완료로 해석하지 않는다.
+
+별도 DB를 쓰는 기존 약국 commerce·공급자/매장 통합 fixture의 가입 전제도 정비했다. 합성 약사 자격을 준비하고 Pharmacy 가입 후 중복 승인을 요구하지 않도록 했다. 범위에 맞는 실제 DB 시나리오 4개를 선택 검증했으며 나머지 거래 흐름의 검증 완료로 확대하지 않는다.
