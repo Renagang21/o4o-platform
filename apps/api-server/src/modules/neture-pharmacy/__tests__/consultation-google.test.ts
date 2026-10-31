@@ -57,3 +57,13 @@ it.each(['ko', 'en', 'zh', 'ja', 'vi', 'th', 'id'])('retains language %s through
   expect(await service.synthesize('합성 문장', language, access)).toHaveProperty('mimeType', 'audio/mpeg');
   expect(account.invokeNative.mock.calls[1][0]).toMatchObject({ kind: 'tts', units: 5, unit: 'character' });
 });
+it('requests manual confirmation for explicitly low-confidence or mixed-language speech', async () => {
+  const account = { invokeNative: jest.fn(async (_request, _scope, run) => (await run()).value) } as any;
+  for (const results of [
+    [{ languageCode: 'ja-JP', alternatives: [{ transcript: '合成質問', confidence: 0.1 }] }],
+    [{ languageCode: 'ja-JP', alternatives: [{ transcript: '合成' }] }, { languageCode: 'en-US', alternatives: [{ transcript: 'question' }] }],
+  ]) {
+    const transport = jest.fn().mockResolvedValue({ results });
+    await expect(new ConsultationGoogleService({} as any, transport, account).recognize(wav().toString('base64'), ['ja', 'en'], { actorId: 'fixture', authorize: async () => true })).rejects.toMatchObject({ code: 'CONSULTATION_LANGUAGE_UNCERTAIN', httpStatus: 422 });
+  }
+});

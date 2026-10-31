@@ -42,6 +42,17 @@ it('makes no initial call, separates evidence/results and waits for review and a
   expect(api.post.mock.calls[1][1]).toMatchObject({ verifyOnly: true, sourceVersion: 'v1' });
   expect(api.post.mock.calls[1][1]).not.toHaveProperty('question');
 });
+it('opens only real HTTP source URLs with review date/version and never links a script URL', async () => {
+  api.post.mockImplementationOnce(async (_path, body) => {
+    const value = output(body);
+    value.data.sources = [{ id: 'p1', kind: 'product-fact', title: '게시 상품 원문', urls: ['javascript:alert(1)', 'https://example.org/evidence'], checkedOn: '2026-10-31', revision: 'source-version' }] as any;
+    return value;
+  });
+  open(); ask();
+  const links = await screen.findAllByRole('link', { name: '출처 확인' });
+  for (const link of links) { expect(link.getAttribute('href')).toBe('https://example.org/evidence'); expect(link.getAttribute('rel')).toBe('noopener noreferrer'); }
+  expect(screen.getAllByText(/확인일 2026-10-31.*자료 버전 source-versi/).length).toBeGreaterThan(0);
+});
 it('keeps a failed question/reference retryable, requires source confirmation and avoids automatic sharing', async () => {
   open(); fireEvent.click(screen.getByText('전문 참고자료 추가'));
   fireEvent.change(screen.getByLabelText('상담 전문 참고자료'), { target: { value: '참고할 근거' } });

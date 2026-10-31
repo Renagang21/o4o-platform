@@ -1,6 +1,6 @@
 # 상담 맥락·상품 근거·실행 수단 통합 검증 V1
 
-> **상태**: 로컬 검증·PR 갱신 진행 · main 미병합·운영 미배포
+> **상태**: 구현·로컬 검증 완료 · 최신 PR 기술 gate 별도 확인 · main 미병합·운영 미배포
 > **확인일**: 2026-10-31
 > **대상**: PR #910 · `wo/consultation-improvement-todo`
 > **계획/절차**: [통합 TODO](../work-orders/TODO-O4O-CONSULTATION-CONTEXT-PRODUCT-AND-PROVIDER-IMPROVEMENT-V1.md) · [실행 안내](../guides/products/O4O-CONSULTATION-CONTEXT-AND-RUNTIME-V1.md)
@@ -31,14 +31,14 @@
 
 ## 실행 검증
 
-- shared packages 빌드, API 빌드, Store production 빌드, 관리자 TypeScript 검사가 통과했다. 최신 main 통합 후 필요한 검사를 다시 확인한다.
-- 서버 focused Jest: 17 suites / 176 tests 통과 후 추가한 언어·모델·공유 보호 검증을 재실행한다. 최종 건수는 아래 후속 기록에서 확정한다.
-- Store focused Vitest: 10 files / 112 tests 통과 후 추가한 source proof·녹음 취소·연결 경고 검증을 재실행한다.
+- main `c7c5cd100c`를 같은 작업 branch에 merge했다. 충돌·이력 재작성 없이 통합하고 frozen-lockfile 재설치·shared packages 재빌드를 완료했다. API 빌드·Store production 빌드·관리자/Neture/Pharmacy Business TypeScript 검사가 통과했다. shared optional 계약 소비처도 함께 확인했다.
+- 서버 focused Jest: **18 suites / 195 tests PASS**. 일곱 언어·불확실 음성·모델 선택·근거/가격·quota와 PostgreSQL 설명 접수를 포함한다. 후속 접근 오류 세분화는 해당 resolver의 **3 tests PASS**와 API 빌드로 재확인했다.
+- Store focused Vitest: **10 files / 117 tests PASS**. source proof 공유 전 확인·녹음 취소·늦은 음성 응답·연결 경고를 포함한다.
 - `node scripts/dev/run-store-consultation-fixture.mjs`: 실제 격리 PostgreSQL 15, baseline·전체 incremental schema·상담/상품/권한/공유 경계 **23 checks PASS**, **Fixture cleanup PASS: database count 0**.
-- 설명 접수 PostgreSQL integration: 별도 로컬 `description_intake_review`에서 **10 tests PASS**. 실제 XLSX→구조화 승인→일반 본문 수정 후 legacy 전환과 공통 STORE/QR 불변을 확인했다. fixture schema 삭제를 확인한 뒤 전용 DB를 제거한다.
-- ESLint 변경 TypeScript 파일: 오류 0, 기존 미사용 변수 경고 2개. 문서 민감정보 패턴 0건(5개 문서), 로컬 문서 링크 누락 0건, diff whitespace 검사 통과.
+- 설명 접수 PostgreSQL integration: 별도 로컬 `description_intake_review`에서 **10 tests PASS**. 실제 XLSX→구조화 승인→일반 본문 수정 후 legacy 전환과 공통 STORE/QR 불변을 확인했다. fixture schema 0건·전용 DB 두 개 0건을 확인했고 이번 작업 전용 컨테이너를 제거했다. 기존 개발/운영 DB·컨테이너는 변경하지 않았다.
+- ESLint 변경 TypeScript 파일: 오류 0, 기존 미사용 변수 경고 2개. 문서 민감정보 패턴 0건(변경 문서), 로컬 문서 링크 누락 0건, diff whitespace 검사 통과.
 - 상담 fixture의 ‘populated down’은 마지막 migration을 상담 migration으로 오인하던 문제를 상담 migration 명시 참조로 고쳤다. 운영 migration·schema는 수정하지 않았다.
-- `node scripts/checks/consultation-context.browser.mjs`: 실제 Chromium, 합성 API, **1440/820/390px 모두 PASS**. 자동 언어 감지→맥락 검색→후보 확인→다음 고객 초기화→관리자 revision 저장→권한 회수와 현황 표시를 확인했다. 실제 Tailwind 설정·콘솔 pageerror·외부 요청 0·가로 넘침 없음도 검사했다. 실제 마이크와 Google는 사용하지 않았다.
+- `node scripts/checks/consultation-context.browser.mjs`: 실제 Chromium, 합성 API, **1440/820/390px 모두 PASS**. 자동 언어 감지→맥락 검색→후보 확인→다음 고객 초기화→관리자 revision 저장→권한 회수와 현황 표시를 확인했다. 실제 Tailwind 설정·콘솔 pageerror·외부 요청 0·가로 넘침 없음도 검사했다. 최신 main 통합 후 재실행했고 초기 Vite compile의 load timeout은 DOM 준비 대기·45초 navigation/30초 locator 한도로 보완했다. 실제 마이크와 Google는 사용하지 않았다.
 - 캡처는 `/tmp/o4o-consultation-context-{1440,820,390}.png`의 로컬 증거다. 캡처/합성 결과를 운영 업무 데이터로 저장하지 않는다.
 
 ## 미확인·운영 인계
@@ -50,3 +50,8 @@
 - 이 개발 공간은 main 병합·auto-merge·배포를 수행하지 않는다. 같은 PR의 최종 HEAD·CI·리뷰·최신 main 대비 위치를 확인해 인계한다.
 
 문서 정합: 통합 TODO를 개발 지시와 실제 구현 상태로 갱신했고 상담 데이터 범위·상품 AI 자료 안내·실행 수단/평가 안내를 대조했다. 과거 배포/관측 기록은 보존한다.
+
+
+## PR 인계 gate
+
+기술 gate 조회에서 `main`은 PR 필수·required `CI Gate`·필수 승인 수 0이며 삭제/non-fast-forward를 금지한다. 개발 공간에서는 merge/auto-merge/deploy를 실행하지 않는다. 최종 commit·원격 일치·CI·Codex·미해결 스레드는 [PR #910](https://github.com/Renagang21/o4o-platform/pull/910)의 최신 HEAD와 완료 인계 보고를 따른다. 이 기록의 로컬 검증 완료를 아직 진행 중인 CI·review의 성공으로 간주하지 않는다.

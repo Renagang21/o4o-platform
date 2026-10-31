@@ -14,7 +14,7 @@ export function ConsultationRuntimeControls({ control }: { control: ModelControl
       <fieldset disabled={!control.data || control.busy || control.loading} className="space-y-3">
         {(['recognition', 'translation', 'synthesis'] as const).map(key => <label key={key} className="block">
           {{ recognition: '음성 인식', translation: '언어 번역', synthesis: '음성 재생' }[key]}
-          <select aria-label={`상담 ${key}`} className="ml-3 min-h-11 rounded border p-2" value={settings[key]} onChange={event => setSettings(previous => ({ ...previous, [key]: event.target.value }))}>
+          <select aria-label={`상담 ${key}`} className="mt-2 block min-h-11 max-w-full rounded border p-2 sm:ml-3 sm:mt-0 sm:inline-block" value={settings[key]} onChange={event => setSettings(previous => ({ ...previous, [key]: event.target.value }))}>
             <option value={key === 'translation' ? 'policy' : 'browser'}>{key === 'translation' ? '상담 번역 사용처의 정책 모델' : '브라우저 기능 · 현재 Chrome'}</option>
             <option value="google-cloud">Google Cloud API · 연결·가격 확인 필요</option>
           </select>

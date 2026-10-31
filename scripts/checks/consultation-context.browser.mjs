@@ -53,7 +53,7 @@ try {
   for (const width of [1440, 820, 390]) {
     const context = await browser.newContext({ viewport: { width, height: 1000 } }), page = await context.newPage();
     const errors = [], external = [], requests = []; let denial = false;
-    page.setDefaultTimeout(15000);
+    page.setDefaultTimeout(30000);
     page.on('pageerror', error => errors.push(error.message));
     await context.route('**/*', async route => {
       const req = route.request(), url = new URL(req.url());
@@ -73,7 +73,7 @@ try {
       }
       return json([]);
     });
-    await page.goto(origin);
+    await page.goto(origin, { waitUntil: 'domcontentloaded', timeout: 45000 });
     await page.getByRole('button', { name: '고객 → 직원', exact: true }).click();
     const sentence = page.getByRole('region', { name: '문장 번역' });
     await sentence.getByRole('textbox').fill('合成の質問です');

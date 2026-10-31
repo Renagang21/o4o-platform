@@ -69,7 +69,8 @@ export class ConsultationGoogleService {
   }
   async recognize(audio: unknown, languages: string[], access: ConsultationCloudAccess) {
     const wav = readConsultationWav(audio);
-    if (!languages.length || languages.length > 3 || languages.some(language => !speechLocales[language])) throw new Error('INVALID_SPEECH_LANGUAGES');
+    if (!languages.length || languages.length > 3 || languages.some(language => !speechLocales[language]))
+      throw new NeturePharmacyError(400, 'INVALID_CONSULTATION_SPEECH', '지원하는 음성 후보 언어를 최대 3개 선택해 주세요.');
     await authorize(access);
     return this.account.invokeNative({ kind: 'stt', provider: 'google-cloud', model: 'stt-short', units: wav.units, unit: 'second', maxOutputTokens: 0 },
       { scope: 'CONTENT_TRANSLATION', userId: access.actorId }, async () => {
@@ -79,7 +80,12 @@ export class ConsultationGoogleService {
         });
         const text = (response.results ?? []).map(result => result.alternatives?.[0]?.transcript ?? '').join(' ').trim();
         const language = normalizedConsultationLanguage(response.results?.[0]?.languageCode ?? '');
-        if (!text || text.length > 1000 || !language || !languages.includes(language)) throw new NeturePharmacyError(422, 'CONSULTATION_LANGUAGE_UNCERTAIN', '입력 언어를 확인하지 못했습니다. 언어를 직접 선택하고 다시 시도해 주세요.');
+        const uncertain = response.results?.some(result => {
+          const confidence = result.alternatives?.[0]?.confidence;
+          return (typeof confidence === 'number' && (!Number.isFinite(confidence) || confidence < 0.5)) ||
+            (result.languageCode && normalizedConsultationLanguage(result.languageCode) !== language);
+        });
+        if (!text || text.length > 1000 || !language || !languages.includes(language) || uncertain) throw new NeturePharmacyError(422, 'CONSULTATION_LANGUAGE_UNCERTAIN', '입력 언어를 확인하지 못했습니다. 언어를 직접 선택하고 다시 시도해 주세요.');
         await authorize(access);
         return { value: { text, language }, usage: { units: wav.units } };
       });
