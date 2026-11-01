@@ -194,6 +194,18 @@ class Apply(unittest.TestCase):
         self.assertEqual(len(api.writes), 2)
 
     @patch.object(t, 'stable_revision', return_value=({}, {'metadata': {'name': 'fixed'}}, ''))
+    @patch.object(t, 'production_idle', side_effect=[None, ValueError('later main or queue')])
+    @patch.object(t, 'public_smoke', side_effect=ValueError('unavailable'))
+    @patch.object(d.time, 'sleep')
+    def test_owned_compensation_is_not_stranded_by_later_main_activity(self, sleep, smoke, idle, revision):
+        api = Cloud(True)
+        before = deepcopy(api.map)
+        with self.assertRaisesRegex(RuntimeError, 'previous routes restored'): d.apply(api, self.record(api), before)
+        self.assertEqual(api.map['hostRules'], before['hostRules'])
+        self.assertEqual(api.map['tests'], before['tests'])
+        self.assertEqual(idle.call_count, 1)
+
+    @patch.object(t, 'stable_revision', return_value=({}, {'metadata': {'name': 'fixed'}}, ''))
     @patch.object(t, 'production_idle')
     @patch.object(d.time, 'sleep')
     def test_concurrent_edit_during_failed_verification_is_not_overwritten(self, sleep, idle, revision):

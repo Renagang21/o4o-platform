@@ -193,6 +193,7 @@ def apply(api, record, original):
         current = api.request('GET', t.MAP)
         if not changed or any(current.get(k, []) != candidate.get(k, []) for k in ('hostRules', 'pathMatchers', 'tests')):
             raise RuntimeError('Drugstore verification failed; no safe automatic route recovery') from None
-        t.production_idle()
+        # Compensation belongs to the original approved write. A later main/queue
+        # must not strand it; exact owned topology and Compute fingerprint protect other writers.
         api.compute_operation('PATCH', t.MAP, {'fingerprint': current['fingerprint'], **{k: original.get(k, []) for k in fields}})
         raise RuntimeError('Drugstore verification failed; previous routes restored; TLS resources retained') from None
