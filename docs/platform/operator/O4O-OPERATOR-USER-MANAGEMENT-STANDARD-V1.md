@@ -1,6 +1,6 @@
 # O4O-OPERATOR-USER-MANAGEMENT-STANDARD-V1
 
-> **상태**: ACTIVE · **최종 갱신**: 2026-10-17 (사용자 조치별 운영 기준·서비스 가입 정리 범위 정합. 후속 구현은 개발 branch 검증·push 범위이며 main·배포 전)
+> **상태**: ACTIVE · **최종 갱신**: 2026-11-01 (공통 회원 리스트의 업무 탭·상단 작업 패널과 권한별 심사·정정 기준 추가. 개발 branch의 검증·PR 상태와 main·운영 반영은 구분)
 > (2026-10-04 정합) **운영자의 회원 비밀번호 변경은 은퇴했다** — `WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1`([CHECK](../../checks/CHECK-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1.md): admin/operator password 변경 surface 0 · PasswordModal 제거). 이후 도입된 이메일 · 비밀번호 로그인([CHECK](../../checks/CHECK-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1.md))은 **사용자 본인**의 인증 수단(가입 · 재설정 · 로그인 상태 `POST /auth/password`)이며 Admin 화면 · `platform:*` 세션은 Google 전용이다. 운영자가 대신 바꾸는 비밀번호 경로는 없다. 아래 §3.2 · §4.2 · §6.1 의 비밀번호 항목은 무효.
 
 > **O4O 운영자 회원관리 표준 v1**
@@ -532,3 +532,13 @@ operator 정지·정지 복구 차단과 `/info`의 회원 유형 admin 제한�
 공통 계정 상태·다른 서비스 가입·약사회 분회는 이 변경 대상이 아니다.
 이 정비의 코드/검증/전달 상태는 [전용 WO](../../work-orders/WO-KPA-MEMBER-DAILY-AUTHORITY-ALIGNMENT-V1.md)를 따른다.
 이 문구만으로 main 병합·운영 반영·실계정 검증 완료로 보지 않는다.
+
+## 공통 회원 리스트 중심 업무 — 2026-11-01
+
+중앙 `/operations/neture/members`에서는 전체 회원·약사 검토 대기·약국 심사 대기·반려/보완으로 업무 대상을 나눈다. 회원을 선택하면 리스트 상단 작업 패널에서 제출 내용·처리 사유·이력을 확인하고 심사·기본정보 정정을 이어간다. 처리 후 최신 상태와 다음 업무를 확인하거나 같은 목록의 다음 회원을 선택한다. 기존 자격/약국 전용 진입은 유지하며 공통 패키지의 다른 소비처 흐름을 바꾸지 않는다.
+
+- 공통 계정·약사 자격·약국 신청 승인은 별개다. 과거 가입 면허와 약국 신청 면허는 입력 출처를 표시하고 현재 자격 원장과 불일치를 안내한다. 과거 값을 자동 이관·승인하지 않는다.
+- `neture.members`는 회원 조회 권한이다. 면허·자격 사유는 `neture.qualifications`, 약국 제출 정보·증빙은 `neture.pharmacies` 권한을 각각 재확인한다. 과거 사업자 입력은 `neture.applications` 권한과 대상의 Neture 가입 원장이 있을 때만 조회하며 타 서비스 자료를 섞지 않는다. 기존 Google 세션과 유효 중앙 위임 조건도 유지한다. 비밀번호·토큰·내부 metadata 원문은 반환하지 않는다.
+- 기본정보 정정은 회원 조회 권한을 가진 중앙 Admin(`platform:super_admin` 또는 유효 중앙 `neture:admin`)의 이름·닉네임·휴대전화에 한정한다. 사유·최신 버전을 확인하고 기존 action_logs에 전후 값과 처리자를 기록한다. 이메일/인증 식별자·계정 상태·면허·사업 원장을 일괄 변경하지 않는다. 기존 개인정보 보존·파기 정책을 적용한다.
+- 약사/약국 결정은 기존 write-path를 사용한다. 본인 면허 근거 확인·자기 승인 금지·중복 면허·버전 충돌·약국 승인 선행 조건을 우회하지 않는다. 반려 후에는 사유와 본인 보완/재신청 경로를 안내한다. 권한이 없는 영역은 조회/처리를 허용하지 않는다.
+- 실제 개인정보를 사용하는 운영 확인은 별도 범위다. 합성 fixture·격리 DB/브라우저 통과를 실계정·운영 배포 완료로 보고하지 않는다. 구현·검증 현황은 [TODO](../../work-orders/TODO-O4O-MEMBER-LIST-REVIEW-V1.md)에 기록한다.

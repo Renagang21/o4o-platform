@@ -1,6 +1,6 @@
 # 드럭스토어형 약국 이름·도메인·사업 키 전환
 
-> **상태**: ACTIVE — 구현 main 통합 완료 / 운영 호스트 전환 보완·배포 진행
+> **상태**: COMPLETED — 이름·키·운영 데이터·TLS·새 호스트·약국 공통 앱 배포 확인 완료
 > **작성일**: 2026-10-31
 > **근거**: 사용자의 O4O 전체 협업체 이름·주소 변경 지시 및 개발 데이터 상태 설명
 
@@ -18,8 +18,8 @@
 - [x] 문서 파일·디렉터리·상호 링크 및 과거 기록의 이름 정규화 주석
 - [x] 로컬 PostgreSQL·회귀 테스트·소비 앱 빌드·PC/모바일 합성 브라우저 검증
 - PR 검증 게이트: [PR #911](https://github.com/Renagang21/o4o-platform/pull/911)의 **최종 HEAD** required CI·자동 리뷰·미해결 스레드를 기준으로 한다. 초기 구현 HEAD의 자동 리뷰는 지적 없이 완료했다. 이후 HEAD도 같은 게이트를 통과해야 병합 준비 완료다.
-- [ ] 통합 시점에 main 포함 및 migration→API→소비 웹 배포 검증
-- [ ] 새 도메인의 실제 DNS·TLS·HTML·JS와 운영 권한/회원 상태 확인
+- [x] main 포함 및 migration→API→소비 웹 배포 검증
+- [x] 새 도메인의 실제 DNS·TLS·HTML·JS와 허용된 읽기 범위의 사업 identity·역할·매장·자격 제한 보존 확인(모든 실회원 업무 검증과 구분)
 
 ## 데이터·배포 경계
 
@@ -46,3 +46,21 @@ main `c7c5cd100c`(PR #907)을 작업 branch에 통합했다. 공통 서비스 �
 ## 2026-11-01 배포 단계 보완
 
 사용자가 main 병합·배포·운영 데이터 전환을 승인했다. PR #911 병합과 main CI는 완료됐으나 기존 URL map의 호스트 범위 불일치를 WIF plan에서 발견했다. 후속 branch는 같은 이름·주소 전환 WO의 운영 보완이며, 기존 prepared cloud checkout에서 별도 branch로 진행한다. 공용 backend·다른 호스트·IAM·DB를 바꾸지 않는 고정 호스트 plan/apply와 필요 시 단일 호스트 관리형 TLS 자원 준비를 추가한다. 보호된 main·owner·CI·freeze·정확한 plan digest·production idle 검사는 유지한다. 승인 이후에도 실제 운영 성공·실패와 남은 일을 CHECK에 구분한다.
+
+## 1차 종료 경계 — 2026-11-01 (후속 결과는 아래 절)
+
+PR #911·#912는 main에 반영됐고 최종 main `948855d408` CI가 통과했다. 선택 Promote의 API·Admin·Partner·Neture·Lecture·Store·KPA Branch 7개와 별도 Pharmcoop 프런트엔드 배포가 성공했다. 운영 사업 키·이름 변경과 기존 business identity 유지도 실제 읽기로 확인했다.
+
+약국 공통 앱과 새 호스트 연결은 GCP 조회 403 때문에 미완료다. 준비한 plan/apply 경로·테스트 완료와 실제 권한·TLS·라우팅·약국 앱 배포 완료를 구분하여 이 WO는 ACTIVE를 유지한다. 소유자의 [호스트/TLS 권한 준비](../guides/DRUGSTORE-HOST-TLS-OPERATIONS-V1.md) 후 동일 WO로 이어가며, 실제 결과·검증 한계는 CHECK의 「현재 통합·배포 판정」이 기준이다.
+
+## 후속 통합·호스트 전환 — 2026-11-01
+
+소유자의 최소 7개 권한 준비 후 GCP 403이 해소됐다. TLS 준비 중 main 변경으로 중단된 실행은 자원을 보존했고, 최신 main의 green CI와 새 plan으로 재개했다. plan 41275239518에서 TLS ACTIVE·추가 생성 불필요를 확인하고 cutover 41275330103에서 새 도메인·공개 HTML/JS 검증까지 성공했다.
+
+약국 공통 앱 단독 선택은 최신 회원 관리 API와의 의존성 판정으로 실제 배포가 건너뛰어졌다. 동일 SHA의 API/Admin/약국 앱 선행 Promote 41275688209이 시작됐음을 확인해 자기 중복 대기 실행만 취소했다. 운영 작업은 직렬화하며 이 실행의 실제 결과를 확인한다. 자세한 증거·실패/건너뜀 구분은 CHECK 후속 실행 절에 둔다.
+
+## 최종 완료 — 2026-11-01
+
+Promote 41275688209의 API·Admin·약국 공통 앱 배포와 최종 serving SHA 보고가 모두 성공했다. 새 주소의 공식 이름·HTML/JS 200 및 네 협업 공간의 PC/390px 8건(pageerror·가로 넘침 0)을 확인했다. 운영 데이터 identity·기존 역할·매장 접근·자격 제한도 보존됐다. 이 WO의 이름·주소·사업 키 전환은 완료하며 초기 미완료 표기는 당시 기록으로 유지한다. 세부 증거·실행 구분·Neture 프록시 등 검증 한계는 [CHECK 최종 완료 판정](../checks/CHECK-O4O-DRUGSTORE-BRAND-DOMAIN-TRANSITION-V1.md#최종-완료-판정--2026-11-01)을 따른다.
+
+본 완료 기록은 문서-only `DEPLOYMENT = NOT_APPLICABLE`이다. 별도 약관 게시·약사 자격 승인·ERP Assistant·서비스 물리 이름 변경을 이 작업의 완료에 포함하지 않는다.
