@@ -8,6 +8,7 @@ import { apiLimiter } from "../middleware/rateLimiter.js";
 import { AppDataSource } from "../database/connection.js";
 import { OperationError } from "../services/operations/operation-audit.js";
 import { PharmacistQualificationService } from "../services/qualifications/pharmacist-qualification.service.js";
+import { CentralMemberWorkspaceService } from '../services/admin/central-member-workspace.service.js';
 
 export const pharmacistQualificationsRouter = Router();
 pharmacistQualificationsRouter.use(
@@ -58,6 +59,32 @@ const google = (req: AuthRequest) => {
       "중앙 운영은 Google 로그인이 필요합니다.",
     );
 };
+const workspace = () => new CentralMemberWorkspaceService(AppDataSource);
+const memberId = (req: AuthRequest) => z.string().uuid().parse(req.params.userId);
+pharmacistQualificationsRouter.get('/members', handle(req => {
+  google(req);
+  const query = z.object({
+    task: z.enum(['all', 'qualifications', 'pharmacies', 'corrections']).default('all'),
+    page: z.coerce.number().int().min(1).max(100000).default(1),
+    q: z.string().trim().max(100).default(''),
+  }).strict().parse(req.query);
+  return workspace().list(req.user!.id, query.task, query.page, query.q);
+}));
+pharmacistQualificationsRouter.get('/members/:userId', handle(req => {
+  google(req);
+  return workspace().detail(req.user!.id, memberId(req));
+}));
+pharmacistQualificationsRouter.patch('/members/:userId', handle(req => {
+  google(req);
+  const input = z.object({
+    name: z.string().trim().min(1).max(50), nickname: z.string().trim().max(50),
+    phone: z.string().trim().max(20), reason: z.string().trim().min(1).max(2000),
+    version: z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{6}$/),
+  }).strict().parse(req.body);
+  return workspace().correct(req.user!.id, memberId(req), {
+    name: input.name!, nickname: input.nickname!, phone: input.phone!, reason: input.reason!, version: input.version!,
+  });
+}));
 pharmacistQualificationsRouter.get(
   "/me",
   handle((req) => service().mine(req.user!.id)),
