@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 export interface YoutubeUploadRequest {id:string;name:string;state:'queued'|'uploading'|'processing'|'completed'|'failed'|'needs-review'|'cancelled';videoUrl?:string|null;errorCode?:string|null;organizationId?:string|null;serviceKey?:string}
 export interface YoutubeUploadApi {
   enqueue:(input:import('./VideoRegistration').VideoRegistrationPayload)=>Promise<{id:string;name:string;queued:boolean;state?:YoutubeUploadRequest['state']}>;
@@ -9,14 +9,24 @@ export interface YoutubeUploadApi {
 const labels={queued:'순서 대기',uploading:'업로드 준비·전송 중',processing:'YouTube 영상 처리 확인 중',completed:'목록 등록 완료',failed:'진행 실패 · 확인 필요','needs-review':'등록 결과·공유 설정 확인 필요',cancelled:'요청 취소'};
 export function YoutubeUploadRequests({api,revision,onCompleted}:Readonly<{api:YoutubeUploadApi;revision:number;onCompleted:()=>void}>){
   const [items,setItems]=useState<YoutubeUploadRequest[]>([]),[error,setError]=useState(''),[ready,setReady]=useState<boolean|null>(null),[retry,setRetry]=useState(0),[busy,setBusy]=useState<string|null>(null);
+  const completedIds=useRef<Set<string>|null>(null),completedCallback=useRef(onCompleted);
+  useEffect(()=>{completedCallback.current=onCompleted;},[onCompleted]);
   useEffect(()=>{
     let live=true,timer:ReturnType<typeof setTimeout>|undefined;
     const load=async()=>{
-      try{const result=await api.list();if(!live)return;setReady(result.availability.ready);setItems(result.items);setError('');if(result.items.some(item=>['queued','uploading','processing'].includes(item.state)))timer=setTimeout(()=>void load(),15000);}
+      try{
+        const result=await api.list();if(!live)return;
+        const completed=result.items.filter(item=>item.state==='completed').map(item=>item.id);
+        // The first response is existing history, not a new completion event.
+        const changed=completedIds.current!==null&&completed.some(id=>!completedIds.current!.has(id));
+        completedIds.current??=new Set();completed.forEach(id=>completedIds.current!.add(id));
+        setReady(result.availability.ready);setItems(result.items);setError('');
+        if(result.items.some(item=>['queued','uploading','processing'].includes(item.state)))timer=setTimeout(()=>void load(),15000);
+        if(changed)completedCallback.current();
+      }
       catch{if(live)setError('YouTube 요청 상태를 확인하지 못했습니다. 새로 확인해 주세요.');}
     };void load();return()=>{live=false;clearTimeout(timer);};
   },[api,revision,retry]);
-  useEffect(()=>{if(items.some(item=>item.state==='completed'))onCompleted();},[items,onCompleted]);
   const again=async(id:string)=>{if(busy)return;setBusy(id);try{await api.retry(id);setRetry(value=>value+1);}catch{setError('재시도하지 못했습니다. 결과 확인이 필요한 요청은 운영 채널에서 확인한 뒤 진행해 주세요.');}finally{setBusy(null);}};
   return <section aria-label="YouTube 등록 요청" className="space-y-2 rounded-lg bg-slate-50 p-3 text-sm">
     <h4 className="font-semibold">YouTube 등록 요청</h4>

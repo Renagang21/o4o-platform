@@ -57,3 +57,9 @@ Community/web-neture 전체 177 suites / 1496 tests PASS. Store·web-neture·Adm
 ## Git 종료 범위
 
 push 직전 fetch 결과 origin/main은 `fd2b7aa39f`로 이동했으며 추가 4 commits는 별도 Drugstore 문서 3개다. 이 작업 경로와 중복이 없어 자동 merge/rebase하지 않고 시작 기준을 유지했다. 사용자 지정 종료점은 작업 branch `wo/community-signage-ai-registration`의 commit/push이며 PR 생성·CI/리뷰 추적·main 변경·배포는 수행하지 않는다. 후속 수정에 사용할 worktree/branch는 보존한다.
+
+## 추가 통합 요청 및 리뷰 보완 (2026-11-01)
+
+사용자의 추가 main 병합·배포 지시로 기존 push-only 종료점 이후 PR #918을 생성했다. 최신 main `8e17ba0b8b`의 커뮤니티 개선 요청 route·화면·홈 섹션을 사이니지와 함께 보존했다. 통합 후 커뮤니티 21 tests·API 타입·production build·1365px/390px fixture PASS.
+
+초기 Codex P1은 완료 이력이 있을 때 `onCompleted`가 매 조회 호출되고 커뮤니티 재조회가 등록 컴포넌트를 재마운트하는 반복이었다. 첫 상태 조회는 기존 이력으로 취급하고 이후 새 완료 ID만 한 번 알린다. 목록 갱신 중 등록 컴포넌트를 유지하며 계정 변경 때는 별도 session key로 초기화한다. 실제 Page와 10ms 지연 응답으로 기존 완료 이력·신규 완료·동일 이력 재조회·초안 보존을 검증했다. 보완 집중 회귀 13 tests·PC/모바일 fixture PASS. 실제 채널 연동 미실행 상태와 현장 점검 항목은 유지한다.

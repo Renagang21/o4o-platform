@@ -35,3 +35,30 @@ it('keeps the shared catalog visible to visitors without a false registration co
   state.user=null;render(<MemoryRouter><Page/></MemoryRouter>);await screen.findByText('공유 영상');
   expect(screen.queryByRole('heading',{name:'AI 동영상 등록'})).toBeNull();expect(state.post).not.toHaveBeenCalled();
 });
+it('keeps completed history quiet and refreshes once for a new completion without resetting the draft',async()=>{
+  let completed=false;
+  state.get.mockImplementation(async(path)=>{
+    await new Promise(resolve=>setTimeout(resolve,10));
+    if(path==='/youtube/uploads')return{data:{success:true,data:{availability:{ready:true},items:[
+      {id:'history',name:'지난 영상',serviceKey:'community',state:'completed'},
+      {id:'new-job',name:'새 요청',serviceKey:'community',state:completed?'completed':'queued'},
+    ]}}};
+    return{data:{data:{items:state.items,hasNext:false,canRegister:true}}};
+  });
+  const catalogCalls=()=>state.get.mock.calls.filter(call=>call[0]==='/communities/community/signage').length;
+  const requestCalls=()=>state.get.mock.calls.filter(call=>call[0]==='/youtube/uploads').length;
+  render(<MemoryRouter><Page/></MemoryRouter>);
+  await screen.findByText('지난 영상');await screen.findByText('순서 대기');
+  const draft=screen.getByPlaceholderText('이 영상을 매장 안내 영상으로 등록해 줘');
+  fireEvent.change(draft,{target:{value:'등록할 안내문'}});
+  expect(catalogCalls()).toBe(1);
+  completed=true;fireEvent.click(screen.getByRole('button',{name:'요청 상태 새로 확인'}));
+  await waitFor(()=>expect(catalogCalls()).toBe(2));
+  await screen.findByRole('heading',{name:'공유 영상'});
+  expect(screen.getByPlaceholderText('이 영상을 매장 안내 영상으로 등록해 줘')).toBe(draft);
+  expect((draft as HTMLTextAreaElement).value).toBe('등록할 안내문');
+  fireEvent.click(screen.getByRole('button',{name:'요청 상태 새로 확인'}));
+  await waitFor(()=>expect(requestCalls()).toBe(3));
+  await waitFor(()=>expect(screen.getAllByText('목록 등록 완료')).toHaveLength(2));
+  expect(catalogCalls()).toBe(2);
+});

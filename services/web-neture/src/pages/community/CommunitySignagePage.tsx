@@ -8,15 +8,18 @@ import { mediaApi } from '../../lib/api/media';
 interface Video { id:string;name:string;description?:string;sourceUrl:string;sourceType:string;tags?:string[] }
 export default function CommunitySignagePage() {
   const {user} = useAuth();
+  return <CommunitySignageSession key={user?.id??'visitor'} user={user}/>;
+}
+function CommunitySignageSession({user}:Readonly<{user:{id:string}|null|undefined}>) {
   const [items,setItems]=useState<Video[]>([]),[page,setPage]=useState(1),[retry,setRetry]=useState(0);
   const [canRegister,setCanRegister]=useState(false),[hasNext,setHasNext]=useState(false),[loading,setLoading]=useState(true),[error,setError]=useState('');
   const [preview,setPreview]=useState<string|null>(null),[handoff,setHandoff]=useState<string|null>(null);
   useEffect(()=>{
-    let live=true;setLoading(true);setError('');setItems([]);setCanRegister(false);setPreview(null);
+    let live=true;setLoading(true);setError('');setItems([]);setPreview(null);
     api.get('/communities/community/signage',{params:{page}}).then(response=>{
       const data=response.data?.data;if(!Array.isArray(data?.items))throw new Error('INVALID_LIST');
       if(live){setItems(data.items);setCanRegister(data.canRegister===true);setHasNext(data.hasNext===true);}
-    }).catch(()=>{if(live)setError('영상 목록을 불러오지 못했습니다. 이용 상태를 확인하고 다시 시도해 주세요.');}).finally(()=>{if(live)setLoading(false);});
+    }).catch(()=>{if(live){setCanRegister(false);setError('영상 목록을 불러오지 못했습니다. 이용 상태를 확인하고 다시 시도해 주세요.');}}).finally(()=>{if(live)setLoading(false);});
     return()=>{live=false;};
   },[page,retry,user?.id]);
   const ask=useCallback(async(question:string)=>{
