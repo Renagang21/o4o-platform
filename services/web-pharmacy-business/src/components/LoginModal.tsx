@@ -23,7 +23,7 @@ import { useAuth, authClient, type User } from '../contexts/AuthContext';
 import { useAuthModal } from '../contexts/AuthModalContext';
 import { semiFranchiseAccessLink, type SemiFranchiseAccessLink } from '../lib/semiFranchiseAccess';
 
-const loginTitle = BUSINESS_SITE.key === 'megapharm' ? '창고형약국 로그인' : 'O4O 약국 로그인';
+const loginTitle = BUSINESS_SITE.key === 'drugstore' ? '드럭스토어형 약국 로그인' : 'O4O 약국 로그인';
 
 export default function LoginModal() {
   const navigate = useNavigate();

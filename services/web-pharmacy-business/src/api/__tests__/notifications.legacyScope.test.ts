@@ -8,7 +8,7 @@ beforeEach(() => {
     data: { count: 4, notifications: [], total: 0 },
   });
 });
-it.each(["kpa-society", "megapharm"])(
+it.each(["kpa-society", "drugstore"])(
   "queries only %s notifications",
   async (serviceKey) => {
     expect(
@@ -44,9 +44,9 @@ it("keeps an unfiltered personal query unfiltered", async () => {
 it("keeps an unauthenticated union query empty", async () => {
   state.get.mockRejectedValue({ status: 401 });
   expect(
-    await notificationsApi.getUnreadCount({ serviceKey: "megapharm" }),
+    await notificationsApi.getUnreadCount({ serviceKey: "drugstore" }),
   ).toBe(0);
   expect(
-    (await notificationsApi.list({ serviceKey: "megapharm" })).notifications,
+    (await notificationsApi.list({ serviceKey: "drugstore" })).notifications,
   ).toEqual([]);
 });

@@ -1,5 +1,8 @@
 # CHECK-O4O-CAREPHARM-PHARMACY-WEB-TRANSITION-V1
 
+> 현행 안내(2026-10-31): 협업체 이름은 **드럭스토어형 약국**, 현재 주소는 `https://drugstore.neture.co.kr`다.
+> **과거 증적의 대상 보존:** 아래 “해당 협업체(당시 구명칭)”·“당시 협업체 구호스트”는 개명·주소 변경 전의 관측 대상이다. 아래 성공·실패·배포 결과를 현재 이름·주소의 운영 검증으로 읽지 않는다. 사용자 지시로 이전 표시명·주소 문자열은 재게시하지 않으며, 문서 경로와 기술 키의 현행 참조 정합은 과거 재실행을 뜻하지 않는다. 당시 원문·실제 호스트 식별자는 기존 Git 이력에서 확인하며 이력을 변경하지 않는다.
+
 > **상태**: COMPLETED · **검증일**: 2026-10-29
 > **범위**: [WO](../work-orders/WO-O4O-CAREPHARM-PHARMACY-WEB-TRANSITION-V1.md)의 CarePharm 약국 협업체 웹 이전·옛 KPA 자원 제거. 새 아키텍처 정본이 아닌 실행 결과 기록이다.
 
@@ -7,7 +10,7 @@
 
 | 서비스 | 도메인·역할 | 결과 |
 |---|---|---|
-| `pharmacy-business-web` | `carepharm.neture.co.kr`, `pharmacy.neture.co.kr`, `megapharm.neture.co.kr` — 약국 협업체 웹 | CarePharm 추가 연결·공개 검증 성공 |
+| `pharmacy-business-web` | `carepharm.neture.co.kr`, `pharmacy.neture.co.kr`, `[당시 협업체 구호스트]` — 약국 협업체 웹 | CarePharm 추가 연결·공개 검증 성공 |
 | `cooperative-web` | `pharmcoop.neture.co.kr` — 개인 회원 기반 약사/약국 협동조합, 소스 `services/web-pharmacy-coop` | 별개 서비스로 유지 |
 | `kpa-branch-web` | `kpa.neture.co.kr` — 약사회 분회 | 유지 |
 | `kpa-society-web` | 이전이 끝난 옛 서비스 | Run·backend·NEG 제거 완료 |

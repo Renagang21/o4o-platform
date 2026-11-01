@@ -280,7 +280,7 @@ export class SemiFranchiseService {
                                ) ORDER BY ra.role, ra.user_id)
                           FROM role_assignments ra JOIN users u ON u.id = ra.user_id
                           LEFT JOIN service_memberships sm ON sm.user_id = u.id AND sm.service_key = $1
-                         WHERE sf.key IN ('pharmacy','carepharm','megapharm')
+                         WHERE sf.key IN ('pharmacy','carepharm','drugstore')
                            AND ra.role IN ('neture:' || sf.key || '_admin', 'neture:' || sf.key || '_operator')
                            AND ra.is_active = true
                            AND (ra.valid_from IS NULL OR ra.valid_from <= CURRENT_TIMESTAMP)

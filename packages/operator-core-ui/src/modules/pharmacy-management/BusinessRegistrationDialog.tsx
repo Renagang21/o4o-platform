@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type KeyboardEvent } from "react";
 import { PHARMACY_COLLABORATORS } from "@o4o/types";
 import { neturePharmacyAdminApi as api } from "./api";
-const services = ["pharmacy", "carepharm", "megapharm"] as const;
+const services = ["pharmacy", "carepharm", "drugstore"] as const;
 export function BusinessRegistrationDialog({
   existing,
   preset = "",

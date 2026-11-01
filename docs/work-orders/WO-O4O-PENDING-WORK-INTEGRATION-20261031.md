@@ -1,5 +1,8 @@
 # O4O 미반영 작업 통합 · 2026-10-31
 
+> 현행 안내(2026-10-31): 협업체 이름은 **드럭스토어형 약국**, 현재 주소는 `https://drugstore.neture.co.kr`다.
+> **과거 증적의 대상 보존:** 아래 “해당 협업체(당시 구명칭)”·“당시 협업체 구호스트”는 개명·주소 변경 전의 관측 대상이다. 아래 성공·실패·배포 결과를 현재 이름·주소의 운영 검증으로 읽지 않는다. 사용자 지시로 이전 표시명·주소 문자열은 재게시하지 않으며, 문서 경로와 기술 키의 현행 참조 정합은 과거 재실행을 뜻하지 않는다. 당시 원문·실제 호스트 식별자는 기존 Git 이력에서 확인하며 이력을 변경하지 않는다.
+
 > **상태**: ACTIVE · **작성일**: 2026-10-31 (Asia/Seoul)
 > **근거**: 사용자 요청 — 미병합 파일 모두 통합, 병합된 변경 배포.
 > **기준 main**: `0ab734a68c599e63e00c6f4d972243b77df03416`
@@ -76,7 +79,7 @@ Main 브라우저 스크립트의 첫 cold-start `networkidle` 시간 초과 뒤
 
 ## 7. PR #900 원격 리뷰 보완
 
-[통합 PR #900](https://github.com/Renagang21/o4o-platform/pull/900)의 첫 Codex 리뷰는 독립 사업 참여자가 일반 `service_memberships` 없이 전환기의 이용 서비스에서 누락되는 문제를 지적했다. 이미 읽는 `/neture/home/entry.businesses`를 사용하고 `pharmacy → kpa-society`로 연결한다. `canParticipate`가 사업 이용 판정의 우선 출처이며, 신청·정지·거절·탈퇴·종료 상태나 자격이 확인되지 않은 active 원장을 이용 권한으로 승격하지 않는다. 약국 개인 회원의 기존 진입과 별도 handoff alias가 없는 메가팜의 공개 진입을 유지한다.
+[통합 PR #900](https://github.com/Renagang21/o4o-platform/pull/900)의 첫 Codex 리뷰는 독립 사업 참여자가 일반 `service_memberships` 없이 전환기의 이용 서비스에서 누락되는 문제를 지적했다. 이미 읽는 `/neture/home/entry.businesses`를 사용하고 `pharmacy → kpa-society`로 연결한다. `canParticipate`가 사업 이용 판정의 우선 출처이며, 신청·정지·거절·탈퇴·종료 상태나 자격이 확인되지 않은 active 원장을 이용 권한으로 승격하지 않는다. 약국 개인 회원의 기존 진입과 별도 handoff alias가 없는 해당 협업체(당시 구명칭)의 공개 진입을 유지한다.
 
 사업 원장 전용 참여·약국/CarePharm handoff·여섯 비참여 상태·기존 개인 가입·잘못된 응답에 관한 회귀 9건을 추가했다. auth-react 전체 254건 PASS이며 다른 초기 테스트와 중복을 빼면 통합 검증 합계는 3,447건이다. PC·모바일 8개 브라우저 조합에서 사업 전용 참여 표시를 확인하고 모바일에서는 약국 handoff 요청을 실제 UI로 검증했다. 보완 후 전체 frontend typecheck와 영향 웹앱 6개 build 재실행 PASS. 마지막 결과는 같은 PR의 최종 HEAD 검증 기록을 따른다.
 

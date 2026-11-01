@@ -16,14 +16,14 @@ describe('browser logout and refresh HTTP contract', () => {
     expect(logout).toHaveBeenCalledWith('fixture-user', scope, SESSION);
     expect(res.body.data.scope).toMatchObject({ serviceKey: scope, serverRevoked: true });
   });
-  it.each([['pharmacy', 'coop'], ['pharmcoop', 'kpa-society'], ['neture', 'kpa-society'], ['megapharm', 'kpa-society'], ['carepharm', 'coop']])('does not retire a signed %s session from the wrong host/scope %s', async (business, scope) => {
+  it.each([['pharmacy', 'coop'], ['pharmcoop', 'kpa-society'], ['neture', 'kpa-society'], ['drugstore', 'kpa-society'], ['carepharm', 'coop']])('does not retire a signed %s session from the wrong host/scope %s', async (business, scope) => {
     verifyAccessToken.mockReturnValue({ serviceKey: scope, sessionId: SESSION });
     const res = mockHandoffRes();
     await AuthSessionController.logout(req({}, business === 'neture' ? 'https://neture.co.kr' : `https://${business}.neture.co.kr`), res);
     expect(res.statusCode).toBe(401);
     expect(logout).not.toHaveBeenCalled();
   });
-  it.each(['pharmacy', 'megapharm', 'carepharm', 'pharmcoop'])('revokes the common account session at %s after direct login or handoff', async business => {
+  it.each(['pharmacy', 'drugstore', 'carepharm', 'pharmcoop'])('revokes the common account session at %s after direct login or handoff', async business => {
     const res = mockHandoffRes();
     await AuthSessionController.logout(req({}, `https://${business}.neture.co.kr`), res);
     expect(res.statusCode).toBe(200);

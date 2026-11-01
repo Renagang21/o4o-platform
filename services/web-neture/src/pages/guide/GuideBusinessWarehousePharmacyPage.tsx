@@ -1,10 +1,10 @@
 /**
- * GuideBusinessWarehousePharmacyPage — 창고형 약국 사업자 상세 안내
+ * GuideBusinessWarehousePharmacyPage — 드럭스토어형 약국 사업자 상세 안내
  *
  * WO-O4O-NETURE-BUSINESS-WAREHOUSE-PHARMACY-DETAIL-PAGE-V1
  *
  * /guide/business/warehouse-pharmacy 의 placeholder 를 실제 사업자 안내 페이지로 승격.
- * 창고형(대규모) 약국 대상. 핵심: O4O 는 POS·로봇·CCTV·키오스크·사이니지 통합 운영 시스템이 아니라,
+ * 드럭스토어형 약국 대상. 핵심: O4O 는 POS·로봇·CCTV·키오스크·사이니지 통합 운영 시스템이 아니라,
  * 자체 제품·이벤트 오퍼·전략 상품을 고객에게 설명하는 콘텐츠와 매장 접점 연결을 선택적으로 지원한다.
  *
  * 정직성: POS 제공·대체 아님. 모든 POS 자동 연동 아님(엑셀 대안). 로봇/CCTV/키오스크/사이니지 하드웨어
@@ -42,9 +42,9 @@ export function GuideBusinessWarehousePharmacyPage() {
       <div className="bg-slate-900 text-white">
         <div className="mx-auto max-w-5xl px-6 py-14 md:py-16">
           <p className="text-sm font-medium text-violet-300 mb-3">사업 운영 안내</p>
-          <h1 className="text-2xl md:text-3xl font-bold mb-3">창고형 약국</h1>
+          <h1 className="text-2xl md:text-3xl font-bold mb-3">드럭스토어형 약국</h1>
           <p className="text-slate-300 leading-relaxed max-w-2xl">
-            많은 상품과 고객 유입을 가진 창고형 약국에서 자체 제품 · 이벤트 오퍼 · 전략 상품을 고객에게 더 잘
+            많은 상품과 고객 유입을 가진 드럭스토어형 약국에서 자체 제품 · 이벤트 오퍼 · 전략 상품을 고객에게 더 잘
             설명하고, POS 데이터와 매장 접점을 활용해 수익성을 높일 수 있는 구조를 만듭니다.
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
@@ -52,7 +52,7 @@ export function GuideBusinessWarehousePharmacyPage() {
               to="/contact"
               className="inline-flex items-center rounded-lg bg-violet-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-violet-500"
             >
-              창고형 약국 적용 방식 상담하기 →
+              드럭스토어형 약국 적용 방식 상담하기 →
             </Link>
             <Link
               to="/guide/business"
@@ -67,7 +67,7 @@ export function GuideBusinessWarehousePharmacyPage() {
       <div className="mx-auto max-w-5xl px-6 py-12 space-y-16">
         {/* ── 2. 기대하는 사업 방향 ── */}
         <section>
-          <SectionTitle eyebrow="기대하는 방향">창고형 약국이 기대하는 사업 방향</SectionTitle>
+          <SectionTitle eyebrow="기대하는 방향">드럭스토어형 약국이 기대하는 사업 방향</SectionTitle>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {[
               { t: '자체 제품과 전용 상품 운영', d: '매장 규모와 고객 유입을 바탕으로 자체 제작 제품이나 단독 상품을 운영합니다.' },
@@ -89,7 +89,7 @@ export function GuideBusinessWarehousePharmacyPage() {
           <SectionTitle eyebrow="적용 원칙">필요한 기능만 선택해 적용합니다</SectionTitle>
           <div className="rounded-xl border-2 border-violet-200 bg-violet-50 p-6">
             <p className="text-sm text-slate-700 leading-relaxed mb-3">
-              창고형 약국은 이미 매장 규모 · 고객 유입 · POS · 주문 · 판매 관리 시스템을 갖춘 경우가 많습니다.
+              드럭스토어형 약국은 이미 매장 규모 · 고객 유입 · POS · 주문 · 판매 관리 시스템을 갖춘 경우가 많습니다.
               O4O 의 모든 서비스를 사용할 필요는 없습니다.
             </p>
             <Bullets
@@ -165,7 +165,7 @@ export function GuideBusinessWarehousePharmacyPage() {
           <SectionTitle eyebrow="표준 기능">O4O 표준 기능으로 할 수 있는 일</SectionTitle>
           <div className="grid gap-4 md:grid-cols-2">
             {[
-              { t: '자체 제품 · 전용 상품 운영', items: ['자체 제작 제품', '창고형 약국 전용 상품', '특정 공급사 단독 상품', '차등 가격 상품', '서비스 단독 제품'] },
+              { t: '자체 제품 · 전용 상품 운영', items: ['자체 제작 제품', '드럭스토어형 약국 전용 상품', '특정 공급사 단독 상품', '차등 가격 상품', '서비스 단독 제품'] },
               { t: '이벤트 오퍼와 가격 경쟁력', items: ['저렴한 가격 상품 확보', '공급사 특가 제안', '특정 기간 · 조건 상품 운영', '고객 유입 상품 구성', '공급사와 우대 조건 협의'] },
               { t: '유통참여형 펀딩과 제품 개발', items: ['제품 개발 참여', '수요 확인', '공급 전 반응 확인', '자체 상품 후보 검토', '공급사와 공동 개발 논의'] },
               { t: '콘텐츠 기반 매장 판매 지원', items: ['전문 제품 설명', 'QR · POP', '사이니지 · 타블렛 · 로봇 화면용 콘텐츠', '공급사 공동 제작 콘텐츠'] },
@@ -279,7 +279,7 @@ export function GuideBusinessWarehousePharmacyPage() {
             ))}
           </div>
           <p className="mt-4 rounded-lg bg-slate-50 border border-slate-200 px-4 py-3 text-sm text-slate-600 leading-relaxed">
-            창고형 약국의 운영 방식 · POS 환경 · 하드웨어 구성 · 자체 제품 운영 여부에 따라 필요한 서비스는{' '}
+            드럭스토어형 약국의 운영 방식 · POS 환경 · 하드웨어 구성 · 자체 제품 운영 여부에 따라 필요한 서비스는{' '}
             <span className="font-semibold text-slate-800">별도 제작 협의가 가능</span>합니다.
           </p>
         </section>
@@ -288,7 +288,7 @@ export function GuideBusinessWarehousePharmacyPage() {
         <section>
           <SectionTitle eyebrow="운영 성과">수익성을 높일 수 있는 운영 지점</SectionTitle>
           <p className="text-sm text-slate-600 leading-relaxed mb-6 max-w-2xl">
-            창고형 약국은 매출 규모가 크지만 수익성을 만들기 쉽지 않습니다. 수익을 보장하지는 않지만, 다음은 수익성을 높일 수 있는 운영 지점입니다.
+            드럭스토어형 약국은 매출 규모가 크지만 수익성을 만들기 쉽지 않습니다. 수익을 보장하지는 않지만, 다음은 수익성을 높일 수 있는 운영 지점입니다.
           </p>
           <div className="grid gap-3 sm:grid-cols-2">
             <Bullets
@@ -313,10 +313,10 @@ export function GuideBusinessWarehousePharmacyPage() {
 
         {/* ── 12. 복합 활용을 통한 운영 확장 ── */}
         <section>
-          <SectionTitle eyebrow="운영 확장">복합 활용을 통한 창고형 약국 운영 확장</SectionTitle>
+          <SectionTitle eyebrow="운영 확장">복합 활용을 통한 드럭스토어형 약국 운영 확장</SectionTitle>
           <div className="rounded-xl border border-violet-200 bg-violet-50 p-6 space-y-2">
             <p className="text-sm text-slate-700 leading-relaxed">
-              창고형 약국은 O4O 의 모든 기능을 사용할 필요는 없습니다. POS · 주문 · 하드웨어는 기존 시스템과 전문 업체를
+              드럭스토어형 약국은 O4O 의 모든 기능을 사용할 필요는 없습니다. POS · 주문 · 하드웨어는 기존 시스템과 전문 업체를
               활용하고, O4O 는 자체 제품 · 이벤트 오퍼 · 전략 상품을 고객에게 설명하는 콘텐츠와 매장 접점 연결을 담당합니다.
             </p>
             <p className="text-sm text-slate-600 leading-relaxed">
@@ -328,7 +328,7 @@ export function GuideBusinessWarehousePharmacyPage() {
         {/* ── 13. 상담 안내 ── */}
         <section>
           <div className="rounded-2xl border border-slate-200 bg-slate-900 p-8 text-center text-white">
-            <h2 className="text-xl font-bold mb-2">창고형 약국 적용 방식 상담하기</h2>
+            <h2 className="text-xl font-bold mb-2">드럭스토어형 약국 적용 방식 상담하기</h2>
             <p className="text-sm text-slate-300 leading-relaxed max-w-xl mx-auto">
               매장 규모 · POS 환경 · 판매 데이터 활용 가능성 · 자체 제품 여부 · 전략 제품군 · 공급사 협력 · 하드웨어 보유 ·
               이벤트 오퍼 운영 · 상비약 세트 같은 전용 서비스 필요 여부에 따라 적용 방식이 달라질 수 있습니다.
@@ -337,7 +337,7 @@ export function GuideBusinessWarehousePharmacyPage() {
               to="/contact"
               className="mt-5 inline-flex items-center rounded-lg bg-violet-600 px-6 py-3 text-sm font-semibold text-white hover:bg-violet-500"
             >
-              창고형 약국 적용 방식 상담하기 →
+              드럭스토어형 약국 적용 방식 상담하기 →
             </Link>
           </div>
         </section>

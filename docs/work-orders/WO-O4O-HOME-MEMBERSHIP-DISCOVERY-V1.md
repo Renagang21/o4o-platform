@@ -1,12 +1,15 @@
 # WO-O4O-HOME-MEMBERSHIP-DISCOVERY-V1
 
+> 현행 안내(2026-10-31): 협업체 이름은 **드럭스토어형 약국**, 현재 주소는 `https://drugstore.neture.co.kr`다.
+> **과거 증적의 대상 보존:** 아래 “해당 협업체(당시 구명칭)”·“당시 협업체 구호스트”는 개명·주소 변경 전의 관측 대상이다. 아래 성공·실패·배포 결과를 현재 이름·주소의 운영 검증으로 읽지 않는다. 사용자 지시로 이전 표시명·주소 문자열은 재게시하지 않으며, 문서 경로와 기술 키의 현행 참조 정합은 과거 재실행을 뜻하지 않는다. 당시 원문·실제 호스트 식별자는 기존 Git 이력에서 확인하며 이력을 변경하지 않는다.
+
 > 상태: **COMPLETED** · 완료: 2026-10-20 (KST) · 검증: [CHECK](../checks/CHECK-O4O-HOME-MEMBERSHIP-DISCOVERY-V1.md)
 
 ## 문제와 승인 범위
 
 사용자가 전체 서비스 가입용으로 준비했다고 설명한 계정은 **매장 경영자 테스트 로그인 버튼의 공개 STORE_OWNER**였다. 초기에는 같은 계정인지 확인되지 않았으나 사용자 답변으로 식별을 확정했다. 비공개 계정 파일 제공은 더 이상 선행 조건이 아니다.
 
-운영 조회에서는 neture·kpa-society·lecture 서비스 가입과 pharmacy 사업 참여만 active였다. community·funding 가입, CarePharm·메가팜 참여는 누락돼 있었다. 기존 준비 코드의 최소 가입 목록과 실제 원장도 일치하지 않았다. 구체적인 누락 발생 시점이나 삭제 주체까지 확정한 것은 아니다.
+운영 조회에서는 neture·kpa-society·lecture 서비스 가입과 pharmacy 사업 참여만 active였다. community·funding 가입, CarePharm·해당 협업체(당시 구명칭) 참여는 누락돼 있었다. 기존 준비 코드의 최소 가입 목록과 실제 원장도 일치하지 않았다. 구체적인 누락 발생 시점이나 삭제 주체까지 확정한 것은 아니다.
 
 사용자는 이 계정과 기존 Demo 약국에 대한 가입·참여 보정 계획을 명시적으로 승인했다. 다른 Demo의 소유권 이전, 관리자·운영자 권한 부여, credential·약관 동의 수정, 신규 사업·조합·분회·공급자 조직 생성은 범위에서 제외했다. 새 실제 계정 생성은 필요하지 않았다.
 
@@ -28,7 +31,7 @@
 | 메인·약국·강의 서비스 | active | 유지 |
 | 내 매장·pharmacy 사업 | 기존 Demo 약국·active | 유지 |
 | 일반 커뮤니티·펀딩 | 가입 없음 | active 서비스 가입 추가 |
-| CarePharm·메가팜 | 사업 존재, Demo 약국 참여 없음 | 기존 Demo 약국의 active 참여 추가 |
+| CarePharm·해당 협업체(당시 구명칭) | 사업 존재, Demo 약국 참여 없음 | 기존 Demo 약국의 active 참여 추가 |
 | 공급자 | 자격 후보 0·이용 상태 none | 유지, 가입한 것으로 가장하지 않음 |
 | 분회 | 활성 소속 후보 0 | 유지, 실제 분회에 임의 연결하지 않음 |
 | 협동조합 | 내 가입 0·공개 목록 0 | 유지, 새 조합 생성·가상 가입 없음 |
@@ -39,7 +42,7 @@
 
 활성 STORE_OWNER registry 단일성, 공통 코드 정본과의 일치, 정상·이메일 확인 계정, 유일한 승인 Demo 약국 owner 관계, 활성 메인 가입 및 두 사업 상태를 확인한다. 기존 pending/suspended/rejected/withdrawn 등 비활성 행은 active로 덮어쓰지 않는다.
 
-기본 plan은 repeatable-read read-only다. apply는 정확한 digest와 serializable transaction을 사용하며, 누락된 community/funding service_memberships와 CarePharm/megapharm semi_franchise_memberships만 INSERT한다. 기존 행을 수정하지 않고 before-image와 추가 행 ID를 기존 비공개 canonical_demo_repair_snapshots에 같은 transaction으로 저장한다. 실패 시 전부 rollback하며 사후 검증 후 commit한다. 복구 시에는 snapshot과 이후 종속 참조를 검토한 보상 transaction을 사용하며 무조건 삭제하지 않는다.
+기본 plan은 repeatable-read read-only다. apply는 정확한 digest와 serializable transaction을 사용하며, 누락된 community/funding service_memberships와 CarePharm/drugstore semi_franchise_memberships만 INSERT한다. 기존 행을 수정하지 않고 before-image와 추가 행 ID를 기존 비공개 canonical_demo_repair_snapshots에 같은 transaction으로 저장한다. 실패 시 전부 rollback하며 사후 검증 후 commit한다. 복구 시에는 snapshot과 이후 종속 참조를 검토한 보상 transaction을 사용하며 무조건 삭제하지 않는다.
 
 초기 별도 workflow의 plan(run 39428287852)은 WIF attribute condition에서 거부돼 DB proxy·SQL 전 인증 단계에서 끝났다. IAM을 확대하지 않고 기존 신뢰 경로로 교정했다. 기존 경로의 읽기 전용 census(run 39429261764)도 성공했다.
 

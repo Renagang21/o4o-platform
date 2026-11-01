@@ -83,7 +83,7 @@ suite("service-admin delegation — isolated PostgreSQL", () => {
       `INSERT INTO role_assignments(user_id,role,is_active) VALUES($1,$2,true)`,
       [actor, role ?? c.adminRole],
     );
-    if (["pharmacy", "carepharm", "megapharm"].includes(key))
+    if (["pharmacy", "carepharm", "drugstore"].includes(key))
       await db.ds.query(
         `INSERT INTO semi_franchises(key,status) VALUES($1,'active')`,
         [key],
@@ -152,7 +152,7 @@ suite("service-admin delegation — isolated PostgreSQL", () => {
     await expect(s.list(actor, "neture")).rejects.toMatchObject({
       status: 403,
     });
-    await expect(s.list(actor, "megapharm")).rejects.toMatchObject({
+    await expect(s.list(actor, "drugstore")).rejects.toMatchObject({
       status: 403,
     });
   });
@@ -283,7 +283,7 @@ suite("service-admin delegation — isolated PostgreSQL", () => {
     "neture",
     "pharmacy",
     "carepharm",
-    "megapharm",
+    "drugstore",
     "pharmcoop",
   ];
   it.each(

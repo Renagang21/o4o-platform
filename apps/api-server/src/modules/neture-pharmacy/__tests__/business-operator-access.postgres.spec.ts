@@ -12,7 +12,7 @@ const integration = process.env.O4O_PHARMACY_ROLES_IT === '1' ? describe : descr
 integration('collaborator operator boundaries on isolated PostgreSQL', () => {
   let db: DataSource;
   const user = randomUUID();
-  const keys = ['pharmacy', 'carepharm', 'megapharm', 'pharmcoop', 'individual-coop', 'unrelated'];
+  const keys = ['pharmacy', 'carepharm', 'drugstore', 'pharmcoop', 'individual-coop', 'unrelated'];
   const ids = Object.fromEntries(keys.map(key => [key, randomUUID()]));
   beforeAll(async () => {
     db = new DataSource({ type: 'postgres', host: '127.0.0.1', port: Number(process.env.O4O_PHARMACY_ROLES_PORT || 55439),

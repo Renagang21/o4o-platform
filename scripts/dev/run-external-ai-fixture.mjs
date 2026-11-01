@@ -1834,7 +1834,7 @@ async function expandedTests(db, tools, provider, register, base, post) {
         "SELECT key FROM semi_franchises WHERE id=$1",
         [business],
       );
-      for (const key of ["pharmacy", "megapharm"]) {
+      for (const key of ["pharmacy", "drugstore"]) {
         const [collision] = await db.query(
           "SELECT id FROM semi_franchises WHERE key=$1",
           [key],

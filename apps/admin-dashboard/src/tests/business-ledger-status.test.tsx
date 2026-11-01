@@ -10,7 +10,7 @@ vi.mock('@o4o/auth-client', () => ({ authClient: { api: { get: vi.fn(), post: vi
 
 const users = [
   { id: 'u-care', email: 'care@example.invalid', roles: ['neture:carepharm_admin'], status: 'active' },
-  { id: 'u-mega', email: 'mega@example.invalid', firstName: '합성', lastName: '담당', roles: ['neture:megapharm_admin'], status: 'active' },
+  { id: 'u-mega', email: 'mega@example.invalid', firstName: '합성', lastName: '담당', roles: ['neture:drugstore_admin'], status: 'active' },
   { id: 'u-neture', email: 'neture@example.invalid', name: '합성 운영자', roles: ['neture:admin'], status: 'active' },
 ];
 
@@ -29,7 +29,7 @@ afterEach(() => { cleanup(); vi.clearAllMocks(); });
 
 describe('business ledger status is separate from account status', () => {
   it('marks role-only businesses as unregistered and links to a preset that does not save', async () => {
-    mockGet(async () => ({ success: true, data: [{ key: 'pharmacy', status: 'active' }, { key: 'megapharm', status: 'closed' }] }));
+    mockGet(async () => ({ success: true, data: [{ key: 'pharmacy', status: 'active' }, { key: 'drugstore', status: 'closed' }] }));
     render(<MemoryRouter><OperatorsPage /></MemoryRouter>);
     await screen.findByText('care@example.invalid');
     await waitFor(() => expect(rowOf('care@example.invalid').textContent).toContain('사업 미등록'));
@@ -62,7 +62,7 @@ describe('business ledger status is separate from account status', () => {
     [null],
     [{ key: 'carepharm', status: 'pending' }],
     [{ key: '', status: 'active' }],
-    [{ key: 'megapharm' }],
+    [{ key: 'drugstore' }],
     [{ key: 'carepharm ', status: 'active' }],
     [{ key: 'CarePharm', status: 'active' }],
     [{ key: 'care.pharm', status: 'active' }],

@@ -1,5 +1,8 @@
 # CHECK-O4O-SUBDOMAIN-HERO-COVERAGE-V1
 
+> 현행 안내(2026-10-31): 협업체 이름은 **드럭스토어형 약국**, 현재 주소는 `https://drugstore.neture.co.kr`다.
+> **과거 증적의 대상 보존:** 아래 “해당 협업체(당시 구명칭)”·“당시 협업체 구호스트”는 개명·주소 변경 전의 관측 대상이다. 아래 성공·실패·배포 결과를 현재 이름·주소의 운영 검증으로 읽지 않는다. 사용자 지시로 이전 표시명·주소 문자열은 재게시하지 않으며, 문서 경로와 기술 키의 현행 참조 정합은 과거 재실행을 뜻하지 않는다. 당시 원문·실제 호스트 식별자는 기존 Git 이력에서 확인하며 이력을 변경하지 않는다.
+
 > **진행 현황 안내 (2026-10-30)**: 강의 Hero·운영 메뉴 보완은 2026-10-24 PR #793(`6a6d20e094`)으로 main에 반영됐다. 아래 「통합·배포 전」 중 통합 대기는 해소됐다. 이 기록만으로 #793 배포 완료를 판정하지 않으며, 실제 lecture operator의 운영 저장·게시와 배포 후 화면은 미검증으로 유지한다.
 > 전체 경과와 남은 확인은 [디자인 정비 진행 현황](../guides/O4O-PUBLIC-DESIGN-PROGRESS-V1.md)을 참조한다. 아래 기존 본문·수치·실행일은 과거 회차 기록으로 보존한다.
 
@@ -18,7 +21,7 @@
 | funding | MarketTrialHubPage / funding | 해당 host 운영 메뉴 | 기존 연결 |
 | community | CommunityHostHomePage / community | 해당 host 운영 메뉴 | 기존 연결 |
 | CarePharm | CarePharmHomePage / carepharm | CarePharmOperatorLayout | 기존 연결 |
-| pharmacy·megapharm | PharmacyMemberHomePage → BusinessHomeFeature | BusinessHomePresentationPage / 사업별 scope | 실제 게시 소식만 표시하는 현행 정책 유지 |
+| pharmacy·drugstore | PharmacyMemberHomePage → BusinessHomeFeature | BusinessHomePresentationPage / 사업별 scope | 실제 게시 소식만 표시하는 현행 정책 유지 |
 | kpa 분회 | BranchHomePage / branchSlug | 분회 SiteSettingsPage | 기존 연결 |
 | pharmcoop·개별 협동조합 | web-pharmacy-coop App / pharmcoop·cooperativeSlug | 각 운영 공간 HomePresentationEditor | 기존 독자 디자인·조합별 범위 유지 |
 | study | `/` → `/courses`, CoursesPage | lecture 운영 업무 메뉴 | 화면·메뉴 누락 수정 |

@@ -1,5 +1,8 @@
 # 약국 협업체 운영 개통 검증 기록
 
+> 현행 안내(2026-10-31): 협업체 이름은 **드럭스토어형 약국**, 현재 주소는 `https://drugstore.neture.co.kr`다.
+> **과거 증적의 대상 보존:** 아래 “해당 협업체(당시 구명칭)”·“당시 협업체 구호스트”는 개명·주소 변경 전의 관측 대상이다. 아래 성공·실패·배포 결과를 현재 이름·주소의 운영 검증으로 읽지 않는다. 사용자 지시로 이전 표시명·주소 문자열은 재게시하지 않으며, 문서 경로와 기술 키의 현행 참조 정합은 과거 재실행을 뜻하지 않는다. 당시 원문·실제 호스트 식별자는 기존 Git 이력에서 확인하며 이력을 변경하지 않는다.
+
 > **상태**: ACTIVE
 > **작성일**: 2026-10-27 · **최종 갱신**: 2026-10-27
 > **근거 WO**: [WO-O4O-COOPERATION-OPERATIONAL-READINESS-V1](../work-orders/WO-O4O-COOPERATION-OPERATIONAL-READINESS-V1.md)
@@ -12,7 +15,7 @@
 
 | 소비처 | 확인 범위 |
 |---|---|
-| Pharmacy·MegaPharm / web-pharmacy-business | 공통 회원 업무·전용 자료·운영자 검토 |
+| Pharmacy·해당 협업체(당시 구명칭) / web-pharmacy-business | 공통 회원 업무·전용 자료·운영자 검토 |
 | CarePharm / web-neture | 공통 회원 업무·전용 자료·운영자 검토 |
 | Pharmcoop / web-pharmacy-coop | 개인 회원 업무·운영자 검토, 약국 scope 미부여 |
 | shared-space-ui·operator-core-ui | 본문·첨부 표현, 기존 transport·scope 유지 |
@@ -56,7 +59,7 @@
 | 항목 | 관측 결과 / 한계 |
 |---|---|
 | 네 공개 홈 | 모두 HTTP 200 |
-| Pharmacy·MegaPharm·CarePharm 가입 정책 | 각각 503 / POLICY_UNAVAILABLE |
+| Pharmacy·해당 협업체(당시 구명칭)·CarePharm 가입 정책 | 각각 503 / POLICY_UNAVAILABLE |
 | 세 사업의 공개 terms·privacy | 총 6개 endpoint 모두 404; 이 경로에서 게시 문서 없음 |
 | 공개 cooperatives 목록 | 빈 목록; 전체 DB에 조합이 없다는 의미로 확대하지 않음 |
 | 지정 점주 로그인·접근 매장 | 성공, 접근 매장 1개 / owner |
@@ -87,11 +90,11 @@
 | 공개 공간 | 홈 | 로드한 JS | JS 응답 |
 |---|---|---|---|
 | Pharmacy | 200 | `/assets/index-CDrFRRNd.js` | 200 |
-| MegaPharm | 200 | `/assets/index-CDrFRRNd.js` | 200 |
+| 해당 협업체(당시 구명칭) | 200 | `/assets/index-CDrFRRNd.js` | 200 |
 | CarePharm | 200 | `/assets/index-B6g209nv.js` | 200 |
 | Pharmcoop | 200 | `/assets/index-DqjcKuME.js` | 200 |
 
-Pharmacy/MegaPharm과 CarePharm의 공개 JS가 전환 전 파일에서 변경된 것도 확인했다. Pharmcoop은 앞서 완료된 배포의 JS를 다시 확인했다. 배포 후 인증 화면의 실계정 양방향 쓰기·실장치 브라우저 검증은 수행하지 않았으며 앞선 격리 브라우저 검증으로 대신 완료 처리하지 않는다.
+Pharmacy/해당 협업체(당시 구명칭)과 CarePharm의 공개 JS가 전환 전 파일에서 변경된 것도 확인했다. Pharmcoop은 앞서 완료된 배포의 JS를 다시 확인했다. 배포 후 인증 화면의 실계정 양방향 쓰기·실장치 브라우저 검증은 수행하지 않았으며 앞선 격리 브라우저 검증으로 대신 완료 처리하지 않는다.
 
 격리 SQL fixture는 synthetic 사용자·업무·인증 문의 잔존 0건을 확인했다. 본 작업 label을 확인한 PostgreSQL container와 연결 anonymous volume을 제거했고, 본 작업 preview만 종료했다. loopback 4311·4312·4313·55479 포트 종료를 확인했다. 다른 리소스는 정리하지 않았다.
 
@@ -105,7 +108,7 @@ Pharmacy/MegaPharm과 CarePharm의 공개 JS가 전환 전 파일에서 변경�
 
 사용자 「진행하자 main병합 전까지」에 따른 후속 작업이다. 기준 main `e96c4a7934`, 작업 branch `wo/cooperation-opening-validation-20261027`. 앞 절의 PR #844/#846 배포는 이전 변경의 완료 증거이며, 아래 새 변경의 main 반영·배포를 뜻하지 않는다.
 
-Pharmacy/MegaPharm 참여 화면이 URL에 있는 약국 선택을 가입 상태 조회·신청·탈퇴 요청에 전달하지 않는 결함을 확인했다. 기존 API는 선택 조직 header를 지원하지만 이 화면은 생략하고 있었다.
+Pharmacy/해당 협업체(당시 구명칭) 참여 화면이 URL에 있는 약국 선택을 가입 상태 조회·신청·탈퇴 요청에 전달하지 않는 결함을 확인했다. 기존 API는 선택 조직 header를 지원하지만 이 화면은 생략하고 있었다.
 
 - 현재 계정의 접근 가능 목록에서 owner/admin/manager 약국을 선택한다. 사업 미가입 약국도 신청할 수 있어야 하므로 활성 사업 회원만 고르는 자료함 selector로 대체하지 않았다.
 - 하나면 자동 선택하되 잘못된 명시적 선택을 다른 약국으로 바꾸지 않는다. 여러 개면 선택 전 가입 조회·신청·탈퇴를 시작하지 않는다. 직원 전용 목록에는 경영자 가입 조작을 제공하지 않는다.
@@ -113,7 +116,7 @@ Pharmacy/MegaPharm 참여 화면이 URL에 있는 약국 선택을 가입 상태
 - 약국/계정/사업 전환 시 입력·동의·상태를 분리하고 이전 응답을 버린다. 처리 중 selector를 잠그되 외부 URL 전환 후 새 약국의 selector가 잠긴 채 남지 않도록 한다. 다른 query와 hash도 보존하며 참여자 게시판 진입에도 선택 약국을 유지한다.
 - 담당 운영자 안내에는 회원용 약국 선택을 요구하지 않는다. CarePharm의 기존 scoped client와 Pharmcoop 개인 가입 코드는 변경하지 않았다. 서버 권한·API endpoint·schema·dependency·CI 설정 변경은 없다.
 
-직접 소비처는 Pharmacy/MegaPharm 앱의 `/my/participation`과 기존 `/businesses/:businessKey/participation`이다. 로컬 `businessApi.post`의 다른 소비처는 사업 게시판 작성·가입 요청·댓글·좋아요·게시판 관리이며, 선택 인자를 주지 않은 기존 호출 형태를 유지한다.
+직접 소비처는 Pharmacy/해당 협업체(당시 구명칭) 앱의 `/my/participation`과 기존 `/businesses/:businessKey/participation`이다. 로컬 `businessApi.post`의 다른 소비처는 사업 게시판 작성·가입 요청·댓글·좋아요·게시판 관리이며, 선택 인자를 주지 않은 기존 호출 형태를 유지한다.
 
 ### 검증
 
@@ -132,7 +135,7 @@ Pharmacy/MegaPharm 참여 화면이 URL에 있는 약국 선택을 가입 상태
 
 초기 회귀 실행에서 약국 선택 시 hash가 사라지는 것을 발견해 URL 갱신을 보완했다. mock 변경으로 드러난 자료함 fixture 누락 2건도 정정한 뒤 전체 검증했다. 첫 ESLint의 기존 effect dependency 경고를 정리했고 최종 검사에는 경고가 없다.
 
-실제 Pharmacy/MegaPharm 빌드 산출물을 loopback preview로 실행했다. 모든 외부 요청을 가로채 합성 API만 연결했으며 운영 자격증명이나 업무 데이터는 사용하지 않았다. 두 host × 1440/390 폭, 총 4개 시나리오 PASS:
+실제 Pharmacy/해당 협업체(당시 구명칭) 빌드 산출물을 loopback preview로 실행했다. 모든 외부 요청을 가로채 합성 API만 연결했으며 운영 자격증명이나 업무 데이터는 사용하지 않았다. 두 host × 1440/390 폭, 총 4개 시나리오 PASS:
 
 - 다중 약국에서 선택 전 가입 조회 0건
 - 약국 A의 신청→pending, 약국 B의 기존 active 조회→탈퇴 요청
@@ -152,7 +155,7 @@ Pharmacy/MegaPharm 참여 화면이 URL에 있는 약국 선택을 가입 상태
 | 세 사업 terms/privacy | 총 6개 경로 모두 404 |
 | 공개 cooperatives | 200, 0건 — 전체 DB에 조합이 없다는 결론 아님 |
 | 지정 점주 | 로그인·접근 매장 조회 200, owner 매장 1개 |
-| 점주의 Pharmacy/MegaPharm/CarePharm 업무 읽기 | 모두 200, 업무·자료 응답 구조 확인 |
+| 점주의 Pharmacy/해당 협업체(당시 구명칭)/CarePharm 업무 읽기 | 모두 200, 업무·자료 응답 구조 확인 |
 | 직원 | 이전 401 이후 Secret 정정 확인이 없어 이번 재로그인 미실행 |
 | 운영자·개인 조합원 | 지정 계정 Secret 미연결, 실계정 검증 미실행 |
 
@@ -182,7 +185,7 @@ Pharmacy/MegaPharm 참여 화면이 URL에 있는 약국 선택을 가입 상태
 - [Delivery 40474459408](https://github.com/Renagang21/o4o-platform/actions/runs/40474459408): 완료, LEVEL_3 판정.
 - [Promote 40474710232](https://github.com/Renagang21/o4o-platform/actions/runs/40474710232): `services=kpa-society`, PASS. 실제 Cloud Run 서비스는 현행 설정의 `pharmacy-business-web`이다. 새 revision smoke·트래픽 전환·배포 확인·최종 serving SHA report가 성공했다.
 
-이번 코드의 runtime 소비처인 Pharmacy/MegaPharm 호스트만 승격했다. API·migration·Neture/CarePharm·Pharmcoop은 이번 작업에서 배포하지 않았다. 전역 production status의 NOT_SELECTED/pending은 미선택 호스트의 남은 판정이며 이번 대상 배포 실패가 아니다. 전체 서비스 배포 완료로 확대하지 않는다.
+이번 코드의 runtime 소비처인 Pharmacy/해당 협업체(당시 구명칭) 호스트만 승격했다. API·migration·Neture/CarePharm·Pharmcoop은 이번 작업에서 배포하지 않았다. 전역 production status의 NOT_SELECTED/pending은 미선택 호스트의 남은 판정이며 이번 대상 배포 실패가 아니다. 전체 서비스 배포 완료로 확대하지 않는다.
 
 배포 후 두 공개 홈과 새 `/assets/index-DEh5rNzw.js`가 모두 200이다. 배포 전 파일은 `/assets/index-CDrFRRNd.js`였으며, 새 공개 bundle에 「가입 상태를 확인할 약국」이 포함된 것도 확인했다. 실행 중인 운영 계정의 신청·탈퇴 쓰기는 수행하지 않았다. 실계정 양방향/실장치 검증의 잔여 조건은 앞 절과 같다.
 
@@ -250,7 +253,7 @@ Pharmacy/MegaPharm 참여 화면이 URL에 있는 약국 선택을 가입 상태
 | 네 도메인 공개 홈 | 모두 200 |
 | 세 약국 사업의 가입 정책 | 각각 503; 공개 terms/privacy 경로 여섯 개는 404. 신규 가입 개통 미완료 |
 | 지정 점주 | 로그인 200, 접근 매장 1개/owner 유지. 본인 공통 약사 자격 조회 200, `unrequested` |
-| 점주의 Pharmacy/MegaPharm/CarePharm 회원 업무 | 모두 403 / `COOPERATION_MEMBERSHIP_REQUIRED`. 최신 개인 약사 자격 조건과 일치하며 과거 200을 현재 완료 증거로 사용하지 않음 |
+| 점주의 Pharmacy/해당 협업체(당시 구명칭)/CarePharm 회원 업무 | 모두 403 / `COOPERATION_MEMBERSHIP_REQUIRED`. 최신 개인 약사 자격 조건과 일치하며 과거 200을 현재 완료 증거로 사용하지 않음 |
 | 점주의 세 약국 사업 운영 업무 | 모두 403. 담당 운영자 목록 조회 200이나 해당 세 사업 지정 없음. 테스트 조합 admin을 다른 사업 운영자로 간주하지 않음 |
 | Pharmcoop | 공개 조합 1건, 지정 조합 관리자 관리 조회 200, 지정 개인 회원 조회 200/`person` |
 | Pharmcoop 경계 | 개인 회원의 관리·역할 관리 403, 약국 header 혼합 403. 두 계정의 기존 전역 역할·매장 연결 fingerprint 동일, 연합회 권한 없음 유지 |
@@ -271,7 +274,7 @@ Pharmacy/MegaPharm 참여 화면이 URL에 있는 약국 선택을 가입 상태
 ### 개통을 위해 남은 입력과 검증
 
 1. 약국 단위 검증 계정의 실제 약사 자격 신청·근거 확인·중앙 담당자 수동 승인, 해당 약국의 사업별 가입 확인.
-2. Pharmacy/MegaPharm/CarePharm의 실제 담당 운영자 지정. 조합 관리자나 플랫폼 일반 역할을 자동 전용하지 않음.
+2. Pharmacy/해당 협업체(당시 구명칭)/CarePharm의 실제 담당 운영자 지정. 조합 관리자나 플랫폼 일반 역할을 자동 전용하지 않음.
 3. 직원 자격증명 정정 확인 후 실제 허용·거절 검증.
 4. 사업별 운영 주체·법정정보·약관 준비. CarePharm 회사 정보 빈칸은 유지하며 미정 상태로 게시하지 않음.
 5. 실매장 PC·태블릿·마이크·읽어주기 검증과 실제 운영 데이터의 완전 정리 가능 범위를 확정한 양방향 검증. 격리 UI/DB 성공을 이 항목의 완료로 대체하지 않음.

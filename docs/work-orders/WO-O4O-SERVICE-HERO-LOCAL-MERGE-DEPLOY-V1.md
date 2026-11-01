@@ -1,5 +1,8 @@
 # 로컬 통합 요청 — 서비스·협동조합 Hero main 병합·배포
 
+> 현행 안내(2026-10-31): 협업체 이름은 **드럭스토어형 약국**, 현재 주소는 `https://drugstore.neture.co.kr`다.
+> **과거 증적의 대상 보존:** 아래 “해당 협업체(당시 구명칭)”·“당시 협업체 구호스트”는 개명·주소 변경 전의 관측 대상이다. 아래 성공·실패·배포 결과를 현재 이름·주소의 운영 검증으로 읽지 않는다. 사용자 지시로 이전 표시명·주소 문자열은 재게시하지 않으며, 문서 경로와 기술 키의 현행 참조 정합은 과거 재실행을 뜻하지 않는다. 당시 원문·실제 호스트 식별자는 기존 Git 이력에서 확인하며 이력을 변경하지 않는다.
+
 - 작성일: 2026-10-20
 - 상태: COMPLETED
 - 최종 갱신: 2026-10-20 (실행 결과: [CHECK](../checks/CHECK-O4O-SERVICE-HERO-OPERATOR-COMPLETION-V1.md) 마지막 절 · 실제 operator 로그인 검증은 미검증으로 보고)
@@ -21,13 +24,13 @@
 |---|---|
 | Pharmcoop 연합회 | `/operator/home-presentation`, 현재 연합회 admin/operator만 편집 |
 | 개별 협동조합 | `/:cooperativeSlug/operator/home-presentation`, 현재 해당 조합의 `cooperative_roles`로 편집 |
-| Pharmacy·MegaPharm | 기존 게시 Hero를 회원 홈 상단에 한 번 표시. 미게시·숨김·오류 시 기존 간결한 제목 유지 |
+| Pharmacy·해당 협업체(당시 구명칭) | 기존 게시 Hero를 회원 홈 상단에 한 번 표시. 미게시·숨김·오류 시 기존 간결한 제목 유지 |
 | O4O 대표 메인 | 옛 홈페이지 CMS의 Hero 편집 탭을 현행 관리 링크로 정리. 기존 데이터 삭제/이전 없음 |
 
 - 연합회 역할만으로 개별 조합을 편집할 수 없다. 개별 조합 operator에게 Neture 역할/가입을 추가로 강제하지 않는다.
 - 서버가 활성 조합·연결 사업·조직 ID를 해석한다. 저장 트랜잭션에서 현재 권한을 재확인하며 기존 조합 관리와 동일 조합 row를 잠근다.
 - 기존 CMS 예약 metadata·revision 충돌·초안/공개 분리·게시 기간·안전 URL 검증을 사용한다.
-- main의 #730 협동조합 회원 기능과 #732 서비스별 Hero 디자인을 통합했다. 이 기능들을 되돌리지 않는다. 연합회/개별 조합 디자인 정보도 추가했고 MegaPharm의 businessKey 시각 구분을 유지했다.
+- main의 #730 협동조합 회원 기능과 #732 서비스별 Hero 디자인을 통합했다. 이 기능들을 되돌리지 않는다. 연합회/개별 조합 디자인 정보도 추가했고 해당 협업체(당시 구명칭)의 businessKey 시각 구분을 유지했다.
 - **이번 변경에 신규 schema·migration·dependency/lockfile·workflow·IAM 변경은 없다.** 기존 운영자 지정·가입 상태·회원/상품 데이터는 변경하지 않았다.
 
 ## 3. 착수·PR·병합
@@ -60,7 +63,7 @@ gh pr create --repo $repo --base main --head $branch --title 'feat: 서비스·�
 
 **PR 본문:**
 
-> Pharmcoop 연합회와 개별 조합 operator가 자기 공간의 Hero를 편집·공개하도록 기존 CMS/홈 편집 기반을 연결합니다. 연합회 역할과 개별 조합 역할을 분리하고 저장 시 현재 권한을 재확인합니다. Pharmacy/MegaPharm의 기존 게시 Hero는 상단에 한 번 표시하며 대표 메인의 중복 Hero 편집 경로를 정리합니다.
+> Pharmcoop 연합회와 개별 조합 operator가 자기 공간의 Hero를 편집·공개하도록 기존 CMS/홈 편집 기반을 연결합니다. 연합회 역할과 개별 조합 역할을 분리하고 저장 시 현재 권한을 재확인합니다. Pharmacy/해당 협업체(당시 구명칭)의 기존 게시 Hero는 상단에 한 번 표시하며 대표 메인의 중복 Hero 편집 경로를 정리합니다.
 >
 > 최신 main의 협동조합 회원 기능과 서비스별 Hero 디자인을 보존해 통합했습니다. schema/migration·dependency·workflow·IAM 변경은 없습니다. 실제 운영 계정·데이터 변경은 미실행입니다. 로컬 검증 결과와 최초 실패·재검증은 CHECK에 기록했습니다. 원격 CI/검토 및 배포 결과는 통합 실행 후 추가 기록합니다.
 
@@ -105,7 +108,7 @@ gh workflow run deploy-cooperative.yml --repo $repo --ref main -f "sha=$target" 
 
 ## 6. 배포 후 확인과 최종 보고
 
-1. API 준비 상태, 대표/공급자/펀딩/커뮤니티/강의/Pharmacy/CarePharm/MegaPharm/Pharmcoop의 해당 홈을 확인한다. 새 관리 API 비로그인 요청은 401, 실제 허용/차단은 서비스·조합별로 확인한다.
+1. API 준비 상태, 대표/공급자/펀딩/커뮤니티/강의/Pharmacy/CarePharm/해당 협업체(당시 구명칭)/Pharmcoop의 해당 홈을 확인한다. 새 관리 API 비로그인 요청은 401, 실제 허용/차단은 서비스·조합별로 확인한다.
 2. 연합회 operator는 `/operator/home-presentation`, 개별 조합 operator는 `/:실제조합주소/operator/home-presentation`에 접근한다. 연합회 역할만으로 개별 조합을 편집하거나 다른 조합으로 넘어갈 수 없어야 한다.
 3. 운영 계정 정보는 `docs/local/TEST-ACCOUNTS.local.md` 정본에서 확인한다. 파일/대상/원복 범위가 없으면 예전 계정이나 임의 Demo/seed로 대체하지 않는다. 실제 Hero 내용을 임의 변경하거나 검증을 이유로 새 조합·회원·역할을 만들지 않는다. 운영에서 확인하지 못한 업무는 미검증으로 보고한다.
 4. 성공·실패, 미검증, 남은 작업을 구분해 기존 CHECK와 PR 설명에 기록한다. PR 번호/URL, 최종 PR HEAD, main merge/배포 SHA, CI·Promote·Pharmcoop 실행 ID/URL, 실제 serving 확인, 공개 확인 결과를 포함한다. 문서 후속 commit만 생긴 경우 코드가 추가 배포됐다고 표현하지 않는다.
@@ -117,7 +120,7 @@ gh workflow run deploy-cooperative.yml --repo $repo --ref main -f "sha=$target" 
 - main `5b2f6bd9ee` 통합: 공통 UI 142개, 협동조합 62개, API route 28개, Neture/CarePharm 52개 PASS.
 - 약국 사업 75개 중 최초 두 건은 기본 대기 안에 요소를 찾지 못했으며 해당 파일 단독 22개 재실행 PASS. timeout/assertion 완화 없음. 최초 나머지 53개 PASS.
 - 통합 후 API 타입/tsup, 공통 패키지, Pharmcoop/KPA/Neture 운영 빌드 PASS. 충돌 해소 중 잘못 전달된 광고 prop 타입 오류를 수정한 뒤 재빌드 PASS.
-- 최종 Chromium 운영 번들 PC 1440·모바일 390: 연합회/조합 12개 + Pharmacy/MegaPharm 4개 PASS. 실패 입력 보존·재시도·공개 소비·권한 경계·가로 넘침/pageerror 0 확인. 합성 인증/API fixture이며 실제 운영 로그인 검증과 구분한다.
+- 최종 Chromium 운영 번들 PC 1440·모바일 390: 연합회/조합 12개 + Pharmacy/해당 협업체(당시 구명칭) 4개 PASS. 실패 입력 보존·재시도·공개 소비·권한 경계·가로 넘침/pageerror 0 확인. 합성 인증/API fixture이며 실제 운영 로그인 검증과 구분한다.
 - 개발 단계 root lint ratchet 기존 오류 기준선 PASS, 통합 수정 대상 ESLint 오류/경고 0. 원격 CI는 미확인이다.
 
 관련 기록:

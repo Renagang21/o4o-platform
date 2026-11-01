@@ -1,5 +1,8 @@
 # CHECK-O4O-COOPERATIVE-ROLE-AND-MEMBER-MANAGEMENT-V1
 
+> 현행 안내(2026-10-31): 협업체 이름은 **드럭스토어형 약국**, 현재 주소는 `https://drugstore.neture.co.kr`다.
+> **과거 증적의 대상 보존:** 아래 “해당 협업체(당시 구명칭)”·“당시 협업체 구호스트”는 개명·주소 변경 전의 관측 대상이다. 아래 성공·실패·배포 결과를 현재 이름·주소의 운영 검증으로 읽지 않는다. 사용자 지시로 이전 표시명·주소 문자열은 재게시하지 않으며, 문서 경로와 기술 키의 현행 참조 정합은 과거 재실행을 뜻하지 않는다. 당시 원문·실제 호스트 식별자는 기존 Git 이력에서 확인하며 이력을 변경하지 않는다.
+
 - 작성: 2026-10-18
 - 상태: LOCAL_VERIFIED · PUSHED · 운영 미적용
 - branch: `wo/cooperative-role-management`
@@ -26,7 +29,7 @@
 | API tsc --noEmit / tsc build / production tsup bundle | 통과 |
 | 조합 PostgreSQL 실제 SQL 검증 | 19 통과: 역할 분리·타 조합 차단·자격 전이·동시 마지막 admin 해제·CLI dry-run/멱등성·계정 삭제 중 쓰기 차단 |
 | HTTP/기존 사업관리 경계 | 5 suites 37 통과 (조합 PostgreSQL 19 포함) |
-| 기존 협업체 역할 PostgreSQL 회귀 | 12 통과 (pharmacy/carepharm/megapharm/pharmcoop, 해제·만료·전역 역할 경계) |
+| 기존 협업체 역할 PostgreSQL 회귀 | 12 통과 (pharmacy/carepharm/drugstore/pharmcoop, 해제·만료·전역 역할 경계) |
 | 기존 사업 접근·community workspace·개인정보 storage | 3 suites 10 통과 (사업 접근 검증은 위 관련 suite와 중복) |
 | 홈 개인 조합/약국 조직 분리 | 2 suites 3 통과, 약국 정지가 독립된 개인 조합 자격을 정지시키지 않음 |
 | 협동조합 Vitest / build | 5 files 43 통과 / 통과 |

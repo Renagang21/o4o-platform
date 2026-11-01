@@ -69,7 +69,7 @@ Cloud Shell에는 gcloud CLI가 제공된다. 프로젝트를 위 값으로 지�
 
 ## GCP 연결 후 조사·전환
 
-- 실제 pharmacy·megapharm 등 사용 중인 host → URL map → backend → serverless NEG → Cloud Run·revision·이미지 연결과 현재 트래픽을 조사한다.
+- 실제 pharmacy·drugstore 등 사용 중인 host → URL map → backend → serverless NEG → Cloud Run·revision·이미지 연결과 현재 트래픽을 조사한다.
 - Cloud Run은 제자리 rename이 되지 않는다. 새 기술 이름과 소비처를 확정하고 같은 검증 SHA로 새 서비스를 만든 뒤 LB를 전환하는 계획을 작성한다.
 - runtime service account·ingress·env/secret 참조·invoker IAM·최소 인스턴스·label을 검토한다. 기존 GitHub 배포 계정은 새 서비스의 최초 IAM 설정 권한이 없을 수 있다.
 - 디렉터리·package·이미지·CI matrix·rollout registry·CORS·run.app 참조와 raw-source 테스트를 함께 갱신한다. 무조건 배포를 제외하는 예외는 넣지 않는다.

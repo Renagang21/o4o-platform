@@ -38,7 +38,7 @@ class Routing(unittest.TestCase):
         self.assertEqual(c.host_matcher(candidate), {'name': c.MATCHER, 'defaultService': NEW})
         self.assertEqual(candidate['tests'][0]['service'], NEW)
         self.assertEqual(candidate['tests'][1], source['tests'][1])
-        # Retirement's exact pharmacy/megapharm host contract stays valid.
+        # Retirement's exact pharmacy/drugstore host contract stays valid.
         self.assertEqual(t.routed_matcher(candidate, t.NEW), source['pathMatchers'][1])
 
     def test_rollback_keeps_other_hosts_and_no_stale_matcher(self):

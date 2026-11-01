@@ -1,13 +1,13 @@
 import { initialHomePresentation, type HomeSurface } from '@o4o/types';
 
 /** Presentation only. The business key selects a visual identity, never an access scope. */
-export type HeroIdentity = HomeSurface | 'megapharm';
+export type HeroIdentity = HomeSurface | 'drugstore';
 export const heroIdentity = (surface: HomeSurface, businessKey?: string): HeroIdentity =>
-  surface === 'pharmacy' && businessKey === 'megapharm' ? 'megapharm' : surface;
+  surface === 'pharmacy' && businessKey === 'drugstore' ? 'drugstore' : surface;
 
 export function initialIdentityPresentation(surface: HomeSurface, businessKey?: string) {
   const config = initialHomePresentation(surface);
-  if (heroIdentity(surface, businessKey) !== 'megapharm') {
+  if (heroIdentity(surface, businessKey) !== 'drugstore') {
     const copy: Partial<Record<HomeSurface, { title?: string; description?: string; secondTitle?: string }>> = {
       supplier: { secondTitle: '제품의 특징을 매장에 전하세요' },
       funding: { title: '새로운 제품, 참여 조건부터 살펴보세요', description: '제품 소개와 사업별 참여 조건을 확인하고, 나에게 맞는 유통 기회를 검토하세요.' },
@@ -25,11 +25,11 @@ export function initialIdentityPresentation(surface: HomeSurface, businessKey?: 
   return {
     ...config,
     slides: config.slides.map((item, index) => ({
-      ...item, eyebrow: '메가팜 · 창고형약국',
+      ...item, eyebrow: '드럭스토어형 약국',
       title: index === 0 ? '사업 소식과 제품 자료, 가입 약국과 함께' : '필요한 사업 자료를 내 약국에서',
-      description: index === 0 ? '메가팜 사업자의 운영 소식과 제품 자료를 확인하고 가입 약국의 활동을 이어가세요.' : '공유된 자료와 참여 조건을 확인하고, 이용 가능한 업무는 내 약국에서 이어갑니다.',
+      description: index === 0 ? '드럭스토어형 약국 사업자의 운영 소식과 제품 자료를 확인하고 가입 약국의 활동을 이어가세요.' : '공유된 자료와 참여 조건을 확인하고, 이용 가능한 업무는 내 약국에서 이어갑니다.',
     })),
-    promotions: config.promotions.map(item => ({...item, eyebrow:'메가팜 · 창고형약국', title:'메가팜 사업 안내', description:'사업 소식과 제품·운영 자료를 공유하는 가입 약국의 공동공간'})),
+    promotions: config.promotions.map(item => ({...item, eyebrow:'드럭스토어형 약국', title:'드럭스토어형 약국 사업 안내', description:'사업 소식과 제품·운영 자료를 공유하는 가입 약국의 공동공간'})),
   };
 }
 
@@ -41,7 +41,7 @@ export const HERO_DESIGN: Record<HeroIdentity, { name: string; guidance: string;
   community: { name: '질문과 경험', guidance: '함께 나눌 질문·경험·자료를 소개해 주세요. 공개할 수 있는 콘텐츠만 사용하세요.', image: '대화·현장 활동·관심 주제를 보여주는 이미지' },
   carepharm: { name: '관리 자료와 약국 협업', guidance: '사업 소식과 약국이 활용할 관리 자료를 소개해 주세요. 환자 정보나 확인되지 않은 건강 성과는 넣지 마세요.', image: '관리 자료·교육·약국 협업 이미지' },
   pharmacy: { name: '본부와 가입 약국', guidance: '가입 약국에 필요한 본부 소식과 사업 자료를 소개해 주세요. 게시한 내용만 공동공간에 표시됩니다.', image: '본부의 실제 사업 소식·공유 자료 이미지' },
-  megapharm: { name: '창고형 약국 협력사업', guidance: '이 사업의 운영 소식과 제품 자료를 소개해 주세요. 실제 운영 정보는 해당 사업의 담당 범위에서 확인하세요.', image: '사업 운영 현장·제품·활용 자료 이미지' },
+  drugstore: { name: '드럭스토어형 약국 협력사업', guidance: '이 사업의 운영 소식과 제품 자료를 소개해 주세요. 실제 운영 정보는 해당 사업의 담당 범위에서 확인하세요.', image: '사업 운영 현장·제품·활용 자료 이미지' },
   pharmcoop: { name: '협동조합의 연결', guidance: '연합회의 소식과 협동조합 공동 활동을 소개해 주세요. 개별 조합 소식은 각 조합에서 관리합니다.', image: '연합회 공동 활동·협동조합 협력 이미지' },
   cooperative: { name: '우리 조합의 소식', guidance: '우리 조합의 소식과 참여 안내를 소개해 주세요. 공개 가능한 내용만 게시합니다.', image: '우리 조합의 활동·참여 안내 이미지' },
   branch: { name: '지역 회원의 소식', guidance: '우리 분회의 공지·행사·자료를 소개하고 실제 일정이나 게시글로 연결해 주세요.', image: '지역 회원 활동·행사 안내 이미지' },
@@ -92,7 +92,7 @@ export function HeroArtwork({ identity }: { identity: HeroIdentity }) {
         <rect x="227" y="175" width="151" height="67" rx="14" className="hero-art-primary"/><text x="302" y="216" textAnchor="middle" className="hero-art-on-primary">공지 · 행사 · 자료</text>
       </> : <>
         <rect x="49" y="55" width="235" height="165" rx="18" className="hero-art-paper"/><path d="M79 92H251M79 119H224M79 147H243" className="hero-art-line"/>
-        <rect x="220" y="165" width="151" height="75" rx="14" className="hero-art-primary"/><text x="295" y="208" textAnchor="middle" className="hero-art-on-primary">{identity==='megapharm'?'사업 · 제품 소식':'본부 · 가입 약국'}</text>
+        <rect x="220" y="165" width="151" height="75" rx="14" className="hero-art-primary"/><text x="295" y="208" textAnchor="middle" className="hero-art-on-primary">{identity==='drugstore'?'사업 · 제품 소식':'본부 · 가입 약국'}</text>
       </>}
     </svg>
   </div>;

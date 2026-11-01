@@ -15,7 +15,7 @@ const groups = [...new Set(O4O_SERVICE_DIRECTORY.map(item => item.category))].ma
 /** 공개 탐색은 개인 업무·가입·이용 권한과 별개이며 각 서비스의 실제 진입 주소로 연결한다. */
 export function discoveryServiceHasMembership(service: Service, data: HomeEntryData): boolean {
   const businessKey = service.key === 'kpa-society' ? 'pharmacy' : service.key;
-  if (['pharmacy', 'carepharm', 'megapharm'].includes(businessKey) && data.businesses !== undefined) {
+  if (['pharmacy', 'carepharm', 'drugstore'].includes(businessKey) && data.businesses !== undefined) {
     const business = data.businesses.find(item => item.key === businessKey);
     // 사업 원장에 상태가 있으면 서비스 카탈로그나 커뮤니티로 덮어쓰지 않는다.
     if (business) return !!(business.canParticipate || business.membershipStatus);
@@ -23,7 +23,7 @@ export function discoveryServiceHasMembership(service: Service, data: HomeEntryD
   }
   if (service.key === 'cooperative') return (data.cooperatives ?? []).length > 0;
   if (service.key === 'supplier' && data.serviceStates?.supplier?.status && data.serviceStates.supplier.status !== 'none') return true;
-  if ((service.key === 'carepharm' || service.key === 'megapharm') && data.communities?.some(item => item.kind === 'semi-franchise' && item.businessKey === service.key && item.canParticipate)) return true;
+  if ((service.key === 'carepharm' || service.key === 'drugstore') && data.communities?.some(item => item.kind === 'semi-franchise' && item.businessKey === service.key && item.canParticipate)) return true;
   if (service.key === 'store') return (data.workspaceStores ?? data.stores).length > 0;
   return !!data.services.find(item => item.key === service.key)?.membership;
 }

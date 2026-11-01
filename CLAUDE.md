@@ -210,7 +210,7 @@ K-Cosmetics(퇴역 결정 2026-10-05 · 운영 runtime 제거 완료 · 잔여 �
 
 ## 10. KPA Society 구조
 
-옛 단일 도메인 3개 서비스 구조는 은퇴(SUPERSEDED 2026-10-20). 약국 협력사업 `pharmacy` 는 `megapharm` · `pharmcoop` · `carepharm` 과 동급 독립 사업, 분회는 `kpa.neture.co.kr`. 정본: [`O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1`](docs/baseline/O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1.md) · 진행: [`WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1`](docs/work-orders/WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1.md).
+옛 단일 도메인 3개 서비스 구조는 은퇴(SUPERSEDED 2026-10-20). 약국 협력사업 `pharmacy` 는 `drugstore` · `pharmcoop` · `carepharm` 과 동급 독립 사업, 분회는 `kpa.neture.co.kr`. 정본: [`O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1`](docs/baseline/O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1.md) · 진행: [`WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1`](docs/work-orders/WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1.md).
 
 ## 11. Operator Dashboard 표준
 

@@ -95,7 +95,7 @@ it("removes the link and count when the server revokes access", async () => {
   render(
     <ServiceContactInboxLink
       client={client}
-      serviceKey="megapharm"
+      serviceKey="drugstore"
       accountId="legacy-operator"
       enabled
     />,

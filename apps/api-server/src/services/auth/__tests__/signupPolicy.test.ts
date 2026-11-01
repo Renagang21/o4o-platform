@@ -17,8 +17,8 @@ describe('signup policy boundary', () => {
     expect(signupPolicyKeyFromOrigin(origin)).toBe('neture');
     expect(socialOrigin({ get: () => origin } as never)).toEqual({ origin, serviceKey: 'neture' });
   });
-  it('MegaPharm reuses the pharmacy app with the existing account signup and social session scope', () => {
-    const origin = 'https://megapharm.neture.co.kr';
+  it('드럭스토어형 약국 reuses the pharmacy app with the existing account signup and social session scope', () => {
+    const origin = 'https://drugstore.neture.co.kr';
     expect(signupPolicyKeyFromOrigin(origin)).toBe('neture');
     expect(socialOrigin({ get: () => origin } as never)).toEqual({ origin, serviceKey: 'neture' });
   });
@@ -26,7 +26,7 @@ describe('signup policy boundary', () => {
       expect(() => signupPolicyKeyFromOrigin(origin)).toThrow(expect.objectContaining({ code: 'SIGNUP_ORIGIN_NOT_ALLOWED' }));
       expect(() => socialOrigin({ get: () => origin } as never)).toThrow(expect.objectContaining({ code: 'SOCIAL_ORIGIN_NOT_ALLOWED' }));
     });
-  it.each(['neture.co.kr','supplier.neture.co.kr','community.neture.co.kr','funding.neture.co.kr','study.neture.co.kr','store.neture.co.kr','kpa.neture.co.kr','pharmacy.neture.co.kr','megapharm.neture.co.kr','pharmcoop.neture.co.kr'])('preserves the pre-rollout signup agreement for %s', host => {
+  it.each(['neture.co.kr','supplier.neture.co.kr','community.neture.co.kr','funding.neture.co.kr','study.neture.co.kr','store.neture.co.kr','kpa.neture.co.kr','pharmacy.neture.co.kr','drugstore.neture.co.kr','pharmcoop.neture.co.kr'])('preserves the pre-rollout signup agreement for %s', host => {
     expect(signupPolicyKeyFromOrigin(`https://${host}`)).toBe('neture');
   });
   it('uses the same account agreement for Society and catalog www alias', () => {

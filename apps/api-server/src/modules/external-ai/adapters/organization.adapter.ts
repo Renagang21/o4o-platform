@@ -139,8 +139,8 @@ export class OrganizationAdapter {
           ? "https://pharmcoop.neture.co.kr"
           : business.key === "carepharm"
             ? "https://carepharm.neture.co.kr"
-            : business.key === "megapharm"
-              ? "https://megapharm.neture.co.kr"
+            : business.key === "drugstore"
+              ? "https://drugstore.neture.co.kr"
               : "https://pharmacy.neture.co.kr",
       ).href,
     };

@@ -59,7 +59,7 @@ suite('CarePharm issuer → actual client → exchange, isolated PostgreSQL', ()
   });
   afterAll(async () => { if (close) await close(); });
   beforeEach(async () => { generateTokens.mockClear(); await query('TRUNCATE handoff_tokens, browser_session_revocations'); });
-  it.each(['pharmcoop', 'megapharm'])('transports %s accounts to exactly that origin without creating business membership', async key => {
+  it.each(['pharmcoop', 'drugstore'])('transports %s accounts to exactly that origin without creating business membership', async key => {
     const origin = `https://${key}.neture.co.kr`;
     const path = key === 'pharmcoop' ? '/one/community?page=2' : '/materials';
     const href = new URL(await requestServiceHandoff(api, { serviceKey: key, origin, returnPath: path }));

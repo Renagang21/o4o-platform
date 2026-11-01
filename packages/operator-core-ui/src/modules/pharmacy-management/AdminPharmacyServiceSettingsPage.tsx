@@ -115,7 +115,7 @@ export default function AdminPharmacyServiceSettingsPage({
         alive.current &&
         data &&
         preset &&
-        ["pharmacy", "carepharm", "megapharm"].includes(preset) &&
+        ["pharmacy", "carepharm", "drugstore"].includes(preset) &&
         !data.targets.some((item) => item.key === `business:${preset}`)
       )
         setRegistration(preset);

@@ -90,7 +90,7 @@ suite('default Pharmacy enrollment with real approval transactions', () => {
     const [audit] = await db.query("SELECT meta->>'membershipId' AS id FROM action_logs WHERE action_key='pharmacy.default_membership.connect' AND meta->>'organizationId'=$1", [p.organization]);
     expect(audit.id).toBe(prior.id);
   });
-  it.each(['megapharm', 'carepharm'])('does not use automatic Pharmacy enrollment for %s', async key => {
+  it.each(['drugstore', 'carepharm'])('does not use automatic Pharmacy enrollment for %s', async key => {
     const p = await pharmacy('active');
     const id = randomUUID(), organization = randomUUID();
     // This disposable DB has no independently configured business policies.

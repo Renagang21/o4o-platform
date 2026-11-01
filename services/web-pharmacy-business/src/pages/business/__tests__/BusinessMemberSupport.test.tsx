@@ -6,7 +6,7 @@ vi.mock('../../../contexts/AuthContext', () => ({ useAuth: () => ({ user: { id: 
 vi.mock('../api', async importOriginal => ({ ...await importOriginal<typeof import('../api')>(), businessApi: { get: mocks.get } }));
 import BusinessWorkspace from '../BusinessWorkspace';
 afterEach(cleanup);
-it.each(['pharmacy', 'megapharm', 'carepharm'].flatMap(key => ['multiple', 'invalid', 'selected', 'single'].map(mode => ({ key, mode }))))('validates the selected pharmacy before linking support: $key / $mode', async ({ key, mode }) => {
+it.each(['pharmacy', 'drugstore', 'carepharm'].flatMap(key => ['multiple', 'invalid', 'selected', 'single'].map(mode => ({ key, mode }))))('validates the selected pharmacy before linking support: $key / $mode', async ({ key, mode }) => {
   const stores = [{ organizationId: 'store-a', organizationName: '약국 A', memberRole: 'owner' }, ...(mode === 'single' ? [] : [{ organizationId: 'store-b', organizationName: '약국 B', memberRole: 'owner' }])];
   mocks.get.mockReset();
   mocks.get.mockImplementation(async (path: string) => {
@@ -25,6 +25,6 @@ it.each(['pharmacy', 'megapharm', 'carepharm'].flatMap(key => ['multiple', 'inva
   if (mode === 'multiple' || mode === 'invalid') expect(href).toBe('/contact');
   else {
     expect(href).toContain(`?store=${mode === 'single' ? 'store-a' : 'store-b'}#cooperation-support`);
-    if (key === 'megapharm') expect(href).toContain('/businesses/megapharm');
+    if (key === 'drugstore') expect(href).toContain('/businesses/drugstore');
   }
 });

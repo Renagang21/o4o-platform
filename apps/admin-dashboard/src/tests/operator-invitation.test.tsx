@@ -48,7 +48,7 @@ describe('operator invitation admin UI', () => {
     expect(screen.getByRole('heading', { name: '중앙 운영 담당자 지정', exact: true })).toBeTruthy();
     expect(screen.getByRole('radio', { name: /Neture/ })).toBeTruthy();
     expect(screen.queryByRole('radio', { name: /약국 경영지원/ })).toBeNull();
-    expect(screen.queryByRole('radio', { name: /MegaPharm/ })).toBeNull();
+    expect(screen.queryByRole('radio', { name: /드럭스토어형 약국/ })).toBeNull();
     expect(screen.queryByRole('radio', { name: /^분회/ })).toBeNull();
     expect(screen.queryByRole('radio', { name: /CarePharm/ })).toBeNull();
     expect(h.post).not.toHaveBeenCalled();
@@ -60,7 +60,7 @@ describe('operator invitation admin UI', () => {
     render(<MemoryRouter><OperatorsPage /></MemoryRouter>);
     fireEvent.click(screen.getByRole('button', { name: '서비스 담당자 지정' }));
     expect(screen.queryByRole('radio', { name: /약국 경영지원/ })).toBeNull();
-    expect(screen.getByRole('radio', { name: /MegaPharm/ })).toBeTruthy();
+    expect(screen.getByRole('radio', { name: /드럭스토어형 약국/ })).toBeTruthy();
     expect(screen.getByRole('radio', { name: /분회/ })).toBeTruthy();
     expect(h.post).not.toHaveBeenCalled();
     await act(async () => {});

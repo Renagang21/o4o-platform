@@ -13,10 +13,10 @@ vi.mock('@o4o/auth-client', () => ({ authClient: { api: {
 } } }));
 afterEach(() => { cleanup(); vi.clearAllMocks(); });
 describe('four collaborator consent invitations', () => {
-  it.each(['pharmacy', 'carepharm', 'megapharm', 'pharmcoop'])('invites %s without a global Neture role or fabricated membership key', async key => {
+  it.each(['pharmacy', 'carepharm', 'drugstore', 'pharmcoop'])('invites %s without a global Neture role or fabricated membership key', async key => {
     const view = render(<MemoryRouter><OperatorsPage /></MemoryRouter>);
     fireEvent.click(await screen.findByRole('button', { name: '서비스 담당자 지정' }));
-    for (const target of ['pharmacy', 'carepharm', 'megapharm', 'pharmcoop']) {
+    for (const target of ['pharmacy', 'carepharm', 'drugstore', 'pharmcoop']) {
       expect(view.container.querySelector(`input[name="target-service"][value="${target}"]`)).toBeTruthy();
     }
     fireEvent.click(view.container.querySelector(`input[name="target-service"][value="${key}"]`)!);

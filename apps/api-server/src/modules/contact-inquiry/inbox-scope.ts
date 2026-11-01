@@ -268,7 +268,7 @@ export function inboxDestination(scope: InboxScope) {
         ? ((
             {
               carepharm: "https://carepharm.neture.co.kr",
-              megapharm: "https://megapharm.neture.co.kr",
+              drugstore: "https://drugstore.neture.co.kr",
             } as Record<string, string>
           )[scope.key] ?? "https://pharmacy.neture.co.kr")
         : origins[scope.key];
@@ -284,7 +284,7 @@ export function inboxDestination(scope: InboxScope) {
 export function inboxNotificationServiceKey(scope: InboxScope) {
   if (scope.kind === "cooperative") return "pharmcoop";
   if (scope.kind === "business") {
-    return scope.key === "carepharm" || scope.key === "megapharm" ? scope.key : "kpa-society";
+    return scope.key === "carepharm" || scope.key === "drugstore" ? scope.key : "kpa-society";
   }
   return ["store", "pharmcoop"].includes(scope.serviceKey) ? "neture" : scope.serviceKey;
 }

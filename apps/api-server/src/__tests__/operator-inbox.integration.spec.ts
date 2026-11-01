@@ -91,7 +91,7 @@ integration('operator contact/inbox actual SQL, scope and failure recovery',()=>
   await request(app).post(`${base}/business/cooperative-inbox-a/contact`).send(payload).expect(404);
  });
  it('delivers each business inquiry into its host bell scope and an owned inbox route',async()=>{
-  for(const [key,serviceKey]of [['carepharm','carepharm'],['pharmacy','kpa-society'],['megapharm','megapharm']]){
+  for(const [key,serviceKey]of [['carepharm','carepharm'],['pharmacy','kpa-society'],['drugstore','drugstore']]){
    if(key!=='carepharm'){
     const organizationId=randomUUID(),businessId=randomUUID();
     await db.query("INSERT INTO organizations(id,name,code,type) VALUES($1,'Synthetic business',$2,'supplier')",[organizationId,`inbox-${key}`]);

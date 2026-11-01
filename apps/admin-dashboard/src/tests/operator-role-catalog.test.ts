@@ -58,7 +58,7 @@ describe('운영자 역할 카탈로그 — 서버 allowlist 와 일치', () => 
     }
   });
 
-  it.each(['pharmacy','carepharm','megapharm'])('%s는 Admin만 있고 타 사업 역할을 포함하지 않는다', key => {
+  it.each(['pharmacy','carepharm','drugstore'])('%s는 Admin만 있고 타 사업 역할을 포함하지 않는다', key => {
     expect(ASSIGNABLE_ROLES[key].map(option => option.value)).toEqual([`neture:${key}_admin`]);
     expect(ASSIGNABLE_ROLES[key].map(option => option.label)).toEqual(['Admin']);
   });
@@ -120,7 +120,7 @@ it('assigns only Admins while retaining existing Operator role metadata', () => 
   expect(ASSIGNABLE_ROLE_VALUES).toContain('partner-support:admin');
   expect(ASSIGNABLE_ROLE_VALUES.every(role => /(?:[:_])admin$/.test(role))).toBe(true);
   expect(ASSIGNABLE_ROLE_VALUES).not.toContain('partner-support:operator');
-  expect(ASSIGNABLE_ROLE_VALUES).not.toContain('neture:megapharm_operator');
+  expect(ASSIGNABLE_ROLE_VALUES).not.toContain('neture:drugstore_operator');
   expect(CENTRAL_OPERATION_ROLES.has('neture:carepharm_admin')).toBe(false);
   expect(CATALOG_ROLE_VALUES.has('partner-support:operator')).toBe(true);
   expect(findRoleOption('partner-support:operator')?.label).toBe('Operator');

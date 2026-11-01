@@ -9,9 +9,9 @@
  * 협동조합(pharmcoop)은 별도 등록 절차라 이 원장 표시 대상이 아니다.
  */
 
-export const LEDGER_BUSINESS_KEYS = ['pharmacy', 'carepharm', 'megapharm'] as const;
+export const LEDGER_BUSINESS_KEYS = ['pharmacy', 'carepharm', 'drugstore'] as const;
 /** 운영자 화면에서 등록 양식 프리셋 링크를 주는 사업 */
-export const REGISTER_PRESET_KEYS = ['carepharm', 'megapharm'] as const;
+export const REGISTER_PRESET_KEYS = ['carepharm', 'drugstore'] as const;
 
 export type LedgerRowStatus = 'active' | 'closed';
 

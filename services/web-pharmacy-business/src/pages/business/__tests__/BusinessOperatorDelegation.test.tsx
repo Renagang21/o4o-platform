@@ -40,7 +40,7 @@ beforeEach(() => {
   });
 });
 afterEach(cleanup);
-it.each(["pharmacy", "megapharm"])(
+it.each(["pharmacy", "drugstore"])(
   "%s admin reaches its own designation API inside its business page",
   async (business) => {
     state.business = business;
@@ -52,7 +52,7 @@ it.each(["pharmacy", "megapharm"])(
     );
   },
 );
-it.each(["neture:pharmacy_operator", "neture:megapharm_admin", "neture:admin"])(
+it.each(["neture:pharmacy_operator", "neture:drugstore_admin", "neture:admin"])(
   "%s does not expose pharmacy role delegation",
   (role) => {
     state.business = "pharmacy";

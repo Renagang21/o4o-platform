@@ -133,7 +133,7 @@ describe('searchCandidates — 사람을 고르기 위한 검색', () => {
 
 
 describe('collaborator assignment preserves the canonical account and membership state', () => {
-  it.each(['pharmacy','carepharm','megapharm','pharmcoop'].flatMap(key => ['admin','operator'].map(level => `neture:${key}_${level}`)))('%s never grants Neture-wide administration or activates suspended membership', async role => {
+  it.each(['pharmacy','carepharm','drugstore','pharmcoop'].flatMap(key => ['admin','operator'].map(level => `neture:${key}_${level}`)))('%s never grants Neture-wide administration or activates suspended membership', async role => {
     const h = makeHarness({ user: USER, linked: LINKED,
       existingMembership: { userId: 'user-1', serviceKey: 'neture', status: 'suspended' } });
     await expect(h.service.assign({ userId:'user-1',serviceKey:'neture',role }))

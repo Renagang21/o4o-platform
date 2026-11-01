@@ -8,7 +8,7 @@
 
 | 대상 | 현행 주소 · 정본 |
 |---|---|
-| 약국 협력사업 `pharmacy` (다른 협력사업 `megapharm` · `pharmcoop` · `carepharm` 과 동급 독립 사업) | `pharmacy.neture.co.kr` — [`O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1`](O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1.md) |
+| 약국 협력사업 `pharmacy` (다른 협력사업 `drugstore` · `pharmcoop` · `carepharm` 과 동급 독립 사업) | `pharmacy.neture.co.kr` — [`O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1`](O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1.md) |
 | KPA 분회 서비스 `kpa-branch` (약사 개인 대상) | `kpa.neture.co.kr/{분회}` — 같은 문서 |
 | 커뮤니티 (독립 서비스) | `community.neture.co.kr` — [`O4O-ROLE-WORKSPACE-ARCHITECTURE-V1`](O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md) §5 |
 | 데모 서비스 | 제거 완료 (2026-09-17) |

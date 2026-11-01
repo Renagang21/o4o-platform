@@ -85,9 +85,9 @@ export const OPERATOR_ROLE_CATALOG: Record<string, OperatorRoleOption[]> = {
     { value: 'neture:carepharm_admin', label: 'Admin', description: 'carepharm 관리자' },
     { value: 'neture:carepharm_operator', label: 'Operator', description: 'carepharm 운영자' },
   ],
-  megapharm: [
-    { value: 'neture:megapharm_admin', label: 'Admin', description: 'megapharm 관리자' },
-    { value: 'neture:megapharm_operator', label: 'Operator', description: 'megapharm 운영자' },
+  drugstore: [
+    { value: 'neture:drugstore_admin', label: 'Admin', description: '드럭스토어형 약국 관리자' },
+    { value: 'neture:drugstore_operator', label: 'Operator', description: '드럭스토어형 약국 운영자' },
   ],
   pharmcoop: [
     { value: 'neture:pharmcoop_admin', label: 'Admin', description: 'pharmcoop 관리자' },

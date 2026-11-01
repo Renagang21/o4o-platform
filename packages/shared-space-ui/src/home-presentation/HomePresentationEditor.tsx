@@ -39,8 +39,8 @@ export function HomePresentationEditor({
   const Heading = heading;
   const design = HERO_DESIGN[heroIdentity(surface, businessKey)];
   const serviceName =
-    surface === "pharmacy" && businessKey === "megapharm"
-      ? "메가팜 · 창고형약국"
+    surface === "pharmacy" && businessKey === "drugstore"
+      ? "드럭스토어형 약국"
       : HOME_SURFACE_INFO[surface].name;
   const endpoint = homePresentationManagePath(
     surface,

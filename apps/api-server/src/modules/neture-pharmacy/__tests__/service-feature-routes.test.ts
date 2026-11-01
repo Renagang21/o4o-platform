@@ -97,7 +97,7 @@ it('restricts member paid eligibility management to platform administrators and 
 it('requires the configured staff-support feature and preserves owner-only location writes', async () => {
   let enabled = false;
   query.mockImplementation(async (sql: string) => {
-    if (sql.includes('FROM semi_franchises sf')) return enabled ? [{key:'megapharm',name:'메가팜',features:['store-staff-support']}] : [];
+    if (sql.includes('FROM semi_franchises sf')) return enabled ? [{key:'drugstore',name:'드럭스토어형 약국',features:['store-staff-support']}] : [];
     if (sql.includes('AS "ownerUserId"')) return [{ownerUserId:'store-owner'}];
     if (sql.includes("metadata->'pharmacyServiceFeatures'")) return [{ role: 'staff', configured: false }];
     if (sql.includes('WITH products')) return [{id:'product',kind:'local',name:'합성 상품',location:'A-3'}];

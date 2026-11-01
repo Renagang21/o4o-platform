@@ -1,5 +1,8 @@
 # 약국 서비스 설정 통합 TODO
 
+> 현행 안내(2026-10-31): 협업체 이름은 **드럭스토어형 약국**, 현재 주소는 `https://drugstore.neture.co.kr`다.
+> **과거 증적의 대상 보존:** 아래 “해당 협업체(당시 구명칭)”·“당시 협업체 구호스트”는 개명·주소 변경 전의 관측 대상이다. 아래 성공·실패·배포 결과를 현재 이름·주소의 운영 검증으로 읽지 않는다. 사용자 지시로 이전 표시명·주소 문자열은 재게시하지 않으며, 문서 경로와 기술 키의 현행 참조 정합은 과거 재실행을 뜻하지 않는다. 당시 원문·실제 호스트 식별자는 기존 Git 이력에서 확인하며 이력을 변경하지 않는다.
+
 > **상태**: COMPLETED
 > **작성일**: 2026-10-21 · **최종 갱신**: 2026-10-21 (Asia/Seoul)
 > **근거 WO/IR**: 사용자 승인 — 약국 협력사업 메뉴를 약국 서비스 설정으로 통합, 코드·문서 조사 후 개발·검증·push까지
@@ -36,7 +39,7 @@
 
 - 정본 §15-7의 기본/유료/사업 합산을 재사용한다. 제공 기능이 곧 service role이나 약사 자격이라는 해석은 하지 않는다.
 - 공통 화면은 `@o4o/operator-core-ui/modules/pharmacy-management`에서 제공하고 관리자 앱과 Neture 호환 wrapper가 소비한다. 연합회 조회는 관리자 전용 wrapper에 남긴다. OperatorSemiFranchisePage·회원 승인·사업별 자료/포럼 화면은 변경 대상이 아니다.
-- 기존 구 URL의 `register=carepharm/megapharm/pharmcoop`, `section=cooperatives`와 운영자 화면의 사업 등록 링크를 조사했다. 구 URL redirect는 query를 보존하고 신규 링크는 통합 주소를 쓴다.
+- 기존 구 URL의 `register=carepharm/drugstore/pharmcoop`, `section=cooperatives`와 운영자 화면의 사업 등록 링크를 조사했다. 구 URL redirect는 query를 보존하고 신규 링크는 통합 주소를 쓴다.
 - `semi_franchise_operators`의 과거 개별 지정은 실제 runtime 접근 조건이므로 읽기만 남기면 해제를 못 한다. 기존 관리 기능을 중앙 운영자 화면의 접힌 영역으로 이동하고, 기타 사업 지정은 기존 후보 검색과 서버의 Neture 운영 자격 검사를 사용한다. 원본 할당·인가 조건을 변경하지 않는다.
 - 현장 요구 집계의 관리자 component는 소비처가 사라져 제거한다. 수집·저장·기존 관리자 API는 보존하고 서비스 운영자에게 전역 집계를 노출하지 않는다.
 - 신규 읽기 API `GET /neture/admin/member-paid-entitlements/:userId/access`는 기존 전체 관리자 guard·no-store를 적용한다. 경영자 관계·가입 원장을 읽고 기존 createPharmacyFeatureService로 기능 제공 근거를 계산한다. DB schema/migration·역할·가입 승인은 추가하지 않는다.

@@ -221,7 +221,7 @@ it("keeps a successful write distinct from a failed refresh and retries only the
 });
 
 it.each([
-  ['pharmacy', 'store-a'], ['megapharm', 'store-a'], ['carepharm', 'store-a'], ['pharmcoop', undefined],
+  ['pharmacy', 'store-a'], ['drugstore', 'store-a'], ['carepharm', 'store-a'], ['pharmcoop', undefined],
 ])('lets %s members read the full operator material and open its attachment without changing membership scope', async (key, organization) => {
   const api = client();
   const data = payload();

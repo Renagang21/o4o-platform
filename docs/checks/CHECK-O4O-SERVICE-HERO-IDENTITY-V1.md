@@ -1,5 +1,8 @@
 # CHECK-O4O-SERVICE-HERO-IDENTITY-V1
 
+> 현행 안내(2026-10-31): 협업체 이름은 **드럭스토어형 약국**, 현재 주소는 `https://drugstore.neture.co.kr`다.
+> **과거 증적의 대상 보존:** 아래 “해당 협업체(당시 구명칭)”·“당시 협업체 구호스트”는 개명·주소 변경 전의 관측 대상이다. 아래 성공·실패·배포 결과를 현재 이름·주소의 운영 검증으로 읽지 않는다. 사용자 지시로 이전 표시명·주소 문자열은 재게시하지 않으며, 문서 경로와 기술 키의 현행 참조 정합은 과거 재실행을 뜻하지 않는다. 당시 원문·실제 호스트 식별자는 기존 Git 이력에서 확인하며 이력을 변경하지 않는다.
+
 > **진행 현황 안내 (2026-10-30)**: 서비스별 Hero 디자인은 PR #732(`71340f3b7f`)로 main에 반영됐다. 아래 LOCAL_VALIDATING은 통합 전 기록이다. 후속 [Hero 운영 정비 CHECK](CHECK-O4O-SERVICE-HERO-OPERATOR-COMPLETION-V1.md)의 2026-10-20 배포 대상은 #732를 포함한 main이다. 해당 배포와 실제 운영 계정의 편집·게시 검증은 구분한다.
 > 전체 경과와 남은 확인은 [디자인 정비 진행 현황](../guides/O4O-PUBLIC-DESIGN-PROGRESS-V1.md)을 참조한다. 아래 기존 본문·수치·실행일은 과거 회차 기록으로 보존한다.
 
@@ -25,7 +28,7 @@
 | CarePharm | 민트 협업형, 기본 안내 구체화 | 위 Neture 관련 테스트 포함 |
 | 일반 커뮤니티 | 따뜻한 대화형, 콘텐츠 아래 위치 유지 | 위 Neture 관련 테스트 포함 |
 | Lecture | 인디고 학습형·본문 바로 아래 진입 버튼 | 10파일 41개 PASS, 앱 빌드 진행 중 |
-| KPA pharmacy·megapharm | 본부 게시 내용만 표시, 간결한 디자인·사업별 색상 | 공동공간 22개 PASS, 앱 빌드 진행 중 |
+| KPA pharmacy·drugstore | 본부 게시 내용만 표시, 간결한 디자인·사업별 색상 | 공동공간 22개 PASS, 앱 빌드 진행 중 |
 | KPA Branch | 지역 소식형, 분회 범위 유지 | 홈 1개 PASS, 앱 빌드 예정 |
 | 운영자 편집 | 제작 안내·동일 디자인 미리보기 | 27화면 편집·3화면 게시 이미지 PASS, 최종 키보드/저장 검사 진행 중 |
 | 협동조합·내 매장 | 기존 독자 디자인/업무 진입 유지 | 해당 앱 소스 diff 0, 새 Hero 사용 추가 없음 |
@@ -36,7 +39,7 @@
 - Route existence: 기존 링크·서비스 루트·업무 진입 유지, 신규 route 없음.
 - Role guard / capability map: 변경 없음.
 - Visibility/filter: 공개 게시·일정·광고 구분·pharmacy 미게시 시 Hero 없음 유지.
-- Business scope: megapharm의 UI 디자인과 새 초안만 구분, 기존 businessKey endpoint 재사용. 사업/서비스 승인·운영 권한을 만들지 않음.
+- Business scope: drugstore의 UI 디자인과 새 초안만 구분, 기존 businessKey endpoint 재사용. 사업/서비스 승인·운영 권한을 만들지 않음.
 - Published content: 운영자 제목·이미지·링크를 덮어쓰지 않고, 이미지가 있으면 장식 그래픽을 숨김. 새 기본 문구는 미게시 기본 화면/새 초안에만 적용.
 
 ### Smoke result

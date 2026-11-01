@@ -231,7 +231,7 @@ describe("service and workspace navigation", () => {
         businesses: [
           { key: "pharmacy", canParticipate: true, membershipStatus: null },
           { key: "carepharm", canParticipate: true, membershipStatus: "active" },
-          { key: "megapharm", canParticipate: true, membershipStatus: null },
+          { key: "drugstore", canParticipate: true, membershipStatus: null },
         ],
       } },
     } : get(path));
@@ -239,7 +239,7 @@ describe("service and workspace navigation", () => {
     await waitFor(() => expect(panel().getByText("이용 중인 서비스")).toBeTruthy());
     const joined = screen.getByText("이용 중인 서비스").nextElementSibling as HTMLElement;
     expect(within(joined).getByRole("button", { name: "O4O 약국 경영지원 이용 중" })).toBeTruthy();
-    expect(within(joined).getByRole("button", { name: "창고형 약국 이용 중" })).toBeTruthy();
+    expect(within(joined).getByRole("button", { name: "드럭스토어형 약국 이용 중" })).toBeTruthy();
     fireEvent.click(within(joined).getByRole("button", { name: "만성질환관리 이용 중" }));
     await waitFor(() => expect(api.post).toHaveBeenCalledWith("/auth/handoff", {
       targetServiceKey: "carepharm", returnPath: "/",

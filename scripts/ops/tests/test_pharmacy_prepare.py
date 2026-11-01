@@ -32,7 +32,7 @@ def fixtures():
                'protocol': 'HTTP', 'enableCDN': True, 'timeoutSec': 30,
                'backends': [{'group': f'{p.NEG}/neg-{p.OLD}'}]}
     url_map = {'fingerprint': 'live-route-version',
-               'hostRules': [{'hosts': ['pharmacy.neture.co.kr', 'megapharm.neture.co.kr'],
+               'hostRules': [{'hosts': ['pharmacy.neture.co.kr', 'drugstore.neture.co.kr'],
                               'pathMatcher': 'path-matcher-pharmacy'}],
                'pathMatchers': [{'name': 'path-matcher-pharmacy', 'defaultService': f'{p.BACKEND}/backend-{p.OLD}'}]}
     policy = {'bindings': [{'role': 'roles/run.invoker', 'members': ['allUsers']}]}

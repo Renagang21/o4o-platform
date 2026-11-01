@@ -24,7 +24,7 @@ beforeEach(() => {
 });
 afterEach(() => { cleanup(); vi.useRealTimers(); });
 
-it.each([{ keys: [] }, { keys: ['pharmacy'] }, { keys: ['megapharm'] }])('requires this pharmacy CarePharm approval: $keys', async ({ keys }) => {
+it.each([{ keys: [] }, { keys: ['pharmacy'] }, { keys: ['drugstore'] }])('requires this pharmacy CarePharm approval: $keys', async ({ keys }) => {
   state.get.mockResolvedValue({ organizationId: 'store-a', semiFranchiseKeys: keys });
   render(tree()); await screen.findByText(/가입 승인 후/);
   expect(screen.queryByRole('link', { name: '공급제품 보기' })).toBeNull();
