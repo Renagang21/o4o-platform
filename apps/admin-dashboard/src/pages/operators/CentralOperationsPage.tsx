@@ -115,8 +115,8 @@ export default function CentralOperationsPage() {
         <button onClick={logout}>로그아웃</button>
       </header>}
     >
-      {!serviceKey && <CentralOperationNotifications key={`panel:${user.id}`} variant="panel" scopeKey={[...roles, ...menuKeys].sort((left,right)=>left.localeCompare(right)).join('|')} />}
       {!serviceKey && <CentralOperationOverview key={user.id} roleKey={[...roles, ...menuKeys].sort((left,right)=>left.localeCompare(right)).join('|')} />}
+      {!serviceKey && <CentralOperationNotifications key={`panel:${user.id}`} variant="panel" scopeKey={[...roles, ...menuKeys].sort((left,right)=>left.localeCompare(right)).join('|')} />}
       {serviceKey && area && <nav aria-label="현재 위치" className="mb-5 flex flex-wrap items-center gap-2 border-b pb-4 text-sm text-slate-500">
         <Link to="/operations" className="text-blue-700 hover:underline">운영 홈</Link><span aria-hidden>›</span>
         <span>{SERVICES.find(([key]) => key === serviceKey)?.[1]}</span><span aria-hidden>›</span>

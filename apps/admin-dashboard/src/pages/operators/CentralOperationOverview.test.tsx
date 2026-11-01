@@ -59,3 +59,17 @@ it('keeps public intake visible but excludes it from the actual pending workload
  expect(screen.queryByLabelText('공공 수집 자료 등록 준비 선택')).toBeNull();
  expect(screen.getByRole('link',{name:/공공 수집 자료 등록 준비 ·/}).getAttribute('href')).toBe('/operations/neture/candidates?status=active&queue=intake');
 });
+it('prioritizes work waiting over three days and keeps it visible after notification reads', async () => {
+  const old = new Date(Date.now() - 4 * 86400000).toISOString();
+  api.get.mockResolvedValue(response([
+    { key: 'new', service: 'supplier', label: '최근 신청', href: '/operator/suppliers', count: 30, available: true },
+    { key: 'community-improvements', service: 'community', label: '개선 요청', href: 'https://admin.neture.co.kr/operations/community/forums', count: 1, oldest: old, available: true },
+  ] as any)); view();
+  await screen.findByText('3일 이상 대기 · 우선 확인');
+  const region = screen.getByLabelText('업무별 대기 바로가기');
+  expect(region.querySelector('a')?.textContent).toContain('개선 요청');
+  expect(screen.getByText(/알림을 읽어도 대기 건수는 줄지 않습니다/)).toBeTruthy();
+  await act(async () => { window.dispatchEvent(new Event('central-operation-work-changed')); });
+  await waitFor(() => expect(api.get.mock.calls.length).toBeGreaterThan(1));
+  expect(screen.getByRole('link', { name: '개선 요청 업무 열기' }).getAttribute('href')).toBe('/operations/community/forums');
+});

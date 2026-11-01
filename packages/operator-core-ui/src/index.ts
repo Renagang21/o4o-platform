@@ -190,3 +190,4 @@ export * from './modules/community-home-operations/communityHomeApi';
 export { default as CommunityManagementWorkspace } from './modules/community-home-operations/CommunityManagementWorkspace';
 export { default as PartnerCommunityOperator } from './modules/partner-community-operations/PartnerCommunityOperator';
 export * from './modules/partner-community-operations/community-api';
+export { default as ImprovementForum } from './modules/community-improvements/ImprovementForum';

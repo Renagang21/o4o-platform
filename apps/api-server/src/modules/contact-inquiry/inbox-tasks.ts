@@ -172,6 +172,14 @@ export function inboxTaskSources(scope: InboxScope): TaskSource[] {
   }
   if (scope.key === "community") {
     add(
+      "community-improvements",
+      "O4O 개선 요청 처리 대기",
+      "https://admin.neture.co.kr/operations/community/forums?tab=improvements",
+      "forum_post p JOIN forum_category_requests b ON b.id=p.forum_id",
+      "b.slug='o4o-updates-improvements' AND b.service_code='community' AND b.organization_id IS NULL AND b.status='completed' AND b.forum_type='open' AND p.status='publish' AND p.organization_id IS NULL AND p.is_organization_exclusive=false AND p.metadata->'o4oImprovementV1'->'value'->>'kind' IN ('bug','suggestion') AND p.metadata->'o4oImprovementV1'->'value'->>'state' IN ('received','reviewing','planned')",
+      "p.created_at",
+    );
+    add(
       "community-members",
       "커뮤니티 가입 대기",
       "/operator/service-members/community",

@@ -1,3 +1,4 @@
+import CommunityImprovementsPage from './pages/community/CommunityImprovementsPage';
 import { serveOperatorInvitationContinuation } from './lib/operatorInvitationReturn';
 import OperatorInvitePage from './pages/OperatorInvitePage';
 import ScopedContactPage from './pages/ScopedContactPage';
@@ -742,6 +743,7 @@ function App() {
                   <Route path=":id" element={<CommunityEditorialPage kind={kind}/>} />
                 </Route>;
               })}
+              {CURRENT_HOST_PROFILE === 'community' && <Route path="/improvements/:id?" element={<CommunityImprovementsPage />} />}
               <Route path="/communities/:communityKey/public" element={<CommunityPublicPostsPage />} />
               <Route path="/communities/:communityKey/public/post/:slug" element={<CommunityPublicPostsPage />} />
               <Route path="/communities/:communityKey/forum" element={<CommunityWorkspacePage />} />

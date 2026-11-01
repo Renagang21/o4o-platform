@@ -48,3 +48,9 @@ it('exposes the intake reference only to the same delegated candidate menu',asyn
  const denied=await centralOperationOverview(db(),'recipient',['neture:admin'],['neture.inbox']);
  expect(denied.tasks.some(task=>task.key==='product-candidate-intake'||task.key==='product-candidates')).toBe(false);
 });
+it('shows improvement work only to its delegated forum reviewers', async () => {
+ read.mockResolvedValue([{ key: 'community-improvements', label: '개선 요청', href: 'https://admin.neture.co.kr/operations/community/forums', count: 2, oldest: null, available: true }]);
+ expect(centralMenuForTask('community','community-improvements')).toBe('community.forums');
+ expect((await centralOperationOverview(db(),'reviewer',['community:admin'],['community.forums'])).tasks).toHaveLength(1);
+ expect((await centralOperationOverview(db(),'member-admin',['community:admin'],['community.members'])).tasks).toHaveLength(0);
+});

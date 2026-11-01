@@ -1,6 +1,7 @@
 import { centralRequestAuthMethod } from '../middleware/central-operation-menu.middleware.js';
 import { assertCentralOperationRequest } from '../services/admin/central-operation-menu-grants.js';
 import { OperationError } from '../services/operations/operation-audit.js';
+import { createCommunityImprovementRoutes } from './community-improvements.routes.js';
 import { Router, type RequestHandler } from 'express';
 import { AppDataSource } from '../database/connection.js';
 import { asyncHandler } from '../middleware/error-handler.js';
@@ -36,6 +37,7 @@ export function createCommunitiesRoutes(optionalAuth: RequestHandler, authentica
     }
     next();
   });
+  router.use(createCommunityImprovementRoutes(optionalAuth, authenticate, currentCommunityUser));
   router.use(createCommunityHomeRoutes(optionalAuth, authenticate, req => currentCommunityUser(req as AuthRequest)));
   router.use(createCommunityManagementRoutes(authenticate));
   router.use(createCommunityPublicReadRoutes(authenticate, req => currentCommunityUser(req as AuthRequest)));

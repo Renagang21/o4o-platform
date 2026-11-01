@@ -178,6 +178,11 @@ export default function CommunityHostHomePage() {
               <HomeSection section="notice" data={data} />
               <HomeSection section="news" data={data} />
             </div>
+            <section aria-label="O4O 개선·업데이트" className="rounded-xl border border-emerald-200 bg-emerald-50 p-5">
+              <h2 className="text-xl font-bold">O4O 개선·업데이트</h2>
+              <p className="mt-2 text-slate-700">업데이트 소식을 확인하고 오류·불편과 기능 개선 의견을 남겨 주세요.</p>
+              <Link className="mt-3 inline-block min-h-11 content-center font-semibold text-emerald-800 underline" to="/improvements">업데이트 확인·개선 요청 →</Link>
+            </section>
             <HomeSection section="forum" data={data} />
             <HomeSection section="content" data={data} />
             <HomeSection section="resource" data={data} />
