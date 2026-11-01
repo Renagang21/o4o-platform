@@ -117,7 +117,8 @@ export const adminMenuStatic: MenuItem[] = [
   //   현행 12개 공식 주소의 기본 접속 상태를 확인한다. 업무 승인 집계/실행은 각 서비스 소관.
   // ============================================
   { id: 'platform-account-governance', label: '계정 · 운영 권한', icon: <Layers className="w-5 h-5" />, path: '/admin/platform' },
-  { id: 'central-operations', label: '직영 통합 운영', icon: <ClipboardList className="w-5 h-5" />, path: '/operations' },
+  { id: 'operations-operators', label: '업무 운영자 지정', icon: <Shield className="w-5 h-5" />, path: '/admin/operations-operators' },
+  { id: 'central-operations', label: '업무 운영', icon: <ClipboardList className="w-5 h-5" />, path: '/operations' },
   { id: 'pharmacy-service-settings', label: '약국 서비스 설정', icon: <Layers className="w-5 h-5" />, path: '/admin/pharmacy-service-settings' },
   {
     id: 'platform-hub',

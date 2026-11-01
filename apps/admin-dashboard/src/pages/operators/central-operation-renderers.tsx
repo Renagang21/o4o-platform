@@ -8,6 +8,7 @@ import {PharmacyMembershipReviewPage} from '@o4o/operator-core-ui/modules/pharma
 import CentralSharedWork from './CentralSharedWork';
 import CentralOperatorInbox from './CentralOperatorInbox';
 import CentralPharmacistQualifications from './CentralPharmacistQualifications';
+import CentralMemberWorkspace from './CentralMemberWorkspace';
 import CentralLectureOperations from './CentralLectureOperations';
 import CentralFundingOperations from './CentralFundingOperations';
 import CentralSupplierOperations from './CentralSupplierOperations';
@@ -34,7 +35,7 @@ const memberApi={
  delete:(path:string)=>http.delete(path).then(r=>r.data),
 };
 const renderers:Record<string,Renderer>={
- 'neture.members':c=><CentralPharmacistQualifications actorId={c.actorId} directory initialQuery={c.userId ?? ''} onReview={c.menuKeys.includes('neture.qualifications') ? id=>c.navigate(`/operations/neture/qualifications?q=${encodeURIComponent(id)}`):undefined} />,
+ 'neture.members':c=><CentralMemberWorkspace key={c.userId ?? 'directory'} actorId={c.actorId} initialQuery={c.userId ?? ''} />,
  'neture.qualifications':c=><CentralPharmacistQualifications key={c.search} actorId={c.actorId} initialQuery={new URLSearchParams(c.search).get('q') ?? ''} />,
  'neture.service-members':c=><ServiceMembersWorkspace serviceKey="neture" basePath="/operations/neture/service-members" api={memberApi} roles={c.roles} userId={c.userId} navigate={c.navigate} />,
  'neture.pharmacies':()=> <PharmacyMembershipReviewPage />,

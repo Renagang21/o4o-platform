@@ -1,3 +1,4 @@
+import { ADMIN_OPERATIONS_INVITATION_SCOPE } from './admin-operations-operator-contract.js';
 import type { EntityManager } from "typeorm";
 import {
   CENTRAL_DELEGATION_SCOPE,
@@ -26,7 +27,7 @@ export function invitationScope(
   service: string,
 ): InvitationScope {
   if (kind === "platform") {
-    if (key !== '' && key !== CENTRAL_DELEGATION_SCOPE) throw new Error('INVALID_INVITATION_SCOPE');
+    if (key !== '' && key !== CENTRAL_DELEGATION_SCOPE && key !== ADMIN_OPERATIONS_INVITATION_SCOPE) throw new Error('INVALID_INVITATION_SCOPE');
     const r = resolvePlatformInvitationRole(role, service, key);
     return {
       scope_type: kind,

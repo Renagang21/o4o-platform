@@ -46,6 +46,7 @@ describe('메뉴 트리 — 플랫폼 관리자 사이트 canonical 구조', () 
   const EXPECTED_PATHS = [
     '/admin',
     '/operations',
+      '/admin/operations-operators',
     '/admin/platform/hub',
     '/admin/platform',
     '/admin/pharmacy-service-settings',

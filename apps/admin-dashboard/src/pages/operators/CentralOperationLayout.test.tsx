@@ -27,7 +27,7 @@ it('opens the matching business and group for a direct detail URL',()=>{
  expect(screen.getByRole('button',{name:'회원·자격'}).getAttribute('aria-expanded')).toBe('true');expect(screen.getByRole('link',{name:'O4O 서비스 회원·이용 상태'}).getAttribute('aria-current')).toBe('page');
 });
 it('uses the same permitted tree in a mobile dialog and closes on selection with focus returned',()=>{
- view('/operations/neture/candidates');fireEvent.click(screen.getByRole('button',{name:/업무 메뉴/}));const dialog=screen.getByRole('dialog',{name:'통합 운영 메뉴'});
+ view('/operations/neture/candidates');fireEvent.click(screen.getByRole('button',{name:/업무 메뉴/}));const dialog=screen.getByRole('dialog',{name:'업무 운영 메뉴'});
  expect(within(dialog).getByRole('link',{name:'상품 후보 검토'})).toBeTruthy();expect(document.body.style.overflow).toBe('hidden');fireEvent.click(within(dialog).getByRole('link',{name:'상품 후보 검토'}));
  expect(screen.queryByRole('dialog')).toBeNull();expect(document.body.style.overflow).toBe('');
 });

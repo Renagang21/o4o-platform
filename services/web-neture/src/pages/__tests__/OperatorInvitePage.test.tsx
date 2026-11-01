@@ -164,3 +164,13 @@ it('keeps a valid incoming token in memory with storage blocked, including Stric
   await screen.findByText(/확인·수락을 완료했습니다/);
   expect(operatorInvitationReturnPath()).toBe('/');
 });
+
+
+it('shows admin-site daily Operator duties before consent and directs the recipient to operations',async()=>{
+  h.post.mockResolvedValue({data:{data:{serviceKey:'neture',role:'neture:operator',purpose:'assignment',scopeName:'관리자 사이트',adminOperations:true,centralDelegation:true,menuLabels:['공통 회원 관리','공급자 신청 심사']}}});
+  render(<OperatorInvitePage />);
+  expect(await screen.findByText(/관리자 사이트 · 업무 운영자/)).toBeTruthy();
+  expect(screen.getByText('공통 회원 관리')).toBeTruthy();
+  expect(screen.getByRole('link',{name:'업무 운영'}).getAttribute('href')).toBe('https://admin.neture.co.kr/operations');
+  expect(h.post.mock.calls.every(([path])=>path.endsWith('/inspect'))).toBe(true);
+});

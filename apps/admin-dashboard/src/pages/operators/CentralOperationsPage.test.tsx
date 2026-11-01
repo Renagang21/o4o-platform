@@ -79,7 +79,7 @@ it("service roles alone do not show operating screens when server delegation is 
   mock.get.mockRejectedValueOnce(new Error("denied"));
   view("/operations/supplier/members");
   expect(await screen.findByRole("alert")).toHaveTextContent(
-    "유효한 업무 위임",
+    "업무 운영자 지정",
   );
   expect(screen.queryByText("members:supplier")).toBeNull();
 });
@@ -115,7 +115,7 @@ it("preserves unsaved work during successful background delegation checks and re
   mock.get.mockRejectedValueOnce(new Error("revoked"));
   fireEvent(window, new Event("focus"));
   expect(await screen.findByRole("alert")).toHaveTextContent(
-    "유효한 업무 위임",
+    "업무 운영자 지정",
   );
   expect(screen.queryByLabelText("작성 중")).toBeNull();
 });

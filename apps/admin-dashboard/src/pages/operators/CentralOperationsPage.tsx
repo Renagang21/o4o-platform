@@ -41,7 +41,7 @@ export default function CentralOperationsPage() {
       if (seq === sequence.current) {
         setGrant(null);
         setError(
-          "Google 로그인과 중앙 관리자의 유효한 업무 위임이 필요합니다.",
+          "Google 로그인과 전체 관리자의 업무 운영자 지정이 필요합니다.",
         );
       }
     }
@@ -108,10 +108,10 @@ export default function CentralOperationsPage() {
   return (
     <CentralOperationLayout services={allowed} menus={visibleMenus} header={
       <header className="flex flex-wrap items-center gap-4 border-b bg-white px-4 py-4 md:px-8">
-        <h1 className="text-2xl font-bold">O4O 통합 운영</h1>
+        <h1 className="text-2xl font-bold">O4O 업무 운영</h1>
         <Link to="/operations">위임 업무</Link>
         <CentralOperationNotifications key={user.id} scopeKey={[...roles, ...menuKeys].sort((left,right)=>left.localeCompare(right)).join('|')} />
-        {isPlatform && <Link to="/admin">전체 관리자</Link>}
+        {isPlatform && <><Link to="/admin/operations-operators">업무 운영자 지정</Link><Link to="/admin">전체 관리자</Link></>}
         <button onClick={logout}>로그아웃</button>
       </header>}
     >

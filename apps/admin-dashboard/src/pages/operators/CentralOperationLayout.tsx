@@ -31,7 +31,7 @@ export default function CentralOperationLayout({services, menus, header, childre
     return () => { document.body.style.overflow = previous; query?.removeEventListener('change',resize); };
   },[mobileOpen]);
   const toggle = (values: string[], key: string) => values.includes(key) ? values.filter(value => value !== key) : [...values,key];
-  const nav = (prefix: string) => <nav aria-label="통합 운영 메뉴" className="space-y-1">
+  const nav = (prefix: string) => <nav aria-label="업무 운영 메뉴" className="space-y-1">
     <Link to="/operations" aria-current={pathname === '/operations' ? 'page' : undefined} onClick={() => setMobileOpen(false)} className={`flex gap-2 rounded-lg px-3 py-3 text-sm font-medium ${pathname === '/operations' ? 'bg-blue-50 text-blue-800' : 'text-slate-700 hover:bg-slate-50'}`}><Home size={18} aria-hidden/>운영 홈·알림</Link>
     {services.map(([key,label]) => <section key={key}>
       <button type="button" aria-expanded={openServices.includes(key)} aria-controls={`${prefix}-${key}`} onClick={() => setOpenServices(old => toggle(old,key))} className={`flex w-full items-center justify-between gap-2 rounded-lg px-3 py-3 text-left text-sm font-semibold ${activeService === key ? 'bg-blue-50 text-blue-800' : 'text-slate-700 hover:bg-slate-50'}`}><span>{label}</span><ChevronDown aria-hidden size={16} className={openServices.includes(key) ? 'rotate-180' : ''}/></button>
@@ -56,7 +56,7 @@ export default function CentralOperationLayout({services, menus, header, childre
         <main className="min-w-0 flex-1">{children}</main>
       </div>
     </div>
-    {mobileOpen && <OperatorDialog label="통합 운영 메뉴" fallbackFocus={trigger} dismissOnBackdrop onCancel={() => setMobileOpen(false)} className="max-w-sm rounded-xl bg-white p-3">
+    {mobileOpen && <OperatorDialog label="업무 운영 메뉴" fallbackFocus={trigger} dismissOnBackdrop onCancel={() => setMobileOpen(false)} className="max-w-sm rounded-xl bg-white p-3">
       <div className="mb-3 flex items-center justify-between border-b pb-3"><h2 className="font-semibold">업무 메뉴</h2><button type="button" data-dialog-initial-focus aria-label="메뉴 닫기" className="rounded p-2" onClick={() => setMobileOpen(false)}><X size={20}/></button></div>{nav('mobile')}
     </OperatorDialog>}
   </div>;
