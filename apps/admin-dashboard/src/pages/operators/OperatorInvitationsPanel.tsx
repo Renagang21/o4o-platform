@@ -32,7 +32,7 @@ export default function OperatorInvitationsPanel({
         '/admin/service-operator-invitations',
       );
       if (!Array.isArray(res.data?.data)) throw new Error('INVALID_RESPONSE');
-      setRows(res.data.data);
+      setRows(res.data.data.filter((row: Invite) => row.scope_key !== 'admin-operations'));
       onLoaded(res.data.data);
       setError('');
     } catch {

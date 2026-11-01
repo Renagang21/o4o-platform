@@ -46,6 +46,7 @@ export const menuPermissions: MenuPermission[] = [
   //   관리자 SPA 진입 floor(App.tsx)가 이미 platform:super_admin 전용이므로
   //   노출 범위는 변하지 않고 선언만 명시화된다.
   { menuId: 'platform-account-governance', roles: [...PLATFORM_ADMIN_ROLES] },
+  { menuId: 'operations-operators', roles: [...PLATFORM_ADMIN_ROLES] },
   { menuId: 'central-operations', roles: [...PLATFORM_ADMIN_ROLES] },
   { menuId: 'pharmacy-service-settings', roles: [...PLATFORM_ADMIN_ROLES] },
   {

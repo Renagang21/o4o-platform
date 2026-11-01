@@ -132,11 +132,12 @@ describe('Demo 계정 보호 계약', () => {
   // [파일, 판정 호출 패턴, 그 판정보다 **뒤에** 와야 하는 첫 write 패턴, (선택) 검사를 시작할 method]
   const WRITE_GUARDS: Array<[string, RegExp, RegExp, string?]> = [
     // 이메일 · role 변경
+    ['services/admin/admin-operations-operators.ts', /await demoAccountService\.assertNotDemoAccount\(userId, m\)/, /roleAssignmentService\.removeRole\(|activateOperationsOperator\(/, 'async change('],
     ['controllers/admin/AdminUserController.ts', /isDemoAccount\(user\.id\)/, /applyAdminRoleEdit\(user\.id/],
     ['controllers/UserManagementController.ts', /isDemoAccount\(/, /applyAdminRoleEdit\(/],
     ['routes/admin/platform-accounts.routes.ts', /isDemoAccount\(/, /assignRole\(/],
-    ['services/admin/service-operator-invitation.service.ts', /await this\.target\(\s*m,\s*input\.targetUserId,\s*scope\s*\)/, /INSERT INTO service_operator_invitations/, 'async prepare('],
-    ['services/admin/service-operator-invitation.service.ts', /await this\.prove\(m, i, userId\)/, /activateInvitation\(/, 'async accept('],
+    ['services/admin/service-operator-invitation.service.ts', /await this\.target\(\s*m,\s*input\.targetUserId\s*\)/, /INSERT INTO service_operator_invitations/, 'async prepare('],
+    ['services/admin/service-operator-invitation.service.ts', /await this\.prove\(m, i, userId\)/, /activate(?:OperationsOperator|Invitation)\(/, 'async accept('],
     ['modules/auth/controllers/auth-account.controller.ts', /assertNotDemoAccount\(/, /UPDATE role_assignments/],
     ['modules/lms/controllers/InstructorController.ts', /isDemoAccount\(/, /repo\.save\(/, 'async approveApplication('],
     ['modules/neture/services/operator-registration.service.ts', /assertNotDemoAccount\(/, /UPDATE service_memberships/],
@@ -166,7 +167,9 @@ describe('Demo 계정 보호 계약', () => {
   it('consent delegates preserve the Demo target check instead of granting directly', () => {
     const source=read('services/admin/service-operator-invitation.service.ts');
     const proof=source.slice(source.indexOf('private async prove('),source.indexOf('async inspect('));
-    expect(proof).toMatch(/await this\.target\(m, userId, this\.scope\(invite\)\)/);
+    expect(proof).toMatch(/this\.scope\(invite\)/);
+    expect(proof).toMatch(/await this\.target\(m, userId\)/);
+    expect(proof.indexOf('this.scope(invite)')).toBeLessThan(proof.indexOf('await this.target(m, userId)'));
     const branch=read('services/kpa-branch/branch-operator-designation.service.ts');
     const designation=branch.slice(branch.indexOf('async designate('),branch.indexOf('async release('));
     expect(designation).toContain('ServiceOperatorInvitationService');expect(designation).toContain('.create(');

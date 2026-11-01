@@ -5,6 +5,7 @@ import { PLATFORM_ADMIN_ROLES } from '@/config/rolePermissions';
 
 const ActiveUsers = lazy(() => import('@/pages/users/ActiveUsers'));
 // Operators Management (admin.neture.co.kr)
+const AdminOperationsOperatorsPage = lazy(() => import('@/pages/operators/AdminOperationsOperatorsPage'));
 const OperatorsPage = lazy(() => import('@/pages/operators'));
 // WO-O4O-ADMIN-DASHBOARD-LEGACY-ROUTE-API-AND-NAVIGATION-CLOSURE-V1 (§8 · §9):
 //   `/enrollments` · `/admin/enrollments` (pages/enrollments/EnrollmentManagement) 와
@@ -30,6 +31,7 @@ const PageLoader = () => (
  */
 export function UserRoutes() {
   return [
+    <Route key="/admin/operations-operators" path="/admin/operations-operators" element={<AdminProtectedRoute requiredRoles={[...PLATFORM_ADMIN_ROLES]}><Suspense fallback={<PageLoader />}><AdminOperationsOperatorsPage /></Suspense></AdminProtectedRoute>} />,
     // 현재 접속자
     <Route key="/active-users" path="/active-users" element={
       <AdminProtectedRoute requiredRoles={['admin', 'super_admin']}>

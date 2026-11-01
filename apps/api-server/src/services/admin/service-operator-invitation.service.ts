@@ -1,3 +1,5 @@
+import { ADMIN_OPERATIONS_OPERATOR_MENUS, isAdminOperationsInvitation, validateAdminOperationsMenus } from './admin-operations-operator-contract.js';
+import { assertOperationsTarget, activateOperationsOperator } from './admin-operations-operators.js';
 import { centralMenusForRole } from '@o4o/types';
 import { validateCentralMenuKeys } from './central-operation-menu-grants.js';
 import { resolvePlatformInvitationRole, CENTRAL_DELEGATION_SCOPE } from "../../config/operator-role-catalog.js";
@@ -49,6 +51,9 @@ const hash = (s: string) => createHash("sha256").update(s).digest("hex");
 const fail = (code: string, status = 409): never => {
   throw new ServiceOperatorInvitationError(code, status);
 };
+const duplicateScopePredicate = (workspace: boolean) => workspace
+  ? 'scope_type=$6 AND scope_key=$7'
+  : "(($6 IN ('platform','service') AND scope_type IN ('platform','service')) OR (scope_type=$6 AND scope_key=$7))";
 const COLUMNS =
   "id,scope_type,scope_key,invited_email,service_key,role,target_user_id,purpose,status,expires_at,accepted_user_id,invited_by_user_id,created_at,updated_at,accepted_at";
 export type InvitationMailer = (
@@ -57,6 +62,7 @@ export type InvitationMailer = (
   role: string,
   confirmation: boolean,
   centralDelegation?: boolean,
+  adminOperations?: boolean,
 ) => Promise<boolean>;
 
 async function defaultMailer(
@@ -65,12 +71,13 @@ async function defaultMailer(
   role: string,
   confirmation: boolean,
   centralDelegation = false,
+  adminOperations = false,
 ): Promise<boolean> {
   const { emailService } = await import("../email.service.js");
   const result = await emailService.sendEmail({
     to,
     ephemeral: true,
-    ...buildOperatorInvitationMail(url, role, confirmation, centralDelegation),
+    ...buildOperatorInvitationMail(url, role, confirmation, centralDelegation, adminOperations),
   });
   if (result.success) logger.info("[OperatorInvitation] SMTP accepted invitation mail");
   else logger.warn("[OperatorInvitation] Invitation mail delivery not confirmed");
@@ -167,7 +174,6 @@ export class ServiceOperatorInvitationService {
   private async target(
     m: EntityManager,
     id: string,
-    scope: InvitationScope,
   ): Promise<User> {
     if (!UUID.test(id)) fail("INVALID_USER_ID", 400);
     const [user]: User[] = await m.query(
@@ -225,15 +231,16 @@ export class ServiceOperatorInvitationService {
       input.role,
       input.serviceKey,
     );
-    const central = scope.scope_type === 'platform' && scope.scope_key === CENTRAL_DELEGATION_SCOPE;
+    const workspace = isAdminOperationsInvitation(scope);
+    const central = workspace || scope.scope_type === 'platform' && scope.scope_key === CENTRAL_DELEGATION_SCOPE;
     if (!central && input.menuKeys !== undefined) fail('INVALID_INVITATION_INPUT', 400);
-    const menuKeys = central ? validateCentralMenuKeys(scope.role, input.menuKeys ?? centralMenusForRole(scope.role).map(menu => menu.key)) : null;
+    const menuKeys = workspace ? validateAdminOperationsMenus(input.menuKeys === undefined ? ADMIN_OPERATIONS_OPERATOR_MENUS.map(menu => menu.key) : input.menuKeys) : central ? validateCentralMenuKeys(scope.role, input.menuKeys ?? centralMenusForRole(scope.role).map(menu => menu.key)) : null;
     // Target lock precedes every role/cooperative mutation, including acceptance and revocation.
     if (input.targetUserId)
       await lockOperatorAssignments(m, input.targetUserId);
     await this.authority(m, scope, input.actorId, input.targetUserId);
     const user = input.targetUserId
-      ? await this.target(m, input.targetUserId, scope)
+      ? await this.target(m, input.targetUserId)
       : null;
     const email = normalizeLoginEmail(user?.email ?? input.email);
     if (!isLoginEmailShapeValid(email)) fail("INVALID_EMAIL", 400);
@@ -246,7 +253,10 @@ export class ServiceOperatorInvitationService {
       ).length
     )
       fail("USER_SELECTION_REQUIRED");
-    if (user) await this.requireUnassignedRole(m, scope, user.id);
+    if (user) {
+      if (workspace) await assertOperationsTarget(m, user.id, menuKeys!);
+      else await this.requireUnassignedRole(m, scope, user.id);
+    }
     await m.query("SELECT pg_advisory_xact_lock(hashtextextended($1,0))", [
       hash(
         `${email}:${scope.service_key}:${scope.role}:${scope.scope_type}:${scope.scope_key}`,
@@ -311,7 +321,8 @@ export class ServiceOperatorInvitationService {
         p.url,
         p.invite.role,
         false,
-        p.invite.scope_type === 'platform' && p.invite.scope_key === CENTRAL_DELEGATION_SCOPE,
+        isAdminOperationsInvitation(p.invite) || p.invite.scope_type === 'platform' && p.invite.scope_key === CENTRAL_DELEGATION_SCOPE,
+        ...(isAdminOperationsInvitation(p.invite) ? [true] as [boolean] : []),
       );
     } catch {
       /* Never log recipient/token/transport errors. */
@@ -369,7 +380,7 @@ export class ServiceOperatorInvitationService {
         return { invite: closed, url: null };
       }
       if (row.target_user_id) {
-        const user = await this.target(m, row.target_user_id, this.scope(row));
+        const user = await this.target(m, row.target_user_id);
         if (
           normalizeLoginEmail(user.email) !==
           normalizeLoginEmail(row.invited_email)
@@ -400,7 +411,8 @@ export class ServiceOperatorInvitationService {
   ) {
     if (invite.target_user_id && invite.target_user_id !== userId)
       fail("INVITATION_ACCOUNT_MISMATCH", 403);
-    const user = await this.target(m, userId, this.scope(invite));
+    this.scope(invite); // Keep current scope validation on inspection as well as acceptance.
+    const user = await this.target(m, userId);
     if (
       normalizeLoginEmail(user.email) !==
       normalizeLoginEmail(invite.invited_email)
@@ -417,6 +429,9 @@ export class ServiceOperatorInvitationService {
     purpose: string;
     scopeName?: string;
     centralDelegation?: boolean;
+    adminOperations?: boolean;
+    menuKeys?: string[];
+    menuLabels?: string[];
   }> {
     if (!/^[a-f0-9]{64}$/.test(token))
       fail("INVALID_OR_EXPIRED_INVITATION", 400);
@@ -439,22 +454,30 @@ export class ServiceOperatorInvitationService {
         );
         scopeName = context?.name;
       }
-      const central = i.scope_type === 'platform' && i.scope_key === CENTRAL_DELEGATION_SCOPE;
+      const workspace = isAdminOperationsInvitation(i);
+      const central = workspace || i.scope_type === 'platform' && i.scope_key === CENTRAL_DELEGATION_SCOPE;
       const [grant] = central ? await m.query('SELECT menu_keys FROM central_operation_menu_grants WHERE invitation_id=$1', [i.id]) : [];
-      const menus = central ? centralMenusForRole(i.role).filter(menu => !grant || grant.menu_keys.includes(menu.key)) : [];
+      if (workspace) validateAdminOperationsMenus(grant?.menu_keys);
+      const menus = central ? (workspace ? ADMIN_OPERATIONS_OPERATOR_MENUS : centralMenusForRole(i.role)).filter(menu => !grant || grant.menu_keys.includes(menu.key)) : [];
       return {
         ...(central ? { menuKeys: menus.map(menu => menu.key), menuLabels: menus.map(menu => menu.label) } : {}),
         serviceKey: i.service_key,
         role: i.role,
         purpose: i.purpose,
-        centralDelegation: i.scope_type === 'platform' && i.scope_key === CENTRAL_DELEGATION_SCOPE,
-        ...(scopeName ? { scopeName } : {}),
+        centralDelegation: central,
+        ...(workspace ? { adminOperations: true } : {}),
+        ...(scopeName ? { scopeName: workspace ? '관리자 사이트' : scopeName } : {}),
       };
     });
   }
   private async saveInvitationMenus(m: EntityManager, invitationId: string, keys: string[]) {
     await m.query(`INSERT INTO central_operation_menu_grants(invitation_id,menu_keys) VALUES($1,$2)
       ON CONFLICT(invitation_id) DO UPDATE SET menu_keys=$2,updated_at=clock_timestamp()`, [invitationId, keys]);
+  }
+  private async recordAcceptedAssignment(m: EntityManager, invite: OperatorInvite, userId: string, menuKeys?: string[]) {
+    if (isAdminOperationsInvitation(invite)) return; // Per-role workspace audit is already recorded by the role activation helper.
+    await recordOperation(m, invite.service_key, invite.invited_by_user_id, 'admin.service_operator_assigned',
+      { scope: invite.scope_key, targetUserId: userId, role: invite.role, ...(menuKeys ? { menuKeys } : {}) });
   }
   async accept(
     token: string,
@@ -499,15 +522,20 @@ export class ServiceOperatorInvitationService {
       if (i.scope_type === "platform") resolvePlatformInvitationRole(i.role, i.service_key, i.scope_key);
       const user = await this.prove(m, i, userId),
         scope = this.scope(i);
-      await this.requireUnassignedRole(m, scope, user.id);
-      const ensured = await activateInvitation(
-        m,
-        scope,
-        i.invited_by_user_id ?? "",
-        user.id,
-      );
+      const workspace = isAdminOperationsInvitation(scope);
       let acceptedMenuKeys: string[] | undefined;
-      if (scope.scope_type === 'platform' && scope.scope_key === CENTRAL_DELEGATION_SCOPE) {
+      let ensured;
+      if (workspace) {
+        const [pending] = await m.query('SELECT menu_keys FROM central_operation_menu_grants WHERE invitation_id=$1 FOR UPDATE', [i.id]);
+        // A missing bundle definition must never turn into all workspace duties.
+        acceptedMenuKeys = validateAdminOperationsMenus(pending?.menu_keys);
+        ensured = await activateOperationsOperator(m, i.invited_by_user_id!, user.id, acceptedMenuKeys);
+        await m.query('DELETE FROM central_operation_menu_grants WHERE invitation_id=$1', [i.id]);
+      } else {
+        await this.requireUnassignedRole(m, scope, user.id);
+        ensured = await activateInvitation(m, scope, i.invited_by_user_id ?? "", user.id);
+      }
+      if (!workspace && scope.scope_type === 'platform' && scope.scope_key === CENTRAL_DELEGATION_SCOPE) {
         const [pending] = await m.query('SELECT menu_keys FROM central_operation_menu_grants WHERE invitation_id=$1 FOR UPDATE', [i.id]);
         const menus = validateCentralMenuKeys(i.role, pending?.menu_keys ?? centralMenusForRole(i.role).map(menu => menu.key));
         acceptedMenuKeys = menus;
@@ -526,7 +554,7 @@ export class ServiceOperatorInvitationService {
       await m.query(
         `UPDATE service_operator_invitations SET status='cancelled',invited_email=NULL,token_hash=NULL,updated_at=$5
         WHERE id<>$1 AND status='pending' AND role=$3 AND (target_user_id=$2 OR lower(invited_email)=$4)
-        AND (($6 IN ('platform','service') AND scope_type IN ('platform','service')) OR (scope_type=$6 AND scope_key=$7))`,
+        AND ${duplicateScopePredicate(workspace)}`,
         [
           i.id,
           user.id,
@@ -537,17 +565,12 @@ export class ServiceOperatorInvitationService {
           i.scope_key,
         ],
       );
-      await recordOperation(
-        m,
-        i.service_key,
-        i.invited_by_user_id,
-        "admin.service_operator_assigned",
-        { scope: i.scope_key, targetUserId: user.id, role: i.role, ...(acceptedMenuKeys ? {menuKeys:acceptedMenuKeys} : {}) },
-      );
+      await this.recordAcceptedAssignment(m, i, user.id, acceptedMenuKeys);
       return {
         serviceKey: i.service_key,
         role: i.role,
         purpose: i.purpose,
+        ...(workspace ? { adminOperations: true } : {}),
         ...(ensured && "policy" in ensured
           ? {
               membershipPolicy: ensured.policy,
