@@ -1,3 +1,4 @@
+import { centralNotificationMenuPredicate } from './central-notification-scope.js';
 import type { DataSource } from 'typeorm';
 import { centralMenusForRole, type CentralOperationService } from '@o4o/types';
 import { readInboxTasks } from '../../modules/contact-inquiry/inbox-tasks.js';
@@ -58,7 +59,7 @@ export async function centralOperationOverview(db: Pick<DataSource, 'query'>, us
   });
   let unreadCount: number | null = null;
   try {
-    const [row] = await db.query(`SELECT COUNT(*)::int count FROM notifications WHERE "userId"=$1 AND "isRead"=false AND "serviceKey"=ANY($2::text[]) AND "organizationId" IS NULL AND (metadata->>'operationMenu' IS NULL OR metadata->>'operationMenu'=ANY($3::text[]))`, [userId, services, [...allowed]]);
+    const [row] = await db.query(`SELECT COUNT(*)::int count FROM notifications WHERE "userId"=$1 AND "isRead"=false AND "serviceKey"=ANY($2::text[]) AND "organizationId" IS NULL AND ${centralNotificationMenuPredicate}`, [userId, services, [...allowed]]);
     unreadCount = Number(row.count);
   } catch { /* A failed count is unavailable, never a fabricated zero. */ }
   return { services, tasks, unreadCount, generatedAt: new Date().toISOString() };

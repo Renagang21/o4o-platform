@@ -32,6 +32,15 @@ export function centralTaskHref(service: string, href: string): string {
       return allowed || detail ? `${url.pathname}${url.search}${url.hash}` : fallback;
     }
     if (url.origin !== origin || url.protocol !== 'https:') return fallback;
+    const contact = /^\/operator\/(?:service-contact\/|inbox\/open\/service\/)([a-z0-9-]+)$/.exec(url.pathname);
+    if (contact) {
+      const key = contact[1];
+      if (service === 'neture' && ['neture','store','hospital','kpa-society','kpa-branch'].includes(key)) {
+        url.searchParams.set('contactService', key);
+        return native('inbox');
+      }
+      if (key === service && centralOperationAreas[service]?.includes('inbox')) return native(service === 'lecture' ? 'contact' : 'inbox');
+    }
     if (service === 'funding') {
       const detail = /^\/operator\/market-trial\/([^/]+)(?:\/offline-operations)?$/.exec(url.pathname);
       if (detail) return native('funding', `/${detail[1]}`);

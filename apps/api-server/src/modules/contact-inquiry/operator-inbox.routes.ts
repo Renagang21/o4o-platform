@@ -27,7 +27,7 @@ import {
   inboxRecipients,
   type InboxScope,
 } from "./inbox-scope.js";
-import { serviceContactRecipients } from "./contact-recipients.js";
+import { centralContactRecipients } from "./central-contact-access.js";
 import {
   deliverOperatorNotifications,
   persistOperatorNotification,
@@ -170,7 +170,7 @@ export function createOperatorInboxRoutes(ds: DataSource) {
               delivery = "none";
               assignmentDelivery = "fail";
               assignmentDelivery = await deliverOperatorNotifications(
-                await serviceContactRecipients(manager, "neture", "neture"),
+                await centralContactRecipients(manager, "neture.inbox"),
                 (op) =>
                   send({
                     userId: op.userId,
@@ -180,6 +180,7 @@ export function createOperatorInboxRoutes(ds: DataSource) {
                     serviceKey: "neture",
                     metadata: {
                       assignmentRequired: true,
+                      operationMenu: "neture.inbox",
                       assignmentReceipt: createHash("sha256")
                         .update(saved.id)
                         .digest("hex"),

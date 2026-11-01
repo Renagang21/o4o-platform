@@ -1,3 +1,6 @@
+import { CENTRAL_CONTACT_MENUS, assertCentralContactAccess } from './central-contact-access.js';
+import { centralRequestAuthMethod } from '../../middleware/central-operation-menu.middleware.js';
+import { OperationError } from '../../services/operations/operation-audit.js';
 import { centralOperationRequest } from '../../middleware/central-operation-menu.middleware.js';
 import type { RequestHandler } from "express";
 import type { DataSource } from "typeorm";
@@ -150,6 +153,15 @@ export function requireContactScope(
         },
       });
       return;
+    }
+    if (level === 'operator' && CENTRAL_CONTACT_MENUS[key]) {
+      try {
+        await assertCentralContactAccess(db, req.user!.id, key, centralRequestAuthMethod(req));
+        return next();
+      } catch (error) {
+        if (error instanceof OperationError) { res.status(error.status).json({success:false,code:error.code,error:error.message}); return; }
+        return next(error);
+      }
     }
     if (key === "kpa-branch")
       return requireKpaBranchScope("kpa-branch:admin")(req, res, next);

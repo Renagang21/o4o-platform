@@ -47,3 +47,15 @@ it('keeps common account lookup separate from Neture service membership work',()
  expect(centralTaskHref('neture','/operator/users')).toBe('/operations/neture/service-members');
  expect(centralTaskHref('neture','/operator/users/synthetic-member')).toBe('/operations/neture/service-members/synthetic-member');
 });
+
+it.each([
+ ['neture','/operator/service-contact/neture','/operations/neture/inbox?contactService=neture'],
+ ['neture','/operator/service-contact/store','/operations/neture/inbox?contactService=store'],
+ ['neture','/operator/inbox/open/service/hospital','/operations/neture/inbox?contactService=hospital'],
+ ['neture','/operator/service-contact/kpa-branch','/operations/neture/inbox?contactService=kpa-branch'],
+ ['pharmcoop','/operator/service-contact/pharmcoop','/operations/pharmcoop/inbox'],
+ ['lecture','/operator/inbox/open/service/lecture','/operations/lecture/contact'],
+])('opens %s contact alerts in the central receiving workspace', (service,path,target) => {
+ expect(centralTaskHref(service,path)).toBe(target);
+ expect(centralTaskHref(service,`https://admin.neture.co.kr${target}`)).toBe(target);
+});

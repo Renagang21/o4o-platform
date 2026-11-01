@@ -1,3 +1,4 @@
+import { centralNotificationMenuPredicate } from '../../services/admin/central-notification-scope.js';
 import { Router } from "express";
 import {
   authenticate,
@@ -56,9 +57,9 @@ centralOperationAccessRouter.get('/notifications', async (req: AuthRequest, res)
     const keys: string[] = res.locals.centralOperationMenus;
     const services = [...new Set(CENTRAL_OPERATION_MENUS.filter(menu => keys.includes(menu.key)).map(menu => menu.service))];
     const rows = await AppDataSource.query(`SELECT id,type,title,message,metadata,"serviceKey","isRead","createdAt" FROM notifications
-      WHERE "userId"=$1 AND "serviceKey"=ANY($2::text[]) AND "organizationId" IS NULL AND (metadata->>'operationMenu' IS NULL OR metadata->>'operationMenu'=ANY($3::text[])) ORDER BY "isRead" ASC,"createdAt" DESC,id DESC LIMIT 20`, [req.user!.id, services, keys]);
+      WHERE "userId"=$1 AND "serviceKey"=ANY($2::text[]) AND "organizationId" IS NULL AND ${centralNotificationMenuPredicate} ORDER BY "isRead" ASC,"createdAt" DESC,id DESC LIMIT 20`, [req.user!.id, services, keys]);
     const [count] = await AppDataSource.query(`SELECT COUNT(*)::int count FROM notifications WHERE "userId"=$1
-      AND "serviceKey"=ANY($2::text[]) AND "organizationId" IS NULL AND "isRead"=false AND (metadata->>'operationMenu' IS NULL OR metadata->>'operationMenu'=ANY($3::text[]))`, [req.user!.id, services, keys]);
+      AND "serviceKey"=ANY($2::text[]) AND "organizationId" IS NULL AND "isRead"=false AND ${centralNotificationMenuPredicate}`, [req.user!.id, services, keys]);
     res.json({ success: true, data: { notifications: rows, unreadCount: Number(count.count) } });
   } catch {
     res.status(503).json({ success: false, code: 'CENTRAL_NOTIFICATIONS_UNAVAILABLE', error: '운영 알림을 조회하지 못했습니다.' });

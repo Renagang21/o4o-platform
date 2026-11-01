@@ -1,3 +1,4 @@
+import { CENTRAL_CONTACT_MENUS, centralContactRecipients } from './central-contact-access.js';
 import { IsNull } from 'typeorm';
 import type { DataSource } from "typeorm";
 import { ContactInquiry } from "./entities/ContactInquiry.entity.js";
@@ -9,6 +10,12 @@ import { sendContactEmails } from "./contact-notification.helper.js";
 import { contactService, contactRecipients } from "./contact-service-scope.js";
 
 export function contactTarget(key: string) {
+  const menu = CENTRAL_CONTACT_MENUS[key];
+  if (menu) {
+    const [service, area] = menu.split('.');
+    const query = service === 'neture' ? `?contactService=${encodeURIComponent(key)}` : '';
+    return `https://admin.neture.co.kr/operations/${service}/${area}${query}`;
+  }
   return key === "lecture"
     ? "/operator/contact"
     : key === "k-cosmetics"
@@ -80,13 +87,11 @@ async function deliverContactInquiry(
       : "off";
   if (settings.inAppNotificationEnabled && inapp !== "sent") {
     try {
-      const operators = await contactRecipients(db, inquiry.service_key);
+      const operators = CENTRAL_CONTACT_MENUS[inquiry.service_key]
+        ? await centralContactRecipients(db, CENTRAL_CONTACT_MENUS[inquiry.service_key])
+        : await contactRecipients(db, inquiry.service_key);
       if (operators.length) {
-        const notificationServiceKey = ["store", "hospital"].includes(
-          inquiry.service_key,
-        )
-          ? "neture"
-          : inquiry.service_key;
+        const notificationServiceKey = CENTRAL_CONTACT_MENUS[inquiry.service_key]?.split('.')[0] ?? inquiry.service_key;
         // The inquiry claim serializes retries. Persisted notifications are per-recipient
         // delivery receipts, including a save whose caller did not observe success.
         const delivered: { userId: string }[] = await db.query(
@@ -113,6 +118,8 @@ async function deliverContactInquiry(
                 serviceKey: notificationServiceKey,
                 metadata: {
                   contactInquiryId: inquiry.id,
+                  operationMenu: CENTRAL_CONTACT_MENUS[inquiry.service_key],
+                  sourceServiceKey: inquiry.service_key,
                   targetUrl: contactTarget(inquiry.service_key),
                 },
               }),
@@ -124,7 +131,7 @@ async function deliverContactInquiry(
       } else {
         inapp = "unassigned";
         // Central operations receives an assignment alert, not another service's private inquiry.
-        const central = await contactRecipients(db, "neture");
+        const central = await centralContactRecipients(db, "neture.inbox");
         // An opaque digest correlates retries without disclosing the inquiry UUID,
         // subject, contact details, or a usable inquiry link to central recipients.
         const assignmentReceipt = createHash("sha256")
@@ -150,6 +157,7 @@ async function deliverContactInquiry(
                 serviceKey: "neture",
                 metadata: {
                   assignmentRequired: true,
+                  operationMenu: "neture.inbox",
                   assignmentReceipt,
                   sourceServiceKey: inquiry.service_key,
                   targetUrl: "/operator",
@@ -181,7 +189,7 @@ async function deliverContactInquiry(
       organizationName: inquiry.organization_name,
       message: inquiry.message,
       createdAt: inquiry.created_at,
-      adminManageUrl: `https://neture.co.kr/operator/service-contact/${inquiry.service_key}`,
+      adminManageUrl: CENTRAL_CONTACT_MENUS[inquiry.service_key] ? contactTarget(inquiry.service_key) : `https://neture.co.kr/operator/service-contact/${inquiry.service_key}`,
     },
   );
   return `inapp:${inapp};email:${previous.includes("email:sent") ? "sent" : email.emailStatus};autoreply:${previous.includes("autoreply:sent") ? "sent" : email.autoReplyStatus}`;
