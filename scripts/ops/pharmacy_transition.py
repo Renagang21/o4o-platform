@@ -429,13 +429,28 @@ def apply_retirement(api, plan):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--phase', required=True, choices=('cutover-plan', 'cutover', 'rollback-plan', 'rollback', 'retire-plan', 'retire', 'assert-route', 'carepharm-plan', 'carepharm-cutover', 'carepharm-rollback-plan', 'carepharm-rollback'))
+    parser.add_argument('--phase', required=True, choices=('cutover-plan', 'cutover', 'rollback-plan', 'rollback', 'retire-plan', 'retire', 'assert-route', 'carepharm-plan', 'carepharm-cutover', 'carepharm-rollback-plan', 'carepharm-rollback', 'drugstore-plan', 'drugstore-cutover'))
     parser.add_argument('--expected-plan', default='')
     args = parser.parse_args()
-    apply = args.phase in ('cutover', 'rollback', 'retire', 'carepharm-cutover', 'carepharm-rollback')
+    apply = args.phase in ('cutover', 'rollback', 'retire', 'carepharm-cutover', 'carepharm-rollback', 'drugstore-cutover')
     if apply and not re.fullmatch(r'[0-9a-f]{64}', args.expected_plan):
         raise ValueError('Mutation requires the exact reviewed plan digest')
     with cloud_api() as api:
+        if args.phase.startswith('drugstore-'):
+            import drugstore_transition as drugstore
+            operation_started = time.monotonic()
+            record, fingerprint, original = drugstore.plan(api)
+            if apply:
+                if fingerprint != args.expected_plan:
+                    raise ValueError('Drugstore plan changed after review')
+                drugstore.apply(api, record, original, operation_started=operation_started)
+            emit_summary('Drugstore transition', {'phase': args.phase, 'plan_digest': fingerprint,
+                         'applied': apply, 'tls_ready_at_plan': record['tls']['ready'],
+                         'create_certificate': record['tls']['create_certificate'],
+                         'create_entry': record['tls']['create_entry'],
+                         'target_revision': record['target_revision'],
+                         'iam_changed': False, 'database_writes': False})
+            return
         if args.phase.startswith('carepharm-'):
             import carepharm_transition as care
             plan, fingerprint, original = care.plan(api, rollback='rollback' in args.phase)
