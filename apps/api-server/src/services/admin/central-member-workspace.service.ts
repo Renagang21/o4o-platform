@@ -32,9 +32,11 @@ export class CentralMemberWorkspaceService {
     if ((task === 'qualifications' && !permissions.qualifications) || (task === 'pharmacies' && !permissions.pharmacies) ||
         (task === 'corrections' && !permissions.qualifications && !permissions.pharmacies))
       throw new OperationError(403, 'MEMBER_TASK_NOT_DELEGATED', '해당 심사 업무 권한이 필요합니다.');
+    const qualificationCorrections = permissions.qualifications ? "p.qualification_status IN ('rejected','revoked')" : 'false';
+    const pharmacyCorrections = permissions.pharmacies ? pharmacyExists('rejected') : 'false';
     const conditions: Record<MemberTask, string> = {
       all: 'true', qualifications: `p.qualification_status='pending'`, pharmacies: pharmacyExists('pending'),
-      corrections: `(${permissions.qualifications ? `p.qualification_status IN ('rejected','revoked')` : 'false'} OR ${permissions.pharmacies ? pharmacyExists('rejected') : 'false'})`,
+      corrections: `(${qualificationCorrections} OR ${pharmacyCorrections})`,
     };
     const query = search.trim().slice(0, 100);
     const match = `($1='' OR u.id::text=$1 OR strpos(lower(COALESCE(u.name,'')),lower($1))>0 OR strpos(lower(COALESCE(u.email,'')),lower($1))>0)`;
@@ -97,7 +99,7 @@ export class CentralMemberWorkspaceService {
     const reason = operationReason(input.reason);
     const phone = normalizePhoneDigits(input.phone);
     if (input.phone.trim() && !isPhoneShapeValid(input.phone)) throw new OperationError(400, 'INVALID_PHONE', '올바른 국내 휴대전화 번호를 입력해 주세요.');
-    return this.db.transaction(async manager => {
+    return await this.db.transaction(async manager => {
       if (!(await memberWorkspaceAccess(manager, actor, true)).edit) throw new OperationError(403, 'MEMBER_ADMIN_REQUIRED', '회원 정보 정정은 중앙 Admin 업무입니다.');
       const [before] = await manager.query(`SELECT ${identity} FROM users u WHERE u.id=$1 FOR UPDATE`, [target]);
       if (!before) throw new OperationError(404, 'MEMBER_NOT_FOUND', '회원을 찾을 수 없습니다.');

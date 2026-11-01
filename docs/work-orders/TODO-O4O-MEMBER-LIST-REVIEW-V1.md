@@ -16,7 +16,7 @@
 - [x] 기본정보 정정은 중앙 Admin의 이름·닉네임·연락처만 허용. 사유·낙관적 잠금·변경 이력을 기록. 이메일·계정 상태·면허·사업 원장을 일괄 수정하지 않는다.
 - [x] 권한 회수·다른 회원 선택·필터 변경·중복 제출·오래된 응답·실패 후 정보 재조회 검증.
 - [x] API 실제 PostgreSQL 격리 fixture와 router 계약, frontend 행동·desktop/mobile browser, type-check/build 검증.
-- [ ] 코드·문서 재점검 후 commit/push/단일 PR, CI·Codex 리뷰·미해결 스레드 확인. main 병합 전 인계.
+- [x] 코드·문서 재점검 후 commit/push/[단일 PR #914](https://github.com/Renagang21/o4o-platform/pull/914) 생성, 첫 CI·Codex 리뷰·미해결 스레드 확인. 보완 후 최종 HEAD의 게이트와 병합 전 인계 판정은 PR 및 완료 보고에서 확인한다.
 
 ## 코드·문서 점검 결과
 
@@ -32,3 +32,7 @@
 - 관리자 프로덕션 build PASS. API·관리자 type-check, 변경 파일 ESLint, unsafe route 검사, 문서 민감정보 검사, diff 검사를 실행했다. 최종 PR/CI 상태는 완료 보고에서 별도로 확인한다.
 - 실제 컴포넌트를 사용하는 합성 browser fixture: 1440px·390px에서 회원 선택→자격 승인→약국 다음 업무 활성화→기본정보 정정 PASS. 각 viewport pageerror 0, 가로 overflow 0. 증거는 저장소 밖 비공개 임시 경로에 보관한다.
 - 면허/약국/과거 사업자 자료는 API가 허용 필드만 구성한다. 운영 계정 로그인·운영 DB·실제 승인/회원 정정은 실행하지 않았다. 외부 알림/메일 전송, main 병합·배포 없음.
+
+### PR 검토 보완
+
+첫 구현 HEAD의 CI Gate·CodeQL·Sonar 게이트가 통과했고 Codex 리뷰는 지적 없이 완료됐다. Sonar 신규 중복률은 0%였다. 게이트와 별개로 신규 주석 18건(중첩 조건식·원시값 표시·readonly props·접근성 출력·catch 이름·불필요 async)을 검토해 같은 PR에서 보완했다. 조건식과 표시 구조를 정리하며 권한·심사·정정 계약을 유지한다. 최종 보완 HEAD의 CI/리뷰 결과는 PR의 최신 checks를 따른다. 이 기록은 main 병합이나 운영 배포를 뜻하지 않는다.
