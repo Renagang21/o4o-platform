@@ -127,7 +127,7 @@ jobs:
     # 분석 결과 SARIF 를 artifact 로 보존한다 — code scanning 대신 결과를 확인하는 경로.
     - name: Preserve CodeQL SARIF
       if: always()
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: codeql-sarif-${{ matrix.language }}
         path: codeql-sarif
