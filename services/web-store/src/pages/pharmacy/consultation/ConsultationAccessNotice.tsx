@@ -5,6 +5,9 @@ import type { Mode } from './ConsultationParts';
 
 export function consultationAccessError(code?: string): string | null {
   switch (code) {
+    case 'PHARMACIST_QUALIFICATION_REQUIRED': return '개인의 약사 자격 신청·승인 상태를 My Home에서 확인해 주세요. 매장 소속이나 로그인 성공만으로 약사 자격이 승인되지는 않습니다.';
+    case 'STORE_OWNER_AGREEMENT_REQUIRED': return 'My Home에서 매장 경영자 이용계약 동의 상태를 확인해 주세요.';
+    case 'AMBIGUOUS_STORE_CONNECTION': return '이용할 매장을 선택한 뒤 다시 확인해 주세요.';
     case 'PHARMACIST_CONFIRMATION_REQUIRED': return '개인의 승인된 약사 자격과 현재 약국의 약사 업무 허용을 모두 확인해 주세요. 경영자의 확인만으로 개인 자격 승인을 대신할 수 없습니다.';
     case 'SERVICE_FEATURE_REQUIRED': return '현재 약국의 제공 기능과 My Home의 근무자별 기능 허용을 확인해 주세요.';
     case 'STORE_ACCESS_REQUIRED':

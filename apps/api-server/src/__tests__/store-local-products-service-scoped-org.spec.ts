@@ -1,4 +1,4 @@
-jest.mock('../utils/store-member-access.js', () => ({ resolveApprovedStoreMemberOrganization: jest.fn(async () => null) }));
+jest.mock('../utils/store-member-access.js', () => ({ resolveApprovedStoreMemberOrganization: jest.fn(async () => null), findApprovedStoreMemberCandidates: jest.fn(async () => []) }));
 /**
  * WO-O4O-STORE-LOCAL-PRODUCTS-SERVICE-SCOPED-ORGANIZATION-RESOLUTION-V1 §9
  *
@@ -361,7 +361,7 @@ describe('products — multiple approved stores and handled-product selection', 
     expect(listOrgParams.every(id => id === ORG_NETURE)).toBe(true);
   });
   it.each([
-    ['get', '/store/handled-products', 200],
+    ['get', '/store/handled-products', 403],
     ['post', '/store/handled-products/remove', 403],
     ['get', '/store/handled-products/qr', 403],
     ['get', '/store/handled-products/qr/export', 403],
@@ -373,8 +373,8 @@ describe('products — multiple approved stores and handled-product selection', 
     const res = await request(app)[method](endpoint).set('x-store-organization-id', ORG_NETURE)
       .send({ items: [{ sourceType: 'local', sourceId: '33333333-3333-4333-8333-333333333333' }] });
     expect(res.status).toBe(status);
-    if (status === 200) expect(res.body.data.items).toEqual([]);
-    else expect(res.body.code).toBe('FORBIDDEN');
+    expect(res.body.code).toBe(endpoint === '/store/handled-products' ? 'STORE_SELECTION_ACCESS_REQUIRED' : 'FORBIDDEN');
+    expect(res.body).not.toHaveProperty('data.items');
     expect(dataSource.query.mock.calls.every(([sql]: [string]) => !/store_local_products|organization_product_listings/.test(sql))).toBe(true);
   });
 });
@@ -393,8 +393,13 @@ describe('handled-products — shared authentication error contract', () => {
     app.use(express.json());
     app.use('/store', createStoreHandledProductsRoutes(dataSource));
     const res = await request(app)[method](endpoint);
-    expect(res.status).toBe(403);
-    expect(res.body).toEqual({ success: false, error, code: 'FORBIDDEN' });
+    if (endpoint === '/store/handled-products') {
+      expect(res.status).toBe(401);
+      expect(res.body).toEqual({ success: false, code: 'AUTH_REQUIRED' });
+    } else {
+      expect(res.status).toBe(403);
+      expect(res.body).toEqual({ success: false, error, code: 'FORBIDDEN' });
+    }
     expect(dataSource.query).not.toHaveBeenCalled();
   });
 });

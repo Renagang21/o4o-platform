@@ -2,7 +2,7 @@ import { fireEvent, render, screen, waitFor, cleanup } from '@testing-library/re
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { StoreProductExcelDialog } from './StoreProductExcelDialog';
 const state = vi.hoisted(() => ({ current: true, preview: vi.fn(), register: vi.fn() }));
-vi.mock('../../api/storeProductAi', () => ({ previewProductFile: state.preview, aiResearchRequest: vi.fn() }));
+vi.mock('../../api/storeProductAi', () => ({ getStoreAiReadiness: vi.fn().mockResolvedValue({ organizationId: 'store', purpose: 'B2B', language: 'ko', listingCount: 0, masterCount: 0, localCount: 0, states: { structured: 0, unclassified: 0, legacy: 0, missing: 0 } }), previewProductFile: state.preview, aiResearchRequest: vi.fn() }));
 vi.mock('../../api/o4oStandardProducts', () => ({ registerStandardProductToStore: state.register }));
 vi.mock('../../components/store/StoreProductSession', () => ({
   useStoreProductScope: () => ({ key: 'store', organizationId: 'store', ready: true }),

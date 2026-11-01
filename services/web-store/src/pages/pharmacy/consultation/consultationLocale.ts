@@ -18,6 +18,7 @@ const fields = [
   "sent",
   "retry",
   "connection",
+  "autoLanguage",
 ] as const;
 const values: Record<string, string[]> = {
   ko: [
@@ -36,10 +37,11 @@ const values: Record<string, string[]> = {
     "출처",
     "선택 언어 자료가 없어 표시된 원문 언어로 안내합니다.",
     "직원이 확인한 자료 번역입니다.",
-    "이름·연락처를 입력하지 마세요. 음성은 브라우저의 인식 서비스로 전달될 수 있습니다.",
+    "이름·연락처를 입력하지 마세요. 음성은 선택한 음성 인식 서비스로 전달될 수 있습니다.",
     "직원에게 전달했습니다.",
     "다시 연결 확인",
     "기기 연결 설정",
+    "음성 언어 자동 감지",
   ],
   en: [
     "Customer consultation",
@@ -57,10 +59,11 @@ const values: Record<string, string[]> = {
     "Source",
     "The selected language is unavailable. This is the published source language.",
     "Translation checked by the staff.",
-    "Do not enter names or contact details. Speech may be sent to your browser’s recognition service.",
+    "Do not enter names or contact details. Speech may be sent to the selected speech recognition service.",
     "Sent to staff.",
     "Check connection again",
     "Device connection",
+    "Detect spoken language automatically",
   ],
   zh: [
     "顾客咨询",
@@ -78,10 +81,11 @@ const values: Record<string, string[]> = {
     "来源",
     "暂无所选语言的资料，现显示已发布的原文。",
     "由店员确认的资料译文。",
-    "请勿输入姓名或联系方式。语音可能会发送至浏览器的识别服务。",
+    "请勿输入姓名或联系方式。语音可能会发送至所选的语音识别服务。",
     "已发送给店员。",
     "重新检查连接",
     "设备连接设置",
+    "自动识别语音语言",
   ],
   ja: [
     "お客様のご相談",
@@ -99,10 +103,11 @@ const values: Record<string, string[]> = {
     "出典",
     "選択した言語の資料がないため、公開されている原文を表示しています。",
     "スタッフが確認した資料の翻訳です。",
-    "氏名や連絡先を入力しないでください。音声はブラウザの認識サービスに送信される場合があります。",
+    "氏名や連絡先を入力しないでください。音声は選択した音声認識サービスに送信される場合があります。",
     "スタッフに送信しました。",
     "接続を再確認",
     "端末の接続設定",
+    "音声の言語を自動検出",
   ],
   vi: [
     "Tư vấn khách hàng",
@@ -120,10 +125,11 @@ const values: Record<string, string[]> = {
     "Nguồn",
     "Chưa có tài liệu bằng ngôn ngữ đã chọn. Đang hiển thị bản gốc đã công bố.",
     "Bản dịch đã được nhân viên xác nhận.",
-    "Không nhập tên hoặc thông tin liên hệ. Giọng nói có thể được gửi tới dịch vụ nhận dạng của trình duyệt.",
+    "Không nhập tên hoặc thông tin liên hệ. Giọng nói có thể được gửi tới dịch vụ nhận dạng giọng nói đã chọn.",
     "Đã gửi cho nhân viên.",
     "Kiểm tra lại kết nối",
     "Kết nối thiết bị",
+    "Tự động nhận dạng ngôn ngữ nói",
   ],
   th: [
     "ปรึกษาสำหรับลูกค้า",
@@ -141,10 +147,11 @@ const values: Record<string, string[]> = {
     "แหล่งข้อมูล",
     "ไม่มีข้อมูลในภาษาที่เลือก จะแสดงต้นฉบับที่เผยแพร่",
     "คำแปลที่พนักงานตรวจสอบแล้ว",
-    "อย่าป้อนชื่อหรือข้อมูลติดต่อ เสียงอาจถูกส่งไปยังบริการรู้จำเสียงของเบราว์เซอร์",
+    "อย่าป้อนชื่อหรือข้อมูลติดต่อ เสียงอาจถูกส่งไปยังบริการรู้จำเสียงที่เลือก",
     "ส่งให้พนักงานแล้ว",
     "ตรวจสอบการเชื่อมต่ออีกครั้ง",
     "การเชื่อมต่ออุปกรณ์",
+    "ตรวจจับภาษาพูดอัตโนมัติ",
   ],
   id: [
     "Konsultasi pelanggan",
@@ -162,10 +169,11 @@ const values: Record<string, string[]> = {
     "Sumber",
     "Bahasa yang dipilih belum tersedia. Menampilkan sumber yang telah dipublikasikan.",
     "Terjemahan diperiksa oleh staf.",
-    "Jangan masukkan nama atau kontak. Suara dapat dikirim ke layanan pengenalan browser.",
+    "Jangan masukkan nama atau kontak. Suara dapat dikirim ke layanan pengenalan suara yang dipilih.",
     "Terkirim ke staf.",
     "Periksa koneksi lagi",
     "Koneksi perangkat",
+    "Deteksi otomatis bahasa ucapan",
   ],
 };
 export function consultationUi(language: string) {

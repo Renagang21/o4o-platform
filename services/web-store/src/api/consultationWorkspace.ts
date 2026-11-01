@@ -46,6 +46,7 @@ export interface CustomerScreen {
   state: "active" | "waiting";
   shared: SharedConsultation | null;
   languages: Array<{ key: string; label: string }>;
+  runtime?: import('../pages/pharmacy/consultation/ConsultationParts').Context['runtime'];
 }
 type Envelope<T> = { success: boolean; data: T };
 export async function fetchConsultationLayout() {
@@ -121,7 +122,7 @@ export async function createConsultationPairing(current: ConsultationStation) {
 }
 /** Public delivery never uses the employee API client, cookies, refresh or Store context. */
 export async function customerRequest<T>(
-  action: "claim" | "read" | "reply",
+  action: "claim" | "read" | "reply" | 'speech/recognize' | 'speech/synthesize',
   body: unknown,
   signal?: AbortSignal,
 ): Promise<T> {
@@ -129,7 +130,7 @@ export async function customerRequest<T>(
   const cancel = () => controller.abort();
   signal?.addEventListener("abort", cancel, { once: true });
   if (signal?.aborted) controller.abort();
-  const timer = window.setTimeout(cancel, 10_000);
+  const timer = window.setTimeout(cancel, action.startsWith('speech/') ? 25_000 : 10_000);
   try {
     const base = import.meta.env.VITE_API_BASE_URL || "";
     const response = await fetch(
@@ -236,6 +237,18 @@ export async function prepareConsultationGuidance(input: {
 }
 
 export interface ConsultationSupportPoint { text: string; sourceIds: string[] }
+export interface ConsultationProductSearchResult {
+  organizationId: string; mode: string; state: 'candidates' | 'clarify' | 'not-needed' | 'empty'; message: string;
+  candidates: Array<{ id: string; kind: 'listing' | 'local'; name: string; location: string }>;
+}
+export async function findConsultationProducts(input: { mode: string; question: string; context: string[]; stationId?: string; epoch?: string }) {
+  const response = await coreApiClient.post<Envelope<ConsultationProductSearchResult>>(`${CONSULTATION_BASE}/consultation-products/prepare`, input);
+  const value = response.data;
+  if (!response.success || !value || !['candidates', 'clarify', 'not-needed', 'empty'].includes(value.state) || !Array.isArray(value.candidates) ||
+    value.candidates.some(item => !item.id || !['listing', 'local'].includes(item.kind) || typeof item.name !== 'string'))
+    throw new Error('현재 매장의 상담 후보 응답을 확인하지 못했습니다.');
+  return value;
+}
 export interface ConsultationSupportResult {
   organizationId: string;
   mode: string;
@@ -244,10 +257,11 @@ export interface ConsultationSupportResult {
   state: 'ready' | 'empty' | 'verified';
   message?: string;
   sourceVersion?: string;
-  sources?: Array<{ id: string; kind: string; title: string }>;
+  sources?: Array<{ id: string; kind: string; title: string; urls?: string[]; checkedOn?: string | null; revision?: string; currentness?: string }>;
   brief?: { productFacts: ConsultationSupportPoint[]; professionalNotes: ConsultationSupportPoint[];
     nextQuestion: string | null; customerDraft: ConsultationSupportPoint };
 }
+export interface ConsultationSupportSourceProof { mode: string; productKind: string; productId: string; sourceVersion: string }
 export async function prepareConsultationSupport(input: {
   mode: string; productKind: string; productId: string; question?: string;
   reference?: { text: string; source: string; reviewed: boolean };

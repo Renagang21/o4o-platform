@@ -62,6 +62,8 @@ function entry(
 }
 
 export const AI_USAGE_CATALOG: readonly AiUsageDefinition[] = [
+  entry('A38', 'pharmacy.support', '상담 맥락·약사 판단 지원', 'store', '구조화·근거 검토', 'scope', 'connected', 'scope',
+    '현재 매장의 자료로 후보·검토 초안만 준비합니다. 모델을 독립 선택하고 사용 중지·한도는 상품 콘텐츠 정책을 공유합니다.', 'PRODUCT_CONTENT'),
   {
     ...entry('A32', 'community.news', '커뮤니티 뉴스 검토·추천', 'shared', '텍스트', 'query', 'connected', 'query',
       '공통 질의 정책의 Gemini 모델·활성 설정을 사용합니다. 초안 검토이며 자동 게시하지 않습니다.', 'SERVICE_QUERY'),
@@ -331,7 +333,7 @@ export const AI_USAGE_CATALOG: readonly AiUsageDefinition[] = [
     "scope",
     "connected",
     "scope",
-    "매장 콘텐츠 번역과 같은 정책을 공유하여 현재 독립 변경·중지가 불가합니다.",
+    "상담 모델을 독립 선택합니다. 중지·한도는 콘텐츠 번역 정책을 공유하며 Google 전용 번역 선택은 상담 실행 수단 설정을 따릅니다.",
     "CONTENT_TRANSLATION",
   ),
   entry(

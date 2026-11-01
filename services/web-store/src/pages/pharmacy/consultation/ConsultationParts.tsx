@@ -14,6 +14,7 @@ export type Context = {
   phrases: Array<{ key: string; text: string }>;
   modes: Mode[];
   supportAllowed?: boolean;
+  runtime?: { recognition: 'browser' | 'google-cloud'; translation: 'policy' | 'google-cloud'; synthesis: 'browser' | 'google-cloud'; detectLanguage: boolean; speechLanguages: string[] };
 };
 export type Result = {
   organizationId: string;
@@ -23,6 +24,9 @@ export type Result = {
   source: string;
   translation: string;
   deliveryId?: string;
+  detectedLanguage?: string;
+  station?: import('../../../api/consultationWorkspace').ConsultationStation;
+  supportSource?: import('../../../api/consultationWorkspace').ConsultationSupportSourceProof;
 };
 type Speech = ReturnType<typeof useConsultationSpeech>;
 

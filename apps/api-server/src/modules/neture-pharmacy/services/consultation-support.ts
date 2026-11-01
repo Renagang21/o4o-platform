@@ -1,3 +1,4 @@
+import { evidenceExcerpt } from './consultation-evidence.js';
 import { NeturePharmacyError } from '../constants.js';
 import type { ConsultationGuidanceService } from './consultation-guidance.js';
 import { validateConsultationSupport, type ConsultationSupportRunner, type ConsultationSupportSource } from './consultation-support.extension.js';
@@ -9,7 +10,7 @@ function boundSources(input: ConsultationSupportSource[]): ConsultationSupportSo
   const sources: ConsultationSupportSource[] = [];
   for (const source of input.filter(item => item.id !== 'r1').slice(0, reference ? 25 : 26)) {
     if (!remaining) break;
-    const text = source.text.slice(0, Math.min(5000, remaining)).trim();
+    const text = evidenceExcerpt(source.text, Math.min(5000, remaining));
     if (!text) continue;
     remaining -= text.length;
     sources.push({ ...source, text, title: source.title + (text.length < source.text.length ? ' · 일부' : '') });
@@ -48,7 +49,7 @@ export class ConsultationSupportService {
       await context.authorize();
       validateConsultationSupport(brief, sources);
       return { state: 'ready', brief, sourceVersion: context.sourceVersion,
-        sources: sources.map(({ id, kind, title }) => ({ id, kind, title })) };
+        sources: sources.map(({ id, kind, title, urls, checkedOn, revision, currentness }) => ({ id, kind, title, urls, checkedOn, revision, currentness })) };
     } catch (error) {
       // Prefer a current access/source denial over a provider error after access changed.
       await context.authorize();

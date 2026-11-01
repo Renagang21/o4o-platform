@@ -42,6 +42,17 @@ function fixture() {
   };
 }
 const actor = "10000000-0000-4000-8000-000000000001";
+it('stores browser/Google consultation choices in the existing revisioned document and preserves model choices', async () => {
+  const f = fixture(), service = new ModelControlService(f.db);
+  const saved = await service.change(0, actor, { action: 'consultation-runtime', runtime: {
+    recognition: 'google-cloud', translation: 'google-cloud', synthesis: 'browser', detectLanguage: true, speechLanguages: ['ko', 'ja'],
+  } });
+  expect(saved.revision).toBe(1);
+  expect((await new ModelControlService(f.db).read()).consultation).toMatchObject({ recognition: 'google-cloud', speechLanguages: ['ko', 'ja'] });
+  await expect(service.change(0, actor, { action: 'consultation-runtime', runtime: {} })).rejects.toHaveProperty('code', 'AI_MODEL_CONTROL_CONFLICT');
+  await expect(service.change(1, actor, { action: 'consultation-runtime', runtime: { recognition: 'unconnected-provider' } })).rejects.toHaveProperty('code', 'CONSULTATION_RUNTIME_INVALID');
+  expect(f.value.revision).toBe(1);
+});
 const model = {
   provider: "openai" as const,
   id: "gpt-fixture",
@@ -683,4 +694,13 @@ it("retains the query-policy model for direct consumers after every managed usag
     }),
   ).resolves.toMatchObject({ revision: state.revision + 1 });
   expect(await service.allows("gemini", "gemini-2.5-flash")).toBe(false);
+});
+
+it('selects pharmacist support independently from translation while retaining the PRODUCT_CONTENT fallback reference', async () => {
+  const f = fixture(), service = new ModelControlService(f.db);
+  const saved = await service.change(0, actor, { action: 'select', target: 'pharmacy.support', selection: { provider: 'openai', model: 'gpt-4o-mini' } });
+  expect(await service.resolve('pharmacy.support', { provider: 'gemini', model: 'gemini-2.5-flash' })).toMatchObject({ provider: 'openai', model: 'gpt-4o-mini' });
+  expect(await service.resolve('pharmacy.consultation', { provider: 'gemini', model: 'gemini-2.5-flash' })).toEqual({ provider: 'gemini', model: 'gemini-2.5-flash' });
+  expect(saved.selections).not.toHaveProperty('policy.PRODUCT_CONTENT');
+  await expect(service.change(saved.revision, actor, { action: 'select', target: 'pharmacy.support', selection: { provider: 'deepseek', model: 'deepseek-chat' } })).rejects.toHaveProperty('code');
 });

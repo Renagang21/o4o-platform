@@ -240,7 +240,7 @@ export async function isStoreOwner(
  * @param serviceKey  지정 시 해당 서비스 role 만 통과 (cross-service leakage 차단).
  *                    미지정 시 모든 서비스 store_owner role 허용 (back-compat).
  */
-function storeOwnerRejection({isOwner,organizationId,resolution,pendingAgreement,qualificationRequired}:StoreOwnerCheckResult){
+export function storeOwnerRejection({isOwner,organizationId,resolution,pendingAgreement,qualificationRequired}:StoreOwnerCheckResult){
   if(resolution.status==='ambiguous')return {status:409,body:{success:false,error:'연결된 매장이 여러 개입니다. 운영자에게 문의해 주세요.',code:'AMBIGUOUS_STORE_CONNECTION'}};
   if(qualificationRequired)return {status:403,body:{success:false,code:'PHARMACIST_QUALIFICATION_REQUIRED',error:'약국 경영 업무에는 승인된 약사 자격이 필요합니다. My Home 설정에서 자격 신청·상태를 확인해 주세요.'}};
   if(pendingAgreement)return {status:428,body:{success:false,error:'매장 경영자 이용계약에 동의한 뒤 이용할 수 있습니다.',code:'STORE_OWNER_AGREEMENT_REQUIRED',pendingPolicyAcceptances:[pendingAgreement]}};

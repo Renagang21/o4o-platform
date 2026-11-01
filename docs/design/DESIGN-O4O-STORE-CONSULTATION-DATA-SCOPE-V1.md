@@ -1,7 +1,7 @@
 # 내 매장 상담·AI 데이터 범위
 
 > **상태**: ACTIVE
-> **작성일**: 2026-10-25 · **최종 갱신**: 2026-10-25
+> **작성일**: 2026-10-25 · **최종 갱신**: 2026-10-31
 > **구현 main**: `fda3f672d19f08c7eb43e1b464d690a500efbc82` (초기 개발 기준 `b7d2cfd86edf4d26d19d1e954fa754f74faf8f7d`)
 > **작업**: [통합 TODO](../work-orders/TODO-O4O-STORE-CONSULTATION-CONTENT-CHANNEL-COMPLETION-V1.md) · [통합·배포 CHECK](../checks/CHECK-O4O-STORE-CONSULTATION-INTEGRATION-DEPLOYMENT-V1.md)
 > **위상**: 사용자 선택에 따른 업무 범위와 main 구현 기준. 운영 적용·관측 상태는 CHECK로 구분하며 공통 Core·개인정보 보존 정본을 대체하지 않는다.
@@ -60,7 +60,7 @@
 
 최근 반영된 [상품설명서 전문 판단·AI 활용 원칙](../guides/products/O4O-PRODUCT-DESCRIPTION-PROFESSIONAL-USE-POLICY-V1.md)의 이용 목적·상품 근거·전문 근거 입력을 재사용한다. 목적별 편집기나 AI provider를 새로 복제하지 않는다.
 
-1. 현재 매장 상품을 선택하고 사용할 수 있는 자료·출처·검수 상태를 확인한다.
+1. 고객의 현재 질문·조건에서 시작한다. 필요한 경우에만 현재 매장의 활성 취급 상품을 찾고 확인한 상품의 승인 자료·출처·검수 상태를 읽는다. 상품명이 없으면 짧은 맥락으로 후보를 찾고, 일반 대화는 상품 선택 없이 이어간다.
 2. 상품 고유 사실, 전문 참고정보, 판단 지원, 고객 설명을 구분한다. 근거 있는 전문 정보를 의료 영역이라는 이유로 일괄 제거하지 않는다.
 3. 필요한 확인 하나를 받고 짧은 첫 결과를 제시한다. 전문인 판단 지원과 고객에게 전달할 내용은 각각 확인한다.
 4. 담당자가 확인한 고객 안내만 고객 언어/화면 또는 기존 태블릿·QR·사이니지 적용 흐름으로 전달한다. 미리보기·AI 결과가 게시/적용 승인을 대신하지 않는다.
@@ -88,3 +88,18 @@ O4O 취급 상품 원문은 기존 `storeDescriptionApi.list`의 `canonical` 매
 PR #813으로 main `fda3f672d1`에 통합했다. 기존 production/WIF Promote `40183174373`에서 API·Store 배포와 serving SHA 재확인이 성공했다(`DEPLOYED · api,store`). API의 현재 설정 조회·cleanup env 처리·새 리비전 준비 상태 검사·트래픽 전환이 성공했고 공개 smoke 13건이 통과했다. production은 `CONSULTATION_STATE_CLEANUP_MODE=apply`를 명시하고 현재 `CONSULTATION_STATE_CLEANUP_ENABLED`를 보존한다. 코드 자체의 로컬 기본 dry-run은 유지한다.
 
 기존 enabled=false는 apply 배포 후에도 중지 상태다. 실제 현재 enabled 값과 정리 실행 count/본문 파기는 이 환경에서 관측하지 못했다. 설정 처리 성공을 실제 정리 완료로 확대하지 않는다. 프로세스 timer·Cloud Run scale-to-zero에 따른 실행 한계와 현장/약사 검수 연기는 [통합·배포 CHECK](../checks/CHECK-O4O-STORE-CONSULTATION-INTEGRATION-DEPLOYMENT-V1.md)를 따른다.
+
+
+## 7. 맥락·실행 수단 후속 구현 (2026-10-31 · PR #910 · main 미병합)
+
+[통합 TODO](../work-orders/TODO-O4O-CONSULTATION-CONTEXT-PRODUCT-AND-PROVIDER-IMPROVEMENT-V1.md)와 [실행 안내](../guides/products/O4O-CONSULTATION-CONTEXT-AND-RUNTIME-V1.md)가 이번 branch의 변경 범위다. 앞 절의 역사적 main·배포 상태와 구분한다.
+
+현재 상담의 최근 질문 3개와 이번 질문(합계 4,000자 이내)은 화면 메모리에만 유지한다. 정정은 최신 질문을 우선하며 계정·매장·모드·epoch·다음 고객·페이지 이탈에서 폐기한다. 맥락 Extension은 상품 참조 필요/확인 질문/검색어만 반환하며 임상 답변이나 DB ID를 생성하지 않는다. 서버가 현재 매장 활성 listing/master부터 범위를 좁히고 중복 master를 제거한 뒤 후보를 보여 준다. 직원이 확인한 후보만 기존 판단 지원으로 넘긴다.
+
+공통 근거는 정확한 B2B·한국어 승인본의 구조화 항목이다. 상품 사실·전문 참고·상담 보조·미분류를 유지하고 미분류는 근거에서 제외한다. URL·확인일·자료 버전을 검토하며 수치·용량·부정 문장의 중간을 잘라 넣지 않는다. 일반 본문 변경은 이전 구조화 연결을 무효화한다. 검토 초안 사용·번역·고객 공유·공유 조회·음성 재생에서 현재 상품/자료 버전을 확인하고 변경된 자료의 안내를 감춘다. 직접 편집한 새 안내의 저장·중앙 제안·승인은 기존 명시 절차를 쓴다.
+
+기존 관리자 model-control 문서에 STT/번역/TTS 실행 수단과 자동 감지·최대 3개 음성 후보 언어를 저장한다. 기본 STT/TTS는 브라우저, 번역은 기존 정책이다. `pharmacy.support`의 모델 선택은 독립이며 PRODUCT_CONTENT 중지·한도를 공유한다. `pharmacy.consultation`의 모델 선택과 CONTENT_TRANSLATION 중지·한도 공유도 유지한다. 브라우저 음성 인식은 선택 언어이며 문자 번역의 자동 감지와 다르다. Google Cloud adapter는 서버 ADC·명시 가격·기존 원자 quota 예약/정산을 사용한다. 실패 시 다른 제공자로 조용히 전환하지 않는다.
+
+녹음은 메모리에서 최대 60초·16kHz mono PCM WAV로 변환하며 서버가 실제 길이를 재계산한다. STT 초, 번역/TTS 문자를 기존 native 원장에서 측정한다. 고객 기기의 외부 음성은 별도 capability·현재 담당자·매장 권한·epoch를 재확인하고 TTS는 현재 공유 안내만 읽는다. 마이크·플레이어는 취소/화면 숨김/범위 변경에서 해제한다. 음성·상담 원문을 공통 AI 이력·Task·Memory로 저장하는 기능은 추가하지 않는다. 외부 제공자의 보존·처리 조건과 실제 비용/언어 품질은 별도 운영 검수 대상이다.
+
+실제 운영 설정 저장·유료 호출·현장 검수는 수행하지 않았다. 검증 증거와 미확인은 [후속 CHECK](../checks/CHECK-O4O-CONSULTATION-CONTEXT-AND-RUNTIME-V1.md)를 따른다.

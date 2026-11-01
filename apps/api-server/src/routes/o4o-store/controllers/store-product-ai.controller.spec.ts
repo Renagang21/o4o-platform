@@ -37,4 +37,14 @@ describe('registered product AI route authorization', () => {
     expect((await req().field('organizationId','forged').attach('file',file,'products.xlsx')).status).toBe(400);
     expect((await req().attach('file',file,'products.html')).status).toBe(400);
   });
+  it('guards the coverage route and preserves permission failure rather than returning zero counts', async () => {
+    const f = fixture(), path = '/ai-context/readiness?language=ko';
+    expect((await request(f.app).get(path)).status).toBe(401);
+    expect((await request(f.app).get(path).set('x-fixture-auth', 'allowed')).status).toBe(403);
+    expect(f.query).not.toHaveBeenCalled();
+    const result = await request(f.app).get(path).set('x-fixture-auth', 'allowed').set('x-store-organization-id', 'fixture');
+    expect(result.status).toBe(200);
+    expect(result.body.data).toMatchObject({ organizationId: 'fixture', masterCount: 0, listingCount: 0 });
+    expect(result.headers['cache-control']).toBe('private, no-store');
+  });
 });
