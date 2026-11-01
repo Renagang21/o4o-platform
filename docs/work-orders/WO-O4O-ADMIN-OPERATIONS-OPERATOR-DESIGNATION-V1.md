@@ -34,7 +34,7 @@
 ## 로컬 검증 결과
 
 - frozen install·공통 package build·API/관리자 typecheck 통과.
-- 관리자 전체 606건 + 늦은 목록 응답 회귀 1건, API focused 49건 + 실제 로컬 PostgreSQL 11건, Neture 초대 수락 13건: 중복 제외 680 tests PASS.
+- 관리자 전체 606건 + 늦은 목록 응답 회귀 1건, API focused 77건 + 실제 로컬 PostgreSQL 11건, Neture 초대 수락 13건: 중복 제외 708 tests PASS.
 - 관리자·Neture production build 및 API tsup build 통과. 기존 번들 크기·Browserslist 경고는 비차단이다.
 - `scripts/quality/admin-operations-operator-smoke.mjs`: localhost 관리자 Vite 4320에서 PC 1280/모바일 390 × 전체 관리자/업무 운영자 4개 조합 PASS. 단일 초대 요청·Admin 역할 입력 부재·허용 업무·관리자 지정 화면 차단·모바일 메뉴·가로 넘침을 확인했다. API는 전부 합성이며 외부 요청은 차단한다.
 - 변경 구현 lint·문서 민감정보·unsafe route·diff 검사 통과. 기존 대형 테스트 파일의 경고는 구현 검사와 구분한다.
@@ -45,3 +45,10 @@
 ## 최신 main 정렬
 
 미게시 개발 branch를 최신 main `cf91b6aec2` 위로 정렬했다. 새 드럭스토어형 약국 명칭·도메인·역할 정책은 유지하며, 기존 중앙 지정 링크 테스트의 충돌은 새 업무 운영자 화면으로 이동하는 계약에 맞춰 해결했다. 다른 branch의 이력이나 운영 데이터는 변경하지 않았다.
+
+
+## CI 보완
+
+초기 CI에서 새 경로를 기존 인증 보존 검사에 등록하고 Demo 대상 검사 호출 형태를 현재 코드에 맞춰야 하는 항목이 확인됐다. 새 경로만 명시적으로 허용하며 범위 확인·Demo 차단이 역할 변경보다 앞서는 순서를 검사한다. 서버 88건(실제 로컬 DB 11건 포함) 재검증 PASS다.
+
+문자열 정렬 비교 함수를 명시하고, 담당 업무 선택 UI·모달 제목·수락 감사·브라우저 합성 응답을 작은 함수/컴포넌트로 분리했다. 규칙을 비활성화하거나 검사 범위를 줄이지 않았다. 브라우저 4개 조합도 다시 통과했다. 최종 CI와 리뷰 결과는 PR #913에서 확인한다.

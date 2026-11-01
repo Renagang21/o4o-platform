@@ -14,11 +14,7 @@ try{
   const context=await browser.newContext({viewport:{width,height:900},reducedMotion:'reduce'});const page=await context.newPage();const errors=[],writes=[],unknown=new Set();let pending=[];
   const role=mode==='admin'?'platform:super_admin':'neture:operator';
   const user={id:rootId,email:'fixture@example.test',name:'Synthetic account',roles:[role],status:'active',isActive:true,isEmailVerified:true,authProvider:'google',permissions:[]};
-  await context.route('**/*',async route=>{
-   const r=route.request(),u=new URL(r.url());
-   if(u.pathname.startsWith('/api/v1/')){
-    const path=u.pathname.slice(7);const headers={'access-control-allow-origin':r.headers().origin||'*','access-control-allow-credentials':'true','access-control-allow-headers':'*'};
-    if(r.method()==='OPTIONS')return route.fulfill({status:204,headers});
+   function fixtureData(path, r) {
     let data;
     if(path==='/auth/status')data={authenticated:true,user};
     else if(path==='/auth/me')data={user};
@@ -30,6 +26,14 @@ try{
     }else if(path==='/admin/operations-operators')data=[];
     else if(path==='/admin/service-operator-invitations')data=pending;
     else {unknown.add(path);data={items:[],notifications:[],unreadCount:0};}
+    return data;
+   }
+  await context.route('**/*',async route=>{
+   const r=route.request(),u=new URL(r.url());
+   if(u.pathname.startsWith('/api/v1/')){
+    const path=u.pathname.slice(7);const headers={'access-control-allow-origin':r.headers().origin||'*','access-control-allow-credentials':'true','access-control-allow-headers':'*'};
+    if(r.method()==='OPTIONS')return route.fulfill({status:204,headers});
+    const data = fixtureData(path, r);
     return route.fulfill({headers,json:{success:true,data}});
    }
    if(u.origin==='http://127.0.0.1:4320')return route.continue();

@@ -51,6 +51,9 @@ const hash = (s: string) => createHash("sha256").update(s).digest("hex");
 const fail = (code: string, status = 409): never => {
   throw new ServiceOperatorInvitationError(code, status);
 };
+const duplicateScopePredicate = (workspace: boolean) => workspace
+  ? 'scope_type=$6 AND scope_key=$7'
+  : "(($6 IN ('platform','service') AND scope_type IN ('platform','service')) OR (scope_type=$6 AND scope_key=$7))";
 const COLUMNS =
   "id,scope_type,scope_key,invited_email,service_key,role,target_user_id,purpose,status,expires_at,accepted_user_id,invited_by_user_id,created_at,updated_at,accepted_at";
 export type InvitationMailer = (
@@ -471,6 +474,11 @@ export class ServiceOperatorInvitationService {
     await m.query(`INSERT INTO central_operation_menu_grants(invitation_id,menu_keys) VALUES($1,$2)
       ON CONFLICT(invitation_id) DO UPDATE SET menu_keys=$2,updated_at=clock_timestamp()`, [invitationId, keys]);
   }
+  private async recordAcceptedAssignment(m: EntityManager, invite: OperatorInvite, userId: string, menuKeys?: string[]) {
+    if (isAdminOperationsInvitation(invite)) return; // Per-role workspace audit is already recorded by the role activation helper.
+    await recordOperation(m, invite.service_key, invite.invited_by_user_id, 'admin.service_operator_assigned',
+      { scope: invite.scope_key, targetUserId: userId, role: invite.role, ...(menuKeys ? { menuKeys } : {}) });
+  }
   async accept(
     token: string,
     userId: string,
@@ -546,7 +554,7 @@ export class ServiceOperatorInvitationService {
       await m.query(
         `UPDATE service_operator_invitations SET status='cancelled',invited_email=NULL,token_hash=NULL,updated_at=$5
         WHERE id<>$1 AND status='pending' AND role=$3 AND (target_user_id=$2 OR lower(invited_email)=$4)
-        AND ${workspace ? 'scope_type=$6 AND scope_key=$7' : "(($6 IN ('platform','service') AND scope_type IN ('platform','service')) OR (scope_type=$6 AND scope_key=$7))"}`,
+        AND ${duplicateScopePredicate(workspace)}`,
         [
           i.id,
           user.id,
@@ -557,13 +565,7 @@ export class ServiceOperatorInvitationService {
           i.scope_key,
         ],
       );
-      if (!workspace) await recordOperation(
-        m,
-        i.service_key,
-        i.invited_by_user_id,
-        "admin.service_operator_assigned",
-        { scope: i.scope_key, targetUserId: user.id, role: i.role, ...(acceptedMenuKeys ? {menuKeys:acceptedMenuKeys} : {}) },
-      );
+      await this.recordAcceptedAssignment(m, i, user.id, acceptedMenuKeys);
       return {
         serviceKey: i.service_key,
         role: i.role,

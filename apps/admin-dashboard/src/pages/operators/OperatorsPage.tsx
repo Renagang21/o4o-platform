@@ -141,6 +141,9 @@ export default function OperatorsPage() {
   const [searchParams] = useSearchParams();
   return searchParams.get('assignment') === 'central' ? <Navigate to="/admin/operations-operators" replace /> : <ServiceAdministratorsPage />;
 }
+function serviceAdministratorFormTitle(userId: string | null) {
+  return userId ? '서비스 관리자 편집' : '서비스 관리자 지정';
+}
 function ServiceAdministratorsPage() {
   const [showLegacy, setShowLegacy] = useState(false);
   const [users, setUsers] = useState<AdminUserDto[]>([]);
@@ -865,7 +868,7 @@ function ServiceAdministratorsPage() {
           <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between p-4 border-b">
               <h2 className="text-lg font-semibold">
-                {editingUserId ? '서비스 관리자 편집' : '서비스 관리자 지정'}
+                {serviceAdministratorFormTitle(editingUserId)}
               </h2>
               <button aria-label="담당자 지정 창 닫기" onClick={closeModal} className="p-1 hover:bg-gray-100 rounded">
                 <X className="w-5 h-5" />

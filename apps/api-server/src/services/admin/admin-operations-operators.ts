@@ -32,7 +32,7 @@ const version = (value: unknown) => createHash('sha256').update(JSON.stringify(v
 const menuKeysForRows = (value: Assignment[]) => [...new Set(value.filter(central).flatMap(row => {
   const allowed = centralMenusForRole(row.role).map(menu => menu.key);
   return row.menu_keys === null ? allowed : allowed.filter(key => row.menu_keys.includes(key));
-}))].sort();
+}))].sort((left, right) => left.localeCompare(right));
 
 /** Caller holds the target lock and verifies invitation identity/consent. No service/global/Admin role is overwritten. */
 export async function assertOperationsTarget(db: Db, userId: string, menuKeys: string[]) {
