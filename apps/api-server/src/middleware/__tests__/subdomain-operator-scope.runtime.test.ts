@@ -197,7 +197,7 @@ describe('커뮤니티 조회 권한의 일반 회원 경계', () => {
 
 
 describe('pharmacy collaborator scopes never become Neture-wide roles', () => {
-  it.each(['pharmacy','carepharm','megapharm','pharmcoop'].flatMap(key => [`neture:${key}_admin`, `neture:${key}_operator`]))('%s only enters the business scope', async role => {
+  it.each(['pharmacy','carepharm','drugstore','pharmcoop'].flatMap(key => [`neture:${key}_admin`, `neture:${key}_operator`]))('%s only enters the business scope', async role => {
     const p: Persona = { roles: [role], memberships: [['neture','active']] };
     expect(await passes(requireNetureBusinessScope as RequestHandler, p)).toBe(true);
     expect(await matrix(p)).toEqual(NONE);

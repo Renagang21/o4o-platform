@@ -1126,7 +1126,7 @@ d('Neture 약국 매장 commerce — 격리 PostgreSQL 통합 검증', () => {
       const legalDs=new DataSource({type:'postgres',url:DB_URL,entities:[ServicePolicyDocument,ServiceLegalProfile],synchronize:false});await legalDs.initialize();
       const app=express();app.use(express.json());app.use((req,_res,next)=>{(req as any).user={id:req.get('X-Fixture-Actor'),roles:['neture:carepharm_admin']};next();});
       app.use('/neture',businessOperationsRoutes(legalDs));
-      const endpoint='/neture/operator/semi-franchises/carepharm/legal/policies';const other=await user();await role(other,'neture:megapharm_admin');
+      const endpoint='/neture/operator/semi-franchises/carepharm/legal/policies';const other=await user();await role(other,'neture:drugstore_admin');
       const reader=await user();await role(reader,'neture:carepharm_operator');
       try {
         expect((await request(app).get(endpoint).set('X-Fixture-Actor',reader)).status).toBe(200);

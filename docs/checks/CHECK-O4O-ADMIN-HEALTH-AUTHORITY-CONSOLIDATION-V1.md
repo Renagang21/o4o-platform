@@ -1,5 +1,8 @@
 # 관리자 서비스 상태·권한 화면 정비 검증
 
+> 현행 안내(2026-10-31): 협업체 이름은 **드럭스토어형 약국**, 현재 주소는 `https://drugstore.neture.co.kr`다.
+> **과거 증적의 대상 보존:** 아래 “해당 협업체(당시 구명칭)”·“당시 협업체 구호스트”는 개명·주소 변경 전의 관측 대상이다. 아래 성공·실패·배포 결과를 현재 이름·주소의 운영 검증으로 읽지 않는다. 사용자 지시로 이전 표시명·주소 문자열은 재게시하지 않으며, 문서 경로와 기술 키의 현행 참조 정합은 과거 재실행을 뜻하지 않는다. 당시 원문·실제 호스트 식별자는 기존 Git 이력에서 확인하며 이력을 변경하지 않는다.
+
 > **상태**: COMPLETED
 > **작성일**: 2026-10-21 · **최종 갱신**: 2026-10-21 (Asia/Seoul)
 > **근거 WO/IR**: [정비 TODO](../work-orders/TODO-O4O-ADMIN-HEALTH-AUTHORITY-CONSOLIDATION-V1.md)
@@ -27,7 +30,7 @@
 
 | 종류 | 대상/의미 |
 |---|---|
-| 약국 협력사업·연합회 | pharmacy, carepharm, megapharm, pharmcoop. 주소는 기존 `PHARMACY_COLLABORATORS` 사용 |
+| 약국 협력사업·연합회 | pharmacy, carepharm, drugstore, pharmcoop. 주소는 기존 `PHARMACY_COLLABORATORS` 사용 |
 | 독립 서비스 | supplier, community, kpa.neture.co.kr(분회), study, funding. 주소는 기존 service catalog 사용 |
 | 공통 공간 | neture 대표 홈, store 내 매장, admin 전체 관리자 |
 | 외부 요청 | 서버 소유 고정 HTTPS 주소와 그 HTML의 동일 origin `/assets/` JS만 GET. cookie/Authorization 전달 없음. redirect를 따라가지 않음 |

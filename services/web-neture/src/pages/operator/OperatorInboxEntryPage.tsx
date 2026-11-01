@@ -11,7 +11,7 @@ const origins = new Set([
   "https://store.neture.co.kr",
   "https://pharmacy.neture.co.kr",
   "https://carepharm.neture.co.kr",
-  "https://megapharm.neture.co.kr",
+  "https://drugstore.neture.co.kr",
   "https://pharmcoop.neture.co.kr",
 ]);
 export function trustedInboxDestination(value: unknown): string | null {

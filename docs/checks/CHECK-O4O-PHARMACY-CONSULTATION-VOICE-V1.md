@@ -1,5 +1,8 @@
 # 다국어 상담 음성 입력·읽어주기 검증
 
+> 현행 안내(2026-10-31): 협업체 이름은 **드럭스토어형 약국**, 현재 주소는 `https://drugstore.neture.co.kr`다.
+> **과거 증적의 대상 보존:** 아래 “해당 협업체(당시 구명칭)”·“당시 협업체 구호스트”는 개명·주소 변경 전의 관측 대상이다. 아래 성공·실패·배포 결과를 현재 이름·주소의 운영 검증으로 읽지 않는다. 사용자 지시로 이전 표시명·주소 문자열은 재게시하지 않으며, 문서 경로와 기술 키의 현행 참조 정합은 과거 재실행을 뜻하지 않는다. 당시 원문·실제 호스트 식별자는 기존 Git 이력에서 확인하며 이력을 변경하지 않는다.
+
 > **상태**: COMPLETED — 코드·문서·로컬 검증·작업 branch push 범위
 > **작성일**: 2026-10-18
 > **작업**: [TODO](../work-orders/TODO-O4O-PHARMACY-CONSULTATION-VOICE-V1.md)
@@ -34,7 +37,7 @@
 
 ## 소비처와 통합 인계
 
-- 상담 페이지와 그 전용 hook만 변경했다. Pharmacy·Megapharm·CarePharm·Cooperative는 같은 Store 상담 기능을 사용한다. 공통 메뉴/route/권한/관리자/My Home 코드·비약국 Store에는 변경이 없다. literal 소비처는 상담 페이지 테스트와 App route import이며 신규 hook은 상담 페이지만 소비한다.
+- 상담 페이지와 그 전용 hook만 변경했다. Pharmacy·Drugstore·CarePharm·Cooperative는 같은 Store 상담 기능을 사용한다. 공통 메뉴/route/권한/관리자/My Home 코드·비약국 Store에는 변경이 없다. literal 소비처는 상담 페이지 테스트와 App route import이며 신규 hook은 상담 페이지만 소비한다.
 - branch `wo/pharmacy-multilingual-consultation`, 후속 기준 `36bd4b8d14`, 선행 서비스 설정 `9af97a9413` 포함. fetch 시 main `f8a849ba6e`를 확인했으며 자동 통합하지 않았다. 통합 담당은 최신 main 병합·관련 재검증 후 PR CI/리뷰·병합·배포를 진행한다.
 - 운영 설정/DB/배포는 변경하지 않았다. 미커밋 변경 없이 후속 commit을 같은 branch에 push하며 worktree는 `KEEP`한다. 환경 도구/의존성은 기존 설치를 재사용하므로 환경 설정 초안 변경은 없다.
 

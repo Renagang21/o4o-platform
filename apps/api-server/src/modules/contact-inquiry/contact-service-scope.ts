@@ -58,9 +58,9 @@ export const CONTACT_SERVICES: Record<
     roles: ["neture:carepharm_operator", "neture:carepharm_admin"],
     membership: "neture",
   },
-  megapharm: {
-    name: "메가팜 · 창고형약국",
-    roles: ["neture:megapharm_operator", "neture:megapharm_admin"],
+  drugstore: {
+    name: "드럭스토어형 약국",
+    roles: ["neture:drugstore_operator", "neture:drugstore_admin"],
     membership: "neture",
   },
   pharmcoop: {
@@ -112,7 +112,7 @@ export async function contactRecipients(
   const businessKey =
     key === "kpa-society"
       ? "pharmacy"
-      : ["carepharm", "megapharm"].includes(key)
+      : ["carepharm", "drugstore"].includes(key)
         ? key
         : null;
   const legacyRoles =

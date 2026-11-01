@@ -23,7 +23,7 @@ export const OPERATOR_DELEGATION_SCOPES = {
   "kpa-society": "kpa",
   pharmacy: "neture:pharmacy",
   carepharm: "neture:carepharm",
-  megapharm: "neture:megapharm",
+  drugstore: "neture:drugstore",
   pharmcoop: "neture:pharmcoop",
 } as const;
 export function delegationScope(key: string) {
@@ -94,7 +94,7 @@ export class ServiceOperatorManagementService {
         "SERVICE_ADMIN_REQUIRED",
         "해당 서비스의 활성 Admin 권한이 필요합니다.",
       );
-    if (["pharmacy", "carepharm", "megapharm"].includes(scope.key)) {
+    if (["pharmacy", "carepharm", "drugstore"].includes(scope.key)) {
       const business = await m.query(
         `SELECT sf.id FROM semi_franchises sf WHERE sf.key=$1 AND sf.status='active'
         AND NOT EXISTS(SELECT 1 FROM cooperatives c WHERE c.semi_franchise_id=sf.id) FOR SHARE OF sf`,

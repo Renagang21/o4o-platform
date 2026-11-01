@@ -226,7 +226,7 @@ const enabled = process.env.UNIFIED_ACCESS_TEST_PORT === "55432";
       expect(await centralOperationRoles(db, user)).toEqual([]);
     });
     it.each([
-      "neture:megapharm_operator",
+      "neture:drugstore_operator",
       "neture:carepharm_admin",
       "cooperative:operator",
       "kpa-branch:operator",
@@ -344,7 +344,7 @@ const enabled = process.env.UNIFIED_ACCESS_TEST_PORT === "55432";
     it("constraint rejects an independent business marked as central and rollback refuses active central assignments", async () => {
       await expect(
         db.query(
-          "INSERT INTO role_assignments(user_id,role,is_active,scope_type) VALUES($1,'neture:megapharm_admin',true,'o4o-direct')",
+          "INSERT INTO role_assignments(user_id,role,is_active,scope_type) VALUES($1,'neture:drugstore_admin',true,'o4o-direct')",
           [user],
         ),
       ).rejects.toMatchObject({ code: "23514" });

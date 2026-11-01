@@ -24,24 +24,24 @@ describe('service-specific Hero presentation', () => {
   });
   it('loads a business-scoped editor with matching branding, guidance and preview', async () => {
     const client={get:vi.fn().mockResolvedValue({data:{success:true,data:{revision:0,draft:null,published:null}}}),put:vi.fn()};
-    const {container}=render(<HomePresentationEditor surface="pharmacy" businessKey="megapharm" client={client}/>);
+    const {container}=render(<HomePresentationEditor surface="pharmacy" businessKey="drugstore" client={client}/>);
     expect(await screen.findByRole('heading',{name:'사업 소식과 제품 자료, 가입 약국과 함께'})).toBeTruthy();
-    expect(client.get).toHaveBeenCalledWith('/home-presentation/pharmacy/business/megapharm/manage');
+    expect(client.get).toHaveBeenCalledWith('/home-presentation/pharmacy/business/drugstore/manage');
     expect(screen.getByLabelText('이 서비스의 Hero 제작 안내')).toBeTruthy();
-    expect(container.querySelector('[data-home-identity="megapharm"]')).toBeTruthy();
+    expect(container.querySelector('[data-home-identity="drugstore"]')).toBeTruthy();
     expect(client.put).not.toHaveBeenCalled();
   });
-  it('starts a new Megapharm composition with its own business copy', () => {
-    const draft=initialIdentityPresentation('pharmacy','megapharm');
-    expect(draft.slides[0].eyebrow).toBe('메가팜 · 창고형약국');
+  it('starts a new Drugstore composition with its own business copy', () => {
+    const draft=initialIdentityPresentation('pharmacy','drugstore');
+    expect(draft.slides[0].eyebrow).toBe('드럭스토어형 약국');
     expect(draft.slides[0].title).toContain('사업 소식과 제품 자료');
     expect(initialIdentityPresentation('pharmacy','pharmacy')).toEqual(initialHomePresentation('pharmacy'));
   });
-  it('distinguishes Megapharm without changing the pharmacy publication or existing destination', () => {
+  it('distinguishes Drugstore without changing the pharmacy publication or existing destination', () => {
     const config=initialHomePresentation('pharmacy');
     config.slides[0].linkUrl='/materials'; config.slides[0].linkText='사업 자료';
-    const {container,rerender}=render(<HomeHeroView surface="pharmacy" businessKey="megapharm" config={config} />);
-    expect(container.querySelector('[data-home-identity="megapharm"]')).toBeTruthy();
+    const {container,rerender}=render(<HomeHeroView surface="pharmacy" businessKey="drugstore" config={config} />);
+    expect(container.querySelector('[data-home-identity="drugstore"]')).toBeTruthy();
     expect(screen.getByRole('link',{name:/사업 자료/}).getAttribute('href')).toBe('/materials');
     rerender(<HomeHeroView surface="pharmacy" businessKey="pharmacy" config={config} />);
     expect(container.querySelector('[data-home-identity="pharmacy"]')).toBeTruthy();

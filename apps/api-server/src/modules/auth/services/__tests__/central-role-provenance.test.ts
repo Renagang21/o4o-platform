@@ -64,7 +64,7 @@ it.each([
 );
 it.each([
   "neture:carepharm_admin",
-  "neture:megapharm_operator",
+  "neture:drugstore_operator",
   "kpa:operator",
   "platform:operator",
 ])("never treats independent/retired %s as a central duty", (role) => {

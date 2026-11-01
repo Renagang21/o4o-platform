@@ -33,7 +33,7 @@ jest.mock("../../../middleware/neture-scope.middleware", () => ({
   requireNetureBusinessScope: (req: any, res: any, next: any) => {
     const role = req.headers["x-test-role"];
     const allowed =
-      /^neture:(?:(?:pharmacy|carepharm|megapharm|pharmcoop)_)?(?:admin|operator)$/.test(
+      /^neture:(?:(?:pharmacy|carepharm|drugstore|pharmcoop)_)?(?:admin|operator)$/.test(
         role || "",
       );
     return allowed && req.headers["x-test-membership"] === "active"

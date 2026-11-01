@@ -1,5 +1,8 @@
 # CHECK-O4O-UNIFIED-MEMBERSHIP-ADMIN-DELIVERY-V1
 
+> 현행 안내(2026-10-31): 협업체 이름은 **드럭스토어형 약국**, 현재 주소는 `https://drugstore.neture.co.kr`다.
+> **과거 증적의 대상 보존:** 아래 “해당 협업체(당시 구명칭)”·“당시 협업체 구호스트”는 개명·주소 변경 전의 관측 대상이다. 아래 성공·실패·배포 결과를 현재 이름·주소의 운영 검증으로 읽지 않는다. 사용자 지시로 이전 표시명·주소 문자열은 재게시하지 않으며, 문서 경로와 기술 키의 현행 참조 정합은 과거 재실행을 뜻하지 않는다. 당시 원문·실제 호스트 식별자는 기존 Git 이력에서 확인하며 이력을 변경하지 않는다.
+
 > **상태**: 운영 반영 완료 · 실제 Google 로그인·면허 심사 미검증
 > **작성일**: 2026-10-28
 > **대상**: [통합 구현 WO](../work-orders/WO-O4O-UNIFIED-MEMBERSHIP-ADMIN-REFACTOR-V1.md)의 후속 운영 반영 기록
@@ -45,7 +48,7 @@ Partner Dockerfile에 해당 패키지와 workspace 의존 패키지의 manifest
 | store | `store-web-00380-hug` | DEPLOYED |
 | kpa-branch | `kpa-branch-web-00373-raw` | DEPLOYED |
 
-`kpa-society`는 현행 약국 협업체 웹의 배포 선택 키이며 퇴역한 옛 KPA Run을 복원하지 않았다. 독립 MegaPharm·CarePharm·개별 조합/분회의 운영 권한과 데이터 범위를 중앙에 편입하지 않았다.
+`kpa-society`는 현행 약국 협업체 웹의 배포 선택 키이며 퇴역한 옛 KPA Run을 복원하지 않았다. 독립 해당 협업체(당시 구명칭)·CarePharm·개별 조합/분회의 운영 권한과 데이터 범위를 중앙에 편입하지 않았다.
 
 공개 read-only 확인은 관리자 `/operations` HTTP 200, API `/health/ready` HTTP 200, 비로그인 중앙 접근 API HTTP 401이다. 관리자 revision 직접 smoke와 traffic 100% 전환, API 전환 후 readiness도 기존 배포 workflow에서 통과했다. 이 결과는 실제 Google OAuth·실계정 위임 수락·면허 근거 확인 및 승인 조작의 검증을 대체하지 않는다.
 

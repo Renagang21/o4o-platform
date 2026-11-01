@@ -605,7 +605,7 @@
   --hero-bg: #f3f7fd; --hero-ink: #213b5e; --hero-muted: #506682; --hero-primary: #285d9b;
   --hero-soft: #dbe7f8; --hero-line: #b2c7df; --hero-art-ink: #244466;
 }
-.home-hero[data-home-identity="megapharm"] {
+.home-hero[data-home-identity="drugstore"] {
   --hero-bg: #242d47; --hero-ink: #fff9e9; --hero-muted: #d9dfed; --hero-primary: #f2bf63; --hero-on-primary: #282d40;
   --hero-soft: #f9e9c9; --hero-line: #8a93ac; --hero-art-ink: #323f5c;
 }
@@ -613,18 +613,18 @@
   --hero-bg: #fbf2ed; --hero-ink: #542c3b; --hero-muted: #755765; --hero-primary: #853c56;
   --hero-soft: #efdae0; --hero-line: #cfacb6; --hero-art-ink: #633347;
 }
-.home-hero:is([data-home-identity="pharmacy"], [data-home-identity="megapharm"]) .home-hero-main {
+.home-hero:is([data-home-identity="pharmacy"], [data-home-identity="drugstore"]) .home-hero-main {
   min-height: 0; grid-template-columns: minmax(0, 1.4fr) minmax(140px, .6fr); gap: 24px;
 }
-.home-hero:is([data-home-identity="pharmacy"], [data-home-identity="megapharm"]) .home-hero-visual { max-width: 240px; }
-.home-hero:is([data-home-identity="pharmacy"], [data-home-identity="megapharm"]) .home-hero-title { font-size: clamp(22px, 2.5vw, 32px) !important; line-height: 1.35 !important; }
+.home-hero:is([data-home-identity="pharmacy"], [data-home-identity="drugstore"]) .home-hero-visual { max-width: 240px; }
+.home-hero:is([data-home-identity="pharmacy"], [data-home-identity="drugstore"]) .home-hero-title { font-size: clamp(22px, 2.5vw, 32px) !important; line-height: 1.35 !important; }
 .home-editor-design-guide { padding: 18px 20px; border: 1px solid #cbd5e1; border-radius: 12px; background: #f8fafc; margin-block: 20px; }
 .home-editor-design-guide h2 { margin: 0 0 8px; font-size: 17px; color: #24374b; }
 .home-editor-design-guide p { margin: 6px 0; color: #475569; line-height: 1.7; }
 @media (max-width: 640px) {
   .home-hero[data-home-identity] { padding-block: 26px; }
   .home-hero[data-home-identity] .home-hero-main,
-  .home-hero:is([data-home-identity="pharmacy"], [data-home-identity="megapharm"]) .home-hero-main {
+  .home-hero:is([data-home-identity="pharmacy"], [data-home-identity="drugstore"]) .home-hero-main {
     grid-template-columns: minmax(0, 1fr); gap: 20px; min-height: 0;
   }
   .home-hero[data-home-identity] .home-hero-copy { order: 0; }
@@ -633,8 +633,8 @@
   .home-hero[data-home-identity] .home-hero-title { font-size: 28px !important; }
   .home-hero[data-home-identity] .home-hero-description { font-size: 15px; }
   .home-hero[data-home-identity] .home-hero-controls { margin-top: 16px; }
-  .home-hero:is([data-home-identity="pharmacy"], [data-home-identity="megapharm"]) .home-hero-visual { max-width: 210px; }
-  .home-hero:is([data-home-identity="pharmacy"], [data-home-identity="megapharm"]) .home-hero-title { font-size: 24px !important; }
+  .home-hero:is([data-home-identity="pharmacy"], [data-home-identity="drugstore"]) .home-hero-visual { max-width: 210px; }
+  .home-hero:is([data-home-identity="pharmacy"], [data-home-identity="drugstore"]) .home-hero-title { font-size: 24px !important; }
 }
 
 /* Cooperative presentation stays distinct from the federation's operating scope. */

@@ -6,7 +6,7 @@ describe('collaborator navigation matches the actual destination guard', () => {
   it('main business entry redirects only Pharmacy operators to the Pharmacy host', () => {
     expect(getBusinessOperatorRolesForHost('main')).toEqual(['neture:pharmacy_admin','neture:pharmacy_operator']);
     expect(decideHost('main', { pathname: '/operator/semi-franchises', search: '', hash: '' })).toEqual({ kind: 'external', href: 'https://pharmacy.neture.co.kr/operator/semi-franchises' });
-    for (const key of ['carepharm','megapharm','pharmcoop']) {
+    for (const key of ['carepharm','drugstore','pharmcoop']) {
       expect(getBusinessOperatorRolesForHost('main')).not.toContain(`neture:${key}_operator`);
     }
   });

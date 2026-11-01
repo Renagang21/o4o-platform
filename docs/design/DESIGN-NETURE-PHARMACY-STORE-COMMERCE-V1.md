@@ -131,7 +131,7 @@ supply_proposals
 ```
 
 - `kpa-society` 가입 · `kpa_members` · `kpa_pharmacist_profiles` 를 자격 근거로 읽지 않는다(재해석 금지). 기존 가입자를 자동 전환하지 않는다.
-- **2026-10-31 사용자 확정:** 기본 승인은 `pharmacy` 기본 회원 가입을 함께 연결한다. 기존 정지·반려·탈퇴는 유지하고, MegaPharm·CarePharm 등 독립 사업 가입과 Pharmcoop 개인 가입은 만들지 않는다. 약국 승인과 기본 회원 연결은 동일 transaction이다. 이전 승인 약국의 연결 누락·동의·운영 반영 상태는 [전용 WO](../work-orders/WO-O4O-PHARMACY-APPROVAL-AUTO-MEMBERSHIP-V1.md)를 따른다.
+- **2026-10-31 사용자 확정:** 기본 승인은 `pharmacy` 기본 회원 가입을 함께 연결한다. 기존 정지·반려·탈퇴는 유지하고, 드럭스토어형 약국·CarePharm 등 독립 사업 가입과 Pharmcoop 개인 가입은 만들지 않는다. 약국 승인과 기본 회원 연결은 동일 transaction이다. 이전 승인 약국의 연결 누락·동의·운영 반영 상태는 [전용 WO](../work-orders/WO-O4O-PHARMACY-APPROVAL-AUTO-MEMBERSHIP-V1.md)를 따른다.
 - 내 매장(약국) 승인 · 반려 · 정지 · 재활성화는 Neture 가입 원장(`service_memberships` 'neture')을 만들거나 바꾸지 않는다. 거꾸로 Neture 메인 자격 충족 · 재활성화도 내 매장 · 약국 협력사업 · 공급자 원장과 역할을 만들거나 복구하지 않는다(원장 분리 기록 — [CHECK §10](../checks/CHECK-NETURE-PHARMACY-STORE-COMMERCE-LOCAL-BROWSER-V1.md), 현행 자격은 위 정본).
 - 상태 전이: `pending→active|rejected`, `active→suspended|terminated`, `suspended→active|terminated`, `rejected|terminated→pending`(재신청, 같은 행).
 
@@ -532,17 +532,17 @@ deactivatePharmacyStore(ds, organizationId)                     정지 · 종료
 구현·검증·인계: [CHECK-PHARMACY-FEATURE-APPLICATION-V1](../checks/CHECK-PHARMACY-FEATURE-APPLICATION-V1.md).
 
 
-### 15-6. megapharm 공통 사업 구조와 직원 현장 지원 (2026-10-16)
+### 15-6. drugstore 공통 사업 구조와 직원 현장 지원 (2026-10-16)
 
-- `megapharm.neture.co.kr`는 기존 약국 협력사업 앱을 재사용하며 사업 키는 `megapharm`이다. `businessSite.ts`에서 기본 사업·표시명을 선택한다. 추가 사업은 `VITE_PHARMACY_BUSINESS_KEY/NAME` 설정을 사용한다. 가입·자료·포럼·운영 권한은 서버의 기존 사업 원장을 따른다. 클라이언트의 기본 사업 설정이 가입 자격을 부여하지 않는다.
-- pharmacy·megapharm·carepharm·pharmcoop 호스트는 모두 공통 Neture 계정 세션을 사용하고 사업별 가입 권한을 별도 검증한다(2026-10-22 정렬). 특정 협력사업 가입이 다른 협력사업의 전제가 되지 않는다. 기존 `kpa-society` handoff 대상은 pharmacy 호스트에서만 교환하는 고정 이동 alias로 수용하며 최종 세션은 neture다. 새 role/직원 identity를 만들지 않는다. 기존 약국의 법정정보·legacy 약관을 다른 사업에 자동 복제하지 않는다.
+- `drugstore.neture.co.kr`는 기존 약국 협력사업 앱을 재사용하며 사업 키는 `drugstore`이다. `businessSite.ts`에서 기본 사업·표시명을 선택한다. 추가 사업은 `VITE_PHARMACY_BUSINESS_KEY/NAME` 설정을 사용한다. 가입·자료·포럼·운영 권한은 서버의 기존 사업 원장을 따른다. 클라이언트의 기본 사업 설정이 가입 자격을 부여하지 않는다.
+- pharmacy·drugstore·carepharm·pharmcoop 호스트는 모두 공통 Neture 계정 세션을 사용하고 사업별 가입 권한을 별도 검증한다(2026-10-22 정렬). 특정 협력사업 가입이 다른 협력사업의 전제가 되지 않는다. 기존 `kpa-society` handoff 대상은 pharmacy 호스트에서만 교환하는 고정 이동 alias로 수용하며 최종 세션은 neture다. 새 role/직원 identity를 만들지 않는다. 기존 약국의 법정정보·legacy 약관을 다른 사업에 자동 복제하지 않는다.
 - `store-staff-support`(매장 직원 지원)는 관리자 고정 선택 기능이다. §15-7에 따라 기본·유료·협력사업 제공 대상으로 선택할 수 있다. 유료 설정 미저장 시에는 기존 tablet/multilingual-content만 유지한다. 기능 이용 자격이 특정 사업의 비공개 자료 접근을 대신하지 않는다.
 - `/store/staff-support`는 소속 매장 상품 검색·위치·게시된 다국어 자료 열람, 짧은 숙지 자료, 간단 요구 기록을 제공한다. 전문인 의약품 선택·증상/복약 상담·자동 의료 AI 판단은 제공하지 않는다. 직원은 게시된 자료만 열람하며 경영자에게만 위치 수정·자료 관리 진입을 표시한다.
 - 위치는 `organizations.metadata.staffSupport.locations`의 `local:<id>`/`listing:<id>` 값(100자 이하), 요구는 같은 metadata의 `demandCounts[한국시간 YYYY-MM][reason]` 정수 집계로 저장한다. 별도 schema/migration·직원 기록·고객/환자 정보·자유서술·담당자 배정은 없다. 단일 UPDATE가 원자적으로 누적한다. 위치 쓰기는 같은 매장 활성 상품과 현재 owner를 확인한다.
 - 짧은 숙지 자료는 기존 협력사업 콘텐츠 게시 절차에서 `staff-quick-guide` tag를 붙인다. 현재 active 가입 사업의 published 자료만 조회한다. 현장 고객 요구의 월별 집계는 전체 관리자 설정 화면에서 노출하지 않는다(2026-10-21 관리자 설정 통합). 기존 수집·저장과 관리자 API의 인증 경계는 보존하며, 서비스 운영자용 조회는 자기 사업/매장 범위를 확인하는 후속 작업이다. 다른 사업/매장 집계를 공유하는 권한을 추가하지 않는다.
-- 운영 등록·DNS/TLS·배포는 통합 담당이 수행한다. 관리자에서 megapharm 사업을 등록하고 제공 기능/담당 운영자를 설정한 뒤 해당 사업의 가입 승인을 진행한다. 코드가 운영에 임의로 사업이나 유료 자격을 seed하지 않는다.
+- 운영 등록·DNS/TLS·배포는 통합 담당이 수행한다. 관리자에서 drugstore 사업을 등록하고 제공 기능/담당 운영자를 설정한 뒤 해당 사업의 가입 승인을 진행한다. 코드가 운영에 임의로 사업이나 유료 자격을 seed하지 않는다.
 
-검증·운영 설정 인계: [CHECK-MEGAPHARM-STAFF-SUPPORT-V1](../checks/CHECK-MEGAPHARM-STAFF-SUPPORT-V1.md).
+검증·운영 설정 인계: [CHECK-DRUGSTORE-STAFF-SUPPORT-V1](../checks/CHECK-DRUGSTORE-STAFF-SUPPORT-V1.md).
 
 ### 15-7. 대상별 서비스 설정과 My Home 근무자 허용 (2026-10-18)
 
@@ -839,7 +839,7 @@ pathRules:
 
 ## 2026-10-18 보완 — 네 약국 협업체 운영자 지정
 
-사용자가 전체 관리자 화면에서 pharmacy·carepharm·megapharm·pharmcoop 각각 Admin과 Operator를
+사용자가 전체 관리자 화면에서 pharmacy·carepharm·drugstore·pharmcoop 각각 Admin과 Operator를
 지정하도록 요청했다. 네 대상은 여전히 사업 식별자이며 별도 `service_memberships` 서비스가 아니다.
 `neture:{사업키}_admin/operator` 역할로 해당 사업만 운영한다. 기존 Neture 전체 역할을 복제하지 않는다.
 `pharmcoop` 역할은 연합회 산하 조합관리 범위다. 연합회 admin은 조합 최종 결정과 조합 admin 지정·해제를, operator는 조합 신청 검토·보완을 맡는다.
@@ -859,7 +859,7 @@ pathRules:
 - 신청과 동의 원장·본문 해시·신청별 정책 연결 기록은 같은 트랜잭션으로 저장한다. 기존 가입 조건/추가 신청 내용의 스냅샷도 유지한다. 개별 협동조합의 개인 가입도 같은 사업 범위의 문서를 확인한다. 실제 문안·동의·사업 역할·유료 자격을 자동 생성하지 않는다.
 - 자료 편집의 ‘직원 숙지 자료로 사용’은 기존 `staff-quick-guide` 태그를 선택한다. 나머지 태그를 유지하고 총 20개 제한을 따른다. 게시·활성 사업 가입 여부에 따라 내 매장의 ‘짧게 익히기’에 표시한다. 과제·시험·별도 관리 담당자 체계는 추가하지 않는다.
 
-작업·검증: [WO](../work-orders/WO-O4O-MEGAPHARM-OPERATIONAL-COMPLETION-V1.md), [CHECK](../checks/CHECK-O4O-MEGAPHARM-OPERATIONAL-COMPLETION-V1.md). 사업 독립 정비 WO 전체의 데이터 삭제·카탈로그/인프라 이름 변경 완료를 뜻하지 않는다.
+작업·검증: [WO](../work-orders/WO-O4O-DRUGSTORE-OPERATIONAL-COMPLETION-V1.md), [CHECK](../checks/CHECK-O4O-DRUGSTORE-OPERATIONAL-COMPLETION-V1.md). 사업 독립 정비 WO 전체의 데이터 삭제·카탈로그/인프라 이름 변경 완료를 뜻하지 않는다.
 
 ### 17-3. CarePharm 신청 증빙과 공급·결제 자격 재확인 (2026-10-22)
 

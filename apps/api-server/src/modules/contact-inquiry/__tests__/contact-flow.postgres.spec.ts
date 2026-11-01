@@ -532,7 +532,7 @@ suite("isolated local PostgreSQL public inquiry flow", () => {
   );
   it("notifies central operations about missing assignment without exposing the inquiry content", async () => {
     await request(app)
-      .post("/public/services/megapharm/contact-inquiries")
+      .post("/public/services/drugstore/contact-inquiries")
       .send({ ...payload, subject: "PRIVATE_SUBJECT" });
     const sent = (
       notificationService.createNotification as jest.Mock
@@ -543,7 +543,7 @@ suite("isolated local PostgreSQL public inquiry flow", () => {
     expect(sent[0].metadata.assignmentRequired).toBe(true);
   });
   it("does not duplicate a private-data-free central assignment alert when retrying email failure", async () => {
-    const defaults = await contactSettings.loadContactSettings(db, "megapharm");
+    const defaults = await contactSettings.loadContactSettings(db, "drugstore");
     const settings = jest
       .spyOn(contactSettings, "loadContactSettings")
       .mockResolvedValue({
@@ -568,7 +568,7 @@ suite("isolated local PostgreSQL public inquiry flow", () => {
         },
       );
       const created = await request(app)
-        .post("/public/services/megapharm/contact-inquiries")
+        .post("/public/services/drugstore/contact-inquiries")
         .send({ ...payload, subject: "PRIVATE_ASSIGNMENT_SUBJECT" });
       expect(created.status).toBe(201);
       const id = created.body.data.id;
@@ -577,8 +577,8 @@ suite("isolated local PostgreSQL public inquiry flow", () => {
         [id],
       );
       expect(before.notification_status).toContain("email:fail");
-      await dispatchContactInquiry(db, "megapharm", id);
-      await dispatchContactInquiry(db, "megapharm", id);
+      await dispatchContactInquiry(db, "drugstore", id);
+      await dispatchContactInquiry(db, "drugstore", id);
       expect(notificationService.createNotification).toHaveBeenCalledTimes(1);
       const sent = (notificationService.createNotification as jest.Mock).mock
         .calls[0][0];
@@ -684,7 +684,7 @@ suite("isolated local PostgreSQL public inquiry flow", () => {
     expect(await contactRecipients(db, "carepharm")).toEqual([
       { userId: central },
     ]);
-    expect(await contactRecipients(db, "megapharm")).toEqual([]);
+    expect(await contactRecipients(db, "drugstore")).toEqual([]);
     expect(
       (
         await request(app)
@@ -695,7 +695,7 @@ suite("isolated local PostgreSQL public inquiry flow", () => {
     expect(
       (
         await request(app)
-          .get("/admin/services/megapharm/contact-inquiries")
+          .get("/admin/services/drugstore/contact-inquiries")
           .set("x-test-user", central)
       ).status,
     ).toBe(403);

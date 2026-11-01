@@ -1,5 +1,8 @@
 # TODO-O4O-PHARMACY-MEMBER-HOME-REORGANIZATION-V1
 
+> 현행 안내(2026-10-31): 협업체 이름은 **드럭스토어형 약국**, 현재 주소는 `https://drugstore.neture.co.kr`다.
+> **과거 증적의 대상 보존:** 아래 “해당 협업체(당시 구명칭)”·“당시 협업체 구호스트”는 개명·주소 변경 전의 관측 대상이다. 아래 성공·실패·배포 결과를 현재 이름·주소의 운영 검증으로 읽지 않는다. 사용자 지시로 이전 표시명·주소 문자열은 재게시하지 않으며, 문서 경로와 기술 키의 현행 참조 정합은 과거 재실행을 뜻하지 않는다. 당시 원문·실제 호스트 식별자는 기존 Git 이력에서 확인하며 이력을 변경하지 않는다.
+
 > **상태**: COMPLETED
 > **작성일**: 2026-10-18 · **최종 갱신**: 2026-10-18 (KST)
 > **근거**: 가입 약국 메인을 사업 소식·본부 콘텐츠·제품 정보·회원 활동 중심으로 재구성하고 검증 후 push까지 진행하라는 사용자 요청
@@ -44,7 +47,7 @@ WORKTREE_DISPOSITION: KEEP — 구현·검증·push 및 후속 통합 인계 전
 ## 코드·문서 대조 결과
 
 - 기존 메인은 `PharmacyMemberHomePage`이며 `/`와 `/businesses/:businessKey`에서 소비한다.
-  같은 앱의 pharmacy/megapharm 기본 호스트와 다른 사업 키를 영향 대상으로 본다.
+  같은 앱의 pharmacy/drugstore 기본 호스트와 다른 사업 키를 영향 대상으로 본다.
 - `KPA_BASE_NAV`는 `KpaGlobalHeader`와 footer가 소비하며 모바일 drawer도 같은 설정이다.
   브랜드 루트 진입은 유지하고 소식/제품은 실제 홈 anchor, 자료/게시판/안내는 기존 route로 연결한다.
 - 큰 일반 Hero는 기존 공통 컴포넌트의 기본 슬라이드에서 나온다. 공통 package를 바꾸지 않고
@@ -70,7 +73,7 @@ WORKTREE_DISPOSITION: KEEP — 구현·검증·push 및 후속 통합 인계 전
 모바일 drawer 닫힘 후 실제 헤더 높이에 맞춘 anchor 이동도 보완했다.
 
 검증 결과는 [이 트랙 CHECK](../checks/CHECK-O4O-PHARMACY-MEMBER-HOME-REORGANIZATION-V1.md)에 기록한다.
-전체 26 files / 177 tests·TypeScript 포함 production build·변경 lint·약국/메가팜 PC/mobile 28흐름 PASS.
+전체 26 files / 177 tests·TypeScript 포함 production build·변경 lint·약국/해당 협업체(당시 구명칭) PC/mobile 28흐름 PASS.
 실제 OAuth·실제 업무 데이터 검증은 하지 않았으며 PR CI·통합·배포는 이번 요청 밖으로 미실행이다.
 
 DEPLOYMENT: REQUIRED — 후속 통합 담당이 actual Delivery 판정 후 진행한다. 이번 완료는 개발·검증·push 범위다.

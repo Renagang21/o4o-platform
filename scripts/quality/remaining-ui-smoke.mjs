@@ -11,7 +11,7 @@ console.log("Evidence directory:", output);
 const sites = {
   "partner.neture.co.kr": 4311,
   "pharmcoop.neture.co.kr": 4310,
-  "megapharm.neture.co.kr": 4313,
+  "drugstore.neture.co.kr": 4313,
   "neture.co.kr": 4312,
   "carepharm.neture.co.kr": 4314,
 };
@@ -80,7 +80,7 @@ function mockApiData(endpoint, request, handoffs) {
       neture: "neture.co.kr",
       "partner-support": "partner.neture.co.kr",
       pharmcoop: "pharmcoop.neture.co.kr",
-      megapharm: "megapharm.neture.co.kr",
+      drugstore: "drugstore.neture.co.kr",
       "kpa-society": "pharmacy.neture.co.kr",
       carepharm: "carepharm.neture.co.kr",
     };
@@ -108,7 +108,7 @@ try {
     for (const [host, path] of [
       ["partner.neture.co.kr", "/community?page=2#recent"],
       ["pharmcoop.neture.co.kr", "/cooperatives/mine?tab=joined"],
-      ["megapharm.neture.co.kr", "/"],
+      ["drugstore.neture.co.kr", "/"],
       ["carepharm.neture.co.kr", "/#news"],
     ]) {
       const context = await browser.newContext({
@@ -232,7 +232,7 @@ try {
           ? "협동조합으로 돌아가기"
           : host.startsWith("carepharm")
             ? "CarePharm로 돌아가기"
-            : "메가팜으로 돌아가기";
+            : "드럭스토어형 약국으로 돌아가기";
       await page
         .getByRole("button", { name: returnLabel, exact: true })
         .waitFor();
@@ -242,7 +242,7 @@ try {
           ? "cooperative"
           : host.startsWith("carepharm")
             ? "carepharm"
-            : "megapharm";
+            : "drugstore";
       assert.equal(
         new URLSearchParams(page.url().split("?")[1]).get("from"),
         expectedSource,

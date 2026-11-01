@@ -16,7 +16,7 @@ const client = vi.hoisted(() => ({
 vi.mock("./api", () => ({ getPharmacyManagementClient: () => client }));
 beforeEach(() => vi.resetAllMocks());
 afterEach(cleanup);
-const summary = (key = "megapharm", canManagePolicies = false) => ({
+const summary = (key = "drugstore", canManagePolicies = false) => ({
   success: true,
   data: {
     businessKey: key,
@@ -30,7 +30,7 @@ const summary = (key = "megapharm", canManagePolicies = false) => ({
 });
 it("does not add requests until explicitly opened and keeps operator writes hidden", async () => {
   client.get.mockResolvedValue({ data: summary() });
-  render(<BusinessOperationsPanel businessKey="megapharm" />);
+  render(<BusinessOperationsPanel businessKey="drugstore" />);
   expect(client.get).not.toHaveBeenCalled();
   fireEvent.click(
     screen.getByRole("button", { name: "현장 요구 · 사업 약관" }),
@@ -47,7 +47,7 @@ it("rejects another business response and retries without calling it an empty li
   client.get
     .mockResolvedValueOnce({ data: summary("carepharm") })
     .mockResolvedValueOnce({ data: summary() });
-  render(<BusinessOperationsPanel businessKey="megapharm" />);
+  render(<BusinessOperationsPanel businessKey="drugstore" />);
   fireEvent.click(
     screen.getByRole("button", { name: "현장 요구 · 사업 약관" }),
   );
@@ -66,7 +66,7 @@ it("drops a previous business response after navigation", async () => {
         }),
     )
     .mockResolvedValueOnce({ data: summary("carepharm") });
-  const view = render(<BusinessOperationsPanel businessKey="megapharm" />);
+  const view = render(<BusinessOperationsPanel businessKey="drugstore" />);
   fireEvent.click(
     screen.getByRole("button", { name: "현장 요구 · 사업 약관" }),
   );
@@ -88,10 +88,10 @@ it("drops a previous business response after navigation", async () => {
 it("loads admin legal settings using only the selected business adapter", async () => {
   client.get.mockImplementation(async (path: string) => ({
     data: path.endsWith("/staff-demands")
-      ? summary("megapharm", true)
+      ? summary("drugstore", true)
       : { success: true, data: path.endsWith("/policies") ? [] : null },
   }));
-  render(<BusinessOperationsPanel businessKey="megapharm" />);
+  render(<BusinessOperationsPanel businessKey="drugstore" />);
   fireEvent.click(
     screen.getByRole("button", { name: "현장 요구 · 사업 약관" }),
   );
@@ -103,12 +103,12 @@ it("loads admin legal settings using only the selected business adapter", async 
     client.get.mock.calls.some(
       ([path]) =>
         path ===
-        "/neture/operator/semi-franchises/megapharm/legal/legal-profile",
+        "/neture/operator/semi-franchises/drugstore/legal/legal-profile",
     ),
   ).toBe(true);
   expect(
     client.get.mock.calls.every(([path]) =>
-      path.startsWith("/neture/operator/semi-franchises/megapharm/"),
+      path.startsWith("/neture/operator/semi-franchises/drugstore/"),
     ),
   ).toBe(true);
 });

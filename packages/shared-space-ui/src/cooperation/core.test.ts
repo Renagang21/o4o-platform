@@ -47,12 +47,12 @@ describe('cooperation core and business extensions', () => {
     source.model = { ...source.model, origin: 'https://other.example' };
     expect(registry.carepharm.materials!.tags).toEqual(['original']);
     expect(registry.carepharm.model.origin).toBe('https://carepharm.neture.co.kr');
-    expect(COOPERATION_EXTENSIONS.megapharm.materials).toBeUndefined();
+    expect(COOPERATION_EXTENSIONS.drugstore.materials).toBeUndefined();
   });
 
-  it('uses the actual MegaPharm host rather than the Pharmacy fallback or an unsupported handoff', () => {
-    expect(cooperationDestination('megapharm', 'community')).toEqual({
-      serviceKey: 'neture', origin: 'https://megapharm.neture.co.kr', returnPath: '/community', navigation: 'public',
+  it('uses the actual 드럭스토어형 약국 host rather than the Pharmacy fallback or an unsupported handoff', () => {
+    expect(cooperationDestination('drugstore', 'community')).toEqual({
+      serviceKey: 'neture', origin: 'https://drugstore.neture.co.kr', returnPath: '/community', navigation: 'public',
     });
   });
 

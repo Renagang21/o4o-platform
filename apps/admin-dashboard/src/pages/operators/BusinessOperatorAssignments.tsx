@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { authClient } from "@o4o/auth-client";
 import type { SemiFranchise } from "@o4o/operator-core-ui/modules/pharmacy-management";
-const canonical = ["pharmacy", "carepharm", "megapharm", "pharmcoop"];
+const canonical = ["pharmacy", "carepharm", "drugstore", "pharmcoop"];
 type Candidate = {
   userId: string;
   name: string | null;
@@ -75,7 +75,7 @@ export default function BusinessOperatorAssignments() {
       </summary>
       <p className="mt-2 text-sm text-gray-600">
         과거 개별 지정과 기타 사업의 담당자를 관리합니다.
-        Pharmacy·CarePharm·MegaPharm·연합회의 새 Admin 지정은 위 권한 지정 기능을, Operator 지정은 해당 서비스의 Admin 화면을 사용하세요.
+        Pharmacy·CarePharm·드럭스토어형 약국·연합회의 새 Admin 지정은 위 권한 지정 기능을, Operator 지정은 해당 서비스의 Admin 화면을 사용하세요.
       </p>
       {error && (
         <p role="alert" className="my-2 text-red-700">

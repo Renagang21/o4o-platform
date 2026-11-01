@@ -1,5 +1,8 @@
 # 관리자 현재 서비스·서브도메인 목록 개발 검증
 
+> 현행 안내(2026-10-31): 협업체 이름은 **드럭스토어형 약국**, 현재 주소는 `https://drugstore.neture.co.kr`다.
+> **과거 증적의 대상 보존:** 아래 “해당 협업체(당시 구명칭)”·“당시 협업체 구호스트”는 개명·주소 변경 전의 관측 대상이다. 아래 성공·실패·배포 결과를 현재 이름·주소의 운영 검증으로 읽지 않는다. 사용자 지시로 이전 표시명·주소 문자열은 재게시하지 않으며, 문서 경로와 기술 키의 현행 참조 정합은 과거 재실행을 뜻하지 않는다. 당시 원문·실제 호스트 식별자는 기존 Git 이력에서 확인하며 이력을 변경하지 않는다.
+
 > **상태**: COMPLETED
 > **작성일**: 2026-10-20 · **최종 갱신**: 2026-10-20 (Asia/Seoul)
 > **근거 WO/IR**: [구현 TODO](../work-orders/WO-O4O-ADMIN-SUBDOMAIN-SERVICE-DIRECTORY-V1.md)
@@ -13,7 +16,7 @@
 | --- | --- | --- |
 | 현재 서비스 | O4O 약국 경영지원 | `pharmacy.neture.co.kr` |
 | 현재 서비스 | CarePharm · 만성질환관리 | `carepharm.neture.co.kr` |
-| 현재 서비스 | MegaPharm · 창고형약국 | `megapharm.neture.co.kr` |
+| 현재 서비스 | 해당 협업체(당시 구명칭) | `[당시 협업체 구호스트]` |
 | 현재 서비스 | 약국·약사 협동조합 연합회 | `pharmcoop.neture.co.kr` |
 | 현재 서비스 | 공급자 | `supplier.neture.co.kr` |
 | 현재 서비스 | 커뮤니티 | `community.neture.co.kr` |
@@ -33,7 +36,7 @@ K-Cosmetics/Retail, PharmacyHub와 내부 상품 도메인 모듈을 현행 서�
 
 - 기존 관리자 router의 `requireAuth` + `requireAdmin` 아래 `GET /api/v1/admin/platform-services/directory`를 추가했다. 인증·역할 정책은 기존 `platform:super_admin` 판정을 유지한다.
 - 서버의 관리자 표시 투영은 `service-catalog.ts`의 공식 origin/이름, `PHARMACY_COLLABORATORS`의 기존 사업 주소, `store-workspace.ts`의 내 매장 주소를 읽는다. 대표 홈 서비스 탐색 정본의 기타 경로도 대조했다. 이 목록은 identity/role/가입 registry가 아니다.
-- Pharmacy/CarePharm/MegaPharm의 상태만 `semi_franchises`에서 key·status를 SELECT한다. `active`=사업 운영, `closed`=사업 종료, 행 없음=사업 미등록, 기타 상태=확인 필요다. 조회 실패는 503으로 표시하며 미등록으로 대체하지 않는다.
+- Pharmacy/CarePharm/해당 협업체(당시 구명칭)의 상태만 `semi_franchises`에서 key·status를 SELECT한다. `active`=사업 운영, `closed`=사업 종료, 행 없음=사업 미등록, 기타 상태=확인 필요다. 조회 실패는 503으로 표시하며 미등록으로 대체하지 않는다.
 - 협동조합은 연합회 주소·역할만 설명하고 단일 사업 행이나 개별 조합·가입·운영자 상태를 읽거나 추정하지 않는다. 다른 항목의 주소 등록은 DNS/실제 서빙/가입 가능 여부를 검증한 상태가 아니다.
 - 개인 계정·사용량·회원·권한 할당·운영자 목록을 조회하지 않는다. DB schema/migration/seed/write·서비스 membership·권한·handoff·DNS·배포 설정 변경은 없다.
 - 기존 DB catalog GET/PATCH 및 공개 catalog는 그대로다. 관리자 페이지의 전용 client만 새 조회를 소비한다. 화면의 상태/설정 변경 기능은 추가하지 않는다.

@@ -1,5 +1,8 @@
 # WO-O4O-CAREPHARM-PHARMACY-WEB-TRANSITION-V1
 
+> 현행 안내(2026-10-31): 협업체 이름은 **드럭스토어형 약국**, 현재 주소는 `https://drugstore.neture.co.kr`다.
+> **과거 증적의 대상 보존:** 아래 “해당 협업체(당시 구명칭)”·“당시 협업체 구호스트”는 개명·주소 변경 전의 관측 대상이다. 아래 성공·실패·배포 결과를 현재 이름·주소의 운영 검증으로 읽지 않는다. 사용자 지시로 이전 표시명·주소 문자열은 재게시하지 않으며, 문서 경로와 기술 키의 현행 참조 정합은 과거 재실행을 뜻하지 않는다. 당시 원문·실제 호스트 식별자는 기존 Git 이력에서 확인하며 이력을 변경하지 않는다.
+
 > **상태**: COMPLETED · **작성일**: 2026-10-29
 > **사용자 승인**: CarePharm을 약국 협업체 공통 웹으로 이전하고 기존 약국 자원을 제거하는 조사 결과에 대해 판단하여 진행. 개발·검증·main 통합·배포·CarePharm 연결 전환·옛 Run/backend/NEG 제거 및 검증까지.
 > **경계**: 기존 사업·회원·자료·세션·권한 유지. DB/migration·IAM 변경·다른 사업 데이터 변경 없음.
@@ -9,7 +12,7 @@
 - [x] 현행 코드·GCP 연결·CarePharm 경로·홈 자료 계약 및 옛 자원 삭제 조건 조사
 - [x] 기존 CarePharm 표시 컴포넌트 재사용과 약국 웹의 호스트·라우트·공개/회원/운영 기능 연결
 - [x] CarePharm만 분리하는 계획/digest·참조 보존·검증 실패 복구를 기존 운영 CLI에 연결
-- [x] Pharmacy/MegaPharm·Neture·공통 소비처 회귀와 desktop/mobile fixture 검증
+- [x] Pharmacy/해당 협업체(당시 구명칭)·Neture·공통 소비처 회귀와 desktop/mobile fixture 검증
 - [x] 동일 PR의 CI·리뷰 지적 보완 후 main 통합 및 웹 배포
 - [x] 새 계획 검토 후 CarePharm host만 pharmacy-business-web으로 전환·공개 검증
 - [x] 옛 자원 요청 0·완전한 참조 검사 후 kpa-society-web/backend/NEG 제거
@@ -25,7 +28,7 @@ CarePharm은 `semi_franchises.key=carepharm`·약국 조직 가입·기존 scope
 
 - Pharmacy build·169 tests PASS. 기존 Neture 전체 172 files/1,464 tests, CarePharm 집중 57 tests PASS.
 - shared-space-ui 23 files/212 tests PASS. Neture·Pharmcoop build PASS.
-- 운영 Python 50 tests 및 workflow gate/diff tests PASS. 전환은 CarePharm host만 분리하고 기존 pharmacy/megapharm 삭제 검사 topology를 유지한다. drift 시 쓰기 거부, 공개 검증 실패 시 이전 연결 복구, 동시 변경 시 타인의 설정 덮어쓰기 금지를 검증했다.
+- 운영 Python 50 tests 및 workflow gate/diff tests PASS. 전환은 CarePharm host만 분리하고 기존 pharmacy/drugstore 삭제 검사 topology를 유지한다. drift 시 쓰기 거부, 공개 검증 실패 시 이전 연결 복구, 동시 변경 시 타인의 설정 덮어쓰기 금지를 검증했다.
 - 실제 빌드 산출물의 익명 desktop/mobile fixture browser 경로 검사를 수행했다. production API·로그인·업무 데이터 write는 사용하지 않았다. 실제 계정 파일은 이 checkout과 기준 checkout에 없어 실계정 로그인·역할별 운영 검증을 완료로 주장하지 않는다.
 - ESLint 오류 0. App의 기존 hook dependency warning 2건은 이번 변경 밖이며 그대로 유지한다. 기존 번들 크기 warning은 build 실패가 아니다.
 

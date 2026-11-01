@@ -32,7 +32,7 @@ it('전시 오류를 빈 상태와 구분하고 재시도한다', async () => {
   expect(await screen.findByText('본부의 실제 캠페인')).toBeTruthy();
   expect(screen.queryByRole('alert')).toBeNull();
 });
-it.each(['pharmacy', 'megapharm'])('계정 전환 및 사업 %s 이동 시 이전 전시와 늦은 응답을 버린다', async nextBusiness => {
+it.each(['pharmacy', 'drugstore'])('계정 전환 및 사업 %s 이동 시 이전 전시와 늦은 응답을 버린다', async nextBusiness => {
   let resolve!: (value: unknown) => void;
   mocks.get.mockImplementationOnce(() => new Promise(r => { resolve = r; }));
   const view = render(<BusinessHomeFeature businessKey="pharmacy" />);
@@ -66,7 +66,7 @@ it('게시 Hero는 상단 h1으로, 광고는 별도 하단에서 한 번 표시
   const config = publication();
   config.promotions = [{ ...config.slides[0], id: 'promotion', title: '하단 안내' }];
   mocks.get.mockResolvedValue(response(config));
-  render(<><BusinessHomeFeature businessKey="megapharm" mode="hero" fallback={<h1>기본 제목</h1>} /><BusinessHomeFeature businessKey="megapharm" mode="promotions" /></>);
+  render(<><BusinessHomeFeature businessKey="drugstore" mode="hero" fallback={<h1>기본 제목</h1>} /><BusinessHomeFeature businessKey="drugstore" mode="promotions" /></>);
   await screen.findByRole('heading', { level: 1, name: '본부의 실제 캠페인' });
   await screen.findByRole('heading', { name: '하단 안내' });
   expect(screen.getAllByText('본부의 실제 캠페인')).toHaveLength(1);

@@ -18,7 +18,7 @@
 | `o4o-admin-dashboard` | admin.neture.co.kr | Admin Dashboard | `deploy-admin.yml` |
 | `neture-web` | neture.co.kr | 네처 서비스 웹 | `deploy-web-services.yml` |
 | `k-cosmetics-web` | retail.neture.co.kr | K-화장품 — 퇴역(2026-10-06 배포 경로 · 앱 소스 은퇴, Cloud Run 정리 대기) | 없음 |
-| `pharmacy-business-web` | pharmacy.neture.co.kr · megapharm.neture.co.kr | 약국 협력사업 앱 (hostname 으로 사업 판정) | `deploy-web-services.yml` |
+| `pharmacy-business-web` | pharmacy.neture.co.kr · drugstore.neture.co.kr | 약국 협력사업 앱 (hostname 으로 사업 판정) | `deploy-web-services.yml` |
 
 ### GitHub Actions Workflows
 

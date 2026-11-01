@@ -1,5 +1,8 @@
 # 약국 서비스 설정·다국어 상담 main 통합 검증
 
+> 현행 안내(2026-10-31): 협업체 이름은 **드럭스토어형 약국**, 현재 주소는 `https://drugstore.neture.co.kr`다.
+> **과거 증적의 대상 보존:** 아래 “해당 협업체(당시 구명칭)”·“당시 협업체 구호스트”는 개명·주소 변경 전의 관측 대상이다. 아래 성공·실패·배포 결과를 현재 이름·주소의 운영 검증으로 읽지 않는다. 사용자 지시로 이전 표시명·주소 문자열은 재게시하지 않으며, 문서 경로와 기술 키의 현행 참조 정합은 과거 재실행을 뜻하지 않는다. 당시 원문·실제 호스트 식별자는 기존 Git 이력에서 확인하며 이력을 변경하지 않는다.
+
 > **상태**: LOCAL_VALIDATED — 이후 CI·병합·배포 상태는 PR/Actions 참조
 > **작성일**: 2026-10-19
 > **범위**: 사용자의 병합·배포 요청에 따른 통합 및 필요한 수정
@@ -39,7 +42,7 @@
 
 ## 소비처·배포 경계
 
-- Admin은 새 협력사업 관리 화면과 설정 화면을 모두 유지한다. Neture 호환 진입은 기존 플랫폼 guard를 재사용한다. My Home·Store·Pharmacy/Megapharm/CarePharm/Cooperative의 공통 제공/직원 허용 구조는 선행 CHECK대로 유지한다.
+- Admin은 새 협력사업 관리 화면과 설정 화면을 모두 유지한다. Neture 호환 진입은 기존 플랫폼 guard를 재사용한다. My Home·Store·Pharmacy/Drugstore/CarePharm/Cooperative의 공통 제공/직원 허용 구조는 선행 CHECK대로 유지한다.
 - `getAdminMenu`의 layout 및 raw-source 소비처를 검색했다. 권한별 메뉴/직접 URL 회귀를 추가했고 기존 App/Store literal 계약을 API 검증에 포함했다.
 - 필수 `CI Gate`, Codex 미해결 사항, 현재 main 위치를 확인한 뒤 PR 경로로 병합한다. ruleset 우회·main 직접 push는 사용하지 않는다.
 - 배포는 README의 Delivery/promote 경로와 실제 serving SHA 기준 판정을 따른다. 이번 PR은 schema를 추가하지 않는다. 누적 배포에 미승인 migration이 포함되면 그 구체적 범위를 확인하고 별도로 처리한다.

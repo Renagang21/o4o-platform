@@ -1,5 +1,8 @@
 # CHECK-O4O-PHARMACY-MEMBER-HOME-REORGANIZATION-V1
 
+> 현행 안내(2026-10-31): 협업체 이름은 **드럭스토어형 약국**, 현재 주소는 `https://drugstore.neture.co.kr`다.
+> **과거 증적의 대상 보존:** 아래 “해당 협업체(당시 구명칭)”·“당시 협업체 구호스트”는 개명·주소 변경 전의 관측 대상이다. 아래 성공·실패·배포 결과를 현재 이름·주소의 운영 검증으로 읽지 않는다. 사용자 지시로 이전 표시명·주소 문자열은 재게시하지 않으며, 문서 경로와 기술 키의 현행 참조 정합은 과거 재실행을 뜻하지 않는다. 당시 원문·실제 호스트 식별자는 기존 Git 이력에서 확인하며 이력을 변경하지 않는다.
+
 > **상태**: COMPLETED
 > **작성일**: 2026-10-18 · **최종 갱신**: 2026-10-18 (KST)
 > **근거 WO/IR**: [단일 TODO](../work-orders/TODO-O4O-PHARMACY-MEMBER-HOME-REORGANIZATION-V1.md)
@@ -16,7 +19,7 @@
 
 | 대상 | 적용과 검증 경계 |
 |---|---|
-| PharmacyMemberHomePage | pharmacy/megapharm 루트 및 `/businesses/:businessKey` 공통 표시. 사업 key와 기존 참여 guard 유지 |
+| PharmacyMemberHomePage | pharmacy/drugstore 루트 및 `/businesses/:businessKey` 공통 표시. 사업 key와 기존 참여 guard 유지 |
 | BusinessHomeFeature | 기존 사업별 전시 GET, parser·공통 Hero/광고 view 재사용. 기본 홍보 fallback 없음, 운영 편집·게시 원장 유지 |
 | KPA_BASE_NAV | GlobalHeader desktop/mobile 및 footer 소비. 기존 route와 홈 anchor만 사용, 본부 문의 footer 유지 |
 | BusinessStoreShortcut | 상단 compact 표시만 추가. 기존 handoff·명시적 매장 선택·오류/중복 실행 방어 유지 |
@@ -41,7 +44,7 @@
 
 Chromium에서 실제 production 빌드 파일과 합성 계정/API를 사용한다. 실제 도메인 요청은 harness에서
 로컬 파일·합성 응답으로 처리하고 외부 요청은 차단한다. 운영 서버·실제 로그인·운영 업무 데이터를 사용하지 않는다.
-약국/메가팜 × PC 1440/mobile 390 각각 아래 흐름을 확인한다.
+약국/해당 협업체(당시 구명칭) × PC 1440/mobile 390 각각 아래 흐름을 확인한다.
 
 1. 사업 소식·운영 자료·제품·회원 활동과 상단 내 매장 표시.
 2. 메뉴의 소식/제품 anchor 이동·같은 메뉴 재진입과 고정 헤더 아래 제목 비가림.
@@ -54,11 +57,11 @@ Chromium에서 실제 production 빌드 파일과 합성 계정/API를 사용한
 최초 harness는 부드러운 스크롤 종료 전 위치를 판정했고, 합성 도착 HTML에 charset이 없어 한글 표기를
 기다리지 못했다. 검증 조건/합성 HTML을 정정했다. 약국 선택 후 조회가 갱신되는 빈 상태도 최종 응답 후 판정한다.
 이와 별개로 모바일 drawer 닫힘 전 높이로 anchor를 계산하는 실제 이동 결함을 발견해 메뉴 닫힘 반영 후
-이동하도록 보완했다. 메가팜의 긴 브랜드명은 헤더 높이도 달라 고정 여백 대신 실제 헤더 높이를 반영한다.
+이동하도록 보완했다. 해당 협업체(당시 구명칭)의 긴 브랜드명은 헤더 높이도 달라 고정 여백 대신 실제 헤더 높이를 반영한다.
 이동 성공을 위해 guard·권한·도메인 정책이나 assertions를 완화하지 않았다.
 
-최종 결과: 약국/메가팜 × PC/mobile × 7흐름 = 28 PASS. 모든 조합에서 pageerror 0·가로 넘침 없음,
-미정의 API 요청 0이었다. 메가팜 모바일도 실제 헤더 하단보다 소식 제목이 아래에 표시되는 것을 확인했다.
+최종 결과: 약국/해당 협업체(당시 구명칭) × PC/mobile × 7흐름 = 28 PASS. 모든 조합에서 pageerror 0·가로 넘침 없음,
+미정의 API 요청 0이었다. 해당 협업체(당시 구명칭) 모바일도 실제 헤더 하단보다 소식 제목이 아래에 표시되는 것을 확인했다.
 최종 소스의 전체 177 tests·변경 lint·TypeScript 포함 production build를 다시 통과했다.
 그 뒤에는 검증 기록 문서만 수정했다.
 
@@ -87,7 +90,7 @@ main #703의 후속 변경을 merge한 후 약국 웹 177건·공통 운영 UI 1
 새 테스트의 지원되지 않는 `ByRoleOptions.exact` 옵션으로 TypeScript가 한 번 실패했다. 문자열 name의
 기본 정확 일치 조건으로 정정한 후 전체 185건·변경 lint·TypeScript 포함 production build PASS다.
 
-리뷰 보완 후 실제 최종 빌드로 약국/메가팜 PC/mobile 28흐름도 다시 PASS, pageerror·가로 넘침 0이다.
+리뷰 보완 후 실제 최종 빌드로 약국/해당 협업체(당시 구명칭) PC/mobile 28흐름도 다시 PASS, pageerror·가로 넘침 0이다.
 
 ### 추가 복귀·표현 보완
 

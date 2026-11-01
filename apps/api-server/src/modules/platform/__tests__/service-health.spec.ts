@@ -26,7 +26,7 @@ it("covers current business, independent services and common spaces without revi
     expect.arrayContaining([
       "pharmacy.neture.co.kr",
       "carepharm.neture.co.kr",
-      "megapharm.neture.co.kr",
+      "drugstore.neture.co.kr",
       "pharmcoop.neture.co.kr",
       "kpa.neture.co.kr",
       "store.neture.co.kr",

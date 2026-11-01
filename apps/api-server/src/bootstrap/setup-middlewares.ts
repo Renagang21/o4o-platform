@@ -73,8 +73,8 @@ export const getAllowedOrigins = (): string[] => {
     "https://kpa.neture.co.kr",
     "https://community.neture.co.kr",
     "https://carepharm.neture.co.kr",
-    // 창고형·대형약국 사업 호스트 — 약국 공통 앱(pharmacy-business-web)을 재사용하며 이 host 로 사업 키 megapharm 이 선택된다.
-    "https://megapharm.neture.co.kr",
+    // 드럭스토어형 약국 사업 호스트 — 약국 공통 앱(pharmacy-business-web)을 재사용하며 이 host 로 사업 키 drugstore 이 선택된다.
+    "https://drugstore.neture.co.kr",
     // Cloud Run service URLs (GCP asia-northeast3)
     "https://neture-web-3e3aws7zqa-du.a.run.app",
     "https://pharmacy-business-web-3e3aws7zqa-du.a.run.app",

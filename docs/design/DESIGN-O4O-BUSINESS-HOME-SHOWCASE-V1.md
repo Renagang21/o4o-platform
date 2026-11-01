@@ -19,7 +19,7 @@ operator 경로는 기존 businessOperator 미들웨어와 requireOperatorOf를 
 
 ## 소비처
 - 공통 OperatorSemiFranchisePage: 메인 진열 관리·최근 이력. 진열 UI를 열 때만 조회한다.
-- PharmacyMemberHomePage: Pharmacy/MegaPharm BUSINESS_SITE 공용 홈. 기존 최근 자료/상품 미리보기를 메인 진열 조회로 연결한다. 전체 자료함은 기존 별도 메뉴로 유지.
+- PharmacyMemberHomePage: Pharmacy/드럭스토어형 약국 BUSINESS_SITE 공용 홈. 기존 최근 자료/상품 미리보기를 메인 진열 조회로 연결한다. 전체 자료함은 기존 별도 메뉴로 유지.
 - CooperationMemberSpace: CarePharm 홈. 계정·선택 약국 가입 확인 후 진열. 운영자는 담당 API로 미리보기.
 - Pharmcoop App: 개별 조합 홈과 자료 메뉴. 연합회 소개 페이지를 개별 조합 진열로 대신하지 않는다. 조합 자료 메뉴는 content만 표시한다. 게시판/회원 가입 등 다른 placeholder 업무는 이번 변경 범위 밖이다.
 - 공유 UI 신규 export는 additive. 다른 홈·자료·포럼 계약 변경 없음. 협동조합 앱은 기존 내부 패키지 shared-space-ui의 workspace 의존만 추가한다. 외부 패키지/version 추가 없음. 기존 Dockerfile은 packages 전체 복사·의존성 순 빌드를 사용한다. 협동조합 Tailwind 스캔에는 신규 공통 진열 파일만 포함한다.

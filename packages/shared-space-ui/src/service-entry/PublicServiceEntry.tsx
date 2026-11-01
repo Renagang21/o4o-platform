@@ -31,9 +31,9 @@ export const PUBLIC_SERVICE_ENTRIES = {
       "사업별 참여 신청과 이용 안내",
     ],
   },
-  megapharm: {
-    name: "메가팜 · 창고형 약국",
-    description: "창고형 약국 협력사업의 참여 방법과 제공 기능을 알아보세요.",
+  drugstore: {
+    name: "드럭스토어형 약국",
+    description: "드럭스토어형 약국 협력사업의 참여 방법과 제공 기능을 알아보세요.",
     features: [
       "협력사업 참여 안내",
       "회원 약국의 소식",

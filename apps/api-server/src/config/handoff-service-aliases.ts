@@ -8,7 +8,7 @@ export function getHandoffServiceAlias(key: unknown) {
       sessionServiceKey: "neture",
       origin: "https://pharmacy.neture.co.kr",
     } as const;
-  if (key === "pharmcoop" || key === "megapharm")
+  if (key === "pharmcoop" || key === "drugstore")
     return {
       key,
       sessionServiceKey: "neture",

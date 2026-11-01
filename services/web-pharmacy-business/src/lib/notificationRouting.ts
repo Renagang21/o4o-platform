@@ -54,7 +54,7 @@ export function openNotificationTarget(
     if (
       ![
         "/operator/service-contact/kpa-society",
-        "/operator/service-contact/megapharm",
+        "/operator/service-contact/drugstore",
       ].includes(target)
     )
       return false;

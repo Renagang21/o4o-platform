@@ -85,7 +85,7 @@ const MultilingualProductPublicLandingPage = lazy(() => import('./pages/public/M
 const ForeignVisitorAffiliatePublicLandingPage = lazy(() => import('./pages/public/ForeignVisitorAffiliatePublicLandingPage').then(m => ({ default: m.ForeignVisitorAffiliatePublicLandingPage })));
 
 /**
- * 약국 협력사업 사이트 (pharmacy.neture.co.kr · megapharm 호스트)
+ * 약국 협력사업 사이트 (pharmacy.neture.co.kr · drugstore 호스트)
  *
  * WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1 D7:
  *   옛 KPA 운영 · 관리 · 매장 · 마이페이지 화면은 이전 없이 삭제했다. 남는 것은

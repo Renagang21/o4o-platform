@@ -1,5 +1,8 @@
 # 관리자 서비스 관리 화면의 현재 서브도메인 정렬
 
+> 현행 안내(2026-10-31): 협업체 이름은 **드럭스토어형 약국**, 현재 주소는 `https://drugstore.neture.co.kr`다.
+> **과거 증적의 대상 보존:** 아래 “해당 협업체(당시 구명칭)”·“당시 협업체 구호스트”는 개명·주소 변경 전의 관측 대상이다. 아래 성공·실패·배포 결과를 현재 이름·주소의 운영 검증으로 읽지 않는다. 사용자 지시로 이전 표시명·주소 문자열은 재게시하지 않으며, 문서 경로와 기술 키의 현행 참조 정합은 과거 재실행을 뜻하지 않는다. 당시 원문·실제 호스트 식별자는 기존 Git 이력에서 확인하며 이력을 변경하지 않는다.
+
 > **상태**: COMPLETED
 > **작성일**: 2026-10-20 · **최종 갱신**: 2026-10-20 (Asia/Seoul)
 > **근거 WO/IR**: 사용자 `/admin/platform/services`의 이전 서비스 목록을 현재 서브도메인 구조로 정비 요청
@@ -15,7 +18,7 @@
 
 - 현재 화면은 `/api/v1/admin/platform-services` → `PlatformServiceCatalogService.listServices()` → `platform_services` DB 행을 표시한다. `entryUrl`은 현재 코드의 공식 URL과 별개이며 과거 상품 모듈·K-Cosmetics가 포함될 수 있다.
 - 실제 서비스 호스트는 API `service-catalog.ts`, 사업별 호스트는 `@o4o/types`의 `PHARMACY_COLLABORATORS`, 내 매장 주소는 `store-workspace.ts`에 있다. `ServiceDiscovery.tsx`와 서비스 탐색 정본에 현재 공개 진입과 Partner 준비 중 정책이 있다.
-- serviceKey·사업 key·운영 권한·업무공간·서브도메인은 다른 축이다. Pharmacy의 legacy `kpa-society`와 분회의 `kpa-branch`를 구분하고, CarePharm/MegaPharm/협동조합의 새 service membership을 만들지 않는다.
+- serviceKey·사업 key·운영 권한·업무공간·서브도메인은 다른 축이다. Pharmacy의 legacy `kpa-society`와 분회의 `kpa-branch`를 구분하고, CarePharm/해당 협업체(당시 구명칭)/협동조합의 새 service membership을 만들지 않는다.
 - `platformAdminApi.getServices`/`PlatformService`의 관리자 UI 소비처는 이 페이지 하나다. 기존 DB catalog GET/PATCH와 공개 catalog 소비처는 변경하지 않고, 같은 관리자 guard 아래 별도 읽기 `/directory`를 추가한다.
 - 기존 `requireAuth` + `requireAdmin`은 `platform:super_admin`을 확인한다. 권한·역할·인증·handoff·DNS·배포 설정·DB schema/seed/write는 변경하지 않는다.
 
@@ -24,7 +27,7 @@
 - [x] 코드·정본·화면 및 문자열 소비처 대조, 데이터 출처와 퇴역 경계 확인
 - [x] 현재 서비스 / 대표·공통 업무공간 / 연동·준비 중 항목으로 구성하는 서버 읽기 투영
 - [x] 공식 코드 URL 재사용, K-Cosmetics·PharmacyHub·내부 상품 모듈을 현행 서비스로 노출하지 않음
-- [x] Pharmacy·CarePharm·MegaPharm은 해당 사업 원장의 운영/종료/미등록을 구분; 협동조합은 연합회 수준만 표시
+- [x] Pharmacy·CarePharm·해당 협업체(당시 구명칭)은 해당 사업 원장의 운영/종료/미등록을 구분; 협동조합은 연합회 수준만 표시
 - [x] Store·admin을 별도 가입 서비스와 구분, Partner는 대표 홈의 준비 중 설명으로 연결
 - [x] 기존 실제 경로인 Cafe24·병원 도구는 연동/도구로 구분하고 서브도메인을 임의 생성하지 않음
 - [x] 화면에 서비스명·공식 주소·업무 범위·원장 상태, 이름/주소 검색·구분 선택·오류 재시도 제공

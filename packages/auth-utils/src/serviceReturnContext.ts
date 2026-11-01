@@ -54,11 +54,11 @@ export const MY_HOME_SOURCES = {
     label: "CarePharm",
     serviceKey: "carepharm",
   },
-  megapharm: {
-    origin: "https://megapharm.neture.co.kr",
-    label: "메가팜",
-    returnLabel: "메가팜으로 돌아가기",
-    serviceKey: "megapharm",
+  drugstore: {
+    origin: "https://drugstore.neture.co.kr",
+    label: "드럭스토어형 약국",
+    returnLabel: "드럭스토어형 약국으로 돌아가기",
+    serviceKey: "drugstore",
   },
 } as const;
 export type MyHomeSource = keyof typeof MY_HOME_SOURCES;

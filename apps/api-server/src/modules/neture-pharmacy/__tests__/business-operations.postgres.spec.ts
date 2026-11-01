@@ -22,7 +22,7 @@ jest.mock("../../../middleware/auth.middleware.js", () => ({
 
 // Fresh canonical bootstrap required. Fixed owned loopback DB; no production URL accepted.
 const suite =
-  process.env.O4O_MEGAPHARM_COMPLETION_IT === "1" ? describe : describe.skip;
+  process.env.O4O_DRUGSTORE_COMPLETION_IT === "1" ? describe : describe.skip;
 suite("business operations on canonical PostgreSQL schema", () => {
   let db: DataSource, app: express.Express;
   const userIds = Array.from({ length: 5 }, () => randomUUID());
@@ -31,12 +31,12 @@ suite("business operations on canonical PostgreSQL schema", () => {
   const [megaOrg, careOrg, store, otherStore, pendingStore] = orgIds;
   const mega = randomUUID(),
     care = randomUUID();
-  const keys = ["megapharm", "carepharm"];
+  const keys = ["drugstore", "carepharm"];
   const scope = businessPolicyScope(mega);
   const coop = randomUUID(),
     coopBusiness = randomUUID(),
     coopOrg = randomUUID();
-  const route = "/operator/semi-franchises/megapharm";
+  const route = "/operator/semi-franchises/drugstore";
   const as = (id: string) => ({
     get: (path: string) => request(app).get(path).set("x-fixture-user", id),
     post: (path: string, body: unknown) =>
@@ -50,7 +50,7 @@ suite("business operations on canonical PostgreSQL schema", () => {
       host: "127.0.0.1",
       port: 55439,
       username: "postgres",
-      database: "o4o_megapharm_completion_test",
+      database: "o4o_drugstore_completion_test",
       entities: [ServiceLegalProfile, ServicePolicyDocument, ActionLog],
       synchronize: false,
     }).initialize();
@@ -73,7 +73,7 @@ suite("business operations on canonical PostgreSQL schema", () => {
         [id, id],
       );
     for (const [id, key, org] of [
-      [mega, "megapharm", megaOrg],
+      [mega, "drugstore", megaOrg],
       [care, "carepharm", careOrg],
     ])
       await db.query(
@@ -81,7 +81,7 @@ suite("business operations on canonical PostgreSQL schema", () => {
         [id, key, org],
       );
     await db.query(
-      `INSERT INTO role_assignments(user_id,role) VALUES($1,'neture:megapharm_admin'),($2,'neture:megapharm_operator'),($3,'neture:carepharm_admin')`,
+      `INSERT INTO role_assignments(user_id,role) VALUES($1,'neture:drugstore_admin'),($2,'neture:drugstore_operator'),($3,'neture:carepharm_admin')`,
       [admin, operator, otherAdmin],
     );
     for (const id of [store, otherStore, pendingStore])
@@ -180,7 +180,7 @@ suite("business operations on canonical PostgreSQL schema", () => {
     );
     expect(response.status).toBe(200);
     expect(response.body.data).toMatchObject({
-      businessKey: "megapharm",
+      businessKey: "drugstore",
       canManagePolicies: false,
       stores: [{ id: store, counts: { "not-found": 3 } }],
     });
@@ -247,16 +247,16 @@ suite("business operations on canonical PostgreSQL schema", () => {
     expect(
       (
         await request(app).get(
-          "/businesses/megapharm/legal/enrollment-policies",
+          "/businesses/drugstore/legal/enrollment-policies",
         )
       ).status,
     ).toBe(503);
     expect(
-      (await request(app).get("/businesses/megapharm/legal/policies/terms"))
+      (await request(app).get("/businesses/drugstore/legal/policies/terms"))
         .status,
     ).toBe(404);
     await expect(
-      new SemiFranchiseService(db).apply(store, owner, "megapharm"),
+      new SemiFranchiseService(db).apply(store, owner, "drugstore"),
     ).rejects.toHaveProperty("code", "POLICY_UNAVAILABLE");
   });
   const refs: any[] = [];
@@ -285,13 +285,13 @@ suite("business operations on canonical PostgreSQL schema", () => {
         expect(
           (
             await request(app).get(
-              "/businesses/megapharm/legal/enrollment-policies",
+              "/businesses/drugstore/legal/enrollment-policies",
             )
           ).status,
         ).toBe(503);
     }
     const policies = await request(app).get(
-      "/businesses/megapharm/legal/enrollment-policies",
+      "/businesses/drugstore/legal/enrollment-policies",
     );
     expect(policies.status).toBe(200);
     expect(policies.body.data).toHaveLength(2);
@@ -317,7 +317,7 @@ suite("business operations on canonical PostgreSQL schema", () => {
       [mega, store],
     );
     await expect(
-      new SemiFranchiseService(db).apply(store, owner, "megapharm", {
+      new SemiFranchiseService(db).apply(store, owner, "drugstore", {
         policyReferences: [{ ...refs[0], version: 2 }, refs[1]],
       }),
     ).rejects.toHaveProperty("code", "POLICY_VERSION_MISMATCH");
@@ -330,7 +330,7 @@ suite("business operations on canonical PostgreSQL schema", () => {
     const application = await new SemiFranchiseService(db).apply(
       store,
       owner,
-      "megapharm",
+      "drugstore",
       { policyReferences: refs },
     );
     expect(application.status).toBe("pending");

@@ -1,6 +1,6 @@
 # O4O-CANONICAL-DEMO-ACCOUNTS-V1
 
-> **2026-10-20 사용자 승인 — 매장 경영자 Demo 참여 데이터 보정**: 매장 경영자 테스트 로그인 버튼 계정의 community·funding 서비스 가입 및 기존 Demo 약국의 CarePharm·메가팜 사업 참여를 실제 원장으로 보정한다. 기존 메인·약국·강의·매장 관계를 유지한다. 공급자·분회·조합은 별도 자격·소속 없이 가입한 것으로 가장하지 않으며, 다른 Demo의 소유권 이전이나 관리자·운영자 권한을 부여하지 않는다. 정확한 운영 적용 상태는 [집행 WO](../work-orders/WO-O4O-HOME-MEMBERSHIP-DISCOVERY-V1.md)와 [검증 CHECK](../checks/CHECK-O4O-HOME-MEMBERSHIP-DISCOVERY-V1.md)에서 구분한다.
+> **2026-10-20 사용자 승인 — 매장 경영자 Demo 참여 데이터 보정**: 매장 경영자 테스트 로그인 버튼 계정의 community·funding 서비스 가입 및 기존 Demo 약국의 CarePharm·드럭스토어형 약국 사업 참여를 실제 원장으로 보정한다. 기존 메인·약국·강의·매장 관계를 유지한다. 공급자·분회·조합은 별도 자격·소속 없이 가입한 것으로 가장하지 않으며, 다른 Demo의 소유권 이전이나 관리자·운영자 권한을 부여하지 않는다. 정확한 운영 적용 상태는 [집행 WO](../work-orders/WO-O4O-HOME-MEMBERSHIP-DISCOVERY-V1.md)와 [검증 CHECK](../checks/CHECK-O4O-HOME-MEMBERSHIP-DISCOVERY-V1.md)에서 구분한다.
 
 > **2026-10-12 최신 확정**: 사용자가 제공한 매장 경영자·공급자·직원 세 계정을 전체 사용자 로그인 버튼과 연결 데이터의 정본으로 전환한다. 직원은 같은 체험 약국의 직원 권한만 가지며 전체관리자·운영자 계정은 포함하지 않는다. 값의 단일 정본은 공통 코드이며 구현·운영 반영은 인증 WO의 T01~T08에서 별도로 기록한다.
 

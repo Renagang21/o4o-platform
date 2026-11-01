@@ -152,7 +152,7 @@ export function HomeHeroView({
   autoRotate = true,
 }: HeroViewProps) {
   const identity = heroIdentity(surface, businessKey);
-  const identityName = identity === "megapharm" ? "메가팜 · 창고형약국" : HOME_SURFACE_INFO[surface].name;
+  const identityName = identity === "drugstore" ? "드럭스토어형 약국" : HOME_SURFACE_INFO[surface].name;
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
   const [interacting, setInteracting] = useState(false);

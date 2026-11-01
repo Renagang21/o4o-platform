@@ -1,6 +1,9 @@
 # Pharmacy 승인·기본 회원 연결 검증
 
-> **상태**: COMPLETED — 구현·main 통합·선택 3서비스 배포 검증 완료. 공개 MegaPharm DNS·개별 자격 개통은 별도.
+> 현행 안내(2026-10-31): 협업체 이름은 **드럭스토어형 약국**, 현재 주소는 `https://drugstore.neture.co.kr`다.
+> **과거 증적의 대상 보존:** 아래 “해당 협업체(당시 구명칭)”·“당시 협업체 구호스트”는 개명·주소 변경 전의 관측 대상이다. 아래 성공·실패·배포 결과를 현재 이름·주소의 운영 검증으로 읽지 않는다. 사용자 지시로 이전 표시명·주소 문자열은 재게시하지 않으며, 문서 경로와 기술 키의 현행 참조 정합은 과거 재실행을 뜻하지 않는다. 당시 원문·실제 호스트 식별자는 기존 Git 이력에서 확인하며 이력을 변경하지 않는다.
+
+> **상태**: COMPLETED — 구현·main 통합·선택 3서비스 배포 검증 완료. 공개 해당 협업체(당시 구명칭) DNS·개별 자격 개통은 별도.
 > **작성일**: 2026-10-31 (Asia/Seoul)
 > **근거 WO**: [Pharmacy 승인·자동 회원 연결](../work-orders/WO-O4O-PHARMACY-APPROVAL-AUTO-MEMBERSHIP-V1.md)
 
@@ -8,7 +11,7 @@
 
 - 약국 승인/재활성화와 기본 `pharmacy` 사업 가입을 동일 transaction으로 연결한다. 기존 active는 유지하고 pending만 활성화한다. 기존 rejected/suspended/terminated는 보존한다.
 - 기존 승인 약국의 누락은 기존 Pharmacy apply POST에서 현행 약국 승인·경영 관계·개인 약사 자격·공통 계정 상태를 확인해 연결한다. 반복/동시 요청은 가입 1건과 연결 감사 1건만 남긴다.
-- Pharmacy 기본 연결에 독립 사업용 추가 신청·약관 심사를 중복 요구하지 않는다. 기존 약국 신청 동의는 유지하며 별도 약관·거래 동의를 자동 생성하지 않는다. MegaPharm·CarePharm은 기존 독립 신청을 유지하고 Pharmcoop 개인 가입·권한은 변경하지 않는다.
+- Pharmacy 기본 연결에 독립 사업용 추가 신청·약관 심사를 중복 요구하지 않는다. 기존 약국 신청 동의는 유지하며 별도 약관·거래 동의를 자동 생성하지 않는다. 해당 협업체(당시 구명칭)·CarePharm은 기존 독립 신청을 유지하고 Pharmcoop 개인 가입·권한은 변경하지 않는다.
 - Store 신청·사업 목록, Pharmacy 참여/접근 안내를 맞춘다. 선택 약국·URL query/hash·계정 전환의 기존 격리를 유지한다. 운영자 역할·새 role·global membership을 발급하지 않는다.
 
 ## 검증
@@ -23,7 +26,7 @@
 | 약국 앱 전체 UI | 23 files / 172 tests PASS |
 | Store 신청/협업체 진입 | 2 files / 11 tests PASS |
 | Pharmacy Business·Store production build | PASS |
-| Pharmacy·MegaPharm desktop/mobile 합성 브라우저 | 4 scenarios PASS — 선택 약국, Pharmacy 즉시 연결·추가 동의 없음, MegaPharm 동의/승인 대기, 기존 active 약국 전환, 탈퇴 후 자동 연결 미노출, query/hash 유지, page error 0·가로 넘침 없음 |
+| Pharmacy·해당 협업체(당시 구명칭) desktop/mobile 합성 브라우저 | 4 scenarios PASS — 선택 약국, Pharmacy 즉시 연결·추가 동의 없음, 해당 협업체(당시 구명칭) 동의/승인 대기, 기존 active 약국 전환, 탈퇴 후 자동 연결 미노출, query/hash 유지, page error 0·가로 넘침 없음 |
 
 새 API 동작은 실제 PostgreSQL과 기존 서비스/회원 guard로 확인했고 브라우저 API는 합성 fixture다. 운영 실계정의 실제 승인·가입을 수행한 것으로 해석하지 않는다. 스크린샷은 private `.onboarding/pharmacy-auto-shots`에 유지하며 mobile 육안 확인했다.
 
@@ -63,7 +66,7 @@
 - Pharmacy: HTML 200, `/assets/index-BtFWzc2s.js` 200/JavaScript, 새 기본 회원 안내 코드 확인.
 - Store: HTML 200, `/assets/index--yVAMJWk.js` 200/JavaScript, 신청 화면 chunk의 기본 회원 안내 코드 확인. 전환 도중 관측한 이전 자산 경로는 전환 후 SPA HTML fallback이 되어, 상태 코드만 보지 않고 MIME·새 자산·내용을 재검증했다.
 - API: 허용된 Pharmacy 동일 출처 proxy의 `/api/health/ready` 200/JSON, `status=ready`.
-- MegaPharm: `megapharm.neture.co.kr` DNS 해석 실패와 proxy CONNECT 403. 원래 사용자 문맥의 다른 철자 `magapharm.neture.co.kr`도 DNS 해석 실패. 새 배포 전부터의 관측이며 DNS/IAM 변경이나 우회 접속을 하지 않았다. 공개 MegaPharm 정상 응답으로 확대하지 않는다.
+- 해당 협업체(당시 구명칭): `[당시 협업체 구호스트]` DNS 해석 실패와 proxy CONNECT 403. 원래 사용자 문맥의 다른 철자로 된 구주소도 DNS 해석 실패. 새 배포 전부터의 관측이며 DNS/IAM 변경이나 우회 접속을 하지 않았다. 공개 해당 협업체(당시 구명칭) 정상 응답으로 확대하지 않는다.
 - 자산 사전 표본은 rollout 중에 수집돼 Pharmacy가 이미 새 자산이었다. 해시 차이만으로 배포 전후를 판정하지 않으며 workflow의 최종 serving SHA 대조·공개 새 자산 확인을 배포 근거로 사용한다.
 - 지정 점주: 로그인 200, 접근 매장 1/owner, 본인 약국 원장 active, 계정 기준 서비스 접근 판정 `allowed=true`, 기본/Pharmacy 가입 상태 active. 기존 회원 연결이라 중복 쓰기나 전체 약국 backfill을 하지 않았다. 개인 약사 자격 `unrequested`, 세 사업 회원 업무 403을 유지했으며 자격을 임의 승인하지 않았다.
 - Pharmcoop: 공개 조합 1, 지정 local admin 관리 조회 200, 개인 회원 조회 200/`person`, 회원의 관리·역할·약국 header 혼합 403. 원래 전역 역할·매장 연결 fingerprint 동일, 연합회 역할 없음 유지.

@@ -106,7 +106,7 @@ it.each([
   ["store", "platform:super_admin"],
   ["hospital", "platform:super_admin"],
   ["carepharm", "neture:admin"],
-  ["megapharm", "neture:admin"],
+  ["drugstore", "neture:admin"],
 ])(
   "shows %s settings for server-confirmed admin %s",
   async (serviceKey, role) => {

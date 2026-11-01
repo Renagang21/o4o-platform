@@ -50,8 +50,8 @@ export const ASSIGNABLE_OPERATOR_ROLES: readonly string[] = Object.freeze([
   'neture:pharmacy_operator',
   'neture:carepharm_admin',
   'neture:carepharm_operator',
-  'neture:megapharm_admin',
-  'neture:megapharm_operator',
+  'neture:drugstore_admin',
+  'neture:drugstore_operator',
   'neture:pharmcoop_admin',
   'neture:pharmcoop_operator',
 ]);

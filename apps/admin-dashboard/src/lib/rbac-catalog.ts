@@ -48,7 +48,7 @@ export const SERVICES: Record<ServiceKey, ServiceMeta> = {
   funding: { key: 'funding', label: '유통참여형 펀딩', badgeClass: 'text-lime-700 bg-lime-50' },
   pharmacy: { key: 'pharmacy', label: PHARMACY_COLLABORATORS.pharmacy.label, badgeClass: 'text-teal-700 bg-teal-50' },
   carepharm: { key: 'carepharm', label: PHARMACY_COLLABORATORS.carepharm.label, badgeClass: 'text-teal-700 bg-teal-50' },
-  megapharm: { key: 'megapharm', label: PHARMACY_COLLABORATORS.megapharm.label, badgeClass: 'text-teal-700 bg-teal-50' },
+  drugstore: { key: 'drugstore', label: PHARMACY_COLLABORATORS.drugstore.label, badgeClass: 'text-teal-700 bg-teal-50' },
   pharmcoop: { key: 'pharmcoop', label: PHARMACY_COLLABORATORS.pharmcoop.label, badgeClass: 'text-teal-700 bg-teal-50' },
 };
 

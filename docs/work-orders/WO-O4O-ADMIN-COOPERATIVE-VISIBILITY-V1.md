@@ -1,5 +1,8 @@
 # WO-O4O-ADMIN-COOPERATIVE-VISIBILITY-V1
 
+> 현행 안내(2026-10-31): 협업체 이름은 **드럭스토어형 약국**, 현재 주소는 `https://drugstore.neture.co.kr`다.
+> **과거 증적의 대상 보존:** 아래 “해당 협업체(당시 구명칭)”·“당시 협업체 구호스트”는 개명·주소 변경 전의 관측 대상이다. 아래 성공·실패·배포 결과를 현재 이름·주소의 운영 검증으로 읽지 않는다. 사용자 지시로 이전 표시명·주소 문자열은 재게시하지 않으며, 문서 경로와 기술 키의 현행 참조 정합은 과거 재실행을 뜻하지 않는다. 당시 원문·실제 호스트 식별자는 기존 Git 이력에서 확인하며 이력을 변경하지 않는다.
+
 - 상태: ACTIVE
 - 작성·최종 갱신: 2026-10-19 (KST)
 - 기준: main `491be1bb82c5b9788ff97020d0e0430939be11b6`
@@ -18,7 +21,7 @@
 
 ## 조사 결과
 
-- `AdminSemiFranchisePage`의 등록 선택은 pharmacy/carepharm/megapharm 3개이며 pharmcoop을 의도적으로 제외한다.
+- `AdminSemiFranchisePage`의 등록 선택은 pharmacy/carepharm/drugstore 3개이며 pharmcoop을 의도적으로 제외한다.
 - 운영자 지정에는 `neture:pharmcoop_admin`과 `neture:pharmcoop_operator`가 이미 있다. 역할만으로 사업이나 조합 행이 생성되지는 않는다.
 - 일반 사업은 `semi_franchises`, 개별 조합은 `cooperatives.semi_franchise_id`로 그 사업에 연결한다. 개인 조합원은 별도 `cooperative_memberships`이며 약국 조직 가입과 구분한다.
 - 기존 `GET /neture/cooperatives`는 조합과 연결 사업이 모두 활성인 공개 디렉토리다. 관리자 연합회 현황의 근거로 사용하지 않는다. 조사 시 공개 조회는 HTTP 200/활성 조합 0건이었으며 전체 조합 부재를 뜻하지 않는다.

@@ -15,7 +15,7 @@ describe('회원 커뮤니티 API 실패 처리', () => {
     expect(get).toHaveBeenCalledWith('/communities/local-business/forum/posts?page=1');
   });
 });
-it.each(['business:carepharm', 'business%3Acarepharm', 'business:pharmacy', 'business%3Amegapharm'])('uses real scoped reads and writes for %s, independent of the demo flag', async key => {
+it.each(['business:carepharm', 'business%3Acarepharm', 'business:pharmacy', 'business%3Adrugstore'])('uses real scoped reads and writes for %s, independent of the demo flag', async key => {
   window.history.replaceState({}, '', `/communities/${key}/forum/posts`);
   const scope = encodeURIComponent(decodeURIComponent(key));
   get.mockResolvedValue({ data: { success: true, data: [], totalCount: 0, pagination: { page: 1, totalPages: 0 } } });

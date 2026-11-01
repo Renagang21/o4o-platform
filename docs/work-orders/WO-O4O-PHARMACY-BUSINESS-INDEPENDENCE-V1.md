@@ -1,5 +1,8 @@
 # 약국 협력사업 4곳 동급 독립 정비
 
+> 현행 안내(2026-10-31): 협업체 이름은 **드럭스토어형 약국**, 현재 주소는 `https://drugstore.neture.co.kr`다.
+> **과거 증적의 대상 보존:** 아래 “해당 협업체(당시 구명칭)”·“당시 협업체 구호스트”는 개명·주소 변경 전의 관측 대상이다. 아래 성공·실패·배포 결과를 현재 이름·주소의 운영 검증으로 읽지 않는다. 사용자 지시로 이전 표시명·주소 문자열은 재게시하지 않으며, 문서 경로와 기술 키의 현행 참조 정합은 과거 재실행을 뜻하지 않는다. 당시 원문·실제 호스트 식별자는 기존 Git 이력에서 확인하며 이력을 변경하지 않는다.
+
 > **상태**: OPEN
 > **작성일**: 2026-10-20
 > **근거**: 사용자 결정(2026-10-20) — pharmacy 예외 제거 · 4개 협력사업 독립 · 사업별 약관 분리
@@ -8,7 +11,7 @@
 
 ## INITIAL_PURPOSE
 
-`pharmacy` · `megapharm` · `pharmcoop` · `carepharm` 은 `neture.co.kr` 서브도메인에서 서로 다른 사업자가 운영할 약국 협력사업이다. 네 사업을 **같은 수준의 독립 사업**으로 만든다. 한 사업의 데이터 · 기능 공간 · 약관이 다른 사업과 공유되지 않아야 한다.
+`pharmacy` · `drugstore` · `pharmcoop` · `carepharm` 은 `neture.co.kr` 서브도메인에서 서로 다른 사업자가 운영할 약국 협력사업이다. 네 사업을 **같은 수준의 독립 사업**으로 만든다. 한 사업의 데이터 · 기능 공간 · 약관이 다른 사업과 공유되지 않아야 한다.
 
 ## CONFIRMED_DECISIONS
 
@@ -32,7 +35,7 @@ D1 과 D5 를 합치면 로그인 계정 · 세션은 네 사업 모두 O4O 공�
 | 사업 | 앱 | 도메인 | 세션 키 (Origin 판정) |
 |---|---|---|---|
 | pharmacy | `services/web-kpa-society` (Cloud Run `kpa-society-web`) | `pharmacy.neture.co.kr` | `kpa-society` |
-| megapharm | 같은 이미지, hostname 으로 사업 판정 | `megapharm.neture.co.kr` | `neture` |
+| drugstore | 같은 이미지, hostname 으로 사업 판정 | `[당시 협업체 구호스트]` | `neture` |
 | carepharm | `services/web-neture` host profile | `carepharm.neture.co.kr` | `neture` |
 | pharmcoop | `services/web-pharmacy-coop` (Cloud Run `cooperative-web`) | `pharmcoop.neture.co.kr` | `coop` (catalog 밖 · 가입 Origin 거절) |
 
@@ -47,7 +50,7 @@ D1 과 D5 를 합치면 로그인 계정 · 세션은 네 사업 모두 O4O 공�
    - `modules/neture-pharmacy/services/pharmacy-membership.service.ts:152-185` — 항상 `kpa-society` 기록.
    - `services/auth/signup-policy.service.ts:11,13,43,67` — 자체 가입 약관은 `kpa-society` 만.
    - `services/web-kpa-society/src/config/businessSite.ts:19` — `authServiceKey: key === "pharmacy" ? "kpa-society" : "neture"`.
-2. **megapharm 데이터 공유 (D2 위반)** — `services/web-kpa-society/src` 의 `'kpa-society'` 하드코딩 약 70곳이 hostname 과 무관하게 같은 범위를 쓴다.
+2. **drugstore 데이터 공유 (D2 위반)** — `services/web-kpa-society/src` 의 `'kpa-society'` 하드코딩 약 70곳이 hostname 과 무관하게 같은 범위를 쓴다.
    - 포럼 `api/forum.ts` (serviceCode), CMS `api/cms.ts:15`, 설문 `api/survey.ts` · `api/participation.ts`, 알림 `KpaGlobalHeader.tsx:65` · `MobileBottomNav.tsx:80`, 가이드 편집 5곳.
    - 미디어 업로드 9곳(`mediaApi.upload(..., 'kpa-society', ...)`), 사이니지 `/api/signage/kpa-society` 3곳 + 화면 4곳, 장바구니 `utils/eventOfferCart.ts:19` · `store-cart/StoreCartPage.tsx:24`, 통합 매장 경로 `lib/unifiedStoreScope.ts:9,15`.
    - 운영자 화면 약 15곳(`?serviceKey=kpa-society` · props), 서비스 전환 `currentServiceKey` 4곳, 가입 게이트 `lib/membershipGate.ts:30` · `components/auth/MembershipGate.tsx:47`.
@@ -60,7 +63,7 @@ D1 과 D5 를 합치면 로그인 계정 · 세션은 네 사업 모두 O4O 공�
 
 ### 운영 데이터 (기존 기록 기준, 이번 WO 에서 재조회 전)
 
-- `semi_franchises` 활성 행 = `pharmacy` 1건. carepharm · megapharm 0건, pharmcoop `cooperatives` 0건 — [CHECK-O4O-CARE-MEGA-BUSINESS-LEDGER-ALIGNMENT-V1](../checks/CHECK-O4O-CARE-MEGA-BUSINESS-LEDGER-ALIGNMENT-V1.md), [CHECK-O4O-PHARMCOOP-DOMAIN-CORRECTION-V1](../checks/CHECK-O4O-PHARMCOOP-DOMAIN-CORRECTION-V1.md).
+- `semi_franchises` 활성 행 = `pharmacy` 1건. carepharm · drugstore 0건, pharmcoop `cooperatives` 0건 — [CHECK-O4O-CARE-MEGA-BUSINESS-LEDGER-ALIGNMENT-V1](../checks/CHECK-O4O-CARE-MEGA-BUSINESS-LEDGER-ALIGNMENT-V1.md), [CHECK-O4O-PHARMCOOP-DOMAIN-CORRECTION-V1](../checks/CHECK-O4O-PHARMCOOP-DOMAIN-CORRECTION-V1.md).
 
 ## 단계
 
@@ -82,7 +85,7 @@ D1 과 D5 를 합치면 로그인 계정 · 세션은 네 사업 모두 O4O 공�
 - 사업 범위 데이터 API 가 사업 범위 키를 받도록 정비(포럼 · CMS · 미디어 · 사이니지 · 장바구니).
 
 ### 단계 4 — 프런트
-- `services/web-kpa-society`: `'kpa-society'` 하드코딩을 `BUSINESS_SITE` 기반 사업 범위 키로 교체. megapharm 도메인에서 pharmacy 데이터가 보이지 않음을 실브라우저로 확인.
+- `services/web-kpa-society`: `'kpa-society'` 하드코딩을 `BUSINESS_SITE` 기반 사업 범위 키로 교체. drugstore 도메인에서 pharmacy 데이터가 보이지 않음을 실브라우저로 확인.
 - `services/web-neture`(carepharm) · `services/web-pharmacy-coop`(pharmcoop): 사업별 약관 · 가입 흐름을 같은 수준으로 맞춘다.
 
 ### 단계 4-a — 프런트 1차: 옛 KPA 화면 삭제 (D7 · D8) · 완료(이 branch)
@@ -127,7 +130,7 @@ D1 과 D5 를 합치면 로그인 계정 · 세션은 네 사업 모두 O4O 공�
   - DNS — 사용자 정리 완료(`retail` A 레코드 포함). `account` CNAME(ghs.googlehosted.com)은 용도 미상이라 사용자 판단으로 유지 — 이 GCP 프로젝트(App Engine · Cloud Run 도메인 매핑)와 저장소에는 연결이 없다.
   - LB `o4o-global-lb` — 옛 약국 앱 도메인 host rule 2 · `path-matcher-kpa-society` · `api.kpa-society.co.kr` 제거(validate 통과 후 import). 나머지 5개 도메인 host rule 은 원래 없었다.
   - 인증서 — 공용 `cm-cert-neture-v4`(옛 약국 앱 도메인 3개 SAN 포함)를 neture 4개 도메인만의 `cm-cert-neture-v5`(기존 DNS authorization 재사용, 만료 2027-01-18)로 교체 → entry 4개 재지정 · ACTIVE → 옛 도메인 entry 3개 · DNS authorization 3개 · v4 삭제. 남은 DNS authorization 은 neture 4개뿐, 은퇴 도메인 인증서 0.
-  - 검증 — neture · www · admin · api 가 v5 를 서빙(SAN 4개), 9개 호스트(neture · www · admin · api /health · pharmacy · megapharm · kpa · pharmcoop · store) HTTP 200.
+  - 검증 — neture · www · admin · api 가 v5 를 서빙(SAN 4개), 9개 호스트(neture · www · admin · api /health · pharmacy · drugstore · kpa · pharmcoop · store) HTTP 200.
   - 운영 DB `platform_services.entry_url` — `kpa-society` → `https://pharmacy.neture.co.kr`, `kpa-branch` → `https://kpa.neture.co.kr`, `k-cosmetics`(퇴역) → NULL. 현재값 조건부 UPDATE 1건씩 · 단일 트랜잭션 · 사용자 승인 · 은퇴 도메인 잔여 0.
   - 남은 것 — K-Cosmetics 잔여 정리(catalog `domain: retail.neture.co.kr` · `cosmetics:*` · 가입 데이터)는 [K-COSMETICS-RETIREMENT-RESIDUE-CONTRACT-V1](../architecture/K-COSMETICS-RETIREMENT-RESIDUE-CONTRACT-V1.md) 범위로 별도.
 
@@ -157,11 +160,11 @@ D1 과 D5 를 합치면 로그인 계정 · 세션은 네 사업 모두 O4O 공�
 1. 정본에 D1~D5 가 반영되고 pharmacy 예외 서술이 없다.
 2. 네 사업 모두 같은 세션 축 · 같은 가입 판정 방식이며 백엔드에 pharmacy 전용 분기가 없다(`kpa-society` 리터럴 0, 단 이력 주석 제외).
 3. 각 사업이 자기 약관 · 정책 문서를 갖고, 가입 · 동의 기록이 사업 단위로 남는다.
-4. megapharm · pharmacy 도메인에서 각자 쓴 포럼 · 콘텐츠 · 미디어 · 사이니지 데이터가 서로 보이지 않음을 실브라우저와 API 응답으로 확인한다.
+4. drugstore · pharmacy 도메인에서 각자 쓴 포럼 · 콘텐츠 · 미디어 · 사이니지 데이터가 서로 보이지 않음을 실브라우저와 API 응답으로 확인한다.
 5. 남은 명칭 잔재(단계 6)는 목록과 처리 여부를 CHECK 에 기록한다.
 
-## 2026-10-22 연결 작업 — 메가팜 운영 완성 WO
+## 2026-10-22 연결 작업 — 해당 협업체(당시 구명칭) 운영 완성 WO
 
-[메가팜 운영 완성 WO](WO-O4O-MEGAPHARM-OPERATIONAL-COMPLETION-V1.md)에서 D1/D3 일부와 D8의 상담 판정을 연결한다. 네 사업 호스트의 세션은 neture로 정렬하고, 사업별 법정정보·약관은 기존 테이블의 business:<사업 UUID> 범위로 관리·공개·동의한다. 매장 약사 사용 확인에서 kpa_pharmacist_profiles 읽기를 제거한다. PR #760의 옛 운영·설문·로컬 매장 사본 제거는 보존한다.
+[해당 협업체(당시 구명칭) 운영 완성 WO](WO-O4O-DRUGSTORE-OPERATIONAL-COMPLETION-V1.md)에서 D1/D3 일부와 D8의 상담 판정을 연결한다. 네 사업 호스트의 세션은 neture로 정렬하고, 사업별 법정정보·약관은 기존 테이블의 business:<사업 UUID> 범위로 관리·공개·동의한다. 매장 약사 사용 확인에서 kpa_pharmacist_profiles 읽기를 제거한다. PR #760의 옛 운영·설문·로컬 매장 사본 제거는 보존한다.
 
 이 연결로 본 WO 전체가 완료되는 것은 아니다. 기존 kpa-society catalog/공통 Store 및 내 매장 신청의 legacy 정책 키, 남은 backend 소비처 정리·운영 데이터 삭제·인프라 이름 변경은 이 WO의 후속 범위로 남는다. 실제 사업 약관 게시·경영자의 사용 확인·현장 음성 품질은 자동 설정하지 않는다. 이번 검증과 Delivery 결과는 연결 WO/CHECK와 해당 PR에서 추적한다.

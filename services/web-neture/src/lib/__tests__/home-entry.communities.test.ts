@@ -179,9 +179,9 @@ describe('독립 협력사업 참여자는 약국 서비스 가입 없이 실제
   expect(await resolveHomeEntryUrl(action)).toBe('https://carepharm.neture.co.kr/handoff?token=synthetic');
   expect(api.post).toHaveBeenCalledWith('/auth/handoff',{targetServiceKey:'carepharm',returnPath:'/'});
  });
- it('메가팜은 자기 공개 호스트로 연결하고 미승인 사업은 업무 진입을 만들지 않는다', () => {
-  const model=buildHomeEntryModel(user(),data([business('megapharm'),{...business('carepharm'),canParticipate:false}],{}));
-  expect(model.myServices.find(item=>item.id==='business:megapharm')?.action).toEqual({kind:'public',href:'https://megapharm.neture.co.kr/'});
+ it('드럭스토어형 약국은 자기 공개 호스트로 연결하고 미승인 사업은 업무 진입을 만들지 않는다', () => {
+  const model=buildHomeEntryModel(user(),data([business('drugstore'),{...business('carepharm'),canParticipate:false}],{}));
+  expect(model.myServices.find(item=>item.id==='business:drugstore')?.action).toEqual({kind:'public',href:'https://drugstore.neture.co.kr/'});
   expect(model.myServices.some(item=>item.id==='business:carepharm')).toBe(false);
  });
 });
