@@ -1,4 +1,4 @@
-import { buildBusinessInfoUpdate } from '../../utils/business-info-write.js';
+import { buildBusinessInfoUpdateStatement } from '../../utils/business-info-write.js';
 import type { DataSource, EntityManager } from 'typeorm';
 import { centralOperationRoles } from './central-operation-access.js';
 import { centralOperationMenuKeys } from './central-operation-menu-grants.js';
@@ -128,7 +128,7 @@ export class CentralMemberWorkspaceService {
       if (!before) throw new OperationError(404,'MEMBER_NOT_FOUND','회원을 찾을 수 없습니다.');
       if (before.version !== input.version) throw new OperationError(409,'MEMBER_CHANGED','회원 정보가 변경되었습니다. 다시 조회해 주세요.');
       if (before.accountStatus !== 'pending') throw new OperationError(409,'NOT_PENDING_REGISTRATION','대기 중인 가입만 거부할 수 있습니다. 활성 회원은 서비스별 이용 중지 절차를 사용해 주세요.');
-      const [privileged] = await manager.query(`SELECT 1 FROM role_assignments WHERE user_id=$1 AND is_active=true AND (role='platform:super_admin' OR role ~ ':(admin|operator)$') LIMIT 1`,[target]);
+      const [privileged] = await manager.query(`SELECT 1 FROM role_assignments WHERE user_id=$1 AND is_active=true AND (role='platform:super_admin' OR role ~ '(^|:|_)(admin|operator)$') LIMIT 1`,[target]);
       if (privileged) throw new OperationError(409,'PRIVILEGED_ACCOUNT','운영 권한이 있는 계정은 가입 거부할 수 없습니다.');
       await manager.query(`UPDATE users SET status='rejected',"updatedAt"=clock_timestamp() WHERE id=$1`,[target]);
       await recordOperation(manager,'neture',actor,'member.registration_rejected',{targetUserId:target,reason,previousStatus:'pending',nextStatus:'rejected'});
@@ -147,9 +147,9 @@ export class CentralMemberWorkspaceService {
       if (before.version!==input.version) throw new OperationError(409,'MEMBER_CHANGED','회원 정보가 변경되었습니다. 다시 조회해 주세요.');
       const patch=Object.fromEntries(Object.entries(input.fields).map(([key,value])=>[mapping[key],value || null]));
       if(Object.hasOwn(before.business??{},'ceoName'))patch.ceoName=input.fields.representativeName||null;
-      const update=buildBusinessInfoUpdate({root:patch},2);
+      const update=buildBusinessInfoUpdateStatement({root:patch},target);
       if(!update)throw new OperationError(400,'BUSINESS_FIELDS_REQUIRED','정정할 사업자 정보를 입력해 주세요.');
-      await manager.query(`UPDATE users SET "businessInfo"=${update.expression},"updatedAt"=clock_timestamp() WHERE id=$1`,[target,...update.params.map(privateValue)]);
+      await manager.query(update.sql,update.params.map(privateValue));
       await recordOperation(manager,'neture',actor,'member.legacy_business_corrected',{targetUserId:target,reason,previous:Object.fromEntries(Object.entries(mapping).map(([key,column])=>[key,before.business?.[column]??(key==='representativeName'?before.business?.ceoName??null:null)])),next:input.fields});
       return {saved:true};
     });

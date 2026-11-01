@@ -94,7 +94,7 @@ export default function CentralMemberWorkspace({ actorId, initialQuery = '' }: R
   ];
   let panelContent = <button type="button" disabled={busy} onClick={() => { if (selectedId) void openMember(selectedId); }}>선택 회원 다시 조회</button>;
   if (reading) panelContent = <output>회원 제출 정보를 확인하는 중…</output>;
-  else if (detail) panelContent = <MemberWorkPanel key={`${detail.member.userId}:${detailSequence.current}:${workMode}`} mode={workMode} detail={detail} actorId={actorId} busy={busy} perform={perform} />;
+  else if (detail) panelContent = <MemberWorkPanel key={`${detail.member.userId}:${detailSequence.current}:${workMode}`} mode={workMode} detail={detail} actorId={actorId} busy={busy} perform={perform} onBusyChange={value=>{lock.current=value;setBusy(value);}} />;
   return <section className="space-y-4 min-w-0" aria-label="회원 업무">
     <h2 className="text-xl font-bold">공통 회원 관리</h2>
     <p>업무 탭에서 회원을 선택하면 리스트 상단에서 제출 자료 확인과 심사를 이어갈 수 있습니다. 계정·약사 자격·약국 승인은 별개입니다.</p>

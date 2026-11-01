@@ -25,8 +25,8 @@ const actionLabels: Record<string, string> = {
 };
 const legacyBusinessLabels: Record<string, string> = { name: '과거 사업장명', businessNumber: '과거 사업자번호', representativeName: '과거 대표자명', businessType: '과거 업태', businessCategory: '과거 종목', businessEntityType: '과거 사업자 구분', businessStartDate: '과거 개업일', address: '과거 주소', addressDetail: '과거 상세 주소', contactName: '과거 담당자', managerPhone: '과거 담당자 전화번호', taxInvoiceEmail: '과거 세금계산서 이메일' };
 type Decision = { kind: 'qualification' | 'pharmacy' | 'account'; action: string; label: string; pharmacyId?: string };
-export default function MemberWorkPanel({ detail, actorId, busy, perform, mode='detail' }: Readonly<{
-  mode?:MemberWorkMode; detail: MemberDetail; actorId: string; busy: boolean; perform: (work: () => Promise<unknown>) => Promise<void>;
+export default function MemberWorkPanel({ detail, actorId, busy, perform, onBusyChange, mode='detail' }: Readonly<{
+  onBusyChange:(busy:boolean)=>void; mode?:MemberWorkMode; detail: MemberDetail; actorId: string; busy: boolean; perform: (work: () => Promise<unknown>) => Promise<void>;
 }>) {
   const { member, qualification, permissions } = detail;
   const [decision, setDecision] = useState<Decision | null>(mode==='reject'?{kind:'account',action:'reject',label:'가입 거부'}:null), [reason, setReason] = useState(''), [confirmed, setConfirmed] = useState(false);
@@ -44,7 +44,7 @@ export default function MemberWorkPanel({ detail, actorId, busy, perform, mode='
     } catch (error) { setDocumentError(memberError(error)); }
   };
   return <div className="space-y-5">
-    {mode==='delete' && <section aria-label="회원 삭제" className="rounded border border-red-300 bg-white p-4 space-y-3"><h4 className="font-semibold">회원 삭제</h4><p>전체 계정 삭제는 서비스 사용중지·보존 대상 검토 후 기존 계정 제거 절차로 진행합니다. 처리 대기와 제거 완료를 구분합니다.</p>{permissions.erase && actorId!==member.userId?<AccountErasureControls accountId={actorId} userId={member.userId} onCompleted={()=>{void perform(async()=>undefined);}}/>:<p>전체 관리자 권한이 필요하며 본인 계정은 여기서 삭제할 수 없습니다.</p>}</section>}
+    {mode==='delete' && <section aria-label="회원 삭제" className="rounded border border-red-300 bg-white p-4 space-y-3"><h4 className="font-semibold">회원 삭제</h4><p>전체 계정 삭제는 서비스 사용중지·보존 대상 검토 후 기존 계정 제거 절차로 진행합니다. 처리 대기와 제거 완료를 구분합니다.</p>{permissions.erase && actorId!==member.userId?<AccountErasureControls onBusyChange={onBusyChange} accountId={actorId} userId={member.userId} onCompleted={()=>{void perform(async()=>undefined);}}/>:<p>전체 관리자 권한이 필요하며 본인 계정은 여기서 삭제할 수 없습니다.</p>}</section>}
     <h4 className="font-bold">{member.name || '회원'} · {member.email}</h4>
     <dl className="grid grid-cols-1 gap-3 md:grid-cols-3">
       <Field label="이름" value={member.name} /><Field label="닉네임" value={member.nickname} /><Field label="휴대전화" value={member.phone} />

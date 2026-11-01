@@ -157,4 +157,15 @@ integration('central member workbench PostgreSQL authority, projection and corre
     }finally{await db.query('DROP TRIGGER reject_correction_audit ON action_logs; DROP FUNCTION reject_correction_audit();');}
   });
 
+  it('protects pending accounts with scoped pharmacy and cooperative operator/admin roles',async()=>{
+    for(const role of ['neture:carepharm_operator','neture:drugstore_admin','neture:pharmcoop_operator']){
+      const userId=randomUUID();
+      await db.query(`INSERT INTO users VALUES($1,'합성 운영 계정',NULL,$2,NULL,'pending',true,true,now(),now(),NULL)`,[userId,`${userId}@example.test`]);
+      await db.query(`INSERT INTO role_assignments(id,user_id,role,is_active) VALUES($1,$2,$3,true)`,[randomUUID(),userId,role]);
+      const detail=await service.detail(admin,userId);
+      await expect(service.rejectRegistration(admin,userId,{reason:'합성 보호 검사',version:detail.member.version})).rejects.toMatchObject({code:'PRIVILEGED_ACCOUNT'});
+      expect((await service.detail(admin,userId)).member.accountStatus).toBe('pending');
+    }
+  });
+
 });

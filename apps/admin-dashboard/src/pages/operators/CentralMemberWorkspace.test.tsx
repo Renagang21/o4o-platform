@@ -147,3 +147,24 @@ it('drops old selection, rows and private detail when detail authority is revoke
  expect(screen.queryByText('member-a@example.test')).not.toBeInTheDocument();
  expect(screen.queryByText('legacy-license')).not.toBeInTheDocument();
 });
+
+it('locks member commands and selection until a delayed erasure response is processed',async()=>{
+ const scoped={...permissions,manageAccount:true,erase:true};let finish!:(value:unknown)=>void;
+ api.get.mockImplementation(async(path:string)=>({data:{data:path===base?{items:rows,counts:{},permissions:scoped}:{...detail(),permissions:scoped}}}));
+ api.delete.mockImplementationOnce(()=>new Promise(resolve=>{finish=resolve;}));
+ const confirm=vi.spyOn(window,'confirm').mockReturnValue(true);
+ try{
+  render(<CentralMemberWorkspace actorId="reviewer"/>);await select();
+  fireEvent.click(screen.getByRole('button',{name:'회원 삭제',exact:true}));
+  fireEvent.click(await screen.findByRole('button',{name:'완전 제거 요청'}));
+  expect(screen.getByRole('button',{name:'회원 정보 수정',exact:true})).toBeDisabled();
+  expect(screen.getByRole('tab',{name:/약국 심사 대기/})).toBeDisabled();
+  fireEvent.click(within(screen.getByRole('table')).getAllByRole('checkbox')[2]);
+  expect(within(screen.getByRole('table')).getAllByRole('checkbox')[1]).toBeChecked();
+  expect(within(screen.getByRole('table')).getAllByRole('checkbox')[2]).not.toBeChecked();
+  finish({data:{data:{state:'review_required',erased:false,operationId:'delayed-operation'}}});
+  await screen.findByText(/자료 분류 검토 필요.*제거 미완료/);
+  expect(screen.getByRole('button',{name:'회원 정보 수정',exact:true})).toBeEnabled();
+  expect(screen.getByRole('button',{name:'상태 확인'})).toBeInTheDocument();
+ }finally{confirm.mockRestore();}
+});

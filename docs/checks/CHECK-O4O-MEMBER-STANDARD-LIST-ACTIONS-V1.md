@@ -84,3 +84,16 @@ Codex P1 검토에서 users.businessInfo의 실제 타입(json)과 테스트 fix
 기존 사업자 정정 검사에서 실제 컬럼 타입까지 확인하며 관련 PostgreSQL·HTTP 17 tests를 재검증해 통과했다.
 기존 jsonb fixture에서의 통과를 실제 json 컬럼의 저장 성공 근거로 쓰지 않는다. 운영 DB schema 변경은 없다.
 이후 동일 HEAD의 원격 CI·Codex 재검토와 병합/배포 증거는 PR과 최종 통합 보고에서 확인한다.
+
+### 삭제 응답 잠금·기존 정적 가드 후속 보완
+
+Codex P2 지적으로 삭제 요청 시작부터 응답 처리까지 부모 회원 작업 잠금을 공유한다.
+검토/완료 응답 전 선택·탭·상단 명령이 바뀌지 않고, 잠금을 해제한 뒤 완료 콜백이 목록을 갱신하도록 순서를 고정했다.
+AccountErasureControls의 선택적 onBusyChange 콜백은 중앙 회원 화면에서만 사용한다. 다른 소비처 PlatformUsersPage는 기존 동작을 유지하며 기존 삭제 UI 6 tests도 통과했다.
+대기 계정의 세부 운영자 역할(CarePharm·Drugstore·연합회 등)도 가입 거부 보호에 포함했다.
+
+기존 CI의 business-info-json-column-guard가 수동 UPDATE+표현식 생성 조합을 인식하지 못해 실패했다.
+가드를 완화하지 않고 buildBusinessInfoUpdateStatement의 표준 SQL 전체 쓰기 경로를 사용했다.
+실제 json 컬럼·세부 역할 보호·기존 정적 가드·HTTP 21 tests와 Admin/삭제 UI 29 tests 통과.
+1440/390 실제 번들에서 삭제 응답을 지연시켜 명령/탭 잠금, 응답 후 검토 상태 보존, 실제 완료 이후 목록 갱신을 확인했다.
+이 보완도 운영 데이터 변경 없이 같은 PR에서 검증한다.
