@@ -8,8 +8,8 @@ const LABELS: Record<AccountErasureResult['state'], string> = {
 };
 
 /** The server's erased flag is authoritative; accepted/202 is never a deletion success. */
-export default function AccountErasureControls({ accountId, userId, onCompleted }: {
-  accountId: string; userId: string; onCompleted: () => void;
+export default function AccountErasureControls({ accountId, userId, onCompleted, onBusyChange }: {
+  accountId: string; userId: string; onCompleted: () => void; onBusyChange?: (busy: boolean) => void;
 }) {
   const [result, setResult] = useState<AccountErasureResult | null>(null);
   const [busy, setBusy] = useState(false);
@@ -23,6 +23,8 @@ export default function AccountErasureControls({ accountId, userId, onCompleted 
   const run = async (action: 'request' | 'status' | 'retry') => {
     if (action === 'request' && !window.confirm('해당 서비스의 사용중지 절차를 확인한 뒤 전체 계정·일반 개인정보 완전 제거를 요청합니다. 진행하시겠습니까?')) return;
     const captured = epoch.current.generation;
+    let completed = false;
+    onBusyChange?.(true);
     setBusy(true); setError(null);
     try {
       const response = action === 'request' ? await api.delete(`/admin/users/${userId}`)
@@ -32,13 +34,17 @@ export default function AccountErasureControls({ accountId, userId, onCompleted 
       const data = response.data?.data as AccountErasureResult | undefined;
       if (!data || typeof data.erased !== 'boolean' || !Object.prototype.hasOwnProperty.call(LABELS,data.state) || (data.state === 'completed') !== data.erased) throw new Error('INVALID_RESPONSE');
       setResult(data);
-      if (data.state === 'completed' && data.erased === true) onCompleted();
+      completed = data.state === 'completed' && data.erased === true;
     } catch (e) {
       const code = (e as { response?: { data?: { code?: string } } }).response?.data?.code;
       if (captured === epoch.current.generation) setError(code === 'SERVICE_STOP_REQUIRED'
         ? '이용 중인 서비스의 Operator가 먼저 해당 서비스 사용중지를 처리해야 합니다.'
         : '요청을 완료하지 못했습니다. 제거 완료로 처리되지 않았습니다. 관리자에게 처리 상태를 확인하세요.');
-    } finally { if (captured === epoch.current.generation) setBusy(false); }
+    } finally { if (captured === epoch.current.generation) {
+      setBusy(false); onBusyChange?.(false);
+      // Release the parent command lock before its completion refresh can run.
+      if (completed) onCompleted();
+    } }
   };
   return <div className="space-y-2 text-sm">
     {result ? <>

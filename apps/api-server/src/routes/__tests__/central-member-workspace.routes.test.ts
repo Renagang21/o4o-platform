@@ -1,13 +1,13 @@
 import express from 'express';
 import request from 'supertest';
-const list = jest.fn(), detail = jest.fn(), correct = jest.fn();
+const list = jest.fn(), detail = jest.fn(), correct = jest.fn(), correctPharmacy=jest.fn(), correctLegacyBusiness=jest.fn(), rejectRegistration=jest.fn();
 jest.mock('../../database/connection.js', () => ({ AppDataSource: {} }));
 jest.mock('../../middleware/rateLimiter.js', () => ({ apiLimiter: (_req: any, _res: any, next: any) => next() }));
 jest.mock('../../middleware/auth.middleware.js', () => ({ authenticate: (req: any, res: any, next: any) => {
   if (!req.headers['x-user']) return res.sendStatus(401);
   req.user = { id: req.headers['x-user'] }; req.authMethod = req.headers['x-method']; next();
 } }));
-jest.mock('../../services/admin/central-member-workspace.service.js', () => ({ CentralMemberWorkspaceService: jest.fn().mockImplementation(() => ({ list, detail, correct })) }));
+jest.mock('../../services/admin/central-member-workspace.service.js', () => ({ CentralMemberWorkspaceService: jest.fn().mockImplementation(() => ({ list, detail, correct,correctPharmacy,correctLegacyBusiness,rejectRegistration })) }));
 import { pharmacistQualificationsRouter } from '../pharmacist-qualifications.routes.js';
 import { OperationError } from '../../services/operations/operation-audit.js';
 const app = express(); app.use(express.json()); app.use('/qualifications', pharmacistQualificationsRouter);
@@ -46,4 +46,19 @@ it('preserves service authority/conflict errors and redacts unexpected failures'
   detail.mockRejectedValueOnce(new Error('private database payload'));
   const response = await request(app).get(path).set('x-user', actor).set('x-method', 'google');
   expect(response.status).toBe(503); expect(JSON.stringify(response.body)).not.toContain('private');
+});
+
+it('validates exact business field allowlists, evidence and account rejection versions',async()=>{
+ const fields={name:'합성 약국',businessNumber:'1234567890',representativeName:'합성 대표',businessType:'업태',businessCategory:'종목',address:'주소',contactName:'담당자',managerPhone:'',taxInvoiceEmail:'',phone:'',contactEmail:''};
+ const pharmacy=`${path}/pharmacies/33333333-3333-4333-8333-333333333333`;
+ const send=(body:unknown)=>request(app).patch(pharmacy).set('x-user',actor).set('x-method','google').send(body);
+ expect((await send({fields,version:'a'.repeat(32),reason:'제출 자료 대조',evidenceConfirmed:true})).status).toBe(200);
+ expect(correctPharmacy).toHaveBeenCalledWith(actor,target,'33333333-3333-4333-8333-333333333333',expect.objectContaining({fields,evidenceConfirmed:true}));
+ correctPharmacy.mockClear();
+ for(const extra of [{fields:{...fields,status:'active'}},{evidenceConfirmed:false},{version:'invalid'},{fields:{...fields,businessNumber:'invalid'}}]){
+  expect((await send({fields,version:'a'.repeat(32),reason:'대조',evidenceConfirmed:true,...extra})).status).toBe(400);
+ }
+ expect(correctPharmacy).not.toHaveBeenCalled();
+ expect((await request(app).post(`${path}/reject-registration`).set('x-user',actor).set('x-method','google').send({reason:'대조 후 거부',version:input.version})).status).toBe(200);
+ expect(rejectRegistration).toHaveBeenCalledWith(actor,target,{reason:'대조 후 거부',version:input.version});
 });
