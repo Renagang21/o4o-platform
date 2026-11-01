@@ -1,3 +1,9 @@
+import { useUnifiedStore } from '../../contexts/StoreContext';
+import { CommunityVideoImport } from './signage/CommunityVideoImport';
+import { VideoRegistration, type VideoRegistrationAction } from '@o4o/store-ui-core';
+import { askStoreAi, storeAiError } from '../../api/storeAi';
+import { mediaApi } from '../../api/media';
+import { createYoutubeVideoApi, registerSignageVideo } from '../../api/signageMedia';
 import MediaPickerModal, { type MediaAssetItem } from '../../components/common/MediaPickerModal';
 import { StoreAiSlot } from '../../components/store/StoreAiPlacement';
 import { videoPreviewUrl } from './signage/videoPreview';
@@ -145,6 +151,8 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
   //   kpaMembership.organizationId(회원 자격 조직) → canonical 매장 조직으로 교정.
   //   signage store API 는 매장 조직만 인정한다.
   const { organizationId } = useStoreOrganizationId();
+  const { effectiveServiceKey } = useUnifiedStore();
+  const youtubeVideoApi = useMemo(() => createYoutubeVideoApi(organizationId, isCurrent), [organizationId, isCurrent]);
   const organizationRef = useRef(organizationId); organizationRef.current = organizationId;
 
   // URL-based tab derivation (IA restructure)
@@ -322,6 +330,18 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
   useEffect(() => {
     loadSignageMedia();
   }, [loadSignageMedia]);
+
+  const askVideoRegistration = useCallback(async (question: string) => {
+    try {
+    const result = await askStoreAi({ question, serviceId: effectiveServiceKey ?? 'neture', task: 'draft', contextData: { pageTitle: '내 매장 · 동영상 등록', serviceInfo: { purpose: '등록할 영상의 제목·설명·태그 JSON 준비. 저장·URL·권한 판단은 하지 않는다.' } } });
+    return result.answer!;
+    } catch (cause) { throw new Error(storeAiError(cause)); }
+  }, [effectiveServiceKey]);
+  const saveVideoRegistration = useCallback(async (payload: import('@o4o/store-ui-core').VideoRegistrationPayload) => {
+    if (!isCurrent() || organizationRef.current !== organizationId) throw new Error('매장이 변경됐습니다. 현재 매장에서 다시 시작해 주세요.');
+    return registerSignageVideo(organizationId, payload);
+  }, [organizationId, isCurrent]);
+  const videoRequestSlot = useCallback((action: VideoRegistrationAction) => <StoreAiSlot priority={3} label="동영상 등록" action={action} />, []);
 
   const registerLibraryVideo = async (asset: MediaAssetItem) => {
     if (libraryLock.current || mediaMutation.current || !isCurrent()) return;
@@ -1188,6 +1208,8 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
       {/* ═══ Assets Tab (내 동영상) ════════════════ */}
       {activeTab === 'assets' && <>
 
+      {new URLSearchParams(location.search).get('communityVideo') && <CommunityVideoImport requestKey={new URLSearchParams(location.search).get('communityRequest') ?? undefined} videoId={new URLSearchParams(location.search).get('communityVideo')!} organizationId={organizationId} isCurrent={isCurrent} onClose={() => { const params = new URLSearchParams(location.search); params.delete('communityVideo'); params.delete('communityRequest'); navigate({pathname: location.pathname, search: params.toString()}, {replace:true}); }} onImported={() => { void reloadItems(); const params = new URLSearchParams(location.search); params.delete('communityVideo'); params.delete('communityRequest'); navigate({pathname: location.pathname, search: params.toString()}, {replace:true}); }} />}
+      <VideoRegistration contextKey={organizationId} youtube={youtubeVideoApi} mediaApi={mediaApi} ask={askVideoRegistration} save={saveVideoRegistration} onSaved={loadSignageMedia} requestSlot={videoRequestSlot} />
       <div className="flex items-center justify-between mb-2">
         <h2 className="text-lg font-semibold text-slate-800">내 동영상</h2>
         <button
@@ -1202,7 +1224,7 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
         <button type="button" disabled={librarySaving} onClick={() => setVideoLibraryOpen(true)} className="min-h-11 rounded-lg bg-teal-700 px-4 text-sm text-white">O4O에 보관 · 영상 선택</button>
         <a href="https://studio.youtube.com/channel/UCG9wb2OKmCBZ63g_ONuFkzg/videos/upload" target="_blank" rel="noopener noreferrer" onClick={() => setShowVideoRegForm(true)} className="inline-flex min-h-11 items-center rounded-lg border px-4 text-sm">YouTube에 저장</a>
       </div>
-      <p className="mb-3 text-sm text-slate-600">O4O 보관은 미디어 라이브러리를 사용합니다. YouTube는 업로드를 마친 뒤 개별 영상 주소를 등록하세요. 채널 주소 자체는 재생할 수 없습니다.</p>
+      <p className="mb-3 text-sm text-slate-600">O4O 보관은 미디어 라이브러리를 사용합니다. YouTube 업로드와 영상 처리에는 수 분 이상 걸릴 수 있습니다. YouTube 화면에서 완료를 확인한 뒤 개별 영상 주소를 등록하세요. 채널 주소 자체는 재생할 수 없습니다.</p>
       {librarySaving && <output>보관 영상을 내 동영상에 연결하고 있습니다…</output>}
       {libraryError && <div role="alert" className="mb-3 rounded-lg bg-amber-50 p-3 text-sm">{libraryError}{libraryPending && <button type="button" disabled={librarySaving} onClick={() => void registerLibraryVideo(libraryPending)} className="min-h-11 px-3 underline">같은 보관 영상 다시 등록</button>}</div>}
       <MediaPickerModal open={videoLibraryOpen} onClose={() => setVideoLibraryOpen(false)} onSelect={asset => void registerLibraryVideo(asset)} assetType="video" contextKey={organizationId} title="O4O 보관 영상" defaultFolder="general" />

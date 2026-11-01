@@ -527,3 +527,10 @@ export {
   PRODUCT_DESCRIPTION_PURPOSE_LABELS,
 } from './llm/storeContentAuthoringPrompt';
 export type { StoreContentLlmTask, StoreContentLlmContext, ProductDescriptionPurpose, ProductDescriptionEvidence } from './llm/storeContentAuthoringPrompt';
+
+export { VideoRegistration, O4O_VIDEO_STUDIO } from './components/video/VideoRegistration';
+export type { VideoRegistrationAction, VideoRegistrationPayload } from './components/video/VideoRegistration';
+export { VideoPlayback } from '@o4o/tablet-kiosk-core';
+export { hostedVideo } from '@o4o/tablet-kiosk-core/video-embed';
+
+export type { YoutubeUploadApi, YoutubeUploadRequest } from './components/video/YoutubeUploadRequests';

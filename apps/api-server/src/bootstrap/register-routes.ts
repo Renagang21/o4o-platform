@@ -898,6 +898,10 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
       logger.error('Failed to register Media Library routes:', mediaLibError);
     }
 
+    // Official channel OAuth and authenticated, durable Cloud Tasks delivery; credentials are never returned.
+    const { createYoutubeRouter } = await import('../modules/youtube/youtube.routes.js');
+    app.use('/api/v1', createYoutubeRouter(dataSource));
+
     // 29d-6. Register Automation Job routes (WO-O4O-AUTOMATION-VIDEO-JOB-P0-ADMIN-WORKSPACE-V1)
     try {
       const { createAutomationJobRouter } = await import('../modules/automation/controllers/automation-job.controller.js');

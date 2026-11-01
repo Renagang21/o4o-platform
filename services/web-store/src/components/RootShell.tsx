@@ -1,3 +1,4 @@
+import { StoreNotifications } from './store/StoreNotifications';
 import { ServiceFooter, ServiceSpaceSwitcher, MyHomeButton, O4OHomeButton, ServiceAccountMenu } from '@o4o/auth-react';
 
 import { OperatorInboxLink } from '@o4o/operator-core-ui';
@@ -60,6 +61,7 @@ export default function RootShell() {
       {/* WO-O4O-CROSS-SERVICE-PUBLIC-DESIGN-FINAL-POLISH-V1: O4O 홈 · 계정은 nav 와 분리한다 — 모바일에서 brand 와 같은 첫 줄에 두고 nav 만 둘째 줄로 내린다.
           세션 복구 중에는 O4O 홈을 비활성으로 둔다(authLoading — 다른 서비스 헤더와 같은 공통 패턴). */}
       <div className="header-actions">
+        {isAuthenticated && user && organizationId && <StoreNotifications key={`${user.id}:${organizationId}`} organizationId={organizationId} />}
         {/* WO-O4O-REPRESENTATIVE-ENTRY-RETURN-HANDOFF-AND-HOME-NAVIGATION-V1: O4O 홈(로그인 유지) · 로그아웃 = 해당 서브도메인의 현재 브라우저 세션 종료 */}
         <span className="inline-flex flex-col items-end gap-1 sm:flex-row sm:items-center sm:gap-3"><ServiceSpaceSwitcher showStoreShortcut={false} api={authClient.api} accountId={user?.id} isAuthenticated={isAuthenticated} authLoading={authLoading} /><MyHomeButton accountId={user?.id} api={authClient.api} isAuthenticated={isAuthenticated} authLoading={authLoading} className="o4o-home-link" /><O4OHomeButton api={authClient.api} isAuthenticated={isAuthenticated} authLoading={authLoading} className="o4o-home-link" /></span>
         {isAuthenticated && user

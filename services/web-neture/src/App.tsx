@@ -1,3 +1,4 @@
+import CommunitySignagePage from './pages/community/CommunitySignagePage';
 import CommunityImprovementsPage from './pages/community/CommunityImprovementsPage';
 import { serveOperatorInvitationContinuation } from './lib/operatorInvitationReturn';
 import OperatorInvitePage from './pages/OperatorInvitePage';
@@ -728,6 +729,7 @@ function App() {
               {CURRENT_HOST_PROFILE === 'supplier' && <Route path="/" element={<SupplierServiceEntry />} />}
               {CURRENT_HOST_PROFILE === 'funding' && <Route path="/" element={<MarketTrialHubPage />} />}
               {CURRENT_HOST_PROFILE === 'community' && <Route path="/" element={<CommunityHostHomePage />} />}
+              <Route path="/communities/community/signage" element={<CommunitySignagePage />} />
               {CURRENT_HOST_PROFILE === 'carepharm' && <>
                 <Route path="/" element={<CarePharmHomePage />} />
                 <Route path="/news/:noticeId" element={<CarePharmNewsPage />} />

@@ -1,3 +1,3 @@
 export { default as CommunityAnnouncementsPage } from './CommunityAnnouncementsPage';
 export { default as CommunityAnnouncementDetailPage } from './CommunityAnnouncementDetailPage';
-// WO-O4O-NETURE-DIGITAL-SIGNAGE-REMOVAL-V1: CommunitySignagePage export 제거 (페이지 삭제, Neture signage 미대상)
+// CommunitySignagePage는 독립 community 서비스의 공유 영상 목록이다(App 직접 연결). 과거 Neture 전용 제거 판정과 구분한다.

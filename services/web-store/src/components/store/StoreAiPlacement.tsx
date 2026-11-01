@@ -8,14 +8,18 @@ import {
   type ReactNode,
 } from "react";
 
+export interface StoreAiAction { run: (question: string) => Promise<string>; label: string }
+
 interface Placement {
   element: HTMLDivElement;
   priority: number;
   label?: string;
+  action?: StoreAiAction;
 }
 const PlacementContext = createContext<{
   target: HTMLDivElement | null;
   label?: string;
+  action?: StoreAiAction;
   register: (placement: Placement) => () => void;
 } | null>(null);
 
@@ -41,6 +45,7 @@ export function StoreAiPlacementProvider({
   return (
     <PlacementContext.Provider
       value={{
+        action: selected?.action,
         target: selected?.element ?? null,
         label: selected?.label,
         register,
@@ -59,17 +64,19 @@ export function useStoreAiPlacement() {
 export function StoreAiSlot({
   priority = 1,
   label,
+  action,
 }: {
   priority?: number;
   label?: string;
+  action?: StoreAiAction;
 }) {
   const placement = useContext(PlacementContext);
   const register = placement?.register;
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (register && ref.current)
-      return register({ element: ref.current, priority, label });
-  }, [register, priority, label]);
+      return register({ element: ref.current, priority, label, action });
+  }, [register, priority, label, action]);
   return (
     <div ref={ref} className="empty:hidden" data-store-ai-slot={priority} />
   );
