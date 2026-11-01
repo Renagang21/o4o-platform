@@ -95,7 +95,17 @@ async function bootstrap(db) {
       }
       if (i < INCREMENTAL_MIGRATIONS.length) {
         await q.query("SET LOCAL search_path TO public");
-        await new INCREMENTAL_MIGRATIONS[i]().up(q);
+        const migration = new INCREMENTAL_MIGRATIONS[i]();
+        await migration.up(q);
+        if (migration instanceof CreateStoreConsultationStations1792815861315) {
+          // Verify consultation rollback at its own schema prefix, before later hardening.
+          await migration.down(q);
+          const prior = await computeSchemaFingerprint(q);
+          assert.equal(prior.hash, expected.fingerprint);
+          assert.equal(prior.lineCount, expected.fingerprintLineCount);
+          await q.query("SET LOCAL search_path TO public");
+          await migration.up(q);
+        }
       }
     }
     await q.commitTransaction();
@@ -104,26 +114,6 @@ async function bootstrap(db) {
     throw e;
   } finally {
     await q.release();
-  }
-  const q2 = db.createQueryRunner();
-  await q2.connect();
-  await q2.startTransaction();
-  try {
-    const migration = new (INCREMENTAL_MIGRATIONS.at(-1))();
-    await migration.down(q2);
-    const prior = await computeSchemaFingerprint(q2);
-    assert.equal(
-      prior.hash,
-      EXPECTED_SCHEMA_STATES[INCREMENTAL_MIGRATIONS.length - 1].fingerprint,
-    );
-    await q2.query("SET LOCAL search_path TO public");
-    await migration.up(q2);
-    await q2.commitTransaction();
-  } catch (e) {
-    await q2.rollbackTransaction();
-    throw e;
-  } finally {
-    await q2.release();
   }
   console.log("Schema prefixes and empty down/up PASS");
 }

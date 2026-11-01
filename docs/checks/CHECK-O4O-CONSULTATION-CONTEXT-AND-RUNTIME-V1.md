@@ -71,3 +71,16 @@ Codex가 `b9d5170dd5`의 고객 화면에서 수동 언어 선택 후에도 Goog
 
 
 `3c81c8bfdb`의 전체 `CI Gate`와 Codex 재검토는 통과했다. SonarCloud의 남은 신규 신뢰성 지적은 관리자 설정 form 저장 버튼의 암묵적 submit이었다. 의도한 동작을 `type="submit"`으로 명시했고 질문 목록의 안정된 key도 보완했다. 지원 패널 5개 테스트·관리자 저장/고객 선택을 포함한 Chromium 3개 화면 크기가 다시 통과했다. 이 후속 commit의 최종 CI·분석·리뷰는 위 PR 인계 gate에 따라 새 HEAD에서 확인한다.
+
+
+## 2026-11-01 통합 요청 후 최신 main 대조
+
+사용자의 main 병합·배포 지시로 이 공간에서 PR #910 통합을 진행한다. 위 개발 단계의 병합/배포 미실행 기록은 당시 상태로 유지한다.
+
+- 최신 main `cf91b6aec2811280bc9c71446521d35b6116f409`를 같은 branch에 충돌 없이 병합했다. shared packages 재빌드·API 빌드·Store production 빌드·관리자 TypeScript 검사가 통과했다. 상담/근거/Google/상품 접근 focused Jest **5 suites / 58 tests PASS**.
+- 상담 fixture가 마지막 incremental migration을 되돌리던 가정을 제거했다. 상담 migration의 빈 DB down/up을 해당 schema prefix에서 검사하고 이후 migration까지 전체 schema fingerprint를 계속 검증한다. 후속 보안 보강과 forward-only 사업 식별자 전환을 되돌리지 않는다. 운영 migration 파일·schema 변경은 없다.
+- 실제 격리 PostgreSQL 15에서 전체 schema prefix 및 상담/상품/권한 경계 **23 checks PASS**. fixture DB 0건과 이번 작업 전용 컨테이너 제거를 확인했다. 기존 개발/운영 DB에는 접근하지 않았다.
+- 최신 main의 별도 PR #911에는 `RenameDrugstoreCooperation1793457683032`가 포함돼 있다. 기존 Delivery 관측에서 API serving SHA는 `c7c5cd100c`였고 배포는 LEVEL 3으로 보류됐다. 상담 PR delta에 신규 migration은 없지만 누적 API 배포의 migration job은 별도 사업 식별자·역할·설정 전환을 포함할 수 있다. 해당 운영 DB 실행 승인을 일반 코드 병합 승인으로 추정하지 않는다. 실제 DB ledger·현재 운영 적용 완료를 이 기록으로 주장하지 않는다.
+- 병합·배포 완료 여부는 PR 최신 HEAD와 post-merge CI/Delivery의 실제 결과로 확인한다. 이 단락은 로컬 통합 검증 기록이며 배포 완료 기록이 아니다.
+
+문서 정합: 과거 개발/관측 기록을 보존하고 최신 main 호환 검증과 배포 승인 경계를 후속 기록으로 추가했다.
