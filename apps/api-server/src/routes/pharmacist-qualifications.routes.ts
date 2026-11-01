@@ -85,6 +85,30 @@ pharmacistQualificationsRouter.patch('/members/:userId', handle(req => {
     name: input.name!, nickname: input.nickname!, phone: input.phone!, reason: input.reason!, version: input.version!,
   });
 }));
+const memberVersion = z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{6}$/);
+const businessText = z.string().trim().max(300);
+const businessEmail = z.union([z.literal(''),z.string().trim().email().max(255)]);
+const businessPhone = z.string().trim().max(50);
+const businessFields = {
+  name: z.string().trim().min(1).max(255),businessNumber:z.string().regex(/^\d{10}$/),
+  representativeName:z.string().trim().max(100),businessType:z.string().trim().max(100),businessCategory:z.string().trim().max(100),address:z.string().trim().max(500),
+  contactName:z.string().trim().max(100),managerPhone:businessPhone,taxInvoiceEmail:businessEmail,
+};
+pharmacistQualificationsRouter.post('/members/:userId/reject-registration',handle(req=>{
+  google(req);
+  const input=z.object({reason:z.string().trim().min(1).max(2000),version:memberVersion}).strict().parse(req.body);
+  return workspace().rejectRegistration(req.user!.id,memberId(req),{reason:input.reason!,version:input.version!});
+}));
+pharmacistQualificationsRouter.patch('/members/:userId/legacy-business',handle(req=>{
+  google(req);
+  const input=z.object({fields:z.object({...businessFields,businessEntityType:businessText,businessStartDate:businessText,addressDetail:z.string().trim().max(500)}).strict(),reason:z.string().trim().min(1).max(2000),version:memberVersion}).strict().parse(req.body);
+  return workspace().correctLegacyBusiness(req.user!.id,memberId(req),{fields:input.fields as Record<string,string>,reason:input.reason!,version:input.version!});
+}));
+pharmacistQualificationsRouter.patch('/members/:userId/pharmacies/:pharmacyId',handle(req=>{
+  google(req);
+  const input=z.object({fields:z.object({...businessFields,phone:businessPhone,contactEmail:businessEmail}).strict(),reason:z.string().trim().min(1).max(2000),version:z.string().regex(/^[a-f0-9]{32}$/),evidenceConfirmed:z.literal(true)}).strict().parse(req.body);
+  return workspace().correctPharmacy(req.user!.id,memberId(req),z.string().uuid().parse(req.params.pharmacyId),{fields:input.fields as Record<string,string>,reason:input.reason!,version:input.version!,evidenceConfirmed:true});
+}));
 pharmacistQualificationsRouter.get(
   "/me",
   handle((req) => service().mine(req.user!.id)),
