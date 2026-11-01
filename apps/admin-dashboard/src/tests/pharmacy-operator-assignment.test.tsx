@@ -1,4 +1,3 @@
-import {centralMenusForRole} from '@o4o/types';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
@@ -27,8 +26,7 @@ describe('four collaborator consent invitations', () => {
     fireEvent.click(await screen.findByRole('radio', { name: /Test Operator/ }));
     fireEvent.click(screen.getByRole('button', { name: '확인 메일 보내기' }));
     await waitFor(() => expect(authClient.api.post).toHaveBeenCalledWith('/admin/service-operator-invitations', {
-      targetUserId: 'synthetic-user', serviceKey: 'neture', role: `neture:${key}_admin`, centralDelegation: key==='pharmcoop',
-      ...(key==='pharmcoop' ? {menuKeys:centralMenusForRole(`neture:${key}_admin`).map(menu=>menu.key)}:{}),
+      targetUserId: 'synthetic-user', serviceKey: 'neture', role: `neture:${key}_admin`, centralDelegation: false,
     }));
     const parsed = parseRole(`neture:${key}_admin`);
     expect(parsed).toMatchObject({ raw: `neture:${key}_admin`, serviceKey: key, roleKey: 'admin' });

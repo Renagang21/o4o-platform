@@ -45,6 +45,7 @@ export function centralApiMenus(service: CentralOperationService, req: Pick<Requ
     if (/\/community\/(?:management|operator)\/(?:boards|members)/.test(path)) return menu('boards');
   }
   if (service === 'neture') {
+    if (req.method === 'GET' && /\/neture\/operator\/pharmacy-documents\/[^/]+$/.test(path)) return menu('pharmacies');
     if (/\/neture\/admin\/service-approvals(?:\/|$)/.test(path)) return menu('service-approval-management');
     if (/\/neture\/admin\/settlements(?:\/|$)/.test(path)) return menu('settlements');
     if (/\/neture\/community\/manage(?:\/|$)/.test(path)) return menu('community-advertising');

@@ -42,3 +42,12 @@ it('escapes the fallback link and its attribute without injecting markup', () =>
   expect(document.querySelector('[onmouseover]')).toBeNull();
   expect(document.querySelectorAll('a')).toHaveLength(2);
 });
+
+
+it('names a single admin-site daily Operator invitation without presenting it as a service Admin grant',()=>{
+  const mail=buildOperatorInvitationMail(url,'neture:operator',false,true,true);
+  expect(mail.subject).toContain('관리자 사이트 업무 운영자 초대');
+  expect(mail.text).toContain('전체 관리자나 서비스 Admin으로 지정되는 초대가 아닙니다.');
+  expect(mail.text).toContain('https://admin.neture.co.kr/operations');
+  expect(mail.text).not.toContain('neture:operator');
+});

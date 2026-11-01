@@ -9,6 +9,8 @@ import { centralServiceLabel } from './central-operation-labels';
 interface Task { kind?: 'reference'; key: string; service: string; label: string; href: string; count: number | null; oldest?: string | null; available: boolean }
 type TaskRow = Task & { id: string };
 interface Snapshot { tasks: Task[]; generatedAt: string }
+const taskAge = (task: Task) => task.oldest && Number.isFinite(Date.parse(task.oldest)) ? Math.max(0, Date.now() - Date.parse(task.oldest)) : 0;
+const overdue = (task: Task) => task.available && !!task.count && taskAge(task) >= 72 * 60 * 60 * 1000;
 export default function CentralOperationOverview({ roleKey }: { roleKey: string }) {
   const [snapshot, setSnapshot] = useState<{ scope: string; value: Snapshot } | null>(null);
   const [error, setError] = useState('');
@@ -38,13 +40,14 @@ export default function CentralOperationOverview({ roleKey }: { roleKey: string 
     const timer = window.setInterval(() => void load(), 60000);
     const focus = () => void load();
     window.addEventListener('focus', focus);
-    return () => { sequence.current++; window.clearInterval(timer); window.removeEventListener('focus', focus); };
+    window.addEventListener('central-operation-work-changed', focus);
+    return () => { sequence.current++; window.clearInterval(timer); window.removeEventListener('focus', focus); window.removeEventListener('central-operation-work-changed', focus); };
   }, [load]);
   const current = snapshot?.scope === roleKey ? snapshot.value : null;
   const tasks = useMemo<TaskRow[]>(() => (current?.tasks ?? []).map(task => ({
     ...task, id: `${task.service}:${task.key}`,
     available: task.available && Number.isSafeInteger(task.count) && task.count! >= 0,
-  })).sort((a, b) => Number(b.available && !!b.count) - Number(a.available && !!a.count) || (b.count ?? 0) - (a.count ?? 0)), [current]);
+  })).sort((a, b) => Number(b.available && !!b.count) - Number(a.available && !!a.count) || Number(overdue(b)) - Number(overdue(a)) || taskAge(b) - taskAge(a) || (b.count ?? 0) - (a.count ?? 0)), [current]);
   const references = tasks.filter(task=>task.kind==='reference');
   const workTasks = tasks.filter(task=>task.kind!=='reference');
   const unavailable = workTasks.filter(task => !task.available);
@@ -63,17 +66,17 @@ export default function CentralOperationOverview({ roleKey }: { roleKey: string 
     { key: 'count', header: '대기', width: '90px', minWidth: 90, sortable: true, sortAccessor: task => task.count ?? -1, render: (_, task) => <Link aria-label={`${task.label} ${task.available ? task.count + '건' : '조회 확인'} 처리하기`} to={centralTaskHref(task.service, task.href)}><span className={`whitespace-nowrap rounded-full px-2 py-1 text-sm font-semibold ${!task.available ? 'bg-amber-50 text-amber-800' : task.count ? 'bg-blue-50 text-blue-800' : 'text-slate-400'}`}>{task.available ? `${task.count}건` : '조회 실패'}</span></Link> },
   ];
   return <section aria-label="전체 업무 대기 현황" className="mb-6 space-y-4">
-    <div className="flex flex-wrap items-center justify-between gap-3"><div><h2 className="text-lg font-semibold">전체 업무 대기 현황</h2><p className="mt-1 text-sm text-slate-500">대기 업무부터 확인하고, 체크한 업무는 상단에서 모아보거나 열 수 있습니다.</p></div><button type="button" disabled={loading} className="rounded border bg-white px-3 py-2 text-sm" onClick={() => void load()}>대기 현황 새로고침</button></div>
+    <div className="flex flex-wrap items-center justify-between gap-3"><div><h2 className="text-lg font-semibold">전체 업무 대기 현황</h2><p className="mt-1 text-sm text-slate-500">승인·처리할 업무는 실제 처리할 때까지 남습니다. 알림을 읽어도 대기 건수는 줄지 않습니다.</p></div><button type="button" disabled={loading} className="rounded border bg-white px-3 py-2 text-sm" onClick={() => void load()}>대기 현황 새로고침</button></div>
     {error && <p role="alert" className="rounded border border-red-200 bg-red-50 p-3">{error}</p>}
     {!current && loading && <output>운영 대기 현황 확인 중…</output>}
     {current && <>
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid gap-3 sm:grid-cols-3">
         <button type="button" onClick={() => showTasks('pending')} className="rounded-xl border bg-white p-4 text-left hover:bg-blue-50"><p className="text-xs text-slate-500">{unavailable.length ? '확인된 대기' : '전체 대기'}</p><strong className="mt-1 block text-2xl text-blue-800">{pending.reduce((sum, task) => sum + task.count!, 0)}<span className="ml-1 text-sm">건</span></strong></button>
         <button type="button" onClick={() => showTasks('pending')} className="rounded-xl border bg-white p-4 text-left hover:bg-blue-50"><p className="text-xs text-slate-500">처리할 업무</p><strong className="mt-1 block text-2xl">{pending.length}<span className="ml-1 text-sm">종류</span></strong></button>
         <button type="button" onClick={() => showTasks('unavailable')} className="rounded-xl border bg-white p-4 text-left hover:bg-blue-50"><p className="text-xs text-slate-500">조회 확인 필요</p><strong className={`mt-1 block text-2xl ${unavailable.length ? 'text-amber-700' : 'text-slate-600'}`}>{unavailable.length}<span className="ml-1 text-sm">종류</span></strong></button>
       </div>
       <div aria-label="업무별 대기 바로가기" className="grid gap-3 sm:grid-cols-2">
-        {pending.filter(task => !service || task.service === service).map(task => <Link key={task.id} to={centralTaskHref(task.service, task.href)} aria-label={`${task.label} 대기 업무 바로가기`} className="rounded-xl border border-blue-200 bg-white p-4 hover:bg-blue-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-600"><span className="block text-sm font-semibold">{task.label} 처리하기</span><span className="mt-1 block text-xs text-slate-500">{centralServiceLabel(task.service)} · {task.count!.toLocaleString()}건 대기 →</span></Link>)}
+        {pending.filter(task => !service || task.service === service).map(task => <Link key={task.id} to={centralTaskHref(task.service, task.href)} aria-label={`${task.label} 대기 업무 바로가기`} className="rounded-xl border border-blue-200 bg-white p-4 hover:bg-blue-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-600"><span className="block text-sm font-semibold">{task.label} 처리하기</span>{overdue(task) && <span className="mt-1 inline-block rounded bg-amber-100 px-2 py-1 text-xs font-semibold text-amber-900">3일 이상 대기 · 우선 확인</span>}<span className="mt-1 block text-xs text-slate-500">{centralServiceLabel(task.service)} · {task.count!.toLocaleString()}건 대기 →</span></Link>)}
       </div>
       {references.length > 0 && <section aria-label="수집 자료 등록 준비" className="space-y-2 rounded-xl border border-slate-200 bg-slate-50 p-4"><h3 className="font-semibold">수집 자료 등록 준비</h3><p className="text-sm text-slate-600">원천 자료의 미등록 상태입니다. 실제 처리 대기 합계에 포함하지 않습니다.</p>{references.map(task=><Link key={task.id} to={centralTaskHref(task.service,task.href)} className="block rounded border bg-white p-3 text-sm">{task.label} · {task.available ? `${task.count!.toLocaleString()}건` : '조회 확인 필요'} →</Link>)}</section>}
       {unavailable.length > 0 && <p role="alert" className="rounded border border-amber-200 bg-amber-50 p-3 text-sm">일부 업무를 조회하지 못했습니다. 조회 실패는 0건으로 집계하지 않습니다.</p>}

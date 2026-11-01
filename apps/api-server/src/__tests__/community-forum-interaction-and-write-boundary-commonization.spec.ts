@@ -102,6 +102,9 @@ function fakeQuery(sql: string, params?: any[]): any[] {
   state.rawQueries.push({ sql, params });
   const s = sql.replace(/\s+/g, ' ').trim();
 
+  if (s.includes("AND slug=$2")) {
+    return state.forums.filter(f => f.id === params?.[0] && f.slug === params?.[1] && f.service_code === 'community' && !f.organization_id);
+  }
   // isForumInServiceScope
   if (s.includes('SELECT 1 FROM forum_category_requests')) {
     // WO-O4O-COMMUNITY-WORKSPACE-CATALOG-AND-ACCESS-ALIGNMENT-V1: 경계는 코드 집합(ANY($2::text[]))
@@ -129,6 +132,7 @@ function fakeQuery(sql: string, params?: any[]): any[] {
 
 function makeRepo(kind: 'post' | 'comment' | 'like' | 'forum' | 'other') {
   return {
+    manager: { query: jest.fn(async (sql: string, params?: any[]) => fakeQuery(sql, params)) },
     findOne: jest.fn(async ({ where }: any) => {
       if (kind === 'forum') {
         const f=state.forums.find(f=>where.id?f.id===where.id:f.slug===where.slug);
@@ -719,6 +723,15 @@ describe('independent community daily moderation authority', () => {
  class ScopedComment extends ForumCommentController {
   protected async resolveForumCommentInServiceScope(): Promise<any> { return {comment:state.comments[0],post:state.posts[0]}; }
  }
+ it('keeps official improvement decisions out of generic author edits and deletes', async () => {
+  state.posts=[post('official-request','official-board')];
+  state.forums=[{id:'official-board',slug:'o4o-updates-improvements',service_code:'community',status:'completed',organization_id:null}];
+  for (const action of ['updatePost','deletePost'] as const) {
+   const {res,out}=makeRes();
+   await new ScopedPost()[action](makeReq({user:USER,ctx:{scope:'community',communityKey:'community',communityOperator:true},params:{id:'official-request'}}),res);
+   expect(out.status).toBe(409);expect(state.savedPosts).toHaveLength(0);
+  }
+ });
  it.each([false,true])('post hiding requires community moderation authority, even for platform admin (%s)',async allowed=>{
   state.posts=[post('community-post','community-board')];
   const {res,out}=makeRes();

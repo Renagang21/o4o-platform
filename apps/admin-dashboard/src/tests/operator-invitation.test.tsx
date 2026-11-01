@@ -1,4 +1,3 @@
-import {centralMenusForRole} from '@o4o/types';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   cleanup,
@@ -8,7 +7,7 @@ import {
   screen,
   waitFor,
 } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
+import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import OperatorsPage from '../pages/operators/OperatorsPage';
 import OperatorInvitationsPanel from '../pages/operators/OperatorInvitationsPanel';
 const h = vi.hoisted(() => ({
@@ -42,17 +41,11 @@ describe('operator invitation admin UI', () => {
     expect(h.post).not.toHaveBeenCalled();
     await act(async () => {});
   });
-  it('플랫폼 홈 배너 경로는 직영 담당자 지정 모달을 열고 독립·퇴역 서비스는 제외한다', async () => {
+  it('이전 중앙 지정 링크는 업무 운영자 전용 화면으로 이동한다', async () => {
     h.get.mockResolvedValue({ data: { data: [] } });
-    render(<MemoryRouter initialEntries={['/operators?assignment=central']}><OperatorsPage /></MemoryRouter>);
-    expect(screen.getByRole('heading', { name: '중앙 운영 담당자 지정', exact: true })).toBeTruthy();
-    expect(screen.getByRole('radio', { name: /Neture/ })).toBeTruthy();
-    expect(screen.queryByRole('radio', { name: /약국 경영지원/ })).toBeNull();
-    expect(screen.queryByRole('radio', { name: /드럭스토어형 약국/ })).toBeNull();
-    expect(screen.queryByRole('radio', { name: /^분회/ })).toBeNull();
-    expect(screen.queryByRole('radio', { name: /CarePharm/ })).toBeNull();
+    render(<MemoryRouter initialEntries={['/operators?assignment=central']}><Routes><Route path="/operators" element={<OperatorsPage />} /><Route path="/admin/operations-operators" element={<h1>업무 운영자 지정 화면</h1>} /></Routes></MemoryRouter>);
+    expect(await screen.findByRole('heading',{name:'업무 운영자 지정 화면'})).toBeTruthy();
     expect(h.post).not.toHaveBeenCalled();
-    await act(async () => {});
   });
 
   it('일반 서비스 지정에서도 kpa-society를 제거하고 독립 서비스·분회는 유지한다', async () => {
@@ -150,8 +143,7 @@ describe('operator invitation admin UI', () => {
           email: 'new@example.com',
           serviceKey: 'community',
           role: 'community:admin',
-          centralDelegation: true,
-          menuKeys: centralMenusForRole('community:admin').map(menu=>menu.key),
+          centralDelegation: false,
         },
       ),
     );

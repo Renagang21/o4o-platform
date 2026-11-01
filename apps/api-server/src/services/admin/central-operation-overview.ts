@@ -7,7 +7,7 @@ const taskAreas: Record<string, Record<string, string>> = {
   neture: { 'legacy-contact': 'legacy-contact', 'product-review': 'product-approvals', 'service-product-review': 'service-product-approvals', 'product-candidates': 'candidates', 'product-candidate-intake':'candidates', 'pharmacist-qualifications': 'qualifications', 'pharmacy-applications': 'pharmacies' },
   supplier: { 'supplier-review': 'suppliers', 'supplier-resubmitted': 'suppliers' },
   lecture: { 'lecture-courses': 'courses', 'lecture-instructors': 'instructors', 'lecture-contact': 'contact', 'lecture-legacy-contact': 'contact' },
-  community: { 'community-members': 'members', 'community-forums': 'forums' },
+  community: { 'community-improvements': 'forums', 'community-members': 'members', 'community-forums': 'forums' },
   pharmcoop: { affiliations: 'federation' },
   'partner-support': { 'partner-reports': 'reports' },
 };

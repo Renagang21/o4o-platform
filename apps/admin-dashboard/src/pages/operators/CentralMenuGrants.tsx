@@ -11,7 +11,7 @@ export function CentralMenuSelection({ role, value, onChange, disabled = false, 
     <div className="grid gap-2 md:grid-cols-2">{available.map(menu => <label key={menu.key} className="flex items-center gap-2">
       <input type="checkbox" checked={value.includes(menu.key)} onChange={event => onChange(event.target.checked ? [...value, menu.key] : value.filter(key => key !== menu.key))} />{menu.label}
     </label>)}</div>
-    {value.length === 0 && <p className="mt-2 text-sm text-amber-800">선택된 업무가 없습니다. 중앙 운영 화면에 진입할 수 없습니다.</p>}
+    {value.length === 0 && <p className="mt-2 text-sm text-amber-800">선택된 업무가 없습니다. 업무 운영 화면에 진입할 수 없습니다.</p>}
   </fieldset>;
 }
 interface Grant { available: CentralOperationMenu[]; menuKeys: string[]; version: string | null }
@@ -40,7 +40,7 @@ export function CentralMenuGrantEditor({ userId, role, onClose, onSaved }: { use
       if (mounted.current) setError((failure as { response?: { data?: { error?: string } } }).response?.data?.error ?? '업무 위임을 저장하지 못했습니다. 최신 설정을 다시 조회해 주세요.');
     } finally { writing.current = false; if (mounted.current) setBusy(false); }
   }
-  return <BaseDetailDrawer open title="중앙 운영 업무 설정" onClose={() => { if (!writing.current) onClose(); }}>
+  return <BaseDetailDrawer open title="업무 운영 설정" onClose={() => { if (!writing.current) onClose(); }}>
     <p>{role}</p>{error && <p role="alert" className="my-3 text-red-700">{error}</p>}
     {!grant ? <button type="button" onClick={() => void load()}>다시 조회</button> : <>
       <CentralMenuSelection role={role} available={grant.available} value={grant.menuKeys} disabled={busy} onChange={menuKeys => setGrant({ ...grant, menuKeys })} />

@@ -1,4 +1,4 @@
-/** Shared lifecycle for the two explicitly owned, loopback-only integration fixtures. */
+/** Shared lifecycle for explicitly owned, loopback-only integration fixtures. */
 import 'reflect-metadata';
 import { randomUUID } from 'node:crypto';
 import { spawn, type ChildProcess } from 'node:child_process';
@@ -12,6 +12,10 @@ import { expectedSchemaStateFor } from '../../apps/api-server/src/database/incre
 import { computeSchemaFingerprint } from '../../apps/api-server/src/database/bootstrap/schema-fingerprint.js';
 
 const profiles = {
+  'improvement-forum': {
+    variable: 'O4O_IMPROVEMENT_TEST_URL', port: '55440', database: 'o4o_improvements_integration',
+    tests: ['src/services/community/__tests__/community-improvements.postgres.spec.ts'],
+  },
   'main-automation': {
     variable: 'MAIN_AUTOMATION_IT_DATABASE_URL', port: '55439', database: 'o4o_main_automation_integration',
     tests: ['src/services/work-data/work-data.integration.spec.ts'],
