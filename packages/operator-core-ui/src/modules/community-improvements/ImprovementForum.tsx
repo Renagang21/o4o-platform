@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import type { AxiosInstance } from 'axios';
 
 export const improvementStates = { received: '접수', reviewing: '검토 중', needs_info: '추가 정보 요청', planned: '반영 예정', completed: '반영 완료', deferred: '보류', declined: '미반영' };
 const kinds = { update: '업데이트 안내', bug: '오류·불편 신고', suggestion: '기능 개선 제안' };
@@ -7,7 +6,12 @@ type Kind = keyof typeof kinds;
 type State = keyof typeof improvementStates;
 interface Item { id: string; title: string; body: string; kind: Kind; state: State; version: number; mine: boolean; canManage?: boolean; createdAt: string; replies: { text: string; official: boolean; requester?: boolean; state?: State; updateId?: string; at: string }[] }
 interface Snapshot { ready: boolean; canManage: boolean; items: Pick<Item, 'id' | 'title' | 'createdAt' | 'kind' | 'state' | 'version' | 'mine'>[]; hasMore: boolean }
-interface Props { client: AxiosInstance; actorKey: string; detailId?: string; management?: boolean; onSelect: (id?: string) => void }
+interface ImprovementClient {
+  get(path: string, config?: { params: Record<string, unknown> }): Promise<{ data?: { data?: unknown } }>;
+  post(path: string, body?: unknown): Promise<unknown>;
+  patch(path: string, body?: unknown): Promise<unknown>;
+}
+interface Props { client: ImprovementClient; actorKey: string; detailId?: string; management?: boolean; onSelect: (id?: string) => void }
 function newSubmissionId() {
   const bytes = crypto.getRandomValues(new Uint8Array(16));
   bytes[6] = (bytes[6] & 15) | 64; bytes[8] = (bytes[8] & 63) | 128;
@@ -33,6 +37,9 @@ function ForumSession({ client, actorKey, detailId, management = false, onSelect
   const [notice, setNotice] = useState('');
   const [writing, setWriting] = useState(false), [writeKind, setWriteKind] = useState<Kind>('suggestion');
   const [title, setTitle] = useState(''), [body, setBody] = useState(''), [reply, setReply] = useState('');
+  const [editVersion, setEditVersion] = useState<number | null>(null);
+  const [replyVersion, setReplyVersion] = useState<number | null>(null);
+  const replyDirty = useRef(false);
   const [editing, setEditing] = useState(false);
   const submissionId = useRef<string | null>(null);
   const [updateUrl, setUpdateUrl] = useState('');
@@ -44,12 +51,24 @@ function ForumSession({ client, actorKey, detailId, management = false, onSelect
     try {
       const response = await client.get(detailId ? `${endpoint}/${encodeURIComponent(detailId)}` : endpoint, detailId ? undefined : { params: { page, kind, ...(pending ? { pending: true } : {}) } });
       const data = response.data?.data;
-      if (!data || (detailId ? !data.id : !Array.isArray(data.items))) throw new Error('INVALID_RESPONSE');
       if (!alive.current || seq !== sequence.current) return;
-      if (detailId) { setItem(data); setState(data.state === 'received' ? 'reviewing' : data.state); }
-      else setSnapshot(data);
+      if (detailId) {
+        const detail = data as Item | undefined;
+        if (!detail?.id || !Array.isArray(detail.replies)) throw new Error('INVALID_RESPONSE');
+        setItem(detail); if (!replyDirty.current) setState(detail.state === 'received' ? 'reviewing' : detail.state);
+      } else {
+        const list = data as Snapshot | undefined;
+        if (!list || !Array.isArray(list.items)) throw new Error('INVALID_RESPONSE');
+        setSnapshot(list);
+      }
       setError('');
-    } catch (e) { if (alive.current && seq === sequence.current) setError(message(e)); }
+    } catch (e) {
+      if (alive.current && seq === sequence.current) {
+        const status = (e as { response?: { status?: number } })?.response?.status;
+        if (status === 401 || status === 403 || status === 404) { setItem(null); setSnapshot(null); }
+        setError(message(e));
+      }
+    }
     finally { if (alive.current && seq === sequence.current) setLoading(false); }
   }, [client, detailId, page, kind, pending]);
   useEffect(() => { alive.current = true; void load(); return () => { alive.current = false; }; }, [load]);
@@ -59,13 +78,16 @@ function ForumSession({ client, actorKey, detailId, management = false, onSelect
     const timer = management ? window.setInterval(refresh, 60000) : undefined;
     return () => { window.removeEventListener('focus', refresh); window.clearInterval(timer); };
   }, [load, management]);
-  const write = async (operation: () => Promise<unknown>, after: () => void) => {
+  const write = async (operation: () => Promise<unknown>, after: (response: unknown) => void) => {
     if (lock.current) return;
     lock.current = true; setBusy(true); setError(''); setNotice('');
-    try { await operation(); if (alive.current) { after(); window.dispatchEvent(new Event('central-operation-work-changed')); } }
+    try { const response = await operation(); if ((response as { data?: { success?: boolean } })?.data?.success !== true) throw new Error('INVALID_WRITE_RESPONSE'); if (alive.current) { after(response); window.dispatchEvent(new Event('central-operation-work-changed')); } }
     catch (e) { if (alive.current) setError(message(e)); }
     finally { lock.current = false; if (alive.current) setBusy(false); }
   };
+  const anchorReply = () => { if (!replyDirty.current && item) { replyDirty.current = true; setReplyVersion(item.version); } };
+  const editConflict = editing && item && editVersion !== item.version;
+  const replyConflict = replyVersion !== null && item && replyVersion !== item.version;
   const permittedManager = item?.canManage ?? snapshot?.canManage ?? false;
   const canManage = management && permittedManager;
   return <section aria-label="O4O 업데이트·개선 요청" className="min-w-0 space-y-4 rounded-xl border bg-white p-4 sm:p-6">
@@ -79,23 +101,25 @@ function ForumSession({ client, actorKey, detailId, management = false, onSelect
     {detailId && item && <article className="space-y-4">
       <div><p className="text-sm text-slate-600">{kinds[item.kind]} · {improvementStates[item.state]} · {new Date(item.createdAt).toLocaleDateString('ko-KR', { timeZone: 'Asia/Seoul' })}</p><h2 className="mt-2 break-words text-xl font-semibold">{item.title}</h2></div>
       <p className="whitespace-pre-wrap break-words">{item.body}</p>
-      {item.mine && (item.kind !== 'update' || canManage) && <button className={classes} disabled={busy} onClick={() => { setEditing(!editing); setTitle(item.title); setBody(item.body); }}>내 글 수정{editing ? ' 접기' : ''}</button>}
-      {editing && <form className="space-y-3 rounded border p-3" onSubmit={e => { e.preventDefault(); void write(() => client.patch(`${endpoint}/${item.id}`, { title, body, version: item.version }), () => { setEditing(false); setNotice('글을 수정했습니다.'); void load(); }); }}>
+      {item.mine && (item.kind !== 'update' || canManage) && <button className={classes} disabled={busy} onClick={() => { setEditing(!editing); setEditVersion(item.version); setTitle(item.title); setBody(item.body); }}>내 글 수정{editing ? ' 접기' : ''}</button>}
+      {editConflict && <div role="alert" className="rounded bg-amber-50 p-3"><p>수정 중 다른 변경이 도착했습니다. 초안을 보관한 뒤 최신 글을 확인해 주세요.</p><button className={classes} disabled={loading || busy} onClick={() => { setTitle(item.title); setBody(item.body); setEditVersion(item.version); setError(''); }}>최신 글로 다시 편집</button></div>}
+      {editing && <form className="space-y-3 rounded border p-3" onSubmit={e => { e.preventDefault(); void write(() => client.patch(`${endpoint}/${item.id}`, { title, body, version: editVersion }), () => { setEditing(false); setEditVersion(null); setNotice('글을 수정했습니다.'); void load(); }); }}>
         <label className="block">수정 제목<input className={`${classes} block w-full`} required maxLength={200} value={title} disabled={busy} onChange={e => setTitle(e.target.value)} /></label>
         <label className="block">수정 내용<textarea className={`${classes} block w-full`} required minLength={5} maxLength={10000} rows={6} value={body} disabled={busy} onChange={e => setBody(e.target.value)} /></label>
         <p className="text-sm text-slate-600">요청을 수정하면 운영팀 처리 대기로 돌아갑니다. 기존 답변은 유지됩니다.</p>
-        <button className={classes} disabled={busy || loading || !!error || !title.trim() || body.trim().length < 5}>수정 저장</button>
+        <button className={classes} disabled={busy || loading || !!error || !!editConflict || !title.trim() || body.trim().length < 5}>수정 저장</button>
       </form>}
       <ol aria-label="답변 이력" className="space-y-3">{item.replies.map((r, i) => <li key={i} className={`rounded border p-3 ${r.official ? 'border-blue-200 bg-blue-50' : 'bg-slate-50'}`}><p className="text-sm font-semibold">{r.official ? 'O4O 운영팀 공식 답변' : r.requester ? '요청자 추가 정보' : '회원 의견'} · {new Date(r.at).toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' })}{r.state ? ` · ${improvementStates[r.state]}` : ''}</p><p className="mt-2 whitespace-pre-wrap break-words">{r.text}</p>{r.updateId && <a className="mt-2 inline-block underline" href={`https://community.neture.co.kr/improvements/${r.updateId}`}>관련 업데이트 안내 보기 →</a>}</li>)}</ol>
+      {replyConflict && <div role="alert" className="rounded bg-amber-50 p-3"><p>새 답변이나 상태 변경이 있습니다. 작성한 답변은 유지됩니다. 최신 내용을 확인해 주세요.</p><button className={classes} disabled={loading || busy} onClick={() => { setReplyVersion(item.version); setState(item.state === 'received' ? 'reviewing' : item.state); setError(''); }}>최신 상태로 답변 계속</button></div>}
       {item.kind !== 'update' && !!actorKey && <form className="space-y-3 border-t pt-4" onSubmit={event => {
         event.preventDefault();
-        void write(() => client.post(`${endpoint}/${item.id}/replies`, { body: reply, version: item.version, official: canManage, ...(canManage ? { state, ...(updateUrl.trim() ? { updateUrl: updateUrl.trim() } : {}) } : {}) }), () => { setReply(''); setUpdateUrl(''); setNotice('답변을 저장했습니다.'); void load(); });
+        void write(() => client.post(`${endpoint}/${item.id}/replies`, { body: reply, version: replyVersion ?? item.version, official: canManage, ...(canManage ? { state, ...(updateUrl.trim() ? { updateUrl: updateUrl.trim() } : {}) } : {}) }), () => { replyDirty.current = false; setReplyVersion(null); setReply(''); setUpdateUrl(''); setNotice('답변을 저장했습니다.'); void load(); });
       }}>
         <h3 className="font-semibold">{canManage ? '공식 답변·처리 상태' : item.mine ? '추가 정보 남기기' : '의견 남기기'}</h3>
-        {canManage && <label className="block">처리 상태 <select className={classes} value={state} disabled={busy} onChange={e => setState(e.target.value as State)}>{Object.entries(improvementStates).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label>}
-        <label className="block">{canManage ? '공개 답변·처리 사유' : '추가 내용'}<textarea className={`${classes} mt-1 block w-full`} rows={5} maxLength={4000} required value={reply} disabled={busy} onChange={e => setReply(e.target.value)} /></label>
-        {canManage && <label className="block">연결할 업데이트 안내 주소 (선택)<input type="url" className={`${classes} mt-1 block w-full`} maxLength={500} disabled={busy} value={updateUrl} onChange={e => setUpdateUrl(e.target.value)} /></label>}
-        <button className={classes} disabled={busy || loading || !!error || !reply.trim()}>{busy ? '저장 중…' : canManage ? '답변·상태 저장' : '추가 정보 보내기'}</button>
+        {canManage && <label className="block">처리 상태 <select className={classes} value={state} disabled={busy} onChange={e => { anchorReply(); setState(e.target.value as State); }}>{Object.entries(improvementStates).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label>}
+        <label className="block">{canManage ? '공개 답변·처리 사유' : '추가 내용'}<textarea className={`${classes} mt-1 block w-full`} rows={5} maxLength={4000} required value={reply} disabled={busy} onChange={e => { anchorReply(); setReply(e.target.value); }} /></label>
+        {canManage && <label className="block">연결할 업데이트 안내 주소 (선택)<input type="url" className={`${classes} mt-1 block w-full`} maxLength={500} disabled={busy} value={updateUrl} onChange={e => { anchorReply(); setUpdateUrl(e.target.value); }} /></label>}
+        <button className={classes} disabled={busy || loading || !!error || !!replyConflict || !reply.trim()}>{busy ? '저장 중…' : canManage ? '답변·상태 저장' : '추가 정보 보내기'}</button>
         {error && <p className="text-sm text-slate-600">내용을 복사해 보관한 뒤 다시 조회하면 최신 상태로 재시도할 수 있습니다.</p>}
       </form>}
     </article>}
@@ -107,7 +131,7 @@ function ForumSession({ client, actorKey, detailId, management = false, onSelect
           {!actorKey && <a className="underline" href="/login">로그인 후 요청 작성</a>}
         </div>
         {management && <p className="text-sm text-slate-600">읽음 처리와 업무 완료는 다릅니다. 추가 정보 요청은 요청자의 답변을 기다리며, 답변이 오면 처리 대기로 돌아옵니다.</p>}
-        {writing && <form className="space-y-3 rounded border p-4" onSubmit={event => { event.preventDefault(); void write(() => client.post(endpoint, { kind: writeKind, title, body, requestId: submissionId.current ??= newSubmissionId() }), () => { submissionId.current = null; setTitle(''); setBody(''); setWriting(false); setNotice('글을 등록했습니다.'); setPage(1); void load(); }); }}>
+        {writing && <form className="space-y-3 rounded border p-4" onSubmit={event => { event.preventDefault(); void write(() => client.post(endpoint, { kind: writeKind, title, body, requestId: submissionId.current ??= newSubmissionId() }), response => { submissionId.current = null; setTitle(''); setBody(''); setWriting(false); setNotice('글을 등록했습니다.'); const createdId = (response as { data?: { data?: { id?: string } } }).data?.data?.id; if (createdId) onSelect(createdId); else { setPage(1); void load(); } }); }}>
           <label className="block">글 구분 <select className={classes} disabled={busy} value={writeKind} onChange={e => setWriteKind(e.target.value as Kind)}>{Object.entries(kinds).filter(([k]) => canManage || k !== 'update').map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label>
           <label className="block">제목<input className={`${classes} mt-1 block w-full`} maxLength={200} required disabled={busy} value={title} onChange={e => setTitle(e.target.value)} /></label>
           <label className="block">내용<textarea className={`${classes} mt-1 block w-full`} rows={6} minLength={5} maxLength={10000} required disabled={busy} value={body} onChange={e => setBody(e.target.value)} /></label>

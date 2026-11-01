@@ -31,7 +31,7 @@ export default function CentralCommunityForums() {
       <button type="button" aria-pressed={!showImprovements} className="rounded border bg-white px-3 py-2" onClick={() => setSearch(new URLSearchParams())}>포럼 개설 신청·관리</button>
       <button type="button" aria-pressed={showImprovements} className="rounded border bg-white px-3 py-2" onClick={() => setSearch(new URLSearchParams({ tab: 'improvements' }))}>O4O 개선 요청</button>
     </nav>
-    {showImprovements ? <ImprovementForum client={client} actorKey={user?.id ?? ''} management detailId={search.get('improvement') ?? undefined} onSelect={id => { const next = new URLSearchParams(search); next.set('tab', 'improvements'); if (id) next.set('improvement', id); else next.delete('improvement'); setSearch(next); }} /> : <>
+    {showImprovements ? <ImprovementForum client={client} actorKey={String(user?.id ?? '')} management detailId={search.get('improvement') ?? undefined} onSelect={id => { const next = new URLSearchParams(search); next.set('tab', 'improvements'); if (id) next.set('improvement', id); else next.delete('improvement'); setSearch(next); }} /> : <>
     <form className="flex flex-wrap items-end gap-3 rounded border bg-white p-4" onSubmit={event => { event.preventDefault(); void create(); }}>
       <label>게시판 이름<input className="ml-2 rounded border px-3 py-2" maxLength={100} disabled={busy} value={name} onChange={event => setName(event.target.value)} /></label>
       <button type="submit" className="rounded bg-blue-700 px-4 py-2 text-white disabled:opacity-50" disabled={busy || !name.trim()}>{busy ? '만드는 중…' : '게시판 만들기'}</button>

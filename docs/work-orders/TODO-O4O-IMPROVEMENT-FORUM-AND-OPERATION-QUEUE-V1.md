@@ -30,8 +30,9 @@
 - [x] 기존 승인 대상·읽음 분리 회귀 검증
 - [x] 단위/통합·타입·빌드·desktop/mobile 기능 검증
 - [x] 코드 자체 검토 (공식 상태 우회 방지·공개/운영 화면 분리·본문 escape·현재 수신 권한)
-- [ ] commit·push·PR·CI/리뷰 확인
-- [ ] 병합 전 인계 (main 병합·배포·운영 개설은 미실행)
+- [x] commit·push·PR 생성 — [PR #915](https://github.com/Renagang21/o4o-platform/pull/915)
+- [x] 원격 CI·자동 리뷰를 같은 PR에서 추적 (최종 판정은 아래 외부 상태 조건)
+- [x] 병합 전 인계 자료 준비 (main 병합·배포·운영 개설은 미실행)
 
 ## 검증 및 인계
 
@@ -50,9 +51,9 @@
 
 - API·경로·메뉴 위임 테스트: 4 suites / 28 PASS.
 - 기존 일반 포럼 작성/수정/일상 중재 회귀: 3 suites / 48 PASS (공식 포럼의 일반 수정/삭제 우회 거부 추가).
-- PostgreSQL canonical schema: 5 PASS. 개설 직렬화·등록 재시도·상태 동시 변경·정지/회수·HTML 안전 저장·업데이트 링크·알림 읽음 분리 검증.
+- PostgreSQL canonical schema: 6 PASS. 개설 직렬화·등록 재시도·상태 동시 변경·정지/회수·HTML 안전 저장·업데이트 링크·알림 읽음 분리 검증.
 - 재사용 DB 검증: 로컬 PostgreSQL 15의 `127.0.0.1:55440`에 테스트 전용 CREATEDB 계정을 준비한다. `O4O_IMPROVEMENT_TEST_URL`은 해당 서버의 `o4o_improvements_integration`을 가리키는 비공개 환경 변수로 설정하고 `pnpm exec tsx scripts/dev/run-improvement-forum-fixture.ts`를 실행한다. DB가 이미 있으면 거부하며, wrapper가 만든 DB만 소유권 marker를 확인해 정리한다. schema PASS / tests PASS / database count 0 확인.
-- web-neture 화면·홈·호스트 경계: 3 files / 68 PASS.
+- web-neture 화면·홈·호스트 경계: 3 files / 72 PASS.
 - 중앙 운영·알림·진입: 3 files / 23 PASS.
 - Chromium: 관리자 2 PASS, 공개 커뮤니티 2 PASS. 각 1440px/390px에서 홈 진입·직접 URL·공식 답변·완료 후 대기 해소·가로 overflow 확인. 실제 운영 계정 인증이 아닌 로컬 합성 fixture 검증이다.
 - 브라우저 명령: admin 디렉터리 `pnpm exec playwright test src/test/e2e/central-improvements.spec.ts --project=chromium --workers=1`; web-neture 디렉터리 `pnpm exec playwright test --config playwright.improvements.config.ts`.
@@ -63,3 +64,12 @@
 실제 운영 계정 로그인·지정 계정 소유자의 공식 포럼 개설·운영 배포는 이번 작업에서 실행하지 않는다. 지정 계정으로 중앙 운영에 로그인해 `O4O 개선 요청` 탭에서 현재 계정을 확인한 뒤 공식 포럼을 개설한다. 이 최초 실행 전에는 공개 화면에 준비 중을 표시한다. 실제 로그인과 계정 권한은 운영 반영 시 별도 검증한다.
 
 환경 게시 설정은 변경하지 않는다. main 병합·auto-merge·배포·운영 DB write는 미실행이다. 원격 PR/CI/리뷰는 다음 인계 상태에서 추적한다.
+
+
+### 리뷰 보완과 최종 인계 조건
+
+- Codex P1: 정상 서명이라도 `private`/`selected` 공개 설정이면 이 고정 전체 공개 포럼 API는 게시판·상세를 제공하지 않는다. 기존 `setCommunityPublicRead` write-path로 전환·복원하는 PostgreSQL 회귀를 추가했다. 공개 철회/권한 오류 재조회 시 이전 본문도 제거한다.
+- Codex P2: 편집·공식 답변 초안은 시작 버전을 유지한다. focus/주기 재조회에서 새 버전을 발견하면 초안·선택 상태를 보존하고 저장을 막으며, 최신 내용을 확인한 뒤 명시적으로 다시 시작한다. 회귀 2건 추가.
+- CI 소비처 타입 보완: 공유 UI는 Axios 전역 선언 대신 필요한 get/post/patch 구조만 받는다. 계정 ID는 wrapper에서 문자열로 정규화한다. `pnpm run type-check:frontend` 전체 소비처 PASS.
+- HTTP 성공이라도 업무 응답 `success`가 아니면 성공 표시·초안 삭제를 하지 않는다. 성공한 신규 글은 정확한 상세로 이동한다.
+- 최신 HEAD의 required CI PASS 및 자동 리뷰 미해결 0이 인계 완료 조건이다. 원격 실행·리뷰 상태는 [PR #915](https://github.com/Renagang21/o4o-platform/pull/915)가 정본이며, 이 문서 작성만으로 원격 PASS를 주장하지 않는다. 필수 검사 실패·미해결 finding이 남으면 병합 준비 완료로 인계하지 않는다.

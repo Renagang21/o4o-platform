@@ -13,7 +13,7 @@ it('shows public requests without exposing member writing or official management
   expect(screen.getByText(/모든 글과 답변은 공개/)).toBeTruthy();
 });
 it('preserves a failed draft and reuses its idempotency key on retry', async () => {
-  const client = { get: vi.fn().mockResolvedValue(list), post: vi.fn().mockRejectedValueOnce(new Error('offline')).mockResolvedValueOnce({}) };
+  const client = { get: vi.fn().mockResolvedValue(list), post: vi.fn().mockRejectedValueOnce(new Error('offline')).mockResolvedValueOnce({ data: { success: true } }) };
   render(<ImprovementForum client={client as never} actorKey="member" onSelect={vi.fn()} />);
   fireEvent.click(await screen.findByRole('button', { name: '글 작성' }));
   fireEvent.change(screen.getByLabelText('제목'), { target: { value: 'New issue' } });
@@ -48,4 +48,50 @@ it('keeps official operations on the central surface even for a public-page mana
   const link = await screen.findByRole('link', { name: '통합 운영에서 공식 답변·업데이트 관리 →' });
   expect(link.getAttribute('href')).toBe('https://admin.neture.co.kr/operations/community/forums?tab=improvements&improvement=one');
   expect(screen.queryByRole('button', { name: '답변·상태 저장' })).toBeNull();
+});
+
+it('does not discard a draft when an HTTP success contains a failed business response', async () => {
+  const client = { get: vi.fn().mockResolvedValue(list), post: vi.fn().mockResolvedValue({ data: { success: false } }) };
+  render(<ImprovementForum client={client as never} actorKey="member" onSelect={vi.fn()} />);
+  fireEvent.click(await screen.findByRole('button', { name: '글 작성' }));
+  fireEvent.change(screen.getByLabelText('제목'), { target: { value: 'Preserved issue' } });
+  fireEvent.change(screen.getByLabelText('내용'), { target: { value: 'Preserved reproduction' } });
+  fireEvent.click(screen.getByRole('button', { name: '공개 글 등록' }));
+  await screen.findByRole('alert');
+  expect((screen.getByLabelText('제목') as HTMLInputElement).value).toBe('Preserved issue');
+  expect(screen.queryByText('글을 등록했습니다.')).toBeNull();
+});
+it('does not overwrite an edit draft baseline after a focus refresh', async () => {
+  const client = { get: vi.fn().mockResolvedValueOnce({ data: { data: item } }).mockResolvedValue({ data: { data: { ...item, title: 'Newer title', body: 'Newer description', version: 4 } } }), patch: vi.fn() };
+  render(<ImprovementForum client={client as never} actorKey="member" detailId="one" onSelect={vi.fn()} />);
+  fireEvent.click(await screen.findByRole('button', { name: '내 글 수정' }));
+  fireEvent.change(screen.getByLabelText('수정 내용'), { target: { value: 'My retained old draft' } });
+  await act(async () => window.dispatchEvent(new Event('focus')));
+  await screen.findByText('수정 중 다른 변경이 도착했습니다. 초안을 보관한 뒤 최신 글을 확인해 주세요.');
+  expect((screen.getByLabelText('수정 내용') as HTMLTextAreaElement).value).toBe('My retained old draft');
+  expect((screen.getByRole('button', { name: '수정 저장' }) as HTMLButtonElement).disabled).toBe(true);
+  expect(client.patch).not.toHaveBeenCalled();
+  fireEvent.click(screen.getByRole('button', { name: '최신 글로 다시 편집' }));
+  expect((screen.getByLabelText('수정 내용') as HTMLTextAreaElement).value).toBe('Newer description');
+});
+it('keeps a pending official reply and its selected state when automatic refresh detects newer work', async () => {
+  const client = { get: vi.fn().mockResolvedValueOnce({ data: { data: { ...item, canManage: true } } }).mockResolvedValue({ data: { data: { ...item, canManage: true, version: 4, state: 'needs_info' } } }), post: vi.fn() };
+  render(<ImprovementForum client={client as never} actorKey="manager" detailId="one" management onSelect={vi.fn()} />);
+  await screen.findByText('Synthetic issue');
+  fireEvent.change(screen.getByLabelText('처리 상태'), { target: { value: 'completed' } });
+  fireEvent.change(screen.getByLabelText('공개 답변·처리 사유'), { target: { value: 'Retained reply' } });
+  await act(async () => window.dispatchEvent(new Event('focus')));
+  await screen.findByText('새 답변이나 상태 변경이 있습니다. 작성한 답변은 유지됩니다. 최신 내용을 확인해 주세요.');
+  expect((screen.getByLabelText('처리 상태') as HTMLSelectElement).value).toBe('completed');
+  expect((screen.getByRole('button', { name: '답변·상태 저장' }) as HTMLButtonElement).disabled).toBe(true);
+  expect(client.post).not.toHaveBeenCalled();
+});
+it('removes a previously visible detail after public visibility is withdrawn', async () => {
+  const client = { get: vi.fn().mockResolvedValueOnce({ data: { data: item } }).mockRejectedValue({ response: { status: 404, data: { error: '공개 철회' } } }) };
+  render(<ImprovementForum client={client as never} actorKey="" detailId="one" onSelect={vi.fn()} />);
+  await screen.findByText('Issue description');
+  await act(async () => window.dispatchEvent(new Event('focus')));
+  await screen.findByRole('alert');
+  expect(screen.queryByText('Issue description')).toBeNull();
+  expect(screen.queryByText('Synthetic issue')).toBeNull();
 });

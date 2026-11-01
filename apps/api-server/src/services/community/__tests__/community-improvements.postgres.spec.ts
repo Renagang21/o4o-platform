@@ -1,6 +1,7 @@
 import { DataSource } from 'typeorm';
 import { randomUUID } from 'node:crypto';
 import { createImprovement, editImprovement, getImprovement, listImprovements, replyImprovement, setupImprovements } from '../community-improvements.js';
+import { setCommunityPublicRead } from '../community-public-read.service.js';
 import { centralOperationOverview } from '../../admin/central-operation-overview.js';
 const fixture = process.env.O4O_IMPROVEMENT_TEST_URL;
 (fixture ? describe : describe.skip)('official improvement forum on canonical PostgreSQL schema', () => {
@@ -60,6 +61,18 @@ const fixture = process.env.O4O_IMPROVEMENT_TEST_URL;
     await db.transaction(m => editImprovement(m, user(member), id, { title: 'Edited issue', body: 'Updated description', version: 2 }));
     const value = await getImprovement(db, null, id); expect(value.title).toBe('Edited issue'); expect(value.state).toBe('received'); expect(value.replies).toHaveLength(1);
     await expect(db.transaction(m => editImprovement(m, user(member), id, { title: 'Stale', body: 'Stale description', version: 2 }))).rejects.toMatchObject({ status: 409 });
+  });
+  it('honors authentic private and selected-public settings from the existing management workflow', async () => {
+    const { id } = await db.transaction(m => createImprovement(m, user(member), { kind: 'bug', title: 'Visibility withdrawal', body: 'Synthetic public information' }));
+    const [board] = await db.query("SELECT id FROM forum_category_requests WHERE slug='o4o-updates-improvements'");
+    for (const mode of ['private','selected'] as const) {
+      await db.transaction(m => setCommunityPublicRead(m, 'community', user(admin), board.id, { mode, postIds: mode === 'selected' ? [id] : [] }));
+      expect((await listImprovements(db, null, 1, '')).ready).toBe(false);
+      await expect(getImprovement(db, null, id)).rejects.toMatchObject({ status: 404 });
+      await expect(getImprovement(db, user(member), id)).rejects.toMatchObject({ status: 404 });
+    }
+    await db.transaction(m => setCommunityPublicRead(m, 'community', user(admin), board.id, { mode: 'board', postIds: [] }));
+    expect((await getImprovement(db, null, id)).title).toBe('Visibility withdrawal');
   });
   it('denies suspended accounts and revoked operators and hides signed-public designation tampering', async () => {
     await db.query(`INSERT INTO service_memberships(user_id,service_key,status) VALUES($1,'community','suspended')`, [other]);

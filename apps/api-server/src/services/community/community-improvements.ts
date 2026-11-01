@@ -48,7 +48,7 @@ async function board(db: Db, lock = false) {
   const [row] = await db.query(`SELECT id,name,requester_id AS "ownerId",metadata FROM forum_category_requests
     WHERE slug=$1 AND service_code='community' AND organization_id IS NULL AND status='completed' AND forum_type='open' ${lock ? 'FOR UPDATE' : ''}`, [IMPROVEMENT_SLUG]);
   if (!row) return null;
-  if (!hasAuthenticPublicReadDesignation('community', row.id, row.metadata?.[PUBLIC_READ_KEY], process.env.JWT_SECRET)) return null;
+  if (row.metadata?.[PUBLIC_READ_KEY]?.mode !== 'board' || !hasAuthenticPublicReadDesignation('community', row.id, row.metadata?.[PUBLIC_READ_KEY], process.env.JWT_SECRET)) return null;
   return row;
 }
 async function member(db: Db, user: CommunityAccessUser | null) {
