@@ -19,7 +19,7 @@ on:
       pharmacy_preparation:
         description: 'none=normal deploy; fixed pharmacy preparation/cutover/rollback/retirement (no IAM or DB writes)'
         type: choice
-        options: [none, plan, prepare, cutover-plan, cutover, rollback-plan, rollback, retire-plan, retire, carepharm-plan, carepharm-cutover, carepharm-rollback-plan, carepharm-rollback]
+        options: [none, plan, prepare, cutover-plan, cutover, rollback-plan, rollback, retire-plan, retire, carepharm-plan, carepharm-cutover, carepharm-rollback-plan, carepharm-rollback, drugstore-plan, drugstore-cutover]
         default: none
       pharmacy_plan_digest:
         description: 'mutating pharmacy modes: exact SHA256 digest from their reviewed plan run'
@@ -953,7 +953,7 @@ jobs:
     if: >-
       github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' &&
       github.triggering_actor == github.repository_owner && vars.DEPLOY_FREEZE == 'false' &&
-      contains(fromJSON('["plan","prepare","cutover-plan","cutover","rollback-plan","rollback","retire-plan","retire","carepharm-plan","carepharm-cutover","carepharm-rollback-plan","carepharm-rollback"]'), inputs.pharmacy_preparation)
+      contains(fromJSON('["plan","prepare","cutover-plan","cutover","rollback-plan","rollback","retire-plan","retire","carepharm-plan","carepharm-cutover","carepharm-rollback-plan","carepharm-rollback","drugstore-plan","drugstore-cutover"]'), inputs.pharmacy_preparation)
     runs-on: ubuntu-latest
     environment: production
     timeout-minutes: 40

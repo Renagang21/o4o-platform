@@ -1,6 +1,6 @@
 # 드럭스토어형 약국 이름·도메인·사업 키 전환
 
-> **상태**: COMPLETED — 구현·로컬 검증 범위 / main 통합·배포·운영 적용 미실행
+> **상태**: ACTIVE — 구현 main 통합 완료 / 운영 호스트 전환 보완·배포 진행
 > **작성일**: 2026-10-31
 > **근거**: 사용자의 O4O 전체 협업체 이름·주소 변경 지시 및 개발 데이터 상태 설명
 
@@ -42,3 +42,7 @@ PR #911의 P1 지적에 따라 과거 WO/CHECK/IR 84건의 본문에서 현재 �
 main `c7c5cd100c`(PR #907)을 작업 branch에 통합했다. 공통 서비스 목록 충돌은 main의 `serviceKey`·세션 복귀 기능을 유지하면서 드럭스토어형 약국의 새 키·표시명·주소를 적용했다. 새 `serviceReturnContext`와 API handoff 별칭도 새 키로 정렬했다. 추가 원장·권한 승인은 없다.
 
 통합 후 API 인증/대표 진입 75 tests PASS, 별도 실제 로컬 PostgreSQL handoff 38 tests PASS(처음에는 해당 PG suite를 건너뛰었으며 전용 DB 준비 후 실제 실행했다). 약국 앱 172 tests·서비스 전환 21 tests·auth-utils 43 tests, Pharmacy/Neture production build·API type-check, PC/390px 합성 브라우저 4흐름을 재검증했다. 이전 커밋의 검증으로 최종 HEAD 성공을 대신하지 않으며 최종 CI/리뷰는 PR에서 확인한다.
+
+## 2026-11-01 배포 단계 보완
+
+사용자가 main 병합·배포·운영 데이터 전환을 승인했다. PR #911 병합과 main CI는 완료됐으나 기존 URL map의 호스트 범위 불일치를 WIF plan에서 발견했다. 후속 branch는 같은 이름·주소 전환 WO의 운영 보완이며, 기존 prepared cloud checkout에서 별도 branch로 진행한다. 공용 backend·다른 호스트·IAM·DB를 바꾸지 않는 고정 호스트 plan/apply와 필요 시 단일 호스트 관리형 TLS 자원 준비를 추가한다. 보호된 main·owner·CI·freeze·정확한 plan digest·production idle 검사는 유지한다. 승인 이후에도 실제 운영 성공·실패와 남은 일을 CHECK에 구분한다.

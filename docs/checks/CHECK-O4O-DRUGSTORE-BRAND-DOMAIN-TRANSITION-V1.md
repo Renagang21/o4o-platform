@@ -1,6 +1,6 @@
 # 드럭스토어형 약국 전환 검증
 
-> **상태**: COMPLETED — 구현·로컬 검증 범위 / main 병합·운영 적용 미실행
+> **상태**: ACTIVE — 구현 main 반영·검증 완료 / 운영 호스트 전환 보완·배포 대기
 > **작성일**: 2026-10-31
 > **작업**: [WO](../work-orders/WO-O4O-DRUGSTORE-BRAND-DOMAIN-TRANSITION-V1.md)
 
@@ -46,3 +46,13 @@ PR #911의 P1 지적에 따라 과거 WO/CHECK/IR 84건의 본문에서 현재 �
 main `c7c5cd100c`(PR #907)을 작업 branch에 통합했다. 공통 서비스 목록 충돌은 main의 `serviceKey`·세션 복귀 기능을 유지하면서 드럭스토어형 약국의 새 키·표시명·주소를 적용했다. 새 `serviceReturnContext`와 API handoff 별칭도 새 키로 정렬했다. 추가 원장·권한 승인은 없다.
 
 통합 후 API 인증/대표 진입 75 tests PASS, 별도 실제 로컬 PostgreSQL handoff 38 tests PASS(처음에는 해당 PG suite를 건너뛰었으며 전용 DB 준비 후 실제 실행했다). 약국 앱 172 tests·서비스 전환 21 tests·auth-utils 43 tests, Pharmacy/Neture production build·API type-check, PC/390px 합성 브라우저 4흐름을 재검증했다. 이전 커밋의 검증으로 최종 HEAD 성공을 대신하지 않으며 최종 CI/리뷰는 PR에서 확인한다.
+
+## 2026-11-01 통합·운영 사전 점검
+
+- PR #911은 main `cf91b6aec2811280bc9c71446521d35b6116f409`에 병합됐다. main CI 41266338817·CodeQL 41266338788 PASS. Delivery 41266986281은 LEVEL_3 보류다. 아직 운영 migration/배포를 실행하지 않았다.
+- GitHub 인증이 일시적으로 HTTP 401을 반환했다가 재조회에서 회복됐다. 네트워크 설정이나 자격증명을 추가하지 않았다.
+- 새 호스트 DNS는 기존 Pharmacy/Neture와 동일한 프런트 주소를 가리키나 HTTPS 503이다. 기존 Pharmacy/Store는 200이다.
+- 기존 WIF 읽기 전용 `retire-plan` 실행 41266635418에서 URL map의 호스트 범위가 현행 계약과 다른 것으로 확인됐다. mutation·삭제·DB write는 없다. 이 상태로 Pharmacy 배포를 강행하지 않는다.
+- 후속 운영 도구는 고정 새 호스트의 TLS·라우팅만 plan→digest 검증→apply 한다. 인증서가 필요하면 고정 단일 호스트·운영 소유 marker의 신규 certificate/map entry만 생성한다. 기존/공용 인증서와 map·proxy·IAM·DNS·DB는 삭제/변경하지 않는다(단, URL map의 승인된 hostRules/tests 전환만 변경).
+- TLS ACTIVE 후 라우팅을 전환하며 새 HTML·JS hash를 대상 Run과 대조한다. 공개 검증 실패 시 자신의 변경만 복원하고, 동시 편집이 감지되면 타인의 설정을 덮어쓰지 않는다. 중간에 생성한 TLS 자원은 삭제하지 않고 재plan 대상으로 보고한다.
+- 운영 도구 Python 70 tests·workflow gate/diff 회귀를 실행했다. 실제 TLS 상태와 정확한 변경 digest는 운영 plan에서 확인해야 하며 테스트를 운영 실행 성공으로 보고하지 않는다.
