@@ -204,3 +204,9 @@ it.each(['main', 'supplier', 'funding', 'community', 'carepharm'] as const)('ret
     kind: 'external', href: 'https://community.neture.co.kr/communities/community/forum?type=question&page=2#posts',
   });
 });
+
+it('keeps improvement list and direct request links on the community host', () => {
+  expect(decideHost('community', { pathname: '/improvements', search: '', hash: '' })).toEqual({ kind: 'stay' });
+  expect(decideHost('community', { pathname: '/improvements/fixture', search: '?from=notice', hash: '' })).toEqual({ kind: 'stay' });
+  expect(decideHost('main', { pathname: '/improvements', search: '', hash: '' }, { community: true })).toEqual({ kind: 'external', href: 'https://community.neture.co.kr/improvements' });
+});

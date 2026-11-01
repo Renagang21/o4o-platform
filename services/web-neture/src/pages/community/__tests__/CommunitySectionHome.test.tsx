@@ -69,7 +69,8 @@ describe("community section home", () => {
     await screen.findByText("notice-pin");
     expect(
       screen.getAllByRole("heading", { level: 2 }).map((x) => x.textContent),
-    ).toEqual(["공지사항", "약업계 주요 소식", "포럼", "콘텐츠", "자료실"]);
+    ).toEqual(["공지사항", "약업계 주요 소식", "O4O 개선·업데이트", "포럼", "콘텐츠", "자료실"]);
+    expect(screen.getByRole("link", { name: "업데이트 확인·개선 요청 →" }).getAttribute("href")).toBe("/improvements");
     const content = screen.getByRole("region", { name: "콘텐츠" });
     expect(within(content).getAllByRole("listitem")).toHaveLength(11);
     expect(within(content).getByText("상시 노출")).toBeTruthy();

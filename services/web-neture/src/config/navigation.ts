@@ -39,6 +39,7 @@ export function getServicePublicNav(profile: HostProfile): GlobalHeaderNavItem[]
     { label: '콘텐츠', href: '/communities/community/content' },
     { label: '자료실', href: '/communities/community/resources' },
     { label: '공지사항', href: '/communities/community/notices' },
+    { label: 'O4O 개선·업데이트', href: '/improvements' },
     { label: 'Contact Us', href: '/contact' },
   ];
   if (profile === 'funding') return [

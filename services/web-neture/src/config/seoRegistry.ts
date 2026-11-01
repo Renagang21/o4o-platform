@@ -89,6 +89,11 @@ export const netureSeoRegistry: SeoRegistry = {
     description: 'Neture 공급자 참여 안내. O4O 유통망 진입 안내.',
     ogType: 'website',
   },
+  '/improvements': {
+    title: 'O4O 업데이트·개선 요청',
+    description: 'O4O 업데이트 안내와 오류·불편 신고, 기능 개선 제안.',
+    ogType: 'website',
+  },
   '/forum': {
     title: '포럼 — Neture',
     description: 'O4O 개념과 네뚜레 구조에 대한 토론 공간.',
