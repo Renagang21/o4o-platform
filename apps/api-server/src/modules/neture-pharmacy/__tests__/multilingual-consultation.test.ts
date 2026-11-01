@@ -37,6 +37,14 @@ it('allows incoming customer words without generating a staff answer', async () 
   await service.translate('staff', 'store', { mode: 'floor-staff', language: 'ja', direction: 'to-staff', text: 'Original utterance' });
   expect(translate.mock.calls[0][0]).toEqual({ source: 'ja', target: 'ko', text: 'Original utterance' });
 });
+it('detects incoming text independently of the preselected language and rejects an uncertain detection', async () => {
+  const input = { mode: 'floor-staff', language: 'ko', direction: 'to-staff', text: '合成質問', detectLanguage: true };
+  translate.mockResolvedValueOnce({ translation: '합성 질문', detectedLanguage: 'ja' });
+  expect(await service.translate('staff', 'store', input)).toMatchObject({ language: 'ko', detectedLanguage: 'ja', translation: '합성 질문' });
+  expect(translate.mock.calls[0][0]).toEqual({ source: 'auto', target: 'ko', text: '合成質問' });
+  translate.mockResolvedValueOnce({ translation: '합성 질문', detectedLanguage: 'unknown' });
+  await expect(service.translate('staff', 'store', input)).rejects.toMatchObject({ httpStatus: 422, code: 'CONSULTATION_LANGUAGE_UNCERTAIN' });
+});
 it('does not equate business/payment permission with professional confirmation', async () => {
   professional.mockResolvedValue(false);
   const context = await service.context('staff', 'store');

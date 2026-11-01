@@ -10,7 +10,7 @@ export interface AiNativeRequest {
   textBytes?: number;
   maxOutputTokens?: number;
   units?: number;
-  unit?: 'image' | 'request' | 'character';
+  unit?: 'image' | 'request' | 'character' | 'second';
 }
 export interface AiNativeUsage { inputTokens?: number; outputTokens?: number; units?: number; searchQueries?: number }
 export interface AiNativeOutcome<T> { value: T; usage?: AiNativeUsage }
@@ -34,7 +34,7 @@ export function prepareNativePlan(request: AiNativeRequest, catalog: AiPriceCata
   const profile = price.native?.[request.kind] ?? (request.kind === 'text' ? { maxInputTokens: request.textBytes ?? 0, maxOutputTokens: request.maxOutputTokens ?? 2048 } : undefined);
   if ((price.match !== 'model' && (request.kind !== 'text' || !['gemini', 'openai', 'claude'].includes(request.provider))) || !profile) throw new Error('AI_PRICING_NOT_CONFIGURED');
   // OCR has image billing; grounding must explicitly include search-request policy costs.
-  if ((request.kind === 'ocr' && profile.unit !== 'image') || (request.kind === 'grounding' && !['request', 'search-query'].includes(profile.unit ?? '')))
+  if ((request.kind === 'stt' && profile.unit !== 'second') || (request.kind === 'translation' && profile.unit !== 'character') || (request.kind === 'ocr' && profile.unit !== 'image') || (request.kind === 'grounding' && !['request', 'search-query'].includes(profile.unit ?? '')))
     throw new Error('AI_PRICING_NOT_CONFIGURED');
   if ((['multimodal', 'grounding'].includes(request.kind) && (!profile.maxInputTokens || !profile.maxOutputTokens)) ||
     (price.inputPerMillion > 0 && profile.maxInputTokens === 0) || (price.outputPerMillion > 0 && profile.maxOutputTokens === 0) ||

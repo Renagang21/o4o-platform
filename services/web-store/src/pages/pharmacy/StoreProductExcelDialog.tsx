@@ -3,6 +3,7 @@ import { previewProductFile, aiResearchRequest, type ProductFilePreview, type Pr
 import { fileRowLabels, guessProductFileColumns, productFileMapping, registerProductFileSelection } from './storeProductExcelModel';
 import { StoreProductDialog, useStoreProductScope, useStoreProductSession } from '../../components/store/StoreProductSession';
 import { useLatestStoreRequest } from './hooks/useLatestStoreRequest';
+import { StoreAiReadinessNotice } from './StoreAiReadinessNotice';
 
 interface Props { open: boolean; onClose: () => void; onRegistered: () => void }
 const button = 'min-h-11 rounded border px-3 py-2 disabled:opacity-50';
@@ -62,6 +63,8 @@ function ExcelSession({ onClose, onRegistered, organizationId }: Readonly<Props 
     <div className="max-h-[90vh] w-full max-w-5xl overflow-auto rounded-lg bg-white p-4 text-slate-900">
       <div className="flex items-start justify-between gap-2"><h2 className="text-lg font-semibold">엑셀 상품 등록·AI 자료 준비</h2><button type="button" className={button} disabled={busy} onClick={onClose}>닫기</button></div>
       <p className="my-2 text-sm">첫 시트의 바코드·상품명 열만 사용합니다. POS 코드·가격·주문·재고는 저장하지 않습니다. 이름으로 찾은 후보는 직접 확인해 선택하세요.</p>
+      <p className="my-2 rounded border border-teal-200 bg-teal-50 p-3 text-sm">상담자료는 O4O 관리자가 공통 상품 DB에서 검토·승인하고 갱신합니다. 승인된 자료를 상담에 활용하며 정기 점검·갱신 일정은 관리자 운영 절차에 따라 안내됩니다. 상품·언어별 준비 상태에 따라 제공 시점은 다를 수 있습니다. 엑셀 등록만으로 자료가 자동 생성되지는 않습니다.</p>
+      <StoreAiReadinessNotice organizationId={organizationId} language={language} />
       <fieldset disabled={busy} className="min-w-0 space-y-3">
         <label className="block">상품 엑셀 파일 <input aria-label="상품 엑셀 파일" type="file" accept=".xlsx,.xls,.csv" onChange={e => {
           const next = e.target.files?.[0]; setFile(next ?? null); if (next) void read(next, false); else { requests.cancel(); setData(null); }

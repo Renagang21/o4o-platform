@@ -7,7 +7,7 @@ import {
   type CustomerCredential,
   type CustomerScreen,
 } from "../../../api/consultationWorkspace";
-import { useConsultationSpeech } from "../useConsultationSpeech";
+import { useConsultationAudio } from '../useConsultationAudio';
 const credentialKey = "o4o:consultation-customer-device:v1";
 const button =
   "min-h-14 rounded-xl border px-5 py-3 text-lg disabled:opacity-50";
@@ -32,6 +32,7 @@ export default function CustomerConsultationPage() {
     [error, setError] = useState(""),
     [notice, setNotice] = useState("");
   const [storageWarning, setStorageWarning] = useState(false);
+  const [autoLanguage, setAutoLanguage] = useState(true);
   const [text, setText] = useState(""),
     [language, setLanguage] = useState("ko"),
     [busy, setBusy] = useState(false),
@@ -54,13 +55,26 @@ export default function CustomerConsultationPage() {
     setScreen(null);
     setText("");
     setNotice("");
+    setAutoLanguage(true);
   }, [invalidateSubmission]);
-  const speech = useConsultationSpeech(
+  const speech = useConsultationAudio(
     `${credential?.id}:${screen?.epoch}:${language}`,
     (words) =>
       setText((previous) =>
         [previous, words].filter(Boolean).join(" ").slice(0, 1000),
-      ),
+      ), {
+      recognition: screen?.runtime?.recognition, synthesis: screen?.runtime?.synthesis,
+      recognize: async (audioBase64, spokenLanguage) => {
+        if (!credential || !screen) throw new Error('상담 화면을 다시 연결해 주세요.');
+        return customerRequest<{ text: string; language: string }>('speech/recognize', { ...credential, epoch: screen.epoch, audioBase64,
+          language: autoLanguage && screen.runtime?.detectLanguage ? 'auto' : spokenLanguage });
+      },
+      synthesize: async () => {
+        if (!credential || !screen) throw new Error('상담 화면을 다시 연결해 주세요.');
+        return customerRequest<{ audioBase64: string; mimeType: string }>('speech/synthesize', { ...credential, epoch: screen.epoch });
+      },
+      onLanguage: value => { if (screen?.languages.some(item => item.key === value)) setLanguage(value); },
+    },
   );
   const copy = consultationUi(screen?.language || language);
   const textRef = useRef(text);
@@ -126,6 +140,7 @@ export default function CustomerConsultationPage() {
           setText("");
           setNotice("");
           setLanguage(value.language);
+          setAutoLanguage(value.runtime?.detectLanguage === true);
           resetSpeech();
         }
         if (
@@ -384,6 +399,7 @@ export default function CustomerConsultationPage() {
                 onChange={(e) => {
                   resetSpeech();
                   setLanguage(e.target.value);
+                  setAutoLanguage(false);
                 }}
               >
                 {screen.languages.map((l) => (
@@ -393,6 +409,10 @@ export default function CustomerConsultationPage() {
                 ))}
               </select>
             </label>
+            {screen.runtime?.recognition === 'google-cloud' && screen.runtime.detectLanguage && <label className="flex min-h-14 items-center gap-3">
+              <input type="checkbox" checked={autoLanguage} disabled={busy || speech.listening}
+                onChange={event => { resetSpeech(); setAutoLanguage(event.target.checked); }} />{copy.autoLanguage}
+            </label>}
             {speech.inputSupported && (
               <button
                 className={button}

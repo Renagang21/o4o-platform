@@ -129,6 +129,14 @@ it('offers an explicit group-specific product editor link after import', async (
   render(wrap(<StoreMultilingualContentsMyPage />, '/work/kpa-society/store/library/multilingual-product-contents/my?groupId=group'));
   const link = await screen.findByRole('link', { name: '연결 제품의 언어별 내용 확인·편집' }); expect(link.getAttribute('href')).toBe('/work/kpa-society/store/products/multilingual/local/local-a?groupId=group');
 });
+it('marks an inactive product connection without deleting the publication or hiding its existing editor', async () => {
+  api.list.mockResolvedValue([group({ targetActive: false })]);
+  render(wrap(<StoreMultilingualContentsMyPage />));
+  await screen.findByText(/연결 제품이 현재 매장의 활성 취급 목록에 없습니다/);
+  expect(screen.getByRole('link', { name: '매장 제품 확인' }).getAttribute('href')).toBe('/store/products');
+  expect(screen.getByRole('link', { name: '연결 제품의 언어별 내용 확인·편집' })).toBeTruthy();
+  expect(api.update).not.toHaveBeenCalled(); expect(api.status).not.toHaveBeenCalled();
+});
 it('shows all language choices and the actual fallback content', async () => {
   render(wrap(<StoreMultilingualContentsMyPage />)); await screen.findByLabelText('확인할 언어');
   expect(screen.getAllByRole('option')).toHaveLength(7); input('확인할 언어', 'zh'); fireEvent.click(screen.getByRole('button', { name: '발행 내용 보기' }));

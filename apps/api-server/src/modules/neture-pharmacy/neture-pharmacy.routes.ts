@@ -190,7 +190,8 @@ export function createNeturePharmacyRoutes(dataSource: DataSource, consultationD
     async (actor,organizationId,input)=>{
       await serviceFeatures.require(actor,organizationId,'store-staff-support');
       return stationProducts.product(organizationId,input.productKind,input.productId);
-    },(actor,org,proof)=>guidance.verify(actor,org,proof));
+    },(actor,org,proof)=>guidance.verify(actor,org,proof),
+    (actor,org,mode,proof)=>guidance.verifySupportSource(actor,org,mode,proof));
   const consultationSupport = new ConsultationSupportService(guidance,
     consultationDependencies?.supportConsultation ?? createConsultationSupportRunner(dataSource));
   router.use(consultationWorkspaceRoutes(dataSource,stations,store,admin,guidance,consultationSupport));
@@ -428,8 +429,11 @@ export function createNeturePharmacyRoutes(dataSource: DataSource, consultationD
     res.setHeader('Cache-Control', 'private, no-store');
     const input = req.body ?? {};
     if (input.stationId !== undefined) await stations.validate(req.user!.id,org(req),input.stationId,input.epoch);
+    if (input.supportSource !== undefined) await guidance.verifySupportSource(req.user!.id,org(req),String(input.mode),input.supportSource);
     const result = await consultation.translate(req.user!.id, org(req), input);
-    return input.stationId === undefined ? result : stations.recordTranslation(req.user!.id,org(req),input.stationId,input.epoch,result);
+    if (input.supportSource !== undefined) await guidance.verifySupportSource(req.user!.id,org(req),String(input.mode),input.supportSource);
+    const prepared = { ...result, ...(input.supportSource !== undefined ? { supportSource: input.supportSource } : {}) };
+    return input.stationId === undefined ? prepared : stations.recordTranslation(req.user!.id,org(req),input.stationId,input.epoch,prepared);
   }));
   router.put('/pharmacy/pharmacist-confirmation', ...store, handle(async (req, res) => {
     res.setHeader('Cache-Control', 'private, no-store'); return confirmOwnerPharmacist(dataSource, req.user!.id, org(req), req.body?.confirmed);

@@ -137,11 +137,17 @@ const managedModel = z.object({
   capabilities: z.array(z.enum(["text", "image", "grounding", "speech"])),
 });
 const selection = z.object({ provider: modelProvider, model: z.string() });
+export const consultationRuntime = z.object({
+  recognition: z.enum(['browser', 'google-cloud']), translation: z.enum(['policy', 'google-cloud']),
+  synthesis: z.enum(['browser', 'google-cloud']), detectLanguage: z.boolean(), speechLanguages: z.array(z.string()),
+});
+export type ConsultationRuntimeSettings = z.infer<typeof consultationRuntime>;
 const modelControls = z.object({
   revision: z.number().int().nonnegative().safe(),
   models: z.array(managedModel),
   deleted: z.array(z.string()),
   selections: z.record(selection),
+  consultation: consultationRuntime.optional(),
   targets: z.array(
     z.object({
       id: z.string(),
@@ -168,6 +174,8 @@ export type AiModelControls = z.infer<typeof modelControls>;
 export type ManagedAiModel = z.infer<typeof managedModel>;
 export type AiModelSelection = z.infer<typeof selection>;
 const modelBase = "/ai/admin/management";
+export const setConsultationRuntime = (runtime: ConsultationRuntimeSettings, revision: number) =>
+  writeModelControl(() => unifiedApi.raw.put(modelBase + '/consultation-runtime', { runtime, revision }));
 export const getAiModelControls = () =>
   get(modelBase + "/models", modelControls);
 async function writeModelControl(

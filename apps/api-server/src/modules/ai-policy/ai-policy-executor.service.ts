@@ -50,7 +50,7 @@ export interface PolicyExecuteOverrides {
   responseMode?: "json" | "text";
   userId?: string;
   /** Server-owned logical usage; never forwarded from a client model override. */
-  usage?: "store.translation" | "pharmacy.consultation" | "supplier.overview" | "cooperative.overview";
+  usage?: "store.translation" | "pharmacy.consultation" | "pharmacy.support" | "supplier.overview" | "cooperative.overview";
   /** Domain host supplies the verified catalogue binding for dynamic scopes only. */
   serviceKey?: string;
 }
@@ -76,6 +76,10 @@ export class AiPolicyExecutorService {
    * @param overrides    - 호출별 설정 오버라이드
    * @returns ExecuteResult (content, model, tokens, durationMs, requestId)
    */
+  async assertEnabled(scope: AiPolicyScope) {
+    if (!(await this.resolvePolicy(scope)).isEnabled) throw new Error('AI_DISABLED');
+  }
+
   async execute(
     scope: AiPolicyScope,
     systemPrompt: string,
@@ -86,7 +90,7 @@ export class AiPolicyExecutorService {
     if (!policy.isEnabled)
       throw new Error(`AI_DISABLED: scope '${scope}' is disabled`);
     if (overrides?.usage &&
-      (['supplier.overview', 'cooperative.overview'].includes(overrides.usage) ? scope !== 'OPERATOR_INSIGHT' : scope !== 'CONTENT_TRANSLATION'))
+      (overrides.usage === 'pharmacy.support' ? scope !== 'PRODUCT_CONTENT' : ['supplier.overview', 'cooperative.overview'].includes(overrides.usage) ? scope !== 'OPERATOR_INSIGHT' : scope !== 'CONTENT_TRANSLATION'))
       throw new Error('AI_POLICY_USAGE_MISMATCH');
     const usage = overrides?.usage ?? (
       scope === "PRODUCT_CONTENT"

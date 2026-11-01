@@ -166,9 +166,9 @@ describe('§9 census — 전환한 호출부는 back-compat 로 돌아가지 않
 
   it('store-handled-products.routes 의 조직 결정 4곳이 모두 kpa 로 고정된다', () => {
     const src = read('routes/platform/store-handled-products.routes.ts');
-    const calls = src.match(/resolveStoreProductAccess\([^)]*\)/g) ?? [];
-    expect(calls).toHaveLength(1);
-    expect(src.match(/await resolveProductOrganization\(req, res(?:, true)?\)/g)).toHaveLength(4);
+    const calls = src.match(/resolveStoreProductAccess(?:Result)?\([^)]*\)/g) ?? [];
+    expect(calls).toHaveLength(2); // GET preserves a detailed denial; mutations/QR use the nullable resolver.
+    expect(src.match(/await resolveProductOrganization\(req, res(?:, true)?\)/g)).toHaveLength(3);
     for (const call of calls) {
       expect(call).toContain("'kpa'");
     }

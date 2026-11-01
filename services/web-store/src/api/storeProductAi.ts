@@ -9,9 +9,16 @@ export interface StoreProductAiContext {
 }
 export interface ProductFileRow {
   row: number; barcode: string; name: string; state: string;
-  candidates: Array<{ id: string; name: string; barcode: string | null; manufacturer: string | null; matchedBy: string; hasAiDescription: boolean; registered: boolean }>;
+  candidates: Array<{ id: string; name: string; barcode: string | null; manufacturer: string | null; matchedBy: string; hasAiDescription: boolean; aiState?: 'missing' | 'legacy' | 'structured' | 'unclassified'; registered: boolean }>;
 }
 export interface ProductFilePreview { headerRow: number; columns: Array<{ index: number; label: string }>; rows: ProductFileRow[] }
+export interface StoreAiReadiness {
+  organizationId: string; purpose: 'B2B'; language: string; listingCount: number; masterCount: number; localCount: number;
+  states: { structured: number; unclassified: number; legacy: number; missing: number };
+}
+export async function getStoreAiReadiness(language: string) {
+  return (await storeJsonFetch<{ data: StoreAiReadiness }>(`${base}/ai-context/readiness?language=${encodeURIComponent(language)}`)).data;
+}
 export async function previewProductFile(file: File, mapping?: { barcodeColumn?: number; nameColumn?: number; language: string }, headerRow?: number) {
   const body = new FormData(); body.append('file', file);
   if (headerRow !== undefined) body.append('headerRow', String(headerRow));

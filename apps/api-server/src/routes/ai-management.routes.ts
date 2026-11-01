@@ -50,6 +50,9 @@ export function createAiManagementRouter(db: DataSource): Router {
     "/models",
     modelOperation(() => models.snapshot()),
   );
+  router.put('/consultation-runtime', modelOperation(req => models.change(req.body?.revision, actor(req), {
+    action: 'consultation-runtime', runtime: req.body?.runtime,
+  })));
   router.post(
     "/models",
     modelOperation(

@@ -8,6 +8,10 @@ import { getTrustedClientIp } from "../../utils/trusted-client-ip.js";
 import { NeturePharmacyError } from "./constants.js";
 import { ConsultationLayoutService } from "./services/consultation-layout.js";
 import type { ConsultationStationService } from "./services/consultation-stations.js";
+import { ConsultationGoogleService } from './services/consultation-google.js';
+import { ModelControlService } from '../../services/ai-management/model-controls.js';
+import { consultationRuntimeSchema } from '../../services/ai-management/consultation-runtime.js';
+import { createPolicyExecutor } from '../ai-policy/ai-policy-factory.js';
 
 type StoreRequest = Request & { organizationId?: string };
 const org = (req: StoreRequest) => {
@@ -26,10 +30,17 @@ const handle =
     try {
       res.json({ success: true, data: await fn(req) });
     } catch (error) {
-      if (error instanceof NeturePharmacyError)
+      const reason = error instanceof Error ? error.message : '';
+      let failure = error;
+      if (!(error instanceof NeturePharmacyError)) {
+        if (reason === 'QUOTA_EXCEEDED') failure = new NeturePharmacyError(429, 'CONSULTATION_QUOTA_EXCEEDED', '상담 AI 이용 한도에 도달했습니다. 문자 입력·표시를 이용해 주세요.');
+        else if (reason.startsWith('AI_PRICING_')) failure = new NeturePharmacyError(503, 'CONSULTATION_PRICING_REQUIRED', '선택한 실행 수단의 가격 설정을 관리자에게 확인해 주세요.');
+        else if (reason.startsWith('AI_DISABLED')) failure = new NeturePharmacyError(503, 'CONSULTATION_AI_DISABLED', '관리자가 현재 상담 AI 실행을 중지했습니다. 문자 입력·표시를 이용해 주세요.');
+      }
+      if (failure instanceof NeturePharmacyError)
         res
-          .status(error.httpStatus)
-          .json({ success: false, code: error.code, error: error.message });
+          .status(failure.httpStatus)
+          .json({ success: false, code: failure.code, error: failure.message });
       else
         res.status(503).json({
           success: false,
@@ -65,6 +76,35 @@ export function consultationWorkspaceRoutes(
         error: "요청이 많습니다. 잠시 후 다시 시도해 주세요.",
       },
     });
+  router.post('/pharmacy/consultation-speech/:operation', ...store, limits(30), handle(async req => {
+    const input = req.body ?? {}, organizationId = org(req);
+    const authorize = async () => {
+      await stations.authorizeSpeech(req.user!.id!, organizationId, String(input.mode));
+      if (input.stationId !== undefined) await stations.validate(req.user!.id!, organizationId, input.stationId, input.epoch);
+      return true;
+    };
+    await authorize();
+    const runtime = consultationRuntimeSchema.parse((await new ModelControlService(db).read()).consultation ?? {});
+    const operation = req.params.operation;
+    if (!['recognize', 'synthesize'].includes(operation) ||
+      (operation === 'recognize' ? runtime.recognition : runtime.synthesis) !== 'google-cloud')
+      throw new NeturePharmacyError(409, 'CONSULTATION_PROVIDER_CHANGED', '현재 상담 실행 수단을 다시 확인해 주세요.');
+    await createPolicyExecutor(db).assertEnabled('CONTENT_TRANSLATION');
+    const cloud = new ConsultationGoogleService(db), access = { actorId: req.user!.id!, authorize };
+    const data = operation === 'recognize'
+      ? await cloud.recognize(input.audioBase64, input.language === 'auto' && runtime.detectLanguage ? runtime.speechLanguages : [String(input.language)], access)
+      : await cloud.synthesize(typeof input.text === 'string' ? input.text : '', String(input.language), access);
+    await authorize();
+    return { ...data, organizationId, mode: input.mode };
+  }));
+  if (guidance)
+    router.post('/pharmacy/consultation-products/prepare', ...store, limits(30), handle(async req => {
+      const input = req.body ?? {}, organizationId = org(req);
+      if (input.stationId !== undefined) await stations.validate(req.user!.id!, organizationId, input.stationId, input.epoch);
+      const result = await guidance.searchSupportProducts(req.user!.id!, organizationId, input);
+      if (input.stationId !== undefined) await stations.validate(req.user!.id!, organizationId, input.stationId, input.epoch);
+      return { ...result, organizationId, mode: input.mode };
+    }));
   if (guidance)
     router.post(
       "/pharmacy/consultation-guidance",
@@ -177,6 +217,25 @@ export function consultationWorkspaceRoutes(
     ),
   );
   // Capability-only endpoints. The bearer is separate from a login or display-device credential.
+  router.post('/pharmacy/consultation-device/speech/:operation', limits(15, true), handle(async req => {
+    const input = req.body ?? {}, owner = await stations.deviceSpeechAccess(input);
+    const authorize = async () => {
+      const current = await stations.deviceSpeechAccess(input);
+      if (current.actorId !== owner.actorId || current.organizationId !== owner.organizationId || current.mode !== owner.mode ||
+        current.language !== owner.language || JSON.stringify(current.shared) !== JSON.stringify(owner.shared))
+        throw new NeturePharmacyError(409, 'CONSULTATION_CHANGED', '현재 안내가 변경되었습니다. 다시 확인해 주세요.');
+      return true;
+    };
+    const runtime = consultationRuntimeSchema.parse((await new ModelControlService(db).read()).consultation ?? {});
+    const operation = req.params.operation;
+    if (!['recognize', 'synthesize'].includes(operation) || (operation === 'recognize' ? runtime.recognition : runtime.synthesis) !== 'google-cloud')
+      throw new NeturePharmacyError(409, 'CONSULTATION_PROVIDER_CHANGED', '상담 실행 수단을 다시 확인해 주세요.');
+    await createPolicyExecutor(db).assertEnabled('CONTENT_TRANSLATION');
+    const cloud = new ConsultationGoogleService(db), access = { actorId: owner.actorId, authorize };
+    return operation === 'recognize'
+      ? cloud.recognize(input.audioBase64, input.language === 'auto' && runtime.detectLanguage ? runtime.speechLanguages : [String(input.language)], access)
+      : cloud.synthesize(typeof owner.shared.text === 'string' ? owner.shared.text : '', typeof owner.shared.language === 'string' ? owner.shared.language : owner.language, access);
+  }));
   router.post(
     "/pharmacy/consultation-device/claim",
     limits(10),

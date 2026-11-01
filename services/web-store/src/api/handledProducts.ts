@@ -41,6 +41,7 @@ async function request<T>(url: string): Promise<T> {
     const body = await response.json().catch(() => ({ message: 'Network error' }));
     const error: any = new Error(body.error || body.message || `HTTP ${response.status}`);
     error.status = response.status;
+    error.code = body.code;
     throw error;
   }
   return response.json();

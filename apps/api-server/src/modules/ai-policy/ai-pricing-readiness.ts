@@ -79,8 +79,8 @@ export function parseAiPricingManifest(input: unknown): AiPricingManifest {
     const scope = row.scope as AiPolicyScope;
     const serviceKey = row.serviceKey === undefined ? SERVICE_FOR_SCOPE[scope] : text(row.serviceKey, /^[a-z][a-z0-9-]{0,49}$/);
     const request = object(row.request, ['kind', 'provider', 'model', 'textBytes', 'maxOutputTokens', 'unit', 'units']);
-    if (!['text', 'multimodal', 'grounding', 'ocr', 'tts'].includes(request.kind as string)) return invalid();
-    if (request.unit !== undefined && !['image', 'request', 'character'].includes(request.unit as string)) return invalid();
+    if (!['text', 'multimodal', 'grounding', 'ocr', 'tts', 'translation', 'stt'].includes(request.kind as string)) return invalid();
+    if (request.unit !== undefined && !['image', 'request', 'character', 'second'].includes(request.unit as string)) return invalid();
     return { id, scope, serviceKey, request: {
       kind: request.kind as AiNativeRequest['kind'],
       provider: text(request.provider, /^[a-z0-9_-]{1,20}$/),
@@ -183,7 +183,7 @@ export function draftAiPriceCatalog(manifest: AiPricingManifest, existing: AiPri
     let rate = rates.find(row => row.provider === request.provider && row.model === request.model);
     if (!rate && request.kind === 'text' && ['gemini', 'openai', 'claude'].includes(request.provider) && rates.some(row => row.provider === request.provider && row.model === '*')) continue;
     if (!rate) {
-      rate = { provider: request.provider, model: request.model, currency: 'USD', inputPerMillion: request.kind === 'ocr' ? 0 : null, outputPerMillion: request.kind === 'ocr' ? 0 : null };
+      rate = { provider: request.provider, model: request.model, currency: 'USD', inputPerMillion: ['ocr', 'translation', 'stt'].includes(request.kind) ? 0 : null, outputPerMillion: ['ocr', 'translation', 'stt'].includes(request.kind) ? 0 : null };
       rates.push(rate);
     }
     if (request.kind === 'text') continue;
@@ -195,7 +195,9 @@ export function draftAiPriceCatalog(manifest: AiPricingManifest, existing: AiPri
       continue;
     }
     generated.add(key);
-    native[request.kind] = request.kind === 'ocr'
+    native[request.kind] = ['translation', 'stt'].includes(request.kind)
+      ? { maxInputTokens: 0, maxOutputTokens: 0, unit: request.kind === 'stt' ? 'second' : 'character', perUnit: null }
+      : request.kind === 'ocr'
       ? { maxInputTokens: 0, maxOutputTokens: 0, unit: 'image', perUnit: null }
       : { maxInputTokens: null, maxOutputTokens: request.maxOutputTokens ?? null,
         ...(request.kind === 'grounding' ? { unit: 'request', perUnit: null } : {}),

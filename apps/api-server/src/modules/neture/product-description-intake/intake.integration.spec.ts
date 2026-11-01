@@ -188,6 +188,8 @@ integration('description intake — isolated PostgreSQL', () => {
     await db.query("UPDATE shared_product_descriptions SET content='<p>일반 편집으로 바뀐 본문</p>' WHERE master_id=$1 AND description_type='B2B' AND status='canonical'", [id]);
     const legacy = await readStoreProductAiContext(db, org, listing, 'ko');
     expect(legacy).toMatchObject({ state: 'legacy', description: { source: null, sections: [{ kind: 'unclassified', text: '일반 편집으로 바뀐 본문' }] } });
+    const changedPreview = await previewStoreExcel(db, org, file, { barcodeColumn: 0, nameColumn: 1, language: 'ko' });
+    expect(changedPreview.rows[0].candidates[0]).toMatchObject({ hasAiDescription: false, aiState: 'legacy' });
     await db.query('UPDATE organization_product_listings SET is_active=false WHERE id=$1', [listing]);
     expect(await readStoreProductAiContext(db, org, listing, 'ko')).toBeNull();
   });
