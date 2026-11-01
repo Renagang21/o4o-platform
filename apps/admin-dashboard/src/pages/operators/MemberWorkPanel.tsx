@@ -61,7 +61,7 @@ export default function MemberWorkPanel({ detail, actorId, busy, perform }: Read
       </> : <p>면허번호와 자격 심사 사유는 약사 자격 검토 권한이 있는 담당자만 확인할 수 있습니다.</p>}
     </section>
     <section className="space-y-3"><h4 className="font-semibold">약국경영자 신청</h4>
-      {permissions.pharmacies && detail.legacyBusiness && <section><h5 className="font-semibold">과거 가입 사업자 정보 · 미검증 자료</h5><p>현재 약국 신청·승인과 구분해서 확인합니다. 과거 정보만으로 사업 권한을 부여하지 않습니다.</p><dl className="grid grid-cols-1 gap-3 md:grid-cols-3">{Object.entries(legacyBusinessLabels).filter(([key]) => detail.legacyBusiness?.[key]).map(([key, label]) => <Field key={key} label={label} value={detail.legacyBusiness?.[key]} />)}</dl></section>}
+      {permissions.applications && detail.legacyBusiness && <section><h5 className="font-semibold">과거 Neture 가입 사업자 정보 · 미검증 자료</h5><p>기존 서비스 가입 검토 권한으로 조회합니다. 현재 약국 신청·승인과 구분하며 과거 정보만으로 사업 권한을 부여하지 않습니다.</p><dl className="grid grid-cols-1 gap-3 md:grid-cols-3">{Object.entries(legacyBusinessLabels).filter(([key]) => detail.legacyBusiness?.[key]).map(([key, label]) => <Field key={key} label={label} value={detail.legacyBusiness?.[key]} />)}</dl></section>}
       {!permissions.pharmacies && <p>약국 신청·증빙은 약국 심사 권한이 필요합니다.</p>}
       {permissions.pharmacies && detail.pharmacies.length === 0 && <p>약국 신청이 없습니다. 신청자는 내 매장 시작 → 약국 신청에서 사업 정보를 제출할 수 있습니다.</p>}
       {permissions.pharmacies && detail.pharmacies.map(pharmacy => <section key={pharmacy.id} aria-label={`약국 신청 ${pharmacy.name}`} className="rounded border bg-white p-3 space-y-3">

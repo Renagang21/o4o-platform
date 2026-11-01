@@ -20,6 +20,7 @@ export async function memberWorkspaceAccess(db: Db, actor: string, lock = false)
   return {
     qualifications: keys.includes('neture.qualifications'),
     pharmacies: keys.includes('neture.pharmacies'),
+    applications: keys.includes('neture.applications'),
     edit: roles.some(role => ['platform:super_admin', 'neture:admin'].includes(role)),
   };
 }
@@ -67,7 +68,7 @@ export class CentralMemberWorkspaceService {
       const [legacy] = await this.db.query(`SELECT NULLIF(BTRIM("businessInfo"->>'licenseNumber'),'') AS license FROM users WHERE id=$1`, [target]);
       legacyLicense = legacy?.license ?? null;
     }
-    if (permissions.pharmacies) {
+    if (permissions.applications) {
       const [legacy] = await this.db.query(`SELECT jsonb_strip_nulls(jsonb_build_object(
         'name',"businessInfo"->>'businessName','businessNumber',"businessInfo"->>'businessNumber',
         'representativeName',COALESCE("businessInfo"->>'representativeName',"businessInfo"->>'ceoName'),
@@ -75,7 +76,8 @@ export class CentralMemberWorkspaceService {
         'businessEntityType',"businessInfo"->>'businessEntityType','businessStartDate',"businessInfo"->>'businessStartDate',
         'address',"businessInfo"->>'address','addressDetail',"businessInfo"->>'address2',
         'contactName',"businessInfo"->>'contactName','managerPhone',"businessInfo"->>'managerPhone',
-        'taxInvoiceEmail',"businessInfo"->>'taxInvoiceEmail')) AS business FROM users WHERE id=$1`, [target]);
+        'taxInvoiceEmail',"businessInfo"->>'taxInvoiceEmail')) AS business FROM users WHERE id=$1
+        AND EXISTS(SELECT 1 FROM service_memberships WHERE user_id=$1 AND service_key='neture')`, [target]);
       legacyBusiness = legacy?.business && Object.keys(legacy.business).length ? legacy.business : null;
     }
     const pharmacies = permissions.pharmacies ? await this.db.query(`SELECT n.id,n.organization_id AS "organizationId",n.pharmacy_name AS name,

@@ -31,6 +31,7 @@ integration('central member workbench PostgreSQL authority, projection and corre
     const assignment = randomUUID();
     await db.query(`INSERT INTO role_assignments(id,user_id,role,scope_type,is_active) VALUES($1,$2,'neture:operator','o4o-direct',true)`, [assignment, reader]);
     await db.query(`INSERT INTO service_memberships VALUES($1,'neture','active')`, [reader]);
+    await db.query(`INSERT INTO service_memberships VALUES($1,'neture','active')`, [target]);
     await db.query(`INSERT INTO central_operation_menu_grants VALUES($1,ARRAY['neture.members'])`, [assignment]);
     await db.query(`INSERT INTO kpa_pharmacist_profiles VALUES($1,'current-license','pending','private reason',NULL,NULL,now())`, [target]);
     const organization = randomUUID();
@@ -67,6 +68,8 @@ integration('central member workbench PostgreSQL authority, projection and corre
     try {
       const response = await request(app).get(path).set('x-method', 'google');
       expect(response.status).toBe(200); expect(response.headers['content-type']).toContain('application/pdf');
+      const scoped = await service.detail(reader, target);
+      expect(scoped.pharmacies).toHaveLength(1); expect(scoped.legacyBusiness).toBeNull();
       expect((await request(app).get(path).set('x-method', 'password')).status).toBe(403);
       expect((await request(app).get(path+'/delete').set('x-method', 'google')).status).toBe(403);
     } finally {
@@ -91,5 +94,8 @@ integration('central member workbench PostgreSQL authority, projection and corre
   it('rejects nonnumeric phone input instead of silently clearing a stored contact', async () => {
     const detail = await service.detail(admin, target);
     await expect(service.correct(admin, target, { name: '합성 회원', nickname: '', phone: 'not-a-phone', reason: '합성 사유', version: detail.member.version })).rejects.toMatchObject({ status: 400 });
+  });
+  it('does not expose business information from a different service as a Neture application', async () => {
+    expect((await service.detail(admin, other)).legacyBusiness).toBeNull();
   });
 });

@@ -1,5 +1,5 @@
 export type MemberTask = 'all' | 'qualifications' | 'pharmacies' | 'corrections';
-export interface MemberPermissions { qualifications: boolean; pharmacies: boolean; edit: boolean }
+export interface MemberPermissions { qualifications: boolean; pharmacies: boolean; applications?: boolean; edit: boolean }
 export interface MemberRow { userId: string; name: string | null; email: string; accountStatus: string; qualificationStatus: string; pharmacyStatus: string | null }
 export interface MemberProfile { userId: string; name: string | null; nickname: string | null; email: string; phone: string | null; accountStatus: string; emailVerified: boolean; joinedAt: string; version: string }
 export interface Qualification { licenseNumber: string | null; status: string; reason: string | null; approvedAt: string | null; reviewedBy: string | null; version: string }

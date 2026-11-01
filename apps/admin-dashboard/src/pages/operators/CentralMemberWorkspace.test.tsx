@@ -78,3 +78,10 @@ it('ignores a late response for the previously selected member', async () => {
   await waitFor(() => expect(screen.queryByText('stale-private-license')).toBeNull());
   expect(within(screen.getByRole('region', { name: '선택 회원 작업' })).getByText(/member-b@example.test/)).toBeInTheDocument();
 });
+it.each([false, true])('shows legacy application fields only with the application-review duty (%s)', async applications => {
+  const scoped = { ...permissions, applications };
+  api.get.mockImplementation(async (path: string) => ({ data: { data: path === base ? { items: rows, counts: {}, permissions: scoped } : { ...detail(), permissions: scoped, legacyBusiness: { name: '과거 합성 사업장' } } } }));
+  render(<CentralMemberWorkspace actorId="reviewer" />); await select();
+  await screen.findByText('fixture-business');
+  expect(screen.queryByText('과거 합성 사업장') !== null).toBe(applications);
+});
