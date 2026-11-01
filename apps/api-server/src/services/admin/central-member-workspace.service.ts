@@ -1,3 +1,4 @@
+import { buildBusinessInfoUpdate } from '../../utils/business-info-write.js';
 import type { DataSource, EntityManager } from 'typeorm';
 import { centralOperationRoles } from './central-operation-access.js';
 import { centralOperationMenuKeys } from './central-operation-menu-grants.js';
@@ -146,7 +147,9 @@ export class CentralMemberWorkspaceService {
       if (before.version!==input.version) throw new OperationError(409,'MEMBER_CHANGED','회원 정보가 변경되었습니다. 다시 조회해 주세요.');
       const patch=Object.fromEntries(Object.entries(input.fields).map(([key,value])=>[mapping[key],value || null]));
       if(Object.hasOwn(before.business??{},'ceoName'))patch.ceoName=input.fields.representativeName||null;
-      await manager.query(`UPDATE users SET "businessInfo"=COALESCE("businessInfo",'{}'::jsonb)||$2::jsonb,"updatedAt"=clock_timestamp() WHERE id=$1`,[target,privateValue(JSON.stringify(patch))]);
+      const update=buildBusinessInfoUpdate({root:patch},2);
+      if(!update)throw new OperationError(400,'BUSINESS_FIELDS_REQUIRED','정정할 사업자 정보를 입력해 주세요.');
+      await manager.query(`UPDATE users SET "businessInfo"=${update.expression},"updatedAt"=clock_timestamp() WHERE id=$1`,[target,...update.params.map(privateValue)]);
       await recordOperation(manager,'neture',actor,'member.legacy_business_corrected',{targetUserId:target,reason,previous:Object.fromEntries(Object.entries(mapping).map(([key,column])=>[key,before.business?.[column]??(key==='representativeName'?before.business?.ceoName??null:null)])),next:input.fields});
       return {saved:true};
     });

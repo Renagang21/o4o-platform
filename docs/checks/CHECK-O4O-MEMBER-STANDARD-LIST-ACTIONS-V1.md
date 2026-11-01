@@ -75,3 +75,12 @@ AGENTS.md는 후속 모든 리스트 작업의 점검 원칙이며 다른 리스
 전용 worktree `/workspace/o4o-wt/member-standard-list-actions`, branch `wo/member-standard-list-actions`는 push 후 후속 개발/통합을 위해 KEEP한다.
 기존 문의 작업 branch와 기준 checkout은 변경하지 않는다. 검증 로그·합성 화면은 `/tmp/member-standard-*`에 보관하고 공개 커밋에 넣지 않는다.
 실제 commit·push SHA와 로컬 상태는 최종 보고로 전달한다.
+
+## main 통합 전 Codex 검토 보완 (2026-11-01)
+
+사용자의 후속 main 병합·배포 지시로 PR #919를 생성했다. 최신 main #918은 정상 merge로 반영했다.
+Codex P1 검토에서 users.businessInfo의 실제 타입(json)과 테스트 fixture(jsonb)의 차이를 발견했다.
+기존 buildBusinessInfoUpdate 헬퍼로 json→jsonb 부분 병합→json 저장을 재사용하고, fixture를 실제 json 타입으로 변경했다.
+기존 사업자 정정 검사에서 실제 컬럼 타입까지 확인하며 관련 PostgreSQL·HTTP 17 tests를 재검증해 통과했다.
+기존 jsonb fixture에서의 통과를 실제 json 컬럼의 저장 성공 근거로 쓰지 않는다. 운영 DB schema 변경은 없다.
+이후 동일 HEAD의 원격 CI·Codex 재검토와 병합/배포 증거는 PR과 최종 통합 보고에서 확인한다.

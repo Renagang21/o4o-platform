@@ -18,7 +18,7 @@ integration('central member workbench PostgreSQL authority, projection and corre
     const setup = new DataSource({ type: 'postgres', url }); await setup.initialize();
     await setup.query(`CREATE SCHEMA ${schema}`); await setup.destroy();
     db = new DataSource({ type: 'postgres', url, extra: { options: `-c search_path=${schema}` } }); await db.initialize();
-    await db.query(`CREATE TABLE users(id uuid PRIMARY KEY,name text,nickname text,email text,phone text,status text,"isActive" boolean,"isEmailVerified" boolean,"createdAt" timestamp,"updatedAt" timestamp,"businessInfo" jsonb);
+    await db.query(`CREATE TABLE users(id uuid PRIMARY KEY,name text,nickname text,email text,phone text,status text,"isActive" boolean,"isEmailVerified" boolean,"createdAt" timestamp,"updatedAt" timestamp,"businessInfo" json);
       CREATE TABLE role_assignments(id uuid PRIMARY KEY,user_id uuid,role text,scope_type text,is_active boolean,valid_from timestamp,valid_until timestamp);
       CREATE TABLE service_memberships(user_id uuid,service_key text,status text);
       CREATE TABLE central_operation_menu_grants(assignment_id uuid,menu_keys text[]);
@@ -125,13 +125,13 @@ integration('central member workbench PostgreSQL authority, projection and corre
     await expect(service.correctPharmacy(admin,other,foreign.id,{...input,version:foreign.version})).rejects.toMatchObject({code:'BUSINESS_NUMBER_IN_USE'});
   });
   it('corrects existing application business fields without altering license, roles or another service',async()=>{
-    await db.query(`UPDATE users SET "businessInfo"="businessInfo"||'{"ceoName":"합성 과거 대표"}'::jsonb WHERE id=$1`,[target]);
+    await db.query(`UPDATE users SET "businessInfo"=("businessInfo"::jsonb||'{"ceoName":"합성 과거 대표"}'::jsonb)::json WHERE id=$1`,[target]);
     const detail=await service.detail(admin,target);
     const fields={name:'정정 과거 사업장',businessNumber:'2345678901',representativeName:'과거 정정 대표',businessType:'업태',businessCategory:'종목',address:'주소',contactName:'담당자',managerPhone:'',taxInvoiceEmail:'',businessEntityType:'개인',businessStartDate:'2020-01-01',addressDetail:'상세'};
     await expect(service.correctLegacyBusiness(reader,target,{fields,reason:'합성 정정 사유',version:detail.member.version})).rejects.toMatchObject({status:403});
     await service.correctLegacyBusiness(admin,target,{fields,reason:'본인 요청 대조',version:detail.member.version});
     const after=await service.detail(admin,target);expect(after.legacyBusiness.name).toBe(fields.name);expect(after.legacyLicense).toBe('legacy-license');
-    const [row]=await db.query(`SELECT "businessInfo" FROM users WHERE id=$1`,[target]);expect(row.businessInfo.internalFutureField).toBe('do-not-disclose');expect(row.businessInfo.ceoName).toBe(fields.representativeName);
+    const [row]=await db.query(`SELECT "businessInfo",pg_typeof("businessInfo")::text AS "businessInfoType" FROM users WHERE id=$1`,[target]);expect(row.businessInfoType).toBe('json');expect(row.businessInfo.internalFutureField).toBe('do-not-disclose');expect(row.businessInfo.ceoName).toBe(fields.representativeName);
     await expect(service.correctLegacyBusiness(admin,target,{fields,reason:'합성 정정 사유',version:detail.member.version})).rejects.toMatchObject({status:409});
   });
   it('rejects only pending, nonprivileged registrations and records a reason',async()=>{
