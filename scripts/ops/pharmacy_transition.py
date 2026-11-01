@@ -438,11 +438,12 @@ def main():
     with cloud_api() as api:
         if args.phase.startswith('drugstore-'):
             import drugstore_transition as drugstore
+            operation_started = time.monotonic()
             record, fingerprint, original = drugstore.plan(api)
             if apply:
                 if fingerprint != args.expected_plan:
                     raise ValueError('Drugstore plan changed after review')
-                drugstore.apply(api, record, original)
+                drugstore.apply(api, record, original, operation_started=operation_started)
             emit_summary('Drugstore transition', {'phase': args.phase, 'plan_digest': fingerprint,
                          'applied': apply, 'tls_ready_at_plan': record['tls']['ready'],
                          'create_certificate': record['tls']['create_certificate'],

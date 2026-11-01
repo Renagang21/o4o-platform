@@ -55,8 +55,8 @@ main `c7c5cd100c`(PR #907)을 작업 branch에 통합했다. 공통 서비스 �
 - 기존 WIF 읽기 전용 `retire-plan` 실행 41266635418에서 URL map의 호스트 범위가 현행 계약과 다른 것으로 확인됐다. mutation·삭제·DB write는 없다. 이 상태로 Pharmacy 배포를 강행하지 않는다.
 - 후속 운영 도구는 고정 새 호스트의 TLS·라우팅만 plan→digest 검증→apply 한다. 인증서가 필요하면 고정 단일 호스트·운영 소유 marker의 신규 certificate/map entry만 생성한다. 기존/공용 인증서와 map·proxy·IAM·DNS·DB는 삭제/변경하지 않는다(단, URL map의 승인된 hostRules/tests 전환만 변경).
 - TLS ACTIVE 후 라우팅을 전환하며 새 HTML·JS hash를 대상 Run과 대조한다. 공개 검증 실패 시 자신의 변경만 복원하고, 동시 편집이 감지되면 타인의 설정을 덮어쓰지 않는다. 중간에 생성한 TLS 자원은 삭제하지 않고 재plan 대상으로 보고한다.
-- 운영 도구 Python 74 tests·workflow gate/diff 회귀를 실행했다. 실제 TLS 상태와 정확한 변경 digest는 운영 plan에서 확인해야 하며 테스트를 운영 실행 성공으로 보고하지 않는다.
+- 운영 도구 Python 75 tests·workflow gate/diff 회귀를 실행했다. 실제 TLS 상태와 정확한 변경 digest는 운영 plan에서 확인해야 하며 테스트를 운영 실행 성공으로 보고하지 않는다.
 
 PR #912 리뷰 보완: 최초 라우팅 쓰기 이후의 보상 복원은 새 배포 gate와 분리했다. 자신의 현재 topology 일치와 최신 Compute fingerprint를 확인하므로 다른 writer를 덮어쓰지 않으며, 이후 main 이동·배포 대기로 복원이 차단되지 않는 회귀를 추가했다.
 
-추가 리뷰 보완: Certificate Manager 프로젝트 ID/번호 별칭을 plan 양쪽 경로에서 정규화하여 발급 상태 진행만으로 digest가 변하지 않게 했다. TLS 대기·라우팅 쓰기에 15분, 공개 검증에 180초 wall-clock 제한을 두며, 늦게 준비된 TLS로 라우팅 쓰기를 시작하지 않는다. 새 호스트 모드는 이미 green인 CI를 요구하고 작업 step에 30분 한도를 두어 40분 job 안에서 보상 복원 시간을 확보한다. 기존 모드의 대기·한도는 유지한다.
+추가 리뷰 보완: Certificate Manager 프로젝트 ID/번호 별칭을 plan 양쪽 경로에서 정규화하여 발급 상태 진행만으로 digest가 변하지 않게 했다. TLS 대기·plan 시작부터의 라우팅 쓰기에 15분, 공개 검증에 180초 wall-clock 제한을 두며, 늦게 준비된 TLS로 라우팅 쓰기를 시작하지 않는다. 새 호스트 모드는 이미 green인 CI를 요구하고 작업 step에 30분 한도를 두어 40분 job 안에서 보상 복원 시간을 확보한다. 기존 모드의 대기·한도는 유지한다.

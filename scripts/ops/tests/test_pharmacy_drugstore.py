@@ -189,6 +189,14 @@ class Apply(unittest.TestCase):
         self.assertEqual(api.map['pathMatchers'], before['pathMatchers'])
         smoke.assert_called_once_with('https://' + d.HOST)
 
+    @patch.object(d.time, 'monotonic', return_value=901)
+    def test_slow_plan_counts_toward_the_operation_write_budget(self, clock):
+        api = Cloud()
+        before = deepcopy(api.map)
+        with self.assertRaisesRegex(RuntimeError, 'budget exhausted'):
+            d.apply(api, self.record(api), before, operation_started=0)
+        self.assertEqual(api.writes, [])
+
     def test_route_drift_before_apply_prevents_all_writes(self):
         api = Cloud()
         original = deepcopy(api.map)

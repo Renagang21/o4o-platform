@@ -168,11 +168,13 @@ def ensure_tls(api, tls):
     raise RuntimeError('Drugstore TLS is not ACTIVE; routing was not changed; owned TLS resources retained for re-plan')
 
 
-def apply(api, record, original):
+def apply(api, record, original, operation_started=None):
     import pharmacy_transition as t
-    route_deadline = time.monotonic() + ROUTE_WRITE_SECONDS
+    route_deadline = (time.monotonic() if operation_started is None else operation_started) + ROUTE_WRITE_SECONDS
     if api.request('GET', t.MAP) != original:
         raise ValueError('URL map changed after plan; no write submitted')
+    if time.monotonic() >= route_deadline:
+        raise RuntimeError('Drugstore route write budget exhausted; routing unchanged; re-plan with prepared TLS')
     ensure_tls(api, record['tls'])
     if api.request('GET', t.MAP) != original:
         raise ValueError('URL map changed during TLS issuance; no route write submitted')
