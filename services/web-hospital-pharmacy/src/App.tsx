@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Link, NavLink, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Link, NavLink, Navigate, useLocation } from 'react-router-dom';
 import { detectBasename } from './lib/basename';
 import { detectBrowserSupport, SUPPORTED_BROWSER_NOTICE } from './lib/browserSupport';
 import { BRAND } from './config/service';
@@ -21,18 +21,20 @@ function FileStatusArea() {
 
 function AppShell({ children }: { children: React.ReactNode }) {
   const { hasFileSystemAccess, officiallySupported } = detectBrowserSupport();
+  const { pathname } = useLocation();
+  const isPharmacyPage = pathname === '/pharmacy' || pathname === '/pharmacy/';
   return (
     <div className="site">
       <header className="header">
         <Link to="/" className="brand">{BRAND.name} <span className="muted">| Neture</span></Link>
-        <nav className="nav">
+        {!isPharmacyPage && <nav className="nav">
           <NavLink to="/ward" className={({ isActive }) => (isActive ? 'active' : '')}>병동</NavLink>
           <NavLink to="/pharmacy" className={({ isActive }) => (isActive ? 'active' : '')}>원내 약품 파일</NavLink>
           <FileStatusArea />
           <a href="https://neture.co.kr/contact?service=hospital" target="_blank" rel="noopener noreferrer">Contact Us</a>
           <a href="https://neture.co.kr/signup" target="_blank" rel="noopener noreferrer">O4O 회원가입</a>
           <a href="https://neture.co.kr/" target="_blank" rel="noopener noreferrer" className="o4o-home-link">O4O 메인으로 <span className="muted">(새 탭)</span></a>
-        </nav>
+        </nav>}
       </header>
       {/* 동작은 하지만 공식 지원 대상이 아닌 브라우저(Whale·Opera 등) — 안내만(§17). */}
       {hasFileSystemAccess && !officiallySupported && (
