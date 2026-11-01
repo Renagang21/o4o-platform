@@ -119,6 +119,22 @@ class TLS(unittest.TestCase):
         self.assertFalse(plan['create_entry'])
         self.assertFalse(plan['ready'])
 
+    @patch.object(t, 'stable_revision', return_value=({'status': {'url': 'https://reviewed'}}, {'metadata': {'name': 'fixed'}}, ''))
+    @patch.object(t, 'target_chain', return_value=({'loadBalancingScheme': 'EXTERNAL_MANAGED'}, {}))
+    @patch.object(t, 'validate_map')
+    @patch.object(t, 'public_smoke', return_value='bundle')
+    def test_project_number_alias_and_issuance_progress_do_not_change_digest(self, smoke, validate, chain, revision):
+        api = Cloud(True)
+        api.cert['name'] = d.CERT.replace('netureyoutube', '117791934476')
+        api.entries[0]['name'] = d.ENTRY.replace('netureyoutube', '117791934476')
+        api.entries[0]['certificates'] = [api.cert['name']]
+        api.cert['managed']['state'] = 'PROVISIONING'
+        _, pending, _ = d.plan(api)
+        api.cert['managed']['state'] = 'ACTIVE'
+        record, active, _ = d.plan(api)
+        self.assertTrue(record['tls']['ready'])
+        self.assertEqual(pending, active)
+
     def test_foreign_certificate_collision_is_not_adopted(self):
         api = Cloud()
         api.cert = {'managed': {'domains': ['pharmacy.neture.co.kr']}, 'labels': d.OWNER}
@@ -204,6 +220,31 @@ class Apply(unittest.TestCase):
         self.assertEqual(api.map['hostRules'], before['hostRules'])
         self.assertEqual(api.map['tests'], before['tests'])
         self.assertEqual(idle.call_count, 1)
+
+    @patch.object(t, 'stable_revision', return_value=({}, {'metadata': {'name': 'fixed'}}, ''))
+    @patch.object(t, 'production_idle')
+    def test_slow_public_failure_has_a_deadline_and_restores_without_another_retry(self, idle, revision):
+        api = Cloud(True)
+        before = deepcopy(api.map)
+        clock = [0]
+        def timeout(_):
+            clock[0] += d.VERIFY_SECONDS + 1
+            raise ValueError('timeout')
+        with patch.object(d.time, 'monotonic', side_effect=lambda: clock[0]), patch.object(t, 'public_smoke', side_effect=timeout) as smoke:
+            with self.assertRaisesRegex(RuntimeError, 'previous routes restored'): d.apply(api, self.record(api), before)
+        self.assertEqual(smoke.call_count, 1)
+        self.assertEqual(api.map['hostRules'], before['hostRules'])
+
+    @patch.object(t, 'stable_revision', return_value=({}, {'metadata': {'name': 'fixed'}}, ''))
+    @patch.object(t, 'production_idle')
+    def test_slow_tls_preparation_cannot_start_a_late_route_write(self, idle, revision):
+        api = Cloud(True)
+        before = deepcopy(api.map)
+        clock = [0]
+        def slow(*_): clock[0] = d.ROUTE_WRITE_SECONDS + 1
+        with patch.object(d.time, 'monotonic', side_effect=lambda: clock[0]), patch.object(d, 'ensure_tls', side_effect=slow):
+            with self.assertRaisesRegex(RuntimeError, 'budget exhausted'): d.apply(api, self.record(api), before)
+        self.assertEqual(api.writes, [])
 
     @patch.object(t, 'stable_revision', return_value=({}, {'metadata': {'name': 'fixed'}}, ''))
     @patch.object(t, 'production_idle')

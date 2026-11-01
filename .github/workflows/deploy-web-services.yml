@@ -967,9 +967,15 @@ jobs:
         with:
           node-version: '22.18.0'
       - name: Require green CI for exact target SHA
+        if: ${{ !startsWith(inputs.pharmacy_preparation, 'drugstore-') }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: node scripts/ci/ci-gate.mjs --target "${{ github.sha }}" --wait-seconds 1800 --enforce
+      - name: Require already-green CI for bounded Drugstore operation
+        if: startsWith(inputs.pharmacy_preparation, 'drugstore-')
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node scripts/ci/ci-gate.mjs --target "${{ github.sha }}" --wait-seconds 0 --enforce
       - name: Require current main and explicit pharmacy selector
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -991,6 +997,7 @@ jobs:
       - name: Test private preparation safety contracts
         run: python3 -m unittest discover -s scripts/ops/tests -p 'test_pharmacy*.py'
       - name: Run fixed pharmacy resource operation
+        timeout-minutes: ${{ startsWith(inputs.pharmacy_preparation, 'drugstore-') && 30 || 40 }}
         env:
           PREPARATION_MODE: ${{ inputs.pharmacy_preparation }}
           PREPARATION_DIGEST: ${{ inputs.pharmacy_plan_digest }}

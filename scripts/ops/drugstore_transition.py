@@ -12,6 +12,9 @@ CERT = ROOT + '/certificates/cm-cert-drugstore'
 MAP_NAME = ROOT + '/certificateMaps/o4o-main-cert-map'
 ENTRY = MAP_NAME + '/certificateMapEntries/cm-entry-drugstore'
 OWNER = {'o4o-operation': 'drugstore-host-transition-v1'}
+TLS_WAIT_SECONDS = 900
+ROUTE_WRITE_SECONDS = 900
+VERIFY_SECONDS = 180
 
 
 def resource(name):
@@ -94,7 +97,8 @@ def tls_plan(api):
         certs = [certificate(api, name) for name in entry.get('certificates', [])]
         if any(covers(c) and c.get('managed', {}).get('state') == 'ACTIVE' for c in certs):
             return {'create_certificate': False, 'create_entry': False, 'ready': True,
-                    'entry': entry['name'], 'certificates': entry['certificates']}
+                    'entry': 'projects/' + resource(entry['name']),
+                    'certificates': sorted('projects/' + resource(name) for name in entry['certificates'])}
         if resource(entry.get('name')) != resource(ENTRY) or entry.get('labels') != OWNER:
             raise ValueError('Existing Drugstore TLS entry is not ready and is not owned by this operation')
         if [resource(c) for c in entry.get('certificates', [])] != [resource(CERT)] or entry.get('hostname') != HOST:
@@ -151,18 +155,22 @@ def ensure_tls(api, tls):
         t.production_idle()
         wait_operation(api, api.request('POST', CM + '/' + MAP_NAME + '/certificateMapEntries?certificateMapEntryId=cm-entry-drugstore',
                                        {'hostname': HOST, 'certificates': [CERT], 'labels': OWNER}))
+    deadline = time.monotonic() + TLS_WAIT_SECONDS
     for attempt in range(120):
         current = tls_plan(api)
         if current['ready']:
             return
         if attempt % 6 == 0:
             print('::notice title=Drugstore TLS::Waiting for the fixed hostname managed certificate to become ACTIVE')
-        time.sleep(10)
+        if time.monotonic() >= deadline:
+            break
+        time.sleep(min(10, max(0, deadline - time.monotonic())))
     raise RuntimeError('Drugstore TLS is not ACTIVE; routing was not changed; owned TLS resources retained for re-plan')
 
 
 def apply(api, record, original):
     import pharmacy_transition as t
+    route_deadline = time.monotonic() + ROUTE_WRITE_SECONDS
     if api.request('GET', t.MAP) != original:
         raise ValueError('URL map changed after plan; no write submitted')
     ensure_tls(api, record['tls'])
@@ -175,7 +183,10 @@ def apply(api, record, original):
     changed = any(candidate.get(k, []) != original.get(k, []) for k in fields)
     if changed:
         t.production_idle()
+        if time.monotonic() >= route_deadline:
+            raise RuntimeError('Drugstore route write budget exhausted; routing unchanged; re-plan with prepared TLS')
         api.compute_operation('PATCH', t.MAP, {'fingerprint': original['fingerprint'], **{k: candidate[k] for k in fields if k in candidate}})
+    deadline = time.monotonic() + VERIFY_SECONDS
     try:
         for attempt in range(36):
             observed = api.request('GET', t.MAP)
@@ -186,9 +197,9 @@ def apply(api, record, original):
                     raise ValueError('Drugstore bundle differs from reviewed target')
                 return
             except (ValueError, RuntimeError):
-                if attempt == 35:
+                if attempt == 35 or time.monotonic() >= deadline:
                     raise
-                time.sleep(5)
+                time.sleep(min(5, max(0, deadline - time.monotonic())))
     except Exception:
         current = api.request('GET', t.MAP)
         if not changed or any(current.get(k, []) != candidate.get(k, []) for k in ('hostRules', 'pathMatchers', 'tests')):
