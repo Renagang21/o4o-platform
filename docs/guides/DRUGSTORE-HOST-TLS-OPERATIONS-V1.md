@@ -16,10 +16,11 @@
 | `certificatemanager.certmapentries.list` | 기존 새 호스트/wildcard 항목 확인 |
 | `certificatemanager.certs.get` | 관리형 인증서 도메인·상태 확인 |
 | `certificatemanager.certs.create` | 필요 시 고정 새 호스트 인증서 생성 |
+| `certificatemanager.certs.use` | 생성한 인증서를 map entry에 연결 |
 | `certificatemanager.certmapentries.create` | 필요 시 고정 새 호스트 map entry 생성 |
 | `certificatemanager.operations.get` | 생성 작업 완료 확인 |
 
-기존 URL-map 조회/검증/수정·Run 조회 권한은 유지한다. 이 추가 역할에는 IAM·DNS 변경, 기존 인증서 수정·삭제 권한을 넣지 않는다. 역할 자체는 프로젝트 범위이며, 실행 코드의 고정 호스트·소유 marker·충돌 검사와 보호된 main/owner/CI/freeze/digest gate가 변경 대상을 제한한다.
+[공식 Certificate Manager 권한 문서](https://docs.cloud.google.com/certificate-manager/docs/permissions)의 map entry 생성에는 `certmapentries.create`와 연결할 인증서의 `certs.use`가 함께 필요하다. 기존 URL-map 조회/검증/수정·Run 조회 권한은 유지한다. 이 추가 역할에는 IAM·DNS 변경, 기존 인증서 수정·삭제 권한을 넣지 않는다. 역할 자체는 프로젝트 범위이며, 실행 코드의 고정 호스트·소유 marker·충돌 검사와 보호된 main/owner/CI/freeze/digest gate가 변경 대상을 제한한다.
 
 ## Cloud Shell 명령
 
@@ -30,13 +31,22 @@ gcloud iam roles create o4oDrugstoreHostTlsOperator \
   --project=netureyoutube \
   --title='O4O Drugstore host TLS operation' \
   --description='TLS inventory and managed certificate/map entry creation; no delete, update, IAM or DNS permissions.' \
-  --permissions=compute.targetHttpsProxies.list,certificatemanager.certmapentries.list,certificatemanager.certs.get,certificatemanager.certs.create,certificatemanager.certmapentries.create,certificatemanager.operations.get \
+  --permissions=compute.targetHttpsProxies.list,certificatemanager.certmapentries.list,certificatemanager.certs.get,certificatemanager.certs.create,certificatemanager.certs.use,certificatemanager.certmapentries.create,certificatemanager.operations.get \
   --stage=GA --format=none &&
 
 gcloud projects add-iam-policy-binding netureyoutube \
   --member=serviceAccount:github-actions@netureyoutube.iam.gserviceaccount.com \
   --role=projects/netureyoutube/roles/o4oDrugstoreHostTlsOperator \
   --condition=None --format=none
+```
+
+기존 안내의 6개 권한으로 역할을 이미 만들고 연결했다면, 소유자가 해당 역할 정의를 확인한 후 누락된 사용 권한만 다음처럼 추가한다. 기존 권한을 통째로 교체하지 않는다.
+
+```bash
+gcloud iam roles update o4oDrugstoreHostTlsOperator \
+  --project=netureyoutube \
+  --add-permissions=certificatemanager.certs.use \
+  --format=none
 ```
 
 `--format=none`은 프로젝트 IAM 정책·계정 목록을 출력하지 않기 위한 것이다. 키·인증 토큰을 채팅·문서·커밋에 붙이지 않는다.
