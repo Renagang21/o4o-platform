@@ -23,7 +23,7 @@
 
 ## Cloud Shell 명령
 
-프로젝트 IAM 소유자 계정으로 Google Cloud Console 오른쪽 위 `>_` Cloud Shell에서 실행한다. 역할이 이미 존재하면 권한이 위 집합과 같은지 먼저 확인한다. 같은 역할을 다시 만들거나 임의로 더 넓게 갱신하지 않는다.
+프로젝트 IAM 소유자 계정으로 Google Cloud Console 오른쪽 위 `>_` Cloud Shell에서 실행한다. 역할이 이미 존재하면 권한이 위 집합과 같은지 먼저 확인한다. 같은 역할을 다시 만들거나 임의로 더 넓게 갱신하지 않는다. 아래 `&&`는 역할 생성이 실패했을 때 기존의 다른 역할을 곧바로 계정에 연결하지 않도록 한다.
 
 ```bash
 gcloud iam roles create o4oDrugstoreHostTlsOperator \
@@ -31,7 +31,7 @@ gcloud iam roles create o4oDrugstoreHostTlsOperator \
   --title='O4O Drugstore host TLS operation' \
   --description='TLS inventory and managed certificate/map entry creation; no delete, update, IAM or DNS permissions.' \
   --permissions=compute.targetHttpsProxies.list,certificatemanager.certmapentries.list,certificatemanager.certs.get,certificatemanager.certs.create,certificatemanager.certmapentries.create,certificatemanager.operations.get \
-  --stage=GA --format=none
+  --stage=GA --format=none &&
 
 gcloud projects add-iam-policy-binding netureyoutube \
   --member=serviceAccount:github-actions@netureyoutube.iam.gserviceaccount.com \
