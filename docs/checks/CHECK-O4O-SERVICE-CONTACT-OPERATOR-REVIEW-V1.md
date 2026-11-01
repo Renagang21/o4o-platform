@@ -79,3 +79,12 @@ Admin: PC/mobile PASS (합성 API). KPA/Neture/Pharmcoop 실제 계정·외부 �
 전용 worktree `/workspace/o4o-wt/service-contact-operator-review`, branch `wo/service-contact-operator-review`.
 검증 로그와 합성 화면은 `/tmp/contact-*`에 보관하며 공개 저장소에 넣지 않는다.
 작업 branch는 후속 개발/통합 전까지 KEEP한다. 실제 commit·push SHA는 최종 보고로 인계한다.
+
+## 최신 main 대조 후 재검증
+
+작업 중 중앙 업무 운영자 지정 PR #913이 반영돼 main이 `28270d11fd`로 이동했다.
+미게시 작업 commit을 그 main 위로 rebase했으며 충돌은 없었다. 새 지정 기능도 기존 `o4o-direct` 역할 할당과 메뉴 제한을 사용함을 확인했다.
+그 기준에서 API 실제 PostgreSQL/HTTP 5 suites 57 tests, Admin 5 files 33 tests, API·Admin 타입 검사와 Admin production build를 다시 통과했다.
+PC/mobile 합성 대응 흐름도 최신 빌드에서 다시 확인했다. 실제 이메일 제공자 전달과 운영 계정 검증은 여전히 미실행이다.
+초기 범위 검사 CLI가 실행 제약으로 중단된 뒤 commit이 진행된 도구 순서 오류가 있었다. commit의 실제 19개 경로를 명시한 작업 목록과 직접 대조해 정확히 일치함을 확인했다.
+후속 문서 commit은 범위 검사 성공 후 실행한다. 기존 checkout과 다른 작업공간은 수정하지 않았다.

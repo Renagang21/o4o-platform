@@ -41,3 +41,5 @@ UI: Admin 중앙 운영 문의함·메뉴·알림 목적지. 서비스 자체 �
 [CHECK](../checks/CHECK-O4O-SERVICE-CONTACT-OPERATOR-REVIEW-V1.md)에 실제 SQL·HTTP·브라우저 증거와 실계정/외부 메일 한계를 기록했다.
 위 체크리스트는 개발 검증 항목이다. commit/push의 실제 SHA·결과는 최종 보고에서 확인한다.
 사용자의 최종 지시에 따라 PR·병합·배포 없이 push 후 전용 worktree를 KEEP한다.
+
+- 최신 main 대조: operator 지정 PR #913의 `28270d11fd` 위로 작업 commit을 정렬하고 API 57·UI 33·타입·빌드·PC/mobile 합성 흐름을 재검증했다.
