@@ -1,5 +1,6 @@
+import { useNavigate } from 'react-router-dom';
 import { AiRequestInput } from '@o4o/ui';
-import { useEffect, useId, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useStoreAiPlacement } from "./StoreAiPlacement";
 import type { StoreMenuSectionItem } from "@o4o/store-ui-core";
@@ -46,8 +47,11 @@ export function StoreAiAssistant(props: Readonly<Props>) {
 function AssistantSession({
   area,
   serviceId,
+  basePath,
 }: Readonly<Props & { serviceId: string }>) {
   const placement = useStoreAiPlacement();
+  const navigate = useNavigate();
+  const pendingVideo = useRef<string | null>(null);
   const id = useId();
   const [open, setOpen] = useState(false);
   const [question, setQuestion] = useState("");
@@ -72,16 +76,21 @@ function AssistantSession({
     STORE_WORKSPACE_AREAS.find((item) => item.key === area)?.label ??
     "매장 설정";
 
-  const submit = async () => {
-    const submitted = question.trim();
+  const submit = useCallback(async (forwarded?: string) => {
+    const submitted = (forwarded ?? question).trim();
     if (lock.current || !submitted || submitted.length > 2000) return;
+    if (!placement?.action && /(?:동영상|영상)/.test(submitted) && /(?:등록해|등록하|저장해|저장하|올려)/.test(submitted) && !/(?:방법|어떻게|설명|알려)/.test(submitted)) {
+      pendingVideo.current = submitted;
+      navigate(`${basePath}/marketing/signage/videos`);
+      return;
+    }
     lock.current = true;
     setBusy(true);
     setError("");
     setCopyStatus("");
     const inputAtSubmit = question;
     try {
-      const result = await askStoreAi({
+      const result = placement?.action ? { answer: await placement.action.run(submitted), remainingQueries: undefined } : await askStoreAi({
         question: submitted,
         serviceId,
         task,
@@ -107,12 +116,20 @@ function AssistantSession({
       setOpen(true);
       if (input.current === inputAtSubmit) setQuestion("");
     } catch (cause) {
-      if (mounted.current) setError(storeAiError(cause));
+      if (mounted.current) setError(placement?.action && cause instanceof Error ? cause.message : storeAiError(cause));
     } finally {
       lock.current = false;
       if (mounted.current) setBusy(false);
     }
-  };
+  }, [basePath, navigate, placement?.action, question, turns, page, serviceId, task]);
+  useEffect(() => {
+    if (placement?.action && pendingVideo.current) {
+      const request = pendingVideo.current;
+      pendingVideo.current = null;
+      void submit(request);
+    }
+  }, [placement?.action, submit]);
+
   const copy = async () => {
     try {
       await navigator.clipboard.writeText(turns[turns.length - 1].answer);
@@ -154,9 +171,9 @@ function AssistantSession({
           value={question}
           maxLength={2000}
           onChange={(event) => setQuestion(event.target.value)}
-          placeholder="AI에게 요청하기"
+          placeholder={placement?.action?.label ?? "AI에게 요청하기"}
           busy={busy}
-          submitLabel={busy ? "답변 준비 중…" : error ? "다시 요청" : "보내기"}
+          submitLabel={busy ? "요청 진행 중…" : error ? "다시 요청" : placement?.action ? "AI로 등록" : "보내기"}
         />
         <button
           type="button"
@@ -182,8 +199,7 @@ function AssistantSession({
           className={`${inDialog ? "mt-2 max-h-[40vh]" : "absolute right-0 top-full z-40 mt-2 max-h-[65vh] w-full sm:max-w-lg"} overflow-y-auto rounded-xl border border-slate-200 bg-white p-4 shadow-lg`}
         >
           <p className="mb-3 text-xs text-slate-500">
-            직접 입력한 내용과 최근 대화만 전달합니다. 저장·게시·기기 적용은
-            기존 작업에서 확인하세요.
+            {placement?.action ? "영상 등록 요청은 목록 저장까지 진행합니다. 기기 재생 적용은 별도로 확인하세요." : "직접 입력한 내용과 최근 대화만 전달합니다. 저장·게시·기기 적용은 기존 작업에서 확인하세요."}
           </p>
           {turns.length > 0 && (
             <div

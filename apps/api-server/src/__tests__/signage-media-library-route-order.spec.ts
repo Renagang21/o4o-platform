@@ -47,6 +47,8 @@ jest.mock('../routes/signage/controllers/media.controller.js', () => ({
   SignageMediaController: jest.fn().mockImplementation(() => ({
     getMediaList: makeHandler('getMediaList'),
     createMedia: makeHandler('createMedia'),
+    registerVideo: makeHandler('registerVideo'),
+    enqueueYoutube: makeHandler('enqueueYoutube'),
     getMedia: makeHandler('getMedia'),
     updateMedia: makeHandler('updateMedia'),
     deleteMedia: makeHandler('deleteMedia'),
@@ -337,5 +339,14 @@ describe('repository 경계 필터 — findMediaLibrary 는 serviceKey/organizat
     expect(out.organization).toEqual([]);
     expect(rec.calls.filter(c => c.sql.includes('media.organizationId = :organizationId'))).toHaveLength(0);
     expect(rec.calls.some(c => c.sql.includes('media.organizationId IS NULL'))).toBe(true);
+  });
+});
+
+
+describe('video registration routes retain the store authentication boundary', () => {
+  it.each(['/media/registration', '/media/youtube-jobs'])('rejects an unauthenticated POST %s before the handler', async path => {
+    const res = await request(buildApp()).post(`/api/signage/kpa-society${path}`).send({});
+    expect(res.status).toBe(401);
+    expect(entered).toEqual([]);
   });
 });

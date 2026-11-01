@@ -133,6 +133,7 @@ export class AutomationJobService {
       lock: { mode: 'pessimistic_write' },
     });
     if (!job) throw new MediaCatalogError('JOB_NOT_FOUND', 404);
+    if (job.statusNote?.startsWith('YOUTUBE:') && job.status !== 'COMPLETED') throw new MediaCatalogError('JOB_MANAGED_BY_YOUTUBE_QUEUE', 409);
     return job;
   }
   private assertOpen(job: AutomationJob) {

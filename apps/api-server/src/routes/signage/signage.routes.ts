@@ -93,6 +93,8 @@ export function createSignageRoutes(dataSource: DataSource): Router {
 
   // POST /api/signage/:serviceKey/media - Create media (store-owned)
   router.post('/media', requireSignageStore, mediaCtrl.createMedia);
+  router.post('/media/registration', requireSignageStore, mediaCtrl.registerVideo);
+  router.post('/media/youtube-jobs', requireSignageStore, mediaCtrl.enqueueYoutube);
 
   // ========== Media Library Routes ==========
   // GET /api/signage/:serviceKey/media/library - Get media library (platform + org)
