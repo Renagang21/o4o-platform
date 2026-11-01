@@ -1,3 +1,4 @@
+import { createCommunitySignageRoutes } from './community-signage.routes.js';
 import { centralRequestAuthMethod } from '../middleware/central-operation-menu.middleware.js';
 import { assertCentralOperationRequest } from '../services/admin/central-operation-menu-grants.js';
 import { OperationError } from '../services/operations/operation-audit.js';
@@ -36,6 +37,7 @@ export function createCommunitiesRoutes(optionalAuth: RequestHandler, authentica
     }
     next();
   });
+  router.use(createCommunitySignageRoutes(optionalAuth, authenticate, req => currentCommunityUser(req as AuthRequest)));
   router.use(createCommunityHomeRoutes(optionalAuth, authenticate, req => currentCommunityUser(req as AuthRequest)));
   router.use(createCommunityManagementRoutes(authenticate));
   router.use(createCommunityPublicReadRoutes(authenticate, req => currentCommunityUser(req as AuthRequest)));

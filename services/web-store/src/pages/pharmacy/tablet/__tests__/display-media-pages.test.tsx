@@ -99,6 +99,7 @@ vi.mock("../../../../api/signageSchedule", () => ({
   fetchSignagePlaylists: async () => [],
 }));
 vi.mock("../../../../api/signageMedia", () => ({
+  createYoutubeVideoApi: () => ({list:async()=>({availability:{ready:false},items:[]}),enqueue:vi.fn(),retry:vi.fn(),cancel:vi.fn()}),
   fetchSignageMedia: api.media,
   updateSignageMedia: api.updateMedia,
   deleteSignageMedia: api.removeMedia,

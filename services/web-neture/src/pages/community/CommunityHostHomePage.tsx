@@ -180,6 +180,7 @@ export default function CommunityHostHomePage() {
             </div>
             <HomeSection section="forum" data={data} />
             <HomeSection section="content" data={data} />
+            <section aria-label="디지털사이니지" className="rounded-xl border border-slate-300 bg-white p-5"><h2 className="text-xl font-bold">디지털사이니지</h2><p className="mt-2 text-sm text-slate-600">회원들의 영상을 등록하고 내 매장에서 이용하세요.</p><Link to="/communities/community/signage" className="mt-2 inline-block min-h-11 content-center text-emerald-700">영상 보기·AI로 등록 →</Link></section>
             <HomeSection section="resource" data={data} />
             <aside aria-label="커뮤니티 안내·광고" className="space-y-4">
               <ServiceHomePromotion surface="community" client={api} />

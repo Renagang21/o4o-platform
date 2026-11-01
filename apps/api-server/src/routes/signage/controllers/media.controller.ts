@@ -1,3 +1,4 @@
+import { registerVideo } from '../services/video-registration.service.js';
 import type { Request, Response, NextFunction } from 'express';
 import type { DataSource } from 'typeorm';
 import { SignageMediaService } from '../services/media.service.js';
@@ -12,7 +13,7 @@ import type {
 export class SignageMediaController {
   private service: SignageMediaService;
 
-  constructor(dataSource: DataSource) {
+  constructor(private dataSource: DataSource) {
     this.service = new SignageMediaService(dataSource);
   }
 
@@ -76,6 +77,22 @@ export class SignageMediaController {
     } catch (error) {
       next(error);
     }
+  };
+
+  enqueueYoutube = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const { YoutubeUploadQueue } = await import('../../../modules/youtube/upload-queue.service.js');
+      const data = await new YoutubeUploadQueue(this.dataSource).enqueue({ ...extractScope(req), actorId: extractUserId(req)! }, req.body);
+      res.status(202).json({success:true,data});
+    } catch(error) { next(error); }
+  };
+
+  registerVideo = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const scope = extractScope(req);
+      const media = await registerVideo(this.dataSource, { ...scope, actorId: extractUserId(req)! }, req.body);
+      res.status(201).json({ success: true, data: media });
+    } catch (error) { next(error); }
   };
 
   updateMedia = async (req: Request, res: Response, next: NextFunction): Promise<void> => {

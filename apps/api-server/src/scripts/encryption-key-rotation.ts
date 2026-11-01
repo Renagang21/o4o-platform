@@ -1,3 +1,4 @@
+import { collectYoutubeKeyCells } from '../modules/youtube/youtube-key-rotation.js';
 /**
  * ENCRYPTION_KEY 교체 러너 (기존 암호문 재암호화)
  * WO-O4O-ENCRYPTION-KEY-CANONICAL-ROLLOUT-V1 §4
@@ -345,6 +346,7 @@ async function main(): Promise<void> {
     const tallies: Tally[] = [];
     tallies.push(await runTarget('platform_store_payment_configs', collectPaymentConfigCells, legacyKey, canonicalKey, apply));
     tallies.push(await runTarget('settings.oauth_settings', collectOAuthSettingCells, legacyKey, canonicalKey, apply));
+    tallies.push(await runTarget('youtube.encrypted_fields', () => collectYoutubeKeyCells(AppDataSource), legacyKey, canonicalKey, apply));
     tallies.push(await runTarget('cafe24_connections', collectCafe24Cells, legacyKey, canonicalKey, apply));
 
     const total = tallies.reduce(

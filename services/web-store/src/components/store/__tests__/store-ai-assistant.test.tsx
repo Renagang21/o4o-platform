@@ -1,3 +1,4 @@
+import { StoreAiPlacementProvider, StoreAiSlot } from '../StoreAiPlacement';
 import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { Link, MemoryRouter, useLocation } from 'react-router-dom';
@@ -104,4 +105,23 @@ it('uses Enter to send while preserving Korean composition and Shift+Enter', asy
  fireEvent.keyDown(input(), {key:'Enter'});
  await screen.findByText('어떤 제품을 안내할까요?');
  expect(m.ask).toHaveBeenCalledTimes(1);
+});
+
+it('executes the bound video registration action through the unified input without a second query', async () => {
+  const action = {label:'영상 등록 요청',run:vi.fn().mockResolvedValue('영상 목록 등록 완료')};
+  render(<MemoryRouter><StoreAiPlacementProvider><StoreAiSlot action={action} label="동영상 등록"/><StoreAiAssistant area="studio" basePath="/store" items={[]}/></StoreAiPlacementProvider></MemoryRouter>);
+  fireEvent.change(input(),{target:{value:'이 영상 등록해 줘'}});
+  fireEvent.click(screen.getByRole('button',{name:'AI로 등록'}));
+  await screen.findByText('영상 목록 등록 완료');
+  expect(action.run).toHaveBeenCalledWith('이 영상 등록해 줘');
+  expect(m.ask).not.toHaveBeenCalled();
+});
+
+it('forwards an explicit video registration request from another area to the same bound action', async () => {
+  const action={label:'영상 등록 요청',run:vi.fn().mockResolvedValue('저장 완료')};
+  function Flow(){const location=useLocation();return <><StoreAiSlot label="기본 작업"/>{location.pathname.endsWith('/videos')&&<StoreAiSlot action={action} label="동영상 등록"/>}<StoreAiAssistant area="studio" basePath="/store" items={[]}/></>;}
+  render(<MemoryRouter initialEntries={['/store/workspace/studio']}><StoreAiPlacementProvider><Flow/></StoreAiPlacementProvider></MemoryRouter>);
+  send('이 영상 https://youtu.be/abcdefghijk 등록해 줘');
+  await screen.findByText('저장 완료');
+  expect(action.run).toHaveBeenCalledWith('이 영상 https://youtu.be/abcdefghijk 등록해 줘');expect(m.ask).not.toHaveBeenCalled();
 });

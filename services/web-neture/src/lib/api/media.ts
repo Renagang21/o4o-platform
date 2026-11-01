@@ -57,7 +57,7 @@ export const mediaApi = {
    * 공용 라이브러리 목록 조회.
    */
   async list(
-    options?: { page?: number; limit?: number; assetType?: string; folder?: string },
+    options?: { page?: number; limit?: number; assetType?: string; folder?: string; storageType?: string },
   ): Promise<{ success: boolean; data?: MediaAssetItem[]; total?: number; page?: number; limit?: number; error?: string }> {
     try {
       const params = new URLSearchParams();

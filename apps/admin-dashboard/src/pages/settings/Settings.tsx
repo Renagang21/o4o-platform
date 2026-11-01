@@ -1,3 +1,4 @@
+import YoutubeChannelSettings from './YoutubeChannelSettings';
 import { FC } from 'react';
 import { Routes, Route, Navigate, Link, useLocation } from 'react-router-dom'
 import { Bot, Mail, Users, UserCircle } from 'lucide-react'
@@ -12,6 +13,7 @@ import MyAccountSettings from './MyAccountSettings'
 // WO-O4O-GOOGLE-ONLY-AUTH-CLEANUP-V1: OAuth 탭 은퇴 — 로그인 수단은 Google 하나이고 그 설정은 서버 env
 //   (`GOOGLE_ALLOWED_CLIENT_IDS`)가 정본이다. 화면에서 편집하지 않는다.
 const settingsTabs = [
+  { id: 'youtube', label: 'YouTube 채널', icon: <Bot className="w-4 h-4" />, path: '/settings/youtube' },
   { id: 'app-services', label: 'AI 운영 관리', icon: <Bot className="w-4 h-4" />, path: '/settings' },
   { id: 'email', label: 'Email', icon: <Mail className="w-4 h-4" />, path: '/settings/email' },
   { id: 'admin-accounts', label: '전체 관리자 계정', icon: <Users className="w-4 h-4" />, path: '/settings/admin-accounts' },
@@ -59,6 +61,8 @@ const Settings: FC = () => {
         <Route index element={<AppServices />} />
         <Route path="app-services" element={<AppServices />} />
         <Route path="ai-query" element={<><Link to="/settings" className="text-blue-700 underline">AI 운영 관리로 돌아가기</Link><AiQuerySettings /></>} />
+        <Route path="youtube" element={<YoutubeChannelSettings />} />
+        <Route path="youtube/callback" element={<YoutubeChannelSettings />} />
         <Route path="email" element={<EmailSettings />} />
         <Route path="admin-accounts" element={<AdminAccountsSettings />} />
         <Route path="my-account" element={<MyAccountSettings />} />

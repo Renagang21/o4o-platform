@@ -467,7 +467,8 @@ export function MediaPickerModal({
                     )}
                   </button>
 
-                  {uploadError && (
+                  {uploading && assetType === 'video' && <output className="block text-sm text-blue-800"><progress aria-label="영상 파일 업로드 중" className="w-full" />영상 크기와 인터넷 속도에 따라 수 분 이상 걸릴 수 있습니다. 보관 완료 안내가 나올 때까지 기다려 주세요.</output>}
+              {uploadError && (
                     <p className="text-sm text-red-600 bg-red-50 rounded-lg px-3 py-2">{uploadError}</p>
                   )}
                 </>
@@ -475,7 +476,7 @@ export function MediaPickerModal({
                 <div className="text-center space-y-4">
                   <div className="bg-emerald-50 rounded-xl p-4">
                     <Check size={24} className="mx-auto text-emerald-600 mb-2" />
-                    <p className="text-sm font-medium text-emerald-700">업로드 완료</p>
+                    <p className="text-sm font-medium text-emerald-700">{assetType === 'video' ? '파일 보관 완료 · 선택 후 영상 목록에 등록해 주세요' : '업로드 완료'}</p>
                     {assetType === 'video' ? <video muted src={uploadedAsset.url} controls preload="metadata" aria-label="보관 영상 미리보기" className="max-h-32 mx-auto" /> : <img src={uploadedAsset.url} alt="업로드됨" className="max-h-32 mx-auto mt-3 rounded-lg object-contain" />}
                     <p className="text-xs text-slate-500 mt-2">{uploadedAsset.originalName}</p>
                     <p className="text-[10px] text-slate-400 mt-1">
