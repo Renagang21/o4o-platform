@@ -28,17 +28,20 @@ export default function AdminOperationsOperatorsPage() {
   const [busy, setBusy] = useState(false);
   const writing = useRef(false);
   const searchSequence = useRef(0);
+  const loadSequence = useRef(0);
   const trigger = useRef<HTMLButtonElement>(null);
   const load = useCallback(async () => {
+    const sequence = ++loadSequence.current;
     setLoading(true); setError('');
     try {
       const [rows, pending] = await Promise.all([authClient.api.get('/admin/operations-operators'), authClient.api.get('/admin/service-operator-invitations')]);
       if (!Array.isArray(rows.data?.data) || !Array.isArray(pending.data?.data)) throw new Error('INVALID_RESPONSE');
+      if (sequence !== loadSequence.current) return;
       setOperators(rows.data.data);
       setInvites(pending.data.data.filter((row: Invitation) => row.scope_type === 'platform' && row.scope_key === 'admin-operations' && row.status === 'pending'));
-    } catch (failure) { setError(message(failure)); } finally { setLoading(false); }
+    } catch (failure) { if (sequence === loadSequence.current) setError(message(failure)); } finally { if (sequence === loadSequence.current) setLoading(false); }
   }, []);
-  const cancelSearch = useCallback(() => { searchSequence.current++; }, []);
+  const cancelSearch = useCallback(() => { searchSequence.current++; loadSequence.current++; }, []);
   useEffect(() => { void load(); return cancelSearch; }, [load, cancelSearch]);
   function open(kind: 'invite' | 'duties' | 'revoke', row: Operator | null = null) {
     searchSequence.current++; setCandidates([]); setCandidate(null); setQuery(''); setEmail(''); setReason(''); setError(''); setNotice(''); setTarget(row);
@@ -77,7 +80,7 @@ export default function AdminOperationsOperatorsPage() {
     <h1 className="text-xl font-bold">업무 운영자 지정</h1>
     <p className="text-sm text-slate-600">관리자 사이트의 <Link to="/operations" className="text-blue-700 underline">업무 운영</Link>에서 일상업무를 처리할 사람을 지정합니다. 전체 관리자는 별도 지정 없이 모든 업무를 이용합니다.</p>
     <p className="text-sm text-slate-600">전체 관리자·서비스 Admin 권한은 부여하지 않습니다. 설정·중요 관리 업무와 독립 사업 내부 운영은 포함하지 않습니다.</p>
-    <div className="flex flex-wrap gap-3"><button ref={trigger} type="button" disabled={busy} onClick={() => open('invite')} className="rounded bg-blue-700 px-4 py-2 text-white">업무 운영자 초대</button><button type="button" disabled={busy || loading} onClick={() => void load()} className="rounded border px-4 py-2">목록 새로고침</button></div>
+    <div className="flex flex-wrap gap-3"><button ref={trigger} type="button" disabled={busy || loading} onClick={() => open('invite')} className="rounded bg-blue-700 px-4 py-2 text-white">업무 운영자 초대</button><button type="button" disabled={busy || loading} onClick={() => void load()} className="rounded border px-4 py-2">목록 새로고침</button></div>
     {!dialog && error && <p role="alert" className="text-red-700">{error}</p>}{notice && <p role="status">{notice}</p>}
     {loading ? <p role="status">업무 운영자 확인 중…</p> : error ? null : <>
       <h2 className="font-semibold">지정된 업무 운영자</h2>
@@ -107,6 +110,7 @@ export default function AdminOperationsOperatorsPage() {
         {!keys.length && <p className="text-amber-800">담당 업무가 없으면 업무 운영 화면을 이용할 수 없습니다.</p>}
         </details>
       </fieldset> : <p>업무 운영자 지정을 해제합니다. 전체 관리자와 별도로 보유한 서비스·독립 사업 권한은 변경하지 않습니다.</p>}
+      {dialog === 'duties' && <p className="my-3 text-sm text-slate-600">새 업무 분야의 권한이 필요한 경우 업무 운영자 초대를 다시 보내 본인 수락을 받아 주세요.</p>}
       {dialog !== 'invite' && <label className="block">처리 사유<textarea className="mt-1 block w-full rounded border p-2" maxLength={2000} value={reason} disabled={busy} onChange={event => setReason(event.target.value)} /></label>}
       <div className="mt-5 flex justify-end gap-3"><button type="button" disabled={busy} onClick={() => { searchSequence.current++; setDialog(null); }}>취소</button><button type="button" disabled={busy || (dialog === 'invite' ? (!candidate && !email.trim()) || !keys.length : !reason.trim())} onClick={() => void submit()} className="rounded bg-blue-700 px-4 py-2 text-white disabled:opacity-50">{busy ? '처리 중…' : dialog === 'invite' ? '초대 메일 보내기' : dialog === 'duties' ? '담당 업무 저장' : '지정 해제'}</button></div>
     </OperatorDialog>}

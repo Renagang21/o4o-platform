@@ -109,6 +109,13 @@ const enabled = process.env.ADMIN_OPERATIONS_LOCAL_PG === 'true';
     expect(await centralOperationMenuKeys(db,target,await centralOperationRoles(db,target))).toEqual([]);
     await expect(management.list(target)).rejects.toMatchObject({status:403});
   });
+  it('requires another consent invitation before adding a new operating area role',async()=>{
+    const row=await accepted();
+    await expect(management.change(admin,target,{menuKeys:[...keys,'funding.funding'],reason:'Synthetic new area',version:row.version})).rejects.toMatchObject({code:'OPERATIONS_NEW_DUTIES_REQUIRE_INVITATION'});
+    expect(await db.query("SELECT 1 FROM role_assignments WHERE user_id=$1 AND role='funding:operator'",[target])).toEqual([]);
+    await invite([...keys,'funding.funding']);await invitations.accept(token,target);
+    expect(await centralOperationRoles(db,target)).toContain('funding:operator');
+  });
   it('revokes only central Operator roles, keeping separate service/independent Admin rights intact',async()=>{
     const row=await accepted();
     await db.query(`INSERT INTO role_assignments(user_id,role) VALUES($1,'neture:carepharm_admin'),($1,'funding:admin')`,[target]);

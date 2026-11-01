@@ -8,7 +8,7 @@
 
 명칭은 전체 관리자(Admin), 업무 운영자(Operator), 업무 운영(`/operations`)으로 통일한다. 기존 전체 관리자 누구나 사이트 전체와 업무 운영을 이용한다. 특정 계정 이메일을 코드·문서·권한 조건으로 사용하지 않는다.
 
-기존 서비스 Admin 초대 화면과 구분한 `/admin/operations-operators`에서 업무 운영자를 지정한다. 일상업무 전체가 기본 선택이며 업무를 좁힐 수 있다. 서비스/역할 선택은 받지 않는다. 한 번의 초대·본인 수락에서 기존 업무별 Operator 역할과 메뉴 제한을 transaction으로 활성화한다. 전체 관리자·서비스 Admin·독립 사업 권한은 부여하지 않는다.
+기존 서비스 Admin 초대 화면과 구분한 `/admin/operations-operators`에서 업무 운영자를 지정한다. 일상업무 전체가 기본 선택이며 업무를 좁힐 수 있다. 서비스/역할 선택은 받지 않는다. 한 번의 초대·본인 수락에서 기존 업무별 Operator 역할과 메뉴 제한을 transaction으로 활성화한다. 기존 수락에 없는 새 업무 분야의 역할 추가는 단순 업무 변경으로 활성화하지 않고 다시 초대·수락한다. 전체 관리자·서비스 Admin·독립 사업 권한은 부여하지 않는다.
 
 기존 원장의 명시적 초대 scope key `admin-operations`를 사용한다. 권한의 정본은 기존 역할 할당과 메뉴 제한이며, 초대 이력을 영구 권한으로 사용하지 않는다. 폐기 역할 복구·새 권한 테이블·migration·운영 DB 직접 변경은 없다. 기존 Google 증명·동시 수정 버전·권한/조직/가입 상태·초대 취소·수락·보존·계정 삭제 계약을 유지한다.
 
@@ -34,9 +34,14 @@
 ## 로컬 검증 결과
 
 - frozen install·공통 package build·API/관리자 typecheck 통과.
-- 관리자 전체 606건, API focused 49건 + 실제 로컬 PostgreSQL 10건, Neture 초대 수락 13건: 중복 제외 678 tests PASS.
+- 관리자 전체 606건 + 늦은 목록 응답 회귀 1건, API focused 49건 + 실제 로컬 PostgreSQL 11건, Neture 초대 수락 13건: 중복 제외 680 tests PASS.
 - 관리자·Neture production build 및 API tsup build 통과. 기존 번들 크기·Browserslist 경고는 비차단이다.
 - `scripts/quality/admin-operations-operator-smoke.mjs`: localhost 관리자 Vite 4320에서 PC 1280/모바일 390 × 전체 관리자/업무 운영자 4개 조합 PASS. 단일 초대 요청·Admin 역할 입력 부재·허용 업무·관리자 지정 화면 차단·모바일 메뉴·가로 넘침을 확인했다. API는 전부 합성이며 외부 요청은 차단한다.
 - 변경 구현 lint·문서 민감정보·unsafe route·diff 검사 통과. 기존 대형 테스트 파일의 경고는 구현 검사와 구분한다.
 - 별도 테스트 계정 기준 파일은 이 worktree와 기준 checkout에 없어 실제 계정·Google·메일 발송은 검증하지 않았다. 운영 역할·회원·조합 데이터는 변경하지 않았다.
 - 운영 DB migration·main 병합·배포는 이번 개발 단계에서 수행하지 않는다. 최종 PR의 HEAD·CI·Codex 리뷰 결과를 인계한다.
+
+
+## 최신 main 정렬
+
+미게시 개발 branch를 최신 main `cf91b6aec2` 위로 정렬했다. 새 드럭스토어형 약국 명칭·도메인·역할 정책은 유지하며, 기존 중앙 지정 링크 테스트의 충돌은 새 업무 운영자 화면으로 이동하는 계약에 맞춰 해결했다. 다른 branch의 이력이나 운영 데이터는 변경하지 않았다.

@@ -1,5 +1,6 @@
+import { StrictMode } from 'react';
 import { afterEach, expect, it, vi } from 'vitest';
-import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
+import { cleanup, act, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { CENTRAL_OPERATION_MENUS } from '@o4o/types';
 const api=vi.hoisted(()=>({get:vi.fn(),post:vi.fn()}));
@@ -49,4 +50,19 @@ it('revokes a designation after an explicit reason without touching service Admi
 it('shows a load failure rather than an empty list',async()=>{
  mount();await screen.findByText('지정된 업무 운영자가 없습니다.');api.get.mockRejectedValueOnce(new Error('offline'));fireEvent.click(screen.getByRole('button',{name:'목록 새로고침'}));
  await screen.findByRole('alert');expect(screen.queryByText('지정된 업무 운영자가 없습니다.')).toBeNull();
+});
+
+
+it('ignores an older initial list response after a designation refresh',async()=>{
+  let finish!: (value: unknown) => void;const old=new Promise(resolve=>{finish=resolve;});let reads=0;
+  api.get.mockImplementation(async(path:string)=>path==='/admin/operations-operators' ? (++reads===1?old:{data:{data:reads===2?[]:[operator]}}) : {data:{data:[]}});
+  api.post.mockResolvedValue({data:{success:true}});
+  render(<StrictMode><MemoryRouter><AdminOperationsOperatorsPage /></MemoryRouter></StrictMode>);
+  await screen.findByText('지정된 업무 운영자가 없습니다.');
+  fireEvent.click(screen.getByRole('button',{name:'업무 운영자 초대'}));
+  fireEvent.change(screen.getByLabelText('미가입자 초대 이메일'),{target:{value:'new@example.test'}});
+  fireEvent.click(screen.getByRole('button',{name:'초대 메일 보내기'}));
+  await screen.findByText(/Synthetic operator/);
+  await act(async()=>{ finish({data:{data:[]}}); await old; });
+  expect(screen.getByText(/Synthetic operator/)).toBeTruthy();
 });

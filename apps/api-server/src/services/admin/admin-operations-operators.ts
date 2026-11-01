@@ -91,6 +91,8 @@ export class AdminOperationsOperators {
       } else {
         const [user] = await m.query(`SELECT 1 FROM users WHERE id=$1 AND "isActive"=true AND "isEmailVerified"=true AND status IN ('active','approved') FOR SHARE`, [userId]);
         if (!user) fail('ACCOUNT_INACTIVE', '사용할 수 없는 계정입니다.', 403);
+        if (adminOperationsRoles(menus).some(role => !delegated.some(row => row.role === role)))
+          fail('OPERATIONS_NEW_DUTIES_REQUIRE_INVITATION', '새 업무 분야를 추가하려면 업무 운영자 초대를 다시 보내고 본인 수락을 받아 주세요.');
         await activateOperationsOperator(m, actor, userId, menus, reason);
       }
       return { revoked: revoke };
