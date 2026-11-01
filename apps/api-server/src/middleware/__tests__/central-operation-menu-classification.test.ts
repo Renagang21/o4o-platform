@@ -15,6 +15,13 @@ it.each([
 it('fails closed for an unmapped operator API', () => {
  expect(centralApiMenus('neture', {originalUrl:'/api/v1/neture/operator/unknown',method:'POST'})).toEqual([]);
 });
+it('maps only the pharmacy document read to the pharmacy review duty', () => {
+ const originalUrl='/api/v1/neture/operator/pharmacy-documents/fixture';
+ expect(centralApiMenus('neture',{originalUrl,method:'GET'})).toEqual(['neture.pharmacies']);
+ for(const method of ['POST','PATCH','DELETE']) expect(centralApiMenus('neture',{originalUrl,method})).toEqual([]);
+ expect(centralApiMenus('neture',{originalUrl:originalUrl+'/delete',method:'GET'})).toEqual([]);
+ expect(centralApiMenus('supplier',{originalUrl,method:'GET'})).toEqual([]);
+});
 it('lets governance and approval duties read active funding without sharing other supplier commands',()=>{
  const originalUrl='/api/v1/neture/operator/suppliers/fixture/active-fundings';
  expect(centralApiMenus('supplier',{originalUrl,method:'GET'})).toEqual(['supplier.suppliers','supplier.governance']);

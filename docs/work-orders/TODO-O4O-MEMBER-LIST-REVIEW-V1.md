@@ -27,7 +27,7 @@
 ## 검증 결과
 
 - 사전 코드·문서 대조 후 구현. 최신 main 기반 전용 branch/worktree에서 작업하며 원래 checkout은 변경하지 않았다.
-- API router + 실제 PostgreSQL 서비스 검증: 3 suites / 20 tests PASS / skip 0. 일회성 localhost DB의 격리 schema에 필요한 실제 SQL 테이블을 생성하고 scope별 조회·신청자 격리·필드 projection·낙관적 잠금·감사 이력·권한 회수를 확인했다. 전체 운영 baseline/migration 또는 실제 계정 검증을 대신하지 않는다.
+- API router·중앙 메뉴·증빙 서비스 + 실제 PostgreSQL 검증: 5 suites / 43 tests PASS / skip 0. 일회성 localhost DB의 격리 schema에 필요한 실제 SQL 테이블을 생성하고 scope별 조회·신청자 격리·필드 projection·낙관적 잠금·감사 이력·권한 회수를 확인했다. 전체 운영 baseline/migration 또는 실제 계정 검증을 대신하지 않는다.
 - 관리자 행동·기존 화면 회귀: 3 files / 20 tests PASS. 권한별 작업, 상세 전환 경합, 심사 조건, 정정 실패 후 최신 정보 재조회 포함.
 - 관리자 프로덕션 build PASS. API·관리자 type-check, 변경 파일 ESLint, unsafe route 검사, 문서 민감정보 검사, diff 검사를 실행했다. 최종 PR/CI 상태는 완료 보고에서 별도로 확인한다.
 - 실제 컴포넌트를 사용하는 합성 browser fixture: 1440px·390px에서 회원 선택→자격 승인→약국 다음 업무 활성화→기본정보 정정 PASS. 각 viewport pageerror 0, 가로 overflow 0. 증거는 저장소 밖 비공개 임시 경로에 보관한다.
@@ -36,3 +36,5 @@
 ### PR 검토 보완
 
 첫 구현 HEAD의 CI Gate·CodeQL·Sonar 게이트가 통과했고 Codex 리뷰는 지적 없이 완료됐다. Sonar 신규 중복률은 0%였다. 게이트와 별개로 신규 주석 18건(중첩 조건식·원시값 표시·readonly props·접근성 출력·catch 이름·불필요 async)을 검토해 같은 PR에서 보완했다. 조건식과 표시 구조를 정리하며 권한·심사·정정 계약을 유지한다. 최종 보완 HEAD의 CI/리뷰 결과는 PR의 최신 checks를 따른다. 이 기록은 main 병합이나 운영 배포를 뜻하지 않는다.
+
+재리뷰에서 중앙 위임 담당자의 사업자등록증 다운로드 경로가 기존 메뉴 매핑에 없어 403이 되는 지적을 확인했다. 실제 GET `/neture/operator/pharmacy-documents/:id`만 `neture.pharmacies`에 연결했다. 다른 HTTP method·인접 명령·타 서비스는 허용하지 않는다. 일반 회원 조회만 위임된 담당자는 차단하고, Google 세션의 약국 심사 위임 담당자는 합성 PDF 응답까지 도달하며, 비-Google·위임 회수 후에는 차단됨을 실제 PostgreSQL 권한 조회와 Express로 검증했다. 기존 증빙의 신청자/조직 연결·저장소 검증은 유지하고 관련 unit 검사도 함께 실행했다. 실제 운영 증빙·GCS 다운로드 검증은 아니다.

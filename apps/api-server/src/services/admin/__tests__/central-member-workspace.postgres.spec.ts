@@ -1,5 +1,9 @@
 import { randomUUID } from 'node:crypto';
 import { DataSource } from 'typeorm';
+import express from 'express';
+import request from 'supertest';
+jest.mock('../../../database/connection.js', () => ({ AppDataSource: {} }));
+import { centralOperationRequest } from '../../../middleware/central-operation-menu.middleware.js';
 import { CentralMemberWorkspaceService } from '../central-member-workspace.service.js';
 
 // Disposable local database only. Existing production credentials are never a fallback.
@@ -51,6 +55,24 @@ integration('central member workbench PostgreSQL authority, projection and corre
     expect(JSON.stringify(detail)).not.toContain('current-license'); expect(JSON.stringify(detail)).not.toContain('fixture-business');
     await expect(service.list(reader, 'pharmacies', 1, '')).rejects.toMatchObject({ status: 403 });
     await expect(service.correct(reader, target, { name: '변경', nickname: '', phone: '', reason: '합성 사유', version: detail.member.version })).rejects.toMatchObject({ status: 403 });
+  });
+  it('lets a delegated pharmacy reviewer read a document but denies directory-only and non-Google sessions', async () => {
+    const app = express();
+    app.use((req: any, _res, next) => { req.user = { id: reader }; req.authMethod = req.header('x-method'); next(); });
+    app.use(centralOperationRequest('neture', undefined, db));
+    app.get('/api/v1/neture/operator/pharmacy-documents/:id', (_req, res) => res.type('pdf').send(Buffer.from('%PDF-1.7 synthetic')));
+    const path = '/api/v1/neture/operator/pharmacy-documents/fixture';
+    expect((await request(app).get(path).set('x-method', 'google')).status).toBe(403);
+    await db.query(`UPDATE central_operation_menu_grants SET menu_keys=ARRAY['neture.members','neture.pharmacies'] WHERE assignment_id IN (SELECT id FROM role_assignments WHERE user_id=$1)`, [reader]);
+    try {
+      const response = await request(app).get(path).set('x-method', 'google');
+      expect(response.status).toBe(200); expect(response.headers['content-type']).toContain('application/pdf');
+      expect((await request(app).get(path).set('x-method', 'password')).status).toBe(403);
+      expect((await request(app).get(path+'/delete').set('x-method', 'google')).status).toBe(403);
+    } finally {
+      await db.query(`UPDATE central_operation_menu_grants SET menu_keys=ARRAY['neture.members'] WHERE assignment_id IN (SELECT id FROM role_assignments WHERE user_id=$1)`, [reader]);
+    }
+    expect((await request(app).get(path).set('x-method', 'google')).status).toBe(403);
   });
   it('corrects only basic fields with an audit record and rejects a stale version', async () => {
     const detail = await service.detail(admin, target);
