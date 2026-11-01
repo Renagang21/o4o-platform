@@ -1,3 +1,4 @@
+import { ADMIN_OPERATIONS_INVITATION_SCOPE } from '../services/admin/admin-operations-operator-contract.js';
 /**
  * 운영자 역할 카탈로그 — WO-O4O-ADMIN-OPERATOR-GOOGLE-INVITATION-AND-ASSIGNMENT-CUTOVER-V1 §16
  *
@@ -135,6 +136,12 @@ export function resolveCentralOperationRole(role: unknown, serviceKey: unknown) 
   return resolved;
 }
 export function resolvePlatformInvitationRole(role: unknown, serviceKey: unknown, scopeKey = '') {
+  if (scopeKey === ADMIN_OPERATIONS_INVITATION_SCOPE) {
+    const resolved = resolveOperatorRole(role, serviceKey);
+    if (resolved.role !== 'neture:operator' || resolved.serviceKey !== 'neture')
+      throw new OperatorRoleContractError('ROLE_NOT_ASSIGNABLE', '관리자 사이트의 업무 운영자 초대만 허용됩니다.');
+    return resolved;
+  }
   const resolved = resolveServiceAdminRole(role, serviceKey);
   return scopeKey === CENTRAL_DELEGATION_SCOPE
     ? resolveCentralOperationRole(resolved.role, resolved.serviceKey)

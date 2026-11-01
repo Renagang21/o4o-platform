@@ -1,3 +1,4 @@
+import { adminOperationsOperatorsRouter } from '../routes/admin/admin-operations-operators.routes.js';
 import {pharmacistQualificationsRouter} from '../routes/pharmacist-qualifications.routes.js';
 import { centralOperationAccessRouter } from '../routes/admin/central-operation-access.routes.js';
 import { adminServiceOperatorInvitations, serviceOperatorInvitationAcceptance } from '../routes/admin/service-operator-invitations.routes.js';
@@ -187,6 +188,7 @@ export async function registerCoreRoutes(app: Application): Promise<void> {
   //   운영자 지정(userId 기준)·초대(email 기준) — 둘 다 platform:super_admin 전용.
   app.use('/api/v1/qualifications/pharmacist', pharmacistQualificationsRouter);
   app.use('/api/v1/operator/central-access', centralOperationAccessRouter);
+  app.use('/api/v1/admin/operations-operators', adminOperationsOperatorsRouter);
   app.use('/api/v1/admin/service-operator-invitations', adminServiceOperatorInvitations);
   app.use('/api/v1/service-operator-invitations', serviceOperatorInvitationAcceptance);
   app.use('/api/v1/admin/operator-assignments', adminOperatorAssignmentsRoutes);

@@ -31,7 +31,7 @@ export default function OperatorInvitePage() {
     serviceKey: string;
     role: string;
     purpose: string;
-    centralDelegation?: boolean; scopeName?: string; menuLabels?: string[];
+    adminOperations?: boolean; centralDelegation?: boolean; scopeName?: string; menuLabels?: string[];
   } | null>(null);
   useEffect(() => {
     let current = true;
@@ -43,7 +43,7 @@ export default function OperatorInvitePage() {
       .post('/service-operator-invitations/inspect', { token })
       .then(
         (res: {
-          data: { data: { serviceKey: string; role: string; purpose: string; centralDelegation?: boolean; scopeName?: string; menuLabels?: string[] } };
+          data: { data: { serviceKey: string; role: string; purpose: string; adminOperations?: boolean; centralDelegation?: boolean; scopeName?: string; menuLabels?: string[] } };
         }) => {
           if (current) setPreview(res.data.data);
         },
@@ -72,7 +72,7 @@ export default function OperatorInvitePage() {
       setDone(true);
       const statuses = Object.values(result.membershipStatuses ?? {});
       setMessage(
-        `${result.serviceKey} · ${result.role} 확인·수락을 완료했습니다.${statuses.some((s) => s !== 'active') ? ' 기존 서비스 가입 상태는 유지됩니다. 서비스 가입 승인·정지 상태를 확인하세요.' : ' 서비스 운영 화면에서 접근을 확인하세요.'}`,
+        `${preview?.adminOperations ? '업무 운영자 지정' : `${result.serviceKey} · ${result.role}`} 확인·수락을 완료했습니다.${statuses.some((s) => s !== 'active') ? ' 기존 서비스 가입 상태는 유지됩니다. 서비스 가입 승인·정지 상태를 확인하세요.' : preview?.adminOperations ? ' 업무 운영 화면에서 Google로 로그인해 접근을 확인하세요.' : ' 서비스 운영 화면에서 접근을 확인하세요.'}`,
       );
       void refreshAuth().catch(() => {
         /* Acceptance succeeded; refresh failure must not be reported as failed acceptance. */
@@ -117,9 +117,9 @@ export default function OperatorInvitePage() {
           </p>
           <p>
             {preview &&
-              `${preview.scopeName || preview.serviceKey} · ${preview.role.startsWith('cooperative:') ? (preview.role.endsWith(':admin') ? '조합 관리자' : '조합 운영자') : (preview.role.endsWith(':admin') || preview.role.endsWith('_admin') ? '서비스 관리자' : '서비스 운영자')} · 신규 운영자 초대`}
+              `${preview.scopeName || preview.serviceKey} · ${preview.adminOperations ? '업무 운영자' : preview.role.startsWith('cooperative:') ? (preview.role.endsWith(':admin') ? '조합 관리자' : '조합 운영자') : (preview.role.endsWith(':admin') || preview.role.endsWith('_admin') ? '서비스 관리자' : '서비스 운영자')} · 신규 운영자 초대`}
           </p>
-          {preview?.centralDelegation && <p>O4O 직영 운영의 중앙 위임입니다. 수락 후 <a href="https://admin.neture.co.kr/operations">통합 운영</a>에서 Google로 로그인하세요.</p>}
+          {preview?.centralDelegation && <p>관리자 사이트의 업무 위임입니다. 수락 후 <a href="https://admin.neture.co.kr/operations">업무 운영</a>에서 Google로 로그인하세요.</p>}
           {preview?.centralDelegation && <section><h2>위임받는 운영 업무</h2>{preview.menuLabels?.length ? <ul>{preview.menuLabels.map(label => <li key={label}>{label}</li>)}</ul> : <p>위임된 메뉴가 없습니다. 중앙 관리자에게 업무 설정을 요청하세요.</p>}</section>}
           <p>초대는 최초 7일 동안 유효합니다. 수락·취소·만료 시 초대용 이메일과 토큰을 파기하고, 권한 변경 최소 이력은 생성 후 달력 1년 보관합니다.</p>
           <button

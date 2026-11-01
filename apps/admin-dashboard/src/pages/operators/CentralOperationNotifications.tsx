@@ -78,7 +78,7 @@ export default function CentralOperationNotifications({ scopeKey, variant = 'bel
       const href = typeof row.metadata?.targetUrl === 'string' ? row.metadata.targetUrl : '/operator';
       const target = centralTaskHref(row.serviceKey, href);
       if (target.startsWith('/')) navigate(target); else window.location.assign(target);
-    }} ariaLabel="통합 운영 알림" emptyText={error ? '알림을 조회하지 못했습니다. 다시 열어 주세요.' : '새 운영 알림이 없습니다.'} />
+    }} ariaLabel="업무 운영 알림" emptyText={error ? '알림을 조회하지 못했습니다. 다시 열어 주세요.' : '새 운영 알림이 없습니다.'} />
     {error && <span role="alert" className="text-sm text-red-700">알림 조회·처리 확인 필요</span>}
   </div>;
   const columns: ListColumnDef<Item>[] = [

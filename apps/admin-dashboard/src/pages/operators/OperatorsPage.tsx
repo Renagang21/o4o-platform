@@ -1,5 +1,4 @@
-import { centralMenusForRole } from '@o4o/types';
-import { CentralMenuSelection, CentralMenuGrantEditor } from './CentralMenuGrants';
+import { CentralMenuGrantEditor } from './CentralMenuGrants';
 import UsersListClean from '../users/UsersListClean';
 import BusinessOperatorAssignments from './BusinessOperatorAssignments';
 /**
@@ -65,7 +64,7 @@ import {
   CATALOG_ROLE_VALUES,
   REGISTRABLE_SERVICE_KEYS,
 } from '@/lib/operator-role-catalog';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, Navigate, useSearchParams } from 'react-router-dom';
 import {
   parseBusinessLedgerResponse,
   registerPresetPath,
@@ -139,9 +138,10 @@ interface UserFormState {
 }
 
 export default function OperatorsPage() {
-  const [searchParams, setSearchParams] = useSearchParams();
-  const centralEntry = searchParams.get('assignment') === 'central';
-  const [centralOnly, setCentralOnly] = useState(centralEntry);
+  const [searchParams] = useSearchParams();
+  return searchParams.get('assignment') === 'central' ? <Navigate to="/admin/operations-operators" replace /> : <ServiceAdministratorsPage />;
+}
+function ServiceAdministratorsPage() {
   const [showLegacy, setShowLegacy] = useState(false);
   const [users, setUsers] = useState<AdminUserDto[]>([]);
   const [loading, setLoading] = useState(true);
@@ -157,14 +157,13 @@ export default function OperatorsPage() {
   const batch = useBatchAction();
 
   // Create/Edit modal
-  const [showModal, setShowModal] = useState(centralEntry);
+  const [showModal, setShowModal] = useState(false);
   const [editingUserId, setEditingUserId] = useState<string | null>(null);
   const [formData, setFormData] = useState<UserFormState>({ email: '', lastName: '', firstName: '', roles: [] });
   // 대상 서비스는 **기본값 없이 시작**한다. 첫 서비스를 자동 확정하면 관리자가 고르지 않은 서비스로
   // 등록이 나가고(과거 KPA 고정 결함), 화면 표시와 실제 serviceKey 가 어긋날 수 있다.
   const [targetServiceKey, setTargetServiceKey] = useState<string>('');
   const [targetRole, setTargetRole] = useState<string>('');
-  const [menuKeys, setMenuKeys] = useState<string[]>([]);
   const [menuTarget, setMenuTarget] = useState<{ userId: string; role: string } | null>(null);
   // (A) 지정 경로 — 사람을 **검색해서 고른다**. 이메일을 타이핑해 넣지 않는다(email ≠ Identity Key).
   const [candidateQuery, setCandidateQuery] = useState('');
@@ -308,8 +307,7 @@ export default function OperatorsPage() {
   }, [allRows]);
 
   // ─── Create / Edit 모달 ───
-  const openCreateModal = (central = false) => {
-    setCentralOnly(central);
+  const openCreateModal = () => {
     setEditingUserId(null);
     setFormData({ email: '', lastName: '', firstName: '', roles: [] });
     setTargetServiceKey('');
@@ -346,11 +344,6 @@ export default function OperatorsPage() {
   };
 
   const closeModal = () => {
-    if (searchParams.has('assignment')) {
-      const next = new URLSearchParams(searchParams);
-      next.delete('assignment');
-      setSearchParams(next, { replace: true });
-    }
     setShowModal(false);
     setEditingUserId(null);
     setFormData({ email: '', lastName: '', firstName: '', roles: [] });
@@ -451,8 +444,7 @@ export default function OperatorsPage() {
       await authClient.api.post('/admin/service-operator-invitations', {
         ...(selectedCandidate ? { targetUserId: selectedCandidate.userId } : { email: inviteEmail.trim() }),
         serviceKey: canonicalServiceKey, role: targetRole,
-        centralDelegation: CENTRAL_OPERATION_ROLES.has(targetRole),
-        ...(CENTRAL_OPERATION_ROLES.has(targetRole) ? { menuKeys } : {}),
+        centralDelegation: false,
       });
       setAssignmentNotice(`${serviceLabel} 운영자 확인 메일 발송을 요청했습니다. 수신함·스팸함에서 메일을 확인해 주세요. 대상자의 로그인·이메일 확인·수락 후 새 권한이 부여됩니다. 기존 서비스 가입 상태는 유지됩니다.`);
       toast.success('운영자 확인 메일 발송을 요청했습니다.');
@@ -693,10 +685,9 @@ export default function OperatorsPage() {
       </div>
 
       <div className="mb-4 space-y-3 rounded border bg-white p-4 text-sm">
-        <h2 className="font-semibold">중앙 운영 담당자 지정·업무 위임</h2>
-        <button type="button" onClick={() => openCreateModal(true)} className="rounded bg-blue-700 px-3 py-2 text-white">중앙 운영 담당자 지정</button>
-        <p>전체 관리자에서는 서비스 Admin만 지정·관리합니다. Operator는 해당 서비스 Admin이 관리하며 기존 Operator 권한은 유지됩니다. 직영 서비스 Admin은 초대 수락 후 위임받은 중앙 업무를 이용합니다. 전체 관리자 계정은 <Link to="/settings/admin-accounts" className="text-blue-700 underline">전체 관리자 계정</Link>에서 관리합니다.</p>
-        <p className="text-gray-600">서비스 역할만 보유한 기존 사용자는 중앙 진입 권한을 자동으로 얻지 않습니다. 초대 수락 후 목록을 새로고침해 주세요. 계정 활성 여부와 실제 서비스 접근 가능 여부는 다릅니다.</p>
+        <h2 className="font-semibold">업무 운영자 지정</h2>
+        <Link to="/admin/operations-operators" className="inline-flex rounded bg-blue-700 px-3 py-2 text-white">업무 운영자 지정</Link>
+        <p>관리자 사이트의 일상업무 담당자는 업무 운영자 지정에서 관리합니다. 이 목록은 각 서비스 Admin을 관리하며, 서비스 Admin 지정만으로 업무 운영 권한을 부여하지 않습니다.</p>
       </div>
       <details className="mb-4 rounded border bg-white p-4" onToggle={e => setShowLegacy(e.currentTarget.open)}><summary className="cursor-pointer font-medium">기존·기타 권한 정리</summary>{showLegacy && <UsersListClean />}</details>
       <BusinessOperatorAssignments />
@@ -874,7 +865,7 @@ export default function OperatorsPage() {
           <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between p-4 border-b">
               <h2 className="text-lg font-semibold">
-                {editingUserId ? '운영자 편집' : centralOnly ? '중앙 운영 담당자 지정' : '서비스 운영자 지정'}
+                {editingUserId ? '서비스 관리자 편집' : '서비스 관리자 지정'}
               </h2>
               <button aria-label="담당자 지정 창 닫기" onClick={closeModal} className="p-1 hover:bg-gray-100 rounded">
                 <X className="w-5 h-5" />
@@ -1034,7 +1025,7 @@ export default function OperatorsPage() {
                       1. 대상 서비스 <span className="text-red-500">*</span>
                     </label>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                      {REGISTRABLE_SERVICE_KEYS.filter(key => !centralOnly || ASSIGNABLE_ROLES[key].some(role => CENTRAL_OPERATION_ROLES.has(role.value))).map((key) => {
+                      {REGISTRABLE_SERVICE_KEYS.map((key) => {
                         const meta = SERVICES[key as keyof typeof SERVICES];
                         const selected = targetServiceKey === key;
                         return (
@@ -1100,7 +1091,7 @@ export default function OperatorsPage() {
                                 type="radio"
                                 name="target-role"
                                 checked={targetRole === role.value}
-                                onChange={() => { setTargetRole(role.value); setMenuKeys(centralMenusForRole(role.value).map(menu => menu.key)); }}
+                                onChange={() => setTargetRole(role.value)}
                                 className="mt-0.5 text-blue-600"
                               />
                               <div>
@@ -1124,7 +1115,6 @@ export default function OperatorsPage() {
                     )}
                   </div>
 
-                  {CENTRAL_OPERATION_ROLES.has(targetRole) && <CentralMenuSelection role={targetRole} value={menuKeys} onChange={setMenuKeys} disabled={submitting} />}
                   <p className="text-xs text-slate-500">
                     플랫폼 계정(<code>platform:super_admin</code>)은 서비스 운영자 등록 대상이 아닙니다 —
                     <b> 설정 &gt; 관리자 계정</b> 화면에서 관리합니다.
