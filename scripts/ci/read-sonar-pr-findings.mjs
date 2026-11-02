@@ -18,6 +18,25 @@ try {
     if(report.issues.length>=report.total) break;
   }
   report.status='collected';report.truncated=report.issues.length<report.total;
+  // Public file/line diagnostics help fix duplication without relaxing the gate.
+  const measuresUrl=new URL('https://sonarcloud.io/api/measures/component_tree');
+  measuresUrl.search=new URLSearchParams({component:report.project,pullRequest,metricKeys:'new_duplicated_lines,new_duplicated_lines_density,new_lines',qualifiers:'FIL',ps:'500'}).toString();
+  const measuresResponse=await fetch(measuresUrl,{signal:AbortSignal.timeout(20000)});
+  if(!measuresResponse.ok) throw new Error(`SONAR_HTTP_${measuresResponse.status}`);
+  const measuresBody=await measuresResponse.json();
+  report.duplications=[];
+  for(const component of measuresBody.components ?? []) {
+    const measures=Object.fromEntries((component.measures ?? []).map(m=>[m.metric,m.period?.value ?? m.periods?.[0]?.value ?? m.value]));
+    if(!(Number(measures.new_duplicated_lines)>0)) continue;
+    const duplicatesUrl=new URL('https://sonarcloud.io/api/duplications/show');
+    duplicatesUrl.search=new URLSearchParams({key:component.key,pullRequest}).toString();
+    const duplicatesResponse=await fetch(duplicatesUrl,{signal:AbortSignal.timeout(20000)});
+    if(!duplicatesResponse.ok) throw new Error(`SONAR_HTTP_${duplicatesResponse.status}`);
+    const duplicatesBody=await duplicatesResponse.json();
+    const entry={path:component.path,measures,blocks:(duplicatesBody.duplications ?? []).map(d=>d.blocks.map(b=>({from:b.from,size:b.size,path:duplicatesBody.files?.[b._ref]?.name ?? null})))};
+    report.duplications.push(entry);
+    console.log('Sonar duplication: '+JSON.stringify(entry));
+  }
 } catch(error) {
   report.error=error instanceof Error && /^SONAR_[A-Z_0-9]+$/.test(error.message) ? error.message : 'SONAR_FETCH_FAILED';
   process.exitCode=1;
