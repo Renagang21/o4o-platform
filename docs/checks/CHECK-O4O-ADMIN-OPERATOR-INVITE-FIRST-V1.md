@@ -2,7 +2,7 @@
 
 - 작성일: 2026-11-02 (Asia/Seoul)
 - 범위: [WO](../work-orders/WO-O4O-ADMIN-OPERATOR-INVITE-FIRST-V1.md)
-- 상태: 구현·로컬 검증 완료, PR CI/리뷰 준비. main 병합·운영 DB 적용·배포 미실행.
+- 상태: 구현·로컬 검증 완료, PR #925에서 CI/리뷰 추적. main 병합·운영 DB 적용·배포 미실행.
 
 ## 사용자 흐름과 권한 보존
 
@@ -19,7 +19,7 @@
 - Neture 수락 화면: 14 tests PASS, TypeScript 포함 production build PASS.
 - Admin production Vite build PASS, API build TypeScript noEmit PASS.
 - 실제 PostgreSQL: 초대·기존 권한 보존·업무 변경/회수·이전 초대 호환·무위임 차단·기간/비활성/정지·재수락 및 route/mail focused 33 tests PASS.
-- 공통 중앙 접근 PostgreSQL 및 서비스별 분류·메일 개인정보·보존·일반 초대 회귀: 6 suites / 65 tests PASS.
+- 공통 중앙 접근 PostgreSQL 및 서비스별 분류·메일 개인정보·보존·일반 초대 회귀: 6 suites / 65 tests PASS (초기 검증). PR 리뷰 보완 후 중앙 전용 자격 심사의 global 위임 메뉴·조회·승인/반려/취소 및 기존 서비스 접근 보존 회귀를 추가했다.
 - 중앙 route·업무 allowlist·bootstrap/classifier 관련 회귀: 5 suites / 88 tests PASS. 별도 환경이 필요한 일반 초대 integration 및 legacy 이력 harness의 58 tests는 SKIP이며 통과로 계산하지 않는다.
 - 격리 PostgreSQL 15 canonical bootstrap와 기존 53 incremental prefix 지문 일치. 새 54번째 migration 후 7411 lines / `4adee8f4fc7f40b3dd9ae6ff84d5bafad7128378e4c58b4042a4234528542a17`. 빈 상태 down/up에서 이전/신규 지문 복원 PASS.
 - migration contract: 21 PASS / 0 FAIL. 운영 DB 지문을 가져오거나 자동 채택하지 않았다.
@@ -33,3 +33,9 @@
 ## 통합 전 남은 일
 
 PR CI·Codex 리뷰 확인 및 지적 보완. 운영 DDL은 AGENTS.md §5에 따라 구체적 migration 적용 승인을 받은 뒤 통합 담당이 실행해야 한다. main 병합은 자동으로 migration을 실행할 수 있는 배포와 연결되므로 승인 전 병합/배포하지 않는다. 실제 초대 수락·Google 계정 연결·메일 도착 검증은 운영 적용 후 사용자 흐름에서 별도 확인한다.
+
+## PR 리뷰 보완
+
+[PR #925](https://github.com/Renagang21/o4o-platform/pull/925)의 P1에서 기존 global 역할을 중앙 위임으로 인정할 때 중앙 전용 약사 자격 심사가 일반 서비스의 추가 제한 예외를 상속하는 문제를 지적했다. 해당 심사의 `reviewer()`는 이미 검증한 중앙 역할과 `centralOperationMenuKeys`를 직접 교차 검사하도록 보완했다. 기존 서비스 권한을 보존하는 일반 서비스 helper를 중앙 전용 자격 심사의 권한으로 사용하지 않는다. 중앙 회원 workspace·자격 알림·개선 제안·Partner·연합회·공개 포럼·Neture action queue의 소비처도 재대조했다. 일반 서비스의 독립 권한 검사는 유지한다. 실제 PostgreSQL의 직접 조회·승인·반려·취소 거부 및 Google route 회귀 2 suites / 41 tests PASS, API noEmit PASS.
+
+최신 main `edb26f21ea`의 별도 가입 안내 변경은 경로가 겹치지 않아 push 전 자기 브랜치를 정렬했다. Neture 수락 14 tests·production build·API noEmit을 다시 통과했다. 검증용 두 PostgreSQL 컨테이너와 그 안의 합성 데이터는 종료·제거했고 잔존 0을 확인했다.

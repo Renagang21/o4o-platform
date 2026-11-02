@@ -1,7 +1,7 @@
 # WO-O4O-ADMIN-OPERATOR-INVITE-FIRST-V1
 
 - 작성일: 2026-11-02 (Asia/Seoul)
-- 상태: 구현·로컬 검증 완료, PR CI/리뷰 준비 · 운영 DB 적용 미승인
+- 상태: 구현·로컬 검증 완료, PR #925 · 운영 DB 적용 미승인
 - 기준 main: `04931f216d`
 - 사용자 확정: 초대 시 권한 선택 없이 기존 일상업무 전체를 기본 제공하고, 이후 담당 업무 변경에서 조정한다. ‘등록만 먼저’ 선택은 사용자 정정으로 취소됐다.
 
@@ -24,7 +24,8 @@
 - [x] 기존 권한 보존·중앙 위임 표시·기본 업무 부여·사후 변경/회수
 - [x] 과거 초대·무위임 global/조직 역할·기간/정지·membership·Google·동시 수정 회귀
 - [x] 실제 격리 PostgreSQL·PC/모바일 UI·전체 관련 소비처 검증
-- [ ] 정본 정책·CHECK·commit/push·CI/리뷰 보완
+- [x] 정본 정책·CHECK·commit/push·발견된 리뷰 지적 보완
+- PR CI는 [#925](https://github.com/Renagang21/o4o-platform/pull/925)의 최신 HEAD 실행 기록으로 확인하며 실제 최종 결과는 인계 보고에 명시한다.
 - [ ] 운영 DB migration 적용 승인 확인 후 main 통합·배포 (이번 코드 작성만으로 적용하지 않음)
 
 ## 로컬 구현·검증

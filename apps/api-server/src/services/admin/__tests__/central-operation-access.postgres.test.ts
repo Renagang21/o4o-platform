@@ -116,6 +116,24 @@ const enabled = process.env.UNIFIED_ACCESS_TEST_PORT === "55432";
       await expect(service.list(user,'all',1)).rejects.toMatchObject({status:403});
       await expect(service.decide(user,user,{action:'reject',reason:'Synthetic decision',version:directory.items[0].version})).rejects.toMatchObject({status:403});
     });
+    it('checks central qualification menus for explicitly delegated global roles without narrowing independent service rights', async () => {
+      await role('neture:operator','global');
+      await db.query(`INSERT INTO kpa_pharmacist_profiles(user_id,license_number,qualification_status,qualification_reason)
+        VALUES($1,'SYNTHETIC-LICENSE','pending','Synthetic private evidence')`,[user]);
+      await db.query(`INSERT INTO central_operation_menu_grants(assignment_id,menu_keys,admin_operations)
+        SELECT id,ARRAY['neture.members'],true FROM role_assignments WHERE user_id=$1`,[user]);
+      const service=new PharmacistQualificationService(db);
+      const directory=await service.list(user,'all',1,'',true);
+      expect(directory.items[0]).toMatchObject({licenseNumber:null,reason:null});
+      await expect(service.list(user,'all',1)).rejects.toMatchObject({code:'CENTRAL_MENU_NOT_DELEGATED'});
+      for(const action of ['approve','reject','revoke'] as const)
+        await expect(service.decide(user,reviewer,{action,reason:'Synthetic direct command',version:'stale',licenseEvidenceChecked:true})).rejects.toMatchObject({code:'CENTRAL_MENU_NOT_DELEGATED'});
+      // Ordinary service operations retain their preexisting authority; central-only review does not inherit it.
+      await expect(assertCentralOperationRequest(db,user,'neture',['neture.cms'],'password')).resolves.toBeUndefined();
+      await db.query("UPDATE central_operation_menu_grants SET menu_keys=ARRAY['neture.qualifications']");
+      expect((await service.list(user,'all',1)).items[0]).toMatchObject({licenseNumber:'SYNTHETIC-LICENSE'});
+      await expect(service.list(user,'all',1,'',true)).rejects.toMatchObject({code:'CENTRAL_MENU_NOT_DELEGATED'});
+    });
     it('keeps relationship cleanup and approval revocation as distinct Admin duties',async()=>{
       expect(()=>validateCentralMenuKeys('neture:operator',['neture.membership-cleanup'])).toThrow();
       expect(()=>validateCentralMenuKeys('neture:operator',['neture.service-approval-management'])).toThrow();
