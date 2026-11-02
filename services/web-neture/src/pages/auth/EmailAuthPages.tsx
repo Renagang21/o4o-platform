@@ -1,7 +1,7 @@
 /**
  * 이메일·비밀번호 인증 페이지 — WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1
  *
- *   /signup            **가입 화면(정본)** — 이메일 회원가입 + 「Google 로 계속하기」 병행
+ *   /signup            **가입 화면(정본)** — Google·카카오·이메일(아이디) 가입
  *   /verify-email      메일 링크 토큰으로 이메일 확인
  *   /find-id           이름 + 휴대전화 → 가린 이메일 힌트
  *   /forgot-password   비밀번호 재설정 메일
@@ -10,8 +10,8 @@
  * 화면 본체는 전부 @o4o/auth-react 공통 컴포넌트다. 이 파일은 카드 레이아웃 · 라우팅 연결만 한다.
  * 로그인은 기존 로그인 모달(`/login` → 모달)을 쓴다. 이미 로그인한 사용자는 가입 화면 대신 홈으로 보낸다.
  *
- * WO §"확정된 사용자 흐름": **가입 화면은 Google 가입과 이메일·비밀번호 가입을 함께 제공한다.**
- * 그래서 `/signup` 이 두 수단을 한 화면에 둔다(로그인 모달과 같은 순서 · 같은 구분선).
+ * `/signup` 은 Google·카카오·이메일(아이디) 가입을 함께 제공한다.
+ * 소셜 가입은 긴 이메일 폼보다 먼저 보여 별도 정보를 입력하지 않고도 시작할 수 있게 한다.
  * `/register` 는 이 화면으로 보낸다 — 가입 진입점이 두 곳으로 갈라지지 않게.
  * 메일 링크의 1회용 토큰은 URL fragment(`#token=`)로 받고, 읽은 즉시 주소창에서 지운다
  * (서버 요청 로그 · 방문 기록 · Referer 로 남지 않게).
@@ -42,7 +42,7 @@ function AuthCard({ title, subtitle, children }: { title: string; subtitle?: str
           <span className="text-2xl" aria-hidden>🌿</span>
           <div>
             <h1 className="text-lg font-bold text-gray-900">{title}</h1>
-            {subtitle && <p className="text-xs text-gray-500">{subtitle}</p>}
+            {subtitle && <p className="text-xs text-gray-500 break-keep">{subtitle}</p>}
           </div>
         </div>
         <div className="p-6">{children}
@@ -94,35 +94,49 @@ export function SignupPage() {
   const links = useAuthLinks();
   const navigate = useNavigate();
   const [googleError, setGoogleError] = useState<string | null>(null);
+  const [emailSignup, setEmailSignup] = useState(false);
   if (isLoading) return null;
   if (isAuthenticated) return <Navigate to={operatorInvitationReturnPath()} replace />;
   return (
-    <AuthCard title="회원가입" subtitle="이메일로 가입하거나 Google 계정으로 계속합니다">
-      <EmailSignupForm api={authClient} links={links} termsHref="/terms" privacyHref="/privacy" />
-
-      <div className="my-5 flex items-center gap-3 text-xs text-gray-400">
-        <span className="h-px flex-1 bg-gray-200" />
-        또는
-        <span className="h-px flex-1 bg-gray-200" />
-      </div>
-
-      {/* 미등록 Google 계정은 이 버튼에서 약관 동의 → 계정 생성까지 간다(로그인 모달과 같은 계약). */}
-      <KakaoContinue<User> client={authClient} loginWithKakao={loginWithKakao} signupWithKakao={signupWithKakao}
-        returnTo={new URLSearchParams(window.location.search).get('returnTo') ?? '/'}
-        onSuccess={() => { navigate(operatorInvitationReturnPath(), { replace: true }); }} />
-      <GoogleContinue<User>
-        getSignupTerms={() => authClient.getSignupTerms()}
-                  getConfig={getGoogleAuthConfig}
-        loginWithGoogle={loginWithGoogle}
-        signupWithGoogle={signupWithGoogle}
-        onStart={() => setGoogleError(null)}
-        onSuccess={() => { setGoogleError(null); navigate(operatorInvitationReturnPath(), { replace: true }); }}
-        onError={({ message }) => setGoogleError(message)}
-        termsHref="/terms"
-        privacyHref="/privacy"
-      />
-      {googleError && (
-        <p role="alert" className="mt-3 text-sm text-red-600">{googleError}</p>
+    <AuthCard title="회원가입" subtitle={emailSignup ? '이메일(아이디)로 가입' : '개인정보 보호를 위해 Google·카카오 가입을 권장합니다.'}>
+      {emailSignup ? (
+        <>
+          <button type="button" className="mb-4 min-h-11 text-sm text-gray-600 underline" onClick={() => { setEmailSignup(false); setGoogleError(null); }}>
+            다른 방법으로 가입
+          </button>
+          <EmailSignupForm api={authClient} links={links} termsHref="/terms" privacyHref="/privacy" />
+        </>
+      ) : (
+        <>
+          <section aria-label="소셜 계정으로 가입" className="space-y-3">
+            <GoogleContinue<User>
+              personalizedButton={false}
+              getSignupTerms={() => authClient.getSignupTerms()}
+              getConfig={getGoogleAuthConfig}
+              loginWithGoogle={loginWithGoogle}
+              signupWithGoogle={signupWithGoogle}
+              onStart={() => setGoogleError(null)}
+              onSuccess={() => { setGoogleError(null); navigate(operatorInvitationReturnPath(), { replace: true }); }}
+              onError={({ message }) => setGoogleError(message)}
+              termsHref="/terms"
+              privacyHref="/privacy"
+            />
+            <KakaoContinue<User> client={authClient} loginWithKakao={loginWithKakao} signupWithKakao={signupWithKakao}
+              returnTo={new URLSearchParams(window.location.search).get('returnTo') ?? '/'}
+              onSuccess={() => { navigate(operatorInvitationReturnPath(), { replace: true }); }} />
+            {googleError && (
+              <p role="alert" className="mt-3 text-sm text-red-600">{googleError}</p>
+            )}
+          </section>
+          <div className="my-5 flex items-center gap-3 text-xs text-gray-500" aria-hidden="true">
+            <span className="h-px flex-1 bg-gray-200" />
+            또는
+            <span className="h-px flex-1 bg-gray-200" />
+          </div>
+          <button type="button" className="min-h-11 w-full rounded-lg border border-gray-300 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50" onClick={() => setEmailSignup(true)}>
+            이메일(아이디)로 가입
+          </button>
+        </>
       )}
     </AuthCard>
   );

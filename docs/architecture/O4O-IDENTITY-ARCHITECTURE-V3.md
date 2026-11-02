@@ -90,6 +90,7 @@ L1 만 L2/L3/L4 의 부모다(FK). L2/L3/L4 사이에 직접 FK 는 없다. 본 
 - **가입은 계정만 만든다** — 어느 수단으로 가입해도 서비스 membership · 조직 · role 을 자동 부여하지 않는다(L3/L4 는 별도 흐름).
 - 신규 `user_password_credentials` · `email_verification_tokens` · `password_reset_tokens` 는 2026-09-24 에 제거된 `service_credentials` · `users.password` · 옛 `password_reset_tokens` 의 **복원이 아니다**(계정 단위 · 해시 저장 · 서비스별 password 없음).
 - **이메일 동일성으로 Identity 를 판정 · 병합하지 않는다.** `sub` miss 일 때 이메일로 기존 `users` 를 찾아 붙이는 **자동 병합은 금지**한다(현행 `socialAuthService` 의 이메일 자동 병합은 Phase 2 첫 제거 대상).
+- **2026-11-02 사용자 확정 — 별도 계정 병합 미지원:** 가입 아이디를 자동으로 검색하거나 기존 O4O 계정 간 자료·권한을 합치지 않는다. 관리자 수동 병합·대행 지원도 제공하지 않는다. My Home의 본인 재인증·대상 인증·명시적 확인을 거치는 현재 계정의 로그인 수단 연결은 유지한다. 기존 연결을 해제하거나 계정·자료를 삭제하지 않으며, 과거 계정 병합 서비스와 관리자 병합 경로를 복구하지 않는다.
 - ~~기존 email+password 사용자는 로그인 상태에서 본인이 Google 을 명시 연결한다(재인증 후 `linked_accounts` insert).~~
   → **전환 완료 (2026-09-24)**. 명시 연결 경로(`/auth/google/link`)는 password 가 사라지면서 도달 불가가 되어 은퇴했고,
   관리자 계정은 1회용 bootstrap 으로 기존 `users.id` 에 Google `sub` 를 연결했다. 2026-09-24 시점의 로그인 경로는
