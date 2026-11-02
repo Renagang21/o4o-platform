@@ -14,6 +14,20 @@ export interface SupplierPublicationInput {
   servicePrices?: Array<{ serviceKey: string; unitPrice: number }>;
 }
 
+export interface SupplierPublicationState {
+  isPublic: boolean;
+  serviceKeys: string[];
+  defaultSupplyEnabled: boolean;
+  priceGeneral: number;
+  distributionType: ReturnType<typeof deriveDistributionType>;
+  serviceApprovals: Array<{ serviceKey: string; status: string; reason: string | null }>;
+}
+
+/** 진단 결과는 내부에 유지하고 HTTP handler가 공개 상태만 선택한다. */
+export type SupplierPublicationResult =
+  | { success: true; data: SupplierPublicationState & Record<string, unknown>; error?: never }
+  | { success: false; error: string; data?: never };
+
 /** 제품 등록 승인과 독립된 일반 공급 게시. 이벤트 원장은 변경하지 않는다. */
 export class SupplierOfferDistributionService {
   async updateDistribution(
@@ -21,7 +35,7 @@ export class SupplierOfferDistributionService {
     supplierId: string,
     userId: string,
     input: SupplierPublicationInput,
-  ): Promise<{ success: boolean; error?: string; data?: Record<string, unknown> }> {
+  ): Promise<SupplierPublicationResult> {
     const validationError = validatePublicationInput(input);
     if (validationError) return { success: false, error: validationError };
     const q = AppDataSource.createQueryRunner();
@@ -74,7 +88,7 @@ export class SupplierOfferDistributionService {
     } finally {
       await q.release();
     }
-    async function abort(error: string) {
+    async function abort(error: string): Promise<{ success: false; error: string }> {
       await q.rollbackTransaction();
       return { success: false, error };
     }

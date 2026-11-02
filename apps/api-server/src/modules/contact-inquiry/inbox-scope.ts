@@ -1,3 +1,5 @@
+import { OperationError } from '../../services/operations/operation-audit.js';
+import { CENTRAL_CONTACT_MENUS, assertCentralContactMenu } from './central-contact-access.js';
 import { centralRequestAuthMethod } from '../../middleware/central-operation-menu.middleware.js';
 import { assertCentralOperationRequest } from '../../services/admin/central-operation-menu-grants.js';
 import type { RequestHandler } from "express";
@@ -116,6 +118,13 @@ export async function resolveInboxScope(
 }
 
 export function scopeGuard(ds: DataSource, scope: InboxScope): RequestHandler {
+  if (scope.kind === 'service' && CENTRAL_CONTACT_MENUS[scope.key]) return async (req, res, next) => {
+    try { await assertCentralContactMenu(ds, req.user!.id, scope.key === 'lecture' ? 'lecture.inbox' : CENTRAL_CONTACT_MENUS[scope.key], centralRequestAuthMethod(req)); next(); }
+    catch (error) {
+      if (error instanceof OperationError) { res.status(error.status).json({success:false,code:error.code,error:error.message}); return; }
+      next(error);
+    }
+  };
   if (scope.kind === "service" && scope.key === "community")
     return async (req, res, next) => {
       try {
@@ -204,6 +213,10 @@ export async function assertInboxWriter(
   actor: string,
 ) {
   await manager.query("SELECT id FROM users WHERE id=$1 FOR SHARE", [actor]);
+  if (scope.kind === 'service' && CENTRAL_CONTACT_MENUS[scope.key]) {
+    await assertCentralContactMenu(manager, actor, scope.key === 'lecture' ? 'lecture.inbox' : CENTRAL_CONTACT_MENUS[scope.key], 'google');
+    return;
+  }
   if (scope.cooperativeId) {
     await manager.query("SELECT id FROM cooperatives WHERE id=$1 FOR UPDATE", [
       scope.cooperativeId,

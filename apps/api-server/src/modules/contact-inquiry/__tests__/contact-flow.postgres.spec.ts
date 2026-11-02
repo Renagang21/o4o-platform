@@ -19,6 +19,7 @@ jest.mock("../../../middleware/auth.middleware.js", () => ({
       'SELECT service_key AS "serviceKey",status FROM service_memberships WHERE user_id=$1',
       [id],
     );
+    req.authMethod = "google";
     req.user = { id, roles: roles.map((r: any) => r.role), memberships };
     next();
   },
@@ -50,7 +51,8 @@ import { requireNetureScope } from "../../../middleware/neture-scope.middleware.
 import * as contactSettings from "../contact-settings.helper.js";
 
 const enabled = process.env.CONTACT_REVIEW_PG_SOCKET;
-const suite = enabled ? describe : describe.skip;
+const port = process.env.CONTACT_REVIEW_TEST_PORT;
+const suite = enabled || port === '55441' ? describe : describe.skip;
 suite("isolated local PostgreSQL public inquiry flow", () => {
   let db: DataSource, app: express.Express;
   const schema = `contact_review_${randomUUID().replace(/-/g, "")}`;
@@ -66,12 +68,13 @@ suite("isolated local PostgreSQL public inquiry flow", () => {
     privacyConsent: true,
   };
   beforeAll(async () => {
-    if (!enabled?.startsWith("/workspace/") && !enabled?.startsWith("/tmp/"))
+    if (port !== "55441" && !enabled?.startsWith("/workspace/") && !enabled?.startsWith("/tmp/"))
       throw Error("Local PostgreSQL socket required");
     db = new DataSource({
       type: "postgres",
-      host: enabled,
-      username: "o4o_local",
+      host: port === "55441" ? "127.0.0.1" : enabled,
+      port: port === "55441" ? 55441 : undefined,
+      username: port === "55441" ? "postgres" : "o4o_local",
       database: "o4o_platform",
       entities: [ContactInquiry, ServiceContactSettings],
       schema,
@@ -96,6 +99,9 @@ suite("isolated local PostgreSQL public inquiry flow", () => {
     CREATE TABLE semi_franchise_operators(semi_franchise_id uuid,user_id uuid,revoked_at timestamptz);
     CREATE TABLE action_logs(id uuid DEFAULT gen_random_uuid(),service_key text,user_id uuid,action_key text,source text,status text,meta jsonb,created_at timestamptz DEFAULT clock_timestamp());
     CREATE TABLE contact_inquiries(id uuid PRIMARY KEY DEFAULT gen_random_uuid(),service_key varchar(50),organization_id uuid,inquiry_type varchar(50),name varchar(100),email varchar(255),phone varchar(50),organization_name varchar(200),subject varchar(300),message text,privacy_consent boolean,status varchar(20),source_path varchar(300),user_agent text,ip_hash varchar(64),notification_status varchar(100),handled_at timestamp,handled_by uuid,internal_note text,created_at timestamp DEFAULT now(),updated_at timestamp DEFAULT now());`);
+    // Direct-service handling now requires explicit central delegation; independent business roles stay scoped below.
+    await db.query(`ALTER TABLE role_assignments ADD COLUMN id uuid DEFAULT gen_random_uuid(), ADD COLUMN scope_type text DEFAULT 'o4o-direct';
+      CREATE TABLE central_operation_menu_grants(assignment_id uuid,menu_keys text[],admin_operations boolean NOT NULL DEFAULT false);`);
     for (const id of [supplier, central, suspended, expired])
       await db.query(`INSERT INTO users VALUES($1,'active',true,true)`, [id]);
     await db.query(
@@ -326,6 +332,8 @@ suite("isolated local PostgreSQL public inquiry flow", () => {
           "INSERT INTO role_assignments VALUES($1,'neture:operator',true,NULL,NULL)",
           [userId],
         );
+        // This case exercises the independent legacy Neture guard, not central delegation.
+        await db.query('UPDATE role_assignments SET scope_type=NULL WHERE user_id=$1', [userId]);
         if (ledger)
           await db.query(
             "INSERT INTO service_memberships VALUES($1,'neture',$2)",
@@ -338,6 +346,7 @@ suite("isolated local PostgreSQL public inquiry flow", () => {
         );
         // Production auth projects canonical main eligibility into JWT memberships.
         const req: any = {
+          method: 'GET', originalUrl: '/api/v1/neture/operator/contact-messages',
           user: {
             id: userId,
             roles: ["neture:operator"],
@@ -705,7 +714,7 @@ suite("isolated local PostgreSQL public inquiry flow", () => {
     );
     expect(await contactRecipients(db, "carepharm")).toEqual([]);
   });
-  it("keeps directory-wide inquiries out of individual branch operators scope", async () => {
+  it("keeps public directory inquiries in central operations, outside individual branch roles", async () => {
     const member = randomUUID(),
       admin = randomUUID();
     for (const id of [member, admin])
@@ -734,7 +743,8 @@ suite("isolated local PostgreSQL public inquiry flow", () => {
           .get("/admin/services/kpa-branch/contact-inquiries/summary")
           .set("x-test-user", admin)
       ).status,
-    ).toBe(200);
+    ).toBe(403);
+    expect((await request(app).get('/admin/services/kpa-branch/contact-inquiries/summary').set('x-test-user',central)).status).toBe(200);
   });
   it("rejects a different reply request while another operator send is in flight", async () => {
     const created = await request(app)

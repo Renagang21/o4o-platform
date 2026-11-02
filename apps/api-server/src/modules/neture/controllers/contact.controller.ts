@@ -1,4 +1,4 @@
-import { serviceContactRecipients } from '../../contact-inquiry/contact-recipients.js';
+import { centralContactRecipients } from '../../contact-inquiry/central-contact-access.js';
 import { deliverOperatorNotifications } from '../../../modules/contact-inquiry/operator-delivery.js';
 /**
  * ContactController — WO-O4O-NETURE-CONTACT-PAGE-V1
@@ -111,7 +111,7 @@ export function createContactController(dataSource: DataSource): Router {
       //   실패가 문의 접수(저장)를 실패시키지 않도록 try/catch 로 격리.
       let inappStatus = 'none';
       try {
-        const operators = await serviceContactRecipients(dataSource, 'neture', 'neture');
+        const operators = await centralContactRecipients(dataSource, 'neture.legacy-contact');
         if (operators.length > 0) {
           inappStatus = await deliverOperatorNotifications(operators, (op) =>
               notificationService.createNotification({
@@ -122,8 +122,9 @@ export function createContactController(dataSource: DataSource): Router {
                 serviceKey: 'neture',
                 metadata: {
                   contactMessageId: entity.id,
+                  operationMenu: 'neture.legacy-contact',
                   contactType: entity.contactType,
-                  targetUrl: '/operator/contact-messages?status=new',
+                  targetUrl: 'https://admin.neture.co.kr/operations/neture/legacy-contact?status=new',
                 },
               }),
             );
