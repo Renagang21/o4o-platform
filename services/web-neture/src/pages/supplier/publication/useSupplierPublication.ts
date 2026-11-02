@@ -69,10 +69,21 @@ export function useSupplierPublication() {
     try {
       const result = await supplierApi.updateDistribution(id, { defaultSupplyEnabled: form.defaultSupplyEnabled, isPublic: form.isPublic, serviceKeys: form.serviceKeys, priceGeneral, servicePrices });
       if (currentId.current !== id) return;
-      if (!result.success) { setMessage({ error: true, text: ERRORS[result.error ?? ''] ?? '게시 설정을 저장하지 못했습니다. 입력을 확인하고 다시 시도해 주세요.' }); return; }
-      setMessage({ error: false, text: '게시 설정을 저장했습니다. 서비스 승인이 필요한 대상은 승인 후 노출됩니다. 제품 승인과 이벤트는 변경하지 않았습니다.' });
+      if (!result.success || !result.data) { setMessage({ error: true, text: ERRORS[result.error ?? ''] ?? '게시 설정을 저장하지 못했습니다. 입력을 확인하고 다시 시도해 주세요.' }); return; }
       // 화면의 입력과 결과 메시지를 유지하고 저장된 대상 요약만 갱신한다.
-      setProducts(rows => rows.map(p => p.id === id ? { ...p, ...result.data } : p));
+      const data = result.data;
+      const savedState = {
+        isPublic: data.isPublic,
+        serviceKeys: data.serviceKeys,
+        defaultSupplyEnabled: data.defaultSupplyEnabled,
+        priceGeneral: data.priceGeneral,
+        distributionType: data.distributionType,
+        serviceApprovals: data.serviceApprovals.map(a => ({
+          serviceKey: a.serviceKey, status: a.status, reason: a.reason,
+        })),
+      };
+      setProducts(rows => rows.map(p => p.id === id ? { ...p, ...savedState } : p));
+      setMessage({ error: false, text: '게시 설정을 저장했습니다. 서비스 승인이 필요한 대상은 승인 후 노출됩니다. 제품 승인과 이벤트는 변경하지 않았습니다.' });
     } catch {
       if (currentId.current === id) setMessage({ error: true, text: '저장하지 못했습니다. 입력을 유지했습니다. 다시 시도해 주세요.' });
     } finally { setSaving(false); }

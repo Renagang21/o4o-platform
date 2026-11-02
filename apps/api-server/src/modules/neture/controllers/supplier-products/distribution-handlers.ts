@@ -33,7 +33,19 @@ export function createSupplierDistributionHandlers(
             result.error === 'OFFER_NOT_FOUND' ? 404 : result.error === 'NOT_OWNED' ? 403 : 400;
           return res.status(statusCode).json(result);
         }
-        res.json(result);
+        const data = result.data;
+        res.json({ success: true, data: {
+          isPublic: data.isPublic,
+          serviceKeys: data.serviceKeys,
+          defaultSupplyEnabled: data.defaultSupplyEnabled,
+          priceGeneral: data.priceGeneral,
+          distributionType: data.distributionType,
+          serviceApprovals: data.serviceApprovals.map(approval => ({
+            serviceKey: approval.serviceKey,
+            status: approval.status,
+            reason: approval.reason,
+          })),
+        } });
       } catch (error) {
         logger.error('[Neture API] Error updating product distribution:', error);
         res

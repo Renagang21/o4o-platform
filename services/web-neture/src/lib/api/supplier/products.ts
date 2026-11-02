@@ -7,6 +7,19 @@ import {
   isValidApprovalCounts,
 } from './errors';
 
+export interface SupplierPublicationState {
+  isPublic: boolean;
+  serviceKeys: string[];
+  defaultSupplyEnabled: boolean;
+  priceGeneral: number;
+  distributionType: DistributionType;
+  serviceApprovals: Array<{ serviceKey: string; status: string; reason: string | null }>;
+}
+
+type SupplierPublicationResponse =
+  | { success: true; data: SupplierPublicationState; error?: never }
+  | { success: false; error?: string; data?: never };
+
 export const supplierProductsApi = {
   async getProducts(): Promise<SupplierProduct[]> {
     let response;
@@ -311,7 +324,7 @@ export const supplierProductsApi = {
       isPublic?: boolean; serviceKeys?: string[]; defaultSupplyEnabled?: boolean; priceGeneral?: number;
       servicePrices?: Array<{ serviceKey: string; unitPrice: number }>;
     },
-  ): Promise<{ success: boolean; error?: string; data?: any }> {
+  ): Promise<SupplierPublicationResponse> {
     try {
       const response = await api.patch(`/neture/supplier/products/${id}/distribution`, input);
       return response.data;
