@@ -65,6 +65,7 @@ import { createPharmacyStoreProvisioner } from './services/pharmacy-store-provis
 import { SemiFranchiseService } from './services/semi-franchise.service.js';
 import { PHARMACY_SERVICE_FEATURES, readServiceFeatures, validateServiceFeatures } from './services/service-features.js';
 import { getSupplyOption, listActiveSemiFranchiseKeys, listSupplyOptions } from './services/supply-access.js';
+import { toSupplyOptionResponse, toCartItemResponse } from './supply-response.js';
 import { SupplierBusinessContentService } from './services/supplier-business-content.service.js';
 import { SupplyProposalService, type ProposalAction } from './services/supply-proposal.service.js';
 import { SemiFranchiseEventService, type EventAction } from './services/semi-franchise-event.service.js';
@@ -276,20 +277,23 @@ export function createNeturePharmacyRoutes(dataSource: DataSource, consultationD
   router.post('/pharmacy/semi-franchises/:key/withdraw', ...store, handle(async (req) =>
     semiFranchises.withdraw(org(req), req.user!.id, req.params.key)));
 
-  router.get('/pharmacy/store/supply-options', ...store, handle(async (req) => listSupplyOptions(dataSource, org(req), {
-    source: typeof req.query.source === 'string' ? req.query.source : undefined,
-    business: typeof req.query.business === 'string' ? req.query.business : undefined,
-    recruitment: typeof req.query.recruitment === 'string' ? req.query.recruitment : undefined,
-    q: typeof req.query.q === 'string' ? req.query.q : undefined,
-    page: Number(req.query.page) || 1,
-    limit: Number(req.query.limit) || 50,
-  })));
+  router.get('/pharmacy/store/supply-options', ...store, handle(async (req) => {
+    const result = await listSupplyOptions(dataSource, org(req), {
+      source: typeof req.query.source === 'string' ? req.query.source : undefined,
+      business: typeof req.query.business === 'string' ? req.query.business : undefined,
+      recruitment: typeof req.query.recruitment === 'string' ? req.query.recruitment : undefined,
+      q: typeof req.query.q === 'string' ? req.query.q : undefined,
+      page: Number(req.query.page) || 1,
+      limit: Number(req.query.limit) || 50,
+    });
+    return { items: result.items.map(toSupplyOptionResponse), total: result.total };
+  }));
   router.get('/pharmacy/store/supply-options/:kind/:id', ...store, handle(async (req) => {
     const kind = SUPPLY_KINDS.find((k) => k === req.params.kind) as SupplyKind | undefined;
     if (!kind) throw new NeturePharmacyError(404, 'SUPPLY_OPTION_NOT_AVAILABLE', '이용할 수 없는 공급 옵션입니다.');
     const option = await getSupplyOption(dataSource, org(req), kind, uuidParam(req, 'id'));
     if (!option) throw new NeturePharmacyError(404, 'SUPPLY_OPTION_NOT_AVAILABLE', '이용할 수 없는 공급 옵션입니다.');
-    return option;
+    return toSupplyOptionResponse(option);
   }));
 
   // 세미프랜차이즈 콘텐츠 자료함 — 가입(active) 세미프랜차이즈의 게시 콘텐츠 · 내 매장 사본
@@ -310,7 +314,8 @@ export function createNeturePharmacyRoutes(dataSource: DataSource, consultationD
   router.post('/pharmacy/recruitments/:id/apply', ...store, handle(async (req) =>
     recruitments.pharmacyApply(org(req), req.user!.id, uuidParam(req, 'id'))));
 
-  router.get('/pharmacy/cart', ...store, handle(async (req) => cart.list(req.user!.id, org(req))));
+  router.get('/pharmacy/cart', ...store, handle(async (req) =>
+    (await cart.list(req.user!.id, org(req))).map(toCartItemResponse)));
   router.post('/pharmacy/cart/items', ...store, handle(async (req) => cart.add(req.user!.id, org(req), req.body ?? {})));
   router.patch('/pharmacy/cart/items/:id', ...store, handle(async (req) =>
     cart.updateQuantity(req.user!.id, org(req), uuidParam(req, 'id'), req.body?.quantity)));
