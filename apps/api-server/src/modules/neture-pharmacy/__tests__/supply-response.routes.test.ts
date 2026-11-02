@@ -1,3 +1,4 @@
+import './fixtures/isolated-router-services.js';
 import express from 'express';
 import request from 'supertest';
 import { createNeturePharmacyRoutes } from '../neture-pharmacy.routes.js';
@@ -24,11 +25,7 @@ jest.mock('../pharmacy-store-access.js', () => ({
     next();
   },
 }));
-jest.mock('../../../services/checkout.service.js', () => ({ checkoutService: {} }));
-jest.mock('../../../routes/kpa/services/event-offer.service.js', () => ({ EventOfferService: class {} }));
-jest.mock('../services/pharmacy-store-provisioner.js', () => ({ createPharmacyStoreProvisioner: () => ({}) }));
-jest.mock('@o4o/asset-copy-core', () => ({ AssetCopyService: class {} }), { virtual: true });
-jest.mock('../services/business-registration-document.service.js', () => ({ BusinessRegistrationDocumentService: class {} }));
+
 
 const optionId = '10000000-0000-4000-8000-000000000001';
 const base = '/api/v1/neture/pharmacy';
