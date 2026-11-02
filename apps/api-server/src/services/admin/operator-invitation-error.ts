@@ -26,6 +26,8 @@ export class ServiceOperatorInvitationError extends Error {
             "이미 활성 운영자입니다. 기존 권한은 그대로 유지됩니다.",
           INVITATION_SCOPE_CHANGED:
             "초대 범위가 변경되었습니다. 새 초대를 요청하세요.",
+          OPERATIONS_INVITATION_REFRESH_REQUIRED:
+            "초대 방식이 변경되었습니다. 화면을 새로고침한 뒤 대상을 선택해 초대하세요. 담당 업무는 나중에 변경할 수 있습니다.",
           INVALID_EMAIL: "초대 이메일 주소를 확인하세요.",
           USER_SELECTION_REQUIRED:
             "이미 가입된 이메일입니다. 사용자 검색에서 대상 계정을 선택하세요.",

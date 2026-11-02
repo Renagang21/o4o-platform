@@ -27,7 +27,7 @@ async function fixture(page: Page, outcome: 'failure' | 'success' = 'failure') {
   });
   return { writes, complete };
 }
-for (const width of [1280, 390]) test(`invitation failure is visible beside the action after scrolling duties at ${width}px`, async ({ page }) => {
+for (const width of [1280, 390]) test(`invitation failure is visible beside the action without choosing duties at ${width}px`, async ({ page }) => {
   test.setTimeout(60_000);
   await page.setViewportSize({ width, height: 700 });
   const { writes, complete } = await fixture(page);
@@ -35,7 +35,8 @@ for (const width of [1280, 390]) test(`invitation failure is visible beside the 
   await page.getByRole('button', { name: '업무 운영자 초대', exact: true }).click();
   const dialog = page.getByRole('dialog', { name: '업무 운영자 초대', exact: true });
   await dialog.getByLabel('미가입자 초대 이메일').fill('invitee@example.test');
-  await dialog.getByText(/개 · 선택 변경/).click();
+  await expect(dialog.getByRole('checkbox')).toHaveCount(0);
+  await expect(dialog.getByText(/일상업무 전체를 기본으로 제공합니다/)).toBeVisible();
   const send = dialog.getByRole('button', { name: '초대 메일 보내기', exact: true });
   await send.scrollIntoViewIfNeeded();
   await send.click();
@@ -46,12 +47,12 @@ for (const width of [1280, 390]) test(`invitation failure is visible beside the 
   await expect(alert).toContainText('메일 발송이 확인되지 않았습니다.');
   await expect(alert).toBeInViewport();
   await expect(dialog.getByLabel('미가입자 초대 이메일')).toHaveValue('invitee@example.test');
-  expect(writes).toHaveLength(1);
+  expect(writes).toEqual([{ email: 'invitee@example.test' }]);
   await dialog.getByRole('button', { name: '초대 목록 확인', exact: true }).click();
   await expect(dialog).not.toBeVisible();
   await expect(page.getByText('invitee@example.test', { exact: true })).toBeVisible();
   await expect(page.getByRole('button', { name: '재발송', exact: true })).toBeVisible();
-  expect(writes).toHaveLength(1);
+  expect(writes).toEqual([{ email: 'invitee@example.test' }]);
 });
 
 for (const width of [1280, 390]) test(`confirmed invitation remains visible until acknowledgement at ${width}px`, async ({ page }) => {
@@ -62,7 +63,8 @@ for (const width of [1280, 390]) test(`confirmed invitation remains visible unti
   await page.getByRole('button', { name: '업무 운영자 초대', exact: true }).click();
   const dialog = page.getByRole('dialog', { name: '업무 운영자 초대', exact: true });
   await dialog.getByLabel('미가입자 초대 이메일').fill('invitee@example.test');
-  await dialog.getByText(/개 · 선택 변경/).click();
+  await expect(dialog.getByRole('checkbox')).toHaveCount(0);
+  await expect(dialog.getByText(/일상업무 전체를 기본으로 제공합니다/)).toBeVisible();
   const send = dialog.getByRole('button', { name: '초대 메일 보내기', exact: true });
   await send.scrollIntoViewIfNeeded();await send.click();
   await expect(dialog.getByRole('status')).toContainText('초대 메일 발송을 요청하고 있습니다');
@@ -71,9 +73,9 @@ for (const width of [1280, 390]) test(`confirmed invitation remains visible unti
   await expect(receipt).toContainText('초대 메일을 발송했습니다');
   await expect(receipt).toBeInViewport();
   await expect(send).toHaveCount(0);
-  expect(writes).toHaveLength(1);
+  expect(writes).toEqual([{ email: 'invitee@example.test' }]);
   await dialog.getByRole('button', { name: '완료', exact: true }).click();
   await expect(dialog).not.toBeVisible();
   await expect(page.getByRole('status').filter({ hasText: '초대 메일을 발송했습니다' })).toBeVisible();
-  expect(writes).toHaveLength(1);
+  expect(writes).toEqual([{ email: 'invitee@example.test' }]);
 });

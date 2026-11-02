@@ -5,7 +5,7 @@ import { AppDataSource } from '../../database/connection.js';
 import { AdminOperationsOperators } from '../../services/admin/admin-operations-operators.js';
 import { ADMIN_OPERATIONS_INVITATION_SCOPE } from '../../services/admin/admin-operations-operator-contract.js';
 import { serviceOperatorInvitationService } from '../../services/admin/service-operator-invitation.service.js';
-import { invitationFailure } from '../../services/admin/operator-invitation-error.js';
+import { invitationFailure, ServiceOperatorInvitationError } from '../../services/admin/operator-invitation-error.js';
 
 export const adminOperationsOperatorsRouter = Router();
 adminOperationsOperatorsRouter.use((_req, res, next) => { res.setHeader('Cache-Control', 'private, no-store'); next(); });
@@ -16,6 +16,9 @@ adminOperationsOperatorsRouter.get('/', async (req: AuthRequest, res) => {
 });
 adminOperationsOperatorsRouter.post('/', async (req: AuthRequest, res) => {
   const { email, targetUserId, menuKeys } = req.body ?? {};
+  if (menuKeys !== undefined) {
+    invitationFailure(res, new ServiceOperatorInvitationError('OPERATIONS_INVITATION_REFRESH_REQUIRED', 400)); return;
+  }
   if ((email !== undefined && typeof email !== 'string') || (targetUserId !== undefined && typeof targetUserId !== 'string')) {
     res.status(400).json({ success: false, code: 'INVALID_INVITATION_INPUT' }); return;
   }

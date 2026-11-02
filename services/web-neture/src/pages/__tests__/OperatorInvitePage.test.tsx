@@ -174,3 +174,10 @@ it('shows admin-site daily Operator duties before consent and directs the recipi
   expect(screen.getByRole('link',{name:'업무 운영'}).getAttribute('href')).toBe('https://admin.neture.co.kr/operations');
   expect(h.post.mock.calls.every(([path])=>path.endsWith('/inspect'))).toBe(true);
 });
+
+it('explains default daily duties without an invitation duty picker', async () => {
+  h.post.mockResolvedValue({data:{data:{serviceKey:'neture',role:'neture:operator',purpose:'assignment',adminOperations:true,centralDelegation:true,defaultDailyDuties:true,menuLabels:['공통 회원 관리']}}});
+  render(<OperatorInvitePage />);
+  expect(await screen.findByText(/수락하면 일상업무 전체를 기본으로 제공합니다/)).toBeTruthy();
+  expect(screen.queryByRole('checkbox')).toBeNull();
+});

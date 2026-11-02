@@ -1,3 +1,4 @@
+import { AddAdminOperationsDelegation1793586897000 } from '../../../database/migrations/1793586897000-AddAdminOperationsDelegation.js';
 import { CreateCentralOperationMenuGrants1793186241009 } from '../../../database/migrations/1793186241009-CreateCentralOperationMenuGrants.js';
 import { CentralOperationMenuGrantService, centralOperationMenuKeys, assertCentralOperationMenu, assertCentralOperationRequest,validateCentralMenuKeys } from '../central-operation-menu-grants.js';
 import { AddPharmacistQualificationDecisions1793165158540 } from "../../../database/migrations/1793165158540-AddPharmacistQualificationDecisions.js";
@@ -77,6 +78,7 @@ const enabled = process.env.UNIFIED_ACCESS_TEST_PORT === "55432";
       // This focused RBAC fixture has no erasure ledger. Full canonical fixture checks the real fence.
       await db.query(`CREATE OR REPLACE FUNCTION public.account_erasure_write_fence() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN RETURN NEW; END $$`);
       await db.transaction(m => new CreateCentralOperationMenuGrants1793186241009().up(m.queryRunner!));
+      await db.transaction(m => new AddAdminOperationsDelegation1793586897000().up(m.queryRunner!));
     });
     afterAll(async () => {
       if (db?.isInitialized) {

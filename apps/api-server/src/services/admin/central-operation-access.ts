@@ -1,3 +1,4 @@
+import { ADMIN_OPERATIONS_OPERATOR_ROLES } from './admin-operations-operator-contract.js';
 import type { DataSource } from "typeorm";
 import {
   CENTRAL_OPERATION_ROLES,
@@ -17,14 +18,16 @@ export async function centralOperationRoles(
     AND ra.is_active=true AND (ra.valid_from IS NULL OR ra.valid_from<=now())
     AND (ra.valid_until IS NULL OR ra.valid_until>=now())
     AND (ra.role='platform:super_admin' OR (
-      ra.scope_type=$2 AND ra.role=ANY($3::text[])
+      (ra.scope_type=$2 OR (ra.role=ANY($4::text[]) AND EXISTS (
+        SELECT 1 FROM central_operation_menu_grants g WHERE g.assignment_id=ra.id AND g.admin_operations=true
+      ))) AND ra.role=ANY($3::text[])
       AND NOT EXISTS (SELECT 1 FROM service_memberships main WHERE main.user_id=u.id AND main.service_key='neture' AND main.status IN ('suspended','withdrawn'))
       AND EXISTS (
         SELECT 1 FROM service_memberships sm WHERE sm.user_id=ra.user_id AND sm.status='active'
         AND sm.service_key=CASE WHEN ra.role LIKE 'neture:%' THEN 'neture' ELSE split_part(ra.role,':',1) END
       )
     )) ${lock ? "FOR SHARE OF ra,u" : ""}`,
-    [userId, CENTRAL_DELEGATION_SCOPE, CENTRAL_OPERATION_ROLES],
+    [userId, CENTRAL_DELEGATION_SCOPE, CENTRAL_OPERATION_ROLES, ADMIN_OPERATIONS_OPERATOR_ROLES],
   );
   return rows
     .map((row) => row.role)

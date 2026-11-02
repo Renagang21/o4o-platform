@@ -345,6 +345,8 @@ export const EXPECTED_SCHEMA_STATES: readonly ExpectedSchemaState[] = [
   { appliedThrough: 'AddAssistantStorageAuthority1793322213345', fingerprint: 'e6fd46ae64b9aed8e41ad05927bc14968f8f840f483142ec69a53760af44fa19', fingerprintLineCount: 7409 },
   // Business identity transition, including the canonical business-key column comment.
   { appliedThrough: 'RenameDrugstoreCooperation1793457683032', fingerprint: 'aab4a2e779cbdcfe5948dbbcd2e71539d365ac05cad42902066a018ca105ca82', fingerprintLineCount: 7410 },
+  // Isolated PostgreSQL 15: all prior prefixes match; new empty down/up restores prior state.
+  { appliedThrough: 'AddAdminOperationsDelegation1793586897000', fingerprint: '4adee8f4fc7f40b3dd9ae6ff84d5bafad7128378e4c58b4042a4234528542a17', fingerprintLineCount: 7411 },
 ] as const;
 
 /** Expected state after `prefixLength` incremental migrations; undefined when not registered. */

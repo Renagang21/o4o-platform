@@ -2,14 +2,14 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { authClient } from '@o4o/auth-client';
 import { OperatorDialog } from '@o4o/operator-core-ui/operation-support';
-import AdminOperationsDutySelection, { DAILY_OPERATION_MENUS as menus } from './AdminOperationsDutySelection';
+import AdminOperationsDutySelection from './AdminOperationsDutySelection';
 
 type DialogMode = 'invite' | 'duties' | 'revoke';
 const TITLES = { invite: '업무 운영자 초대', duties: '담당 업무 변경', revoke: '업무 운영자 해제' };
 const ACTIONS = { invite: '초대 메일 보내기', duties: '담당 업무 저장', revoke: '지정 해제' };
-function canSubmit(mode: DialogMode | null, busy: boolean, recipient: boolean, count: number, reason: string) {
+function canSubmit(mode: DialogMode | null, busy: boolean, recipient: boolean, reason: string) {
   if (busy || !mode) return false;
-  if (mode === 'invite') return recipient && count > 0;
+  if (mode === 'invite') return recipient;
   return reason.trim().length > 0;
 }
 interface Operator { id: string; name: string | null; email: string; status: string; isActive: boolean; menuKeys: string[]; version: string }
@@ -65,7 +65,7 @@ export default function AdminOperationsOperatorsPage() {
   function open(kind: DialogMode, row: Operator | null = null) {
     setCompleted(false); setFailureCode(''); setSearchNotice('');
     searchSequence.current++; setCandidates([]); setCandidate(null); setQuery(''); setEmail(''); setReason(''); setError(''); setNotice(''); setTarget(row);
-    setKeys(kind === 'invite' ? menus.map(menu => menu.key) : row?.menuKeys ?? []); setDialog(kind);
+    setKeys(row?.menuKeys ?? []); setDialog(kind);
   }
   async function search() {
     setSearchNotice('');
@@ -82,7 +82,7 @@ export default function AdminOperationsOperatorsPage() {
     writing.current = true; setBusy(true); setError(''); setFailureCode(''); setSearchNotice('');
     try {
       if (dialog === 'invite') {
-        const response = await authClient.api.post('/admin/operations-operators', { ...(candidate ? { targetUserId: candidate.userId } : { email: email.trim() }), menuKeys: keys });
+        const response = await authClient.api.post('/admin/operations-operators', { ...(candidate ? { targetUserId: candidate.userId } : { email: email.trim() }) });
         if (response.data?.success !== true) throw new Error('INVITATION_RESULT_UNCONFIRMED');
         setNotice('업무 운영자 초대 메일을 발송했습니다. 본인 수락 후 Google 로그인으로 업무 운영을 이용할 수 있습니다.');
         setCompleted(true); searchSequence.current++; void load(); return;
@@ -125,10 +125,10 @@ export default function AdminOperationsOperatorsPage() {
         {searchNotice && !completed && <p role="status" className="text-sm text-slate-600">{searchNotice}</p>}
         {candidates.map(row => <label key={row.userId} className="flex items-start gap-2 rounded border p-3"><input type="radio" disabled={busy || completed} name="operations-candidate" checked={candidate?.userId === row.userId} onChange={() => { setCandidate(row); setEmail(''); }} /><span className="break-all">{row.name || '이름 없음'} · {row.email}{!row.hasGoogleLink && <span className="block text-sm text-amber-800">업무 운영 이용 전 Google 계정 연결이 필요합니다.</span>}</span></label>)}
         <label className="block">미가입자 초대 이메일<input type="email" disabled={busy || completed} className="mt-1 block w-full rounded border p-2" value={email} onChange={event => { setEmail(event.target.value); setCandidate(null); }} /></label>
-        <p className="text-sm text-slate-600">가입된 계정은 검색 후 선택하세요. 이메일 일치만으로 계정을 연결하지 않습니다. 초대 수락 전에는 운영 권한이 활성화되지 않습니다.</p>
+        <p className="text-sm text-slate-600">가입된 계정은 검색 후 선택하세요. 이메일 일치만으로 계정을 연결하지 않습니다. 수락하면 일상업무 전체를 기본으로 제공합니다. 담당 업무는 나중에 변경할 수 있습니다.</p>
       </div> : <p className="my-4 break-all">{target?.name} · {target?.email}</p>}
-      {dialog !== 'revoke' ? <AdminOperationsDutySelection value={keys} onChange={setKeys} disabled={busy || completed} expanded={dialog === 'duties'} /> : <p>업무 운영자 지정을 해제합니다. 전체 관리자와 별도로 보유한 서비스·독립 사업 권한은 변경하지 않습니다.</p>}
-      {dialog === 'duties' && <p className="my-3 text-sm text-slate-600">새 업무 분야의 권한이 필요한 경우 업무 운영자 초대를 다시 보내 본인 수락을 받아 주세요.</p>}
+      {dialog === 'duties' ? <AdminOperationsDutySelection value={keys} onChange={setKeys} disabled={busy || completed} expanded={dialog === 'duties'} /> : dialog === 'revoke' ? <p>업무 운영자 지정을 해제합니다. 전체 관리자와 별도로 보유한 서비스·독립 사업 권한은 변경하지 않습니다.</p> : null}
+      {dialog === 'duties' && <p className="my-3 text-sm text-slate-600">담당 업무를 선택하고 저장하세요. 초대 메일을 다시 보낼 필요는 없습니다.</p>}
       {dialog !== 'invite' && <label className="block">처리 사유<textarea className="mt-1 block w-full rounded border p-2" maxLength={2000} value={reason} disabled={busy} onChange={event => setReason(event.target.value)} /></label>}
       <div className="sticky bottom-0 z-10 mt-5 space-y-3 border-t bg-white pt-3">
         {dialog === 'invite' && <p className="break-all text-sm text-slate-600">받는 사람: {candidate?.email || email.trim() || '위에서 사용자를 선택하거나 이메일을 입력해 주세요.'}</p>}
@@ -138,7 +138,7 @@ export default function AdminOperationsOperatorsPage() {
         <div className="flex flex-wrap justify-end gap-3">
           {failureCode === 'INVITATION_MAIL_FAILED' && <button type="button" disabled={busy} onClick={() => { setDialog(null); void load(); }} className="rounded border px-3 py-2">초대 목록 확인</button>}
           <button type="button" disabled={busy} onClick={() => { searchSequence.current++; setDialog(null); }}>{completed ? '완료' : '취소'}</button>
-          {!completed && <button type="button" disabled={!canSubmit(dialog, busy, Boolean(candidate || email.trim()), keys.length, reason)} onClick={() => void submit()} className="rounded bg-blue-700 px-4 py-2 text-white disabled:opacity-50">{busy ? '처리 중…' : ACTIONS[dialog]}</button>}
+          {!completed && <button type="button" disabled={!canSubmit(dialog, busy, Boolean(candidate || email.trim()), reason)} onClick={() => void submit()} className="rounded bg-blue-700 px-4 py-2 text-white disabled:opacity-50">{busy ? '처리 중…' : ACTIONS[dialog]}</button>}
         </div>
       </div>
     </OperatorDialog>}

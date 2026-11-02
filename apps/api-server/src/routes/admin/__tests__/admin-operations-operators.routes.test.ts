@@ -22,9 +22,14 @@ it('requires authentication and lets the current whole-site Admin manage this wo
   expect((await request(app).get('/ops').set('x-fixture-role','platform:super_admin')).status).toBe(200);
 });
 it('derives the fixed Operator transport server-side instead of trusting a requested Admin role',async()=>{
-  expect((await request(app).post('/ops').set('x-fixture-role','platform:super_admin').send({targetUserId:'00000000-0000-4000-8000-000000000002',menuKeys:['neture.members'],role:'platform:super_admin',serviceKey:'platform'})).status).toBe(201);
-  expect(create).toHaveBeenCalledWith(expect.objectContaining({role:'neture:operator',serviceKey:'neture',scopeKey:'admin-operations',menuKeys:['neture.members']}));
+  expect((await request(app).post('/ops').set('x-fixture-role','platform:super_admin').send({targetUserId:'00000000-0000-4000-8000-000000000002',role:'platform:super_admin',serviceKey:'platform'})).status).toBe(201);
+  expect(create).toHaveBeenCalledWith(expect.objectContaining({role:'neture:operator',serviceKey:'neture',scopeKey:'admin-operations',menuKeys:undefined}));
 });
 it('rejects malformed target identifiers before applying changes',async()=>{
   expect((await request(app).post('/ops/invalid/revoke').set('x-fixture-role','platform:super_admin').send({})).status).toBe(400);expect(change).not.toHaveBeenCalled();
+});
+
+it('rejects stale invitation duty selection rather than silently broadening its scope',async()=>{
+  expect((await request(app).post('/ops').set('x-fixture-role','platform:super_admin').send({email:'fixture@example.test',menuKeys:['neture.members']})).status).toBe(400);
+  expect(create).not.toHaveBeenCalled();
 });
