@@ -108,3 +108,13 @@ it('offers the existing pending list after mail failure without issuing another 
  fireEvent.click(dialog.getByRole('button',{name:'초대 목록 확인'}));
  await screen.findByRole('button',{name:'재발송'});expect(screen.queryByRole('dialog')).toBeNull();expect(api.post).toHaveBeenCalledTimes(1);
 });
+
+it('shows an empty search result inside the open invitation without presenting it as sent mail',async()=>{
+ mount();await screen.findByText('지정된 업무 운영자가 없습니다.');fireEvent.click(screen.getByRole('button',{name:'업무 운영자 초대'}));
+ const dialog=within(screen.getByRole('dialog'));api.get.mockResolvedValueOnce({data:{data:{candidates:[]}}});
+ fireEvent.change(dialog.getByLabelText('기존 사용자 검색'),{target:{value:'unknown'}});fireEvent.click(dialog.getByRole('button',{name:'사용자 검색'}));
+ expect(await dialog.findByRole('status')).toHaveTextContent('검색 결과가 없습니다. 공통 계정이 없다면 이메일로 초대하세요.');
+ expect(api.post).not.toHaveBeenCalled();
+ fireEvent.change(dialog.getByLabelText('기존 사용자 검색'),{target:{value:'different'}});expect(dialog.queryByRole('status')).toBeNull();
+ fireEvent.click(dialog.getByRole('button',{name:'취소'}));expect(screen.queryByText(/검색 결과가 없습니다/)).toBeNull();
+});

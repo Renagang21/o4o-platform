@@ -35,6 +35,7 @@ export default function AdminOperationsOperatorsPage() {
   const [target, setTarget] = useState<Operator | null>(null);
   const [email, setEmail] = useState('');
   const [query, setQuery] = useState('');
+  const [searchNotice, setSearchNotice] = useState('');
   const [candidates, setCandidates] = useState<Candidate[]>([]);
   const [candidate, setCandidate] = useState<Candidate | null>(null);
   const [keys, setKeys] = useState<string[]>([]);
@@ -62,22 +63,23 @@ export default function AdminOperationsOperatorsPage() {
   useEffect(() => { void load(); return cancelSearch; }, [load, cancelSearch]);
   useEffect(() => { if (dialog && error) feedback.current?.focus(); }, [dialog, error]);
   function open(kind: DialogMode, row: Operator | null = null) {
-    setCompleted(false); setFailureCode('');
+    setCompleted(false); setFailureCode(''); setSearchNotice('');
     searchSequence.current++; setCandidates([]); setCandidate(null); setQuery(''); setEmail(''); setReason(''); setError(''); setNotice(''); setTarget(row);
     setKeys(kind === 'invite' ? menus.map(menu => menu.key) : row?.menuKeys ?? []); setDialog(kind);
   }
   async function search() {
+    setSearchNotice('');
     if (query.trim().length < 2) { setError('이름이나 이메일을 두 글자 이상 입력해 주세요.'); return; }
     const seq = ++searchSequence.current; setError(''); setCandidates([]); setCandidate(null);
     try {
       const response = await authClient.api.get('/admin/operator-assignments/candidates', { params: { q: query.trim() } });
       if (!Array.isArray(response.data?.data?.candidates)) throw new Error('INVALID_RESPONSE');
-      if (seq === searchSequence.current) { setCandidates(response.data.data.candidates); if (!response.data.data.candidates.length) setNotice('검색 결과가 없습니다. 공통 계정이 없다면 이메일로 초대하세요.'); }
+      if (seq === searchSequence.current) { setCandidates(response.data.data.candidates); if (!response.data.data.candidates.length) setSearchNotice('검색 결과가 없습니다. 공통 계정이 없다면 이메일로 초대하세요.'); }
     } catch (error_) { if (seq === searchSequence.current) setError(message(error_)); }
   }
   async function submit() {
     if (writing.current || !dialog || completed) return;
-    writing.current = true; setBusy(true); setError(''); setFailureCode('');
+    writing.current = true; setBusy(true); setError(''); setFailureCode(''); setSearchNotice('');
     try {
       if (dialog === 'invite') {
         const response = await authClient.api.post('/admin/operations-operators', { ...(candidate ? { targetUserId: candidate.userId } : { email: email.trim() }), menuKeys: keys });
@@ -118,8 +120,9 @@ export default function AdminOperationsOperatorsPage() {
     {dialog && <OperatorDialog busy={busy} label={TITLES[dialog]} fallbackFocus={trigger} onCancel={() => { if (!writing.current) { searchSequence.current++; setDialog(null); } }} className="max-w-3xl rounded-xl bg-white p-5">
       <h2 className="text-lg font-semibold">{TITLES[dialog]}</h2>
       {dialog === 'invite' ? <div className="mt-4 space-y-3">
-        <label className="block">기존 사용자 검색<input disabled={busy || completed} className="mt-1 block w-full rounded border p-2" value={query} onChange={event => { searchSequence.current++; setCandidate(null); setCandidates([]); setQuery(event.target.value); }} /></label>
+        <label className="block">기존 사용자 검색<input disabled={busy || completed} className="mt-1 block w-full rounded border p-2" value={query} onChange={event => { searchSequence.current++; setCandidate(null); setCandidates([]); setSearchNotice(''); setQuery(event.target.value); }} /></label>
         <button type="button" disabled={busy || completed} onClick={() => void search()} className="rounded border px-3 py-2">사용자 검색</button>
+        {searchNotice && !completed && <p role="status" className="text-sm text-slate-600">{searchNotice}</p>}
         {candidates.map(row => <label key={row.userId} className="flex items-start gap-2 rounded border p-3"><input type="radio" disabled={busy || completed} name="operations-candidate" checked={candidate?.userId === row.userId} onChange={() => { setCandidate(row); setEmail(''); }} /><span className="break-all">{row.name || '이름 없음'} · {row.email}{!row.hasGoogleLink && <span className="block text-sm text-amber-800">업무 운영 이용 전 Google 계정 연결이 필요합니다.</span>}</span></label>)}
         <label className="block">미가입자 초대 이메일<input type="email" disabled={busy || completed} className="mt-1 block w-full rounded border p-2" value={email} onChange={event => { setEmail(event.target.value); setCandidate(null); }} /></label>
         <p className="text-sm text-slate-600">가입된 계정은 검색 후 선택하세요. 이메일 일치만으로 계정을 연결하지 않습니다. 초대 수락 전에는 운영 권한이 활성화되지 않습니다.</p>
