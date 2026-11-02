@@ -279,28 +279,7 @@ export class NetureService {
   async updateSupplierOffer(
     offerId: string,
     supplierId: string,
-    updates: {
-      isActive?: boolean;
-      isPublic?: boolean;
-      distributionType?: OfferDistributionType;
-      allowedSellerIds?: string[] | null;
-      priceGeneral?: number;
-      priceGold?: number | null;
-      pricePlatinum?: number | null;
-      consumerReferencePrice?: number | null;
-      stockQuantity?: number;
-      consumerShortDescription?: string | null;
-      consumerDetailDescription?: string | null;
-      name?: string;
-      // WO-NETURE-PRODUCT-FIELD-GAP-FIX-V1: Master-level fields
-      categoryId?: string | null;
-      brandId?: string | null;
-      specification?: string | null;
-      originCountry?: string | null;
-      tags?: string[];
-      // WO-KPA-RECOMMENDED-TAB-REPLACE-CURATION-WITH-SUPPLIER-HIGHLIGHT-V1
-      isFeatured?: boolean;
-    }
+    updates: Parameters<NetureOfferService['updateSupplierOffer']>[2]
   ) {
     return this.offerService.updateSupplierOffer(offerId, supplierId, updates);
   }

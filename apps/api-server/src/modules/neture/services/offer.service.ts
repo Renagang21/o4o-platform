@@ -123,28 +123,7 @@ export class NetureOfferService {
   async updateSupplierOffer(
     offerId: string,
     supplierId: string,
-    updates: {
-      isActive?: boolean;
-      isPublic?: boolean;
-      distributionType?: OfferDistributionType;
-      allowedSellerIds?: string[] | null;
-      priceGeneral?: number;
-      priceGold?: number | null;
-      pricePlatinum?: number | null;
-      consumerReferencePrice?: number | null;
-      stockQuantity?: number;
-      consumerShortDescription?: string | null;
-      consumerDetailDescription?: string | null;
-      name?: string;
-      // WO-NETURE-PRODUCT-FIELD-GAP-FIX-V1: Master-level fields
-      categoryId?: string | null;
-      brandId?: string | null;
-      specification?: string | null;
-      originCountry?: string | null;
-      tags?: string[];
-      // WO-KPA-RECOMMENDED-TAB-REPLACE-CURATION-WITH-SUPPLIER-HIGHLIGHT-V1
-      isFeatured?: boolean;
-    }
+    updates: Parameters<SupplierOfferWriteService['updateSupplierOffer']>[2]
   ) {
     return this.supplierOfferWriteService.updateSupplierOffer(offerId, supplierId, updates);
   }
@@ -154,7 +133,7 @@ export class NetureOfferService {
     supplierId: string,
     userId: string,
     input: import('./supplier-offer-distribution.service.js').SupplierPublicationInput,
-  ): Promise<{ success: boolean; error?: string; data?: Record<string, unknown> }> {
+  ): Promise<import('./supplier-offer-distribution.service.js').SupplierPublicationResult> {
     return this.supplierOfferDistributionService.updateDistribution(offerId, supplierId, userId, input);
   }
 

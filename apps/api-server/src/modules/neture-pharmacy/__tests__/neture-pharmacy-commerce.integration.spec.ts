@@ -139,6 +139,11 @@ async function approvedPharmacy() {
   return { owner, orgId: row.organization_id as string, membershipId: row.id as string };
 }
 
+async function removeDefaultMembership(organizationId: string) {
+  // Approval now creates the default membership; explicitly remove only this fixture row for missing-membership cases.
+  await ds.query("DELETE FROM semi_franchise_memberships WHERE organization_id=$1 AND semi_franchise_id=(SELECT id FROM semi_franchises WHERE key='pharmacy')", [organizationId]);
+}
+
 async function joinSemiFranchise(orgId: string, owner: string, key: string, sfOperator: string) {
   const sf = (await sfs.getByKey(key))!;
   const app = await sfs.apply(orgId, owner, key, { policyReferences: await fixtureBusinessPolicies(ds, key) });
@@ -174,7 +179,7 @@ d('Neture 약국 매장 commerce — 격리 PostgreSQL 통합 검증', () => {
   });
 
   describe('독립 커뮤니티 · 사업 커뮤니티 공간', () => {
-    it('독립 community 서비스 가입과 사업 가입을 분리하고, 담당 운영자·정지·종료를 원장에서 판정한다', async () => {
+    it('일반 커뮤니티 접근과 사업 가입을 분리하고, 담당 운영자·정지·종료를 원장에서 판정한다', async () => {
       const member = await approvedPharmacy();
       const independentKey = uniq('independent');
       const [independent] = await ds.query("INSERT INTO communities (slug,name,status) VALUES ($1,'Independent','active') RETURNING id", [independentKey]);
@@ -187,10 +192,11 @@ d('Neture 약국 매장 commerce — 격리 PostgreSQL 통합 검증', () => {
       const actor = { id: member.owner };
       // Retired per-community rows never grant access to the independent service.
       expect(await resolveCommunityWorkspace(ds, actor, independentKey)).toBeNull();
-      expect(await resolveCommunityWorkspace(ds, actor, 'community')).toMatchObject({ allowed: false, canJoin: true });
+      // Current workspace policy: an active verified common account needs no extra general-community enrollment.
+      expect(await resolveCommunityWorkspace(ds, actor, 'community')).toMatchObject({ allowed: true, canJoin: false });
       await ds.query("INSERT INTO community_memberships (community_id,user_id,status,role) VALUES ($1,$2,'active','member')", [independent.id, member.owner]);
       expect(await resolveCommunityWorkspace(ds, actor, independentKey)).toBeNull();
-      expect(await resolveCommunityWorkspace(ds, actor, 'community')).toMatchObject({ allowed: false });
+      expect(await resolveCommunityWorkspace(ds, actor, 'community')).toMatchObject({ allowed: true });
       await ds.query("INSERT INTO service_memberships(user_id,service_key,role,status) VALUES ($1,'community','member','active')", [member.owner]);
       expect(await resolveCommunityWorkspace(ds, actor, 'community')).toMatchObject({ allowed: true, forumStorageCodes: ['community'] });
       expect(await resolveCommunityWorkspace(ds, actor, independentKey)).toBeNull();
@@ -296,8 +302,9 @@ d('Neture 약국 매장 commerce — 격리 PostgreSQL 통합 검증', () => {
       expect((await isStoreOwner(ds, legacy, 'kpa')).isOwner).toBe(false);
     });
 
-    it('세미프랜차이즈 미가입이어도 매장은 열리지만 공급 옵션은 0이다', async () => {
+    it('기본 가입이 누락되어도 매장은 열리지만 공급 옵션은 0이다', async () => {
       const p = await approvedPharmacy();
+      await removeDefaultMembership(p.orgId);
       await supplierWithProduct({ price: 10000, defaultSupplyEnabled: true });
       expect((await isStoreOwner(ds, p.owner, 'kpa')).isOwner).toBe(true);
       const list = await listSupplyOptions(ds, p.orgId);
@@ -451,6 +458,7 @@ d('Neture 약국 매장 commerce — 격리 PostgreSQL 통합 검증', () => {
       const unpublished = await supplierWithProduct({ price: 14000 });
       const member = await approvedPharmacy();
       const outsider = await approvedPharmacy();
+      await removeDefaultMembership(outsider.orgId);
       await joinSemiFranchise(member.orgId, member.owner, 'pharmacy', pharmacyOperator);
 
       const opt = await getSupplyOption(ds, member.orgId, 'default', plain.offerId);
@@ -640,6 +648,7 @@ d('Neture 약국 매장 commerce — 격리 PostgreSQL 통합 검증', () => {
       const prod = await supplierWithProduct({ price: 20000 });
       const member = await approvedPharmacy();
       const outsider = await approvedPharmacy();
+      await removeDefaultMembership(outsider.orgId);
       const sf = (await sfs.getByKey('pharmacy'))!;
       await joinSemiFranchise(member.orgId, member.owner, 'pharmacy', pharmacyOperator);
       const otherKey = uniq('other-recruitment');
@@ -826,8 +835,9 @@ d('Neture 약국 매장 commerce — 격리 PostgreSQL 통합 검증', () => {
         references.push({ policyDocumentId: doc.id, version: 2, documentType: type });
       }
     });
-    async function member() {
+    async function member(withDefaultMembership = true) {
       const store = await approvedPharmacy();
+      if (!withDefaultMembership) await removeDefaultMembership(store.orgId);
       const application = await sfs.apply(store.orgId, store.owner, 'carepharm', { acceptedConditions: true, policyReferences: references });
       await sfs.decideMembership(care!, careOperator, application.id, 'approve');
       return { ...store, businessMembershipId: application.id };
@@ -853,7 +863,7 @@ d('Neture 약국 매장 commerce — 격리 PostgreSQL 통합 검증', () => {
       expect(await ds.query("SELECT 1 FROM user_policy_acceptances WHERE user_id=$1 AND service_key=$2", [pharmacy.owner,scope])).toEqual([]);
     });
     it('stores exact version/hash and application evidence without requiring pharmacy cooperation membership', async () => {
-      const pharmacy = await member();
+      const pharmacy = await member(false);
       const [stored] = await ds.query("SELECT metadata->'semiFranchiseApplications'->'carepharm' AS application FROM organizations WHERE id=$1", [pharmacy.orgId]);
       expect(stored.application.applicationPolicies).toEqual(expect.arrayContaining([expect.objectContaining({ serviceKey: scope, version: 2, contentHash: computePolicyContentHash('Synthetic exact terms body'), acceptanceKind: 'agreement' })]));
       expect(await ds.query("SELECT 1 FROM semi_franchise_memberships sfm JOIN semi_franchises sf ON sf.id=sfm.semi_franchise_id WHERE sfm.organization_id=$1 AND sf.key='pharmacy'", [pharmacy.orgId])).toEqual([]);
