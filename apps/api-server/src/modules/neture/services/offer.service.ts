@@ -90,17 +90,7 @@ export class NetureOfferService {
     return this.adminOfferReadService.getAllProducts(filters);
   }
 
-  async getAllProductsPaged(options?: {
-    supplierId?: string;
-    distributionType?: OfferDistributionType;
-    isActive?: boolean;
-    approvalStatus?: OfferApprovalStatus;
-    search?: string;
-    sortBy?: string;
-    sortOrder?: string;
-    page?: number;
-    limit?: number;
-  }): Promise<{ items: Array<Record<string, unknown>>; total: number }>{
+  async getAllProductsPaged(options?: Parameters<AdminOfferReadService['getAllProductsPaged']>[0]) {
     return this.adminOfferReadService.getAllProductsPaged(options);
   }
 
@@ -150,20 +140,7 @@ export class NetureOfferService {
 
   async getSupplierProductsPaginated(
     supplierId: string,
-    options: {
-      page?: number;
-      limit?: number;
-      keyword?: string;
-      distributionType?: string;
-      isActive?: string;
-      sort?: string;
-      order?: string;
-      hasImage?: string;
-      hasDescription?: string;
-      barcodeSource?: string;
-      completenessStatus?: string;
-      serviceApprovalStatus?: string;
-    } = {},
+    options: Parameters<SupplierOfferReadService['getSupplierProductsPaginated']>[1] = {},
   ) {
     return this.supplierOfferReadService.getSupplierProductsPaginated(supplierId, options);
   }
