@@ -290,7 +290,7 @@ jobs:
         run: node scripts/deployment/pharmacy-hub-domain-detachment.mjs
       - name: Save domain detachment request and verification evidence
         if: always() && inputs.domain_detachment == true
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: pharmacyhub-domain-detachment-${{ github.run_id }}
           path: ${{ runner.temp }}/pharmacyhub-qr-cutover/
@@ -361,7 +361,7 @@ jobs:
         run: pnpm exec tsx apps/api-server/src/scripts/demo-account-reconcile.ts
       - name: Save sanitized Demo account reconciliation result
         if: always() && inputs.demo_accounts == true
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: demo-accounts-${{ github.run_id }}
           path: ${{ runner.temp }}/demo-account-reconciliation.json
@@ -407,7 +407,7 @@ jobs:
         run: node scripts/deployment/pharmacy-hub-resource-retirement.mjs
       - name: Save backup and verification evidence
         if: always() && inputs.ph_media_purge != true && inputs.ph_development_purge != true && inputs.ph_admin_purge != true && inputs.certificate_retirement != true && inputs.domain_detachment != true && inputs.resource_retirement != true && inputs.retirement_inventory != true && inputs.mode != 'operator-census' && inputs.demo_census != true && inputs.demo_relink != true && inputs.demo_cleanup != true && inputs.copy_cleanup != true && inputs.demo_accounts != true
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: pharmacyhub-url-map-${{ github.run_id }}
           path: ${{ runner.temp }}/pharmacyhub-qr-cutover/*.json
