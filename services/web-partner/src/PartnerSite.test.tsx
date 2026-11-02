@@ -71,6 +71,161 @@ beforeEach(() => {
 });
 afterEach(cleanup);
 describe("Partner public entry, login, opt-in and community", () => {
+  it("retries unavailable boards without reloading the page or joining", async () => {
+    vi.mocked(communityApi.boards).mockRejectedValueOnce(
+      new Error("unavailable"),
+    );
+    mount();
+    await screen.findByText("게시판을 불러오지 못했습니다.");
+    fireEvent.click(screen.getByRole("button", { name: "연결 다시 확인" }));
+    await screen.findByRole("link", { name: board.name, exact: true });
+    expect(screen.queryByText("게시판을 불러오지 못했습니다.")).toBeNull();
+    expect(communityApi.boards).toHaveBeenCalledTimes(2);
+    expect(communityApi.join).not.toHaveBeenCalled();
+  });
+  it("keeps joining disabled until failed policy loading is retried", async () => {
+    vi.mocked(partnerApi.me).mockResolvedValue(user);
+    vi.mocked(communityApi.policies).mockRejectedValueOnce(
+      new Error("unavailable"),
+    );
+    mount();
+    await screen.findByText("서비스 이용 안내를 불러오지 못했습니다.");
+    expect(
+      (
+        screen.getByRole("button", {
+          name: "커뮤니티 가입하기",
+        }) as HTMLButtonElement
+      ).disabled,
+    ).toBe(true);
+    fireEvent.click(screen.getByRole("button", { name: "연결 다시 확인" }));
+    await waitFor(() =>
+      expect(
+        (
+          screen.getByRole("button", {
+            name: "커뮤니티 가입하기",
+          }) as HTMLButtonElement
+        ).disabled,
+      ).toBe(false),
+    );
+    expect(communityApi.join).not.toHaveBeenCalled();
+  });
+  it("does not treat an unavailable membership as non-membership and recovers by reading", async () => {
+    vi.mocked(partnerApi.me).mockResolvedValue(user);
+    vi.mocked(communityApi.membership)
+      .mockRejectedValueOnce(new ApiError(503, "PARTNER_UNAVAILABLE"))
+      .mockResolvedValue({ status: "active", operator: false });
+    mount();
+    const retry = await screen.findByRole("button", {
+      name: "가입 상태 다시 확인",
+    });
+    expect(
+      screen.queryByRole("button", { name: "커뮤니티 가입하기" }),
+    ).toBeNull();
+    expect(communityApi.list).not.toHaveBeenCalled();
+    fireEvent.click(retry);
+    await screen.findByRole("button", { name: "글쓰기" });
+    expect(communityApi.membership).toHaveBeenCalledTimes(2);
+    expect(communityApi.join).not.toHaveBeenCalled();
+  });
+  it("keeps a suspended member blocked after a failed membership read is retried", async () => {
+    vi.mocked(partnerApi.me).mockResolvedValue(user);
+    vi.mocked(communityApi.membership)
+      .mockRejectedValueOnce(new Error("unavailable"))
+      .mockResolvedValue({ status: "suspended", operator: false });
+    mount();
+    fireEvent.click(
+      await screen.findByRole("button", { name: "가입 상태 다시 확인" }),
+    );
+    await screen.findByText(/현재 커뮤니티 이용 상태/);
+    expect(
+      screen.queryByRole("button", { name: "커뮤니티 가입하기" }),
+    ).toBeNull();
+    expect(communityApi.list).not.toHaveBeenCalled();
+  });
+  it("retries a failed list using the same board without a write", async () => {
+    vi.mocked(partnerApi.me).mockResolvedValue(user);
+    vi.mocked(communityApi.membership).mockResolvedValue({
+      status: "active",
+      operator: false,
+    });
+    vi.mocked(communityApi.list).mockRejectedValueOnce(
+      new Error("목록 일시 실패"),
+    );
+    mount(`/community/boards/${board.id}`);
+    await screen.findByText("목록 일시 실패");
+    fireEvent.click(
+      screen.getByRole("button", { name: "게시글 다시 불러오기" }),
+    );
+    await screen.findByRole("button", { name: "글쓰기" });
+    expect(communityApi.list).toHaveBeenNthCalledWith(2, board.id, "", 1);
+    expect(communityApi.post).not.toHaveBeenCalled();
+  });
+  it("keeps search and page when retrying a failed page read", async () => {
+    vi.mocked(partnerApi.me).mockResolvedValue(user);
+    vi.mocked(communityApi.membership).mockResolvedValue({
+      status: "active",
+      operator: false,
+    });
+    vi.mocked(communityApi.list).mockResolvedValue({
+      items: [],
+      count: 40,
+      page: 1,
+    });
+    mount(`/community/boards/${board.id}`);
+    await screen.findByRole("button", { name: "글쓰기" });
+    fireEvent.change(screen.getByLabelText("글 검색"), {
+      target: { value: "콘텐츠" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "검색", exact: true }));
+    await waitFor(() =>
+      expect(communityApi.list).toHaveBeenLastCalledWith(board.id, "콘텐츠", 1),
+    );
+    await screen.findByRole("button", { name: "다음", exact: true });
+    vi.mocked(communityApi.list).mockRejectedValueOnce(
+      new Error("두 번째 페이지 실패"),
+    );
+    fireEvent.click(screen.getByRole("button", { name: "다음", exact: true }));
+    await screen.findByText("두 번째 페이지 실패");
+    fireEvent.click(
+      screen.getByRole("button", { name: "게시글 다시 불러오기" }),
+    );
+    await screen.findByRole("button", { name: "글쓰기" });
+    expect(communityApi.list).toHaveBeenLastCalledWith(board.id, "콘텐츠", 2);
+    expect((screen.getByLabelText("글 검색") as HTMLInputElement).value).toBe(
+      "콘텐츠",
+    );
+  });
+  it("retries an unavailable post detail at its existing URL", async () => {
+    vi.mocked(partnerApi.me).mockResolvedValue(user);
+    vi.mocked(communityApi.membership).mockResolvedValue({
+      status: "active",
+      operator: false,
+    });
+    vi.mocked(communityApi.detail)
+      .mockRejectedValueOnce(new Error("본문 일시 실패"))
+      .mockResolvedValue({
+        id: board.id,
+        board_id: board.id,
+        title: "복구한 글",
+        body: "복구한 본문",
+        author_id: user.id,
+        author_name: "회원 A",
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        revision: 0,
+        state: "published",
+        pinned: false,
+        comments: [],
+      });
+    mount(`/community/posts/${board.id}`);
+    await screen.findByText("본문 일시 실패");
+    fireEvent.click(
+      screen.getByRole("button", { name: "게시글 다시 불러오기" }),
+    );
+    await screen.findByRole("heading", { name: "복구한 글" });
+    expect(communityApi.detail).toHaveBeenNthCalledWith(2, board.id);
+  });
+
   it("clears the visible member session and operator menu even when server logout fails", async () => {
     vi.mocked(partnerApi.me).mockResolvedValue(user);
     vi.mocked(communityApi.membership).mockResolvedValue({
@@ -291,14 +446,20 @@ describe("Partner public entry, login, opt-in and community", () => {
   });
 });
 
-it('returns to the requested workspace tab after login without replacing the invitation/session handler', async () => {
-  vi.mocked(partnerApi.me).mockRejectedValueOnce(new ApiError(401, 'UNAUTHENTICATED')).mockResolvedValue(user);
+it("returns to the requested workspace tab after login without replacing the invitation/session handler", async () => {
+  vi.mocked(partnerApi.me)
+    .mockRejectedValueOnce(new ApiError(401, "UNAUTHENTICATED"))
+    .mockResolvedValue(user);
   vi.mocked(partnerApi.login).mockResolvedValue({});
-  mount('/login?returnTo=%2Fworkspace%3Fmode%3Dlocal%23assets');
-  await screen.findByRole('heading', { name: 'O4O 계정 로그인' });
-  fireEvent.change(screen.getByLabelText('이메일'), { target: { value: 'fixture@example.test' } });
-  fireEvent.change(screen.getByLabelText('비밀번호'), { target: { value: 'synthetic-input-only' } });
-  fireEvent.submit(screen.getByLabelText('이메일').closest('form')!);
-  await screen.findByText('資料作業空間');
+  mount("/login?returnTo=%2Fworkspace%3Fmode%3Dlocal%23assets");
+  await screen.findByRole("heading", { name: "O4O 계정 로그인" });
+  fireEvent.change(screen.getByLabelText("이메일"), {
+    target: { value: "fixture@example.test" },
+  });
+  fireEvent.change(screen.getByLabelText("비밀번호"), {
+    target: { value: "synthetic-input-only" },
+  });
+  fireEvent.submit(screen.getByLabelText("이메일").closest("form")!);
+  await screen.findByText("資料作業空間");
   expect(partnerApi.login).toHaveBeenCalledTimes(1);
 });

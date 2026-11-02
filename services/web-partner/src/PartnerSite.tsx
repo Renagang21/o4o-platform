@@ -89,9 +89,15 @@ export default function PartnerSite() {
     [policies, setPolicies] = useState<CommunityPolicy[]>([]),
     [password, setPassword] = useState("");
   const [policiesReady, setPoliciesReady] = useState(false);
+  const [membershipReady, setMembershipReady] = useState(false);
+  const [loadAttempt, setLoadAttempt] = useState(0);
+  const [initialLoadErrors, setInitialLoadErrors] = useState<string[]>([]);
   const running = useRef(false);
   const reloadMembership = async () => {
+    setMembershipReady(false);
+    setMembership({ status: null, operator: false });
     setMembership(await communityApi.membership());
+    setMembershipReady(true);
   };
   const run: Run = async (work) => {
     if (running.current) return;
@@ -114,6 +120,13 @@ export default function PartnerSite() {
   };
   useEffect(() => {
     let active = true;
+    setReady(false);
+    setUser(null);
+    setMembership({ status: null, operator: false });
+    setMembershipReady(false);
+    setPoliciesReady(false);
+    setInitialLoadErrors([]);
+    const issues: string[] = [];
     void Promise.allSettled([
       communityApi.boards(),
       communityApi.policies(),
@@ -121,24 +134,23 @@ export default function PartnerSite() {
     ]).then(async (results) => {
       if (!active) return;
       if (results[0].status === "fulfilled") setBoards(results[0].value);
-      else
-        setError("게시판을 불러오지 못했습니다. 잠시 후 다시 확인해 주세요.");
+      else issues.push("게시판을 불러오지 못했습니다.");
       if (results[1].status === "fulfilled") {
         setPolicies(results[1].value);
         setPoliciesReady(true);
-      } else
-        setError(
-          "서비스 이용 안내를 불러오지 못했습니다. 페이지를 새로 열어 주세요.",
-        );
+      } else issues.push("서비스 이용 안내를 불러오지 못했습니다.");
       const session = results[2];
       if (session.status === "fulfilled") {
         setUser(session.value);
         try {
           const m = await communityApi.membership();
-          if (active) setMembership(m);
+          if (active) {
+            setMembership(m);
+            setMembershipReady(true);
+          }
         } catch (e) {
           if (active)
-            setError(
+            issues.push(
               e instanceof Error
                 ? e.message
                 : "가입 상태를 확인하지 못했습니다.",
@@ -147,17 +159,20 @@ export default function PartnerSite() {
       } else if (
         !(session.reason instanceof ApiError && session.reason.status === 401)
       )
-        setError(
+        issues.push(
           session.reason instanceof Error
             ? session.reason.message
             : "계정 연결을 확인하지 못했습니다.",
         );
-      if (active) setReady(true);
+      if (active) {
+        setInitialLoadErrors(issues);
+        setReady(true);
+      }
     });
     return () => {
       active = false;
     };
-  }, []);
+  }, [loadAttempt]);
   const login = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const data = new FormData(e.currentTarget);
@@ -196,7 +211,7 @@ export default function PartnerSite() {
     new URLSearchParams(location.search).get("mode") === "local";
   const operator = location.pathname.startsWith("/operator");
   const loginPage = location.pathname === "/login";
-  const member = membership.status === "active";
+  const member = membershipReady && membership.status === "active";
   return (
     <>
       <GlobalHeader
@@ -253,7 +268,7 @@ export default function PartnerSite() {
           </span>
         }
         accountSlot={
-          user ? (
+          ready && user ? (
             <ServiceAccountMenu
               displayName={user.displayName || user.name || "회원"}
               onLogout={() =>
@@ -278,6 +293,23 @@ export default function PartnerSite() {
           <p role="alert" className="message failure">
             {error}
           </p>
+        )}
+        {initialLoadErrors.length > 0 && (
+          <section className="panel" aria-label="커뮤니티 연결 확인">
+            <div role="alert">
+              {initialLoadErrors.map((issue, index) => (
+                <p key={`${index}-${issue}`}>{issue}</p>
+              ))}
+            </div>
+            <button
+              type="button"
+              className="button quiet"
+              disabled={busy || !ready}
+              onClick={() => setLoadAttempt((attempt) => attempt + 1)}
+            >
+              연결 다시 확인
+            </button>
+          </section>
         )}
         {message && (
           <p role="status" className="message success">
@@ -382,6 +414,18 @@ export default function PartnerSite() {
                       로그인하고 참여하기
                     </Link>
                   </>
+                ) : !membershipReady ? (
+                  <div>
+                    <p>가입 상태를 확인한 뒤 커뮤니티에 참여할 수 있습니다.</p>
+                    <button
+                      type="button"
+                      className="button quiet"
+                      disabled={busy || !ready}
+                      onClick={() => setLoadAttempt((attempt) => attempt + 1)}
+                    >
+                      가입 상태 다시 확인
+                    </button>
+                  </div>
                 ) : membership.status ? (
                   <p>
                     현재 커뮤니티 이용 상태:{" "}
@@ -396,6 +440,7 @@ export default function PartnerSite() {
                       e.preventDefault();
                       void run(async () => {
                         setMembership(await communityApi.join(policies));
+                        setMembershipReady(true);
                         setMessage("파트너 커뮤니티에 가입했습니다.");
                       });
                     }}
@@ -524,6 +569,7 @@ function CommunityContent({
     [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true),
     [loadError, setLoadError] = useState(""),
+    [readAttempt, setReadAttempt] = useState(0),
     [writing, setWriting] = useState(false),
     [editing, setEditing] = useState(false),
     [title, setTitle] = useState(""),
@@ -570,14 +616,24 @@ function CommunityContent({
     return () => {
       active = false;
     };
-  }, [postId, boardId, page, search]);
+  }, [postId, boardId, page, search, readAttempt]);
   const action = (work: () => Promise<void>) => void run(work);
   if (loading) return <p role="status">게시글을 불러오고 있습니다…</p>;
   if (loadError)
     return (
-      <p role="alert" className="message failure">
-        {loadError}
-      </p>
+      <section className="panel">
+        <p role="alert" className="message failure">
+          {loadError}
+        </p>
+        <button
+          type="button"
+          className="button quiet"
+          disabled={busy}
+          onClick={() => setReadAttempt((attempt) => attempt + 1)}
+        >
+          게시글 다시 불러오기
+        </button>
+      </section>
     );
   const editor = (onSubmit: () => Promise<void>): ReactNode => (
     <form
