@@ -33,5 +33,5 @@ it('uses the same permitted tree in a mobile dialog and closes on selection with
 });
 it('does not expose ungranted businesses or add a fold for a group with one available task',()=>{
  view('/operations/supplier/inbox',CENTRAL_OPERATION_MENUS.filter(m=>m.key==='supplier.inbox'));
- expect(screen.queryByRole('button',{name:'약국·공통 운영'})).toBeNull();expect(screen.queryByRole('button',{name:'문의·알림'})).toBeNull();expect(screen.getByRole('link',{name:'운영 알림·문의함'})).toBeTruthy();expect(screen.queryByRole('link',{name:'공급자 상태 관리'})).toBeNull();
+ expect(screen.queryByRole('button',{name:'약국·공통 운영'})).toBeNull();expect(screen.queryByRole('button',{name:'문의·알림'})).toBeNull();expect(screen.getByRole('link',{name:'문의 접수·처리 / 운영 업무함'})).toBeTruthy();expect(screen.queryByRole('link',{name:'공급자 상태 관리'})).toBeNull();
 });

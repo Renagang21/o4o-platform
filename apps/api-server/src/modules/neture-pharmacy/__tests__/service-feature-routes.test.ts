@@ -1,3 +1,4 @@
+import './fixtures/isolated-router-services.cjs';
 jest.mock('../../../database/connection.js',()=>({AppDataSource:{query:jest.fn(async()=>[])}}));
 import express from 'express';
 import request from 'supertest';
@@ -22,11 +23,7 @@ jest.mock('../pharmacy-store-access.js', () => ({
     next();
   },
 }));
-jest.mock('../../../services/checkout.service.js', () => ({ checkoutService: {} }));
-jest.mock('../../../routes/kpa/services/event-offer.service.js', () => ({ EventOfferService: class {} }));
-jest.mock('../services/pharmacy-store-provisioner.js', () => ({ createPharmacyStoreProvisioner: () => ({}) }));
-jest.mock('@o4o/asset-copy-core', () => ({ AssetCopyService: class {} }), { virtual: true });
-jest.mock('../services/business-registration-document.service.js', () => ({ BusinessRegistrationDocumentService: class {} }));
+
 
 const query = jest.fn();
 function app() {

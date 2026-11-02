@@ -1,3 +1,4 @@
+import { CENTRAL_CONTACT_MENUS, centralContactRecipients, centralContactTarget } from './central-contact-access.js';
 import type { DataSource } from "typeorm";
 import {
   OperationError,
@@ -47,7 +48,11 @@ export async function retryInboxNotification(
       );
       enabled = settings?.in_app_notification_enabled !== false;
     }
-    const recipients = enabled ? await inboxRecipients(manager, scope) : [];
+    const centralMenu = scope.kind === 'service' ? CENTRAL_CONTACT_MENUS[scope.serviceKey] : undefined;
+    const notificationServiceKey = centralMenu?.split('.')[0] ?? inboxNotificationServiceKey(scope);
+    const recipients = !enabled ? [] : centralMenu
+      ? await centralContactRecipients(manager, centralMenu)
+      : await inboxRecipients(manager, scope);
     let created = 0;
     for (const recipient of recipients) {
       const [existing] = await manager.query(
@@ -56,7 +61,7 @@ export async function retryInboxNotification(
          AND channel='in_app' AND metadata->>'contactInquiryId'=$4 LIMIT 1`,
         [
           recipient.userId,
-          inboxNotificationServiceKey(scope),
+          notificationServiceKey,
           scope.organizationId,
           contactId,
         ],
@@ -67,13 +72,14 @@ export async function retryInboxNotification(
          VALUES($1,$2,$3,'contact.new',$4,$5,$6::jsonb,'in_app',false)`,
         [
           recipient.userId,
-          inboxNotificationServiceKey(scope),
+          notificationServiceKey,
           scope.organizationId,
           `${scope.name} 새 문의`,
           contact.subject,
           JSON.stringify({
             contactInquiryId: contactId,
-            targetUrl: inboxNotificationTarget(scope),
+            targetUrl: centralMenu ? centralContactTarget(scope.serviceKey) : inboxNotificationTarget(scope),
+            ...(centralMenu ? { operationMenu: centralMenu, sourceServiceKey: scope.serviceKey } : {}),
           }),
         ],
       );
