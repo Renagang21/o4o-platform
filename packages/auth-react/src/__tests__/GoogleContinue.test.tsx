@@ -47,6 +47,19 @@ function mount(overrides: Partial<Parameters<typeof GoogleContinue>[0]> = {}) {
   return props;
 }
 
+it('다른 가입 방식으로 이동한 뒤 도착한 Google 인증 응답으로 로그인을 시작하지 않는다', async () => {
+  const onStart = vi.fn();
+  const props = mount({ personalizedButton: false, onStart });
+  await waitFor(() => expect(captured).not.toBeNull());
+  const lateCredential = captured!.onCredential;
+  cleanup();
+  await act(async () => { lateCredential('synthetic-late-google-proof'); });
+  expect(onStart).not.toHaveBeenCalled();
+  expect(props.loginWithGoogle).not.toHaveBeenCalled();
+  expect(props.signupWithGoogle).not.toHaveBeenCalled();
+  expect(props.onSuccess).not.toHaveBeenCalled();
+});
+
 describe('GoogleContinue — 준비 상태', () => {
   it('allowlist 가 비어 있으면(enabled=false) 버튼 대신 "준비 중" 을 보여주고 GIS 를 로드하지 않는다', async () => {
     mount({ getSignupTerms: vi.fn(async () => TERMS),
