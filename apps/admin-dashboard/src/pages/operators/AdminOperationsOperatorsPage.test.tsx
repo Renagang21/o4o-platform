@@ -2,7 +2,6 @@ import { StrictMode } from 'react';
 import { afterEach, expect, it, vi } from 'vitest';
 import { cleanup, act, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import { CENTRAL_OPERATION_MENUS } from '@o4o/types';
 const api=vi.hoisted(()=>({get:vi.fn(),post:vi.fn()}));
 vi.mock('@o4o/auth-client',()=>({authClient:{api}}));
 import AdminOperationsOperatorsPage from './AdminOperationsOperatorsPage';
@@ -13,24 +12,24 @@ function mount(rows: unknown[]=[]){
  render(<MemoryRouter><AdminOperationsOperatorsPage /></MemoryRouter>);
 }
 afterEach(()=>{cleanup();vi.clearAllMocks();});
-it('sends one workspace invitation with duties, without selecting a service or Admin role',async()=>{
+it('sends a recipient-only invitation without selecting duties, service or Admin role',async()=>{
  mount();await screen.findByText('지정된 업무 운영자가 없습니다.');
  fireEvent.click(screen.getByRole('button',{name:'업무 운영자 초대'}));const dialog=screen.getByRole('dialog',{name:'업무 운영자 초대'});
  expect(within(dialog).queryByText('대상 서비스')).toBeNull();expect(within(dialog).queryByText('서비스 관리자')).toBeNull();
  fireEvent.change(within(dialog).getByLabelText('미가입자 초대 이메일'),{target:{value:'new@example.test'}});
  fireEvent.click(within(dialog).getByRole('button',{name:'초대 메일 보내기'}));
- await waitFor(()=>expect(api.post).toHaveBeenCalledWith('/admin/operations-operators',{email:'new@example.test',menuKeys:CENTRAL_OPERATION_MENUS.filter(menu=>menu.minimumRole==='operator').map(menu=>menu.key)}));
+ await waitFor(()=>expect(api.post).toHaveBeenCalledWith('/admin/operations-operators',{email:'new@example.test'}));
  expect(await screen.findByRole('status')).toHaveTextContent('업무 운영자 초대 메일을 발송했습니다.');
 });
-it('selects a verified account identity and only the selected daily duties',async()=>{
+it('selects a verified account without asking for duties',async()=>{
  mount();await screen.findByText('지정된 업무 운영자가 없습니다.');fireEvent.click(screen.getByRole('button',{name:'업무 운영자 초대'}));
  const dialog=within(screen.getByRole('dialog'));
  fireEvent.change(dialog.getByLabelText('기존 사용자 검색'),{target:{value:'candidate'}});fireEvent.click(dialog.getByRole('button',{name:'사용자 검색'}));
- fireEvent.click(await dialog.findByRole('radio',{name:/Synthetic candidate/}));fireEvent.click(dialog.getByText(/개 · 선택 변경/));fireEvent.click(dialog.getByRole('button',{name:'선택 해제'}));
- expect(dialog.getByRole('button',{name:'초대 메일 보내기'})).toBeDisabled();
- fireEvent.click(dialog.getByRole('checkbox',{name:'공통 회원 관리'}));
+ fireEvent.click(await dialog.findByRole('radio',{name:/Synthetic candidate/}));
+ expect(dialog.queryByRole('checkbox')).toBeNull();
+ expect(dialog.getByText(/일상업무 전체를 기본으로 제공합니다/)).toBeTruthy();
  fireEvent.click(dialog.getByRole('button',{name:'초대 메일 보내기'}));
- await waitFor(()=>expect(api.post).toHaveBeenCalledWith('/admin/operations-operators',{targetUserId:'fixture-target',menuKeys:['neture.members']}));
+ await waitFor(()=>expect(api.post).toHaveBeenCalledWith('/admin/operations-operators',{targetUserId:'fixture-target'}));
 });
 it('edits duties with the loaded version and a reason, then reports server conflicts',async()=>{
  mount([operator]);await screen.findByText(/Synthetic operator/);fireEvent.click(screen.getByRole('button',{name:'담당 업무 변경'}));

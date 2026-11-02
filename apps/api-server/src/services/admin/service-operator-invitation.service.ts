@@ -233,8 +233,9 @@ export class ServiceOperatorInvitationService {
     );
     const workspace = isAdminOperationsInvitation(scope);
     const central = workspace || scope.scope_type === 'platform' && scope.scope_key === CENTRAL_DELEGATION_SCOPE;
+    if (workspace && input.menuKeys !== undefined) fail('OPERATIONS_INVITATION_REFRESH_REQUIRED', 400);
     if (!central && input.menuKeys !== undefined) fail('INVALID_INVITATION_INPUT', 400);
-    const menuKeys = workspace ? validateAdminOperationsMenus(input.menuKeys === undefined ? ADMIN_OPERATIONS_OPERATOR_MENUS.map(menu => menu.key) : input.menuKeys) : central ? validateCentralMenuKeys(scope.role, input.menuKeys ?? centralMenusForRole(scope.role).map(menu => menu.key)) : null;
+    const menuKeys = workspace ? ADMIN_OPERATIONS_OPERATOR_MENUS.map(menu => menu.key) : central ? validateCentralMenuKeys(scope.role, input.menuKeys ?? centralMenusForRole(scope.role).map(menu => menu.key)) : null;
     // Target lock precedes every role/cooperative mutation, including acceptance and revocation.
     if (input.targetUserId)
       await lockOperatorAssignments(m, input.targetUserId);
@@ -254,7 +255,7 @@ export class ServiceOperatorInvitationService {
     )
       fail("USER_SELECTION_REQUIRED");
     if (user) {
-      if (workspace) await assertOperationsTarget(m, user.id, menuKeys!);
+      if (workspace) await assertOperationsTarget(m, user.id);
       else await this.requireUnassignedRole(m, scope, user.id);
     }
     await m.query("SELECT pg_advisory_xact_lock(hashtextextended($1,0))", [
@@ -284,7 +285,7 @@ export class ServiceOperatorInvitationService {
       // Same permission and same selected account only. Never rebind another pending invitation.
       if ((prior.target_user_id ?? null) !== (user?.id ?? null)) fail("INVITATION_ACCOUNT_MISMATCH", 403);
       const rotated = await this.rotate(m, prior, input.actorId);
-      if (menuKeys !== null) await this.saveInvitationMenus(m, prior.id, menuKeys);
+      if (menuKeys !== null) await this.saveInvitationMenus(m, prior.id, menuKeys, workspace);
       return rotated;
     }
     const token = randomBytes(32).toString("hex"),
@@ -307,7 +308,7 @@ export class ServiceOperatorInvitationService {
         now,
       ],
     );
-    if (menuKeys !== null) await this.saveInvitationMenus(m, invite.id, menuKeys);
+    if (menuKeys !== null) await this.saveInvitationMenus(m, invite.id, menuKeys, workspace);
     return {
       invite,
       url: `${getServiceOrigin("neture")}/operator-invite#token=${token}`,
@@ -430,6 +431,7 @@ export class ServiceOperatorInvitationService {
     scopeName?: string;
     centralDelegation?: boolean;
     adminOperations?: boolean;
+    defaultDailyDuties?: boolean;
     menuKeys?: string[];
     menuLabels?: string[];
   }> {
@@ -456,7 +458,7 @@ export class ServiceOperatorInvitationService {
       }
       const workspace = isAdminOperationsInvitation(i);
       const central = workspace || i.scope_type === 'platform' && i.scope_key === CENTRAL_DELEGATION_SCOPE;
-      const [grant] = central ? await m.query('SELECT menu_keys FROM central_operation_menu_grants WHERE invitation_id=$1', [i.id]) : [];
+      const [grant] = central ? await m.query('SELECT menu_keys,admin_operations FROM central_operation_menu_grants WHERE invitation_id=$1', [i.id]) : [];
       if (workspace) validateAdminOperationsMenus(grant?.menu_keys);
       const menus = central ? (workspace ? ADMIN_OPERATIONS_OPERATOR_MENUS : centralMenusForRole(i.role)).filter(menu => !grant || grant.menu_keys.includes(menu.key)) : [];
       return {
@@ -465,14 +467,14 @@ export class ServiceOperatorInvitationService {
         role: i.role,
         purpose: i.purpose,
         centralDelegation: central,
-        ...(workspace ? { adminOperations: true } : {}),
+        ...(workspace ? { adminOperations: true, defaultDailyDuties: grant?.admin_operations === true } : {}),
         ...(scopeName ? { scopeName: workspace ? '관리자 사이트' : scopeName } : {}),
       };
     });
   }
-  private async saveInvitationMenus(m: EntityManager, invitationId: string, keys: string[]) {
-    await m.query(`INSERT INTO central_operation_menu_grants(invitation_id,menu_keys) VALUES($1,$2)
-      ON CONFLICT(invitation_id) DO UPDATE SET menu_keys=$2,updated_at=clock_timestamp()`, [invitationId, keys]);
+  private async saveInvitationMenus(m: EntityManager, invitationId: string, keys: string[], workspace: boolean) {
+    await m.query(`INSERT INTO central_operation_menu_grants(invitation_id,menu_keys,admin_operations) VALUES($1,$2,$3)
+      ON CONFLICT(invitation_id) DO UPDATE SET menu_keys=$2,admin_operations=$3,updated_at=clock_timestamp()`, [invitationId, keys, workspace]);
   }
   private async recordAcceptedAssignment(m: EntityManager, invite: OperatorInvite, userId: string, menuKeys?: string[]) {
     if (isAdminOperationsInvitation(invite)) return; // Per-role workspace audit is already recorded by the role activation helper.

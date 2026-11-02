@@ -127,6 +127,8 @@ import { AddAssistantStorageAuthority1793322213345 } from '../migrations/1793322
 
 import { RenameDrugstoreCooperation1793457683032 } from '../migrations/1793457683032-RenameDrugstoreCooperation.js';
 
+import { AddAdminOperationsDelegation1793586897000 } from '../migrations/1793586897000-AddAdminOperationsDelegation.js';
+
 export const INCREMENTAL_MIGRATIONS: readonly MigrationClass[] = [
   CreateStoreOwnerTerminationCases1789701000000,
   AlterHandoffTokensTargetWorkspace1789974015939,
@@ -181,6 +183,7 @@ export const INCREMENTAL_MIGRATIONS: readonly MigrationClass[] = [
   CreateAssistantWorkData1793257200000,
   AddAssistantStorageAuthority1793322213345,
   RenameDrugstoreCooperation1793457683032,
+  AddAdminOperationsDelegation1793586897000,
 ];
 
 export function incrementalMigrationNames(): string[] {

@@ -1,3 +1,4 @@
+import { ADMIN_OPERATIONS_OPERATOR_ROLES } from './admin-operations-operator-contract.js';
 import { centralMenusForRole, centralServiceForRole, type CentralOperationService } from '@o4o/types';
 import type { DataSource, EntityManager } from 'typeorm';
 import { CENTRAL_DELEGATION_SCOPE } from '../../config/operator-role-catalog.js';
@@ -22,9 +23,9 @@ export async function centralOperationMenuKeys(db: Db, userId: string, roles: re
   const assignments: Array<{ role: string; menuKeys: string[] | null }> = await db.query(
     `SELECT ra.role,g.menu_keys AS "menuKeys" FROM role_assignments ra
      LEFT JOIN central_operation_menu_grants g ON g.assignment_id=ra.id
-     WHERE ra.user_id=$1 AND ra.role=ANY($2::text[]) AND ra.scope_type=$3 AND ra.is_active=true
+     WHERE ra.user_id=$1 AND ra.role=ANY($2::text[]) AND (ra.scope_type=$3 OR (ra.role=ANY($4::text[]) AND g.admin_operations=true)) AND ra.is_active=true
      AND (ra.valid_from IS NULL OR ra.valid_from<=now()) AND (ra.valid_until IS NULL OR ra.valid_until>=now())`,
-    [userId, roles, CENTRAL_DELEGATION_SCOPE],
+    [userId, roles, CENTRAL_DELEGATION_SCOPE, ADMIN_OPERATIONS_OPERATOR_ROLES],
   );
   return [...new Set(assignments.flatMap(assignment => {
     const available = centralMenusForRole(assignment.role).map(menu => menu.key);
@@ -63,8 +64,10 @@ async function platformAdmin(db: Db, actor: string) {
     throw new OperationError(403, 'CENTRAL_MENU_ADMIN_REQUIRED', '통합 관리자의 업무 위임 권한이 필요합니다.');
 }
 async function assignment(db: Db, userId: string, role: string, lock = false) {
-  const [row] = await db.query(`SELECT id FROM role_assignments WHERE user_id=$1 AND role=$2 AND is_active=true AND scope_type=$3
-    AND (valid_from IS NULL OR valid_from<=now()) AND (valid_until IS NULL OR valid_until>=now()) ${lock ? 'FOR UPDATE' : ''}`, [userId, role, CENTRAL_DELEGATION_SCOPE]);
+  const [row] = await db.query(`SELECT id FROM role_assignments ra WHERE user_id=$1 AND role=$2 AND is_active=true
+    AND (scope_type=$3 OR (role=ANY($4::text[]) AND EXISTS (
+      SELECT 1 FROM central_operation_menu_grants g WHERE g.assignment_id=ra.id AND g.admin_operations=true)))
+    AND (valid_from IS NULL OR valid_from<=now()) AND (valid_until IS NULL OR valid_until>=now()) ${lock ? 'FOR UPDATE' : ''}`, [userId, role, CENTRAL_DELEGATION_SCOPE, ADMIN_OPERATIONS_OPERATOR_ROLES]);
   if (!row || !centralMenusForRole(role).length || role === 'platform:super_admin')
     throw new OperationError(404, 'CENTRAL_ASSIGNMENT_NOT_FOUND', '유효한 직영 업무 위임을 찾을 수 없습니다. 초대 수락과 역할 유효기간을 확인해 주세요.');
   return String(row.id);

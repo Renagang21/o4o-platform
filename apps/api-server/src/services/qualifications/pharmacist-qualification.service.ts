@@ -1,5 +1,5 @@
 import { notifyQualification } from './pharmacist-qualification-notifications.js';
-import { assertCentralOperationMenu } from '../admin/central-operation-menu-grants.js';
+import { centralOperationMenuKeys } from '../admin/central-operation-menu-grants.js';
 import type { DataSource, EntityManager } from "typeorm";
 import { getNetureMainMembershipStatus } from "../../modules/neture/services/neture-main-membership.js";
 import { centralOperationRoles } from "../admin/central-operation-access.js";
@@ -50,7 +50,10 @@ async function reviewer(m: Exec, actor: string, lock = false, areas = ['qualific
     )
   )
     throw denied();
-  await assertCentralOperationMenu(m, actor, 'neture', areas.map(area => `neture.${area}`));
+  // This is a central-only workflow: an independently held service role cannot bypass its menu grants.
+  const keys = await centralOperationMenuKeys(m, actor, roles);
+  if (!areas.some(area => keys.includes(`neture.${area}`)))
+    throw new OperationError(403, 'CENTRAL_MENU_NOT_DELEGATED', '이 업무 메뉴를 위임받지 않았거나 권한이 회수되었습니다.');
 }
 async function account(m: Exec, user: string) {
   const rows = await m.query(
