@@ -6,6 +6,15 @@ import type {
 import logger from '../../../../utils/logger.js';
 import type { NetureService } from '../../neture.service.js';
 
+function respondPrices(res: Response, result: { success: boolean; error?: string }) {
+  if (!result.success) return res.status(result.error === 'NOT_OWNED' ? 403 : 400).json(result);
+  return res.json(result);
+}
+function priceFailure(res: Response, error: unknown, operation: 'fetching' | 'setting') {
+  logger.error(`[Neture API] Error ${operation} service prices:`, error);
+  return res.status(500).json({ success: false, error: 'INTERNAL_ERROR' });
+}
+
 /** HTTP contract handlers; authorization stays on the public controller routes. */
 export function createSupplierDistributionHandlers(
   netureService: Pick<
@@ -61,13 +70,9 @@ export function createSupplierDistributionHandlers(
       try {
         const supplierId = (req as SupplierRequest).supplierId;
         const result = await netureService.getServicePrices(req.params.id, supplierId);
-        if (!result.success) {
-          return res.status(result.error === 'NOT_OWNED' ? 403 : 400).json(result);
-        }
-        res.json(result);
+        return respondPrices(res, result);
       } catch (error) {
-        logger.error('[Neture API] Error fetching service prices:', error);
-        res.status(500).json({ success: false, error: 'INTERNAL_ERROR' });
+        return priceFailure(res, error, 'fetching');
       }
     },
     setPrices: async (req: AuthenticatedRequest, res: Response) => {
@@ -78,13 +83,9 @@ export function createSupplierDistributionHandlers(
           return res.status(400).json({ success: false, error: 'INVALID_PRICES' });
         }
         const result = await netureService.setServicePrices(req.params.id, supplierId, prices);
-        if (!result.success) {
-          return res.status(result.error === 'NOT_OWNED' ? 403 : 400).json(result);
-        }
-        res.json(result);
+        return respondPrices(res, result);
       } catch (error) {
-        logger.error('[Neture API] Error setting service prices:', error);
-        res.status(500).json({ success: false, error: 'INTERNAL_ERROR' });
+        return priceFailure(res, error, 'setting');
       }
     },
   };
