@@ -49,19 +49,26 @@ Neture의 `SignupPage`에서 Google·카카오를 먼저 표시하고 이메일 
 
 기존 `/mypage/settings`에는 `SocialAccountConnections`와 `PasswordSecuritySettings`가 이미 연결돼 있다. 현재 계정 재인증, 연결할 Google·카카오 계정 인증, 명시적 최종 확인을 거쳐 같은 O4O 계정의 로그인 수단을 추가한다. 같은 계정의 이메일 비밀번호도 설정할 수 있다. 다른 계정에 이미 연결된 소셜 identity는 서버가 충돌로 거절하며, 이메일 일치만으로 합치지 않는다.
 
-따라서 한 O4O 계정에서 Google·카카오·이메일을 사용하는 기능은 기존 구현을 재사용한다. 별도로 이미 생성한 O4O 계정들의 자료·업무 권한을 병합하거나 여러 동일 제공자 아이디를 묶는 기능을 완료했다고 주장하지 않는다. 사용자가 뜻한 통합 범위는 별도 확인 질문으로 구분했다. 이 조사에서 실제 계정 연결·자료 이전·권한 합산을 실행하지 않았다.
+따라서 한 O4O 계정에서 Google·카카오·이메일을 사용하는 기능은 기존 구현을 재사용한다. 별도로 이미 생성한 O4O 계정들의 자료·업무 권한을 병합하거나 여러 동일 제공자 아이디를 묶는 기능을 완료했다고 주장하지 않는다. 이 조사에서 실제 계정 연결·자료 이전·권한 합산을 실행하지 않았다.
+
+후속 사용자 결정으로 통합 범위 확인은 종료했다. 가입 아이디 자동 검색·별도 계정 자료/권한 병합은 추가하지 않고 관리자도 병합을 지원하지 않는다. 기존 현재 계정의 로그인 수단 연결은 유지하며 가입 화면에 통합 안내·사용자 책임 문구를 넣지 않는다.
+
+코드 조사에서 과거 `account-linking.service.ts`와 계정 병합 함수는 이미 은퇴했고 현재 관리자 UI/API·운영 스크립트에도 별도 계정 병합 경로가 없음을 확인했다. 기존 부재 고정 회귀 `auth-runtime-and-legacy-package-final-closure.spec.ts`와 `googleIdentityNoEmailMergeGuard.test.ts`를 재사용한다. 제거할 현행 병합 기능이 없으므로 로그인 수단 연결·관리자 회원 조회/관리·기존 계정/자료를 삭제하지 않는다. 정책을 인증·My Home·Identity 정본에 반영한다.
 
 ## 실행 검증
 
 - `pnpm install --frozen-lockfile --offline` 및 `pnpm run build:packages` PASS. dependency·lockfile 변경 없음.
 - Auth React 기존 전체 회귀 **23 files / 283 tests PASS**. Google 동의·카카오 상태·이메일 인증·비밀번호 설정·현재 계정과 연결할 계정의 별도 인증/최종 확인 계약을 포함한다.
 - Auth Client 기존 전체 회귀 **5 files / 40 tests PASS**. 기존 SDK·소셜 인증 transport 계약을 확인했다.
+- 기존 계정 병합/이메일 자동 병합 부재 고정 검사 **2 suites / 26 tests PASS**. DB·네트워크 접근 없이 제거된 서비스·함수와 권한 병합 경로가 재유입되지 않았음을 확인했다.
 - Neture 이메일 확인/로그인 모달 기존 회귀 **2 files / 15 tests PASS**. Neture production build PASS.
 - 실제 Chromium **1365/820/390px PASS**. 첫 화면에서 Google→카카오→이메일 선택이 스크롤 없이 보임, 계정 추천을 끄는 SDK 옵션 전달, Google 동의 전 가입 미실행, 이메일 전환 후 지연 Google 응답의 로그인 시작 차단, 이메일 요청 1회, 확인 메일 안내에 소셜 버튼 없음, 가로 넘침·pageerror·외부 요청 0을 확인했다.
 - 브라우저는 실제 `SignupPage`·공통 인증 컴포넌트·실제 CSS와 합성 provider를 사용했다. 실제 Google 계정·카카오 인증·메일 전송·운영 회원 데이터는 사용하지 않았다. Google 실서비스의 인증 성공이나 계정 병합 검증을 뜻하지 않는다.
 - 캡처 `/tmp/o4o-signup-method-{1365,820,390}.png`, 메일 안내 캡처 `/tmp/o4o-signup-email-notice-{1365,820,390}.png`, 로컬 결과 `/tmp/o4o-signup-method-browser-results.json`은 합성 검증 증거다. 사용자 화면의 개인정보는 복사하지 않았다.
-- 변경 TypeScript ESLint 오류 0. 변경 문서 3개 민감정보 패턴 0건, diff whitespace PASS.
+- 변경 TypeScript ESLint 오류 0. 변경 문서 4개 민감정보 패턴 0건, diff whitespace PASS.
 
 공통 소비처 조사: `GoogleContinue`는 Neture 가입/로그인 모달과 공통 `LoginMethods`에서 사용되며 Neture·약국 업무·지부 인증 context가 관련 타입을 소비한다. 기존 소비처는 선택 옵션을 전달하지 않아 기본 표시와 인증 콜백·동의 계약을 유지한다. API/Identity Core 변경·migration·운영 설정 변경은 없다. 최종 affected CI 및 자동 리뷰 판정은 인계 PR의 최신 HEAD에서 확인한다.
+
+코드 HEAD `15c2405e89`의 PR #924 CI Gate(`41374976694`)·CodeQL·SonarCloud·Codex는 통과했다. 이후 사용자가 계정 병합 미지원·관리자 미지원 정책을 확정해 문서를 보완했다. 후속 문서 HEAD의 최종 CI·리뷰는 같은 PR에서 다시 확인하며 이전 코드 HEAD의 성공으로 대체하지 않는다.
 
 문서 정합: 화면 내 가입 방식 설명과 현재 허용된 세 가지 방식을 맞추고 비밀번호 제보 정정을 기록한다.
