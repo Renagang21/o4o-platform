@@ -34,3 +34,9 @@ Sonar는 신규 코드 중복률 3.7%로 실패했다. 두 facade의 동일한 O
 - 추가 중복 보완: compatibility facade의 관리자·공급자 목록 조회 입력도 실제 담당 read service의 `Parameters` 타입을 참조한다. 런타임 조회·응답·권한 동작은 유지하며 복사된 입력 정의를 제거했다.
 
 - CI의 public Sonar 진단에서 실제 중복은 `supply-response.routes.test.ts` 19–31행과 기존 `service-feature-routes.test.ts`의 router provider mock 13행으로 확인했다. 두 테스트의 관련 없는 provider mock을 공통 fixture로 옮기고 각자의 인증·매장 guard 및 독립 응답 기대값은 유지했다. 기준/제외/환경/권한 설정은 바꾸지 않았다.
+
+## 배포 빌드 후속 보완 (2026-11-02)
+
+첫 Promote `41399413985`는 DB migration·API revision 생성 전에 production TypeScript 검사에서 실패했다. 일반 CI의 tsconfig는 모든 `__tests__`를 제외하지만 배포 tsconfig는 module 내부의 `.ts` fixture를 포함하여 Jest 전역을 찾지 못했다. 공통 mock fixture를 Jest 전용 CommonJS `.cjs`로 바꾸고 두 테스트 import만 맞춘다. 운영 타입·권한·DB·build 설정은 바꾸지 않는다. 실제 배포용 build와 계약 검증을 재실행하며, 실패한 배포를 성공으로 보고하지 않는다.
+
+후속 로컬 검증: API dependency closure PASS, 4 suites/115 tests PASS, `pnpm -C apps/api-server run build`(production tsconfig) PASS, `build:api` tsup PASS. main/migrate entry·migration-config와 migration JS 598개 보존, 테스트 fixture production emit 없음 확인. 실행 시 DB 접속·migration 적용은 하지 않았다.

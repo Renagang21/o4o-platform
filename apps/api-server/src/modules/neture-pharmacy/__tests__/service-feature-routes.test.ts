@@ -1,4 +1,4 @@
-import './fixtures/isolated-router-services.js';
+import './fixtures/isolated-router-services.cjs';
 jest.mock('../../../database/connection.js',()=>({AppDataSource:{query:jest.fn(async()=>[])}}));
 import express from 'express';
 import request from 'supertest';

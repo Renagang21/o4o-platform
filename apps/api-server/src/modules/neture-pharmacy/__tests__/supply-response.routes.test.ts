@@ -1,4 +1,4 @@
-import './fixtures/isolated-router-services.js';
+import './fixtures/isolated-router-services.cjs';
 import express from 'express';
 import request from 'supertest';
 import { createNeturePharmacyRoutes } from '../neture-pharmacy.routes.js';
