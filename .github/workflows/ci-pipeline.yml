@@ -237,7 +237,7 @@ jobs:
       run: node scripts/ci/read-sonar-pr-findings.mjs
     - name: Upload Sonar PR diagnostics
       if: always() && github.event_name == 'pull_request' && !github.event.repository.private && vars.CI_COST_PROFILE != 'budget'
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: sonar-pr-findings
         path: sonar-pr-findings.json
@@ -471,7 +471,7 @@ jobs:
 
     - name: Upload API Jest shadow selection
       if: always() && matrix.shard == 1
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       continue-on-error: true
       with:
         name: api-jest-shadow-${{ github.run_id }}-${{ github.run_attempt }}
