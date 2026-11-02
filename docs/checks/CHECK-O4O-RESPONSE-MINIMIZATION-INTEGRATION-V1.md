@@ -32,3 +32,5 @@ Sonar는 신규 코드 중복률 3.7%로 실패했다. 두 facade의 동일한 O
 이후 HTTP·Offer 쓰기 107 tests와 API TypeScript noEmit을 다시 통과했다. 기존 0/null/undefined 보존·중첩 미래 필드 차단·오류 상태 코드 검증을 유지했다. 새 Sonar 판정은 후속 HEAD의 실제 check에서 확인한다. 최신 main `2e612f6295`와 결합했으며 문의 PR 변경은 이 PR에 섞지 않았다.
 
 - 추가 중복 보완: compatibility facade의 관리자·공급자 목록 조회 입력도 실제 담당 read service의 `Parameters` 타입을 참조한다. 런타임 조회·응답·권한 동작은 유지하며 복사된 입력 정의를 제거했다.
+
+- CI의 public Sonar 진단에서 실제 중복은 `supply-response.routes.test.ts` 19–31행과 기존 `service-feature-routes.test.ts`의 router provider mock 13행으로 확인했다. 두 테스트의 관련 없는 provider mock을 공통 fixture로 옮기고 각자의 인증·매장 guard 및 독립 응답 기대값은 유지했다. 기준/제외/환경/권한 설정은 바꾸지 않았다.
