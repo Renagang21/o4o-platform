@@ -66,3 +66,45 @@ it('ignores an older initial list response after a designation refresh',async()=
   await act(async()=>{ finish({data:{data:[]}}); await old; });
   expect(screen.getByText(/Synthetic operator/)).toBeTruthy();
 });
+
+it('keeps confirmed success visible until acknowledgement and prevents duplicate pending submissions',async()=>{
+ mount();await screen.findByText('지정된 업무 운영자가 없습니다.');fireEvent.click(screen.getByRole('button',{name:'업무 운영자 초대'}));
+ const dialog=within(screen.getByRole('dialog'));const email=dialog.getByLabelText('미가입자 초대 이메일');
+ fireEvent.change(email,{target:{value:'new@example.test'}});
+ let finish!: (value:unknown)=>void;api.post.mockImplementationOnce(()=>new Promise(resolve=>{finish=resolve;}));
+ const send=dialog.getByRole('button',{name:'초대 메일 보내기'});fireEvent.click(send);fireEvent.click(send);
+ expect(api.post).toHaveBeenCalledTimes(1);expect(send).toBeDisabled();expect(email).toBeDisabled();
+ expect(dialog.getByRole('status')).toHaveTextContent('초대 메일 발송을 요청하고 있습니다');
+ await act(async()=>{finish({data:{success:true}});});
+ expect(dialog.getByRole('status')).toHaveTextContent('초대 메일을 발송했습니다');
+ expect(dialog.queryByRole('button',{name:'초대 메일 보내기'})).toBeNull();
+ fireEvent.click(dialog.getByRole('button',{name:'완료'}));expect(screen.queryByRole('dialog')).toBeNull();
+ expect(screen.getByRole('status')).toHaveTextContent('초대 메일을 발송했습니다');
+});
+
+it('renders structured server errors as readable feedback without losing the invite draft',async()=>{
+ mount();await screen.findByText('지정된 업무 운영자가 없습니다.');fireEvent.click(screen.getByRole('button',{name:'업무 운영자 초대'}));
+ const dialog=within(screen.getByRole('dialog'));fireEvent.change(dialog.getByLabelText('미가입자 초대 이메일'),{target:{value:'new@example.test'}});
+ api.post.mockRejectedValueOnce({response:{data:{error:{code:'FORBIDDEN',message:'현재 초대 권한을 확인해 주세요.'}}}});
+ fireEvent.click(dialog.getByRole('button',{name:'초대 메일 보내기'}));
+ expect(await dialog.findByRole('alert')).toHaveTextContent('현재 초대 권한을 확인해 주세요.');
+ expect(dialog.getByLabelText('미가입자 초대 이메일')).toHaveValue('new@example.test');
+ expect(dialog.getByRole('button',{name:'초대 메일 보내기'})).toBeEnabled();
+});
+
+it('does not claim mail was sent for an unconfirmed HTTP success response',async()=>{
+ mount();await screen.findByText('지정된 업무 운영자가 없습니다.');fireEvent.click(screen.getByRole('button',{name:'업무 운영자 초대'}));
+ const dialog=within(screen.getByRole('dialog'));fireEvent.change(dialog.getByLabelText('미가입자 초대 이메일'),{target:{value:'new@example.test'}});
+ api.post.mockResolvedValueOnce({data:{success:false}});fireEvent.click(dialog.getByRole('button',{name:'초대 메일 보내기'}));
+ await dialog.findByRole('alert');expect(dialog.queryByRole('status')).toBeNull();expect(dialog.getByRole('button',{name:'초대 메일 보내기'})).toBeEnabled();
+});
+
+it('offers the existing pending list after mail failure without issuing another invite',async()=>{
+ mount();await screen.findByText('지정된 업무 운영자가 없습니다.');fireEvent.click(screen.getByRole('button',{name:'업무 운영자 초대'}));
+ const dialog=within(screen.getByRole('dialog'));fireEvent.change(dialog.getByLabelText('미가입자 초대 이메일'),{target:{value:'new@example.test'}});
+ api.post.mockRejectedValueOnce({response:{data:{code:'INVITATION_MAIL_FAILED',error:'초대는 저장됐으나 메일 발송을 확인하지 못했습니다.'}}});
+ fireEvent.click(dialog.getByRole('button',{name:'초대 메일 보내기'}));await dialog.findByRole('alert');
+ api.get.mockImplementation(async(path:string)=>({data:{data:path==='/admin/service-operator-invitations'?[{id:'pending',scope_type:'platform',scope_key:'admin-operations',invited_email:'new@example.test',status:'pending',expired:false}]:[]}}));
+ fireEvent.click(dialog.getByRole('button',{name:'초대 목록 확인'}));
+ await screen.findByRole('button',{name:'재발송'});expect(screen.queryByRole('dialog')).toBeNull();expect(api.post).toHaveBeenCalledTimes(1);
+});
