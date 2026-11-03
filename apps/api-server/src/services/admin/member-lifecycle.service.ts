@@ -1,3 +1,4 @@
+import { NETURE_STORE_OWNER_ROLE } from "../../modules/neture-pharmacy/services/pharmacy-store-provisioner.js";
 import { closureInventory } from "../store/store-closure-inventory.js";
 import { withBusinessErasureDisposition } from "../privacy/business-erasure-disposition.js";
 import { StoreOwnerTerminationService } from "../store-owner-termination.service.js";
@@ -19,7 +20,7 @@ async function lockMembers(m: EntityManager, ids: string[]) {
   await m.query(
     "SELECT pg_advisory_xact_lock_shared(hashtextextended('o4o-account-erasure-writes',0))",
   );
-  for (const id of [...new Set(ids)].sort()) {
+  for (const id of [...new Set(ids.map(id=>id.toLowerCase()))].sort((a,b)=>a.localeCompare(b,"en"))) {
     await m.query(
       "SELECT pg_advisory_xact_lock(hashtextextended('store-member:' || $1,0))",
       [id],
@@ -39,6 +40,29 @@ async function protectAccount(m: EntityManager, target: string) {
       "PRIVILEGED_ACCOUNT",
       "운영 권한이 있거나 보호된 계정은 회원 이용 해지로 변경할 수 없습니다.",
     );
+}
+
+async function releaseOwnerMarkers(
+  m: EntityManager,
+  userId: string,
+  organizationId: string,
+) {
+  const otherOwnedStores = await m.query(
+    `SELECT 1 FROM organization_members om JOIN organizations o ON o.id=om.organization_id
+    WHERE om.user_id=$1 AND om.organization_id<>$2 AND om.role='owner' AND om.left_at IS NULL
+    AND o."isActive"=true AND o.type IN ('store','pharmacy') LIMIT 1`,
+    [userId, organizationId],
+  );
+  if (!otherOwnedStores.length)
+    await roleAssignmentService.removeRole(userId, "kpa:store_owner", m);
+  const approvedPharmacies = await m.query(
+    `SELECT 1 FROM neture_pharmacy_memberships p JOIN organizations o ON o.id=p.organization_id
+    JOIN organization_members om ON om.organization_id=p.organization_id AND om.user_id=p.applicant_user_id AND om.role='owner' AND om.left_at IS NULL
+    WHERE p.applicant_user_id=$1 AND p.organization_id<>$2 AND p.status='active' AND o."isActive"=true LIMIT 1`,
+    [userId, organizationId],
+  );
+  if (!approvedPharmacies.length)
+    await roleAssignmentService.removeRole(userId, NETURE_STORE_OWNER_ROLE, m);
 }
 
 /** Personal account, employee access and pharmacy ownership are separate operations. */
@@ -261,17 +285,11 @@ export class MemberLifecycleService {
           const service = new StoreOwnerTerminationService(
             m as unknown as DataSource,
           );
-          const lifecycle =
-            existing ??
-            (await service.createCase({
-              serviceKey: "kpa-society",
-              organizationId,
-              userId: target,
-              requestedBy: actor,
-              returnRequested: false,
-            }));
-          if (!["terminated", "failed"].includes(lifecycle.status))
-            await service.terminateCase(lifecycle.id);
+          const lifecycle = await service.recordFullClosureCase({
+            organizationId,
+            userId: target,
+            actorId: actor,
+          });
           const members: Array<{ user_id: string; role: string }> =
             await m.query(
               `SELECT user_id,role FROM organization_members WHERE organization_id=$1 AND left_at IS NULL FOR UPDATE`,
@@ -286,20 +304,8 @@ export class MemberLifecycleService {
                 "kpa:store_member",
                 m,
               );
-            if (member.role === "owner") {
-              const otherOwnedStores = await m.query(
-                `SELECT 1 FROM organization_members om JOIN organizations o ON o.id=om.organization_id
-                 WHERE om.user_id=$1 AND om.organization_id<>$2 AND om.role='owner'
-                 AND om.left_at IS NULL AND o."isActive"=true AND o.type IN ('store','pharmacy') LIMIT 1`,
-                [member.user_id, organizationId],
-              );
-              if (!otherOwnedStores.length)
-                await roleAssignmentService.removeRole(
-                  member.user_id,
-                  "kpa:store_owner",
-                  m,
-                );
-            }
+            if (member.role === "owner")
+              await releaseOwnerMarkers(m, member.user_id, organizationId);
           }
           await m.query(
             `UPDATE organization_members SET left_at=COALESCE(left_at,now()),updated_at=now() WHERE organization_id=$1`,
@@ -453,7 +459,7 @@ export class MemberLifecycleService {
               "새 경영자의 기존 사업체 소속을 먼저 정리해 주세요.",
             );
           const [qualification] = await m.query(
-            `SELECT license_number FROM kpa_pharmacist_profiles WHERE user_id=$1 AND qualification_status='approved' AND NULLIF(BTRIM(license_number),'') IS NOT NULL FOR SHARE`,
+            `SELECT license_number FROM kpa_pharmacist_profiles WHERE user_id=$1 AND qualification_status='approved' AND license_verified=true AND verified_at IS NOT NULL AND verified_by IS NOT NULL AND NULLIF(BTRIM(license_number),'') IS NOT NULL FOR SHARE`,
             [next.id],
           );
           if (!qualification)
@@ -484,19 +490,14 @@ export class MemberLifecycleService {
           );
           // Registration files stay in their own lifecycle; never erase their manifest here.
           await roleAssignmentService.assignRole(
-            { userId: next.id, role: "kpa:store_owner", assignedBy: actor },
+            {
+              userId: next.id,
+              role: NETURE_STORE_OWNER_ROLE,
+              assignedBy: actor,
+            },
             m,
           );
-          const remaining = await m.query(
-            `SELECT 1 FROM organization_members WHERE user_id=$1 AND role='owner' AND left_at IS NULL LIMIT 1`,
-            [target],
-          );
-          if (!remaining.length)
-            await roleAssignmentService.removeRole(
-              target,
-              "kpa:store_owner",
-              m,
-            );
+          await releaseOwnerMarkers(m, target, organizationId);
           await m.query(
             'UPDATE users SET "refreshTokenFamily"=gen_random_uuid()::text,"updatedAt"=clock_timestamp() WHERE id=ANY($1::uuid[])',
             [[target, next.id]],

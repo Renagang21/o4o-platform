@@ -1,3 +1,5 @@
+import {mayEraseSupplierProfileFile} from '../../../modules/neture/services/supplier-account-erasure.js';
+import { connectDefaultPharmacyMembership } from '../../../modules/neture-pharmacy/services/default-pharmacy-membership.js';
 import { BusinessRegistrationDocumentService } from '../../../modules/neture-pharmacy/services/business-registration-document.service.js';
 import { purgeClosureDocuments } from '../../store/store-closure-files.js';
 import { hardDeleteLectureCourse,lectureDeletionPlan } from '../../../modules/lms/services/lecture-course-cleanup.service.js';
@@ -101,10 +103,16 @@ integration('account erasure — isolated PostgreSQL schema/real sessions', () =
 
   const organization = async (ownerId:string) => {
     const id=randomUUID();
-    await db.query(`INSERT INTO organizations(id,name,code,type,created_by_user_id) VALUES($1,'Synthetic pharmacy',$2,'store',$3)`,[id,id,ownerId]);
+    await db.query(`INSERT INTO organizations(id,name,code,type,created_by_user_id) VALUES($1,'Synthetic pharmacy',$2,'pharmacy',$3)`,[id,id,ownerId]);
     await db.query(`INSERT INTO organization_members(organization_id,user_id,role) VALUES($1,$2,'owner')`,[id,ownerId]);
     return id;
   };
+  async function defaultPharmacyConnection(organizationId:string,applicantId:string){
+    const businessOrg=await organization(fixtureAdminId);await db.query("UPDATE organizations SET type='semi_franchise' WHERE id=$1",[businessOrg]);
+    const [business]=await db.query(`INSERT INTO semi_franchises(key,name,organization_id) VALUES('pharmacy','Synthetic default Pharmacy',$1) RETURNING id`,[businessOrg]);
+    await connectDefaultPharmacyMembership(db.manager,{organizationId,applicantId,approvedBy:fixtureAdminId,actorId:fixtureAdminId});
+    return business.id;
+  }
   it('normal signup/login records are minimized without retaining a profile or resetting retention clocks',async()=>{
     const target=await user(),peer=await user(),anchor='2026-10-20T09:00:00.000Z';
     const [login]=await db.query(`INSERT INTO login_attempts(email,"userAgent","failureReason",success,"createdAt") VALUES($1,$2::text,$2::text,false,$3) RETURNING id`,[target.email,target.email,anchor]);
@@ -161,8 +169,9 @@ integration('account erasure — isolated PostgreSQL schema/real sessions', () =
     expect((await db.query(`SELECT status FROM service_memberships WHERE user_id=$1 AND service_key='lecture'`,[employee.id]))[0].status).toBe('active');
     expect((await db.query('SELECT "refreshTokenFamily" FROM users WHERE id=$1',[employee.id]))[0].refreshTokenFamily).toBe(before.refreshTokenFamily);
   });
-  it('account erasure detaches business and resource attribution while preserving products, forum replies and courses',async()=>{
+  it.each(['staff','admin','manager'])('%s account erasure detaches business attribution while preserving products, peer replies and courses',async(role)=>{
     const owner=await user(),employee=await user(),peer=await user(),org=await organization(owner.id);
+    await db.query('INSERT INTO organization_members(organization_id,user_id,role) VALUES($1,$2,$3)',[org,employee.id,role]);
     const [catalog]=await db.query(`INSERT INTO catalog_products(name,regulatory_type,created_by) VALUES('Synthetic catalog','other',$1) RETURNING id`,[owner.id]);
     const [product]=await db.query(`INSERT INTO store_products(organization_id,catalog_product_id,name,price,created_by) VALUES($1,$2,'Synthetic employer product',0,$3) RETURNING id`,[org,catalog.id,employee.id]);
     const [post]=await db.query(`INSERT INTO forum_post(title,slug,author_id) VALUES('Synthetic resource',$1,$2) RETURNING id`,[randomUUID(),employee.id]);
@@ -321,14 +330,17 @@ integration('account erasure — isolated PostgreSQL schema/real sessions', () =
       VALUES($1,$2,true,now(),$3,'approved','Synthetic evidence')`,[next.id,randomUUID().slice(0,20),fixtureAdminId]);
     await db.query(`INSERT INTO neture_pharmacy_memberships(organization_id,applicant_user_id,status,pharmacy_name,business_number,pharmacist_license_number)
       VALUES($1,$2,'active','Synthetic pharmacy',$3,'old-license')`,[org,previous.id,randomUUID().slice(0,10)]);
-    await db.query(`INSERT INTO role_assignments(user_id,role) VALUES($1,'kpa:store_owner')`,[previous.id]);
+    await db.query(`INSERT INTO role_assignments(user_id,role) VALUES($1,'neture:store_owner')`,[previous.id]);
     await db.query(`INSERT INTO store_local_products(organization_id,name) VALUES($1,'Preserved sale content')`,[org]);
     const documentId=randomUUID();
     await db.query(`INSERT INTO kyc_documents(id,user_id,"documentType","fileUrl","fileName") VALUES($1,$2,'business_registration',$3,'synthetic.pdf')`,[documentId,previous.id,`gcs://o4o-private-documents/business-registration/${previous.id}/proof`]);
     await db.query(`UPDATE organizations SET metadata=jsonb_build_object('businessProfile',jsonb_build_object('businessRegistrationDocumentId',$1::text)) WHERE id=$2`,[documentId,org]);
+    await defaultPharmacyConnection(org,previous.id);
     const lifecycle=new MemberLifecycleService(db);
     await lifecycle.transferPharmacy(fixtureAdminId,previous.id,org,{nextOwnerEmail:next.email,reason:'Synthetic sale confirmed',transferConfirmed:true});
     expect((await db.query('SELECT applicant_user_id FROM neture_pharmacy_memberships WHERE organization_id=$1',[org]))[0].applicant_user_id).toBe(next.id);
+    expect((await db.query(`SELECT is_active FROM role_assignments WHERE user_id=$1 AND role='neture:store_owner'`,[next.id]))[0].is_active).toBe(true);
+    expect(await db.query(`SELECT id FROM role_assignments WHERE user_id=$1 AND role='kpa:store_owner'`,[next.id])).toHaveLength(0);
     expect((await db.query("SELECT user_id FROM organization_members WHERE organization_id=$1 AND role='owner' AND left_at IS NULL",[org]))[0].user_id).toBe(next.id);
     const documents=new BusinessRegistrationDocumentService(db);
     expect(await documents.canReadDocument(previous.id,documentId)).toBe(false);
@@ -338,18 +350,55 @@ integration('account erasure — isolated PostgreSQL schema/real sessions', () =
     expect(await documents.canReadDocument(next.id,documentId)).toBe(true);
     expect(await db.query('SELECT 1 FROM store_local_products WHERE organization_id=$1',[org])).toHaveLength(1);
     expect(await db.query('SELECT 1 FROM neture_pharmacy_memberships WHERE organization_id=$1',[org])).toHaveLength(1);
+    expect((await db.query('SELECT applied_by FROM semi_franchise_memberships WHERE organization_id=$1',[org]))[0].applied_by).toBeNull();
   });
   it('supplier account erasure retains the supplier business identity and removes its private profile',async()=>{
     const target=await user(),supplier=randomUUID(),org=await organization(target.id);
     await db.query("UPDATE organizations SET type='supplier' WHERE id=$1",[org]);
-    await db.query(`INSERT INTO neture_suppliers(id,slug,user_id,contact_email,manager_name,settlement_account_number)
-      VALUES($1::uuid,$1::text,$2,$3,'Synthetic private contact','synthetic-account')`,[supplier,target.id,target.email]);
+    await db.query(`INSERT INTO neture_suppliers(id,slug,user_id,contact_email,manager_name,settlement_account_number,organization_id)
+      VALUES($1::uuid,$1::text,$2,$3,'Synthetic private contact','synthetic-account',$4)`,[supplier,target.id,target.email,org]);
     const master=randomUUID(),offer=randomUUID();
     await db.query(`INSERT INTO product_masters(id,regulatory_name,name,manufacturer_name) VALUES($1,'Synthetic regulatory name','Synthetic product','Synthetic manufacturer')`,[master]);
     await db.query(`INSERT INTO supplier_product_offers(id,master_id,supplier_id,slug) VALUES($1,$2,$3,$4)`,[offer,master,supplier,offer]);
     expect((await service().request(target.id)).erased).toBe(true);
     expect(await db.query('SELECT 1 FROM supplier_product_offers WHERE id=$1 AND supplier_id=$2',[offer,supplier])).toHaveLength(1);
     expect((await db.query('SELECT user_id,contact_email,manager_name,settlement_account_number,status FROM neture_suppliers WHERE id=$1',[supplier]))[0]).toEqual({user_id:null,contact_email:null,manager_name:null,settlement_account_number:null,status:'INACTIVE'});
+  });
+  it('supplier proof-file ownership uses canonical organization membership and rejects shared documents',async()=>{
+    const target=await user(),peer=await user(),org=await organization(target.id),supplier=randomUUID(),document=randomUUID();
+    await db.query("UPDATE organizations SET type='supplier' WHERE id=$1",[org]);
+    const path=`neture/suppliers/${supplier}/kyc/business-registration/${document}.pdf`;
+    await db.query(`INSERT INTO kyc_documents(id,user_id,"documentType","fileUrl","fileName") VALUES($1,$2,'business_registration',$3,'synthetic.pdf')`,[document,target.id,`gcs://fixture-private/${path}`]);
+    await db.query(`INSERT INTO neture_suppliers(id,slug,organization_id,user_id,business_registration_document_id) VALUES($1::uuid,$1::text,$2,NULL,$3)`,[supplier,org,document]);
+    const metadata={o4o_resource_kind:'supplier',o4o_asset_purpose:'business',o4o_resource_id:supplier,o4o_document_id:document};
+    expect(await mayEraseSupplierProfileFile(db.manager,target.id,'fixture-private',path,metadata)).toBe(true);
+    expect(await mayEraseSupplierProfileFile(db.manager,peer.id,'fixture-private',path,metadata)).toBe(false);
+    const peerOrg=await organization(peer.id);
+    await db.query(`UPDATE organizations SET metadata=jsonb_build_object('businessProfile',jsonb_build_object('businessRegistrationDocumentId',$2::text)) WHERE id=$1`,[peerOrg,document]);
+    expect(await mayEraseSupplierProfileFile(db.manager,target.id,'fixture-private',path,metadata)).toBe(false);
+  });
+  it('canonical supplier ownership works with a NULL legacy pointer and removes the typed manager email',async()=>{
+    const target=await user(),org=await organization(target.id),supplier=randomUUID();
+    await db.query("UPDATE organizations SET type='supplier',metadata=jsonb_build_object('businessProfile',jsonb_build_object('managerEmail',$2::text,'businessEntityType','corporation')) WHERE id=$1",[org,target.email]);
+    await db.query(`INSERT INTO neture_suppliers(id,slug,organization_id,user_id,contact_email) VALUES($1::uuid,$1::text,$2,NULL,$3)`,[supplier,org,target.email]);
+    expect(await service().request(target.id)).toMatchObject({erased:true,state:'completed'});
+    expect((await db.query('SELECT contact_email,status FROM neture_suppliers WHERE id=$1',[supplier]))[0]).toEqual({contact_email:null,status:'INACTIVE'});
+    expect((await db.query('SELECT metadata FROM organizations WHERE id=$1',[org]))[0].metadata.businessProfile).toEqual({businessEntityType:'corporation'});
+  });
+  it('a legacy supplier pointer never authorizes erasing another canonical owner’s business profile',async()=>{
+    const target=await user(),peer=await user(),org=await organization(peer.id),supplier=randomUUID();
+    await db.query("UPDATE organizations SET type='supplier' WHERE id=$1",[org]);
+    await db.query(`INSERT INTO neture_suppliers(id,slug,organization_id,user_id,contact_email) VALUES($1::uuid,$1::text,$2,$3,$4)`,[supplier,org,target.id,peer.email]);
+    const result=await service().request(target.id);expect(result).toMatchObject({erased:false,state:'review_required'});expect(result.reviewCodes).toContain('REVIEW:public.neture_suppliers');
+    expect((await db.query('SELECT contact_email,status FROM neture_suppliers WHERE id=$1',[supplier]))[0].contact_email).toBe(peer.email);
+  });
+  it('shared supplier ownership requires domain disposition and preserves the shared profile',async()=>{
+    const target=await user(),peer=await user(),org=await organization(target.id),supplier=randomUUID();
+    await db.query("UPDATE organizations SET type='supplier' WHERE id=$1",[org]);
+    await db.query(`INSERT INTO organization_members(organization_id,user_id,role) VALUES($1,$2,'owner')`,[org,peer.id]);
+    await db.query(`INSERT INTO neture_suppliers(id,slug,organization_id,user_id,contact_email) VALUES($1::uuid,$1::text,$2,$3,$4)`,[supplier,org,target.id,target.email]);
+    const result=await service().request(target.id);expect(result).toMatchObject({erased:false,state:'review_required'});expect(result.reviewCodes).toContain('SUPPLIER_OWNER_DISPOSITION_REVIEW_REQUIRED');
+    expect((await db.query('SELECT contact_email FROM neture_suppliers WHERE id=$1',[supplier]))[0].contact_email).toBe(target.email);
   });
   it('confirmed complete pharmacy closure purges Store content and allows subsequent personal erasure',async()=>{
     const target=await user(),org=await organization(target.id);
@@ -375,12 +424,43 @@ integration('account erasure — isolated PostgreSQL schema/real sessions', () =
     const target=await user(),closed=await organization(target.id),retained=await organization(target.id);
     await db.query(`INSERT INTO platform_services(code,name) VALUES('kpa-society','Synthetic service') ON CONFLICT DO NOTHING`);
     await db.query(`INSERT INTO organization_service_enrollments(organization_id,service_code) VALUES($1,'kpa-society'),($2,'kpa-society')`,[closed,retained]);
-    await db.query(`INSERT INTO role_assignments(user_id,role) VALUES($1,'kpa:store_owner')`,[target.id]);
+    await db.query(`INSERT INTO role_assignments(user_id,role) VALUES($1,'kpa:store_owner'),($1,'neture:store_owner')`,[target.id]);
+    await db.query(`INSERT INTO neture_pharmacy_memberships(organization_id,applicant_user_id,status,pharmacy_name,business_number,pharmacist_license_number) VALUES($1,$2,'active','Synthetic retained pharmacy',$3,'synthetic-license')`,[retained,target.id,randomUUID().slice(0,10)]);
     await db.query(`INSERT INTO neture_pharmacy_memberships(organization_id,applicant_user_id,status,pharmacy_name,business_number,pharmacist_license_number) VALUES($1,$2,'active','Synthetic closing pharmacy',$3,'synthetic-license')`,[closed,target.id,randomUUID().slice(0,10)]);
     expect((await new MemberLifecycleService(db).closePharmacy(fixtureAdminId,target.id,closed,{reason:'Synthetic selected pharmacy closure',closureConfirmed:true})).storeInventoryPurged).toBe(true);
     expect((await db.query(`SELECT is_active FROM role_assignments WHERE user_id=$1 AND role='kpa:store_owner'`,[target.id]))[0].is_active).toBe(true);
+    expect((await db.query(`SELECT is_active FROM role_assignments WHERE user_id=$1 AND role='neture:store_owner'`,[target.id]))[0].is_active).toBe(true);
     expect((await db.query('SELECT left_at FROM organization_members WHERE organization_id=$1 AND user_id=$2',[retained,target.id]))[0].left_at).toBeNull();
     expect((await db.query('SELECT "isActive" FROM organizations WHERE id=$1',[retained]))[0].isActive).toBe(true);
+  });
+  it('full closure inventories nonstandard business references and preserves them until native-domain review',async()=>{
+    const target=await user(),peer=await user(),org=await organization(target.id);
+    await db.query(`INSERT INTO platform_services(code,name) VALUES('kpa-society','Synthetic service') ON CONFLICT DO NOTHING`);
+    await db.query(`INSERT INTO organization_service_enrollments(organization_id,service_code) VALUES($1,'kpa-society')`,[org]);
+    await db.query(`INSERT INTO role_assignments(user_id,role) VALUES($1,'kpa:store_owner')`,[target.id]);
+    await db.query(`INSERT INTO neture_pharmacy_memberships(organization_id,applicant_user_id,status,pharmacy_name,business_number,pharmacist_license_number) VALUES($1,$2,'active','Synthetic pharmacy',$3,'synthetic-license')`,[org,target.id,randomUUID().slice(0,10)]);
+    const [order]=await db.query(`INSERT INTO checkout_orders("orderNumber","buyerId","sellerId","sellerOrganizationId","totalAmount") VALUES($1,$2,'synthetic-supplier',$3,0) RETURNING id`,[randomUUID(),peer.id,org]);
+    await db.query(`INSERT INTO store_local_products(organization_id,name) VALUES($1,'Preserve until reviewed')`,[org]);
+    const lifecycle=new MemberLifecycleService(db);
+    expect((await lifecycle.closurePlan(fixtureAdminId,target.id,org)).reviewRows).toBe(1);
+    const result=await lifecycle.closePharmacy(fixtureAdminId,target.id,org,{reason:'Synthetic unclassified business reference',closureConfirmed:true});
+    expect(result).toMatchObject({storeInventoryPurged:false,errorCode:'STORE_CLOSURE_INVENTORY_REVIEW_REQUIRED'});
+    expect(await db.query('SELECT id FROM checkout_orders WHERE id=$1',[order.id])).toHaveLength(1);
+    expect(await db.query('SELECT id FROM store_local_products WHERE organization_id=$1',[org])).toHaveLength(1);
+  });
+  it.each(['active','suspended'])('current %s pharmacy closes without a legacy KPA role or active enrollment prerequisite',async(status)=>{
+    const target=await user(),org=await organization(target.id);
+    await db.query(`INSERT INTO platform_services(code,name) VALUES('kpa-society','Synthetic service') ON CONFLICT DO NOTHING`);
+    await db.query(`INSERT INTO organization_service_enrollments(organization_id,service_code,status) VALUES($1,'kpa-society',$2)`,[org,status==='active'?'active':'inactive']);
+    if(status==='active')await db.query(`INSERT INTO role_assignments(user_id,role) VALUES($1,'neture:store_owner')`,[target.id]);
+    await db.query(`INSERT INTO neture_pharmacy_memberships(organization_id,applicant_user_id,status,pharmacy_name,business_number,pharmacist_license_number) VALUES($1,$2,$3,'Synthetic current pharmacy',$4,'synthetic-license')`,[org,target.id,status,randomUUID().slice(0,10)]);
+    const defaultBusiness=await defaultPharmacyConnection(org,target.id);
+    expect(await db.query(`SELECT id FROM role_assignments WHERE user_id=$1 AND role='kpa:store_owner'`,[target.id])).toHaveLength(0);
+    expect((await new MemberLifecycleService(db).closePharmacy(fixtureAdminId,target.id,org,{reason:'Synthetic native pharmacy closure',closureConfirmed:true})).storeInventoryPurged).toBe(true);
+    expect(await db.query(`SELECT id FROM role_assignments WHERE user_id=$1 AND role='neture:store_owner' AND is_active`,[target.id])).toHaveLength(0);
+    expect(await db.query('SELECT id FROM semi_franchise_memberships WHERE organization_id=$1',[org])).toHaveLength(0);
+    expect(await db.query('SELECT id FROM semi_franchises WHERE id=$1',[defaultBusiness])).toHaveLength(1);
+    expect((await service().request(target.id)).erased).toBe(true);
   });
   it('an inactive pharmacy without completed closure still needs business disposition',async()=>{
     const target=await user(),org=await organization(target.id);

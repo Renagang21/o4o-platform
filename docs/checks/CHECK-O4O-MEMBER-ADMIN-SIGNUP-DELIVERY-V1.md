@@ -15,9 +15,9 @@
 | Admin 계정 제거 | Operator 사전 정지 없이 원자적 접근 차단·세션 회수 후 durable 삭제 처리. 현재 DB 전체 관리자 권한·보호 계정·Google 인증을 검사한다. 계정/개인 row·파일·미분류 잔여 검사를 모두 통과해야 `completed/erased=true`다. |
 | 직원 | 활성 staff/accepted/admin/manager는 store/pharmacy/supplier/semi_franchise 사업체 하나에 소속. owner의 복수 사업체 소유는 허용. API뿐 아니라 DB direct writer와 동시 가입에도 같은 경계를 적용한다. |
 | 업무·포럼·강의 자료 | 작성자·업로더라는 이유만으로 삭제하지 않는다. 명시적 attribution만 비우고 사업체/동료 답글/강의 등을 보존한다. 내용·JSON의 미분류 개인정보는 임의 삭제하지 않고 검토한다. |
-| 약국 매도 | 승인 약사인 새 경영자의 활성 계정·자격·소속 확인 후 같은 조직의 소유 관계·면허 이전. 전 경영자 접근·개인 연락처 사본 해제. 사업 증빙 열람은 업로더 대신 현재 조직 소유자 기준이다. |
-| 약국 완전폐업 | 매도와 별도 확인. 조직 접근 종료, 정식 폐업 tombstone·writer fence, 최신 Store inventory 및 파일 journal을 통해 실제 자료 파기. 미분류/파일 실패는 폐업 적용·자료 삭제 미완료로 구분하고 재시도한다. 기존 계약 종료의 7일 경로는 유지하며 다른 활성 약국의 경영자 권한을 함께 없애지 않는다. |
-| 공급자 | Neture 도메인에서 공급자 개인 연락처·정산 연락/은행 프로필·개인 증빙 연결 제거. 공급자 사업 identity·제품·거래는 개인 계정 FK cascade로 삭제하지 않는다. 공유/규제 증빙은 별도 검토한다. |
+| 약국 매도 | 현재 Neture 승인 표식을 이전하며 승인 약사인 새 경영자의 활성 계정·자격·소속 확인 후 같은 조직의 소유 관계·면허 이전. 전 경영자 접근·개인 연락처 사본 해제. 사업 증빙 열람은 업로더 대신 현재 조직 소유자 기준이다. |
+| 약국 완전폐업 | 매도와 별도 확인. 조직 접근 종료, 정식 폐업 tombstone·writer fence, 최신 Store inventory 및 파일 journal을 통해 실제 자료 파기. 미분류/파일 실패는 폐업 적용·자료 삭제 미완료로 구분하고 재시도한다. 현재 약국 승인 원장·소속으로 폐업 case를 생성하므로 과거 KPA role·active enrollment를 전제로 하지 않는다. 기본 Pharmacy 회원 연결도 정리한다. 기존 계약 종료의 7일 경로는 유지하며 다른 활성 약국의 경영자 권한을 함께 없애지 않는다. |
+| 공급자 | Neture 도메인의 canonical organization owner 관계로 전체 대상 공급자를 찾고(legacy user_id로 선택하지 않음), 공급자 개인 연락처·정산 연락/은행 프로필·개인 증빙 연결 제거. 공급자 사업 identity·제품·거래는 개인 계정 FK cascade로 삭제하지 않는다. 조직 managerEmail도 제거한다. 공동 소유/충돌한 legacy 연결과 공유·규제 증빙은 별도 검토한다. |
 | 포럼·강의 최종 삭제 | Admin의 기존 콘텐츠·자료 메뉴 아래 진입. 보관된 대상 한 개의 실제 삭제 계획과 관련 row 수를 확인하고 기존 domain final delete를 실행한다. forum stale digest·course blocker는 실패로 갱신한다. Operator 공개/이용 운영과 구분한다. |
 
 ## Admin·가입·메일
@@ -44,20 +44,21 @@ main의 canonical schema를 전용 PostgreSQL 15로 재현한 결과, 과거 보
 - 사업 증빙 업로드는 기존 GCS save에 owner/purpose/document ID metadata를 함께 기록한다. 공급자도 도메인·document·producer prefix로 소유를 입증한다. 기존 미표식 파일을 일괄 소유로 인정하거나 backfill하지 않는다.
 - 개인 파일은 계정 avatar·KYC·고정 private root의 첨부와 owned log 사본, typed business-registration/공급자 KYC prefix의 orphan을 조사한다. 전체 공용 버킷을 업로더 기준으로 지우지 않는다.
 - 공유 사용을 재확인하고 reference scan부터 외부 삭제까지 DB writer barrier로 보호한다. 세대 pin 중 기다린 peer 참조가 commit하면 다음 pass에서 삭제를 막는 실제 경합도 검증했다. content generation을 먼저 DB에 commit한 다음 실제 외부 삭제를 실행한다. metadata ownership·metageneration도 재검사하며 404/412·교체 세대·실패는 재시도/검토로 남긴다. 원본 문서·manifest를 파일 제거 전에 잃지 않는다.
-- 완전폐업은 현재 org/store UUID 소유 table을 다시 조사하고, 명시적 Store inventory 밖의 nonempty table·unreviewed storage pointer·빠진 fence는 파기를 막는다. 공유 카탈로그 media는 업로더가 전 경영자여도 삭제하지 않는다. 실제 파일 삭제 후 DB 잔여 재검사를 통과해야 `purge_completed`다.
+- 완전폐업은 현재 org/store UUID 소유 table과 sellerOrganizationId·applicant/target organization·service_store_id 업무 참조를 다시 조사하고, 명시적 Store inventory 밖의 nonempty table·unreviewed storage pointer·빠진 fence는 파기를 막는다. 공유 카탈로그 media는 업로더가 전 경영자여도 삭제하지 않는다. 실제 파일 삭제 후 DB 잔여 재검사를 통과해야 `purge_completed`다.
 
 ## 검증 증거
 
-모든 DB·파일 검증은 loopback `55469`의 전용 tmpfs PostgreSQL과 임시 파일만 사용한다. 실제 운영 계정·업무·GCP 파일을 변경하지 않았고 유료 AI 호출도 없다. native DB/HTTP tests의 GCS adapter는 외부 접근을 거절하는 strict mock 및 임시 파일 adapter다. 이것을 운영 IAM/파일 전수 검증으로 확대하지 않는다.
+모든 DB·파일 검증은 loopback `55469`의 전용 tmpfs PostgreSQL과 임시 파일만 사용한다. 두 합성 DB의 업무 table 각351개를 비운 뒤 이 작업 전용 tmpfs PostgreSQL 컨테이너와 loopback DB forward·Vite preview를 제거했다. 실제 운영 계정·업무·GCP 파일을 변경하지 않았고 유료 AI 호출도 없다. native DB/HTTP tests의 GCS adapter는 외부 접근을 거절하는 strict mock 및 임시 파일 adapter다. 이것을 운영 IAM/파일 전수 검증으로 확대하지 않는다.
 
 | 검증 | 결과 |
 | --- | --- |
 | canonical fresh bootstrap + 전체 57 incremental | PASS, 정식 최종 7552 lines 일치 |
 | 기존 main prefix → 추가 3개 → down/up | main 원래 7411 lines와 최종 7552 lines 재현 PASS. populated 폐업의 rollback 거절·기존 중복 직원의 upgrade 거절 PASS |
-| 실제 PostgreSQL/HTTP/JWT/임시 파일 | 66 tests PASS (정식 schema, 전용 DB) |
-| API 관련 domain 회귀 6 suites + 정식 migration/native ESM 2 suites | 105 + 23 tests PASS. native 포함 API 중복 없는 합계 194 |
+| 실제 PostgreSQL/HTTP/JWT/임시 파일 | 75 tests PASS (정식 schema, 전용 DB) |
+| API 관련 domain·CI 경계 회귀 9 suites + 정식 migration/native ESM 2 suites | 174 + 23 tests PASS |
+| 운영자 초대 실제 PostgreSQL/계정 삭제 | 54 tests PASS, official schema fence 0 gaps. API 중복 없는 합계 326 |
 | auth-react 24 files | 290 tests PASS |
-| Admin 기능·menu/route guard 9 files | 161 tests PASS |
+| Admin 전체 64 files | 655 tests PASS, 후속 UI 변경 집중 41 + AccountControls 회귀도 PASS |
 | PC 1440 / mobile 390, 실제 component + 합성 HTTP/GIS | 36 flow checks PASS. 직접 진입/Operator 분리/파일 미완료/재시도/권한 회수/가입 크기/중복 메일·generic resend 포함. 실제 OAuth 제공자 로그인·운영 삭제 검증은 아님 |
 | API/Admin type-check, API/Admin/Neture production build | PASS |
 | 변경 TS/TSX ESLint | 0 errors, 기존 unused 3 warnings (LMS 2 / ForumComment 1) |
@@ -79,10 +80,10 @@ import 이름만 검색하지 않고 `@o4o/auth-react`, Google/Kakao/Email compo
 ## 통합·배포 기록 / 운영 잔여
 
 - GitHub 소유자 권한·push dry-run·실제 ruleset 조회 완료. explicit `Promote dry_run=true` 실행 [41584780737](https://github.com/Renagang21/o4o-platform/actions/runs/41584780737) SUCCESS: 배포0, freeze false, 해당 기준 SHA CI green. dry-run을 실제 배포로 세지 않는다.
-- PR/최종 HEAD CI·리뷰/main/post-merge: 진행 전. 완료 후 실제 링크·상태를 갱신한다.
+- 통합 PR [#933](https://github.com/Renagang21/o4o-platform/pull/933). 최초 `ce0dad849c`의 전체 CI에서 구 정책 가정·메뉴 census·추가 의존성 mock 차이를 확인하고 보완했다. Codex P1(현재 Neture 약국의 폐업이 과거 KPA 역할/활성 enrollment를 요구함)을 현재 승인 원장 기반 처리로 수정하고 active/suspended·실제 Pharmacy 기본 연결·현재 role 이전을 검증했다. 최종 HEAD CI·Codex·미해결 thread·main/post-merge는 이 PR의 최신 기록을 기술 gate로 확인한다. 이 문서의 로컬 PASS를 원격 CI PASS로 대체하지 않는다.
 - `DEPLOYMENT=MANUAL/GATED` (migration·인증·권한). 자동 배포/개인 삭제 활성화 완료 아님.
 - 운영 적용 항목·영향·중지/복구 조건: [운영 적용 계획](../work-orders/ROLLOUT-O4O-MEMBER-ADMIN-SIGNUP-DELIVERY-V1.md).
-- 미분류 legacy JSON·billing/다른 domain 참조·표식 없는/공유 파일은 안전하게 review로 남는다. 현재 운영 자료를 열어 전수 해결했다고 주장하지 않는다. 시스템별 1/2년 분류·storage list/get/delete IAM·approved inventory와 환경 설정을 확인하기 전 개인 삭제를 활성화하지 않는다.
-- 신규 최소 증빙/삭제 운영 내역의 자동 만료 job 등록은 이 작업에 포함하지 않는다. 명시적 기존 maintenance 경계와 정책 기간을 유지한다. 실제 GCP serving/IAM 조회는 이 공간에 identity가 없어 별도 검증이 필요하다.
+- 공급자는 legacy user_id=NULL canonical owner·다른 owner의 legacy pointer·공동 소유·실제 증빙 proof SQL도 검증했다. 미분류 legacy JSON·billing/다른 domain 참조·표식 없는/공유 파일은 안전하게 review로 남는다. 현재 운영 자료를 열어 전수 해결했다고 주장하지 않는다. 시스템별 1/2년 분류·storage list/get/delete IAM·approved inventory와 환경 설정을 확인하기 전 개인 삭제를 활성화하지 않는다.
+- 신규 최소 증빙/삭제 운영 내역의 자동 만료 job 등록은 이 작업에 포함하지 않는다. 명시적 기존 maintenance 경계와 정책 기간을 유지한다. 직접 gcloud IAM 조사는 이 공간에 identity가 없어 미실행이다. serving SHA는 승인 후 정상 Delivery/Promote의 WIF 조회 artifact로 검증할 수 있으며 이를 위해 이 공간에 새 GCP token을 추가하지 않는다.
 
 문서 정합: 역할 Architecture·Store 소속·개인정보 정책의 현재 사용자 결정을 정렬하고, 기존 기간/게시 원문/과거 WO·CHECK는 변경하지 않았다. 선행 remote 기록은 해당 commit에 보존한다. 구현·시험 성공을 운영 활성화 완료로 표현하지 않는다.

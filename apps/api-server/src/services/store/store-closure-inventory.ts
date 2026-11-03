@@ -1,6 +1,7 @@
 import type { EntityManager } from "typeorm";
 // Full business closure only. Service-contract termination keeps its existing inventory.
 const DELETES: Readonly<Record<string, string>> = {
+  semi_franchise_memberships: "organization_id",
   notifications: "organizationId",
   store_ai_insights: "organization_id",
   store_ai_product_insights: "organization_id",
@@ -52,6 +53,8 @@ const EXISTING = new Set([
   "store_tablet_corner_contents",
   "store_asset_derivations",
 ]);
+// Supplier/workflow references (sellerOrganizationId, applicant/target organization, service_store_id)
+// are inventoried too. Their native domains must classify nonempty rows before full purge.
 // A minimal identity shell supports statutory B2B records and the durable closure journal.
 // Other domain rows are not presumed retained: nonempty unclassified tables block closure.
 const SHELL = new Set([
@@ -71,7 +74,7 @@ export async function closureInventory(db: Db, organizationId: string) {
     await db.query(`SELECT n.nspname AS schema_name,c.relname AS table_name,a.attname AS column_name
  FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace JOIN pg_attribute a ON a.attrelid=c.oid
  WHERE c.relkind='r' AND n.nspname IN ('public','neture','cosmetics') AND a.attnum>0 AND NOT a.attisdropped
- AND a.attname IN ('organization_id','organizationId','store_id','storeId') AND a.atttypid='uuid'::regtype ORDER BY n.nspname,c.relname,a.attname`);
+ AND a.attname IN ('organization_id','organizationId','store_id','storeId','sellerOrganizationId','applicant_organization_id','target_organization_id','service_store_id') AND a.atttypid='uuid'::regtype ORDER BY n.nspname,c.relname,a.attname`);
   const items = [];
   for (const table of tables) {
     const [row] = await db.query(

@@ -64,7 +64,7 @@
 ## 검증·인계·통합·배포
 
 - [x] 합성 전용 DB·파일 fixture로 개인/직원/약국 이전/완전폐업/공급자/포럼/강의의 실제 보존·제거 검증
-- [ ] 임시 안전장치 없이 정식 migration·스키마로 실행하고 생성 fixture·연결 데이터 정리 확인
+- [x] 임시 안전장치 없이 정식 migration·스키마로 실행하고 생성 fixture·연결 데이터 정리 확인
 - [x] Operator 차단 / Admin 직접 URL / 재권한 검사 / 비동기 실패·중복·재시도 검증
 - [x] PC·모바일 체크 → 상단 작업 → 확인 → 실행 → 갱신 브라우저 검증(운영 자료 삭제 금지)
 - [x] 필요한 타입·lint·단위/통합 테스트·production build·공통 소비처·문서 민감정보·diff 검사
@@ -83,4 +83,10 @@
 
 요청의 개인/직원/매도/폐업/공급자/포럼·강의, Admin native·Operator 경계, 표준 목록/선택/실패, 가입 버튼/중복 메일을 코드·정책·실제 DB·PC/mobile 모집단과 다시 대조했다. 13개 누락은 공식 migration으로 해결했고 신규·다른 함수/이벤트 fence가 readiness를 만족시키지 못하는 회귀를 유지했다. 순수 비활성화·파일 실패·미분류 잔여를 완료로 표시하지 않는다.
 
-검증: 실제 DB/HTTP/JWT/임시 파일66, domain105, schema/native ESM23, Admin161, auth290 tests PASS. PC/mobile36 flows PASS, API/Admin type-check 및 API/Admin/Neture production build PASS. 로그 최소화의 원래 clock·타인 자료, 파일 세대 pin·공유 참조 경합, 단일 직원 경합, 타 약국 owner 권한 보존까지 포함한다. 운영 삭제시험·데이터 이전·유료 AI 호출 0. [CHECK](../checks/CHECK-O4O-MEMBER-ADMIN-SIGNUP-DELIVERY-V1.md)와 [운영 적용 계획](ROLLOUT-O4O-MEMBER-ADMIN-SIGNUP-DELIVERY-V1.md)을 함께 확인한다.
+검증: 실제 DB/HTTP/JWT/임시 파일75, domain/CI경계174, schema/native ESM23, 실제 운영자 초대54, Admin전체655, auth290 tests PASS. PC/mobile36 flows PASS, API/Admin type-check 및 API/Admin/Neture production build PASS. 로그 최소화의 원래 clock·타인 자료, 파일 세대 pin·공유 참조 경합, 단일 직원 경합, 타 약국 owner 권한 보존까지 포함한다. 운영 삭제시험·데이터 이전·유료 AI 호출 0. [CHECK](../checks/CHECK-O4O-MEMBER-ADMIN-SIGNUP-DELIVERY-V1.md)와 [운영 적용 계획](ROLLOUT-O4O-MEMBER-ADMIN-SIGNUP-DELIVERY-V1.md)을 함께 확인한다.
+
+## PR 검증 보완
+
+[#933](https://github.com/Renagang21/o4o-platform/pull/933)의 최초 전체 CI와 Codex P1을 반영했다. 현재 `pharmacy` 조직·`neture:store_owner`·정지된 enrollment에서 완전폐업이 가능하고 기존 KPA 계약 자격을 요구하지 않는다. 매도는 같은 승인 표식을 이전하며 기본 Pharmacy 소속을 보존/해제한다. Supplier는 canonical 조직 owner 관계로만 개인 프로필/증빙을 처리하고 공동 소유·legacy 충돌은 검토로 남긴다. 실제 DB75·운영자 초대54가 임시 fence 없이 통과했다. 과거 단일 화면 수·선택 없는 row 승인·Operator 사전 정지·추가 의존성 없는 mock 가정을 현 코드와 맞췄으며 기술 gate를 완화하지 않았다. 최종 원격 CI/리뷰·병합 상태는 PR 최신 HEAD의 기록으로 확인한다.
+
+합성 검증 종료 정리: 전용 DB 2개 각각351 table·잔여0, owned tmpfs 컨테이너 제거, loopback forward와 Vite 종료. 다른 세션의 작업공간·파일·DB는 정리하지 않았다.

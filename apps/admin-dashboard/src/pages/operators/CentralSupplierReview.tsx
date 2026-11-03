@@ -12,6 +12,7 @@ type Supplier = {
   businessNumber?: string;
   representativeName?: string;
   missingProfileFields?: string[];
+  missingActivationFields?: string[];
 };
 const base = "/neture/operator/suppliers";
 /** Approval stays in the supplier domain; account deletion stays in native Admin. */
@@ -194,7 +195,7 @@ export default function CentralSupplierReview({
             {detail.representativeName || "미등록"} · 사업자번호:{" "}
             {detail.businessNumber || "미등록"}
           </p>
-          <p>보완 항목: {detail.missingProfileFields?.join(", ") || "없음"}</p>
+          <p>프로필 보완 안내: {(detail.missingProfileFields ?? detail.missingActivationFields)?.join(", ") || "없음"}</p>
           {adminMode && detail.userId && (
             <Link
               to={`/admin/platform/users?userId=${encodeURIComponent(detail.userId)}`}

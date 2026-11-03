@@ -1,3 +1,4 @@
+import { ERASURE_WRITER_GAPS_SQL } from '../../privacy/erasure-writer-manifest.js';
 import {CreateCentralOperationMenuGrants1793186241009} from '../../../database/migrations/1793186241009-CreateCentralOperationMenuGrants.js';
 import { CreateServiceOperatorInvitations1792886400000 } from '../../../database/migrations/1792886400000-CreateServiceOperatorInvitations.js';
 import { retainOperatorInvitations } from '../operator-invitation-retention.js';
@@ -97,16 +98,8 @@ integration(
         db: 'o4o_operator_invitation_fixture',
         t: 'service_operator_invitations',
       });
-      // Populate the disposable erasure writer manifest for newer unrelated fixture tables too.
-      for (const t of await query(`SELECT n.nspname,c.relname FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
-      WHERE c.relkind='r' AND n.nspname IN ('public','neture','cosmetics')
-      AND c.relname NOT IN ('o4o_schema_baselines','typeorm_migrations') AND c.relname NOT LIKE 'account_erasure_%'
-      AND NOT EXISTS(SELECT 1 FROM pg_trigger tr WHERE tr.tgrelid=c.oid AND tr.tgname='account_erasure_write_fence')`)) {
-        const quote = (v: string) => '"' + v.replace(/"/g, '""') + '"';
-        await query(
-          `CREATE TRIGGER account_erasure_write_fence BEFORE INSERT OR UPDATE ON ${quote(t.nspname)}.${quote(t.relname)} FOR EACH ROW EXECUTE FUNCTION account_erasure_write_fence()`,
-        );
-      }
+      // Readiness must come from the official full migration chain, never fixture-only triggers.
+      expect(await query(ERASURE_WRITER_GAPS_SQL)).toHaveLength(0);
       // Entity access is adapted to this schema fixture. Business transactions/locks/constraints are real.
       const adapted = {
         query: query,
@@ -467,12 +460,9 @@ integration(
         systemBasis: 'synthetic-system',
         personalBuckets: [],
       });
-      await query(
-        "INSERT INTO service_memberships(user_id,service_key,status) VALUES($1,'neture','suspended')",
-        [target],
-      );
-      await expect(erasure.request(target,admin)).rejects.toMatchObject({code:'SERVICE_STOP_REQUIRED'});
-      await query("UPDATE service_memberships SET status='suspended' WHERE user_id=$1 AND service_key='lecture'",[target]);
+      expect((await query("SELECT status FROM service_memberships WHERE user_id=$1 AND service_key='lecture'",[target]))[0].status).toBe('active');
+      expect((await query('SELECT "isActive" FROM users WHERE id=$1',[target]))[0].isActive).toBe(true);
+      // Admin starts erasure directly; a separate Operator suspension is no longer a prerequisite.
       const result = await erasure.request(target, admin);
       expect(result.reviewCodes).toEqual([]);
       expect(result).toMatchObject({ state: 'completed', erased: true });

@@ -23,22 +23,39 @@ const supplierFiles = [
   "settlement_bankbook_document_id",
   "mail_order_sales_document_id",
 ];
-
-const quote = (value: string) => '"' + value.replace(/"/g, '""') + '"';
+// Same canonical relationship as supplier-context.resolver. No legacy user_id fallback,
+// arbitrary LIMIT 1 supplier selection, or writer/uploader-based business ownership.
+const OWNER = `EXISTS(SELECT 1 FROM organization_members om JOIN organizations org ON org.id=om.organization_id
+ WHERE om.organization_id=s.organization_id AND om.user_id::text=$1 AND om.role='owner' AND om.left_at IS NULL AND org.type='supplier')`;
+const q = (value: string) => '"' + value.replace(/"/g, '""') + '"';
+export async function ownedSupplierIds(
+  db: Pick<EntityManager, "query">,
+  userId: string,
+): Promise<string[]> {
+  return (
+    await db.query(`SELECT s.id FROM neture_suppliers s WHERE ${OWNER}`, [
+      userId,
+    ])
+  ).map((row: { id: string }) => row.id);
+}
 export function supplierErasureProjection(
   table: ErasureTable,
   alias = "r",
 ): string {
   const row = `to_jsonb(${alias})`;
+  if (table.schema_name !== "public") return row;
+  if (table.table_name === "organizations")
+    return `(CASE WHEN EXISTS(SELECT 1 FROM neture_suppliers s WHERE s.organization_id=${alias}.id AND ${OWNER})
+ THEN jsonb_set(${row},'{metadata,businessProfile}',COALESCE(${alias}.metadata->'businessProfile','{}'::jsonb)-'managerEmail') ELSE ${row} END)`;
   if (
     table.table_name !== "neture_suppliers" ||
-    !table.columns.includes("user_id")
+    !table.columns.includes("organization_id")
   )
     return row;
   const fields = SUPPLIER_PRIVATE_FIELDS.filter((field) =>
     table.columns.includes(field),
   );
-  return `(CASE WHEN ${alias}.user_id::text=$1 THEN ${row} - ARRAY[${fields.map((field) => `'${field}'`).join(",")}] ELSE ${row} END)`;
+  return `(CASE WHEN ${OWNER.replaceAll("s.", alias + ".")} THEN ${row}-ARRAY[${fields.map((field) => `'${field}'`).join(",")}] ELSE ${row} END)`;
 }
 export async function reviewSupplierErasure(
   db: Pick<EntityManager, "query">,
@@ -49,16 +66,22 @@ export async function reviewSupplierErasure(
     (table) =>
       table.schema_name === "public" && table.table_name === "neture_suppliers",
   );
+  if (!supplier?.columns.includes("organization_id")) return [];
+  const coowners = await db.query(
+    `SELECT 1 FROM neture_suppliers s WHERE ${OWNER} AND EXISTS(SELECT 1 FROM organization_members peer WHERE peer.organization_id=s.organization_id AND peer.user_id::text<>$1 AND peer.role='owner' AND peer.left_at IS NULL)`,
+    [userId],
+  );
+  if (coowners.length) return ["SUPPLIER_OWNER_DISPOSITION_REVIEW_REQUIRED"];
+  const conflictingLegacy=await db.query(`SELECT 1 FROM neture_suppliers s WHERE ${OWNER} AND s.user_id IS NOT NULL AND s.user_id::text<>$1`,[userId]);
+  if(conflictingLegacy.length)return ["SUPPLIER_OWNER_DISPOSITION_REVIEW_REQUIRED"];
   const fields = supplierFiles.filter((field) =>
-    supplier?.columns.includes(field),
+    supplier.columns.includes(field),
   );
   if (!fields.length) return [];
-  // Supplier onboarding proofs are profile data. Product/other-business proofs
-  // keep their explicit native references; never erase another person's document.
   const rows = await db.query(
-    `SELECT 1 FROM neture_suppliers s CROSS JOIN LATERAL unnest(ARRAY[${fields.map((field) => `s.${quote(field)}`).join(",")}]) ref(id)
- LEFT JOIN kyc_documents d ON d.id=ref.id WHERE s.user_id=$1 AND ref.id IS NOT NULL
- AND (d.id IS NULL OR (d.user_id IS NOT NULL AND d.user_id<>$1)) LIMIT 1`,
+    `SELECT 1 FROM neture_suppliers s CROSS JOIN LATERAL unnest(ARRAY[${fields.map((field) => `s.${q(field)}`).join(",")}]) ref(id)
+ LEFT JOIN kyc_documents d ON d.id=ref.id WHERE ${OWNER} AND ref.id IS NOT NULL
+ AND (d.id IS NULL OR (d.user_id IS NOT NULL AND d.user_id::text<>$1)) LIMIT 1`,
     [userId],
   );
   return rows.length ? ["SUPPLIER_PRIVATE_FILES_REVIEW_REQUIRED"] : [];
@@ -72,17 +95,21 @@ export async function detachSupplierAccount(
     (table) =>
       table.schema_name === "public" && table.table_name === "neture_suppliers",
   );
-  if (!table?.columns.includes("user_id")) return;
+  if (!table?.columns.includes("organization_id")) return;
+  await db.query(
+    `UPDATE organizations o SET metadata=jsonb_set(metadata,'{businessProfile}',(metadata->'businessProfile')-'managerEmail')
+ WHERE jsonb_typeof(metadata->'businessProfile')='object' AND EXISTS(SELECT 1 FROM neture_suppliers s WHERE s.organization_id=o.id AND ${OWNER})`,
+    [userId],
+  );
   const fields = SUPPLIER_PRIVATE_FIELDS.filter((field) =>
     table.columns.includes(field),
   );
   await db.query(
-    `UPDATE neture_suppliers SET ${fields.map((field) => `${quote(field)}=NULL`).join(",")},status='INACTIVE',updated_at=now() WHERE user_id=$1`,
+    `UPDATE neture_suppliers s SET ${fields.map((field) => `${q(field)}=NULL`).join(",")},status='INACTIVE',updated_at=now() WHERE ${OWNER}`,
     [userId],
   );
 }
-
-/** Storage ownership proof is tied to the current domain link, not merely an uploader. */
+/** Current canonical supplier ownership + document/resource proof; never just an uploader. */
 export async function mayEraseSupplierProfileFile(
   db: Pick<EntityManager, "query">,
   userId: string,
@@ -98,9 +125,8 @@ export async function mayEraseSupplierProfileFile(
   )
     return false;
   const rows = await db.query(
-    `SELECT d.id FROM kyc_documents d JOIN neture_suppliers s ON s.user_id=d.user_id
- WHERE s.user_id=$1 AND s.id::text=$2 AND d.id::text=$3 AND d."fileUrl"=$4
- AND d.id IN (s.business_registration_document_id,s.settlement_bankbook_document_id,s.mail_order_sales_document_id)
+    `SELECT d.id FROM kyc_documents d JOIN neture_suppliers s ON d.id IN(s.business_registration_document_id,s.settlement_bankbook_document_id,s.mail_order_sales_document_id)
+ WHERE ${OWNER} AND (d.user_id IS NULL OR d.user_id::text=$1) AND s.id::text=$2 AND d.id::text=$3 AND d."fileUrl"=$4
  AND NOT EXISTS(SELECT 1 FROM organizations o WHERE o.metadata->'businessProfile'->>'businessRegistrationDocumentId'=d.id::text)
  AND NOT EXISTS(SELECT 1 FROM neture_supplier_regulated_categories c WHERE c.evidence_document_id=d.id)
  AND NOT EXISTS(SELECT 1 FROM neture_suppliers other WHERE other.id<>s.id AND d.id IN(other.business_registration_document_id,other.settlement_bankbook_document_id,other.mail_order_sales_document_id))`,
@@ -112,18 +138,18 @@ export async function mayEraseSupplierProfileFile(
     ],
   );
   if (rows.length) return true;
-  // A failed DB save may leave only the tagged object. Its exact producer prefix
-  // and current supplier ownership still prove scope; any surviving DB reference
-  // is checked separately by the orchestrator before the generation is deleted.
   if (
     !path.startsWith(`neture/suppliers/${metadata.o4o_resource_id}/kyc/`) ||
     !path.endsWith(`/${metadata.o4o_document_id}.pdf`)
   )
     return false;
-  const orphan = await db.query(
-    `SELECT 1 FROM neture_suppliers s WHERE s.user_id=$1 AND s.id::text=$2
-   AND NOT EXISTS(SELECT 1 FROM kyc_documents WHERE "fileUrl"=$3)`,
-    [userId, metadata.o4o_resource_id, `gcs://${bucket}/${path}`],
+  return (
+    (
+      await db.query(
+        `SELECT 1 FROM neture_suppliers s WHERE ${OWNER} AND s.id::text=$2
+ AND NOT EXISTS(SELECT 1 FROM kyc_documents WHERE "fileUrl"=$3)`,
+        [userId, metadata.o4o_resource_id, `gcs://${bucket}/${path}`],
+      )
+    ).length > 0
   );
-  return orphan.length > 0;
 }

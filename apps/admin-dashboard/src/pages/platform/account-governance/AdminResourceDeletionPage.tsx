@@ -57,7 +57,7 @@ export default function AdminResourceDeletionPage() {
       );
       if (seq !== epoch.current.value) return;
       const data = response.data;
-      const items = kind === "community" ? data?.data : data?.data;
+      const items = data?.data;
       if (!Array.isArray(items)) throw new Error();
       setRows(
         kind === "community"

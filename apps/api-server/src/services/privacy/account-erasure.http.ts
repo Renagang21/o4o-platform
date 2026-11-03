@@ -1,6 +1,6 @@
 import type { EntityManager } from 'typeorm';
 import { BUSINESS_DOCUMENT } from './account-personal-data.js';
-import { mayEraseSupplierProfileFile } from '../../modules/neture/services/supplier-account-erasure.js';
+import { mayEraseSupplierProfileFile, ownedSupplierIds } from '../../modules/neture/services/supplier-account-erasure.js';
 import type { Request, Response } from 'express';
 import { Storage } from '@google-cloud/storage';
 import { AppDataSource } from '../../database/connection.js';
@@ -14,8 +14,8 @@ async function assertFileOwnership(bucket:string,path:string,ownerId:string,meta
 export const accountErasureStorage: PersonalStorage = {
   async discover(ownerId,db){
     const bucket=process.env.GCS_PRIVATE_DOCUMENT_BUCKET||'o4o-private-documents';
-    const suppliers=await db.query('SELECT id FROM neture_suppliers WHERE user_id=$1',[ownerId]);
-    const prefixes=[`business-registration/${ownerId}/`,...suppliers.map(row=>`neture/suppliers/${row.id}/kyc/`)];
+    const suppliers=await ownedSupplierIds(db,ownerId);
+    const prefixes=[`business-registration/${ownerId}/`,...suppliers.map(id=>`neture/suppliers/${id}/kyc/`)];
     const pointers:string[]=[];
     for(const prefix of prefixes){
       let pageToken:string|undefined;

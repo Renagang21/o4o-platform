@@ -22,6 +22,7 @@ const quote = (value: string) => '"' + value.replace(/"/g, '""') + '"';
 const BUSINESS_ATTRIBUTION: Readonly<
   Record<string, { scope: string; fields: readonly string[] }>
 > = {
+  semi_franchise_memberships: { scope: "r.organization_id IS NOT NULL", fields: ["applied_by", "decided_by"] },
   store_products: {
     scope: "r.organization_id IS NOT NULL",
     fields: ["created_by"],
@@ -98,7 +99,7 @@ export function businessErasureProjection(
     table.table_name === "organizations" &&
     table.columns.includes("created_by_user_id")
   ) {
-    return `${row} - 'created_by_user_id'`;
+    return `${supplierErasureProjection(table,alias)} - 'created_by_user_id'`;
   }
   if (table.table_name === "store_owner_termination_cases")
     return `${row} - 'requested_by'`;
@@ -138,7 +139,7 @@ export async function businessErasureReviews(
   if (has("organizations") && has("organization_members")) {
     const rows = await db.query(
       `SELECT 1 FROM organization_members om JOIN organizations o ON o.id=om.organization_id
-      WHERE om.user_id=$1 AND om.role IN ('owner','admin','manager') AND om.left_at IS NULL AND o.type='store' AND ${closurePending} LIMIT 1`,
+      WHERE om.user_id=$1 AND om.role='owner' AND om.left_at IS NULL AND o.type IN ('store','pharmacy') AND ${closurePending} LIMIT 1`,
       [userId],
     );
     if (rows.length) codes.push("PHARMACY_TRANSFER_OR_CLOSURE_REQUIRED");

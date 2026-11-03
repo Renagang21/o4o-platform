@@ -183,7 +183,7 @@ export default function MemberLifecycleActions({
               </label>
               {action === "transfer" && (
                 <label className="block">
-                  새 경영자 가입 이메일
+                  새 경영자 가입 이메일{" "}
                   <input
                     type="email"
                     required
