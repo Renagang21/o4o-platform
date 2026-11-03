@@ -61,6 +61,18 @@ it('다른 가입 방식으로 이동한 뒤 도착한 Google 인증 응답으�
 });
 
 describe('GoogleContinue — 준비 상태', () => {
+  it('기본 로그인 버튼에는 브라우저 계정 이름·이메일을 표시하지 않는다', async () => {
+    mount();
+    await waitFor(() => expect(renderGoogleButton).toHaveBeenCalled());
+    expect(renderGoogleButton).toHaveBeenLastCalledWith(expect.objectContaining({ button: { size: 'medium', text: 'continue_with' } }));
+  });
+
+  it('가입 화면은 계정 추천 없이 가입 문구를 사용한다', async () => {
+    mount({ buttonText: 'signup_with' });
+    await waitFor(() => expect(renderGoogleButton).toHaveBeenCalled());
+    expect(renderGoogleButton).toHaveBeenLastCalledWith(expect.objectContaining({ button: { size: 'medium', text: 'signup_with' } }));
+  });
+
   it('allowlist 가 비어 있으면(enabled=false) 버튼 대신 "준비 중" 을 보여주고 GIS 를 로드하지 않는다', async () => {
     mount({ getSignupTerms: vi.fn(async () => TERMS),
       getConfig: vi.fn(async () => ({ enabled: false, clientId: null })) });

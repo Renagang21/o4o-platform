@@ -1,4 +1,10 @@
-/* Scoped to login presentation; signup, recovery and service workspaces keep their styles. */
+/* Shared account presentation for login, signup and recovery; service workspaces stay scoped. */
+.o4o-login-surface .o4o-login-email-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  margin-bottom: 18px;
+}
 .o4o-login-page,
 .o4o-login-surface {
   --login-accent: #176651;
@@ -68,7 +74,7 @@
   font-weight: 750;
   letter-spacing: -0.03em;
 }
-.o4o-login-story-brand svg {
+.o4o-login-story-brand :is(svg, img) {
   width: 30px;
   height: 30px;
   color: var(--login-accent);
@@ -180,7 +186,7 @@
   background: var(--login-soft);
   color: var(--login-accent);
 }
-.o4o-login-mark svg {
+.o4o-login-mark :is(svg, img) {
   width: 27px;
   height: 27px;
 }
@@ -222,16 +228,16 @@
   background: #eaf0eb;
   color: #253d30;
 }
-.o4o-login-surface [data-testid="email-login-form"] {
+.o4o-login-surface :is([data-testid="email-login-form"], [data-testid="email-signup-form"], .o4o-login-email-form) {
   gap: 18px !important;
 }
-.o4o-login-surface [data-testid="email-login-form"] label {
+.o4o-login-surface :is([data-testid="email-login-form"], [data-testid="email-signup-form"], .o4o-login-email-form) label {
   font-size: 13px !important;
   font-weight: 600 !important;
   color: #3b4b43 !important;
   margin-bottom: 4px;
 }
-.o4o-login-surface [data-testid="email-login-form"] input {
+.o4o-login-surface :is([data-testid="email-login-form"], [data-testid="email-signup-form"], .o4o-login-email-form) input:not([type="checkbox"]) {
   min-height: 50px;
   padding: 13px 14px !important;
   border-radius: 12px !important;
@@ -243,13 +249,13 @@
     border-color 0.15s,
     box-shadow 0.15s;
 }
-.o4o-login-surface [data-testid="email-login-form"] input[type="password"],
+.o4o-login-surface :is([data-testid="email-login-form"], [data-testid="email-signup-form"], .o4o-login-email-form) input[type="password"],
 .o4o-login-surface
-  [data-testid="email-login-form"]
+  :is([data-testid="email-login-form"], [data-testid="email-signup-form"], .o4o-login-email-form)
   input[data-testid="email-login-password"] {
   padding-right: 70px !important;
 }
-.o4o-login-surface [data-testid="email-login-form"] button[type="submit"] {
+.o4o-login-surface :is([data-testid="email-login-form"], [data-testid="email-signup-form"], .o4o-login-email-form) button[type="submit"] {
   min-height: 50px;
   padding: 13px 18px !important;
   border-radius: 12px !important;
@@ -257,21 +263,21 @@
   letter-spacing: 0.01em;
   font-size: 15px !important;
 }
-.o4o-login-surface [data-testid="email-login-form"] button:disabled {
+.o4o-login-surface :is([data-testid="email-login-form"], [data-testid="email-signup-form"], .o4o-login-email-form) button:disabled {
   cursor: not-allowed !important;
 }
-.o4o-login-surface [data-testid="email-login-form"] nav {
+.o4o-login-surface :is([data-testid="email-login-form"], [data-testid="email-signup-form"], .o4o-login-email-form) nav {
   flex-wrap: wrap;
   gap: 6px 10px !important;
   margin-top: 2px;
   font-size: 12px !important;
 }
-.o4o-login-surface [data-testid="email-login-form"] nav a {
+.o4o-login-surface :is([data-testid="email-login-form"], [data-testid="email-signup-form"], .o4o-login-email-form) nav a {
   color: #617168 !important;
   text-decoration: none !important;
   padding: 5px 0;
 }
-.o4o-login-surface [data-testid="email-login-form"] nav a:hover {
+.o4o-login-surface :is([data-testid="email-login-form"], [data-testid="email-signup-form"], .o4o-login-email-form) nav a:hover {
   text-decoration: underline !important;
   color: var(--login-accent) !important;
 }
@@ -286,7 +292,34 @@
 .o4o-login-surface [data-testid="google-continue-button"] {
   max-width: 100%;
   overflow: hidden;
+  align-items: center;
 }
+.o4o-login-email-option > summary,
+.o4o-login-surface .o4o-auth-choice {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 46px;
+  padding: 10px 16px;
+  border: 1px solid var(--login-border, #dce5df);
+  border-radius: 12px;
+  color: var(--login-ink, #18382f);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  list-style: none;
+  box-sizing: border-box;
+}
+.o4o-login-email-option > summary::-webkit-details-marker { display: none; }
+.o4o-login-email-option > summary::after { content: '+'; font-size: 18px; }
+.o4o-login-email-option[open] > summary::after { content: '−'; }
+.o4o-login-email-option > summary:hover { background: var(--login-soft, #edf5f0); }
+.o4o-login-email-option > summary:focus-visible {
+  outline: 2px solid var(--login-accent, #176651);
+  outline-offset: 3px;
+}
+.o4o-login-email-content { padding-top: 18px; }
 .o4o-login-overlay {
   position: fixed;
   inset: 0;
@@ -404,7 +437,7 @@
   }
 }
 
-.o4o-login-surface [data-testid="email-login-form"] button[aria-pressed] {
+.o4o-login-surface :is([data-testid="email-login-form"], [data-testid="email-signup-form"], .o4o-login-email-form) button[aria-pressed] {
   min-width: 52px;
   min-height: 44px;
   padding: 8px !important;
@@ -457,3 +490,6 @@
   word-break: keep-all;
   line-height: 1.5;
 }
+
+.o4o-login-surface [data-testid="email-signup-form"] input[autocomplete="new-password"] { padding-right: 70px !important; }
+.o4o-login-surface > .o4o-auth-choice, .o4o-login-body > .o4o-auth-choice { width: 100%; }

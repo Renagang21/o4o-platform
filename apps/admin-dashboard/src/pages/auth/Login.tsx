@@ -59,6 +59,7 @@ const Login: FC = () => {
     void renderGoogleButton({
       clientId: googleClientId,
       container: googleContainerRef.current,
+      button: { size: 'medium', text: 'continue_with' },
       onCredential: (idToken) => { void handleGoogleCredential(idToken); },
       onError: (err) => toast.error(err.message || 'Google 버튼을 불러오지 못했습니다.'),
     }).then((fn) => { if (disposed) fn(); else cleanup = fn; });

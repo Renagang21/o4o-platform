@@ -28,6 +28,8 @@ interface ServiceEntryTarget {
   publicPathPrefixes: readonly string[];
   /** 미가입 사용자에게 보여 줄 공개 목록 경로 */
   browsePath: string;
+  publicDescription: string;
+  browseLabel: string;
 }
 
 /** 이 출발점으로 들어갈 수 있는 서비스. 로그인 화면을 가진 서비스는 각자 로그인한다. */
@@ -39,6 +41,17 @@ const SERVICE_ENTRY_TARGETS: Readonly<Record<string, ServiceEntryTarget>> = Obje
     publicPaths: ['/', '/terms', '/privacy'],
     publicPathPrefixes: ['/courses', '/certificates/verify/', '/certificate/verify/'],
     browsePath: '/courses',
+    publicDescription: '공개 강의는 회원이 아니어도 볼 수 있습니다. O4O 강의 이용 신청은 문의하기로 남겨 주시면 확인 후 안내해 드립니다.',
+    browseLabel: '공개 강의 둘러보기',
+  },
+  'partner-support': {
+    label: 'O4O Partner',
+    origin: 'https://partner.neture.co.kr',
+    publicPaths: ['/', '/community'],
+    publicPathPrefixes: [],
+    browsePath: '/community',
+    publicDescription: '파트너 공개 화면에서 이용 안내를 확인할 수 있습니다. 서비스 이용 문의는 문의하기로 남겨 주세요.',
+    browseLabel: '파트너 둘러보기',
   },
 });
 
@@ -101,7 +114,7 @@ export default function ServiceEntryPage() {
         <p className="mt-3 text-sm text-gray-600">O4O 계정 로그인은 정상적으로 완료되었습니다.</p>
         <p className="mt-1 text-sm text-gray-600" role="alert">{denial(target.label)}</p>
         <p className="mt-3 text-sm text-gray-500">
-          공개 강의는 회원이 아니어도 볼 수 있습니다. {target.label} 이용 신청은 문의하기로 남겨 주시면 확인 후 안내해 드립니다.
+          {target.publicDescription}
         </p>
         <div className="mt-6 flex flex-col items-center gap-3">
           <a
@@ -109,7 +122,7 @@ export default function ServiceEntryPage() {
             href={browseHref}
             data-testid="service-entry-browse"
           >
-            {backToPublic ? '보던 화면으로 돌아가기' : '공개 강의 둘러보기'}
+            {backToPublic ? '보던 화면으로 돌아가기' : target.browseLabel}
           </a>
           <Link className="text-sm font-medium text-green-700 underline" to="/contact" data-testid="service-entry-inquiry">
             {target.label} 이용 문의하기

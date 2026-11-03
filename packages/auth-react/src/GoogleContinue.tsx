@@ -41,8 +41,10 @@ export interface GoogleContinueProps<TUser = unknown> {
   privacyHref?: string;
   /** Google 버튼 아래 안내(선택). 버튼이 보이는 동안에만 렌더한다. */
   hint?: ReactNode;
-  /** 가입 선택 화면에서 브라우저 계정 이름·이메일이 표시되는 맞춤 버튼을 끈다. */
+  /** 기본 false: 브라우저 계정 이름·이메일을 버튼에 표시하지 않는다. */
   personalizedButton?: boolean;
+  /** 로그인·가입 화면의 동작에 맞는 GIS 공식 버튼 문구. */
+  buttonText?: 'continue_with' | 'signin_with' | 'signup_with';
   className?: string;
 }
 
@@ -75,7 +77,8 @@ export function GoogleContinue<TUser = unknown>({
   onError,
   onStart,
   hint,
-  personalizedButton = true,
+  personalizedButton = false,
+  buttonText = 'continue_with',
   className,
 }: GoogleContinueProps<TUser>) {
   const [policy, setPolicy] = useState<SignupTermsDocument | null>(null);
@@ -156,14 +159,14 @@ export function GoogleContinue<TUser = unknown>({
       container: containerRef.current,
       // GIS 공식 지원: medium 버튼에는 계정 이름·이메일 맞춤 표시가 없다.
       // https://developers.google.com/identity/gsi/web/guides/personalized-button
-      ...(!personalizedButton && { button: { size: 'medium' as const, text: 'signup_with' as const } }),
+      ...(!personalizedButton && { button: { size: 'medium' as const, text: buttonText } }),
       onCredential: (token) => { void handleCredential(token); },
       onError: (err) => {
         if (mountedRef.current) setMessage(err.message || 'Google 버튼을 불러오지 못했습니다.');
       },
     }).then((fn) => { if (disposed) fn(); else cleanup = fn; });
     return () => { disposed = true; cleanup?.(); };
-  }, [stage, handleCredential, personalizedButton]);
+  }, [stage, handleCredential, personalizedButton, buttonText]);
 
   /** consent → signup */
   const submitSignup = useCallback(async () => {

@@ -21,6 +21,7 @@ import {
   ServiceAccountMenu,
   ServiceFooter,
 } from "@o4o/auth-react";
+import { PartnerAccountCard } from "./PartnerAccountCard";
 import WorkspacePortal, {
   type WorkspaceSessionChange,
 } from "./WorkspacePortal";
@@ -173,6 +174,21 @@ export default function PartnerSite() {
       active = false;
     };
   }, [loadAttempt]);
+  const finishLogin = async () => {
+    setUser(await partnerApi.me());
+    await reloadMembership();
+    const invite = location.state?.workspaceInvite;
+    if (typeof invite === "string" && /^[a-f0-9]{64}$/.test(invite)) {
+      resyncWorkspaceSession(invite);
+      return;
+    }
+    nav(
+      safeServiceReturnPath(
+        new URLSearchParams(location.search).get("returnTo"),
+      ) ?? "/community",
+      { replace: true },
+    );
+  };
   const login = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const data = new FormData(e.currentTarget);
@@ -180,19 +196,7 @@ export default function PartnerSite() {
     setPassword("");
     void run(async () => {
       await partnerApi.login(String(data.get("email")), secret);
-      setUser(await partnerApi.me());
-      await reloadMembership();
-      const invite = location.state?.workspaceInvite;
-      if (typeof invite === "string" && /^[a-f0-9]{64}$/.test(invite)) {
-        resyncWorkspaceSession(invite);
-        return;
-      }
-      nav(
-        safeServiceReturnPath(
-          new URLSearchParams(location.search).get("returnTo"),
-        ) ?? "/community",
-        { replace: true },
-      );
+      await finishLogin();
     });
   };
   const onWorkspaceSessionChange = (change: WorkspaceSessionChange) => {
@@ -329,10 +333,11 @@ export default function PartnerSite() {
         ) : workspace ? (
           <WorkspacePortal onSessionChange={onWorkspaceSessionChange} />
         ) : loginPage ? (
-          <section className="community-auth panel">
-            <h1>O4O 계정 로그인</h1>
-            <p>로그인 후 파트너 커뮤니티에 별도로 가입할 수 있습니다.</p>
-            <form onSubmit={login}>
+          <PartnerAccountCard
+            busy={busy || !ready}
+            onCheck={() => void run(finishLogin)}
+          >
+            <form className="o4o-login-email-form" onSubmit={login}>
               <label className="field">
                 이메일
                 <input
@@ -356,7 +361,7 @@ export default function PartnerSite() {
               </button>
             </form>
             <a href="https://neture.co.kr/signup">O4O 계정 만들기 ↗</a>
-          </section>
+          </PartnerAccountCard>
         ) : operator ? (
           <>
             {!ready ? (

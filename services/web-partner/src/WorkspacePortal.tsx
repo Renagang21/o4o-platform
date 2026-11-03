@@ -6,6 +6,7 @@ import {
   type FormEvent,
 } from "react";
 import App from "./App";
+import { PartnerAccountCard } from "./PartnerAccountCard";
 import { PasswordInput } from "@o4o/auth-react";
 import {
   partnerApi,
@@ -345,63 +346,55 @@ export default function WorkspacePortal({
                 O4O 가입·계정 안내 ↗
               </a>
             </div>
-            <form
-              className="panel"
-              onSubmit={(e) => {
-                e.preventDefault();
-                const el = e.currentTarget,
-                  f = new FormData(el);
-                const email = String(f.get("email") || ""),
-                  password = String(f.get("password") || "");
-                setLoginPassword("");
-                void run(async () => {
-                  await partnerApi.login(email, password);
-                  if (onSessionChange) {
-                    onSessionChange({
-                      type: "signed-in",
-                      inviteToken: joinToken,
-                    });
-                    return;
-                  }
-                  await connect();
-                });
-              }}
+            <PartnerAccountCard
+              busy={busy}
+              heading="h2"
+              onCheck={() => void run(connect)}
             >
-              <h2>O4O 계정 로그인</h2>
-              <label className="field">
-                이메일
-                <input
-                  name="email"
-                  type="email"
-                  autoComplete="username"
-                  required
-                />
-              </label>
-              <PasswordInput
-                label="비밀번호"
-                name="password"
-                value={loginPassword}
-                onChange={setLoginPassword}
-                autoComplete="current-password"
-                disabled={busy}
-              />
-              <button className="button primary" disabled={busy}>
-                로그인
-              </button>
-              <button
-                className="button secondary"
-                type="button"
-                disabled={busy}
-                onClick={() => void run(connect)}
+              <form
+                className="o4o-login-email-form"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  const el = e.currentTarget,
+                    f = new FormData(el);
+                  const email = String(f.get("email") || ""),
+                    password = String(f.get("password") || "");
+                  setLoginPassword("");
+                  void run(async () => {
+                    await partnerApi.login(email, password);
+                    if (onSessionChange) {
+                      onSessionChange({
+                        type: "signed-in",
+                        inviteToken: joinToken,
+                      });
+                      return;
+                    }
+                    await connect();
+                  });
+                }}
               >
-                기존 로그인 확인
-              </button>
-              <p className="hint">
-                비밀번호는 기존 인증 API에만 전달하고 저장하지 않습니다. Google
-                계정 이용자는 O4O 메인에서 로그인한 뒤 기존 로그인 확인을
-                이용하세요.
-              </p>
-            </form>
+                <label className="field">
+                  이메일
+                  <input
+                    name="email"
+                    type="email"
+                    autoComplete="username"
+                    required
+                  />
+                </label>
+                <PasswordInput
+                  label="비밀번호"
+                  name="password"
+                  value={loginPassword}
+                  onChange={setLoginPassword}
+                  autoComplete="current-password"
+                  disabled={busy}
+                />
+                <button className="button primary" disabled={busy}>
+                  로그인
+                </button>
+              </form>
+            </PartnerAccountCard>
           </div>
         ) : (
           <>

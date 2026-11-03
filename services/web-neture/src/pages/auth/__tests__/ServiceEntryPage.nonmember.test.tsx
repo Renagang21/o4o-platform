@@ -114,6 +114,39 @@ describe('ServiceEntryPage — 미가입 사용자', () => {
 });
 
 describe('ServiceEntryPage — 회귀', () => {
+  it('Partner 로그인 전에는 대상 복귀 경로를 보존하고 모달을 연다', async () => {
+    h.auth.isAuthenticated = false;
+    const entry = '/service-entry/partner-support?returnPath=%2Fcommunity';
+    mount(entry);
+    await waitFor(() => expect(h.openLoginModal).toHaveBeenCalledWith(entry));
+    expect(h.resolveServiceEntryUrl).not.toHaveBeenCalled();
+    expect(screen.getByTestId('service-entry-login').textContent).toContain('O4O Partner');
+  });
+
+  it('Partner 인증 후에는 partner-support handoff로 대상 origin에 세션을 전달한다', async () => {
+    const href = 'https://partner.neture.co.kr/handoff?token=fixture&returnTo=%2Fcommunity';
+    h.resolveServiceEntryUrl.mockResolvedValue(href);
+    mount('/service-entry/partner-support?returnPath=%2Fcommunity');
+    await waitFor(() => expect(assign).toHaveBeenCalledWith(href));
+    expect(h.resolveServiceEntryUrl).toHaveBeenCalledWith('partner-support', '/community');
+  });
+
+  it('Partner의 외부 복귀 주소는 handoff에 전달하지 않는다', async () => {
+    h.resolveServiceEntryUrl.mockResolvedValue('https://partner.neture.co.kr/handoff?token=fixture');
+    mount('/service-entry/partner-support?returnPath=https%3A%2F%2Fexample.test');
+    await waitFor(() => expect(h.resolveServiceEntryUrl).toHaveBeenCalledWith('partner-support', undefined));
+  });
+
+  it('Partner 이용 거절 시 보호 경로 대신 공개 파트너 안내를 제공한다', async () => {
+    h.resolveServiceEntryUrl.mockRejectedValue(new h.ServiceEntryError('거절', 'HANDOFF_TARGET_NOT_ACTIVE'));
+    mount('/service-entry/partner-support?returnPath=%2Fworkspace');
+    const browse = await screen.findByTestId('service-entry-browse');
+    expect(browse.getAttribute('href')).toBe('https://partner.neture.co.kr/community');
+    expect(browse.textContent).toBe('파트너 둘러보기');
+    expect(screen.queryByText(/공개 강의는/)).toBeNull();
+    expect(assign).not.toHaveBeenCalled();
+  });
+
   it('membership 이 아닌 오류는 기존 일반 오류 화면', async () => {
     h.resolveServiceEntryUrl.mockRejectedValue(new h.ServiceEntryError('로그인이 필요합니다.', 'AUTH_REQUIRED'));
     mount('/service-entry/lecture');

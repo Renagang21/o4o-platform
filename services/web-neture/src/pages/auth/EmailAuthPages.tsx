@@ -20,6 +20,8 @@ import { useLayoutEffect, useMemo, useState, type ReactNode } from 'react';
 import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import {
   O4OHomeButton,
+  LoginCard,
+  NETURE_LOGO_SRC,
   GoogleContinue, KakaoContinue,
   EmailSignupForm,
   VerifyEmailView,
@@ -36,20 +38,12 @@ import { operatorInvitationReturnPath, recoverOperatorInvitationContinuation } f
 function AuthCard({ title, subtitle, children }: { title: string; subtitle?: string; children: ReactNode }) {
   const { isAuthenticated, isLoading } = useAuth();
   return (
-    <div className="min-h-screen bg-gray-50 flex items-start sm:items-center justify-center px-4 py-10">
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        <div className="flex items-center gap-3 px-6 py-4 border-b border-gray-100">
-          <span className="text-2xl" aria-hidden>🌿</span>
-          <div>
-            <h1 className="text-lg font-bold text-gray-900">{title}</h1>
-            {subtitle && <p className="text-xs text-gray-500 break-keep">{subtitle}</p>}
-          </div>
-        </div>
-        <div className="p-6">{children}
-          <div className="mt-6"><O4OHomeButton api={authClient.api} isAuthenticated={isAuthenticated} authLoading={isLoading} label="O4O 메인으로" className="o4o-home-link" /></div>
-        </div>
-      </div>
-    </div>
+    <main className="o4o-login-page">
+      <LoginCard brand="Neture" title={title} description={subtitle} tone="green" logoSrc={NETURE_LOGO_SRC}>
+        {children}
+        <div className="o4o-login-footnote"><O4OHomeButton api={authClient.api} isAuthenticated={isAuthenticated} authLoading={isLoading} label="O4O 메인으로" className="o4o-home-link" /></div>
+      </LoginCard>
+    </main>
   );
 }
 
@@ -111,6 +105,7 @@ export function SignupPage() {
           <section aria-label="소셜 계정으로 가입" className="space-y-3">
             <GoogleContinue<User>
               personalizedButton={false}
+              buttonText="signup_with"
               getSignupTerms={() => authClient.getSignupTerms()}
               getConfig={getGoogleAuthConfig}
               loginWithGoogle={loginWithGoogle}
@@ -133,7 +128,7 @@ export function SignupPage() {
             또는
             <span className="h-px flex-1 bg-gray-200" />
           </div>
-          <button type="button" className="min-h-11 w-full rounded-lg border border-gray-300 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50" onClick={() => setEmailSignup(true)}>
+          <button type="button" className="o4o-auth-choice w-full" onClick={() => setEmailSignup(true)}>
             이메일(아이디)로 가입
           </button>
         </>

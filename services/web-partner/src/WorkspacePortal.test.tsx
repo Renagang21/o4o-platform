@@ -47,6 +47,7 @@ describe("공동공간 진입", () => {
     render(<WorkspacePortal onSessionChange={changed} />);
     await screen.findByRole("button", { name: "공동공간 만들기" });
     fireEvent.click(screen.getByRole("button", { name: "로그아웃" }));
+    fireEvent.click(await screen.findByText("이메일로 로그인"));
     await screen.findByRole("button", { name: "로그인", exact: true });
     expect(changed).toHaveBeenCalledWith({
       type: "signed-out",
@@ -72,10 +73,12 @@ describe("공동공간 진입", () => {
     );
     vi.mocked(partnerApi.login).mockResolvedValue({});
     render(<WorkspacePortal onSessionChange={changed} />);
+    fireEvent.click(await screen.findByText("이메일로 로그인"));
     await screen.findByRole("button", { name: "로그인", exact: true });
     await waitFor(() =>
       expect(screen.queryByText("서버에서 처리 중입니다…")).toBeNull(),
     );
+    if (!screen.getByTestId("email-login-option").hasAttribute("open")) fireEvent.click(screen.getByText("이메일로 로그인"));
     fireEvent.change(screen.getByLabelText("이메일"), {
       target: { value: "member@example.invalid" },
     });
@@ -149,10 +152,11 @@ describe("공동공간 진입", () => {
       new ApiError(401, "UNAUTHENTICATED"),
     );
     fireEvent.click(screen.getByRole("button", { name: "서버 공동공간 연결" }));
+    fireEvent.click(await screen.findByText("이메일로 로그인"));
     await screen.findByRole("button", { name: "로그인", exact: true });
     expect(screen.queryByLabelText("이용할 공동공간")).toBeNull();
     expect(screen.queryByText("테스트 사용자님의 공동공간")).toBeNull();
-    fireEvent.click(screen.getByRole("button", { name: "기존 로그인 확인" }));
+    fireEvent.click(screen.getByRole("button", { name: "로그인 상태 확인" }));
     await screen.findByLabelText("이용할 공동공간");
     expect(
       (screen.getByLabelText("이용할 공동공간") as HTMLSelectElement).value,
@@ -170,6 +174,7 @@ describe("공동공간 진입", () => {
     await waitFor(() =>
       expect(screen.queryByText("서버에서 처리 중입니다…")).toBeNull(),
     );
+    if (!screen.getByTestId("email-login-option").hasAttribute("open")) fireEvent.click(screen.getByText("이메일로 로그인"));
     fireEvent.change(screen.getByLabelText("이메일"), {
       target: { value: "fixture@example.invalid" },
     });
