@@ -7,8 +7,8 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { AuthClient, getAccessToken } from "@o4o/auth-client";
 import {
-  EmailLoginForm,
-  O4O_ACCOUNT_LINKS,
+  LoginCard,
+  LoginMethods,
   useServiceAuth,
   ServiceSpaceSwitcher,
   MyHomeButton,
@@ -173,22 +173,22 @@ export function ConnectedApp() {
         ) : undefined
       }
       loginContent={
-        <section className="section">
-          <h1>협동조합 로그인</h1>
+        <LoginCard brand="O4O 협동조합" title="협동조합 로그인">
           {auth.user ? (
             <>
               <p>로그인했습니다.</p>
               <Link to={returnTo}>원래 화면으로 이동</Link>
             </>
           ) : (
-            <EmailLoginForm
-              links={O4O_ACCOUNT_LINKS}
-              onLogin={auth.loginWithEmail}
+            <LoginMethods
+              loginWithEmail={auth.loginWithEmail}
               api={authClient}
               onSuccess={() => navigate(returnTo, { replace: true })}
+              google={{ getSignupTerms: () => authClient.getSignupTerms(), getConfig: () => authClient.getGoogleAuthConfig(), loginWithGoogle: auth.loginWithGoogle, signupWithGoogle: auth.signupWithGoogle }}
+              kakao={{ client: authClient, loginWithKakao: auth.loginWithKakao, signupWithKakao: auth.signupWithKakao, returnTo }}
             />
           )}
-        </section>
+        </LoginCard>
       }
     />
   );

@@ -10,7 +10,7 @@ import type { CSSProperties, ReactNode } from 'react';
 import { KakaoContinue, type KakaoContinueProps } from './KakaoContinue';
 import { GoogleContinue, type GoogleContinueProps } from './GoogleContinue';
 import { DemoLoginButtons } from './DemoLoginButtons';
-import { EmailLoginForm } from './email/EmailLoginForm';
+import { EmailLoginDisclosure } from './EmailLoginDisclosure';
 import type { EmailAuthApi, EmailAuthLinks } from './email/shared';
 import type { AuthLoginResult } from './types';
 
@@ -57,18 +57,18 @@ export function LoginMethods<TUser = unknown>({
   const hint: ReactNode = google.hint ?? <p style={hintStyle}>{DEFAULT_GOOGLE_HINT}</p>;
   return (
     <div className={className} style={box} data-testid="login-methods">
-      <EmailLoginForm<TUser>
+      <GoogleContinue<TUser> {...google} personalizedButton={false} hint={hint} onSuccess={({ user }) => onSuccess(user)} />
+      {kakao && <KakaoContinue {...kakao} onSuccess={onSuccess} />}
+      <div style={divider} aria-hidden>
+        <span style={rule} />또는<span style={rule} />
+      </div>
+      <EmailLoginDisclosure<TUser>
         onLogin={loginWithEmail}
         api={api}
         links={accountLinks}
         onSuccess={(result) => { if (result.user) onSuccess(result.user); }}
         onFailure={onEmailFailure}
       />
-      <div style={divider} aria-hidden>
-        <span style={rule} />또는<span style={rule} />
-      </div>
-      <GoogleContinue<TUser> {...google} hint={hint} onSuccess={({ user }) => onSuccess(user)} />
-      {kakao && <KakaoContinue {...kakao} onSuccess={onSuccess} />}
       <DemoLoginButtons loginWithEmail={loginWithEmail} onSuccess={onSuccess} onFailure={onEmailFailure} />
     </div>
   );

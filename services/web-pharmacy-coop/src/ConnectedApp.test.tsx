@@ -23,7 +23,7 @@ vi.mock("@o4o/auth-react", async (importOriginal) => ({
   ...await importOriginal<typeof import("@o4o/auth-react")>(),
   useServiceAuth: () => mocks.auth,
   O4O_ACCOUNT_LINKS: { signup: "https://neture.co.kr/signup" },
-  EmailLoginForm: ({ links, onSuccess }: { links?: { signup?: string }; onSuccess?: () => void }) => <><p>공통 로그인</p>{links?.signup && <a href={links.signup}>회원가입</a>}<button onClick={onSuccess}>합성 로그인 완료</button></>,
+  LoginMethods: ({ onSuccess }: { links?: { signup?: string }; onSuccess?: () => void }) => <><p>공통 로그인</p><a href="https://neture.co.kr/signup">회원가입</a><button onClick={onSuccess}>합성 로그인 완료</button></>,
 }));
 vi.mock("./App", () => ({
   App: ({ session, loginContent }: { session: { userId: string | null }; loginContent?: React.ReactNode }) => (

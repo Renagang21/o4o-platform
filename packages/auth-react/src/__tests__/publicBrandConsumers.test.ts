@@ -19,7 +19,7 @@ const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../../../..');
 const read = (p: string) => readFileSync(resolve(ROOT, p), 'utf8');
 
 const APPS = [
-  { app: 'web-neture', host: 'https://neture.co.kr/', favicon: '/favicon.png' },
+  { app: 'web-neture', host: 'https://neture.co.kr/', favicon: '/favicon.svg' },
   { app: 'web-pharmacy-business', host: 'https://pharmacy.neture.co.kr/', favicon: '/favicon.png' },
   { app: 'web-store', host: 'https://store.neture.co.kr/', favicon: '/favicon.svg' },
   { app: 'web-lecture', host: 'https://study.neture.co.kr/', favicon: '/favicon.svg' },

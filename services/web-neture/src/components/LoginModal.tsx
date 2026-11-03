@@ -16,7 +16,7 @@ import { claimLoginNavigation, cancelLoginNavigation } from '../lib/loginNavigat
 
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LoginCard, O4OHomeButton, GoogleContinue, KakaoContinue, EmailLoginForm } from '@o4o/auth-react';
+import { LoginCard, O4OHomeButton, GoogleContinue, KakaoContinue, EmailLoginDisclosure, NETURE_LOGO_SRC } from '@o4o/auth-react';
 import { authClient } from '../lib/apiClient';
 import { useAuth } from '../contexts';
 import type { User } from '../contexts/AuthContext';
@@ -186,27 +186,11 @@ export default function LoginModal({ isOpen, onClose, returnUrl }: LoginModalPro
     <div className="o4o-login-overlay" role="dialog" aria-modal="true" aria-label={`${LOGIN_BRAND[CURRENT_HOST_PROFILE]} 로그인`}
     >
       <button type="button" className="o4o-login-backdrop" aria-label="로그인 창 배경 닫기" onClick={onClose} />
-      <LoginCard brand={LOGIN_BRAND[CURRENT_HOST_PROFILE]} tone="green" heading="h2" title={`${LOGIN_BRAND[CURRENT_HOST_PROFILE]} 로그인`} description={LOGIN_MODAL_SUBTITLE[CURRENT_HOST_PROFILE]} onClose={onClose}>
-
-              {/* WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1: 이메일 + 비밀번호 로그인(공통 폼) */}
-              <EmailLoginForm<User>
-                onLogin={loginWithEmail}
-                api={authClient}
-                onSuccess={() => { setError(null); setIsNotMember(false); handleLoginSuccess(); }}
-                links={{ signup: '/signup', findId: '/find-id', forgotPassword: '/forgot-password', onNavigate: handleNavigate }}
-              />
-
-              <div className="my-6 flex items-center gap-3 text-xs text-gray-400" aria-hidden>
-                <span className="h-px flex-1 bg-gray-200" />
-                또는
-                <span className="h-px flex-1 bg-gray-200" />
-              </div>
+      <LoginCard brand={LOGIN_BRAND[CURRENT_HOST_PROFILE]} tone="green" heading="h2" title={`${LOGIN_BRAND[CURRENT_HOST_PROFILE]} 로그인`} description={LOGIN_MODAL_SUBTITLE[CURRENT_HOST_PROFILE]} onClose={onClose}
+        logoSrc={CURRENT_HOST_PROFILE === 'community' || CURRENT_HOST_PROFILE === 'carepharm' ? undefined : NETURE_LOGO_SRC}>
 
               {/* WO-O4O-GOOGLE-ONLY-SIGNUP-LOGIN-V1: Google 로 계속하기 — 미등록이면 약관 동의 → 계정 생성 */}
-              <div className="mb-4">
-                <KakaoContinue<User> client={authClient} loginWithKakao={loginWithKakao} signupWithKakao={signupWithKakao}
-                  returnTo={returnUrl ?? '/'}
-                  onSuccess={handleLoginSuccess} />
+              <div className="flex flex-col gap-3">
                 <GoogleContinue<User>
                   getSignupTerms={() => authClient.getSignupTerms()}
                   getConfig={getGoogleAuthConfig}
@@ -230,7 +214,20 @@ export default function LoginModal({ isOpen, onClose, returnUrl }: LoginModalPro
                     </p>
                   }
                 />
+                <KakaoContinue<User> client={authClient} loginWithKakao={loginWithKakao} signupWithKakao={signupWithKakao}
+                  returnTo={returnUrl ?? '/'}
+                  onSuccess={handleLoginSuccess} />
               </div>
+
+              <div className="my-5 flex items-center gap-3 text-xs text-gray-400" aria-hidden>
+                <span className="h-px flex-1 bg-gray-200" />또는<span className="h-px flex-1 bg-gray-200" />
+              </div>
+              <EmailLoginDisclosure<User>
+                onLogin={loginWithEmail}
+                api={authClient}
+                onSuccess={() => { setError(null); setIsNotMember(false); handleLoginSuccess(); }}
+                links={{ signup: '/signup', findId: '/find-id', forgotPassword: '/forgot-password', onNavigate: handleNavigate }}
+              />
 
               {/* WO-O4O-LOGIN-SERVICE-NOT-MEMBER-UX-V1: 서비스 미가입 안내 + 신청 링크 */}
               {error && (
