@@ -35,10 +35,10 @@ export class KycDocument {
   /**
    * 문서 소유자
    */
-  @Column({ name: 'user_id', type: 'uuid' })
-  userId!: string;
+  @Column({ name: 'user_id', type: 'uuid', nullable: true })
+  userId!: string | null;
 
-  @ManyToOne('User', { onDelete: 'CASCADE' })
+  @ManyToOne('User', { onDelete: 'SET NULL', nullable: true })
   @JoinColumn({ name: 'user_id' })
   user!: User;
 

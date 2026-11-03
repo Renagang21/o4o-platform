@@ -4,6 +4,8 @@ const mine = jest.fn(),
   apply = jest.fn(),
   list = jest.fn(),
   decide = jest.fn();
+// Qualification routes are unit-tested independently of member lifecycle dependencies.
+jest.mock("../../services/admin/member-lifecycle.service.js", () => ({ MemberLifecycleService: jest.fn() }));
 jest.mock("../../database/connection.js", () => ({ AppDataSource: {} }));
 jest.mock("../../middleware/rateLimiter.js", () => ({
   apiLimiter: (_req: any, _res: any, next: any) => next(),

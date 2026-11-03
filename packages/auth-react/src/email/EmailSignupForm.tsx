@@ -9,8 +9,9 @@ import type { SignupTermsDocument } from '@o4o/auth-client';
  * 가입은 계정만 만든다 — 서비스 가입 · 조직 · 역할을 주지 않고 세션도 열지 않는다(메일 확인 후 로그인).
  * 이미 쓰는 이메일은 서버가 안내 문구를 준다(새 계정 · 자동 병합 없음).
  */
-import { useState, type FormEvent } from 'react';
+import { useRef, useState, type FormEvent } from 'react';
 import { checkPasswordPolicy, isLoginEmailShapeValid } from '@o4o/auth-utils';
+import { useVerificationEmailResend } from './useVerificationEmailResend';
 import { PasswordInput } from './PasswordInput';
 import { PasswordPolicyHints } from './PasswordPolicyHints';
 import { linkHandler, readEmailAuthError, styles, type EmailAuthApi, type EmailAuthLinks } from './shared';
@@ -33,6 +34,7 @@ function signupPhoneDigits(value: string) {
 }
 
 export function EmailSignupForm({ api, links, className }: EmailSignupFormProps) {
+  const submitLock=useRef(false);
   const [policy, setPolicy] = useState<SignupTermsDocument | null>(null);
   const [policyReload, setPolicyReload] = useState(0);
   const [email, setEmail] = useState('');
@@ -81,7 +83,8 @@ export function EmailSignupForm({ api, links, className }: EmailSignupFormProps)
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
-    if (!ready) return;
+    if (!ready || submitLock.current) return;
+    submitLock.current=true;
     setSubmitting(true);
     setError(null);
     try {
@@ -98,9 +101,15 @@ export function EmailSignupForm({ api, links, className }: EmailSignupFormProps)
       setSentTo({ email: email.trim(), masked: res.maskedEmail ?? undefined, mailSent: res.mailSent });
     } catch (e) {
       const failure = readEmailAuthError(e, '회원가입을 처리하지 못했습니다. 잠시 후 다시 시도해 주세요.');
+      if (failure.code === 'EMAIL_PENDING_VERIFICATION') {
+        setPassword(''); setConfirm('');
+        setSentTo({ email: email.trim() });
+        return;
+      }
       if (failure.code?.startsWith('POLICY_')) { setPolicy(null); setTerms(false); setPrivacy(false); setPolicyReload(value => value + 1); }
       setError(failure.message);
     } finally {
+      submitLock.current=false;
       setSubmitting(false);
     }
   };
@@ -225,28 +234,14 @@ export interface EmailSentNoticeProps {
 }
 
 /** 확인 메일 발송 안내 — 재발송 · 로그인으로 이동. */
-export function EmailSentNotice({ api, email, maskedEmail, mailSent, links, className }: EmailSentNoticeProps) {
-  const [resending, setResending] = useState(false);
-  const [message, setMessage] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
-
-  const handleResend = async () => {
-    setResending(true);
-    setError(null);
-    try {
-      const res = await api.resendVerificationEmail(email);
-      setMessage(res.message ?? '확인 메일을 다시 보냈습니다.');
-    } catch (e) {
-      setError(readEmailAuthError(e, '확인 메일을 보내지 못했습니다.').message);
-    } finally {
-      setResending(false);
-    }
-  };
+export function EmailSentNotice({ api, email, mailSent, links, className }: EmailSentNoticeProps) {
+  const resend = useVerificationEmailResend(api, email);
 
   return (
     <div style={styles.box} className={className} data-testid="email-sent-notice">
       <p role="status" style={styles.notice}>
-        <strong>{maskedEmail ?? email}</strong> 으로 확인 메일을 보냈습니다.
+        <strong>{email}</strong><br />
+        {mailSent === true ? '확인 메일을 보냈습니다.' : mailSent === false ? '확인 메일을 보내지 못했습니다.' : '가입 신청한 이메일의 확인이 필요합니다.'}
         <br />
         메일의 링크를 열면 가입이 완료되고, 그다음 이메일과 비밀번호로 로그인할 수 있습니다. 링크는 24시간 동안 유효합니다.
       </p>
@@ -254,10 +249,10 @@ export function EmailSentNotice({ api, email, maskedEmail, mailSent, links, clas
         <p style={styles.error}>메일 발송이 지연되고 있습니다. 잠시 후 아래 버튼으로 다시 보내 주세요.</p>
       )}
       <p style={styles.hint}>메일이 보이지 않으면 스팸함을 확인해 주세요.</p>
-      {message && <p role="status" style={styles.hintOk}>{message}</p>}
-      {error && <p role="alert" style={styles.error}>{error}</p>}
-      <button type="button" onClick={handleResend} disabled={resending} style={styles.ghostBtn}>
-        {resending ? '보내는 중…' : '확인 메일 다시 보내기'}
+      {resend.message && <p role="status" style={styles.hintOk}>{resend.message}</p>}
+      {resend.error && <p role="alert" style={styles.error}>{resend.error}</p>}
+      <button type="button" onClick={() => void resend.resend()} disabled={resend.busy || resend.remaining > 0} style={styles.ghostBtn}>
+        {resend.label}
       </button>
       {links?.login && (
         <a href={links.login} onClick={linkHandler(links, links.login)} style={{ ...styles.primaryBtn, textAlign: 'center', textDecoration: 'none', boxSizing: 'border-box', display: 'block' }}>

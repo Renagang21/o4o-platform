@@ -8,8 +8,9 @@
  */
 import { useState, type FormEvent } from 'react';
 import type { AuthLoginResult } from '../types';
+import { useVerificationEmailResend } from './useVerificationEmailResend';
 import { PasswordInput } from './PasswordInput';
-import { linkHandler, readEmailAuthError, styles, type EmailAuthApi, type EmailAuthLinks } from './shared';
+import { linkHandler, styles, type EmailAuthApi, type EmailAuthLinks } from './shared';
 
 export interface EmailLoginFormProps<TUser> {
   onLogin: (email: string, password: string) => Promise<AuthLoginResult<TUser>>;
@@ -29,8 +30,7 @@ export function EmailLoginForm<TUser>({ onLogin, onSuccess, onFailure, api, link
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [needsVerify, setNeedsVerify] = useState(false);
-  const [notice, setNotice] = useState<string | null>(null);
-  const [resending, setResending] = useState(false);
+  const resend = useVerificationEmailResend(api, email);
 
   const canSubmit = email.trim().length > 0 && password.length > 0 && !submitting;
 
@@ -39,7 +39,7 @@ export function EmailLoginForm<TUser>({ onLogin, onSuccess, onFailure, api, link
     if (!canSubmit) return;
     setSubmitting(true);
     setError(null);
-    setNotice(null);
+
     setNeedsVerify(false);
     const result = await onLogin(email.trim(), password);
     setSubmitting(false);
@@ -53,18 +53,6 @@ export function EmailLoginForm<TUser>({ onLogin, onSuccess, onFailure, api, link
     onFailure?.(result);
   };
 
-  const handleResend = async () => {
-    setResending(true);
-    try {
-      const res = await api.resendVerificationEmail(email.trim());
-      setNotice(res.message ?? '확인 메일을 다시 보냈습니다. 메일함을 확인해 주세요.');
-      setError(null);
-    } catch (e) {
-      setError(readEmailAuthError(e, '확인 메일을 보내지 못했습니다.').message);
-    } finally {
-      setResending(false);
-    }
-  };
 
   return (
     <form onSubmit={handleSubmit} style={styles.box} className={className} noValidate data-testid="email-login-form">
@@ -77,7 +65,7 @@ export function EmailLoginForm<TUser>({ onLogin, onSuccess, onFailure, api, link
           autoComplete="username"
           autoCapitalize="off"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={(e) => { setEmail(e.target.value); setNeedsVerify(false); }}
           disabled={submitting}
           style={styles.input}
           placeholder="name@example.com"
@@ -92,10 +80,11 @@ export function EmailLoginForm<TUser>({ onLogin, onSuccess, onFailure, api, link
         testId="email-login-password"
       />
       {error && <p role="alert" style={styles.error}>{error}</p>}
-      {notice && <p role="status" style={styles.notice}>{notice}</p>}
+      {resend.message && <p role="status" style={styles.notice}>{resend.message}</p>}
+      {resend.error && <p role="alert" style={styles.error}>{resend.error}</p>}
       {needsVerify && (
-        <button type="button" onClick={handleResend} disabled={resending} style={styles.ghostBtn}>
-          {resending ? '보내는 중…' : '확인 메일 다시 보내기'}
+        <button type="button" onClick={() => void resend.resend()} disabled={resend.busy || resend.remaining > 0} style={styles.ghostBtn}>
+          {resend.label}
         </button>
       )}
       <button type="submit" disabled={!canSubmit} style={{ ...styles.primaryBtn, opacity: canSubmit ? 1 : 0.6 }}>

@@ -120,7 +120,7 @@ export class StoreConsoleController {
       const countResult = await AppDataSource.query(
         `SELECT COUNT(*)::int as total
          FROM organizations o
-         LEFT JOIN users u ON o.created_by_user_id = u.id
+         LEFT JOIN users u ON u.id = COALESCE((SELECT om.user_id FROM organization_members om WHERE om.organization_id=o.id AND om.role='owner' AND om.left_at IS NULL ORDER BY om.created_at LIMIT 1),o.created_by_user_id)
          ${whereClause}`,
         params
       );
@@ -133,7 +133,7 @@ export class StoreConsoleController {
                 o.address, o.address_detail, o.phone, o.business_number,
                 o.template_profile, o.created_by_user_id,
                 o."createdAt", o."updatedAt",
-                u.email as owner_email, u.name as owner_name,
+                u.email as owner_email, u.name as owner_name, u.id AS owner_id,
                 (SELECT pss.slug FROM platform_store_slugs pss
                  WHERE pss.store_id = o.id AND pss.is_active = true LIMIT 1) as slug,
                 (SELECT COUNT(*)::int FROM organization_channels oc
@@ -141,7 +141,7 @@ export class StoreConsoleController {
                 (SELECT COUNT(*)::int FROM organization_product_listings opl
                  WHERE opl.organization_id = o.id AND opl.is_active = true) as product_count
          FROM organizations o
-         LEFT JOIN users u ON o.created_by_user_id = u.id
+         LEFT JOIN users u ON u.id = COALESCE((SELECT om.user_id FROM organization_members om WHERE om.organization_id=o.id AND om.role='owner' AND om.left_at IS NULL ORDER BY om.created_at LIMIT 1),o.created_by_user_id)
          ${whereClause}
          ORDER BY ${sortField} ${order}
          LIMIT $${paramIdx} OFFSET $${paramIdx + 1}`,
@@ -196,6 +196,7 @@ export class StoreConsoleController {
           phone: s.phone,
           businessNumber: s.business_number,
           templateProfile: s.template_profile,
+          ownerId: s.owner_id,
           ownerEmail: s.owner_email,
           ownerName: s.owner_name,
           slug: s.slug,
@@ -240,11 +241,11 @@ export class StoreConsoleController {
                 o.business_number, o.created_by_user_id,
                 o.template_profile, o.storefront_config,
                 o.metadata, o."createdAt", o."updatedAt",
-                u.email as owner_email, u.name as owner_name,
+                u.email as owner_email, u.name as owner_name, u.id AS owner_id,
                 (SELECT pss.slug FROM platform_store_slugs pss
                  WHERE pss.store_id = o.id AND pss.is_active = true LIMIT 1) as slug
          FROM organizations o
-         LEFT JOIN users u ON o.created_by_user_id = u.id
+         LEFT JOIN users u ON u.id = COALESCE((SELECT om.user_id FROM organization_members om WHERE om.organization_id=o.id AND om.role='owner' AND om.left_at IS NULL ORDER BY om.created_at LIMIT 1),o.created_by_user_id)
          WHERE o.id = $1`,
         [storeId]
       );
@@ -276,6 +277,7 @@ export class StoreConsoleController {
           templateProfile: s.template_profile,
           storefrontConfig: s.storefront_config,
           metadata: s.metadata,
+          ownerId: s.owner_id,
           ownerEmail: s.owner_email,
           ownerName: s.owner_name,
           slug: s.slug,

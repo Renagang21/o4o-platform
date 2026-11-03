@@ -4,7 +4,7 @@ import { Users, UserCog, ArrowRight } from 'lucide-react';
 const CARDS = [
   { icon: UserCog, title: '업무 운영', description: '위임받은 직영 서비스의 회원·약국·강의·문의 업무를 처리합니다.', to: '/operations' },
   { icon: UserCog, title: '전체 관리자 계정', description: '관리자 계정을 조회하고 활성 상태를 관리합니다.', to: '/settings/admin-accounts' },
-  { icon: Users, title: '사용자 조회', description: '전체 계정 현황을 확인합니다. 일상업무는 업무 운영, 독립 사업 업무는 해당 사업에서 처리합니다.', to: '/admin/platform/users' },
+  { icon: Users, title: '회원·사업체 관리', description: '전체 회원·공급자·내 매장과 삭제 처리 내역을 직접 관리합니다.', to: '/admin/platform/users' },
   { icon: UserCog, title: '서비스 관리자', description: '각 서비스 Admin의 초대·해제를 관리합니다.', to: '/operators' },
 ];
 

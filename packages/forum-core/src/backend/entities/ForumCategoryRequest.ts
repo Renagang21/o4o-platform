@@ -77,8 +77,8 @@ export class ForumCategoryRequest {
   organizationId?: string;
 
   // 신청자 정보
-  @Column({ name: 'requester_id', type: 'uuid' })
-  requesterId!: string;
+  @Column({ name: 'requester_id', type: 'uuid', nullable: true })
+  requesterId!: string | null;
 
   @Column({ name: 'requester_name', type: 'varchar', length: 100 })
   requesterName!: string;

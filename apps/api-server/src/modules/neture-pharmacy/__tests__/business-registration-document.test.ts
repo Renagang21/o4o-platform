@@ -11,7 +11,7 @@ describe('private business registration documents', () => {
   it('saves an owned pending document and returns no storage URL', async () => {
     expect(await service.upload('u1', file())).toEqual({ id: 'd1', fileName: 'synthetic.pdf', mimeType: 'application/pdf' });
     expect(repo.create).toHaveBeenCalledWith(expect.objectContaining({ userId: 'u1', documentType: 'business_registration', verificationStatus: 'PENDING' }));
-    expect(mockObject.save).toHaveBeenCalledWith(expect.any(Buffer), expect.objectContaining({ metadata: { contentType: 'application/pdf', cacheControl: 'private, no-store' } }));
+    expect(mockObject.save).toHaveBeenCalledWith(expect.any(Buffer), expect.objectContaining({ metadata: { contentType: 'application/pdf', cacheControl: 'private, no-store',metadata:expect.objectContaining({o4o_document_id:expect.any(String),o4o_owner_user_id:'u1',o4o_asset_purpose:'personal'}) } }));
   });
   it.each([
     [Buffer.from('not a PDF'), 'application/pdf', 10],
@@ -30,14 +30,17 @@ describe('private business registration documents', () => {
     expect(mockObject.delete).toHaveBeenCalledTimes(1);
   });
   it('ownership lookup includes authenticated user and document type', async () => {
+    query.mockResolvedValueOnce([{id:'d1'}]);
     await service.findOwned('u1', 'd1');
-    expect(repo.findOne).toHaveBeenCalledWith({ where: { id: 'd1', userId: 'u1', documentType: 'business_registration' } });
+    expect(query).toHaveBeenCalledWith(expect.stringContaining("m.role='owner'"),['u1','d1']);
+    expect(repo.findOne).toHaveBeenCalledWith({ where: { id: 'd1', documentType: 'business_registration' } });
   });
   it.each([[[], false], [[{ id: 'd1' }], true]])('review access requires a linked pharmacy application', async (rows, allowed) => {
     query.mockResolvedValueOnce(rows);
     expect(await service.canReviewPharmacyDocument('d1')).toBe(allowed);
     const sql = query.mock.calls[0][0];
-    expect(sql).toContain('pm.applicant_user_id = d.user_id');
+    expect(sql).toContain('pm.organization_id=o.id');
+    expect(sql).not.toContain('pm.applicant_user_id = d.user_id');
     expect(sql).toContain("businessRegistrationDocumentId");
     expect(sql).toContain('pm.organization_id');
   });

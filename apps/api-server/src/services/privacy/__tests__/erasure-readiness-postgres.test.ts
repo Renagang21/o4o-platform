@@ -6,18 +6,14 @@ import { ERASURE_WRITER_GAPS_SQL } from '../erasure-writer-manifest.js';
 const integration=process.env.O4O_ERASURE_TEST_PORT==='55469'?describe:describe.skip;
 integration('erasure readiness — disposable schema and synthetic accounts',()=>{
   let db:DataSource;
-  const fixtureFences:Array<{schema:string;table:string}>=[];
-  const quote=(s:string)=>'"'+s.replace(/"/g,'""')+'"';
   const service=()=>new AccountErasureService(db,{enabled:true,inventoryReviewed:true,systemYears:1,systemBasis:'isolated-system',personalBuckets:[]});
   beforeAll(async()=>{
     db=new DataSource({type:'postgres',host:'127.0.0.1',port:55469,username:'agent',database:'o4o_erasure_fixture',entities:[],synchronize:false});await db.initialize();
-    const gaps=await db.query(`SELECT n.nspname AS schema,c.relname AS table FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE c.oid IN (${ERASURE_WRITER_GAPS_SQL})`);
-    // Unchanged domains are isolated fixture assumptions, NOT a migration or an operational repair.
-    for(const gap of gaps){await db.query(`CREATE TRIGGER account_erasure_write_fence BEFORE INSERT OR UPDATE ON ${quote(gap.schema)}.${quote(gap.table)} FOR EACH ROW EXECUTE FUNCTION public.account_erasure_write_fence()`);fixtureFences.push(gap);}
+    // The caller prepares the official complete schema. A missing fence must fail this suite.
+    expect(await db.query(ERASURE_WRITER_GAPS_SQL)).toHaveLength(0);
   });
   afterAll(async()=>{
     if(!db?.isInitialized)return;
-    for(const gap of fixtureFences)await db.query(`DROP TRIGGER account_erasure_write_fence ON ${quote(gap.schema)}.${quote(gap.table)}`);
     await db.destroy();
   });
   it('forward migration repairs each of the three non-AI tables and the new counter table',async()=>{

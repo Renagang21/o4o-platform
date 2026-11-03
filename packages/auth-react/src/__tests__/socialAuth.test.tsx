@@ -1,5 +1,5 @@
 const TERMS = { policyDocumentId: '11111111-1111-4111-8111-111111111111', version: 1, title: 'Fixture agreement', termsHref: 'https://neture.co.kr/terms' };
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent, waitFor, cleanup, renderHook, act } from '@testing-library/react';
 let callback: any = null; let credential: ((value: string) => void) | undefined;
 vi.mock('@o4o/auth-client', async original => ({ ...(await original<any>()), takeSocialCallback: () => { const value=callback;callback=null;return value; }, redirectToKakao: vi.fn(), renderGoogleButton: vi.fn(async (options:any)=>{credential=options.onCredential;return ()=>{};}) }));
@@ -40,8 +40,12 @@ it('signup/email verification notices never authenticate the shared context',asy
 it('Kakao signup hides privacy links until the server supplies the policy owner', async () => {
   callback={token:'state',kind:'kakao-login'};
   let resolve!: (doc: typeof TERMS) => void;
-  render(<KakaoContinue client={{getSignupTerms:()=>new Promise(r=>{resolve=r;}),getKakaoAuthConfig:async()=>({enabled:true}),startKakaoLogin:vi.fn()}} loginWithKakao={async()=>({success:false,nextStep:'signup',signupTicket:'ticket',email:'synthetic@fixture.invalid'})} signupWithKakao={vi.fn()} onSuccess={vi.fn()} privacyHref="/privacy" />);
+  const policy=new Promise<typeof TERMS>(r=>{resolve=r;});
+  const loadPolicy=vi.fn(()=>policy);
+  render(<KakaoContinue client={{getSignupTerms:loadPolicy,getKakaoAuthConfig:async()=>({enabled:true}),startKakaoLogin:vi.fn()}} loginWithKakao={async()=>({success:false,nextStep:'signup',signupTicket:'ticket',email:'synthetic@fixture.invalid'})} signupWithKakao={vi.fn()} onSuccess={vi.fn()} privacyHref="/privacy" />);
   await screen.findByText(/계정을 만들려면/);
+  // The heading may render before the policy effect starts on a busy CI runner.
+  await waitFor(()=>expect(loadPolicy).toHaveBeenCalled());
   expect(screen.queryByRole('link',{name:'내용 보기'})).toBeNull();
   await act(async()=>{const doc={...TERMS,privacyHref:'https://pharmacy.neture.co.kr/privacy'};resolve(doc);});
   expect((await screen.findByRole('link',{name:'내용 보기'})).getAttribute('href')).toBe('https://pharmacy.neture.co.kr/privacy');

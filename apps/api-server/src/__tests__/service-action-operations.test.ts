@@ -129,7 +129,7 @@ it('preserves the server value when a stale contact draft is submitted', async (
 });
 
 it('deletes only an archived lecture and records audit in its owning transaction', async () => {
-  query.mockImplementation(async sql => sql.includes('FOR UPDATE') ? [{ id: 'course', title: 'Fixture', status: 'archived' }] : []);
+  query.mockImplementation(async sql => sql.includes('FROM users u') ? [{id:'admin'}] : sql.includes('AS present') ? [{present:false}] : sql.includes('count(*)') ? [{n:0}] : sql.includes('FROM lms_courses') ? [{ id: 'course', title: 'Fixture', status: 'archived' }] : []);
   expect(await hardDeleteLectureCourse(db, 'course', 'admin', 'cleanup')).toMatchObject({ deleted: true, title: 'Fixture' });
   expect(query.mock.calls[0][0]).toContain(`service_key='lecture'`);
   expect(query.mock.calls.at(-1)![1].slice(0, 3)).toEqual(['lecture', 'admin', 'lecture.course.hard_delete']);
@@ -140,7 +140,7 @@ it.each([[[]], [[{ status: 'published' }]]])('blocks a missing, foreign or activ
   expect(query).toHaveBeenCalledTimes(1);
 });
 it('lecture audit failure rejects the whole purge transaction', async () => {
-  query.mockImplementation(async sql => { if (sql.includes('INSERT INTO action_logs')) throw new Error('audit failed'); return sql.includes('FOR UPDATE') ? [{ status: 'archived' }] : []; });
+  query.mockImplementation(async sql => { if (sql.includes('INSERT INTO action_logs')) throw new Error('audit failed'); return sql.includes('FROM users u') ? [{id:'admin'}] : sql.includes('AS present') ? [{present:false}] : sql.includes('count(*)') ? [{n:0}] : sql.includes('FROM lms_courses') ? [{ status: 'archived' }] : []; });
   await expect(hardDeleteLectureCourse(db, 'course', 'admin', 'cleanup')).rejects.toThrow('audit failed');
   expect(events).toEqual(['rollback']);
 });
@@ -152,4 +152,15 @@ it('relationship cleanup protects the selected service operator tier without blo
   query.mockResolvedValue([]);
   await expect(assertOrdinaryServiceMember(manager as any, 'user', ['kpa-society'])).resolves.toBeUndefined();
   expect(query.mock.calls.at(-1)![1][1]).toEqual(['kpa:admin', 'kpa:operator']);
+});
+
+it('legacy lecture deletion without a digest still rejects revoked current authority', async () => {
+  query.mockImplementation(async sql => sql.includes('FOR UPDATE') ? [{id:'course',status:'archived'}] : []);
+  await expect(hardDeleteLectureCourse(db,'course','revoked','cleanup')).rejects.toMatchObject({code:'COURSE_ADMIN_REQUIRED'});
+  expect(query.mock.calls.some(([sql])=>sql.startsWith('DELETE'))).toBe(false);
+});
+it('legacy lecture deletion without a digest preserves unreviewed owned storage', async () => {
+  query.mockImplementation(async sql => sql.includes('FROM users u') ? [{id:'admin'}] : sql.includes('AS present') ? [{present:true}] : sql.includes('count(*)') ? [{n:1}] : sql.includes('FROM lms_courses') ? [{id:'course',status:'archived'}] : []);
+  await expect(hardDeleteLectureCourse(db,'course','admin','cleanup')).rejects.toMatchObject({code:'DELETION_BLOCKED'});
+  expect(query.mock.calls.some(([sql])=>sql.startsWith('DELETE'))).toBe(false);
 });

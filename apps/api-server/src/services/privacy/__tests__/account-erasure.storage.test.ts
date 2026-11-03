@@ -1,6 +1,7 @@
 const file = {getMetadata:jest.fn(),delete:jest.fn(),exists:jest.fn()};
+const getFiles=jest.fn();
 const selectFile = jest.fn(() => file);
-jest.mock('@google-cloud/storage',()=>({Storage:jest.fn().mockImplementation(()=>({bucket:()=>({file:selectFile})}))}));
+jest.mock('@google-cloud/storage',()=>({Storage:jest.fn().mockImplementation(()=>({bucket:()=>({file:selectFile,getFiles})}))}));
 jest.mock('../../../database/connection.js',()=>({AppDataSource:{}}));
 import {accountErasureStorage as storage} from '../account-erasure.http.js';
 
@@ -53,4 +54,18 @@ describe('erasure storage ownership and exact generation adapter',()=>{
     await expect(storage.generation('fixture','object','owner')).rejects.toMatchObject({code:503});
     await expect(storage.deleteGeneration('fixture','object','17','owner')).rejects.toMatchObject({code:503});
   });
+});
+
+it('discovers tagged orphan files from the typed personal prefix without scanning a global media bucket',async()=>{
+ const db={query:jest.fn().mockResolvedValue([])};
+ getFiles.mockResolvedValue([[{name:'business-registration/owner/orphan.pdf',getMetadata:async()=>[owned()]}],null]);
+ expect(await storage.discover!('owner',db)).toEqual(['gcs://o4o-private-documents/business-registration/owner/orphan.pdf']);
+ expect(getFiles).toHaveBeenCalledWith(expect.objectContaining({prefix:'business-registration/owner/',autoPaginate:false,maxResults:100}));
+});
+
+it('never accepts an object stringifier as personal ownership proof',async()=>{
+  file.delete.mockClear();
+  file.getMetadata.mockResolvedValue([{...owned(),metadata:{o4o_owner_user_id:{toString:()=> 'owner'},o4o_asset_purpose:'personal'}}]);
+  await expect(storage.generation('fixture','object','owner')).rejects.toMatchObject({code:'PERSONAL_FILE_OWNERSHIP_REVIEW_REQUIRED'});
+  expect(file.delete).not.toHaveBeenCalled();
 });

@@ -11,6 +11,7 @@ export interface KakaoContinueProps<TUser = unknown> {
   onSuccess: (user: TUser) => void;
   onError?: (result: AuthLoginResult<TUser>) => void;
   returnTo?: string;
+  intent?: 'login' | 'signup';
   termsHref?: string; privacyHref?: string;
 }
 export function KakaoContinue<TUser> (props: KakaoContinueProps<TUser>) {
@@ -78,7 +79,7 @@ export function KakaoContinue<TUser> (props: KakaoContinueProps<TUser>) {
       <p role="alert">카카오 로그인을 불러오지 못했습니다. 다시 시도해 주세요.</p>
       <button type="button" disabled={busy} onClick={() => setConfigAttempt(attempt => attempt + 1)}>카카오 로그인 다시 불러오기</button>
     </>}
-    {configState === 'enabled' && !ticket && <button type="button" disabled={busy} style={{ background: '#fee500', color: '#191919', minHeight: 44, border: 0, borderRadius: 6 }} onClick={() => void start()}>카카오로 계속하기</button>}
+    {configState === 'enabled' && !ticket && <button type="button" disabled={busy} style={{ background: '#fee500', color: '#191919', minHeight: props.intent === 'signup' ? 32 : 44, ...(props.intent === 'signup' ? { height: 32, paddingBlock: 0, boxSizing: 'border-box' as const } : {}), border: 0, borderRadius: 6 }} onClick={() => void start()}>{props.intent === 'signup' ? '카카오로 가입' : '카카오로 계속하기'}</button>}
     {busy && <p role="status">카카오 계정을 확인하고 있습니다…</p>}
     {ticket && <form onSubmit={e => { e.preventDefault(); if (busy || !policy || !terms || !privacy) return; setBusy(true); void ref.current.signupWithKakao(ticket, { email, name, nickname: nickname.trim(), phone, consents: { terms, privacy, marketing, ...signupPolicyReferences(policy!) } }).then(finish).catch((error: any) => { if (mounted.current) { setBusy(false); if (['POLICY_VERSION_MISMATCH', 'POLICY_UNAVAILABLE'].includes(error?.response?.data?.code ?? error?.response?.data?.error?.code)) { setPolicy(null); setTerms(false); setPrivacy(false); setPolicyReload(n => n + 1); setMessage('정책이 변경되었습니다. 입력 내용은 유지됩니다. 최신 내용을 확인해 주세요.'); } else setMessage('가입을 처리하지 못했습니다. 입력 내용을 확인하고 다시 시도해 주세요.'); } }); }} style={{ display: 'grid', gap: 10 }}>
       <p>계정을 만들려면 정보를 입력하고 약관에 동의해 주세요.</p>

@@ -73,6 +73,10 @@ function makeDs(seed: { members?: Row[]; users?: Row[]; pharmacy?: boolean } = {
   const query = jest.fn(async (q: string, p: any[] = []) => {
     const s = q.replace(/\s+/g, ' ').trim();
     sql.push(s);
+    if (s.startsWith('SELECT 1 FROM organization_members m JOIN organizations o ON o.id=m.organization_id WHERE m.user_id=$1 AND m.organization_id<>$2')) {
+      return members.filter(m=>m.user_id===p[0] && m.organization_id!==p[1] && m.left_at==null && ['staff','accepted','owner','admin','manager'].includes(m.role)).map(()=>({ok:1}));
+    }
+    if (s.startsWith('SELECT id FROM organizations')) return [{id:p[0]}];
     if (s.startsWith('SELECT pg_advisory_xact_lock')) return [];
 
     if (s.startsWith('SELECT EXISTS (SELECT 1 FROM neture_pharmacy_memberships pm')) {
@@ -591,4 +595,12 @@ it('실패한 승인 트랜잭션 뒤 다음 승인에서 다시 사용자 잠�
   await expect(approveStoreMember(ds, { ownerUserId: OWNER, targetUserId: STAFF })).rejects.toThrow('grant unavailable');
   await approveStoreMember(ds, { ownerUserId: OWNER, targetUserId: STAFF });
   expect(sql.filter(q => q.includes('pg_advisory_xact_lock')).length).toBe(2);
+});
+
+it('rejects employment in a second business, but permits a new employer after departure',async()=>{
+  asOwnerOf(ORG_B);linkedMock.mockResolvedValue(true);
+  const fixture=makeDs({users:[{id:STAFF,email:'staff@fixture.invalid'}],members:[{organization_id:ORG_A,user_id:STAFF,role:'staff',left_at:null}]});
+  await expect(inviteStoreMember(fixture.ds,{ownerUserId:OWNER,email:'staff@fixture.invalid',preferredOrganizationId:ORG_B})).rejects.toMatchObject({code:'OTHER_EMPLOYER_EXISTS'});
+  fixture.members[0].left_at=new Date();
+  await expect(inviteStoreMember(fixture.ds,{ownerUserId:OWNER,email:'staff@fixture.invalid',preferredOrganizationId:ORG_B})).resolves.toMatchObject({organizationId:ORG_B});
 });

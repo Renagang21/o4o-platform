@@ -37,8 +37,8 @@ export class AssetSnapshot {
   @Column({ name: 'content_json', type: 'jsonb', default: '{}' })
   contentJson!: Record<string, unknown>;
 
-  @Column({ name: 'created_by', type: 'uuid' })
-  createdBy!: string;
+  @Column({ name: 'created_by', type: 'uuid', nullable: true })
+  createdBy!: string | null;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date;

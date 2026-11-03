@@ -77,8 +77,8 @@ export class StoreProduct {
   @Column({ name: 'is_active', type: 'boolean', default: true })
   isActive: boolean;
 
-  @Column({ name: 'created_by', type: 'uuid' })
-  createdBy: string;
+  @Column({ name: 'created_by', type: 'uuid', nullable: true })
+  createdBy: string | null;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
