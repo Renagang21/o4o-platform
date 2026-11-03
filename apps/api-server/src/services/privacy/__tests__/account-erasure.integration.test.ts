@@ -462,6 +462,56 @@ integration('account erasure — isolated PostgreSQL schema/real sessions', () =
     expect(await db.query('SELECT id FROM semi_franchises WHERE id=$1',[defaultBusiness])).toHaveLength(1);
     expect((await service().request(target.id)).erased).toBe(true);
   });
+  async function currentPharmacy(){
+    const target=await user({netureStopped:false}),org=await organization(target.id);
+    await db.query(`INSERT INTO platform_services(code,name) VALUES('kpa-society','Synthetic service') ON CONFLICT DO NOTHING`);
+    await db.query(`INSERT INTO organization_service_enrollments(organization_id,service_code) VALUES($1,'kpa-society')`,[org]);
+    await db.query(`INSERT INTO role_assignments(user_id,role) VALUES($1,'neture:store_owner')`,[target.id]);
+    await db.query(`INSERT INTO neture_pharmacy_memberships(organization_id,applicant_user_id,status,pharmacy_name,business_number,pharmacist_license_number) VALUES($1,$2,'active','Synthetic current pharmacy',$3,'synthetic-license')`,[org,target.id,randomUUID().slice(0,10)]);
+    return {target,org};
+  }
+  it('explicit complete closure removes all organization service keys while retaining global and peer resources',async()=>{
+    const {target,org}=await currentPharmacy(),peer=await user(),peerOrg=await organization(peer.id);
+    for(const key of ['kpa','neture','k-cosmetics']){
+      for(const table of ['store_pops','store_blog_posts'])await db.query(`INSERT INTO ${table}(store_id,service_key,title,slug,content) VALUES($1,$2,'Synthetic store copy',$3,'Synthetic content')`,[org,key,randomUUID()]);
+      await db.query(`INSERT INTO store_videos(store_id,service_key,title,slug,video_url) VALUES($1,$2,'Synthetic video',$3,'https://fixture.invalid/video')`,[org,key,randomUUID()]);
+      const [media]=await db.query(`INSERT INTO signage_media("serviceKey","organizationId",name,"mediaType","sourceType","sourceUrl","createdByUserId") VALUES($1,$2,'Synthetic store media','video','url','https://fixture.invalid/video',$3) RETURNING id`,[key,org,target.id]);
+      const [playlist]=await db.query(`INSERT INTO signage_playlists("serviceKey","organizationId",name,"createdByUserId") VALUES($1,$2,'Synthetic store playlist',$3) RETURNING id`,[key,org,target.id]);
+      await db.query(`INSERT INTO signage_playlist_items("playlistId","mediaId","sortOrder") VALUES($1,$2,0)`,[playlist.id,media.id]);
+      await db.query(`INSERT INTO signage_schedules("serviceKey","organizationId",name,"playlistId","daysOfWeek","startTime","endTime") VALUES($1,$2,'Synthetic store schedule',$3,'{1}','09:00','18:00')`,[key,org,playlist.id]);
+    }
+    const [global]=await db.query(`INSERT INTO signage_playlists("serviceKey",name) VALUES('neture','Global original retained') RETURNING id`);
+    const [other]=await db.query(`INSERT INTO signage_playlists("serviceKey","organizationId",name) VALUES('neture',$1,'Peer retained') RETURNING id`,[peerOrg]);
+    expect((await service().request(target.id)).state).toBe('review_required');
+    expect((await new MemberLifecycleService(db).closePharmacy(fixtureAdminId,target.id,org,{reason:'Synthetic all-service complete closure',closureConfirmed:true})).storeInventoryPurged).toBe(true);
+    for(const table of ['store_pops','store_blog_posts','store_videos'])expect(await db.query(`SELECT id FROM ${table} WHERE store_id=$1`,[org])).toHaveLength(0);
+    for(const table of ['signage_media','signage_playlists','signage_schedules'])expect(await db.query(`SELECT id FROM ${table} WHERE "organizationId"=$1`,[org])).toHaveLength(0);
+    expect(await db.query('SELECT id FROM signage_playlists WHERE id=ANY($1)',[[global.id,other.id]])).toHaveLength(2);
+    expect((await service().request(target.id)).erased).toBe(true);
+  });
+  it.each(['schedule','media'])('complete closure preserves another organization’s %s reference and returns explicit review',async(kind)=>{
+    const {target,org}=await currentPharmacy(),peer=await user(),peerOrg=await organization(peer.id);
+    const [playlist]=await db.query(`INSERT INTO signage_playlists("serviceKey","organizationId",name) VALUES('neture',$1,'Synthetic source') RETURNING id`,[kind==='schedule'?org:peerOrg]);
+    if(kind==='schedule')await db.query(`INSERT INTO signage_schedules("serviceKey","organizationId",name,"playlistId","daysOfWeek","startTime","endTime") VALUES('neture',$1,'Peer schedule',$2,'{1}','09:00','18:00')`,[peerOrg,playlist.id]);
+    else{
+      const [media]=await db.query(`INSERT INTO signage_media("serviceKey","organizationId",name,"mediaType","sourceType","sourceUrl") VALUES('neture',$1,'Synthetic shared media','video','url','https://fixture.invalid/video') RETURNING id`,[org]);
+      await db.query(`INSERT INTO signage_playlist_items("playlistId","mediaId","sortOrder") VALUES($1,$2,0)`,[playlist.id,media.id]);
+    }
+    const result=await new MemberLifecycleService(db).closePharmacy(fixtureAdminId,target.id,org,{reason:'Synthetic shared content guard',closureConfirmed:true});
+    expect(result).toMatchObject({storeInventoryPurged:false,errorCode:'STORE_CLOSURE_SHARED_CONTENT_REVIEW_REQUIRED'});
+    expect(await db.query('SELECT id FROM signage_playlists WHERE id=$1',[playlist.id])).toHaveLength(1);
+    expect(await db.query(`SELECT id FROM ${kind==='schedule'?'signage_schedules':'signage_playlist_items'} WHERE ${kind==='schedule'?'"organizationId"':'"playlistId"'}=$1`,[kind==='schedule'?peerOrg:playlist.id])).toHaveLength(1);
+  });
+  it('ordinary KPA contract purge keeps another service’s store content and its original seven-day boundary',async()=>{
+    const {target,org}=await currentPharmacy();await db.query(`INSERT INTO role_assignments(user_id,role) VALUES($1,'kpa:store_owner')`,[target.id]);
+    const [keep]=await db.query(`INSERT INTO signage_playlists("serviceKey","organizationId",name) VALUES('neture',$1,'Retained Neture content') RETURNING id`,[org]);
+    const legacy=new (await import('../../store-owner-termination.service.js')).StoreOwnerTerminationService(db);
+    const lifecycle=await legacy.createCase({serviceKey:'kpa-society',organizationId:org,userId:target.id,requestedBy:fixtureAdminId});
+    await legacy.terminateCase(lifecycle.id);
+    await expect(legacy.purgeCase(lifecycle.id,{dryRun:false})).rejects.toMatchObject({code:'PURGE_NOT_DUE'});
+    await legacy.purgeCase(lifecycle.id,{dryRun:false,now:new Date(Date.now()+8*86400000)});
+    expect(await db.query('SELECT id FROM signage_playlists WHERE id=$1',[keep.id])).toHaveLength(1);
+  });
   it('an inactive pharmacy without completed closure still needs business disposition',async()=>{
     const target=await user(),org=await organization(target.id);
     await db.query('UPDATE organizations SET "isActive"=false WHERE id=$1',[org]);

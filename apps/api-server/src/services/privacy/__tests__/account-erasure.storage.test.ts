@@ -62,3 +62,10 @@ it('discovers tagged orphan files from the typed personal prefix without scannin
  expect(await storage.discover!('owner',db)).toEqual(['gcs://o4o-private-documents/business-registration/owner/orphan.pdf']);
  expect(getFiles).toHaveBeenCalledWith(expect.objectContaining({prefix:'business-registration/owner/',autoPaginate:false,maxResults:100}));
 });
+
+it('never accepts an object stringifier as personal ownership proof',async()=>{
+  file.delete.mockClear();
+  file.getMetadata.mockResolvedValue([{...owned(),metadata:{o4o_owner_user_id:{toString:()=> 'owner'},o4o_asset_purpose:'personal'}}]);
+  await expect(storage.generation('fixture','object','owner')).rejects.toMatchObject({code:'PERSONAL_FILE_OWNERSHIP_REVIEW_REQUIRED'});
+  expect(file.delete).not.toHaveBeenCalled();
+});

@@ -8,7 +8,7 @@ import { AccountErasureError, AccountErasureService, type PersonalStorage } from
 
 const gcs = new Storage();
 async function assertFileOwnership(bucket:string,path:string,ownerId:string,metadata:Record<string,unknown>,db:Pick<EntityManager,'query'>=AppDataSource){
- const personal=String(metadata.o4o_owner_user_id??'').toLowerCase()===ownerId.toLowerCase()&&metadata.o4o_asset_purpose==='personal';
+ const personal=typeof metadata.o4o_owner_user_id==='string'&&metadata.o4o_owner_user_id.toLowerCase()===ownerId.toLowerCase()&&metadata.o4o_asset_purpose==='personal';
  if(!personal&&!await mayEraseSupplierProfileFile(db,ownerId,bucket,path,metadata))throw new AccountErasureError('PERSONAL_FILE_OWNERSHIP_REVIEW_REQUIRED',409);
 }
 export const accountErasureStorage: PersonalStorage = {

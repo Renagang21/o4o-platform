@@ -344,7 +344,9 @@ export class AccountErasureService {
       } finally { await m.query('CLOSE erasure_provider_scan'); }
     };
     const tables = await this.tables(m);
-    const codes = [...await businessErasureReviews(m, String(user.id), tables),...await systemLogReviews(m,String(user.id))];
+    const subjectId=user.id;
+    if(typeof subjectId!=='string'||!UUID.test(subjectId))throw new AccountErasureError('INVALID_ERASURE_SUBJECT',409);
+    const codes = [...await businessErasureReviews(m,subjectId,tables),...await systemLogReviews(m,subjectId)];
     const [otherUsers]=await m.query(`SELECT count(*)::int AS n FROM users r WHERE r.id<>$1
       AND (${leaf('r')}::text ~* ANY($2::text[]) OR ${leaf('r')} ?| $3::text[])`,[user.id,patterns,shortTokens]);
     if(otherUsers.n || await providerReview('public.users','AND r.id::text<>$1'))codes.push('REVIEW:public.users');

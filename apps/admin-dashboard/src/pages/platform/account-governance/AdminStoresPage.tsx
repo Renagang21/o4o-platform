@@ -42,7 +42,7 @@ export default function AdminStoresPage() {
       });
       if (seq !== epoch.current.value) return;
       const data = response.data;
-      if (!Array.isArray(data?.stores)) throw new Error();
+      if (!Array.isArray(data?.stores)) throw new Error('INVALID_RESPONSE');
       setRows(data.stores);
       setHasNext(page < data.pagination.totalPages);
     } catch {
@@ -90,9 +90,9 @@ export default function AdminStoresPage() {
           value={search}
           onChange={(event) => setSearch(event.target.value)}
         />
-        <button>검색</button>
+        <button type="submit">검색</button>
       </form>
-      <button disabled={loading} onClick={() => void load()}>
+      <button type="button" disabled={loading} onClick={() => void load()}>
         새로고침
       </button>
       {error && <p role="alert">{error}</p>}
@@ -147,14 +147,14 @@ export default function AdminStoresPage() {
         loading={loading}
       />
       <nav>
-        <button
+        <button type="button"
           disabled={page === 1 || loading}
           onClick={() => setPage(page - 1)}
         >
           이전
         </button>{" "}
         {page}{" "}
-        <button
+        <button type="button"
           disabled={!hasNext || loading}
           onClick={() => setPage(page + 1)}
         >

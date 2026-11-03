@@ -185,3 +185,66 @@ export const CLOSED_STORE_WRITER_GAPS_SQL = `SELECT c.oid,a.attname::text FROM p
  SELECT 1 FROM pg_trigger tr WHERE tr.tgrelid=to_regclass('public.organizations') AND tr.tgname='store_closure_write_fence'
  AND tr.tgenabled='O' AND (tr.tgtype & 23)=23 AND tr.tgnargs=1 AND tr.tgargs=convert_to('id','UTF8')||decode('00','hex')
  AND tr.tgfoid=to_regproc('public.o4o_closed_pharmacy_write_fence'))`;
+
+/** Cross-store consumers must keep their resources; never rely on a cascading FK to remove them. */
+export async function assertClosureSharedReferences(
+  db: Db,
+  organizationId: string,
+) {
+  const [row] = await db.query(
+    `SELECT
+    EXISTS(SELECT 1 FROM signage_playlists p JOIN signage_schedules s ON s."playlistId"=p.id WHERE p."organizationId"=$1 AND s."organizationId" IS DISTINCT FROM $1)
+    OR EXISTS(SELECT 1 FROM signage_media media JOIN signage_playlist_items i ON i."mediaId"=media.id JOIN signage_playlists p ON p.id=i."playlistId" WHERE media."organizationId"=$1 AND p."organizationId" IS DISTINCT FROM $1)
+    OR EXISTS(SELECT 1 FROM store_tablet_screen_sets sets JOIN store_tablets t ON t.current_screen_set_id=sets.id WHERE sets.organization_id=$1 AND t.organization_id<>$1)
+    OR EXISTS(SELECT 1 FROM store_tablet_screen_sets sets JOIN store_tablet_corner_contents c ON c.screen_set_id=sets.id WHERE sets.organization_id=$1 AND c.organization_id<>$1)
+    OR EXISTS(SELECT 1 FROM store_playlists p JOIN signage_schedules s ON s."storePlaylistId"=p.id WHERE p.organization_id=$1 AND s."organizationId" IS DISTINCT FROM $1)
+    OR EXISTS(SELECT 1 FROM o4o_asset_snapshots snap JOIN store_playlist_items i ON i.snapshot_id=snap.id JOIN store_playlists p ON p.id=i.playlist_id WHERE snap.organization_id=$1 AND p.organization_id<>$1) AS shared`,
+    [organizationId],
+  );
+  if (!row || row.shared)
+    throw new Error("STORE_CLOSURE_SHARED_CONTENT_REVIEW_REQUIRED");
+}
+
+/** All service keys attached to this closed organization; ordinary contracts keep their fixed scope. */
+export async function fullClosureServiceKeys(db: Db, organizationId: string) {
+  const tables = [
+    ["store_pops", "store_id", "service_key"],
+    ["store_blog_posts", "store_id", "service_key"],
+    ["store_videos", "store_id", "service_key"],
+    ["store_pop_documents", "organization_id", "service_key"],
+    ["store_asset_derivations", "organization_id", "service_key"],
+    [
+      "store_multilingual_product_content_groups",
+      "organization_id",
+      "service_key",
+    ],
+    ["organization_product_listings", "organization_id", "service_key"],
+    ["signage_media", "organizationId", "serviceKey"],
+    ["signage_playlists", "organizationId", "serviceKey"],
+    ["signage_schedules", "organizationId", "serviceKey"],
+  ];
+  const queries = tables.map(
+    ([table, owner, service]) =>
+      "SELECT " +
+      q(service) +
+      " AS key FROM public." +
+      q(table) +
+      " WHERE " +
+      q(owner) +
+      "=$1",
+  );
+  const content = await db.query(
+    "SELECT DISTINCT key FROM (" +
+      queries.join(" UNION ALL ") +
+      ") owned WHERE key IS NOT NULL",
+    [organizationId],
+  );
+  const slugs = await db.query(
+    "SELECT DISTINCT service_key AS key FROM platform_store_slugs WHERE store_id=$1",
+    [organizationId],
+  );
+  return {
+    contentKeys: content.map((row: { key: string }) => row.key),
+    slugKeys: slugs.map((row: { key: string }) => row.key),
+  };
+}

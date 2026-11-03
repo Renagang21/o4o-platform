@@ -52,7 +52,7 @@ export default function AdminErasureHistoryPage() {
       ]);
       if (generation !== epoch.current.value) return;
       const data = response.data?.data;
-      if (!Array.isArray(data?.items)) throw new Error();
+      if (!Array.isArray(data?.items)) throw new Error('INVALID_RESPONSE');
       setReadiness(ready.data?.data ?? null);
       setRows(data.items);
       setHasNext(data.hasNext === true);
@@ -193,14 +193,14 @@ export default function AdminErasureHistoryPage() {
         }}
       />
       <nav aria-label="삭제 내역 페이지">
-        <button
+        <button type="button"
           disabled={busy || page === 1}
           onClick={() => setPage((value) => value - 1)}
         >
           이전
         </button>{" "}
         {page}{" "}
-        <button
+        <button type="button"
           disabled={busy || !hasNext}
           onClick={() => setPage((value) => value + 1)}
         >

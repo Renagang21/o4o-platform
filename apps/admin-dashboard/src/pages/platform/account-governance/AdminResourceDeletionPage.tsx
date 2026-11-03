@@ -58,7 +58,7 @@ export default function AdminResourceDeletionPage() {
       if (seq !== epoch.current.value) return;
       const data = response.data;
       const items = data?.data;
-      if (!Array.isArray(items)) throw new Error();
+      if (!Array.isArray(items)) throw new Error('INVALID_RESPONSE');
       setRows(
         kind === "community"
           ? items
@@ -144,7 +144,7 @@ export default function AdminResourceDeletionPage() {
         { data: { expectedDigest: plan.digest, reason: reason.trim() } },
       );
       const data = response.data?.data;
-      if (data?.applied !== true && data?.deleted !== true) throw new Error();
+      if (data?.applied !== true && data?.deleted !== true) throw new Error('INVALID_RESPONSE');
       if (seq === epoch.current.value)
         setNotice("선택 대상과 연결 자료의 삭제를 완료했습니다.");
     } catch {
@@ -177,7 +177,7 @@ export default function AdminResourceDeletionPage() {
         공용 미디어 원본은 유지합니다.
       </p>
       <nav aria-label="삭제 대상">
-        <button
+        <button type="button"
           disabled={busy}
           aria-pressed={kind === "community"}
           onClick={() => {
@@ -187,7 +187,7 @@ export default function AdminResourceDeletionPage() {
         >
           커뮤니티 포럼
         </button>
-        <button
+        <button type="button"
           disabled={busy}
           aria-pressed={kind === "lecture"}
           onClick={() => {
@@ -198,7 +198,7 @@ export default function AdminResourceDeletionPage() {
           강의
         </button>
       </nav>
-      <button disabled={busy || loading} onClick={() => void load()}>
+      <button type="button" disabled={busy || loading} onClick={() => void load()}>
         새로고침
       </button>
       {error && <p role="alert">{error}</p>}
@@ -272,7 +272,7 @@ export default function AdminResourceDeletionPage() {
             />
             대상과 유지·삭제 범위를 확인했습니다.
           </label>
-          <button
+          <button type="button"
             disabled={
               busy || !confirmed || !reason.trim() || !!plan.blockers?.length
             }
@@ -298,11 +298,11 @@ export default function AdminResourceDeletionPage() {
         }}
       />
       <nav>
-        <button disabled={busy || page === 1} onClick={() => setPage(page - 1)}>
+        <button type="button" disabled={busy || page === 1} onClick={() => setPage(page - 1)}>
           이전
         </button>{" "}
         {page}{" "}
-        <button disabled={busy || !hasNext} onClick={() => setPage(page + 1)}>
+        <button type="button" disabled={busy || !hasNext} onClick={() => setPage(page + 1)}>
           다음
         </button>
       </nav>
