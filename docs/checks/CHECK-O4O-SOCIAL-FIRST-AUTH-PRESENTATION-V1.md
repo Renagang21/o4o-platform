@@ -52,3 +52,9 @@ TODO를 소비처 목록과 다시 대조했다. commit·push 결과는 최종 �
 ## 문서 정합
 
 인증·서비스 가입 정본에 2026-11-03 사용자 정책과 이 CHECK를 연결했다. 과거 가입 방식 보완 기록은 당시 결과로 유지한다.
+
+## 후속 통합 검토 — PR #932
+
+사용자가 main 병합·배포를 추가 지시해 통합 검토를 진행했다. Codex 리뷰에서 Neture localStorage 세션은 Partner의 cookie 확인만으로 전달되지 않는 점을 확인했다. 소셜 진입 링크를 기존 `/service-entry/partner-support?returnPath=%2Fcommunity` → `/auth/handoff` → Partner `/handoff`로 연결했다. 새 창의 Partner 수신기가 같은 origin의 토큰을 저장하면 원래 탭의 명시적 상태 확인이 그 토큰을 읽는다. 초대·작성 상태는 원래 탭에서 유지하며 계정·서비스 가입·권한을 새로 만들지 않는다. Neture 출발점은 유한한 `partner-support` 대상을 허용하며 외부 복귀 경로를 전달하지 않는다.
+
+수정 후 Neture 인증/출발점 5파일 61건, Partner 전체 7파일 102건 및 두 서비스의 타입 검사 포함 build를 재검증했다. 변경 파일 ESLint·문서 민감정보·diff 검사도 통과했다. 출발점의 로그인 전 대기·로그인 후 handoff·외부 복귀 차단·서비스별 거절 안내와 수신 토큰 저장 후 원래 클라이언트의 Bearer 재조회가 포함된다.

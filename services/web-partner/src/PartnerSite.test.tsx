@@ -453,7 +453,7 @@ it("checks the social session without submitting email credentials or losing the
     .mockResolvedValue(user);
   mount("/login?returnTo=%2Fworkspace%3Fmode%3Dlocal%23assets");
   const social = await screen.findByRole("link", { name: "Google·카카오로 로그인 ↗" });
-  expect(social.getAttribute("href")).toBe("https://neture.co.kr/login");
+  expect(social.getAttribute("href")).toBe("https://neture.co.kr/service-entry/partner-support?returnPath=%2Fcommunity");
   expect(social.getAttribute("target")).toBe("_blank");
   expect(social.getAttribute("rel")).toContain("noopener");
   expect(screen.getByTestId("email-login-option").hasAttribute("open")).toBe(false);

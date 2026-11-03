@@ -20,6 +20,21 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 describe("Partner cookie API client", () => {
+  it("reads a newly handed-off session when the original tab checks login again", async () => {
+    clearStoredTokens();
+    const token = crypto.randomUUID();
+    const fetch = vi.fn()
+      .mockResolvedValueOnce(response(401, { success: false, code: "UNAUTHENTICATED" }))
+      .mockResolvedValueOnce(response(200, { success: true, data: { user: { id: "fixture-user" } } }));
+    vi.stubGlobal("fetch", fetch);
+    await expect(request("/api/v1/auth/me", "GET", undefined, false)).rejects.toMatchObject({ status: 401 });
+    // The /handoff receiver stores the token in the Partner origin, shared by its tabs.
+    storeTokens({ accessToken: token });
+    await expect(partnerApi.me()).resolves.toEqual({ id: "fixture-user" });
+    expect(fetch.mock.calls[1][1].headers.Authorization).toBe(`Bearer ${token}`);
+    expect(fetch.mock.calls[1][1].credentials).toBe("omit");
+  });
+
   it("logs out an expired handoff session with its refresh token and without parent-domain cookies", async () => {
     const token = crypto.randomUUID(),
       refresh = crypto.randomUUID();

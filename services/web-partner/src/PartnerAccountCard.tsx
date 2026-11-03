@@ -22,14 +22,14 @@ export function PartnerAccountCard({
     >
       <a
         className="o4o-login-primary-link"
-        href="https://neture.co.kr/login"
+        href="https://neture.co.kr/service-entry/partner-support?returnPath=%2Fcommunity"
         target="_blank"
         rel="noopener noreferrer"
       >
         Google·카카오로 로그인 ↗
       </a>
       <p className="o4o-login-description">
-        새 창에서 O4O에 로그인한 뒤 아래에서 로그인 상태를 확인해 주세요.
+        새 창에서 로그인하고 파트너 화면이 열리면 아래에서 로그인 상태를 확인해 주세요.
       </p>
       <button
         type="button"
