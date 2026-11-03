@@ -229,7 +229,7 @@ jobs:
           sparse-checkout: scripts/ci
       - uses: actions/setup-node@v7
         with:
-          node-version: '22.18.0'
+          node-version: '22.23.4'
       - name: Require green CI for target SHA
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -281,7 +281,7 @@ jobs:
       - name: Set up pinned Node for PC distribution
         uses: actions/setup-node@v7
         with:
-          node-version: '22.18.0'
+          node-version: '22.23.4'
 
       - name: Build verified Windows PC distribution
         run: node tools/o4o-local-agent/release/build-release.mjs --source-sha "$GITHUB_SHA" --out services/web-neture/public/downloads/pc-connection
@@ -965,7 +965,7 @@ jobs:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v7
         with:
-          node-version: '22.18.0'
+          node-version: '22.23.4'
       - name: Require green CI for exact target SHA
         if: ${{ !startsWith(inputs.pharmacy_preparation, 'drugstore-') }}
         env:

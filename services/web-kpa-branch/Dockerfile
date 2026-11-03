@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1
 # KPA Branch Web — Cloud Run 호환 정적 파일 서빙
 #
 # WO-O4O-PHARMACIST-BRANCH-SERVICE-FOUNDATION-DESIGN-AND-IMPLEMENTATION-V1
@@ -12,14 +13,16 @@
 #    반드시 함께 추가해야 한다. 누락 시 Docker 빌드가 실패한다.
 
 # Build stage
-FROM node:20-alpine AS builder
+FROM node:22.23.4-alpine AS builder
 
 WORKDIR /app
 
-RUN npm install -g pnpm
+RUN --mount=type=secret,id=proxy_ca \
+    if [ -f /run/secrets/proxy_ca ]; then export NODE_EXTRA_CA_CERTS=/run/secrets/proxy_ca; fi; \
+    npm install -g --ignore-scripts pnpm@10.25.0
 
 # Copy workspace configuration
-COPY pnpm-workspace.yaml ./
+COPY pnpm-workspace.yaml pnpm-lock.yaml ./
 COPY package.json ./
 COPY tsconfig.base.json ./
 COPY tsconfig.packages.json ./
@@ -39,7 +42,9 @@ COPY packages/shared-space-ui/package.json ./packages/shared-space-ui/
 COPY services/web-kpa-branch/package.json ./services/web-kpa-branch/
 
 # WO-O4O-DOCKER-PNPM-IGNORE-SCRIPTS-FIX-V1: --ignore-scripts 로 prepare 자동 빌드 skip
-RUN pnpm install --filter kpa-branch-web... --ignore-scripts
+RUN --mount=type=secret,id=proxy_ca \
+    if [ -f /run/secrets/proxy_ca ]; then export NODE_EXTRA_CA_CERTS=/run/secrets/proxy_ca; fi; \
+    pnpm install --filter kpa-branch-web... --fail-if-no-match --frozen-lockfile --ignore-scripts --verify-store-integrity=true
 
 # Copy workspace package source
 COPY packages/types/ ./packages/types/
@@ -66,14 +71,16 @@ WORKDIR /app/services/web-kpa-branch
 ARG VITE_API_BASE_URL
 ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
 
-RUN npx vite build
+RUN pnpm exec vite build
 
 # Runner stage
-FROM node:20-alpine AS runner
+FROM node:22.23.4-alpine AS runner
 
 WORKDIR /app
 
-RUN npm install -g serve
+RUN --mount=type=secret,id=proxy_ca \
+    if [ -f /run/secrets/proxy_ca ]; then export NODE_EXTRA_CA_CERTS=/run/secrets/proxy_ca; fi; \
+    npm install -g --ignore-scripts serve@14.2.4
 
 COPY --from=builder /app/services/web-kpa-branch/dist ./dist
 

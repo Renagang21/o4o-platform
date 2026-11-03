@@ -1,11 +1,16 @@
-FROM node:20-alpine AS builder
+# syntax=docker/dockerfile:1
+FROM node:22.23.4-alpine AS builder
 WORKDIR /app
-RUN npm install -g pnpm
-COPY pnpm-workspace.yaml package.json tsconfig.base.json tsconfig.packages.json ./
+RUN --mount=type=secret,id=proxy_ca \
+    if [ -f /run/secrets/proxy_ca ]; then export NODE_EXTRA_CA_CERTS=/run/secrets/proxy_ca; fi; \
+    npm install -g --ignore-scripts pnpm@10.25.0
+COPY pnpm-workspace.yaml pnpm-lock.yaml package.json tsconfig.base.json tsconfig.packages.json ./
 COPY packages/file-understanding-core/package.json ./packages/file-understanding-core/
 COPY packages/hospital-pharmacy-core/package.json ./packages/hospital-pharmacy-core/
 COPY services/web-hospital-pharmacy/package.json ./services/web-hospital-pharmacy/
-RUN pnpm install --filter hospital-pharmacy-web... --ignore-scripts
+RUN --mount=type=secret,id=proxy_ca \
+    if [ -f /run/secrets/proxy_ca ]; then export NODE_EXTRA_CA_CERTS=/run/secrets/proxy_ca; fi; \
+    pnpm install --filter hospital-pharmacy-web... --fail-if-no-match --frozen-lockfile --ignore-scripts --verify-store-integrity=true
 COPY packages/file-understanding-core/ ./packages/file-understanding-core/
 COPY packages/hospital-pharmacy-core/ ./packages/hospital-pharmacy-core/
 COPY services/web-hospital-pharmacy/ ./services/web-hospital-pharmacy/
@@ -18,11 +23,13 @@ ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
 ARG VITE_SERVICE_URL=https://hospital.neture.co.kr
 ENV VITE_SERVICE_URL=$VITE_SERVICE_URL
 WORKDIR /app/services/web-hospital-pharmacy
-RUN npx vite build
+RUN pnpm exec vite build
 
-FROM node:20-alpine AS runner
+FROM node:22.23.4-alpine AS runner
 WORKDIR /app
-RUN npm install -g serve
+RUN --mount=type=secret,id=proxy_ca \
+    if [ -f /run/secrets/proxy_ca ]; then export NODE_EXTRA_CA_CERTS=/run/secrets/proxy_ca; fi; \
+    npm install -g --ignore-scripts serve@14.2.4
 COPY --from=builder /app/services/web-hospital-pharmacy/dist ./dist
 # 정본 진입은 neture.co.kr/hospital (LB 가 `/hospital/...` 을 그대로 전달) · Cloud Run 직접 URL 은 root 진입.
 # 같은 이미지가 두 진입을 서빙해야 하므로 dist 를 `/hospital` 아래에도 둔다(kpa-branch `/kpa` 선례).

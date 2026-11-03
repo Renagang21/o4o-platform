@@ -16,7 +16,7 @@
 # -----------------------------------------------------------------------------
 # Stage 1: Dependencies Installation
 # -----------------------------------------------------------------------------
-FROM node:22-slim AS deps
+FROM node:22.23.4-bookworm-slim AS deps
 
 WORKDIR /app
 
@@ -35,7 +35,7 @@ RUN --mount=type=secret,id=proxy_ca \
 # -----------------------------------------------------------------------------
 # Stage 2: Production Runtime
 # -----------------------------------------------------------------------------
-FROM node:22-slim AS runner
+FROM node:22.23.4-bookworm-slim AS runner
 
 WORKDIR /app
 

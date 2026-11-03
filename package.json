@@ -83,7 +83,8 @@
     "verify": "pnpm run verify:registry",
     "// === Phase R10: AppStore Guard ===": "",
     "verify:appstore": "npx ts-node --esm scripts/appstore-guard.ts",
-    "prepare": "husky"
+    "prepare": "husky",
+    "check:runtime": "node scripts/check-runtime-consistency.mjs"
   },
   "devDependencies": {
     "@capacitor/cli": "^7.4.4",
@@ -173,8 +174,8 @@
     "xml2js": "0.6.2"
   },
   "volta": {
-    "node": "22.18.0",
-    "npm": "10.9.3",
+    "node": "22.23.4",
+    "npm": "10.9.9",
     "pnpm": "10.25.0"
   },
   "pnpm": {
