@@ -4,11 +4,13 @@ import { centralOperationRoles } from './central-operation-access.js';
 import { centralOperationMenuKeys } from './central-operation-menu-grants.js';
 import { OperationError, operationReason, recordOperation } from '../operations/operation-audit.js';
 import { isPhoneShapeValid, normalizePhoneDigits } from '../../common/auth/phone-shape.js';
+import { resolveNetureMainMembershipStatus } from '../../modules/neture/services/neture-main-membership.js';
 
 type Db = Pick<EntityManager, 'query'>;
 export type MemberTask = 'all' | 'qualifications' | 'pharmacies' | 'corrections';
 const version = `to_char(u."updatedAt",'YYYY-MM-DD"T"HH24:MI:SS.US')`;
 const identity = `u.id AS "userId",u.name,u.nickname,u.email,u.phone,u.status AS "accountStatus",
+ u."isActive" AS "accountActive",(SELECT sm.status FROM service_memberships sm WHERE sm.user_id=u.id AND sm.service_key='neture') AS "membershipStatus",
  u."isEmailVerified" AS "emailVerified",u."createdAt" AS "joinedAt",${version} AS version`;
 const pharmacyExists = (status: string) => `EXISTS(SELECT 1 FROM neture_pharmacy_memberships n WHERE n.applicant_user_id=u.id AND n.status='${status}')`;
 const privateValue = (value: unknown) => ({ toPostgres: () => value, toJSON: () => '[redacted]' });
@@ -50,17 +52,20 @@ export class CentralMemberWorkspaceService {
       COUNT(*) FILTER(WHERE ${permissions.pharmacies ? conditions.pharmacies : 'false'})::int AS pharmacies,
       COUNT(*) FILTER(WHERE ${conditions.corrections})::int AS corrections ${from}`, [query]);
     const items = await this.db.query(`SELECT u.id AS "userId",u.name,u.email,u.status AS "accountStatus",
+      u."isActive" AS "accountActive",u."isEmailVerified" AS "emailVerified",
+      (SELECT sm.status FROM service_memberships sm WHERE sm.user_id=u.id AND sm.service_key='neture') AS "membershipStatus",
       COALESCE(p.qualification_status,'unrequested') AS "qualificationStatus",
       ${permissions.pharmacies ? `(SELECT n.status FROM neture_pharmacy_memberships n WHERE n.applicant_user_id=u.id ORDER BY n.applied_at DESC,n.id LIMIT 1)` : 'NULL::text'} AS "pharmacyStatus"
       ${from} AND (${conditions[task]}) ORDER BY u."createdAt" DESC,u.id LIMIT 21 OFFSET $2`,
     [query, (page - 1) * 20]);
-    return { items: items.slice(0, 20), hasNext: items.length > 20, counts, permissions };
+    return { items: items.slice(0, 20).map(row=>({...row,serviceStatus:['withdrawn','suspended'].includes(row.membershipStatus)?row.membershipStatus:resolveNetureMainMembershipStatus({account_status:row.accountStatus,account_active:row.accountActive,email_verified:row.emailVerified,membership_status:row.membershipStatus})})), hasNext: items.length > 20, counts, permissions };
   }
 
   async detail(actor: string, target: string) {
     const permissions = await memberWorkspaceAccess(this.db, actor);
     const [member] = await this.db.query(`SELECT ${identity} FROM users u WHERE u.id=$1`, [target]);
     if (!member) throw new OperationError(404, 'MEMBER_NOT_FOUND', '회원을 찾을 수 없습니다.');
+    member.serviceStatus=['withdrawn','suspended'].includes(member.membershipStatus)?member.membershipStatus:resolveNetureMainMembershipStatus({account_status:member.accountStatus,account_active:member.accountActive,email_verified:member.emailVerified,membership_status:member.membershipStatus});
     let qualification = null;
     let legacyLicense = null;
     let legacyBusiness = null;

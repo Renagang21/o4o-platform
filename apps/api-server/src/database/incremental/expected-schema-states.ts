@@ -347,6 +347,10 @@ export const EXPECTED_SCHEMA_STATES: readonly ExpectedSchemaState[] = [
   { appliedThrough: 'RenameDrugstoreCooperation1793457683032', fingerprint: 'aab4a2e779cbdcfe5948dbbcd2e71539d365ac05cad42902066a018ca105ca82', fingerprintLineCount: 7410 },
   // Isolated PostgreSQL 15: all prior prefixes match; new empty down/up restores prior state.
   { appliedThrough: 'AddAdminOperationsDelegation1793586897000', fingerprint: '4adee8f4fc7f40b3dd9ae6ff84d5bafad7128378e4c58b4042a4234528542a17', fingerprintLineCount: 7411 },
+  // Isolated PostgreSQL 15: official forward migration; no fixture-only trigger registration.
+  { appliedThrough: 'CompleteMemberErasureFences1793684890120', fingerprint: '894ee65f5593ca245bf16872ef0ea64e3eed387c69ee144d578c98b94b34df47', fingerprintLineCount: 7426 },
+  { appliedThrough: 'SeparateMemberResourceOwnership1793691490120', fingerprint: '8f1a89e4a4b1b02b655bc81f4250493db071fdb2a10cafd33c525f8fcf412044', fingerprintLineCount: 7446 },
+  { appliedThrough: 'FenceClosedPharmacyWriters1793698990120', fingerprint: '9c5e1bb5494257c578430da1cd297a5a56438ab8e369f619b7db19c3f0cebe76', fingerprintLineCount: 7552 },
 ] as const;
 
 /** Expected state after `prefixLength` incremental migrations; undefined when not registered. */

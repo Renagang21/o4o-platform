@@ -1,5 +1,5 @@
 import { PublicPreviewController } from '../controllers/PublicPreviewController.js';
-import { hardDeleteLectureCourse } from '../services/lecture-course-cleanup.service.js';
+import { hardDeleteLectureCourse, lectureDeletionPlan } from '../services/lecture-course-cleanup.service.js';
 import { OperationError } from '../../../services/operations/operation-audit.js';
 import { Router, Request, Response } from 'express';
 import { CourseController } from '../controllers/CourseController.js';
@@ -392,9 +392,13 @@ router.post('/operator/courses/:id/archive', ipBurstLimiter, requireAuth, apiLim
 }));
 
 // DELETE /api/v1/lms/operator/courses/:id/hard — service admin only, ARCHIVED, transactional hard delete
+router.get('/operator/courses/:id/deletion-plan', ipBurstLimiter, requireAuth, apiLimiter, requireLectureAdmin, asyncHandler(async (req:Request,res:Response)=>{
+ try{return res.json({success:true,data:await AppDataSource.transaction('REPEATABLE READ',m=>lectureDeletionPlan(m,req.params.id))});}
+ catch(error){if(error instanceof OperationError)return res.status(error.status).json({success:false,code:error.code,error:error.message});throw error;}
+}));
 router.delete('/operator/courses/:id/hard', ipBurstLimiter, requireAuth, apiLimiter, requireLectureAdmin, asyncHandler(async (req: Request, res: Response) => {
   try {
-    const data = await hardDeleteLectureCourse(AppDataSource, req.params.id, (req as any).user.id, req.body?.reason);
+    const data = await hardDeleteLectureCourse(AppDataSource, req.params.id, (req as any).user.id, req.body?.reason, req.body?.expectedDigest);
     return res.json({ success: true, data });
   } catch (error) {
     if (error instanceof OperationError) return res.status(error.status).json({ success: false, code: error.code, error: error.message });

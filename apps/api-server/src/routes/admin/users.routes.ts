@@ -1,4 +1,4 @@
-import { respondErasure, respondErasureCapabilities } from '../../services/privacy/account-erasure.http.js';
+import { respondErasure, respondErasureCapabilities, respondErasureList, respondErasureReadiness } from '../../services/privacy/account-erasure.http.js';
 /**
  * @core O4O_PLATFORM_CORE — Approval
  * Core Routes: GET /admin/users, PATCH /admin/users/:id/status
@@ -36,6 +36,8 @@ const ADMIN_ROLES = ['platform:super_admin'];
 router.get('/', requireRole(ADMIN_ROLES), adminUserController.getUsers);
 router.get('/statistics', requireRole(ADMIN_ROLES), adminUserController.getUserStatistics);
 router.get('/erasure-capabilities', requireRole(ADMIN_ROLES), respondErasureCapabilities);
+router.get('/erasure-readiness', requireRole(ADMIN_ROLES), respondErasureReadiness);
+router.get('/erasure-operations', requireRole(ADMIN_ROLES), respondErasureList);
 router.get('/:id', requireRole(ADMIN_ROLES), adminUserController.getUser);
 
 // User creation (admin only) — IR-O4O-ADMIN-OPERATOR-CREATE-SUPERADMIN-AUTH-FAILURE-V1

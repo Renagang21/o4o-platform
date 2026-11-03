@@ -1,3 +1,6 @@
+import { withBusinessErasureDisposition } from './privacy/business-erasure-disposition.js';
+import { assertClosureInventory, assertClosureStorageReviewed, purgeAdditionalClosureRows } from './store/store-closure-inventory.js';
+import { purgeClosureDocuments } from './store/store-closure-files.js';
 import { createHash } from 'crypto';
 import type { DataSource, EntityManager } from 'typeorm';
 import { AppDataSource } from '../database/connection.js';
@@ -8,6 +11,13 @@ import {
   DEMO_ACCOUNT_FORBIDDEN_CODE,
   DEMO_ACCOUNT_FORBIDDEN_MESSAGE,
 } from './auth/demo-account.service.js';
+
+async function assertClosureAdmin(m:Pick<EntityManager,'query'>,actor?:string){
+ const rows=await m.query(`SELECT u.id FROM users u JOIN role_assignments r ON r.user_id=u.id WHERE u.id=$1 AND u."isActive"=true
+ AND r.role='platform:super_admin' AND r.is_active=true AND r.valid_from<=statement_timestamp()
+ AND (r.valid_until IS NULL OR r.valid_until>=statement_timestamp()) FOR SHARE OF u,r`,[actor??null]);
+ if(!rows.length)throw new StoreOwnerTerminationError('ACCOUNT_ADMIN_REQUIRED','폐업 자료 삭제는 현재 전체 관리자 권한이 필요합니다.',403);
+}
 
 export const STORE_OWNER_CONTRACT_SERVICES = ['kpa-society'] as const;
 export type StoreOwnerContractServiceKey = typeof STORE_OWNER_CONTRACT_SERVICES[number] | 'pharmacy-hub';
@@ -394,8 +404,11 @@ export class StoreOwnerTerminationService {
       // 일반 서비스 회원자격은 유지한다. 매장 경영자 역할과 해당 Store↔Service 연결만 종료한다.
       await m.query(
         `UPDATE role_assignments SET is_active=false, updated_at=NOW()
-          WHERE user_id=$1 AND role=$2 AND is_active=true`,
-        [c.userId, cfg.role],
+          WHERE user_id=$1 AND role=$2 AND is_active=true
+          AND NOT EXISTS(SELECT 1 FROM organization_members om JOIN organizations o ON o.id=om.organization_id
+            WHERE om.user_id=$1 AND om.organization_id<>$3 AND om.role='owner' AND om.left_at IS NULL
+            AND o."isActive"=true AND o.type IN ('store','pharmacy'))`,
+        [c.userId, cfg.role, c.organizationId],
       );
       await m.query(
         `UPDATE organization_service_enrollments SET status='inactive', updated_at=NOW()
@@ -606,7 +619,7 @@ export class StoreOwnerTerminationService {
     }
   }
 
-  async purgeCase(caseId: string, options: { dryRun?: boolean; now?: Date } = {}): Promise<PurgePreview> {
+  async purgeCase(caseId: string, options: { dryRun?: boolean; now?: Date; closureConfirmed?: boolean; actorId?: string } = {}): Promise<PurgePreview> {
     const preview = await this.previewPurge(caseId);
     if (options.dryRun !== false) return preview;
 
@@ -615,7 +628,17 @@ export class StoreOwnerTerminationService {
       throw new StoreOwnerTerminationError('PURGE_NOT_ALLOWED', '계약 종료가 적용된 건만 파기할 수 있습니다.', 409);
     }
     const now = options.now ?? new Date();
-    if (!c.purgeDueAt || new Date(c.purgeDueAt).getTime() > now.getTime()) {
+    if (options.closureConfirmed === true) {
+      // An explicitly confirmed full pharmacy closure is distinct from an ordinary
+      // service-contract termination. Never apply this path to a sale or active store.
+      const [closed] = await this.dataSource.query(`SELECT 1 FROM organizations o
+        JOIN neture_pharmacy_memberships p ON p.organization_id=o.id
+        WHERE o.id=$1 AND o."isActive"=false AND p.status='terminated'
+          AND NOT EXISTS(SELECT 1 FROM organization_service_enrollments e WHERE e.organization_id=o.id AND e.status='active')
+          AND NOT EXISTS(SELECT 1 FROM organization_members m WHERE m.organization_id=o.id AND m.left_at IS NULL)`, [c.organizationId]);
+      if (!closed) throw new StoreOwnerTerminationError('FULL_CLOSURE_REQUIRED', '완전폐업과 모든 소속 해지가 확인된 약국만 즉시 자료 삭제할 수 있습니다.', 409);
+    }
+    if (options.closureConfirmed !== true && (!c.purgeDueAt || new Date(c.purgeDueAt).getTime() > now.getTime())) {
       throw new StoreOwnerTerminationError('PURGE_NOT_DUE', '아직 7일 파기 기한이 도래하지 않았습니다.', 409);
     }
 
@@ -623,6 +646,18 @@ export class StoreOwnerTerminationService {
     await assertNotDemoStoreOwner(this.dataSource, c.userId);
 
     try {
+      if(options.closureConfirmed===true) {
+        await assertClosureInventory(this.dataSource,c.organizationId);
+        await assertClosureStorageReviewed(this.dataSource,c.organizationId);
+        for(let pass=0;pass<2;pass++)await this.dataSource.transaction(async m=>{
+          await m.query("SELECT pg_advisory_xact_lock_shared(hashtextextended('o4o-account-erasure-writes',0))");
+          await assertClosureAdmin(m,options.actorId);
+          await m.query("SELECT set_config('o4o.closure_operation',$1,true)",[c.id]);
+          await withBusinessErasureDisposition(m,c.userId,()=>purgeClosureDocuments(m,c.id,c.organizationId));
+        });
+        const [files]=await this.dataSource.query("SELECT count(*)::int AS n FROM store_closure_file_tasks WHERE case_id=$1 AND state='pending'",[c.id]);
+        if(files.n)throw new StoreOwnerTerminationError('PURGE_INCOMPLETE','폐업 파일 삭제가 미완료입니다.',409);
+      }
       /**
        * Phase 1 — 현재 매장의 Store 참조를 먼저 제거하되 store_execution_assets 는 보존한다.
        *
@@ -635,6 +670,12 @@ export class StoreOwnerTerminationService {
        * 모두 남아 다음 명시적 apply 에서 재시도할 수 있다.
        */
       await this.dataSource.transaction(async (m) => {
+        if(options.closureConfirmed===true) {
+          await m.query("SELECT pg_advisory_xact_lock_shared(hashtextextended('o4o-account-erasure-writes',0))");
+          await assertClosureAdmin(m,options.actorId);
+          await m.query("SELECT set_config('o4o.closure_operation',$1,true)",[c.id]);
+          await purgeAdditionalClosureRows(m,c.organizationId);
+        }
         // 서비스 전용 매장 사본/출력물
         await m.query(`DELETE FROM signage_schedules WHERE "organizationId"=$1 AND "serviceKey"=ANY($2::text[])`, [c.organizationId,cfg.contentKeys]);
         await m.query(`DELETE FROM signage_playlist_items WHERE "playlistId" IN (SELECT id FROM signage_playlists WHERE "organizationId"=$1 AND "serviceKey"=ANY($2::text[]))`, [c.organizationId,cfg.contentKeys]);
@@ -685,12 +726,18 @@ export class StoreOwnerTerminationService {
 
       // Phase 2 — 현재 org 참조가 제거된 뒤 물리 미디어를 지운다.
       // storage 실패 시 MediaLibraryService가 DB media row를 보존하고 throw → case failed.
-      if (!preview.hasOtherActiveStoreService) {
+      if (!preview.hasOtherActiveStoreService && options.closureConfirmed!==true) {
         await this.purgeOwnedMedia(c);
       }
 
       // Phase 3 — GCS/Media 처리 성공(또는 외부 참조로 보존 결정) 후 실행자산과 case를 확정한다.
       await this.dataSource.transaction(async (m) => {
+        if(options.closureConfirmed===true) {
+          await m.query("SELECT pg_advisory_xact_lock_shared(hashtextextended('o4o-account-erasure-writes',0))");
+          await assertClosureAdmin(m,options.actorId);
+          await m.query("SELECT set_config('o4o.closure_operation',$1,true)",[c.id]);
+        }
+        return withBusinessErasureDisposition(m,c.userId,async()=>{
         if (!preview.hasOtherActiveStoreService) {
           await m.query(`DELETE FROM store_execution_assets WHERE organization_id=$1`, [c.organizationId]);
 
@@ -707,6 +754,8 @@ export class StoreOwnerTerminationService {
                 WHERE id=$1`,
               [c.organizationId],
             );
+            if (options.closureConfirmed === true) await m.query(
+              'UPDATE organizations SET metadata=NULL,description=NULL,created_by_user_id=NULL WHERE id=$1', [c.organizationId]);
             await m.query(
               `UPDATE organization_members SET left_at=COALESCE(left_at,NOW()), updated_at=NOW()
                 WHERE organization_id=$1 AND user_id=$2 AND role='owner' AND left_at IS NULL`,
@@ -715,21 +764,27 @@ export class StoreOwnerTerminationService {
           }
         }
 
+        if(options.closureConfirmed===true) {
+          await assertClosureInventory(m,c.organizationId,true);
+          await m.query(`DELETE FROM organization_members WHERE organization_id=$1`,[c.organizationId]);
+          await m.query(`DELETE FROM organization_service_enrollments WHERE organization_id=$1`,[c.organizationId]);
+          await m.query(`UPDATE neture_pharmacy_memberships SET pharmacy_name='종료된 매장',business_number='',pharmacist_license_number='',reason=NULL WHERE organization_id=$1`,[c.organizationId]);
+        }
         await m.query(
           `UPDATE store_owner_termination_cases
               SET status='purge_completed', purge_completed_at=NOW(), failure_reason=NULL, updated_at=NOW()
             WHERE id=$1`,
           [c.id],
         );
+        });
       });
     } catch (error: any) {
-      const code = error instanceof StoreOwnerTerminationError ? error.code : 'PURGE_INCOMPLETE';
-      await this.dataSource.query(
-        `UPDATE store_owner_termination_cases
-            SET status='failed', failure_reason=$2, updated_at=NOW()
-          WHERE id=$1`,
-        [c.id, String(code).slice(0,500)],
-      );
+      const candidate=String(error?.code??error?.message??'');
+      const code = error instanceof StoreOwnerTerminationError ? error.code : /^STORE_CLOSURE_[A-Z_]+$/.test(candidate)?candidate:'PURGE_INCOMPLETE';
+      await this.dataSource.transaction(async m=>{
+        await m.query("SELECT pg_advisory_xact_lock_shared(hashtextextended('o4o-account-erasure-writes',0))");
+        await withBusinessErasureDisposition(m,c.userId,()=>m.query(`UPDATE store_owner_termination_cases SET status='failed',failure_reason=$2,updated_at=now() WHERE id=$1`,[c.id,String(code).slice(0,500)]));
+      });
       throw error;
     }
     return this.previewPurge(caseId);

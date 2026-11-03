@@ -8,6 +8,8 @@ import { apiLimiter } from "../middleware/rateLimiter.js";
 import { AppDataSource } from "../database/connection.js";
 import { OperationError } from "../services/operations/operation-audit.js";
 import { PharmacistQualificationService } from "../services/qualifications/pharmacist-qualification.service.js";
+import { StoreOwnerTerminationError } from '../services/store-owner-termination.service.js';
+import { MemberLifecycleService } from '../services/admin/member-lifecycle.service.js';
 import { CentralMemberWorkspaceService } from '../services/admin/central-member-workspace.service.js';
 
 export const pharmacistQualificationsRouter = Router();
@@ -26,6 +28,9 @@ const handle =
     try {
       res.json({ success: true, data: await work(req) });
     } catch (error) {
+      if (error instanceof StoreOwnerTerminationError) {
+        res.status(error.httpStatus).json({success:false,code:error.code,error:error.message}); return;
+      }
       if (error instanceof OperationError) {
         res
           .status(error.status)
@@ -84,6 +89,32 @@ pharmacistQualificationsRouter.patch('/members/:userId', handle(req => {
   return workspace().correct(req.user!.id, memberId(req), {
     name: input.name!, nickname: input.nickname!, phone: input.phone!, reason: input.reason!, version: input.version!,
   });
+}));
+pharmacistQualificationsRouter.get('/members/:userId/pharmacies/:organizationId/closure-plan',handle(req=>{
+ google(req);
+ return new MemberLifecycleService(AppDataSource).closurePlan(req.user!.id,memberId(req),z.string().uuid().parse(req.params.organizationId));
+}));
+pharmacistQualificationsRouter.post('/members/:userId/stop-access', handle(req => {
+  google(req);
+  const input = z.object({reason:z.string().trim().min(1).max(2000),
+    version:z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{6}$/)}).strict().parse(req.body);
+  return new MemberLifecycleService(AppDataSource).stopAccess(req.user!.id, memberId(req), {reason:input.reason!,version:input.version!});
+}));
+pharmacistQualificationsRouter.post('/members/:userId/terminate-access', handle(req => {
+  google(req);
+  const input=z.object({reason:z.string().trim().min(1).max(2000),version:z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{6}$/)}).strict().parse(req.body);
+  return new MemberLifecycleService(AppDataSource).terminateAccess(req.user!.id,memberId(req),{reason:input.reason!,version:input.version!});
+}));
+pharmacistQualificationsRouter.post('/members/:userId/pharmacies/:organizationId/transfer', handle(req => {
+  google(req);
+  const input = z.object({nextOwnerEmail:z.string().trim().email().max(255),reason:z.string().trim().min(1).max(2000),transferConfirmed:z.literal(true)}).strict().parse(req.body);
+  return new MemberLifecycleService(AppDataSource).transferPharmacy(req.user!.id, memberId(req),z.string().uuid().parse(req.params.organizationId),
+    {nextOwnerEmail:input.nextOwnerEmail!,reason:input.reason!,transferConfirmed:true});
+}));
+pharmacistQualificationsRouter.post('/members/:userId/pharmacies/:organizationId/close', handle(req => {
+  google(req);
+  const input = z.object({reason:z.string().trim().min(1).max(2000),closureConfirmed:z.literal(true)}).strict().parse(req.body);
+  return new MemberLifecycleService(AppDataSource).closePharmacy(req.user!.id,memberId(req),z.string().uuid().parse(req.params.organizationId),{reason:input.reason!,closureConfirmed:true});
 }));
 const memberVersion = z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{6}$/);
 const businessText = z.string().trim().max(300);

@@ -204,7 +204,8 @@ export function GoogleContinue<TUser = unknown>({
       {stage.kind === 'button' && (
         <div
           ref={containerRef}
-          style={{ display: 'flex', justifyContent: 'center', minHeight: 44 }}
+          aria-label={buttonText==='signup_with'?'Google로 가입':undefined}
+          style={{ display: 'flex', justifyContent: 'center', minHeight: buttonText==='signup_with'?32:44 }}
           data-testid="google-continue-button"
         />
       )}

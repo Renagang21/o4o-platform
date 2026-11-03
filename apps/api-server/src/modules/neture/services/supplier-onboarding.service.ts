@@ -148,17 +148,20 @@ export class SupplierOnboardingService {
       return { success: false as const, error: 'PDF_ONLY' };
     }
 
-    const gcsPath = `neture/suppliers/${supplierId}/kyc/${documentType}/${randomUUID()}.pdf`;
+    const documentId=randomUUID();
+    const gcsPath = `neture/suppliers/${supplierId}/kyc/${documentType}/${documentId}.pdf`;
     const bucket = this.storage.bucket(this.bucketName);
     await bucket.file(gcsPath).save(file.buffer, {
       resumable: false,
       metadata: {
         contentType: 'application/pdf',
         cacheControl: 'private, no-store',
+        metadata: {o4o_document_id:documentId,o4o_resource_kind:'supplier',o4o_resource_id:supplierId,o4o_asset_purpose:'business'},
       },
     });
 
     const document = this.documentRepo.create({
+      id:documentId,
       userId: supplier.userId,
       documentType,
       fileUrl: `gcs://${this.bucketName}/${gcsPath}`,

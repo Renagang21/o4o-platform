@@ -129,12 +129,12 @@ it('uses the existing account erasure workflow and never reports a pending revie
  api.delete.mockResolvedValue({data:{data:{state:'review_required',erased:false,operationId:'synthetic-operation'}}});
  const confirm=vi.spyOn(window,'confirm').mockReturnValue(true);
  try{
-  render(<CentralMemberWorkspace actorId="reviewer"/>);await select();
-  fireEvent.click(screen.getByRole('button',{name:'회원 삭제',exact:true}));
-  fireEvent.click(await screen.findByRole('button',{name:'완전 제거 요청'}));
-  await screen.findByText(/자료 분류 검토 필요.*제거 미완료/);
+  render(<CentralMemberWorkspace adminMode actorId="reviewer"/>);await select();
+  fireEvent.click(screen.getByRole('button',{name:'계정·개인자료 삭제 확인',exact:true}));
+  fireEvent.click(await screen.findByRole('button',{name:'계정·개인자료 완전삭제'}));
+  await screen.findByText(/삭제 미완료 — 확인 필요.*삭제 미완료/);
   expect(api.delete).toHaveBeenCalledWith('/admin/users/member-a');
-  expect(screen.queryByText('계정·일반 개인정보 제거 완료')).not.toBeInTheDocument();
+  expect(screen.queryByText('계정·개인자료 삭제 완료')).not.toBeInTheDocument();
  }finally{confirm.mockRestore();}
 });
 
@@ -154,17 +154,18 @@ it('locks member commands and selection until a delayed erasure response is proc
  api.delete.mockImplementationOnce(()=>new Promise(resolve=>{finish=resolve;}));
  const confirm=vi.spyOn(window,'confirm').mockReturnValue(true);
  try{
-  render(<CentralMemberWorkspace actorId="reviewer"/>);await select();
-  fireEvent.click(screen.getByRole('button',{name:'회원 삭제',exact:true}));
-  fireEvent.click(await screen.findByRole('button',{name:'완전 제거 요청'}));
+  render(<CentralMemberWorkspace adminMode actorId="reviewer"/>);await select();
+  fireEvent.click(screen.getByRole('button',{name:'계정·개인자료 삭제 확인',exact:true}));
+  fireEvent.click(await screen.findByRole('button',{name:'계정·개인자료 완전삭제'}));
   expect(screen.getByRole('button',{name:'회원 정보 수정',exact:true})).toBeDisabled();
   expect(screen.getByRole('tab',{name:/약국 심사 대기/})).toBeDisabled();
   fireEvent.click(within(screen.getByRole('table')).getAllByRole('checkbox')[2]);
   expect(within(screen.getByRole('table')).getAllByRole('checkbox')[1]).toBeChecked();
   expect(within(screen.getByRole('table')).getAllByRole('checkbox')[2]).not.toBeChecked();
   finish({data:{data:{state:'review_required',erased:false,operationId:'delayed-operation'}}});
-  await screen.findByText(/자료 분류 검토 필요.*제거 미완료/);
-  expect(screen.getByRole('button',{name:'회원 정보 수정',exact:true})).toBeEnabled();
+  await screen.findByText(/삭제 미완료 — 확인 필요.*삭제 미완료/);
+  expect(screen.queryByRole('button',{name:'회원 정보 수정',exact:true})).not.toBeInTheDocument();
+  expect(within(screen.getByRole('table')).getAllByRole('checkbox')[1]).not.toBeChecked();
   expect(screen.getByRole('button',{name:'상태 확인'})).toBeInTheDocument();
  }finally{confirm.mockRestore();}
 });

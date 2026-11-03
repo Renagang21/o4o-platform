@@ -145,4 +145,9 @@ export interface UserErasureResult {
   state: 'pending' | 'processing' | 'review_required' | 'retry_required' | 'completed';
   erased: boolean;
   reviewDueAt: string | null;
+  reviewCodes?: string[];
+  errorCode?: string | null;
+  remainingFileTasks?: number;
+  requestedAt?: string;
+  updatedAt?: string;
 }

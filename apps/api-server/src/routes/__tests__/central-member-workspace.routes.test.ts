@@ -1,5 +1,8 @@
 import express from 'express';
 import request from 'supertest';
+const closePharmacy=jest.fn().mockResolvedValue({saved:true});
+const stopAccess=jest.fn().mockResolvedValue({saved:true}),transferPharmacy=jest.fn().mockResolvedValue({saved:true});
+jest.mock('../../services/admin/member-lifecycle.service.js',()=>({MemberLifecycleService:jest.fn().mockImplementation(()=>({stopAccess,transferPharmacy,closePharmacy}))}));
 const list = jest.fn(), detail = jest.fn(), correct = jest.fn(), correctPharmacy=jest.fn(), correctLegacyBusiness=jest.fn(), rejectRegistration=jest.fn();
 jest.mock('../../database/connection.js', () => ({ AppDataSource: {} }));
 jest.mock('../../middleware/rateLimiter.js', () => ({ apiLimiter: (_req: any, _res: any, next: any) => next() }));
@@ -61,4 +64,17 @@ it('validates exact business field allowlists, evidence and account rejection ve
  expect(correctPharmacy).not.toHaveBeenCalled();
  expect((await request(app).post(`${path}/reject-registration`).set('x-user',actor).set('x-method','google').send({reason:'대조 후 거부',version:input.version})).status).toBe(200);
  expect(rejectRegistration).toHaveBeenCalledWith(actor,target,{reason:'대조 후 거부',version:input.version});
+});
+
+it('validates explicit employee termination and pharmacy sale confirmation',async()=>{
+  const stop=`${path}/stop-access`;
+  expect((await request(app).post(stop).set('x-user',actor).set('x-method','google').send({reason:'해지 확인',version:input.version})).status).toBe(200);
+  expect(stopAccess).toHaveBeenCalledWith(actor,target,{reason:'해지 확인',version:input.version});
+  const sale=`${path}/pharmacies/33333333-3333-4333-8333-333333333333/transfer`;
+  const body={reason:'매도 확인',nextOwnerEmail:'next@fixture.invalid',transferConfirmed:true};
+  expect((await request(app).post(sale).set('x-user',actor).set('x-method','google').send({...body,transferConfirmed:false})).status).toBe(400);
+  expect(transferPharmacy).not.toHaveBeenCalled();
+  expect((await request(app).post(sale).set('x-user',actor).set('x-method','password').send(body)).status).toBe(403);
+  expect((await request(app).post(sale).set('x-user',actor).set('x-method','google').send(body)).status).toBe(200);
+  expect(transferPharmacy).toHaveBeenCalledWith(actor,target,'33333333-3333-4333-8333-333333333333',body);
 });

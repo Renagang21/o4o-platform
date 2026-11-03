@@ -133,6 +133,7 @@ export class StoreMemberError extends Error {
       | 'STORE_OWNER_REQUIRED'
       | 'USER_NOT_FOUND'
       | 'ALREADY_MEMBER'
+      | 'OTHER_EMPLOYER_EXISTS'
       | 'INVITATION_NOT_FOUND'
       | 'CANNOT_MODIFY_OWNER'
       | 'SELF_INVITE_FORBIDDEN',
@@ -149,6 +150,7 @@ const MESSAGES: Record<StoreMemberError['code'], string> = {
   STORE_OWNER_REQUIRED: '매장 경영자만 할 수 있습니다.',
   USER_NOT_FOUND: '해당 주소로 가입된 사용자가 없습니다. 먼저 가입한 뒤 초대해 주세요.',
   ALREADY_MEMBER: '이미 이 매장의 구성원입니다.',
+  OTHER_EMPLOYER_EXISTS: '직원은 하나의 사업체에만 소속될 수 있습니다. 기존 소속을 먼저 해지해 주세요.',
   INVITATION_NOT_FOUND: '수락할 초대가 없습니다.',
   CANNOT_MODIFY_OWNER: '매장 경영자 본인의 소속은 이 경로로 바꿀 수 없습니다.',
   SELF_INVITE_FORBIDDEN: '자기 자신은 초대할 수 없습니다.',
@@ -266,6 +268,18 @@ export async function listStoreMembers(
   };
 }
 
+/** One employee belongs to one business. Pending invitations do not grant employment. */
+async function assertSingleEmployer(manager: EntityManager, userId: string, organizationId: string) {
+  // Recheck the business after acquiring the member lock. A closure may have
+  // happened after the owner's initial authorization check.
+  const [organization] = await manager.query('SELECT id FROM organizations WHERE id=$1 AND "isActive"=true FOR SHARE', [organizationId]);
+  if (!organization) fail('STORE_NOT_RESOLVED',403);
+  const other = await manager.query(`SELECT 1 FROM organization_members m JOIN organizations o ON o.id=m.organization_id
+    WHERE m.user_id=$1 AND m.organization_id<>$2 AND m.left_at IS NULL AND o.type IN ('store','pharmacy','supplier','semi_franchise')
+      AND m.role IN ('staff','accepted','owner','admin','manager') LIMIT 1`, [userId, organizationId]);
+  if (other.length) fail('OTHER_EMPLOYER_EXISTS', 409);
+}
+
 /**
  * 사용자를 매장에 초대한다 — **이미 가입한 사용자만**.
  *
@@ -292,6 +306,7 @@ export async function inviteStoreMember(
   if (user.id === input.ownerUserId) fail('SELF_INVITE_FORBIDDEN', 400);
 
   return withStoreMemberLock(dataSource, user.id, async manager => {
+    await assertSingleEmployer(manager, user.id, organizationId);
     const [existing]: Array<{ role: string; left_at: Date | null }> = await manager.query(
       `SELECT role, left_at FROM organization_members WHERE organization_id = $1 AND user_id = $2 LIMIT 1`,
       [organizationId, user.id],
@@ -363,6 +378,7 @@ async function acceptStoreInvitationUnlocked(
     [input.organizationId, input.userId, STORE_INVITED_ROLE],
   );
   if (!invitation) fail('INVITATION_NOT_FOUND', 404);
+  await assertSingleEmployer(dataSource, input.userId, input.organizationId);
   // The current pharmacy policy does not replace the active external Cafe24 invitation flow.
   const legacyCafe = !invitation.is_pharmacy && (await linkedServiceKeys(dataSource, input.organizationId)).includes('cafe24-b2b');
   if (!invitation.is_pharmacy && !legacyCafe) fail('STORE_NOT_RESOLVED', 403);
@@ -403,6 +419,7 @@ async function approveStoreMemberUnlocked(
     [organizationId, input.targetUserId, STORE_ACCEPTED_ROLE],
   );
   if (!pending) fail('INVITATION_NOT_FOUND', 404);
+  await assertSingleEmployer(manager, input.targetUserId, organizationId);
   if (input.pharmacistConfirmed === true) {
     const owners = await manager.query(`SELECT 1 FROM organization_members WHERE organization_id = $1 AND user_id = $2 AND left_at IS NULL AND role = $3`,
       [organizationId, input.ownerUserId, 'owner']);
@@ -472,9 +489,8 @@ async function removeStoreMemberUnlocked(
     [organizationId, input.targetUserId, STORE_MEMBERSHIP_MANAGED_ROLES],
   );
 
-  // 인가 role 회수 — **다른 매장에 아직 남아 있으면 회수하지 않는다**.
-  //   한 사람이 같은 서비스의 매장 둘에 소속될 수 있고, 한 곳에서 빠졌다고 나머지 접근까지
-  //   끊으면 안 된다. 그래서 서비스별로 "남은 활성 staff 관계" 를 세고 0 일 때만 지운다.
+  // Employment ends for the single business. Existing legacy duplicate relations
+  // are still checked below so this change cannot revoke unrelated legacy access.
   const services = await linkedServiceKeys(dataSource, organizationId);
   // Pharmacy approval, not enrollment/slug existence, grants the current staff role.
   if (input.serviceKey === 'kpa' && !services.includes('kpa')) services.push('kpa');
