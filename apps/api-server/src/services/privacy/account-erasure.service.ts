@@ -1,8 +1,8 @@
+import { businessErasureProjection, businessErasureReviews, removeBusinessAccountLinks } from './account-business-data.js';
 import { cooperativeAdminTransferRequired } from './cooperative-erasure-review.js';
 import { createHash, randomUUID } from 'node:crypto';
 import type { DataSource, EntityManager } from 'typeorm';
 import type { AuthProvider } from '../../types/account-linking.js';
-import { getNetureMainMembershipStatus } from '../../modules/neture/services/neture-main-membership.js';
 import { CALENDAR_EXPIRY_SQL } from './calendar-retention.js';
 import { ERASURE_WRITER_GAPS_SQL } from './erasure-writer-manifest.js';
 import { CENTRAL_MENU_GRANT_OWNER_SQL } from './central-menu-grant-ownership.js';
@@ -49,6 +49,9 @@ const PRIVATE_OWNERS: Readonly<Record<string, readonly string[]>> = {
   assistant_run_frames: ['user_id'], assistant_procedural_patterns: ['user_id'], assistant_tasks: ['requested_by_user_id'],
   role_migration_log: ['user_id'], service_memberships: ['user_id'], role_assignments: ['user_id'],
   community_memberships: ['user_id'],
+  organization_members: ['user_id'],
+  store_owner_termination_cases: ['user_id'],
+  neture_pharmacy_memberships: ['applicant_user_id'],
   service_operator_invitations: ['target_user_id', 'accepted_user_id'],
   cooperative_memberships: ['user_id'],
   cooperative_roles: ['user_id'],
@@ -115,10 +118,8 @@ export class AccountErasureService {
       const [user] = await m.query('SELECT id FROM users WHERE id=$1 FOR UPDATE', [userId]);
       if (!user) throw new AccountErasureError('USER_NOT_FOUND', 404);
       await this.assertTarget(m,userId);
-      const active = await m.query("SELECT service_key FROM service_memberships WHERE user_id=$1 AND status='active' FOR UPDATE", [userId]);
-      // Stage one is a scoped Operator action. Never silently suspend other services as Admin deletion.
-      // Inactive/pending/rejected membership or historical events do not block erasure.
-      if (active.length || await getNetureMainMembershipStatus(m,userId)==='active') throw new AccountErasureError('SERVICE_STOP_REQUIRED',409);
+      // An Admin's confirmed full-account deletion stops access atomically below.
+      // A separate Operator suspension is not a prerequisite.
       const [o] = await m.query(`INSERT INTO account_erasure_operations(subject_id,subject_hash,requested_by_key,state)
         VALUES($1,$2,$3,'processing') RETURNING id`, [userId, hash(userId),actorId]);
       await m.query("SELECT set_config('o4o.erasure_operation',$1,true)", [o.id]);
@@ -271,13 +272,13 @@ export class AccountErasureService {
       }
       return false;
     };
-    const providerReview=async(table:string, exclusion:string, attributionOnly=false):Promise<boolean> => {
+    const providerReview=async(table:string, exclusion:string, attributionOnly=false, projection='to_jsonb(r)'):Promise<boolean> => {
       if(!identities.providers.length)return false;
       // SQL boundaries remove short-ID timestamp candidates. A transaction cursor bounds
       // Node memory even when many genuine candidates require namespace/domain inspection.
       await m.query(`DECLARE erasure_provider_scan NO SCROLL CURSOR FOR
-        SELECT (to_jsonb(r) ${attributionOnly ? "- ARRAY['assigned_by','granted_by']" : ''}) AS payload FROM ${table} r WHERE $1::text IS NOT NULL AND
-        jsonb_path_query_array(to_jsonb(r) ${attributionOnly ? "- ARRAY['assigned_by','granted_by']" : ''},'$.** ? (@.type() == "string")')::text
+        SELECT (${projection} ${attributionOnly ? "- ARRAY['assigned_by','granted_by']" : ''}) AS payload FROM ${table} r WHERE $1::text IS NOT NULL AND
+        jsonb_path_query_array(${projection} ${attributionOnly ? "- ARRAY['assigned_by','granted_by']" : ''},'$.** ? (@.type() == "string")')::text
         ~* ANY($2::text[]) ${exclusion}`,[user.id,identities.providers.map(p=>
           `(^|[^[:alnum:]_.-])${p.id.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')}($|[^[:alnum:]_.-])`)]);
       try {
@@ -288,7 +289,8 @@ export class AccountErasureService {
         }
       } finally { await m.query('CLOSE erasure_provider_scan'); }
     };
-    const codes: string[] = [];
+    const tables = await this.tables(m);
+    const codes = await businessErasureReviews(m, String(user.id), tables);
     const [otherUsers]=await m.query(`SELECT count(*)::int AS n FROM users r WHERE r.id<>$1
       AND (${leaf('r')}::text ~* ANY($2::text[]) OR ${leaf('r')} ?| $3::text[])`,[user.id,patterns,shortTokens]);
     if(otherUsers.n || await providerReview('public.users','AND r.id::text<>$1'))codes.push('REVIEW:public.users');
@@ -301,7 +303,7 @@ export class AccountErasureService {
         AND NOT EXISTS(SELECT 1 FROM service_memberships sm WHERE sm.user_id=u.id AND sm.service_key='neture' AND sm.status IN ('suspended','withdrawn')))`, [user.id]);
     if (soleAdmin.n) codes.push('COMMUNITY_MANAGEMENT_TRANSFER_REQUIRED');
     if (await cooperativeAdminTransferRequired(m,user.id as string)) codes.push('COOPERATIVE_MANAGEMENT_TRANSFER_REQUIRED');
-    for (const t of await this.tables(m)) {
+    for (const t of tables) {
       const table = `${quote(t.schema_name)}.${quote(t.table_name)}`;
       const owners = t.schema_name === 'public' ? PRIVATE_OWNERS[t.table_name] : undefined;
       let predicate = owners?.filter(c => t.columns.includes(c)).map(c => `r.${quote(c)}::text=$1`).join(' OR ');
@@ -341,10 +343,12 @@ export class AccountErasureService {
       // The grant belongs to user_id. assigned_by is attribution only and its
       // existing ON DELETE SET NULL FK clears it; every other field is still scanned.
       const roleAttribution = t.schema_name === 'public' && ['role_assignments','assistant_work_data_consents'].includes(t.table_name);
+      const projection = businessErasureProjection(t);
+      const projectedLeaf = leaf('r',roleAttribution).replace('to_jsonb(r)', projection);
       const [r] = await m.query(`SELECT count(*)::int AS n FROM ${table} r
-        WHERE $1::text IS NOT NULL AND (${leaf('r',roleAttribution)}::text ~* ANY($2::text[]) OR ${leaf('r',roleAttribution)} ?| $3::text[])
+        WHERE $1::text IS NOT NULL AND (${projectedLeaf}::text ~* ANY($2::text[]) OR ${projectedLeaf} ?| $3::text[])
         ${predicate ? `AND NOT (${predicate})` : ''}`, [user.id, patterns,shortTokens]);
-      if (r.n || await providerReview(table,predicate ? `AND NOT (${predicate})` : '',roleAttribution)) codes.push(`REVIEW:${t.schema_name}.${t.table_name}`);
+      if (r.n || await providerReview(table,predicate ? `AND NOT (${predicate})` : '',roleAttribution,projection)) codes.push(`REVIEW:${t.schema_name}.${t.table_name}`);
     }
     // Verify the migration's writer fence on every scanned table and users, including tables added later.
     const [missing] = await m.query(`SELECT count(*)::int AS n FROM (${ERASURE_WRITER_GAPS_SQL}) missing`);
@@ -378,6 +382,7 @@ export class AccountErasureService {
 
   private async removePrivateRows(m: EntityManager, userId: string): Promise<void> {
     const tables = await this.tables(m);
+    await removeBusinessAccountLinks(m, userId, tables);
     if (tables.some(t => t.schema_name === 'public' && t.table_name === 'action_logs')) {
       await minimizeCentralMenuAudit(m,userId,hash(userId));
     }

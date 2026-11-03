@@ -145,7 +145,7 @@ export default function PlatformUsersPage() {
       <h1 className="text-xl font-bold text-slate-900 mb-1">전체 사용자 조회</h1>
       <p className="text-sm text-slate-500 mb-3">
         O4O 전체 사용자 현황과 계정 완전 제거 처리 상태를 확인합니다.
-        서비스 사용중지는 해당 Operator가 처리하고, 전체 계정 완전 제거는 Admin이 요청합니다. 권한 해제와는 별도 절차입니다.
+        Operator는 이용 정지, Admin은 계정·개인자료 완전삭제를 처리합니다. 완전삭제 시 접근도 함께 차단하므로 사전 정지는 필요하지 않습니다. 사업체·약국 및 공급자 제품·거래 자료는 개인 자료와 분리해 처리합니다.
       </p>
 
       <div className="flex items-start gap-2 rounded-lg bg-slate-50 border border-slate-200 px-3 py-2 mb-5 text-xs text-slate-500">

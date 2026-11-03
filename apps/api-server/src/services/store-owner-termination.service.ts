@@ -606,7 +606,7 @@ export class StoreOwnerTerminationService {
     }
   }
 
-  async purgeCase(caseId: string, options: { dryRun?: boolean; now?: Date } = {}): Promise<PurgePreview> {
+  async purgeCase(caseId: string, options: { dryRun?: boolean; now?: Date; closureConfirmed?: boolean } = {}): Promise<PurgePreview> {
     const preview = await this.previewPurge(caseId);
     if (options.dryRun !== false) return preview;
 
@@ -615,7 +615,17 @@ export class StoreOwnerTerminationService {
       throw new StoreOwnerTerminationError('PURGE_NOT_ALLOWED', '계약 종료가 적용된 건만 파기할 수 있습니다.', 409);
     }
     const now = options.now ?? new Date();
-    if (!c.purgeDueAt || new Date(c.purgeDueAt).getTime() > now.getTime()) {
+    if (options.closureConfirmed === true) {
+      // An explicitly confirmed full pharmacy closure is distinct from an ordinary
+      // service-contract termination. Never apply this path to a sale or active store.
+      const [closed] = await this.dataSource.query(`SELECT 1 FROM organizations o
+        JOIN neture_pharmacy_memberships p ON p.organization_id=o.id
+        WHERE o.id=$1 AND o."isActive"=false AND p.status='terminated'
+          AND NOT EXISTS(SELECT 1 FROM organization_service_enrollments e WHERE e.organization_id=o.id AND e.status='active')
+          AND NOT EXISTS(SELECT 1 FROM organization_members m WHERE m.organization_id=o.id AND m.left_at IS NULL)`, [c.organizationId]);
+      if (!closed) throw new StoreOwnerTerminationError('FULL_CLOSURE_REQUIRED', '완전폐업과 모든 소속 해지가 확인된 약국만 즉시 자료 삭제할 수 있습니다.', 409);
+    }
+    if (options.closureConfirmed !== true && (!c.purgeDueAt || new Date(c.purgeDueAt).getTime() > now.getTime())) {
       throw new StoreOwnerTerminationError('PURGE_NOT_DUE', '아직 7일 파기 기한이 도래하지 않았습니다.', 409);
     }
 
@@ -707,6 +717,8 @@ export class StoreOwnerTerminationService {
                 WHERE id=$1`,
               [c.organizationId],
             );
+            if (options.closureConfirmed === true) await m.query(
+              'UPDATE organizations SET metadata=NULL,description=NULL,created_by_user_id=NULL WHERE id=$1', [c.organizationId]);
             await m.query(
               `UPDATE organization_members SET left_at=COALESCE(left_at,NOW()), updated_at=NOW()
                 WHERE organization_id=$1 AND user_id=$2 AND role='owner' AND left_at IS NULL`,

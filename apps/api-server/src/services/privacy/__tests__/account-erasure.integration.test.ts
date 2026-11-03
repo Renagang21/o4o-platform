@@ -1,3 +1,4 @@
+import { MemberLifecycleService } from '../../admin/member-lifecycle.service.js';
 import 'reflect-metadata';
 import { randomUUID } from 'node:crypto';
 import { DataSource } from 'typeorm';
@@ -24,6 +25,8 @@ jest.mock('../../../database/connection.js', () => ({ AppDataSource: {
   get manager() { return db?.manager ?? {query:(...args:any[])=>(db.query as any)(...args)}; },
 } }));
 jest.mock('../../../modules/auth/services/role-assignment.service.js', () => ({ roleAssignmentService: {
+  removeRole: async(id:string,role:string,manager:any=db)=>manager.query('UPDATE role_assignments SET is_active=false WHERE user_id=$1 AND role=$2',[id,role]),
+  assignRole: async(input:any,manager:any=db)=>manager.query('INSERT INTO role_assignments(user_id,role,assigned_by) VALUES($1,$2,$3) ON CONFLICT DO NOTHING',[input.userId,input.role,input.assignedBy]),
   getRoleNames: async (id: string) => (await db.query('SELECT role FROM role_assignments WHERE user_id=$1 AND is_active=true AND valid_from<=statement_timestamp() AND (valid_until IS NULL OR valid_until>=statement_timestamp())',[id])).map((r: {role:string})=>r.role),
   hasAnyRole: async (id: string,roles:string[]) => (await db.query('SELECT 1 FROM role_assignments WHERE user_id=$1 AND is_active=true AND valid_from<=statement_timestamp() AND (valid_until IS NULL OR valid_until>=statement_timestamp()) AND role=ANY($2)',[id,roles])).length>0,
   getActiveRoles: async (id: string) => db.query('SELECT * FROM role_assignments WHERE user_id=$1 AND is_active=true AND valid_from<=statement_timestamp() AND (valid_until IS NULL OR valid_until>=statement_timestamp())',[id]),
@@ -79,6 +82,85 @@ integration('account erasure — isolated PostgreSQL schema/real sessions', () =
   beforeEach(async () => { await db.query('TRUNCATE users,account_erasure_operations,account_erasure_community_evidence,account_erasure_audit_events CASCADE'); const admin=await user();fixtureAdminId=admin.id;await db.query("INSERT INTO role_assignments(user_id,role,is_active) VALUES($1,'platform:super_admin',true)",[fixtureAdminId]); });
   afterAll(async () => { if(server)await new Promise<void>((resolve,reject)=>server.close(e=>e?reject(e):resolve())); if(db?.isInitialized) { await db.query('TRUNCATE users,account_erasure_operations,account_erasure_community_evidence,account_erasure_audit_events CASCADE'); await db.destroy(); } });
 
+  const organization = async (ownerId:string) => {
+    const id=randomUUID();
+    await db.query(`INSERT INTO organizations(id,name,code,type,created_by_user_id) VALUES($1,'Synthetic pharmacy',$2,'store',$3)`,[id,id,ownerId]);
+    await db.query(`INSERT INTO organization_members(organization_id,user_id,role) VALUES($1,$2,'owner')`,[id,ownerId]);
+    return id;
+  };
+  it('lifecycle mutations reject missing central authority and stale member versions before changes',async()=>{
+    const actor=await user(),target=await user({netureStopped:false});
+    const lifecycle=new MemberLifecycleService(db);
+    await expect(lifecycle.stopAccess(actor.id,target.id,{reason:'Synthetic stop',version:'stale'})).rejects.toMatchObject({status:403});
+    await expect(lifecycle.stopAccess(fixtureAdminId,target.id,{reason:'Synthetic stop',version:'stale'})).rejects.toMatchObject({code:'MEMBER_CHANGED'});
+    expect(await db.query(`SELECT 1 FROM service_memberships WHERE user_id=$1 AND status='suspended'`,[target.id])).toHaveLength(0);
+    expect((await db.query('SELECT "isActive" FROM users WHERE id=$1',[target.id]))[0].isActive).toBe(true);
+  });
+  it('employee access termination preserves business content and later erasure removes personal links',async()=>{
+    const owner=await user(),employee=await user({netureStopped:false}),org=await organization(owner.id);
+    await db.query(`INSERT INTO organization_members(organization_id,user_id,role) VALUES($1,$2,'staff')`,[org,employee.id]);
+    await db.query(`INSERT INTO role_assignments(user_id,role) VALUES($1,'kpa:store_member')`,[employee.id]);
+    await db.query(`INSERT INTO store_local_products(organization_id,name) VALUES($1,'Business document sentinel')`,[org]);
+    const [version]=await db.query(`SELECT to_char("updatedAt",'YYYY-MM-DD"T"HH24:MI:SS.US') AS version FROM users WHERE id=$1`,[employee.id]);
+    const stopped=await new MemberLifecycleService(db).stopAccess(fixtureAdminId,employee.id,{reason:'Synthetic employment termination',version:version.version});
+    expect(stopped.businessDataDeleted).toBe(false);
+    expect((await db.query(`SELECT left_at FROM organization_members WHERE user_id=$1`,[employee.id]))[0].left_at).not.toBeNull();
+    expect((await service().request(employee.id)).erased).toBe(true);
+    expect(await db.query('SELECT 1 FROM organization_members WHERE user_id=$1',[employee.id])).toHaveLength(0);
+    expect(await db.query('SELECT 1 FROM store_local_products WHERE organization_id=$1',[org])).toHaveLength(1);
+  });
+  it('pharmacy sale keeps the organization and content while moving ownership and approved license',async()=>{
+    const previous=await user(),next=await user({netureStopped:false}),org=await organization(previous.id);
+    await db.query(`INSERT INTO kpa_pharmacist_profiles(user_id,license_number,license_verified,verified_at,verified_by,qualification_status,qualification_reason)
+      VALUES($1,$2,true,now(),$3,'approved','Synthetic evidence')`,[next.id,randomUUID().slice(0,20),fixtureAdminId]);
+    await db.query(`INSERT INTO neture_pharmacy_memberships(organization_id,applicant_user_id,status,pharmacy_name,business_number,pharmacist_license_number)
+      VALUES($1,$2,'active','Synthetic pharmacy',$3,'old-license')`,[org,previous.id,randomUUID().slice(0,10)]);
+    await db.query(`INSERT INTO role_assignments(user_id,role) VALUES($1,'kpa:store_owner')`,[previous.id]);
+    await db.query(`INSERT INTO store_local_products(organization_id,name) VALUES($1,'Preserved sale content')`,[org]);
+    const lifecycle=new MemberLifecycleService(db);
+    await lifecycle.transferPharmacy(fixtureAdminId,previous.id,org,{nextOwnerEmail:next.email,reason:'Synthetic sale confirmed',transferConfirmed:true});
+    expect((await db.query('SELECT applicant_user_id FROM neture_pharmacy_memberships WHERE organization_id=$1',[org]))[0].applicant_user_id).toBe(next.id);
+    expect((await db.query("SELECT user_id FROM organization_members WHERE organization_id=$1 AND role='owner' AND left_at IS NULL",[org]))[0].user_id).toBe(next.id);
+    expect((await service().request(previous.id)).erased).toBe(true);
+    expect(await db.query('SELECT 1 FROM store_local_products WHERE organization_id=$1',[org])).toHaveLength(1);
+    expect(await db.query('SELECT 1 FROM neture_pharmacy_memberships WHERE organization_id=$1',[org])).toHaveLength(1);
+  });
+  it('supplier account erasure retains the supplier business identity and removes its private profile',async()=>{
+    const target=await user(),supplier=randomUUID(),org=await organization(target.id);
+    await db.query("UPDATE organizations SET type='supplier' WHERE id=$1",[org]);
+    await db.query(`INSERT INTO neture_suppliers(id,slug,user_id,contact_email,manager_name,settlement_account_number)
+      VALUES($1::uuid,$1::text,$2,$3,'Synthetic private contact','synthetic-account')`,[supplier,target.id,target.email]);
+    const master=randomUUID(),offer=randomUUID();
+    await db.query(`INSERT INTO product_masters(id,regulatory_name,name,manufacturer_name) VALUES($1,'Synthetic regulatory name','Synthetic product','Synthetic manufacturer')`,[master]);
+    await db.query(`INSERT INTO supplier_product_offers(id,master_id,supplier_id,slug) VALUES($1,$2,$3,$4)`,[offer,master,supplier,offer]);
+    expect((await service().request(target.id)).erased).toBe(true);
+    expect(await db.query('SELECT 1 FROM supplier_product_offers WHERE id=$1 AND supplier_id=$2',[offer,supplier])).toHaveLength(1);
+    expect((await db.query('SELECT user_id,contact_email,manager_name,settlement_account_number,status FROM neture_suppliers WHERE id=$1',[supplier]))[0]).toEqual({user_id:null,contact_email:null,manager_name:null,settlement_account_number:null,status:'INACTIVE'});
+  });
+  it('confirmed complete pharmacy closure purges Store content and allows subsequent personal erasure',async()=>{
+    const target=await user(),org=await organization(target.id);
+    await db.query(`INSERT INTO platform_services(code,name) VALUES('kpa-society','Synthetic service') ON CONFLICT DO NOTHING`);
+    await db.query(`INSERT INTO organization_service_enrollments(organization_id,service_code) VALUES($1,'kpa-society')`,[org]);
+    await db.query(`INSERT INTO role_assignments(user_id,role) VALUES($1,'kpa:store_owner')`,[target.id]);
+    await db.query(`INSERT INTO neture_pharmacy_memberships(organization_id,applicant_user_id,status,pharmacy_name,business_number,pharmacist_license_number)
+      VALUES($1,$2,'active','Synthetic pharmacy',$3,'synthetic-license')`,[org,target.id,randomUUID().slice(0,10)]);
+    await db.query(`INSERT INTO store_local_products(organization_id,name) VALUES($1,'Closed pharmacy content')`,[org]);
+    const result=await new MemberLifecycleService(db).closePharmacy(fixtureAdminId,target.id,org,{reason:'Synthetic complete closure',closureConfirmed:true});
+    expect(result.storeInventoryPurged).toBe(true);
+    expect(await db.query('SELECT 1 FROM store_local_products WHERE organization_id=$1',[org])).toHaveLength(0);
+    expect((await db.query('SELECT "isActive" FROM organizations WHERE id=$1',[org]))[0].isActive).toBe(false);
+    expect((await service().request(target.id)).erased).toBe(true);
+  });
+  it('an inactive pharmacy without completed closure still needs business disposition',async()=>{
+    const target=await user(),org=await organization(target.id);
+    await db.query('UPDATE organizations SET "isActive"=false WHERE id=$1',[org]);
+    expect((await service().request(target.id)).reviewCodes).toContain('PHARMACY_TRANSFER_OR_CLOSURE_REQUIRED');
+  });
+  it('an active pharmacy owner cannot be erased before sale or closure disposition',async()=>{
+    const target=await user();await organization(target.id);
+    const result=await service().request(target.id);
+    expect(result.erased).toBe(false);expect(result.reviewCodes).toContain('PHARMACY_TRANSFER_OR_CLOSURE_REQUIRED');
+  });
   it('disabled rollout performs no deactivation or operation write',async()=>{
     const u=await user();
     await expect(new AccountErasureService(db,{enabled:false,personalBuckets:[]}).request(u.id,fixtureAdminId)).rejects.toMatchObject({code:'ACCOUNT_ERASURE_ROLLOUT_REQUIRED',statusCode:503});
@@ -107,26 +189,23 @@ integration('account erasure — isolated PostgreSQL schema/real sessions', () =
     expect(disabled.status).toBe(200);expect((await disabled.json() as any).data.enabled).toBe(false);
     } finally {delete process.env.ACCOUNT_ERASURE_MODE;delete process.env.ACCOUNT_ERASURE_FILE_INVENTORY_REVIEW;delete process.env.ACCOUNT_ERASURE_SYSTEM_YEARS;delete process.env.ACCOUNT_ERASURE_SYSTEM_POLICY_BASIS;}
   });
-  it('stage one requires active service stop; inactive membership/history never blocks',async()=>{
-    const u=await user();
+  it('Admin deletion stops an active account without a separate Operator suspension',async()=>{
+    const u=await user({netureStopped:false});
     await db.query("INSERT INTO service_memberships(user_id,service_key,role,status) VALUES($1,'community','member','active')",[u.id]);
-    await expect(service().request(u.id)).rejects.toMatchObject({code:'SERVICE_STOP_REQUIRED'});
-    expect(await db.query('SELECT id FROM account_erasure_operations')).toHaveLength(0);
-    await db.query("UPDATE service_memberships SET status='suspended' WHERE user_id=$1",[u.id]);
     const r=await service().request(u.id);expect(r.erased).toBe(true);
     expect(await db.query('SELECT id FROM users WHERE id=$1',[u.id])).toHaveLength(0);
+    expect(await db.query('SELECT id FROM service_memberships WHERE user_id=$1',[u.id])).toHaveLength(0);
   });
   it('Operator stop materialises derived Neture access without touching another service/account',async()=>{
     const u=await user({netureStopped:false});
     await db.query("INSERT INTO service_memberships(user_id,service_key,role,status) VALUES($1,'lecture','member','active')",[u.id]);
-    await expect(service().request(u.id)).rejects.toMatchObject({code:'SERVICE_STOP_REQUIRED'});
     await db.transaction(async manager=>{
       await new MembershipApprovalService().suspendMembership({userId:u.id,suspendedBy:fixtureAdminId,isPlatformAdmin:false,serviceKeys:['neture'],manager});
     });
     const memberships=await db.query('SELECT service_key,status FROM service_memberships WHERE user_id=$1 ORDER BY service_key',[u.id]);
     expect(memberships).toEqual([{service_key:'lecture',status:'active'},{service_key:'neture',status:'suspended'}]);
     expect((await db.query('SELECT "isActive",status FROM users WHERE id=$1',[u.id]))[0]).toEqual({isActive:true,status:'active'});
-    await expect(service().request(u.id)).rejects.toMatchObject({code:'SERVICE_STOP_REQUIRED'});
+    expect((await service().request(u.id)).erased).toBe(true);
   });
   it('protected super admin and Demo owners are rejected without writes',async()=>{
     const a=await user();await db.query("INSERT INTO role_assignments(user_id,role,is_active) VALUES($1,'platform:super_admin',true)",[a.id]);

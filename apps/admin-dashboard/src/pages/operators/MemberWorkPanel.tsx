@@ -1,3 +1,4 @@
+import MemberLifecycleActions from './MemberLifecycleActions';
 import MemberBusinessEditor from './MemberBusinessEditor';
 import AccountErasureControls from '../platform/account-governance/AccountErasureControls';
 import { useState } from 'react';
@@ -44,7 +45,8 @@ export default function MemberWorkPanel({ detail, actorId, busy, perform, onBusy
     } catch (error) { setDocumentError(memberError(error)); }
   };
   return <div className="space-y-5">
-    {mode==='delete' && <section aria-label="회원 삭제" className="rounded border border-red-300 bg-white p-4 space-y-3"><h4 className="font-semibold">회원 삭제</h4><p>전체 계정 삭제는 서비스 사용중지·보존 대상 검토 후 기존 계정 제거 절차로 진행합니다. 처리 대기와 제거 완료를 구분합니다.</p>{permissions.erase && actorId!==member.userId?<AccountErasureControls onBusyChange={onBusyChange} accountId={actorId} userId={member.userId} onCompleted={()=>{void perform(async()=>undefined);}}/>:<p>전체 관리자 권한이 필요하며 본인 계정은 여기서 삭제할 수 없습니다.</p>}</section>}
+    {mode==='delete' && <section aria-label="회원 삭제" className="rounded border border-red-300 bg-white p-4 space-y-3"><h4 className="font-semibold">회원 삭제</h4><p>이용 정지는 접근을 차단하고 자료를 유지합니다. 완전삭제는 계정과 개인 자료를 삭제합니다. 직원의 업무 자료는 사업체에 남습니다. 약국 매도는 경영자 이전, 완전폐업은 약국 자료 삭제로 처리하며 공급자 제품·거래 자료는 별도로 처리합니다.</p>{permissions.erase && actorId!==member.userId?<AccountErasureControls onBusyChange={onBusyChange} accountId={actorId} userId={member.userId} onCompleted={()=>{void perform(async()=>undefined);}}/>:<p>전체 관리자 권한이 필요하며 본인 계정은 여기서 삭제할 수 없습니다.</p>}</section>}
+    <MemberLifecycleActions detail={detail} actorId={actorId} busy={busy} perform={perform} />
     <h4 className="font-bold">{member.name || '회원'} · {member.email}</h4>
     <dl className="grid grid-cols-1 gap-3 md:grid-cols-3">
       <Field label="이름" value={member.name} /><Field label="닉네임" value={member.nickname} /><Field label="휴대전화" value={member.phone} />
