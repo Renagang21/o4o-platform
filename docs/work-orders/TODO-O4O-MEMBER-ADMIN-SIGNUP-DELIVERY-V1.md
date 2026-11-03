@@ -83,12 +83,14 @@
 
 요청의 개인/직원/매도/폐업/공급자/포럼·강의, Admin native·Operator 경계, 표준 목록/선택/실패, 가입 버튼/중복 메일을 코드·정책·실제 DB·PC/mobile 모집단과 다시 대조했다. 13개 누락은 공식 migration으로 해결했고 신규·다른 함수/이벤트 fence가 readiness를 만족시키지 못하는 회귀를 유지했다. 순수 비활성화·파일 실패·미분류 잔여를 완료로 표시하지 않는다.
 
-검증: 실제 DB/HTTP/JWT/임시 파일79, domain/CI경계175, schema/native ESM23, 실제 운영자 초대54, Admin전체655, auth290 tests PASS. PC/mobile36 flows PASS, API/Admin type-check 및 API/Admin/Neture production build PASS. 로그 최소화의 원래 clock·타인 자료, 파일 세대 pin·공유 참조 경합, 단일 직원 경합, 타 약국 owner 권한 보존까지 포함한다. 운영 삭제시험·데이터 이전·유료 AI 호출 0. [CHECK](../checks/CHECK-O4O-MEMBER-ADMIN-SIGNUP-DELIVERY-V1.md)와 [운영 적용 계획](ROLLOUT-O4O-MEMBER-ADMIN-SIGNUP-DELIVERY-V1.md)을 함께 확인한다.
+검증: 실제 DB/HTTP/JWT/임시 파일83, domain/CI경계175, schema/native ESM23, 실제 운영자 초대54, Admin전체657, auth290 tests PASS. PC/mobile36 flows PASS, API/Admin type-check 및 API/Admin/Neture production build PASS. 로그 최소화의 원래 clock·타인 자료, 파일 세대 pin·공유 참조 경합, 단일 직원 경합, 타 약국 owner 권한 보존까지 포함한다. 운영 삭제시험·데이터 이전·유료 AI 호출 0. [CHECK](../checks/CHECK-O4O-MEMBER-ADMIN-SIGNUP-DELIVERY-V1.md)와 [운영 적용 계획](ROLLOUT-O4O-MEMBER-ADMIN-SIGNUP-DELIVERY-V1.md)을 함께 확인한다.
 
 ## PR 검증 보완
 
-[#933](https://github.com/Renagang21/o4o-platform/pull/933)의 최초 전체 CI와 Codex P1을 반영했다. 현재 `pharmacy` 조직·`neture:store_owner`·정지된 enrollment에서 완전폐업이 가능하고 기존 KPA 계약 자격을 요구하지 않는다. 매도는 같은 승인 표식을 이전하며 기본 Pharmacy 소속을 보존/해제한다. Supplier는 canonical 조직 owner 관계로만 개인 프로필/증빙을 처리하고 공동 소유·legacy 충돌은 검토로 남긴다. 실제 DB79·운영자 초대54가 임시 fence 없이 통과했다. 과거 단일 화면 수·선택 없는 row 승인·Operator 사전 정지·추가 의존성 없는 mock 가정을 현 코드와 맞췄으며 기술 gate를 완화하지 않았다. 최종 원격 CI/리뷰·병합 상태는 PR 최신 HEAD의 기록으로 확인한다.
+[#933](https://github.com/Renagang21/o4o-platform/pull/933)의 최초 전체 CI와 Codex P1을 반영했다. 현재 `pharmacy` 조직·`neture:store_owner`·정지된 enrollment에서 완전폐업이 가능하고 기존 KPA 계약 자격을 요구하지 않는다. 매도는 같은 승인 표식을 이전하며 기본 Pharmacy 소속을 보존/해제한다. Supplier는 canonical 조직 owner 관계로만 개인 프로필/증빙을 처리하고 공동 소유·legacy 충돌은 검토로 남긴다. 실제 DB83·운영자 초대54가 임시 fence 없이 통과했다. 과거 단일 화면 수·선택 없는 row 승인·Operator 사전 정지·추가 의존성 없는 mock 가정을 현 코드와 맞췄으며 기술 gate를 완화하지 않았다. 최종 원격 CI/리뷰·병합 상태는 PR 최신 HEAD의 기록으로 확인한다.
 
 합성 검증 종료 정리: 전용 DB 2개 각각351 table·잔여0, owned tmpfs 컨테이너 제거, loopback forward와 Vite 종료. 다른 세션의 작업공간·파일·DB는 정리하지 않았다.
 
 재리뷰 P2 보완: 완전폐업은 조직의 모든 서비스 키 자료를 처리하며 다른 매장 참조는 검토로 보호한다. 일반 KPA 계약의 서비스 범위·7일 대기는 유지한다. 4개 실제 PostgreSQL 회귀와 metadata scalar 검증 회귀를 추가했다. 원격 Code Quality에서 드러난 카카오 약관 테스트의 준비 순서도 보완했다. 재리뷰용 합성 DB의 351 table 잔여0 및 전용 컨테이너 제거도 확인했다.
+
+후속 재리뷰: 최종 삭제 submit 버튼과 실제 클릭 회귀, 정정 로그 previous/next의 검사·실제 최소화, 완료된 폐업 파일 경로·parent/child 정리까지 보완했다. 완료/이미 없음은 후속 계정 삭제를 허용하고 pending 파일은 manifest를 보존하며 차단한다. 실제 producer를 통한 DB 회귀 4개·버튼 클릭 2개와 지연 응답 act 대기를 추가했다. 최종 native 83·Admin 657·PC/mobile 36 검증 및 재검증용 fixture 종료 정리 근거는 CHECK·artifact에 대조한다.

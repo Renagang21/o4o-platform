@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import CentralMemberWorkspace from './CentralMemberWorkspace';
 import type { MemberDetail } from './member-workspace-model';
@@ -162,7 +162,7 @@ it('locks member commands and selection until a delayed erasure response is proc
   fireEvent.click(within(screen.getByRole('table')).getAllByRole('checkbox')[2]);
   expect(within(screen.getByRole('table')).getAllByRole('checkbox')[1]).toBeChecked();
   expect(within(screen.getByRole('table')).getAllByRole('checkbox')[2]).not.toBeChecked();
-  finish({data:{data:{state:'review_required',erased:false,operationId:'delayed-operation'}}});
+  await act(async()=>{finish({data:{data:{state:'review_required',erased:false,operationId:'delayed-operation'}}});});
   await screen.findByText(/삭제 미완료 — 확인 필요.*삭제 미완료/);
   expect(screen.queryByRole('button',{name:'회원 정보 수정',exact:true})).not.toBeInTheDocument();
   expect(within(screen.getByRole('table')).getAllByRole('checkbox')[1]).not.toBeChecked();

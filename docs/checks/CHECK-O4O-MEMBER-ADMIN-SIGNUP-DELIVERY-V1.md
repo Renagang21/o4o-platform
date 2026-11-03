@@ -48,17 +48,17 @@ main의 canonical schema를 전용 PostgreSQL 15로 재현한 결과, 과거 보
 
 ## 검증 증거
 
-모든 DB·파일 검증은 loopback `55469`의 전용 tmpfs PostgreSQL과 임시 파일만 사용한다. 최초 검증의 합성 DB 두 개(각351 table)를 비우고 전용 컨테이너·loopback DB forward·Vite preview를 제거했다. 재리뷰 검증도 같은 이름의 새 전용 tmpfs 컨테이너·합성 DB 한 개에서 완료했고 351 table 잔여0과 컨테이너 제거를 `fixture-cleanup-p2.json`에 기록했다. 실제 운영 계정·업무·GCP 파일을 변경하지 않았고 유료 AI 호출도 없다. native DB/HTTP tests의 GCS adapter는 외부 접근을 거절하는 strict mock 및 임시 파일 adapter다. 이것을 운영 IAM/파일 전수 검증으로 확대하지 않는다.
+모든 DB·파일 검증은 loopback `55469`의 전용 tmpfs PostgreSQL과 임시 파일만 사용한다. 최초 검증의 합성 DB 두 개(각351 table)를 비우고 전용 컨테이너·loopback DB forward·Vite preview를 제거했다. 재리뷰 검증도 같은 이름의 새 전용 tmpfs 컨테이너·합성 DB 한 개에서 완료했고 351 table 잔여0과 컨테이너 제거를 `fixture-cleanup-p2.json`에 기록했다. 마지막 재리뷰의 별도 합성 DB도 잔여0·컨테이너 제거·Vite 종료를 `fixture-cleanup-head4.json`에 확인했다. 실제 운영 계정·업무·GCP 파일을 변경하지 않았고 유료 AI 호출도 없다. native DB/HTTP tests의 GCS adapter는 외부 접근을 거절하는 strict mock 및 임시 파일 adapter다. 이것을 운영 IAM/파일 전수 검증으로 확대하지 않는다.
 
 | 검증 | 결과 |
 | --- | --- |
 | canonical fresh bootstrap + 전체 57 incremental | PASS, 정식 최종 7552 lines 일치 |
 | 기존 main prefix → 추가 3개 → down/up | main 원래 7411 lines와 최종 7552 lines 재현 PASS. populated 폐업의 rollback 거절·기존 중복 직원의 upgrade 거절 PASS |
-| 실제 PostgreSQL/HTTP/JWT/임시 파일 | 79 tests PASS (정식 schema, 전용 DB) |
+| 실제 PostgreSQL/HTTP/JWT/임시 파일 | 83 tests PASS (정식 schema, 전용 DB) |
 | API 관련 domain·CI 경계 회귀 9 suites + 정식 migration/native ESM 2 suites | 175 + 23 tests PASS |
-| 운영자 초대 실제 PostgreSQL/계정 삭제 | 54 tests PASS, official schema fence 0 gaps. API 중복 없는 합계 331 |
+| 운영자 초대 실제 PostgreSQL/계정 삭제 | 54 tests PASS, official schema fence 0 gaps. API 중복 없는 합계 335 |
 | auth-react 24 files | 290 tests PASS |
-| Admin 전체 64 files | 655 tests PASS, 후속 UI 변경 집중 41 + AccountControls 회귀도 PASS |
+| Admin 전체 65 files | 657 tests PASS, 후속 UI 변경 집중 41 + AccountControls 회귀도 PASS |
 | PC 1440 / mobile 390, 실제 component + 합성 HTTP/GIS | 36 flow checks PASS. 직접 진입/Operator 분리/파일 미완료/재시도/권한 회수/가입 크기/중복 메일·generic resend 포함. 실제 OAuth 제공자 로그인·운영 삭제 검증은 아님 |
 | API/Admin type-check, API/Admin/Neture production build | PASS |
 | 변경 TS/TSX ESLint | 0 errors, 기존 unused 3 warnings (LMS 2 / ForumComment 1) |
@@ -80,7 +80,7 @@ import 이름만 검색하지 않고 `@o4o/auth-react`, Google/Kakao/Email compo
 ## 통합·배포 기록 / 운영 잔여
 
 - GitHub 소유자 권한·push dry-run·실제 ruleset 조회 완료. explicit `Promote dry_run=true` 실행 [41584780737](https://github.com/Renagang21/o4o-platform/actions/runs/41584780737) SUCCESS: 배포0, freeze false, 해당 기준 SHA CI green. dry-run을 실제 배포로 세지 않는다.
-- 통합 PR [#933](https://github.com/Renagang21/o4o-platform/pull/933). 최초 `ce0dad849c`의 전체 CI에서 구 정책 가정·메뉴 census·추가 의존성 mock 차이를 확인하고 보완했다. Codex P1(현재 Neture 약국의 폐업이 과거 KPA 역할/활성 enrollment를 요구함)을 현재 승인 원장 기반 처리로 수정하고 active/suspended·실제 Pharmacy 기본 연결·현재 role 이전을 검증했다. 후속 `9301e04a61`의 전체 API 3개 shard·실제 PostgreSQL·build·CodeQL은 통과했고, Code Quality에서 카카오 약관 테스트의 deferred 초기화 순서 문제가 드러나 테스트 준비/대기를 수정했다. Codex P2의 완전폐업 서비스 키 누락은 모든 조직 서비스 키 처리 및 타 매장 참조 보호로 보완하고 4개 native 회귀를 추가했다. 파일 소유 metadata와 사용자 ID는 객체 문자열 변환을 허용하지 않도록 scalar 검증을 보완했다. 최종 HEAD CI·Codex·미해결 thread·main/post-merge는 이 PR의 최신 기록을 기술 gate로 확인한다. 이 문서의 로컬 PASS를 원격 CI PASS로 대체하지 않는다.
+- 통합 PR [#933](https://github.com/Renagang21/o4o-platform/pull/933). 최초 `ce0dad849c`의 전체 CI에서 구 정책 가정·메뉴 census·추가 의존성 mock 차이를 확인하고 보완했다. Codex P1(현재 Neture 약국의 폐업이 과거 KPA 역할/활성 enrollment를 요구함)을 현재 승인 원장 기반 처리로 수정하고 active/suspended·실제 Pharmacy 기본 연결·현재 role 이전을 검증했다. 후속 `9301e04a61`의 전체 API 3개 shard·실제 PostgreSQL·build·CodeQL은 통과했고, Code Quality에서 카카오 약관 테스트의 deferred 초기화 순서 문제가 드러나 테스트 준비/대기를 수정했다. Codex P2의 완전폐업 서비스 키 누락은 모든 조직 서비스 키 처리 및 타 매장 참조 보호로 보완하고 4개 native 회귀를 추가했다. 파일 소유 metadata와 사용자 ID는 객체 문자열 변환을 허용하지 않도록 scalar 검증을 보완했다. 후속 P1/P2는 실제 최종 삭제 버튼 submit, 회원 정정 producer의 previous/next 최소화(검사와 실행의 공통 필드 목록), 완료 파일 task의 경로 최소화·부모 소유 연결로 수정했다. 실제 정정 함수·UUID 업로드 경로·deleted/already_absent·미완료 manifest 보호를 포함한 4개 DB 회귀와 포럼/강의 버튼 클릭 2개를 추가했다. 지연 응답 UI 시험은 React act 안에서 완료시켜 상태 반영을 기다린다. 최종 HEAD CI·Codex·미해결 thread·main/post-merge는 이 PR의 최신 기록을 기술 gate로 확인한다. 이 문서의 로컬 PASS를 원격 CI PASS로 대체하지 않는다.
 - `DEPLOYMENT=MANUAL/GATED` (migration·인증·권한). 자동 배포/개인 삭제 활성화 완료 아님.
 - 운영 적용 항목·영향·중지/복구 조건: [운영 적용 계획](../work-orders/ROLLOUT-O4O-MEMBER-ADMIN-SIGNUP-DELIVERY-V1.md).
 - 공급자는 legacy user_id=NULL canonical owner·다른 owner의 legacy pointer·공동 소유·실제 증빙 proof SQL도 검증했다. 미분류 legacy JSON·billing/다른 domain 참조·표식 없는/공유 파일은 안전하게 review로 남는다. 현재 운영 자료를 열어 전수 해결했다고 주장하지 않는다. 시스템별 1/2년 분류·storage list/get/delete IAM·approved inventory와 환경 설정을 확인하기 전 개인 삭제를 활성화하지 않는다.

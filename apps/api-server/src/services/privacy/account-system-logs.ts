@@ -7,6 +7,8 @@ export const EMAIL_LOG_OWNER_SQL = `lower(r.recipient) IN ${SUBJECT_EMAILS_SQL}`
 export const PROFILE_AUDIT_SQL = `r."entityType" IN ('User','user','users') AND r."entityId"::text=$1`;
 const SUBJECT_OPERATION = `r.action_key ~ '^(member[.]|qualification[.]pharmacist_|pharmacy_membership[.])' AND (r.meta->>'targetUserId'=$1 OR r.meta->>'applicantId'=$1)`;
 const APPLICATION_OPERATION = `r.action_key='service:application_policy' AND r.user_id::text=$1 AND jsonb_typeof(r.meta->'application')='object' AND jsonb_typeof(r.meta->'policies')='array'`;
+// Keep preview and mutation aligned with the actual member-correction producers.
+const SUBJECT_PRIVATE_META = "ARRAY['targetUserId','applicantId','reason','licenseNumber','before','after','previous','next']";
 export function systemLogProjection(
   table: ErasureTable,
   row: string,
@@ -23,7 +25,7 @@ export function systemLogProjection(
   if (table.table_name === "ai_usage_logs")
     return `(CASE WHEN ${alias}."userId"::text=$1 THEN ${row}-ARRAY['userId','errorMessage'] ELSE ${row} END)`;
   if (table.table_name === "action_logs")
-    return `(CASE WHEN ${sql(SUBJECT_OPERATION)} THEN (${row}-ARRAY['meta'])||jsonb_build_object('meta',${alias}.meta-ARRAY['targetUserId','applicantId','reason','licenseNumber','before','after']) WHEN ${sql(APPLICATION_OPERATION)} THEN (${row}-ARRAY['user_id','meta'])||jsonb_build_object('meta',jsonb_set(${alias}.meta,'{application}',(${alias}.meta->'application')-'id')) ELSE ${row} END)`;
+    return `(CASE WHEN ${sql(SUBJECT_OPERATION)} THEN (${row}-ARRAY['meta'])||jsonb_build_object('meta',${alias}.meta-${SUBJECT_PRIVATE_META}) WHEN ${sql(APPLICATION_OPERATION)} THEN (${row}-ARRAY['user_id','meta'])||jsonb_build_object('meta',jsonb_set(${alias}.meta,'{application}',(${alias}.meta->'application')-'id')) ELSE ${row} END)`;
   return row;
 }
 /** File copies in these fields disappear with the private profile; shared proofs do not. */
@@ -92,7 +94,7 @@ export async function minimizeSystemLogs(
     [userId],
   );
   await db.query(
-    `UPDATE action_logs r SET meta=(meta-ARRAY['targetUserId','applicantId','reason','licenseNumber','before','after'])||jsonb_build_object('subjectKey',$2::text) WHERE ${SUBJECT_OPERATION}`,
+    `UPDATE action_logs r SET meta=(meta-${SUBJECT_PRIVATE_META})||jsonb_build_object('subjectKey',$2::text) WHERE ${SUBJECT_OPERATION}`,
     [userId, key],
   );
   await db.query(

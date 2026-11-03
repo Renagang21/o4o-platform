@@ -272,7 +272,7 @@ export default function AdminResourceDeletionPage() {
             />
             대상과 유지·삭제 범위를 확인했습니다.
           </label>
-          <button type="button"
+          <button type="submit"
             disabled={
               busy || !confirmed || !reason.trim() || !!plan.blockers?.length
             }

@@ -1,7 +1,8 @@
 import {mayEraseSupplierProfileFile} from '../../../modules/neture/services/supplier-account-erasure.js';
 import { connectDefaultPharmacyMembership } from '../../../modules/neture-pharmacy/services/default-pharmacy-membership.js';
 import { BusinessRegistrationDocumentService } from '../../../modules/neture-pharmacy/services/business-registration-document.service.js';
-import { purgeClosureDocuments } from '../../store/store-closure-files.js';
+import { CentralMemberWorkspaceService } from '../../admin/central-member-workspace.service.js';
+import { closureStorage, purgeClosureDocuments } from '../../store/store-closure-files.js';
 import { hardDeleteLectureCourse,lectureDeletionPlan } from '../../../modules/lms/services/lecture-course-cleanup.service.js';
 import { applyCommunityDeletion,planCommunityDeletion } from '../../community/community-management.service.js';
 import {mkdtemp,writeFile,readFile,unlink,rm} from 'node:fs/promises';
@@ -136,6 +137,22 @@ integration('account erasure — isolated PostgreSQL schema/real sessions', () =
     }finally{
       await db.query('DELETE FROM login_attempts WHERE id=$1',[login.id]);await db.query('DELETE FROM email_logs WHERE id=ANY($1)',[[mail.id,peerMail.id]]);await db.query('DELETE FROM audit_logs WHERE id=$1',[audit.id]);await db.query('DELETE FROM ai_usage_logs WHERE id=$1',[usage.id]);await db.query('DELETE FROM action_logs WHERE id=$1',[application.id]);await db.query('DELETE FROM user_policy_acceptances WHERE policy_document_id=$1',[policy.id]);await db.query('DELETE FROM service_policy_documents WHERE id=$1',[policy.id]);
     }
+  });
+  it('member correction audit snapshots lose personal fields while peer evidence and retention clocks remain',async()=>{
+    const target=await user({name:'Synthetic old profile'}),peer=await user();
+    const workspace=new CentralMemberWorkspaceService(db);
+    for(const subject of [target,peer]){
+      const detail=await workspace.detail(fixtureAdminId,subject.id);
+      await workspace.correct(fixtureAdminId,subject.id,{name:'Synthetic corrected profile',nickname:'Synthetic corrected nickname',phone:'01012345678',reason:'Synthetic profile correction',version:detail.member.version});
+    }
+    const [before]=await db.query("SELECT id,meta,created_at FROM action_logs WHERE action_key='member.profile_corrected' AND meta->>'targetUserId'=$1",[target.id]);
+    const [peerBefore]=await db.query("SELECT id,meta,created_at FROM action_logs WHERE action_key='member.profile_corrected' AND meta->>'targetUserId'=$1",[peer.id]);
+    expect(before.meta.previous.name).toBe('Synthetic old profile');expect(before.meta.next.phone).toBe('01012345678');
+    expect(await service().request(target.id)).toMatchObject({state:'completed',erased:true});
+    const [after]=await db.query('SELECT meta,created_at FROM action_logs WHERE id=$1',[before.id]);
+    for(const key of ['targetUserId','reason','before','after','previous','next'])expect(after.meta[key]).toBeUndefined();
+    expect(after.meta.subjectKey).toMatch(/^[a-f0-9]{64}$/);expect(after.created_at).toEqual(before.created_at);
+    expect((await db.query('SELECT meta FROM action_logs WHERE id=$1',[peerBefore.id]))[0].meta).toEqual(peerBefore.meta);
   });
   it('unknown business audit copies require review and are never silently discarded',async()=>{
     const target=await user(),[audit]=await db.query(`INSERT INTO audit_logs("entityType","entityId",action,changes) VALUES('Order',$1,'update',jsonb_build_object('contact',$2::text)) RETURNING id`,[randomUUID(),target.email]);
@@ -501,6 +518,34 @@ integration('account erasure — isolated PostgreSQL schema/real sessions', () =
     expect(result).toMatchObject({storeInventoryPurged:false,errorCode:'STORE_CLOSURE_SHARED_CONTENT_REVIEW_REQUIRED'});
     expect(await db.query('SELECT id FROM signage_playlists WHERE id=$1',[playlist.id])).toHaveLength(1);
     expect(await db.query(`SELECT id FROM ${kind==='schedule'?'signage_schedules':'signage_playlist_items'} WHERE ${kind==='schedule'?'"organizationId"':'"playlistId"'}=$1`,[kind==='schedule'?peerOrg:playlist.id])).toHaveLength(1);
+  });
+  it.each(['deleted','already_absent'])('completed closure journal clears the personal path after %s and permits later account erasure',async(state)=>{
+    const {target,org}=await currentPharmacy(),documentId=randomUUID();
+    const directory=await mkdtemp(join(tmpdir(),'o4o-closure-completed-')),file=join(directory,'synthetic.pdf');
+    const objectPath=`business-registration/${target.id}/${documentId}`;
+    await db.query(`INSERT INTO kyc_documents(id,user_id,"documentType","fileUrl","fileName") VALUES($1,$2,'business_registration',$3,'synthetic.pdf')`,[documentId,target.id,'gcs://o4o-private-documents/'+objectPath]);
+    await db.query(`UPDATE organizations SET metadata=jsonb_build_object('businessProfile',jsonb_build_object('businessRegistrationDocumentId',$1::text)) WHERE id=$2`,[documentId,org]);
+    if(state==='deleted')await writeFile(file,'Synthetic closure proof');
+    const inspect=jest.spyOn(closureStorage,'inspect').mockImplementation(async()=>{try{await readFile(file);return '41';}catch{return null;}});
+    const remove=jest.spyOn(closureStorage,'remove').mockImplementation(async()=>{await unlink(file);});
+    try{
+      const result=await new MemberLifecycleService(db).closePharmacy(fixtureAdminId,target.id,org,{reason:'Synthetic closure document disposal',closureConfirmed:true});
+      expect(result.storeInventoryPurged).toBe(true);
+      const [task]=await db.query('SELECT state,object_path,document_id,object_hash FROM store_closure_file_tasks WHERE case_id=$1',[result.caseId]);
+      expect(task).toMatchObject({state,object_path:'',document_id:null});expect(task.object_hash).toMatch(/^[a-f0-9]{64}$/);
+      expect(remove).toHaveBeenCalledTimes(state==='deleted'?1:0);
+      const erased=await service().request(target.id);expect(erased.reviewCodes).toEqual([]);
+      expect(erased).toMatchObject({state:'completed',erased:true});
+      await expect(readFile(file)).rejects.toMatchObject({code:'ENOENT'});
+    }finally{inspect.mockRestore();remove.mockRestore();await rm(directory,{recursive:true,force:true});}
+  });
+  it('a pending closure file receipt still blocks account erasure and preserves its retry manifest',async()=>{
+    const target=await user(),org=await organization(target.id),objectPath=`business-registration/${target.id}/pending-proof`;
+    const [c]=await db.query(`INSERT INTO store_owner_termination_cases(service_key,organization_id,user_id,status) VALUES('kpa-society',$1,$2,'cancelled') RETURNING id`,[org,target.id]);
+    const [task]=await db.query(`INSERT INTO store_closure_file_tasks(case_id,object_hash,bucket,object_path) VALUES($1,$2,'o4o-private-documents',$3) RETURNING id`,[c.id,'e'.repeat(64),objectPath]);
+    const result=await service().request(target.id);
+    expect(result).toMatchObject({state:'review_required',erased:false});expect(result.reviewCodes).toContain('REVIEW:public.store_closure_file_tasks');
+    expect((await db.query('SELECT state,object_path FROM store_closure_file_tasks WHERE id=$1',[task.id]))[0]).toEqual({state:'pending',object_path:objectPath});
   });
   it('ordinary KPA contract purge keeps another service’s store content and its original seven-day boundary',async()=>{
     const {target,org}=await currentPharmacy();await db.query(`INSERT INTO role_assignments(user_id,role) VALUES($1,'kpa:store_owner')`,[target.id]);

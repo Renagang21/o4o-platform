@@ -163,4 +163,10 @@ export async function purgeClosureDocuments(
     `DELETE FROM kyc_documents d USING store_closure_file_tasks f WHERE f.case_id=$1 AND f.document_id=d.id AND f.state IN ('deleted','already_absent')`,
     [caseId],
   );
+  // Pending paths are required for retries; completed tasks retain only opaque evidence.
+  // Also minimizes a previously completed task when the same closure is retried.
+  await db.query(
+    `UPDATE store_closure_file_tasks SET object_path='',updated_at=now() WHERE case_id=$1 AND state IN ('deleted','already_absent') AND object_path<>''`,
+    [caseId],
+  );
 }

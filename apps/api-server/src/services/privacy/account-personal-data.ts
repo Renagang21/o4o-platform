@@ -1,6 +1,10 @@
 import type { EntityManager } from "typeorm";
 /** Fixed ownership predicates. $1 is always the subject UUID; aliases are internal. */
 export const PERSONAL_DERIVED: Readonly<Record<string, string>> = {
+  // The parent case is private; only physically completed, minimized child receipts follow it.
+  // Pending or non-minimized tasks remain visible to the ordinary residual review.
+  store_closure_file_tasks:
+    "r.case_id IN (SELECT id FROM store_owner_termination_cases WHERE user_id::text=$1 AND status IN ('purge_completed','cancelled')) AND r.state IN ('deleted','already_absent') AND r.object_path=''",
   lms_progress:
     'r."enrollmentId" IN (SELECT id FROM lms_enrollments WHERE "userId"::text=$1)',
   personal_mail_rules:
