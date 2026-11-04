@@ -206,6 +206,7 @@ describe('GoogleAuthService — Google-only Signup/Login', () => {
     expect(store.users).toHaveLength(1);
     expect(store.linked).toHaveLength(1);
     const u = store.users[0];
+    expect(u.businessInfo).toMatchObject({o4oMembershipRegistrationV1:{type:null,state:'pending',fields:{}}});
     const l = store.linked[0];
     // WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1 Phase B-1:
     //   구 계약은 `password: null` 을 명시적으로 기록하는 것이었다. 컬럼이 B-2 에서 사라지므로

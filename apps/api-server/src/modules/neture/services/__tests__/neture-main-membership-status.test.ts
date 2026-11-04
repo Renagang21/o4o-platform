@@ -4,6 +4,10 @@ const active = { account_status: 'active', account_active: true, email_verified:
 describe('joined and single-user main eligibility share the same policy', () => {
   it.each<[string, NetureMainMembershipRow | undefined, string]>([
     ['missing account', undefined, 'none'],
+    ['new role signup pending', {...active,registration_state:'pending'},'pending'],
+    ['rejected role signup', {...active,registration_state:'rejected'},'rejected'],
+    ['approved role signup', {...active,registration_state:'approved'},'active'],
+    ['withdrawal wins over approved signup', {...active,registration_state:'approved',membership_status:'withdrawn'},'withdrawn'],
     ['verified usable account without membership', active, 'active'],
     ['approved account', { ...active, account_status: 'approved' }, 'active'],
     ['legacy pending membership', { ...active, membership_status: 'pending' }, 'active'],

@@ -1,4 +1,5 @@
 import {correctIdentity,type MemberCorrection} from './member-profile-corrections.js';
+import {correctRegistration,readRegistrationView,MEMBER_REGISTRATION_TYPE_SQL,MEMBER_REGISTRATION_STATE_SQL,MEMBER_LOGIN_METHODS_SQL} from './member-registration-data.js';
 import { buildBusinessInfoUpdateStatement } from '../../utils/business-info-write.js';
 import type { DataSource, EntityManager } from 'typeorm';
 import { centralOperationRoles } from './central-operation-access.js';
@@ -8,15 +9,16 @@ import { isPhoneShapeValid, normalizePhoneDigits } from '../../common/auth/phone
 import { resolveNetureMainMembershipStatus } from '../../modules/neture/services/neture-main-membership.js';
 
 type Db = Pick<EntityManager, 'query'>;
-export type MemberTask = 'all' | 'qualifications' | 'pharmacies' | 'corrections';
+export type MemberTask = 'all' | 'pending' | 'inactive' | 'qualifications' | 'pharmacies' | 'corrections';
 const version = `to_char(u."updatedAt",'YYYY-MM-DD"T"HH24:MI:SS.US')`;
 const identity = `u.id AS "userId",u.name,u.nickname,u.email,u.phone,u.status AS "accountStatus",
  u."isActive" AS "accountActive",(SELECT sm.status FROM service_memberships sm WHERE sm.user_id=u.id AND sm.service_key='neture') AS "membershipStatus",
- u."isEmailVerified" AS "emailVerified",EXISTS(SELECT 1 FROM user_password_credentials pc WHERE pc.user_id=u.id) AS "hasPassword",u."createdAt" AS "joinedAt",${version} AS version`;
+ u."isEmailVerified" AS "emailVerified",EXISTS(SELECT 1 FROM user_password_credentials pc WHERE pc.user_id=u.id) AS "hasPassword",u."createdAt" AS "joinedAt",${version} AS version,
+ ${MEMBER_REGISTRATION_TYPE_SQL} AS "registrationType",${MEMBER_REGISTRATION_STATE_SQL} AS "registrationState",${MEMBER_LOGIN_METHODS_SQL} AS "loginMethods"`;
 const pharmacyExists = (status: string) => `EXISTS(SELECT 1 FROM neture_pharmacy_memberships n WHERE n.applicant_user_id=u.id AND n.status='${status}')`;
 const privateValue = (value: unknown) => ({ toPostgres: () => value, toJSON: () => '[redacted]' });
 
-/** Member-directory authority does not confer qualification, document, or business authority. */
+/** Member delegates review signup fields and evidence; dedicated domain/admin commands retain their own grants. */
 export async function memberWorkspaceAccess(db: Db, actor: string, lock = false) {
   const roles = await centralOperationRoles(db, actor, lock);
   const keys = await centralOperationMenuKeys(db, actor, roles);
@@ -36,37 +38,40 @@ export class CentralMemberWorkspaceService {
 
   async list(actor: string, task: MemberTask, page: number, search: string) {
     const permissions = await memberWorkspaceAccess(this.db, actor);
-    if ((task === 'qualifications' && !permissions.qualifications) || (task === 'pharmacies' && !permissions.pharmacies) ||
-        (task === 'corrections' && !permissions.qualifications && !permissions.pharmacies))
+    if ((task === 'qualifications' && !permissions.qualifications) || (task === 'pharmacies' && !permissions.pharmacies))
       throw new OperationError(403, 'MEMBER_TASK_NOT_DELEGATED', '해당 심사 업무 권한이 필요합니다.');
     const qualificationCorrections = permissions.qualifications ? "p.qualification_status IN ('rejected','revoked')" : 'false';
     const pharmacyCorrections = permissions.pharmacies ? pharmacyExists('rejected') : 'false';
     const conditions: Record<MemberTask, string> = {
       all: 'true', qualifications: `p.qualification_status='pending'`, pharmacies: pharmacyExists('pending'),
-      corrections: `(${qualificationCorrections} OR ${pharmacyCorrections})`,
+      pending: `(${MEMBER_REGISTRATION_STATE_SQL}='pending' OR u.status='pending' OR (u."isEmailVerified"=false AND u.status IN ('active','approved')))`,
+      inactive: `EXISTS(SELECT 1 FROM service_memberships sm WHERE sm.user_id=u.id AND sm.service_key='neture' AND sm.status IN ('suspended','withdrawn'))`,
+      corrections: `(${MEMBER_REGISTRATION_STATE_SQL}='rejected' OR ${qualificationCorrections} OR ${pharmacyCorrections})`,
     };
     const query = search.trim().slice(0, 100);
-    const match = `($1='' OR u.id::text=$1 OR strpos(lower(COALESCE(u.name,'')),lower($1))>0 OR strpos(lower(COALESCE(u.email,'')),lower($1))>0)`;
+    const match = `($1='' OR u.id::text=$1 OR strpos(lower(COALESCE(u.name,'')),lower($1))>0 OR strpos(lower(COALESCE(u.nickname,'')),lower($1))>0 OR strpos(lower(COALESCE(u.email,'')),lower($1))>0)`;
     const from = `FROM users u LEFT JOIN kpa_pharmacist_profiles p ON p.user_id=u.id WHERE ${match}`;
     const [counts] = await this.db.query(`SELECT COUNT(*)::int AS all,
+      COUNT(*) FILTER(WHERE ${conditions.pending})::int AS pending,COUNT(*) FILTER(WHERE ${conditions.inactive})::int AS inactive,
       COUNT(*) FILTER(WHERE ${permissions.qualifications ? conditions.qualifications : 'false'})::int AS qualifications,
       COUNT(*) FILTER(WHERE ${permissions.pharmacies ? conditions.pharmacies : 'false'})::int AS pharmacies,
       COUNT(*) FILTER(WHERE ${conditions.corrections})::int AS corrections ${from}`, [query]);
-    const items = await this.db.query(`SELECT u.id AS "userId",u.name,u.email,u.status AS "accountStatus",
+    const items = await this.db.query(`SELECT u.id AS "userId",u.name,u.nickname,u.email,u.status AS "accountStatus",
+      ${MEMBER_REGISTRATION_TYPE_SQL} AS "registrationType",${MEMBER_REGISTRATION_STATE_SQL} AS "registrationState",${MEMBER_LOGIN_METHODS_SQL} AS "loginMethods",
       u."isActive" AS "accountActive",u."isEmailVerified" AS "emailVerified",
       (SELECT sm.status FROM service_memberships sm WHERE sm.user_id=u.id AND sm.service_key='neture') AS "membershipStatus",
       COALESCE(p.qualification_status,'unrequested') AS "qualificationStatus",
       ${permissions.pharmacies ? `(SELECT n.status FROM neture_pharmacy_memberships n WHERE n.applicant_user_id=u.id ORDER BY n.applied_at DESC,n.id LIMIT 1)` : 'NULL::text'} AS "pharmacyStatus"
       ${from} AND (${conditions[task]}) ORDER BY u."createdAt" DESC,u.id LIMIT 21 OFFSET $2`,
     [query, (page - 1) * 20]);
-    return { items: items.slice(0, 20).map(row=>({...row,serviceStatus:['withdrawn','suspended'].includes(row.membershipStatus)?row.membershipStatus:resolveNetureMainMembershipStatus({account_status:row.accountStatus,account_active:row.accountActive,email_verified:row.emailVerified,membership_status:row.membershipStatus})})), hasNext: items.length > 20, counts, permissions };
+    return { items: items.slice(0, 20).map(row=>({...row,serviceStatus:resolveNetureMainMembershipStatus({account_status:row.accountStatus,account_active:row.accountActive,email_verified:row.emailVerified,membership_status:row.membershipStatus,registration_state:row.registrationState})})), hasNext: items.length > 20, counts, permissions };
   }
 
   async detail(actor: string, target: string) {
     const permissions = await memberWorkspaceAccess(this.db, actor);
     const [member] = await this.db.query(`SELECT ${identity} FROM users u WHERE u.id=$1`, [target]);
     if (!member) throw new OperationError(404, 'MEMBER_NOT_FOUND', '회원을 찾을 수 없습니다.');
-    member.serviceStatus=['withdrawn','suspended'].includes(member.membershipStatus)?member.membershipStatus:resolveNetureMainMembershipStatus({account_status:member.accountStatus,account_active:member.accountActive,email_verified:member.emailVerified,membership_status:member.membershipStatus});
+    member.serviceStatus=resolveNetureMainMembershipStatus({account_status:member.accountStatus,account_active:member.accountActive,email_verified:member.emailVerified,membership_status:member.membershipStatus,registration_state:member.registrationState});
     let qualification = null;
     let legacyLicense = null;
     let legacyBusiness = null;
@@ -99,11 +104,12 @@ export class CentralMemberWorkspaceService {
       o.metadata->>'contactEmail' AS "contactEmail",o.metadata->>'taxInvoiceEmail' AS "taxInvoiceEmail"
       FROM neture_pharmacy_memberships n JOIN organizations o ON o.id=n.organization_id
       WHERE n.applicant_user_id=$1 ORDER BY n.applied_at DESC,n.id`, [target]) : [];
-    const actions = ['member.profile_corrected','member.license_corrected','member.temporary_password_issued','member.legacy_business_corrected','member.registration_rejected', ...(permissions.pharmacies ? ['member.pharmacy_profile_corrected'] : []), ...(permissions.qualifications ? ['qualification.pharmacist_requested', 'qualification.pharmacist_approved', 'qualification.pharmacist_rejected', 'qualification.pharmacist_revoked'] : [])];
+    const actions = ['member.profile_corrected','member.license_corrected','member.temporary_password_issued','member.legacy_business_corrected','member.registration_rejected','member.registration_submitted','member.registration_approved','member.access_restored', ...(permissions.pharmacies ? ['member.pharmacy_profile_corrected'] : []), ...(permissions.qualifications ? ['qualification.pharmacist_requested', 'qualification.pharmacist_approved', 'qualification.pharmacist_rejected', 'qualification.pharmacist_revoked'] : [])];
     const history = await this.db.query(`SELECT action_key AS action,created_at AS "createdAt",user_id AS "actorId",meta->>'reason' AS reason
       FROM action_logs WHERE service_key='neture' AND meta->>'targetUserId'=$1 AND action_key=ANY($2::text[])
       ORDER BY created_at DESC,id DESC LIMIT 30`, [target, actions]);
-    return { member, qualification: qualification ?? null, legacyLicense, legacyBusiness, pharmacies, history, permissions };
+    const registration=await readRegistrationView(this.db,target);
+    return { member, registration, qualification: qualification ?? null, legacyLicense, legacyBusiness, pharmacies, history, permissions };
   }
 
   async correct(actor: string, target: string, input: MemberCorrection) {
@@ -119,6 +125,13 @@ export class CentralMemberWorkspaceService {
       if (!before) throw new OperationError(404, 'MEMBER_NOT_FOUND', '회원을 찾을 수 없습니다.');
       if (before.version !== input.version) throw new OperationError(409, 'MEMBER_CHANGED', '회원 정보가 변경되었습니다. 다시 조회한 뒤 정정해 주세요.');
       const result=await correctIdentity(manager,actor,target,before,access,input);
+      if(input.registration){
+        const next=await correctRegistration(manager,target,input.registration);
+        if(next.state==='approved'){
+          const {MemberRegistrationService}=await import('./member-registration.service.js');
+          await new MemberRegistrationService(this.db).syncApprovedFields(manager,actor,target,next,input.qualificationVersion,reason,input.businessVersion);
+        }
+      }
       await manager.query(`UPDATE users SET name=$2,nickname=$3,phone=$4,"updatedAt"=clock_timestamp() WHERE id=$1`,
         [target, privateValue(input.name), privateValue(input.nickname || null), privateValue(phone || null)]);
       await recordOperation(manager, 'neture', actor, 'member.profile_corrected', { targetUserId: target, reason,

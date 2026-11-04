@@ -20,7 +20,10 @@ integration('member profile and temporary recovery PostgreSQL',()=>{
   if(!['127.0.0.1','localhost'].includes(new URL(url!).hostname))throw new Error('LOCAL_FIXTURE_REQUIRED');
   const setup=new DataSource({type:'postgres',url});await setup.initialize();await setup.query(`CREATE SCHEMA ${schema}`);await setup.destroy();
   db=new DataSource({type:'postgres',url,extra:{options:`-c search_path=${schema}`}});await db.initialize();
-  await db.query(`CREATE TABLE users(id uuid PRIMARY KEY,name text,nickname text,email text UNIQUE,phone text,status text,"isActive" boolean,"isEmailVerified" boolean,"createdAt" timestamp DEFAULT now(),"updatedAt" timestamp DEFAULT now(),"businessInfo" json,"refreshTokenFamily" text);
+  await db.query(`CREATE TABLE linked_accounts("userId" uuid,provider text,"providerId" text);
+   CREATE TABLE organization_members(organization_id uuid,user_id uuid,role text,left_at timestamp);
+   CREATE TABLE neture_suppliers(id uuid,user_id uuid,organization_id uuid,status text);
+   CREATE TABLE users(id uuid PRIMARY KEY,name text,nickname text,email text UNIQUE,phone text,status text,"isActive" boolean,"isEmailVerified" boolean,"createdAt" timestamp DEFAULT now(),"updatedAt" timestamp DEFAULT now(),"businessInfo" json,"refreshTokenFamily" text);
    CREATE TABLE role_assignments(id uuid PRIMARY KEY,user_id uuid,role text,scope_type text,is_active boolean,valid_from timestamp,valid_until timestamp);
    CREATE TABLE central_operation_menu_grants(assignment_id uuid,menu_keys text[],admin_operations boolean DEFAULT false);
    CREATE TABLE service_memberships(user_id uuid,service_key text,status text);
@@ -29,7 +32,7 @@ integration('member profile and temporary recovery PostgreSQL',()=>{
    CREATE TABLE password_reset_tokens(user_id uuid,consumed_at timestamp);
    CREATE TABLE email_verification_tokens(user_id uuid,consumed_at timestamp);
    CREATE TABLE kpa_pharmacist_profiles(user_id uuid PRIMARY KEY,license_number text,license_verified boolean,qualification_status text,qualification_reason text,verified_at timestamp,verified_by uuid,updated_at timestamp DEFAULT now());
-   CREATE TABLE organizations(id uuid PRIMARY KEY,address text,phone text,metadata jsonb,name text,business_number text,"updatedAt" timestamp);
+   CREATE TABLE organizations(id uuid PRIMARY KEY,type text DEFAULT 'pharmacy',address_detail jsonb,address text,phone text,metadata jsonb,name text,business_number text,"updatedAt" timestamp);
    CREATE TABLE neture_pharmacy_memberships(id uuid,organization_id uuid,applicant_user_id uuid,pharmacy_name text,business_number text,pharmacist_license_number varchar(30),status text,reason text,applied_at timestamp,decided_at timestamp,decided_by uuid,updated_at timestamp DEFAULT now());
    CREATE TABLE notifications("userId" uuid,"serviceKey" text,type text,title text,message text,metadata jsonb,channel text,"isRead" boolean);
    CREATE TABLE action_logs(id bigserial,service_key text,user_id uuid,action_key text,source text,status text,meta jsonb,created_at timestamp DEFAULT now());`);
@@ -47,11 +50,11 @@ integration('member profile and temporary recovery PostgreSQL',()=>{
  afterAll(async()=>{if(db?.isInitialized){await db.query(`DROP SCHEMA ${schema} CASCADE`);await db.destroy();}});
  const input=async(id=target)=>({name:'정정 회원',nickname:'별칭',phone:'01012345678',reason,version:(await profiles.detail(admin,id)).member.version});
  const resetInput=async(id=target)=>({version:(await input(id)).version,reason,evidenceConfirmed:true as const});
- it('corrects email atomically, requires re-verification and consumes old links/sessions',async()=>{
+ it('confirms operator-corrected email atomically and consumes old links/sessions',async()=>{
   await db.query('INSERT INTO password_reset_tokens VALUES($1,NULL);',[target]);await db.query('INSERT INTO email_verification_tokens VALUES($1,NULL)',[target]);
   const result=await profiles.correct(operator,target,{...await input(),email:'corrected@example.test',evidenceConfirmed:true});
   expect(result.emailChanged).toBe(true);
-  const [row]=await db.query('SELECT * FROM users WHERE id=$1',[target]);expect(row.email).toBe('corrected@example.test');expect(row.isEmailVerified).toBe(false);expect(row.refreshTokenFamily).not.toBe('old-family');
+  const [row]=await db.query('SELECT * FROM users WHERE id=$1',[target]);expect(row.email).toBe('corrected@example.test');expect(row.isEmailVerified).toBe(true);expect(row.refreshTokenFamily).not.toBe('old-family');
   for(const table of ['password_reset_tokens','email_verification_tokens'])expect((await db.query(`SELECT consumed_at FROM ${table} WHERE user_id=$1`,[target]))[0].consumed_at).not.toBeNull();
  });
  it('rolls back profile writes on duplicate email, missing evidence or stale version',async()=>{
@@ -64,12 +67,12 @@ integration('member profile and temporary recovery PostgreSQL',()=>{
   await new PharmacistQualificationService(db).decide(admin,target,{action:'approve',reason,version:pending.qualification.version,licenseEvidenceChecked:true});
   expect((await profiles.detail(admin,target)).qualification.status).toBe('approved');
  });
- it('changing an approved license clears approval and rejects duplicate or stale qualification evidence',async()=>{
+ it('corrects an approved license without redundant review and rejects duplicate or stale qualification evidence',async()=>{
   await db.query(`INSERT INTO kpa_pharmacist_profiles(user_id,license_number,license_verified,qualification_status,verified_at,verified_by) VALUES($1,'old',true,'approved',now(),$2),($3,'taken',true,'approved',now(),$2)`,[target,admin,other]);
   const before=await profiles.detail(admin,target);
   await expect(profiles.correct(operator,target,{...await input(),licenseNumber:'taken',qualificationVersion:before.qualification.version,evidenceConfirmed:true})).rejects.toMatchObject({code:'LICENSE_REVIEW_REQUIRED'});
   await profiles.correct(operator,target,{...await input(),licenseNumber:'corrected',qualificationVersion:before.qualification.version,evidenceConfirmed:true});
-  const [row]=await db.query('SELECT * FROM kpa_pharmacist_profiles WHERE user_id=$1',[target]);expect(row.qualification_status).toBe('pending');expect(row.license_verified).toBe(false);expect(row.verified_by).toBeNull();
+  const [row]=await db.query('SELECT * FROM kpa_pharmacist_profiles WHERE user_id=$1',[target]);expect(row.qualification_status).toBe('approved');expect(row.license_verified).toBe(true);expect(row.verified_by).toBe(operator);
   await expect(profiles.correct(operator,target,{...await input(),licenseNumber:'another',qualificationVersion:before.qualification.version,evidenceConfirmed:true})).rejects.toMatchObject({code:'QUALIFICATION_CHANGED'});
  });
  it('issues a random, expiring hashed credential and invalidates the old password and sessions',async()=>{
@@ -136,14 +139,14 @@ integration('member profile and temporary recovery PostgreSQL',()=>{
   await expect(profiles.correctPharmacy(operator,target,pharmacy,{fields:{...fields,licenseNumber:'unverified'},version:active.pharmacies[0].version,reason,evidenceConfirmed:true})).rejects.toMatchObject({code:'QUALIFICATION_LICENSE_MISMATCH'});
  });
 
- it('requests verification for the corrected social-only identity without adding a password or approving it',async()=>{
+ it('confirms operator-corrected social-only contact without sending another verification email or adding a password',async()=>{
   await profiles.correct(operator,target,{...await input(),email:'social-corrected@example.test',evidenceConfirmed:true});
   const mail=jest.fn(async()=>true);const verification=new MemberVerificationService(db,mail);
   const current=await profiles.detail(admin,target);
-  expect(await verification.request(operator,target,current.member.version)).toEqual({requested:true,alreadyVerified:false});
-  expect(mail).toHaveBeenCalledWith({id:target,email:'social-corrected@example.test'});
+  expect(await verification.request(operator,target,current.member.version)).toEqual({requested:false,alreadyVerified:true});
+  expect(mail).not.toHaveBeenCalled();
   expect(await passwordCredentialService.hasPassword(target,db.manager)).toBe(false);
-  expect((await profiles.detail(admin,target)).member.emailVerified).toBe(false);
+  expect((await profiles.detail(admin,target)).member.emailVerified).toBe(true);
  });
  it('does not claim delivery on a failed verification request or send a stale target',async()=>{
   await db.query('UPDATE users SET "isEmailVerified"=false WHERE id=$1',[target]);
