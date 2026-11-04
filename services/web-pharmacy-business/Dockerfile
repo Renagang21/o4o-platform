@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1
 # Phase 1 - Service Web Server Dockerfile
 # Cloud Run 호환 정적 파일 서빙
 #
@@ -5,15 +6,17 @@
 # docker build -f services/web-pharmacy-business/Dockerfile .
 
 # Build stage
-FROM node:20-alpine AS builder
+FROM node:22.23.4-alpine AS builder
 
 WORKDIR /app
 
 # Install pnpm
-RUN npm install -g pnpm
+RUN --mount=type=secret,id=proxy_ca \
+    if [ -f /run/secrets/proxy_ca ]; then export NODE_EXTRA_CA_CERTS=/run/secrets/proxy_ca; fi; \
+    npm install -g --ignore-scripts pnpm@10.25.0
 
 # Copy workspace configuration
-COPY pnpm-workspace.yaml ./
+COPY pnpm-workspace.yaml pnpm-lock.yaml ./
 COPY package.json ./
 COPY tsconfig.base.json ./
 COPY tsconfig.packages.json ./
@@ -47,7 +50,10 @@ COPY services/web-pharmacy-business/package.json ./services/web-pharmacy-busines
 # WO-O4O-DOCKER-PNPM-IGNORE-SCRIPTS-FIX-V1: --ignore-scripts로 prepare 자동 빌드 skip.
 # packages/types prepare가 tsconfig.json 미복사 시점에 tsc --build 실행해 실패하는 문제 회피.
 # 명시적 build는 source copy 후 아래 RUN 단계에서 수행됨.
-RUN pnpm install --filter @o4o/web-pharmacy-business... --ignore-scripts
+RUN --mount=type=secret,id=proxy_ca \
+    if [ -f /run/secrets/proxy_ca ]; then export NODE_EXTRA_CA_CERTS=/run/secrets/proxy_ca; fi; \
+    pnpm install --filter @o4o/web-pharmacy-business... --fail-if-no-match \
+      --frozen-lockfile --ignore-scripts --verify-store-integrity=true
 
 # Copy workspace package source
 COPY packages/types/ ./packages/types/
@@ -94,7 +100,7 @@ ENV VITE_SERVICE_URL=$VITE_SERVICE_URL
 
 # Build the service (vite only — tsc는 CI/로컬에서 별도 수행)
 WORKDIR /app/services/web-pharmacy-business
-RUN npx vite build
+RUN pnpm exec vite build
 
 # Production stage - nginx for static files + API proxy
 FROM nginx:alpine AS runner

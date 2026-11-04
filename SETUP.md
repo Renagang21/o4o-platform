@@ -1,7 +1,7 @@
 # O4O Platform — 로컬 실행환경 정본
 
 > 이 문서는 **로컬 개발 실행환경의 단일 기준(SSOT)** 입니다.
-> **최종 갱신**: 2026-10-14 — AI 공통 기반·운영 적용, API 의존성 빌드와 신규 개발자 착수 안내 정합
+> **최종 갱신**: 2026-11-03 — Node 22 보안 패치·CI/Docker 버전 및 frozen 설치 정합
 > 개발 규칙·아키텍처 경계·운영 정책은 사용하는 에이전트의 진입점([AGENTS.md](AGENTS.md) / [CLAUDE.md](CLAUDE.md))과 해당 정본을 따릅니다.
 
 ## 현재 AI 기반과 개발 착수 — 2026-10-14
@@ -47,7 +47,8 @@ CHECK·WO·IR·archive 등 과거 기록에 남은 `TEST-ACCOUNT.txt` 표기는 
 
 | 도구 | 버전 | 확인 | 필요한 사람 |
 |---|---|---|---|
-| Node.js | 22.18.0 | `node --version` | 전원 |
+| Node.js | 22.23.4 | `node --version` | 전원 |
+| npm | 10.9.9 | `npm --version` | 전원 (Node 배포판 포함) |
 | pnpm | 10.25.0 | `pnpm --version` | 전원 |
 | PostgreSQL (로컬 개발 DB) | 15 | `psql --version` | 로컬 API 를 띄우는 개발자 (운영 DB 와 같은 major) |
 | gcloud CLI | 최신 | `gcloud --version` | **운영자 전용** — 공동개발 로컬환경에는 필요 없음 |
@@ -60,9 +61,22 @@ CHECK·WO·IR·archive 등 과거 기록에 남은 `TEST-ACCOUNT.txt` 표기는 
 TypeScript · Vite 는 workspace 별로 여러 버전이 공존합니다(예: web-neture 는 TS 5.9 · Vite 5, 일부 서비스는 Vite 7).
 **직접 맞추지 않습니다** — `pnpm-lock.yaml` 이 패키지별로 해결합니다.
 
-**기준값은 루트 `package.json`의 `volta` 필드입니다** (`node 22.18.0` · `pnpm 10.25.0`).
+**기준값은 루트 `package.json`의 `volta` 필드입니다** (`node 22.23.4` · `pnpm 10.25.0`).
 CI(`.github/actions/setup-build-env`)도 동일 버전을 사용하므로, 로컬을 이 값에 맞추면
 "로컬은 되는데 CI 는 실패" 를 줄일 수 있습니다. Volta 사용 시 저장소 디렉터리에서 자동 적용됩니다.
+
+Node 22 계열을 유지하며 개발·CI·서버 Docker는 보안 릴리스 **22.23.4**,
+npm은 해당 릴리스의 **10.9.9**, pnpm은 **10.25.0**을 기준으로 합니다.
+`pnpm run check:runtime`으로 `.nvmrc`·활성 workflow·Docker의 버전과 frozen 설치를 확인합니다.
+배포용 설치도 lockfile 불일치 시 실패하며 잠금 없이 재시도하지 않습니다.
+Node 버전을 바꾼 뒤에는 기존 `node_modules`를 다른 major의 바이너리로 재사용하지 말고
+해당 버전에서 `pnpm install --frozen-lockfile`을 다시 실행합니다.
+
+Windows Local Agent의 오프라인 패키지에 내장되는 Node **22.18.0**은 별도 배포 계약입니다.
+실제 Windows 설치 검증 전에는 `tools/o4o-local-agent/release/`의 버전과 manifest 검사를
+서버 런타임에 맞춰 일괄 변경하지 않습니다.
+Windows installer CI도 패키지에 실제로 넣는 실행 파일을 검사하므로 **22.18.0**을 사용합니다.
+`check:runtime`은 이 job과 installer manifest를 서버 버전이 아닌 내장 런타임 버전에 대조합니다.
 
 > `package.json`의 `engines.pnpm` 은 아직 `>=9.0.0` 으로 남아 있으나, 실제 기준은 위
 > `volta.pnpm` (10.25.0) 입니다. pnpm 9 로는 lockfile 형식이 어긋날 수 있습니다.
@@ -204,7 +218,7 @@ Admin 개발 서버의 기준 포트는 **3001**입니다. `apps/admin-dashboard
 
 첫 공동개발 대상(neture.co.kr Main · O4O Agent) 기준 절차입니다. **운영 credential 은 필요 없습니다.**
 
-1. **설치** — §1 도구(Node 22.18.0 · pnpm 10.25.0 · PostgreSQL 15) 준비 후 `pnpm install --frozen-lockfile` (§2-1).
+1. **설치** — §1 도구(Node 22.23.4 · pnpm 10.25.0 · PostgreSQL 15) 준비 후 `pnpm install --frozen-lockfile` (§2-1).
 2. **공통 패키지 빌드** — `pnpm run build:packages`.
    web-neture 가 쓰는 `@o4o/*` 일부(types · auth-client · ui · content-editor · forum-core 등)는 소스가 아니라 `dist` 를 import 하므로, 이 빌드 없이는 dev server 가 뜨지 않습니다.
    현재 이 명령에는 `build:api-deps`도 포함됩니다. API workspace 의존성을 pnpm의 의존 순서로 빌드하므로 이전 checkout의 `dist`에 의존하지 않습니다. API 의존성만 변경했으면 `pnpm run build:api-deps`로 다시 빌드합니다.

@@ -36,7 +36,7 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 env:
-  NODE_VERSION: '22.18.0'
+  NODE_VERSION: '22.23.4'
   CI_BUILD_CACHE_DISABLED: ${{ vars.CI_BUILD_CACHE_DISABLED }}
 
 jobs:
@@ -121,6 +121,9 @@ jobs:
         pnpm run build:lms-client
         pnpm run build:account-ui
         echo "O4O_PACKAGES_PREBUILT=1" >> "$GITHUB_ENV"
+
+    - name: Check Node and dependency installation consistency
+      run: pnpm run check:runtime
 
     # WO-O4O-TYPES-AUTO-BUILD-GUARD-V1
     # 위 두 단계가 root build:packages와 같은 패키지를 준비하지만,
@@ -890,6 +893,7 @@ jobs:
         sparse-checkout: tools/o4o-local-agent
     - uses: actions/setup-node@v7
       with:
+        # Tests embed this executable; match the separately pinned PC release runtime.
         node-version: '22.18.0'
     - name: Verify installation, data preservation and packaged runtime health
       # Readable output also preserves bounded failure annotations from this suite.

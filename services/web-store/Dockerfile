@@ -1,9 +1,12 @@
+# syntax=docker/dockerfile:1
 # WO-O4O-UNIFIED-STORE-WORKSPACE-FOUNDATION-V1 (§8 Scope Extension)
 # store.neture.co.kr = O4O 공통 Store Workspace (서비스가 아니다 · serviceKey 없음).
 # 선별 COPY: store-web 의 workspace 의존 closure 전부(신규 패키지 추가 시 package.json + source 두 줄 + 필요 시 build 한 줄).
-FROM node:22.18.0-alpine AS builder
+FROM node:22.23.4-alpine AS builder
 WORKDIR /app
-RUN npm install -g --ignore-scripts pnpm@10.25.0
+RUN --mount=type=secret,id=proxy_ca \
+    if [ -f /run/secrets/proxy_ca ]; then export NODE_EXTRA_CA_CERTS=/run/secrets/proxy_ca; fi; \
+    npm install -g --ignore-scripts pnpm@10.25.0
 COPY pnpm-workspace.yaml pnpm-lock.yaml package.json tsconfig.base.json tsconfig.packages.json ./
 COPY packages/types/package.json ./packages/types/
 COPY packages/o4o-ai-components/package.json ./packages/o4o-ai-components/
@@ -29,7 +32,9 @@ COPY packages/store-ui-core/package.json ./packages/store-ui-core/
 COPY packages/tablet-kiosk-core/package.json ./packages/tablet-kiosk-core/
 COPY packages/tablet-screen-set-editor/package.json ./packages/tablet-screen-set-editor/
 COPY services/web-store/package.json ./services/web-store/
-RUN pnpm install --filter store-web... --fail-if-no-match --frozen-lockfile --ignore-scripts
+RUN --mount=type=secret,id=proxy_ca \
+    if [ -f /run/secrets/proxy_ca ]; then export NODE_EXTRA_CA_CERTS=/run/secrets/proxy_ca; fi; \
+    pnpm install --filter store-web... --fail-if-no-match --frozen-lockfile --ignore-scripts
 COPY packages/types/ ./packages/types/
 COPY packages/o4o-ai-components/ ./packages/o4o-ai-components/
 COPY packages/auth-utils/ ./packages/auth-utils/
@@ -68,9 +73,11 @@ ENV VITE_SERVICE_URL=$VITE_SERVICE_URL
 WORKDIR /app/services/web-store
 RUN pnpm exec vite build
 
-FROM node:22.18.0-alpine AS runner
+FROM node:22.23.4-alpine AS runner
 WORKDIR /app
-RUN npm install -g --ignore-scripts serve@14.2.4
+RUN --mount=type=secret,id=proxy_ca \
+    if [ -f /run/secrets/proxy_ca ]; then export NODE_EXTRA_CA_CERTS=/run/secrets/proxy_ca; fi; \
+    npm install -g --ignore-scripts serve@14.2.4
 COPY --from=builder /app/services/web-store/dist ./dist
 USER node
 ENV PORT=8080

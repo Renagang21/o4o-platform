@@ -1,4 +1,5 @@
-FROM node:22.18.0-alpine AS builder
+# syntax=docker/dockerfile:1
+FROM node:22.23.4-alpine AS builder
 WORKDIR /app
 RUN --mount=type=secret,id=proxy_ca \
     if [ -f /run/secrets/proxy_ca ]; then export NODE_EXTRA_CA_CERTS=/run/secrets/proxy_ca; fi; \
@@ -14,7 +15,7 @@ ARG VITE_API_BASE_URL=https://api.neture.co.kr
 ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
 RUN pnpm --filter @o4o/web-pharmacy-coop... --if-present -r build
 
-FROM node:22.18.0-alpine AS runner
+FROM node:22.23.4-alpine AS runner
 WORKDIR /app
 RUN --mount=type=secret,id=proxy_ca \
     if [ -f /run/secrets/proxy_ca ]; then export NODE_EXTRA_CA_CERTS=/run/secrets/proxy_ca; fi; \
