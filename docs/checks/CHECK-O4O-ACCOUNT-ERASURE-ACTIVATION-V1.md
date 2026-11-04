@@ -29,15 +29,16 @@ runtime capabilities와 운영 audit는 같은 schema 준비 SQL을 사용한다
 
 현행 개인정보 보존 정본 §6의 기본 달력1년을 명시적 근거로 사용한다. 기존 2년 설정은 단축하지 않는다. 5만 명 이상인데 1년 설정인 경우 활성화를 거절한다. 법정2년 대상의 별도 시스템 분류·정책은 원래 정본을 따른다. 기존 생성·발송 clock과 보존 예외를 변경하지 않는다.
 
-일일 maintenance는 기존 `retentionReport`의 만료일·hold 처리를 재사용해 만료된 최소 증빙·감사와 완료 처리 내역만 정리한다. 계정 request/resume을 호출하지 않는다. erasure가 OFF면 skip한다. 이것은 실제 운영 회원의 삭제 시험이 아니다.
+부팅·24시간 간격의 기존 개인정보 보존 job에 최소 기록 정리를 연결했다. 수동 maintenance도 같은 기존 `retentionReport`의 만료일·hold 처리를 재사용해 만료된 최소 증빙·감사와 완료 처리 내역만 정리한다. 계정 request/resume을 호출하지 않는다. erasure가 OFF면 skip한다. 이것은 실제 운영 회원의 삭제 시험이 아니다.
 
 ## 운영 절차
 
-`Account erasure operations`는 owner·main ref·정확한 SHA·green CI·freeze false를 검사한다. audit → 집계와 source 검토 → compatible serving API 확인 → no-traffic 설정 후보 → 후보 env/schema/storage 검사 → 100% 전환 → 공개 health·enabled 재검증 순서다. 실패한 후보는 노출하지 않고, 전환 후 실패는 이 실행의 후보가 여전히 serving일 때만 이전 revision으로 복구한다. 동시 운영 변경을 덮어쓰지 않는다. disable도 OFF 후보로 실제 pinned traffic을 전환한다.
+`Account erasure operations`는 인증이 허용된 기존 `deploy-api.yml` reusable job을 호출한다. WIF provider 허용 목록을 넓히지 않는다. 외부 schedule 이벤트 대신 기존 in-app 보존 job을 재사용한다. owner·main ref·정확한 SHA·green CI·freeze false를 검사한다. audit → 집계와 source 검토(필요 시 prepare-storage로 같은 project의 private document bucket만 비공개 생성·runtime storage.objectUser 바인딩 후 재조사) → compatible serving API 확인 → no-traffic 설정 후보 → 후보 env/schema/storage 검사 → 100% 전환 → 공개 health·enabled 재검증 순서다. 실패한 후보는 노출하지 않고, 전환 후 실패는 이 실행의 후보가 여전히 serving일 때만 이전 revision으로 복구한다. 동시 운영 변경을 덮어쓰지 않는다. disable도 OFF 후보로 실제 pinned traffic을 전환한다.
 
 ## 로컬 증거
 
-- 운영 증거·config 검증/CLI 실행·복구·serving-env 및 기존 env/배포 helper: Node 117 PASS.
+- 운영 증거·config 검증/CLI 실행·복구·serving-env 및 기존 env/배포 helper: Node 118 PASS.
+- 기존 보존 job의 OFF/dry-run/apply/오류 비노출 및 storage 회귀 19 PASS.
 - 저장소 probe·충돌·실패 정리·교체 세대·권한 부족·불완전 inventory: 6 PASS.
 - 정식 PostgreSQL15 bootstrap/57 incremental, native 계정 삭제/파일/보존/fence 회귀 83 PASS.
 - 기존 supplier/Google권한/canonical migration source guard 79 PASS.
@@ -49,3 +50,5 @@ runtime capabilities와 운영 audit는 같은 schema 준비 SQL을 사용한다
 대기. 운영 audit 집계·probe 잔여0·현재 설정·활성화 enabled·정확한 serving·공개 권한 차단·최소 기록 maintenance·후속 설정 보존 결과를 분리해 기록한다.
 
 문서 정합: 기존 회원 관리의 배포 성공과 이번 완전삭제 활성화를 구분한다. 사용자 삭제 테스트 금지라는 해석을 되살리지 않는다. 기간·법정 분류·타인/사업체 소유 보호를 변경하지 않는다.
+
+권한 조사 근거: 기존 runtime 최소 권한 CHECK는 media/video 두 bucket만 열거한다. 새 private 문서 bucket 권한이 실제로 부족하면 같은 project 소유를 확인한 뒤 그 bucket 하나의 objectUser만 준비한다. 프로젝트 전체 권한·WIF 신뢰 목록은 넓히지 않는다. prepare-storage는 audit 완료나 활성화를 대신하지 않는다.

@@ -44,7 +44,7 @@ export function sameRuntimeTemplate(serviceSpec,revisionSpec){
  return JSON.stringify(normalize(serviceSpec))===JSON.stringify(normalize(revisionSpec));
 }
 async function run(){
- const action=process.argv[2]??'audit';if(!['audit','activate','disable','maintenance'].includes(action))throw new Error('INVALID_ACTION');
+ const action=process.argv[2]??'audit';if(!['audit','prepare-storage','activate','disable','maintenance'].includes(action))throw new Error('INVALID_ACTION');
  const target=process.env.GITHUB_SHA;if(!/^[a-f0-9]{40}$/.test(target??''))throw new Error('EXACT_SHA_REQUIRED');
  const directory=mkdtempSync(join(tmpdir(),'o4o-erasure-ops-'));let previous;
  const service=()=>command(['run','services','describe','o4o-core-api',...location,'--format=json']);
@@ -55,6 +55,21 @@ async function run(){
  };
  try{
   const revision=served();previous=revision.metadata.name;
+  if(action==='prepare-storage'){
+   const env=Object.fromEntries((revision.spec.containers[0].env??[]).map(e=>[e.name,e.value]));
+   const bucket=env.GCS_PRIVATE_DOCUMENT_BUCKET||'o4o-private-documents';
+   if(!/^[a-z0-9][a-z0-9._-]{1,220}[a-z0-9]$/.test(bucket))throw new Error('BUCKET_NAME_INVALID');
+   const exists=spawnSync('gcloud',['storage','buckets','describe','gs://'+bucket,'--format=json'],{encoding:'utf8',maxBuffer:4*1024*1024});
+   if(exists.status!==0){
+    if(!/NOT_FOUND|not found|404/i.test(exists.stderr??''))throw new Error('BUCKET_OWNERSHIP_UNVERIFIED');
+    command(['storage','buckets','create','gs://'+bucket,'--project=netureyoutube','--location=asia-northeast3','--uniform-bucket-level-access','--public-access-prevention','--quiet'],false);
+   }
+   const owned=command(['storage','buckets','list','--project=netureyoutube','--format=json']);
+   if(!owned.some(b=>typeof b.name==='string'&&b.name.replace(/^gs:\/\//,'').replace(/\/$/,'')===bucket))throw new Error('BUCKET_PROJECT_UNVERIFIED');
+   command(['storage','buckets','add-iam-policy-binding','gs://'+bucket,'--member=serviceAccount:o4o-runtime@netureyoutube.iam.gserviceaccount.com','--role=roles/storage.objectUser','--quiet'],false);
+   writeFileSync(process.env.ERASURE_AUDIT_REPORT,JSON.stringify({storagePrepared:true,scope:'private-document-bucket',role:'roles/storage.objectUser',activationChanged:false},null,2)+'\n');
+   console.log('Private document storage prepared; activation remains unchanged');return;
+  }
   const payload=readFileSync(process.env.ERASURE_AUDIT_PAYLOAD,'utf8').trim();if(!/^[A-Za-z0-9+/=]+$/.test(payload))throw new Error('PAYLOAD_INVALID');
   const audit=async(expectEnabled=false,maintenance=false)=>{
    const original=command(['run','jobs','describe','o4o-api-migrations',...location,'--format=json']);

@@ -137,7 +137,7 @@ describe('DEPLOY_FREEZE cutover — 게이트 · trigger · 동시성 (WO-O4O-CI
     it(`${file}: 배포 · ci-gate job 은 DEPLOY_FREEZE == 'false' 일 때만 (fail-closed) · freeze-notice 는 그 반대`, () => {
       const wf = read(file);
       const deployIfs = count(wf, /vars\.DEPLOY_FREEZE == 'false'/g);
-      const expected = file.endsWith('web-services.yml') ? 9 : 2; // web: ci-gate 1 + deploy 7 + private preparation 1
+      const expected = file.endsWith('web-services.yml') ? 9 : file.endsWith('deploy-api.yml') ? 3 : 2; // API adds the separately gated erasure operations job
       assert.equal(deployIfs, expected);
       assert.match(wf, /^ {2}freeze-notice:\n(?: {4}#.*\n)* {4}if: vars\.DEPLOY_FREEZE != 'false'\n/m);
       assert.doesNotMatch(wf, /DEPLOY_FREEZE == 'true'|DEPLOY_FREEZE != 'true'/, '"true" 비교는 부재 · 오타를 허용으로 만든다');

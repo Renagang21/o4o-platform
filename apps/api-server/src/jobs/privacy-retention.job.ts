@@ -1,3 +1,4 @@
+import { AccountErasureService, erasureOptionsFromEnv } from '../services/privacy/account-erasure.service.js';
 import { AppDataSource } from '../database/connection.js';
 import { PrivacyRetentionService } from '../services/privacy-retention.service.js';
 import logger from '../utils/logger.js';
@@ -47,6 +48,14 @@ export class PrivacyRetentionJob {
       }
       const service = new PrivacyRetentionService(AppDataSource);
       const result = mode === 'apply' ? await service.apply(startedAt) : await service.dryRun(startedAt);
+      if(process.env.ACCOUNT_ERASURE_MODE==='apply'){
+        try{
+          const minimum=await new AccountErasureService(AppDataSource,erasureOptionsFromEnv()).retentionReport(startedAt,mode==='apply');
+          logger.info('[privacy-retention] account erasure minimum records',{mode,...minimum});
+        }catch{
+          logger.error('[privacy-retention] account erasure minimum records unavailable');
+        }
+      }
       const finishedAt = new Date();
       logger.info(`[privacy-retention] ${mode} done`, {
         jobName: 'privacy-retention',

@@ -8,10 +8,8 @@ on:
         required: true
       action:
         type: choice
-        options: [audit, activate, disable, maintenance]
+        options: [audit, prepare-storage, activate, disable, maintenance]
         default: audit
-  schedule:
-    - cron: '0 18 * * *'
 permissions:
   contents: read
   actions: read
@@ -21,53 +19,8 @@ concurrency:
   cancel-in-progress: false
 jobs:
   operate:
-    if: github.ref == 'refs/heads/main' && vars.DEPLOY_FREEZE == 'false' && (github.event_name == 'schedule' || (github.actor == github.repository_owner && github.triggering_actor == github.repository_owner))
-    environment: production
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
-          sparse-checkout: |
-            /*
-            !/apps/api-server/src/scripts/data/
-          sparse-checkout-cone-mode: false
-      - uses: ./.github/actions/setup-build-env
-        with:
-          build-packages: 'false'
-          strict-lockfile: 'true'
-      - name: Verify exact main and green CI
-        env:
-          GH_TOKEN: ${{ github.token }}
-          GITHUB_TOKEN: ${{ github.token }}
-          TARGET: ${{ inputs.sha || github.sha }}
-        run: |
-          set -euo pipefail
-          test "$TARGET" = "$GITHUB_SHA"
-          test "$TARGET" = "$(gh api repos/$GITHUB_REPOSITORY/commits/main --jq .sha)"
-          node scripts/ci/ci-gate.mjs --target "$TARGET" --wait-seconds 1800 --enforce
-      - name: Bundle fixed audit and maintenance program
-        run: |
-          pnpm exec esbuild scripts/privacy/account-erasure-audit.ts --bundle --platform=node --format=esm --packages=external --minify --outfile="$RUNNER_TEMP/erasure-audit.mjs"
-          base64 -w0 "$RUNNER_TEMP/erasure-audit.mjs" > "$RUNNER_TEMP/erasure-audit.base64"
-      - uses: google-github-actions/auth@v3
-        with:
-          workload_identity_provider: projects/117791934476/locations/global/workloadIdentityPools/github-actions/providers/o4o-platform
-          service_account: github-actions@netureyoutube.iam.gserviceaccount.com
-      - uses: google-github-actions/setup-gcloud@v2
-        with:
-          project_id: netureyoutube
-          skip_install: true
-      - name: Audit or activate verified runtime
-        env:
-          OPERATION: ${{ inputs.action || 'maintenance' }}
-          ERASURE_AUDIT_PAYLOAD: ${{ runner.temp }}/erasure-audit.base64
-          ERASURE_AUDIT_REPORT: ${{ runner.temp }}/erasure-readiness.json
-        run: node scripts/privacy/account-erasure-operations.mjs "$OPERATION"
-      - uses: actions/upload-artifact@v7
-        if: always()
-        with:
-          name: erasure-readiness-${{ github.run_id }}
-          path: ${{ runner.temp }}/erasure-readiness.json
-          if-no-files-found: ignore
+    if: github.ref == 'refs/heads/main' && vars.DEPLOY_FREEZE == 'false' && github.actor == github.repository_owner && github.triggering_actor == github.repository_owner
+    uses: ./.github/workflows/deploy-api.yml
+    with:
+      erasure_operation: ${{ inputs.action }}
+      erasure_sha: ${{ inputs.sha }}

@@ -32,6 +32,11 @@ export interface ErasureOptions {
   personalBuckets: readonly string[];
   storage?: PersonalStorage;
 }
+/** Same explicit environment gates for HTTP and the existing retention job. */
+export function erasureOptionsFromEnv(env:NodeJS.ProcessEnv=process.env):ErasureOptions{
+  const years=Number(env.ACCOUNT_ERASURE_SYSTEM_YEARS);
+  return {enabled:env.ACCOUNT_ERASURE_MODE==='apply',inventoryReviewed:env.ACCOUNT_ERASURE_FILE_INVENTORY_REVIEW==='confirmed',systemYears:years===1||years===2?years:undefined,systemBasis:env.ACCOUNT_ERASURE_SYSTEM_POLICY_BASIS,personalBuckets:[env.GCS_MEDIA_LIBRARY_BUCKET||'o4o-media-library',env.GCS_PRIVATE_DOCUMENT_BUCKET||'o4o-private-documents']};
+}
 type ErasureFileTask = {id:string;bucket:string;object_path:string;generation:string|null};
 type Operation = { id: string; subject_id: string | null; subject_hash: string; requested_by_key: string; state: ErasureState; review_codes: string[]; review_due_at: Date };
 const hash = (id: string) => createHash('sha256').update(id.toLowerCase()).digest('hex');
