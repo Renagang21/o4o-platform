@@ -44,3 +44,12 @@ test('fails closed for unresolved aliases and a production exception entering th
   lock.importers['apps/api-server'].dependencies['@nestjs/platform-express'] = { specifier: '10.4.22', version: '10.4.22' };
   assert.throws(() => runtimeDependencies(api, lock), /remove the production-only exception/);
 });
+
+test('preserves the patched production ORM until a coordinated shared type upgrade', () => {
+  const { api, lock } = fixture();
+  api.dependencies.typeorm = '0.3.27';
+  lock.importers['apps/api-server'].dependencies.typeorm = { specifier: '0.3.27', version: '0.3.27(pg@8.23.1)' };
+  assert.equal(runtimeDependencies(api, lock).typeorm, '0.3.31');
+  lock.importers['apps/api-server'].dependencies.typeorm.version = '0.3.31';
+  assert.throws(() => runtimeDependencies(api, lock), /review\/remove the explicit CI\/runtime version exception/);
+});

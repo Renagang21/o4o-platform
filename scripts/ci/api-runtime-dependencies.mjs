@@ -11,6 +11,10 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
 // Retain the existing production-only Nest adapter. It is not in the pnpm API
 // graph, so do not silently claim CI/runtime parity for it or resolve it afresh.
 export const productionOnly = Object.freeze({ '@nestjs/platform-express': '10.4.22' });
+// Keep the already-serving security-patched ORM until its shared workspace type
+// graph can move together. Updating only the API creates incompatible DataSource
+// identities; downgrading production would reintroduce resolved advisories.
+export const versionExceptions = Object.freeze({ typeorm: { ci: '0.3.27', production: '0.3.31' } });
 
 export function runtimeDependencies(api, lock) {
   const importer = lock.importers?.['apps/api-server'];
@@ -22,7 +26,9 @@ export function runtimeDependencies(api, lock) {
     assert.equal(entry?.specifier, specifier, `${name}: API manifest and pnpm lock differ`);
     const match = /^(\d+\.\d+\.\d+(?:-[\w.-]+)?)(?:\(|$)/.exec(entry.version);
     assert.ok(match, `${name}: unsupported pnpm resolution ${entry.version}`);
-    dependencies[name] = match[1];
+    const exception = versionExceptions[name];
+    if (exception) assert.equal(match[1], exception.ci, `${name}: review/remove the explicit CI/runtime version exception after a coordinated workspace upgrade`);
+    dependencies[name] = exception?.production ?? match[1];
   }
   for (const [name, version] of Object.entries(productionOnly)) {
     assert.ok(!Object.hasOwn(dependencies, name), `${name}: remove the production-only exception after adding it to the API graph`);
@@ -40,7 +46,8 @@ export function checkRuntimeDependencies(api, pnpmLock, manifest, npmLock) {
   for (const [name, version] of Object.entries(expected)) {
     assert.equal(npmLock.packages?.[`node_modules/${name}`]?.version, version, `${name}: production npm lock differs from the tested/preserved exact version`);
   }
-  return { shared: Object.keys(expected).length - Object.keys(productionOnly).length, exceptions: Object.keys(productionOnly).length };
+  const exceptions = Object.keys(productionOnly).length + Object.keys(versionExceptions).filter(name => Object.hasOwn(expected, name)).length;
+  return { shared: Object.keys(expected).length - exceptions, exceptions };
 }
 
 function main() {
@@ -59,7 +66,7 @@ function main() {
     return;
   }
   const result = checkRuntimeDependencies(api, pnpmLock, manifest, read('apps/api-server/package.production-lock.json'));
-  console.log(`API runtime dependency parity PASS: ${result.shared} shared exact versions; ${result.exceptions} explicitly preserved production-only adapter. Transitive npm/pnpm trees remain separate.`);
+  console.log(`API runtime dependency parity PASS: ${result.shared} shared exact versions; ${result.exceptions} explicit exceptions (production-only Nest adapter; coordinated TypeORM upgrade pending). Transitive npm/pnpm trees remain separate.`);
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) main();
