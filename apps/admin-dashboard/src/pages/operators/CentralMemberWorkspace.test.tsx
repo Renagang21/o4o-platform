@@ -235,3 +235,22 @@ it('removes private fields when authority is lost during temporary password issu
  await screen.findByText('현재 회원 업무 권한을 다시 확인해 주세요.');
  expect(screen.queryByLabelText('이메일')).toBeNull();expect(screen.queryByRole('region',{name:'선택 회원 작업'})).toBeNull();
 });
+
+it('preserves the selected pharmacy approval command when entered from the top pharmacy action',async()=>{
+ api.get.mockImplementation(async(path:string)=>({data:{data:path===base?{items:rows,counts:{},permissions}:{...detail(),qualification:{...detail().qualification!,status:'approved'}}}}));
+ render(<CentralMemberWorkspace actorId="reviewer"/>);await select();
+ fireEvent.click(screen.getByRole('button',{name:'약국·사업자 정보',exact:true}));
+ fireEvent.click(await screen.findByRole('button',{name:'약국 승인',exact:true}));
+ fireEvent.change(screen.getByLabelText('처리·보완 사유'),{target:{value:'사업자 제출 근거 확인'}});
+ fireEvent.click(screen.getByLabelText('신청자와 약국·사업자 정보 및 승인 조건을 확인했습니다.'));
+ fireEvent.click(screen.getByRole('button',{name:'처리 결과 저장'}));
+ await waitFor(()=>expect(api.post).toHaveBeenCalledWith('/neture/operator/pharmacy-memberships/pharmacy-a/approve',{reason:'사업자 제출 근거 확인'}));
+});
+it('uses the authorized member verification endpoint for an unverified social-only member',async()=>{
+ api.get.mockImplementation(async(path:string)=>({data:{data:path===base?{items:rows,counts:{},permissions}:{...detail(),member:{...detail().member,emailVerified:false,hasPassword:false}}}}));
+ api.post.mockResolvedValue({data:{data:{requested:true,alreadyVerified:false}}});
+ render(<CentralMemberWorkspace actorId="reviewer"/>);await select();
+ fireEvent.click(await screen.findByRole('button',{name:'확인 메일 보내기'}));
+ await screen.findByText('확인 메일 요청을 접수했습니다.');
+ expect(api.post).toHaveBeenCalledWith(`${base}/member-a/verification-email`,{version:detail().member.version});
+});

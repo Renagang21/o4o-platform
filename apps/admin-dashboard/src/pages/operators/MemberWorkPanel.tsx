@@ -36,7 +36,7 @@ export default function MemberWorkPanel({ detail, actorId, busy, perform, onBusy
   const setEditing=(value:boolean)=>onModeChange(value?'edit':'detail');
   const [businessEditing,setBusinessEditing]=useState<string|null>(null);
   const [documentError, setDocumentError] = useState('');
-  const choose = (next: Decision) => { setDecision(next); setEditing(false); setReason(''); setConfirmed(false); };
+  const choose = (next: Decision) => { setDecision(next); setReason(''); setConfirmed(false); };
   const download = async (id: string) => {
     setDocumentError('');
     try {
@@ -81,7 +81,7 @@ export default function MemberWorkPanel({ detail, actorId, busy, perform, onBusy
         {businessEditing===pharmacy.id && <MemberBusinessEditor detail={detail} pharmacy={pharmacy} busy={busy} perform={perform} onCancel={()=>setBusinessEditing(null)}/>}
         {pharmacy.documentId ? <button type="button" disabled={busy} onClick={() => void download(pharmacy.documentId!)}>사업자등록증 확인</button> : <p>사업자등록증 첨부 없음 · 선택 제출 항목</p>}
         {['pending', 'suspended'].includes(pharmacy.status) && <p>{pharmacyGuidance(detail, pharmacy)} 서버가 최신 가입·권한·자격을 다시 확인합니다.</p>}
-        <div className="flex flex-wrap gap-3">{(pharmacyActions[pharmacy.status] ?? []).map(action => <button type="button" key={action.action} disabled={busy || (permissions.qualifications && ['approve', 'reactivate'].includes(action.action) && !canActivatePharmacy(detail, pharmacy))} onClick={() => choose({ kind: 'pharmacy', ...action, pharmacyId: pharmacy.id })}>{action.label}</button>)}</div>
+        {!editing&&<div className="flex flex-wrap gap-3">{(pharmacyActions[pharmacy.status] ?? []).map(action => <button type="button" key={action.action} disabled={busy || (permissions.qualifications && ['approve', 'reactivate'].includes(action.action) && !canActivatePharmacy(detail, pharmacy))} onClick={() => choose({ kind: 'pharmacy', ...action, pharmacyId: pharmacy.id })}>{action.label}</button>)}</div>}
         {pharmacy.status === 'rejected' && <p>신청자는 반려 사유를 확인하고 내 매장 → 약국 신청에서 자료를 보완해 다시 신청할 수 있습니다.</p>}
       </section>)}
       {documentError && <p role="alert">{documentError}</p>}

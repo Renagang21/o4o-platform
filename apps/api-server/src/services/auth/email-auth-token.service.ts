@@ -136,3 +136,10 @@ export class EmailAuthTokenService {
     return (Array.isArray(result) && Array.isArray(result[0]) ? result[0] : result) as ConsumedToken[];
   }
 }
+
+/** Identity corrections invalidate both link kinds using the authentication token owner. */
+export async function invalidateEmailAuthLinks(manager:Queryable,userId:string):Promise<void>{
+  for(const table of [TOKEN_TABLE.verification,TOKEN_TABLE.reset]){
+    await manager.query(`UPDATE ${table} SET consumed_at=now() WHERE user_id=$1 AND consumed_at IS NULL`,[userId]);
+  }
+}

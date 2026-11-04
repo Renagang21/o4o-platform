@@ -1,3 +1,4 @@
+import {invalidateEmailAuthLinks} from '../auth/email-auth-token.service.js';
 import {randomUUID} from 'node:crypto';
 import type {EntityManager} from 'typeorm';
 import {normalizeLoginEmail,isLoginEmailShapeValid} from '@o4o/auth-utils';
@@ -17,7 +18,7 @@ export async function correctIdentity(m:EntityManager,actor:string,target:string
     const [duplicate]=await m.query('SELECT 1 FROM users WHERE lower(email)=lower($1) AND id<>$2',[secret(email),target]);
     if(duplicate)throw new OperationError(409,'EMAIL_IN_USE','이미 가입된 이메일입니다.');
     await m.query('UPDATE users SET email=$2,"isEmailVerified"=false,"refreshTokenFamily"=$3 WHERE id=$1',[target,secret(email),randomUUID()]);
-    for(const table of ['email_verification_tokens','password_reset_tokens'])await m.query(`UPDATE ${table} SET consumed_at=now() WHERE user_id=$1 AND consumed_at IS NULL`,[target]);
+    await invalidateEmailAuthLinks(m,target);
   }
   await correctLicense(m,actor,target,access.qualifications,input);
   return {emailChanged:email!==before.email};

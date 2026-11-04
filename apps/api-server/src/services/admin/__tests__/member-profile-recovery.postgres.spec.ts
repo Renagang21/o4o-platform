@@ -1,6 +1,7 @@
 import {randomUUID} from 'node:crypto';
 import {DataSource} from 'typeorm';
 jest.mock('../../../database/connection.js',()=>({AppDataSource:{}}));
+import {MemberVerificationService} from '../member-verification.service.js';
 import {CentralMemberWorkspaceService} from '../central-member-workspace.service.js';
 import {EmailAuthRecovery} from '../../auth/email-auth.recovery.js';
 import {MemberCredentialRecoveryService} from '../member-credential-recovery.service.js';
@@ -131,6 +132,23 @@ integration('member profile and temporary recovery PostgreSQL',()=>{
   await db.query("UPDATE neture_pharmacy_memberships SET status='active' WHERE id=$1",[pharmacy]);
   const active=await profiles.detail(admin,target);
   await expect(profiles.correctPharmacy(operator,target,pharmacy,{fields:{...fields,licenseNumber:'unverified'},version:active.pharmacies[0].version,reason,evidenceConfirmed:true})).rejects.toMatchObject({code:'QUALIFICATION_LICENSE_MISMATCH'});
+ });
+
+ it('requests verification for the corrected social-only identity without adding a password or approving it',async()=>{
+  await profiles.correct(operator,target,{...await input(),email:'social-corrected@example.test',evidenceConfirmed:true});
+  const mail=jest.fn(async()=>true);const verification=new MemberVerificationService(db,mail);
+  const current=await profiles.detail(admin,target);
+  expect(await verification.request(operator,target,current.member.version)).toEqual({requested:true,alreadyVerified:false});
+  expect(mail).toHaveBeenCalledWith({id:target,email:'social-corrected@example.test'});
+  expect(await passwordCredentialService.hasPassword(target,db.manager)).toBe(false);
+  expect((await profiles.detail(admin,target)).member.emailVerified).toBe(false);
+ });
+ it('does not claim delivery on a failed verification request or send a stale target',async()=>{
+  await db.query('UPDATE users SET "isEmailVerified"=false WHERE id=$1',[target]);
+  const mail=jest.fn(async()=>false);const verification=new MemberVerificationService(db,mail);
+  await expect(verification.request(operator,target,'stale')).rejects.toMatchObject({code:'MEMBER_CHANGED'});expect(mail).not.toHaveBeenCalled();
+  await expect(verification.request(operator,target,(await input()).version)).rejects.toMatchObject({code:'VERIFICATION_MAIL_UNAVAILABLE'});
+  await expect(verification.request(other,target,(await input()).version)).rejects.toMatchObject({status:403});
  });
 
 });

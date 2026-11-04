@@ -1,3 +1,5 @@
+const requestVerification=jest.fn().mockResolvedValue({requested:true});
+jest.mock('../../services/admin/member-verification.service.js',()=>({MemberVerificationService:jest.fn().mockImplementation(()=>({request:requestVerification}))}));
 const issueTemporary=jest.fn().mockResolvedValue({temporaryPassword:'fixture-only',expiresAt:'2026-11-05T00:00:00Z'});
 jest.mock('../../services/admin/member-credential-recovery.service.js',()=>({MemberCredentialRecoveryService:jest.fn().mockImplementation(()=>({issue:issueTemporary}))}));
 import express from 'express';
@@ -90,4 +92,15 @@ it('temporary issuance requires authenticated Google, exact version and explicit
  const result=await request(app).post(endpoint).set('x-user',actor).set('x-method','google').send(body);
  expect(result.status).toBe(200);expect(result.headers['cache-control']).toBe('private, no-store');
  expect(issueTemporary).toHaveBeenCalledWith(actor,target,body);
+});
+
+it('keeps operator verification Google-authenticated, versioned and no-store for social-only targets too',async()=>{
+ const endpoint=path+'/verification-email';const body={version:input.version};
+ expect((await request(app).post(endpoint).send(body)).status).toBe(401);
+ for(const method of ['password','kakao'])expect((await request(app).post(endpoint).set('x-user',actor).set('x-method',method).send(body)).status).toBe(403);
+ expect((await request(app).post(endpoint).set('x-user',actor).set('x-method','google').send({version:'stale'})).status).toBe(400);
+ expect(requestVerification).not.toHaveBeenCalled();
+ const result=await request(app).post(endpoint).set('x-user',actor).set('x-method','google').send(body);
+ expect(result.status).toBe(200);expect(result.headers['cache-control']).toBe('private, no-store');
+ expect(requestVerification).toHaveBeenCalledWith(actor,target,input.version);
 });

@@ -1,3 +1,4 @@
+import {MemberVerificationService} from '../services/admin/member-verification.service.js';
 import {MemberCredentialRecoveryService} from '../services/admin/member-credential-recovery.service.js';
 import { Router } from "express";
 import { z } from "zod";
@@ -92,6 +93,11 @@ pharmacistQualificationsRouter.patch('/members/:userId', handle(req => {
     name: input.name!, nickname: input.nickname!, phone: input.phone!, reason: input.reason!, version: input.version!,
     ...(input.email!==undefined?{email:input.email}:{}),...(input.licenseNumber!==undefined?{licenseNumber:input.licenseNumber,qualificationVersion:input.qualificationVersion,evidenceConfirmed:input.evidenceConfirmed}:{}),...(input.evidenceConfirmed!==undefined?{evidenceConfirmed:input.evidenceConfirmed}:{}),
   });
+}));
+pharmacistQualificationsRouter.post('/members/:userId/verification-email',handle(req=>{
+  google(req);
+  const input=z.object({version:z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{6}$/)}).strict().parse(req.body);
+  return new MemberVerificationService(AppDataSource).request(req.user!.id,memberId(req),input.version!);
 }));
 pharmacistQualificationsRouter.post('/members/:userId/temporary-password',handle(req=>{
   google(req);
