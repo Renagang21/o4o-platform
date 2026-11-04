@@ -66,7 +66,7 @@
 - [x] 합성 전용 DB·파일 fixture로 개인/직원/약국 이전/완전폐업/공급자/포럼/강의의 실제 보존·제거 검증
 - [x] 임시 안전장치 없이 정식 migration·스키마로 실행하고 생성 fixture·연결 데이터 정리 확인
 - [x] Operator 차단 / Admin 직접 URL / 재권한 검사 / 비동기 실패·중복·재시도 검증
-- [x] PC·모바일 체크 → 상단 작업 → 확인 → 실행 → 갱신 브라우저 검증(운영 자료 삭제 금지)
+- [x] PC·모바일 체크 → 상단 작업 → 확인 → 실행 → 갱신 브라우저 검증(실제 실행은 합성 fixture 사용)
 - [x] 필요한 타입·lint·단위/통합 테스트·production build·공통 소비처·문서 민감정보·diff 검사
 - [x] 정확한 최종 HEAD의 PR CI·Codex 리뷰·미해결 사항·최신 main 확인 후 정상 PR merge
 - [x] post-merge CI·Delivery·필요한 통제 배포·실제 serving SHA·공개 상태 확인
