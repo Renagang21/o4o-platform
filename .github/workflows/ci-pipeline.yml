@@ -36,7 +36,7 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 env:
-  NODE_VERSION: '22.18.0'
+  NODE_VERSION: '22.23.4'
   CI_BUILD_CACHE_DISABLED: ${{ vars.CI_BUILD_CACHE_DISABLED }}
 
 jobs:
@@ -121,6 +121,9 @@ jobs:
         pnpm run build:lms-client
         pnpm run build:account-ui
         echo "O4O_PACKAGES_PREBUILT=1" >> "$GITHUB_ENV"
+
+    - name: Check Node and dependency installation consistency
+      run: pnpm run check:runtime
 
     # WO-O4O-TYPES-AUTO-BUILD-GUARD-V1
     # 위 두 단계가 root build:packages와 같은 패키지를 준비하지만,
@@ -230,6 +233,7 @@ jobs:
         scripts/ci/__tests__/detect-affected.test.mjs
         scripts/ci/__tests__/actions-cost.test.mjs
         scripts/ci/__tests__/api-build-cache.test.mjs
+        scripts/ci/__tests__/api-runtime-dependencies.test.mjs
         scripts/ci/__tests__/quality-package-build.test.mjs
         scripts/ci/__tests__/deploy-risk.test.mjs
         scripts/ci/__tests__/ci-gate.test.mjs
@@ -630,7 +634,7 @@ jobs:
         done
         { echo "### Web production build (affected)"; echo ""; echo "| service | vite build |"; echo "|---|---|"; cat "$RUNNER_TEMP/web-build.md"; } >> "$GITHUB_STEP_SUMMARY"
 
-  # ===========================================================================
+  # ====================================================================
   # 4. Docs-only fast path
   #
   # WO-O4O-DOCS-ONLY-CI-SECURITY-FAST-PATH-AND-PUSH-CONCURRENCY-PRESERVATION-V1
@@ -706,7 +710,7 @@ jobs:
           cd apps/api-server && npx jest --maxWorkers=1 $SPECS
         fi
 
-  # ===========================================================================
+  # ====================================================================
   # 4. Admin-only fast path
   #
   # WO-O4O-ADMIN-CI-CD-AFFECTED-SCOPE-AND-DUPLICATE-WORK-REDUCTION-V1
@@ -890,6 +894,7 @@ jobs:
         sparse-checkout: tools/o4o-local-agent
     - uses: actions/setup-node@v7
       with:
+        # Tests embed this executable; match the separately pinned PC release runtime.
         node-version: '22.18.0'
     - name: Verify installation, data preservation and packaged runtime health
       # Readable output also preserves bounded failure annotations from this suite.
@@ -948,10 +953,41 @@ jobs:
         MEMBER_WORKSPACE_TEST_DATABASE_URL: postgresql://agent@127.0.0.1:55432/postgres
       run: pnpm --filter @o4o/api-server exec jest --runInBand --runTestsByPath src/services/admin/__tests__/central-member-workspace.postgres.spec.ts src/services/admin/__tests__/member-profile-recovery.postgres.spec.ts
 
+  # Check the actual npm tree used by Docker in parallel with the long Jest jobs.
+  api-runtime-dependencies:
+    name: API production dependency smoke
+    permissions:
+      contents: read
+    runs-on: ubuntu-latest
+    needs: [detect]
+    if: needs.detect.outputs.defer_full != 'true' && (needs.detect.outputs.api_affected == 'true' || needs.detect.outputs.global_or_unknown == 'true')
+    timeout-minutes: 10
+    steps:
+    - uses: actions/checkout@v6
+      with:
+        sparse-checkout: |
+          apps/api-server/package.production.json
+          apps/api-server/package.production-lock.json
+          scripts/ci/smoke-api-runtime.mjs
+        sparse-checkout-cone-mode: false
+    - uses: actions/setup-node@v7
+      with:
+        node-version: '22.23.4'
+        cache: npm
+        cache-dependency-path: apps/api-server/package.production-lock.json
+    - name: Install the frozen production dependency tree
+      run: |
+        mkdir -p "$RUNNER_TEMP/api-runtime"
+        cp apps/api-server/package.production.json "$RUNNER_TEMP/api-runtime/package.json"
+        cp apps/api-server/package.production-lock.json "$RUNNER_TEMP/api-runtime/package-lock.json"
+        npm ci --prefix "$RUNNER_TEMP/api-runtime" --omit=dev --ignore-scripts --no-audit --no-fund
+    - name: Verify dependency loading and native image processing
+      run: node scripts/ci/smoke-api-runtime.mjs "$RUNNER_TEMP/api-runtime"
+
   ci-gate:
     name: CI Gate
     runs-on: ubuntu-latest
-    needs: [detect, quality-check, api-tests, build, web-build, docs-fast-validate, admin-fast-validate, admin-fast-guards, docs-sensitive-guard, pc-installer-windows, central-operator-integration]
+    needs: [detect, quality-check, api-tests, build, web-build, docs-fast-validate, admin-fast-validate, admin-fast-guards, docs-sensitive-guard, pc-installer-windows, central-operator-integration, api-runtime-dependencies]
     if: always()
     timeout-minutes: 5
     steps:

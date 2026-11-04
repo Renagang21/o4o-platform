@@ -6,7 +6,7 @@
 # docker build -f services/web-neture/Dockerfile .
 
 # Build stage
-FROM node:22.18.0-alpine AS builder
+FROM node:22.23.4-alpine AS builder
 
 WORKDIR /app
 
@@ -14,7 +14,7 @@ WORKDIR /app
 # Optional managed-environment proxy CA; never stored in an image layer.
 RUN --mount=type=secret,id=proxy_ca \
     if [ -f /run/secrets/proxy_ca ]; then export NODE_EXTRA_CA_CERTS=/run/secrets/proxy_ca; fi; \
-    npm install -g pnpm@10.25.0 --ignore-scripts
+    npm install -g --ignore-scripts pnpm@10.25.0
 
 # Copy workspace configuration
 COPY pnpm-workspace.yaml ./
