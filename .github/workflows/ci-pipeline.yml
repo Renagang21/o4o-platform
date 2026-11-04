@@ -106,9 +106,24 @@ jobs:
         node-version: ${{ env.NODE_VERSION }}
         # WO-O4O-CI-BLOCKING-GATE-FINALIZATION-V1: 검증 경로에서는 lockfile drift 를 실패로 만든다.
         strict-lockfile: 'true'
+        build-packages: 'false'
+
+    # root build:packages는 개별 빌드 후 API closure에서 같은 패키지를 다시 빌드한다.
+    # API closure는 기존 checksum 검증 캐시/실제 빌드로 준비하고, 그 밖의 패키지만
+    # 기존 root script로 빌드한다. quality-package-build.test.mjs가 전체 대상의 동등성을 검사한다.
+    - name: Build API dependency closure
+      uses: ./.github/actions/api-dependency-build
+
+    - name: Build remaining shared packages
+      run: |
+        pnpm run build:appearance-system
+        pnpm run build:auth-context
+        pnpm run build:lms-client
+        pnpm run build:account-ui
+        echo "O4O_PACKAGES_PREBUILT=1" >> "$GITHUB_ENV"
 
     # WO-O4O-TYPES-AUTO-BUILD-GUARD-V1
-    # setup-build-env가 이미 pnpm run build:packages를 실행하지만,
+    # 위 두 단계가 root build:packages와 같은 패키지를 준비하지만,
     # types/dist가 stale인 채로 type-check가 도는 회귀를 다시 방지하기 위한 명시 가드.
     - name: Build shared types (explicit guard)
       run: pnpm --filter=@o4o/types run build
@@ -132,8 +147,7 @@ jobs:
     - name: Run TypeScript check (App Store packages)
       run: pnpm run typecheck:app-store-packages
 
-    # setup-build-env가 이미 root build:packages를 실행하고, 그 체인에는
-    # build:api-deps (`pnpm --filter "@o4o/api-server^..." run build`)가 포함된다.
+    # 위 Build API dependency closure가 API type-check의 의존성을 준비했다.
     # 따라서 같은 quality-check runner에서 API dependency를 다시 빌드하지 않는다.
     # API type-check 자체는 그대로 blocking으로 유지한다.
     - name: Run TypeScript check (api-server)
@@ -216,6 +230,7 @@ jobs:
         scripts/ci/__tests__/detect-affected.test.mjs
         scripts/ci/__tests__/actions-cost.test.mjs
         scripts/ci/__tests__/api-build-cache.test.mjs
+        scripts/ci/__tests__/quality-package-build.test.mjs
         scripts/ci/__tests__/deploy-risk.test.mjs
         scripts/ci/__tests__/ci-gate.test.mjs
         scripts/ci/__tests__/cloud-run-rollout.test.mjs

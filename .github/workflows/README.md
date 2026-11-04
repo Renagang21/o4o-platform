@@ -74,6 +74,8 @@ node scripts/ci/actions-cost.mjs --repo Renagang21/o4o-platform --from 2026-09-3
 동일 입력 fingerprint와 산출물 SHA-256 대조를 통과해야 하며, 캐시 부재·입력 변경·출력 불일치는 기존 전체 의존성 빌드로 돌아간다.
 캐시 서비스 실패도 테스트 생략으로 처리하지 않는다. `CI_BUILD_CACHE_DISABLED=true`는 재사용만 중단하는 rollback 변수다.
 테스트·타입 검사·권한 검증·배포 gate 결과는 재사용하지 않는다. cold 동시 실행에서는 중복 빌드가 남을 수 있다.
+`Code Quality Check`도 같은 API 의존성 캐시를 사용하며, API closure 밖의 공통 패키지는 기존 root build script로 준비한다.
+전체 빌드 대상이 `build:packages`와 같은지는 CI 회귀 검사로 확인한다. 검사 자체와 types freshness guard는 그대로 실행한다.
 Node 22.18.0 기준으로 CI와 정기 검사 환경을 맞췄다. 실제 절감은 step 실행시간과 cache hit 결과로 확인한다.
 
 월 10만원은 희망 비용 수준이며 지출 상한이 아니다. 이 작업은 비공개 전환이나 계정의 지출 차단 설정을 포함하지 않는다.
