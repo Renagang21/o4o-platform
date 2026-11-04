@@ -225,6 +225,11 @@ jobs:
         scripts/ci/__tests__/deploy-workflow-diff.test.mjs
         scripts/ci/__tests__/deploy-orchestrate.test.mjs
 
+    - name: Test account erasure activation controls (isolated)
+      run: |
+        node --test scripts/privacy/account-erasure-operations.test.mjs scripts/privacy/account-erasure-execution.test.mjs scripts/privacy/account-erasure-env.test.mjs
+        pnpm exec tsx --test scripts/privacy/account-erasure-audit.test.ts
+
     - name: Test GitHub App token issuer (isolated, no credentials)
       run: node --test scripts/ops/github-app-token.test.mjs
 

@@ -639,6 +639,17 @@ jobs:
           --require-current true \
           --out "$RUNNER_TEMP/consultation-cleanup-env"
 
+    # Preserve audited activation settings across full environment replacement.
+    - name: Preserve account erasure activation env
+      if: inputs.migrate_only != 'true'
+      run: |
+        node scripts/ci/cloud-run-env.mjs optional \
+          --service ${{ env.SERVICE_NAME }} \
+          --names ACCOUNT_ERASURE_MODE,ACCOUNT_ERASURE_FILE_INVENTORY_REVIEW,ACCOUNT_ERASURE_SYSTEM_YEARS,ACCOUNT_ERASURE_SYSTEM_POLICY_BASIS \
+          --serving-only true --require-plain true \
+          --require-current true \
+          --out "$RUNNER_TEMP/account-erasure-env"
+
     # WO-O4O-EXTERNAL-AI-PRODUCTION-ACTIVATION-V1 — 외부 AI(ChatGPT) 연결 설정 4개.
     #   저장소 variable 값 있음 → 설정 · 없음 → 현재 운영 값 유지 · 둘 다 없음 → 생략(모듈은 미설정 503 · 기본 OFF).
     #   현재 서비스 조회에 실패하면 운영 값을 지운 채 배포하지 않도록 이 step 이 실패한다(--require-current).
@@ -694,6 +705,8 @@ jobs:
 
         # External AI connection: plain URLs from the step above; the credential key only as a Secret Manager reference.
         # When the variable is unset an existing secret binding persists (--update-secrets is not a full replacement).
+        ACCOUNT_ERASURE_ENV=()
+        if [ -s "$RUNNER_TEMP/account-erasure-env" ]; then mapfile -d '' ACCOUNT_ERASURE_ENV < "$RUNNER_TEMP/account-erasure-env"; fi
         EXTERNAL_AI_ENV=()
         if [ -s "$RUNNER_TEMP/external-ai-env" ]; then mapfile -d '' EXTERNAL_AI_ENV < "$RUNNER_TEMP/external-ai-env"; fi
         if [ -n "$EXTERNAL_AI_SECRET_RESOURCE" ]; then
@@ -774,6 +787,7 @@ jobs:
           "${AI_PRICING_ENV[@]}" \
           "${CONSULTATION_CLEANUP_ENV[@]}" \
           "${EXTERNAL_AI_ENV[@]}" \
+          "${ACCOUNT_ERASURE_ENV[@]}" \
           "${PAYMENT_ENV[@]}" \
           "${ROLLOUT_ARGS[@]}" \
           --update-labels="o4o-commit-sha=${{ github.sha }}" \

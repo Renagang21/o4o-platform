@@ -1,3 +1,4 @@
+import { ACCOUNT_ERASURE_SCHEMA_READY_SQL } from './account-erasure-schema.js';
 import { systemLogProjection, systemLogReviews, minimizeSystemLogs, privateLogPointerPredicate, EMAIL_LOG_OWNER_SQL, PROFILE_AUDIT_SQL } from './account-system-logs.js';
 import { CLOSED_STORE_WRITER_GAPS_SQL } from '../store/store-closure-inventory.js';
 import { personalPredicate, removePersonalDerived } from './account-personal-data.js';
@@ -95,18 +96,7 @@ export class AccountErasureService {
   async capabilities():Promise<{enabled:boolean}> {
     if (!this.options.enabled || this.options.inventoryReviewed!==true || ![1,2].includes(this.options.systemYears ?? 0) ||
       !/^[a-zA-Z0-9:_-]{1,100}$/.test(this.options.systemBasis ?? '')) return {enabled:false};
-    const [r]=await this.db.query(`SELECT to_regclass('public.account_erasure_operations') IS NOT NULL
-      AND to_regclass('public.account_erasure_file_tasks') IS NOT NULL
-      AND to_regclass('public.account_erasure_reference_keys') IS NOT NULL
-      AND to_regclass('public.account_erasure_community_evidence') IS NOT NULL
-      AND to_regclass('public.account_erasure_audit_events') IS NOT NULL
-      AND to_regproc('public.account_erasure_write_fence') IS NOT NULL
-      AND to_regclass('public.store_closure_file_tasks') IS NOT NULL
-      AND EXISTS(SELECT 1 FROM pg_attribute WHERE attrelid=to_regclass('public.organizations') AND attname='full_closure_at' AND NOT attisdropped)
-      AND NOT EXISTS(${CLOSED_STORE_WRITER_GAPS_SQL})
-      AND NOT EXISTS(${ERASURE_WRITER_GAPS_SQL})
-      AND EXISTS(SELECT 1 FROM pg_constraint WHERE conrelid=to_regclass('public.account_erasure_reference_keys')
-        AND conname='account_erasure_uuid_keys_only' AND contype='c' AND convalidated) AS ready`);
+    const [r]=await this.db.query(ACCOUNT_ERASURE_SCHEMA_READY_SQL);
     return {enabled:r?.ready===true};
   }
 
