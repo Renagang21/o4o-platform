@@ -28,7 +28,10 @@ for (const name of Object.keys(manifest.dependencies)) {
   const result = spawnSync(process.execPath, ['--input-type=module', '--eval', code], {
     cwd: directory, encoding: 'utf8', timeout: 20000, maxBuffer: 1024 * 1024,
   });
-  if (result.status !== 0) failures.push(`${name}: ${result.error?.message || result.stderr || `exit ${result.status}`}`);
+  if (result.status !== 0) {
+    const detail = result.error?.message || result.stderr || `exit ${result.status}`;
+    failures.push(`${name}: ${detail}`);
+  }
 }
 assert.equal(failures.length, 0, `Production dependency loading failed:\n${failures.join('\n')}`);
 console.log(`API isolated runtime smoke PASS: ${Object.keys(manifest.dependencies).length} packages loaded; Sharp native PNG encoding passed; no application/DB started.`);
