@@ -27,7 +27,8 @@ it('opens complete member and pharmacy submissions above the member list with no
   await within(panel).findByText('합성 업태');
   expect(within(panel).getByText('fixture-business')).toBeInTheDocument();
   expect(within(panel).getByText('legacy-license')).toBeInTheDocument();
-  expect(within(panel).getByText(/과거 가입 자료와 자격 신청/)).toBeInTheDocument();
+  expect(within(panel).getByLabelText('약사 면허번호')).toHaveValue('fixture-license');
+  expect(within(panel).getByLabelText('약사 면허번호')).toHaveAttribute('readonly');
   expect(within(panel).getByRole('button', { name: '약국 승인' })).toBeDisabled();
   expect(panel.compareDocumentPosition(screen.getByRole('table')) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
 });
@@ -48,16 +49,19 @@ it('requires a reason and evidence, then submits the exact selected qualificatio
   await waitFor(() => expect(api.post).toHaveBeenCalledWith('/qualifications/pharmacist/review/member-a', { action: 'approve', reason: '합성 면허 근거 확인', version: detail().qualification!.version, licenseEvidenceChecked: true }));
   expect(await screen.findByText(/처리 결과를 저장했습니다/)).toBeInTheDocument();
 });
-it('keeps a conflict visible after refreshing and resets the edit form without claiming success', async () => {
+it('keeps a conflict and the operator draft visible until explicit reload without claiming success', async () => {
   api.patch.mockRejectedValueOnce({ response: { data: { error: '회원 정보가 변경되었습니다. 다시 조회해 주세요.' } } });
   render(<CentralMemberWorkspace actorId="reviewer" />); await select();
-  fireEvent.click(await screen.findByRole('button', { name: '기본정보 정정' }));
+  fireEvent.click(await screen.findByRole('button', { name: '수정',exact:true }));
   fireEvent.change(screen.getByLabelText('이름'), { target: { value: '정정 합성 회원' } });
-  fireEvent.change(screen.getByLabelText('처리·보완 사유'), { target: { value: '본인 요청 확인' } });
-  fireEvent.click(screen.getByRole('button', { name: '처리 결과 저장' }));
+  fireEvent.change(screen.getByLabelText('수정 사유'), { target: { value: '본인 요청 확인' } });
+  fireEvent.click(screen.getByRole('button', { name: '회원 정보 저장' }));
   await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('회원 정보가 변경'));
-  expect(api.patch.mock.calls[0][1]).toEqual({ name: '정정 합성 회원', nickname: '합성 별칭', phone: '', reason: '본인 요청 확인', version: detail().member.version });
-  expect(screen.queryByLabelText('처리·보완 사유')).toBeNull();
+  expect(api.patch.mock.calls[0][1]).toEqual({ name: '정정 합성 회원', nickname: '합성 별칭', phone: '', email:'member-a@example.test',licenseNumber:'fixture-license',qualificationVersion:detail().qualification!.version,evidenceConfirmed:false, reason: '본인 요청 확인', version: detail().member.version });
+  expect(screen.getByLabelText('수정 사유')).toHaveValue('본인 요청 확인');
+  expect(screen.getByLabelText('이름')).toHaveValue('정정 합성 회원');
+  fireEvent.click(screen.getByRole('button',{name:'최신 정보 다시 조회'}));
+  await waitFor(()=>expect(screen.getByLabelText('이름')).toHaveValue('합성 회원 1'));
   expect(screen.queryByText(/처리 결과를 저장했습니다/)).toBeNull();
 });
 it('does not render restricted tasks, licenses, documents or edit actions for a directory-only reviewer', async () => {
@@ -67,7 +71,7 @@ it('does not render restricted tasks, licenses, documents or edit actions for a 
   await screen.findByText(/면허번호와 자격 심사 사유는/);
   expect(screen.queryByRole('tab', { name: /약사 검토 대기/ })).toBeNull();
   expect(screen.queryByText('fixture-license')).toBeNull();
-  expect(screen.queryByRole('button', { name: '기본정보 정정' })).toBeNull();
+  expect(screen.queryByRole('button', { name: '수정',exact:true })).toBeNull();
 });
 it('ignores a late response for the previously selected member', async () => {
   let resolveFirst!: (value: unknown) => void;
@@ -96,7 +100,8 @@ it('restores row/header selection and the standard top action bar; edits require
  expect(screen.getByRole('button',{name:'회원 정보 수정'})).toBeDisabled();
  fireEvent.click(boxes[2]);
  fireEvent.click(screen.getByRole('button',{name:'회원 정보 수정'}));
- expect(await screen.findByLabelText('이름')).toHaveValue('합성 회원 1');
+ await waitFor(()=>expect(screen.getByLabelText('이름')).not.toHaveAttribute('readonly'));
+ expect(screen.getByLabelText('이름')).toHaveValue('합성 회원 1');
  fireEvent.click(screen.getByRole('tab',{name:/전체 회원/}));
  fireEvent.click(screen.getByRole('tab',{name:/약국 심사 대기/}));
  await waitFor(()=>expect(screen.queryByRole('button',{name:'회원 상세보기'})).not.toBeInTheDocument());
@@ -105,6 +110,7 @@ it('submits pharmacy business corrections with evidence, reason, and exact versi
  api.get.mockImplementation(async(path:string)=>({data:{data:path===base?{items:rows,counts:{},permissions}:{...detail(),pharmacies:detail().pharmacies.map(p=>({...p,version:'a'.repeat(32),businessNumber:'1234567890'}))}}}));
  render(<CentralMemberWorkspace actorId="reviewer"/>);await select();
  fireEvent.click(await screen.findByRole('button',{name:'약국·사업자 정보 수정'}));
+ expect(screen.getByLabelText('약국 신청 면허번호')).toHaveAttribute('maxlength','30');
  fireEvent.change(screen.getByLabelText('대표자명'),{target:{value:'정정 합성 대표'}});
  fireEvent.change(screen.getByLabelText('사업자 정보 정정 사유'),{target:{value:'제출 근거 대조'}});
  expect(screen.getByRole('button',{name:'사업자 정보 저장'})).toBeDisabled();
@@ -168,4 +174,84 @@ it('locks member commands and selection until a delayed erasure response is proc
   expect(within(screen.getByRole('table')).getAllByRole('checkbox')[1]).not.toBeChecked();
   expect(screen.getByRole('button',{name:'상태 확인'})).toBeInTheDocument();
  }finally{confirm.mockRestore();}
+});
+
+it('switches from detail into editing without another fetch or a transient return to readonly',async()=>{
+ render(<CentralMemberWorkspace actorId="reviewer"/>);await select();
+ await screen.findByRole('form',{name:'회원 정보 보기'});
+ const calls=api.get.mock.calls.length;
+ fireEvent.click(screen.getByRole('button',{name:'회원 정보 수정',exact:true}));
+ expect(screen.getByRole('form',{name:'회원 정보 수정'})).toBeInTheDocument();
+ expect(screen.getByLabelText('이름')).not.toHaveAttribute('readonly');
+ fireEvent.change(screen.getByLabelText('이름'),{target:{value:'유지할 정정'}});
+ fireEvent(window,new Event('focus'));
+ await act(async()=>Promise.resolve());
+ expect(api.get).toHaveBeenCalledTimes(calls);
+ expect(screen.getByLabelText('이름')).toHaveValue('유지할 정정');
+});
+it('requires evidence for email or license corrections and submits both current versions',async()=>{
+ render(<CentralMemberWorkspace actorId="reviewer"/>);await select();
+ fireEvent.click(screen.getByRole('button',{name:'회원 정보 수정',exact:true}));
+ fireEvent.change(screen.getByLabelText('이메일'),{target:{value:'corrected@example.test'}});
+ fireEvent.change(screen.getByLabelText('약사 면허번호'),{target:{value:'corrected-license'}});
+ fireEvent.change(screen.getByLabelText('수정 사유'),{target:{value:'본인 제출 자료 정정'}});
+ expect(screen.getByRole('button',{name:'회원 정보 저장'})).toBeDisabled();
+ fireEvent.click(screen.getByLabelText('이메일·면허 정정 근거를 확인했습니다.'));
+ fireEvent.click(screen.getByRole('button',{name:'회원 정보 저장'}));
+ await waitFor(()=>expect(api.patch).toHaveBeenCalledWith(`${base}/member-a`,expect.objectContaining({email:'corrected@example.test',licenseNumber:'corrected-license',qualificationVersion:detail().qualification!.version,evidenceConfirmed:true})));
+});
+it('shows a one-time temporary password only after authorized issuance and clears it when selection changes',async()=>{
+ api.post.mockResolvedValue({data:{data:{temporaryPassword:'Synthetic-only-123!',expiresAt:'2026-11-05T00:00:00Z'}}});
+ render(<CentralMemberWorkspace actorId="reviewer"/>);await select();
+ fireEvent.click(screen.getByRole('button',{name:'회원 정보 수정',exact:true}));
+ fireEvent.click(screen.getByRole('button',{name:'임시 비밀번호 발급'}));
+ expect(screen.getByRole('button',{name:'발급',exact:true})).toBeDisabled();
+ fireEvent.change(screen.getByLabelText('발급 사유'),{target:{value:'합성 회원 요청'}});
+ fireEvent.click(screen.getByLabelText('본인 요청과 비밀번호 전달 대상을 확인했습니다.'));
+ fireEvent.click(screen.getByRole('button',{name:'발급',exact:true}));
+ expect(await screen.findByLabelText('발급된 임시 비밀번호')).toHaveTextContent('Synthetic-only-123!');
+ expect(api.post).toHaveBeenCalledWith(`${base}/member-a/temporary-password`,{version:detail().member.version,reason:'합성 회원 요청',evidenceConfirmed:true});
+ fireEvent.click(screen.getByRole('button',{name:/합성 회원 2/}));
+ await waitFor(()=>expect(screen.queryByText('Synthetic-only-123!')).toBeNull());
+});
+
+it('clears private fields instead of preserving a draft when write authority is revoked',async()=>{
+ api.patch.mockRejectedValueOnce({response:{status:403,data:{error:'회원 업무 권한이 회수되었습니다.'}}});
+ render(<CentralMemberWorkspace actorId="reviewer"/>);await select();
+ fireEvent.click(screen.getByRole('button',{name:'회원 정보 수정',exact:true}));
+ fireEvent.change(screen.getByLabelText('수정 사유'),{target:{value:'정정'}});
+ fireEvent.click(screen.getByRole('button',{name:'회원 정보 저장'}));
+ await screen.findByText('회원 업무 권한이 회수되었습니다.');
+ expect(screen.queryByLabelText('이메일')).toBeNull();expect(screen.queryByRole('region',{name:'선택 회원 작업'})).toBeNull();
+});
+
+it('removes private fields when authority is lost during temporary password issuance',async()=>{
+ api.post.mockRejectedValueOnce({response:{status:403,data:{error:'권한 회수'}}});
+ render(<CentralMemberWorkspace actorId="reviewer"/>);await select();
+ fireEvent.click(screen.getByRole('button',{name:'회원 정보 수정',exact:true}));
+ fireEvent.click(screen.getByRole('button',{name:'임시 비밀번호 발급'}));
+ fireEvent.change(screen.getByLabelText('발급 사유'),{target:{value:'본인 요청'}});
+ fireEvent.click(screen.getByLabelText('본인 요청과 비밀번호 전달 대상을 확인했습니다.'));
+ fireEvent.click(screen.getByRole('button',{name:'발급',exact:true}));
+ await screen.findByText('현재 회원 업무 권한을 다시 확인해 주세요.');
+ expect(screen.queryByLabelText('이메일')).toBeNull();expect(screen.queryByRole('region',{name:'선택 회원 작업'})).toBeNull();
+});
+
+it('preserves the selected pharmacy approval command when entered from the top pharmacy action',async()=>{
+ api.get.mockImplementation(async(path:string)=>({data:{data:path===base?{items:rows,counts:{},permissions}:{...detail(),qualification:{...detail().qualification!,status:'approved'}}}}));
+ render(<CentralMemberWorkspace actorId="reviewer"/>);await select();
+ fireEvent.click(screen.getByRole('button',{name:'약국·사업자 정보',exact:true}));
+ fireEvent.click(await screen.findByRole('button',{name:'약국 승인',exact:true}));
+ fireEvent.change(screen.getByLabelText('처리·보완 사유'),{target:{value:'사업자 제출 근거 확인'}});
+ fireEvent.click(screen.getByLabelText('신청자와 약국·사업자 정보 및 승인 조건을 확인했습니다.'));
+ fireEvent.click(screen.getByRole('button',{name:'처리 결과 저장'}));
+ await waitFor(()=>expect(api.post).toHaveBeenCalledWith('/neture/operator/pharmacy-memberships/pharmacy-a/approve',{reason:'사업자 제출 근거 확인'}));
+});
+it('uses the authorized member verification endpoint for an unverified social-only member',async()=>{
+ api.get.mockImplementation(async(path:string)=>({data:{data:path===base?{items:rows,counts:{},permissions}:{...detail(),member:{...detail().member,emailVerified:false,hasPassword:false}}}}));
+ api.post.mockResolvedValue({data:{data:{requested:true,alreadyVerified:false}}});
+ render(<CentralMemberWorkspace actorId="reviewer"/>);await select();
+ fireEvent.click(await screen.findByRole('button',{name:'확인 메일 보내기'}));
+ await screen.findByText('확인 메일 요청을 접수했습니다.');
+ expect(api.post).toHaveBeenCalledWith(`${base}/member-a/verification-email`,{version:detail().member.version});
 });

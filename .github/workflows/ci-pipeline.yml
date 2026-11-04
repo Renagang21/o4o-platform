@@ -634,7 +634,7 @@ jobs:
         done
         { echo "### Web production build (affected)"; echo ""; echo "| service | vite build |"; echo "|---|---|"; cat "$RUNNER_TEMP/web-build.md"; } >> "$GITHUB_STEP_SUMMARY"
 
-  # ===========================================================================
+  # ====================================================================
   # 4. Docs-only fast path
   #
   # WO-O4O-DOCS-ONLY-CI-SECURITY-FAST-PATH-AND-PUSH-CONCURRENCY-PRESERVATION-V1
@@ -710,7 +710,7 @@ jobs:
           cd apps/api-server && npx jest --maxWorkers=1 $SPECS
         fi
 
-  # ===========================================================================
+  # ====================================================================
   # 4. Admin-only fast path
   #
   # WO-O4O-ADMIN-CI-CD-AFFECTED-SCOPE-AND-DUPLICATE-WORK-REDUCTION-V1
@@ -947,6 +947,11 @@ jobs:
         CI: 'true'
         CANDIDATE_WORKFLOW_CI_PORT: '55432'
       run: pnpm --filter @o4o/api-server exec jest --runInBand --runTestsByPath src/modules/neture/services/__tests__/candidate-workflow.postgres.spec.ts src/modules/neture/services/__tests__/product-trash-batch.postgres.spec.ts
+
+    - name: Verify member profile correction and temporary credential transactions
+      env:
+        MEMBER_WORKSPACE_TEST_DATABASE_URL: postgresql://agent@127.0.0.1:55432/postgres
+      run: pnpm --filter @o4o/api-server exec jest --runInBand --runTestsByPath src/services/admin/__tests__/central-member-workspace.postgres.spec.ts src/services/admin/__tests__/member-profile-recovery.postgres.spec.ts
 
   # Check the actual npm tree used by Docker in parallel with the long Jest jobs.
   api-runtime-dependencies:

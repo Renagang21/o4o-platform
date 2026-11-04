@@ -82,9 +82,21 @@ class PasswordCredentialService {
          SET password_hash = EXCLUDED.password_hash,
              algo = EXCLUDED.algo,
              password_changed_at = now(),
-             updated_at = now()`,
+             updated_at = now(),
+             temporary_expires_at = NULL`,
       [userId, hash, PASSWORD_HASH_ALGO],
     );
+  }
+
+  /** Called only inside the authorized operator transaction; plaintext is never persisted. */
+  async setTemporaryPassword(userId: string, plain: string, expiresAt: Date, manager: Queryable): Promise<void> {
+    await this.setPassword(userId, plain, manager);
+    await manager.query('UPDATE user_password_credentials SET temporary_expires_at=$2 WHERE user_id=$1', [userId, expiresAt]);
+  }
+
+  async temporaryStatus(userId: string, manager?: Queryable): Promise<string | null> {
+    const [row] = await (await this.resolveDb(manager)).query('SELECT temporary_expires_at FROM user_password_credentials WHERE user_id=$1', [userId]);
+    return row?.temporary_expires_at ? new Date(row.temporary_expires_at).toISOString() : null;
   }
 
   /**
@@ -94,11 +106,13 @@ class PasswordCredentialService {
   async verifyPassword(userId: string | null, plain: string, manager?: Queryable): Promise<boolean> {
     let hash: string | null = null;
     if (userId) {
-      const rows: Array<{ password_hash: string }> = await (await this.resolveDb(manager)).query(
-        `SELECT password_hash FROM user_password_credentials WHERE user_id = $1`,
+      const rows: Array<{ password_hash: string; temporary_expires_at?: Date | string | null }> = await (await this.resolveDb(manager)).query(
+        `SELECT password_hash, temporary_expires_at FROM user_password_credentials WHERE user_id = $1`,
         [userId],
       );
-      hash = rows[0]?.password_hash ?? null;
+      const row = rows[0];
+      const expired = row?.temporary_expires_at != null && new Date(row.temporary_expires_at).getTime() <= Date.now();
+      hash = expired ? null : row?.password_hash ?? null;
     }
     // 72바이트 초과 원문은 저장될 수 없으므로 어떤 해시와도 일치하지 않는다 — 잘린 앞부분으로 인증하지 않는다.
     // 같은 비용의 compare 는 그대로 한 번 수행한다(길이는 공격자가 아는 값이지만 분기 비용을 맞춘다).
