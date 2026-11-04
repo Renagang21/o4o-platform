@@ -498,6 +498,8 @@ jobs:
     # 이 명령의 **선별 범위**는 Phase 1 승인 전까지 바뀌지 않는다.
     # `--shard` 는 범위가 아니라 분할이다 — 3 shard 의 합집합이 전체 suite 다.
     - name: Run tests (api-server Jest, serial to prevent OOM)
+      env:
+        O4O_JEST_SHARD_STRATEGY: ${{ vars.O4O_JEST_SHARD_STRATEGY }}
       run: cd apps/api-server && npx jest --maxWorkers=1 --shard=${{ matrix.shard }}/3
 
   # 3. Build all applications

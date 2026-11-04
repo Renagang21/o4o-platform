@@ -82,6 +82,12 @@ Node 22.18.0 기준으로 CI와 정기 검사 환경을 맞췄다. 실제 절감
 
 ## 공통 액션 구성
 
+API Jest는 전체 discovery 결과를 3개 묶음에 빠짐없이 분배한다. `jest-shard-sequencer.cjs`는 기록된 느린 suite부터 예상 부하가 적은 묶음에 배치하며,
+시간 기록이 없는 신규 suite도 기본 가중치로 포함한다. 시간표는 실행 대상 목록이 아니며, 오래된 기록은 속도에만 영향을 준다.
+묶음 안 실행 순서·결과 캐시는 Jest 기본값, 각 묶음은 `--maxWorkers=1`, 정기 unsharded 전체 검사는 그대로다.
+`O4O_JEST_SHARD_STRATEGY=hash` repository variable은 기존 Jest hash 분배로 돌아가는 rollback이다(검사 생략 없음).
+시간표는 `apps/api-server/src/__tests__/setup/jest-shard-durations.json`의 source run을 기준으로 하며, 배포 기록 누적 후 필요할 때 재측정한다.
+
 `.github/actions/setup-build-env/action.yml` — pnpm/Node 셋업 + 의존성 설치 + 공유 패키지 빌드.
 `strict-lockfile: 'true'` 로 opt-in 하면 lockfile drift 를 실패로 만든다(CI Pipeline 이 사용).
 
