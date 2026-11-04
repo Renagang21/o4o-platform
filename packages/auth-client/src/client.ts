@@ -341,7 +341,7 @@ export class AuthClient {
     return ((response.data as { data?: EmailAuthNotice })?.data ?? {}) as EmailAuthNotice;
   }
 
-  async getPasswordStatus(): Promise<{ hasPassword: boolean; canManage: boolean }> {
+  async getPasswordStatus(): Promise<{ hasPassword: boolean; canManage: boolean; temporaryExpiresAt?: string | null }> {
     const response = await this.api.get('/auth/password');
     return response.data.data;
   }

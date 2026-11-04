@@ -1,3 +1,4 @@
+import {MemberCredentialRecoveryService} from '../services/admin/member-credential-recovery.service.js';
 import { Router } from "express";
 import { z } from "zod";
 import {
@@ -83,12 +84,19 @@ pharmacistQualificationsRouter.patch('/members/:userId', handle(req => {
   google(req);
   const input = z.object({
     name: z.string().trim().min(1).max(50), nickname: z.string().trim().max(50),
+    email:z.string().trim().email().max(255).optional(),licenseNumber:z.string().trim().max(100).refine(value=>[...value].every(char=>char.charCodeAt(0)>=32&&char.charCodeAt(0)!==127)).optional(),qualificationVersion:z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{6}$/).nullable().optional(),evidenceConfirmed:z.boolean().optional(),
     phone: z.string().trim().max(20), reason: z.string().trim().min(1).max(2000),
     version: z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{6}$/),
   }).strict().parse(req.body);
   return workspace().correct(req.user!.id, memberId(req), {
     name: input.name!, nickname: input.nickname!, phone: input.phone!, reason: input.reason!, version: input.version!,
+    ...(input.email!==undefined?{email:input.email}:{}),...(input.licenseNumber!==undefined?{licenseNumber:input.licenseNumber,qualificationVersion:input.qualificationVersion,evidenceConfirmed:input.evidenceConfirmed}:{}),...(input.evidenceConfirmed!==undefined?{evidenceConfirmed:input.evidenceConfirmed}:{}),
   });
+}));
+pharmacistQualificationsRouter.post('/members/:userId/temporary-password',handle(req=>{
+  google(req);
+  const input=z.object({reason:z.string().trim().min(1).max(2000),version:z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{6}$/),evidenceConfirmed:z.literal(true)}).strict().parse(req.body);
+  return new MemberCredentialRecoveryService(AppDataSource).issue(req.user!.id,memberId(req),{version:input.version!,reason:input.reason!,evidenceConfirmed:true});
 }));
 pharmacistQualificationsRouter.get('/members/:userId/pharmacies/:organizationId/closure-plan',handle(req=>{
  google(req);
@@ -137,7 +145,7 @@ pharmacistQualificationsRouter.patch('/members/:userId/legacy-business',handle(r
 }));
 pharmacistQualificationsRouter.patch('/members/:userId/pharmacies/:pharmacyId',handle(req=>{
   google(req);
-  const input=z.object({fields:z.object({...businessFields,phone:businessPhone,contactEmail:businessEmail}).strict(),reason:z.string().trim().min(1).max(2000),version:z.string().regex(/^[a-f0-9]{32}$/),evidenceConfirmed:z.literal(true)}).strict().parse(req.body);
+  const input=z.object({fields:z.object({...businessFields,licenseNumber:z.string().trim().min(1).max(100).refine(value=>[...value].every(char=>char.charCodeAt(0)>=32&&char.charCodeAt(0)!==127)).optional(),phone:businessPhone,contactEmail:businessEmail}).strict(),reason:z.string().trim().min(1).max(2000),version:z.string().regex(/^[a-f0-9]{32}$/),evidenceConfirmed:z.literal(true)}).strict().parse(req.body);
   return workspace().correctPharmacy(req.user!.id,memberId(req),z.string().uuid().parse(req.params.pharmacyId),{fields:input.fields as Record<string,string>,reason:input.reason!,version:input.version!,evidenceConfirmed:true});
 }));
 pharmacistQualificationsRouter.get(

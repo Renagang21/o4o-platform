@@ -18,10 +18,11 @@ integration('central member workbench PostgreSQL authority, projection and corre
     const setup = new DataSource({ type: 'postgres', url }); await setup.initialize();
     await setup.query(`CREATE SCHEMA ${schema}`); await setup.destroy();
     db = new DataSource({ type: 'postgres', url, extra: { options: `-c search_path=${schema}` } }); await db.initialize();
-    await db.query(`CREATE TABLE users(id uuid PRIMARY KEY,name text,nickname text,email text,phone text,status text,"isActive" boolean,"isEmailVerified" boolean,"createdAt" timestamp,"updatedAt" timestamp,"businessInfo" json);
+    await db.query(`CREATE TABLE user_password_credentials(user_id uuid);
+      CREATE TABLE users(id uuid PRIMARY KEY,name text,nickname text,email text,phone text,status text,"isActive" boolean,"isEmailVerified" boolean,"createdAt" timestamp,"updatedAt" timestamp,"businessInfo" json);
       CREATE TABLE role_assignments(id uuid PRIMARY KEY,user_id uuid,role text,scope_type text,is_active boolean,valid_from timestamp,valid_until timestamp);
       CREATE TABLE service_memberships(user_id uuid,service_key text,status text);
-      CREATE TABLE central_operation_menu_grants(assignment_id uuid,menu_keys text[]);
+      CREATE TABLE central_operation_menu_grants(assignment_id uuid,menu_keys text[],admin_operations boolean DEFAULT false);
       CREATE TABLE kpa_pharmacist_profiles(user_id uuid,license_number text,qualification_status text,qualification_reason text,verified_at timestamp,verified_by uuid,updated_at timestamp);
       CREATE TABLE organizations(id uuid PRIMARY KEY,address text,phone text,metadata jsonb,name text,business_number text,"updatedAt" timestamp DEFAULT now());
       CREATE TABLE neture_pharmacy_memberships(id uuid PRIMARY KEY,organization_id uuid,applicant_user_id uuid,pharmacy_name text,business_number text,pharmacist_license_number text,status text,reason text,applied_at timestamp,decided_at timestamp,decided_by uuid,updated_at timestamp DEFAULT now());
@@ -32,7 +33,7 @@ integration('central member workbench PostgreSQL authority, projection and corre
     await db.query(`INSERT INTO role_assignments(id,user_id,role,scope_type,is_active) VALUES($1,$2,'neture:operator','o4o-direct',true)`, [assignment, reader]);
     await db.query(`INSERT INTO service_memberships VALUES($1,'neture','active')`, [reader]);
     await db.query(`INSERT INTO service_memberships VALUES($1,'neture','active')`, [target]);
-    await db.query(`INSERT INTO central_operation_menu_grants VALUES($1,ARRAY['neture.members'])`, [assignment]);
+    await db.query(`INSERT INTO central_operation_menu_grants(assignment_id,menu_keys) VALUES($1,ARRAY['neture.members'])`, [assignment]);
     await db.query(`INSERT INTO kpa_pharmacist_profiles VALUES($1,'current-license','pending','private reason',NULL,NULL,now())`, [target]);
     const organization = randomUUID();
     await db.query(`INSERT INTO organizations VALUES($1,'합성 주소','fixture-phone',$2)`, [organization, { businessProfile: { representativeName: '합성 대표', businessType: '합성 업태', businessCategory: '합성 종목', businessRegistrationDocumentId: randomUUID(), internalFutureField: 'do-not-disclose' }, contactName: '합성 담당자', managerPhone: 'fixture-phone', contactEmail: 'contact@example.test', taxInvoiceEmail: 'tax@example.test' }]);

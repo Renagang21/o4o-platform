@@ -434,7 +434,7 @@ export class EmailAuthService {
   }
   async getPasswordStatus(
     userId: string,
-  ): Promise<{ hasPassword: boolean; canManage: boolean }> {
+  ): Promise<{ hasPassword: boolean; canManage: boolean; temporaryExpiresAt?: string | null }> {
     return this.recovery.getPasswordStatus(userId);
   }
   async findLoginId(input: {

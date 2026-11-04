@@ -1,3 +1,5 @@
+const issueTemporary=jest.fn().mockResolvedValue({temporaryPassword:'fixture-only',expiresAt:'2026-11-05T00:00:00Z'});
+jest.mock('../../services/admin/member-credential-recovery.service.js',()=>({MemberCredentialRecoveryService:jest.fn().mockImplementation(()=>({issue:issueTemporary}))}));
 import express from 'express';
 import request from 'supertest';
 const closePharmacy=jest.fn().mockResolvedValue({saved:true});
@@ -34,7 +36,7 @@ it('passes bounded task filters and the authenticated actor to the workspace ser
   for (const query of ['task=unknown', 'page=0', 'page=NaN', 'scope=all']) expect((await request(app).get(`/qualifications/members?${query}`).set('x-user', actor).set('x-method', 'google')).status).toBe(400);
 });
 it('rejects privilege/identity fields, missing reasons and stale-version shapes without writing', async () => {
-  for (const extra of [{ role: 'platform:super_admin' }, { email: 'other@example.test' }, { licenseNumber: 'fixture' }, { accountStatus: 'approved' }, { reason: '' }, { version: 'invalid' }]) {
+  for (const extra of [{ role: 'platform:super_admin' }, { email: 'invalid' }, { licenseNumber: 'invalid\x00license' }, { accountStatus: 'approved' }, { reason: '' }, { version: 'invalid' }]) {
     expect((await request(app).patch(path).set('x-user', actor).set('x-method', 'google').send({ ...input, ...extra })).status).toBe(400);
   }
   expect(correct).not.toHaveBeenCalled();
@@ -77,4 +79,15 @@ it('validates explicit employee termination and pharmacy sale confirmation',asyn
   expect((await request(app).post(sale).set('x-user',actor).set('x-method','password').send(body)).status).toBe(403);
   expect((await request(app).post(sale).set('x-user',actor).set('x-method','google').send(body)).status).toBe(200);
   expect(transferPharmacy).toHaveBeenCalledWith(actor,target,'33333333-3333-4333-8333-333333333333',body);
+});
+
+it('temporary issuance requires authenticated Google, exact version and explicit evidence',async()=>{
+ const endpoint=path+'/temporary-password';const body={version:input.version,reason:'본인 복구 요청',evidenceConfirmed:true};
+ expect((await request(app).post(endpoint).send(body)).status).toBe(401);
+ for(const method of ['password','kakao'])expect((await request(app).post(endpoint).set('x-user',actor).set('x-method',method).send(body)).status).toBe(403);
+ for(const patch of [{evidenceConfirmed:false},{version:'stale'},{password:'operator-picked'},{reason:''}])expect((await request(app).post(endpoint).set('x-user',actor).set('x-method','google').send({...body,...patch})).status).toBe(400);
+ expect(issueTemporary).not.toHaveBeenCalled();
+ const result=await request(app).post(endpoint).set('x-user',actor).set('x-method','google').send(body);
+ expect(result.status).toBe(200);expect(result.headers['cache-control']).toBe('private, no-store');
+ expect(issueTemporary).toHaveBeenCalledWith(actor,target,body);
 });

@@ -12,7 +12,7 @@ export interface PasswordSecuritySettingsProps {
 
 /** Account-level password management; Demo/admin restrictions also apply on the server. */
 export function PasswordSecuritySettings({ client, onSessionEnded, notify }: PasswordSecuritySettingsProps) {
-  const [status, setStatus] = useState<{ hasPassword: boolean; canManage: boolean } | null>(null);
+  const [status, setStatus] = useState<{ hasPassword: boolean; canManage: boolean; temporaryExpiresAt?: string | null } | null>(null);
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmation, setConfirmation] = useState('');
@@ -52,6 +52,7 @@ export function PasswordSecuritySettings({ client, onSessionEnded, notify }: Pas
       {status && !status.canManage && <p className="text-sm text-gray-600">이 계정에서는 비밀번호 설정을 변경할 수 없습니다.</p>}
       {status?.canManage && (
         <form onSubmit={(event) => void submit(event)} className="space-y-4">
+          {status.temporaryExpiresAt && <p role="status" className="text-sm text-amber-800">임시 비밀번호를 사용 중입니다. 만료 전에 새 비밀번호로 변경해 주세요.</p>}
           <p className="text-sm text-gray-600">저장하면 모든 서비스의 기존 세션이 종료됩니다. 다시 로그인해 주세요.</p>
           {status.hasPassword && <PasswordInput label="현재 비밀번호" value={currentPassword} onChange={setCurrentPassword} autoComplete="current-password" disabled={busy} />}
           <PasswordInput label="새 비밀번호" value={newPassword} onChange={setNewPassword} autoComplete="new-password" disabled={busy} />
