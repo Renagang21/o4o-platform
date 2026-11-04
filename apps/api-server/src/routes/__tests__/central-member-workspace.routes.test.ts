@@ -62,7 +62,7 @@ it('validates exact business field allowlists, evidence and account rejection ve
  expect((await send({fields,version:'a'.repeat(32),reason:'제출 자료 대조',evidenceConfirmed:true})).status).toBe(200);
  expect(correctPharmacy).toHaveBeenCalledWith(actor,target,'33333333-3333-4333-8333-333333333333',expect.objectContaining({fields,evidenceConfirmed:true}));
  correctPharmacy.mockClear();
- for(const extra of [{fields:{...fields,status:'active'}},{evidenceConfirmed:false},{version:'invalid'},{fields:{...fields,businessNumber:'invalid'}}]){
+ for(const extra of [{fields:{...fields,status:'active'}},{evidenceConfirmed:false},{version:'invalid'},{fields:{...fields,businessNumber:'invalid'}},{fields:{...fields,licenseNumber:'x'.repeat(31)}}]){
   expect((await send({fields,version:'a'.repeat(32),reason:'대조',evidenceConfirmed:true,...extra})).status).toBe(400);
  }
  expect(correctPharmacy).not.toHaveBeenCalled();

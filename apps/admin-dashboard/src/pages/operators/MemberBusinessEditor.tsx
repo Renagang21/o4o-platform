@@ -1,7 +1,7 @@
 import {useState} from 'react';
 import {authClient} from '@o4o/auth-client';
 import type {MemberDetail,MemberPharmacy} from './member-workspace-model';
-const fieldLimit=(key:string)=>key==='licenseNumber'?100:key==='businessNumber'?13:['name','contactEmail','taxInvoiceEmail'].includes(key)?255:['address','addressDetail'].includes(key)?500:['phone','managerPhone'].includes(key)?50:['representativeName','businessType','businessCategory','contactName'].includes(key)?100:300;
+const fieldLimit=(key:string)=>key==='licenseNumber'?30:key==='businessNumber'?13:['name','contactEmail','taxInvoiceEmail'].includes(key)?255:['address','addressDetail'].includes(key)?500:['phone','managerPhone'].includes(key)?50:['representativeName','businessType','businessCategory','contactName'].includes(key)?100:300;
 const labels: Record<string,string>={licenseNumber:'약국 신청 면허번호',name:'사업장명',businessNumber:'사업자등록번호',representativeName:'대표자명',businessType:'업태',businessCategory:'종목',address:'사업장 주소',phone:'약국 전화번호',contactName:'담당자 이름',managerPhone:'담당자 전화번호',contactEmail:'담당자 이메일',taxInvoiceEmail:'세금계산서 이메일',businessEntityType:'사업자 구분',businessStartDate:'개업일',addressDetail:'상세 주소'};
 export default function MemberBusinessEditor({detail,pharmacy,busy,perform,onCancel}:{detail:MemberDetail;pharmacy?:MemberPharmacy;busy:boolean;perform:(work:()=>Promise<unknown>)=>Promise<void>;onCancel:()=>void}){
  const source=pharmacy ?? detail.legacyBusiness ?? {};

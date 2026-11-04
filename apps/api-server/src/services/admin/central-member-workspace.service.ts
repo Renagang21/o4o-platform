@@ -168,6 +168,7 @@ export class CentralMemberWorkspaceService {
   async correctPharmacy(actor: string, target: string, id: string, input: {fields: Record<string,string>; reason: string; version: string; evidenceConfirmed: true}) {
     const reason=operationReason(input.reason), f=input.fields;
     if (!/^\d{10}$/.test(f.businessNumber)) throw new OperationError(400,'INVALID_BUSINESS_NUMBER','사업자등록번호 10자리를 입력해 주세요.');
+    if (f.licenseNumber !== undefined && [...f.licenseNumber.trim()].length > 30) throw new OperationError(400,'INVALID_LICENSE_NUMBER','약국 신청 면허번호는 30자 이내로 입력해 주세요.');
     return this.db.transaction(async manager=>{
       const access=await memberWorkspaceAccess(manager,actor,true);
       if (!access.edit || !access.pharmacies) throw new OperationError(403,'PHARMACY_REVIEW_REQUIRED','약국 정보 정정 업무 위임이 필요합니다.');

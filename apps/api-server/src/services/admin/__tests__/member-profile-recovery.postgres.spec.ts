@@ -30,7 +30,7 @@ integration('member profile and temporary recovery PostgreSQL',()=>{
    CREATE TABLE email_verification_tokens(user_id uuid,consumed_at timestamp);
    CREATE TABLE kpa_pharmacist_profiles(user_id uuid PRIMARY KEY,license_number text,license_verified boolean,qualification_status text,qualification_reason text,verified_at timestamp,verified_by uuid,updated_at timestamp DEFAULT now());
    CREATE TABLE organizations(id uuid PRIMARY KEY,address text,phone text,metadata jsonb,name text,business_number text,"updatedAt" timestamp);
-   CREATE TABLE neture_pharmacy_memberships(id uuid,organization_id uuid,applicant_user_id uuid,pharmacy_name text,business_number text,pharmacist_license_number text,status text,reason text,applied_at timestamp,decided_at timestamp,decided_by uuid,updated_at timestamp DEFAULT now());
+   CREATE TABLE neture_pharmacy_memberships(id uuid,organization_id uuid,applicant_user_id uuid,pharmacy_name text,business_number text,pharmacist_license_number varchar(30),status text,reason text,applied_at timestamp,decided_at timestamp,decided_by uuid,updated_at timestamp DEFAULT now());
    CREATE TABLE notifications("userId" uuid,"serviceKey" text,type text,title text,message text,metadata jsonb,channel text,"isRead" boolean);
    CREATE TABLE action_logs(id bigserial,service_key text,user_id uuid,action_key text,source text,status text,meta jsonb,created_at timestamp DEFAULT now());`);
   for(const id of [admin,operator,target,other])await db.query(`INSERT INTO users(id,name,email,status,"isActive","isEmailVerified","businessInfo","refreshTokenFamily") VALUES($1,'합성 회원',$2,'active',true,true,'{}','old-family')`,[id,id+'@example.test']);
@@ -127,6 +127,8 @@ integration('member profile and temporary recovery PostgreSQL',()=>{
   await db.query(`INSERT INTO neture_pharmacy_memberships(id,organization_id,applicant_user_id,pharmacy_name,business_number,pharmacist_license_number,status,applied_at) VALUES($1,$2,$3,'합성 약국','1234567890','old','pending',now())`,[pharmacy,org,target]);
   const fields={name:'합성 약국',businessNumber:'1234567890',licenseNumber:'correct-license',representativeName:'대표',businessType:'약국',businessCategory:'의약품',address:'합성 주소',phone:'',contactName:'담당',managerPhone:'',contactEmail:'',taxInvoiceEmail:''};
   const detail=await profiles.detail(admin,target);
+  await expect(profiles.correctPharmacy(operator,target,pharmacy,{fields:{...fields,licenseNumber:'x'.repeat(31)},version:detail.pharmacies[0].version,reason,evidenceConfirmed:true})).rejects.toMatchObject({status:400,code:'INVALID_LICENSE_NUMBER'});
+  expect((await profiles.detail(admin,target)).pharmacies[0].licenseNumber).toBe('old');
   await profiles.correctPharmacy(operator,target,pharmacy,{fields,version:detail.pharmacies[0].version,reason,evidenceConfirmed:true});
   expect((await profiles.detail(admin,target)).pharmacies[0].licenseNumber).toBe('correct-license');
   await db.query("UPDATE neture_pharmacy_memberships SET status='active' WHERE id=$1",[pharmacy]);

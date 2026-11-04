@@ -51,3 +51,5 @@ main 병합 및 배포 전에는 운영 화면에 이 변경이 반영되지 않
 - 소셜 전용 회원은 공개 resend가 비밀번호 수단을 요구하여 이메일 정정 후 확인 메일을 못 받았다. 공개 resend의 기존 경계는 유지하고 중앙 Google 세션+회원 업무 권한+현재 버전을 검증하는 /qualifications/pharmacist/members/:userId/verification-email을 연결했다. 기존 단회 토큰·주소/상태/세션 세대 재검증을 재사용한다. 실제 메일 전달 실패나 잘못된 응답을 성공으로 표시하지 않는다. 비밀번호 수단·자격·가입 승인을 만들지 않는다.
 - 최신 main의 PR937 Node22와 PR939 API production dependency 정비를 자기 작업 branch에 정상 merge했다. CI 충돌은 회원 PG 검증 step과 production smoke job을 모두 보존해 해결했다. main의 의존성 변경을 재작성하지 않았다.
 - 보완 검증: Admin21 PASS, 기존 인증 경계/route/토큰106 PASS. 전용 PostgreSQL26 PASS로 소셜 전용 대상·버전 충돌·위임 없음·발송 실패를 확인했다. 운영 이메일/비밀번호 발급으로 검증하지 않는다. 필수 CI·최신 Codex·병합 및 운영 배포 결과는 후속 기록으로 구분한다.
+
+- 후속 리뷰의 약국 신청 면허번호 저장 한도 불일치도 보완했다. 실제 varchar(30)에 맞춰 UI·API·서비스에서 초과 입력을 거절하고 PG fixture도 varchar(30)으로 바꿨다. 31자 입력은 400으로 거절되고 기존 값이 유지됨을 검증한다. canonical 약사 면허 필드는 별도 스키마이므로 변경하지 않는다.

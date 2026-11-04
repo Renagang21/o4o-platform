@@ -151,7 +151,7 @@ pharmacistQualificationsRouter.patch('/members/:userId/legacy-business',handle(r
 }));
 pharmacistQualificationsRouter.patch('/members/:userId/pharmacies/:pharmacyId',handle(req=>{
   google(req);
-  const input=z.object({fields:z.object({...businessFields,licenseNumber:z.string().trim().min(1).max(100).refine(value=>[...value].every(char=>char.charCodeAt(0)>=32&&char.charCodeAt(0)!==127)).optional(),phone:businessPhone,contactEmail:businessEmail}).strict(),reason:z.string().trim().min(1).max(2000),version:z.string().regex(/^[a-f0-9]{32}$/),evidenceConfirmed:z.literal(true)}).strict().parse(req.body);
+  const input=z.object({fields:z.object({...businessFields,licenseNumber:z.string().trim().min(1).max(30).refine(value=>[...value].every(char=>char.charCodeAt(0)>=32&&char.charCodeAt(0)!==127)).optional(),phone:businessPhone,contactEmail:businessEmail}).strict(),reason:z.string().trim().min(1).max(2000),version:z.string().regex(/^[a-f0-9]{32}$/),evidenceConfirmed:z.literal(true)}).strict().parse(req.body);
   return workspace().correctPharmacy(req.user!.id,memberId(req),z.string().uuid().parse(req.params.pharmacyId),{fields:input.fields as Record<string,string>,reason:input.reason!,version:input.version!,evidenceConfirmed:true});
 }));
 pharmacistQualificationsRouter.get(

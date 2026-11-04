@@ -110,6 +110,7 @@ it('submits pharmacy business corrections with evidence, reason, and exact versi
  api.get.mockImplementation(async(path:string)=>({data:{data:path===base?{items:rows,counts:{},permissions}:{...detail(),pharmacies:detail().pharmacies.map(p=>({...p,version:'a'.repeat(32),businessNumber:'1234567890'}))}}}));
  render(<CentralMemberWorkspace actorId="reviewer"/>);await select();
  fireEvent.click(await screen.findByRole('button',{name:'약국·사업자 정보 수정'}));
+ expect(screen.getByLabelText('약국 신청 면허번호')).toHaveAttribute('maxlength','30');
  fireEvent.change(screen.getByLabelText('대표자명'),{target:{value:'정정 합성 대표'}});
  fireEvent.change(screen.getByLabelText('사업자 정보 정정 사유'),{target:{value:'제출 근거 대조'}});
  expect(screen.getByRole('button',{name:'사업자 정보 저장'})).toBeDisabled();
