@@ -38,24 +38,12 @@ export function jobSpec(original,revision,payload,expectEnabled=false,maintenanc
 export function sameRuntimeTemplate(serviceSpec,revisionSpec){
  const normalize=value=>{
   if(Array.isArray(value))return value.map(normalize);
-  if(value&&typeof value==='object')return Object.fromEntries(Object.keys(value).sort().filter(k=>k!=='image').map(k=>[k,k==='env'?normalize(value[k].filter(e=>!ERASURE_ENV_NAMES.includes(e.name)).sort((a,b)=>a.name.localeCompare(b.name,'en'))):normalize(value[k])]));
+  if(value&&typeof value==='object')return Object.fromEntries(Object.keys(value).sort((a,b)=>a.localeCompare(b,'en')).filter(k=>k!=='image').map(k=>[k,k==='env'?normalize(value[k].filter(e=>!ERASURE_ENV_NAMES.includes(e.name)).sort((a,b)=>a.name.localeCompare(b.name,'en'))):normalize(value[k])]));
   return value;
  };
  return JSON.stringify(normalize(serviceSpec))===JSON.stringify(normalize(revisionSpec));
 }
-async function run(){
- const action=process.argv[2]??'audit';if(!['audit','prepare-storage','activate','disable','maintenance'].includes(action))throw new Error('INVALID_ACTION');
- const target=process.env.GITHUB_SHA;if(!/^[a-f0-9]{40}$/.test(target??''))throw new Error('EXACT_SHA_REQUIRED');
- const directory=mkdtempSync(join(tmpdir(),'o4o-erasure-ops-'));let previous;
- const service=()=>command(['run','services','describe','o4o-core-api',...location,'--format=json']);
- const served=()=>{
-  const s=service(),live=s.status?.traffic?.filter(t=>t.percent>0)??[];
-  if(live.length!==1||live[0].percent!==100||!live[0].revisionName)throw new Error('SINGLE_SERVING_REVISION_REQUIRED');
-  return command(['run','revisions','describe',live[0].revisionName,...location,'--format=json']);
- };
- try{
-  const revision=served();previous=revision.metadata.name;
-  if(action==='prepare-storage'){
+function prepareStorage(revision){
    const env=Object.fromEntries((revision.spec.containers[0].env??[]).map(e=>[e.name,e.value]));
    const bucket=env.GCS_PRIVATE_DOCUMENT_BUCKET||'o4o-private-documents';
    if(!/^[a-z0-9][a-z0-9._-]{1,220}[a-z0-9]$/.test(bucket))throw new Error('BUCKET_NAME_INVALID');
@@ -69,9 +57,9 @@ async function run(){
    command(['storage','buckets','add-iam-policy-binding','gs://'+bucket,'--member=serviceAccount:o4o-runtime@netureyoutube.iam.gserviceaccount.com','--role=roles/storage.objectUser','--quiet'],false);
    writeFileSync(process.env.ERASURE_AUDIT_REPORT,JSON.stringify({storagePrepared:true,scope:'private-document-bucket',role:'roles/storage.objectUser',activationChanged:false},null,2)+'\n');
    console.log('Private document storage prepared; activation remains unchanged');return;
-  }
-  const payload=readFileSync(process.env.ERASURE_AUDIT_PAYLOAD,'utf8').trim();if(!/^[A-Za-z0-9+/=]+$/.test(payload))throw new Error('PAYLOAD_INVALID');
-  const audit=async(expectEnabled=false,maintenance=false)=>{
+}
+function createAudit(directory,served,payload){
+ return async(expectEnabled=false,maintenance=false)=>{
    const original=command(['run','jobs','describe','o4o-api-migrations',...location,'--format=json']);
    const existing=spawnSync('gcloud',['run','jobs','describe','o4o-account-erasure-audit',...location,'--format=json'],{encoding:'utf8'});
    if(existing.status!==0&&!/NOT_FOUND|not found/i.test(existing.stderr??''))throw new Error('JOB_OWNERSHIP_UNVERIFIED');
@@ -87,26 +75,10 @@ async function run(){
     await new Promise(r=>setTimeout(r,5000));
    }
    throw new Error('AUDIT_REPORT_UNAVAILABLE');
-  };
-  if(action==='maintenance'){
-   const env=Object.fromEntries((revision.spec.containers[0].env??[]).map(e=>[e.name,e.value]));
-   if(env.ACCOUNT_ERASURE_MODE!=='apply'){console.log('Maintenance skipped: erasure is off');return;}
-   const report=await audit(true,true);writeFileSync(process.env.ERASURE_AUDIT_REPORT,JSON.stringify(report,null,2)+'\n');console.log('Expired minimum-record maintenance complete');return;
-  }
-  const report=action==='disable'?undefined:{...await audit(),runtimeTemplateMatchesServing:sameRuntimeTemplate(service().spec.template.spec,revision.spec)};if(report)writeFileSync(process.env.ERASURE_AUDIT_REPORT,JSON.stringify(report,null,2)+'\n');console.log('Read-only DB and runtime storage audit complete');
-  if(action==='audit')return;
-  const api=DEPLOY_TARGETS.find(t=>t.key==='api');
-  const gap=assessServingGap(target,{api:readServingSha(api)},buildWorkspaceGraph()).api;
-  if(gap.deploy_required||!['UP_TO_DATE','BEHIND_NO_RUNTIME_CHANGE'].includes(gap.status))throw new Error('DEPLOY_API_FIRST');
-  const current=Object.fromEntries((revision.spec.containers[0].env??[]).map(e=>[e.name,e.value]));
-  const values=action==='disable'?{ACCOUNT_ERASURE_MODE:'off'}:activationValues(report,current),tag='erasure-'+process.env.GITHUB_RUN_ID;
-  if(!/^erasure-[0-9]+$/.test(tag))throw new Error('RUN_ID_REQUIRED');
-  if(served().metadata.name!==previous||!sameRuntimeTemplate(service().spec.template.spec,revision.spec))throw new Error('RUNTIME_CHANGED_DURING_AUDIT');
-  command(['run','services','update','o4o-core-api',...location,'--image='+revision.status.imageDigest,'--no-traffic','--tag='+tag,'--update-env-vars=^::^'+Object.entries(values).map(([k,v])=>k+'='+v).join('::'),'--quiet'],false);
-  let changed=false,candidateName;
-  try{
+ };
+}
+function verifyCandidate({action,service,revision,tag,directory,payload}){
    const tagged=service().status.traffic.find(t=>t.tag===tag);if(!tagged?.revisionName)throw new Error('NEW_REVISION_REQUIRED');
-   candidateName=tagged.revisionName;
    const candidate=command(['run','revisions','describe',tagged.revisionName,...location,'--format=json']);
    if(!candidate.status.conditions.some(c=>c.type==='Ready'&&c.status==='True'))throw new Error('REVISION_NOT_READY');
    if(candidate.status.imageDigest!==revision.status.imageDigest)throw new Error('IMAGE_CHANGED');
@@ -117,13 +89,55 @@ async function run(){
    command(['run','jobs','replace',path,...location,'--quiet'],false);
    command(['run','jobs','execute','o4o-account-erasure-audit',...location,'--wait','--format=json']);
    }else if(candidate.spec.containers[0].env.find(e=>e.name==='ACCOUNT_ERASURE_MODE')?.value!=='off')throw new Error('DISABLE_NOT_READY');
-   if(served().metadata.name!==previous)throw new Error('SERVING_CHANGED_DURING_AUDIT');
-   command(['run','services','update-traffic','o4o-core-api',...location,'--to-revisions='+tagged.revisionName+'=100','--quiet'],false);changed=true;
-   const health=await fetch('https://api.neture.co.kr/health',{signal:AbortSignal.timeout(30000)});if(!health.ok)throw new Error('PUBLIC_HEALTH_FAILED');
+   return tagged.revisionName;
+}
+async function verifyServingResult(action,served,audit){
    if(action==='disable'){if(served().spec.containers[0].env.find(e=>e.name==='ACCOUNT_ERASURE_MODE')?.value!=='off')throw new Error('DISABLE_NOT_READY');console.log('Account erasure disabled on the serving revision');return;}
    const final=await audit(true);if(!final.enabled)throw new Error('READINESS_NOT_ENABLED');
    writeFileSync(process.env.ERASURE_AUDIT_REPORT,JSON.stringify({...final,activated:true},null,2)+'\n');console.log('Account erasure enabled; serving revision and readiness verified');
-  }catch(error){if(changed&&served().metadata.name===candidateName)command(['run','services','update-traffic','o4o-core-api',...location,'--to-revisions='+previous+'=100','--quiet'],false);throw error;}
+}
+async function switchRevision({action,service,served,previous,revision,tag,directory,payload,audit}){
+  let changed=false,candidateName;
+  try{
+   candidateName=verifyCandidate({action,service,revision,tag,directory,payload});
+   if(served().metadata.name!==previous)throw new Error('SERVING_CHANGED_DURING_AUDIT');
+   command(['run','services','update-traffic','o4o-core-api',...location,'--to-revisions='+candidateName+'=100','--quiet'],false);changed=true;
+   const health=await fetch('https://api.neture.co.kr/health',{signal:AbortSignal.timeout(30000)});if(!health.ok){throw new Error('PUBLIC_HEALTH_FAILED');}
+   await verifyServingResult(action,served,audit);
+  }catch(error){if(changed&&served().metadata.name===candidateName){command(['run','services','update-traffic','o4o-core-api',...location,'--to-revisions='+previous+'=100','--quiet'],false);}throw error;}
+}
+async function maintainRecords(revision,audit){
+   const env=Object.fromEntries((revision.spec.containers[0].env??[]).map(e=>[e.name,e.value]));
+   if(env.ACCOUNT_ERASURE_MODE!=='apply'){console.log('Maintenance skipped: erasure is off');return;}
+   const report=await audit(true,true);writeFileSync(process.env.ERASURE_AUDIT_REPORT,JSON.stringify(report,null,2)+'\n');console.log('Expired minimum-record maintenance complete');return;
+}
+async function run(){
+ const action=process.argv[2]??'audit';if(!['audit','prepare-storage','activate','disable','maintenance'].includes(action))throw new Error('INVALID_ACTION');
+ const target=process.env.GITHUB_SHA;if(!/^[a-f0-9]{40}$/.test(target??''))throw new Error('EXACT_SHA_REQUIRED');
+ const directory=mkdtempSync(join(tmpdir(),'o4o-erasure-ops-'));let previous;
+ const service=()=>command(['run','services','describe','o4o-core-api',...location,'--format=json']);
+ const served=()=>{
+  const s=service(),live=s.status?.traffic?.filter(t=>t.percent>0)??[];
+  if(live.length!==1||live[0].percent!==100||!live[0].revisionName)throw new Error('SINGLE_SERVING_REVISION_REQUIRED');
+  return command(['run','revisions','describe',live[0].revisionName,...location,'--format=json']);
+ };
+ try{
+  const revision=served();previous=revision.metadata.name;
+  if(action==='prepare-storage'){prepareStorage(revision);return;}
+  const payload=readFileSync(process.env.ERASURE_AUDIT_PAYLOAD,'utf8').trim();if(!/^[A-Za-z0-9+/=]+$/.test(payload))throw new Error('PAYLOAD_INVALID');
+  const audit=createAudit(directory,served,payload);
+  if(action==='maintenance'){await maintainRecords(revision,audit);return;}
+  const report=action==='disable'?undefined:{...await audit(),runtimeTemplateMatchesServing:sameRuntimeTemplate(service().spec.template.spec,revision.spec)};if(report){writeFileSync(process.env.ERASURE_AUDIT_REPORT,JSON.stringify(report,null,2)+'\n');}console.log('Read-only DB and runtime storage audit complete');
+  if(action==='audit')return;
+  const api=DEPLOY_TARGETS.find(t=>t.key==='api');
+  const gap=assessServingGap(target,{api:readServingSha(api)},buildWorkspaceGraph()).api;
+  if(gap.deploy_required||!['UP_TO_DATE','BEHIND_NO_RUNTIME_CHANGE'].includes(gap.status))throw new Error('DEPLOY_API_FIRST');
+  const current=Object.fromEntries((revision.spec.containers[0].env??[]).map(e=>[e.name,e.value]));
+  const values=action==='disable'?{ACCOUNT_ERASURE_MODE:'off'}:activationValues(report,current),tag='erasure-'+process.env.GITHUB_RUN_ID;
+  if(!/^erasure-\d+$/.test(tag))throw new Error('RUN_ID_REQUIRED');
+  if(served().metadata.name!==previous||!sameRuntimeTemplate(service().spec.template.spec,revision.spec))throw new Error('RUNTIME_CHANGED_DURING_AUDIT');
+  command(['run','services','update','o4o-core-api',...location,'--image='+revision.status.imageDigest,'--no-traffic','--tag='+tag,'--update-env-vars=^::^'+Object.entries(values).map(([k,v])=>k+'='+v).join('::'),'--quiet'],false);
+  await switchRevision({action,service,served,previous,revision,tag,directory,payload,audit});
  }finally{rmSync(directory,{recursive:true,force:true});}
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href)run().catch(error=>{const code=/^[A-Z_:]{1,120}$/.test(error?.message??'')?error.message:'UNEXPECTED_FAILURE';console.error('ACCOUNT_ERASURE_OPERATION_FAILED '+code);process.exitCode=1;});

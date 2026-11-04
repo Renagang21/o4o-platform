@@ -85,6 +85,15 @@ export function servingEnvironment(service,revision){
   return {...service,spec:{...service.spec,template:{...service.spec?.template,spec:revision.spec}}};
 }
 
+function readServingEnvironment(service){
+    assertCurrentKnown(service,true);
+    const live=service.status?.traffic?.filter(t=>t.percent>0)??[];
+    if(live.length!==1||live[0].percent!==100||!/^[a-z0-9-]+$/.test(live[0].revisionName??''))throw new Error('SERVING_ENV_UNKNOWN');
+    const result=spawnSync('gcloud',['run','revisions','describe',live[0].revisionName,'--project=netureyoutube','--region=asia-northeast3','--format=json'],{encoding:'utf8',maxBuffer:32*1024*1024,shell:process.platform==='win32'});
+    if(result.status!==0)throw new Error('SERVING_ENV_UNKNOWN');
+    return servingEnvironment(service,JSON.parse(result.stdout||'null'));
+}
+
 function main() {
   const [cmd, ...rest] = process.argv.slice(2);
   if (cmd !== 'optional') throw new Error(`알 수 없는 명령: ${cmd}`);
@@ -101,14 +110,7 @@ function main() {
   // 서비스 조회 실패 = 현재 값을 모름 → carry 없이 set/omit 만 (빈 값은 여전히 만들지 않는다)
   let service = out.status === 0 ? JSON.parse(out.stdout || 'null') : null;
   assertCurrentKnown(service, args['require-current'] === 'true');
-  if(args['serving-only']==='true'){
-    assertCurrentKnown(service,true);
-    const live=service.status?.traffic?.filter(t=>t.percent>0)??[];
-    if(live.length!==1||live[0].percent!==100||!/^[a-z0-9-]+$/.test(live[0].revisionName??''))throw new Error('SERVING_ENV_UNKNOWN');
-    const result=spawnSync('gcloud',['run','revisions','describe',live[0].revisionName,'--project=netureyoutube','--region=asia-northeast3','--format=json'],{encoding:'utf8',maxBuffer:32*1024*1024,shell:process.platform==='win32'});
-    if(result.status!==0)throw new Error('SERVING_ENV_UNKNOWN');
-    service=servingEnvironment(service,JSON.parse(result.stdout||'null'));
-  }
+  if(args['serving-only']==='true')service=readServingEnvironment(service);
 
   if (args['require-plain'] === 'true') assertPlainEnvKnown(service, names);
   if (!service) console.log(`⚠️ ${args.service} describe 실패 — carry 없이 판정`);
