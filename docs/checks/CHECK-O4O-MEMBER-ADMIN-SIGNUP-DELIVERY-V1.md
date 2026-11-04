@@ -2,7 +2,7 @@
 
 - 기준일: 2026-11-03, 기준 main `53bab48e880cec6760908ff9614d875d6bbc9b39`
 - branch: `wo/member-account-lifecycle-20261103`
-- 상태: 구현·로컬 검증 완료, PR #933 재리뷰·통합 진행 중. PR·main·운영 실행은 아래 통합 기록으로 별도 관리한다.
+- 상태: 구현·main 통합·운영 배포 완료. 초기 검증 기록과 2026-11-04 실제 배포 결과를 아래에서 구분한다.
 - 사용자 지정: 이 공간은 구현·PR·main 통합·배포 담당이다.
 - 작업 목록: [TODO](../work-orders/TODO-O4O-MEMBER-ADMIN-SIGNUP-DELIVERY-V1.md)
 - 선행 작업: 원격 `wo/member-erasure-simplification`의 `1a1e5f9a49506056bdffa1c913b9b49523657162`에서 관련 코드만 검토·재사용했다. 그 branch의 WO/CHECK·시험 횟수는 이번 증거에 합산하지 않는다. 당시의 임시 시험 fence는 재사용하지 않는다.
@@ -87,3 +87,19 @@ import 이름만 검색하지 않고 `@o4o/auth-react`, Google/Kakao/Email compo
 - 신규 최소 증빙/삭제 운영 내역의 자동 만료 job 등록은 이 작업에 포함하지 않는다. 명시적 기존 maintenance 경계와 정책 기간을 유지한다. 직접 gcloud IAM 조사는 이 공간에 identity가 없어 미실행이다. serving SHA는 승인 후 정상 Delivery/Promote의 WIF 조회 artifact로 검증할 수 있으며 이를 위해 이 공간에 새 GCP token을 추가하지 않는다.
 
 문서 정합: 역할 Architecture·Store 소속·개인정보 정책의 현재 사용자 결정을 정렬하고, 기존 기간/게시 원문/과거 WO·CHECK는 변경하지 않았다. 선행 remote 기록은 해당 commit에 보존한다. 구현·시험 성공을 운영 활성화 완료로 표현하지 않는다.
+
+## 후속 정정·운영 배포 (2026-11-04 한국 시각)
+
+운영 자료 삭제 테스트 금지를 사용자 지시로 단정했던 설명을 철회했다. 기존 실제 검증·미실행 사실은 변경하지 않는다. 운영 DDL 포함 배포를 승인받아 [Promote 41742629940](https://github.com/Renagang21/o4o-platform/actions/runs/41742629940)을 실행했다. main은 `4fcc28acdbc082705d0cd675c349392daca577eb`이며 CI·CodeQL 성공과 PR #933 병합을 확인했다. 실제 운영 적용·serving·공개 smoke 결과는 아래 후속 기록으로 추가한다.
+
+
+### 실제 완료 결과
+
+- 승인: 2026-11-04 사용자 배포 지시. 운영 DDL 포함 정상 Promote 실행 승인으로 반영했다.
+- main PR #933 병합 `4fcc28acdbc082705d0cd675c349392daca577eb`, post-merge CI·CodeQL PASS.
+- [Promote 41742629940](https://github.com/Renagang21/o4o-platform/actions/runs/41742629940) SUCCESS. API migration Job `o4o-api-migrations-vr7h8` 성공, API verified smoke·트래픽 전환 성공.
+- 최종 Report `production=DEPLOYED`: API·Admin·partner·neture·kpa-society·lecture·store·kpa-branch 모두 serving SHA `4fcc28acdb` 확인. API revision `o4o-core-api-04357-mey`, Admin `o4o-admin-dashboard-01718-naj`.
+- [협동조합 앱 41743565064](https://github.com/Renagang21/o4o-platform/actions/runs/41743565064) SUCCESS. `frontend_only=true, apply=false`, private smoke와 검토 revision 100% 트래픽 검증. 조합 fixture 등록 단계는 skip했다.
+- 공개 확인: API health 200, 비인가 erasure-readiness 401, Admin 회원 경로·Neture 가입 화면 200. 새 Admin 자산 `index-nBwK2m4b.js`에 ‘회원 해지’·‘계정·개인자료 삭제 확인’이 있고 ‘회원 삭제’·‘완전 제거 요청’은 없다. 실제 로그인 계정의 삭제 명령을 실행한 검증으로 확대하지 않는다.
+- 계정 완전삭제 활성화 설정은 이번 배포에서 추가하지 않았다. 파일 소유·공유 inventory 및 보존 분류·IAM 확인은 활성화 준비 잔여이며, 사용자 금지 지시가 원인인 것으로 설명하지 않는다.
+- 검증 artifacts: 저장소 밖 `/workspace/.o4o-cloud/artifacts/member-account-lifecycle-20261104/`. 실제 개인정보·자격증명 값을 문서에 기록하지 않는다.

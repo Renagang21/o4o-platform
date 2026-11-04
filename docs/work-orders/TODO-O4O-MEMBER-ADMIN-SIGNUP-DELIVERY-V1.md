@@ -1,12 +1,12 @@
 # TODO — 회원가입·회원관리·자료 삭제 통합 정비
 
-- 상태: 구현·로컬 검증 완료, PR·통합 진행 중
+- 상태: 구현·main 통합·운영 배포 완료, 계정 완전삭제 활성화 준비는 별도 잔여
 - 기준일: 2026-11-03
 - 사용자 승인: 이 공간에서 TODO·구현·검증·PR·main 병합·배포까지 수행
 - 기준 main: `53bab48e880cec6760908ff9614d875d6bbc9b39`
 - branch: `wo/member-account-lifecycle-20261103`
 - 범위: 가입/메일 확인, Admin 직접 관리, Operator 정지·해지, 단일 직원 소속, 약국 이전·완전폐업, 개인/사업/공유 자료 분류와 최종 삭제·재시도
-- 제외: 운영 회원/업무 자료의 삭제 테스트, 승인 전 운영 migration·삭제 활성화, Node/패키지 업그레이드, 무관한 작업공간 정리
+- 제외: 승인 전 운영 migration·삭제 활성화, Node/패키지 업그레이드, 무관한 작업공간 정리
 
 ## 준비·전수 대조
 
@@ -68,9 +68,9 @@
 - [x] Operator 차단 / Admin 직접 URL / 재권한 검사 / 비동기 실패·중복·재시도 검증
 - [x] PC·모바일 체크 → 상단 작업 → 확인 → 실행 → 갱신 브라우저 검증(운영 자료 삭제 금지)
 - [x] 필요한 타입·lint·단위/통합 테스트·production build·공통 소비처·문서 민감정보·diff 검사
-- [ ] 정확한 최종 HEAD의 PR CI·Codex 리뷰·미해결 사항·최신 main 확인 후 정상 PR merge
-- [ ] post-merge CI·Delivery·필요한 통제 배포·실제 serving SHA·공개 상태 확인
-- [ ] 최종 보고에 구현/검증/PR·commit/실제 배포/미확인·차단/문서 정합을 구분
+- [x] 정확한 최종 HEAD의 PR CI·Codex 리뷰·미해결 사항·최신 main 확인 후 정상 PR merge
+- [x] post-merge CI·Delivery·필요한 통제 배포·실제 serving SHA·공개 상태 확인
+- [x] 최종 보고에 구현/검증/PR·commit/실제 배포/미확인·차단/문서 정합을 구분
 
 ## 현재 사실·승인 경계
 
@@ -94,3 +94,19 @@
 재리뷰 P2 보완: 완전폐업은 조직의 모든 서비스 키 자료를 처리하며 다른 매장 참조는 검토로 보호한다. 일반 KPA 계약의 서비스 범위·7일 대기는 유지한다. 4개 실제 PostgreSQL 회귀와 metadata scalar 검증 회귀를 추가했다. 원격 Code Quality에서 드러난 카카오 약관 테스트의 준비 순서도 보완했다. 재리뷰용 합성 DB의 351 table 잔여0 및 전용 컨테이너 제거도 확인했다.
 
 후속 재리뷰: 최종 삭제 submit 버튼과 실제 클릭 회귀, 정정 로그 previous/next의 검사·실제 최소화, 완료된 폐업 파일 경로·parent/child 정리까지 보완했다. 완료/이미 없음은 후속 계정 삭제를 허용하고 pending 파일은 manifest를 보존하며 차단한다. 실제 producer를 통한 DB 회귀 4개·버튼 클릭 2개와 지연 응답 act 대기를 추가했다. 최종 native 83·Admin 657·PC/mobile 36 검증 및 재검증용 fixture 종료 정리 근거는 CHECK·artifact에 대조한다.
+
+## 2026-11-04 사용자 지시 정정·배포 승인 (한국 시각)
+
+사용자는 운영 자료 삭제 테스트를 금지한 적이 없다고 정정했다. 이를 사용자의 확정 지시로 취급한 설명과 제외 항목을 철회한다. 기존 합성 검증의 실제 실행 기록은 유지한다. 이번에는 운영 migration 3개를 포함한 정상 Promote 배포를 승인받았다. 검증 대상이 지정되지 않은 실회원·업무 자료를 배포 smoke에서 임의 삭제하지 않는 것은 실행 판단이며 사용자 금지 지시로 기록하지 않는다.
+
+
+### 실제 완료 결과
+
+- 승인: 2026-11-04 사용자 배포 지시. 운영 DDL 포함 정상 Promote 실행 승인으로 반영했다.
+- main PR #933 병합 `4fcc28acdbc082705d0cd675c349392daca577eb`, post-merge CI·CodeQL PASS.
+- [Promote 41742629940](https://github.com/Renagang21/o4o-platform/actions/runs/41742629940) SUCCESS. API migration Job `o4o-api-migrations-vr7h8` 성공, API verified smoke·트래픽 전환 성공.
+- 최종 Report `production=DEPLOYED`: API·Admin·partner·neture·kpa-society·lecture·store·kpa-branch 모두 serving SHA `4fcc28acdb` 확인. API revision `o4o-core-api-04357-mey`, Admin `o4o-admin-dashboard-01718-naj`.
+- [협동조합 앱 41743565064](https://github.com/Renagang21/o4o-platform/actions/runs/41743565064) SUCCESS. `frontend_only=true, apply=false`, private smoke와 검토 revision 100% 트래픽 검증. 조합 fixture 등록 단계는 skip했다.
+- 공개 확인: API health 200, 비인가 erasure-readiness 401, Admin 회원 경로·Neture 가입 화면 200. 새 Admin 자산 `index-nBwK2m4b.js`에 ‘회원 해지’·‘계정·개인자료 삭제 확인’이 있고 ‘회원 삭제’·‘완전 제거 요청’은 없다. 실제 로그인 계정의 삭제 명령을 실행한 검증으로 확대하지 않는다.
+- 계정 완전삭제 활성화 설정은 이번 배포에서 추가하지 않았다. 파일 소유·공유 inventory 및 보존 분류·IAM 확인은 활성화 준비 잔여이며, 사용자 금지 지시가 원인인 것으로 설명하지 않는다.
+- 검증 artifacts: 저장소 밖 `/workspace/.o4o-cloud/artifacts/member-account-lifecycle-20261104/`. 실제 개인정보·자격증명 값을 문서에 기록하지 않는다.
