@@ -101,6 +101,8 @@ integration('member profile and temporary recovery PostgreSQL',()=>{
   await passwordCredentialService.setPassword(target,'Original123!',db.manager);
   await expect(recovery.issue(operator,target,{...await resetInput(),evidenceConfirmed:false as true})).rejects.toMatchObject({status:400});
   await expect(recovery.issue(operator,target,{...await resetInput(),version:'stale'})).rejects.toMatchObject({status:409});
+  const duty=randomUUID();await db.query("INSERT INTO role_assignments(id,user_id,role,is_active) VALUES($1,$2,'neture:pharmcoop_admin',true)",[duty,target]);
+  try{await expect(recovery.issue(operator,target,await resetInput())).rejects.toMatchObject({code:'PRIVILEGED_ACCOUNT_PROTECTED'});}finally{await db.query('DELETE FROM role_assignments WHERE id=$1',[duty]);}
  });
  it('refuses schema rollback while an issued temporary credential exists',async()=>{
   await passwordCredentialService.setPassword(target,'Original123!',db.manager);
