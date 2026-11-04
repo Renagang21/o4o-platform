@@ -68,6 +68,10 @@ export class MemberRegistrationService {
     return {
       member,
       requiresRegistration: member.requiresRegistration === true,
+      canSubmit:
+        !registration ||
+        registration.state === 'rejected' ||
+        (registration.state === 'pending' && !registration.requestId),
       registration: registration
         ? {
             type: registration.type,
@@ -147,6 +151,7 @@ export class MemberRegistrationService {
         ...value,
         state: 'pending',
         requestId,
+        ...(prior?.legacyMainAccess ? { legacyMainAccess: true } : {}),
       });
       await m.query(
         'UPDATE users SET name=$2,nickname=$3,phone=$4,"updatedAt"=clock_timestamp() WHERE id=$1',

@@ -4,6 +4,9 @@ const active = { account_status: 'active', account_active: true, email_verified:
 describe('joined and single-user main eligibility share the same policy', () => {
   it.each<[string, NetureMainMembershipRow | undefined, string]>([
     ['missing account', undefined, 'none'],
+    ['legacy pending credential does not close main', {...active,registration_state:'pending',legacy_main_access:true},'active'],
+    ['legacy rejected credential does not close main', {...active,registration_state:'rejected',legacy_main_access:true},'active'],
+    ['legacy preservation does not undo withdrawal', {...active,registration_state:'pending',legacy_main_access:true,membership_status:'withdrawn'},'withdrawn'],
     ['new role signup pending', {...active,registration_state:'pending'},'pending'],
     ['rejected role signup', {...active,registration_state:'rejected'},'rejected'],
     ['approved role signup', {...active,registration_state:'approved'},'active'],

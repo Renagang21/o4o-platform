@@ -17,6 +17,7 @@ import {
   MEMBER_REGISTRATION_KEY,
   type MemberRegistrationType,
 } from '@o4o/types';
+import { assertRegistrationDocument } from '../member-registration-data.js';
 import { buildBusinessInfoUpdateStatement } from '../../../utils/business-info-write.js';
 @Entity('users')
 class User {
@@ -474,6 +475,19 @@ const enabled = process.env.OPERATOR_INVITE_TEST_PORT === '55432';
           version: 2,
         });
       }
+      const prepared = await workspace.detail(actor, target);
+      await workspace.correct(actor, target, {
+        name: 'Synthetic member',
+        nickname: 'Synthetic nick',
+        phone: '01012345678',
+        reason,
+        version: prepared.member.version,
+        registration: { type: 'supplier', fields: business },
+      });
+      expect((await registration.self(target)).canSubmit).toBe(true);
+      await expect(approve()).rejects.toMatchObject({
+        code: 'ENROLLMENT_POLICY_REQUIRED',
+      });
       await expect(submit('supplier', business)).rejects.toBeDefined();
       await registration.submit(target, {
         type: 'supplier',
@@ -484,6 +498,7 @@ const enabled = process.env.OPERATOR_INVITE_TEST_PORT === '55432';
         version: await version(),
         policyReferences: docs,
       });
+      expect((await registration.self(target)).canSubmit).toBe(false);
       const [snapshot] = await db.query(
         `SELECT "businessInfo"->'o4oMembershipRegistrationV1' AS r FROM users WHERE id=$1`,
         [target],
@@ -622,6 +637,150 @@ const enabled = process.env.OPERATOR_INVITE_TEST_PORT === '55432';
       expect((await workspace.detail(actor, target)).member.name).toBe(
         'Common fields only',
       );
+    });
+    it.each(['pending', 'rejected'])(
+      'preserves legacy main access without approving a %s pharmacist credential',
+      async (state) => {
+        await db.query(
+          "INSERT INTO kpa_pharmacist_profiles(user_id,license_number,qualification_status,qualification_reason) VALUES($1,'legacy-license',$2,'Synthetic prior review')",
+          [target, state],
+        );
+        expect(await getNetureMainMembershipStatus(db, target)).toBe('active');
+        const before = await workspace.detail(actor, target);
+        await workspace.correct(actor, target, {
+          name: 'Corrected legacy contact',
+          nickname: 'Legacy nick',
+          phone: '01012345678',
+          reason,
+          version: before.member.version,
+          registration: {
+            type: 'pharmacist',
+            fields: { licenseNumber: 'legacy-license' },
+          },
+        });
+        expect(await getNetureMainMembershipStatus(db, target)).toBe('active');
+        expect(
+          (await workspace.list(actor, 'all', 1, '')).items.find(
+            (r) => r.userId === target,
+          )?.serviceStatus,
+        ).toBe('active');
+        expect(
+          (
+            await db.query(
+              'SELECT qualification_status FROM kpa_pharmacist_profiles WHERE user_id=$1',
+              [target],
+            )
+          )[0].qualification_status,
+        ).toBe(state);
+        await submit('pharmacist', { licenseNumber: 'legacy-license' });
+        expect(await getNetureMainMembershipStatus(db, target)).toBe('active');
+        await registration.decide(actor, target, {
+          action: 'reject',
+          reason,
+          version: await version(),
+        });
+        expect(await getNetureMainMembershipStatus(db, target)).toBe('active');
+      },
+    );
+    it('keeps legacy supplier application status separate from existing main access during contact correction', async () => {
+      await submit('supplier', business);
+      await approve();
+      await db.query(`UPDATE users SET "businessInfo"='{}' WHERE id=$1`, [
+        target,
+      ]);
+      await db.query(
+        "UPDATE neture_suppliers SET status='PENDING' WHERE user_id=$1",
+        [target],
+      );
+      const before = await workspace.detail(actor, target);
+      await workspace.correct(actor, target, {
+        name: 'Corrected legacy supplier',
+        nickname: 'Supplier nick',
+        phone: '01012345678',
+        reason,
+        version: before.member.version,
+        registration: { type: 'supplier', fields: business },
+      });
+      expect(await getNetureMainMembershipStatus(db, target)).toBe('active');
+      expect(
+        (
+          await db.query(
+            'SELECT status FROM neture_suppliers WHERE user_id=$1',
+            [target],
+          )
+        )[0].status,
+      ).toBe('PENDING');
+    });
+    it('authorizes a transferred supplier document through the current owner and denies the former uploader', async () => {
+      const [doc] = await db.query(
+        `INSERT INTO kyc_documents(user_id,"documentType","fileUrl","fileName") VALUES($1,'business_registration','gcs://fixture.invalid/private','synthetic.pdf') RETURNING id`,
+        [target],
+      );
+      await submit('supplier', {
+        ...business,
+        businessRegistrationDocumentId: doc.id,
+      });
+      await approve();
+      await assertRegistrationDocument(db, target, {
+        businessRegistrationDocumentId: doc.id,
+      });
+      const [supplier] = await db.query(
+        'SELECT organization_id FROM neture_suppliers WHERE user_id=$1',
+        [target],
+      );
+      await db.query(
+        'UPDATE neture_suppliers SET user_id=NULL WHERE organization_id=$1',
+        [supplier.organization_id],
+      );
+      await db.query(
+        "UPDATE organization_members SET user_id=$2 WHERE organization_id=$1 AND role='owner' AND left_at IS NULL",
+        [supplier.organization_id, other],
+      );
+      await assertRegistrationDocument(db, other, {
+        businessRegistrationDocumentId: doc.id,
+      });
+      await expect(
+        assertRegistrationDocument(db, target, {
+          businessRegistrationDocumentId: doc.id,
+        }),
+      ).rejects.toMatchObject({ code: 'REGISTRATION_DOCUMENT_FORBIDDEN' });
+      const detail = await workspace.detail(actor, other);
+      await workspace.correct(actor, other, {
+        name: 'Current owner',
+        nickname: 'Owner nick',
+        phone: '01012345678',
+        reason,
+        version: detail.member.version,
+        businessVersion: detail.registration?.businessVersion,
+        registration: { type: 'supplier', fields: detail.registration!.fields },
+      });
+      expect(
+        (await workspace.detail(actor, other)).registration?.fields
+          .businessRegistrationDocumentId,
+      ).toBe(doc.id);
+    });
+    it('confirms an unchanged contact address when the operator saves reviewed member information', async () => {
+      await submit('other');
+      await approve();
+      await db.query('UPDATE users SET "isEmailVerified"=false WHERE id=$1', [
+        target,
+      ]);
+      const before = await workspace.detail(actor, target);
+      const result = await workspace.correct(actor, target, {
+        name: 'Reviewed member',
+        nickname: 'Reviewed nick',
+        phone: '01012345678',
+        email: before.member.email,
+        evidenceConfirmed: true,
+        reason,
+        version: before.member.version,
+        registration: { type: 'other', fields: {} },
+      });
+      expect(result.emailChanged).toBe(false);
+      expect((await workspace.detail(actor, target)).member.emailVerified).toBe(
+        true,
+      );
+      expect(await getNetureMainMembershipStatus(db, target)).toBe('active');
     });
     it('keeps an already-usable legacy general member usable after an operator profile correction', async () => {
       const detail = await workspace.detail(actor, target);

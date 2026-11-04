@@ -1,5 +1,5 @@
 import {correctIdentity,type MemberCorrection} from './member-profile-corrections.js';
-import {correctRegistration,readRegistrationView,MEMBER_REGISTRATION_TYPE_SQL,MEMBER_REGISTRATION_STATE_SQL,MEMBER_LOGIN_METHODS_SQL} from './member-registration-data.js';
+import {correctRegistration,readRegistrationView,MEMBER_REGISTRATION_LEGACY_ACCESS_SQL,MEMBER_REGISTRATION_TYPE_SQL,MEMBER_REGISTRATION_STATE_SQL,MEMBER_LOGIN_METHODS_SQL} from './member-registration-data.js';
 import { buildBusinessInfoUpdateStatement } from '../../utils/business-info-write.js';
 import type { DataSource, EntityManager } from 'typeorm';
 import { centralOperationRoles } from './central-operation-access.js';
@@ -14,7 +14,7 @@ const version = `to_char(u."updatedAt",'YYYY-MM-DD"T"HH24:MI:SS.US')`;
 const identity = `u.id AS "userId",u.name,u.nickname,u.email,u.phone,u.status AS "accountStatus",
  u."isActive" AS "accountActive",(SELECT sm.status FROM service_memberships sm WHERE sm.user_id=u.id AND sm.service_key='neture') AS "membershipStatus",
  u."isEmailVerified" AS "emailVerified",EXISTS(SELECT 1 FROM user_password_credentials pc WHERE pc.user_id=u.id) AS "hasPassword",u."createdAt" AS "joinedAt",${version} AS version,
- ${MEMBER_REGISTRATION_TYPE_SQL} AS "registrationType",${MEMBER_REGISTRATION_STATE_SQL} AS "registrationState",${MEMBER_LOGIN_METHODS_SQL} AS "loginMethods"`;
+ ${MEMBER_REGISTRATION_TYPE_SQL} AS "registrationType",${MEMBER_REGISTRATION_STATE_SQL} AS "registrationState",${MEMBER_REGISTRATION_LEGACY_ACCESS_SQL} AS "registrationLegacyMainAccess",${MEMBER_LOGIN_METHODS_SQL} AS "loginMethods"`;
 const pharmacyExists = (status: string) => `EXISTS(SELECT 1 FROM neture_pharmacy_memberships n WHERE n.applicant_user_id=u.id AND n.status='${status}')`;
 const privateValue = (value: unknown) => ({ toPostgres: () => value, toJSON: () => '[redacted]' });
 
@@ -57,21 +57,21 @@ export class CentralMemberWorkspaceService {
       COUNT(*) FILTER(WHERE ${permissions.pharmacies ? conditions.pharmacies : 'false'})::int AS pharmacies,
       COUNT(*) FILTER(WHERE ${conditions.corrections})::int AS corrections ${from}`, [query]);
     const items = await this.db.query(`SELECT u.id AS "userId",u.name,u.nickname,u.email,u.status AS "accountStatus",
-      ${MEMBER_REGISTRATION_TYPE_SQL} AS "registrationType",${MEMBER_REGISTRATION_STATE_SQL} AS "registrationState",${MEMBER_LOGIN_METHODS_SQL} AS "loginMethods",
+      ${MEMBER_REGISTRATION_TYPE_SQL} AS "registrationType",${MEMBER_REGISTRATION_STATE_SQL} AS "registrationState",${MEMBER_REGISTRATION_LEGACY_ACCESS_SQL} AS "registrationLegacyMainAccess",${MEMBER_LOGIN_METHODS_SQL} AS "loginMethods",
       u."isActive" AS "accountActive",u."isEmailVerified" AS "emailVerified",
       (SELECT sm.status FROM service_memberships sm WHERE sm.user_id=u.id AND sm.service_key='neture') AS "membershipStatus",
       COALESCE(p.qualification_status,'unrequested') AS "qualificationStatus",
       ${permissions.pharmacies ? `(SELECT n.status FROM neture_pharmacy_memberships n WHERE n.applicant_user_id=u.id ORDER BY n.applied_at DESC,n.id LIMIT 1)` : 'NULL::text'} AS "pharmacyStatus"
       ${from} AND (${conditions[task]}) ORDER BY u."createdAt" DESC,u.id LIMIT 21 OFFSET $2`,
     [query, (page - 1) * 20]);
-    return { items: items.slice(0, 20).map(row=>({...row,serviceStatus:resolveNetureMainMembershipStatus({account_status:row.accountStatus,account_active:row.accountActive,email_verified:row.emailVerified,membership_status:row.membershipStatus,registration_state:row.registrationState})})), hasNext: items.length > 20, counts, permissions };
+    return { items: items.slice(0, 20).map(row=>({...row,serviceStatus:resolveNetureMainMembershipStatus({account_status:row.accountStatus,account_active:row.accountActive,email_verified:row.emailVerified,membership_status:row.membershipStatus,registration_state:row.registrationState,legacy_main_access:row.registrationLegacyMainAccess})})), hasNext: items.length > 20, counts, permissions };
   }
 
   async detail(actor: string, target: string) {
     const permissions = await memberWorkspaceAccess(this.db, actor);
     const [member] = await this.db.query(`SELECT ${identity} FROM users u WHERE u.id=$1`, [target]);
     if (!member) throw new OperationError(404, 'MEMBER_NOT_FOUND', '회원을 찾을 수 없습니다.');
-    member.serviceStatus=resolveNetureMainMembershipStatus({account_status:member.accountStatus,account_active:member.accountActive,email_verified:member.emailVerified,membership_status:member.membershipStatus,registration_state:member.registrationState});
+    member.serviceStatus=resolveNetureMainMembershipStatus({account_status:member.accountStatus,account_active:member.accountActive,email_verified:member.emailVerified,membership_status:member.membershipStatus,registration_state:member.registrationState,legacy_main_access:member.registrationLegacyMainAccess});
     let qualification = null;
     let legacyLicense = null;
     let legacyBusiness = null;

@@ -23,6 +23,7 @@ export default function MemberRegistrationForm() {
   const [type, setType] = useState<MemberRegistrationType | ''>(''),
     [fields, setFields] = useState<Values>({}),
     [state, setState] = useState<MemberRegistration['state'] | null>(null);
+  const [canSubmit, setCanSubmit] = useState(false);
   const [member, setMember] = useState({
       name: '',
       nickname: '',
@@ -73,6 +74,7 @@ export default function MemberRegistrationForm() {
         setType(data.registration?.type ?? '');
         setFields(data.registration?.fields ?? {});
         setState(data.registration?.state ?? null);
+        setCanSubmit(data.canSubmit === true);
         if (data.registration?.reason) setNotice(data.registration.reason);
       })
       .catch((e) => {
@@ -85,7 +87,7 @@ export default function MemberRegistrationForm() {
       current = false;
     };
   }, [user?.id, attempt]);
-  const readOnly = state === 'approved' || state === 'pending';
+  const readOnly = state === 'approved' || (state === 'pending' && !canSubmit);
   const documentWork = async (work: () => Promise<void>) => {
     if (requestLock.current) return;
     requestLock.current = true;

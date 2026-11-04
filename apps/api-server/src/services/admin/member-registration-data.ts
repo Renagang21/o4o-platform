@@ -15,6 +15,7 @@ export const MEMBER_REGISTRATION_TYPE_SQL = `COALESCE(${REGISTRATION_SQL}->>'typ
  CASE WHEN EXISTS(SELECT 1 FROM neture_pharmacy_memberships pm WHERE pm.applicant_user_id=u.id) THEN 'pharmacy_owner'
  WHEN EXISTS(SELECT 1 FROM neture_suppliers ns JOIN organization_members om ON om.organization_id=ns.organization_id WHERE om.user_id=u.id AND om.role='owner' AND om.left_at IS NULL) THEN 'supplier'
  WHEN EXISTS(SELECT 1 FROM kpa_pharmacist_profiles pp WHERE pp.user_id=u.id AND NULLIF(BTRIM(pp.license_number),'') IS NOT NULL) THEN 'pharmacist' END)`;
+export const MEMBER_REGISTRATION_LEGACY_ACCESS_SQL = `${REGISTRATION_SQL}->>'legacyMainAccess'='true'`;
 export const MEMBER_REGISTRATION_STATE_SQL = `${REGISTRATION_SQL}->>'state'`;
 export const MEMBER_LOGIN_METHODS_SQL = `ARRAY(SELECT DISTINCT la.provider FROM linked_accounts la WHERE la."userId"=u.id AND la.provider IN ('google','kakao')) || CASE WHEN EXISTS(SELECT 1 FROM user_password_credentials pc WHERE pc.user_id=u.id) THEN ARRAY['email']::text[] ELSE ARRAY[]::text[] END`;
 type Exec = Pick<EntityManager, 'query'>;
@@ -232,9 +233,10 @@ export async function assertRegistrationDocument(
   if (!id) return;
   const rows = await m.query(
     `SELECT d.id FROM kyc_documents d WHERE d.id=$2 AND d."documentType"='business_registration' AND
-    ((d.user_id=$1 AND NOT EXISTS(SELECT 1 FROM organizations o WHERE o.metadata->'businessProfile'->>'businessRegistrationDocumentId'=d.id::text))
+    ((d.user_id=$1 AND NOT EXISTS(SELECT 1 FROM organizations o WHERE o.metadata->'businessProfile'->>'businessRegistrationDocumentId'=d.id::text)
+      AND NOT EXISTS(SELECT 1 FROM neture_suppliers ns WHERE ns.business_registration_document_id=d.id))
     OR EXISTS(SELECT 1 FROM organizations o JOIN organization_members om ON om.organization_id=o.id WHERE
-      o.metadata->'businessProfile'->>'businessRegistrationDocumentId'=d.id::text AND om.user_id=$1 AND om.role='owner' AND om.left_at IS NULL))`,
+      (o.metadata->'businessProfile'->>'businessRegistrationDocumentId'=d.id::text OR EXISTS(SELECT 1 FROM neture_suppliers ns WHERE ns.organization_id=o.id AND ns.business_registration_document_id=d.id)) AND om.user_id=$1 AND om.role='owner' AND om.left_at IS NULL))`,
     [target, id],
   );
   if (!rows.length)
@@ -258,21 +260,23 @@ export async function correctRegistration(
       'REGISTRATION_TYPE_ALREADY_APPROVED',
       '추가 자격은 My Home의 해당 절차로 처리해 주세요.',
     );
-  const [legacy] = prior
-    ? []
-    : await m.query(
-        `SELECT "businessInfo"::jsonb ? '${MEMBER_REGISTRATION_KEY}' AS marked,
-    "isActive" AS active,"isEmailVerified" AS verified,status FROM users WHERE id=$1`,
-        [target],
-      );
-  const generalAlreadyActive =
-    value.type === 'other' &&
-    legacy?.marked !== true &&
-    legacy?.active === true &&
-    legacy?.verified === true &&
-    ['active', 'approved'].includes(legacy?.status);
+  const [legacy] = await m.query(
+    `SELECT "businessInfo"::jsonb ? '${MEMBER_REGISTRATION_KEY}' AS marked,
+    "isActive" AS active,"isEmailVerified" AS verified,status,
+    (SELECT status FROM service_memberships WHERE user_id=$1 AND service_key='neture') AS membership_status FROM users WHERE id=$1`,
+    [target],
+  );
+  const preserveLegacyMain =
+    prior?.legacyMainAccess === true ||
+    (legacy?.marked !== true &&
+      legacy?.active === true &&
+      legacy?.verified === true &&
+      ['active', 'approved'].includes(legacy?.status) &&
+      !['suspended', 'withdrawn'].includes(legacy?.membership_status));
+  const generalAlreadyActive = value.type === 'other' && preserveLegacyMain;
   const next = {
     ...value,
+    ...(preserveLegacyMain ? { legacyMainAccess: true } : {}),
     state: prior?.state ?? (generalAlreadyActive ? 'approved' : 'pending'),
     ...(prior?.type === value.type && prior.requestId
       ? { requestId: prior.requestId }

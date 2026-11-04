@@ -104,6 +104,29 @@ describe('role-specific signup', () => {
     await screen.findByText('가입 검토 대기 중입니다.');
     expect(screen.queryByRole('button', { name: '가입 정보 제출' })).toBeNull();
   });
+  it('lets the member submit consent when the operator prepared a pending role profile', async () => {
+    mocks.get.mockResolvedValue({
+      data: {
+        data: {
+          ...profile,
+          canSubmit: true,
+          registration: { type: 'other', fields: {}, state: 'pending' },
+        },
+      },
+    });
+    render(<MemberRegistrationForm />);
+    const submit = await screen.findByRole('button', {
+      name: '가입 정보 제출',
+    });
+    expect((submit as HTMLButtonElement).disabled).toBe(false);
+    fireEvent.click(submit);
+    await waitFor(() =>
+      expect(mocks.post).toHaveBeenCalledWith(
+        '/member-registration/self',
+        expect.objectContaining({ type: 'other', policyReferences: [] }),
+      ),
+    );
+  });
   it('offers a retry after initial retrieval fails', async () => {
     mocks.get.mockRejectedValueOnce(new Error('offline'));
     render(<MemberRegistrationForm />);

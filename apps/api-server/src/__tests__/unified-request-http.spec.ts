@@ -585,7 +585,7 @@ describe('⑭ Neture 가입 승인 guard (CHECK §10 E5)', () => {
     netureStatusMock.mockResolvedValue('none');
     expect((await request(app).post('/api/ai/request').send({ text: 'x' })).body.error).toBe('Neture 계정 가입과 이메일 확인이 필요합니다.');
     netureStatusMock.mockResolvedValue('pending');
-    expect((await request(app).post('/api/ai/request').send({ text: 'x' })).body.error).toBe('이메일 확인 또는 계정 상태 확인이 필요합니다.');
+    expect((await request(app).post('/api/ai/request').send({ text: 'x' })).body.error).toBe('가입 정보·승인 및 계정 상태를 확인해 주세요.');
   });
 
   // 병원약국은 이 리팩토링 대상이 아니다 — Neture 가입 여부와 무관하게 main 과 같은 병원약국 처리(②-b · ②-b2 · ②-b3)를 받는다.

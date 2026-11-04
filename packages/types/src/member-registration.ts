@@ -39,6 +39,8 @@ export interface MemberRegistrationInput {
 export interface MemberRegistration extends MemberRegistrationInput {
   /** Server-owned application identity binds published-policy evidence to this submission. */
   requestId?: string;
+  /** Server-owned compatibility marker; never grants qualification or a business role. */
+  legacyMainAccess?: boolean;
   /** Read-only concurrency token for the canonical qualification, not a signup input. */
   qualificationVersion?: string | null;
   businessVersion?: string | null;
