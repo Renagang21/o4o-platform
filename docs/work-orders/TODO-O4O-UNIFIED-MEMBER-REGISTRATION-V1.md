@@ -2,7 +2,7 @@
 
 - 사용자 지시: 2026-11-04. 가입 유형은 약사·약국경영자·공급자·파트너·기타. 직원은 경영자 전용 관리다.
 - 기준 main: ac42c35b33b1ea2b3829fda2ebc1b8b1b3a15ada
-- 작업 branch: wo/member-registration-unified-20261104. 종료: 구현·검증·commit·push·PR. main 병합·배포는 하지 않는다.
+- 작업 branch: wo/member-registration-unified-20261104. 초기 개발 종료: 구현·검증·commit·push·PR. 사용자 후속 지시로 PR 검증 후 main 병합·배포까지 이 공간이 담당한다.
 - 기존 PR936 및 다른 작업공간은 별도 보존한다. 운영 회원 변경·운영 DB 작업은 개발 검증에 포함하지 않는다.
 
 ## 1. 조사 및 TODO 재점검
@@ -31,7 +31,7 @@
 - [x] 이메일/면허 오기 정정·중복·권한·버전·동시 승인·중복 클릭 및 실패 draft 보존.
 - [x] 정식 스키마의 격리 PostgreSQL 검증. 필요 migration/fingerprint/개인정보 writer fence 정합.
 - [x] 실제 Chromium PC/mobile: 한 줄 목록·체크→수정→역할별 입력·서류→승인·해지·복구·목록 갱신.
-- [ ] 변경 lint·문서 민감정보·diff·staged scope 검증, commit·push·PR 생성 및 실제 검증 결과 보고.
+- [x] 변경 lint·문서 민감정보·diff·staged scope 검증, commit·push·PR 생성 및 실제 검증 결과 기록.
 
 ## TODO 재점검·보정 및 필드 표
 
@@ -54,4 +54,4 @@
 
 ## 검증 및 인계
 
-상세 근거는 [CHECK](../checks/CHECK-O4O-UNIFIED-MEMBER-REGISTRATION-V1.md). 신규 정책 정본과 관련 4문서/색인에 대체 범위를 연결했다. schema/manifest/lockfile 변경, 운영 자료 작업, main 병합/배포는 없다. PR 생성 전 최종 scope·민감정보 검증을 완료한다.
+상세 근거는 [CHECK](../checks/CHECK-O4O-UNIFIED-MEMBER-REGISTRATION-V1.md). 신규 정책 정본과 관련 4문서/색인에 대체 범위를 연결했다. schema/manifest/lockfile 변경, 운영 자료 검수 작업은 없다. 최종 scope·민감정보 검증 후 [PR941](https://github.com/Renagang21/o4o-platform/pull/941)을 생성했다. 사용자 후속 지시로 CI·Codex·병합 gate를 확인한 뒤 main 병합과 현행 Delivery 통제 배포를 진행한다. 통합·배포의 실제 SHA/결과는 PR과 완료 보고에서 별도 확인한다.

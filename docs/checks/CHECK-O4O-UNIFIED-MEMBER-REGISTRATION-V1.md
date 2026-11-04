@@ -4,7 +4,7 @@
 - 정책: [통합 가입·관리 기준](../baseline/O4O-UNIFIED-MEMBER-REGISTRATION-V1.md)
 - 실행 계획/재점검: [TODO](../work-orders/TODO-O4O-UNIFIED-MEMBER-REGISTRATION-V1.md)
 - 기준 main: `ac42c35b33b1ea2b3829fda2ebc1b8b1b3a15ada` (#940). 작업: `wo/member-registration-unified-20261104`.
-- 범위: 현재 Codex 작업공간의 전용 worktree에서 개발·로컬 검증·push·PR까지. main 병합·배포·운영 회원 변경은 포함하지 않는다. 다른 12개 worktree와 기존 PR936은 변경하지 않았다.
+- 로컬 검증 범위: 현재 Codex 전용 worktree의 개발·push·[PR941](https://github.com/Renagang21/o4o-platform/pull/941). 이후 사용자 지시로 이 공간이 main 통합·배포도 담당한다. 아래 결과는 운영 회원 변경을 포함하지 않는 개발 검증이며 실제 통합·배포 결과는 PR/완료 보고로 구분한다. 다른 12개 worktree와 기존 PR936은 변경하지 않았다.
 
 ## 구현 결과
 
@@ -42,3 +42,5 @@ DB native 테스트를 기존 PostgreSQL CI 단계에 포함해 일반 Jest 실�
 실제 Google/Kakao 계정 생성·SMTP·비공개 GCS 업로드·운영 회원 수정/삭제는 실행하지 않았다. 외부 공급자와 실제 운영 데이터 검수는 PR 통합 이후의 별도 운영 검증이다. 기존 Admin 전체 계정 삭제 활성화 PR936은 이 변경에 포함하지 않는다. 여러 사업체로 대상이 불명확하면 해당 사업체 관리에서 수정하며 임의 선택하지 않는다.
 
 PR 상태·SHA와 CI 관찰 결과는 PR 및 완료 보고에서 별도로 명시한다. 이 문서는 main 병합/배포 완료를 주장하지 않는다.
+
+통합 승인 추가(2026-11-04): 사용자가 PR 생성 뒤 main 병합·배포까지 명시적으로 요청했다. 현재 변경에는 신규 migration이 없다. CI/리뷰/현재 main gate를 만족한 뒤 현행 Delivery·필요 시 Promote를 사용하며 우회 배포는 하지 않는다.
