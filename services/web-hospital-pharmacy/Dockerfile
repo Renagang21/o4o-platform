@@ -10,7 +10,8 @@ COPY packages/hospital-pharmacy-core/package.json ./packages/hospital-pharmacy-c
 COPY services/web-hospital-pharmacy/package.json ./services/web-hospital-pharmacy/
 RUN --mount=type=secret,id=proxy_ca \
     if [ -f /run/secrets/proxy_ca ]; then export NODE_EXTRA_CA_CERTS=/run/secrets/proxy_ca; fi; \
-    pnpm install --filter hospital-pharmacy-web... --fail-if-no-match --frozen-lockfile --ignore-scripts --verify-store-integrity=true
+    pnpm install --filter hospital-pharmacy-web... --fail-if-no-match \
+      --frozen-lockfile --ignore-scripts --verify-store-integrity=true
 COPY packages/file-understanding-core/ ./packages/file-understanding-core/
 COPY packages/hospital-pharmacy-core/ ./packages/hospital-pharmacy-core/
 COPY services/web-hospital-pharmacy/ ./services/web-hospital-pharmacy/
@@ -37,4 +38,5 @@ COPY --from=builder /app/services/web-hospital-pharmacy/dist ./dist
 RUN cp -r ./dist ./dist-base && mv ./dist-base ./dist/hospital
 ENV PORT=8080
 EXPOSE 8080
+USER node
 CMD ["serve", "-s", "dist", "-l", "8080"]

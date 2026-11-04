@@ -44,7 +44,8 @@ COPY services/web-kpa-branch/package.json ./services/web-kpa-branch/
 # WO-O4O-DOCKER-PNPM-IGNORE-SCRIPTS-FIX-V1: --ignore-scripts 로 prepare 자동 빌드 skip
 RUN --mount=type=secret,id=proxy_ca \
     if [ -f /run/secrets/proxy_ca ]; then export NODE_EXTRA_CA_CERTS=/run/secrets/proxy_ca; fi; \
-    pnpm install --filter kpa-branch-web... --fail-if-no-match --frozen-lockfile --ignore-scripts --verify-store-integrity=true
+    pnpm install --filter kpa-branch-web... --fail-if-no-match \
+      --frozen-lockfile --ignore-scripts --verify-store-integrity=true
 
 # Copy workspace package source
 COPY packages/types/ ./packages/types/
@@ -94,4 +95,5 @@ RUN cp -r ./dist ./dist-public-base && mv ./dist-public-base ./dist/kpa
 
 EXPOSE 8080
 
+USER node
 CMD ["serve", "-s", "dist", "-l", "8080"]

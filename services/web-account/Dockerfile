@@ -32,7 +32,8 @@ COPY services/web-account/ ./services/web-account/
 # 명시적 build는 source copy 후 아래 RUN 단계에서 수행됨.
 RUN --mount=type=secret,id=proxy_ca \
     if [ -f /run/secrets/proxy_ca ]; then export NODE_EXTRA_CA_CERTS=/run/secrets/proxy_ca; fi; \
-    pnpm install --filter account-web... --fail-if-no-match --frozen-lockfile --ignore-scripts --verify-store-integrity=true
+    pnpm install --filter account-web... --fail-if-no-match \
+      --frozen-lockfile --ignore-scripts --verify-store-integrity=true
 
 # Build-time environment variable for Vite
 ARG VITE_API_BASE_URL=https://api.neture.co.kr
@@ -65,4 +66,5 @@ ENV PORT=8080
 EXPOSE 8080
 
 # Serve static files
+USER node
 CMD ["serve", "-s", "dist", "-l", "8080"]

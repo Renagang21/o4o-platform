@@ -52,7 +52,8 @@ COPY services/web-pharmacy-business/package.json ./services/web-pharmacy-busines
 # 명시적 build는 source copy 후 아래 RUN 단계에서 수행됨.
 RUN --mount=type=secret,id=proxy_ca \
     if [ -f /run/secrets/proxy_ca ]; then export NODE_EXTRA_CA_CERTS=/run/secrets/proxy_ca; fi; \
-    pnpm install --filter @o4o/web-pharmacy-business... --fail-if-no-match --frozen-lockfile --ignore-scripts --verify-store-integrity=true
+    pnpm install --filter @o4o/web-pharmacy-business... --fail-if-no-match \
+      --frozen-lockfile --ignore-scripts --verify-store-integrity=true
 
 # Copy workspace package source
 COPY packages/types/ ./packages/types/
