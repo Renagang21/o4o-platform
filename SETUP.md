@@ -1,7 +1,7 @@
 # O4O Platform — 로컬 실행환경 정본
 
 > 이 문서는 **로컬 개발 실행환경의 단일 기준(SSOT)** 입니다.
-> **최종 갱신**: 2026-11-03 — Node 22 보안 패치·CI/Docker 버전 및 frozen 설치 정합
+> **최종 갱신**: 2026-11-04 — Node 22·TypeORM 공동 정렬 및 API 실행 의존성 정합
 > 개발 규칙·아키텍처 경계·운영 정책은 사용하는 에이전트의 진입점([AGENTS.md](AGENTS.md) / [CLAUDE.md](CLAUDE.md))과 해당 정본을 따릅니다.
 
 ## 현재 AI 기반과 개발 착수 — 2026-10-14
@@ -87,11 +87,15 @@ API의 외부 실행 의존성은 `pnpm-lock.yaml`의 `apps/api-server` importer
 각 의존성의 로딩과 Sharp 네이티브 PNG 생성을 검사합니다. 애플리케이션이나 DB는 시작하지 않습니다.
 
 workspace 패키지는 API bundle에 포함되므로 이 manifest에서 제외하며 `@types/*`도 제외합니다.
-명시적 예외는 기존 운영 전용 `@nestjs/platform-express` **10.4.22**, TypeORM **CI 0.3.27 / 운영 0.3.31**입니다.
-TypeORM은 API만 올리면 공통 패키지와 `DataSource` 타입 identity가 달라져 컴파일이 실패하므로,
-기존 운영의 보안 패치와 기존 CI 타입 구성을 보존합니다. 공통 workspace 전체를 함께 정렬하는 후속 작업이 필요합니다.
-이 ORM 정렬·adapter 필요성 정리와 npm/pnpm의 **전이 의존성 전체 일치**는 별도 후속 범위이며,
-이번 검사가 두 설치 트리 전체의 동일성을 보장하지는 않습니다.
+TypeORM은 API와 공통 workspace가 **0.3.31**을 함께 해석하도록 루트 `pnpm.overrides.typeorm`으로 고정합니다.
+API만 올리면 공통 패키지의 `DataSource` 타입 identity와 갈라질 수 있으므로, 변경 시 공통 dependency closure 빌드와
+API type-check·실제 PostgreSQL 회귀 검사를 함께 수행합니다. `check:runtime`은 lockfile override와 모든 importer의
+TypeORM 버전 및 단일 패키지 버전 해석을 검사합니다. 기존 CI/운영 TypeORM 버전 예외는 제거했습니다.
+
+API는 Express를 직접 기동하며 Nest HTTP factory를 사용하지 않습니다. 운영 전용 `@nestjs/platform-express`와
+기존 npm lock에 남던 optional adapter 설치 항목도 제거했습니다. 향후 Nest HTTP 기동을 도입한다면 adapter를
+API 의존성과 테스트에 명시적으로 추가해야 합니다. 현재 API 외부 실행 의존성은 예외 없이 CI/운영 직접 버전이 일치합니다.
+다만 npm/pnpm의 **전이 의존성 전체 일치**를 보장하지는 않습니다.
 
 API 의존성을 의도적으로 변경한 뒤에는 일반 frozen 설치를 바꾸지 않고 다음과 같이 갱신합니다
 (PowerShell 예시, §1의 Node/npm/pnpm 사용). 임시 폴더를 사용해 workspace의 `node_modules`를 건드리지 않습니다.
