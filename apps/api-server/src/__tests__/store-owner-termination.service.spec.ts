@@ -131,3 +131,12 @@ it('does not reopen retired K-Cosmetics termination or touch its data', async ()
     .rejects.toMatchObject({ code: 'STORE_OWNER_TERMINATION_SERVICE_NOT_ALLOWED' });
   expect(query).not.toHaveBeenCalled();
 });
+
+it('explicit immediate closure never bypasses the active-business/employee check',async()=>{
+  const ds=fakeDs(()=>[]);
+  const service=new StoreOwnerTerminationService(ds);
+  jest.spyOn(service,'previewPurge').mockResolvedValue({} as any);
+  jest.spyOn(service,'getCase').mockResolvedValue({id:'case',status:'terminated',organizationId:'organization',purgeDueAt:'2999-01-01T00:00:00Z'} as any);
+  await expect(service.purgeCase('case',{dryRun:false,closureConfirmed:true})).rejects.toMatchObject({code:'FULL_CLOSURE_REQUIRED'});
+  expect(ds.query.mock.calls.every(([sql]:[string])=>!sql.includes('DELETE'))).toBe(true);
+});

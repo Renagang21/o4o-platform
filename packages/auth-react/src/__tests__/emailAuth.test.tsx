@@ -152,7 +152,7 @@ describe('EmailSignupForm', () => {
     expect(submit().disabled).toBe(false);
     fireEvent.click(submit());
     await screen.findByTestId('email-sent-notice');
-    expect(screen.getByText('n**@x.com')).toBeTruthy();
+    expect(screen.getByText('new@x.com')).toBeTruthy();
     expect(screen.getByText('로그인하러 가기')).toBeTruthy();
     expect(signup).toHaveBeenCalledWith({
       email: 'new@x.com', nickname: 'Fixture nickname',

@@ -14,7 +14,10 @@ import { ShieldCheck } from 'lucide-react';
 const NAV = [
   { to: '/admin/platform', label: '플랫폼 홈', end: true },
   { to: '/settings/admin-accounts', label: '전체 관리자 계정', end: false },
-  { to: '/admin/platform/users', label: '사용자 조회', end: false },
+  { to: '/admin/platform/users', label: '전체 회원', end: false },
+  { to: '/admin/platform/suppliers', label: '공급자', end: false },
+  { to: '/admin/platform/stores', label: '내 매장', end: false },
+  { to: '/admin/platform/erasure-operations', label: '삭제 처리 내역', end: false },
 ];
 
 export default function PlatformSectionLayout() {

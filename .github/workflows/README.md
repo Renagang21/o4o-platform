@@ -74,11 +74,19 @@ node scripts/ci/actions-cost.mjs --repo Renagang21/o4o-platform --from 2026-09-3
 동일 입력 fingerprint와 산출물 SHA-256 대조를 통과해야 하며, 캐시 부재·입력 변경·출력 불일치는 기존 전체 의존성 빌드로 돌아간다.
 캐시 서비스 실패도 테스트 생략으로 처리하지 않는다. `CI_BUILD_CACHE_DISABLED=true`는 재사용만 중단하는 rollback 변수다.
 테스트·타입 검사·권한 검증·배포 gate 결과는 재사용하지 않는다. cold 동시 실행에서는 중복 빌드가 남을 수 있다.
+`Code Quality Check`도 같은 API 의존성 캐시를 사용하며, API closure 밖의 공통 패키지는 기존 root build script로 준비한다.
+전체 빌드 대상이 `build:packages`와 같은지는 CI 회귀 검사로 확인한다. 검사 자체와 types freshness guard는 그대로 실행한다.
 Node 22.23.4 기준으로 CI와 정기 검사 환경을 맞췄다. 실제 절감은 step 실행시간과 cache hit 결과로 확인한다.
 
 월 10만원은 희망 비용 수준이며 지출 상한이 아니다. 이 작업은 비공개 전환이나 계정의 지출 차단 설정을 포함하지 않는다.
 
 ## 공통 액션 구성
+
+API Jest는 전체 discovery 결과를 3개 묶음에 빠짐없이 분배한다. `jest-shard-sequencer.cjs`는 기록된 느린 suite부터 예상 부하가 적은 묶음에 배치하며,
+시간 기록이 없는 신규 suite도 기본 가중치로 포함한다. 시간표는 실행 대상 목록이 아니며, 오래된 기록은 속도에만 영향을 준다.
+묶음 안 실행 순서·결과 캐시는 Jest 기본값, 각 묶음은 `--maxWorkers=1`, 정기 unsharded 전체 검사는 그대로다.
+`O4O_JEST_SHARD_STRATEGY=hash` repository variable은 기존 Jest hash 분배로 돌아가는 rollback이다(검사 생략 없음).
+시간표는 `apps/api-server/src/__tests__/setup/jest-shard-durations.json`의 source run을 기준으로 하며, 배포 기록 누적 후 필요할 때 재측정한다.
 
 `.github/actions/setup-build-env/action.yml` — pnpm/Node 셋업 + 의존성 설치 + 공유 패키지 빌드.
 모든 호출에서 frozen lockfile 설치를 사용하며, lockfile drift는 실패로 처리한다. `strict-lockfile` 입력은 기존 호출 호환용으로만 남아 있다.

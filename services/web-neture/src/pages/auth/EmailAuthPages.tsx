@@ -92,7 +92,7 @@ export function SignupPage() {
   if (isLoading) return null;
   if (isAuthenticated) return <Navigate to={operatorInvitationReturnPath()} replace />;
   return (
-    <AuthCard title="회원가입" subtitle={emailSignup ? '이메일(아이디)로 가입' : '개인정보 보호를 위해 Google·카카오 가입을 권장합니다.'}>
+    <AuthCard title="회원가입" subtitle={emailSignup ? '이메일로 가입' : '개인정보 보호를 위해 Google·카카오 가입을 권장합니다.'}>
       {emailSignup ? (
         <>
           <button type="button" className="mb-4 min-h-11 text-sm text-gray-600 underline" onClick={() => { setEmailSignup(false); setGoogleError(null); }}>
@@ -102,7 +102,7 @@ export function SignupPage() {
         </>
       ) : (
         <>
-          <section aria-label="소셜 계정으로 가입" className="space-y-3">
+          <section aria-label="소셜 계정으로 가입" className="space-y-3" style={{maxWidth:400,marginInline:'auto'}}>
             <GoogleContinue<User>
               personalizedButton={false}
               buttonText="signup_with"
@@ -116,7 +116,7 @@ export function SignupPage() {
               termsHref="/terms"
               privacyHref="/privacy"
             />
-            <KakaoContinue<User> client={authClient} loginWithKakao={loginWithKakao} signupWithKakao={signupWithKakao}
+            <KakaoContinue<User> intent="signup" client={authClient} loginWithKakao={loginWithKakao} signupWithKakao={signupWithKakao}
               returnTo={new URLSearchParams(window.location.search).get('returnTo') ?? '/'}
               onSuccess={() => { navigate(operatorInvitationReturnPath(), { replace: true }); }} />
             {googleError && (
@@ -128,8 +128,8 @@ export function SignupPage() {
             또는
             <span className="h-px flex-1 bg-gray-200" />
           </div>
-          <button type="button" className="o4o-auth-choice w-full" onClick={() => setEmailSignup(true)}>
-            이메일(아이디)로 가입
+          <button type="button" className="o4o-auth-choice w-full" style={{ minHeight: 32, height: 32, paddingBlock: 0, maxWidth:400, display:'block', marginInline:'auto' }} onClick={() => setEmailSignup(true)}>
+            이메일로 가입
           </button>
         </>
       )}

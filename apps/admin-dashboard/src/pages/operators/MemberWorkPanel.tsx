@@ -1,8 +1,9 @@
+import MemberLifecycleActions from './MemberLifecycleActions';
 import MemberBusinessEditor from './MemberBusinessEditor';
 import AccountErasureControls from '../platform/account-governance/AccountErasureControls';
 import { useState } from 'react';
 import { authClient } from '@o4o/auth-client';
-import { canActivatePharmacy, memberError, pharmacyActions, pharmacyLabels, qualificationLabels, type MemberDetail, type MemberPharmacy, type MemberWorkMode } from './member-workspace-model';
+import { canActivatePharmacy, memberError, memberServiceLabels, pharmacyActions, pharmacyLabels, qualificationLabels, type MemberDetail, type MemberPharmacy, type MemberWorkMode } from './member-workspace-model';
 
 const base = '/qualifications/pharmacist';
 function fieldText(value: unknown): string {
@@ -25,8 +26,8 @@ const actionLabels: Record<string, string> = {
 };
 const legacyBusinessLabels: Record<string, string> = { name: '과거 사업장명', businessNumber: '과거 사업자번호', representativeName: '과거 대표자명', businessType: '과거 업태', businessCategory: '과거 종목', businessEntityType: '과거 사업자 구분', businessStartDate: '과거 개업일', address: '과거 주소', addressDetail: '과거 상세 주소', contactName: '과거 담당자', managerPhone: '과거 담당자 전화번호', taxInvoiceEmail: '과거 세금계산서 이메일' };
 type Decision = { kind: 'qualification' | 'pharmacy' | 'account'; action: string; label: string; pharmacyId?: string };
-export default function MemberWorkPanel({ detail, actorId, busy, perform, onBusyChange, mode='detail' }: Readonly<{
-  onBusyChange:(busy:boolean)=>void; mode?:MemberWorkMode; detail: MemberDetail; actorId: string; busy: boolean; perform: (work: () => Promise<unknown>) => Promise<void>;
+export default function MemberWorkPanel({ detail, actorId, busy, perform, onBusyChange, mode='detail', adminMode=false, onErasureResult }: Readonly<{
+  onErasureResult?:(result:import('@/types/user').UserErasureResult)=>void; adminMode?:boolean; onBusyChange:(busy:boolean)=>void; mode?:MemberWorkMode; detail: MemberDetail; actorId: string; busy: boolean; perform: (work: () => Promise<unknown>) => Promise<void>;
 }>) {
   const { member, qualification, permissions } = detail;
   const [decision, setDecision] = useState<Decision | null>(mode==='reject'?{kind:'account',action:'reject',label:'가입 거부'}:null), [reason, setReason] = useState(''), [confirmed, setConfirmed] = useState(false);
@@ -44,11 +45,12 @@ export default function MemberWorkPanel({ detail, actorId, busy, perform, onBusy
     } catch (error) { setDocumentError(memberError(error)); }
   };
   return <div className="space-y-5">
-    {mode==='delete' && <section aria-label="회원 삭제" className="rounded border border-red-300 bg-white p-4 space-y-3"><h4 className="font-semibold">회원 삭제</h4><p>전체 계정 삭제는 서비스 사용중지·보존 대상 검토 후 기존 계정 제거 절차로 진행합니다. 처리 대기와 제거 완료를 구분합니다.</p>{permissions.erase && actorId!==member.userId?<AccountErasureControls onBusyChange={onBusyChange} accountId={actorId} userId={member.userId} onCompleted={()=>{void perform(async()=>undefined);}}/>:<p>전체 관리자 권한이 필요하며 본인 계정은 여기서 삭제할 수 없습니다.</p>}</section>}
+    {adminMode && mode==='delete' && <section aria-label="계정·개인자료 완전삭제" className="rounded border border-red-300 bg-white p-4 space-y-3"><h4 className="font-semibold">계정·개인자료 완전삭제</h4><p>이용 정지는 접근을 차단하고 자료를 유지합니다. 완전삭제는 계정과 개인 자료를 삭제합니다. 직원의 업무 자료는 사업체에 남습니다. 약국 매도는 경영자 이전, 완전폐업은 약국 자료 삭제로 처리하며 공급자 제품·거래 자료는 별도로 처리합니다.</p>{permissions.erase && actorId!==member.userId?<AccountErasureControls onResult={onErasureResult} onBusyChange={onBusyChange} accountId={actorId} userId={member.userId} onCompleted={()=>{void perform(async()=>undefined);}}/>:<p>전체 관리자 권한이 필요하며 본인 계정은 여기서 삭제할 수 없습니다.</p>}</section>}
+    <MemberLifecycleActions adminMode={adminMode} initialAction={!adminMode&&mode==='delete'?'terminate':null} detail={detail} actorId={actorId} busy={busy} perform={perform} />
     <h4 className="font-bold">{member.name || '회원'} · {member.email}</h4>
     <dl className="grid grid-cols-1 gap-3 md:grid-cols-3">
       <Field label="이름" value={member.name} /><Field label="닉네임" value={member.nickname} /><Field label="휴대전화" value={member.phone} />
-      <Field label="계정 상태" value={member.accountStatus} /><Field label="이메일 확인" value={member.emailVerified} /><Field label="가입일" value={member.joinedAt} />
+      <Field label="Neture 이용" value={memberServiceLabels[member.serviceStatus ?? ""] ?? "확인 필요"} /><Field label="공통 계정 상태" value={member.accountActive===false?'비활성':member.accountStatus} /><Field label="이메일 확인" value={member.emailVerified} /><Field label="가입일" value={member.joinedAt} />
     </dl>
     {permissions.edit && <button type="button" disabled={busy} onClick={() => { setEditing(true); setDecision(null); setReason(''); }}>기본정보 정정</button>}
     <section className="space-y-2"><h4 className="font-semibold">약사 자격과 면허 입력 출처</h4>
