@@ -2,6 +2,8 @@
 module.exports = {
   preset: 'ts-jest',
   testEnvironment: "node",
+  // Only shard assignment changes; Jest's sort/cache and unsharded runs stay standard.
+  testSequencer: '<rootDir>/src/__tests__/setup/jest-shard-sequencer.cjs',
   passWithNoTests: true,
   roots: ['<rootDir>/src'],
   testMatch: [
