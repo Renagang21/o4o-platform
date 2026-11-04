@@ -1,3 +1,4 @@
+import {correctIdentity,type MemberCorrection} from './member-profile-corrections.js';
 import { buildBusinessInfoUpdateStatement } from '../../utils/business-info-write.js';
 import type { DataSource, EntityManager } from 'typeorm';
 import { centralOperationRoles } from './central-operation-access.js';
@@ -11,7 +12,7 @@ export type MemberTask = 'all' | 'qualifications' | 'pharmacies' | 'corrections'
 const version = `to_char(u."updatedAt",'YYYY-MM-DD"T"HH24:MI:SS.US')`;
 const identity = `u.id AS "userId",u.name,u.nickname,u.email,u.phone,u.status AS "accountStatus",
  u."isActive" AS "accountActive",(SELECT sm.status FROM service_memberships sm WHERE sm.user_id=u.id AND sm.service_key='neture') AS "membershipStatus",
- u."isEmailVerified" AS "emailVerified",u."createdAt" AS "joinedAt",${version} AS version`;
+ u."isEmailVerified" AS "emailVerified",EXISTS(SELECT 1 FROM user_password_credentials pc WHERE pc.user_id=u.id) AS "hasPassword",u."createdAt" AS "joinedAt",${version} AS version`;
 const pharmacyExists = (status: string) => `EXISTS(SELECT 1 FROM neture_pharmacy_memberships n WHERE n.applicant_user_id=u.id AND n.status='${status}')`;
 const privateValue = (value: unknown) => ({ toPostgres: () => value, toJSON: () => '[redacted]' });
 
@@ -98,14 +99,14 @@ export class CentralMemberWorkspaceService {
       o.metadata->>'contactEmail' AS "contactEmail",o.metadata->>'taxInvoiceEmail' AS "taxInvoiceEmail"
       FROM neture_pharmacy_memberships n JOIN organizations o ON o.id=n.organization_id
       WHERE n.applicant_user_id=$1 ORDER BY n.applied_at DESC,n.id`, [target]) : [];
-    const actions = ['member.profile_corrected','member.legacy_business_corrected','member.registration_rejected', ...(permissions.pharmacies ? ['member.pharmacy_profile_corrected'] : []), ...(permissions.qualifications ? ['qualification.pharmacist_requested', 'qualification.pharmacist_approved', 'qualification.pharmacist_rejected', 'qualification.pharmacist_revoked'] : [])];
+    const actions = ['member.profile_corrected','member.license_corrected','member.temporary_password_issued','member.legacy_business_corrected','member.registration_rejected', ...(permissions.pharmacies ? ['member.pharmacy_profile_corrected'] : []), ...(permissions.qualifications ? ['qualification.pharmacist_requested', 'qualification.pharmacist_approved', 'qualification.pharmacist_rejected', 'qualification.pharmacist_revoked'] : [])];
     const history = await this.db.query(`SELECT action_key AS action,created_at AS "createdAt",user_id AS "actorId",meta->>'reason' AS reason
       FROM action_logs WHERE service_key='neture' AND meta->>'targetUserId'=$1 AND action_key=ANY($2::text[])
       ORDER BY created_at DESC,id DESC LIMIT 30`, [target, actions]);
     return { member, qualification: qualification ?? null, legacyLicense, legacyBusiness, pharmacies, history, permissions };
   }
 
-  async correct(actor: string, target: string, input: { name: string; nickname: string; phone: string; reason: string; version: string }) {
+  async correct(actor: string, target: string, input: MemberCorrection) {
     const reason = operationReason(input.reason);
     const phone = normalizePhoneDigits(input.phone);
     if (input.phone.trim() && !isPhoneShapeValid(input.phone)) throw new OperationError(400, 'INVALID_PHONE', '올바른 국내 휴대전화 번호를 입력해 주세요.');
@@ -117,11 +118,15 @@ export class CentralMemberWorkspaceService {
       const [before] = await manager.query(`SELECT ${identity} FROM users u WHERE u.id=$1 FOR UPDATE`, [target]);
       if (!before) throw new OperationError(404, 'MEMBER_NOT_FOUND', '회원을 찾을 수 없습니다.');
       if (before.version !== input.version) throw new OperationError(409, 'MEMBER_CHANGED', '회원 정보가 변경되었습니다. 다시 조회한 뒤 정정해 주세요.');
-      await manager.query(`UPDATE users SET name=$2,nickname=$3,phone=$4,"updatedAt"=now() WHERE id=$1`,
+      const result=await correctIdentity(manager,actor,target,before,access,input);
+      await manager.query(`UPDATE users SET name=$2,nickname=$3,phone=$4,"updatedAt"=clock_timestamp() WHERE id=$1`,
         [target, privateValue(input.name), privateValue(input.nickname || null), privateValue(phone || null)]);
       await recordOperation(manager, 'neture', actor, 'member.profile_corrected', { targetUserId: target, reason,
-        previous: { name: before.name, nickname: before.nickname, phone: before.phone }, next: { name: input.name, nickname: input.nickname, phone } });
-      return { saved: true };
+        previous: { name: before.name, nickname: before.nickname, phone: before.phone,...(result.emailChanged?{email:before.email}:{}) }, next: { name: input.name, nickname: input.nickname, phone,...(result.emailChanged?{email:input.email?.trim().toLowerCase()}:{}) } });
+      return { saved: true, ...result };
+    }).catch((error:unknown)=>{
+      if((error as {code?:string}).code==='23505')throw new OperationError(409,'EMAIL_IN_USE','이미 가입된 이메일입니다.');
+      throw error;
     });
   }
   async rejectRegistration(actor: string, target: string, input: {reason: string; version: string}) {
@@ -163,22 +168,27 @@ export class CentralMemberWorkspaceService {
   async correctPharmacy(actor: string, target: string, id: string, input: {fields: Record<string,string>; reason: string; version: string; evidenceConfirmed: true}) {
     const reason=operationReason(input.reason), f=input.fields;
     if (!/^\d{10}$/.test(f.businessNumber)) throw new OperationError(400,'INVALID_BUSINESS_NUMBER','사업자등록번호 10자리를 입력해 주세요.');
+    if (f.licenseNumber !== undefined && [...f.licenseNumber.trim()].length > 30) throw new OperationError(400,'INVALID_LICENSE_NUMBER','약국 신청 면허번호는 30자 이내로 입력해 주세요.');
     return this.db.transaction(async manager=>{
       const access=await memberWorkspaceAccess(manager,actor,true);
       if (!access.edit || !access.pharmacies) throw new OperationError(403,'PHARMACY_REVIEW_REQUIRED','약국 정보 정정 업무 위임이 필요합니다.');
-      const [before]=await manager.query(`SELECT n.organization_id AS "organizationId",n.pharmacy_name AS name,n.business_number AS "businessNumber",o.address,o.phone,o.metadata,md5(to_jsonb(n)::text||to_jsonb(o)::text) AS version
+      const [before]=await manager.query(`SELECT n.organization_id AS "organizationId",n.pharmacy_name AS name,n.business_number AS "businessNumber",n.pharmacist_license_number AS "licenseNumber",n.status,o.address,o.phone,o.metadata,md5(to_jsonb(n)::text||to_jsonb(o)::text) AS version
         FROM neture_pharmacy_memberships n JOIN organizations o ON o.id=n.organization_id WHERE n.id=$1 AND n.applicant_user_id=$2 FOR UPDATE OF n,o`,[id,target]);
       if (!before) throw new OperationError(404,'PHARMACY_NOT_FOUND','해당 회원의 약국 신청을 찾을 수 없습니다.');
       if (before.version!==input.version) throw new OperationError(409,'PHARMACY_CHANGED','약국 정보가 변경되었습니다. 다시 조회해 주세요.');
+      if(f.licenseNumber!==undefined&&f.licenseNumber!==before.licenseNumber&&['active','suspended'].includes(before.status)){
+        const [qualified]=await manager.query(`SELECT 1 FROM kpa_pharmacist_profiles WHERE user_id=$1 AND BTRIM(license_number)=$2 AND qualification_status='approved' AND license_verified=true AND verified_at IS NOT NULL AND verified_by IS NOT NULL`,[target,privateValue(f.licenseNumber)]);
+        if(!qualified)throw new OperationError(409,'QUALIFICATION_LICENSE_MISMATCH','승인된 약국의 면허 변경은 일치하는 약사 자격을 먼저 확인해 주세요.');
+      }
       const [duplicate]=await manager.query(`SELECT 1 FROM neture_pharmacy_memberships WHERE business_number=$1 AND status IN ('pending','active','suspended') AND id<>$2 LIMIT 1`,[f.businessNumber,id]);
       if (duplicate) throw new OperationError(409,'BUSINESS_NUMBER_IN_USE','이미 사용 중인 사업자등록번호입니다.');
       const [shared]=await manager.query(`SELECT 1 FROM neture_pharmacy_memberships WHERE organization_id=$1 AND applicant_user_id<>$2 LIMIT 1`,[before.organizationId,target]);
       if (shared) throw new OperationError(409,'PHARMACY_SHARED_ORGANIZATION','조직과 신청자 연결을 먼저 확인해야 합니다.');
-      await manager.query(`UPDATE neture_pharmacy_memberships SET pharmacy_name=$2,business_number=$3,updated_at=clock_timestamp() WHERE id=$1`,[id,privateValue(f.name),privateValue(f.businessNumber)]);
+      await manager.query(`UPDATE neture_pharmacy_memberships SET pharmacy_name=$2,business_number=$3,pharmacist_license_number=COALESCE($4,pharmacist_license_number),updated_at=clock_timestamp() WHERE id=$1`,[id,privateValue(f.name),privateValue(f.businessNumber),privateValue(f.licenseNumber??null)]);
       const profile={businessName:f.name,businessNumber:f.businessNumber,representativeName:f.representativeName,businessType:f.businessType,businessCategory:f.businessCategory,address:f.address};
       const contacts={contactName:f.contactName,managerPhone:f.managerPhone,contactEmail:f.contactEmail,taxInvoiceEmail:f.taxInvoiceEmail};
       await manager.query(`UPDATE organizations SET name=$2,business_number=$3,address=$4,phone=$5,"updatedAt"=clock_timestamp(),metadata=COALESCE(metadata,'{}'::jsonb)||$6::jsonb||jsonb_build_object('businessProfile',(CASE WHEN jsonb_typeof(metadata->'businessProfile')='object' THEN metadata->'businessProfile' ELSE '{}'::jsonb END)||$7::jsonb) WHERE id=$1`,[before.organizationId,privateValue(f.name),privateValue(f.businessNumber),privateValue(f.address),privateValue(f.phone),privateValue(JSON.stringify(contacts)),privateValue(JSON.stringify(profile))]);
-      await recordOperation(manager,'neture',actor,'member.pharmacy_profile_corrected',{targetUserId:target,pharmacyId:id,reason,evidenceConfirmed:input.evidenceConfirmed,previous:{name:before.name,businessNumber:before.businessNumber,address:before.address,phone:before.phone,...Object.fromEntries(['representativeName','businessType','businessCategory'].map(key=>[key,before.metadata?.businessProfile?.[key]??null])),...Object.fromEntries(['contactName','managerPhone','contactEmail','taxInvoiceEmail'].map(key=>[key,before.metadata?.[key]??null]))},next:f});
+      await recordOperation(manager,'neture',actor,'member.pharmacy_profile_corrected',{targetUserId:target,pharmacyId:id,reason,evidenceConfirmed:input.evidenceConfirmed,previous:{name:before.name,businessNumber:before.businessNumber,licenseNumber:before.licenseNumber,address:before.address,phone:before.phone,...Object.fromEntries(['representativeName','businessType','businessCategory'].map(key=>[key,before.metadata?.businessProfile?.[key]??null])),...Object.fromEntries(['contactName','managerPhone','contactEmail','taxInvoiceEmail'].map(key=>[key,before.metadata?.[key]??null]))},next:f});
       return {saved:true};
     }).catch((error:unknown)=>{
       if((error as {code?:string}).code==='23505')throw new OperationError(409,'BUSINESS_NUMBER_IN_USE','이미 사용 중인 사업자등록번호입니다.');

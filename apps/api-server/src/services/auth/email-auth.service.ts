@@ -315,7 +315,7 @@ export class EmailAuthService {
     });
   }
 
-  /** Social callers must first prove the linked provider identity; this does not open an HTTP route. */
+  /** Trusted callers first prove provider identity or central member authority; public resend stays scoped. */
   async sendVerificationMail(
     user: User,
     sessionServiceKey: string | null,
@@ -434,7 +434,7 @@ export class EmailAuthService {
   }
   async getPasswordStatus(
     userId: string,
-  ): Promise<{ hasPassword: boolean; canManage: boolean }> {
+  ): Promise<{ hasPassword: boolean; canManage: boolean; temporaryExpiresAt?: string | null }> {
     return this.recovery.getPasswordStatus(userId);
   }
   async findLoginId(input: {

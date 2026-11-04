@@ -351,6 +351,9 @@ export const EXPECTED_SCHEMA_STATES: readonly ExpectedSchemaState[] = [
   { appliedThrough: 'CompleteMemberErasureFences1793684890120', fingerprint: '894ee65f5593ca245bf16872ef0ea64e3eed387c69ee144d578c98b94b34df47', fingerprintLineCount: 7426 },
   { appliedThrough: 'SeparateMemberResourceOwnership1793691490120', fingerprint: '8f1a89e4a4b1b02b655bc81f4250493db071fdb2a10cafd33c525f8fcf412044', fingerprintLineCount: 7446 },
   { appliedThrough: 'FenceClosedPharmacyWriters1793698990120', fingerprint: '9c5e1bb5494257c578430da1cd297a5a56438ab8e369f619b7db19c3f0cebe76', fingerprintLineCount: 7552 },
+  // Isolated PostgreSQL15 canonical bootstrap + all incremental migrations (2026-11-04).
+  {appliedThrough:'AddTemporaryPasswordExpiry1793750400000',fingerprint:'54c2a438578eba53484d8f2fd473019d6c119efc12946274fec9bd700d421fba',fingerprintLineCount:7553},
+
 ] as const;
 
 /** Expected state after `prefixLength` incremental migrations; undefined when not registered. */

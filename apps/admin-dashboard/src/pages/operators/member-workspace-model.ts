@@ -1,7 +1,7 @@
 export type MemberTask = 'all' | 'qualifications' | 'pharmacies' | 'corrections';
 export interface MemberPermissions { qualifications: boolean; pharmacies: boolean; applications?: boolean; edit: boolean; manageAccount?: boolean; erase?: boolean }
 export interface MemberRow { userId: string; name: string | null; email: string; accountStatus: string; accountActive?:boolean; serviceStatus?: string; qualificationStatus: string; pharmacyStatus: string | null }
-export interface MemberProfile { userId: string; name: string | null; nickname: string | null; email: string; phone: string | null; accountStatus: string; accountActive?:boolean; serviceStatus?: string; emailVerified: boolean; joinedAt: string; version: string }
+export interface MemberProfile { hasPassword?:boolean; userId: string; name: string | null; nickname: string | null; email: string; phone: string | null; accountStatus: string; accountActive?:boolean; serviceStatus?: string; emailVerified: boolean; joinedAt: string; version: string }
 export interface Qualification { licenseNumber: string | null; status: string; reason: string | null; approvedAt: string | null; reviewedBy: string | null; version: string }
 export interface MemberPharmacy {
   id: string; version?: string; organizationId: string; name: string; businessNumber: string; licenseNumber: string; status: string; reason: string | null;
