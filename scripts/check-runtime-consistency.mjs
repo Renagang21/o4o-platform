@@ -15,8 +15,13 @@ assert.match(read('.npmrc'), /^verify-store-integrity=true$/m, 'Keep store integ
 const setup = read('.github/actions/setup-build-env/action.yml');
 const pnpmDefault = /pnpm-version:\s*\n[\s\S]*?default:\s*['"]([^'"]+)/.exec(setup);
 assert.equal(pnpmDefault?.[1], volta.pnpm, 'The CI pnpm default must match volta.pnpm');
+const packagedNode = /export const NODE_VERSION = ['"]([^'"]+)/.exec(read('tools/o4o-local-agent/release/build-release.mjs'))?.[1];
+assert.match(packagedNode, /^22\.\d+\.\d+$/, 'The separately packaged PC runtime must remain Node 22');
+const installerNode = /manifest\.nodeVersion !== ['"]([^'"]+)/.exec(read('tools/o4o-local-agent/release/install-core.mjs'))?.[1];
+assert.equal(installerNode, packagedNode, 'The PC installer manifest check must match its packaged runtime');
 
 let workflowPins = 0;
+let packagedPins = 0;
 function checkWorkflows(dir) {
   for (const entry of readdirSync(path.join(root, dir), { withFileTypes: true })) {
     const name = `${dir}/${entry.name}`;
@@ -25,8 +30,12 @@ function checkWorkflows(dir) {
       const text = read(name);
       // Retired workflows are historical records and cannot execute their jobs.
       if (/^name:.*RETIRED/m.test(text)) continue;
+      const jobs = [...text.matchAll(/^  ([\w-]+):\s*$/gm)];
       for (const match of text.matchAll(/^\s*(?:node-version|NODE_VERSION):\s*['"]?(\d+\.\d+\.\d+)/gm)) {
-        assert.equal(match[1], volta.node, `${name}: Node pin differs from volta.node`);
+        const pcInstaller = name === '.github/workflows/ci-pipeline.yml' && jobs.findLast(job => job.index < match.index)?.[1] === 'pc-installer-windows';
+        const expected = pcInstaller ? packagedNode : volta.node;
+        assert.equal(match[1], expected, `${name}: Node pin differs from ${pcInstaller ? 'the packaged PC runtime' : 'volta.node'}`);
+        if (pcInstaller) packagedPins++;
         workflowPins++;
       }
       const input = /node-version:\s*\n[\s\S]*?default:\s*['"](\d+\.\d+\.\d+)/.exec(text);
@@ -39,6 +48,7 @@ function checkWorkflows(dir) {
 }
 checkWorkflows('.github');
 assert.ok(workflowPins > 0, 'No workflow runtime pins were checked');
+assert.equal(packagedPins, 1, 'Check the Windows installer against its packaged runtime');
 
 let dockerStages = 0;
 for (const dir of ['apps', 'services']) {
@@ -67,4 +77,4 @@ for (const dir of ['apps', 'services']) {
 }
 assert.ok(dockerStages > 0, 'No Docker Node stages were checked');
 assert.ok(!setup.includes('--no-frozen-lockfile'), 'CI must not resolve an unlocked dependency tree');
-console.log(`Runtime consistency PASS: Node ${volta.node}, pnpm ${volta.pnpm}; ${workflowPins} workflow pins, ${dockerStages} Docker stages`);
+console.log(`Runtime consistency PASS: Node ${volta.node}, pnpm ${volta.pnpm}; ${workflowPins} workflow pins (${packagedPins} PC runtime ${packagedNode}), ${dockerStages} Docker stages`);

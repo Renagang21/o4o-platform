@@ -75,6 +75,8 @@ Node 버전을 바꾼 뒤에는 기존 `node_modules`를 다른 major의 바이�
 Windows Local Agent의 오프라인 패키지에 내장되는 Node **22.18.0**은 별도 배포 계약입니다.
 실제 Windows 설치 검증 전에는 `tools/o4o-local-agent/release/`의 버전과 manifest 검사를
 서버 런타임에 맞춰 일괄 변경하지 않습니다.
+Windows installer CI도 패키지에 실제로 넣는 실행 파일을 검사하므로 **22.18.0**을 사용합니다.
+`check:runtime`은 이 job과 installer manifest를 서버 버전이 아닌 내장 런타임 버전에 대조합니다.
 
 > `package.json`의 `engines.pnpm` 은 아직 `>=9.0.0` 으로 남아 있으나, 실제 기준은 위
 > `volta.pnpm` (10.25.0) 입니다. pnpm 9 로는 lockfile 형식이 어긋날 수 있습니다.
