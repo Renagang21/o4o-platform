@@ -233,6 +233,7 @@ jobs:
         scripts/ci/__tests__/detect-affected.test.mjs
         scripts/ci/__tests__/actions-cost.test.mjs
         scripts/ci/__tests__/api-build-cache.test.mjs
+        scripts/ci/__tests__/api-runtime-dependencies.test.mjs
         scripts/ci/__tests__/quality-package-build.test.mjs
         scripts/ci/__tests__/deploy-risk.test.mjs
         scripts/ci/__tests__/ci-gate.test.mjs
@@ -947,10 +948,41 @@ jobs:
         CANDIDATE_WORKFLOW_CI_PORT: '55432'
       run: pnpm --filter @o4o/api-server exec jest --runInBand --runTestsByPath src/modules/neture/services/__tests__/candidate-workflow.postgres.spec.ts src/modules/neture/services/__tests__/product-trash-batch.postgres.spec.ts
 
+  # Check the actual npm tree used by Docker in parallel with the long Jest jobs.
+  api-runtime-dependencies:
+    name: API production dependency smoke
+    permissions:
+      contents: read
+    runs-on: ubuntu-latest
+    needs: [detect]
+    if: needs.detect.outputs.defer_full != 'true' && (needs.detect.outputs.api_affected == 'true' || needs.detect.outputs.global_or_unknown == 'true')
+    timeout-minutes: 10
+    steps:
+    - uses: actions/checkout@v6
+      with:
+        sparse-checkout: |
+          apps/api-server/package.production.json
+          apps/api-server/package.production-lock.json
+          scripts/ci/smoke-api-runtime.mjs
+        sparse-checkout-cone-mode: false
+    - uses: actions/setup-node@v7
+      with:
+        node-version: '22.23.4'
+        cache: npm
+        cache-dependency-path: apps/api-server/package.production-lock.json
+    - name: Install the frozen production dependency tree
+      run: |
+        mkdir -p "$RUNNER_TEMP/api-runtime"
+        cp apps/api-server/package.production.json "$RUNNER_TEMP/api-runtime/package.json"
+        cp apps/api-server/package.production-lock.json "$RUNNER_TEMP/api-runtime/package-lock.json"
+        npm ci --prefix "$RUNNER_TEMP/api-runtime" --omit=dev --ignore-scripts --no-audit --no-fund
+    - name: Verify dependency loading and native image processing
+      run: node scripts/ci/smoke-api-runtime.mjs "$RUNNER_TEMP/api-runtime"
+
   ci-gate:
     name: CI Gate
     runs-on: ubuntu-latest
-    needs: [detect, quality-check, api-tests, build, web-build, docs-fast-validate, admin-fast-validate, admin-fast-guards, docs-sensitive-guard, pc-installer-windows, central-operator-integration]
+    needs: [detect, quality-check, api-tests, build, web-build, docs-fast-validate, admin-fast-validate, admin-fast-guards, docs-sensitive-guard, pc-installer-windows, central-operator-integration, api-runtime-dependencies]
     if: always()
     timeout-minutes: 5
     steps:

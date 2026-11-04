@@ -84,7 +84,8 @@
     "// === Phase R10: AppStore Guard ===": "",
     "verify:appstore": "npx ts-node --esm scripts/appstore-guard.ts",
     "prepare": "husky",
-    "check:runtime": "node scripts/check-runtime-consistency.mjs"
+    "check:runtime": "node scripts/check-runtime-consistency.mjs && node scripts/ci/api-runtime-dependencies.mjs",
+    "sync:api-runtime": "node scripts/ci/api-runtime-dependencies.mjs --write"
   },
   "devDependencies": {
     "@capacitor/cli": "^7.4.4",

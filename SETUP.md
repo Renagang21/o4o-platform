@@ -78,6 +78,43 @@ Windows Local Agent의 오프라인 패키지에 내장되는 Node **22.18.0**�
 Windows installer CI도 패키지에 실제로 넣는 실행 파일을 검사하므로 **22.18.0**을 사용합니다.
 `check:runtime`은 이 job과 installer manifest를 서버 버전이 아닌 내장 런타임 버전에 대조합니다.
 
+### API 테스트·운영 의존성 일치
+
+API의 외부 실행 의존성은 `pnpm-lock.yaml`의 `apps/api-server` importer에서 해결된
+**정확한 버전**을 `package.production.json`에 생성합니다. Docker의 npm 설치 방식은 유지합니다.
+`pnpm run check:runtime`은 운영 manifest와 `package.production-lock.json`의 최상위 설치 버전까지
+대조하며, CI의 별도 병렬 job은 Docker와 같은 `npm ci --omit=dev --ignore-scripts` 설치 후
+각 의존성의 로딩과 Sharp 네이티브 PNG 생성을 검사합니다. 애플리케이션이나 DB는 시작하지 않습니다.
+
+workspace 패키지는 API bundle에 포함되므로 이 manifest에서 제외하며 `@types/*`도 제외합니다.
+명시적 예외는 기존 운영 전용 `@nestjs/platform-express` **10.4.22**, TypeORM **CI 0.3.27 / 운영 0.3.31**입니다.
+TypeORM은 API만 올리면 공통 패키지와 `DataSource` 타입 identity가 달라져 컴파일이 실패하므로,
+기존 운영의 보안 패치와 기존 CI 타입 구성을 보존합니다. 공통 workspace 전체를 함께 정렬하는 후속 작업이 필요합니다.
+이 ORM 정렬·adapter 필요성 정리와 npm/pnpm의 **전이 의존성 전체 일치**는 별도 후속 범위이며,
+이번 검사가 두 설치 트리 전체의 동일성을 보장하지는 않습니다.
+
+API 의존성을 의도적으로 변경한 뒤에는 일반 frozen 설치를 바꾸지 않고 다음과 같이 갱신합니다
+(PowerShell 예시, §1의 Node/npm/pnpm 사용). 임시 폴더를 사용해 workspace의 `node_modules`를 건드리지 않습니다.
+
+```powershell
+pnpm run sync:api-runtime
+if ($LASTEXITCODE -ne 0) { throw 'Runtime manifest generation failed' }
+$runtime = Join-Path ([IO.Path]::GetTempPath()) ('o4o-runtime-' + [guid]::NewGuid())
+New-Item -ItemType Directory $runtime | Out-Null
+Copy-Item apps/api-server/package.production.json (Join-Path $runtime 'package.json')
+Copy-Item apps/api-server/package.production-lock.json (Join-Path $runtime 'package-lock.json')
+npm install --prefix $runtime --package-lock-only --ignore-scripts --omit=dev --no-audit --no-fund
+if ($LASTEXITCODE -ne 0) { throw 'Runtime lock generation failed; do not copy the lock' }
+Copy-Item (Join-Path $runtime 'package-lock.json') apps/api-server/package.production-lock.json
+pnpm run check:runtime
+```
+
+생성된 두 파일과 API 의존성 변경을 함께 검토·커밋합니다. 잠금 없이 설치하는 fallback은 추가하지 않습니다.
+기존 운영 버전이 CI보다 최신이면 오래된 CI 버전으로 단순 하향하지 않습니다. Node 22 호환 범위에서
+운영 버전을 보존하며 API manifest와 pnpm 잠금을 먼저 맞춘 뒤 재검증합니다. 의존성 변경 시 기존 운영
+잠금과 변경 잠금의 `npm audit --omit=dev --package-lock-only --json` 결과도 비교하며, 전체 보안 정비용
+`npm audit fix`나 주 버전 일괄 갱신으로 범위를 넓히지 않습니다.
+
 > `package.json`의 `engines.pnpm` 은 아직 `>=9.0.0` 으로 남아 있으나, 실제 기준은 위
 > `volta.pnpm` (10.25.0) 입니다. pnpm 9 로는 lockfile 형식이 어긋날 수 있습니다.
 
