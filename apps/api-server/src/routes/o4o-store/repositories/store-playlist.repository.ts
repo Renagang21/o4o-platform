@@ -19,6 +19,7 @@ import { AssetCopyService } from '@o4o/asset-copy-core';
 export interface PlaylistDto {
   id: string;
   name: string;
+  tags: string[];
   playlistType: string;
   publishStatus: string;
   isActive: boolean;
@@ -32,6 +33,7 @@ export interface PlaylistDto {
 export interface PlaylistCreateDto {
   id: string;
   name: string;
+  tags: string[];
   playlistType: string;
   publishStatus: string;
   isActive: boolean;
@@ -41,6 +43,7 @@ export interface PlaylistCreateDto {
 export interface PlaylistUpdateDto {
   id: string;
   name: string;
+  tags: string[];
   playlistType: string;
   publishStatus: string;
   isActive: boolean;
@@ -114,7 +117,7 @@ export class StorePlaylistRepository {
    *   태블릿 전용('tablet_idle') 항목이 사이니지 재생 목록에 섞여 들어갔다.
    *   canonical Tablet idle resolver 가 `IN ('tablet_idle','both')` 를 읽는 것과 대칭으로
    *   여기서는 `IN ('signage','both')` 만 읽는다.
-   *   편집용 findPlaylistItems() 는 playback reader 가 아니므로 전체 surface 를 유지한다.
+   *   매장 편집용 reader도 현재 유효한 signage 필수 영상만 합산한다. 운영자 관리 목록과 구분한다.
    */
   async findPublicPlaylistItems(playlistId: string, serviceKey?: string): Promise<PlaylistItemDto[]> {
     if (serviceKey) {
@@ -125,7 +128,7 @@ export class StorePlaylistRepository {
            i.display_order AS "displayOrder",
            i.is_forced AS "isForced",
            s.title,
-           s.content_json AS "contentJson",
+           (s.content_json::jsonb || jsonb_build_object('forcedStartAt', i.forced_start_at AT TIME ZONE 'UTC', 'forcedEndAt', i.forced_end_at AT TIME ZONE 'UTC')) AS "contentJson",
            NULL::uuid AS "forcedMediaId"
          FROM store_playlist_items i
          JOIN o4o_asset_snapshots s ON s.id = i.snapshot_id
@@ -134,7 +137,7 @@ export class StorePlaylistRepository {
              i.is_forced = false
              OR (
                (i.forced_start_at IS NULL OR NOW() >= i.forced_start_at)
-               AND (i.forced_end_at IS NULL OR NOW() <= i.forced_end_at)
+               AND (i.forced_end_at IS NULL OR NOW() < i.forced_end_at)
              )
            )
 
@@ -150,7 +153,8 @@ export class StorePlaylistRepository {
              'url', fc.video_url,
              'sourceType', fc.source_type,
              'embedId', fc.embed_id,
-             'thumbnailUrl', fc.thumbnail_url
+             'thumbnailUrl', fc.thumbnail_url,
+             'forcedStartAt', fc.start_at, 'forcedEndAt', fc.end_at
            )::jsonb AS "contentJson",
            fc.media_id AS "forcedMediaId"
          FROM signage_forced_content fc
@@ -161,7 +165,7 @@ export class StorePlaylistRepository {
            AND fc.deleted_at IS NULL
            AND fc.target_surface IN ('signage','both')
            AND NOW() >= fc.start_at
-           AND NOW() <= fc.end_at
+           AND NOW() < fc.end_at
 
          ORDER BY "displayOrder" ASC`,
         [playlistId, serviceKey],
@@ -175,7 +179,7 @@ export class StorePlaylistRepository {
          i.display_order AS "displayOrder",
          i.is_forced AS "isForced",
          s.title,
-         s.content_json AS "contentJson"
+         (s.content_json::jsonb || jsonb_build_object('forcedStartAt', i.forced_start_at AT TIME ZONE 'UTC', 'forcedEndAt', i.forced_end_at AT TIME ZONE 'UTC')) AS "contentJson"
        FROM store_playlist_items i
        JOIN o4o_asset_snapshots s ON s.id = i.snapshot_id
        WHERE i.playlist_id = $1
@@ -183,7 +187,7 @@ export class StorePlaylistRepository {
            i.is_forced = false
            OR (
              (i.forced_start_at IS NULL OR NOW() >= i.forced_start_at)
-             AND (i.forced_end_at IS NULL OR NOW() <= i.forced_end_at)
+             AND (i.forced_end_at IS NULL OR NOW() < i.forced_end_at)
            )
          )
        ORDER BY i.display_order ASC`,
@@ -195,19 +199,23 @@ export class StorePlaylistRepository {
   // PLAYLIST CRUD (auth)
   // ═══════════════════════════════════════════════════
 
-  async findPlaylistsByOrganization(organizationId: string): Promise<PlaylistDto[]> {
+  async findPlaylistsByOrganization(organizationId: string, serviceKey?: string): Promise<PlaylistDto[]> {
     const rows: any[] = await this.dataSource.query(
-      `SELECT
+      `WITH required AS (SELECT COUNT(*)::int AS count FROM signage_forced_content
+        WHERE service_key = $2 AND is_active = true AND deleted_at IS NULL
+          AND target_surface IN ('signage','both') AND NOW() >= start_at AND NOW() < end_at)
+       SELECT
          p.id,
          p.name,
+         p.tags,
          p.playlist_type AS "playlistType",
          p.publish_status AS "publishStatus",
          p.is_active AS "isActive",
          p.source_playlist_id AS "sourcePlaylistId",
          p.created_at AS "createdAt",
          p.updated_at AS "updatedAt",
-         COALESCE(ic.item_count, 0)::int AS "itemCount",
-         COALESCE(ic.forced_count, 0)::int AS "forcedCount"
+         (COALESCE(ic.item_count, 0) + (SELECT count FROM required))::int AS "itemCount",
+         (COALESCE(ic.forced_count, 0) + (SELECT count FROM required))::int AS "forcedCount"
        FROM store_playlists p
        LEFT JOIN (
          SELECT
@@ -215,11 +223,12 @@ export class StorePlaylistRepository {
            COUNT(*)::int AS item_count,
            COUNT(*) FILTER (WHERE is_forced = true)::int AS forced_count
          FROM store_playlist_items
+         WHERE is_forced = false OR ((forced_start_at IS NULL OR NOW() >= forced_start_at) AND (forced_end_at IS NULL OR NOW() < forced_end_at))
          GROUP BY playlist_id
        ) ic ON ic.playlist_id = p.id
        WHERE p.organization_id = $1 AND p.is_active = true
        ORDER BY p.updated_at DESC`,
-      [organizationId],
+      [organizationId, serviceKey ?? null],
     );
     return rows;
   }
@@ -228,16 +237,28 @@ export class StorePlaylistRepository {
     organizationId: string,
     name: string,
     playlistType: 'SINGLE' | 'LIST',
+    tags: string[] = [],
+    clientRequestId?: string,
   ): Promise<PlaylistCreateDto> {
+    if (clientRequestId) {
+      const [row] = await this.dataSource.query(`INSERT INTO store_playlists (organization_id,name,playlist_type,tags,client_request_id)
+        VALUES ($1,$2,$3,$4,$5)
+        ON CONFLICT (organization_id,client_request_id) DO UPDATE SET client_request_id = EXCLUDED.client_request_id
+        RETURNING id,name,tags,playlist_type AS "playlistType",publish_status AS "publishStatus",is_active AS "isActive",created_at AS "createdAt"`,
+        [organizationId, name, playlistType, tags, clientRequestId]);
+      return row;
+    }
     const entity = this.playlistRepo.create({
       organization_id: organizationId,
       name,
+      tags,
       playlist_type: playlistType,
     });
     const saved = await this.playlistRepo.save(entity);
     return {
       id: saved.id,
       name: saved.name,
+      tags: saved.tags,
       playlistType: saved.playlist_type,
       publishStatus: saved.publish_status,
       isActive: saved.is_active,
@@ -248,10 +269,11 @@ export class StorePlaylistRepository {
   async updatePlaylist(
     id: string,
     organizationId: string,
-    updates: { name?: string; publishStatus?: string; isActive?: boolean },
+    updates: { name?: string; tags?: string[]; publishStatus?: string; isActive?: boolean },
   ): Promise<PlaylistUpdateDto | null> {
     // Build update object
     const setFields: Partial<StorePlaylist> = {};
+    if (updates.tags !== undefined) setFields.tags = updates.tags;
     if (updates.name !== undefined) setFields.name = updates.name.trim();
     if (updates.publishStatus !== undefined && (updates.publishStatus === 'draft' || updates.publishStatus === 'published')) {
       setFields.publish_status = updates.publishStatus as 'draft' | 'published';
@@ -265,7 +287,7 @@ export class StorePlaylistRepository {
       .update()
       .set({ ...setFields, updated_at: () => 'NOW()' })
       .where('id = :id AND organization_id = :organizationId', { id, organizationId })
-      .returning('id, name, playlist_type, publish_status, is_active, updated_at')
+      .returning('id, name, tags, playlist_type, publish_status, is_active, updated_at')
       .execute();
 
     if (result.raw.length === 0) return null;
@@ -273,6 +295,7 @@ export class StorePlaylistRepository {
     return {
       id: r.id,
       name: r.name,
+      tags: r.tags,
       playlistType: r.playlist_type,
       publishStatus: r.publish_status,
       isActive: r.is_active,
@@ -340,13 +363,23 @@ export class StorePlaylistRepository {
        FROM store_playlist_items i
        JOIN o4o_asset_snapshots s ON s.id = i.snapshot_id
        WHERE i.playlist_id = $1
+         AND (i.is_forced = false OR (
+           (i.forced_start_at IS NULL OR NOW() >= i.forced_start_at)
+           AND (i.forced_end_at IS NULL OR NOW() < i.forced_end_at)))
        ORDER BY i.display_order ASC`,
       [playlistId],
     );
 
     if (!serviceKey) return realItems;
 
-    const forcedItems: PlaylistItemDto[] = await this.dataSource.query(
+    const forcedItems = await this.findRequiredPlaylistItems(playlistId, serviceKey);
+
+    return [...realItems, ...forcedItems].sort((a, b) => a.displayOrder - b.displayOrder);
+  }
+
+  /** Only currently effective signage requirements are visible to a store. */
+  async findRequiredPlaylistItems(playlistId: string | null, serviceKey: string): Promise<PlaylistItemDto[]> {
+    return this.dataSource.query(
       `SELECT
          'forced-' || fc.id AS id,
          NULL AS "snapshotId",
@@ -371,11 +404,12 @@ export class StorePlaylistRepository {
        WHERE fc.service_key = $2
          AND fc.is_active = true
          AND fc.deleted_at IS NULL
+         AND fc.target_surface IN ('signage','both')
+         AND NOW() >= fc.start_at AND NOW() < fc.end_at
        ORDER BY COALESCE(fp.display_order, 9999) ASC`,
       [playlistId, serviceKey],
     );
 
-    return [...realItems, ...forcedItems].sort((a, b) => a.displayOrder - b.displayOrder);
   }
 
   /**
@@ -388,10 +422,14 @@ export class StorePlaylistRepository {
   ): Promise<{ id: string; snapshotId: string; displayOrder: number; isForced: boolean; isLocked: boolean; createdAt: Date }> {
     return this.dataSource.transaction(async (manager) => {
       const locked = await manager.query(
-        `SELECT id, playlist_type FROM store_playlists WHERE id = $1 FOR UPDATE`,
+        `SELECT id, playlist_type, client_request_id FROM store_playlists WHERE id = $1 FOR UPDATE`,
         [playlistId],
       );
 
+      if (locked[0]?.client_request_id) {
+        const [existing] = await manager.query(`SELECT id,snapshot_id AS "snapshotId",display_order AS "displayOrder",is_forced AS "isForced",is_locked AS "isLocked",created_at AS "createdAt" FROM store_playlist_items WHERE playlist_id=$1 AND snapshot_id=$2 LIMIT 1`, [playlistId,snapshotId]);
+        if (existing) return existing;
+      }
       if (locked[0]?.playlist_type === 'SINGLE') {
         const countResult = await manager.query(
           `SELECT COUNT(*)::int AS count FROM store_playlist_items WHERE playlist_id = $1`,
@@ -482,18 +520,19 @@ export class StorePlaylistRepository {
    * Uses ON CONFLICT for signage_forced_content_positions.
    */
   async reorderItems(playlistId: string, order: string[]): Promise<{ reordered: number }> {
+    return this.dataSource.transaction(async manager => {
     for (let i = 0; i < order.length; i++) {
       const itemId = order[i];
       if (itemId.startsWith('forced-')) {
         const forcedContentId = itemId.substring(7);
-        await this.dataSource.query(
+        await manager.query(
           `INSERT INTO signage_forced_content_positions (playlist_id, forced_content_id, display_order)
            VALUES ($1, $2, $3)
            ON CONFLICT (playlist_id, forced_content_id) DO UPDATE SET display_order = $3`,
           [playlistId, forcedContentId, i],
         );
       } else {
-        await this.dataSource.query(
+        await manager.query(
           `UPDATE store_playlist_items SET display_order = $1, updated_at = NOW()
            WHERE id = $2 AND playlist_id = $3`,
           [i, itemId, playlistId],
@@ -501,6 +540,7 @@ export class StorePlaylistRepository {
       }
     }
     return { reordered: order.length };
+    });
   }
 
   /**
@@ -513,6 +553,35 @@ export class StorePlaylistRepository {
     organizationId: string,
     userId: string,
   ): Promise<{ id: string; snapshotId: string; displayOrder: number; isForced: boolean; isLocked: boolean; createdAt: Date }> {
+    const authoring = await this.playlistRepo.findOne({ where: { id: playlistId, organization_id: organizationId, is_active: true }, select: ['id', 'client_request_id'] });
+    if (authoring?.client_request_id) return this.dataSource.transaction(async manager => {
+      const [locked] = await manager.query('SELECT id,playlist_type FROM store_playlists WHERE id=$1 AND organization_id=$2 AND is_active=true FOR UPDATE', [playlistId, organizationId]);
+      if (!locked) throw Object.assign(new Error('Playlist not found'), { statusCode: 404, code: 'NOT_FOUND' });
+      // Look at the independent copy before reading its source: an acknowledged retry
+      // must still work after the source was edited, hidden or removed.
+      const [existing] = await manager.query(`SELECT i.id,i.snapshot_id AS "snapshotId",i.display_order AS "displayOrder",i.is_forced AS "isForced",i.is_locked AS "isLocked",i.created_at AS "createdAt"
+        FROM store_playlist_items i JOIN o4o_asset_snapshots s ON s.id=i.snapshot_id
+        WHERE i.playlist_id=$1 AND s.organization_id=$2 AND s.source_service='signage-media' AND s.source_asset_id=$3 LIMIT 1`, [playlistId,organizationId,mediaId]);
+      if (existing) return existing;
+      const [media] = await manager.query(`SELECT * FROM signage_media WHERE id=$1 AND "organizationId"=$2 AND "deletedAt" IS NULL`, [mediaId,organizationId]);
+      if (!media) throw Object.assign(new Error('Signage media not found'), { statusCode: 404, code: 'NOT_FOUND' });
+      const libraryId = media.metadata?.mediaLibraryAssetId;
+      if (typeof libraryId === 'string') {
+        const asset = await lockStoredVideo(manager, libraryId, userId);
+        if (asset.url !== media.sourceUrl) throw storedVideoUnavailable();
+      }
+      const [{ count }] = await manager.query('SELECT COUNT(*)::int AS count FROM store_playlist_items WHERE playlist_id=$1', [playlistId]);
+      if (locked.playlist_type === 'SINGLE' && count > 0) throw Object.assign(new Error('SINGLE playlist allows only 1 item'), { statusCode: 400, code: 'SINGLE_LIMIT' });
+      const scoped = Object.create(this.dataSource) as DataSource;
+      scoped.getRepository = manager.getRepository.bind(manager);
+      const { snapshot } = await new AssetCopyService(scoped).copyResolved({ sourceService: 'signage-media', sourceAssetId: mediaId, assetType: 'signage', targetOrganizationId: organizationId, createdBy: userId, title: media.name,
+        contentJson: { title: media.name, mediaType: media.mediaType, sourceType: media.sourceType, sourceUrl: media.sourceUrl, thumbnailUrl: media.thumbnailUrl, duration: media.duration, resolution: media.resolution, content: media.content, tags: media.tags, category: media.category, description: media.description, metadata: media.metadata, source: 'signage-media' } });
+      const [order] = await manager.query('SELECT COALESCE(MAX(display_order),-1)::int+1 AS next_order FROM store_playlist_items WHERE playlist_id=$1', [playlistId]);
+      const [item] = await manager.query(`INSERT INTO store_playlist_items (playlist_id,snapshot_id,display_order) VALUES ($1,$2,$3)
+        RETURNING id,snapshot_id AS "snapshotId",display_order AS "displayOrder",is_forced AS "isForced",is_locked AS "isLocked",created_at AS "createdAt"`, [playlistId,snapshot.id,order.next_order]);
+      return item;
+    });
+
     // Verify signage_media belongs to this organization
     const mediaRows = await this.dataSource.query(
       `SELECT "id", "name", "mediaType", "sourceType", "sourceUrl",

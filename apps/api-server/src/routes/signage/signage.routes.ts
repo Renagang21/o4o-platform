@@ -233,16 +233,16 @@ export function createSignageRoutes(dataSource: DataSource): Router {
   // Operator manages forced content that is auto-injected into all store playlists at query time
 
   // GET /api/signage/:serviceKey/hq/forced-content - List forced content
-  router.get('/hq/forced-content', requireSignageOperator, forcedCtrl.list);
+  router.get('/hq/forced-content', requireSignageAdmin, forcedCtrl.list);
 
   // POST /api/signage/:serviceKey/hq/forced-content - Create forced content
-  router.post('/hq/forced-content', requireSignageOperator, forcedCtrl.create);
+  router.post('/hq/forced-content', requireSignageAdmin, forcedCtrl.create);
 
   // PATCH /api/signage/:serviceKey/hq/forced-content/:id - Update forced content
-  router.patch('/hq/forced-content/:id', requireSignageOperator, validateUuidParams('id'), forcedCtrl.update);
+  router.patch('/hq/forced-content/:id', requireSignageAdmin, validateUuidParams('id'), forcedCtrl.update);
 
   // DELETE /api/signage/:serviceKey/hq/forced-content/:id - Soft delete forced content
-  router.delete('/hq/forced-content/:id', requireSignageOperator, validateUuidParams('id'), forcedCtrl.remove);
+  router.delete('/hq/forced-content/:id', requireSignageAdmin, validateUuidParams('id'), forcedCtrl.remove);
 
   // ========== Community Content Creation Routes (WO-O4O-SIGNAGE-COMMUNITY-AUTHORSHIP-PHASE1-V1) ==========
   // Community creates global content with source='community', scope='global'

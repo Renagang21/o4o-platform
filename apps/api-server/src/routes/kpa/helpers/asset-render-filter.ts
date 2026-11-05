@@ -60,7 +60,7 @@ export function buildPublishedAssetQuery(
       OR (
         c.is_forced = true
         AND (c.forced_start_at IS NULL OR NOW() >= c.forced_start_at)
-        AND (c.forced_end_at IS NULL OR NOW() <= c.forced_end_at)
+        AND (c.forced_end_at IS NULL OR NOW() < c.forced_end_at)
       )
     )`,
   ];

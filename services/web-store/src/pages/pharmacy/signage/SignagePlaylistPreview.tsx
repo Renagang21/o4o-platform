@@ -1,3 +1,4 @@
+import { inRequiredWindow, useSignageClock } from './requiredVideoWindow';
 import { VideoPlayback } from '@o4o/tablet-kiosk-core';
 import { hostedVideo } from '@o4o/tablet-kiosk-core/video-embed';
 import { useId, useState } from 'react';
@@ -6,7 +7,9 @@ import { videoPreviewUrl } from './videoPreview';
 import type { StorePlaylistItem } from '../../../api/storePlaylist';
 
 /** Preview uses the saved snapshot items; it never publishes or reports device playback. */
-export function SignagePlaylistPreview({ name, items, onClose }: Readonly<{ name: string; items: StorePlaylistItem[]; onClose: () => void }>) {
+export function SignagePlaylistPreview({ name, items: allItems, onClose }: Readonly<{ name: string; items: StorePlaylistItem[]; onClose: () => void }>) {
+  const now = useSignageClock();
+  const items = allItems.filter(item => inRequiredWindow(item, now));
   const id = useId();
   const [selectedId, setSelectedId] = useState(items[0]?.id ?? null);
   const item = items.find(row => row.id === selectedId) ?? items[0];

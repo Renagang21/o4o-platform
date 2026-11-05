@@ -1,5 +1,6 @@
+import { fetchRequiredPlaylistVideos, type StorePlaylistItem } from '../../api/storePlaylist';
+import { inRequiredWindow, useSignageClock } from './signage/requiredVideoWindow';
 import { PlaylistNameEditor } from './signage/PlaylistNameEditor';
-import { signageVideoOrigin } from './signage/signageVideoList';
 import { useUnifiedStore } from '../../contexts/StoreContext';
 import { CommunityVideoImport } from './signage/CommunityVideoImport';
 import { VideoRegistration, type VideoRegistrationAction } from '@o4o/store-ui-core';
@@ -15,7 +16,7 @@ import { AuthoringDialog } from './authoring/AuthoringDialog';
 import { useStoreOperationScope } from '../../hooks/useStoreOperationScope';
 import { useLatestStoreRequest } from './hooks/useLatestStoreRequest';
 import { readSignageMediaDraft, signageMediaMetadata, emptySignageMediaDraft, type SignageEditTarget, type SignageMediaDraft } from './signage/signageMediaDraft';
-import { buildSignageVideoList, filterSignageVideos, summarizePlaylistDuration, type UnifiedVideoItem, type SignageStatusFilter as StatusFilter, type SignageSortKey as SortKey } from './signage/signageVideoList';
+import { buildSignageVideoList, filterSignageVideos, signageVideoTags, summarizePlaylistDuration, type UnifiedVideoItem, type SignageSortKey as SortKey } from './signage/signageVideoList';
 import { useSignagePlaylists } from './hooks/useSignagePlaylists';
 import { useSignageSchedules } from './hooks/useSignageSchedules';
 /**
@@ -49,7 +50,6 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import {
   // WO-O4O-MY-STORE-REMAINING-FEATURE-VIEW-COMMONIZATION-V1 §5-B: 공통 사이니지 순수 로직
   SIGNAGE_DAY_LABELS as DAY_LABELS,
-  formatSignageDate as formatDate,
   formatSignageShortDate as formatShortDate,
   daysUntil,
   isForcedExpiringSoon,
@@ -58,7 +58,6 @@ import {
   isScheduleNowActive,
   getCurrentSchedule,
   getNextSchedule,
-  computeSignageKpi,
   detectVideoSource,
 } from '@o4o/store-ui-core';
 import {
@@ -72,7 +71,6 @@ import {
   ShieldAlert,
   AlertTriangle,
   ArrowUpDown,
-  Filter,
   Plus,
   ListVideo,
   Trash2,
@@ -87,7 +85,6 @@ import {
   assetSnapshotApi,
   storeAssetControlApi,
   type StoreAssetItem,
-  type AssetPublishStatus,
 } from '../../api/assetSnapshot';
 import type { StorePlaylist } from '../../api/storePlaylist';
 import {
@@ -103,13 +100,6 @@ import { useStoreOrganizationId } from '../../hooks/useStoreOrganizationId';
 /* ─── Constants ──────────────────────────────── */
 
 const PAGE_LIMIT = 20;
-
-const STATUS_CONFIG: Record<AssetPublishStatus, { label: string; bg: string; text: string }> = {
-  draft: { label: '초안', bg: 'bg-slate-100', text: 'text-slate-600' },
-  published: { label: '게시됨', bg: 'bg-green-50', text: 'text-green-700' },
-  hidden: { label: '숨김', bg: 'bg-orange-50', text: 'text-orange-700' },
-};
-
 
 /* ─── Helpers ────────────────────────────────── */
 
@@ -219,10 +209,7 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
 
   const [error, setError] = useState<string | null>(null);
   const fetchItems = useCallback(async () => { setError(null); await reloadItems(); }, [reloadItems]);
-  const statusBusy = useRef(new Set<string>());
-  const [updatingId, setUpdatingId] = useState<string | null>(null);
 
-  const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const [sortKey, setSortKey] = useState<SortKey>('newest');
   const [page, setPage] = useState(1);
   const [assetKeyword, setAssetKeyword] = useState('');
@@ -487,16 +474,36 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
   useEffect(() => { editTargetRef.current = null; setEditingTarget(null); setEditError(''); }, [organizationId]);
 
   // ── Unified video list (snapshots + direct media) ──
-  const unifiedVideos = useMemo(() => buildSignageVideoList(items, signageMediaItems), [items, signageMediaItems]);
+  const [requiredVideos, setRequiredVideos] = useState<StorePlaylistItem[]>([]);
+  const [requiredReadError, setRequiredReadError] = useState('');
+  const now = useSignageClock();
+  useEffect(() => {
+    let active = true, busy = false;
+    const refresh = async () => {
+      if (busy) return; busy = true;
+      try { const data = await fetchRequiredPlaylistVideos(); if (active && isCurrent()) { setRequiredVideos(previous => JSON.stringify(previous) === JSON.stringify(data) ? previous : data); setRequiredReadError(''); } }
+      catch { if (active) setRequiredReadError('필수 영상을 갱신하지 못했습니다. 잠시 후 다시 확인합니다.'); }
+      finally { busy = false; }
+    };
+    void refresh(); const timer = setInterval(() => void refresh(), 15000);
+    return () => { active = false; clearInterval(timer); };
+  }, [organizationId, isCurrent]);
+  const windowSignature = [...items.filter(item => inRequiredWindow(item, now)).map(item => item.id), ...requiredVideos.filter(item => inRequiredWindow(item, now)).map(item => item.id)].join(',');
+  const unifiedVideos = useMemo(() => [
+    ...buildSignageVideoList(items, signageMediaItems).filter(video => inRequiredWindow(video, now)),
+    ...requiredVideos.filter(item => inRequiredWindow(item, now)).map(item => ({
+      id: item.id, title: item.title, source: 'snapshot' as const, publishStatus: 'published' as const,
+      isForced: true, isLocked: true, forcedStartAt: item.forcedStartAt, forcedEndAt: item.forcedEndAt, createdAt: item.createdAt,
+      _snapshot: { ...item, publishStatus: 'published', contentJson: item.contentJson, assetType: 'signage' } as unknown as StoreAssetItem,
+    })),
+  ], [items, signageMediaItems, requiredVideos, windowSignature]);
 
-  // KPI (snapshot 기준 유지)
-  const kpi = useMemo(() => computeSignageKpi(items), [items]);
   const forcedExpiringCount = useMemo(() => items.filter(isForcedExpiringSoon).length, [items]);
 
   // Filter + Sort + Keyword (unified: snapshots + direct media)
   const filteredUnified = useMemo(() => filterSignageVideos(unifiedVideos, {
-    status: statusFilter, sort: sortKey, keyword: assetKeyword,
-  }), [unifiedVideos, statusFilter, sortKey, assetKeyword]);
+    status: 'published', sort: sortKey, keyword: assetKeyword,
+  }), [unifiedVideos, sortKey, assetKeyword]);
 
   // Pagination
   const totalPages = Math.max(1, Math.ceil(filteredUnified.length / PAGE_LIMIT));
@@ -505,7 +512,7 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
     return filteredUnified.slice(start, start + PAGE_LIMIT);
   }, [filteredUnified, page]);
 
-  useEffect(() => { setPage(1); }, [statusFilter, sortKey, assetKeyword]);
+  useEffect(() => { setPage(1); }, [sortKey, assetKeyword]);
 
   useEffect(() => { if (page > totalPages) setPage(totalPages); }, [page, totalPages]);
 
@@ -525,34 +532,16 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
     return playlists.filter(p => p.name.toLowerCase().includes(kw));
   }, [playlists, playlistKeyword]);
 
-  useEffect(() => { setCheckedVideos(new Set()); setEditingTarget(null); }, [organizationId, activeTab, page, statusFilter, sortKey, assetKeyword]);
+  useEffect(() => { setCheckedVideos(new Set()); setEditingTarget(null); }, [organizationId, activeTab, page, sortKey, assetKeyword]);
   useEffect(() => { setCheckedPlaylists(new Set()); setSelectedPlaylistId(null); }, [organizationId, playlistKeyword]);
   const toggleChecked = (set: Dispatch<SetStateAction<Set<string>>>, id: string, checked: boolean) => set(previous => { const next = new Set(previous); if (checked) next.add(id); else next.delete(id); return next; });
   const checkedPlaylist = checkedPlaylists.size === 1 ? filteredPlaylists.find(item => checkedPlaylists.has(item.id)) : undefined;
   const checkedVideo = checkedVideos.size === 1 ? pagedUnified.find(item => checkedVideos.has(item.id)) : undefined;
-  const videoActionBusy = editSaving || !!updatingId || librarySaving || regVideoSaving;
+  const videoActionBusy = editSaving || librarySaving || regVideoSaving;
   useEffect(() => setCheckedVideos(new Set()), [unifiedVideos]);
   useEffect(() => setCheckedPlaylists(new Set()), [playlists]);
 
   // Handlers
-  const handleToggleStatus = async (item: StoreAssetItem) => {
-    if (item.isForced || statusBusy.current.has(item.id) || !isCurrent()) return;
-    statusBusy.current.add(item.id);
-    const cycle: AssetPublishStatus[] = ['draft', 'published', 'hidden'];
-    const currentIdx = cycle.indexOf(item.publishStatus);
-    const nextStatus = cycle[(currentIdx + 1) % cycle.length];
-    setUpdatingId(item.id);
-    try {
-      const res = await storeAssetControlApi.updatePublishStatus(item.id, nextStatus);
-      if (!isCurrent()) return;
-      setItems(prev => prev.map(it =>
-        it.id === item.id ? { ...it, publishStatus: res.data.publishStatus } : it,
-      ));
-    } catch { if (isCurrent()) setError('게시 상태를 변경하지 못했습니다. 다시 시도해 주시기 바랍니다.'); } finally {
-      statusBusy.current.delete(item.id); if (isCurrent()) setUpdatingId(null);
-    }
-  };
-
   const selectedPlaylist = playlists.find(p => p.id === selectedPlaylistId);
   const [clock, setClock] = useState(() => new Date());
   useEffect(() => {
@@ -970,7 +959,7 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
                         <div className="flex flex-col items-center gap-0 flex-shrink-0">
                           <span className="text-[10px] text-slate-400 w-5 text-center leading-none mb-0.5">{idx + 1}</span>
                           <button
-                            onClick={() => handleMoveItem(idx, -1)}
+                            onClick={() => handleMoveItem(item.id, -1)}
                             disabled={playlistBusy || idx === 0}
                             className="text-slate-300 hover:text-slate-600 disabled:opacity-20 p-0.5"
                             title="위로"
@@ -978,7 +967,7 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
                             <ChevronLeft className="w-3 h-3 rotate-90" />
                           </button>
                           <button
-                            onClick={() => handleMoveItem(idx, 1)}
+                            onClick={() => handleMoveItem(item.id, 1)}
                             disabled={playlistBusy || idx === playlistItems.length - 1}
                             className="text-slate-300 hover:text-slate-600 disabled:opacity-20 p-0.5"
                             title="아래로"
@@ -1349,19 +1338,7 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
         </div>
       )}
 
-      {/* ─── [A] Signage KPI ─────────────────────── */}
-      {!loading && !mediaLoading && !mediaLoadError && !error && !listError && (
-        <div className="grid grid-cols-5 gap-4 mb-6">
-          <KpiCard label="게시 중" count={kpi.published} color="green" />
-          <KpiCard label="초안" count={kpi.draft} color="slate" />
-          <KpiCard label="숨김" count={kpi.hidden} color="orange" />
-          <KpiCard label="강제노출" count={kpi.forcedActive} color="red"
-            warning={forcedExpiringCount > 0 ? `${forcedExpiringCount}건 만료 임박` : undefined}
-          />
-          <KpiCard label="사이니지 채널" count={kpi.signageChannel} color="purple" />
-        </div>
-      )}
-
+      {requiredReadError && <p role="status" className="mb-3 text-sm text-amber-800">{requiredReadError}</p>}
       {/* ─── [B] 검색 + 필터 바 ─────────────────── */}
       {!loading && !mediaLoading && !mediaLoadError && !error && !listError && unifiedVideos.length > 0 && (
         <div className="relative mb-3">
@@ -1370,35 +1347,13 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
             type="text"
             value={assetKeyword}
             onChange={e => setAssetKeyword(e.target.value)}
-            placeholder="동영상 이름으로 검색..."
+            placeholder="제목·태그로 검색..."
             className="w-full pl-9 pr-4 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
       )}
       {!loading && !mediaLoading && !mediaLoadError && !error && !listError && unifiedVideos.length > 0 && (
         <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
-          <div className="flex flex-wrap items-center gap-1 min-w-0">
-            <Filter className="w-3.5 h-3.5 text-slate-400" />
-            {([
-              { key: 'all', label: '전체' },
-              { key: 'published', label: '게시됨' },
-              { key: 'draft', label: '초안' },
-              { key: 'hidden', label: '숨김' },
-              { key: 'forced', label: '강제노출' },
-            ] as { key: StatusFilter; label: string }[]).map(opt => (
-              <button
-                key={opt.key}
-                onClick={() => setStatusFilter(opt.key)}
-                className={`px-2.5 py-1 rounded-full text-xs font-medium transition-colors ${
-                  statusFilter === opt.key
-                    ? 'bg-blue-100 text-blue-700'
-                    : 'text-slate-500 hover:bg-slate-100'
-                }`}
-              >
-                {opt.label}
-              </button>
-            ))}
-          </div>
           <div className="flex items-center gap-1.5">
             <ArrowUpDown className="w-3.5 h-3.5 text-slate-400" />
             <select
@@ -1408,7 +1363,6 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
             >
               <option value="newest">최신순</option>
               <option value="forced-first">강제노출 우선</option>
-              <option value="published-first">게시 상태 우선</option>
             </select>
           </div>
         </div>
@@ -1445,7 +1399,7 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
               <p className="text-xs mt-1">O4O 보관 영상을 선택하거나 YouTube/Vimeo 영상 주소를 등록하시기 바랍니다.</p>
             </>
           ) : (
-            <p className="text-sm">선택한 필터 조건에 해당하는 동영상이 없습니다.</p>
+            <p className="text-sm">검색 조건에 해당하는 게시된 동영상이 없습니다.</p>
           )}
         </div>
       ) : (
@@ -1457,43 +1411,27 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
           <DataTable<UnifiedVideoItem>
             columns={[
               { key: 'select', title: <input type="checkbox" aria-label="동영상 현재 페이지 전체 선택" checked={pagedUnified.length > 0 && pagedUnified.every(item => checkedVideos.has(item.id))} onChange={event => setCheckedVideos(event.target.checked ? new Set(pagedUnified.map(item => item.id)) : new Set())} />, render: (_v, item) => <input type="checkbox" aria-label={`${item.title} 영상 선택`} checked={checkedVideos.has(item.id)} onChange={event => toggleChecked(setCheckedVideos, item.id, event.target.checked)} /> },
-              { key: 'origin', title: '가져온 경로', render: (_v, video) => <span className="text-xs text-slate-600">{signageVideoOrigin(video)}</span> },
               {
                 key: 'title',
-                title: '제목',
+                title: '제목 / 태그',
                 render: (_v, v) => {
-                  if (v.source === 'direct') {
-                    const media = v._media;
-                    return (
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <span className="font-medium text-slate-900 truncate max-w-md">{v.title}</span>
-                          <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-purple-100 text-purple-700">
-                            {v.sourceType === 'youtube' ? 'YouTube' : v.sourceType === 'vimeo' ? 'Vimeo' : '직접'}
-                          </span>
-                        </div>
-                        {media?.description && (
-                          <p className="text-[11px] text-slate-400 mt-0.5 truncate max-w-md">{media.description}</p>
-                        )}
-                        {media?.tags && media.tags.length > 0 && (
-                          <div className="flex flex-wrap gap-1 mt-1">
-                            {media.tags.map(tag => (
-                              <span key={tag} className="px-1.5 py-0 rounded text-[10px] bg-slate-100 text-slate-500">{tag}</span>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    );
-                  }
+                  const tags = signageVideoTags(v);
+                  const summary = (
+                    <>
+                      <span className="font-medium text-slate-900 break-words whitespace-normal">{v.title}</span>
+                      {(v._media?.description || v._snapshot?.contentJson?.description) && (
+                        <p className="text-xs text-slate-500 mt-1 whitespace-normal break-words">{String(v._media?.description || v._snapshot?.contentJson?.description)}</p>
+                      )}
+                      {tags.length > 0 && <div className="flex flex-wrap gap-1 mt-1">{tags.map(tag => <span key={tag} className="px-1.5 rounded text-xs bg-slate-100 text-slate-500">{tag}</span>)}</div>}
+                    </>
+                  );
+                  if (v.source === 'direct') return <div>{summary}</div>;
                   const item = v._snapshot!;
                   const expired = isForcedExpired(item);
                   const expiringSoon = isForcedExpiringSoon(item);
                   return (
                     <div>
-                      <div className="flex items-center gap-2">
-                        <span className="font-medium text-slate-900 truncate max-w-md">{v.title}</span>
-                        <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-slate-100 text-slate-500">HUB</span>
-                      </div>
+                      {summary}
                       {item.isForced && (
                         <div className="flex items-center gap-2 mt-1">
                           {expired ? (
@@ -1516,44 +1454,6 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
                     </div>
                   );
                 },
-              },
-              {
-                key: 'publishStatus',
-                title: '상태',
-                render: (_v, v) => {
-                  if (v.source === 'direct') {
-                    const mediaStatus = v._media?.status;
-                    const isDraft = mediaStatus === 'draft';
-                    return (
-                      <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${isDraft ? 'bg-slate-100 text-slate-600' : 'bg-green-50 text-green-700'}`}>
-                        {isDraft ? '초안' : '공개'}
-                      </span>
-                    );
-                  }
-                  const item = v._snapshot!;
-                  const statusCfg = STATUS_CONFIG[item.publishStatus] || STATUS_CONFIG.draft;
-                  const isUpdating = updatingId === item.id;
-                  return item.isForced ? (
-                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-50 text-green-700 cursor-not-allowed opacity-70" title="관리자 강제노출 - 변경 불가">
-                      <Lock className="w-3 h-3 mr-1" />{statusCfg.label}
-                    </span>
-                  ) : (
-                    <button
-                      onClick={e => { e.stopPropagation(); handleToggleStatus(item); }}
-                      disabled={isUpdating}
-                      className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium cursor-pointer hover:opacity-80 transition-opacity disabled:opacity-50 ${statusCfg.bg} ${statusCfg.text}`}
-                      title="클릭하여 상태 변경 (초안 → 게시됨 → 숨김)"
-                    >
-                      {isUpdating && <Loader2 className="w-3 h-3 animate-spin mr-1" />}{statusCfg.label}
-                    </button>
-                  );
-                },
-              },
-              {
-                key: 'createdAt',
-                title: '등록일',
-                dataIndex: 'createdAt',
-                render: (v) => <span className="text-slate-500">{formatDate(v as string)}</span>,
               },
               {
                 key: 'actions',
@@ -1792,39 +1692,6 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
         handleCloseEditDrawer={handleCloseEditDrawer}
         handleDeleteFromDrawer={handleDeleteFromDrawer} handleSaveEdit={handleSaveEdit}
       />
-    </div>
-  );
-}
-
-/* ─── Sub-Components ─────────────────────────── */
-
-function KpiCard({ label, count, color, warning }: {
-  label: string;
-  count: number;
-  color: 'green' | 'slate' | 'orange' | 'red' | 'purple';
-  warning?: string;
-}) {
-  const colorMap = {
-    green: { bg: 'bg-green-50', text: 'text-green-700' },
-    slate: { bg: 'bg-slate-50', text: 'text-slate-700' },
-    orange: { bg: 'bg-orange-50', text: 'text-orange-700' },
-    red: { bg: 'bg-red-50', text: 'text-red-700' },
-    purple: { bg: 'bg-purple-50', text: 'text-purple-700' },
-  };
-  const c = colorMap[color];
-
-  return (
-    <div className={`rounded-lg border border-slate-200 p-4 ${c.bg}`}>
-      <div className="text-xs text-slate-500 mb-1">{label}</div>
-      <div className={`text-2xl font-bold ${c.text}`}>
-        {count}<span className="text-sm font-normal ml-0.5">건</span>
-      </div>
-      {warning && (
-        <div className="flex items-center gap-1 mt-1.5 text-[10px] text-amber-600 font-medium">
-          <AlertTriangle className="w-3 h-3" />
-          {warning}
-        </div>
-      )}
     </div>
   );
 }

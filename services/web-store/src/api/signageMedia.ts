@@ -28,6 +28,7 @@ export interface SignageMediaItem {
   thumbnailUrl: string | null;
   status: string;
   source: string;
+  duration?: number | null;
   tags?: string[];
   createdAt: string;
   updatedAt: string;

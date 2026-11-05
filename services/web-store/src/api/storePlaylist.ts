@@ -1,3 +1,4 @@
+import { calibrateSignageClock } from '../lib/signageClock';
 /**
  * Store Playlist API — 매장 사이니지 플레이리스트
  *
@@ -54,7 +55,7 @@ export async function fetchStorePlaylists(): Promise<StorePlaylist[]> {
 }
 
 export async function createStorePlaylist(
-  payload: { name: string; playlistType?: PlaylistType; description?: string; tags?: string[] },
+  payload: { name: string; clientRequestId?: string; playlistType?: PlaylistType; description?: string; tags?: string[] },
 ): Promise<StorePlaylist> {
   const response = await apiClient.post<{ success: boolean; data: StorePlaylist }>(
     '/store-playlists',
@@ -65,7 +66,7 @@ export async function createStorePlaylist(
 
 export async function updateStorePlaylist(
   id: string,
-  updates: { name?: string; publishStatus?: PlaylistPublishStatus; isActive?: boolean },
+  updates: { name?: string; tags?: string[]; publishStatus?: PlaylistPublishStatus; isActive?: boolean },
 ): Promise<StorePlaylist> {
   const response = await apiClient.patch<{ success: boolean; data: StorePlaylist }>(
     `/store-playlists/${id}`,
@@ -135,4 +136,11 @@ export async function deletePlaylistItem(
   itemId: string,
 ): Promise<void> {
   await apiClient.delete(`/store-playlists/${playlistId}/items/${itemId}`);
+}
+
+/** Store-scoped active requirements; never uses the operator listing endpoint. */
+export async function fetchRequiredPlaylistVideos(): Promise<StorePlaylistItem[]> {
+  const response = await apiClient.get<{ success: boolean; data: StorePlaylistItem[]; serverNow?: string }>('/store-playlists/required-videos');
+  calibrateSignageClock(response.serverNow);
+  return response.data;
 }
