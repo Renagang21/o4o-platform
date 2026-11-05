@@ -73,7 +73,7 @@ export default function LocalAgentCard({
         const outcome = await connectThisPc(target, request.signal);
         if (!active.current || request.signal.aborted) return false;
         if (!outcome.ok) {
-          setHealth(null);
+          setHealth({ ...target, connected: false });
           setStatus("unavailable");
           setMessage(describeConnectFailure(outcome.code));
           return false;
@@ -107,11 +107,11 @@ export default function LocalAgentCard({
       const sequence = ++probeSequence.current;
       setStatus("checking");
       setMessage(null);
-      setHealth(null);
 
       const probe = await probeLocalAgent();
       if (!active.current || sequence !== probeSequence.current) return;
       if (!probe.ok) {
+        setHealth(null);
         setStatus("unavailable");
         setMessage(describeLocalAgentUnavailable(probe.reason));
         return;

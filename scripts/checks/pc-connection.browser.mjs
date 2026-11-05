@@ -1,5 +1,6 @@
 import { chromium } from "@playwright/test";
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 import { mkdtemp } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -16,6 +17,12 @@ const release = {
   filename: `o4o-pc-connection-${"b".repeat(12)}-${"a".repeat(12)}.zip`,
   sha256: "c".repeat(64),
   bytes: 20,
+};
+const setupPayload = Buffer.from("@echo off\r\nrem synthetic fixture only");
+release.setup = {
+  filename: release.filename.replace(".zip", "-setup.cmd"),
+  bytes: setupPayload.length,
+  sha256: createHash("sha256").update(setupPayload).digest("hex"),
 };
 const html = `<html><head><meta name="viewport" content="width=device-width,initial-scale=1"></head><body><div id="root"></div><script type="module">
 import RefreshRuntime from '/@react-refresh'; RefreshRuntime.injectIntoGlobalHook(window);window.$RefreshReg$=()=>{};window.$RefreshSig$=()=>type=>type;window.__vite_plugin_react_preamble_installed__=true;</script><script type="module">
@@ -50,6 +57,12 @@ try {
           url = new URL(req.url());
         if (url.origin === origin && url.pathname === "/__pc_ui_fixture")
           return route.fulfill({ contentType: "text/html", body: html });
+        if (url.pathname.endsWith(release.setup.filename))
+          return route.fulfill({
+            body: setupPayload,
+            contentType: "application/octet-stream",
+            headers: { "Content-Length": String(setupPayload.length) },
+          });
         if (url.pathname === "/downloads/pc-connection/release.json")
           return route.fulfill({ json: release });
         if (url.origin === "http://127.0.0.1:47821") {
@@ -104,6 +117,13 @@ try {
           .count(),
         0,
       );
+      await page
+        .getByRole("button", { name: "설치 파일 받기", exact: true })
+        .click();
+      await page
+        .getByRole("button", { name: "자동 연결 중지", exact: true })
+        .click();
+      assert.equal(pairs, 0);
       program = true;
       await page
         .getByRole("button", { name: "설치된 프로그램 연결 확인", exact: true })
@@ -119,6 +139,12 @@ try {
         .click();
       await page
         .getByText("이 PC가 현재 계정에 연결됐습니다.", { exact: true })
+        .waitFor();
+      await page
+        .getByRole("group", { name: "PC 연결 진행 단계" })
+        .locator("li")
+        .nth(2)
+        .getByText("완료", { exact: true })
         .waitFor();
       assert.equal(pairs, 2);
       assert(nonces >= 2);

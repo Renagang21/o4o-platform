@@ -61,3 +61,12 @@
 - 실제 배포 포맷으로 Windows Node 22.18.0 archive의 공식 checksum을 검증하고 release ZIP/embedded installer를 로컬 생성했다. ZIP 33,531,740 bytes, installer 33,539,072 bytes로 32MiB 제한 아래다. publish/upload는 하지 않았다.
 - 첫 Windows CI는 packaged runtime health 단계까지 통과한 뒤, 이미 종료된 CMD PID를 taskkill하려는 기존 테스트 정리에서 실패했다. 새 시작 방식에 맞춰 테스트 전용 패키지의 --worker를 정확한 exe 경로로 식별하고 Ctrl+C 정상 종료를 검증하도록 보완했다. 강제 종료로 숨기지 않으며, CI 결과는 PR 최신 HEAD에서 확인한다. Linux 전용 결과와 실제 Windows CI를 구분한다.
 - Windows 최초 설치 consent, GUI의 사용자 시각 검수, 실제 사용자 PC의 LNA/운영 계정 연결은 미검증이다. 실제 사용자 PC/credential/pairing/운영 원장은 수정하지 않았다.
+
+
+## Windows CI 및 연결 확인 최종 보완
+
+- [CI 41945916644](https://github.com/Renagang21/o4o-platform/actions/runs/41945916644)의 **PC installer Windows PASS**: 실제 Windows Node 22.18.0에서 packaged runtime/한글 경로/재설치/손상된 파일 거절/기존 데이터 보존과 Ctrl+C 정상 종료를 실행했다. API Jest **3 shards PASS**, 웹·관리자 production build 및 중앙 운영 PostgreSQL integration도 PASS였다.
+- 이 실행의 Code Quality는 src 바깥 `packages/account-ui/__tests__`의 이전 문구 기대값 1개(매개변수화 5건)로 실패했다. 변환기 대상에 top-level tests/__tests__도 포함하고 기대값을 보완한 뒤 Account UI Jest **28 PASS**로 재검증했다. 기준·assertion·검증 범위를 줄이지 않았다. 마지막 HEAD의 전체 CI는 PR에서 별도로 확인한다.
+- 연결 확인 시 관측값/manifest를 먼저 null로 지워 설치 카드가 순간적으로 바뀌던 경로를 제거했다. 재조회 중에는 기존 설치 정보를 유지하고, manifest 조회 실패 후에는 최신 버전이라고 표시하지 않는다. 타 계정 연결 실패는 프로그램 응답과 구분한다.
+- 수동 연결 확인도 자동 설치 연결과 같은 단계 완료 표시에 반영한다. 다운로드 → 자동 확인 중지 → 수동 타 계정 거절 → 수동 성공 → 계정 연결 단계 완료를 Chromium 390/1440px에서 확인했다. 다운로드 파일·API는 허구 fixture만 사용하고 실제 설치/계정 변경을 하지 않는다. 연결/manifest focused tests **23 PASS**.
+- 실제 사용자 PC의 브라우저 LNA·운영 계정 연결, Windows UI의 사용자 시각 검수, main 병합·배포는 여전히 별도 범위다. 일회성 PostgreSQL 컨테이너/볼륨을 제거했다. 기존 작업공간은 보존한다.

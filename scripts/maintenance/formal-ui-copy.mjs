@@ -18,7 +18,7 @@ const files = execFileSync(
   .filter(
     (f) =>
       (/\/src\/.*\.(tsx?|jsx?)$/.test(f) ||
-        /\/tests\/.*\.(test|spec)\.tsx?$/.test(f)) &&
+        /\/(?:tests|__tests__)\/.*\.(test|spec)\.tsx?$/.test(f)) &&
       !/(fixture|mock|seed|prompt|knowledge|example|context-builder|editing-preset|content-authoring-guide|localIntent|nl\.ts|forum-cosmetics|\/data\/)/i.test(
         f,
       ),

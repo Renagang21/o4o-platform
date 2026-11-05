@@ -103,3 +103,42 @@ it('distinguishes account connection from waiting for installation and aborts a 
  expect(signal?.aborted).toBe(true);
  expect(screen.getByText(/자동 확인을 멈췄습니다/)).toBeTruthy();
 });
+
+
+
+it("keeps the current-program panel while manifest revalidation is pending and never calls stale data latest after failure", async () => {
+  let rejectLookup!: (error: Error) => void;
+  const pending = new Promise((_, reject) => {
+    rejectLookup = reject;
+  });
+  const fetcher = vi
+    .fn()
+    .mockResolvedValueOnce({ ok: true, json: async () => release })
+    .mockReturnValue(pending);
+  vi.stubGlobal("fetch", fetcher);
+  render(
+    <PcProgramUpdate
+      health={{
+        agentVersion: "0.4.0",
+        connected: true,
+        nonce: "fixture",
+        releaseId: release.releaseId,
+        localData: { ready: true, schemaVersion: 8 },
+      }}
+      onVerify={vi.fn()}
+    />,
+  );
+  await screen.findByText("최신 프로그램입니다.");
+  fireEvent.click(screen.getByRole("button", { name: "연결 상태 확인" }));
+  expect(screen.getByText("다시 설치", { selector: "summary" })).toBeTruthy();
+  expect(
+    screen.getByText("게시된 설치 버전을 다시 확인하고 있습니다."),
+  ).toBeTruthy();
+  rejectLookup(new Error("offline"));
+  await screen.findByRole("alert");
+  expect(screen.getByText("다시 설치", { selector: "summary" })).toBeTruthy();
+  expect(screen.queryByText("최신 프로그램입니다.")).toBeNull();
+  expect(
+    screen.getByText(/프로그램 응답은 확인했지만 최신 버전은/),
+  ).toBeTruthy();
+});
