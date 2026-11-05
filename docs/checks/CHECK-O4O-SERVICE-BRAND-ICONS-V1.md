@@ -54,6 +54,7 @@ route/role/capability/visibility 정책 변경 없음. 로그인·실계정 기�
 
 로컬: 공통 패키지 전체 build, UI/Admin/Neture/약국 type-check, 10개 프런트 Vite production build,
 서비스 자산 규격·원본 보존 검사 및 브랜드/SPA 회귀 검사. Chromium에서 16개 서비스/경로를 PC1280·모바일390 두 viewport로 확인한다.
+공통 인증 UI의 공개 브랜드 경로 정합 검사는 SVG·ICO·모바일 파일 존재를 검사하도록 갱신했으며 전체 291개가 통과했다. 분회 compact 기호는 약국 십자와 구분되는 갈래로 보완하고 PC/mobile을 재확인했다.
 파일 decode, JS 오류, 가로 넘침을 확인하고 결과와 화면을 `/workspace/scratch/service-brand-icons/`에 보존한다.
 운영 CI·리뷰·병합·배포와 실제 serving SHA 증거는 통합 PR 종료 기록에 추가한다. 이 문서의 완료 상태는 자산 제작·로컬 검증 기록이며 배포 성공의 대체 증거가 아니다.
 

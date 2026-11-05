@@ -17,7 +17,7 @@ export const profiles = {
   partner: ['O4O Partner', '<g fill="none" stroke="#fff" stroke-width="2.8"><ellipse cx="5" cy="9" rx="3.6" ry="5" transform="rotate(40 5 9)"/><ellipse cx="11" cy="7" rx="3.6" ry="5" transform="rotate(40 11 7)"/></g>'],
   store: ['내 매장', '<path d="M2 1h12l2 5H0Z M2 8h3v4h6V8h3v7H2Z"/>'],
   account: ['O4O Account', '<circle cx="8" cy="4" r="3"/><path d="M1 15v-2a7 6 0 0 1 14 0v2Z"/>'],
-  'kpa-branch': ['약사회 분회', '<path d="M7 1h3v5h4v3h-4v5H7V9H2V6h5Z"/><circle cx="8.5" cy="2" r="2"/><circle cx="2" cy="7.5" r="2"/><circle cx="14" cy="7.5" r="2"/><circle cx="8.5" cy="14" r="2"/>'],
+  'kpa-branch': ['약사회 분회', '<path d="M8 14V8L3 3m5 5 5-5" fill="none" stroke="#fff" stroke-width="2.8"/><circle cx="3" cy="3" r="2.5"/><circle cx="13" cy="3" r="2.5"/><circle cx="8" cy="13" r="2.5"/>'],
   supplier: ['공급자', '<path d="m8 0 7 4v8l-7 4-7-4V4Zm0 2L3 5l5 3 5-3Zm-5 5v4l4 2V9Z" fill-rule="evenodd"/>'],
   funding: ['유통참여형 펀딩', '<path d="M1 10h3v5H1Zm5-4h4v9H6Zm6-5h3v14h-3Z"/>'],
   community: ['커뮤니티', '<path d="M1 1h14v10H7l-5 4v-4H1Z"/><path d="M4 5h2v2H4Zm3 0h2v2H7Zm3 0h2v2h-2Z" fill="#005177"/>'],
