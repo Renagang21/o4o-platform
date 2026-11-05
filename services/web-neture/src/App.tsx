@@ -1,3 +1,4 @@
+import { ServiceBrandIdentity } from './components/ServiceBrandIdentity';
 import CommunitySignagePage from './pages/community/CommunitySignagePage';
 import CommunityImprovementsPage from './pages/community/CommunityImprovementsPage';
 import { serveOperatorInvitationContinuation } from './lib/operatorInvitationReturn';
@@ -668,6 +669,7 @@ function App() {
     <AuthProvider>
       <LoginModalProvider>
         <BrowserRouter>
+          <ServiceBrandIdentity />
           {/* WO-O4O-WORK-SCOPE-CONTRACT-V0: active Work Scope(route+인증 파생) 제공.
               useLocation/useAuth 를 쓰므로 BrowserRouter 안 · AuthProvider 아래에 둔다.
               화면·route 동작은 바꾸지 않는다 — Phase 3 중앙 AI 입력의 연결점이다. */}

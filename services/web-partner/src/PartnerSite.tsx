@@ -219,7 +219,7 @@ export default function PartnerSite() {
   return (
     <>
       <GlobalHeader
-        brand={{ name: "O4O Partner", icon: "p.", href: "/" }}
+        brand={{ name: "O4O Partner", icon: "p.", logoSrc: `${import.meta.env.BASE_URL}brand/partner/logo-mark.svg`, href: "/" }}
         publicNav={PARTNER_PUBLIC_NAV}
         contextualNav={membership.operator ? PARTNER_OPERATOR_NAV : []}
         user={

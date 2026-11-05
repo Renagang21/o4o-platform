@@ -20,11 +20,11 @@ const read = (p: string) => readFileSync(resolve(ROOT, p), 'utf8');
 
 const APPS = [
   { app: 'web-neture', host: 'https://neture.co.kr/', favicon: '/favicon.svg' },
-  { app: 'web-pharmacy-business', host: 'https://pharmacy.neture.co.kr/', favicon: '/favicon.png' },
-  { app: 'web-store', host: 'https://store.neture.co.kr/', favicon: '/favicon.svg' },
-  { app: 'web-lecture', host: 'https://study.neture.co.kr/', favicon: '/favicon.svg' },
+  { app: 'web-pharmacy-business', host: 'https://pharmacy.neture.co.kr/', favicon: '/brand/pharmacy/favicon.svg' },
+  { app: 'web-store', host: 'https://store.neture.co.kr/', favicon: '/brand/store/favicon.svg' },
+  { app: 'web-lecture', host: 'https://study.neture.co.kr/', favicon: '/brand/lecture/favicon.svg' },
   // kpa-branch: 같은 index.html 이 분회 path · 분회 자체 도메인에도 서빙 → 고정 og:url 을 두지 않는다
-  { app: 'web-kpa-branch', host: null, favicon: '/favicon.svg' },
+  { app: 'web-kpa-branch', host: null, favicon: '/brand/kpa-branch/favicon.svg' },
 ] as const;
 
 const PRETENDARD = 'https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css';
@@ -42,8 +42,16 @@ describe.each(APPS)('$app — 공개 브랜드 진입 파일', ({ app, host, fav
   });
 
   it('favicon 을 참조하고 그 파일이 public 에 실제로 있다', () => {
-    expect(html).toMatch(new RegExp(`<link rel="icon"[^>]*href="${favicon}"`));
-    expect(existsSync(resolve(ROOT, `services/${app}/public${favicon}`))).toBe(true);
+    const document = new DOMParser().parseFromString(html, 'text/html');
+    const primary = document.querySelector('link[rel="icon"][type="image/svg+xml"]');
+    expect(primary?.getAttribute('href')?.replace('%BASE_URL%', '/')).toBe(favicon);
+    const icons = document.querySelectorAll('link[rel="icon"], link[rel="apple-touch-icon"]');
+    expect(icons.length).toBeGreaterThan(0);
+    for (const icon of icons) {
+      const href = icon.getAttribute('href')?.replace('%BASE_URL%', '/');
+      expect(href?.startsWith('/')).toBe(true);
+      expect(existsSync(resolve(ROOT, `services/${app}/public${href}`))).toBe(true);
+    }
   });
 
   it('og:url 은 서비스 host(또는 없음) · og:image 는 없다', () => {
