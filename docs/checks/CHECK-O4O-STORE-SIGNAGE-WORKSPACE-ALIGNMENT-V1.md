@@ -1,6 +1,6 @@
 # 내 매장 콘텐츠·사이니지 정비 검증
 
-작성일: 2026-11-05. 상태: 로컬 구현·검증 완료, PR 준비. PR 생성까지이며 main 병합·배포는 범위 밖이다.
+작성일: 2026-11-05. 상태: 로컬 구현·검증 완료, [PR #945](https://github.com/Renagang21/o4o-platform/pull/945) 생성. main 미병합·미배포. PR 생성까지이며 main 병합·배포는 범위 밖이다.
 
 기준 main: `695fb9814aee3c632aa14551759aaab5846fb8c3`.
 정책: [내 매장 정본](../baseline/O4O-STORE-CONTENT-SIGNAGE-WORKSPACE-V1.md).
@@ -78,3 +78,6 @@ DB 검증의 초기 fixture 누락/포트 조건/이전 실행 중복 자료는 
 개발 중 PR #944 서비스 로고가 main `bc33210dae`에 반영됐다. push 전 자기 브랜치만 그 기준으로 rebase했다.
 헤더의 한 충돌은 새 SVG 로고와 매장 이름 표시를 모두 보존했다. 업무공간/메뉴 회귀 69건을 다시 통과했다.
 다른 세션의 브랜치·체크아웃·로고 변경 원본은 수정하지 않았다.
+
+최신 main 정합 후 store 웹 production build도 성공했다. 검증 종료 후 이번 작업의 Vite·TCP 전달 프로세스를 종료하고,
+소유 task label을 확인한 일회용 PostgreSQL 컨테이너를 종료·자동 제거하여 합성 DB 자료를 남기지 않았다.
