@@ -132,6 +132,7 @@ export type { ResolveNotificationTargetOptions } from './notifications/resolveTa
 
 // WO-O4O-BUSINESS-REGISTRATION-COMMON-UI-COMPONENT-V1
 export { BusinessRegistrationFields } from './components/BusinessRegistrationFields.js';
+export {MemberRegistrationFields,type MemberRegistrationFieldsProps} from './components/MemberRegistrationFields.js';
 export type {
   BusinessRegistrationFieldsProps,
   BusinessRegistrationFieldsValue,

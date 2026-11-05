@@ -382,6 +382,7 @@ describe('EmailAuthService', () => {
 
       expect(h.store.users).toHaveLength(1);
       const u = h.store.users[0];
+      expect(u.businessInfo).toMatchObject({o4oMembershipRegistrationV1:{type:null,state:'pending',fields:{}}});
       expect(u.email).toBe('new.user@example.com');
       expect(u.phone).toBe('01012345678');
       expect(u.isEmailVerified).toBe(false);

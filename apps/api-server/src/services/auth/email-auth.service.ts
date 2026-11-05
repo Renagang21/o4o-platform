@@ -1,3 +1,4 @@
+import {initialMemberRegistration} from './new-member-registration.js';
 import {
   recordSignupTerms,
   recordSignupPrivacy,
@@ -216,7 +217,7 @@ export class EmailAuthService {
 
       const now = this.now();
       const repo = manager.getRepository(User);
-      const created = repo.create({
+      const created = repo.create({businessInfo:initialMemberRegistration(),
         email,
         name,
         nickname: input.nickname?.trim() || undefined,

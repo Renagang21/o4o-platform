@@ -13,7 +13,7 @@
  * 매장 접근 판정(isStoreOwner 'kpa')은 원장 `neture_pharmacy_memberships.status='active'` 를 읽는다 —
  * 원장 테이블의 소유는 인증 · 가입 트랙이고, Store 는 읽기만 한다.
  */
-import type { DataSource } from 'typeorm';
+import type { DataSource, QueryRunner } from 'typeorm';
 import { StoreSlugService } from '@o4o/platform-core/store-identity';
 import { organizationOpsService } from '../../organization/services/organization-ops.service.js';
 import {
@@ -69,9 +69,10 @@ export async function updatePharmacyStoreProfile(
 export async function activatePharmacyStore(
   dataSource: DataSource,
   input: { organizationId: string; pharmacyName: string },
+  queryRunner?: QueryRunner,
 ): Promise<void> {
   const { organizationId, pharmacyName } = input;
-  await organizationOpsService.enrollService({ organizationId, serviceCode: KPA_CANONICAL_SERVICE_CODE });
+  await organizationOpsService.enrollService({ organizationId, serviceCode: KPA_CANONICAL_SERVICE_CODE },queryRunner);
   await dataSource.query(
     `UPDATE organization_service_enrollments SET status = 'active', updated_at = NOW()
       WHERE organization_id = $1 AND service_code = $2 AND status <> 'active'`,

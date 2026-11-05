@@ -11,7 +11,7 @@ import type { MemberDetail } from "./member-workspace-model";
 const api = vi.hoisted(() => ({ post: vi.fn(), get: vi.fn() }));
 vi.mock("@o4o/auth-client", () => ({ authClient: { api } }));
 const detail = {
-  member: { userId: "target", version: "synthetic-version" },
+  member: { userId: "target", version: "synthetic-version", serviceStatus: "active" },
   permissions: { edit: true, manageAccount: true },
   pharmacies: [
     { organizationId: "organization", name: "합성 약국", status: "active" },
@@ -41,21 +41,15 @@ const confirmReason = () =>
   fireEvent.change(screen.getByLabelText("이용 관리 사유"), {
     target: { value: "합성 확인 사유" },
   });
-it("keeps access termination distinct from personal or business data deletion", async () => {
-  renderActions();
-  fireEvent.click(screen.getByText("이용 정지"));
-  expect(screen.getByRole("button", { name: "이용 정지 실행" })).toBeDisabled();
-  confirmReason();
-  fireEvent.click(
-    screen.getByLabelText("일시 이용 정지와 자료 유지를 확인했습니다."),
-  );
-  fireEvent.click(screen.getByRole("button", { name: "이용 정지 실행" }));
-  await waitFor(() =>
-    expect(api.post).toHaveBeenCalledWith(
-      "/qualifications/pharmacist/members/target/stop-access",
-      { reason: "합성 확인 사유", version: "synthetic-version" },
-    ),
-  );
+it('terminates member access without a staff command or employee confirmation',async()=>{
+ renderActions();expect(screen.queryByText('이용 정지')).toBeNull();fireEvent.click(screen.getByRole('button',{name:'회원 해지',exact:true}));
+ confirmReason();expect(screen.queryByRole('checkbox')).toBeNull();fireEvent.click(screen.getByRole('button',{name:'회원 해지 실행'}));
+ await waitFor(()=>expect(api.post).toHaveBeenCalledWith('/qualifications/pharmacist/members/target/terminate-access',{reason:'합성 확인 사유',version:'synthetic-version'}));
+});
+it('restores a withdrawn member through the dedicated member restore command',async()=>{
+ renderActions({...detail,member:{...detail.member,serviceStatus:'withdrawn'}});expect(screen.queryByRole('button',{name:'회원 해지',exact:true})).toBeNull();
+ fireEvent.click(screen.getByRole('button',{name:'이용 복구',exact:true}));confirmReason();fireEvent.click(screen.getByRole('button',{name:'이용 복구 실행'}));
+ await waitFor(()=>expect(api.post).toHaveBeenCalledWith('/qualifications/pharmacist/members/target/restore-access',{reason:'합성 확인 사유',version:'synthetic-version'}));
 });
 it("sale requires both-party confirmation and sends the selected organization and new owner email", async () => {
   renderActions();

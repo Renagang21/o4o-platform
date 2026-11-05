@@ -9,6 +9,8 @@ import type { StoreAddress } from './store-address.js';
  * Designed to comply with Korean business registration and e-commerce law
  */
 export interface BusinessInfo {
+  /** Server-owned signup snapshot, excluded from ordinary self-profile business patches. */
+  o4oMembershipRegistrationV1?: import('@o4o/types').MemberRegistration | {type:null;state:'pending';fields:Record<string,never>};
   // 기본 사업자 정보 (사업자등록증 기준 Canonical — WO-O4O-BUSINESS-REGISTRATION-FIELD-NAMING-STANDARD-V1)
   businessName?: string;             // 상호명
   businessNumber?: string;           // 사업자등록번호 (XXX-XX-XXXXX)

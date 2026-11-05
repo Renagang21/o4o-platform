@@ -59,6 +59,8 @@ const COLUMN = '"businessInfo"';
 const SAFE_KEY = /^[A-Za-z0-9_]+$/;
 
 export interface BusinessInfoPatch {
+  /** Internal owner capability; never populated from request bodies. */
+  registrationOwner?: 'member-registration';
   /** 최상위 키 patch — 이번 요청이 **명시적으로 수정하는 키만** 담는다. */
   root?: Record<string, unknown>;
   /**
@@ -98,6 +100,10 @@ export function buildBusinessInfoUpdate(
   patch: BusinessInfoPatch,
   startIndex: number,
 ): BusinessInfoUpdateFragment | null {
+  const reserved='o4oMembershipRegistrationV1';
+  if((Object.hasOwn(patch.root??{},reserved)||Object.hasOwn(patch.nested??{},reserved))&&patch.registrationOwner!=='member-registration') {
+    throw new Error('MEMBER_REGISTRATION_RESERVED_KEY');
+  }
   const root = patch.root ?? {};
   const nestedEntries = Object.entries(patch.nested ?? {})
     // 하위 키가 하나도 없는 중첩 patch 는 write 대상이 아니다 (빈 객체로 덮어쓰지 않는다).

@@ -2,6 +2,7 @@
 // Export all type definitions here
 
 export * from './api.js';
+export * from './member-registration.js';
 
 // Legacy auth exports (selectively, for backward compatibility)
 // Note: User, Permission are now in auth/index.ts (SSOT)
