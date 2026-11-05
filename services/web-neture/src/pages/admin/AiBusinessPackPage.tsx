@@ -158,7 +158,7 @@ export default function AiBusinessPackPage() {
             <div className="p-4 bg-gray-50 rounded-lg">
               <p className="font-medium text-gray-900 mb-2">매장 페이지에서 질문하는 경우</p>
               <p className="text-sm text-gray-600">
-                "이 매장의 인기 상품이 뭐입니다?"
+                "이 매장의 인기 상품이 무엇입니까?"
               </p>
               <p className="text-sm text-primary-600 mt-2">
                 → 해당 매장의 다른 상품들이 함께 표시됩니다

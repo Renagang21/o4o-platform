@@ -20,8 +20,8 @@
 - [x] Windows 설치/실행 UI와 진행 상태·완료/실패 표시 개선
 - [x] PC 프로그램/서버/현재 계정 연결 단계를 분리하고 확인 결과 유지
 - [x] 코드 기반 Demo 약국 경영자·약사 자격 연결과 일반 계정 격리 검증
-- [ ] 관련 회귀·빌드·타입·desktop/mobile 브라우저 검증 및 한계 기록
-- [ ] 문서 정합·민감정보·diff 점검 → commit/push → 기존 PR 확인 후 PR 생성
+- [x] 관련 회귀·빌드·타입·desktop/mobile 브라우저 검증 및 한계 기록
+- [x] 문서 정합·민감정보·diff 점검 → commit/push → 기존 PR 확인 후 PR 생성
 
 ## 조사·설계·검증 기록
 
@@ -50,3 +50,14 @@
 ## 문서 정합과 인계
 
 기존 WO/CHECK의 과거 실행 결과는 다시 쓰지 않는다. 현행 PC guide·Demo 정본을 이번 사용자 요청 범위에서 보완하고 UI 문체 guide를 추가했다. main의 중앙 운영 책임과 일반 약사 수동 심사·조직/정책 동의 계약을 유지한다. WORKTREE_DISPOSITION: KEEP — PR 검토/추가 수정과 Windows 검증에 필요. 최종 SHA·PR·남은 체크는 완료 보고로 인계한다.
+
+
+## PR #943 및 후속 검증
+
+- PR: https://github.com/Renagang21/o4o-platform/pull/943 (초안으로 생성, main 병합/배포 미실행).
+- 개발 중 main의 회원 등록 PR #941이 반영돼 `b6301cdf20`을 작업 branch에 정상 merge했다. 충돌한 6개 파일은 incoming 회원 등록 로직을 보존하고 시스템 문구만 다시 적용했다. 다른 세션 branch와 main 자체는 변경하지 않았다.
+- 통합 후 회원 등록·인증 및 이전 실패 회귀 **7 suites / 182 tests PASS**. API typecheck PASS. 새 account-ui export의 dist 누락은 해당 package rebuild 후 Admin/Neture typecheck PASS로 확인했다.
+- API 전체 실행은 **646 suites PASS / 78 SKIP, 9993 tests PASS / 1202 SKIP / 5 FAIL**이었다. 실패한 4 suites는 문구 소스 계약·자연어 단어 사전·기존 mock·src 밖 content-editor 기대값이었다. 단어 사전/AI 지침/예제 속성은 원문 보존 대상으로 복원하고 변환기에서도 제외했다. 실제 입력 동작을 약화하지 않고 실패 suites를 수정 후 **46 tests PASS**, 통합 후 포함 회귀는 위 182 tests PASS로 재확인했다. 전체 실행 자체를 all-green으로 보고하지 않는다.
+- 실제 배포 포맷으로 Windows Node 22.18.0 archive의 공식 checksum을 검증하고 release ZIP/embedded installer를 로컬 생성했다. ZIP 33,531,740 bytes, installer 33,539,072 bytes로 32MiB 제한 아래다. publish/upload는 하지 않았다.
+- 첫 Windows CI는 packaged runtime health 단계까지 통과한 뒤, 이미 종료된 CMD PID를 taskkill하려는 기존 테스트 정리에서 실패했다. 새 시작 방식에 맞춰 테스트 전용 패키지의 --worker를 정확한 exe 경로로 식별하고 Ctrl+C 정상 종료를 검증하도록 보완했다. 강제 종료로 숨기지 않으며, CI 결과는 PR 최신 HEAD에서 확인한다. Linux 전용 결과와 실제 Windows CI를 구분한다.
+- Windows 최초 설치 consent, GUI의 사용자 시각 검수, 실제 사용자 PC의 LNA/운영 계정 연결은 미검증이다. 실제 사용자 PC/credential/pairing/운영 원장은 수정하지 않았다.

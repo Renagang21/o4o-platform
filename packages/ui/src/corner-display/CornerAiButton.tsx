@@ -190,7 +190,7 @@ export const CornerAiButton: React.FC<CornerAiButtonProps> = ({
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 aria-label="AI 상담 요청"
-                placeholder="예: 이 제품의 특징이 뭐입니다? / 추천 상품 알려주시기 바랍니다"
+                placeholder="예: 이 제품의 특징이 무엇입니까? / 추천 상품 알려주시기 바랍니다"
                 submitLabel={isProcessing ? '처리 중...' : '질문하기'}
                 busy={isProcessing}
                 disabled={isButtonDisabled}

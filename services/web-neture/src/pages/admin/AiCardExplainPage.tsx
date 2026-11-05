@@ -145,7 +145,7 @@ export default function AiCardExplainPage() {
             <div className="p-4 bg-gray-50 rounded-lg">
               <p className="font-medium text-gray-900 mb-2">매장 페이지에서 질문</p>
               <p className="text-sm text-gray-600">
-                "이 매장에서 가장 인기 있는 상품이 뭐입니다?"
+                "이 매장에서 가장 인기 있는 상품이 무엇입니까?"
               </p>
               <p className="text-sm text-green-600 mt-2">
                 → 해당 매장의 상품 카드 우선 노출 (same_store)
