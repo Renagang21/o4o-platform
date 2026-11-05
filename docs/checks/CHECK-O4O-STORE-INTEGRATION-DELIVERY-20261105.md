@@ -40,6 +40,8 @@ Neture `/downloads/pc-connection/release.json`의 sourceSha가 4db39d8368과 일
 
 사용자가 외부 공개 YouTube 영상을 선택해 테스트하도록 요청했다. `Blender Big Buck Bunny official` 검색과 공개 샘플 후보 `https://www.youtube.com/watch?v=aqz-KE-bpKQ`의 oEmbed 요청을 시도했지만 `www.youtube.com` CONNECT가 클라우드 프록시 403으로 거절됐다. 검색 성공·현재 영상 공개/퍼가기 허용·실제 재생 성공을 주장하지 않는다.
 
+추가로 배포된 것과 동일한 `VideoPlayback` 소스를 격리 Chromium 1920×1080에서 실제 YouTube 후보 URL로 실행했다. 합성 YouTube API 응답은 제공하지 않았다. `www.youtube.com`의 실제 응답 HTTP 403과 ‘YouTube 재생기를 불러오지 못했습니다’ 오류 표시를 확인했고 `ended=false`, `playbackConfirmed=false`였다. 이 검사는 운영 저장/물리 TV 송출 검증과 다르며 업무 데이터 생성은 0건이다.
+
 현재 운영 자료가 비어 있고 Store 삭제는 숨김 처리이므로 운영 일회성 영상/목록을 생성하지 않았다. 이는 [AGENTS.md §5](../../AGENTS.md)의 ‘종료 후 완전 삭제할 수 없는 테스트는 운영 환경에서 실행하지 않는다’ 기준을 따른다. 실제 영상/물리 TV 송출은 **BLOCKED / 미검증**이며 배포·운영 조회 성공과 구분한다. 사용자 기기의 네트워크·외부 영상 제공자 상태도 이 클라우드의 결과로 단정하지 않는다.
 
 ## 남은 문제·보존
