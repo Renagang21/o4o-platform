@@ -24,7 +24,7 @@
 | 의존 패키지 | API dependency closure, types/account-ui, appearance-system/lms-client/auth-context 빌드 PASS. 새 worktree의 누락 dist는 기존 빌드로 준비했으며 앱/manifest 변경으로 우회하지 않음 |
 | 타입·운영 빌드 | API/Admin/Neture tsc 및 production build PASS. 프런트의 기존 큰 청크 안내는 유지 |
 | 정식 DB | 라벨이 있는 별도 PostgreSQL15 tmpfs 컨테이너, loopback55432·전용 fixture DB. baseline+58 incremental schema prefix fingerprints PASS. schema migration/backfill 추가 없음 |
-| DB·HTTP·카카오 신규 가입 | 전용 가입25, 기존 회원/임시 비밀번호26, HTTP경계5, 카카오 신규가입1: 합계57개 검증. 각 유형 승인·재요청·동시 승인·중복 면허 rollback·소유 문서·정책 증적·사업자 충돌·직원/타서비스 불변 포함 |
+| DB·HTTP·카카오 신규 가입 | 전용 가입25, 기존 회원/임시 비밀번호26, HTTP경계13, 카카오 신규가입1: 합계65개 검증. 각 유형 승인·재요청·동시 승인·중복 면허 rollback·소유 문서·정책 증적·사업자 충돌·직원/타서비스 불변 포함 |
 | 추가 회귀 | 인증/Google전용/이메일/사업자 JSON writer/메인 판정/직원 Store 접근/기존 HTTP 경계10개 suite227개 PASS. 수정한 Google·이메일 신규 가입에는 실제 생성된 표식을 추가 확인. 추가 Supplier boundary 및 직원 업무 source/behavior 회귀 PASS |
 | Admin 화면 | 회원 목록/수정14 + 이용 관리5 =19개 PASS. 단일 행·선택·가입 필드·실패 draft·403 정리·임시 비밀번호 회원 전환 시 제거·Admin 매도/폐업 보존 |
 | Neture 화면 | 인증·가입·운영 진입·메인 안내12개 suite127개 PASS. 신규 가입8개는 역할별 필드/409 draft/조회 재시도/신규 계정 전용 이동을 검증 |
@@ -50,3 +50,9 @@ PR 상태·SHA와 CI 관찰 결과는 PR 및 완료 보고에서 별도로 명�
 Codex 리뷰 보완: 기존 활성 회원의 대기/반려 자격·공급자 신청을 새 회원 대기로 승격해 메인을 막지 않도록 서버 전용 legacyMainAccess 읽기 호환을 유지한다. 이 표식은 자격/사업체 승인을 대신하지 않고 공통 정지·명시 해지보다 우선하지 않는다. 공급자 증빙은 neture_suppliers의 문서 연결과 현재 owner를 함께 검사해 이전 제출자 접근을 차단한다. 같은 주소를 운영자가 확인해 저장한 경우도 추가 확인메일 없이 완료한다. 관련 DB 회귀5개와 메인 판정3개를 추가했다.
 
 전체 PR CI에서 기존 AI 요청 HTTP 검증의 대기 안내 문구 기대 1건이 새 문구와 달랐다. 해당 문구만 현재 정책에 맞춰 정정한 뒤 suite61개가 통과했다. 권한 guard·에러 상태·테스트 범위는 유지한다. 최신 보완은 기존 회원/HTTP/카카오57개·메인 판정19개·가입 화면8개·변경 API/Neture build/lint로 확인했다.
+
+2026-11-05 추가 진단: 사용자 승인을 받은 별도 읽기 전용 workflow(41938573981)에서 SonarCloud 보안 등급 C의 원인이 신규 업로드 제한의 typescript:S5693 한 건임을 확인했다. 신규 통합 가입/정정 업로드를 8,000,000바이트 이하·파일1개·추가 필드0개로 제한하고 multipart parts/header도 제한했다. 두 업로드 경로에서 상한 직전/상한 허용, 초과 및 추가 필드/두 번째 파일 거절을 검증한다. 분석 기준 억제/완화는 하지 않는다. 임시 진단 workflow는 main에 병합하지 않는다.
+
+증빙 조회 경계 재점검: 신규 회원 API와 기존 약국 서류 조회가 같은 소유관계 helper를 사용하도록 연결했다. 공급자 원장에 연결된 서류를 이전 제출자가 구형 다운로드 URL로 우회해 읽지 못하도록 하며, 기존 약국 서류 권한 테스트와 정식 DB의 이전/현재 소유자 판정으로 함께 검증한다.
+
+보완 검증 결과: 정식 스키마·기존 회원·업로드 HTTP·카카오 65개, 기존 증빙/신규 업로드 23개, Admin19개·가입 화면8개 및 API build/lint PASS. 공개 Sonar 진단 메타데이터와 읽기 전용 workflow 사본은 `/workspace/.o4o-cloud/artifacts/member-registration-unified-20261104/sonar`에 보관했다.

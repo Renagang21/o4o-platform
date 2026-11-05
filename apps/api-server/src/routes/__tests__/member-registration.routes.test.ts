@@ -163,3 +163,66 @@ it('checks document ownership before reading a private stream', async () => {
     businessRegistrationDocumentId: target,
   });
 });
+
+describe.each(['/self/document', `/members/${target}/document`])(
+  'bounded document upload: %s',
+  (path) => {
+    const send = () =>
+      request(app).post(path).set('x-user', actor).set('x-method', 'google');
+    const pdf = (size: number) => {
+      const bytes = Buffer.alloc(size);
+      bytes.write('%PDF-1.4');
+      return bytes;
+    };
+    it.each([7_999_999, 8_000_000])(
+      'accepts one %i-byte file up to the 8MB bound',
+      async (size) => {
+        upload.mockResolvedValueOnce({ id: target });
+        const response = await send().attach(
+          'file',
+          pdf(size),
+          'synthetic.pdf',
+        );
+        expect(response.status).toBe(200);
+        expect(upload).toHaveBeenCalledWith(
+          path === '/self/document' ? actor : target,
+          expect.objectContaining({
+            size,
+            buffer: expect.any(Buffer),
+          }),
+        );
+      },
+    );
+    it.each([8_000_001])(
+      'rejects a %i-byte file before document storage',
+      async (size) => {
+        const response = await send().attach(
+          'file',
+          pdf(size),
+          'synthetic.pdf',
+        );
+        expect(response.status).toBe(400);
+        expect(response.body.code).toBe('INVALID_DOCUMENT');
+        expect(response.body.error).toContain('8MB 이하');
+        expect(upload).not.toHaveBeenCalled();
+      },
+    );
+    it('rejects non-file fields and a second file before document storage', async () => {
+      expect(
+        (
+          await send()
+            .field('userId', target)
+            .attach('file', pdf(16), 'synthetic.pdf')
+        ).status,
+      ).toBe(400);
+      expect(
+        (
+          await send()
+            .attach('file', pdf(16), 'one.pdf')
+            .attach('file', pdf(16), 'two.pdf')
+        ).status,
+      ).toBe(400);
+      expect(upload).not.toHaveBeenCalled();
+    });
+  },
+);

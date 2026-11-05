@@ -2,6 +2,7 @@ import { Storage } from '@google-cloud/storage';
 import { randomUUID } from 'node:crypto';
 import type { DataSource } from 'typeorm';
 import { KycDocument } from '../../../entities/KycDocument.js';
+import {canReadBusinessRegistrationDocument} from './business-registration-document-access.js';
 import { NeturePharmacyError } from '../constants.js';
 
 /** Private documents, owned by the authenticated user; never accept a caller URL. */
@@ -36,11 +37,7 @@ export class BusinessRegistrationDocumentService {
   }
 
   async canReadDocument(userId: string, id: string):Promise<boolean> {
-    const rows=await this.dataSource.query(`SELECT d.id FROM kyc_documents d WHERE d.id=$2 AND d."documentType"='business_registration'
-      AND ((d.user_id=$1 AND NOT EXISTS(SELECT 1 FROM organizations o WHERE o.metadata->'businessProfile'->>'businessRegistrationDocumentId'=d.id::text))
-      OR EXISTS(SELECT 1 FROM organizations o JOIN organization_members m ON m.organization_id=o.id
-        WHERE o.metadata->'businessProfile'->>'businessRegistrationDocumentId'=d.id::text AND m.user_id=$1 AND m.role='owner' AND m.left_at IS NULL))`,[userId,id]);
-    return rows.length>0;
+    return canReadBusinessRegistrationDocument(this.dataSource,userId,id);
   }
 
   async findOwned(userId:string,id:string){

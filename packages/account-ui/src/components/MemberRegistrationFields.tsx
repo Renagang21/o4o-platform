@@ -110,9 +110,11 @@ export function MemberRegistrationFields({
           {!readOnly && onUpload && (
             <label className="block">
               사업자등록증 첨부
+              <span className="ml-2 text-slate-500">PDF·JPG·PNG, 8MB 이하</span>
               <input
                 className={input}
                 type="file"
+                aria-label="사업자등록증 첨부"
                 accept="application/pdf,image/png,image/jpeg"
                 onChange={(event) => {
                   const file = event.target.files?.[0];

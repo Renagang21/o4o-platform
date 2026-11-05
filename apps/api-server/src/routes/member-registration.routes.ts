@@ -41,7 +41,14 @@ const policies = z
   .optional();
 const upload = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: 10 * 1024 * 1024, files: 1 },
+  // Bound both the file buffer and non-file multipart allocations before storage work.
+  limits: {
+    fileSize: 8_000_000,
+    files: 1,
+    fields: 0,
+    parts: 2,
+    headerPairs: 100,
+  },
 }).single('file');
 function fail(error: unknown, res: Response) {
   if (error instanceof OperationError) {
@@ -63,32 +70,26 @@ function fail(error: unknown, res: Response) {
     return;
   }
   if (error instanceof z.ZodError) {
-    res
-      .status(400)
-      .json({
-        success: false,
-        code: 'INVALID_REGISTRATION_INPUT',
-        error: error.issues[0]?.message ?? '입력 정보를 확인해 주세요.',
-      });
+    res.status(400).json({
+      success: false,
+      code: 'INVALID_REGISTRATION_INPUT',
+      error: error.issues[0]?.message ?? '입력 정보를 확인해 주세요.',
+    });
     return;
   }
   if (error instanceof multer.MulterError) {
-    res
-      .status(400)
-      .json({
-        success: false,
-        code: 'INVALID_DOCUMENT',
-        error: '10MB 이하 파일 한 개를 선택해 주세요.',
-      });
+    res.status(400).json({
+      success: false,
+      code: 'INVALID_DOCUMENT',
+      error: '8MB 이하 파일 한 개만 선택해 주세요.',
+    });
     return;
   }
-  res
-    .status(503)
-    .json({
-      success: false,
-      code: 'MEMBER_REGISTRATION_UNAVAILABLE',
-      error: '처리하지 못했습니다. 최신 정보와 권한을 확인해 주세요.',
-    });
+  res.status(503).json({
+    success: false,
+    code: 'MEMBER_REGISTRATION_UNAVAILABLE',
+    error: '처리하지 못했습니다. 최신 정보와 권한을 확인해 주세요.',
+  });
 }
 /** Identity middleware is common; central commands additionally require Google + current delegated authority. */
 export function createMemberRegistrationRoutes(

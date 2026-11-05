@@ -1,3 +1,4 @@
+import {canReadBusinessRegistrationDocument} from '../../modules/neture-pharmacy/services/business-registration-document-access.js';
 import type { EntityManager } from 'typeorm';
 import {
   MEMBER_REGISTRATION_KEY,
@@ -231,15 +232,7 @@ export async function assertRegistrationDocument(
 ) {
   const id = fields.businessRegistrationDocumentId;
   if (!id) return;
-  const rows = await m.query(
-    `SELECT d.id FROM kyc_documents d WHERE d.id=$2 AND d."documentType"='business_registration' AND
-    ((d.user_id=$1 AND NOT EXISTS(SELECT 1 FROM organizations o WHERE o.metadata->'businessProfile'->>'businessRegistrationDocumentId'=d.id::text)
-      AND NOT EXISTS(SELECT 1 FROM neture_suppliers ns WHERE ns.business_registration_document_id=d.id))
-    OR EXISTS(SELECT 1 FROM organizations o JOIN organization_members om ON om.organization_id=o.id WHERE
-      (o.metadata->'businessProfile'->>'businessRegistrationDocumentId'=d.id::text OR EXISTS(SELECT 1 FROM neture_suppliers ns WHERE ns.organization_id=o.id AND ns.business_registration_document_id=d.id)) AND om.user_id=$1 AND om.role='owner' AND om.left_at IS NULL))`,
-    [target, id],
-  );
-  if (!rows.length)
+  if (!await canReadBusinessRegistrationDocument(m,target,id))
     throw new OperationError(
       403,
       'REGISTRATION_DOCUMENT_FORBIDDEN',

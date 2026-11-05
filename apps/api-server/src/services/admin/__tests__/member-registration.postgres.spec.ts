@@ -17,6 +17,7 @@ import {
   MEMBER_REGISTRATION_KEY,
   type MemberRegistrationType,
 } from '@o4o/types';
+import {canReadBusinessRegistrationDocument} from '../../../modules/neture-pharmacy/services/business-registration-document-access.js';
 import { assertRegistrationDocument } from '../member-registration-data.js';
 import { buildBusinessInfoUpdateStatement } from '../../../utils/business-info-write.js';
 @Entity('users')
@@ -739,6 +740,8 @@ const enabled = process.env.OPERATOR_INVITE_TEST_PORT === '55432';
       await assertRegistrationDocument(db, other, {
         businessRegistrationDocumentId: doc.id,
       });
+      expect(await canReadBusinessRegistrationDocument(db,other,doc.id)).toBe(true);
+      expect(await canReadBusinessRegistrationDocument(db,target,doc.id)).toBe(false);
       await expect(
         assertRegistrationDocument(db, target, {
           businessRegistrationDocumentId: doc.id,
