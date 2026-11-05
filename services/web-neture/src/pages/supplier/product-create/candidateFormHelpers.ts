@@ -48,20 +48,20 @@ export function flattenCategories(
  */
 const CREATE_ERROR_MESSAGE: Record<string, string> = {
   SUPPLIER_NOT_ACTIVE: '공급자 계정이 아직 활성화되지 않았습니다. 승인 완료 후 요청할 수 있습니다.',
-  SUPPLIER_NOT_FOUND: '공급자 정보를 찾을 수 없습니다. 공급자 등록 상태를 확인해 주세요.',
-  CANDIDATE_NAME_REQUIRED: '상품명을 입력해 주세요.',
+  SUPPLIER_NOT_FOUND: '공급자 정보를 찾을 수 없습니다. 공급자 등록 상태를 확인해 주시기 바랍니다.',
+  CANDIDATE_NAME_REQUIRED: '상품명을 입력해 주시기 바랍니다.',
   INVALID_REGULATORY_TYPE: '선택한 규제 유형이 올바르지 않습니다.',
   DRUG_CATEGORY_REQUIRED:
-    '의약품은 일반의약품/전문의약품 구분이 필요합니다. 제품 유형을 다시 선택해 주세요.',
-  INVALID_CATEGORY_ID: '카테고리를 다시 선택해 주세요.',
-  INVALID_BRAND_ID: '브랜드 정보가 올바르지 않습니다. 브랜드명을 다시 입력해 주세요.',
+    '의약품은 일반의약품/전문의약품 구분이 필요합니다. 제품 유형을 다시 선택해 주시기 바랍니다.',
+  INVALID_CATEGORY_ID: '카테고리를 다시 선택해 주시기 바랍니다.',
+  INVALID_BRAND_ID: '브랜드 정보가 올바르지 않습니다. 브랜드명을 다시 입력해 주시기 바랍니다.',
   INVALID_PRICE: '공급가/소비자 참고가는 0 이상의 숫자여야 합니다.',
-  INVALID_URL: '이미지 주소가 올바르지 않습니다. 이미지를 다시 선택해 주세요.',
+  INVALID_URL: '이미지 주소가 올바르지 않습니다. 이미지를 다시 선택해 주시기 바랍니다.',
   TOO_MANY_IMAGES: '상세 이미지는 최대 20장까지 등록할 수 있습니다.',
-  FIELD_TOO_LONG: '입력값이 허용 길이를 초과했습니다. 상품명·설명 길이를 줄여 주세요.',
+  FIELD_TOO_LONG: '입력값이 허용 길이를 초과했습니다. 상품명·설명 길이를 줄여 주시기 바랍니다.',
   FORBIDDEN_FIELD:
-    '허용되지 않은 항목이 포함되어 있습니다. 화면을 새로고침한 뒤 다시 시도해 주세요.',
-  INTERNAL_ERROR: '서버 오류로 요청하지 못했습니다. 잠시 후 다시 시도해 주세요.',
+    '허용되지 않은 항목이 포함되어 있습니다. 화면을 새로고침한 뒤 다시 시도해 주시기 바랍니다.',
+  INTERNAL_ERROR: '서버 오류로 요청하지 못했습니다. 잠시 후 다시 시도해 주시기 바랍니다.',
 };
 
 export function createErrorMessage(

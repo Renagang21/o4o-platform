@@ -44,6 +44,6 @@ export function MyHomeBusinessEntry({ businessKey, organizationId, hasCommunity,
         <button key={destination} type="button" disabled={busy} onClick={() => void open(destination)} className="min-h-11 rounded-lg border px-3 py-2 text-sm text-blue-700 disabled:opacity-50">{label}</button>)}
     </div>
     {busy && <p role="status" className="mt-2 text-xs text-slate-500">이동 중…</p>}
-    {error && <p role="alert" className="mt-2 text-sm text-amber-900">이동하지 못했습니다. 이용 상태를 확인하고 다시 시도해 주세요.</p>}
+    {error && <p role="alert" className="mt-2 text-sm text-amber-900">이동하지 못했습니다. 이용 상태를 확인하고 다시 시도해 주시기 바랍니다.</p>}
   </div>;
 }

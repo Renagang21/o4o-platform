@@ -95,9 +95,9 @@ export function validateNewContent(draft: {
   title: string;
   html: string;
 }): string | null {
-  if (!draft.title.trim()) return "제목을 입력해 주세요.";
+  if (!draft.title.trim()) return "제목을 입력해 주시기 바랍니다.";
   if (!draft.html.trim() || draft.html.trim() === "<p></p>")
-    return "본문을 직접 작성하거나 붙여넣어 주세요.";
+    return "본문을 직접 작성하거나 붙여넣어 주시기 바랍니다.";
   return null;
 }
 
@@ -331,14 +331,14 @@ async function verifySavedConsultation(draft: TextContentDraft, id: string, resu
 export function consultationSaveError(error: unknown): string {
   const code = (error as { code?: string })?.code;
   const messages: Record<string, string> = {
-    PRODUCT_LINK_CHANGED: '상품 연결이 변경됐습니다. 입력을 보관한 뒤 상품 목록에서 자료를 다시 열어 주세요.',
-    INVALID_PRODUCT_REF: '현재 매장의 상품을 확인할 수 없습니다. 상품의 사용 상태와 매장 선택을 확인해 주세요.',
-    INVALID_CONSULTATION: '상품·목적·언어·근거 입력을 확인해 주세요. 작성 내용은 유지했습니다.',
-    EMPTY_CONSULTATION: '저장할 본문을 입력해 주세요.',
-    NOT_FOUND: '자료를 찾을 수 없습니다. 입력을 보관한 뒤 자료함에서 다시 확인해 주세요.',
-    CONTENT_CONFLICT: '다른 저장본이 있습니다. 최신 자료를 불러오지 못했으므로 입력을 유지했습니다. 다시 시도해 주세요.',
+    PRODUCT_LINK_CHANGED: '상품 연결이 변경됐습니다. 입력을 보관한 뒤 상품 목록에서 자료를 다시 열어 주시기 바랍니다.',
+    INVALID_PRODUCT_REF: '현재 매장의 상품을 확인할 수 없습니다. 상품의 사용 상태와 매장 선택을 확인해 주시기 바랍니다.',
+    INVALID_CONSULTATION: '상품·목적·언어·근거 입력을 확인해 주시기 바랍니다. 작성 내용은 유지했습니다.',
+    EMPTY_CONSULTATION: '저장할 본문을 입력해 주시기 바랍니다.',
+    NOT_FOUND: '자료를 찾을 수 없습니다. 입력을 보관한 뒤 자료함에서 다시 확인해 주시기 바랍니다.',
+    CONTENT_CONFLICT: '다른 저장본이 있습니다. 최신 자료를 불러오지 못했으므로 입력을 유지했습니다. 다시 시도해 주시기 바랍니다.',
   };
   const status = (error as { status?: number })?.status;
-  if (!code && (status === 401 || status === 403)) return '로그인과 현재 매장 접근 권한을 다시 확인해 주세요. 입력은 유지했습니다.';
-  return (code && messages[code]) || '저장하지 못했습니다. 입력 내용을 유지한 채 다시 시도해 주세요.';
+  if (!code && (status === 401 || status === 403)) return '로그인과 현재 매장 접근 권한을 다시 확인해 주시기 바랍니다. 입력은 유지했습니다.';
+  return (code && messages[code]) || '저장하지 못했습니다. 입력 내용을 유지한 채 다시 시도해 주시기 바랍니다.';
 }

@@ -43,7 +43,7 @@ export function createCommunityHomeRoutes(
       throw new CommunityManagementError(
         400,
         "INVALID_PAGE",
-        "페이지를 확인해 주세요.",
+        "페이지를 확인해 주시기 바랍니다.",
       );
     return +page;
   };

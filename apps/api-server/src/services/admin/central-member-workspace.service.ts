@@ -115,7 +115,7 @@ export class CentralMemberWorkspaceService {
   async correct(actor: string, target: string, input: MemberCorrection) {
     const reason = operationReason(input.reason);
     const phone = normalizePhoneDigits(input.phone);
-    if (input.phone.trim() && !isPhoneShapeValid(input.phone)) throw new OperationError(400, 'INVALID_PHONE', '올바른 국내 휴대전화 번호를 입력해 주세요.');
+    if (input.phone.trim() && !isPhoneShapeValid(input.phone)) throw new OperationError(400, 'INVALID_PHONE', '올바른 국내 휴대전화 번호를 입력해 주시기 바랍니다.');
     return await this.db.transaction(async manager => {
       const access=await memberWorkspaceAccess(manager, actor, true);
       if (!access.edit) throw new OperationError(403, 'MEMBER_ADMIN_REQUIRED', '회원 정보 정정 업무 위임이 필요합니다.');
@@ -123,7 +123,7 @@ export class CentralMemberWorkspaceService {
       if(protectedTarget&&!access.manageAccount)throw new OperationError(403,'ADMIN_ACCOUNT_PROTECTED','전체 관리자 정보는 전체 관리자가 정정해야 합니다.');
       const [before] = await manager.query(`SELECT ${identity} FROM users u WHERE u.id=$1 FOR UPDATE`, [target]);
       if (!before) throw new OperationError(404, 'MEMBER_NOT_FOUND', '회원을 찾을 수 없습니다.');
-      if (before.version !== input.version) throw new OperationError(409, 'MEMBER_CHANGED', '회원 정보가 변경되었습니다. 다시 조회한 뒤 정정해 주세요.');
+      if (before.version !== input.version) throw new OperationError(409, 'MEMBER_CHANGED', '회원 정보가 변경되었습니다. 다시 조회한 뒤 정정해 주시기 바랍니다.');
       const result=await correctIdentity(manager,actor,target,before,access,input);
       if(input.registration){
         const next=await correctRegistration(manager,target,input.registration);
@@ -149,8 +149,8 @@ export class CentralMemberWorkspaceService {
         throw new OperationError(403,'ACCOUNT_ADMIN_REQUIRED','계정 가입 거부는 전체 관리자 업무입니다.');
       const [before] = await manager.query(`SELECT ${identity} FROM users u WHERE u.id=$1 FOR UPDATE`,[target]);
       if (!before) throw new OperationError(404,'MEMBER_NOT_FOUND','회원을 찾을 수 없습니다.');
-      if (before.version !== input.version) throw new OperationError(409,'MEMBER_CHANGED','회원 정보가 변경되었습니다. 다시 조회해 주세요.');
-      if (before.accountStatus !== 'pending') throw new OperationError(409,'NOT_PENDING_REGISTRATION','대기 중인 가입만 거부할 수 있습니다. 활성 회원은 서비스별 이용 중지 절차를 사용해 주세요.');
+      if (before.version !== input.version) throw new OperationError(409,'MEMBER_CHANGED','회원 정보가 변경되었습니다. 다시 조회해 주시기 바랍니다.');
+      if (before.accountStatus !== 'pending') throw new OperationError(409,'NOT_PENDING_REGISTRATION','대기 중인 가입만 거부할 수 있습니다. 활성 회원은 서비스별 이용 중지 절차를 사용해 주시기 바랍니다.');
       const [privileged] = await manager.query(`SELECT 1 FROM role_assignments WHERE user_id=$1 AND is_active=true AND (role='platform:super_admin' OR role ~ '(^|:|_)(admin|operator)$') LIMIT 1`,[target]);
       if (privileged) throw new OperationError(409,'PRIVILEGED_ACCOUNT','운영 권한이 있는 계정은 가입 거부할 수 없습니다.');
       await manager.query(`UPDATE users SET status='rejected',"updatedAt"=clock_timestamp() WHERE id=$1`,[target]);
@@ -167,11 +167,11 @@ export class CentralMemberWorkspaceService {
       if (!access.edit || !access.applications) throw new OperationError(403,'BUSINESS_REVIEW_REQUIRED','기존 가입 사업자 정보 정정 권한이 필요합니다.');
       const [before]=await manager.query(`SELECT ${identity},u."businessInfo" AS business FROM users u WHERE u.id=$1 AND EXISTS(SELECT 1 FROM service_memberships WHERE user_id=$1 AND service_key='neture') FOR UPDATE`,[target]);
       if (!before) throw new OperationError(404,'BUSINESS_NOT_FOUND','기존 Neture 가입 자료를 찾을 수 없습니다.');
-      if (before.version!==input.version) throw new OperationError(409,'MEMBER_CHANGED','회원 정보가 변경되었습니다. 다시 조회해 주세요.');
+      if (before.version!==input.version) throw new OperationError(409,'MEMBER_CHANGED','회원 정보가 변경되었습니다. 다시 조회해 주시기 바랍니다.');
       const patch=Object.fromEntries(Object.entries(input.fields).map(([key,value])=>[mapping[key],value || null]));
       if(Object.hasOwn(before.business??{},'ceoName'))patch.ceoName=input.fields.representativeName||null;
       const update=buildBusinessInfoUpdateStatement({root:patch},target);
-      if(!update)throw new OperationError(400,'BUSINESS_FIELDS_REQUIRED','정정할 사업자 정보를 입력해 주세요.');
+      if(!update)throw new OperationError(400,'BUSINESS_FIELDS_REQUIRED','정정할 사업자 정보를 입력해 주시기 바랍니다.');
       await manager.query(update.sql,update.params.map(privateValue));
       await recordOperation(manager,'neture',actor,'member.legacy_business_corrected',{targetUserId:target,reason,previous:Object.fromEntries(Object.entries(mapping).map(([key,column])=>[key,before.business?.[column]??(key==='representativeName'?before.business?.ceoName??null:null)])),next:input.fields});
       return {saved:true};
@@ -180,18 +180,18 @@ export class CentralMemberWorkspaceService {
 
   async correctPharmacy(actor: string, target: string, id: string, input: {fields: Record<string,string>; reason: string; version: string; evidenceConfirmed: true}) {
     const reason=operationReason(input.reason), f=input.fields;
-    if (!/^\d{10}$/.test(f.businessNumber)) throw new OperationError(400,'INVALID_BUSINESS_NUMBER','사업자등록번호 10자리를 입력해 주세요.');
-    if (f.licenseNumber !== undefined && [...f.licenseNumber.trim()].length > 30) throw new OperationError(400,'INVALID_LICENSE_NUMBER','약국 신청 면허번호는 30자 이내로 입력해 주세요.');
+    if (!/^\d{10}$/.test(f.businessNumber)) throw new OperationError(400,'INVALID_BUSINESS_NUMBER','사업자등록번호 10자리를 입력해 주시기 바랍니다.');
+    if (f.licenseNumber !== undefined && [...f.licenseNumber.trim()].length > 30) throw new OperationError(400,'INVALID_LICENSE_NUMBER','약국 신청 면허번호는 30자 이내로 입력해 주시기 바랍니다.');
     return this.db.transaction(async manager=>{
       const access=await memberWorkspaceAccess(manager,actor,true);
       if (!access.edit || !access.pharmacies) throw new OperationError(403,'PHARMACY_REVIEW_REQUIRED','약국 정보 정정 업무 위임이 필요합니다.');
       const [before]=await manager.query(`SELECT n.organization_id AS "organizationId",n.pharmacy_name AS name,n.business_number AS "businessNumber",n.pharmacist_license_number AS "licenseNumber",n.status,o.address,o.phone,o.metadata,md5(to_jsonb(n)::text||to_jsonb(o)::text) AS version
         FROM neture_pharmacy_memberships n JOIN organizations o ON o.id=n.organization_id WHERE n.id=$1 AND n.applicant_user_id=$2 FOR UPDATE OF n,o`,[id,target]);
       if (!before) throw new OperationError(404,'PHARMACY_NOT_FOUND','해당 회원의 약국 신청을 찾을 수 없습니다.');
-      if (before.version!==input.version) throw new OperationError(409,'PHARMACY_CHANGED','약국 정보가 변경되었습니다. 다시 조회해 주세요.');
+      if (before.version!==input.version) throw new OperationError(409,'PHARMACY_CHANGED','약국 정보가 변경되었습니다. 다시 조회해 주시기 바랍니다.');
       if(f.licenseNumber!==undefined&&f.licenseNumber!==before.licenseNumber&&['active','suspended'].includes(before.status)){
         const [qualified]=await manager.query(`SELECT 1 FROM kpa_pharmacist_profiles WHERE user_id=$1 AND BTRIM(license_number)=$2 AND qualification_status='approved' AND license_verified=true AND verified_at IS NOT NULL AND verified_by IS NOT NULL`,[target,privateValue(f.licenseNumber)]);
-        if(!qualified)throw new OperationError(409,'QUALIFICATION_LICENSE_MISMATCH','승인된 약국의 면허 변경은 일치하는 약사 자격을 먼저 확인해 주세요.');
+        if(!qualified)throw new OperationError(409,'QUALIFICATION_LICENSE_MISMATCH','승인된 약국의 면허 변경은 일치하는 약사 자격을 먼저 확인해 주시기 바랍니다.');
       }
       const [duplicate]=await manager.query(`SELECT 1 FROM neture_pharmacy_memberships WHERE business_number=$1 AND status IN ('pending','active','suspended') AND id<>$2 LIMIT 1`,[f.businessNumber,id]);
       if (duplicate) throw new OperationError(409,'BUSINESS_NUMBER_IN_USE','이미 사용 중인 사업자등록번호입니다.');

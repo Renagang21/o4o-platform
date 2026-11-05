@@ -22,14 +22,14 @@ async function send(text='합성 프로그램에서 주문을 준비해 줘'){
  fireEvent.click(screen.getByTestId('home-composer-submit'));
 }
 it('opens inline on first pre-action PC failure, preserves confirmed request/attachment, and retries only by explicit action',async()=>{
- mocks.send.mockResolvedValueOnce({kind:'confirm',confirm:{message:'이 작업을 진행할까요?'}}).mockResolvedValueOnce(unavailable).mockResolvedValueOnce(completed);
+ mocks.send.mockResolvedValueOnce({kind:'confirm',confirm:{message:'이 작업을 진행하시겠습니까?'}}).mockResolvedValueOnce(unavailable).mockResolvedValueOnce(completed);
  render(page());const file=new File(['code,name\n0001,합성'], 'fixture.csv',{type:'text/csv'});
  fireEvent.change(screen.getByTestId('home-composer-file'),{target:{files:[file]}});
- await send();await screen.findByText('이 작업을 진행할까요?');fireEvent.click(screen.getByRole('button',{name:'진행',exact:true}));
+ await send();await screen.findByText('이 작업을 진행하시겠습니까?');fireEvent.click(screen.getByRole('button',{name:'진행',exact:true}));
  await screen.findByRole('region',{name:'자동화 PC 설치·연결 준비'});
  expect(screen.getByTestId('home-composer-input')).toHaveProperty('value','합성 프로그램에서 주문을 준비해 줘');
  expect(screen.getByTestId('home-composer-attachments').textContent).toContain('fixture.csv');expect(mocks.send).toHaveBeenCalledTimes(2);
- expect(mocks.card).toHaveBeenCalled();expect(screen.queryByText('Chrome 의 현재 화면에서 직접 이어서 진행하세요.')).toBeNull();
+ expect(mocks.card).toHaveBeenCalled();expect(screen.queryByText('Chrome 의 현재 화면에서 직접 이어서 진행하시기 바랍니다.')).toBeNull();
  fireEvent.click(screen.getByRole('button',{name:'설치·연결 후 요청 계속'}));await screen.findByText('완료');
  expect(mocks.send).toHaveBeenCalledTimes(3);expect(mocks.send.mock.calls[2][0]).toMatchObject({text:'합성 프로그램에서 주문을 준비해 줘',routeHint:'work',attachments:[{file}]});
  expect(screen.queryByRole('region',{name:'자동화 PC 설치·연결 준비'})).toBeNull();expect(screen.getByTestId('home-composer-input')).toHaveProperty('value','');
@@ -64,6 +64,6 @@ it('discards late setup responses after the work context changes',async()=>{
  await waitFor(()=>expect(screen.queryByTestId('home-composer-pending')).toBeNull());expect(screen.queryByRole('region',{name:'자동화 PC 설치·연결 준비'})).toBeNull();expect(mocks.card).not.toHaveBeenCalled();
 });
 it('routes an edited request normally instead of carrying the previous work confirmation',async()=>{
- mocks.send.mockResolvedValueOnce({kind:'confirm',confirm:{message:'이 작업을 진행할까요?'}}).mockResolvedValueOnce(unavailable).mockResolvedValueOnce({kind:'chat',chat:{message:'새 질문 응답'}});render(page());await send();await screen.findByText('이 작업을 진행할까요?');fireEvent.click(screen.getByRole('button',{name:'진행',exact:true}));await screen.findByRole('region',{name:'자동화 PC 설치·연결 준비'});
+ mocks.send.mockResolvedValueOnce({kind:'confirm',confirm:{message:'이 작업을 진행하시겠습니까?'}}).mockResolvedValueOnce(unavailable).mockResolvedValueOnce({kind:'chat',chat:{message:'새 질문 응답'}});render(page());await send();await screen.findByText('이 작업을 진행하시겠습니까?');fireEvent.click(screen.getByRole('button',{name:'진행',exact:true}));await screen.findByRole('region',{name:'자동화 PC 설치·연결 준비'});
  fireEvent.change(screen.getByTestId('home-composer-input'),{target:{value:'다른 질문을 설명해 줘'}});fireEvent.click(screen.getByRole('button',{name:'설치·연결 후 요청 계속'}));await screen.findByText('새 질문 응답');expect(mocks.send.mock.calls[2][0].routeHint).toBeUndefined();expect(mocks.send.mock.calls[2][0].text).toBe('다른 질문을 설명해 줘');
 });

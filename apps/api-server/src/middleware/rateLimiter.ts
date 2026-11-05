@@ -17,7 +17,7 @@ import { Request, Response, NextFunction } from 'express';
 export const defaultLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15분
   max: 100, // 최대 100개 요청
-  message: '너무 많은 요청이 발생했습니다. 잠시 후 다시 시도해주세요.',
+  message: '너무 많은 요청이 발생했습니다. 잠시 후 다시 시도해 주시기 바랍니다.',
   standardHeaders: true,
   legacyHeaders: false,
 });
@@ -26,7 +26,7 @@ export const defaultLimiter = rateLimit({
 export const strictLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15분
   max: 5, // 최대 5개 요청
-  message: '너무 많은 시도가 감지되었습니다. 15분 후 다시 시도해주세요.',
+  message: '너무 많은 시도가 감지되었습니다. 15분 후 다시 시도해 주시기 바랍니다.',
   standardHeaders: true,
   legacyHeaders: false,
   skipSuccessfulRequests: true,
@@ -186,7 +186,7 @@ export const findLoginIdInputLimiter = findLoginIdLimiters.input;
 export const uploadLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1시간
   max: 100, // 시간당 100개 파일
-  message: '파일 업로드 한도를 초과했습니다. 1시간 후 다시 시도해주세요.',
+  message: '파일 업로드 한도를 초과했습니다. 1시간 후 다시 시도해 주시기 바랍니다.',
 });
 
 // 동적 레이트 리밋 (사용자 티어별)
@@ -254,7 +254,7 @@ export class SmartRateLimiter {
       const burstRequests = recentRequests.filter(time => time > oneSecondAgo);
       if (burstRequests.length > 10) {
         return res.status(429).json({
-          error: '너무 빠른 요청입니다. 잠시 후 다시 시도해주세요.',
+          error: '너무 빠른 요청입니다. 잠시 후 다시 시도해 주시기 바랍니다.',
           retryAfter: 1,
         });
       }

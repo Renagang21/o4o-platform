@@ -26,7 +26,7 @@ export async function loadTabletWorkspace(tabletId: string) {
 export async function loadIdleLibraryAssets(): Promise<LibraryAsset[]> {
     // (1) store_execution_assets
     const directAssetsP = getStoreExecutionAssets({ limit: 100 }).then((res) => {
-      if (!res.success) throw new Error('자료함을 불러오지 못했습니다. 다시 시도해 주세요.');
+      if (!res.success) throw new Error('자료함을 불러오지 못했습니다. 다시 시도해 주시기 바랍니다.');
       const items = res.data?.items ?? [];
       const out: LibraryAsset[] = [];
       for (const item of items) {

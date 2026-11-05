@@ -81,10 +81,10 @@ export default function SupplierProductLlmAssistPanel({
     const ok = await copyText(prompt);
     setCopied(ok);
     if (ok) {
-      onNotify?.('작업 요청문을 복사했습니다. ChatGPT 대화창에 붙여 넣고 결과 JSON 을 받아 오세요.', 'success');
+      onNotify?.('작업 요청문을 복사했습니다. ChatGPT 대화창에 붙여 넣고 결과 JSON 을 받아 오시기 바랍니다.', 'success');
       setTimeout(() => setCopied(false), 2500);
     } else {
-      onNotify?.('복사에 실패했습니다. 아래 요청문을 직접 선택해 복사해 주세요.', 'error');
+      onNotify?.('복사에 실패했습니다. 아래 요청문을 직접 선택해 복사해 주시기 바랍니다.', 'error');
     }
   };
 
@@ -100,7 +100,7 @@ export default function SupplierProductLlmAssistPanel({
     const notes = onApplyDraft(parsed.draft, mode);
     setApplyMessages([...parsed.warnings, ...notes]);
     setApplied(true);
-    onNotify?.('결과를 입력란에 적용했습니다. 내용을 확인·수정한 뒤 검토 요청을 제출해 주세요.', 'success');
+    onNotify?.('결과를 입력란에 적용했습니다. 내용을 확인·수정한 뒤 검토 요청을 제출해 주시기 바랍니다.', 'success');
   };
 
   return (
@@ -126,7 +126,7 @@ export default function SupplierProductLlmAssistPanel({
 
           {/* 1. 자료 유형 */}
           <div>
-            <div className="text-xs font-medium text-slate-700 mb-1">1. 어떤 자료로 정리하나요?</div>
+            <div className="text-xs font-medium text-slate-700 mb-1">1. 어떤 자료로 정리합니까?</div>
             <div className="flex flex-wrap gap-1.5">
               {SOURCE_OPTIONS.map((opt) => (
                 <label
@@ -176,7 +176,7 @@ export default function SupplierProductLlmAssistPanel({
 
           {/* 2. Prompt 복사 */}
           <div>
-            <div className="text-xs font-medium text-slate-700 mb-1">2. 작업 요청문을 복사해 ChatGPT 에 붙여 넣으세요</div>
+            <div className="text-xs font-medium text-slate-700 mb-1">2. 작업 요청문을 복사해 ChatGPT 에 붙여 넣으시기 바랍니다</div>
             <div className="flex items-center gap-2">
               <button
                 type="button"
@@ -187,8 +187,8 @@ export default function SupplierProductLlmAssistPanel({
                 {copied ? '복사됨' : '요청문 복사'}
               </button>
               <span className="text-[11px] text-slate-500">
-                {sourceKind === 'image' && '사진은 ChatGPT 대화에 직접 첨부하세요.'}
-                {sourceKind === 'pdf' && 'PDF 는 ChatGPT 대화에 직접 첨부하세요.'}
+                {sourceKind === 'image' && '사진은 ChatGPT 대화에 직접 첨부하시기 바랍니다.'}
+                {sourceKind === 'pdf' && 'PDF 는 ChatGPT 대화에 직접 첨부하시기 바랍니다.'}
               </span>
             </div>
             <details className="mt-2">
@@ -199,7 +199,7 @@ export default function SupplierProductLlmAssistPanel({
 
           {/* 3. 결과 적용 */}
           <div>
-            <div className="text-xs font-medium text-slate-700 mb-1">3. ChatGPT 가 준 결과(JSON)를 붙여 넣고 적용하세요</div>
+            <div className="text-xs font-medium text-slate-700 mb-1">3. ChatGPT 가 준 결과(JSON)를 붙여 넣고 적용하시기 바랍니다</div>
             <textarea
               value={resultText}
               onChange={(e) => { setResultText(e.target.value); setApplied(false); setApplyError(null); }}
@@ -233,7 +233,7 @@ export default function SupplierProductLlmAssistPanel({
             )}
             {applied && (
               <div className="mt-2 rounded-lg border border-emerald-200 bg-emerald-50 p-2 text-xs text-emerald-800">
-                적용했습니다. 입력란을 확인·수정한 뒤 검토 요청을 제출하세요. 카테고리·브랜드·이미지는 직접 선택합니다.
+                적용했습니다. 입력란을 확인·수정한 뒤 검토 요청을 제출하시기 바랍니다. 카테고리·브랜드·이미지는 직접 선택합니다.
               </div>
             )}
             {applyMessages.length > 0 && (

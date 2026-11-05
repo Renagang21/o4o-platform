@@ -92,7 +92,7 @@ async function authFetch(url: string, options: RequestInit = {}): Promise<any> {
   const json = await res.json().catch(() => null);
   if (!res.ok || json?.success !== true || json.data == null) {
     const error = new Error(
-      "다국어 콘텐츠 요청을 완료하지 못했습니다. 다시 시도해 주세요.",
+      "다국어 콘텐츠 요청을 완료하지 못했습니다. 다시 시도해 주시기 바랍니다.",
     ) as Error & { code?: string; status: number };
     error.status = res.status;
     error.code = json?.error?.code || json?.code;
@@ -119,7 +119,7 @@ export async function listMlcHub(params?: {
     json.meta.total < 0
   )
     throw new Error(
-      "제공 자료 목록을 확인하지 못했습니다. 다시 시도해 주세요.",
+      "제공 자료 목록을 확인하지 못했습니다. 다시 시도해 주시기 바랍니다.",
     );
   return { data: json.data, meta: json.meta };
 }

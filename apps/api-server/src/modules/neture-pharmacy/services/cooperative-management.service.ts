@@ -19,7 +19,7 @@ const invalid = () =>
   new NeturePharmacyError(
     400,
     "COOPERATIVE_INVALID_INPUT",
-    "입력값과 처리 사유를 확인해 주세요.",
+    "입력값과 처리 사유를 확인해 주시기 바랍니다.",
   );
 export const MEMBER_TRANSITIONS: Readonly<
   Record<string, readonly [readonly string[], string]>
@@ -280,7 +280,7 @@ export class CooperativeManagementService {
       await this.validateInvitationGrant(m,actor,coop,role);
       const [user]=await m.query(`SELECT id FROM users WHERE lower(email)=lower($1) AND status IN ('active','approved')
         AND "isActive"=true AND "isEmailVerified"=true FOR SHARE`,[email.trim()]);
-      if (!user) throw new NeturePharmacyError(400,'COOPERATIVE_TARGET_UNAVAILABLE','활성 계정을 확인해 주세요.');
+      if (!user) throw new NeturePharmacyError(400,'COOPERATIVE_TARGET_UNAVAILABLE','활성 계정을 확인해 주시기 바랍니다.');
       return user.id as string;
     });
     const { ServiceOperatorInvitationService }=await import('../../../services/admin/service-operator-invitation.service.js');

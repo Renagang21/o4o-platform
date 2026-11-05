@@ -263,7 +263,7 @@ export function StoreBlogManageView({
       await navigator.clipboard.writeText(url);
       alert('공개 URL이 클립보드에 복사되었습니다.');
     } catch {
-      alert(`복사에 실패했습니다. 직접 복사해 주세요:\n${url}`);
+      alert(`복사에 실패했습니다. 직접 복사해 주시기 바랍니다:\n${url}`);
     }
   };
 

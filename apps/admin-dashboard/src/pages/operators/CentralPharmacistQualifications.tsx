@@ -142,7 +142,7 @@ export default function CentralPharmacistQualifications({
       setSelected(null);
       setRows([]);
       setError(
-        "처리하지 못했습니다. 신청 정보·검토 권한을 다시 조회해 주세요.",
+        "처리하지 못했습니다. 신청 정보·검토 권한을 다시 조회해 주시기 바랍니다.",
       );
     } finally {
       locked.current = false;
@@ -174,8 +174,8 @@ export default function CentralPharmacistQualifications({
         { key: "revoke", label: "선택 회원 승인 취소", disabled: busy || selectedRow?.status !== "approved", onClick: () => { if (selectedRow) choose(selectedRow, "revoke"); } },
       ]} />}
       {directory && selectedKeys.size > 0 && <ActionBar selectedCount={selectedKeys.size} onClearSelection={() => setSelectedKeys(new Set())} actions={[{key:'review',label:'선택 회원 상세',disabled:!selectedRow,onClick:()=>{if(selectedRow)setDetail(selectedRow);}}]} />}
-      {selectedKeys.size > 1 && <p className="text-sm text-slate-600">면허 근거와 사유를 회원별로 확인하도록 검토할 회원 한 명을 선택해 주세요.</p>}
-      <DataTable<Qualification> tableId={directory ? "central-common-members" : "central-pharmacist-qualifications"} columns={directory ? columns.filter(column => !["licenseNumber", "reason", "actions"].includes(column.key)) : columns} data={rows} rowKey="userId" loading={loading} emptyMessage={error ? "조회에 실패했습니다. 새로고침으로 다시 확인해 주세요." : "현재 조건에 해당하는 회원이 없습니다."} onRowClick={directory ? row => setDetail(row) : undefined} selectable selectedKeys={selectedKeys} onSelectionChange={(keys) => { if (!busy) setSelectedKeys(keys); }} reorderable persistState columnVisibility />
+      {selectedKeys.size > 1 && <p className="text-sm text-slate-600">면허 근거와 사유를 회원별로 확인하도록 검토할 회원 한 명을 선택해 주시기 바랍니다.</p>}
+      <DataTable<Qualification> tableId={directory ? "central-common-members" : "central-pharmacist-qualifications"} columns={directory ? columns.filter(column => !["licenseNumber", "reason", "actions"].includes(column.key)) : columns} data={rows} rowKey="userId" loading={loading} emptyMessage={error ? "조회에 실패했습니다. 새로고침으로 다시 확인해 주시기 바랍니다." : "현재 조건에 해당하는 회원이 없습니다."} onRowClick={directory ? row => setDetail(row) : undefined} selectable selectedKeys={selectedKeys} onSelectionChange={(keys) => { if (!busy) setSelectedKeys(keys); }} reorderable persistState columnVisibility />
       {directory && <BaseDetailDrawer open={!!detail} title="공통 회원 상세" onClose={() => setDetail(null)}>{detail && <section className="space-y-3"><p>{detail.name} · {detail.email}</p><p>계정 상태: {detail.accountStatus}</p><p>약사 자격: {labels[detail.status] ?? detail.status}</p>{onReview && <button type="button" onClick={() => onReview(detail.userId)}>약사 자격 검토로 이동</button>}</section>}</BaseDetailDrawer>}
       <nav>
         <button disabled={busy || page === 1} onClick={() => setPage(page - 1)}>

@@ -113,7 +113,7 @@ export function OperatorNotifications({
         }
       })
       .catch(() => {
-        if (active) setError("알림을 불러오지 못했습니다. 다시 시도해 주세요.");
+        if (active) setError("알림을 불러오지 못했습니다. 다시 시도해 주시기 바랍니다.");
       });
     return () => {
       active = false;
@@ -139,7 +139,7 @@ export function OperatorNotifications({
       }
     } catch {
       if (live.current)
-        setError("읽음 표시를 저장하지 못했습니다. 다시 시도해 주세요.");
+        setError("읽음 표시를 저장하지 못했습니다. 다시 시도해 주시기 바랍니다.");
     } finally {
       writing.current = false;
       if (live.current) setBusy(null);

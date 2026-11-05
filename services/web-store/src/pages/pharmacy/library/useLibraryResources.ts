@@ -24,7 +24,7 @@ export function useLibraryResources() {
     setHasMore(kinds.some(k => sources.current[k].more && !sources.current[k].error));
   }, []);
   const load = useCallback(async (reset: boolean, failedOnly = false) => {
-    if (!organizationId) { setLoading(false); setErrors(['매장을 선택한 뒤 다시 시도해 주세요.']); return; }
+    if (!organizationId) { setLoading(false); setErrors(['매장을 선택한 뒤 다시 시도해 주시기 바랍니다.']); return; }
     if (!isCurrent() || writeBusy.current || (!reset && readBusy.current)) return;
     const run = ++revision.current;
     readBusy.current = true; setLoading(true);

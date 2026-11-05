@@ -567,7 +567,7 @@ function WorkDetail({
     };
   }, [client, state.endpoint, id, offset]);
   if (error)
-    return <p role="alert">{error} · 업무 새로고침으로 다시 조회해 주세요.</p>;
+    return <p role="alert">{error} · 업무 새로고침으로 다시 조회해 주시기 바랍니다.</p>;
   if (!data) return <p role="status">처리 현황 조회 중…</p>;
   return (
     <div className="cw-panel">
@@ -655,7 +655,7 @@ function ApplicationDecision({
     [error, setError] = useState("");
   const decide = (next: string) => {
     if (next === "rejected" && !note.trim()) {
-      setError("반려 사유를 입력해 주세요.");
+      setError("반려 사유를 입력해 주시기 바랍니다.");
       return;
     }
     setError("");

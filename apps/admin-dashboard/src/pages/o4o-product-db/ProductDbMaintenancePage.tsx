@@ -269,7 +269,7 @@ function ApplyPanel({
         <ShieldAlert className="w-4 h-4 shrink-0 mt-0.5" />
         <span>
           Apply 는 <strong>candidate_status 를 archived 로 전환</strong>합니다(되돌리려면 별도 조치 필요).
-          ProductMaster/ProductIdentifier 는 변경되지 않습니다. 실행하려면 아래에 확인 문구를 정확히 입력하세요.
+          ProductMaster/ProductIdentifier 는 변경되지 않습니다. 실행하려면 아래에 확인 문구를 정확히 입력하시기 바랍니다.
         </span>
       </div>
       <div className="flex flex-wrap items-center gap-3">

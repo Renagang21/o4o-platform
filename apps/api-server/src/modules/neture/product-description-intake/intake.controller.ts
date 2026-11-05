@@ -17,8 +17,8 @@ export function createDescriptionIntakeController(db: DataSource): Router {
   const handle = (task: (req: Request) => Promise<unknown>) => async (req: Request, res: Response) => {
     try { res.json({ success: true, data: await task(req) }); }
     catch (error) {
-      if (error instanceof DescriptionIntakeError || error instanceof CorrectionError) { res.status(error.status).json({ success: false, code: error.code, error: '입력·최신 설명서·선택한 상품을 다시 확인해 주세요.' }); return; }
-      if (error instanceof z.ZodError) { res.status(400).json({ success: false, code: 'INVALID_DESCRIPTION_REQUEST', error: '입력 형식을 확인해 주세요.' }); return; }
+      if (error instanceof DescriptionIntakeError || error instanceof CorrectionError) { res.status(error.status).json({ success: false, code: error.code, error: '입력·최신 설명서·선택한 상품을 다시 확인해 주시기 바랍니다.' }); return; }
+      if (error instanceof z.ZodError) { res.status(400).json({ success: false, code: 'INVALID_DESCRIPTION_REQUEST', error: '입력 형식을 확인해 주시기 바랍니다.' }); return; }
       logger.error('[description-intake] request failed', error);
       res.status(500).json({ success: false, code: 'DESCRIPTION_INTAKE_FAILED', error: '상품 설명서 처리에 실패했습니다.' });
     }

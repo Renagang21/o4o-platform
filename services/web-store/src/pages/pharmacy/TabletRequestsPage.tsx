@@ -61,7 +61,7 @@ const URGENCY_BADGE: Record<Urgency, { label: string; bg: string; color: string;
 
 export function TabletRequestsPage() {
   const scope = useMonitoringScope();
-  if (!scope.ready) return <p role="status">매장을 선택하고 서비스 연결을 확인해 주세요.</p>;
+  if (!scope.ready) return <p role="status">매장을 선택하고 서비스 연결을 확인해 주시기 바랍니다.</p>;
   return <ConsultationRequests key={scope.key} organizationId={scope.organizationId!} />;
 }
 
@@ -325,7 +325,7 @@ function ConsultationRequests({ organizationId }: { organizationId: string }) {
               dataSource={interestRequests}
               rowKey="id"
               loading={loading}
-              emptyText={error ? '목록을 다시 불러와 주세요' : '현재 대기 중인 상담 요청이 없습니다'}
+              emptyText={error ? '목록을 다시 불러와 주시기 바랍니다' : '현재 대기 중인 상담 요청이 없습니다'}
             />
             </div>
           </div>

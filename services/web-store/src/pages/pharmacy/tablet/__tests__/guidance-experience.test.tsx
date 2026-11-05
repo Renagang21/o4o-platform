@@ -20,7 +20,7 @@ const products = [
 ];
 const sections = [
   { blockType: 'corner_description', sortOrder: 10, data: { title: '손님에게 보이는 제목', body: '짧은 코너 안내' } },
-  { blockType: 'content_list', sortOrder: 20, data: { items: [{ itemId: 'guide', title: '사용 순서', summary: '차례대로 확인하세요', hasDetail: true, detail: { html: '자세한 사용 순서' } }] } },
+  { blockType: 'content_list', sortOrder: 20, data: { items: [{ itemId: 'guide', title: '사용 순서', summary: '차례대로 확인하시기 바랍니다', hasDetail: true, detail: { html: '자세한 사용 순서' } }] } },
   { blockType: 'product_list', sortOrder: 30, data: { selectionMode: 'selected', products } },
   { blockType: 'idle_media', sortOrder: 40, data: { items: [{ url: 'https://youtu.be/example' }] } },
 ];

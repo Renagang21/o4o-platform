@@ -135,7 +135,7 @@ export function AiContentResultPreview({
                 </div>
               )}
               <div style={{ marginTop: '6px', color: '#b45309' }}>
-                최종 활용 전 원문 이용조건을 확인하세요.
+                최종 활용 전 원문 이용조건을 확인하시기 바랍니다.
                 {sourceUrl && (
                   <>
                     {' '}

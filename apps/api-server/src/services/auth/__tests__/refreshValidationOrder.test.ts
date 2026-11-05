@@ -54,7 +54,7 @@ describe('refresh validation precedence and effects', () => {
   });
   it('retired signed scope wins over expiry and never reads a user', async () => {
     payload!.serviceKey = 'pharmacy-hub'; expired = true;
-    await rejected('SERVICE_SESSION_REVOKED', '세션이 종료되었습니다. 다시 로그인해 주세요.', ['verify']);
+    await rejected('SERVICE_SESSION_REVOKED', '세션이 종료되었습니다. 다시 로그인해 주시기 바랍니다.', ['verify']);
   });
   it('explicit expiry precedes account and family checks', async () => {
     expired = true; account = null; payload!.tokenFamily = undefined;
@@ -66,7 +66,7 @@ describe('refresh validation precedence and effects', () => {
   });
   it('blocked account precedes family errors', async () => {
     account!.status = 'suspended' as User['status']; payload!.tokenFamily = undefined;
-    await rejected('ACCOUNT_NOT_ACTIVE', '계정 상태가 유효하지 않습니다. 다시 로그인해 주세요.', ['verify', 'expiry', 'account']);
+    await rejected('ACCOUNT_NOT_ACTIVE', '계정 상태가 유효하지 않습니다. 다시 로그인해 주시기 바랍니다.', ['verify', 'expiry', 'account']);
   });
   it('missing signed family precedes a revoked account family', async () => {
     payload!.tokenFamily = undefined; account!.refreshTokenFamily = null;
@@ -74,7 +74,7 @@ describe('refresh validation precedence and effects', () => {
   });
   it('revoked account generation precedes browser and method checks', async () => {
     account!.refreshTokenFamily = null; browserLive = false; roles = ['platform:super_admin'];
-    await rejected('TOKEN_FAMILY_REVOKED', '세션이 종료되었습니다. 다시 로그인해 주세요.', ['verify', 'expiry', 'account']);
+    await rejected('TOKEN_FAMILY_REVOKED', '세션이 종료되었습니다. 다시 로그인해 주시기 바랍니다.', ['verify', 'expiry', 'account']);
   });
   it('family mismatch never reads browser state or fresh roles', async () => {
     account!.refreshTokenFamily = 'new-fixture-generation'; browserLive = false;
@@ -82,7 +82,7 @@ describe('refresh validation precedence and effects', () => {
   });
   it('revoked browser precedes a platform method rejection', async () => {
     browserLive = false; roles = ['platform:super_admin'];
-    await rejected('SERVICE_SESSION_REVOKED', '세션이 종료되었습니다. 다시 로그인해 주세요.', ['verify', 'expiry', 'account', 'browser']);
+    await rejected('SERVICE_SESSION_REVOKED', '세션이 종료되었습니다. 다시 로그인해 주시기 바랍니다.', ['verify', 'expiry', 'account', 'browser']);
   });
   it('fresh platform roles reject password without issuance', async () => {
     roles = ['platform:super_admin'];

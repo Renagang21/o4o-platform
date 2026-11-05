@@ -34,7 +34,7 @@ export function parseFirstmallAdmin(
   const detected = detectShopBase(html);
   const base = normalizeBase(shopDomain) || detected;
   if (!base) {
-    warnings.push('쇼핑몰 주소를 찾지 못했습니다. 이미지가 표시되지 않으면 쇼핑몰 주소를 직접 입력해 주세요.');
+    warnings.push('쇼핑몰 주소를 찾지 못했습니다. 이미지가 표시되지 않으면 쇼핑몰 주소를 직접 입력해 주시기 바랍니다.');
   }
 
   const goodsSeq = matchGoodsSeq(html);
@@ -69,7 +69,7 @@ export function parseFirstmallAdmin(
   const detailHtml = rawDetail ? sanitizeDetailHtml(rawDetail, base) : null;
   const detailImageUrls = rawDetail ? extractDetailImages(rawDetail, base) : [];
 
-  if (!name) warnings.push('상품명(goodsName)을 찾지 못했습니다. Firstmall 관리자 상품 수정 페이지 HTML 이 맞는지 확인해 주세요.');
+  if (!name) warnings.push('상품명(goodsName)을 찾지 못했습니다. Firstmall 관리자 상품 수정 페이지 HTML 이 맞는지 확인해 주시기 바랍니다.');
 
   return {
     goodsSeq,

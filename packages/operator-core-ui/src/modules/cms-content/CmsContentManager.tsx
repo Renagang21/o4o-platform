@@ -828,7 +828,7 @@ function ContentEditor({
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!title.trim()) {
-      setError('제목을 입력해주세요.');
+      setError('제목을 입력해 주시기 바랍니다.');
       return;
     }
     setSaving(true);
@@ -879,7 +879,7 @@ function ContentEditor({
               type="text"
               value={title}
               onChange={e => setTitle(e.target.value)}
-              placeholder="콘텐츠 제목을 입력하세요"
+              placeholder="콘텐츠 제목을 입력하시기 바랍니다"
               className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
@@ -902,7 +902,7 @@ function ContentEditor({
               onChange={({ html }: { html: string }) => setBody(html)}
               preset="full"
               minHeight="300px"
-              placeholder="콘텐츠 내용을 입력하세요"
+              placeholder="콘텐츠 내용을 입력하시기 바랍니다"
             />
           </div>
 

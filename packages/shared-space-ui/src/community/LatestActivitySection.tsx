@@ -187,7 +187,7 @@ export function LatestActivitySection({
   badges = LATEST_ACTIVITY_BADGES,
   emptyMessage = '등록된 글이 없습니다',
   errorTitle = '최신글을 불러오지 못했습니다',
-  errorDescription = '잠시 후 다시 시도해 주세요.',
+  errorDescription = '잠시 후 다시 시도해 주시기 바랍니다.',
   retryLabel = '다시 시도',
   headerRightSlot,
 }: LatestActivitySectionProps) {

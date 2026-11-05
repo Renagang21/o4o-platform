@@ -174,7 +174,7 @@ export default function PrintContentPage() {
                 marginBottom: "8px",
               }}
             >
-              QR 코드로 온라인에서 확인하세요
+              QR 코드로 온라인에서 확인하시기 바랍니다
             </p>
             <img
               src={qrImageUrl(publicUrl, 160)}

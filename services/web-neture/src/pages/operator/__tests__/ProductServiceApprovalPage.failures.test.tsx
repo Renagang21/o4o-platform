@@ -14,7 +14,7 @@ function item(id: string, approvalStatus: string): ServiceApprovalItem {
 const rows = () => [item('a', 'pending'), item('b', 'pending'), item('c', 'approved')];
 const listResult = (data = rows()) => ({ data, pagination: { page: 1, limit: 30, total: 3, totalPages: 1 } });
 const batchResult = (decision: ServiceApprovalDecision, completed: number, failed: number) => ({ success: true, data: decision === 'approve' ? { approved: completed, failed } : { rejected: completed, failed } });
-const input = (decision: ServiceApprovalDecision) => screen.getByPlaceholderText(decision === 'approve' ? '승인 메모를 입력하세요 (선택)' : '거절 사유를 입력하세요 (선택)') as HTMLTextAreaElement;
+const input = (decision: ServiceApprovalDecision) => screen.getByPlaceholderText(decision === 'approve' ? '승인 메모를 입력하시기 바랍니다 (선택)' : '거절 사유를 입력하시기 바랍니다 (선택)') as HTMLTextAreaElement;
 const confirm = (decision: ServiceApprovalDecision) => screen.getByRole('button', { name: decision === 'approve' ? '승인 확인' : '거절 확인', exact: true }) as HTMLButtonElement;
 async function open(decision: ServiceApprovalDecision, batch = false) {
   await screen.findByText('검증상품-a');
@@ -50,7 +50,7 @@ it.each(['approve', 'reject'] as const)('single %s failure preserves input and a
   expect(api[decision]).toHaveBeenNthCalledWith(2, 'a', '보존할 입력');
   await waitFor(() => expect(api.list).toHaveBeenCalledTimes(2));
 });
-function inputPlaceholder(decision: ServiceApprovalDecision) { return decision === 'approve' ? '승인 메모를 입력하세요 (선택)' : '거절 사유를 입력하세요 (선택)'; }
+function inputPlaceholder(decision: ServiceApprovalDecision) { return decision === 'approve' ? '승인 메모를 입력하시기 바랍니다 (선택)' : '거절 사유를 입력하시기 바랍니다 (선택)'; }
 
 it.each(['approve', 'reject'] as const)('throw from %s releases the lock and preserves draft', async decision => {
   api[decision].mockRejectedValueOnce(new Error('fixture exception'));

@@ -26,7 +26,7 @@ export const featureCardBlockDefinition: BlockDefinition = {
     },
     description: {
       type: 'string',
-      default: '기능 설명을 입력하세요',
+      default: '기능 설명을 입력하시기 바랍니다',
     },
     link: {
       type: 'string',

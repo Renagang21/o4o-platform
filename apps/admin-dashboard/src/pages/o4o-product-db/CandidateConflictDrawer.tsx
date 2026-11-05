@@ -79,9 +79,9 @@ export default function CandidateConflictDrawer({ candidateId, open, onClose, on
   const askBulk = (action: CandidateBulkAction) => {
     if (!candidateId) return;
     const map: Record<CandidateBulkAction, { title: string; message: string; variant: ConfirmState['variant']; confirmText: string }> = {
-      archive: { title: 'archive 처리', message: '이 후보를 archive 처리합니다. 원천 데이터(rawPayload)는 삭제되지 않으며, 기본 목록에서 정리 상태로 전환됩니다. 계속할까요?', variant: 'warning', confirmText: 'archive' },
-      ignore: { title: 'ignored 처리', message: 'O4O 상품화 대상이 아닌 후보로 처리(제외)합니다. 원천 데이터는 삭제되지 않습니다. 계속할까요?', variant: 'warning', confirmText: '제외' },
-      manual_review: { title: 'manual review 처리', message: '판단 보류(검토 중) 상태로 표시합니다. 계속할까요?', variant: 'default', confirmText: '보류' },
+      archive: { title: 'archive 처리', message: '이 후보를 archive 처리합니다. 원천 데이터(rawPayload)는 삭제되지 않으며, 기본 목록에서 정리 상태로 전환됩니다. 계속하시겠습니까?', variant: 'warning', confirmText: 'archive' },
+      ignore: { title: 'ignored 처리', message: 'O4O 상품화 대상이 아닌 후보로 처리(제외)합니다. 원천 데이터는 삭제되지 않습니다. 계속하시겠습니까?', variant: 'warning', confirmText: '제외' },
+      manual_review: { title: 'manual review 처리', message: '판단 보류(검토 중) 상태로 표시합니다. 계속하시겠습니까?', variant: 'default', confirmText: '보류' },
     };
     const c = map[action];
     setConfirm({ ...c, run: async () => { await bulkCandidateAction([candidateId], action); } });
@@ -91,7 +91,7 @@ export default function CandidateConflictDrawer({ candidateId, open, onClose, on
     if (!candidateId || !c) return;
     setConfirm({
       title: '신규 기본상품으로 등록',
-      message: `이 후보를 O4O 기본상품(ProductMaster)으로 등록합니다.\n\n등록 정보:\n상품명: ${c.candidateName || '—'}\n제조/업체: ${c.candidateManufacturer || '—'}\n식별자/바코드: ${c.identifierValue || '—'}\n규격: ${c.candidateSpec || '—'}\n\n해당 등록 경로의 중복 검사에서 동일 상품이 확인되면 신규 생성하지 않고 기존 상품에 연결합니다(중복 방지 dedup). 원천 rawPayload 는 삭제되지 않습니다. 계속할까요?`,
+      message: `이 후보를 O4O 기본상품(ProductMaster)으로 등록합니다.\n\n등록 정보:\n상품명: ${c.candidateName || '—'}\n제조/업체: ${c.candidateManufacturer || '—'}\n식별자/바코드: ${c.identifierValue || '—'}\n규격: ${c.candidateSpec || '—'}\n\n해당 등록 경로의 중복 검사에서 동일 상품이 확인되면 신규 생성하지 않고 기존 상품에 연결합니다(중복 방지 dedup). 원천 rawPayload 는 삭제되지 않습니다. 계속하시겠습니까?`,
       confirmText: '등록',
       variant: 'default',
       run: async () => {
@@ -167,7 +167,7 @@ export default function CandidateConflictDrawer({ candidateId, open, onClose, on
               ) : (
                 <div className="text-xs text-gray-500 bg-gray-50 border border-gray-200 rounded p-2.5">
                   {info.promotable?.reason === 'NOT_DRUG_SOURCE'
-                    ? '이 후보 유형(의료기기·의약외품·건강기능식품·e약은요 등)은 신규 등록을 지원하지 않습니다. 이 자료는 일반 의약품 등록 API의 대상이 아닙니다. 원천 식별자·허가 상태·필수 정보를 검증하고 해당 제품군의 등록 경로를 준비해야 합니다. 검증·보완 내역을 기록하고 수집 자료로 관리하세요.'
+                    ? '이 후보 유형(의료기기·의약외품·건강기능식품·e약은요 등)은 신규 등록을 지원하지 않습니다. 이 자료는 일반 의약품 등록 API의 대상이 아닙니다. 원천 식별자·허가 상태·필수 정보를 검증하고 해당 제품군의 등록 경로를 준비해야 합니다. 검증·보완 내역을 기록하고 수집 자료로 관리하시기 바랍니다.'
                     : info.promotable?.reason === 'ALREADY_LINKED'
                       ? '이미 O4O 상품에 등록·연결된 후보입니다.'
                       : '현재 상태(pending/reviewing)가 아니어서 등록할 수 없습니다.'}

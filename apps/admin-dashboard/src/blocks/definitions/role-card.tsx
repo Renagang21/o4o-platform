@@ -30,7 +30,7 @@ export const roleCardBlockDefinition: BlockDefinition = {
     },
     description: {
       type: 'string',
-      default: '담당 업무 또는 소개를 입력하세요',
+      default: '담당 업무 또는 소개를 입력하시기 바랍니다',
     },
     email: {
       type: 'string',

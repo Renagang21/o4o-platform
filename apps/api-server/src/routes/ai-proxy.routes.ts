@@ -316,7 +316,7 @@ async function performWorkAgentRun(
   if ('reply' in runnable) return runnable.reply;
   const { toolCtx } = runnable;
   const manualCheck = validateManualReferences(body.manualReferences);
-  if (!manualCheck.ok) return { status: 400, body: { success: false, code: 'MANUAL_REFERENCES_INVALID', error: '매뉴얼 참고자료 형식을 확인해 주세요.' } };
+  if (!manualCheck.ok) return { status: 400, body: { success: false, code: 'MANUAL_REFERENCES_INVALID', error: '매뉴얼 참고자료 형식을 확인해 주시기 바랍니다.' } };
   if (intent && manualCheck.references.length) intent = {
     ...intent,
     manualReferences: manualCheck.references,
@@ -935,7 +935,7 @@ router.post('/content-to-store-use', authenticate, async (req, res: Response) =>
 
   const plainText = htmlToPlainText(sourceHtml);
   if (plainText.length < 10) {
-    return res.status(400).json({ success: false, error: '콘텐츠 내용이 너무 짧습니다. 본문을 먼저 작성해 주세요.' });
+    return res.status(400).json({ success: false, error: '콘텐츠 내용이 너무 짧습니다. 본문을 먼저 작성해 주시기 바랍니다.' });
   }
 
   const outputType = useCaseToOutputType(useCase as StoreUseCase);
@@ -1271,7 +1271,7 @@ router.post('/lesson-body', authenticate, async (req, res: Response) => {
       logger.warn('[lesson-body] 응답이 너무 짧음', { requestId, length: rawText.length });
       return res.status(500).json({
         success: false,
-        error: 'AI 응답이 너무 짧습니다. 다시 시도해 주세요.',
+        error: 'AI 응답이 너무 짧습니다. 다시 시도해 주시기 바랍니다.',
         requestId,
       });
     }
@@ -1327,7 +1327,7 @@ async function performHomeChat(
   }
   const message = validation.message;
   const manualCheck = validateManualReferences(reqBody.manualReferences);
-  if (!manualCheck.ok) return { status: 400, body: { success: false, code: 'MANUAL_REFERENCES_INVALID', error: '매뉴얼 참고자료 형식을 확인해 주세요.' } };
+  if (!manualCheck.ok) return { status: 400, body: { success: false, code: 'MANUAL_REFERENCES_INVALID', error: '매뉴얼 참고자료 형식을 확인해 주시기 바랍니다.' } };
   const manualReferences = manualCheck.references;
 
 
@@ -1477,7 +1477,7 @@ async function performHomeChat(
     const answer = extractHomeChatAnswer(result.content);
     if (!answer) {
       logger.warn('home-chat empty answer', { requestId, userId, model: result.model });
-      return { status: 502, body: { success: false, error: '응답을 생성하지 못했습니다. 다시 시도해 주세요.', code: 'AI_ERROR' } };
+      return { status: 502, body: { success: false, error: '응답을 생성하지 못했습니다. 다시 시도해 주시기 바랍니다.', code: 'AI_ERROR' } };
     }
 
     return {
@@ -1662,7 +1662,7 @@ router.post('/request', authenticate, requireNetureMemberOrHospitalSurface, dyna
   const attachments = attachmentCheck.attachments;
   const manualCheck = validateManualReferences(body.manualReferences);
   if (!manualCheck.ok || (body.surface === 'hospital-drug' && manualCheck.references.length > 0)) {
-    return res.status(400).json({ success: false, code: 'MANUAL_REFERENCES_INVALID', error: '매뉴얼 참고자료 형식을 확인해 주세요.' });
+    return res.status(400).json({ success: false, code: 'MANUAL_REFERENCES_INVALID', error: '매뉴얼 참고자료 형식을 확인해 주시기 바랍니다.' });
   }
   const manualReferences = manualCheck.references;
 
@@ -1710,7 +1710,7 @@ router.post('/request', authenticate, requireNetureMemberOrHospitalSurface, dyna
       const admission=normalizeAiError(error);
       if(isAiAccountingError(admission.code))return res.status(aiErrorHttpStatus(admission.code)).json({success:false,code:admission.code,error:aiErrorUserMessage(admission.code)});
       const status=typeof (error as any)?.status==='number'?(error as any).status:503;
-      return res.status(status).json({success:false,code:'SERVER_WORK_UNAVAILABLE',error:'서버 업무를 마치지 못했어요. 권한과 자료 상태를 확인한 뒤 다시 요청해 주세요.'});
+      return res.status(status).json({success:false,code:'SERVER_WORK_UNAVAILABLE',error:'서버 업무를 마치지 못했습니다. 권한과 자료 상태를 확인한 뒤 다시 요청해 주시기 바랍니다.'});
     }
   }
 

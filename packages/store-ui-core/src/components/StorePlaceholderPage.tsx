@@ -27,7 +27,7 @@ export function StorePlaceholderPage({ title }: { title: string }) {
         </div>
         <p className="text-lg font-medium text-slate-700">곧 출시 예정</p>
         <p className="mt-2 text-slate-500">
-          이 기능은 현재 개발 중입니다. 잠시만 기다려주세요.
+          이 기능은 현재 개발 중입니다. 잠시만 기다려주시기 바랍니다.
         </p>
       </div>
     </div>

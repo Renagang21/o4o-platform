@@ -41,7 +41,7 @@ export function invitationScope(
     if (role !== s.operatorRole || service !== s.membershipKey)
       throw new OperatorRoleContractError(
         "SERVICE_KEY_MISMATCH",
-        "서비스와 역할 범위를 확인하세요.",
+        "서비스와 역할 범위를 확인하시기 바랍니다.",
       );
     return {
       scope_type: kind,

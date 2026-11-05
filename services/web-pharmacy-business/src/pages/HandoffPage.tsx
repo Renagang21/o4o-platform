@@ -22,11 +22,11 @@ import { semiFranchiseAccessLink } from '../lib/semiFranchiseAccess';
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.neture.co.kr';
 
 const ERROR_MESSAGES: Record<string, string> = {
-  HANDOFF_TOKEN_INVALID: '이동 링크가 만료되었거나 이미 사용되었습니다. 다시 로그인해 주세요.',
+  HANDOFF_TOKEN_INVALID: '이동 링크가 만료되었거나 이미 사용되었습니다. 다시 로그인해 주시기 바랍니다.',
   HANDOFF_TARGET_NO_MEMBERSHIP: '이 서비스에 가입되어 있지 않습니다.',
   HANDOFF_TARGET_WITHDRAWN: '탈퇴한 서비스는 이동할 수 없습니다.',
   HANDOFF_TARGET_NOT_ACTIVE: '이 서비스 이용이 아직 승인되지 않았거나 정지 상태입니다.',
-  INVALID_USER: '계정을 확인할 수 없습니다. 다시 로그인해 주세요.',
+  INVALID_USER: '계정을 확인할 수 없습니다. 다시 로그인해 주시기 바랍니다.',
 };
 
 function resolvePharmacyFailure(data: unknown): HandoffFailure | null {

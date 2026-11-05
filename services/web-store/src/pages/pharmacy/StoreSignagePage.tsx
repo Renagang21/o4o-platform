@@ -1,3 +1,5 @@
+import { PlaylistNameEditor } from './signage/PlaylistNameEditor';
+import { signageVideoOrigin } from './signage/signageVideoList';
 import { useUnifiedStore } from '../../contexts/StoreContext';
 import { CommunityVideoImport } from './signage/CommunityVideoImport';
 import { VideoRegistration, type VideoRegistrationAction } from '@o4o/store-ui-core';
@@ -24,8 +26,8 @@ import { useSignageSchedules } from './hooks/useSignageSchedules';
  * WO-O4O-SIGNAGE-KPA-PHASE1-MODERNIZATION-V1: 3탭 구조 전환, DataTable 적용
  *
  * /store/signage: 3탭 구조
- *  [Tab 1] 내 동영상 — 기존 channel_map 기반 자산 관리
- *  [Tab 2] 내 플레이리스트 — Store Playlist CRUD + item 관리
+ *  [Tab 1] 동영상 보관함 — 기존 channel_map 기반 자산 관리
+ *  [Tab 2] 재생목록 — Store Playlist CRUD + item 관리
  *  [Tab 3] 스케줄 — 시간/요일 기반 재생 스케줄 CRUD
  *
  * 전이 패턴: Hub → assetSnapshotApi.copy → o4o_asset_snapshots → Playlist에 추가
@@ -39,9 +41,9 @@ import { useSignageSchedules } from './hooks/useSignageSchedules';
 
 import { StoreSignageScheduleForm } from './StoreSignageScheduleForm';
 import { StoreSignageMediaEditor } from './StoreSignageMediaEditor';
-import { StoreWorkflowNavigation, storeWorkspaceBase } from '../../components/store/StoreWorkflowNavigation';
+import { storeWorkspaceBase } from '../../components/store/StoreWorkflowNavigation';
 import { withWorkspaceMode } from '../../config/storeWorkspace';
-import { useState, useEffect, useCallback, useMemo, useRef, useId } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef, useId, type Dispatch, type SetStateAction } from 'react';
 import { useStoreResource } from './hooks/useStoreResource';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import {
@@ -79,7 +81,7 @@ import {
   Pencil,
   Search,
 } from 'lucide-react';
-import { DataTable, type Column } from '@o4o/ui';
+import { ActionBar, DataTable, type Column } from '@o4o/ui';
 import type { SignageScheduleItem } from '../../api/signageSchedule';
 import {
   assetSnapshotApi,
@@ -252,6 +254,7 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
     setShowLibrarySelector,
     handleTogglePublish,
     handleDeletePlaylist,
+    handleRenamePlaylist,
     handleAddFromLibrary,
     handleDeleteItem,
     handleBulkAdd,
@@ -259,6 +262,9 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
     acceptCreatedPlaylist,
   } = useSignagePlaylists(organizationId);
   const [quickStart, setQuickStart] = useState(false);
+  const [checkedVideos, setCheckedVideos] = useState<Set<string>>(new Set());
+  const [checkedPlaylists, setCheckedPlaylists] = useState<Set<string>>(new Set());
+  const [initialVideos, setInitialVideos] = useState<string[]>([]);
   const [videoLibraryOpen, setVideoLibraryOpen] = useState(false);
   const [libraryPending, setLibraryPending] = useState<MediaAssetItem | null>(null);
   const [libraryError, setLibraryError] = useState('');
@@ -322,11 +328,11 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
       const data = await fetchSignageMedia(organizationId);
       if (!Array.isArray(data)) throw new Error('Invalid media');
       if (current() && isCurrent()) setSignageMediaItems(data);
-    } catch { if (current() && isCurrent()) setMediaLoadError('내 동영상을 불러오지 못했습니다. 다시 시도해 주세요.'); }
+    } catch { if (current() && isCurrent()) setMediaLoadError('동영상 보관함을 불러오지 못했습니다. 다시 시도해 주시기 바랍니다.'); }
     finally { if (current() && isCurrent()) setMediaLoading(false); }
   }, [organizationId, mediaReads, isCurrent]);
 
-  // 마운트 시 콘텐츠·플레이리스트·스케줄 병렬 로드 (상단 요약 패널에 필요)
+  // 마운트 시 콘텐츠·재생목록·스케줄 병렬 로드 (상단 요약 패널에 필요)
   useEffect(() => {
     loadSignageMedia();
   }, [loadSignageMedia]);
@@ -338,7 +344,7 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
     } catch (cause) { throw new Error(storeAiError(cause)); }
   }, [effectiveServiceKey]);
   const saveVideoRegistration = useCallback(async (payload: import('@o4o/store-ui-core').VideoRegistrationPayload) => {
-    if (!isCurrent() || organizationRef.current !== organizationId) throw new Error('매장이 변경됐습니다. 현재 매장에서 다시 시작해 주세요.');
+    if (!isCurrent() || organizationRef.current !== organizationId) throw new Error('매장이 변경됐습니다. 현재 매장에서 다시 시작해 주시기 바랍니다.');
     return registerSignageVideo(organizationId, payload);
   }, [organizationId, isCurrent]);
   const videoRequestSlot = useCallback((action: VideoRegistrationAction) => <StoreAiSlot priority={3} label="동영상 등록" action={action} />, []);
@@ -353,7 +359,7 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
       if (!isCurrent() || organizationRef.current !== store) return;
       setLibraryPending(null); await loadSignageMedia();
     } catch (error) {
-      if (isCurrent() && organizationRef.current === store) setLibraryError(error instanceof Error ? error.message : '영상은 라이브러리에 보관됐지만 목록 등록을 확인하지 못했습니다. 다시 등록해 주세요.');
+      if (isCurrent() && organizationRef.current === store) setLibraryError(error instanceof Error ? error.message : '영상은 라이브러리에 보관됐지만 목록 등록을 확인하지 못했습니다. 다시 등록해 주시기 바랍니다.');
     } finally {
       libraryLock.current = false; mediaMutation.current = false;
       if (isCurrent() && organizationRef.current === store) setLibrarySaving(false);
@@ -366,7 +372,7 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
     if (registrationBusy.current || mediaMutation.current || !isCurrent() || !regVideoTitle.trim() || !regVideoUrl.trim()) return;
     const sourceType = detectVideoSource(regVideoUrl.trim());
     if (!sourceType || !videoPreviewUrl(regVideoUrl)) {
-      setRegVideoError('올바른 YouTube 또는 Vimeo URL을 입력해 주세요.');
+      setRegVideoError('올바른 YouTube 또는 Vimeo URL을 입력해 주시기 바랍니다.');
       return;
     }
     const tags = regVideoTags.split(',').map(t => t.trim()).filter(Boolean);
@@ -403,13 +409,13 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
   };
 
   const handleDeleteMedia = async (mediaId: string) => {
-    if (mediaMutation.current || !isCurrent() || !confirm('이 동영상을 삭제하시겠습니까?')) return;
+    if (mediaMutation.current || !isCurrent() || !confirm('보관함에서 이 동영상을 삭제하시겠습니까? 재생목록에서 제거하는 작업과 다릅니다.')) return;
     mediaReads.cancel(); setMediaLoading(false);
     mediaMutation.current = true;
     try {
       await deleteSignageMedia(organizationId, mediaId);
       if (isCurrent()) await loadSignageMedia();
-    } catch { if (isCurrent()) setError('동영상을 삭제하지 못했습니다. 다시 시도해 주세요.'); }
+    } catch { if (isCurrent()) setError('동영상을 삭제하지 못했습니다. 다시 시도해 주시기 바랍니다.'); }
     finally { mediaMutation.current = false; }
   };
 
@@ -475,7 +481,7 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
       if (editTargetRef.current === target) { editTargetRef.current = null; setEditingTarget(null); setEditError(''); }
       if (target.kind === 'direct') void loadSignageMedia(); else void fetchItems();
     } catch {
-      if (isCurrent() && organizationRef.current === store && editTargetRef.current === target) setEditError('삭제하지 못했습니다. 다시 시도해 주세요.');
+      if (isCurrent() && organizationRef.current === store && editTargetRef.current === target) setEditError('삭제하지 못했습니다. 다시 시도해 주시기 바랍니다.');
     } finally { mediaMutation.current = false; editBusy.current = false; if (isCurrent()) setEditSaving(false); }
   };
   useEffect(() => { editTargetRef.current = null; setEditingTarget(null); setEditError(''); }, [organizationId]);
@@ -519,6 +525,15 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
     return playlists.filter(p => p.name.toLowerCase().includes(kw));
   }, [playlists, playlistKeyword]);
 
+  useEffect(() => { setCheckedVideos(new Set()); setEditingTarget(null); }, [organizationId, activeTab, page, statusFilter, sortKey, assetKeyword]);
+  useEffect(() => { setCheckedPlaylists(new Set()); setSelectedPlaylistId(null); }, [organizationId, playlistKeyword]);
+  const toggleChecked = (set: Dispatch<SetStateAction<Set<string>>>, id: string, checked: boolean) => set(previous => { const next = new Set(previous); if (checked) next.add(id); else next.delete(id); return next; });
+  const checkedPlaylist = checkedPlaylists.size === 1 ? filteredPlaylists.find(item => checkedPlaylists.has(item.id)) : undefined;
+  const checkedVideo = checkedVideos.size === 1 ? pagedUnified.find(item => checkedVideos.has(item.id)) : undefined;
+  const videoActionBusy = editSaving || !!updatingId || librarySaving || regVideoSaving;
+  useEffect(() => setCheckedVideos(new Set()), [unifiedVideos]);
+  useEffect(() => setCheckedPlaylists(new Set()), [playlists]);
+
   // Handlers
   const handleToggleStatus = async (item: StoreAssetItem) => {
     if (item.isForced || statusBusy.current.has(item.id) || !isCurrent()) return;
@@ -533,7 +548,7 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
       setItems(prev => prev.map(it =>
         it.id === item.id ? { ...it, publishStatus: res.data.publishStatus } : it,
       ));
-    } catch { if (isCurrent()) setError('게시 상태를 변경하지 못했습니다. 다시 시도해 주세요.'); } finally {
+    } catch { if (isCurrent()) setError('게시 상태를 변경하지 못했습니다. 다시 시도해 주시기 바랍니다.'); } finally {
       statusBusy.current.delete(item.id); if (isCurrent()) setUpdatingId(null);
     }
   };
@@ -562,7 +577,7 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
   // WO-O4O-STORE-LAYOUT-WIDTH-OVERFLOW-FIX-V1: max-w/mx-auto 제거 — StoreDashboardLayout이 max-w-[1200px] 관리
   return (
     <div className="w-full">
-      <StoreWorkflowNavigation subject="사이니지" studioPath="/marketing/signage/playlist" usePath="/marketing/signage/schedules" />
+      <p className="mb-3 text-sm text-slate-600">사이니지 · 동영상 보관함 → 재생목록 → 재생·편성</p>
       {activeTab === 'schedules' && schedulePlaylistError && (
         <div role="alert" className="mb-4 rounded-lg bg-red-50 p-3 text-sm text-red-700">
           스케줄의 재생목록 정보를 불러오지 못했습니다.
@@ -606,7 +621,7 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
           }`}
         >
           <Monitor className="w-4 h-4" />
-          내 동영상
+          동영상 보관함
         </button>
         <button
           onClick={() => navigateTab('playlist')}
@@ -617,7 +632,7 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
           }`}
         >
           <ListVideo className="w-4 h-4" />
-          내 플레이리스트
+          재생목록
         </button>
         <button
           onClick={() => navigateTab('schedules')}
@@ -628,8 +643,9 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
           }`}
         >
           <Calendar className="w-4 h-4" />
-          스케줄
+          재생 일정
         </button>
+        <Link className="min-h-11 content-center px-4 text-sm text-slate-600" to={`${base}/marketing/signage/player`}>TV 재생</Link>
       </div>
 
       {/* ─── 현재 재생 상태 요약 패널 ─────────────── */}
@@ -651,7 +667,7 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
                   || currentSchedule.playlist?.name
                   || playlists.find(p => p.id === currentSchedule.playlistId)?.name
                   || signagePlaylists.find(p => p.id === currentSchedule.playlistId)?.name
-                  || '플레이리스트'}
+                  || '재생목록'}
               </p>
               <p className="text-xs text-slate-500 mt-0.5">
                 {currentSchedule.name} · {toHHMM(currentSchedule.startTime)} ~ {toHHMM(currentSchedule.endTime)}
@@ -682,25 +698,25 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
           onClick={() => navigateTab('schedules')}
           className="flex-shrink-0 text-xs text-slate-400 hover:text-blue-600 underline underline-offset-2"
         >
-          스케줄 관리
+          재생 일정 관리
         </button>
       </div>}
 
       {/* ═══ Playlist Tab ═══════════════════════════ */}
       {activeTab === 'playlist' && (
         <div>
-          {savedGuide && <p role="status" className="mb-4 rounded-lg bg-teal-50 p-4 text-sm text-teal-900">{savedGuide} 초안을 저장했습니다. 자료를 확인한 뒤 게시하고 재생 시간을 정하세요.</p>}
+          {savedGuide && <p role="status" className="mb-4 rounded-lg bg-teal-50 p-4 text-sm text-teal-900">{savedGuide} 초안을 저장했습니다. 자료를 확인한 뒤 게시하고 재생 시간을 정하시기 바랍니다.</p>}
           {/* Create + list */}
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-slate-800">내 플레이리스트</h2>
+            <h2 className="text-lg font-semibold text-slate-800">재생목록</h2>
             {/* WO-O4O-SIGNAGE-PLAYLIST-CREATE-STANDARD-ALL-SURFACES-V1: 모달 → 표준 /new 등록 페이지 */}
             <button
               disabled={loading || mediaLoading || !!listError || !!mediaLoadError}
-              onClick={() => setQuickStart(true)}
+              onClick={() => { setInitialVideos([]); setQuickStart(true); }}
               className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-blue-600 border border-blue-300 rounded-lg hover:bg-blue-50"
             >
               <Plus className="w-4 h-4" />
-              새 안내 만들기
+              새 재생목록
             </button>
           </div>
           {listError && <p role="alert" className="mb-3 text-sm text-red-700">매장 자료를 불러오지 못했습니다. <button type="button" onClick={() => void fetchItems()} className="min-h-11 underline">매장 자료 다시 시도</button></p>}
@@ -708,7 +724,7 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
           <details className="mb-4 text-sm text-slate-600"><summary className="min-h-11 cursor-pointer">상세 관리</summary><Link to={`${base}/marketing/signage/playlist/new`} className="inline-flex min-h-11 items-center underline">이름만 먼저 정하고 자료 추가</Link></details>
 
           <details open={!selectedPlaylistId} className="mb-4">
-          <summary className="min-h-11 cursor-pointer text-sm font-medium text-slate-700">{selectedPlaylistId ? `다른 안내 선택 · ${playlists.length}개` : '저장한 안내 선택'}</summary>
+          <summary className="min-h-11 cursor-pointer text-sm font-medium text-slate-700">{selectedPlaylistId ? `다른 재생목록 선택 · ${playlists.length}개` : '저장한 재생목록 선택'}</summary>
           {/* Playlist search */}
           {!playlistLoading && !playlistError && playlists.length > 0 && (
             <div className="relative mb-3">
@@ -717,7 +733,7 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
                 type="text"
                 value={playlistKeyword}
                 onChange={e => setPlaylistKeyword(e.target.value)}
-                placeholder="플레이리스트 이름으로 검색..."
+                placeholder="재생목록 이름으로 검색..."
                 className="w-full pl-9 pr-4 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
@@ -735,13 +751,18 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
           ) : playlists.length === 0 && !playlistLoading ? (
             <div className="text-center py-12 text-slate-400">
               <ListVideo className="w-8 h-8 mx-auto mb-2 text-slate-300" />
-              <p className="text-sm">플레이리스트가 없습니다.</p>
-              <p className="text-xs mt-1">'새 안내 만들기'에서 자료를 고르면 초안이 저장됩니다.</p>
+              <p className="text-sm">재생목록이 없습니다.</p>
+              <p className="text-xs mt-1">'새 재생목록'에서 자료를 고르면 초안이 저장됩니다.</p>
             </div>
           ) : (
             <div className="mb-6">
+              <ActionBar selectedCount={checkedPlaylists.size} onClearSelection={() => setCheckedPlaylists(new Set())} actions={[
+                { key: 'edit', label: '선택 재생목록 수정', disabled: !checkedPlaylist || !!checkedPlaylist && busyPlaylistIds.has(checkedPlaylist.id), onClick: () => { if (checkedPlaylist) setSelectedPlaylistId(checkedPlaylist.id); } },
+                { key: 'delete', label: '선택 재생목록 삭제', variant: 'danger', disabled: !checkedPlaylist || !!checkedPlaylist && busyPlaylistIds.has(checkedPlaylist.id), onClick: async () => { if (checkedPlaylist) { await handleDeletePlaylist(checkedPlaylist); setCheckedPlaylists(new Set()); } } },
+              ]} statusInfo="수정·삭제는 한 개의 재생목록을 선택한 경우 실행합니다." />
               <DataTable<StorePlaylist>
                 columns={[
+                  { key: 'select', title: <input type="checkbox" aria-label="재생목록 현재 페이지 전체 선택" checked={filteredPlaylists.length > 0 && filteredPlaylists.every(item => checkedPlaylists.has(item.id))} onChange={event => setCheckedPlaylists(event.target.checked ? new Set(filteredPlaylists.map(item => item.id)) : new Set())} />, render: (_v, item) => <input type="checkbox" aria-label={`${item.name} 재생목록 선택`} checked={checkedPlaylists.has(item.id)} onClick={event => event.stopPropagation()} onChange={event => toggleChecked(setCheckedPlaylists, item.id, event.target.checked)} /> },
                   {
                     key: 'name',
                     title: '이름',
@@ -891,13 +912,13 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
                     className="flex items-center gap-1 px-2.5 py-1 text-xs text-blue-600 border border-blue-300 rounded-md hover:bg-blue-50"
                   >
                     <Plus className="w-3 h-3" />
-                    내 동영상에서 추가
+                    동영상 보관함에서 추가
                   </button>
                 </div>
               </div>
 
               <section aria-label="선택 안내 다음 작업" className="space-y-3 border-b border-slate-100 bg-teal-50/40 p-4">
-                <p className="text-sm text-slate-700">자료·순서 변경은 바로 저장됩니다. 실제 재생 화면은 다시 열어 확인하세요. 등록 영상에서 가져온 사본은 원본과 자동 동기화되지 않습니다. 필수 자료의 잠금·시간 조건은 유지됩니다.</p>
+                <p className="text-sm text-slate-700">자료·순서 변경은 바로 저장됩니다. 실제 재생 화면은 다시 열어 확인하시기 바랍니다. 등록 영상에서 가져온 사본은 원본과 자동 동기화되지 않습니다. 필수 자료의 잠금·시간 조건은 유지됩니다.</p>
                 <div className="flex flex-wrap gap-2">
                   <button type="button" disabled={playlistItemsLoading || !!playlistItemsError || !playlistItems.length} onClick={() => setPlaylistPreview(true)} className="min-h-11 rounded-lg border border-teal-300 bg-white px-3 text-sm disabled:opacity-50">저장된 안내 미리보기</button>
                   <button type="button" disabled={playlistBusy || !playlistItems.length || !!playlistItemsError || playlistItemsLoading} onClick={() => void handleTogglePublish(selectedPlaylist)} className="min-h-11 rounded-lg border border-slate-300 bg-white px-3 text-sm disabled:opacity-50">{selectedPlaylist.publishStatus === 'published' ? '게시 중단' : '자료 확인 후 게시'}</button>
@@ -906,6 +927,7 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
                 </div>
               </section>
 
+              <PlaylistNameEditor key={selectedPlaylist.id} playlist={selectedPlaylist} busy={playlistBusy} onSave={handleRenamePlaylist} />
               {/* Total duration summary */}
               {playlistItems.length > 0 && (
                 <div className="px-4 py-2 bg-slate-50 border-b border-slate-100 flex items-center gap-3 text-[11px]">
@@ -934,7 +956,7 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
                 <div className="py-10 text-center text-slate-400">
                   <ListVideo className="w-8 h-8 mx-auto mb-2 text-slate-300" />
                   <p className="text-sm">재생 항목이 없습니다.</p>
-                  <p className="text-xs mt-1">'내 동영상에서 추가' 버튼으로 동영상을 추가하세요.</p>
+                  <p className="text-xs mt-1">'동영상 보관함에서 추가' 버튼으로 동영상을 추가하시기 바랍니다.</p>
                 </div>
               ) : (
                 <div className="divide-y divide-slate-100">
@@ -1001,8 +1023,9 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
                           <button
                             disabled={playlistBusy}
                             onClick={() => handleDeleteItem(item.id)}
+                            aria-label={`${item.title} 재생목록에서 제거`}
                             className="p-1 text-slate-300 hover:text-red-500 rounded flex-shrink-0"
-                            title="삭제"
+                            title="재생목록에서 제거"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
                           </button>
@@ -1017,15 +1040,15 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
         </div>
       )}
 
-      {quickStart && <SignageQuickStart videos={unifiedVideos} organizationId={organizationId} isCurrent={isCurrent}
-        onSaved={playlist => { acceptCreatedPlaylist(playlist); setSavedGuide(playlist.name); setQuickStart(false); void fetchItems(); void loadPlaylists(); }}
+      {quickStart && <SignageQuickStart videos={unifiedVideos} initialSelected={initialVideos} organizationId={organizationId} isCurrent={isCurrent}
+        onSaved={playlist => { acceptCreatedPlaylist(playlist); setSavedGuide(playlist.name); setQuickStart(false); setCheckedVideos(new Set()); navigate(`${base}/marketing/signage/playlist`, { state: { signagePlaylistId: playlist.id } }); void fetchItems(); void loadPlaylists(); }}
         onClose={draft => { setQuickStart(false); if (draft) acceptCreatedPlaylist(draft); void loadPlaylists(); }} />}
       {playlistPreview && selectedPlaylist && <SignagePlaylistPreview key={selectedPlaylist.id} name={selectedPlaylist.name} items={playlistItems} onClose={() => setPlaylistPreview(false)} />}
 
       {/* ═══ Schedule Tab ══════════════════════════ */}
       {activeTab === 'schedules' && (
         <div>
-          {savedSchedule && <div role="status" className="mb-4 space-y-2 rounded-lg bg-teal-50 p-4 text-sm text-teal-900"><p>{savedSchedule.name} 일정을 저장했습니다. 실제 기기의 재생 결과는 별도로 확인하세요.</p><Link to={`${base}/marketing/signage/player`} className="inline-flex min-h-11 items-center underline">재생할 안내 확인</Link></div>}
+          {savedSchedule && <div role="status" className="mb-4 space-y-2 rounded-lg bg-teal-50 p-4 text-sm text-teal-900"><p>{savedSchedule.name} 일정을 저장했습니다. 실제 기기의 재생 결과는 별도로 확인하시기 바랍니다.</p><Link to={`${base}/marketing/signage/player`} className="inline-flex min-h-11 items-center underline">재생할 안내 확인</Link></div>}
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold text-slate-800">스케줄</h2>
             <button
@@ -1087,7 +1110,7 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
             <div className="text-center py-12 text-slate-400">
               <Calendar className="w-8 h-8 mx-auto mb-2 text-slate-300" />
               <p className="text-sm">스케줄이 없습니다.</p>
-              <p className="text-xs mt-1">먼저 '내 플레이리스트' 탭에서 플레이리스트를 만들고 콘텐츠를 추가하세요.</p>
+              <p className="text-xs mt-1">먼저 '재생목록' 탭에서 재생목록을 만들고 콘텐츠를 추가하시기 바랍니다.</p>
             </div>
           ) : (
             <DataTable<SignageScheduleItem>
@@ -1100,7 +1123,7 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
                 },
                 {
                   key: 'playlist',
-                  title: '플레이리스트',
+                  title: '재생목록',
                   render: (_v, sch) => (
                     <span className="text-slate-600 text-xs">
                       {playlists.find(p => p.id === sch.storePlaylistId)?.name || sch.playlist?.name || signagePlaylists.find(p => p.id === sch.playlistId)?.name || playlists.find(p => p.id === sch.playlistId)?.name || sch.name}
@@ -1205,27 +1228,28 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
         </div>
       )}
 
-      {/* ═══ Assets Tab (내 동영상) ════════════════ */}
+      {/* ═══ Assets Tab (동영상 보관함) ════════════════ */}
       {activeTab === 'assets' && <>
 
       {new URLSearchParams(location.search).get('communityVideo') && <CommunityVideoImport requestKey={new URLSearchParams(location.search).get('communityRequest') ?? undefined} videoId={new URLSearchParams(location.search).get('communityVideo')!} organizationId={organizationId} isCurrent={isCurrent} onClose={() => { const params = new URLSearchParams(location.search); params.delete('communityVideo'); params.delete('communityRequest'); navigate({pathname: location.pathname, search: params.toString()}, {replace:true}); }} onImported={() => { void reloadItems(); const params = new URLSearchParams(location.search); params.delete('communityVideo'); params.delete('communityRequest'); navigate({pathname: location.pathname, search: params.toString()}, {replace:true}); }} />}
       <VideoRegistration contextKey={organizationId} youtube={youtubeVideoApi} mediaApi={mediaApi} ask={askVideoRegistration} save={saveVideoRegistration} onSaved={loadSignageMedia} requestSlot={videoRequestSlot} />
       <div className="flex items-center justify-between mb-2">
-        <h2 className="text-lg font-semibold text-slate-800">내 동영상</h2>
+        <h2 className="text-lg font-semibold text-slate-800">동영상 보관함</h2>
         <button
           onClick={() => setShowVideoRegForm(true)}
           className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-blue-600 border border-blue-300 rounded-lg hover:bg-blue-50"
         >
           <Plus className="w-4 h-4" />
-          동영상 등록
+          외부 영상 URL 등록
         </button>
       </div>
       <div className="mb-3 flex flex-wrap items-center gap-3">
-        <button type="button" disabled={librarySaving} onClick={() => setVideoLibraryOpen(true)} className="min-h-11 rounded-lg bg-teal-700 px-4 text-sm text-white">O4O에 보관 · 영상 선택</button>
-        <a href="https://studio.youtube.com/channel/UCG9wb2OKmCBZ63g_ONuFkzg/videos/upload" target="_blank" rel="noopener noreferrer" onClick={() => setShowVideoRegForm(true)} className="inline-flex min-h-11 items-center rounded-lg border px-4 text-sm">YouTube에 저장</a>
+        <button type="button" disabled={librarySaving} onClick={() => setVideoLibraryOpen(true)} className="min-h-11 rounded-lg bg-teal-700 px-4 text-sm text-white">내 보관 파일에서 선택</button>
+        <a href="https://studio.youtube.com/channel/UCG9wb2OKmCBZ63g_ONuFkzg/videos/upload" target="_blank" rel="noopener noreferrer" onClick={() => setShowVideoRegForm(true)} className="inline-flex min-h-11 items-center rounded-lg border px-4 text-sm">O4O YouTube 업로드(선택)</a>
       </div>
-      <p className="mb-3 text-sm text-slate-600">O4O 보관은 미디어 라이브러리를 사용합니다. YouTube 업로드와 영상 처리에는 수 분 이상 걸릴 수 있습니다. YouTube 화면에서 완료를 확인한 뒤 개별 영상 주소를 등록하세요. 채널 주소 자체는 재생할 수 없습니다.</p>
-      {librarySaving && <output>보관 영상을 내 동영상에 연결하고 있습니다…</output>}
+      <div className="mb-3 flex flex-wrap gap-3 text-sm"><a className="min-h-11 content-center underline" href="https://community.neture.co.kr">커뮤니티에서 영상 찾기</a><Link className="min-h-11 content-center underline" to={`${base}/pharmacy/contents`}>가입 협업체 자료 가져오기</Link></div>
+      <p className="mb-3 text-sm text-slate-600">다른 YouTube 채널·Vimeo·직접 재생 URL을 등록할 수 있습니다. 공개 영상도 임베드 허용과 매장 이용 권한을 확인해야 합니다. 영상이 삭제·비공개로 전환되면 재생할 수 없습니다. O4O 보관은 미디어 라이브러리를 사용합니다. YouTube 업로드와 영상 처리에는 수 분 이상 걸릴 수 있습니다. YouTube 화면에서 완료를 확인한 뒤 개별 영상 주소를 등록하시기 바랍니다. 채널 주소 자체는 재생할 수 없습니다.</p>
+      {librarySaving && <output>보관 영상을 동영상 보관함에 연결하고 있습니다…</output>}
       {libraryError && <div role="alert" className="mb-3 rounded-lg bg-amber-50 p-3 text-sm">{libraryError}{libraryPending && <button type="button" disabled={librarySaving} onClick={() => void registerLibraryVideo(libraryPending)} className="min-h-11 px-3 underline">같은 보관 영상 다시 등록</button>}</div>}
       <MediaPickerModal open={videoLibraryOpen} onClose={() => setVideoLibraryOpen(false)} onSelect={asset => void registerLibraryVideo(asset)} assetType="video" contextKey={organizationId} title="O4O 보관 영상" defaultFolder="general" />
       {/* Video registration form — modal */}
@@ -1249,7 +1273,7 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
                 type="text"
                 value={regVideoTitle}
                 onChange={e => { setRegVideoTitle(e.target.value); setRegVideoError(''); }}
-                placeholder="동영상 제목을 입력하세요"
+                placeholder="동영상 제목을 입력하시기 바랍니다"
                 className="w-full px-3 py-1.5 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
                 autoFocus
               />
@@ -1269,7 +1293,7 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
               <textarea
                 value={regVideoDescription}
                 onChange={e => setRegVideoDescription(e.target.value)}
-                placeholder="이 동영상의 활용 위치나 용도를 간략히 기록하세요"
+                placeholder="이 동영상의 활용 위치나 용도를 간략히 기록하시기 바랍니다"
                 rows={2}
                 className="w-full px-3 py-1.5 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 resize-none"
               />
@@ -1418,7 +1442,7 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
             <>
               <Monitor className="w-10 h-10 mx-auto mb-3 text-slate-300" />
               <p className="text-sm">동영상이 없습니다.</p>
-              <p className="text-xs mt-1">O4O 보관 영상을 선택하거나 YouTube/Vimeo 영상 주소를 등록하세요.</p>
+              <p className="text-xs mt-1">O4O 보관 영상을 선택하거나 YouTube/Vimeo 영상 주소를 등록하시기 바랍니다.</p>
             </>
           ) : (
             <p className="text-sm">선택한 필터 조건에 해당하는 동영상이 없습니다.</p>
@@ -1426,8 +1450,14 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
         </div>
       ) : (
         <>
+          <ActionBar selectedCount={checkedVideos.size} onClearSelection={() => setCheckedVideos(new Set())} actions={[
+            { key: 'create', label: '선택 영상으로 재생목록 만들기', disabled: videoActionBusy || [...checkedVideos].some(id => { const video = pagedUnified.find(item => item.id === id); return !video || video.isForced || video.isLocked; }), onClick: () => { setInitialVideos([...checkedVideos]); setQuickStart(true); } },
+            { key: 'detail', label: '선택 영상 상세·수정', disabled: !checkedVideo || videoActionBusy || checkedVideo.isLocked || checkedVideo.isForced, onClick: () => { if (checkedVideo) handleOpenEdit(checkedVideo); } },
+          ]} statusInfo="여러 영상을 선택해 새 재생목록을 만들 수 있습니다. 상세·수정은 한 개를 선택합니다." />
           <DataTable<UnifiedVideoItem>
             columns={[
+              { key: 'select', title: <input type="checkbox" aria-label="동영상 현재 페이지 전체 선택" checked={pagedUnified.length > 0 && pagedUnified.every(item => checkedVideos.has(item.id))} onChange={event => setCheckedVideos(event.target.checked ? new Set(pagedUnified.map(item => item.id)) : new Set())} />, render: (_v, item) => <input type="checkbox" aria-label={`${item.title} 영상 선택`} checked={checkedVideos.has(item.id)} onChange={event => toggleChecked(setCheckedVideos, item.id, event.target.checked)} /> },
+              { key: 'origin', title: '가져온 경로', render: (_v, video) => <span className="text-xs text-slate-600">{signageVideoOrigin(video)}</span> },
               {
                 key: 'title',
                 title: '제목',
@@ -1568,12 +1598,12 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
                         </button>
                       )}
                       <button
-                        onClick={() => navigateTab('playlist')}
+                        onClick={() => { setInitialVideos([v.id]); setQuickStart(true); }}
                         className="inline-flex items-center gap-1 px-2 py-1 text-[11px] text-blue-600 border border-blue-200 rounded hover:bg-blue-50"
-                        title="플레이리스트 탭으로 이동하여 추가"
+                        title="이 영상으로 새 재생목록 만들기"
                       >
                         <ListVideo className="w-3 h-3" />
-                        플레이리스트에 추가
+                        새 재생목록에 담기
                       </button>
                     </div>
                   );
@@ -1624,8 +1654,8 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
             {/* Modal header */}
             <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
               <div>
-                <h3 id={addVideoTitleId} className="text-sm font-semibold text-slate-800">내 동영상에서 추가</h3>
-                <p className="text-xs text-slate-400 mt-0.5">선택한 동영상이 플레이리스트에 추가됩니다</p>
+                <h3 id={addVideoTitleId} className="text-sm font-semibold text-slate-800">동영상 보관함에서 추가</h3>
+                <p className="text-xs text-slate-400 mt-0.5">선택한 동영상이 재생목록에 추가됩니다</p>
               </div>
               {addModalSelected.size > 0 && (
                 <span className="text-xs font-medium text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">
@@ -1653,7 +1683,7 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
             <div className="flex-1 overflow-y-auto divide-y divide-slate-50">
               {addModalVideos.length === 0 ? (
                 <div className="py-12 text-center text-slate-400 text-sm">
-                  {addModalSearch ? '검색 결과가 없습니다.' : '등록된 동영상이 없습니다. 먼저 내 동영상 탭에서 동영상을 추가하세요.'}
+                  {addModalSearch ? '검색 결과가 없습니다.' : '등록된 동영상이 없습니다. 먼저 동영상 보관함 탭에서 동영상을 추가하시기 바랍니다.'}
                 </div>
               ) : addModalVideos.map(v => {
                 const isSelected = addModalSelected.has(v.id);

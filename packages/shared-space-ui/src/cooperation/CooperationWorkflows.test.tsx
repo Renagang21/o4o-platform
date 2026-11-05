@@ -127,7 +127,7 @@ it("never fetches pharmacy work without an explicit selected pharmacy", () => {
     />,
   );
   expect(
-    screen.getByText("회원 업무를 이용할 약국을 선택해 주세요."),
+    screen.getByText("회원 업무를 이용할 약국을 선택해 주시기 바랍니다."),
   ).toBeTruthy();
   expect(api.get).not.toHaveBeenCalled();
 });

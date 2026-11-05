@@ -121,7 +121,7 @@ const netureMembersClient: MembersConsoleClient = {
         const msg = String(err?.response?.data?.error || err?.response?.data?.message || err?.message || '');
         if (code === 404 || /REGISTRATION_NOT_FOUND|already processed/i.test(msg)) {
           throw new Error(
-            '이미 가입 승인된 회원입니다. 공급자 프로필 승인이 필요하면 "공급자 승인 관리(공급자 활성화)" 화면에서 처리해 주세요.',
+            '이미 가입 승인된 회원입니다. 공급자 프로필 승인이 필요하면 "공급자 승인 관리(공급자 활성화)" 화면에서 처리해 주시기 바랍니다.',
           );
         }
         throw err;

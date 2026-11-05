@@ -124,7 +124,7 @@ export class EmailAuthController extends BaseController {
     try {
       await emailAuthService.resetPassword(token, newPassword);
       return BaseController.ok(res, {
-        message: '비밀번호를 바꿨습니다. 새 비밀번호로 다시 로그인해 주세요. 다른 기기의 로그인도 모두 끝났습니다.',
+        message: '비밀번호를 바꿨습니다. 새 비밀번호로 다시 로그인해 주시기 바랍니다. 다른 기기의 로그인도 모두 끝났습니다.',
       });
     } catch (error) {
       return EmailAuthController.handleError(res, error, 'reset');

@@ -45,7 +45,7 @@ export default function SupplierOnboardingFields({
           <FileText className="w-5 h-5 text-gray-500" />
           공급자 서류 및 정산 정보
         </h2>
-        <p className="text-xs text-gray-500 mb-5">증빙 파일은 선택 사항이며 미제출로 신청·승인이 제한되지 않습니다. 담당자·세금계산서 정보도 나중에 보완할 수 있습니다. 실제 정산에 필요한 계좌 정보는 정산 전에 확인해 주세요.</p>
+        <p className="text-xs text-gray-500 mb-5">증빙 파일은 선택 사항이며 미제출로 신청·승인이 제한되지 않습니다. 담당자·세금계산서 정보도 나중에 보완할 수 있습니다. 실제 정산에 필요한 계좌 정보는 정산 전에 확인해 주시기 바랍니다.</p>
 
         {/* WO-O4O-NETURE-SUPPLIER-PROFILE-AUX-LOAD-ERROR-CONTRACT-V1:
             조회 실패를 "미입력" 으로 오인시키지 않는다. 입력값은 비우지 않고 안내만 덧붙인다. */}

@@ -29,7 +29,7 @@ export default function InstructorSubmissionsPage() {
   async function grade(id: string, gradingStatus: 'graded' | 'returned') {
     const d = draft[id] ?? { score: '', feedback: '' };
     const score = gradingStatus === 'graded' ? Number(d.score) : null;
-    if (gradingStatus === 'graded' && (d.score === '' || Number.isNaN(score))) { toast.error('점수를 입력하세요.'); return; }
+    if (gradingStatus === 'graded' && (d.score === '' || Number.isNaN(score))) { toast.error('점수를 입력하시기 바랍니다.'); return; }
     setBusy(id);
     try { await instructorApi.gradeSubmission(id, { gradingStatus, score, feedback: d.feedback }); toast.success('처리했습니다.'); await load(); }
     catch (err) { toast.error(errorMessage(err, '채점에 실패했습니다.')); }

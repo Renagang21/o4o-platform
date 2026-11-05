@@ -189,7 +189,7 @@ export default function GeneralSettings() {
               name="siteDescription"
               value={settings.siteDescription}
               onChange={(e: any) => handleChange('siteDescription', e.target.value)}
-              placeholder="사이트에 대한 간단한 설명을 입력하세요"
+              placeholder="사이트에 대한 간단한 설명을 입력하시기 바랍니다"
               rows={3}
             />
           </div>
@@ -215,7 +215,7 @@ export default function GeneralSettings() {
               placeholder="https://example.com/favicon.ico"
             />
             <p className="text-xs text-gray-500">
-              사이트 파비콘 이미지 URL을 입력하세요 (.ico, .png, .svg 지원)
+              사이트 파비콘 이미지 URL을 입력하시기 바랍니다 (.ico, .png, .svg 지원)
             </p>
             {settings.favicon && (
               <div className="mt-2 p-3 bg-gray-50 border border-gray-200 rounded-md">
@@ -251,7 +251,7 @@ export default function GeneralSettings() {
               placeholder="https://example.com/logo.png"
             />
             <p className="text-xs text-gray-500">
-              헤더에 표시될 로고 이미지 URL을 입력하세요
+              헤더에 표시될 로고 이미지 URL을 입력하시기 바랍니다
             </p>
             {settings.logo && (
               <div className="mt-2 p-3 bg-gray-50 border border-gray-200 rounded-md">

@@ -96,7 +96,7 @@ export function useSupplierProducts() {
     restoredOffer.current = offerId;
     const target = products.find((p) => p.id === offerId);
     if (target) setDrawerProduct(target);
-    else setToast('요청한 상품을 현재 목록에서 찾을 수 없습니다. 검색·필터를 확인해 주세요.');
+    else setToast('요청한 상품을 현재 목록에서 찾을 수 없습니다. 검색·필터를 확인해 주시기 바랍니다.');
   }, [searchParams, loading, loadError, products]);
   const closeDrawer = () => {
     setDrawerProduct(null);

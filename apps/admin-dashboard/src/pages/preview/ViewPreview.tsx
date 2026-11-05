@@ -37,7 +37,7 @@ export default function ViewPreview() {
           setError('미리보기 응답 형식을 확인할 수 없습니다.');
         }
       } catch {
-        if (!controller.signal.aborted) setError('미리보기를 불러오지 못했습니다. 잠시 후 다시 시도해주세요.');
+        if (!controller.signal.aborted) setError('미리보기를 불러오지 못했습니다. 잠시 후 다시 시도해 주시기 바랍니다.');
       } finally {
         if (!controller.signal.aborted) setLoading(false);
       }
@@ -47,7 +47,7 @@ export default function ViewPreview() {
   }, [slug, preview, retry]);
 
   if (!slug) {
-    return <div role="alert" className="p-6 text-center">미리보기 주소를 확인해주세요.</div>;
+    return <div role="alert" className="p-6 text-center">미리보기 주소를 확인해 주시기 바랍니다.</div>;
   }
   if (loading) {
     return <div role="status" className="flex items-center justify-center min-h-screen bg-white">미리보기를 불러오는 중입니다.</div>;

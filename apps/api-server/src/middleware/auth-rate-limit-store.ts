@@ -66,7 +66,7 @@ export function sharedAuthLimiter(store: PostgresAuthRateLimitStore, options: Sh
     let lease: AuthLimitLease;
     try { lease = await store.reserve(options.scope,options.key(req),options.windowMs); }
     catch {
-      res.status(503).json({ success:false,code:'AUTH_RATE_LIMIT_UNAVAILABLE',error:'인증 요청 제한을 확인할 수 없습니다. 잠시 뒤 다시 시도해 주세요.' });
+      res.status(503).json({ success:false,code:'AUTH_RATE_LIMIT_UNAVAILABLE',error:'인증 요청 제한을 확인할 수 없습니다. 잠시 뒤 다시 시도해 주시기 바랍니다.' });
       return;
     }
     const remaining = Math.max(0,options.max-lease.hits);

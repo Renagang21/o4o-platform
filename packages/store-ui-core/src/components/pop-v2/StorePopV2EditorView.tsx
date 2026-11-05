@@ -109,7 +109,7 @@ export function StorePopV2EditorView(props: StorePopV2EditorViewProps) {
       <section style={popSectionStyle}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
           <span style={popStepBadgeStyle(accent)}>1</span>
-          <strong style={{ fontSize: 14, color: '#0f172a' }}>무엇으로 POP 을 만들까요?</strong>
+          <strong style={{ fontSize: 14, color: '#0f172a' }}>무엇으로 POP 을 만드시겠습니까?</strong>
         </div>
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
           <button
@@ -159,7 +159,7 @@ export function StorePopV2EditorView(props: StorePopV2EditorViewProps) {
             {s.contentCandidatesLoading && <div style={mutedStyle}>불러오는 중…</div>}
             {!s.contentCandidatesLoading && s.contentCandidates.length === 0 && (
               <div style={mutedStyle}>
-                POP 으로 만들 수 있는 내 매장 콘텐츠가 없습니다. 콘텐츠를 먼저 등록해 주세요.
+                POP 으로 만들 수 있는 내 매장 콘텐츠가 없습니다. 콘텐츠를 먼저 등록해 주시기 바랍니다.
               </div>
             )}
             <div style={{ display: 'grid', gap: 8 }}>

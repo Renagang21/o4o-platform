@@ -17,6 +17,7 @@ export interface StoreAddress {
 }
 
 export interface PharmacyInfoData {
+  demoExample?: { name: string; representativeName: string; businessNumber: string; licenseNumber: string; address: string; businessType: string; businessItem: string; documentUrl: string };
   organizationId: string;
   name: string;
   phone: string | null;

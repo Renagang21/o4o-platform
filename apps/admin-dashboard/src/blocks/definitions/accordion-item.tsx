@@ -18,11 +18,11 @@ export const accordionItemBlockDefinition: BlockDefinition = {
   attributes: {
     title: {
       type: 'string',
-      default: '질문을 입력하세요',
+      default: '질문을 입력하시기 바랍니다',
     },
     content: {
       type: 'string',
-      default: '답변을 입력하세요',
+      default: '답변을 입력하시기 바랍니다',
     },
     defaultOpen: {
       type: 'boolean',

@@ -99,7 +99,7 @@ export function StoreUseModal({ open, onClose, editor }: StoreUseModalProps) {
   async function handleGenerate() {
     const sourceHtml = getSourceHtml();
     if (!sourceHtml || sourceHtml === '<p></p>') {
-      setError('에디터에 내용을 먼저 작성해 주세요.');
+      setError('에디터에 내용을 먼저 작성해 주시기 바랍니다.');
       return;
     }
 
@@ -133,7 +133,7 @@ export function StoreUseModal({ open, onClose, editor }: StoreUseModalProps) {
         bullets: data.bullets || [],
       });
     } catch {
-      setError('네트워크 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.');
+      setError('네트워크 오류가 발생했습니다. 잠시 후 다시 시도해 주시기 바랍니다.');
     } finally {
       setLoading(false);
     }
@@ -192,7 +192,7 @@ export function StoreUseModal({ open, onClose, editor }: StoreUseModalProps) {
 
       setSavedAssetId(data.data?.id ?? data.id ?? '');
     } catch {
-      setSaveError('네트워크 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.');
+      setSaveError('네트워크 오류가 발생했습니다. 잠시 후 다시 시도해 주시기 바랍니다.');
     } finally {
       setSaving(false);
     }

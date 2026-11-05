@@ -25,7 +25,7 @@ export function createCommunityPublicReadRoutes(authenticate: RequestHandler, re
   router.get('/:communityKey/public/posts', apiLimiter, handle(req => {
     const rawPage = String(req.query.page ?? '1');
     if (!/^\d+$/.test(rawPage) || +rawPage < 1 || +rawPage > 10000) {
-      throw new CommunityPublicReadError(400, 'INVALID_PAGE', '유효한 페이지를 선택해 주세요.');
+      throw new CommunityPublicReadError(400, 'INVALID_PAGE', '유효한 페이지를 선택해 주시기 바랍니다.');
     }
     return listPublicCommunityPosts(AppDataSource, req.params.communityKey, +rawPage);
   }));

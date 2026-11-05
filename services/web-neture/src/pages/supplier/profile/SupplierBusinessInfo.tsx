@@ -61,7 +61,7 @@ export default function SupplierBusinessInfo({
               required
               className={inputClass}
             />
-            <p className="mt-1 text-xs text-gray-400">사업자등록증에 기재된 상호명을 입력해 주세요.</p>
+            <p className="mt-1 text-xs text-gray-400">사업자등록증에 기재된 상호명을 입력해 주시기 바랍니다.</p>
           </div>
 
           {/* 대표자명 */}

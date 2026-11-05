@@ -67,7 +67,7 @@ it.each(["no-store", "pending", "active", "error"])(
       </MemoryRouter>,
     );
     if (status === "no-store")
-      await screen.findByText("회원 업무를 이용할 약국을 선택해 주세요.");
+      await screen.findByText("회원 업무를 이용할 약국을 선택해 주시기 바랍니다.");
     else if (status === "pending") await screen.findByText("승인 대기");
     else if (status === "error")
       await screen.findByText(

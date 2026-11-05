@@ -105,7 +105,7 @@ export default function SupplierStoreDescriptionsPage() {
     supplierStoreDescriptionApi
       .listMine()
       .then(setDrafts)
-      .catch(() => toast.error('설명서 목록을 새로고침하지 못했습니다. 잠시 후 다시 시도해 주세요.'));
+      .catch(() => toast.error('설명서 목록을 새로고침하지 못했습니다. 잠시 후 다시 시도해 주시기 바랍니다.'));
   };
 
   // ACTIVE 시 상품 목록 + 내 STORE 설명서 작업행 로드
@@ -139,7 +139,7 @@ export default function SupplierStoreDescriptionsPage() {
     if (!masterId || productsLoading || productsError || !active) return;
     const target = products.find((p) => p.masterId === masterId);
     if (!target || (requestedLanguage && !SUPPORTED_LANGS.includes(requestedLanguage as SupportedLang)) || (descriptionId && !drafts.some((d) => d.id === descriptionId && d.masterId === masterId && normLang(d.language) === normLang(requestedLanguage)))) {
-      setDeepLinkError('요청한 상품 또는 언어를 열 수 없습니다. 목록에서 대상을 확인해 주세요.');
+      setDeepLinkError('요청한 상품 또는 언어를 열 수 없습니다. 목록에서 대상을 확인해 주시기 바랍니다.');
       setSelected(null);
       return;
     }
@@ -216,7 +216,7 @@ export default function SupplierStoreDescriptionsPage() {
         <div className="rounded-xl border border-red-200 bg-red-50 p-6 text-red-900">
           <h2 className="text-lg font-bold">공급자 정보를 불러오지 못했습니다</h2>
           <p className="mt-2 text-sm">
-            일시적인 오류로 승인 상태를 확인할 수 없습니다. 잠시 후 다시 시도해 주세요.
+            일시적인 오류로 승인 상태를 확인할 수 없습니다. 잠시 후 다시 시도해 주시기 바랍니다.
           </p>
           <button
             type="button"
@@ -232,7 +232,7 @@ export default function SupplierStoreDescriptionsPage() {
             <div>
               <h2 className="text-lg font-bold text-slate-900">상품별 매장용 설명서</h2>
               <p className="mt-1 text-sm text-slate-500">
-                상품을 선택해 매장용(STORE) 설명서를 작성하세요. 검수요청 후 운영자 검수를 통과하면 매장에 노출됩니다.
+                상품을 선택해 매장용(STORE) 설명서를 작성하시기 바랍니다. 검수요청 후 운영자 검수를 통과하면 매장에 노출됩니다.
               </p>
             </div>
             <Link
@@ -275,7 +275,7 @@ export default function SupplierStoreDescriptionsPage() {
                     <Link to={PRODUCTS_PATH} className="text-emerald-700 underline">
                       상품을 먼저 등록
                     </Link>
-                    하세요.
+                    하시기 바랍니다.
                   </>
                 ) : (
                   '검색 결과가 없습니다.'
@@ -335,7 +335,7 @@ export default function SupplierStoreDescriptionsPage() {
             )}
           </div>
           {filteredProducts.length > 100 && (
-            <p className="mt-2 text-xs text-slate-400">최대 100개까지 표시됩니다. 검색으로 좁혀 주세요.</p>
+            <p className="mt-2 text-xs text-slate-400">최대 100개까지 표시됩니다. 검색으로 좁혀 주시기 바랍니다.</p>
           )}
 
           {selected && (
@@ -362,7 +362,7 @@ export default function SupplierStoreDescriptionsPage() {
           </h2>
           <p className="mt-2 text-sm">
             {status === 'REJECTED' || status === 'INACTIVE'
-              ? '자세한 사항은 운영자에게 문의해 주세요.'
+              ? '자세한 사항은 운영자에게 문의해 주시기 바랍니다.'
               : '매장용 설명서 작성은 운영자 승인 이후 이용할 수 있습니다. 대시보드 열람과 프로필 작성은 지금도 가능합니다.'}
           </p>
           <div className="mt-4 flex flex-wrap gap-2">
@@ -380,7 +380,7 @@ export default function SupplierStoreDescriptionsPage() {
       {/* 승인 완료 + 프로필 미완료 → 보완 안내(정보성, 차단 아님) */}
       {!loading && active && labels.length > 0 && (
         <div className="mt-4 rounded-xl border border-sky-200 bg-sky-50 p-4 text-sky-900">
-          <p className="text-sm font-semibold">공급자 정보를 등록해 주세요</p>
+          <p className="text-sm font-semibold">공급자 정보를 등록해 주시기 바랍니다</p>
           <p className="mt-1 text-sm">
             미입력: <span className="font-medium">{labels.join(', ')}</span>
           </p>

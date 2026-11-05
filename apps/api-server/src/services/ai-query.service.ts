@@ -162,7 +162,7 @@ class AiQueryService {
       if (updates.defaultModel && await new ModelControlService({
         isInitialized: true, query: manager.query.bind(manager),
       }).allows('gemini', updates.defaultModel) === false) {
-        throw new ModelControlError(409, 'AI_MODEL_REMOVED', '선택한 모델이 삭제됐습니다. 최신 목록에서 다시 선택해 주세요.');
+        throw new ModelControlError(409, 'AI_MODEL_REMOVED', '선택한 모델이 삭제됐습니다. 최신 목록에서 다시 선택해 주시기 바랍니다.');
       }
       const repo = manager.getRepository(AiQueryPolicy);
       const policy = await repo.findOneOrFail({ where: { id: 1 } });
@@ -484,7 +484,7 @@ class AiQueryService {
     if (!apiKey) {
       return {
         success: false,
-        error: 'AI API 키가 설정되지 않았습니다. 관리자에게 문의하세요.',
+        error: 'AI API 키가 설정되지 않았습니다. 관리자에게 문의하시기 바랍니다.',
         errorCode: 'NO_API_KEY'
       };
     }

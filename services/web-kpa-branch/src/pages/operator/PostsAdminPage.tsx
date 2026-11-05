@@ -47,7 +47,7 @@ export default function PostsAdminPage({ slug }: { slug: string }) {
 
   async function submit(status: 'draft' | 'published') {
     if (!draft.title.trim()) {
-      setError('제목을 입력하세요.');
+      setError('제목을 입력하시기 바랍니다.');
       return;
     }
     setBusy(true);
@@ -75,7 +75,7 @@ export default function PostsAdminPage({ slug }: { slug: string }) {
   }
 
   async function remove(p: BranchPost) {
-    if (!window.confirm(`"${p.title}" 글을 삭제할까요?`)) return;
+    if (!window.confirm(`"${p.title}" 글을 삭제하시겠습니까?`)) return;
     setBusy(true);
     try {
       await deletePost(slug, p.id);

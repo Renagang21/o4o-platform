@@ -126,7 +126,7 @@ export default function SupplierStoreDescriptionReviewPage() {
   };
 
   const doApprove = async (id: string) => {
-    if (!window.confirm('이 설명서를 검수 완료(매장 노출)로 승격할까요?')) return;
+    if (!window.confirm('이 설명서를 검수 완료(매장 노출)로 승격하시겠습니까?')) return;
     setActing(true);
     try {
       await approveSupplierStoreReview(id);
@@ -167,7 +167,7 @@ export default function SupplierStoreDescriptionReviewPage() {
     if (!revisionTarget) return;
     const reason = revisionReason.trim();
     if (!reason) {
-      toast.error('수정 요청 사유를 입력하세요');
+      toast.error('수정 요청 사유를 입력하시기 바랍니다');
       return;
     }
     setActing(true);
@@ -199,7 +199,7 @@ export default function SupplierStoreDescriptionReviewPage() {
 
   const runExpiryApply = async () => {
     if (!expiryInfo || expiryInfo.count === 0) return;
-    if (!window.confirm(`기한이 지난 수정 요청 설명서 ${expiryInfo.count}건을 영구 삭제합니다. 진행할까요?`)) return;
+    if (!window.confirm(`기한이 지난 수정 요청 설명서 ${expiryInfo.count}건을 영구 삭제합니다. 진행하시겠습니까?`)) return;
     setExpiryBusy(true);
     try {
       const r = await expirySupplierStoreReviewApply();
@@ -558,7 +558,7 @@ export default function SupplierStoreDescriptionReviewPage() {
               value={revisionReason}
               onChange={(e) => setRevisionReason(e.target.value)}
               rows={4}
-              placeholder="수정 요청 사유를 입력하세요 (필수)"
+              placeholder="수정 요청 사유를 입력하시기 바랍니다 (필수)"
               className="mt-3 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-admin-blue"
             />
             <div className="mt-3 flex justify-end gap-2">

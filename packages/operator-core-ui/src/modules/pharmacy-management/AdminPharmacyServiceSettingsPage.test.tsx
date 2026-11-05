@@ -294,7 +294,7 @@ it("retries the registry read without repeating a successful business creation",
   });
   fireEvent.click(screen.getByRole("button", { name: "사업 등록" }));
   await screen.findByText(
-    "사업은 등록됐지만 목록을 확인하지 못했습니다. 다시 조회해 주세요.",
+    "사업은 등록됐지만 목록을 확인하지 못했습니다. 다시 조회해 주시기 바랍니다.",
   );
   fireEvent.click(screen.getByRole("button", { name: "등록 목록 다시 조회" }));
   await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());

@@ -64,7 +64,7 @@ describe('shared external AI authoring workflow', () => {
   it('does not apply a sanitized empty result', () => {
     render(<Harness />); paste('<script>bad()</script>'); fireEvent.click(screen.getByRole('button', { name: '결과 미리보기' }));
     expect(screen.queryByTitle('결과 미리보기')).toBeNull();
-    expect(screen.getByText('미리 볼 본문이 없습니다. 결과 HTML을 확인해 주세요.').textContent).toContain('본문이 없습니다');
+    expect(screen.getByText('미리 볼 본문이 없습니다. 결과 HTML을 확인해 주시기 바랍니다.').textContent).toContain('본문이 없습니다');
   });
   it('drops paste, material selection and review when document scope changes', () => {
     const { rerender } = render(<Harness />); paste(); review();
@@ -89,7 +89,7 @@ describe('shared external AI authoring workflow', () => {
     copy.mockRejectedValue(Error('fixture')); Object.defineProperty(document, 'execCommand', { configurable: true, value: vi.fn(() => false) });
     render(<LlmAssistPanel defaultOpen guideText="직접 복사할 안내" />);
     fireEvent.click(screen.getByRole('button', { name: '작업 안내 복사' }));
-    await screen.findByText('복사하지 못했습니다. 아래 내용을 직접 선택해 복사해 주세요.');
+    await screen.findByText('복사하지 못했습니다. 아래 내용을 직접 선택해 복사해 주시기 바랍니다.');
     expect(screen.queryByRole('button', { name: '✓ 복사됨' })).toBeNull();
     expect((screen.getByLabelText('전달할 작업 안내') as HTMLTextAreaElement).value).toBe('직접 복사할 안내');
   });

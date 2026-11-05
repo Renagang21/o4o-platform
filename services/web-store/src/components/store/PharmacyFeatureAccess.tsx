@@ -133,7 +133,7 @@ export function PharmacyFeatureNotice({
       {denied && (
         <p className="mt-2">
           약국의 기본·유료·협력사업 제공 기능과 My Home에서 경영자가 허용한
-          근무자 이용 범위를 확인해 주세요.
+          근무자 이용 범위를 확인해 주시기 바랍니다.
         </p>
       )}
       {(error || denied) && (

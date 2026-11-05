@@ -20,7 +20,7 @@ it('shows failed saves with an explicit retry and keeps video playback available
  const ref = createRef<HTMLVideoElement>();
  render(<ResumeVideo videoRef={ref} src="https://example.org/video.mp4" courseId="course" lessonId="lesson" enabled port={api} onTimeUpdate={vi.fn()} />);
  ref.current!.currentTime = 18; fireEvent.timeUpdate(ref.current!);
- await screen.findByText('이어보기 위치 저장에 실패했습니다. 다시 저장해 주세요.');
+ await screen.findByText('이어보기 위치 저장에 실패했습니다. 다시 저장해 주시기 바랍니다.');
  fireEvent.click(screen.getByRole('button', { name: '현재 위치 저장' }));
  await screen.findByText('이어보기 위치를 저장했습니다.');
  expect(api.savePlayback).toHaveBeenCalledTimes(2);

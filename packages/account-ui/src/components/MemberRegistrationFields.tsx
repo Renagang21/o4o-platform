@@ -45,7 +45,7 @@ export function MemberRegistrationFields({
             onTypeChange(event.target.value as MemberRegistrationType)
           }
         >
-          <option value="">선택해 주세요</option>
+          <option value="">선택해 주시기 바랍니다</option>
           {Object.entries(MEMBER_REGISTRATION_TYPES).map(([key, label]) => (
             <option key={key} value={key}>
               {label}

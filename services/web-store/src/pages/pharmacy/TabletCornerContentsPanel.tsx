@@ -66,7 +66,7 @@ const cornerContentActionPolicy = defineActionPolicy<CornerContent>('kpa:tablet-
       variant: 'danger',
       visible: (c) => !c.isCurrent,
       confirm: (c) => ({
-        title: '이 코너에서 제거할까요?',
+        title: '이 코너에서 제거하시겠습니까?',
         message: `“${c.name}” 을(를) 이 코너의 목록에서 뺍니다.\n콘텐츠 자체는 삭제되지 않고, 다른 코너의 연결도 그대로 유지됩니다.`,
         confirmText: '코너에서 제거',
         variant: 'danger',
@@ -79,7 +79,7 @@ const cornerContentActionPolicy = defineActionPolicy<CornerContent>('kpa:tablet-
       label: '적용 해제',
       visible: (c) => c.isCurrent,
       confirm: {
-        title: '적용을 해제할까요?',
+        title: '적용을 해제하시겠습니까?',
         message: '현재 표시 콘텐츠를 해제하고 기본 화면으로 되돌립니다.\n연결은 유지됩니다.',
         confirmText: '적용 해제',
       },
@@ -110,7 +110,7 @@ export default function TabletCornerContentsPanel({ tabletId, onCurrentChange, o
   const [previewBusy, setPreviewBusy] = useState<string | null>(null);
 
   const handlePreview = async (it: CornerContent) => {
-    if (!canPreview) { onToast({ type: 'error', message: '매장 공개 주소를 불러오는 중입니다. 잠시 후 다시 시도해 주세요.' }); return; }
+    if (!canPreview) { onToast({ type: 'error', message: '매장 공개 주소를 불러오는 중입니다. 잠시 후 다시 시도해 주시기 바랍니다.' }); return; }
     if (previewBusy) return;
     // WO-...-PREVIEW-CORNER-CONTEXT-AND-LABEL-FIX-V1: 이 코너의 실제 진열 상품으로 미리보기(공개 화면과 동일 resolve).
     onPreviewContext?.(tabletId);
@@ -146,7 +146,7 @@ export default function TabletCornerContentsPanel({ tabletId, onCurrentChange, o
     if (busy) return;
     if (it.status !== 'active') {
       const ok = window.confirm(
-        `"${it.name}" 은(는) 아직 초안입니다.\n활성화한 뒤 이 코너의 현재 화면으로 사용할까요?`,
+        `"${it.name}" 은(는) 아직 초안입니다.\n활성화한 뒤 이 코너의 현재 화면으로 사용하시겠습니까?`,
       );
       if (!ok) return;
     }
@@ -187,7 +187,7 @@ export default function TabletCornerContentsPanel({ tabletId, onCurrentChange, o
       await load();
     } catch (e: any) {
       const msg = e?.code === 'CURRENT_CONTENT_CANNOT_BE_REMOVED'
-        ? '현재 사용 중인 콘텐츠입니다. 다른 콘텐츠로 교체하거나 적용을 해제한 뒤 해제해 주세요.'
+        ? '현재 사용 중인 콘텐츠입니다. 다른 콘텐츠로 교체하거나 적용을 해제한 뒤 해제해 주시기 바랍니다.'
         : (e?.message || '연결 해제에 실패했습니다.');
       onToast({ type: 'error', message: msg });
     } finally { setBusy(false); }
@@ -245,7 +245,7 @@ export default function TabletCornerContentsPanel({ tabletId, onCurrentChange, o
           <div className="rounded-xl border border-dashed border-slate-300 bg-slate-50/60 text-center py-8 px-4 space-y-3">
             <p className="text-sm text-slate-500 leading-relaxed">
               이 코너에 연결된 콘텐츠가 없습니다.<br />
-              <b>태블릿 콘텐츠</b> 탭에서 만든 콘텐츠를 이 코너에 연결해 주세요.
+              <b>태블릿 콘텐츠</b> 탭에서 만든 콘텐츠를 이 코너에 연결해 주시기 바랍니다.
             </p>
             <button onClick={() => setPicking(true)} className={`${btn} text-white bg-indigo-600 hover:bg-indigo-700`}>
               <Plus className="w-4 h-4" /> 기존 콘텐츠 추가

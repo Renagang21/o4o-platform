@@ -29,7 +29,7 @@ describe.each([['Neture compatibility', NeturePage, NetureEditor], ['Pharmacy', 
     await waitFor(() => expect(mocks.get.mock.calls.some(([p]) => p.includes('/memberships'))).toBe(true));
     mocks.user = { id: 'operator-b' }; mocks.get.mockResolvedValue(envelope([]));
     view.rerender(tree());
-    await screen.findByText('담당으로 지정된 약국 협력사업이 없습니다. 전체 관리자에게 담당 지정을 요청하세요.');
+    await screen.findByText('담당으로 지정된 약국 협력사업이 없습니다. 전체 관리자에게 담당 지정을 요청하시기 바랍니다.');
     await act(async () => { resolve(envelope([{ id: 'old', organizationName: '이전 약국', status: 'pending' }])); });
     expect(screen.queryByText('이전 약국')).toBeNull();
     expect(screen.queryByLabelText('담당 사업')).toBeNull();

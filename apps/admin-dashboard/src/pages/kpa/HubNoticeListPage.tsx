@@ -195,7 +195,7 @@ function NoticeModal({ initial, onClose, onSaved }: NoticeModalProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.title.trim()) {
-      toast.error('제목을 입력하세요.');
+      toast.error('제목을 입력하시기 바랍니다.');
       return;
     }
     setSaving(true);

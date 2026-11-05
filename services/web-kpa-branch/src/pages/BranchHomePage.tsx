@@ -34,7 +34,7 @@ export default function BranchHomePage({ slug, basePath }: { slug: string; baseP
           message:
             status === 404
               ? '아직 공개되지 않은 분회 홈페이지입니다.'
-              : '분회 홈페이지를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.',
+              : '분회 홈페이지를 불러오지 못했습니다. 잠시 후 다시 시도해 주시기 바랍니다.',
         });
       });
     listPublicEvents(slug)
@@ -62,7 +62,7 @@ export default function BranchHomePage({ slug, basePath }: { slug: string; baseP
 
   return (
     <div className="space-y-10">
-      <ServiceHomeHero surface="branch" branchSlug={slug} client={authClient.api} eyebrow={state.site.branchName} title={[state.site.title]} description={[state.site.tagline || '우리 분회의 공지·행사·자료를 확인하세요.']} />
+      <ServiceHomeHero surface="branch" branchSlug={slug} client={authClient.api} eyebrow={state.site.branchName} title={[state.site.title]} description={[state.site.tagline || '우리 분회의 공지·행사·자료를 확인하시기 바랍니다.']} />
 
       <section>
         <div className="mb-2 flex items-center justify-between">

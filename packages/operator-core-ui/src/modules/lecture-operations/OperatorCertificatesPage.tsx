@@ -46,7 +46,7 @@ export default function OperatorCertificatesPage() {
         setOperations(prev => [...(page === 1 ? [] : prev), ...(r.data?.operations ?? [])]);
         setHistoryPage({ page, hasMore: !!r.data?.hasMore });
       }
-    } catch { if (seq === state.seq) { if (page === 1) setOperations([]); setHistoryError('처리 이력을 조회하지 못했습니다. 대상과 운영 권한을 확인해 주세요.'); } }
+    } catch { if (seq === state.seq) { if (page === 1) setOperations([]); setHistoryError('처리 이력을 조회하지 못했습니다. 대상과 운영 권한을 확인해 주시기 바랍니다.'); } }
     finally { if (seq === state.seq) setHistoryBusy(false); }
   }
   return <main className="page page-wide">
@@ -72,7 +72,7 @@ export default function OperatorCertificatesPage() {
       <div className="field-row">
         <label className="field"><span>갱신 기간(개월)</span><input disabled={busy} type="number" min={1} step={1} value={months} onChange={(e) => setMonths(Number(e.target.value))} /></label>
       </div>
-      {!validMonths && <p role="alert">갱신 기간은 1개월 이상의 정수로 입력하세요.</p>}
+      {!validMonths && <p role="alert">갱신 기간은 1개월 이상의 정수로 입력하시기 바랍니다.</p>}
       <div className="row-actions">
         <button type="button" className="btn" disabled={busy || !targetId || !validMonths} onClick={() => void execute({ kind: 'renew', id: targetId, months })}>갱신</button>
         <button type="button" className="btn btn-ghost danger" disabled={busy || !targetId} onClick={() => { clearMessage(); setRevoking(targetId); }}>폐기</button>

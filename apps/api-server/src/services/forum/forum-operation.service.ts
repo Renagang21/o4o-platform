@@ -10,7 +10,7 @@ export async function changeForumAvailability(db: DataSource, id: string, servic
   return db.transaction(async manager => {
     const forum = await manager.getRepository(ForumCategoryRequest).findOne({ where: { id, serviceCode }, lock: { mode: 'pessimistic_write' } });
     if (!forum) throw new OperationError(404, 'NOT_FOUND', '포럼을 찾을 수 없습니다.');
-    if (forum.status !== (active ? 'archived' : 'completed')) throw new OperationError(409, 'STATUS_CHANGED', '포럼 상태가 변경됐습니다. 다시 조회해 주세요.');
+    if (forum.status !== (active ? 'archived' : 'completed')) throw new OperationError(409, 'STATUS_CHANGED', '포럼 상태가 변경됐습니다. 다시 조회해 주시기 바랍니다.');
     if (active) {
       const conflicts = await manager.query(`SELECT id FROM forum_category_requests
         WHERE service_code=$1 AND status='completed' AND id<>$2
@@ -55,7 +55,7 @@ export async function hardDeleteForum(db: DataSource, id: string, serviceCode: s
   return db.transaction(async manager => {
     const forum = await manager.getRepository(ForumCategoryRequest).findOne({ where: { id, serviceCode }, lock: { mode: 'pessimistic_write' } });
     if (!forum) throw new OperationError(404, 'NOT_FOUND', '포럼을 찾을 수 없습니다.');
-    if (forum.status !== 'archived') throw new OperationError(409, 'ARCHIVE_REQUIRED', '사용 중지 후 완전 삭제해 주세요.');
+    if (forum.status !== 'archived') throw new OperationError(409, 'ARCHIVE_REQUIRED', '사용 중지 후 완전 삭제해 주시기 바랍니다.');
     const counts = await purgeForumAndDependents(manager, forum);
     await recordOperation(manager, serviceCode, actorId, 'forum.admin.hard_delete', { forumId: id, forumName: forum.name, reason, affectedCounts: counts });
     return { id, name: forum.name, hardDeleted: true, affectedCounts: counts };

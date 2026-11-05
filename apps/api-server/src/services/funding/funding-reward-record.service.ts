@@ -14,7 +14,7 @@ export class FundingRewardRecordService {
       throw new FundingError(
         400,
         "INVALID_REWARD_STATUS",
-        "이행 상태를 확인해 주세요.",
+        "이행 상태를 확인해 주시기 바랍니다.",
       );
     return await this.ds.transaction(async (manager) => {
       const [before] = await manager.query(

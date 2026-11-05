@@ -321,7 +321,7 @@ export function usePopV2Editor(options: UsePopV2EditorOptions): PopV2EditorState
 
   const save = useCallback(async (): Promise<PopV2Document | null> => {
     if (sources.length === 0) {
-      notify.error('POP 으로 만들 콘텐츠를 먼저 선택해 주세요.');
+      notify.error('POP 으로 만들 콘텐츠를 먼저 선택해 주시기 바랍니다.');
       return null;
     }
     setSaving(true);

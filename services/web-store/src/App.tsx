@@ -49,7 +49,7 @@ function PharmacyReviewAccess() {
   const { user, isAuthenticated, isLoading } = useAuth();
   if (isLoading) return <p>권한을 확인하는 중입니다…</p>;
   if (!isAuthenticated) return <Navigate to="/login?returnTo=%2Foperator%2Fpharmacy-memberships" replace />;
-  if (!user?.roles?.some(r => ['neture:operator', 'neture:admin', 'platform:super_admin'].includes(r))) return <p>내 매장 신청 심사 권한이 필요합니다.</p>;
+  if (!user?.roles?.some(r => ['neture:operator', 'neture:admin', 'platform:super_admin'].includes(r))) return <p>약국 승인 기록 관리 권한이 필요합니다.</p>;
   return <PharmacyMembershipReviewPage />;
 }
 
@@ -110,8 +110,8 @@ const HubMultilingualContentLibraryPage = named(() => import('./pages/pharmacy/H
 const StoreMultilingualContentsMyPage = named(() => import('./pages/pharmacy/StoreMultilingualContentsMyPage'), 'StoreMultilingualContentsMyPage');
 const HubSupplierLibraryPage = named(() => import('./pages/pharmacy/HubSupplierLibraryPage'), 'HubSupplierLibraryPage');
 
-// ── Neture 약국 매장(내 매장(약국) 신청 · 세미프랜차이즈 · 공급 상품 직접 주문) — WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1 ──
-const PharmacyMembershipPage = lazy(() => import('./pages/neture-pharmacy/PharmacyMembershipPage'));
+// ── Neture 약국 매장(약국 자동 연결 · 세미프랜차이즈 · 공급 상품 직접 주문) — WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1 ──
+const PharmacyRegistrationNotice = lazy(() => import('./pages/neture-pharmacy/PharmacyRegistrationNotice'));
 const SemiFranchisesPage = lazy(() => import('./pages/neture-pharmacy/SemiFranchisesPage'));
 const SupplyOptionsPage = lazy(() => import('./pages/neture-pharmacy/SupplyOptionsPage'));
 const PharmacyContentSourcesPage = lazy(() => import('./pages/neture-pharmacy/PharmacyContentSourcesPage'));
@@ -210,7 +210,7 @@ function storeChildRoutes() {
         <Route path="pop" element={<Navigate to={`${S}/marketing/pop-v2`} replace />} />
         <Route path="signage" element={<Navigate to={`${S}/marketing/signage/playlist`} replace />} />
         {/* Neture 약국 매장 — 약국(kpa-society) 문맥 전용. 매장 HUB 단계 없이 내 매장에서 바로 주문(DESIGN §6) */}
-        <Route path={rel(PP.membership)} element={pharmacyOnly(<PharmacyMembershipPage />)} />
+        <Route path={rel(PP.membership)} element={pharmacyOnly(<PharmacyRegistrationNotice />)} />
         <Route path={rel(PP.semiFranchises)} element={pharmacyOnly(<SemiFranchisesPage />)} />
         <Route path={rel(PP.supply)} element={pharmacyOnly(<SupplyOptionsPage />)} />
         <Route path={rel(PP.contents)} element={pharmacyOnly(<PharmacyContentSourcesPage />)} />
@@ -241,6 +241,7 @@ export function WorkspaceApp() {
       <Route path={WORKSPACE_PATHS.login} element={<LoginPage />} />
       <Route path={WORKSPACE_PATHS.select} element={gated(<StoreSelectorPage />)} />
       <Route path={WORKSPACE_PATHS.home} element={gated(<HomePage />)} />
+      <Route path="/pharmacy" element={gated(<Navigate to="/store/info" replace />)} />
       <Route path={WORKSPACE_PATHS.myServices} element={gated(<MyServicesPage />)} />
       <Route path={WORKSPACE_PATHS.settings} element={gated(<SettingsPage />)} />
       {/*
@@ -251,8 +252,8 @@ export function WorkspaceApp() {
       <Route path={WORKSPACE_PATHS.invitations} element={<StoreInvitationsPage />} />
       {/* 매장 시작하기(사업자 가입) — 매장이 없는 사용자가 쓰는 화면이라 StoreGate 밖이다 */}
       <Route path={WORKSPACE_PATHS.enrollment} element={<StoreEnrollmentPage />} />
-      {/* 내 매장(약국) 신청 — 승인 전에는 매장이 없으므로 StoreGate 밖이다(로그인만) */}
-      <Route path={WORKSPACE_PATHS.pharmacyEnrollment} element={<PharmacyMembershipPage />} />
+      {/* 과거 별도 신청 URL — 회원 등록·매장 자동 연결 안내만 제공한다 */}
+      <Route path={WORKSPACE_PATHS.pharmacyEnrollment} element={<PharmacyRegistrationNotice />} />
 
       <Route path="/external-ai/drafts/:id" element={<ExternalAiDraftEntry />} />
       <Route path="/external-ai/product-contents/:targetKind/:targetId/:id" element={<ExternalAiDraftEntry productContent />} />

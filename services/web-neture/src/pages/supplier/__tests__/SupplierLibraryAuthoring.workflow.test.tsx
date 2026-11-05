@@ -66,7 +66,7 @@ it('disables authoring while the save is pending and does not submit twice', asy
 it('does not hydrate a new document with a late response for the previous route', async () => {
   let finish!: (value: unknown) => void; api.getLibraryItem.mockImplementation(() => new Promise(resolve => { finish = resolve; }));
   show(); fireEvent.click(screen.getByRole('button', { name: '새 문서로 이동' }));
-  fireEvent.change(screen.getByPlaceholderText('자료 제목을 입력하세요'), { target: { value: '새 자료 제목' } });
+  fireEvent.change(screen.getByPlaceholderText('자료 제목을 입력하시기 바랍니다'), { target: { value: '새 자료 제목' } });
   await act(async () => finish(documentItem('이전 자료 제목')));
   expect(screen.getByDisplayValue('새 자료 제목')).toBeTruthy(); expect(screen.queryByDisplayValue('이전 자료 제목')).toBeNull();
 });
@@ -75,7 +75,7 @@ it('does not redirect a new draft after a previous route save completes', async 
   api.updateLibraryItem.mockImplementation(() => new Promise(resolve => { finish = resolve; }));
   show(); await screen.findByDisplayValue('이전 문서'); fireEvent.click(screen.getByRole('button', { name: '수정 저장' }));
   fireEvent.click(screen.getByRole('button', { name: '새 문서로 이동' }));
-  fireEvent.change(screen.getByPlaceholderText('자료 제목을 입력하세요'), { target: { value: '작성 중' } });
+  fireEvent.change(screen.getByPlaceholderText('자료 제목을 입력하시기 바랍니다'), { target: { value: '작성 중' } });
   await act(async () => finish({ success: true }));
   expect(screen.getByDisplayValue('작성 중')).toBeTruthy(); expect(screen.queryByText('자료함 목록')).toBeNull();
 });
@@ -89,7 +89,7 @@ it('does not expose a writable empty form after failed read and supports a read 
 it('offers document authoring only for document content and retains manual creation', async () => {
   show('/supplier/library/new'); expect(screen.queryByRole('button', { name: '외부 AI로 문서 작업' })).toBeNull();
   fireEvent.click(screen.getByRole('button', { name: '문서 (Document)' }));
-  fireEvent.change(screen.getByPlaceholderText('자료 제목을 입력하세요'), { target: { value: '수동 문서' } });
+  fireEvent.change(screen.getByPlaceholderText('자료 제목을 입력하시기 바랍니다'), { target: { value: '수동 문서' } });
   fireEvent.change(screen.getByLabelText('문서 편집'), { target: { value: '<p>직접 작성</p>' } });
   api.createLibraryItem.mockResolvedValue({ success: true }); fireEvent.click(screen.getByRole('button', { name: '등록' }));
   await waitFor(() => expect(api.createLibraryItem).toHaveBeenCalledWith(expect.objectContaining({ contentType: 'document', isPublic: false })));
@@ -106,7 +106,7 @@ it('discards document and external AI drafts on account replacement and logout',
   expect(screen.queryByDisplayValue('이전 계정 문서')).toBeNull(); expect(screen.queryByRole('dialog')).toBeNull();
   session.user = null;
   view.refreshSession();
-  expect(screen.queryByPlaceholderText('자료 제목을 입력하세요')).toBeNull();
+  expect(screen.queryByPlaceholderText('자료 제목을 입력하시기 바랍니다')).toBeNull();
 });
 
 it('returns a saved original to the same source and business request without submitting a review', async () => {
@@ -115,7 +115,7 @@ it('returns a saved original to the same source and business request without sub
   api.updateLibraryItem.mockResolvedValue({ success: true });
   show('/supplier/library/one/edit?returnTo=' + encodeURIComponent(destination));
   await screen.findByDisplayValue('반려 원본');
-  fireEvent.change(screen.getByPlaceholderText('자료 제목을 입력하세요'), { target: { value: '보완 원본' } });
+  fireEvent.change(screen.getByPlaceholderText('자료 제목을 입력하시기 바랍니다'), { target: { value: '보완 원본' } });
   fireEvent.click(screen.getByRole('button', { name: '수정 저장' }));
   await screen.findByText('자료함 목록?requestSource=one&business=carepharm');
   expect(api.updateLibraryItem).toHaveBeenCalledWith('one', expect.objectContaining({ title: '보완 원본', isPublic: false }));

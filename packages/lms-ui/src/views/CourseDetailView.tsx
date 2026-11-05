@@ -106,7 +106,7 @@ export function CourseDetailView({
         const status = outline.reason?.response?.status;
         setLessonsError(status === 401 || status === 403
           ? '목차를 보려면 로그인 또는 수강 권한이 필요합니다.'
-          : '목차를 불러오지 못했습니다. 다시 시도해 주세요.');
+          : '목차를 불러오지 못했습니다. 다시 시도해 주시기 바랍니다.');
       }
       if (registration.status === 'fulfilled') setEnrollment(registration.value);
       else {
@@ -373,7 +373,7 @@ export function CourseDetailView({
                   <button type="button" disabled style={{ ...primaryButtonStyle('#ef4444', true) }}>
                     수강 거절됨
                   </button>
-                  <p style={sidebarNoteStyle}>강사에게 문의하세요.</p>
+                  <p style={sidebarNoteStyle}>강사에게 문의하시기 바랍니다.</p>
                 </div>
               ) : enrollment.status === 'completed' ? (
                 <div>

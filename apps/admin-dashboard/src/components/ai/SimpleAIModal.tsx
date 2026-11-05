@@ -56,7 +56,7 @@ export const SimpleAIModal: React.FC<SimpleAIModalProps> = ({
 
   const handleGenerate = async () => {
     if (!prompt.trim()) {
-      setError(mode === 'new' ? '페이지 내용을 입력해주세요.' : '편집 요청 사항을 입력해주세요.');
+      setError(mode === 'new' ? '페이지 내용을 입력해 주시기 바랍니다.' : '편집 요청 사항을 입력해 주시기 바랍니다.');
       return;
     }
 
@@ -100,8 +100,8 @@ export const SimpleAIModal: React.FC<SimpleAIModalProps> = ({
         setIsGenerating(false);
         setError(
           mode === 'edit'
-            ? `편집할 내용이 너무 많습니다 (${finalPrompt.length}자). 페이지를 나누거나 일부 내용을 먼저 삭제한 후 다시 시도해주세요.`
-            : `프롬프트가 너무 깁니다 (${finalPrompt.length}자). 더 짧게 요청해주세요.`
+            ? `편집할 내용이 너무 많습니다 (${finalPrompt.length}자). 페이지를 나누거나 일부 내용을 먼저 삭제한 후 다시 시도해 주시기 바랍니다.`
+            : `프롬프트가 너무 깁니다 (${finalPrompt.length}자). 더 짧게 요청해 주시기 바랍니다.`
         );
         return;
       }
@@ -124,7 +124,7 @@ export const SimpleAIModal: React.FC<SimpleAIModalProps> = ({
       clearInterval(intervalId);
 
       if (!result.blocks || result.blocks.length === 0) {
-        throw new Error('생성된 블록이 없습니다. AI 응답을 확인하세요.');
+        throw new Error('생성된 블록이 없습니다. AI 응답을 확인하시기 바랍니다.');
       }
 
       onGenerate(result);
@@ -158,14 +158,14 @@ export const SimpleAIModal: React.FC<SimpleAIModalProps> = ({
   ];
 
   const examplePrompts = {
-    landing: '혁신적인 AI 기반 웹사이트 빌더를 소개하는 랜딩 페이지를 만들어주세요.',
-    about: '창의적이고 혁신적인 기술 스타트업 회사 소개 페이지를 만들어주세요.',
-    product: '차세대 AI 콘텐츠 생성 도구를 소개하는 제품 페이지를 만들어주세요.',
-    blog: '2025년 AI와 웹 개발의 미래 트렌드에 대한 블로그 포스트를 작성해주세요.',
+    landing: '혁신적인 AI 기반 웹사이트 빌더를 소개하는 랜딩 페이지를 만들어주시기 바랍니다.',
+    about: '창의적이고 혁신적인 기술 스타트업 회사 소개 페이지를 만들어주시기 바랍니다.',
+    product: '차세대 AI 콘텐츠 생성 도구를 소개하는 제품 페이지를 만들어주시기 바랍니다.',
+    blog: '2025년 AI와 웹 개발의 미래 트렌드에 대한 블로그 포스트를 작성해 주시기 바랍니다.',
   };
 
   // 편집 모드 예시 - 위치 기반 블록 추가/수정 요청
-  const editExamplePrompt = '상단에 제목으로 "환영합니다" 추가하고, 그 아래에 소개 문구 단락을 추가해주세요';
+  const editExamplePrompt = '상단에 제목으로 "환영합니다" 추가하고, 그 아래에 소개 문구 단락을 추가해 주시기 바랍니다';
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -195,7 +195,7 @@ export const SimpleAIModal: React.FC<SimpleAIModalProps> = ({
                 {Math.floor(elapsedTime / 60)}:{(elapsedTime % 60).toString().padStart(2, '0')}
               </p>
               <p className="text-center text-xs text-gray-500">
-                {elapsedTime < 30 ? 'AI 응답 생성 중...' : '조금만 더 기다려주세요...'}
+                {elapsedTime < 30 ? 'AI 응답 생성 중...' : '조금만 더 기다려주시기 바랍니다...'}
               </p>
             </div>
           </div>
@@ -239,7 +239,7 @@ export const SimpleAIModal: React.FC<SimpleAIModalProps> = ({
               <p className="text-xs text-blue-700 mt-1">
                 💡 <a href="/settings/app-services" target="_blank" className="underline hover:no-underline">
                   AI Services 설정
-                </a>에서 Gemini 앱을 먼저 설치하세요.
+                </a>에서 Gemini 앱을 먼저 설치하시기 바랍니다.
               </p>
             </div>
 
@@ -275,7 +275,7 @@ export const SimpleAIModal: React.FC<SimpleAIModalProps> = ({
                 onChange={(e) => setApiKey(e.target.value)}
               />
               <div className="text-xs text-gray-500 space-y-1">
-                <p>Google AI Studio에서 발급받은 API 키를 입력하세요</p>
+                <p>Google AI Studio에서 발급받은 API 키를 입력하시기 바랍니다</p>
                 {!apiKey && (
                   <p className="text-blue-600">
                     💡 <a href="/settings/app-services" target="_blank" className="underline hover:no-underline">
@@ -301,8 +301,8 @@ export const SimpleAIModal: React.FC<SimpleAIModalProps> = ({
               </div>
               <AiRequestInput
                 placeholder={mode === 'new'
-                  ? '어떤 페이지를 만들까요? 자세히 설명해주세요...'
-                  : '어떻게 편집할까요? 구체적으로 설명해주세요...'}
+                  ? '어떤 페이지를 만드시겠습니까? 자세히 설명해 주시기 바랍니다...'
+                  : '어떻게 편집하시겠습니까? 구체적으로 설명해 주시기 바랍니다...'}
                 aria-label={mode === 'new' ? '페이지 내용 설명' : '편집 요청 사항'}
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}

@@ -26,7 +26,7 @@ it('preserves a failed draft and reuses its idempotency key on retry', async () 
   await screen.findByText('글을 등록했습니다.'); expect(client.post.mock.calls[0][1].requestId).toBe(client.post.mock.calls[1][1].requestId);
 });
 it('posts an official decision with the displayed version and retains text after a conflict', async () => {
-  const client = { get: vi.fn().mockResolvedValue({ data: { data: { ...item, canManage: true } } }), post: vi.fn().mockRejectedValue({ response: { data: { error: '다시 조회해 주세요.' } } }) };
+  const client = { get: vi.fn().mockResolvedValue({ data: { data: { ...item, canManage: true } } }), post: vi.fn().mockRejectedValue({ response: { data: { error: '다시 조회해 주시기 바랍니다.' } } }) };
   render(<ImprovementForum client={client as never} actorKey="manager" detailId="one" management onSelect={vi.fn()} />);
   await screen.findByText('Synthetic issue');
   fireEvent.change(screen.getByLabelText('처리 상태'), { target: { value: 'completed' } });
@@ -67,7 +67,7 @@ it('does not overwrite an edit draft baseline after a focus refresh', async () =
   fireEvent.click(await screen.findByRole('button', { name: '내 글 수정' }));
   fireEvent.change(screen.getByLabelText('수정 내용'), { target: { value: 'My retained old draft' } });
   await act(async () => window.dispatchEvent(new Event('focus')));
-  await screen.findByText('수정 중 다른 변경이 도착했습니다. 초안을 보관한 뒤 최신 글을 확인해 주세요.');
+  await screen.findByText('수정 중 다른 변경이 도착했습니다. 초안을 보관한 뒤 최신 글을 확인해 주시기 바랍니다.');
   expect((screen.getByLabelText('수정 내용') as HTMLTextAreaElement).value).toBe('My retained old draft');
   expect((screen.getByRole('button', { name: '수정 저장' }) as HTMLButtonElement).disabled).toBe(true);
   expect(client.patch).not.toHaveBeenCalled();
@@ -81,7 +81,7 @@ it('keeps a pending official reply and its selected state when automatic refresh
   fireEvent.change(screen.getByLabelText('처리 상태'), { target: { value: 'completed' } });
   fireEvent.change(screen.getByLabelText('공개 답변·처리 사유'), { target: { value: 'Retained reply' } });
   await act(async () => window.dispatchEvent(new Event('focus')));
-  await screen.findByText('새 답변이나 상태 변경이 있습니다. 작성한 답변은 유지됩니다. 최신 내용을 확인해 주세요.');
+  await screen.findByText('새 답변이나 상태 변경이 있습니다. 작성한 답변은 유지됩니다. 최신 내용을 확인해 주시기 바랍니다.');
   expect((screen.getByLabelText('처리 상태') as HTMLSelectElement).value).toBe('completed');
   expect((screen.getByRole('button', { name: '답변·상태 저장' }) as HTMLButtonElement).disabled).toBe(true);
   expect(client.post).not.toHaveBeenCalled();

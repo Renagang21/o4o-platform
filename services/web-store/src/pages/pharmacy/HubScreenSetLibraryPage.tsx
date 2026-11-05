@@ -443,7 +443,7 @@ export function HubScreenSetLibraryPage() {
                 </div>
                 <p className="text-[12px] text-emerald-900 leading-relaxed">
                   매장 소유의 <b>독립 사본</b>이 만들어졌습니다. 이후 원본이 수정·게시 해제되어도 이 사본은 영향을 받지 않습니다.
-                  <br /><b>코너에는 아직 적용되지 않았습니다.</b> 실제 태블릿에 띄우려면 ‘코너별 운영’에서 이 콘텐츠를 선택해 주세요.
+                  <br /><b>코너에는 아직 적용되지 않았습니다.</b> 실제 태블릿에 띄우려면 ‘코너별 운영’에서 이 콘텐츠를 선택해 주시기 바랍니다.
                 </p>
                 <button
                   onClick={() => navigate('/store/commerce/tablet-displays', {

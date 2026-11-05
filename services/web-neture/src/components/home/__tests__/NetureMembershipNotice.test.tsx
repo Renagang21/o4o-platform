@@ -5,8 +5,8 @@ import { NetureMembershipNotice } from '../NetureMembershipNotice';
 describe('Neture membership notice', () => {
   afterEach(cleanup);
   it.each([
-    ['none', '가입 정보와 계정 상태를 확인해 주세요'],
-    ['pending', '가입 정보·승인 및 계정 상태를 확인해 주세요'],
+    ['none', '가입 정보와 계정 상태를 확인해 주시기 바랍니다'],
+    ['pending', '가입 정보·승인 및 계정 상태를 확인해 주시기 바랍니다'],
     ['rejected', 'Neture 가입이 반려되었습니다'],
     ['suspended', 'Neture 이용이 정지된 상태입니다'],
     ['withdrawn', 'Neture 가입이 해지된 상태입니다'],

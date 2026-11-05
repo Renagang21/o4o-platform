@@ -77,7 +77,7 @@ export default function PharmacyMembershipReviewPage() {
       const r = askReason(label);
       if (r === null) return;
       reason = r || undefined;
-    } else if (!window.confirm(`${m.pharmacy_name} — ${label} 처리할까요?`)) {
+    } else if (!window.confirm(`${m.pharmacy_name} — ${label} 처리하시겠습니까?`)) {
       return;
     }
     setBusyId(m.id);
@@ -107,7 +107,7 @@ export default function PharmacyMembershipReviewPage() {
     <div className="space-y-4 p-6">
       <PageHeader
         title="내 매장(약국) 신청 심사"
-        description="신청 원장의 사업자등록번호 · 약사 면허번호를 확인해 처리합니다. 약사 자격과 사업자 정보를 검토하고 오프라인으로 약국 여부를 확인해 주세요. 증빙 파일은 선택 사항이며 미제출만으로 승인을 제한하지 않습니다. 신청자의 메인 이메일 확인이 필요합니다. 이 승인은 Neture 가입 · 세미프랜차이즈 가입을 바꾸지 않습니다."
+        description="신청 원장의 사업자등록번호 · 약사 면허번호를 확인해 처리합니다. 약사 자격과 사업자 정보를 검토하고 오프라인으로 약국 여부를 확인해 주시기 바랍니다. 증빙 파일은 선택 사항이며 미제출만으로 승인을 제한하지 않습니다. 신청자의 메인 이메일 확인이 필요합니다. 이 승인은 Neture 가입 · 세미프랜차이즈 가입을 바꾸지 않습니다."
       />
 
       <div className="flex flex-wrap items-center justify-between gap-3">

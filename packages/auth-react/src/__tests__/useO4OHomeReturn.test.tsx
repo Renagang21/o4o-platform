@@ -116,7 +116,7 @@ describe('O4OHomeButton', () => {
     render(<O4OHomeButton api={{ post }} isAuthenticated navigate={navigate} />);
     fireEvent.click(screen.getByTestId('o4o-home-button'));
     await flush();
-    expect(screen.getByRole('alert').textContent).toBe('O4O 홈으로 이동하지 못했습니다. 잠시 후 다시 시도해 주세요.');
+    expect(screen.getByRole('alert').textContent).toBe('O4O 홈으로 이동하지 못했습니다. 잠시 후 다시 시도해 주시기 바랍니다.');
     expect((screen.getByTestId('o4o-home-button') as HTMLButtonElement).disabled).toBe(false);
     expect(navigate).not.toHaveBeenCalled();
     fireEvent.click(screen.getByTestId('o4o-home-button'));

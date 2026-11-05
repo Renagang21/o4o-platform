@@ -87,11 +87,11 @@ export class MemberLifecycleService {
       await protectAccount(m,target);
       const [user]=await m.query(`SELECT id,status,"isActive",to_char("updatedAt",'YYYY-MM-DD"T"HH24:MI:SS.US') AS version FROM users WHERE id=$1 FOR UPDATE`,[target]);
       if(!user)throw new OperationError(404,'MEMBER_NOT_FOUND','회원을 찾을 수 없습니다.');
-      if(user.version!==input.version)throw new OperationError(409,'MEMBER_CHANGED','회원 정보가 변경되었습니다. 다시 조회해 주세요.');
+      if(user.version!==input.version)throw new OperationError(409,'MEMBER_CHANGED','회원 정보가 변경되었습니다. 다시 조회해 주시기 바랍니다.');
       if(!user.isActive||!['active','approved'].includes(user.status))throw new OperationError(409,'ACCOUNT_ADMIN_REQUIRED','공통 계정 이용 상태는 Admin에서 확인해야 합니다.');
       const state=await getNetureMainMembershipStatus(m,target);
       if(next==='active'&&!['suspended','withdrawn'].includes(state))throw new OperationError(409,'MEMBER_SERVICE_STATE_CHANGED','해지된 회원만 복구할 수 있습니다.');
-      if(next==='withdrawn'&&!['active','suspended','withdrawn'].includes(state))throw new OperationError(409,'MEMBER_SERVICE_STATE_CHANGED','현재 회원 상태를 다시 확인해 주세요.');
+      if(next==='withdrawn'&&!['active','suspended','withdrawn'].includes(state))throw new OperationError(409,'MEMBER_SERVICE_STATE_CHANGED','현재 회원 상태를 다시 확인해 주시기 바랍니다.');
       await m.query(`INSERT INTO service_memberships(user_id,service_key,status,role) VALUES($1,'neture',$2,'customer')
         ON CONFLICT(user_id,service_key) DO UPDATE SET status=$2,updated_at=now()`,[target,next]);
       await m.query('UPDATE users SET "updatedAt"=clock_timestamp() WHERE id=$1',[target]);
@@ -120,7 +120,7 @@ export class MemberLifecycleService {
         throw new OperationError(
           409,
           "PHARMACY_OWNER_CHANGED",
-          "현재 약국 경영자를 다시 확인해 주세요.",
+          "현재 약국 경영자를 다시 확인해 주시기 바랍니다.",
         );
       const items = await closureInventory(m, organizationId);
       return {
@@ -184,7 +184,7 @@ export class MemberLifecycleService {
             throw new OperationError(
               409,
               "PHARMACY_OWNER_CHANGED",
-              "현재 약국 경영자를 다시 확인해 주세요.",
+              "현재 약국 경영자를 다시 확인해 주시기 바랍니다.",
             );
           const [organization] = await m.query(
             'SELECT id,"isActive" FROM organizations WHERE id=$1 FOR UPDATE',
@@ -320,7 +320,7 @@ export class MemberLifecycleService {
           throw new OperationError(
             409,
             "NEXT_OWNER_REQUIRED",
-            "가입된 새 경영자의 이메일을 확인해 주세요.",
+            "가입된 새 경영자의 이메일을 확인해 주시기 바랍니다.",
           );
         nextId = next.id;
         await lockMembers(m, [actor, target, next.id]);
@@ -360,7 +360,7 @@ export class MemberLifecycleService {
             throw new OperationError(
               409,
               "PHARMACY_OWNER_CHANGED",
-              "현재 승인된 약국과 경영자 소속을 다시 확인해 주세요.",
+              "현재 승인된 약국과 경영자 소속을 다시 확인해 주시기 바랍니다.",
             );
           const pending = await m.query(
             `SELECT 1 FROM store_owner_termination_cases WHERE organization_id=$1 AND status<>'cancelled' LIMIT 1`,
@@ -380,7 +380,7 @@ export class MemberLifecycleService {
             throw new OperationError(
               409,
               "OTHER_EMPLOYER_EXISTS",
-              "새 경영자의 기존 사업체 소속을 먼저 정리해 주세요.",
+              "새 경영자의 기존 사업체 소속을 먼저 정리해 주시기 바랍니다.",
             );
           const [qualification] = await m.query(
             `SELECT license_number FROM kpa_pharmacist_profiles WHERE user_id=$1 AND qualification_status='approved' AND license_verified=true AND verified_at IS NOT NULL AND verified_by IS NOT NULL AND NULLIF(BTRIM(license_number),'') IS NOT NULL FOR SHARE`,

@@ -27,8 +27,8 @@ describe('supplier write conflict transport', () => {
 describe('recruitment supply price transport',()=>{
   it('preserves a price conflict for deliberate reload instead of reporting a successful save',async()=>{
     const {supplierRecruitmentApi}=await import('../supplier/recruitment');
-    transport.patch.mockRejectedValue({response:{status:409,data:{error:'SUPPLY_PRICE_ALREADY_CONFIRMED',message:'최신 모집 정보를 확인해 주세요.'}}});
-    expect(await supplierRecruitmentApi.confirmSupplyPrice('fixture',1000)).toEqual({success:false,error:'SUPPLY_PRICE_ALREADY_CONFIRMED',message:'최신 모집 정보를 확인해 주세요.'});
+    transport.patch.mockRejectedValue({response:{status:409,data:{error:'SUPPLY_PRICE_ALREADY_CONFIRMED',message:'최신 모집 정보를 확인해 주시기 바랍니다.'}}});
+    expect(await supplierRecruitmentApi.confirmSupplyPrice('fixture',1000)).toEqual({success:false,error:'SUPPLY_PRICE_ALREADY_CONFIRMED',message:'최신 모집 정보를 확인해 주시기 바랍니다.'});
     expect(transport.patch).toHaveBeenCalledWith('/neture/seller-recruitment/recruitments/fixture/supply-price',{supplyUnitPrice:1000});
   });
   it.each([undefined,{}, {success:'yes'}])('treats a malformed confirmation response as unconfirmed: %j',async data=>{

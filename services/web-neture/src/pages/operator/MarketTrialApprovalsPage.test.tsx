@@ -89,13 +89,13 @@ it('read errors have a retry and never masquerade as an empty failure list', asy
 it('failed resolution preserves the note for retry and an unmounted tab cannot refresh', async () => {
   let complete!: (value: unknown) => void;
   mocks.failures.mockResolvedValue(list([failure()]));
-  mocks.resolve.mockRejectedValueOnce(new Error('권한을 확인하세요')).mockImplementationOnce(() => new Promise(done => { complete = done; }));
+  mocks.resolve.mockRejectedValueOnce(new Error('권한을 확인하시기 바랍니다')).mockImplementationOnce(() => new Promise(done => { complete = done; }));
   const view = showFailures();
   await screen.findByText('복구 대상 펀딩');
   fireEvent.click(screen.getByRole('button', { name: '해결 처리', exact: true }));
   fireEvent.change(screen.getByRole('textbox', { name: '운영 메모' }), { target: { value: '유지할 메모' } });
   fireEvent.click(screen.getByRole('button', { name: '해결 완료' }));
-  await screen.findByText('권한을 확인하세요');
+  await screen.findByText('권한을 확인하시기 바랍니다');
   expect((screen.getByRole('textbox', { name: '운영 메모' }) as HTMLTextAreaElement).value).toBe('유지할 메모');
   fireEvent.click(screen.getByRole('button', { name: '해결 완료' }));
   view.unmount();

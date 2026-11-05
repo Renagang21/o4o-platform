@@ -273,7 +273,7 @@ export default function PointBudgetPage() {
         )}
 
         {budgetsQuery.data && budgetsQuery.data.length === 0 && (
-          <p className="text-sm text-gray-400">등록된 예산이 없습니다. 위 폼에서 추가하세요.</p>
+          <p className="text-sm text-gray-400">등록된 예산이 없습니다. 위 폼에서 추가하시기 바랍니다.</p>
         )}
 
         <div className="space-y-3">

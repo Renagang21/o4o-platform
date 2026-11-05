@@ -7,11 +7,11 @@ export class ProductCleanupOperationsService {
 
   async merge(sourceId: string, targetId: string, actorId: string, inputReason: unknown) {
     const reason = operationReason(inputReason);
-    if (!sourceId || !targetId || sourceId === targetId) throw new OperationError(400, 'INVALID_MASTER_IDS', '서로 다른 원본·대상 상품을 선택해 주세요.');
+    if (!sourceId || !targetId || sourceId === targetId) throw new OperationError(400, 'INVALID_MASTER_IDS', '서로 다른 원본·대상 상품을 선택해 주시기 바랍니다.');
     return this.db.transaction(async manager => {
       // Stable lock order also covers simultaneous reversed merge requests.
       const masters = await manager.query('SELECT id FROM product_masters WHERE id=ANY($1::uuid[]) ORDER BY id FOR UPDATE', [[sourceId, targetId]]);
-      if (masters.length !== 2) throw new OperationError(409, 'MASTER_CHANGED', '병합 대상이 변경됐습니다. 다시 조회해 주세요.');
+      if (masters.length !== 2) throw new OperationError(409, 'MASTER_CHANGED', '병합 대상이 변경됐습니다. 다시 조회해 주시기 바랍니다.');
       const offers = await manager.query('UPDATE supplier_product_offers SET master_id=$1 WHERE master_id=$2 RETURNING id', [targetId, sourceId]);
       const images = await manager.query('UPDATE product_images SET master_id=$1 WHERE master_id=$2 RETURNING id', [targetId, sourceId]);
       await manager.query('DELETE FROM product_masters WHERE id=$1', [sourceId]);
@@ -39,7 +39,7 @@ export class ProductCleanupOperationsService {
         (SELECT COUNT(*)::int FROM checkout_orders WHERE items @> jsonb_build_array(jsonb_build_object('productId', $1::text))) AS checkout_orders,
         (SELECT COUNT(*)::int FROM store_cart_items WHERE supplier_product_offer_id=$1) AS carts`, [offerId]);
       if (links.order_items || links.checkout_orders || links.carts) throw new OperationError(409, 'HAS_COMMERCE_REFERENCES', '주문 또는 장바구니 연결이 있어 완전 삭제할 수 없습니다.');
-      if (links.listings || links.products || (mode === 'pending' && links.approvals)) throw new OperationError(409, 'HARD_DELETE_BLOCKED', '활성 매장 연결·서비스 상품 또는 승인 이력을 먼저 확인해 주세요.');
+      if (links.listings || links.products || (mode === 'pending' && links.approvals)) throw new OperationError(409, 'HARD_DELETE_BLOCKED', '활성 매장 연결·서비스 상품 또는 승인 이력을 먼저 확인해 주시기 바랍니다.');
       await manager.query('DELETE FROM spot_price_policies WHERE offer_id=$1', [offerId]);
       await manager.query('DELETE FROM supplier_product_offers WHERE id=$1', [offerId]);
       await recordOperation(manager, 'neture', actorId, 'product.admin.hard_delete', { offerId, mode, reason });
@@ -53,7 +53,7 @@ export class ProductCleanupOperationsService {
     return this.db.transaction(async manager => {
       const [offer] = await manager.query('SELECT id,deleted_at FROM supplier_product_offers WHERE id=$1 FOR UPDATE', [offerId]);
       if (!offer) throw new OperationError(404, 'OFFER_NOT_FOUND', '상품을 찾을 수 없습니다.');
-      if (!!offer.deleted_at !== restore) throw new OperationError(409, 'STATUS_CHANGED', '휴지통 상태가 변경됐습니다. 다시 조회해 주세요.');
+      if (!!offer.deleted_at !== restore) throw new OperationError(409, 'STATUS_CHANGED', '휴지통 상태가 변경됐습니다. 다시 조회해 주시기 바랍니다.');
       if (restore) {
         // Restoring the record never republishes it.
         await manager.query('UPDATE supplier_product_offers SET deleted_at=NULL,deleted_by=NULL,delete_reason=NULL,is_active=false WHERE id=$1', [offerId]);

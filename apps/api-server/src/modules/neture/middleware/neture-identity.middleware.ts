@@ -70,7 +70,7 @@ function sendContextRequired(res: Response, resolution: Extract<SupplierResoluti
     success: false,
     error: {
       code: 'SUPPLIER_CONTEXT_REQUIRED',
-      message: '여러 공급자 조직에 속해 있습니다. 작업할 조직을 지정해 주세요.',
+      message: '여러 공급자 조직에 속해 있습니다. 작업할 조직을 지정해 주시기 바랍니다.',
     },
     candidates: resolution.candidates,
   });

@@ -122,8 +122,8 @@ export default function FundingParticipantsSection(props: Props) {
                     <label className="block text-xs text-gray-600">{selected.action === 'confirm' ? '운영자 메모 (선택)' : '처리 사유 (선택)'}
                       <textarea className={field} disabled={busy} value={selected.note} onChange={e => setForm({ ...selected, note: e.target.value })} /></label>
                     {selected.action !== 'confirm' && <p className="text-xs text-gray-500 my-2">최초 입금 확인일·금액·송금 참조는 이력으로 보존합니다.</p>}
-                    {stale && <p role="alert">현황이 변경됐습니다. 위의 입금 확인·정정 버튼으로 최신 값을 다시 열어 주세요.</p>}
-                    {invalidAmount(selected.amount) && <p role="alert" className="text-xs text-red-600 my-2">금액은 0 이상, 소수점 두 자리까지 입력해 주세요.</p>}
+                    {stale && <p role="alert">현황이 변경됐습니다. 위의 입금 확인·정정 버튼으로 최신 값을 다시 열어 주시기 바랍니다.</p>}
+                    {invalidAmount(selected.amount) && <p role="alert" className="text-xs text-red-600 my-2">금액은 0 이상, 소수점 두 자리까지 입력해 주시기 바랍니다.</p>}
                     <div className="flex gap-2 mt-3"><button type="submit" className={button} disabled={busy || stale || invalidAmount(selected.amount)}>{busy ? '저장 중...' : '기록 저장'}</button>
                       <button type="button" className={button} disabled={busy} onClick={() => setForm(null)}>취소</button></div>
                   </form>}

@@ -77,7 +77,7 @@ function ContentImport({ onClose, onImport, organizationId }: StoreContentImport
     if (!selected || !state.current()) return;
     const html = contentJsonToHtml(selected.contentJson);
     if (!html.replace(/<[^>]*>/g, '').trim() && !/<(img|video|audio)\b/i.test(html)) {
-      setValidationError('이 콘텐츠에는 가져올 본문이 없습니다. 다른 콘텐츠를 선택해 주세요.');
+      setValidationError('이 콘텐츠에는 가져올 본문이 없습니다. 다른 콘텐츠를 선택해 주시기 바랍니다.');
       return;
     }
     onImport(html, selected.title);

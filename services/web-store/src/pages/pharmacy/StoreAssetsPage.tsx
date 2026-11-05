@@ -24,7 +24,7 @@ function StorePublishingSession() {
     <div className="space-y-4">
       <StoreLibraryNavigation section="mine" />
       <section className="rounded-xl border border-teal-200 bg-teal-50 p-4 text-sm text-teal-900" aria-label="게시·활용 안내" >
-        <h2 className="font-semibold">게시 설정과 실제 활용을 구분해 확인하세요</h2>
+        <h2 className="font-semibold">게시 설정과 실제 활용을 구분해 확인하시기 바랍니다</h2>
         <p className="mt-2">이 화면은 가져온 사본의 게시 설정입니다. 직접 작성·제작 자료는 자료함에서 관리합니다. 게시됨은 기기 연결이나 재생 완료를 뜻하지 않습니다.</p>
         <nav aria-label="게시 작업 이어가기" className="mt-3 flex flex-wrap gap-2">
           <Link className="rounded-lg border bg-white px-3 py-2" to={`${base}/library/contents`}>자료 선택·편집</Link>

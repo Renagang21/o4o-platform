@@ -61,7 +61,7 @@ export function CarePharmHome({ view = 'home', client, accountId, onLogin, onEnt
       </section>
       <section id="news" aria-labelledby="carepharm-news" className="scroll-mt-24 border-t border-slate-200 pt-8">
         <h2 id="carepharm-news" className="text-xl font-semibold text-slate-900">공지·안내</h2>
-        <p className="mb-5 mt-2 text-sm leading-6 text-slate-600">협업체 운영자가 게시한 소식과 참여 안내를 확인하세요.</p>
+        <p className="mb-5 mt-2 text-sm leading-6 text-slate-600">협업체 운영자가 게시한 소식과 참여 안내를 확인하시기 바랍니다.</p>
         {notices}
       </section>
       <CarePharmWorkspaces />

@@ -123,8 +123,8 @@ function PdfExportSession({ content, onClose }: Readonly<{ content: PdfExportCon
     } catch (error) {
       try { win?.close(); } catch { /* closed window */ }
       if (isCurrent()) setExportError(error instanceof Error && error.message === 'POPUP_BLOCKED'
-        ? '팝업이 차단되었습니다. 브라우저 팝업을 허용한 뒤 다시 시도하세요.'
-        : 'PDF를 준비하지 못했습니다. 옵션을 유지한 채 다시 시도해 주세요.');
+        ? '팝업이 차단되었습니다. 브라우저 팝업을 허용한 뒤 다시 시도하시기 바랍니다.'
+        : 'PDF를 준비하지 못했습니다. 옵션을 유지한 채 다시 시도해 주시기 바랍니다.');
     } finally {
       lock.current = false;
       if (isCurrent()) setGenerating(false);

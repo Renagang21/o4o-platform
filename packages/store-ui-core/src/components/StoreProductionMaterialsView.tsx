@@ -136,8 +136,8 @@ export function StoreProductionMaterialsView({
           </p>
           <p style={{ margin: '8px 0 0', color: '#94a3b8', fontSize: 13, lineHeight: 1.6 }}>
             {crossLinks.length > 0
-              ? '위 만들기 버튼 또는 내 자료함 → 콘텐츠에서 제작 작업을 시작하세요.'
-              : '내 자료함 → 콘텐츠에서 제작 작업을 시작하세요.'}
+              ? '위 만들기 버튼 또는 내 자료함 → 콘텐츠에서 제작 작업을 시작하시기 바랍니다.'
+              : '내 자료함 → 콘텐츠에서 제작 작업을 시작하시기 바랍니다.'}
           </p>
         </div>
       ) : (

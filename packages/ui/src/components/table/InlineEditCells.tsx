@@ -34,7 +34,7 @@ export function EditableTextCell({
   value,
   onSave,
   allowEmpty = false,
-  placeholder = '값을 입력하세요',
+  placeholder = '값을 입력하시기 바랍니다',
   maxLength,
   className = '',
 }: EditableTextCellProps) {

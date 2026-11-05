@@ -211,7 +211,7 @@ describe('ProductDetailDrawer existing workflow', () => {
     fireEvent.click(await screen.findByTitle('삭제'));
     await waitFor(() =>
       expect(mocks.toast.error).toHaveBeenCalledWith(
-        '이미지를 삭제하지 못했습니다. 잠시 후 다시 시도해 주세요.',
+        '이미지를 삭제하지 못했습니다. 잠시 후 다시 시도해 주시기 바랍니다.',
       ),
     );
     expect(mocks.product.deleteProductImage).toHaveBeenCalledWith('image-a', 'master-a');
@@ -424,7 +424,7 @@ describe('ProductDetailDrawer existing workflow', () => {
     fireEvent.change(screen.getByPlaceholderText('기본 1,000'), { target: { value: '0' } });
     save();
     await waitFor(() =>
-      expect(mocks.toast.error).toHaveBeenCalledWith('KPA Society: 0보다 큰 정수를 입력하세요'),
+      expect(mocks.toast.error).toHaveBeenCalledWith('KPA Society: 0보다 큰 정수를 입력하시기 바랍니다'),
     );
     expect(mocks.supplier.setServicePrices).not.toHaveBeenCalled();
     fireEvent.change(screen.getByPlaceholderText('기본 1,000'), { target: { value: '2000' } });

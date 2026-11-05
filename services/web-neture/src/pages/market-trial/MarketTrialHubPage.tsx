@@ -97,7 +97,7 @@ export function MarketTrialHubPage() {
           className="mb-6"
           compact
           title="내 참여 내역을 불러오지 못했습니다."
-          description={loadError ? '참여 여부는 다시 조회해 주세요.' : '모집 목록은 볼 수 있습니다. 참여 여부는 다시 조회해 주세요.'}
+          description={loadError ? '참여 여부는 다시 조회해 주시기 바랍니다.' : '모집 목록은 볼 수 있습니다. 참여 여부는 다시 조회해 주시기 바랍니다.'}
           onRetry={() => setReloadKey((k) => k + 1)}
         />
       )}

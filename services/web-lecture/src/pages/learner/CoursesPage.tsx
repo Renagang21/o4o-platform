@@ -58,7 +58,7 @@ export default function CoursesPage() {
   useEffect(() => { void load(); return () => { requestId.current += 1; }; }, [load, isAuthenticated, user?.id]);
 
   const gate = isAuthenticated && !canAccess('learner',user)
-    ? <div className="notice">강의 이용 상태를 확인해 주세요. 이용 정지·탈퇴 또는 계정 확인 문제는 <a href={INQUIRY_URL}>이용 문의</a> 후 가능합니다.</div>
+    ? <div className="notice">강의 이용 상태를 확인해 주시기 바랍니다. 이용 정지·탈퇴 또는 계정 확인 문제는 <a href={INQUIRY_URL}>이용 문의</a> 후 가능합니다.</div>
     : !isAuthenticated
       ? <div className="notice">회원 전용 강의와 수강 신청은 <Link to="/login" state={{ from: `${location.pathname}${location.search}` }}>로그인</Link> 후 이용할 수 있습니다.</div>
       : null;

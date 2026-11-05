@@ -85,7 +85,7 @@ function Tools({ organizationId, organizationName, accountId, canEnterCommunity 
       const href = await requestServiceHandoff(api, { ...destination, returnPath: `${destination.returnPath}?store=${encodeURIComponent(organizationId)}` });
       if (isCurrent()) window.location.assign(href);
     } catch {
-      if (isCurrent()) setEntryError('회원 커뮤니티로 이동하지 못했습니다. 다시 시도해 주세요.');
+      if (isCurrent()) setEntryError('회원 커뮤니티로 이동하지 못했습니다. 다시 시도해 주시기 바랍니다.');
     } finally {
       if (isCurrent()) { movePending.current = false; setMoving(false); }
     }
@@ -93,7 +93,7 @@ function Tools({ organizationId, organizationName, accountId, canEnterCommunity 
 
   return <PharmacyPage title="만성질환관리" description="CarePharm에서 제공하는 제품과 자료를 우리 약국의 경영에 활용합니다."
     actions={organizationId && accountId && <button type="button" className={actionClass} onClick={() => setRetry(n => n + 1)}>새로고침</button>}>
-    {!accountId ? <p>로그인 후 이용해 주세요.</p> : !organizationId ? <p>약국을 먼저 선택해 주세요.</p> : error ? <div role="alert"><p>{error}</p><button className={actionClass} onClick={() => setRetry(n => n + 1)}>다시 확인</button></div> : allowed === null ? <p role="status">이용 상태를 확인하고 있습니다…</p> : !allowed ? <div className="rounded-xl border bg-white p-6"><p>선택한 약국은 만성질환관리 서비스 가입 승인 후 이용할 수 있습니다.</p><Link className={`${actionClass} mt-4`} to="/store/pharmacy/semi-franchises">협력사업 서비스 · 가입 상태 확인</Link></div> : <div className="space-y-8">
+    {!accountId ? <p>로그인 후 이용해 주시기 바랍니다.</p> : !organizationId ? <p>약국을 먼저 선택해 주시기 바랍니다.</p> : error ? <div role="alert"><p>{error}</p><button className={actionClass} onClick={() => setRetry(n => n + 1)}>다시 확인</button></div> : allowed === null ? <p role="status">이용 상태를 확인하고 있습니다…</p> : !allowed ? <div className="rounded-xl border bg-white p-6"><p>선택한 약국은 만성질환관리 서비스 가입 승인 후 이용할 수 있습니다.</p><Link className={`${actionClass} mt-4`} to="/store/pharmacy/semi-franchises">협력사업 서비스 · 가입 상태 확인</Link></div> : <div className="space-y-8">
       <section className="rounded-2xl bg-emerald-950 p-5 text-white sm:p-7">
         <p className="text-sm text-emerald-200">CarePharm · 가입 승인된 약국</p>
         <h2 className="mt-2 break-words text-xl font-semibold">{organizationName || '선택한 약국'}의 협업 업무</h2>
@@ -125,7 +125,7 @@ function Tools({ organizationId, organizationName, accountId, canEnterCommunity 
 
       <section id="carepharm-production" aria-labelledby="carepharm-production-heading" className="scroll-mt-24 rounded-xl border bg-white p-5">
         <h2 id="carepharm-production-heading" className="text-lg font-semibold">내 매장 안내물 제작</h2>
-        <p className="my-3 text-sm leading-6 text-slate-600">회원자료를 가져온 뒤 내 자료함에서 편집하고 POP 제작에 활용하세요. 사본은 원본이 바뀌어도 자동으로 바뀌지 않습니다.</p>
+        <p className="my-3 text-sm leading-6 text-slate-600">회원자료를 가져온 뒤 내 자료함에서 편집하고 POP 제작에 활용하시기 바랍니다. 사본은 원본이 바뀌어도 자동으로 바뀌지 않습니다.</p>
         <p className="mb-4 text-sm leading-6 text-slate-600">정보 QR은 제품이나 매장에서 직접 만든 콘텐츠 등 지원되는 대상을 선택해 연결합니다.</p>
         <div className="flex flex-wrap gap-3">
           <Link className={actionClass} to="/store/library/contents">내 자료함 · 편집</Link>
@@ -136,7 +136,7 @@ function Tools({ organizationId, organizationName, accountId, canEnterCommunity 
 
       <section aria-labelledby="carepharm-cooperation-heading" className="rounded-xl border bg-slate-50 p-5">
         <h2 id="carepharm-cooperation-heading" className="text-lg font-semibold">협업체 소식 · 업무 문의</h2>
-        <p className="my-3 text-sm leading-6 text-slate-600">운영 소식과 이용 안내는 협업체에서 확인하세요. 제품·공급조건·자료 활용에 관한 질문과 약국 운영 사례는 회원 커뮤니티에서 나눕니다.</p>
+        <p className="my-3 text-sm leading-6 text-slate-600">운영 소식과 이용 안내는 협업체에서 확인하시기 바랍니다. 제품·공급조건·자료 활용에 관한 질문과 약국 운영 사례는 회원 커뮤니티에서 나눕니다.</p>
         <div className="flex flex-wrap gap-3">
           <a className={actionClass} href="https://carepharm.neture.co.kr/#news">CarePharm 공지·안내</a>
           {canEnterCommunity && <button type="button" className={actionClass} disabled={moving} onClick={() => void enterCommunity()}>{moving ? '이동 중…' : '회원 커뮤니티 · 문의'}</button>}

@@ -149,7 +149,7 @@ it('does not pick an arbitrary pharmacy when the owner has multiple stores', asy
     { organizationId: 'store-a', organizationName: '약국 A', memberRole: 'owner' },
     { organizationId: 'store-b', organizationName: '약국 B', memberRole: 'owner' },
   ] })) : previous(path, config));
-  mount('participation'); await screen.findByText('가입 상태를 확인할 약국을 선택해 주세요.');
+  mount('participation'); await screen.findByText('가입 상태를 확인할 약국을 선택해 주시기 바랍니다.');
   expect(state.get.mock.calls.some(([path]) => path.endsWith('/semi-franchises'))).toBe(false);
   fireEvent.change(screen.getByRole('combobox'), { target: { value: 'store-b' } });
   await screen.findByText('미가입');
@@ -158,7 +158,7 @@ it('does not pick an arbitrary pharmacy when the owner has multiple stores', asy
 it('never replaces an invalid explicit pharmacy with the first accessible one', async () => {
   access.allowed = true;
   render(<MemoryRouter initialEntries={['/materials?store=foreign']}><CarePharmHomePage view="materials" /></MemoryRouter>);
-  await screen.findByText('회원 업무를 이용할 약국을 선택해 주세요.');
+  await screen.findByText('회원 업무를 이용할 약국을 선택해 주시기 바랍니다.');
   expect(state.get.mock.calls.some(([path]) => path.endsWith('/store/contents'))).toBe(false);
 });
 

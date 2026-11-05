@@ -28,7 +28,7 @@ export default function CentralMemberWorkspace({ actorId, initialQuery = '', adm
   const actorEpoch=useRef({value:0});
   useEffect(()=>{const state=actorEpoch.current;++state.value;lock.current=false;setBusy(false);setPermissions({qualifications:false,pharmacies:false,edit:false});return()=>{++state.value;};},[actorId,adminMode]);
   const panel = useRef<HTMLElement | null>(null);
-  const clearPrivate=()=>{++detailSequence.current;setDetail(null);setSelectedId(null);setSelectedIds(new Set());setRows([]);setCounts({});setPermissions({qualifications:false,pharmacies:false,edit:false});setBusy(false);lock.current=false;setError('현재 회원 업무 권한을 다시 확인해 주세요.');};
+  const clearPrivate=()=>{++detailSequence.current;setDetail(null);setSelectedId(null);setSelectedIds(new Set());setRows([]);setCounts({});setPermissions({qualifications:false,pharmacies:false,edit:false});setBusy(false);lock.current=false;setError('현재 회원 업무 권한을 다시 확인해 주시기 바랍니다.');};
   useEffect(() => { if (selectedId) panel.current?.scrollIntoView?.({ block: 'start', behavior: 'smooth' }); }, [selectedId]);
   const load = useCallback(async () => {
     const seq = ++listSequence.current;
@@ -75,8 +75,8 @@ export default function CentralMemberWorkspace({ actorId, initialQuery = '', adm
     try {
       const outcome=await work() as {data?:{data?:{storeInventoryPurged?:boolean;errorCode?:string}}};
       if(context!==actorEpoch.current.value)return;
-      if(outcome?.data?.data?.storeInventoryPurged===false) setNotice(`폐업과 접근 해제는 적용됐습니다. 자료·파일 삭제는 미완료입니다. 확인 후 재시도해 주세요. (${outcome.data.data.errorCode??'PURGE_INCOMPLETE'})`);
-      else setNotice('처리 결과를 저장했습니다. 아래에서 다음 업무 또는 다음 회원을 선택해 주세요.');
+      if(outcome?.data?.data?.storeInventoryPurged===false) setNotice(`폐업과 접근 해제는 적용됐습니다. 자료·파일 삭제는 미완료입니다. 확인 후 재시도해 주시기 바랍니다. (${outcome.data.data.errorCode??'PURGE_INCOMPLETE'})`);
+      else setNotice('처리 결과를 저장했습니다. 아래에서 다음 업무 또는 다음 회원을 선택해 주시기 바랍니다.');
     } catch (error_) { failureMessage = memberError(error_);accessLost=[401,403].includes((error_ as {response?:{status?:number}}).response?.status??0); }
     finally {
       const refresh=async()=>{

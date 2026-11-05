@@ -36,7 +36,7 @@ export interface MyServicesViewProps {
 
 const REASON_MESSAGES: Record<string, string> = {
   NO_ACCESSIBLE_STORE: '이 계정으로 운영 중인 매장이 없습니다.',
-  MULTIPLE_ACCESSIBLE_STORES: '운영 중인 매장이 여러 개입니다. 각 서비스의 내 매장 화면에서 확인해 주세요.',
+  MULTIPLE_ACCESSIBLE_STORES: '운영 중인 매장이 여러 개입니다. 각 서비스의 내 매장 화면에서 확인해 주시기 바랍니다.',
   NOT_STORE_MEMBER: '이 매장의 구성원이 아닙니다.',
 };
 
@@ -69,7 +69,7 @@ export function MyServicesView({
       const url = await api.resolveServiceEntryUrl(serviceKey, target.myStore);
       window.location.assign(url);
     } catch {
-      setEntryError('서비스로 이동하지 못했습니다. 잠시 후 다시 시도해 주세요.');
+      setEntryError('서비스로 이동하지 못했습니다. 잠시 후 다시 시도해 주시기 바랍니다.');
       setEntering(null);
     }
   }

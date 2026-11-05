@@ -62,13 +62,13 @@ export default function SupplierProductRegisterEntryPage() {
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-slate-900">상품 추가</h1>
         <p className="text-sm text-slate-500 mt-1">
-          등록할 제품이 <strong>의약품</strong>인지 <strong>비의약품</strong>인지 먼저 선택하세요.
+          등록할 제품이 <strong>의약품</strong>인지 <strong>비의약품</strong>인지 먼저 선택하시기 바랍니다.
           선택에 따라 입력 항목과 검토 절차가 달라집니다.
         </p>
       </div>
 
       <div className="mb-6 rounded-lg border border-blue-200 bg-blue-50 p-4">
-        <h2 className="font-semibold text-slate-800">이미 등록된 제품인가요?</h2>
+        <h2 className="font-semibold text-slate-800">이미 등록된 제품입니까?</h2>
         <p className="my-2 text-sm text-slate-600">표준 제품을 찾으면 정보를 다시 입력하지 않고 공급가와 공급 방식을 설정할 수 있습니다.</p>
         <button type="button" onClick={() => navigate('/supplier/products/library')} className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white">기존 제품 검색·공급 연결</button>
       </div>
@@ -136,7 +136,7 @@ export default function SupplierProductRegisterEntryPage() {
             })}
           </div>
           <p className="mt-2 text-xs text-slate-400">
-            바코드·표준코드·품목기준코드 등 식별 정보가 있는 경우 입력해 주세요. 식별 정보가 없어도 임시 저장은 가능합니다.
+            바코드·표준코드·품목기준코드 등 식별 정보가 있는 경우 입력해 주시기 바랍니다. 식별 정보가 없어도 임시 저장은 가능합니다.
           </p>
         </div>
       )}
@@ -202,7 +202,7 @@ export default function SupplierProductRegisterEntryPage() {
       {/* 하단: 제품 등록 후 연결 메뉴 안내 */}
       <div className="mt-6 rounded-lg bg-slate-50 border border-slate-200 p-4">
         <p className="text-xs text-slate-500 leading-relaxed">
-          제품이 <strong>이미 O4O 표준 제품에 있으면</strong> 제품 라이브러리에서 바로 <strong>공급 연결</strong>하세요.
+          제품이 <strong>이미 O4O 표준 제품에 있으면</strong> 제품 라이브러리에서 바로 <strong>공급 연결</strong>하시기 바랍니다.
           없으면 여기서 <strong>직접 입력</strong>하거나 <strong>ChatGPT로 제품정보를 정리</strong>해 검토 요청을 제출합니다.
           제출한 제품 정보는 <strong>운영자 검토 후 표준 제품으로 확정</strong>되며, 그 뒤 제품 라이브러리에서
           선택해 공급가·공급 방식을 설정하면 공급 상품이 됩니다.

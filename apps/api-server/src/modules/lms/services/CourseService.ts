@@ -141,7 +141,7 @@ export class CourseService extends BaseService<Course> {
     // O4O Tag Policy V1 — sanitize + required
     const sanitizedTags = sanitizeCourseTags(data.tags);
     if (sanitizedTags.length === 0) {
-      throw new CourseValidationError('태그를 1개 이상 입력해주세요');
+      throw new CourseValidationError('태그를 1개 이상 입력해 주시기 바랍니다');
     }
 
     const course = this.courseRepository.create({
@@ -292,7 +292,7 @@ export class CourseService extends BaseService<Course> {
     if (data.tags !== undefined) {
       const sanitizedTags = sanitizeCourseTags(data.tags);
       if (sanitizedTags.length === 0) {
-        throw new CourseValidationError('태그를 1개 이상 입력해주세요');
+        throw new CourseValidationError('태그를 1개 이상 입력해 주시기 바랍니다');
       }
       data.tags = sanitizedTags;
     }

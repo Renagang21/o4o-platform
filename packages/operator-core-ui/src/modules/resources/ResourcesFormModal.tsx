@@ -61,7 +61,7 @@ export function ResourcesFormModal({
     e.preventDefault();
     if (submitting.current || loading) return;
     if (!value.title.trim()) {
-      toast.error('제목을 입력해 주세요');
+      toast.error('제목을 입력해 주시기 바랍니다');
       return;
     }
     submitting.current = true; setSubmitError(null); setSaving(true);
@@ -128,7 +128,7 @@ export function ResourcesFormModal({
                     onChange={(v) => setValue((prev) => ({ ...prev, body: v.html }))}
                     preset="full"
                     minHeight="260px"
-                    placeholder={`${nouns.entity} 본문을 작성하세요`}
+                    placeholder={`${nouns.entity} 본문을 작성하시기 바랍니다`}
                   />
                 </div>
               </>

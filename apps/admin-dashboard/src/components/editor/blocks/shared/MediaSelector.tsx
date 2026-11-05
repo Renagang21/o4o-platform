@@ -739,7 +739,7 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({
           {isDragActive && (
             <div className="absolute inset-0 bg-blue-500 bg-opacity-10 border-2 border-dashed border-blue-500 rounded-lg flex items-center justify-center">
               <div className="text-blue-600 text-lg font-medium">
-                파일을 여기에 놓으세요
+                파일을 여기에 놓으시기 바랍니다
               </div>
             </div>
           )}
@@ -761,7 +761,7 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({
             <div className="flex flex-col items-center justify-center h-64 text-gray-500">
               <FileImage className="w-16 h-16 mb-4" />
               <span className="text-lg font-medium mb-2">미디어 파일이 없습니다</span>
-              <span className="text-sm">파일을 업로드하거나 검색 조건을 변경해보세요</span>
+              <span className="text-sm">파일을 업로드하거나 검색 조건을 변경해보시기 바랍니다</span>
             </div>
           ) : (
             <>
@@ -811,7 +811,7 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({
                   {multiple && maxSelection > 1 && ` (최대 ${maxSelection}개)`}
                 </span>
               ) : (
-                <span>파일을 선택하세요</span>
+                <span>파일을 선택하시기 바랍니다</span>
               )}
             </div>
             <div className="flex items-center gap-2">

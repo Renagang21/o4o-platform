@@ -141,7 +141,7 @@ export default function AIPageGeneratorTest() {
             ) : (
               <div className="text-center py-8 text-gray-500">
                 아직 생성된 블록이 없습니다.<br />
-                왼쪽에서 AI 생성을 시작하세요.
+                왼쪽에서 AI 생성을 시작하시기 바랍니다.
               </div>
             )}
           </CardContent>

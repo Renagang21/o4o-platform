@@ -69,18 +69,18 @@ interface EventOfferStats {
 
 // Error codes
 const ERROR_CODES = {
-  STATS_UNAVAILABLE: { code: 'STATS_UNAVAILABLE', message: '통계 집계 중입니다. 잠시 후 다시 시도해 주세요.' },
+  STATS_UNAVAILABLE: { code: 'STATS_UNAVAILABLE', message: '통계 집계 중입니다. 잠시 후 다시 시도해 주시기 바랍니다.' },
   INTERNAL_ERROR: { code: 'INTERNAL_ERROR', message: '서버 오류가 발생했습니다.' },
   NOT_FOUND: { code: 'NOT_FOUND', message: '상품을 찾을 수 없습니다.' },
   INVALID_PARAMS: { code: 'INVALID_PARAMS', message: '필수 파라미터가 없습니다.' },
   PRODUCT_NOT_APPROVED: { code: 'PRODUCT_NOT_APPROVED', message: '제품 등록 승인 후 이벤트를 등록할 수 있습니다.' },
-  INVALID_EVENT_CONDITIONS: { code: 'INVALID_EVENT_CONDITIONS', message: '이벤트 가격과 시작·종료 일시를 확인해 주세요.' },
+  INVALID_EVENT_CONDITIONS: { code: 'INVALID_EVENT_CONDITIONS', message: '이벤트 가격과 시작·종료 일시를 확인해 주시기 바랍니다.' },
   OFFER_NOT_FOUND: { code: 'OFFER_NOT_FOUND', message: '공급자 상품을 찾을 수 없습니다.' },
   ALREADY_REGISTERED: { code: 'ALREADY_REGISTERED', message: '이미 등록된 이벤트 상품입니다.' },
   ORG_NOT_FOUND: { code: 'ORG_NOT_FOUND', message: '운영자 조직 정보를 찾을 수 없습니다.' },
   // WO-O4O-EVENT-OFFER-APPROVAL-PHASE1-V1: Approval Queue 에러
   INVALID_STATE: { code: 'INVALID_STATE', message: '대기중(pending) 상태에서만 승인/반려할 수 있습니다.' },
-  INVALID_REASON: { code: 'INVALID_REASON', message: '반려 사유를 입력해 주세요.' },
+  INVALID_REASON: { code: 'INVALID_REASON', message: '반려 사유를 입력해 주시기 바랍니다.' },
 } as const;
 
 function createErrorResponse(

@@ -63,7 +63,7 @@ export default function CentralOperationNotifications({ scopeKey, variant = 'bel
       }
       // The panel may unmount during navigation; surviving consumers still need a fresh query.
       window.dispatchEvent(new Event(CHANGED));
-    } catch { if (lifecycle.current.mounted && lifecycle.current.scope === scopeKey) setError('알림의 읽음 상태를 저장하지 못했습니다. 다시 조회해 주세요.'); }
+    } catch { if (lifecycle.current.mounted && lifecycle.current.scope === scopeKey) setError('알림의 읽음 상태를 저장하지 못했습니다. 다시 조회해 주시기 바랍니다.'); }
     finally { lock.current = false; if (lifecycle.current.mounted) setWriting(false); }
   };
   const open = (item: Item) => {
@@ -78,7 +78,7 @@ export default function CentralOperationNotifications({ scopeKey, variant = 'bel
       const href = typeof row.metadata?.targetUrl === 'string' ? row.metadata.targetUrl : '/operator';
       const target = centralTaskHref(row.serviceKey, href);
       if (target.startsWith('/')) navigate(target); else window.location.assign(target);
-    }} ariaLabel="업무 운영 알림" emptyText={error ? '알림을 조회하지 못했습니다. 다시 열어 주세요.' : '새 운영 알림이 없습니다.'} />
+    }} ariaLabel="업무 운영 알림" emptyText={error ? '알림을 조회하지 못했습니다. 다시 열어 주시기 바랍니다.' : '새 운영 알림이 없습니다.'} />
     {error && <span role="alert" className="text-sm text-red-700">알림 조회·처리 확인 필요</span>}
   </div>;
   const columns: ListColumnDef<Item>[] = [
@@ -91,6 +91,6 @@ export default function CentralOperationNotifications({ scopeKey, variant = 'bel
     {notice && <p role="status" className="text-sm text-blue-800">{notice}</p>}
     <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={unreadOnly} onChange={e => { setUnreadOnly(e.target.checked); setSelected(new Set()); }} />읽지 않은 알림만</label>
     <div className="[&>div>div]:flex-wrap"><ActionBar selectedCount={selectedUnread.length} onClearSelection={() => { if (!lock.current) setSelected(new Set()); }} actions={[{ key: 'read', label: '선택 알림 읽음', variant: 'primary', disabled: loading || writing || !!error, loading: writing, onClick: () => read(selectedUnread) }]} /></div>
-    <div className="max-h-72 overflow-auto"><DataTable className="[&_td]:px-3 [&_th]:px-3 [&_td]:whitespace-normal [&_th]:whitespace-normal" tableId="central-operation-notifications" columns={columns} data={rows} rowKey="id" loading={loading && !current} selectable selectedKeys={selected} onSelectionChange={keys => { if (!lock.current) setSelected(new Set([...keys].filter(id => rows.some(item => item.id === id && !item.isRead)))); }} emptyMessage={error ? '알림을 다시 조회해 주세요.' : unreadOnly ? '표시할 읽지 않은 알림이 없습니다.' : '운영 알림이 없습니다.'} /></div>
+    <div className="max-h-72 overflow-auto"><DataTable className="[&_td]:px-3 [&_th]:px-3 [&_td]:whitespace-normal [&_th]:whitespace-normal" tableId="central-operation-notifications" columns={columns} data={rows} rowKey="id" loading={loading && !current} selectable selectedKeys={selected} onSelectionChange={keys => { if (!lock.current) setSelected(new Set([...keys].filter(id => rows.some(item => item.id === id && !item.isRead)))); }} emptyMessage={error ? '알림을 다시 조회해 주시기 바랍니다.' : unreadOnly ? '표시할 읽지 않은 알림이 없습니다.' : '운영 알림이 없습니다.'} /></div>
   </section>;
 }

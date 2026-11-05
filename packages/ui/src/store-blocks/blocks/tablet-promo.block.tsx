@@ -27,7 +27,7 @@ function TabletPromoBlockComponent({ context }: BlockComponentProps) {
           <span style={{ fontSize: '28px' }}>📱</span>
           <div>
             <p style={{ fontSize: '14px', fontWeight: 600, color: '#1e40af' }}>매장 상품 안내</p>
-            <p style={{ fontSize: '13px', color: '#3b82f6' }}>태블릿에서 관심 상품을 확인하세요</p>
+            <p style={{ fontSize: '13px', color: '#3b82f6' }}>태블릿에서 관심 상품을 확인하시기 바랍니다</p>
           </div>
         </div>
       </Link>

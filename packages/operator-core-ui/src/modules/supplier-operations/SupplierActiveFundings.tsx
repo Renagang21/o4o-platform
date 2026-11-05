@@ -71,7 +71,7 @@ export default function SupplierActiveFundings({
           ))}
           {more && (
             <p>
-              100건을 초과합니다. 펀딩 운영 화면에서 전체 현황을 확인하세요.
+              100건을 초과합니다. 펀딩 운영 화면에서 전체 현황을 확인하시기 바랍니다.
             </p>
           )}
         </>

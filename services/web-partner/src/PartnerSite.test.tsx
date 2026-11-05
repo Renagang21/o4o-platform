@@ -38,7 +38,7 @@ vi.mock("./WorkspacePortal", () => ({
 const board = {
   id: "00000000-0000-4000-8000-000000000001",
   name: "자유 소통",
-  description: "경험을 나누세요",
+  description: "경험을 나누시기 바랍니다",
   operator_only: false,
   revision: 0,
 };
@@ -289,7 +289,7 @@ describe("Partner public entry, login, opt-in and community", () => {
   it("shows a public community introduction without implicitly enrolling a visitor", async () => {
     mount();
     await screen.findByText("로그인하고 참여하기");
-    expect(screen.getByText("경험을 나누세요")).toBeTruthy();
+    expect(screen.getByText("경험을 나누시기 바랍니다")).toBeTruthy();
     expect(communityApi.join).not.toHaveBeenCalled();
     expect(communityApi.list).not.toHaveBeenCalled();
   });

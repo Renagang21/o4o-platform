@@ -138,11 +138,11 @@ export function ProductMarketingView({
         setData(res.data);
       } else {
         // success=false 도 실패로 취급한다(이전에는 조용히 통과해 빈 화면처럼 보였다).
-        setLoadError('마케팅 자산 정보를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.');
+        setLoadError('마케팅 자산 정보를 불러오지 못했습니다. 잠시 후 다시 시도해 주시기 바랍니다.');
       }
     } catch {
       // 재조회 실패 시 기존 data 는 유지한다.
-      setLoadError('마케팅 자산 정보를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.');
+      setLoadError('마케팅 자산 정보를 불러오지 못했습니다. 잠시 후 다시 시도해 주시기 바랍니다.');
     } finally {
       setLoading(false);
     }
@@ -190,10 +190,10 @@ export function ProductMarketingView({
         await fetchData();
       } else {
         // 실패 시 목록에서 제거하지 않아 기존 연결 상태가 그대로 유지된다.
-        setActionError('연결을 해제하지 못했습니다. 잠시 후 다시 시도해 주세요.');
+        setActionError('연결을 해제하지 못했습니다. 잠시 후 다시 시도해 주시기 바랍니다.');
       }
     } catch {
-      setActionError('연결을 해제하지 못했습니다. 잠시 후 다시 시도해 주세요.');
+      setActionError('연결을 해제하지 못했습니다. 잠시 후 다시 시도해 주시기 바랍니다.');
     } finally {
       setUnlinkingId(null);
     }
@@ -219,7 +219,7 @@ export function ProductMarketingView({
           <p style={{ color: '#991B1B', fontSize: '15px', fontWeight: 600, marginTop: '12px' }}>
             마케팅 자산 정보를 불러오지 못했습니다.
           </p>
-          <p style={{ color: c.neutral500, fontSize: '13px', marginTop: '4px' }}>잠시 후 다시 시도해 주세요.</p>
+          <p style={{ color: c.neutral500, fontSize: '13px', marginTop: '4px' }}>잠시 후 다시 시도해 주시기 바랍니다.</p>
           <button type="button" onClick={() => void fetchData()} style={styles.retryBtn}>다시 시도</button>
         </div>
       </div>

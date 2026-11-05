@@ -39,7 +39,7 @@ const homeProps: GuideFeaturesPageProps = {
     eyebrow: '이용 안내',
     title: 'O4O 플랫폼 이용 안내',
     description:
-      'O4O는 좋은 제품이 실제 매장에서 움직이도록 지원하는 플랫폼입니다. O4O 이해부터 서비스 운영 · 기능 사용 · 사업 운영 · 공급자/판매자 참여까지, 목적에 맞는 영역을 선택해 이동하세요.',
+      'O4O는 좋은 제품이 실제 매장에서 움직이도록 지원하는 플랫폼입니다. O4O 이해부터 서비스 운영 · 기능 사용 · 사업 운영 · 공급자/판매자 참여까지, 목적에 맞는 영역을 선택해 이동하시기 바랍니다.',
     flowBarTitle: '안내 영역',
     flowLabels: ['O4O 이해', '서비스 운영자', '기능 설명', '사업 안내', '공급자', '판매자/매장'],
   },
@@ -95,7 +95,7 @@ const homeProps: GuideFeaturesPageProps = {
       title: '서비스 운영자 안내',
       primaryRoute: '/guide/for-operator',
       description:
-        'O4O 기반 서비스를 운영하려는 사업자를 위한 안내입니다. 협동조합 준비 그룹 · 약국 네트워크 · 전문약사 그룹 · 관광객/드럭스토어형 약국 네트워크 · 화장품 전문매장 네트워크 · 도매상/제조사/브랜드사 주도 서비스 · 마케팅 사업자 등이 해당합니다. Business Guide 에서 실제 사업 운영 방법을 확인하세요.',
+        'O4O 기반 서비스를 운영하려는 사업자를 위한 안내입니다. 협동조합 준비 그룹 · 약국 네트워크 · 전문약사 그룹 · 관광객/드럭스토어형 약국 네트워크 · 화장품 전문매장 네트워크 · 도매상/제조사/브랜드사 주도 서비스 · 마케팅 사업자 등이 해당합니다. Business Guide 에서 실제 사업 운영 방법을 확인하시기 바랍니다.',
       items: [
         { label: '운영자 이용 안내', route: '/guide/for-operator' },
         { label: 'Business Guide (사업 운영 안내 모음)', route: '/guide/business' },

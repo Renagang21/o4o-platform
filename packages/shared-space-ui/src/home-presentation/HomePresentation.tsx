@@ -32,11 +32,11 @@ export function homePresentationPath(
   cooperativeSlug?: string,
 ) {
   if (surface === "cooperative") {
-    if (!cooperativeSlug) throw new Error("협동조합을 먼저 선택해 주세요.");
+    if (!cooperativeSlug) throw new Error("협동조합을 먼저 선택해 주시기 바랍니다.");
     return `/home-presentation/cooperative/${encodeURIComponent(cooperativeSlug)}`;
   }
   if (surface === "branch") {
-    if (!branchSlug) throw new Error("분회를 먼저 선택해 주세요.");
+    if (!branchSlug) throw new Error("분회를 먼저 선택해 주시기 바랍니다.");
     return `/kpa-branch/branches/${encodeURIComponent(branchSlug)}/home-presentation`;
   }
   return `/home-presentation/${surface}${surface === "pharmacy" && businessKey ? `/business/${encodeURIComponent(businessKey)}` : ""}`;

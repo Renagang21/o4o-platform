@@ -38,11 +38,11 @@ export function ProductConsultationAuthoring({ value, title, html, disabled, isC
       }} />
     <ProductDescriptionAssist value={value.assist} onChange={assist => onChange({ ...value, assist })}
       context={{ task: 'product-description', title, productName: value.product.name, currentHtml: html,
-        additionalInstruction: `결과는 ${consultationLanguages[value.language]}로 작성하세요.` }}
+        additionalInstruction: `결과는 ${consultationLanguages[value.language]}로 작성하시기 바랍니다.` }}
       onApplyHtml={body => {
         if (!isCurrent() || disabled) return;
         const clean = sanitizeRichHtml(body);
-        if (!clean.trim()) { setApplyError('적용할 본문이 없습니다. 결과 HTML을 확인해 주세요.'); return; }
+        if (!clean.trim()) { setApplyError('적용할 본문이 없습니다. 결과 HTML을 확인해 주시기 바랍니다.'); return; }
         setApplyError(''); onApplyHtml(clean);
       }} />
     {applyError && <p role="alert" className="text-sm text-red-700">{applyError}</p>}

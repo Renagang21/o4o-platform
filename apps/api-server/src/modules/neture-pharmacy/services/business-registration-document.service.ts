@@ -12,14 +12,14 @@ export class BusinessRegistrationDocumentService {
   constructor(private readonly dataSource: DataSource) {}
 
   async upload(userId: string, file: Express.Multer.File | undefined) {
-    if (!file) throw new NeturePharmacyError(400, 'DOCUMENT_REQUIRED', '사업자등록증 사본을 선택해 주세요.');
+    if (!file) throw new NeturePharmacyError(400, 'DOCUMENT_REQUIRED', '사업자등록증 사본을 선택해 주시기 바랍니다.');
     const header = file.buffer;
     const pdf = header.subarray(0, 5).toString() === '%PDF-';
     const png = header.subarray(0, 8).equals(Buffer.from([137,80,78,71,13,10,26,10]));
     const jpeg = header[0] === 255 && header[1] === 216 && header[2] === 255;
     const mime = pdf ? 'application/pdf' : png ? 'image/png' : jpeg ? 'image/jpeg' : null;
     if (!mime || mime !== file.mimetype || file.size > 10 * 1024 * 1024) {
-      throw new NeturePharmacyError(400, 'INVALID_DOCUMENT', '사업자등록증은 10MB 이하 PDF, JPG 또는 PNG 파일로 제출해 주세요.');
+      throw new NeturePharmacyError(400, 'INVALID_DOCUMENT', '사업자등록증은 10MB 이하 PDF, JPG 또는 PNG 파일로 제출해 주시기 바랍니다.');
     }
     const documentId=randomUUID();
     const object = this.storage.bucket(this.bucket).file(`business-registration/${userId}/${documentId}`);

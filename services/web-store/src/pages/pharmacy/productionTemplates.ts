@@ -72,7 +72,7 @@ export const PRODUCTION_TEMPLATE_REGISTRY: ProductionTemplate[] = [
       '하단 본문은 30자 이내 한 문장으로 마무리하세요. ' +
       '불필요한 수식어 없이 핵심만 전달합니다.',
     starterHtml:
-      '<h2>제목을 입력하세요</h2>' +
+      '<h2>제목을 입력하시기 바랍니다</h2>' +
       '<ul><li>핵심 포인트 1</li><li>핵심 포인트 2</li><li>핵심 포인트 3</li></ul>' +
       '<p>짧은 본문 메시지 (30자 이내)</p>',
   },
@@ -97,7 +97,7 @@ export const PRODUCTION_TEMPLATE_REGISTRY: ProductionTemplate[] = [
       '제목은 친근한 어투로 20자 이내, 설명은 쉬운 말로 풀어쓰고, ' +
       '전문 용어는 최소화합니다. 고객이 한눈에 이해할 수 있도록 구성하세요.',
     starterHtml:
-      '<h2>친근한 제목을 입력하세요</h2>' +
+      '<h2>친근한 제목을 입력하시기 바랍니다</h2>' +
       '<p>고객을 위한 안내 메시지를 여기에 작성합니다.</p>' +
       '<ul><li>혜택 1</li><li>혜택 2</li></ul>',
   },
@@ -123,9 +123,9 @@ export const PRODUCTION_TEMPLATE_REGISTRY: ProductionTemplate[] = [
       '과장 표현 없이 정확한 정보를 전달하며, 복약지도 관점을 유지합니다.',
     starterHtml:
       '<h2>전문 약국 안내</h2>' +
-      '<p><strong>효능·효과:</strong> 여기에 효능을 입력하세요.</p>' +
-      '<p><strong>복용 방법:</strong> 복용 방법을 입력하세요.</p>' +
-      '<p><strong>주의사항:</strong> 주의사항을 입력하세요.</p>',
+      '<p><strong>효능·효과:</strong> 여기에 효능을 입력하시기 바랍니다.</p>' +
+      '<p><strong>복용 방법:</strong> 복용 방법을 입력하시기 바랍니다.</p>' +
+      '<p><strong>주의사항:</strong> 주의사항을 입력하시기 바랍니다.</p>',
   },
 
   // ──────────────────────────────────────────────────────────────────────────

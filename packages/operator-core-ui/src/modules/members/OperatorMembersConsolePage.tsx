@@ -265,7 +265,7 @@ export function OperatorMembersConsolePage({
   const runWrite = async (operation: () => Promise<void>) => {
     const scope = state.current;
     if (!scope.mounted || scope !== renderedScope || scope.writing) return;
-    if (renderedView !== scope.view || loading || error) { setActionError('목록을 다시 확인한 뒤 처리해 주세요.'); return; }
+    if (renderedView !== scope.view || loading || error) { setActionError('목록을 다시 확인한 뒤 처리해 주시기 바랍니다.'); return; }
     scope.writing = true; setWriting(true); setActionError(''); setNotice('');
     try { await operation(); }
     catch (e: any) { if (scope.mounted) setActionError(e?.response?.data?.error || e?.message || '처리에 실패했습니다.'); }
@@ -720,7 +720,7 @@ export function OperatorMembersConsolePage({
           rowKey="id"
           loading={loading}
           emptyMessage={
-            error ? '목록을 다시 불러와 주세요.' : activeTab === 'pending'
+            error ? '목록을 다시 불러와 주시기 바랍니다.' : activeTab === 'pending'
               ? '가입 신청이 없습니다.'
               : isApprovalOnly
                 ? '해당 상태의 가입 신청이 없습니다.'
@@ -871,7 +871,7 @@ export function OperatorMembersConsolePage({
                 }}
               >
                 <p style={{ fontSize: 12, color: '#92400e', fontWeight: 500 }}>
-                  가입 신청 대기 중입니다. 아래 버튼으로 승인 또는 반려를 처리하세요.
+                  가입 신청 대기 중입니다. 아래 버튼으로 승인 또는 반려를 처리하시기 바랍니다.
                 </p>
               </div>
             )}

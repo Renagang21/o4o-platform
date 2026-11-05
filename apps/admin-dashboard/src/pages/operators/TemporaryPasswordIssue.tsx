@@ -9,7 +9,7 @@ export default function TemporaryPasswordIssue({detail,busy,onBusyChange,onFinis
   return <section className="border-t pt-3" aria-label="임시 비밀번호">
     {!open?<button type="button" disabled={busy} onClick={()=>setOpen(true)}>임시 비밀번호 발급</button>:issued?<div className="space-y-2">
       <p>임시 비밀번호 · 24시간 유효</p><output aria-label="발급된 임시 비밀번호" className="block break-all rounded border bg-white p-3 font-mono">{issued.temporaryPassword}</output>
-      <p className="text-sm">회원에게 안전하게 전달해 주세요. 로그인 후 My Home에서 변경할 수 있습니다.</p>
+      <p className="text-sm">회원에게 안전하게 전달해 주시기 바랍니다. 로그인 후 My Home에서 변경할 수 있습니다.</p>
       <button type="button" disabled={busy} onClick={()=>{setIssued(null);onFinished();}}>확인 완료</button>
     </div>:<form className="space-y-2" onSubmit={async event=>{
       event.preventDefault();if(busy||lock.current||!confirmed||!reason.trim())return;

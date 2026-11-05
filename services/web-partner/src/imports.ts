@@ -10,7 +10,7 @@ import {
 /** Bounded RFC4180 parser. Never evaluates cells or partially imports a bad file. */
 export function csv(text: string): Record<string, string>[] {
   if (new TextEncoder().encode(text).length > 1024 * 1024)
-    throw new Error("CSV 파일은 1MB 이내로 선택해 주세요.");
+    throw new Error("CSV 파일은 1MB 이내로 선택해 주시기 바랍니다.");
   const rows: string[][] = [];
   let row: string[] = [],
     cell = "",
@@ -41,11 +41,11 @@ export function csv(text: string): Record<string, string>[] {
       }
     } else {
       if (closed || c === '"')
-        throw new Error("CSV 따옴표 형식을 확인해 주세요.");
+        throw new Error("CSV 따옴표 형식을 확인해 주시기 바랍니다.");
       cell += c;
     }
     if (cell.length > 20000 || rows.length > 1001)
-      throw new Error("CSV는 1,000행 이내로 입력해 주세요.");
+      throw new Error("CSV는 1,000행 이내로 입력해 주시기 바랍니다.");
   }
   if (quoted) throw new Error("CSV 따옴표가 닫히지 않았습니다.");
   row.push(cell);
@@ -61,7 +61,7 @@ export function csv(text: string): Record<string, string>[] {
     throw new Error("CSV 제목이 비어 있거나 중복되었습니다.");
   return rows.map((r, i) => {
     if (r.length !== header.length)
-      throw new Error(`${i + 2}행의 열 개수를 확인해 주세요.`);
+      throw new Error(`${i + 2}행의 열 개수를 확인해 주시기 바랍니다.`);
     return Object.fromEntries(header.map((h, j) => [h, r[j].trim()]));
   });
 }
@@ -75,7 +75,7 @@ export function activitiesCsv(
     !w.proposals.some((p) => p.id === proposalId) ||
     !w.creators.some((c) => c.id === creatorId)
   )
-    throw new Error("홍보 제안과 홍보자를 선택해 주세요.");
+    throw new Error("홍보 제안과 홍보자를 선택해 주시기 바랍니다.");
   const rows = csv(text),
     seen = new Set(
       w.activities.map((a) => `${a.creatorId}|${new URL(a.url).href}`),
@@ -99,20 +99,20 @@ export function activitiesCsv(
       )
     )
       throw new Error(
-        `${i + 2}행: url,publishedAt,views,likes,comments,shares 열을 확인해 주세요.`,
+        `${i + 2}행: url,publishedAt,views,likes,comments,shares 열을 확인해 주시기 바랍니다.`,
       );
     let url: URL;
     try {
       url = new URL(row.url);
     } catch {
-      throw new Error(`${i + 2}행: 게시물 주소를 확인해 주세요.`);
+      throw new Error(`${i + 2}행: 게시물 주소를 확인해 주시기 바랍니다.`);
     }
     if (
       !["http:", "https:"].includes(url.protocol) ||
       url.username ||
       url.password
     )
-      throw new Error(`${i + 2}행: 안전한 게시물 주소를 입력해 주세요.`);
+      throw new Error(`${i + 2}행: 안전한 게시물 주소를 입력해 주시기 바랍니다.`);
     const publishedAt = calendarDate(row.publishedAt);
     const number = (v: string | undefined) => (v ? integer(v) : null);
     const values = {
@@ -161,7 +161,7 @@ export function paymentsCsv(
       seen.has(row.settlementId)
     )
       throw new Error(
-        `${i + 2}행: settlementId,paidAt,reference 열과 중복 ID를 확인해 주세요.`,
+        `${i + 2}행: settlementId,paidAt,reference 열과 중복 ID를 확인해 주시기 바랍니다.`,
       );
     seen.add(row.settlementId);
     const entry = w.settlements.find((s) => s.id === row.settlementId);
@@ -175,7 +175,7 @@ export function paymentsCsv(
       (row.reference || "").length > 250
     )
       throw new Error(
-        `${i + 2}행: 등록된 정산 ID와 지급 시각·참조를 확인해 주세요.`,
+        `${i + 2}행: 등록된 정산 ID와 지급 시각·참조를 확인해 주시기 바랍니다.`,
       );
     validCalendarDate(row.paidAt.slice(0, 10));
     const paidAt = new Date(row.paidAt).toISOString(),
@@ -186,7 +186,7 @@ export function paymentsCsv(
         (entry.externalReference || "") !== reference
       )
         throw new Error(
-          `${i + 2}행: 기존 지급 기록과 다릅니다. 개별 기록 수정에서 확인해 주세요.`,
+          `${i + 2}행: 기존 지급 기록과 다릅니다. 개별 기록 수정에서 확인해 주시기 바랍니다.`,
         );
       continue;
     }

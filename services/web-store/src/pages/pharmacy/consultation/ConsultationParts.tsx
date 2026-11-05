@@ -107,7 +107,7 @@ function ReadAloudButton({
   if (!speech.outputSupported)
     return (
       <p className="text-sm text-slate-600">
-        이 브라우저는 읽어주기를 지원하지 않습니다. 문자 화면을 이용해 주세요.
+        이 브라우저는 읽어주기를 지원하지 않습니다. 문자 화면을 이용해 주시기 바랍니다.
       </p>
     );
   return (
@@ -148,7 +148,7 @@ export function ConsultationInput({
       <>
         <p className="text-sm text-slate-600">
           직원은 매장 안내 문구를 선택합니다. 약 선택·복용 문의는 약사에게
-          연결해 주세요.
+          연결해 주시기 바랍니다.
         </p>
         <label className="block space-y-2">
           <span className="font-medium">안내 문구</span>

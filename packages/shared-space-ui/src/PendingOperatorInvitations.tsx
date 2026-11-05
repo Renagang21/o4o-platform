@@ -62,7 +62,7 @@ export function PendingOperatorInvitations({
     } catch {
       if (ticket === generation.current)
         setError(
-          "초대 처리에 실패했습니다. 새로고침해 현재 상태를 확인하세요.",
+          "초대 처리에 실패했습니다. 새로고침해 현재 상태를 확인하시기 바랍니다.",
         );
     } finally {
       if (ticket === generation.current) {

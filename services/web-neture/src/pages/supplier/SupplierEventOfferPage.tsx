@@ -84,7 +84,7 @@ export default function SupplierEventOfferPage() {
             <div>
               <h2 className="text-sm font-semibold text-slate-800">내 제안 현황</h2>
               <p className="text-xs text-slate-500 mt-0.5">
-                내가 제안한 이벤트의 승인 상태입니다. 반려된 경우 사유를 확인하세요.
+                내가 제안한 이벤트의 승인 상태입니다. 반려된 경우 사유를 확인하시기 바랍니다.
               </p>
             </div>
             {!proposalsError && <span className="text-xs text-slate-500">총 {myProposals.length}건</span>}
@@ -175,7 +175,7 @@ export default function SupplierEventOfferPage() {
         <div className="text-center py-16 text-slate-500">
           <AlertTriangle size={40} className="mx-auto mb-3 text-red-400" />
           <p className="font-medium text-slate-700">이벤트 오퍼 현황을 불러오지 못했습니다.</p>
-          <p className="text-sm mt-1">일시적인 오류일 수 있습니다. 잠시 후 다시 시도해 주세요.</p>
+          <p className="text-sm mt-1">일시적인 오류일 수 있습니다. 잠시 후 다시 시도해 주시기 바랍니다.</p>
           <button
             type="button"
             onClick={() => fetchItems(page, activeTab)}

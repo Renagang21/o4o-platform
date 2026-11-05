@@ -75,11 +75,11 @@ export function OperatorHubContentWritePage({
 
   const handleSave = async (): Promise<HubContentPost | null> => {
     if (!title.trim()) {
-      toast.error('제목을 입력하세요');
+      toast.error('제목을 입력하시기 바랍니다');
       return null;
     }
     if (!content.trim() || content.trim() === '<p></p>') {
-      toast.error('본문을 입력하세요');
+      toast.error('본문을 입력하시기 바랍니다');
       return null;
     }
     setIsSaving(true);

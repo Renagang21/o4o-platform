@@ -27,7 +27,7 @@ export default function PharmacyDeptPage() {
       <h1>원내 약품 파일</h1>
       <p className="muted">
         이 PC 에서 직접 고른 원내 약품 파일을 그대로 읽습니다. 같은 파일을 새 내용으로 저장하면 화면으로 돌아오거나 조회할 때
-        자동으로 다시 읽습니다. 새 목록을 다른 파일로 받았으면 [파일 변경] 으로 그 파일을 고르세요. 파일은 서버로 올라가지 않습니다.
+        자동으로 다시 읽습니다. 새 목록을 다른 파일로 받았으면 [파일 변경] 으로 그 파일을 고르시기 바랍니다. 파일은 서버로 올라가지 않습니다.
       </p>
 
       <div className="panel">
@@ -53,7 +53,7 @@ export default function PharmacyDeptPage() {
       </div>
 
       {file?.question && (
-        <div className="notice">{file.question}<br />열 해석이 맞는지 확인하고, 필요하면 열 제목을 명확히 한 뒤 파일을 다시 저장해 주세요.</div>
+        <div className="notice">{file.question}<br />열 해석이 맞는지 확인하고, 필요하면 열 제목을 명확히 한 뒤 파일을 다시 저장해 주시기 바랍니다.</div>
       )}
       {error && <div className="err">{error}</div>}
 

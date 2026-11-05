@@ -41,7 +41,7 @@ describe('O4O 약국 표시 브랜드', () => {
     expect(PHARMACY_HERO.title).toEqual(['약국의 정보와 업무를', '하나로 연결합니다']);
     expect(PHARMACY_HERO.description).toEqual([
       '제품 정보와 콘텐츠를 활용하고,',
-      '매장 운영과 고객 서비스를 더 편리하게 시작하세요.',
+      '매장 운영과 고객 서비스를 더 편리하게 시작하시기 바랍니다.',
     ]);
   });
 

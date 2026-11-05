@@ -128,7 +128,7 @@ const ForumBoardList: FC = () => {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-modern-text-primary">포럼 게시판</h1>
-          <p className="text-modern-text-secondary mt-1">포럼 게시글을 관리하고 모더레이션하세요.</p>
+          <p className="text-modern-text-secondary mt-1">포럼 게시글을 관리하고 모더레이션하시기 바랍니다.</p>
         </div>
         <Button onClick={() => navigate('/forum/posts/new')}>
           <Plus className="w-4 h-4 mr-2" />

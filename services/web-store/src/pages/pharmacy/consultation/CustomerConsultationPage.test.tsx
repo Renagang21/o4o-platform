@@ -312,7 +312,7 @@ it('retains the device storage warning through new consultations and clears it o
     render(<Page />);
     fireEvent.change(screen.getByLabelText('고객 화면 연결 코드'), { target: { value: 'ABCDE12345' } });
     fireEvent.click(screen.getByRole('button', { name: '연결하기' })); await act(async () => {});
-    const warning = '이 브라우저에서는 연결이 저장되지 않습니다. 다음에 다시 연결해 주세요.';
+    const warning = '이 브라우저에서는 연결이 저장되지 않습니다. 다음에 다시 연결해 주시기 바랍니다.';
     expect(screen.getByText(warning)).toBeTruthy();
     current = state('next-customer', 3);
     await act(async () => { await vi.advanceTimersByTimeAsync(2500); });

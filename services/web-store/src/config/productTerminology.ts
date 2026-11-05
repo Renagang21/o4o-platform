@@ -18,7 +18,7 @@ export const DIRECT_PRODUCT_DESCRIPTION_LABELS = {
 
 export const STORE_PRODUCT_NAME = '내 매장 제품';
 export const DIRECT_PRODUCT_DESCRIPTION_NOTICE =
-  '직접 등록 제품의 상세설명을 저장하는 화면입니다. 저장한 내용은 해당 매장에서만 조회·수정합니다. O4O 공용 상품 DB의 대표 설명은 O4O 관리자가 관리합니다. 매장 홍보문·이벤트·POP 문구는 콘텐츠 만들기에서 별도로 제작하세요.';
+  '직접 등록 제품의 상세설명을 저장하는 화면입니다. 저장한 내용은 해당 매장에서만 조회·수정합니다. O4O 공용 상품 DB의 대표 설명은 O4O 관리자가 관리합니다. 매장 홍보문·이벤트·POP 문구는 콘텐츠 만들기에서 별도로 제작하시기 바랍니다.';
 
 export const STORE_PRODUCT_SETTINGS_LABELS = {
   title: '제품 진열 설정',
@@ -26,7 +26,7 @@ export const STORE_PRODUCT_SETTINGS_LABELS = {
   registerButtonLabel: 'O4O 제품 취급 등록',
   infoText: 'O4O 제품을 매장 경영활용 제품으로 등록할 수 있습니다. 등록한 제품은 태블릿 전시, QR 안내, 사이니지 등에 연결해 활용할 수 있습니다.',
   emptyTitle: '취급 중인 O4O 제품이 없습니다',
-  emptyDescription: 'O4O 제품을 취급 등록해 태블릿과 매장 안내 서비스에 활용해 주세요.',
+  emptyDescription: 'O4O 제품을 취급 등록해 태블릿과 매장 안내 서비스에 활용해 주시기 바랍니다.',
 };
 
 export const STORE_PRODUCT_MESSAGES = {

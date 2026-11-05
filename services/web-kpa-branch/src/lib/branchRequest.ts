@@ -35,12 +35,12 @@ export function normalizeSlugInput(raw: string): string {
 /** 신청 전 안내 — 문제가 없으면 null. */
 export function slugProblem(raw: string): string | null {
   const slug = normalizeSlugInput(raw);
-  if (!slug) return '주소를 입력하세요.';
+  if (!slug) return '주소를 입력하시기 바랍니다.';
   if (slug.length < SLUG_MIN || slug.length > SLUG_MAX || !SLUG_RE.test(slug)) {
     return `주소는 영문 소문자·숫자와 하이픈으로 ${SLUG_MIN}~${SLUG_MAX}자여야 합니다.`;
   }
   if (RESERVED_BRANCH_SLUGS.includes(slug)) {
-    return `'${slug}' 는 서비스 화면 주소로 예약되어 분회 주소로 쓸 수 없습니다. 다른 주소로 신청해 주세요.`;
+    return `'${slug}' 는 서비스 화면 주소로 예약되어 분회 주소로 쓸 수 없습니다. 다른 주소로 신청해 주시기 바랍니다.`;
   }
   return null;
 }

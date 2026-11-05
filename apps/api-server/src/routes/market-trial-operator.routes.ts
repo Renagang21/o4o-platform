@@ -55,7 +55,7 @@ export function createNetureOperatorTrialRoutes(): Router {
   router.post('/:id/offline-operations', async (req, res) => {
     try {
       if (!req.body || typeof req.body !== 'object' || Array.isArray(req.body)) {
-        throw new FundingError(400, 'INVALID_OFFLINE_INPUT', '처리 내용을 확인해 주세요.');
+        throw new FundingError(400, 'INVALID_OFFLINE_INPUT', '처리 내용을 확인해 주시기 바랍니다.');
       }
       const actor = (req as any).user.id;
       const data = await new FundingOfflineOperationsService(AppDataSource).update(req.params.id, req.body.participantId ?? null, actor, req.body);

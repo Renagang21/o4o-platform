@@ -93,7 +93,7 @@ export async function sendHomeChat(
     });
     const data = res?.data?.data as HomeChatResult | undefined;
     if (!data || typeof data.message !== 'string') {
-      throw new HomeChatError('응답을 생성하지 못했습니다. 다시 시도해 주세요.', 'AI_ERROR');
+      throw new HomeChatError('응답을 생성하지 못했습니다. 다시 시도해 주시기 바랍니다.', 'AI_ERROR');
     }
     return data;
   } catch (err) {
@@ -101,11 +101,11 @@ export async function sendHomeChat(
     const resp = (err as { response?: { status?: number; data?: { error?: string; code?: string } } }).response;
     if (resp) {
       throw new HomeChatError(
-        resp.data?.error || '응답을 생성하지 못했습니다. 다시 시도해 주세요.',
+        resp.data?.error || '응답을 생성하지 못했습니다. 다시 시도해 주시기 바랍니다.',
         resp.data?.code || 'AI_ERROR',
         resp.status,
       );
     }
-    throw new HomeChatError('네트워크 오류가 발생했습니다. 다시 시도해 주세요.', 'NETWORK_ERROR');
+    throw new HomeChatError('네트워크 오류가 발생했습니다. 다시 시도해 주시기 바랍니다.', 'NETWORK_ERROR');
   }
 }

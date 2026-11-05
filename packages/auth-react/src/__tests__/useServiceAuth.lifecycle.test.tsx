@@ -170,7 +170,7 @@ describe('authentication request lifetimes', () => {
     await act(async () => { await h.hook.result.current.loginWithGoogle('current'); });
     await act(async () => {
       first.reject({ response: { status: 403, data: { code: 'ACCOUNT_NOT_ACTIVE' } } });
-      expect(await pending).toMatchObject({ success: false, error: '로그인이 취소되었습니다. 다시 시도해 주세요.' });
+      expect(await pending).toMatchObject({ success: false, error: '로그인이 취소되었습니다. 다시 시도해 주시기 바랍니다.' });
     });
     expect(h.hook.result.current.user?.id).toBe('current');
   });

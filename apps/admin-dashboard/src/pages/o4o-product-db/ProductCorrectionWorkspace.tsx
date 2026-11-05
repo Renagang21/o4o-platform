@@ -557,7 +557,7 @@ function RuleEditor({
           maxLength={8000}
           disabled={!canWrite || busy}
           onChange={(e) => update('instructions', e.target.value)}
-          placeholder="확인할 근거, 판단 기준, 필요한 보완 내용을 적으세요. 발견 사례에 따라 계속 보완할 수 있습니다."
+          placeholder="확인할 근거, 판단 기준, 필요한 보완 내용을 적으시기 바랍니다. 발견 사례에 따라 계속 보완할 수 있습니다."
         />
       </label>
       <label className="block text-sm">
@@ -896,7 +896,7 @@ function TaskEditor({
     try {
       const result = await api.aiDraft(batchId, task.id, batchRevision);
       if (result.taskId !== task.id || result.batchRevision !== batchRevision || result.sourceFingerprint !== task.product.fingerprint)
-        throw new Error('작업 기준이 변경됐습니다. 최신 작업을 확인해 주세요.');
+        throw new Error('작업 기준이 변경됐습니다. 최신 작업을 확인해 주시기 바랍니다.');
       if (aiActive.current) setAiDraft(result);
     } catch (e) {
       if (aiActive.current) setError(message(e));
@@ -905,7 +905,7 @@ function TaskEditor({
       if (aiActive.current) setAiBusy(false);
     }
   };
-  const requestText = `상품 보완 검토 작업 (원본 적용 없음)\n기준: ${rule.title} v${rule.revision}\n지침:\n${rule.instructions}\n상품: ${task.product.name}\n이용 목적: ${purposes[rule.purpose]}\n대상: ${rule.descriptionType} / ${rule.language}\n상품군: ${task.product.regulatoryType} / 제조사: ${task.product.manufacturerName ?? '미확인'} / 규격: ${task.product.specification ?? '미확인'}\n기존 원문${task.product.sourceTruncated ? ' (앞부분만, 전체 원문 추가 확인 필요)' : ''}:\n${task.product.sourceContent}\n출처: ${task.product.sourceType ?? '미확인'} / ${task.product.sourceRefId ?? '미확인'}\n상품 사실과 전문 참고정보를 구분하고 각각의 출처·확인일을 기록하세요. 수치의 기준량을 추정하거나 일반 사용 안내를 제품 고유 사용법으로 바꾸지 마세요. 질병명·진단·감별 정보는 단어만으로 배제하지 말고 해당 이용 목적과 전문 근거에 맞게 구성하세요. 확인되지 않은 내용은 필요한 근거로 표시하세요. 보완 초안과 근거·검토 메모를 작성하고 공식 데이터 변경·게시 완료로 표현하지 마세요.`;
+  const requestText = `상품 보완 검토 작업 (원본 적용 없음)\n기준: ${rule.title} v${rule.revision}\n지침:\n${rule.instructions}\n상품: ${task.product.name}\n이용 목적: ${purposes[rule.purpose]}\n대상: ${rule.descriptionType} / ${rule.language}\n상품군: ${task.product.regulatoryType} / 제조사: ${task.product.manufacturerName ?? '미확인'} / 규격: ${task.product.specification ?? '미확인'}\n기존 원문${task.product.sourceTruncated ? ' (앞부분만, 전체 원문 추가 확인 필요)' : ''}:\n${task.product.sourceContent}\n출처: ${task.product.sourceType ?? '미확인'} / ${task.product.sourceRefId ?? '미확인'}\n상품 사실과 전문 참고정보를 구분하고 각각의 출처·확인일을 기록하시기 바랍니다. 수치의 기준량을 추정하거나 일반 사용 안내를 제품 고유 사용법으로 바꾸지 마시기 바랍니다. 질병명·진단·감별 정보는 단어만으로 배제하지 말고 해당 이용 목적과 전문 근거에 맞게 구성하시기 바랍니다. 확인되지 않은 내용은 필요한 근거로 표시하시기 바랍니다. 보완 초안과 근거·검토 메모를 작성하고 공식 데이터 변경·게시 완료로 표현하지 마시기 바랍니다.`;
   return (
     <div className="space-y-3">
       <a className="block text-sm text-blue-700 underline" href={`/admin/o4o-product-db/maintenance?product=${task.product.id}&batch=${batchId}&task=${task.id}#product-workspace`}>이 상품의 자료·정비·갱신 이력 열기</a>
@@ -923,7 +923,7 @@ function TaskEditor({
               await navigator.clipboard.writeText(requestText);
               setError('');
             } catch {
-              setError('복사하지 못했습니다. 작업 안내를 직접 선택해 복사해 주세요.');
+              setError('복사하지 못했습니다. 작업 안내를 직접 선택해 복사해 주시기 바랍니다.');
             }
           }}
         >
@@ -978,11 +978,11 @@ function TaskEditor({
         <button type="button" className={secondary} disabled={!canWrite || saving || aiBusy} onClick={() => void requestAiDraft()}>
           {aiBusy ? 'AI 초안 준비 중…' : 'AI 보완 초안 요청'}
         </button>
-        <p className="text-xs">저장된 원문·기준·메모·근거로 검토안을 만듭니다. 입력 중인 내용은 먼저 저장해 주세요. 공식 상품에는 반영하지 않습니다.</p>
+        <p className="text-xs">저장된 원문·기준·메모·근거로 검토안을 만듭니다. 입력 중인 내용은 먼저 저장해 주시기 바랍니다. 공식 상품에는 반영하지 않습니다.</p>
         {aiDraft && <>
           <pre className="max-h-80 overflow-auto whitespace-pre-wrap break-words">{aiDraft.draft}</pre>
           <ul>{aiDraft.missingEvidence.map((item, i) => <li key={`${i}:${item}`}>{item}</li>)}</ul>
-          {aiDraft.batchRevision !== batchRevision && <p role="alert">작업 버전이 바뀌었습니다. 최신 기준으로 다시 요청해 주세요.</p>}
+          {aiDraft.batchRevision !== batchRevision && <p role="alert">작업 버전이 바뀌었습니다. 최신 기준으로 다시 요청해 주시기 바랍니다.</p>}
           <button type="button" className={secondary} disabled={!canWrite || saving || aiDraft.batchRevision !== batchRevision} onClick={() => setForm(previous => ({ ...previous, draft: aiDraft.draft }))}>이 검토안을 보완 초안에 넣기</button>
         </>}
       </section>

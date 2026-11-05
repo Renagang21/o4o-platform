@@ -26,7 +26,7 @@ function loadYouTube(): Promise<YouTubeApi> {
       script.dataset.o4oYoutubeApi = 'true'; script.async = true;
       document.head.appendChild(script);
     }
-    script.onerror = () => { clearTimeout(timer); script?.remove(); youtubeReady = null; reject(new Error('YouTube 연결을 확인해 주세요.')); };
+    script.onerror = () => { clearTimeout(timer); script?.remove(); youtubeReady = null; reject(new Error('YouTube 연결을 확인해 주시기 바랍니다.')); };
   });
   return youtubeReady;
 }
@@ -57,14 +57,14 @@ export function VideoPlayback({ url, kind, title = '영상', controls = true, on
       if (!current || failed || ended) return;
       failed = true; clear(); setState('error'); setMessage(text); callbacks.current.onError?.(text);
     };
-    const waiting = () => { clear(); timer = setTimeout(() => fail('영상을 불러오지 못했습니다. 연결과 영상 상태를 확인해 주세요.'), 30000); };
+    const waiting = () => { clear(); timer = setTimeout(() => fail('영상을 불러오지 못했습니다. 연결과 영상 상태를 확인해 주시기 바랍니다.'), 30000); };
     const playing = () => { if (current && !failed) { clear(); setState('playing'); } };
     const finish = () => { if (current && !failed && !ended) { ended = true; clear(); callbacks.current.onEnded?.(); } };
     const blocked = () => { if (current) { clear(); setState('blocked'); } };
     lifecycle.current = { fail, waiting, playing, ended: finish };
     setState('loading'); setMessage(''); waiting();
     const parsed = hostedVideo(url);
-    if (kind !== 'video' && parsed?.provider !== kind) fail('개별 영상 주소를 확인해 주세요.');
+    if (kind !== 'video' && parsed?.provider !== kind) fail('개별 영상 주소를 확인해 주시기 바랍니다.');
     else if (kind === 'youtube' && parsed) {
       void loadYouTube().then(api => {
         if (!current || failed || !host.current) return;
@@ -82,7 +82,7 @@ export function VideoPlayback({ url, kind, title = '영상', controls = true, on
               else if (event.data === 3) waiting();
               else if (event.data === 2) clear();
             },
-            onError: () => fail('YouTube 영상을 재생할 수 없습니다. 공개·퍼가기 허용 상태를 확인해 주세요.'),
+            onError: () => fail('YouTube 영상을 재생할 수 없습니다. 공개·퍼가기 허용 상태를 확인해 주시기 바랍니다.'),
             onAutoplayBlocked: blocked,
           },
         });

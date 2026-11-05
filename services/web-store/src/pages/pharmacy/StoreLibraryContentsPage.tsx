@@ -123,9 +123,9 @@ function LibraryContents({ workspace, navigation, quickLinks }: LibraryPageProps
     <StorePageShell
       labels={{
         ...STORE_CONTENTS_HEADING,
-        ...(workspace ? { pageTitle: '매장 컨텐츠' } : {}),
+        ...(workspace ? { pageTitle: '매장 콘텐츠' } : {}),
         subtitle:
-          '저장한 안내를 선택해 수정하거나 새 안내를 만드세요.',
+          '저장한 안내를 선택해 수정하거나 새 안내를 만드시기 바랍니다.',
       }}
       Icon={BookOpen}
       iconColor={colors.primary}
@@ -151,7 +151,7 @@ function LibraryContents({ workspace, navigation, quickLinks }: LibraryPageProps
       }
     >
       {navigation ?? <StoreLibraryNavigation section="mine" />}
-      {searchParams.get('create') === '1' && searchParams.has('pStore') && searchParams.get('pStore') !== organizationId && <p role="alert" className="mb-4 rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm">매장이 변경되었습니다. 현재 매장의 제품을 다시 선택해 주세요. <Link className="underline" to={`${base}/my-products`}>내 상품 선택</Link></p>}
+      {searchParams.get('create') === '1' && searchParams.has('pStore') && searchParams.get('pStore') !== organizationId && <p role="alert" className="mb-4 rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm">매장이 변경되었습니다. 현재 매장의 제품을 다시 선택해 주시기 바랍니다. <Link className="underline" to={`${base}/my-products`}>내 상품 선택</Link></p>}
       {/* WO-O4O-STORE-PRODUCTION-MATERIALS-CONTENT-SELECTOR-MODAL-V1:
           공통 selector 를 'page' 모드로 mount — 콘텐츠 목록 + 검색 + 선택 + 제작 시작 + 선택 제거 */}
       <StoreContentsSelector

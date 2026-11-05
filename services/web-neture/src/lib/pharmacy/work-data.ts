@@ -16,11 +16,11 @@ export interface WorkDataSnapshot {
 export async function workDataRequest<T>(action:string,workScope:WorkScope,body:Record<string,unknown>={}):Promise<T> {
   try {
     const response=await api.post(`${API_BASE_URL}/api/ai/work-data/${action}`,{...body,workScope:toHomeChatScope(workScope)},{timeout:45000});
-    if(!response.data?.success)throw Error(response.data?.error ?? '자료를 확인하지 못했어요.');
+    if(!response.data?.success)throw Error(response.data?.error ?? '자료를 확인하지 못했습니다.');
     return response.data.data;
   } catch(error) {
     const message=(error as {response?:{data?:{error?:string}}})?.response?.data?.error;
-    throw Error(message ?? (error instanceof Error?error.message:'자료를 확인하지 못했어요.'));
+    throw Error(message ?? (error instanceof Error?error.message:'자료를 확인하지 못했습니다.'));
   }
 }
 /** Load working catalogs/sheets only. Histories stay paged on their storage host. */
@@ -31,9 +31,9 @@ export async function loadWorkingData(workScope:WorkScope,onProgress?:(count:num
     let after:string|null=null;
     do {
       const page:WorkDataSnapshot=await workDataRequest<WorkDataSnapshot>('read',workScope,{kind,after,limit:500,...(result?{location:result.location,...(result.deviceId?{deviceId:result.deviceId}:{})}:{})});
-      if(result && (page.location!==result.location || page.deviceId!==result.deviceId || page.consent.owner!==result.consent.owner || page.consent.epoch!==result.consent.epoch || page.revision!==result.revision))throw Error('자료가 바뀌었어요. 다시 불러와 주세요.');
+      if(result && (page.location!==result.location || page.deviceId!==result.deviceId || page.consent.owner!==result.consent.owner || page.consent.epoch!==result.consent.epoch || page.revision!==result.revision))throw Error('자료가 바뀌었습니다. 다시 불러와 주시기 바랍니다.');
       result=page;records.push(...page.records);Object.assign(versions,page.versions);onProgress?.(records.length);
-      if(page.next===after && after)throw Error('자료의 다음 페이지를 확인하지 못했어요.');
+      if(page.next===after && after)throw Error('자료의 다음 페이지를 확인하지 못했습니다.');
       after=page.next;
     }while(after);
   }

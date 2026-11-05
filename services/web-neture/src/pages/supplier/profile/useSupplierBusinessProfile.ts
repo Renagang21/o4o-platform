@@ -99,12 +99,12 @@ export function useSupplierBusinessProfile() {
   const handleSave = async () => {
     if (!name.trim() || name.trim().length > 255) {
       setSaved(false);
-      setError('상호명을 1~255자로 입력해 주세요.');
+      setError('상호명을 1~255자로 입력해 주시기 바랍니다.');
       return;
     }
     if (businessEntityType && !isSelectableBusinessEntityType(businessEntityType)) {
       setSaved(false);
-      setError('세금계산서 발행을 위한 개인 / 법인 구분을 선택해 주세요.');
+      setError('세금계산서 발행을 위한 개인 / 법인 구분을 선택해 주시기 바랍니다.');
       return;
     }
     setSaving(true);

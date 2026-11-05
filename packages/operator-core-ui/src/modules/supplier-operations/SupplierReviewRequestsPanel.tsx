@@ -92,7 +92,7 @@ export default function SupplierReviewRequestsPanel({
     } catch {
       if (current())
         setReadError(
-          "보완 요청을 조회하지 못했습니다. 다시 조회한 후 처리해 주세요.",
+          "보완 요청을 조회하지 못했습니다. 다시 조회한 후 처리해 주시기 바랍니다.",
         );
       return false;
     } finally {
@@ -143,7 +143,7 @@ export default function SupplierReviewRequestsPanel({
       } else if (!operator && target?.state === "requested") {
         await supplierReviewApi.submit(target.id, note, target.version);
         if (scope.mounted)
-          setNotice("보완 제출을 저장했습니다. 운영자의 검토를 기다려 주세요.");
+          setNotice("보완 제출을 저장했습니다. 운영자의 검토를 기다려 주시기 바랍니다.");
       } else return;
       if (!scope.mounted) return;
       setNote("");
@@ -166,7 +166,7 @@ export default function SupplierReviewRequestsPanel({
               message?: string;
             }
           )?.response?.data?.error?.message ||
-            "저장에 실패했습니다. 입력을 유지했습니다. 대상이 변경됐다면 다시 조회해 주세요.",
+            "저장에 실패했습니다. 입력을 유지했습니다. 대상이 변경됐다면 다시 조회해 주시기 바랍니다.",
         );
     } finally {
       scope.writing = false;
@@ -198,7 +198,7 @@ export default function SupplierReviewRequestsPanel({
       <h2 className="font-semibold">보완 요청 · 처리 이력</h2>
       <p className="text-xs text-slate-500">
         사업자 정보와 서류는 해당 입력란에서 저장한 뒤 보완 내용을 제출해
-        주세요. 보완 제출·검토 완료는 공급자 승인과 별도입니다.
+        주시기 바랍니다. 보완 제출·검토 완료는 공급자 승인과 별도입니다.
       </p>
       {notice && (
         <p role="status" className="text-sm text-emerald-800">
@@ -207,7 +207,7 @@ export default function SupplierReviewRequestsPanel({
       )}
       {refreshFailed && (
         <p role="alert" className="text-sm text-amber-800">
-          저장은 완료됐지만 목록 갱신에 실패했습니다. 다시 조회만 해 주세요.
+          저장은 완료됐지만 목록 갱신에 실패했습니다. 다시 조회만 해 주시기 바랍니다.
         </p>
       )}
       {readError && (

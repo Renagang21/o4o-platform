@@ -101,7 +101,7 @@ export default function SupplierSupplyProposalsPage() {
   const end = async (p: SupplyProposal) => {
     if (
       !window.confirm(
-        `${p.productName} 제안(${formatWon(p.unitPrice)})을 종료할까요? 종료한 제안은 되살릴 수 없습니다.`,
+        `${p.productName} 제안(${formatWon(p.unitPrice)})을 종료하시겠습니까? 종료한 제안은 되살릴 수 없습니다.`,
       )
     )
       return;
@@ -134,7 +134,7 @@ export default function SupplierSupplyProposalsPage() {
           className="rounded-lg bg-amber-50 p-3 text-sm text-amber-800"
         >
           요청한 상품은 공급 가능한 승인 상품 목록에 없습니다. 다른 상품을
-          선택해 주세요.
+          선택해 주시기 바랍니다.
         </p>
       )}
       <PageHeader
@@ -157,7 +157,7 @@ export default function SupplierSupplyProposalsPage() {
 
       <Message message={message} />
 
-      <p className="text-xs text-gray-500 md:hidden">제안 목록은 좌우로 밀어 전체 조건과 처리 버튼을 확인하세요.</p>
+      <p className="text-xs text-gray-500 md:hidden">제안 목록은 좌우로 밀어 전체 조건과 처리 버튼을 확인하시기 바랍니다.</p>
       <div role="region" aria-label="공급 제안 목록" tabIndex={0} className="overflow-x-auto rounded-lg border border-gray-200 bg-white">
         <table className="min-w-[900px] divide-y divide-gray-200">
           <thead className="bg-gray-50">

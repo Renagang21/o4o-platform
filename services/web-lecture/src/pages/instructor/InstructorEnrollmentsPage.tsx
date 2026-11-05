@@ -30,7 +30,7 @@ export default function InstructorEnrollmentsPage() {
     finally { setBusy(null); }
   }
   async function reject(id: string) {
-    const reason = window.prompt('반려 사유를 입력하세요.');
+    const reason = window.prompt('반려 사유를 입력하시기 바랍니다.');
     if (reason === null) return;
     setBusy(id);
     try { await instructorApi.rejectEnrollment(id, reason); toast.success('반려했습니다.'); await load(); }

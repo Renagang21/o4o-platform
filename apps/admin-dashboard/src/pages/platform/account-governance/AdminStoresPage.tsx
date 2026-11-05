@@ -48,7 +48,7 @@ export default function AdminStoresPage() {
     } catch {
       if (seq === epoch.current.value)
         setError(
-          "매장 목록을 조회하지 못했습니다. 권한을 확인한 뒤 다시 조회해 주세요.",
+          "매장 목록을 조회하지 못했습니다. 권한을 확인한 뒤 다시 조회해 주시기 바랍니다.",
         );
     } finally {
       if (seq === epoch.current.value) setLoading(false);

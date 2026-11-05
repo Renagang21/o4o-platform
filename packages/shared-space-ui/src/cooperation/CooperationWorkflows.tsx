@@ -60,11 +60,11 @@ export function workflowError(error: unknown) {
     error as { response?: { status?: number; data?: { error?: unknown } } }
   )?.response;
   if (response?.status && response.status >= 500)
-    return "업무 서버에 연결하지 못했습니다. 입력을 유지하고 다시 시도해 주세요.";
+    return "업무 서버에 연결하지 못했습니다. 입력을 유지하고 다시 시도해 주시기 바랍니다.";
   if (typeof response?.data?.error === "string") return response.data.error;
   return error instanceof Error && !(error instanceof TypeError)
     ? error.message
-    : "업무를 조회하거나 처리하지 못했습니다. 다시 시도해 주세요.";
+    : "업무를 조회하거나 처리하지 못했습니다. 다시 시도해 주시기 바랍니다.";
 }
 export function useWorkflowData(
   props: WorkflowProps,
@@ -172,8 +172,8 @@ export function WorkflowMessages({
         <p role="status">
           처리를 완료했습니다.{" "}
           {state.error
-            ? "최신 목록 조회에 실패했습니다. 업무 다시 조회로 결과를 확인해 주세요."
-            : "최신 업무 기록을 확인해 주세요."}
+            ? "최신 목록 조회에 실패했습니다. 업무 다시 조회로 결과를 확인해 주시기 바랍니다."
+            : "최신 업무 기록을 확인해 주시기 바랍니다."}
         </p>
       )}
       {state.loading && <p role="status">업무 기록을 불러오고 있습니다…</p>}
@@ -226,7 +226,7 @@ export function WorkflowPager({
 export function CooperationMemberWorkflows(props: WorkflowProps) {
   if (!props.accountId) return null;
   if (props.kind === "business" && !props.organizationId)
-    return <p>회원 업무를 이용할 약국을 선택해 주세요.</p>;
+    return <p>회원 업무를 이용할 약국을 선택해 주시기 바랍니다.</p>;
   return (
     <MemberWorkflows
       key={`${props.accountId}:${props.kind}:${props.scopeKey}:${props.organizationId ?? ""}`}

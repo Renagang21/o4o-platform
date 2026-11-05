@@ -8,10 +8,10 @@ import type { ProductFormData } from '../../../components/product';
  */
 const OFFER_SAVE_ERROR_MESSAGE: Record<string, string> = {
   PRIVATE_REQUIRES_SELLER_IDS:
-    '판매자가 지정되지 않은 내부 상품은 활성화하거나 유통 범위를 바꿀 수 없습니다. [공급 방식 변경]에서 공급 방식을 먼저 설정해 주세요. (가격·설명 등 정보 수정은 그대로 저장됩니다)',
+    '판매자가 지정되지 않은 내부 상품은 활성화하거나 유통 범위를 바꿀 수 없습니다. [공급 방식 변경]에서 공급 방식을 먼저 설정해 주시기 바랍니다. (가격·설명 등 정보 수정은 그대로 저장됩니다)',
   SERVICE_REQUIRES_KEYS: '서비스 공급으로 설정하려면 대상 서비스를 1개 이상 선택해야 합니다.',
   PUBLIC_REQUIRES_DESCRIPTION: '공개 공급으로 전환하려면 상품 설명을 먼저 입력해야 합니다.',
-  PRODUCT_NOT_FOUND: '상품을 찾을 수 없습니다. 목록을 새로고침한 뒤 다시 시도해 주세요.',
+  PRODUCT_NOT_FOUND: '상품을 찾을 수 없습니다. 목록을 새로고침한 뒤 다시 시도해 주시기 바랍니다.',
 };
 
 /**
@@ -20,8 +20,8 @@ const OFFER_SAVE_ERROR_MESSAGE: Record<string, string> = {
  */
 const IMAGE_ERROR_MESSAGE: Record<string, string> = {
   MASTER_NOT_OWNED: '이 상품에 대한 권한이 없습니다.',
-  NETWORK_ERROR: '통신 오류로 처리하지 못했습니다. 잠시 후 다시 시도해 주세요.',
-  MISSING_MASTER_ID: '상품 정보가 없어 처리할 수 없습니다. 화면을 새로고침해 주세요.',
+  NETWORK_ERROR: '통신 오류로 처리하지 못했습니다. 잠시 후 다시 시도해 주시기 바랍니다.',
+  MISSING_MASTER_ID: '상품 정보가 없어 처리할 수 없습니다. 화면을 새로고침해 주시기 바랍니다.',
   MISSING_IMAGE_URL: '이미지 주소가 올바르지 않습니다.',
 };
 

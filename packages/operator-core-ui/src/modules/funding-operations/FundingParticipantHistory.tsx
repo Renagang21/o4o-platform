@@ -73,7 +73,7 @@ export default function FundingParticipantHistory({
         }
       } catch {
         if (active())
-          setError("처리 이력을 조회하지 못했습니다. 다시 조회해 주세요.");
+          setError("처리 이력을 조회하지 못했습니다. 다시 조회해 주시기 바랍니다.");
       } finally {
         if (active()) setLoading(false);
       }

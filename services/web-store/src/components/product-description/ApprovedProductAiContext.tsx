@@ -15,7 +15,7 @@ export function ApprovedProductAiContext({ listingId, language, disabled, isCurr
     if (disabled || lock.current || !isCurrent()) return;
     lock.current = true; const current = requests.begin(); setBusy(true); setError(''); setValue(null);
     try { const data = await getStoreProductAiContext(listingId, language); if (current() && isCurrent()) setValue(data); }
-    catch { if (current() && isCurrent()) setError('AI 상담자료를 조회하지 못했습니다. 현재 매장의 등록 상품인지 확인하고 다시 시도해 주세요.'); }
+    catch { if (current() && isCurrent()) setError('AI 상담자료를 조회하지 못했습니다. 현재 매장의 등록 상품인지 확인하고 다시 시도해 주시기 바랍니다.'); }
     finally { lock.current = false; if (current() && isCurrent()) setBusy(false); }
   };
   const description = value?.description;
@@ -32,7 +32,7 @@ export function ApprovedProductAiContext({ listingId, language, disabled, isCurr
         <h4>{roles[section.kind]} · {section.title}</h4><p className="whitespace-pre-wrap">{section.text}</p>
         {section.referenceUrls.map(url => <a key={url} href={url} target="_blank" rel="noopener noreferrer" className="block break-all underline">{url}</a>)}
       </section>)}</div>
-      <p className="text-xs">전문 참고·미분류 자료는 제품의 확정 효과가 아닙니다. 현재 원문과 근거를 확인한 뒤 사용하세요.</p>
+      <p className="text-xs">전문 참고·미분류 자료는 제품의 확정 효과가 아닙니다. 현재 원문과 근거를 확인한 뒤 사용하시기 바랍니다.</p>
       <button type="button" className="min-h-11 rounded border px-3" disabled={disabled || busy} onClick={() => {
         if (!isCurrent()) return;
         onUse({ facts: description.sections.filter(s => s.kind === 'product-fact').map(s => `${s.title}\n${s.text}`).join('\n\n'),

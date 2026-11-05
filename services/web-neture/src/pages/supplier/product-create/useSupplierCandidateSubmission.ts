@@ -30,7 +30,7 @@ export function useSupplierCandidateSubmission(
   // Submit — Candidate 제출 (Master/Offer 생성 없음)
   const handleSubmit = async () => {
     if (barcodeChecked && master) {
-      setSubmitError('이미 등록된 제품입니다. [기존 제품에 공급 연결]로 진행해 주세요.');
+      setSubmitError('이미 등록된 제품입니다. [기존 제품에 공급 연결]로 진행해 주시기 바랍니다.');
       return;
     }
     setSubmitting(true);

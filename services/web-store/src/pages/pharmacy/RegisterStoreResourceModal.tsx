@@ -95,15 +95,15 @@ export function RegisterStoreResourceModal({ open, onClose, onRegistered }: Regi
 
   const handleSubmit = async () => {
     if (!title.trim()) {
-      toast.error('제목을 입력해주세요');
+      toast.error('제목을 입력해 주시기 바랍니다');
       return;
     }
     if (mode === 'link' && !externalUrl.trim()) {
-      toast.error('외부 링크 URL 을 입력해주세요');
+      toast.error('외부 링크 URL 을 입력해 주시기 바랍니다');
       return;
     }
     if (mode === 'file' && !uploadedFile) {
-      toast.error('파일을 업로드해주세요');
+      toast.error('파일을 업로드해 주시기 바랍니다');
       return;
     }
 

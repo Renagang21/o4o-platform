@@ -266,7 +266,7 @@ export default function StoreOrderDetailPage() {
         <div style={styles.empty}>
           <Package size={48} color="#cbd5e1" />
           <h3 style={styles.emptyTitle}>주문 정보를 불러오지 못했습니다</h3>
-          <p style={styles.emptyText}>잠시 후 다시 시도해 주세요.</p>
+          <p style={styles.emptyText}>잠시 후 다시 시도해 주시기 바랍니다.</p>
           <button onClick={loadOrder} style={styles.retryButton}>다시 시도</button>
           <Link to="/store/orders" style={styles.backLink}>
             <ArrowLeft size={16} /> 주문 목록으로 돌아가기
@@ -397,7 +397,7 @@ export default function StoreOrderDetailPage() {
         <SectionCard icon={<Truck size={18} color="#6366f1" />} title="배송 추적">
           <div style={styles.shipmentError}>
             <p style={styles.shipmentErrorTitle}>배송 정보를 불러오지 못했습니다.</p>
-            <p style={styles.shipmentErrorText}>잠시 후 다시 시도해 주세요.</p>
+            <p style={styles.shipmentErrorText}>잠시 후 다시 시도해 주시기 바랍니다.</p>
             <button onClick={retryShipment} style={styles.retryButton}>다시 시도</button>
           </div>
         </SectionCard>

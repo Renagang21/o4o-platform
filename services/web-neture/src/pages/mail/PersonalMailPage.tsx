@@ -219,7 +219,7 @@ function MailManager() {
               onClick={() => {
                 if (
                   window.confirm(
-                    "O4O 연결과 관리 자료를 삭제하고 원래 메일은 유지합니다. 연결을 해제할까요?",
+                    "O4O 연결과 관리 자료를 삭제하고 원래 메일은 유지합니다. 연결을 해제하시겠습니까?",
                   )
                 )
                   void perform(async () => {
@@ -316,7 +316,7 @@ function MailManager() {
               onClick={() => {
                 if (
                   window.confirm(
-                    "O4O 메일 연결과 수집 자료·규칙·작업을 삭제합니다. 원래 메일은 삭제하지 않습니다. 연결을 해제할까요?",
+                    "O4O 메일 연결과 수집 자료·규칙·작업을 삭제합니다. 원래 메일은 삭제하지 않습니다. 연결을 해제하시겠습니까?",
                   )
                 )
                   void perform(async () => {
@@ -335,7 +335,7 @@ function MailManager() {
           </div>
           <p className="text-sm text-slate-600">
             연결 해제는 진행 중인 메일 한 건의 처리가 끝난 뒤 반영됩니다. 제공자
-            계정의 앱 권한·앱 비밀번호는 해당 계정 설정에서도 확인하세요.
+            계정의 앱 권한·앱 비밀번호는 해당 계정 설정에서도 확인하시기 바랍니다.
           </p>
         </section>
       )}
@@ -363,7 +363,7 @@ function MailManager() {
               현재 페이지 모두 선택
             </label>
             {!senders.length && (
-              <p>수집된 발신처가 없습니다. 수집 완료 후 다시 확인해 주세요.</p>
+              <p>수집된 발신처가 없습니다. 수집 완료 후 다시 확인해 주시기 바랍니다.</p>
             )}
             <div className="grid gap-3 sm:grid-cols-2">
               {senders.map((row) => (
@@ -630,7 +630,7 @@ export default function PersonalMailPage() {
         <MyPageLoadingState message="계정을 확인하고 있습니다…" />
       ) : !isAuthenticated || !user ? (
         <MyPageAuthRequired
-          description="내 메일을 관리하려면 로그인해 주세요."
+          description="내 메일을 관리하려면 로그인해 주시기 바랍니다."
           onAction={() => openLoginModal("/mypage/mail")}
         />
       ) : CURRENT_HOST_PROFILE !== "main" ? (

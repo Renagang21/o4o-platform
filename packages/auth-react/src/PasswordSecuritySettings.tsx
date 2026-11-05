@@ -21,7 +21,7 @@ export function PasswordSecuritySettings({ client, onSessionEnded, notify }: Pas
   useEffect(() => {
     let active = true;
     void client.getPasswordStatus().then((value) => { if (active) setStatus(value); })
-      .catch(() => { if (active) setError('비밀번호 설정을 불러오지 못했습니다. 다시 시도해 주세요.'); });
+      .catch(() => { if (active) setError('비밀번호 설정을 불러오지 못했습니다. 다시 시도해 주시기 바랍니다.'); });
     return () => { active = false; };
   }, [client]);
 
@@ -29,19 +29,19 @@ export function PasswordSecuritySettings({ client, onSessionEnded, notify }: Pas
     event.preventDefault();
     if (!status?.canManage || busy) return;
     if (newPassword !== confirmation) { setError('새 비밀번호가 서로 일치하지 않습니다.'); return; }
-    if (checkPasswordPolicy(newPassword).length) { setError('비밀번호 조건을 확인해 주세요.'); return; }
-    if (status.hasPassword && !currentPassword) { setError('현재 비밀번호를 입력해 주세요.'); return; }
+    if (checkPasswordPolicy(newPassword).length) { setError('비밀번호 조건을 확인해 주시기 바랍니다.'); return; }
+    if (status.hasPassword && !currentPassword) { setError('현재 비밀번호를 입력해 주시기 바랍니다.'); return; }
     setBusy(true); setError('');
     try {
       await client.setPassword({ ...(status.hasPassword && { currentPassword }), newPassword });
       setCurrentPassword(''); setNewPassword(''); setConfirmation('');
-      notify?.success('비밀번호를 저장했습니다. 새 비밀번호로 다시 로그인해 주세요.');
+      notify?.success('비밀번호를 저장했습니다. 새 비밀번호로 다시 로그인해 주시기 바랍니다.');
       onSessionEnded?.();
     } catch (failure) {
       const code = (failure as { response?: { data?: { code?: string } } }).response?.data?.code;
       setError(code === 'CURRENT_PASSWORD_MISMATCH' ? '현재 비밀번호가 올바르지 않습니다.' :
         code === 'DEMO_ACCOUNT_FORBIDDEN' ? 'Demo 계정은 비밀번호를 변경할 수 없습니다.' :
-        '비밀번호를 저장하지 못했습니다. 입력 내용을 확인하고 다시 시도해 주세요.');
+        '비밀번호를 저장하지 못했습니다. 입력 내용을 확인하고 다시 시도해 주시기 바랍니다.');
     } finally { setBusy(false); }
   };
   return (
@@ -52,8 +52,8 @@ export function PasswordSecuritySettings({ client, onSessionEnded, notify }: Pas
       {status && !status.canManage && <p className="text-sm text-gray-600">이 계정에서는 비밀번호 설정을 변경할 수 없습니다.</p>}
       {status?.canManage && (
         <form onSubmit={(event) => void submit(event)} className="space-y-4">
-          {status.temporaryExpiresAt && <p role="status" className="text-sm text-amber-800">임시 비밀번호를 사용 중입니다. 만료 전에 새 비밀번호로 변경해 주세요.</p>}
-          <p className="text-sm text-gray-600">저장하면 모든 서비스의 기존 세션이 종료됩니다. 다시 로그인해 주세요.</p>
+          {status.temporaryExpiresAt && <p role="status" className="text-sm text-amber-800">임시 비밀번호를 사용 중입니다. 만료 전에 새 비밀번호로 변경해 주시기 바랍니다.</p>}
+          <p className="text-sm text-gray-600">저장하면 모든 서비스의 기존 세션이 종료됩니다. 다시 로그인해 주시기 바랍니다.</p>
           {status.hasPassword && <PasswordInput label="현재 비밀번호" value={currentPassword} onChange={setCurrentPassword} autoComplete="current-password" disabled={busy} />}
           <PasswordInput label="새 비밀번호" value={newPassword} onChange={setNewPassword} autoComplete="new-password" disabled={busy} />
           <PasswordPolicyHints password={newPassword} />

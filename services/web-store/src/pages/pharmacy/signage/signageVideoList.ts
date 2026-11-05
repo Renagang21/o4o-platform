@@ -121,3 +121,12 @@ export function summarizePlaylistDuration(
   }
   return { totalSec, missingCount };
 }
+
+/** Import origin is separate from hosting provider; do not guess an unknown business. */
+export function signageVideoOrigin(video: UnifiedVideoItem): string {
+  if (video.source === 'direct') return '직접 등록';
+  const service = video._snapshot?.sourceService;
+  if (service === 'community') return '커뮤니티';
+  if (service === 'semi-franchise') return '가입 협업체';
+  return '제공 자료';
+}

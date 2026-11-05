@@ -85,7 +85,7 @@ export async function readRegistrationBusiness(
     throw new OperationError(
       409,
       'BUSINESS_SELECTION_REQUIRED',
-      '연결된 사업체가 여러 개입니다. 해당 사업체 관리에서 수정해 주세요.',
+      '연결된 사업체가 여러 개입니다. 해당 사업체 관리에서 수정해 주시기 바랍니다.',
     );
   return rows[0] ?? null;
 }
@@ -236,7 +236,7 @@ export async function assertRegistrationDocument(
     throw new OperationError(
       403,
       'REGISTRATION_DOCUMENT_FORBIDDEN',
-      '이 회원의 사업자등록증을 선택해 주세요.',
+      '이 회원의 사업자등록증을 선택해 주시기 바랍니다.',
     );
 }
 export async function correctRegistration(
@@ -251,7 +251,7 @@ export async function correctRegistration(
     throw new OperationError(
       409,
       'REGISTRATION_TYPE_ALREADY_APPROVED',
-      '추가 자격은 My Home의 해당 절차로 처리해 주세요.',
+      '추가 자격은 My Home의 해당 절차로 처리해 주시기 바랍니다.',
     );
   const [legacy] = await m.query(
     `SELECT "businessInfo"::jsonb ? '${MEMBER_REGISTRATION_KEY}' AS marked,

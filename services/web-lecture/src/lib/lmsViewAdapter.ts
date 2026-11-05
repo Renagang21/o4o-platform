@@ -32,7 +32,7 @@ export const lessonPath = (courseId: string, lessonId: string) => `${LECTURE_HUB
 export const lectureLabels: LmsViewLabels = createLmsLabels({
   breadcrumbHub: '강의',
   membersOnlyTitle: '회원 전용 강의입니다',
-  membersOnlyDesc: 'O4O 강의 서비스 회원만 볼 수 있는 강의입니다. 로그인 후 다시 시도해 주세요.',
+  membersOnlyDesc: 'O4O 강의 서비스 회원만 볼 수 있는 강의입니다. 로그인 후 다시 시도해 주시기 바랍니다.',
 });
 
 function toEnrollment(e: LectureEnrollment | null | undefined) {

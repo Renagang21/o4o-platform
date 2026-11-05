@@ -203,18 +203,18 @@ export function buildFileConfidenceQuestion(
 
   const parts: string[] = [];
   if (verdict.missingRequired.length > 0) {
-    parts.push(`필수 항목을 어느 열에서 찾을지 알려 주세요: ${dedupe(verdict.missingRequired.map(labelOf)).join(', ')}`);
+    parts.push(`필수 항목을 어느 열에서 찾을지 알려 주시기 바랍니다: ${dedupe(verdict.missingRequired.map(labelOf)).join(', ')}`);
   }
   if (verdict.lowConfidenceColumns.length > 0) {
-    parts.push(`이 항목 해석이 맞는지 확인해 주세요: ${dedupe(verdict.lowConfidenceColumns.map((c) => labelOf(c.targetField))).join(', ')}`);
+    parts.push(`이 항목 해석이 맞는지 확인해 주시기 바랍니다: ${dedupe(verdict.lowConfidenceColumns.map((c) => labelOf(c.targetField))).join(', ')}`);
   }
   if (verdict.lowConfidenceRegions.length > 0) {
     const regions = dedupe(verdict.lowConfidenceRegions.map((r) => (r.sectionLabel?.trim() || `${r.sheetName} 구역`)));
-    parts.push(`이 구역의 표 범위가 맞는지 확인해 주세요: ${regions.join(', ')}`);
+    parts.push(`이 구역의 표 범위가 맞는지 확인해 주시기 바랍니다: ${regions.join(', ')}`);
   }
   // ok=false 인데 세부 항목이 비어 있으면(전체 신뢰도만 낮음) 일반 확인으로 되돌린다.
   if (parts.length === 0) {
-    return '파일 구조를 확실히 읽지 못했습니다. 표의 제목 행이나 데이터가 시작하는 위치를 알려 주시겠어요?';
+    return '파일 구조를 확실히 읽지 못했습니다. 표의 제목 행이나 데이터가 시작하는 위치를 알려 주시겠습니까?';
   }
   return parts.join('\n');
 }

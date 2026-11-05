@@ -84,7 +84,7 @@ const CommentForm: React.FC<{
 }> = ({
   onSubmit,
   onCancel,
-  placeholder = '댓글을 입력하세요...',
+  placeholder = '댓글을 입력하시기 바랍니다...',
   initialValue = '',
   submitLabel = '댓글 작성',
   showCancel = false,
@@ -524,7 +524,7 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
           </svg>
           <p>아직 댓글이 없습니다.</p>
           {allowComments && isLoggedIn && (
-            <p className="text-sm text-gray-400 mt-1">첫 댓글을 작성해보세요!</p>
+            <p className="text-sm text-gray-400 mt-1">첫 댓글을 작성해보시기 바랍니다!</p>
           )}
         </div>
       )}

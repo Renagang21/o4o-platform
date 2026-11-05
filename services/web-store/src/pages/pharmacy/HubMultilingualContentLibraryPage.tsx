@@ -68,7 +68,7 @@ function HubLibrarySession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>
       setItems(res.data);
       setTotal(res.meta?.total ?? 0);
     } catch {
-      if (current() && isCurrent()) setError('제공 자료를 불러오지 못했습니다. 다시 시도해 주세요.');
+      if (current() && isCurrent()) setError('제공 자료를 불러오지 못했습니다. 다시 시도해 주시기 바랍니다.');
     } finally {
       if (current() && isCurrent()) setIsLoading(false);
     }

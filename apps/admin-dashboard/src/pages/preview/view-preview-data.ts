@@ -38,7 +38,7 @@ export function readPreviewComponents(body: unknown): PreviewComponent[] {
 }
 
 export function previewStatusMessage(status: number): string {
-  if (status === 404) return '미리보기 데이터 또는 조회 경로를 찾을 수 없습니다. 서버 연결 상태를 확인해주세요.';
+  if (status === 404) return '미리보기 데이터 또는 조회 경로를 찾을 수 없습니다. 서버 연결 상태를 확인해 주시기 바랍니다.';
   if (status === 401 || status === 403) return '이 미리보기에 접근할 수 없습니다.';
-  return '미리보기를 불러오지 못했습니다. 잠시 후 다시 시도해주세요.';
+  return '미리보기를 불러오지 못했습니다. 잠시 후 다시 시도해 주시기 바랍니다.';
 }

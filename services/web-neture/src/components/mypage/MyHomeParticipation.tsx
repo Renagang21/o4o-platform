@@ -249,7 +249,7 @@ function StudyHistory({
         <ResourceNotice error={result.error} reload={result.reload} />
       ) : "denied" in result.data ? (
         <div role="alert" className="mt-3 text-sm text-amber-900">
-          Study 이용 권한을 확인해 주세요.{" "}
+          Study 이용 권한을 확인해 주시기 바랍니다.{" "}
           <button className="underline" onClick={result.reload}>
             다시 확인
           </button>
@@ -263,7 +263,7 @@ function StudyHistory({
             <p className="mt-3 text-sm text-slate-600">
               {result.data.total === 0
                 ? "수강 이력이 없습니다."
-                : "이 페이지에는 수강 이력이 없습니다. 이전 페이지를 확인해 주세요."}
+                : "이 페이지에는 수강 이력이 없습니다. 이전 페이지를 확인해 주시기 바랍니다."}
             </p>
           ) : (
             <ul className="mt-3 divide-y divide-slate-100">
@@ -302,7 +302,7 @@ function StudyHistory({
       )}
       {move.error && (
         <p role="alert" className="mt-3 text-sm text-amber-900">
-          Study로 이동하지 못했습니다. 이용 권한을 확인하고 다시 시도해 주세요.
+          Study로 이동하지 못했습니다. 이용 권한을 확인하고 다시 시도해 주시기 바랍니다.
         </p>
       )}
       <button
@@ -414,7 +414,7 @@ export function MyHomeParticipation({
           ) : (
             <>
               <p className="mt-3 text-sm text-slate-600">
-                Study의 가입·승인 상태를 확인해 주세요. 활성 회원은 본인 수강
+                Study의 가입·승인 상태를 확인해 주시기 바랍니다. 활성 회원은 본인 수강
                 이력을 볼 수 있습니다.
               </p>
               <Link

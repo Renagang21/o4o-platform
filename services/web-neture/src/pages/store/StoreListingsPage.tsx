@@ -88,7 +88,7 @@ export default function StoreListingsPage() {
   const handleSavePrice = async (listing: StoreListingItem) => {
     const priceVal = editPrice.trim() === '' ? null : Number(editPrice);
     if (priceVal !== null && (isNaN(priceVal) || priceVal < 0)) {
-      showMessage('error', '올바른 가격을 입력해주세요.');
+      showMessage('error', '올바른 가격을 입력해 주시기 바랍니다.');
       return;
     }
     const result = await storeApi.updateListing(listing.id, { price: priceVal });
@@ -147,7 +147,7 @@ export default function StoreListingsPage() {
         <div className="flex flex-col items-center py-16 text-slate-500">
           <Package size={48} className="mb-4 opacity-40 text-red-300" />
           <p className="text-sm font-medium text-slate-700">진열 목록을 불러오지 못했습니다</p>
-          <p className="text-xs mt-1 text-slate-400">네트워크 또는 서버 오류일 수 있습니다. 잠시 후 다시 시도해주세요.</p>
+          <p className="text-xs mt-1 text-slate-400">네트워크 또는 서버 오류일 수 있습니다. 잠시 후 다시 시도해 주시기 바랍니다.</p>
           <button
             onClick={() => fetchListings(page)}
             className="mt-4 px-4 py-2 bg-slate-100 hover:bg-slate-200 rounded-lg text-sm font-medium text-slate-700"
@@ -159,7 +159,7 @@ export default function StoreListingsPage() {
         <div className="flex flex-col items-center py-16 text-slate-400">
           <Package size={48} className="mb-4 opacity-50" />
           <p className="text-sm">진열된 제품이 없습니다</p>
-          <p className="text-xs mt-1">라이브러리에서 상품을 검색하여 진열해보세요</p>
+          <p className="text-xs mt-1">라이브러리에서 상품을 검색하여 진열해보시기 바랍니다</p>
           <button
             onClick={() => navigate('/store/manage/products/library')}
             className="mt-4 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 text-sm font-medium"

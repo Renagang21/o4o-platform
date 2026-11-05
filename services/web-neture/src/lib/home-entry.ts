@@ -444,7 +444,7 @@ export async function resolveServiceEntryUrl(serviceKey: string, returnPath?: st
     // (약국 가입 · 세미프랜차이즈 가입 · 승인 대기 · 정지)를 `serviceAccess` 와 함께 준다 — 고정 문구보다 우선.
     const serverMessage = body?.serviceAccess && typeof body.error === 'string' ? body.error : undefined;
     throw new ServiceEntryError(
-      serverMessage ?? HANDOFF_ERROR_MESSAGES[body?.code ?? ''] ?? '서비스로 이동하지 못했습니다. 잠시 후 다시 시도해 주세요.',
+      serverMessage ?? HANDOFF_ERROR_MESSAGES[body?.code ?? ''] ?? '서비스로 이동하지 못했습니다. 잠시 후 다시 시도해 주시기 바랍니다.',
       body?.code,
     );
   }
@@ -462,7 +462,7 @@ export async function resolveHomeEntryUrl(action: Extract<EntryAction, { kind: '
     const res = await api.post('/auth/handoff', { targetWorkspace: 'store', returnPath: action.returnPath });
     url = res.data?.data?.targetUrl;
   } catch {
-    throw new ServiceEntryError('내 매장으로 이동하지 못했습니다. 잠시 후 다시 시도해 주세요.');
+    throw new ServiceEntryError('내 매장으로 이동하지 못했습니다. 잠시 후 다시 시도해 주시기 바랍니다.');
   }
   try {
     const target = new URL(url ?? '');

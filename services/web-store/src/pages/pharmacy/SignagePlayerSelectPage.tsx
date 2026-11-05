@@ -22,7 +22,7 @@ import { useStoreOrganizationId } from '../../hooks/useStoreOrganizationId';
 import { useStoreOperationScope } from '../../hooks/useStoreOperationScope';
 import { useLatestStoreRequest } from './hooks/useLatestStoreRequest';
 import { Link, useLocation } from 'react-router-dom';
-import { storeWorkspaceBase, StoreWorkflowNavigation } from '../../components/store/StoreWorkflowNavigation';
+import { storeWorkspaceBase } from '../../components/store/StoreWorkflowNavigation';
 
 /** HH:MM:SS → HH:MM */
 function toHHMM(t: string): string {
@@ -67,7 +67,12 @@ function PlayerSelectionSession({ isCurrent }: Readonly<{ isCurrent: () => boole
 
   return (
     <>
-    <StoreWorkflowNavigation subject="사이니지" studioPath="/marketing/signage/playlist" usePath="/marketing/signage/player" />
+    <nav aria-label="사이니지 업무" className="mb-3 flex flex-wrap gap-2 text-sm">
+      <Link className="min-h-11 content-center rounded-lg border px-3" to={`${base}/marketing/signage/videos`}>동영상 보관함</Link>
+      <Link className="min-h-11 content-center rounded-lg border px-3" to={`${base}/marketing/signage/playlist`}>재생목록</Link>
+      <Link className="min-h-11 content-center rounded-lg border px-3" to={`${base}/marketing/signage/schedules`}>재생 일정</Link>
+      <span aria-current="page" className="min-h-11 content-center rounded-lg bg-teal-50 px-3">TV 재생</span>
+    </nav>
     <SignagePlayerSelectView
       fetchStorePlaylists={fetchStorePlaylists}
       playButtonClassName="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-teal-600 text-white hover:bg-teal-700 transition-colors"
@@ -100,7 +105,7 @@ function PlayerSelectionSession({ isCurrent }: Readonly<{ isCurrent: () => boole
               </button>
             </div>
             <p className="text-xs text-teal-500 mt-2">
-              실제 TV 재생 완료를 뜻하지 않습니다. 변경 후 재생 화면을 다시 열고 기기에서 확인하세요.
+              실제 TV 재생 완료를 뜻하지 않습니다. 변경 후 재생 화면을 다시 열고 기기에서 확인하시기 바랍니다.
             </p>
             {activeContent.schedule.storePlaylistId && <Link to={`${base}/marketing/signage/playlist`} state={{ signagePlaylistId: activeContent.schedule.storePlaylistId }} className="inline-flex min-h-11 items-center text-sm text-teal-800 underline">현재 안내 수정</Link>}
           </div>

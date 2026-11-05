@@ -55,7 +55,7 @@ export class SemiFranchiseService {
       JOIN neture_pharmacy_memberships npm ON npm.organization_id=om.organization_id AND npm.status='active'
       WHERE om.user_id=$1 AND om.organization_id=$2 AND om.left_at IS NULL AND om.role IN ('owner','admin','manager')
       FOR SHARE OF om,npm`, [userId, organizationId]);
-    if(owner&&!await hasApprovedPharmacist(m,userId))throw new NeturePharmacyError(403,'PHARMACIST_QUALIFICATION_REQUIRED','약국 경영자의 약사 자격 승인을 확인해 주세요.');
+    if(owner&&!await hasApprovedPharmacist(m,userId))throw new NeturePharmacyError(403,'PHARMACIST_QUALIFICATION_REQUIRED','약국 경영자의 약사 자격 승인을 확인해 주시기 바랍니다.');
     if (!owner) throw new NeturePharmacyError(403, 'BUSINESS_APPLICANT_REQUIRED', '협업체 가입 신청·탈퇴는 해당 약국의 경영자급 권한이 필요합니다.');
   }
 
@@ -92,7 +92,7 @@ export class SemiFranchiseService {
 
   async apply(organizationId: string, userId: string, key: string, application: { acceptedConditions?: boolean; conditions?: string; note?: string; policyReferences?: EnrollmentPolicyReference[] } = {}) {
     if (application.note !== undefined && (typeof application.note !== 'string' || application.note.length > 2000))
-      throw new NeturePharmacyError(400, 'INVALID_APPLICATION', '추가 신청 내용은 2000자 이내로 입력해 주세요.');
+      throw new NeturePharmacyError(400, 'INVALID_APPLICATION', '추가 신청 내용은 2000자 이내로 입력해 주시기 바랍니다.');
     return this.dataSource.transaction(async (m) => {
       await assertNetureMainMembershipActive(m, userId);
       await this.requireApplicant(m, userId, organizationId);
@@ -105,15 +105,15 @@ export class SemiFranchiseService {
           organizationId, applicantId: basic.applicant_user_id, approvedBy: basic.decided_by, actorId: userId,
         });
         if (linked.status !== 'active')
-          throw new NeturePharmacyError(409, 'PHARMACY_MEMBERSHIP_RESTRICTED', '기존 Pharmacy 이용 정지·반려·탈퇴 상태는 자동으로 변경하지 않습니다. 운영자에게 문의해 주세요.');
+          throw new NeturePharmacyError(409, 'PHARMACY_MEMBERSHIP_RESTRICTED', '기존 Pharmacy 이용 정지·반려·탈퇴 상태는 자동으로 변경하지 않습니다. 운영자에게 문의해 주시기 바랍니다.');
         return linked;
       }
       const [sf]: SemiFranchiseRow[] = await m.query(`SELECT sf.id, sf.key, sf.name, sf.organization_id, sf.status, sf.payment_receiver_key, sf.community_key, owner.metadata->>'registrationConditions' AS registration_conditions FROM semi_franchises sf JOIN organizations owner ON owner.id = sf.organization_id WHERE sf.key = $1 FOR SHARE OF sf, owner`, [key]);
       if (!sf || sf.status !== 'active') throw new NeturePharmacyError(404, 'SEMI_FRANCHISE_NOT_FOUND', '세미프랜차이즈를 찾을 수 없습니다.');
       if (sf.registration_conditions && application.acceptedConditions !== true)
-        throw new NeturePharmacyError(400, 'CONDITIONS_REQUIRED', '서비스 가입 조건을 확인하고 동의해 주세요.');
+        throw new NeturePharmacyError(400, 'CONDITIONS_REQUIRED', '서비스 가입 조건을 확인하고 동의해 주시기 바랍니다.');
       if ((application.conditions ?? '') !== (sf.registration_conditions ?? ''))
-        throw new NeturePharmacyError(409, 'CONDITIONS_CHANGED', '가입 조건이 변경되었습니다. 목록을 새로고침하고 다시 확인해 주세요.');
+        throw new NeturePharmacyError(409, 'CONDITIONS_CHANGED', '가입 조건이 변경되었습니다. 목록을 새로고침하고 다시 확인해 주시기 바랍니다.');
       const policyScope = businessPolicyScope(sf.id);
       const policies = await recordEnrollmentPolicies(m, userId, policyScope, application.policyReferences);
       const saveApplication = async (membershipId: string) => {
@@ -304,13 +304,13 @@ export class SemiFranchiseService {
     if (input.registrationConditions !== undefined && (typeof input.registrationConditions !== 'string' || input.registrationConditions.length > 4000)) throw new NeturePharmacyError(400, 'INVALID_CONDITIONS', '가입 조건은 4000자 이내입니다.');
     const name = typeof input.name === 'string' ? input.name.trim() : '';
     if (!KEY_RE.test(key)) throw new NeturePharmacyError(400, 'INVALID_KEY', 'key 는 영문 소문자 · 숫자 · - 2~63자입니다.');
-    if (!name || name.length > 255) throw new NeturePharmacyError(400, 'INVALID_NAME', '이름을 입력해 주세요.');
+    if (!name || name.length > 255) throw new NeturePharmacyError(400, 'INVALID_NAME', '이름을 입력해 주시기 바랍니다.');
     return await this.dataSource.transaction(async (m) => {
       const [dup] = await m.query(`SELECT 1 FROM semi_franchises WHERE key = $1`, [key]);
       if (dup) throw new NeturePharmacyError(409, 'KEY_IN_USE', '이미 있는 key 입니다.');
       const communityKey = input.communityKey?.trim() || null;
       if (communityKey && (!KEY_RE.test(communityKey) || await businessCommunityKeyTaken(m, communityKey))) {
-        throw new NeturePharmacyError(409, 'COMMUNITY_KEY_IN_USE', '독립 커뮤니티와 다른 주소를 사용해 주세요.');
+        throw new NeturePharmacyError(409, 'COMMUNITY_KEY_IN_USE', '독립 커뮤니티와 다른 주소를 사용해 주시기 바랍니다.');
       }
       // 운영 조직 — 이 세미프랜차이즈 이벤트 원장(OPL)의 소유 조직.
       const [org] = await m.query(
@@ -346,7 +346,7 @@ export class SemiFranchiseService {
     return this.dataSource.transaction(async (m) => {
       const communityKey = patch.communityKey?.trim() || null;
       if (communityKey && (!KEY_RE.test(communityKey) || await businessCommunityKeyTaken(m, communityKey, sf.id))) {
-        throw new NeturePharmacyError(409, 'COMMUNITY_KEY_IN_USE', '독립 커뮤니티와 다른 주소를 사용해 주세요.');
+        throw new NeturePharmacyError(409, 'COMMUNITY_KEY_IN_USE', '독립 커뮤니티와 다른 주소를 사용해 주시기 바랍니다.');
       }
       if (patch.registrationConditions !== undefined) {
         if (typeof patch.registrationConditions !== 'string' || patch.registrationConditions.length > 4000) throw new NeturePharmacyError(400, 'INVALID_CONDITIONS', '가입 조건은 4000자 이내입니다.');
@@ -383,7 +383,7 @@ export class SemiFranchiseService {
   async assignOperator(key: string, userId: string, assignedBy: string) {
     const sf = await this.getByKey(key);
     if (!sf) throw new NeturePharmacyError(404, 'SEMI_FRANCHISE_NOT_FOUND', '세미프랜차이즈를 찾을 수 없습니다.');
-    if ((await this.dataSource.query('SELECT 1 FROM cooperatives WHERE semi_franchise_id=$1',[sf.id])).length) throw new NeturePharmacyError(409,'USE_COOPERATIVE_ROLES','조합별 역할 관리에서 지정해 주세요.');
+    if ((await this.dataSource.query('SELECT 1 FROM cooperatives WHERE semi_franchise_id=$1',[sf.id])).length) throw new NeturePharmacyError(409,'USE_COOPERATIVE_ROLES','조합별 역할 관리에서 지정해 주시기 바랍니다.');
     return this.dataSource.transaction(async manager => {
       if (!(await hasCooperativeOperatorAccess(manager, userId))) throw new NeturePharmacyError(409, 'NOT_NETURE_OPERATOR', '현재 Neture 운영 권한과 메인 이용 자격이 필요합니다.');
       const rows = await manager.query(

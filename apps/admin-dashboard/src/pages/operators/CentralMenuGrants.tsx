@@ -27,7 +27,7 @@ export function CentralMenuGrantEditor({ userId, role, onClose, onSaved }: { use
     try {
       const response = await authClient.api.get('/admin/service-operator-invitations/menu-grants', { params: { userId, role } });
       if (mounted.current) setGrant(response.data.data);
-    } catch { if (mounted.current) setError('유효한 중앙 위임을 조회하지 못했습니다. 초대 수락·유효기간을 확인해 주세요.'); }
+    } catch { if (mounted.current) setError('유효한 중앙 위임을 조회하지 못했습니다. 초대 수락·유효기간을 확인해 주시기 바랍니다.'); }
   };
   useEffect(() => { mounted.current = true; void load(); return () => { mounted.current = false; }; }, [userId, role]);
   async function save() {
@@ -37,7 +37,7 @@ export function CentralMenuGrantEditor({ userId, role, onClose, onSaved }: { use
       const response = await authClient.api.patch('/admin/service-operator-invitations/menu-grants', { userId, role, menuKeys: grant.menuKeys, version: grant.version, reason });
       if (mounted.current) { setGrant({ ...grant, ...response.data.data }); onSaved(); onClose(); }
     } catch (failure) {
-      if (mounted.current) setError((failure as { response?: { data?: { error?: string } } }).response?.data?.error ?? '업무 위임을 저장하지 못했습니다. 최신 설정을 다시 조회해 주세요.');
+      if (mounted.current) setError((failure as { response?: { data?: { error?: string } } }).response?.data?.error ?? '업무 위임을 저장하지 못했습니다. 최신 설정을 다시 조회해 주시기 바랍니다.');
     } finally { writing.current = false; if (mounted.current) setBusy(false); }
   }
   return <BaseDetailDrawer open title="업무 운영 설정" onClose={() => { if (!writing.current) onClose(); }}>

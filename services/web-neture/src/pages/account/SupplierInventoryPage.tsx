@@ -88,12 +88,12 @@ export default function SupplierInventoryPage() {
         showMessage(`${item.name} 재고 추적 ${result.data.track_inventory ? '활성화' : '비활성화'}`, 'success');
       } else if (result.error === 'INVENTORY_CONFLICT') {
         await fetchInventory();
-        showMessage('재고가 변경되었습니다. 최신 재고를 확인하고 다시 수정해 주세요.', 'error', true);
+        showMessage('재고가 변경되었습니다. 최신 재고를 확인하고 다시 수정해 주시기 바랍니다.', 'error', true);
       } else {
-        showMessage('재고 추적 설정을 변경하지 못했습니다. 다시 시도해 주세요.', 'error');
+        showMessage('재고 추적 설정을 변경하지 못했습니다. 다시 시도해 주시기 바랍니다.', 'error');
       }
     } catch {
-      showMessage('재고 추적 설정을 변경하지 못했습니다. 다시 시도해 주세요.', 'error');
+      showMessage('재고 추적 설정을 변경하지 못했습니다. 다시 시도해 주시기 바랍니다.', 'error');
     } finally {
       setSaving(false);
     }
@@ -126,12 +126,12 @@ export default function SupplierInventoryPage() {
       } else if (result.error === 'INVENTORY_CONFLICT') {
         setEditingId(null);
         await fetchInventory();
-        showMessage('재고가 변경되었습니다. 최신 재고를 확인하고 다시 수정해 주세요.', 'error', true);
+        showMessage('재고가 변경되었습니다. 최신 재고를 확인하고 다시 수정해 주시기 바랍니다.', 'error', true);
       } else {
-        showMessage('재고를 저장하지 못했습니다. 다시 시도해 주세요.', 'error');
+        showMessage('재고를 저장하지 못했습니다. 다시 시도해 주시기 바랍니다.', 'error');
       }
     } catch {
-      showMessage('재고를 저장하지 못했습니다. 다시 시도해 주세요.', 'error');
+      showMessage('재고를 저장하지 못했습니다. 다시 시도해 주시기 바랍니다.', 'error');
     } finally {
       setSaving(false);
     }

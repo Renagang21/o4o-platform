@@ -67,7 +67,7 @@ function TabletRuntime({
         if (!cancelled) {
           setDeviceError("태블릿 연결 상태를 확인하지 못했습니다.");
           if ((e as { status?: number }).status === 401) {
-            setDeviceError("태블릿 연결이 해제되었습니다. 기기를 다시 연결해 주세요.");
+            setDeviceError("태블릿 연결이 해제되었습니다. 기기를 다시 연결해 주시기 바랍니다.");
             clearStoredTabletDevice();
             setDevice(null);
           }

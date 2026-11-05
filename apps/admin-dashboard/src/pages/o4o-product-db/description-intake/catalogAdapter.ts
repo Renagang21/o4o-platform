@@ -24,7 +24,7 @@ export function readPublicDescriptionCatalog(raw: unknown, descriptionType: Desc
       content, descriptionType, language, barcodes: Array.isArray(d.verified_barcodes) ? d.verified_barcodes.map(str) : [],
       ...(Array.isArray(d.aiSections) ? { aiSections: d.aiSections.map(raw => {
         const section = record(raw), kind = str(section.kind);
-        if (!['product-fact','professional-reference','counseling-support','unclassified'].includes(kind)) throw new Error('AI 항목의 정보 구분을 확인해 주세요.');
+        if (!['product-fact','professional-reference','counseling-support','unclassified'].includes(kind)) throw new Error('AI 항목의 정보 구분을 확인해 주시기 바랍니다.');
         return { key: str(section.key), title: str(section.title), kind: kind as NonNullable<DescriptionEntry['aiSections']>[number]['kind'],
           text: str(section.text), referenceUrls: Array.isArray(section.referenceUrls) ? section.referenceUrls.map(str) : [] };
       }) } : {}),

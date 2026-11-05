@@ -116,7 +116,7 @@ export async function applyAdminRoleEdit(
   const plan = planAdminRoleEdit(current, requested);
 
   if (plan.add.length) {
-    throw new AdminRoleEditForbiddenError('OPERATOR_INVITATION_REQUIRED', '새 운영 권한은 운영자 초대 메일의 확인·수락 후에만 부여됩니다. 운영자 지정 화면에서 초대하세요.');
+    throw new AdminRoleEditForbiddenError('OPERATOR_INVITATION_REQUIRED', '새 운영 권한은 운영자 초대 메일의 확인·수락 후에만 부여됩니다. 운영자 지정 화면에서 초대하시기 바랍니다.');
   }
 
   if (requester.id === userId) {

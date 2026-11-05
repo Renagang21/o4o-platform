@@ -206,14 +206,14 @@ export default function ProductServiceApprovalPage() {
       const result = await operatorServiceApprovalApi.deletePendingOffer(offerId, deleteReason.trim());
       if (!deleteMounted.current) return;
       if (!result.success) {
-        setDeleteError(`삭제하지 못했습니다. 대상과 선택을 유지했습니다. 다시 시도해 주세요. (${result.error || 'UNKNOWN_ERROR'})`);
+        setDeleteError(`삭제하지 못했습니다. 대상과 선택을 유지했습니다. 다시 시도해 주시기 바랍니다. (${result.error || 'UNKNOWN_ERROR'})`);
         return;
       }
       setDeleteTarget(null);
       setDrawerItem(current => current?.offerId === offerId ? null : current);
       deleted = true;
     } catch {
-      if (deleteMounted.current) setDeleteError('삭제 요청을 완료하지 못했습니다. 대상과 선택을 유지했습니다. 다시 시도해 주세요.');
+      if (deleteMounted.current) setDeleteError('삭제 요청을 완료하지 못했습니다. 대상과 선택을 유지했습니다. 다시 시도해 주시기 바랍니다.');
     } finally {
       deleteWriting.current = false;
       if (deleteMounted.current) setDeleteLoading(false);
@@ -232,13 +232,13 @@ export default function ProductServiceApprovalPage() {
       const result = await productCleanupApi.softDelete(item.offerId);
       if (!deleteMounted.current) return;
       if (!result.success) {
-        setTrashError(`휴지통으로 이동하지 못했습니다. 대상과 선택을 유지했습니다. 다시 시도해 주세요. (${result.error || 'UNKNOWN_ERROR'})`);
+        setTrashError(`휴지통으로 이동하지 못했습니다. 대상과 선택을 유지했습니다. 다시 시도해 주시기 바랍니다. (${result.error || 'UNKNOWN_ERROR'})`);
         return;
       }
       setDrawerItem(current => current?.offerId === item.offerId ? null : current);
       deleted = true;
     } catch {
-      if (deleteMounted.current) setTrashError('휴지통 이동 요청을 완료하지 못했습니다. 대상과 선택을 유지했습니다. 다시 시도해 주세요.');
+      if (deleteMounted.current) setTrashError('휴지통 이동 요청을 완료하지 못했습니다. 대상과 선택을 유지했습니다. 다시 시도해 주시기 바랍니다.');
     } finally {
       trashWriting.current = false;
       if (deleteMounted.current) setActionLoading(null);
@@ -586,7 +586,7 @@ export default function ProductServiceApprovalPage() {
         ) : permissionError ? (
           <div className="text-center py-16">
             <div className="text-red-500 font-medium text-lg mb-2">{permissionError}</div>
-            <p className="text-slate-400 text-sm">이 페이지에 접근할 권한이 없습니다. 관리자에게 문의하세요.</p>
+            <p className="text-slate-400 text-sm">이 페이지에 접근할 권한이 없습니다. 관리자에게 문의하시기 바랍니다.</p>
           </div>
         ) : items.length === 0 ? (
           <div className="text-center py-16 text-slate-400">데이터가 없습니다</div>

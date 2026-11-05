@@ -78,7 +78,7 @@ export default function BusinessForumPage({ view = 'posts' }: Readonly<{ view?: 
         navigate(`${base}/post/${encodeURIComponent(post.slug)}`);
       } else {
         const forumId = category || categories[0]?.id;
-        if (!forumId) { setError('게시판이 없습니다. 게시판 개설을 신청해 주세요.'); return; }
+        if (!forumId) { setError('게시판이 없습니다. 게시판 개설을 신청해 주시기 바랍니다.'); return; }
         const created = await businessApi.post<ForumPostResponse>(`${apiBase}/posts`, { title, content: editorHtml, forumId, type: 'discussion' });
         navigate(created.status === 'pending' ? `${base}/my-posts` : `${base}/post/${encodeURIComponent(created.slug)}`);
       }
@@ -96,7 +96,7 @@ export default function BusinessForumPage({ view = 'posts' }: Readonly<{ view?: 
   if (error && !post && (view === 'post' || editId)) return <div className="rounded-xl border border-red-100 bg-red-50 p-6"><p role="alert" className="text-sm text-red-700">{error}</p><button className="mt-3 min-h-11 rounded-lg border bg-white px-4 py-2 text-sm" type="button" onClick={() => setVersion(n => n + 1)}>다시 시도</button></div>;
   if (view === 'write') return <div className="min-w-0 rounded-xl border border-slate-200 bg-white p-4 sm:p-6">
     <h2 className="mb-2 text-xl font-semibold text-slate-900">{editId ? '게시글 수정' : '이야기 나누기'}</h2>
-    <p className="mb-6 text-sm leading-6 text-slate-500">약국 운영의 경험과 질문을 회원들과 나눠 주세요.</p>
+    <p className="mb-6 text-sm leading-6 text-slate-500">약국 운영의 경험과 질문을 회원들과 나눠 주시기 바랍니다.</p>
     {error && <p role="alert">{error}</p>}
     {post?.status === 'draft' && <p className="mb-4 rounded border p-3">비공개 초안입니다. 게시하면 이 게시판 이용자에게 공개됩니다.</p>}
     {!editId && <label className="mb-5 flex flex-wrap items-center gap-3 text-sm font-medium text-slate-600">게시판 <select className="min-h-11 min-w-0 max-w-full rounded-lg border border-slate-200 bg-white px-3 py-2" value={category || categories[0]?.id || ''} onChange={e => setParams({ category: e.target.value })}>
@@ -104,14 +104,14 @@ export default function BusinessForumPage({ view = 'posts' }: Readonly<{ view?: 
     </select></label>}
     {(!editId || post) && <ForumWriteForm key={post?.id ?? category} initialTitle={post?.title} initialContentHtml={postContentHtml(post?.content)}
       submitLabel={post?.status === 'draft' ? '검토한 초안 게시' : editId ? '수정하기' : '등록하기'}
-      onSubmit={submit} onCancel={() => navigate(base)} onInvalid={() => setError('제목과 내용을 입력해 주세요.')} />}
+      onSubmit={submit} onCancel={() => navigate(base)} onInvalid={() => setError('제목과 내용을 입력해 주시기 바랍니다.')} />}
   </div>;
   if (view === 'post' && post) return <BusinessPostArticle post={post} comments={comments} commentTotal={commentTotal}
     userId={user?.id} canManage={access?.canManage === true} apiBase={apiBase} base={base} busy={busy} error={error}
     mutate={mutate} loadMore={() => setCommentLimit(n => n + 20)} />;
   return <div className="min-w-0 rounded-xl border border-slate-200 bg-white p-4 sm:p-6">
     <h2 className="mb-2 text-xl font-semibold text-slate-900">{view === 'mine' ? '내가 쓴 글' : '참여자 게시글'}</h2>
-    <p className="mb-5 text-sm leading-6 text-slate-500">회원들의 소식과 약국 운영 경험을 확인하세요.</p>
+    <p className="mb-5 text-sm leading-6 text-slate-500">회원들의 소식과 약국 운영 경험을 확인하시기 바랍니다.</p>
     <label className="mb-5 flex flex-wrap items-center gap-3 text-sm font-medium text-slate-600">게시판 <select className="min-h-11 min-w-0 max-w-full rounded-lg border border-slate-200 bg-white px-3 py-2" value={category} onChange={e => setParams({ category: e.target.value })}>
       <option value="">전체</option>{categories.map(board => <option key={board.id} value={board.id}>{board.name}</option>)}
     </select></label>

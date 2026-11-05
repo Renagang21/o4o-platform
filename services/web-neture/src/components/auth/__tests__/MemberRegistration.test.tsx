@@ -50,7 +50,7 @@ describe('role-specific signup', () => {
     expect(
       [...type.querySelectorAll('option')].map((e) => e.textContent),
     ).toEqual([
-      '선택해 주세요',
+      '선택해 주시기 바랍니다',
       '약사',
       '약국경영자',
       '공급자',
@@ -70,7 +70,7 @@ describe('role-specific signup', () => {
   });
   it('submits versioned data and retains a failed draft', async () => {
     mocks.post.mockRejectedValueOnce({
-      response: { status: 409, data: { error: '다시 조회해 주세요.' } },
+      response: { status: 409, data: { error: '다시 조회해 주시기 바랍니다.' } },
     });
     render(<MemberRegistrationForm />);
     fireEvent.change(await screen.findByLabelText('가입 유형'), {

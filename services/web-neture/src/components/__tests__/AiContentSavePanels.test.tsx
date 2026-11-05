@@ -8,7 +8,7 @@ describe('AI content save destinations preserve interaction and result semantics
   it('community title, destination, save and cancel are delegated to the original owner', () => {
     const title = vi.fn(), forum = vi.fn(), save = vi.fn(), cancel = vi.fn();
     render(<CommunitySavePanel communityTitle="초안" setCommunityTitle={title} communityForumId="" setCommunityForumId={forum} communityForums={[{ id: 'forum-a', name: '업무 포럼' }]} communityForumsLoading={false} communitySaving={false} communitySaveStatus={null} handleCommunitySave={save} onCancel={cancel} />);
-    fireEvent.change(screen.getByPlaceholderText('게시글 제목을 입력하세요'), { target: { value: '편집 제목' } });
+    fireEvent.change(screen.getByPlaceholderText('게시글 제목을 입력하시기 바랍니다'), { target: { value: '편집 제목' } });
     fireEvent.change(screen.getByRole('combobox'), { target: { value: 'forum-a' } });
     fireEvent.click(screen.getByRole('button', { name: '게시글 저장' }));
     fireEvent.click(screen.getByRole('button', { name: '취소' }));

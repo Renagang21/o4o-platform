@@ -113,7 +113,7 @@ export function MemberPaidFeaturesPanel() {
     } catch {
       if (alive.current && version === generation.current)
         setAccessError(
-          "이용 자격과 제공 근거를 확인하지 못했습니다. 다시 조회해 주세요.",
+          "이용 자격과 제공 근거를 확인하지 못했습니다. 다시 조회해 주시기 바랍니다.",
         );
     }
   };
@@ -146,7 +146,7 @@ export function MemberPaidFeaturesPanel() {
     } catch {
       if (alive.current && version === generation.current) {
         setMessage(
-          "회원을 조회하지 못했습니다. 이메일을 확인하고 다시 시도해 주세요.",
+          "회원을 조회하지 못했습니다. 이메일을 확인하고 다시 시도해 주시기 바랍니다.",
         );
         setFailure(true);
       }
@@ -174,7 +174,7 @@ export function MemberPaidFeaturesPanel() {
       await readAccess(member.id, version);
     } catch {
       if (alive.current && version === generation.current) {
-        setMessage("저장하지 못했습니다. 다시 시도해 주세요.");
+        setMessage("저장하지 못했습니다. 다시 시도해 주시기 바랍니다.");
         setFailure(true);
       }
     } finally {

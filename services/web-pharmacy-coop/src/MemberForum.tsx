@@ -262,7 +262,7 @@ function ForumPostForm({
     [error, setError] = useState(""),
     [message, setMessage] = useState("");
   if (!boards.length)
-    return <p>개설된 게시판이 없습니다. 조합 운영자에게 문의하세요.</p>;
+    return <p>개설된 게시판이 없습니다. 조합 운영자에게 문의하시기 바랍니다.</p>;
   return (
     <form
       className="card spaced"

@@ -64,6 +64,6 @@ export function assertPolicyEffectiveForPublication(effectiveDate: Date | string
     throw new ServicePolicyLifecycleError('POLICY_EFFECTIVE_DATE_INVALID', '유효한 시행일이 필요합니다.', 400);
   }
   if (policyCalendarDay(date) > policyCalendarDay(now)) {
-    throw new ServicePolicyLifecycleError('POLICY_NOT_YET_EFFECTIVE', '공고 중인 문서는 시행일 이후 게시해 주세요.');
+    throw new ServicePolicyLifecycleError('POLICY_NOT_YET_EFFECTIVE', '공고 중인 문서는 시행일 이후 게시해 주시기 바랍니다.');
   }
 }

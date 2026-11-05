@@ -287,7 +287,7 @@ export default function BrandManagementPage() {
               <div>
                 <h2 id={`${dialogId}-merge-title`} className="text-lg font-semibold text-slate-800">브랜드 병합</h2>
                 <p className="text-sm text-slate-500 mt-0.5">
-                  "<span className="font-medium text-orange-600">{mergeSource.name}</span>"을(를) 병합할 대상 브랜드를 선택하세요
+                  "<span className="font-medium text-orange-600">{mergeSource.name}</span>"을(를) 병합할 대상 브랜드를 선택하시기 바랍니다
                 </p>
               </div>
               <button

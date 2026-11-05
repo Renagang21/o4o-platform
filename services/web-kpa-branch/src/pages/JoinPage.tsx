@@ -60,7 +60,7 @@ export default function JoinPage() {
       <div className="mx-auto max-w-sm px-4 py-16">
         <h1 className="text-xl font-bold text-gray-900">가입 신청이 접수되었습니다</h1>
         <p className="mt-3 text-sm text-gray-600">
-          분회 운영자의 승인 후 이용할 수 있습니다. 승인되면 같은 계정으로 로그인해 주세요.
+          분회 운영자의 승인 후 이용할 수 있습니다. 승인되면 같은 계정으로 로그인해 주시기 바랍니다.
         </p>
         <Link to="/login" className="mt-6 inline-block text-sm font-medium text-primary-600 underline">
           로그인 화면으로
@@ -79,7 +79,7 @@ export default function JoinPage() {
       <div className="mx-auto max-w-sm px-4 py-16">
         <h1 className="text-xl font-bold text-gray-900">{BRAND.nameKo} 가입 신청</h1>
         <p className="mt-2 text-sm text-gray-500">
-          먼저 로그인해 주세요. 계정이 없으면 회원가입하거나 Google 버튼에서 약관 동의 후 만들 수 있습니다.
+          먼저 로그인해 주시기 바랍니다. 계정이 없으면 회원가입하거나 Google 버튼에서 약관 동의 후 만들 수 있습니다.
         </p>
         <div className="mt-6">
           <LoginMethods<BranchUser>

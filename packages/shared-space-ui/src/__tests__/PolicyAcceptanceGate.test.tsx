@@ -200,11 +200,11 @@ it('복수 패널의 inline gate는 서로 다른 제목을 가진 비모달 reg
   await waitFor(() => expect(screen.getAllByTestId('policy-acceptance-content')).toHaveLength(2));
   expect(screen.queryByRole('dialog')).toBeNull();
   expect(screen.getByText('계속 이용 가능한 패널')).toBeTruthy();
-  const regions = screen.getAllByRole('region', { name: 'O4O 통합 서비스 이용약관에 동의해 주세요' });
+  const regions = screen.getAllByRole('region', { name: 'O4O 통합 서비스 이용약관에 동의해 주시기 바랍니다' });
   const ids = regions.map(region => region.getAttribute('aria-labelledby'));
   expect(new Set(ids).size).toBe(2);
   for (const region of regions) expect(region.getAttribute('aria-modal')).toBeNull();
-  expect(screen.getAllByRole('heading', { level: 2, name: 'O4O 통합 서비스 이용약관에 동의해 주세요' })).toHaveLength(2);
+  expect(screen.getAllByRole('heading', { level: 2, name: 'O4O 통합 서비스 이용약관에 동의해 주시기 바랍니다' })).toHaveLength(2);
 });
 
 it.each([

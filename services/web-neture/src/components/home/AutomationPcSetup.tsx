@@ -30,15 +30,15 @@ export default function AutomationPcSetup({
       className="mt-4 w-full max-w-xl space-y-3 rounded-2xl border border-slate-200 bg-slate-50 p-4 text-left text-sm"
     >
       <h3 className="font-semibold text-slate-900">
-        자동화를 시작할 PC를 준비해 주세요
+        자동화를 시작할 PC를 준비해 주시기 바랍니다
       </h3>
-      <p>설치하는 동안 이 화면을 열어 두세요. 요청과 첨부는 그대로 유지돼요.</p>
+      <p>설치하는 동안 이 화면을 열어 두시기 바랍니다. 요청과 첨부는 그대로 유지됩니다.</p>
       {isWindows ? (
         <LocalAgentCard onBusyChange={setChecking} />
       ) : (
         <p className="rounded-lg bg-white p-3">
           업무를 실행할 Windows PC에서 같은 계정으로 O4O 메인에 접속한 뒤 ‘PC
-          연결 준비’를 눌러 설치·연결하세요. 준비가 끝나면 이 기기로 돌아와
+          연결 준비’를 눌러 설치·연결하시기 바랍니다. 준비가 끝나면 이 기기로 돌아와
           요청을 계속할 수 있습니다.
         </p>
       )}
@@ -61,7 +61,7 @@ export default function AutomationPcSetup({
         준비 화면 닫기
       </button>
       <p className="text-xs text-slate-500">
-        PC 연결을 마친 뒤 요청을 계속해 주세요.
+        PC 연결을 마친 뒤 요청을 계속해 주시기 바랍니다.
       </p>
     </section>
   );

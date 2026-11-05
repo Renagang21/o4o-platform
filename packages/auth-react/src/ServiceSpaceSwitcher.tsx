@@ -156,7 +156,7 @@ function Switcher({
       })
       .catch(() => {
         if (current)
-          setError("이용 상태를 불러오지 못했습니다. 다시 시도해 주세요.");
+          setError("이용 상태를 불러오지 못했습니다. 다시 시도해 주시기 바랍니다.");
       })
       .finally(() => {
         if (current) setLoading(false);
@@ -199,7 +199,7 @@ function Switcher({
     } catch {
       if (alive.current && generation === navigationGeneration.current)
         setError(
-          "이동하지 못했습니다. 이용 자격을 확인하거나 다시 시도해 주세요.",
+          "이동하지 못했습니다. 이용 자격을 확인하거나 다시 시도해 주시기 바랍니다.",
         );
     } finally {
       if (alive.current && generation === navigationGeneration.current) {

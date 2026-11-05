@@ -162,12 +162,12 @@ export function ProductionMaterialEditorShell({
 
   const handleSave = useCallback(async () => {
     if (!title.trim()) {
-      notify.error('제목을 입력해 주세요.');
+      notify.error('제목을 입력해 주시기 바랍니다.');
       return;
     }
     const html = editorHtml;
     if (!html || html === '<p></p>' || html.trim() === '') {
-      notify.error('내용을 입력해 주세요.');
+      notify.error('내용을 입력해 주시기 바랍니다.');
       return;
     }
 
@@ -186,7 +186,7 @@ export function ProductionMaterialEditorShell({
       notify.success('제작 자료가 저장되었습니다.');
       navigate(savedPath);
     } catch {
-      notify.error('저장에 실패했습니다. 다시 시도해 주세요.');
+      notify.error('저장에 실패했습니다. 다시 시도해 주시기 바랍니다.');
     } finally {
       setSaving(false);
     }
@@ -223,7 +223,7 @@ export function ProductionMaterialEditorShell({
             type="text"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            placeholder="제작 자료 제목을 입력하세요"
+            placeholder="제작 자료 제목을 입력하시기 바랍니다"
             style={styles.titleInput}
             maxLength={200}
           />
@@ -291,7 +291,7 @@ export function ProductionMaterialEditorShell({
         <EditorComponent
           value={editorValue}
           onChange={handleChange}
-          placeholder="직접 작성하거나 ChatGPT 등 외부 AI에서 만든 내용을 붙여넣으세요."
+          placeholder="직접 작성하거나 ChatGPT 등 외부 AI에서 만든 내용을 붙여넣으시기 바랍니다."
           minHeight="520px"
           preset="full"
           showInternalAi={false}

@@ -140,7 +140,7 @@ export class PharmacyCartService {
 
   async add(buyerId: string, organizationId: string, input: { kind?: string; id?: string; quantity?: number }) {
     const kind = SUPPLY_KINDS.find((k) => k === input.kind);
-    if (!kind || !isUuid(input.id)) throw new NeturePharmacyError(400, 'INVALID_SUPPLY_OPTION', '공급 옵션을 선택해 주세요.');
+    if (!kind || !isUuid(input.id)) throw new NeturePharmacyError(400, 'INVALID_SUPPLY_OPTION', '공급 옵션을 선택해 주시기 바랍니다.');
     const quantity = input.quantity === undefined ? 1 : Number(input.quantity);
     if (!isValidOrderQuantity(quantity)) throw new NeturePharmacyError(400, 'INVALID_QUANTITY', '수량이 올바르지 않습니다.');
     const option = await getSupplyOption(this.dataSource, organizationId, kind, input.id);
@@ -298,7 +298,7 @@ export class PharmacyCartService {
           WHERE id=ANY($1::uuid[]) AND buyer_id=$2 AND organization_id=$3 AND service_key=$4 ORDER BY id FOR UPDATE`,
           [group.lines.map(l=>l.cartItemId),buyerId,organizationId,NETURE_PHARMACY_SERVICE_KEY]);
         if (currentCart.length !== group.lines.length || group.lines.some(l => !currentCart.some((r: {id:string;quantity:number}) => r.id === l.cartItemId && r.quantity === l.quantity))) {
-          throw new NeturePharmacyError(409, 'CART_ITEM_CHANGED', '장바구니가 변경되었습니다. 다시 확인해 주세요.');
+          throw new NeturePharmacyError(409, 'CART_ITEM_CHANGED', '장바구니가 변경되었습니다. 다시 확인해 주시기 바랍니다.');
         }
         await lockCheckoutSupply(qr.manager, organizationId, group.lines.map(l=>l.option));
         for (const line of group.lines) {
@@ -307,7 +307,7 @@ export class PharmacyCartService {
           // Availability can decrease while waiting for another checkout; terms must stay fixed.
           const terms = (option: SupplyOption) => ({ ...option, availableStock: null, totalQuantity: null });
           if (current.trackInventory && current.availableStock !== null && current.availableStock < line.quantity) throw new NeturePharmacyError(409, 'INSUFFICIENT_STOCK', '재고가 부족합니다.');
-          if (JSON.stringify(terms(current)) !== JSON.stringify(terms(line.option))) throw new NeturePharmacyError(409, 'SUPPLY_OPTION_CHANGED', '공급조건이 변경되었습니다. 장바구니를 다시 확인해 주세요.');
+          if (JSON.stringify(terms(current)) !== JSON.stringify(terms(line.option))) throw new NeturePharmacyError(409, 'SUPPLY_OPTION_CHANGED', '공급조건이 변경되었습니다. 장바구니를 다시 확인해 주시기 바랍니다.');
         }
         for (const line of eventLines) await this.eventReserver.reserveEventOfferListing(qr, {
           listingId: line.option.optionId, serviceKey: SEMI_FRANCHISE_EVENT_SERVICE_KEY, userId: buyerId, quantity: line.quantity,

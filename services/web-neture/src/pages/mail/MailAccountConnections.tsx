@@ -89,7 +89,7 @@ export function MailAccountConnections({
             />
           </label>
           <p className="text-sm text-slate-600">
-            네이버에서 IMAP 사용을 허용하고 앱 비밀번호를 발급한 뒤 연결하세요.
+            네이버에서 IMAP 사용을 허용하고 앱 비밀번호를 발급한 뒤 연결하시기 바랍니다.
             제공자가 지원하는 보관·휴지통 기능만 사용합니다.
           </p>
           <button

@@ -64,13 +64,13 @@ describe('common service member workflow', () => {
     mount(client, { rejectReason: { required: true } });
     fireEvent.click(await screen.findByText('검증 회원'));
     fireEvent.change(screen.getByLabelText('반려 사유'), {
-      target: { value: '보완해주세요' },
+      target: { value: '보완해 주시기 바랍니다' },
     });
     fireEvent.click(screen.getByRole('button', { name: '반려' }));
     await screen.findByText('반려 장애');
     expect(
       (screen.getByLabelText('반려 사유') as HTMLTextAreaElement).value,
-    ).toBe('보완해주세요');
+    ).toBe('보완해 주시기 바랍니다');
     fireEvent.click(screen.getByRole('button', { name: '반려' }));
     await screen.findByRole('status');
     expect(client.updateStatus).toHaveBeenCalledTimes(2);

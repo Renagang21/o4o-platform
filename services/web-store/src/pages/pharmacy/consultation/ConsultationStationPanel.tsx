@@ -32,12 +32,12 @@ export function ConsultationStationPanel({
       </div>
       <p className="text-sm text-slate-600">
         고객 태블릿에서 {window.location.origin}/consultation/customer 를 열고
-        연결 코드를 입력하세요. 이 기기에서 새 탭을 열어도 다른 태블릿에
+        연결 코드를 입력하시기 바랍니다. 이 기기에서 새 탭을 열어도 다른 태블릿에
         자동으로 열리지는 않습니다.
       </p>
       {!room?.active ? (
         <p className="text-sm text-slate-600">
-          위의 ‘매대 상담 시작’을 누른 뒤 고객 화면을 연결하세요.
+          위의 ‘매대 상담 시작’을 누른 뒤 고객 화면을 연결하시기 바랍니다.
         </p>
       ) : (
         <>
@@ -87,7 +87,7 @@ export function ConsultationStationPanel({
       )}
       {conflict && (
         <div className="rounded border bg-amber-50 p-3">
-          <p>진행 중인 상담을 끝내고 이 화면에서 시작할까요?</p>
+          <p>진행 중인 상담을 끝내고 이 화면에서 시작하시겠습니까?</p>
           <button
             className={button}
             disabled={busy}

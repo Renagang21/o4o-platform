@@ -114,7 +114,7 @@ export function EventProposalModal({
               </div>
               {selectedTargets.length === 0 && (
                 <p className="mt-2 text-xs text-red-600">
-                  대상 서비스를 1개 이상 선택해 주세요.
+                  대상 서비스를 1개 이상 선택해 주시기 바랍니다.
                 </p>
               )}
             </div>
@@ -137,7 +137,7 @@ export function EventProposalModal({
                     제안 가능한 상품을 불러오지 못했습니다.
                   </p>
                   <p className="text-xs mt-1 text-slate-400">
-                    잠시 후 다시 시도해 주세요.
+                    잠시 후 다시 시도해 주시기 바랍니다.
                   </p>
                   <button
                     type="button"

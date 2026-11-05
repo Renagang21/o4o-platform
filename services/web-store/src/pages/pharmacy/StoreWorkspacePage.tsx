@@ -147,6 +147,10 @@ function WorkspaceContents({ area }: WorkspaceProps) {
         }
       />
     );
+  if (area === "use" && new URLSearchParams(location.search).get('topic') === 'signage') {
+    const params = new URLSearchParams(location.search); params.delete('topic');
+    return <Navigate to={{ pathname: `${config.basePath}/marketing/signage/playlist`, search: params.toString(), hash: location.hash }} replace state={location.state} />;
+  }
   if (area === "use") return <StoreOperationsPage config={config} />;
   // A missing capability must never be restored by composing its page directly.
   return (
@@ -155,13 +159,13 @@ function WorkspaceContents({ area }: WorkspaceProps) {
         {area === "commerce"
           ? "상품·거래"
           : area === "studio"
-            ? "매장 컨텐츠"
+            ? "매장 콘텐츠"
             : "매장 운영"}
       </h1>
       {navigation}
       <p role="status" className="text-sm text-slate-600">
         {groups.length
-          ? "전체 업무에서 이용할 작업을 선택하세요."
+          ? "전체 업무에서 이용할 작업을 선택하시기 바랍니다."
           : "현재 이용할 수 있는 업무가 없습니다."}
       </p>
     </div>

@@ -18,9 +18,9 @@ export function SignagePlaylistPreview({ name, items, onClose }: Readonly<{ name
   return <AuthoringDialog labelId={id} onClose={onClose} className="max-w-3xl">
     <div className="space-y-4 p-5">
       <h2 id={id} className="text-lg font-semibold">{name} · 저장된 안내 미리보기</h2>
-      <p className="text-sm text-slate-600">저장된 순서와 영상 자료를 확인합니다. 기기의 전체화면·자동 재생 결과는 재생 화면에서 확인하세요.</p>
+      <p className="text-sm text-slate-600">저장된 순서와 영상 자료를 확인합니다. 기기의 전체화면·자동 재생 결과는 재생 화면에서 확인하시기 바랍니다.</p>
       {url ? <div className="aspect-video w-full"><VideoPlayback key={item.id} url={url} kind={hostedVideo(url)?.provider ?? 'video'} title={`${item.title} 미리보기`} /></div>
-        : <p className="rounded-lg bg-slate-100 p-6 text-sm">{item?.title ?? '자료가 없습니다.'}{item && ' · 이 자료 형식의 재생 결과는 재생 화면에서 확인하세요.'}</p>}
+        : <p className="rounded-lg bg-slate-100 p-6 text-sm">{item?.title ?? '자료가 없습니다.'}{item && ' · 이 자료 형식의 재생 결과는 재생 화면에서 확인하시기 바랍니다.'}</p>}
       <nav aria-label="안내 순서 확인" className="flex flex-wrap items-center gap-3 text-sm">
         <button type="button" disabled={index <= 0} onClick={() => setSelectedId(items[index - 1].id)} className="min-h-11 rounded border px-3 disabled:opacity-50">이전 안내</button>
         <span>{index < 0 ? 0 : index + 1} / {items.length}</span>

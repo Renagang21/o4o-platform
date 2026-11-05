@@ -82,7 +82,7 @@ function MediaRenderer({ item, onEnded, onError }: Readonly<{ item: PlaybackItem
   const supported = !!url && (media?.mediaType === 'image' || media?.mediaType === 'video' || !!provider);
   const error = useRef(onError); error.current = onError;
   useEffect(() => { if (!supported) error.current('재생할 수 없는 자료입니다.'); }, [supported, item.id]);
-  if (!media || !supported) return <p className="text-white">재생할 자료를 확인해 주세요.</p>;
+  if (!media || !supported) return <p className="text-white">재생할 자료를 확인해 주시기 바랍니다.</p>;
   if (media.mediaType === 'image' && !provider) return <img src={url} alt={media.name} className="h-full w-full object-contain" onError={() => onError('이미지를 불러오지 못했습니다.')} />;
   return <VideoPlayback url={url} kind={provider ?? 'video'} title={media.name} onEnded={onEnded} onError={onError} />;
 }
@@ -185,7 +185,7 @@ function PlaybackSession() {
       return signagePlaylistToPlaybackData(result.data);
     };
     void load().then(result => { if (current) setPlaybackData(result); })
-      .catch(cause => { if (current) setError(cause.message === 'NO_SCHEDULE' ? '현재 시간에 적용된 일정이 없습니다. 재생 시간을 확인하거나 게시된 안내를 선택하세요.' : '재생 자료를 불러오지 못했습니다. 게시 상태와 접근 권한을 확인하고 다시 시도해 주세요.'); })
+      .catch(cause => { if (current) setError(cause.message === 'NO_SCHEDULE' ? '현재 시간에 적용된 일정이 없습니다. 재생 시간을 확인하거나 게시된 안내를 선택하시기 바랍니다.' : '재생 자료를 불러오지 못했습니다. 게시 상태와 접근 권한을 확인하고 다시 시도해 주시기 바랍니다.'); })
       .finally(() => { if (current) setLoading(false); });
     return () => { current = false; };
   }, [playlistId, isScheduleMode, storeOrganizationId, storeOrgLoading, retry]);

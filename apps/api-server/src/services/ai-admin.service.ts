@@ -231,7 +231,7 @@ class AiAdminService {
     if (await new ModelControlService({
       isInitialized: true, query: manager.query.bind(manager),
     }).allows('gemini', engine.slug) === false) {
-      throw new ModelControlError(409, 'AI_MODEL_REMOVED', '삭제된 모델의 엔진은 활성화할 수 없습니다. 최신 모델 목록을 확인해 주세요.');
+      throw new ModelControlError(409, 'AI_MODEL_REMOVED', '삭제된 모델의 엔진은 활성화할 수 없습니다. 최신 모델 목록을 확인해 주시기 바랍니다.');
     }
 
     // Deactivate all engines
