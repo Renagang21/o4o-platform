@@ -177,6 +177,7 @@ export const menuPermissions: MenuPermission[] = [
     menuId: 'o4o-product-db-maintenance',
     roles: [...PLATFORM_ADMIN_ROLES]
   },
+  { menuId: 'content-required-signage', roles: [...PLATFORM_ADMIN_ROLES] },
   {
     menuId: 'content-overview',
     roles: [...PLATFORM_ADMIN_ROLES]

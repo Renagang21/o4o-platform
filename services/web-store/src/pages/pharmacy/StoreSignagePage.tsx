@@ -1,3 +1,5 @@
+import { fetchRequiredPlaylistVideos, type StorePlaylistItem } from '../../api/storePlaylist';
+import { inRequiredWindow, useSignageClock } from './signage/requiredVideoWindow';
 import { PlaylistNameEditor } from './signage/PlaylistNameEditor';
 import { useUnifiedStore } from '../../contexts/StoreContext';
 import { CommunityVideoImport } from './signage/CommunityVideoImport';
@@ -472,7 +474,29 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
   useEffect(() => { editTargetRef.current = null; setEditingTarget(null); setEditError(''); }, [organizationId]);
 
   // ── Unified video list (snapshots + direct media) ──
-  const unifiedVideos = useMemo(() => buildSignageVideoList(items, signageMediaItems), [items, signageMediaItems]);
+  const [requiredVideos, setRequiredVideos] = useState<StorePlaylistItem[]>([]);
+  const [requiredReadError, setRequiredReadError] = useState('');
+  const now = useSignageClock();
+  useEffect(() => {
+    let active = true, busy = false;
+    const refresh = async () => {
+      if (busy) return; busy = true;
+      try { const data = await fetchRequiredPlaylistVideos(); if (active && isCurrent()) { setRequiredVideos(previous => JSON.stringify(previous) === JSON.stringify(data) ? previous : data); setRequiredReadError(''); } }
+      catch { if (active) setRequiredReadError('필수 영상을 갱신하지 못했습니다. 잠시 후 다시 확인합니다.'); }
+      finally { busy = false; }
+    };
+    void refresh(); const timer = setInterval(() => void refresh(), 15000);
+    return () => { active = false; clearInterval(timer); };
+  }, [organizationId, isCurrent]);
+  const windowSignature = [...items.filter(item => inRequiredWindow(item, now)).map(item => item.id), ...requiredVideos.filter(item => inRequiredWindow(item, now)).map(item => item.id)].join(',');
+  const unifiedVideos = useMemo(() => [
+    ...buildSignageVideoList(items, signageMediaItems).filter(video => inRequiredWindow(video, now)),
+    ...requiredVideos.filter(item => inRequiredWindow(item, now)).map(item => ({
+      id: item.id, title: item.title, source: 'snapshot' as const, publishStatus: 'published' as const,
+      isForced: true, isLocked: true, forcedStartAt: item.forcedStartAt, forcedEndAt: item.forcedEndAt, createdAt: item.createdAt,
+      _snapshot: { ...item, publishStatus: 'published', contentJson: item.contentJson, assetType: 'signage' } as unknown as StoreAssetItem,
+    })),
+  ], [items, signageMediaItems, requiredVideos, windowSignature]);
 
   const forcedExpiringCount = useMemo(() => items.filter(isForcedExpiringSoon).length, [items]);
 
@@ -1314,6 +1338,7 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
         </div>
       )}
 
+      {requiredReadError && <p role="status" className="mb-3 text-sm text-amber-800">{requiredReadError}</p>}
       {/* ─── [B] 검색 + 필터 바 ─────────────────── */}
       {!loading && !mediaLoading && !mediaLoadError && !error && !listError && unifiedVideos.length > 0 && (
         <div className="relative mb-3">

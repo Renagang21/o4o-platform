@@ -1,3 +1,4 @@
+import { inRequiredWindow, useSignageClock } from '../signage/requiredVideoWindow';
 import { useLatestStoreRequest } from "./useLatestStoreRequest";
 import { useState, useEffect, useCallback, useRef } from "react";
 import {
@@ -178,11 +179,11 @@ export function useSignagePlaylists(organizationId: string) {
           );
       }
     });
-  const handleRenamePlaylist = (playlist: StorePlaylist, name: string) => {
+  const handleRenamePlaylist = (playlist: StorePlaylist, name: string, tags?: string[]) => {
     const trimmed = name.trim();
     if (!trimmed || trimmed.length > 255) return;
     return runPlaylistMutation(playlist.id, async (isStoreCurrent) => {
-      await updateStorePlaylist(playlist.id, { name: trimmed });
+      await updateStorePlaylist(playlist.id, { name: trimmed, ...(tags ? { tags } : {}) });
       if (isStoreCurrent()) await loadPlaylists();
     });
   };
@@ -357,6 +358,18 @@ export function useSignagePlaylists(organizationId: string) {
       setPlaylistItemsLoading(false);
     }
   }, [selectedPlaylistId, loadPlaylistItems, itemRequest]);
+  const now = useSignageClock();
+  useEffect(() => {
+    if (!selectedPlaylistId) return;
+    let active = true, inFlight = false;
+    const timer = setInterval(async () => {
+      if (inFlight || busy.current.size) return; inFlight = true;
+      try { const rows = await fetchPlaylistItems(selectedPlaylistId); if (active && currentPlaylist.current === selectedPlaylistId && currentStore.current === organizationId) setPlaylistItems(rows); }
+      catch { /* Keep local period checks active when the network is unavailable. */ }
+      finally { inFlight = false; }
+    }, 15000);
+    return () => { active = false; clearInterval(timer); };
+  }, [selectedPlaylistId, organizationId]);
   return {
     playlistActionError,
     playlistItemsError,
@@ -370,7 +383,7 @@ export function useSignagePlaylists(organizationId: string) {
     playlistError,
     selectedPlaylistId,
     setSelectedPlaylistId: changeSelectedPlaylist,
-    playlistItems,
+    playlistItems: playlistItems.filter(item => inRequiredWindow(item, now)),
     playlistItemsLoading,
     playlistKeyword,
     setPlaylistKeyword,

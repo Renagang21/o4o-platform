@@ -10,7 +10,7 @@ const playlist = { id: 'list', name: '대기실', publishStatus: 'draft' } as an
 it('edits a name, prevents empty/duplicate submission and resets on external name change', () => {
   const save = vi.fn(); const view = render(<PlaylistNameEditor playlist={playlist} busy={false} onSave={save} />);
   expect((screen.getByRole('button', { name: '이름 저장' }) as HTMLButtonElement).disabled).toBe(true);
-  fireEvent.change(screen.getByRole('textbox'), { target: { value: '카운터' } });
+  fireEvent.change(screen.getByRole('textbox', { name: '재생목록 이름' }), { target: { value: '카운터' } });
   fireEvent.submit(screen.getByRole('form', { name: '재생목록 이름 수정' }));
   expect(save).toHaveBeenCalledWith(playlist, '카운터');
   view.rerender(<PlaylistNameEditor playlist={{...playlist,name:'서버 저장 이름'}} busy onSave={save} />);

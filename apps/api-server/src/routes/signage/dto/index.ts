@@ -269,10 +269,19 @@ export interface ActiveContentRequestDto {
   currentTime?: string; // ISO datetime, defaults to now
 }
 
+export interface StorePlaylistPlaybackItemDto {
+  id: string;
+  snapshotId: string | null;
+  displayOrder: number;
+  isForced: boolean;
+  title?: string;
+  contentJson?: unknown;
+}
+
 export interface ActiveContentResponseDto {
   playlist: PlaylistResponseDto | null;
   schedule: ScheduleResponseDto | null;
-  items: PlaylistItemResponseDto[];
+  items: PlaylistItemResponseDto[] | StorePlaylistPlaybackItemDto[];
   resolvedAt: string;
   nextScheduleChange: string | null;
 }

@@ -96,3 +96,20 @@ it('plays forced-content hosted URLs without mediaType as videos and never start
   act(() => events.onStateChange({ data: 0 })); expect(destroy).toHaveBeenCalledTimes(1);
   cleanup(); delete (window as any).YT; vi.useRealTimers();
 });
+
+it('stops a playing required video at its deadline without waiting for a network refresh', async () => {
+  vi.useFakeTimers();
+  try {
+    m.get.mockResolvedValue({ success: true, data: { name: 'Window fixture', items: [
+      { ...snapshot, id: 'forced-fixture', title: 'Required fixture', isForced: true, contentJson: { ...snapshot.contentJson, forcedEndAt: new Date(Date.now() + 2000).toISOString() } },
+      { ...snapshot, id: 'ordinary-fixture', title: 'Ordinary fixture' },
+    ] } });
+    await act(async () => { render(app()); });
+    fireEvent.click(screen.getByRole('button', { name: /일반 화면으로 재생/ }));
+    expect(screen.getByLabelText('Required fixture')).toBeTruthy();
+    m.get.mockRejectedValue(new Error('offline'));
+    await act(async () => { vi.advanceTimersByTime(3000); });
+    expect(screen.queryByLabelText('Required fixture')).toBeNull();
+    expect(screen.getByLabelText('Ordinary fixture')).toBeTruthy();
+  } finally { vi.useRealTimers(); }
+});

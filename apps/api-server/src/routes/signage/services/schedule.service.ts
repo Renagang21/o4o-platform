@@ -1,3 +1,4 @@
+import { StorePlaylistRepository } from '../../o4o-store/repositories/store-playlist.repository.js';
 import type { DataSource } from 'typeorm';
 import type { SignageSchedule } from '@o4o-apps/digital-signage-core/entities';
 import { SignageScheduleRepository } from '../repositories/schedule.repository.js';
@@ -160,16 +161,10 @@ export class SignageScheduleService {
 
     // Store playlist takes priority
     if (schedule.storePlaylistId) {
-      const storeItems = await this.dataSource.query(
-        `SELECT spi.id, spi.snapshot_id AS "snapshotId", spi.display_order AS "displayOrder",
-                spi.is_forced AS "isForced", spi.is_locked AS "isLocked",
-                snap.title, snap.content_json AS "contentJson", snap.asset_type AS "assetType"
-         FROM store_playlist_items spi
-         JOIN o4o_asset_snapshots snap ON snap.id = spi.snapshot_id
-         WHERE spi.playlist_id = $1
-         ORDER BY spi.display_order ASC`,
-        [schedule.storePlaylistId],
-      );
+      const storeRepo = new StorePlaylistRepository(this.dataSource);
+      const header = await storeRepo.findPublicPlaylist(schedule.storePlaylistId);
+      const storeItems = header && header.organizationId === scope.organizationId
+        ? await storeRepo.findPublicPlaylistItems(schedule.storePlaylistId, scope.serviceKey) : [];
       return {
         playlist: null,
         schedule: toScheduleResponse(schedule),

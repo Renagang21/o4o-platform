@@ -1,3 +1,5 @@
+import { calibrateSignageClock } from '../../lib/signageClock';
+import { inRequiredWindow, useSignageClock } from './signage/requiredVideoWindow';
 import { VideoPlayback, useMediaSequence } from '@o4o/tablet-kiosk-core';
 import { hostedVideo } from '@o4o/tablet-kiosk-core/video-embed';
 /**
@@ -34,6 +36,9 @@ const SIGNAGE_BASE = () => `${API_BASE_URL}/api/signage/${SERVICE_KEY()}`;
 
 // ── Playback item type (unified for both modes) ─────────────────────────────
 interface PlaybackItem {
+  isForced?: boolean;
+  forcedStartAt?: string | null;
+  forcedEndAt?: string | null;
   id: string;
   displayOrder: number;
   displayDuration?: number;
@@ -63,6 +68,9 @@ function storeItemToPlaybackItem(item: StorePlaylistActiveItem): PlaybackItem {
   const mediaType = hostedVideo(url) ? 'video' : (cj.mediaType as string) || defaultType;
   return {
     id: item.id,
+    isForced: item.isForced,
+    forcedStartAt: (cj.forcedStartAt as string | null) ?? null,
+    forcedEndAt: (cj.forcedEndAt as string | null) ?? null,
     displayOrder: item.displayOrder,
     displayDuration: (cj.duration as number) || undefined,
     isActive: true,
@@ -156,13 +164,15 @@ function PlaybackSession() {
       if (isScheduleMode) {
         if (!storeOrganizationId) throw new Error('STORE_REQUIRED');
         const result = await fetchActiveContent(storeOrganizationId);
+        calibrateSignageClock(result.resolvedAt);
         if (!result.schedule) throw new Error('NO_SCHEDULE');
         return { name: result.schedule.name, isLoop: true, defaultDuration: 10, items: result.items.map(storeItemToPlaybackItem) };
       }
       // The selection page lists store_playlists. Resolve that same model with its existing
       // public playback reader (published + active + forced/time-window filtering).
       try {
-        const result = await apiClient.get<{ success: boolean; data: { name: string; items: StorePlaylistActiveItem[] } }>(`/store-playlists/public/${encodeURIComponent(playlistId)}`);
+        const result = await apiClient.get<{ success: boolean; data: { name: string; items: StorePlaylistActiveItem[]; serverNow?: string } }>(`/store-playlists/public/${encodeURIComponent(playlistId)}`);
+        calibrateSignageClock(result.data?.serverNow);
         if (!result.success || !result.data) throw new Error('INVALID_PLAYLIST');
         return { name: result.data.name, isLoop: true, defaultDuration: 10, items: result.data.items.map(storeItemToPlaybackItem) };
       } catch (cause) {
@@ -184,14 +194,20 @@ function PlaybackSession() {
       if (!result.success || !result.data) throw new Error('PLAYLIST_UNAVAILABLE');
       return signagePlaylistToPlaybackData(result.data);
     };
-    void load().then(result => { if (current) setPlaybackData(result); })
-      .catch(cause => { if (current) setError(cause.message === 'NO_SCHEDULE' ? '현재 시간에 적용된 일정이 없습니다. 재생 시간을 확인하거나 게시된 안내를 선택하시기 바랍니다.' : '재생 자료를 불러오지 못했습니다. 게시 상태와 접근 권한을 확인하고 다시 시도해 주시기 바랍니다.'); })
-      .finally(() => { if (current) setLoading(false); });
-    return () => { current = false; };
+    let inFlight = false, loaded = false;
+    const refresh = async () => {
+      if (inFlight) return; inFlight = true;
+      try { const result = await load(); if (current) { loaded = true; setPlaybackData(previous => JSON.stringify(previous) === JSON.stringify(result) ? previous : result); setError(null); } }
+      catch (cause) { if (current && !loaded) setError((cause as Error).message === 'NO_SCHEDULE' ? '현재 시간에 적용된 일정이 없습니다. 재생 시간을 확인하거나 게시된 안내를 선택하시기 바랍니다.' : '재생 자료를 불러오지 못했습니다. 게시 상태와 접근 권한을 확인하고 다시 시도해 주시기 바랍니다.'); }
+      finally { inFlight = false; if (current) setLoading(false); }
+    };
+    void refresh(); const timer = setInterval(() => void refresh(), 15000);
+    return () => { current = false; clearInterval(timer); };
   }, [playlistId, isScheduleMode, storeOrganizationId, storeOrgLoading, retry]);
 
   // ── 아이템 순서 정렬 ────────────────────────────────────────────────────────
-  const items = playbackData?.items ?? [];
+  const now = useSignageClock();
+  const items = (playbackData?.items ?? []).filter(item => inRequiredWindow(item, now));
   const sequence = useMediaSequence(items.map(item => item.id), `${playlistId}:${retry}:${phase}`, playbackData?.isLoop ?? true);
   const { next, token, failedCurrent } = sequence;
   const currentIdx = sequence.index;

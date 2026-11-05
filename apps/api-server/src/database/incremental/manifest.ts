@@ -134,6 +134,8 @@ import { FenceClosedPharmacyWriters1793698990120 } from '../migrations/179369899
 
 import { AddTemporaryPasswordExpiry1793750400000 } from '../migrations/1793750400000-AddTemporaryPasswordExpiry.js';
 
+import { AddStorePlaylistTags1793857542325 } from '../migrations/1793857542325-AddStorePlaylistTags.js';
+
 export const INCREMENTAL_MIGRATIONS: readonly MigrationClass[] = [
   CreateStoreOwnerTerminationCases1789701000000,
   AlterHandoffTokensTargetWorkspace1789974015939,
@@ -193,6 +195,7 @@ export const INCREMENTAL_MIGRATIONS: readonly MigrationClass[] = [
   SeparateMemberResourceOwnership1793691490120,
   FenceClosedPharmacyWriters1793698990120,
   AddTemporaryPasswordExpiry1793750400000,
+  AddStorePlaylistTags1793857542325,
 ];
 
 export function incrementalMigrationNames(): string[] {
