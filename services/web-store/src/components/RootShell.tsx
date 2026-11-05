@@ -5,7 +5,7 @@ import { OperatorInboxLink } from '@o4o/operator-core-ui';
 /**
  * 공통 root shell — WO-O4O-UNIFIED-STORE-WORKSPACE-FOUNDATION-V1 §3-⑥
  * 홈 · 내 매장 · 서비스 업무 · 내 서비스 · 설정을 제공한다. HUB 기능은 내 매장에 배치한다.
- * `내 매장: ○○ ▼` 로 언제든 매장을 바꾼다(Selector 재진입).
+ * 가입 승인으로 연결된 매장 이름을 표시한다. 일반 메뉴에는 매장 선택을 반복하지 않는다.
  */
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
 import { PublicLegalFooterInfo } from '@o4o/shared-space-ui';
