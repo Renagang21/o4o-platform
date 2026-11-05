@@ -46,7 +46,7 @@ export default function RootShell() {
   return <div className="site">
     <header className="header o4o-service-header">
       <div className="header-left">
-        <Link className="brand" to={WORKSPACE_PATHS.home}>{BRAND.name}</Link>
+        <Link className="brand" to={WORKSPACE_PATHS.home}><img src={`${import.meta.env.BASE_URL}brand/store/logo-mark.svg`} alt="" aria-hidden="true" width="36" height="36" style={{display:"inline-block",verticalAlign:"middle",marginRight:8,flexShrink:0}} />{BRAND.name}</Link>
         <StoreSwitcher />
       </div>
       <nav className="nav" aria-label="매장 업무공간" data-testid="root-nav">

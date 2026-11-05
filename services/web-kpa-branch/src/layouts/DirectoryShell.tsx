@@ -29,9 +29,7 @@ export default function DirectoryShell({ children }: { children: ReactNode }) {
       <header className="border-b border-gray-200" data-testid="directory-header">
         <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-3 px-4 py-4">
           <Link to="/" className="flex items-center gap-3">
-            <span aria-hidden="true" className="flex h-10 w-10 items-center justify-center rounded bg-primary-600 text-sm font-bold text-white">
-              분회
-            </span>
+            <img src={`${import.meta.env.BASE_URL}brand/kpa-branch/logo-mark.svg`} alt="" aria-hidden="true" className="h-10 w-10 shrink-0" />
             <span className="text-lg font-semibold text-gray-900">{BRAND.nameKo}</span>
           </Link>
           <div className="flex items-center gap-3 text-sm">
