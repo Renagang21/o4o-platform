@@ -127,6 +127,9 @@ export function createStoreAssetControlController(
             ON c.snapshot_id = s.id AND c.organization_id = s.organization_id
           WHERE s.organization_id = $1
             AND (c.publish_status IS NULL OR c.publish_status != 'hidden')
+            AND (COALESCE(c.is_forced, false) = false OR (
+              (c.forced_start_at IS NULL OR NOW() >= c.forced_start_at)
+              AND (c.forced_end_at IS NULL OR NOW() < c.forced_end_at)))
           ${countTypeFilter}
           ${countSearchFilter}
         `;
@@ -161,6 +164,9 @@ export function createStoreAssetControlController(
             ON c.snapshot_id = s.id AND c.organization_id = s.organization_id
           WHERE s.organization_id = $1
             AND (c.publish_status IS NULL OR c.publish_status != 'hidden')
+            AND (COALESCE(c.is_forced, false) = false OR (
+              (c.forced_start_at IS NULL OR NOW() >= c.forced_start_at)
+              AND (c.forced_end_at IS NULL OR NOW() < c.forced_end_at)))
           ${typeFilter}
           ${searchFilter}
           ORDER BY

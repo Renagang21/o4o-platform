@@ -69,7 +69,8 @@ jest.mock('../middleware/auth.middleware.js', () => ({
         .json({ success: false, error: 'Authentication required', code: 'AUTH_REQUIRED' });
     }
     // operator + store_owner → operator / store / community guard 를 모두 통과한다.
-    req.user = { id: 'u1', roles: ['kpa:operator', 'kpa:store_owner'], isActive: true };
+    const roles = req.path.includes('/hq/forced-content') ? ['platform:super_admin'] : ['kpa:operator', 'kpa:store_owner'];
+    req.user = { id: 'u1', roles, isActive: true };
     next();
   },
 }));

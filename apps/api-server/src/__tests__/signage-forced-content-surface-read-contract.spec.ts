@@ -18,7 +18,7 @@
  *   'both'         | 포함             | 포함
  *   invalid/NULL   | 제외             | 제외
  *
- * 관리(management) reader 는 playback reader 가 아니므로 전체 surface 를 본다.
+ * Store 관리 reader도 현재 유효한 signage 필수 영상만 본다(2026-11-05 사용자 확정).
  *
  * DB 는 붙이지 않는다. reader 원본 SQL 에서 실제 허용 집합을 추출해
  * truth table 을 평가하므로 mock 과의 순환 검증이 되지 않는다.
@@ -104,7 +104,7 @@ describe('WO-O4O-SIGNAGE-FORCED-CONTENT-SURFACE-READ-CONTRACT-CLOSURE-V2', () =>
       expect(body).toMatch(/fc\.is_active = true/);
       expect(body).toMatch(/fc\.deleted_at IS NULL/);
       expect(body).toMatch(/NOW\(\) >= fc\.start_at/);
-      expect(body).toMatch(/NOW\(\) <= fc\.end_at/);
+      expect(body).toMatch(/NOW\(\) < fc\.end_at/);
       expect(body).toMatch(/fc\.service_key = \$2/);
     });
   });
@@ -192,11 +192,10 @@ describe('WO-O4O-SIGNAGE-FORCED-CONTENT-SURFACE-READ-CONTRACT-CLOSURE-V2', () =>
   });
 
   describe('management reader — playback 계약 대상 아님', () => {
-    it('findPlaylistItems 는 편집용이므로 surface 전체를 본다 (필터 강제 안 함)', () => {
-      const body = methodBody(repoSrc, 'findPlaylistItems');
-      expect(body).toMatch(/FROM signage_forced_content/);
-      // 편집 화면은 tablet 전용 항목도 보여줄 수 있어야 한다 → 제약 없음을 명시적으로 고정
-      expect(allowedSurfaces(body).size).toBe(0);
+    it('store management uses currently effective signage requirements only', () => {
+      const body = methodBody(repoSrc, 'findRequiredPlaylistItems');
+      expect(body).toMatch(/NOW\(\) >= fc.start_at AND NOW\(\) < fc.end_at/);
+      expect([...allowedSurfaces(body)].sort()).toEqual(['both', 'signage']);
     });
   });
 

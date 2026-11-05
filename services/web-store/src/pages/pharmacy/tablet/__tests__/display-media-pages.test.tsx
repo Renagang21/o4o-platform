@@ -458,7 +458,7 @@ it.each([
       id: "snapshot",
       title: "Copied fixture",
       assetType: "signage",
-      publishStatus: "draft",
+      publishStatus: "published",
       channelMap: {},
       isForced: false,
       isLocked: false,
@@ -500,3 +500,19 @@ it.each([
     expect(api.updateMedia).not.toHaveBeenCalled();
   },
 );
+
+it("video list shows one content column and published videos only, preserving selection/edit actions", async () => {
+  api.media.mockResolvedValue([{ ...media, tags: ["건강"] }, { ...media, id: "draft-video", name: "Draft video", status: "draft" }]);
+  render(wrap(<StoreSignagePage />, "/store/marketing/signage/videos"));
+  await screen.findByText("Fixture video");
+  expect(screen.queryByText("Draft video")).toBeNull();
+  expect(screen.getByRole("columnheader", { name: "제목 / 태그" })).toBeTruthy();
+  for (const label of ["가져온 경로", "등록일", "상태"]) {
+    expect(screen.queryByRole("columnheader", { name: label })).toBeNull();
+  }
+  expect(screen.queryByRole("button", { name: "게시됨" })).toBeNull();
+  fireEvent.change(screen.getByPlaceholderText("제목·태그로 검색..."), { target: { value: "건강" } });
+  expect(screen.getByText("Fixture video")).toBeTruthy();
+  fireEvent.click(screen.getByLabelText("Fixture video 영상 선택"));
+  expect(screen.getByRole("button", { name: "선택 영상 상세·수정" })).toBeTruthy();
+});

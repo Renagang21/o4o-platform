@@ -24,7 +24,7 @@ main 병합·배포·운영 DB 변경은 하지 않는다. 기존 자료/테이�
 
 ## 조사 결과 · 제거/보존 경계
 
-- 기준: origin/main `50fccb6875`, 독립 branch `wo/display-playback-simplification`.
+- 시작 기준: origin/main `50fccb6875`; 최종 정렬 기준은 #947 반영 main `a4d769c1b2`, 독립 branch `wo/display-playback-simplification`.
 - PR #945는 다른 가입·매장 연결 변경을 포함하고 최신 main과 충돌한다. 가져오기를 취소했으며 그 PR/branch는 수정하지 않는다. 현재 main에 이미 통합된 매장 흐름에서 직접 진행한다.
 
 | 대상 | 처리 | 근거/소비처 |
@@ -62,14 +62,14 @@ main 병합·배포·운영 DB 변경은 하지 않는다. 기존 자료/테이�
 ## 검증 기록 — 2026-11-05
 
 - Node 22.23.4 / pnpm 10.25.0, frozen lockfile 설치. 의존성/lockfile 변경 없음.
-- web-store 전체: **94 files / 937 tests PASS**. 최종 사이니지 변경은 개별 오류 건너뛰기, 모든 실패 재시도, store 전환 응답 폐기, 이전 `_schedule` 주소 안내, published/active 목록만 선택, 403에서 public reader 우회 금지를 포함한다.
+- web-store 전체: **95 files / 948 tests PASS**. 최종 사이니지 변경은 개별 오류 건너뛰기, 모든 실패 재시도, store 전환 응답 폐기, 이전 `_schedule` 주소 안내, published/active 목록만 선택, 403에서 public reader 우회 금지를 포함한다.
 - store-ui-core 공통 계약: **3 files / 55 tests PASS**. 공통 메뉴/목록의 체크·ActionBar 업무 연결 유지.
-- API signage 범위: **13 suites / 241 tests PASS**, 기존 조건부 **1 suite / 5 tests SKIP**. 매장 schedule endpoint auth/404/무쓰기, 조직 격리, stored video, forced 시간창/태블릿 surface를 포함한다.
+- API signage 범위: **13 suites / 243 tests PASS**, 기존 조건부 **1 suite / 5 tests SKIP**. 매장 schedule endpoint auth/404/무쓰기, 조직 격리, stored video, forced 시간창/태블릿 surface를 포함한다.
 - web-store(type-check 포함)·web-neture(type-check 포함) production build, API type-check·tsup bundle PASS. 기존 chunk 크기/Browserslist/tsconfig 중복 옵션 경고는 범위 밖이며 설정을 변경하지 않았다.
 - 실제 Chromium + 로컬 가상 자료: PC 1440px / mobile 390px, 새 탭 → 체크 → 상단 ActionBar → 재생, 독립 두 창, 새로고침, 주소 복사, 목록 변경, native 전체화면 진입/해제, 전체화면 거절 시 일반 재생, media 404 후 재시도, 목록 조회 실패/복구, 선택적 AI 없는 외부 영상 등록. pageerror 0.
-- 재생 중 조작부는 숨기고 작은 `재생 설정 열기`로 접근한다. 목록은 자동으로 바꾸지 않으며 `변경한 목록 다시 적용`으로 명시적으로 다시 읽는다.
+- 재생 중 조작부는 숨기고 작은 `재생 설정 열기`로 접근한다. 선택한 목록 ID는 자동으로 바꾸지 않는다. #947의 필수 영상 기간 정책을 보존해 같은 목록의 서버 변경은 15초마다 확인하고 캐시한 필수 영상의 만료는 1초 시계로 적용한다. `변경한 목록 다시 적용`은 즉시 다시 읽기다.
 - 브라우저 자료/계정·API는 격리 fixture다. 운영 로그인·실제 약국 TV·실제 YouTube/Vimeo 서비스 transport/등록은 검증하지 않았다. 브라우저 실패 복구를 외부 영상 재생 성공으로 기록하지 않는다.
-- main 병합·배포·운영 DB 변경·클라우드 환경 게시 없음. 배포 판단은 후속 통합 단계다.
+- main으로의 병합·배포·운영 DB 변경·클라우드 환경 게시 없음. 배포 판단은 후속 통합 단계다.
 
 ## 문서 정합
 
@@ -91,3 +91,11 @@ main 병합·배포·운영 DB 변경은 하지 않는다. 기존 자료/테이�
 - PR: [#948 — 재생 일정 폐기 및 디스플레이별 재생목록 선택](https://github.com/Renagang21/o4o-platform/pull/948)
 - branch: `wo/display-playback-simplification`; 구현 commit: `00d5148cc9`.
 - 지정된 개발·PR 생성 범위는 완료했다. GitHub CI 결과와 #945 중복 파일 확인·main 통합·배포/현장 TV 검증은 후속 통합 단계다. 이 문서의 COMPLETED는 운영 배포 완료를 의미하지 않는다.
+
+## 최신 main 충돌 정리
+
+PR 작성 중 main에 반영된 #947(`a4d769c1b2`)을 이 작업 branch로 병합했다(main으로 병합한 것이 아니다).
+새 재생목록 제작/태그·작성 요청 재사용, 게시 영상 단일 목록, 필수 영상 시간창·15초 서버 확인·1초 만료 처리를 보존했다.
+시간표 전용 service/DTO는 여전히 제거하고 새 public playlist reader의 필수 기간 필터를 사용한다.
+#947의 migration·전체 운영자 기능은 기존 main에서 상속한 것으로, 이 PR의 main 대비 migration/admin 변경은 0이다.
+재생 중 필수 영상 만료를 포함해 store 948 tests, API signage 243 tests 및 type-check/build/브라우저를 다시 검증했다.

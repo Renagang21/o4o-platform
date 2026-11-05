@@ -10,7 +10,7 @@ const playlist = { id: 'list', name: '대기실', publishStatus: 'draft' } as an
 it('edits a name, prevents empty/duplicate submission and resets on external name change', () => {
   const save = vi.fn(); const view = render(<PlaylistNameEditor playlist={playlist} busy={false} onSave={save} />);
   expect((screen.getByRole('button', { name: '이름 저장' }) as HTMLButtonElement).disabled).toBe(true);
-  fireEvent.change(screen.getByRole('textbox'), { target: { value: '카운터' } });
+  fireEvent.change(screen.getByRole('textbox', { name: '재생목록 이름' }), { target: { value: '카운터' } });
   fireEvent.submit(screen.getByRole('form', { name: '재생목록 이름 수정' }));
   expect(save).toHaveBeenCalledWith(playlist, '카운터');
   view.rerender(<PlaylistNameEditor playlist={{...playlist,name:'서버 저장 이름'}} busy onSave={save} />);
@@ -38,4 +38,22 @@ it('keeps rename errors visible and does not pretend the server saved a new name
 it.each([['community','커뮤니티'],['semi-franchise','가입 협업체'],['unknown','제공 자료']])('keeps import origin separate from video host: %s', (service,label) => {
   expect(signageVideoOrigin({source:'snapshot',_snapshot:{sourceService:service}} as any)).toBe(label);
   expect(signageVideoOrigin({source:'direct',sourceType:'youtube'} as any)).toBe('직접 등록');
+});
+
+it('reorders the visible IDs after a requirement expires before the next successful poll', async () => {
+  vi.useFakeTimers();
+  try {
+    api.fetchStorePlaylists.mockResolvedValue([playlist]);
+    const expired = { id: 'forced-window', isForced: true, forcedEndAt: new Date(Date.now() + 2000).toISOString() };
+    api.fetchPlaylistItems.mockResolvedValue([expired, { id: 'A' }, { id: 'B' }] as never[]);
+    api.reorderPlaylistItems.mockResolvedValue(undefined);
+    let result!: ReturnType<typeof renderHook<ReturnType<typeof useSignagePlaylists>, unknown>>['result'];
+    await act(async () => { result = renderHook(() => useSignagePlaylists('store-a')).result; });
+    await act(async () => { result.current.setSelectedPlaylistId('list'); });
+    await act(async () => { vi.advanceTimersByTime(3000); });
+    expect(result.current.playlistItems.map(item => item.id)).toEqual(['A', 'B']);
+    await act(async () => { await result.current.handleMoveItem('A', 1); });
+    expect(api.reorderPlaylistItems).toHaveBeenCalledWith('list', ['B', 'A']);
+    expect(result.current.playlistActionError).toBeNull();
+  } finally { vi.useRealTimers(); }
 });

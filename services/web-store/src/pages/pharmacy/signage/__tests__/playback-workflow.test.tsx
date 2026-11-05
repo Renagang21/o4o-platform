@@ -52,7 +52,7 @@ it('ignores a delayed playback response after switching stores', async () => {
   await act(async () => resolve({ success: true, data: { name: '매장 안내 A', items: [snapshot] } }));
   expect(screen.queryByText('매장 안내 A')).toBeNull();
 });
-it('applies a changed saved list only on an explicit reload, never on an ended event', async () => {
+it('does not refetch on an ended event and supports an explicit reload', async () => {
   vi.spyOn(HTMLMediaElement.prototype, 'play').mockResolvedValue(undefined);
   m.get.mockResolvedValue({ success: true, data: { name: 'Stored A', items: [{ ...snapshot, contentJson: { sourceUrl: '/a.mp4', mediaType: 'video' } }] } });
   render(app()); await screen.findByText('Stored A');
@@ -152,4 +152,21 @@ it('redirects retired schedule playback URLs to the playlist chooser without rea
   </Routes></MemoryRouter>);
   await screen.findByText('게시된 플레이리스트가 없습니다.');
   expect(m.get).not.toHaveBeenCalled();
+});
+
+it('stops a playing required video at its deadline without waiting for a network refresh', async () => {
+  vi.useFakeTimers();
+  try {
+    m.get.mockResolvedValue({ success: true, data: { name: 'Window fixture', items: [
+      { ...snapshot, id: 'forced-fixture', title: 'Required fixture', isForced: true, contentJson: { ...snapshot.contentJson, forcedEndAt: new Date(Date.now() + 2000).toISOString() } },
+      { ...snapshot, id: 'ordinary-fixture', title: 'Ordinary fixture' },
+    ] } });
+    await act(async () => { render(app()); });
+    fireEvent.click(screen.getByRole('button', { name: /일반 화면으로 재생/ }));
+    expect(screen.getByLabelText('Required fixture')).toBeTruthy();
+    m.get.mockRejectedValue(new Error('offline'));
+    await act(async () => { vi.advanceTimersByTime(3000); });
+    expect(screen.queryByLabelText('Required fixture')).toBeNull();
+    expect(screen.getByLabelText('Ordinary fixture')).toBeTruthy();
+  } finally { vi.useRealTimers(); }
 });

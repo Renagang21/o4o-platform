@@ -135,15 +135,15 @@ describe('§9-4~6 · 메뉴 권한 정책', () => {
   // 약국 서비스 설정 통합: 협력사업 독립 메뉴 제거로 클릭 21 → 20, 그룹 헤더 4 유지.
   // 공개자료·매장 제안 설명서 검토 진입점 추가 (19 → 20).
   // 회원·사업체 native 4개와 콘텐츠 최종 삭제 +5, 플랫폼/회원 그룹 +2.
-  it('업무 운영과 운영자 지정을 포함한 클릭 가능한 정적 메뉴는 27개다', () => {
-    expect(CLICKABLE).toHaveLength(27);
+  it('업무 운영과 운영자 지정을 포함한 클릭 가능한 정적 메뉴는 28개다', () => {
+    expect(CLICKABLE).toHaveLength(28);
   });
 
-  it('4. 정적 메뉴 전 노드(클릭 27 + 그룹 헤더 6)가 명시적 권한 설정을 갖는다', () => {
+  it('4. 정적 메뉴 전 노드(클릭 28 + 그룹 헤더 6)가 명시적 권한 설정을 갖는다', () => {
     const configured = new Set(menuPermissions.map((m) => m.menuId));
     const missing = ALL_NODES.map((n) => n.id).filter((id) => !!id && !configured.has(id));
     expect(missing).toEqual([]);
-    expect(ALL_NODES).toHaveLength(33); // 클릭 27 + 그룹 헤더 6
+    expect(ALL_NODES).toHaveLength(34); // 클릭 28 + 그룹 헤더 6
   });
 
   it('4-b. 모든 설정 항목이 명시적 역할을 갖는다 (무게이트 항목 0)', () => {
