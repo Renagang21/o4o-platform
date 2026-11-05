@@ -563,7 +563,7 @@ export default function App({ remote, embedded = false }: { remote?: RemoteWorks
       </a>
       <div className="topbar" role="group" aria-label="작업공간 도구">
         {!embedded && <a className="brand" href="#home">
-          <span className="brand-mark">o4o</span>
+          <img src={`${import.meta.env.BASE_URL}brand/partner/logo-mark.svg`} alt="" aria-hidden="true" width="36" height="36" />
           <span>
             partner<span className="brand-dot">.</span>
           </span>

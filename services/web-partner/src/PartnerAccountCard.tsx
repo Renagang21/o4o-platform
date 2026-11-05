@@ -14,7 +14,7 @@ export function PartnerAccountCard({
   heading?: "h1" | "h2";
 }) {
   return (
-    <LoginCard
+    <LoginCard logoSrc={`${import.meta.env.BASE_URL}brand/partner/logo-mark.svg`}
       brand="O4O Partner"
       title="O4O 계정 로그인"
       heading={heading}

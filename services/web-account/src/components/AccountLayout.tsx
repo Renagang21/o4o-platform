@@ -32,7 +32,7 @@ export default function AccountLayout() {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-50">
         <div className="w-full max-w-md p-8 bg-white rounded-lg shadow-md text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">O4O Account Center</h1>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2"><img src={`${import.meta.env.BASE_URL}brand/account/logo-mark.svg`} alt="" aria-hidden="true" width="36" height="36" style={{display:"inline-block",verticalAlign:"middle",marginRight:8}} />O4O Account Center</h1>
           <p className="text-sm text-gray-500 mb-6">
             서비스 계정을 관리하고 서비스를 이동합니다.
           </p>
@@ -57,7 +57,7 @@ export default function AccountLayout() {
       {/* Header */}
       <header className="bg-white border-b border-gray-200">
         <div className="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
-          <h1 className="text-lg font-bold text-gray-900">O4O Account Center</h1>
+          <h1 className="text-lg font-bold text-gray-900"><img src={`${import.meta.env.BASE_URL}brand/account/logo-mark.svg`} alt="" aria-hidden="true" width="36" height="36" style={{display:"inline-block",verticalAlign:"middle",marginRight:8}} />O4O Account Center</h1>
           <div className="flex items-center gap-4">
             <span className="text-sm text-gray-600">{user?.name || user?.email}</span>
             <button

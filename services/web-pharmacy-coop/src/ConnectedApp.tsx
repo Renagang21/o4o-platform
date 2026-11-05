@@ -173,7 +173,7 @@ export function ConnectedApp() {
         ) : undefined
       }
       loginContent={
-        <LoginCard brand="O4O 협동조합" title="협동조합 로그인">
+        <LoginCard logoSrc={`${import.meta.env.BASE_URL}brand/pharmacy-coop/logo-mark.svg`} brand="O4O 협동조합" title="협동조합 로그인">
           {auth.user ? (
             <>
               <p>로그인했습니다.</p>

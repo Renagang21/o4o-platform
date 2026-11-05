@@ -164,9 +164,7 @@ export function BranchLayout({ slug, basePath }: { slug: string; basePath: strin
             {site?.logoUrl ? (
               <img src={site.logoUrl} alt="" className="h-8 w-8 rounded object-contain md:h-10 md:w-10" />
             ) : (
-              <span className="flex h-8 w-8 items-center justify-center rounded bg-primary-600 text-xs font-bold text-white md:h-10 md:w-10 md:text-sm">
-                분회
-              </span>
+              <img src={`${import.meta.env.BASE_URL}brand/kpa-branch/logo-mark.svg`} alt="" aria-hidden="true" className="h-8 w-8 object-contain md:h-10 md:w-10" />
             )}
             <span className="text-lg font-semibold text-gray-900">{site?.title ?? site?.branchName ?? '분회 홈페이지'}</span>
           </Link>

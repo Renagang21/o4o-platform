@@ -228,7 +228,7 @@ function Layout() {
         </div>
       </div>
       <GlobalHeader
-        brand={{ name: '약국 협동조합 연합회', icon: '＋', href: '/' }}
+        brand={{ name: '약국 협동조합 연합회', icon: '＋', logoSrc: `${import.meta.env.BASE_URL}brand/pharmacy-coop/logo-mark.svg`, href: '/' }}
         publicNav={COOPERATIVE_PUBLIC_NAV}
         contextualNav={[
           ...(session.userId ? COOPERATIVE_MEMBER_NAV : []),

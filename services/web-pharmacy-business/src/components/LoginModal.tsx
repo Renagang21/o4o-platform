@@ -1,3 +1,4 @@
+import { PHARMACY_HEADER_BRAND } from '../config/brand';
 /**
  * LoginModal - KPA Society 로그인 모달
  *
@@ -98,7 +99,7 @@ export default function LoginModal() {
     <div className="o4o-login-overlay" role="dialog" aria-modal="true" aria-label={loginTitle}
     >
       <button type="button" className="o4o-login-backdrop" aria-label="로그인 창 배경 닫기" onClick={closeModal} />
-      <LoginCard brand="O4O 약국" tone="blue" heading="h2" title={loginTitle} description="약국의 일상과 비즈니스를 연결하시기 바랍니다." onClose={closeModal}>
+      <LoginCard logoSrc={PHARMACY_HEADER_BRAND.logoSrc} brand="O4O 약국" tone="blue" heading="h2" title={loginTitle} description="약국의 일상과 비즈니스를 연결하시기 바랍니다." onClose={closeModal}>
 
           {error && !isNotMember && (
             <div className="mb-4 p-3 rounded-lg border bg-red-50 border-red-200">

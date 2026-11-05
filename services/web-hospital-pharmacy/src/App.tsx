@@ -26,7 +26,7 @@ function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="site">
       <header className="header">
-        <Link to="/" className="brand">{BRAND.name} <span className="muted">| Neture</span></Link>
+        <Link to="/" className="brand"><img src={`${import.meta.env.BASE_URL}brand/hospital-pharmacy/logo-mark.svg`} alt="" aria-hidden="true" width="36" height="36" style={{display:"inline-block",verticalAlign:"middle",marginRight:8,flexShrink:0}} />{BRAND.name} <span className="muted">| Neture</span></Link>
         {!isPharmacyPage && <nav className="nav">
           <NavLink to="/ward" className={({ isActive }) => (isActive ? 'active' : '')}>병동</NavLink>
           <NavLink to="/pharmacy" className={({ isActive }) => (isActive ? 'active' : '')}>원내 약품 파일</NavLink>

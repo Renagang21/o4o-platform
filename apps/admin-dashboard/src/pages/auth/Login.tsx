@@ -113,8 +113,8 @@ const Login: FC = () => {
   };
 
   return (
-    <LoginLayout brand="O4O Admin" tone="slate" headline={<>운영의 시작,<br />명확하고 간결하게.</>} description="O4O 서비스 운영을 위한 관리자 공간입니다.">
-      <LoginCard brand="O4O Admin" tone="slate" heading="h1" title="관리자 로그인" description="승인된 관리자 Google 계정으로 로그인하시기 바랍니다.">
+    <LoginLayout logoSrc={`${import.meta.env.BASE_URL}brand/admin/logo-mark.svg`} brand="O4O Admin" tone="slate" headline={<>운영의 시작,<br />명확하고 간결하게.</>} description="O4O 서비스 운영을 위한 관리자 공간입니다.">
+      <LoginCard logoSrc={`${import.meta.env.BASE_URL}brand/admin/logo-mark.svg`} brand="O4O Admin" tone="slate" heading="h1" title="관리자 로그인" description="승인된 관리자 Google 계정으로 로그인하시기 바랍니다.">
         {/* 세션 사용자 교체 안내 — 명시적 재로그인 전까지 기존 화면 · 서버 세션을 쓰지 않는다 */}
         {sessionConflict && (
           <div
