@@ -237,6 +237,8 @@ export function WorkspaceApp() {
     {/* 사이니지 재생은 chrome-free (KPA 와 동일하게 layout 밖) */}
     <Route path={`${S}/marketing/signage/display`} element={gated(<SignagePlayerSelectPage selection />)} />
     <Route path={`${S}/marketing/signage/play/:playlistId`} element={gated(<SignagePlaybackPage />)} />
+    <Route path={`${W}/kpa-society/store/marketing/signage/display`} element={gated(<SignagePlayerSelectPage selection />)} />
+    <Route path={`${W}/kpa-society/store/marketing/signage/play/:playlistId`} element={gated(<SignagePlaybackPage />)} />
 
     <Route element={<RootShell />}>
       <Route path={WORKSPACE_PATHS.login} element={<LoginPage />} />

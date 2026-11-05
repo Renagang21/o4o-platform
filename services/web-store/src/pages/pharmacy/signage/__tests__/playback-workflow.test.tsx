@@ -133,6 +133,7 @@ it('reports clipboard failure without claiming the address was copied', async ()
   render(app()); await screen.findByText('매장 안내 A');
   fireEvent.click(screen.getByRole('button', { name: '재생 주소 복사' }));
   await screen.findByText(/주소 복사에 실패했습니다/);
+  expect(screen.queryByText('재생 주소를 복사했습니다.')).toBeNull();
 });
 
 it('drops the previous display list response after a store switch', async () => {

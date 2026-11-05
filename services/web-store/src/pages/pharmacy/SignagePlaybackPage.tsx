@@ -198,7 +198,8 @@ function PlaybackSession() {
     };
     let inFlight = false, loaded = false;
     const refresh = async () => {
-      if (inFlight) return; inFlight = true;
+      if (inFlight) return;
+      inFlight = true;
       try { const result = await load(); if (current) { loaded = true; setPlaybackData(previous => JSON.stringify(previous) === JSON.stringify(result) ? previous : result); setError(null); } }
       catch { if (current && !loaded) setError('재생 자료를 불러오지 못했습니다. 게시 상태와 접근 권한을 확인하고 다시 시도해 주시기 바랍니다.'); }
       finally { inFlight = false; if (current) setLoading(false); }
@@ -272,14 +273,12 @@ function PlaybackSession() {
       ref={containerRef}
       className="fixed inset-0 bg-black z-50 overflow-hidden"
       onMouseMove={handleMouseMove}
-      onPointerDown={handleMouseMove}
       onFocusCapture={handleMouseMove}
-      onKeyDown={handleMouseMove}
     >
       {(phase !== 'playing' || showControls) && <div className="absolute bottom-10 left-4 right-4 z-10 flex flex-wrap items-center gap-2 text-sm text-white">
         <button type="button" onClick={handleClose} className="min-h-11 rounded bg-slate-800 px-3">재생목록 변경</button>
         <button type="button" onClick={() => void copyAddress()} className="min-h-11 rounded bg-slate-800 px-3">재생 주소 복사</button>
-        {(copyNotice || fullscreenNotice) && <output role="status">{copyNotice} {fullscreenNotice}</output>}
+        {(copyNotice || fullscreenNotice) && <output>{copyNotice} {fullscreenNotice}</output>}
       </div>}
       {phase === 'playing' && !showControls && <button type="button" onClick={handleMouseMove} className="absolute bottom-4 right-4 z-10 min-h-11 rounded bg-black/40 px-3 text-sm text-white/70">재생 설정 열기</button>}
       {/* ── Loading ─────────────────────────────────────────────────────── */}

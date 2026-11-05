@@ -142,7 +142,7 @@ describe('census — UUID parameter route 전수 (미조사 0)', () => {
     // WO-O4O-SIGNAGE-LEGACY-STACK-SIMPLIFICATION-AND-TABLET-AUTHORING-CLOSURE-V1:
     //   content-blocks/:id (get·patch·delete) + layout-presets/:id (get·patch·delete) 6건 은퇴로 39 → 33.
     // Store schedule GET/PATCH/DELETE retired: 33 → 30.
-    expect(targets.length).toBe(30);
+    expect(targets).toHaveLength(30);
 
     const layers = router.stack.filter((l: any) => l.route);
     for (const t of targets) {
@@ -352,5 +352,24 @@ describe('우선순위 — 인증 · serviceKey · 권한이 id validation 보�
     );
     expect(res.status).toBe(400);
     expect(res.body.code).toBe('INVALID_SERVICE_KEY');
+  });
+});
+
+describe('store schedules are retired', () => {
+  it.each([
+    ['get', '/schedules'], ['post', '/schedules'], ['get', '/schedules/calendar'],
+    ['get', `/schedules/${VALID_UUID}`], ['patch', `/schedules/${VALID_UUID}`],
+    ['delete', `/schedules/${VALID_UUID}`], ['get', '/active-content'],
+  ])('%s %s has no handler or writes', async (method, path) => {
+    allowStore();
+    const result = await (request(buildApp()) as any)[method]('/api/signage/kpa-society' + path)
+      .set('Authorization', 'Bearer fixture').set('X-Organization-Id', KPA_ORG);
+    expect(result.status).toBe(404);
+    expect(entered).toEqual([]);
+    expect(q).not.toHaveBeenCalled();
+  });
+  it('preserves authentication for the retired URLs', async () => {
+    const result = await request(buildApp()).get('/api/signage/kpa-society/schedules');
+    expect(result.status).toBe(401);
   });
 });

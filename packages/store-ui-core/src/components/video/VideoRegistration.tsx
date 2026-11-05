@@ -27,6 +27,13 @@ function draftFields(answer: string) {
     throw new Error('AI가 등록 정보를 준비하지 못했습니다. 직접 제목을 입력해 등록할 수 있습니다.');
   return { name: value.name.trim(), description: value.description, tags: value.tags as string[] };
 }
+/** Bounded, linear extraction keeps the URL supplied by the user, never by AI. */
+function firstVideoUrl(request: string): string {
+  const candidate = request.slice(0, 2000).split(/\s+/).find(word => word.startsWith('https://') || word.startsWith('http://')) ?? '';
+  let end = candidate.length;
+  while (end > 0 && '),.'.includes(candidate[end - 1])) end--;
+  return candidate.slice(0, end);
+}
 /** One explicit request prepares metadata and commits the registration. AI never selects a URL or scope. */
 export function VideoRegistration(props: Readonly<Props>) {
   return <RegistrationSession key={props.contextKey} {...props} />;
@@ -34,6 +41,7 @@ export function VideoRegistration(props: Readonly<Props>) {
 function RegistrationSession({ contextKey, mediaApi, ask, save, onSaved, requestSlot, youtube }: Readonly<Props>) {
   const id = useId();
   const [source, setSource] = useState<'o4o' | 'external'>('o4o');
+  const [showRequests, setShowRequests] = useState(false);
   const [url, setUrl] = useState(''), [asset, setAsset] = useState<MediaAssetItem | null>(null);
   const [picker, setPicker] = useState(false), [question, setQuestion] = useState(''), [name, setName] = useState('');
   const [stage, setStage] = useState<'idle'|'preparing'|'saving'|'queueing'|'saved'>('idle');
@@ -50,7 +58,7 @@ function RegistrationSession({ contextKey, mediaApi, ask, save, onSaved, request
   }, [busy]);
   const run = useCallback(async (request: string, useAi = true) => {
     if (lock.current) throw new Error('등록 중입니다. 결과를 기다려 주시기 바랍니다.');
-    const enteredUrl = source === 'external' ? (url.trim() || request.match(/https?:\/\/[^\s<>]+/)?.[0]?.replace(/[),.]+$/, '') || '') : '';
+    const enteredUrl = source === 'external' ? (url.trim() || firstVideoUrl(request)) : '';
     const video = hostedVideo(enteredUrl);
     if (!asset && !video) throw new Error('업로드·처리가 끝난 개별 영상 주소를 넣거나 O4O 보관 영상을 선택해 주시기 바랍니다.');
     const key = JSON.stringify([asset?.id, video?.id, video?.provider, request, name, useAi, destination]);
@@ -88,11 +96,11 @@ function RegistrationSession({ contextKey, mediaApi, ask, save, onSaved, request
   const submit = async (useAi: boolean) => { try { await run(question, useAi); } catch (cause) { if (live.current) setError(cause instanceof Error ? cause.message : '등록하지 못했습니다.'); } };
   return <section aria-label="동영상 등록" className="space-y-3 rounded-xl border border-slate-300 bg-white p-4">
     <h3 className="font-semibold text-slate-900">동영상 등록</h3>
-    <div role="group" aria-label="동영상 등록 경로" className="grid gap-3 sm:grid-cols-2">
+    <fieldset aria-label="동영상 등록 경로" className="grid gap-3 sm:grid-cols-2">
       {([['o4o', 'O4O 영상 등록'], ['external', '외부 영상 연결']] as const).map(([value, label]) => <button key={value} type="button" aria-pressed={source === value} disabled={busy} onClick={() => {
         setSource(value); setAsset(null); setUrl(''); setDestination('o4o'); setStage('idle'); setError(''); setSavedName(''); prepared.current = null;
       }} className={`min-h-11 rounded-lg border px-4 py-3 text-left ${source === value ? 'border-teal-700 bg-teal-50' : 'border-slate-300'}`}>{label}</button>)}
-    </div>
+    </fieldset>
     {source === 'o4o' ? <div className="space-y-2">
       <p className="text-sm text-slate-600">파일을 업로드하거나 O4O에 보관한 영상을 선택합니다. 파일 보관과 동영상 보관함 등록은 각각 완료 여부를 안내합니다.</p>
       <button type="button" disabled={busy} onClick={() => setPicker(true)} className="min-h-11 rounded-lg border border-slate-300 px-3 text-sm">O4O 영상 보관·선택</button>
@@ -114,7 +122,10 @@ function RegistrationSession({ contextKey, mediaApi, ask, save, onSaved, request
     {busy && <output className="block text-sm text-blue-800"><progress aria-label="영상 등록 진행 중" className="w-full" />{stage === 'preparing' ? '등록 정보를 준비하고 있습니다.' : stage==='queueing'?'YouTube 등록 요청을 접수하고 있습니다.':'영상 목록에 저장하고 있습니다.'} {seconds}초 경과 · 완료될 때까지 기다려 주시기 바랍니다.</output>}
     {error && <p role="alert" className="text-sm text-red-700">{error} 입력과 준비한 정보는 유지됩니다.</p>}
     {savedName && <output className="block text-sm text-emerald-800">“{savedName}” {queued?'YouTube 등록 요청 접수 · 완료되면 알림으로 알려드립니다':'목록 등록 완료'}</output>}
-    {source === 'o4o' && asset && destination === 'youtube' && youtube && <YoutubeUploadRequests api={youtube} revision={revision} onCompleted={onSaved}/>}
+    {youtube && <details open={showRequests || (!!asset && destination === 'youtube')} onToggle={event => setShowRequests(event.currentTarget.open)}>
+      <summary className="min-h-11 cursor-pointer content-center text-sm">YouTube 요청 조회·재시도</summary>
+      {(showRequests || (!!asset && destination === 'youtube')) && <YoutubeUploadRequests api={youtube} revision={revision} onCompleted={onSaved}/>}
+    </details>}
     <MediaPickerModal open={picker} api={mediaApi} contextKey={contextKey} assetType="video" defaultFolder="general" title="O4O 영상 보관·선택" onClose={() => setPicker(false)} onSelect={value => { setAsset(value); setPicker(false); setStage('idle'); prepared.current = null; }} />
   </section>;
 }

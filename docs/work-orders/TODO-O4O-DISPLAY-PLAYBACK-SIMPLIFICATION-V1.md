@@ -99,3 +99,13 @@ PR 작성 중 main에 반영된 #947(`a4d769c1b2`)을 이 작업 branch로 병�
 시간표 전용 service/DTO는 여전히 제거하고 새 public playlist reader의 필수 기간 필터를 사용한다.
 #947의 migration·전체 운영자 기능은 기존 main에서 상속한 것으로, 이 PR의 main 대비 migration/admin 변경은 0이다.
 재생 중 필수 영상 만료를 포함해 store 948 tests, API signage 243 tests 및 type-check/build/브라우저를 다시 검증했다.
+
+## 병합·배포 추가 요청과 리뷰 보완
+
+사용자가 개발 PR 전달 후 이 공간에서 main 병합·배포를 추가로 요청했다. 아래 항목을 먼저 보완했으며 기술 gate 확인 후 정식 Delivery/필요한 Promote 경로를 따른다. 기존 DB migration·권한·배포 설정 변경을 추가하지 않는다. 실제 병합/배포 결과는 PR #948의 CI·production 상태와 최종 실행 결과를 확인한다.
+
+- 서비스 매장(`/work/kpa-society/store`)에서도 chrome-free 디스플레이 선택/재생 route를 같은 StoreGate로 연결했다. 실제 App route tree 회귀 테스트를 추가했다.
+- 새 등록 상태와 기존 YouTube 요청 관리를 분리했다. 영상 선택 없이 `YouTube 요청 조회·재시도`를 열어 기존 요청 재시도·취소가 가능하다. 등록 폼은 계속 간결하게 유지한다.
+- web-neture community 소비처 테스트를 새 등록 경로/선택적 AI에 맞췄다. Neture 전체 **180 files / 1530 tests PASS**. CI에서 함께 실패했던 무관한 mail 테스트도 로컬 전체 실행에서 통과했으며 mail 코드는 수정하지 않았다.
+- Store 전체 **95 files / 950 tests PASS**, 추가 YouTube 요청 관리와 실제 route matching을 포함한 집중 **9 files / 68 tests PASS**.
+- 일정 폐기 API 테스트는 기존 route fixture를 재사용하도록 합쳐 중복 43줄을 제거했다. guard 정책/품질 기준을 완화하지 않았다. UUID/폐기 경로 통합 **88 tests PASS**.

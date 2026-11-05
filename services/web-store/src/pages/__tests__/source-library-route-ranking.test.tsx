@@ -36,3 +36,14 @@ it('keeps customer and display runtime outside employee authentication and Store
   expect(staff).toHaveLength(1);
   expect(staff[0].route.path).toBe('/consultation/staff');
 });
+
+it.each(['/store', '/work/kpa-society/store'])('matches display selection and playback outside layout for %s', base => {
+  const routes = createRoutesFromElements(routeTree(WorkspaceApp() as TreeElement)!.props.children);
+  for (const suffix of ['/display', '/play/fixture', '/play/_schedule']) {
+    const matches = matchRoutes(routes, `${base}/marketing/signage${suffix}`)!;
+    expect(matches).toHaveLength(1);
+    expect(matches[0].route.path).toBe(`${base}/marketing/signage${suffix === '/display' ? suffix : '/play/:playlistId'}`);
+    const gate = matches[0].route.element as ReactElement<{children:ReactElement}>;
+    expect(gate.props.children.type).toBeTruthy();
+  }
+});

@@ -1,4 +1,4 @@
-import { fetchRequiredPlaylistVideos, type StorePlaylistItem } from '../../api/storePlaylist';
+import { fetchRequiredPlaylistVideos, type StorePlaylistItem, type StorePlaylist } from '../../api/storePlaylist';
 import { inRequiredWindow, useSignageClock } from './signage/requiredVideoWindow';
 import { PlaylistNameEditor } from './signage/PlaylistNameEditor';
 import { useUnifiedStore } from '../../contexts/StoreContext';
@@ -73,7 +73,6 @@ import {
   storeAssetControlApi,
   type StoreAssetItem,
 } from '../../api/assetSnapshot';
-import type { StorePlaylist } from '../../api/storePlaylist';
 import {
   fetchSignageMedia,
   updateSignageMedia,
@@ -343,7 +342,8 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
   useEffect(() => {
     let active = true, busy = false;
     const refresh = async () => {
-      if (busy) return; busy = true;
+      if (busy) return;
+      busy = true;
       try { const data = await fetchRequiredPlaylistVideos(); if (active && isCurrent()) { setRequiredVideos(previous => JSON.stringify(previous) === JSON.stringify(data) ? previous : data); setRequiredReadError(''); } }
       catch { if (active) setRequiredReadError('필수 영상을 갱신하지 못했습니다. 잠시 후 다시 확인합니다.'); }
       finally { busy = false; }
@@ -465,7 +465,7 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
       {/* ═══ Playlist Tab ═══════════════════════════ */}
       {activeTab === 'playlist' && (
         <div>
-          {savedGuide && <p role="status" className="mb-4 rounded-lg bg-teal-50 p-4 text-sm text-teal-900">{savedGuide} 초안을 저장했습니다. 자료를 확인한 뒤 게시하고 디스플레이에서 재생목록을 선택하시기 바랍니다.</p>}
+          {savedGuide && <output className="mb-4 block rounded-lg bg-teal-50 p-4 text-sm text-teal-900">{savedGuide} 초안을 저장했습니다. 자료를 확인한 뒤 게시하고 디스플레이에서 재생목록을 선택하시기 바랍니다.</output>}
           {/* Create + list */}
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold text-slate-800">재생목록</h2>
@@ -803,7 +803,7 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
       </section>
       <h2 className="mb-2 text-lg font-semibold text-slate-800">동영상 보관함</h2>
 
-      {requiredReadError && <p role="status" className="mb-3 text-sm text-amber-800">{requiredReadError}</p>}
+      {requiredReadError && <output className="mb-3 block text-sm text-amber-800">{requiredReadError}</output>}
       {/* ─── [B] 검색 + 필터 바 ─────────────────── */}
       {!loading && !mediaLoading && !mediaLoadError && !error && !listError && unifiedVideos.length > 0 && (
         <div className="relative mb-3">

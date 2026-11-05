@@ -95,3 +95,19 @@ it('defaults to O4O storage and registers directly without AI or a YouTube conne
   expect(props.ask).not.toHaveBeenCalled(); expect(youtube.enqueue).not.toHaveBeenCalled();
   expect(props.save.mock.calls[0][0]).toMatchObject({mediaLibraryAssetId:'90000000-0000-4000-a000-000000000001'});
 });
+
+it('lets a returning user retry and cancel earlier YouTube requests without choosing an asset',async()=>{
+  const props=setup();const youtube={enqueue:vi.fn(),list:vi.fn().mockResolvedValue({availability:{ready:true},items:[
+    {id:'failed',name:'이전 실패 요청',state:'failed'}, {id:'queued',name:'이전 대기 요청',state:'queued'},
+  ]}),retry:vi.fn().mockResolvedValue({}),cancel:vi.fn().mockResolvedValue({})};
+  render(<VideoRegistration {...props} youtube={youtube}/>);
+  expect(youtube.list).not.toHaveBeenCalled();
+  fireEvent.click(screen.getByText('YouTube 요청 조회·재시도'));
+  await screen.findByText('이전 실패 요청');
+  fireEvent.click(screen.getByRole('button',{name:'같은 요청 재시도'}));
+  await waitFor(()=>expect(youtube.retry).toHaveBeenCalledWith('failed'));
+  await waitFor(()=>expect((screen.getByRole('button',{name:'대기 요청 취소'}) as HTMLButtonElement).disabled).toBe(false));
+  fireEvent.click(screen.getByRole('button',{name:'대기 요청 취소'}));
+  await waitFor(()=>expect(youtube.cancel).toHaveBeenCalledWith('queued'));
+  expect(props.save).not.toHaveBeenCalled();expect(youtube.enqueue).not.toHaveBeenCalled();
+});
