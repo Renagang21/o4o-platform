@@ -81,16 +81,16 @@ function cleanText(raw: unknown, max: number): string | null {
 
 export function validateApplication(input: Partial<PharmacyApplicationInput>): PharmacyApplicationInput {
   if (input.businessRegistrationDocumentId != null && (typeof input.businessRegistrationDocumentId !== 'string' || input.businessRegistrationDocumentId.length > 36))
-    throw new NeturePharmacyError(400, 'INVALID_DOCUMENT', '본인이 제출한 사업자등록증을 선택해 주세요.');
+    throw new NeturePharmacyError(400, 'INVALID_DOCUMENT', '본인이 제출한 사업자등록증을 선택해 주시기 바랍니다.');
   const pharmacyName = cleanText(input.pharmacyName, 255);
   const businessNumber = normalizeBusinessNumber(input.businessNumber);
   const pharmacistLicenseNumber = cleanText(input.pharmacistLicenseNumber, 30);
-  if (!pharmacyName) throw new NeturePharmacyError(400, 'INVALID_PHARMACY_NAME', '약국 이름을 입력해 주세요.');
-  if (!businessNumber) throw new NeturePharmacyError(400, 'INVALID_BUSINESS_NUMBER', '사업자등록번호 10자리를 입력해 주세요.');
-  if (!pharmacistLicenseNumber) throw new NeturePharmacyError(400, 'INVALID_LICENSE_NUMBER', '약사 면허번호를 입력해 주세요.');
+  if (!pharmacyName) throw new NeturePharmacyError(400, 'INVALID_PHARMACY_NAME', '약국 이름을 입력해 주시기 바랍니다.');
+  if (!businessNumber) throw new NeturePharmacyError(400, 'INVALID_BUSINESS_NUMBER', '사업자등록번호 10자리를 입력해 주시기 바랍니다.');
+  if (!pharmacistLicenseNumber) throw new NeturePharmacyError(400, 'INVALID_LICENSE_NUMBER', '약사 면허번호를 입력해 주시기 바랍니다.');
   for (const email of [input.contactEmail, input.taxInvoiceEmail]) {
     if (email && (typeof email !== 'string' || email.trim().length > 255 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())))
-      throw new NeturePharmacyError(400, 'INVALID_EMAIL', '올바른 이메일 주소를 입력해 주세요.');
+      throw new NeturePharmacyError(400, 'INVALID_EMAIL', '올바른 이메일 주소를 입력해 주시기 바랍니다.');
   }
   return {
     pharmacyName,
@@ -149,9 +149,9 @@ export class PharmacyMembershipService {
       // Evidence is optional. When supplied, retain ownership/type/status validation.
       if (input.businessRegistrationDocumentId) {
         if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(input.businessRegistrationDocumentId))
-          throw new NeturePharmacyError(400, 'INVALID_DOCUMENT', '본인이 제출한 사업자등록증을 선택해 주세요.');
+          throw new NeturePharmacyError(400, 'INVALID_DOCUMENT', '본인이 제출한 사업자등록증을 선택해 주시기 바랍니다.');
         const [document] = await m.query(`SELECT id FROM kyc_documents WHERE id = $1 AND user_id = $2 AND "documentType" = 'business_registration' AND "verificationStatus" IN ('PENDING','VERIFIED')`, [input.businessRegistrationDocumentId, userId]);
-        if (!document) throw new NeturePharmacyError(400, 'INVALID_DOCUMENT', '본인이 제출한 사업자등록증을 선택해 주세요.');
+        if (!document) throw new NeturePharmacyError(400, 'INVALID_DOCUMENT', '본인이 제출한 사업자등록증을 선택해 주시기 바랍니다.');
       }
       const existing = await this.findMine(userId, m);
       if (existing && !canReapply(existing.status)) {
@@ -264,7 +264,7 @@ export class PharmacyMembershipService {
         const qualified = await m.query(`SELECT id FROM kpa_pharmacist_profiles WHERE user_id=$1 AND qualification_status='approved'
           AND license_verified=true AND verified_at IS NOT NULL AND verified_by IS NOT NULL AND BTRIM(license_number)=BTRIM($2) FOR SHARE`,
           [current.applicant_user_id,current.pharmacist_license_number]);
-        if(!qualified.length)throw new NeturePharmacyError(409,'PHARMACIST_QUALIFICATION_REQUIRED','신청 면허번호와 일치하는 공통 약사 자격을 먼저 승인해 주세요.');
+        if(!qualified.length)throw new NeturePharmacyError(409,'PHARMACIST_QUALIFICATION_REQUIRED','신청 면허번호와 일치하는 공통 약사 자격을 먼저 승인해 주시기 바랍니다.');
 
       }
       const [row] = rowsOf(await m.query(

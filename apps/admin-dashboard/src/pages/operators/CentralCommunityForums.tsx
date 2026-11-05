@@ -19,8 +19,8 @@ export default function CentralCommunityForums() {
     current.writing = true; setBusy(true); setError(''); setNotice('');
     try {
       await client.post('/communities/community/boards', { name: name.trim() });
-      if (current.mounted) { setName(''); setVersion(value => value + 1); setNotice('게시판을 만들었습니다. 공개 범위를 확인해 주세요.'); }
-    } catch { if (current.mounted) setError('게시판을 만들지 못했습니다. 현재 권한과 입력 내용을 확인해 주세요.'); }
+      if (current.mounted) { setName(''); setVersion(value => value + 1); setNotice('게시판을 만들었습니다. 공개 범위를 확인해 주시기 바랍니다.'); }
+    } catch { if (current.mounted) setError('게시판을 만들지 못했습니다. 현재 권한과 입력 내용을 확인해 주시기 바랍니다.'); }
     finally { current.writing = false; if (current.mounted) setBusy(false); }
   }
   const { user } = useAuth();

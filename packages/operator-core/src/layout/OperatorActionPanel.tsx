@@ -95,7 +95,7 @@ export function OperatorActionPanel({
                 <p className={`text-sm font-medium ${cfg.textColor}`}>{action.title}</p>
                 <p className={`text-xs mt-0.5 ${cfg.descColor}`}>{action.description}</p>
                 {hasError && (
-                  <p className="text-xs mt-1 text-red-600">실행 실패 — 다시 시도해주세요</p>
+                  <p className="text-xs mt-1 text-red-600">실행 실패 — 다시 시도해 주시기 바랍니다</p>
                 )}
               </div>
 

@@ -34,7 +34,7 @@ const STATUS_MESSAGES: Record<ServiceKey, Record<string, { title: string; body: 
     none: { title: '공급자 서비스 신청이 필요합니다', body: 'O4O 계정으로 로그인되어 있지만 공급자 서비스는 아직 신청하지 않았습니다. 신청 후 승인되면 공급자 업무를 이용할 수 있습니다.', action: 'apply' },
     pending: { title: '공급자 서비스 신청 중', body: '신청이 접수되어 승인을 기다리고 있습니다. 승인되면 공급자 업무를 이용할 수 있습니다.', action: null },
     rejected: { title: '공급자 서비스 신청이 반려되었습니다', body: '신청 내용을 확인한 뒤 다시 신청할 수 있습니다. 다른 서비스 이용에는 영향이 없습니다.', action: 'reapply' },
-    suspended: { title: '공급자 서비스 이용이 정지되었습니다', body: '공급자 업무 공간을 이용할 수 없습니다. 자세한 내용은 운영자에게 문의해 주세요.', action: null },
+    suspended: { title: '공급자 서비스 이용이 정지되었습니다', body: '공급자 업무 공간을 이용할 수 없습니다. 자세한 내용은 운영자에게 문의해 주시기 바랍니다.', action: null },
     withdrawn: { title: '공급자 서비스를 탈퇴했습니다', body: '공급자 서비스만 종료된 상태입니다. O4O 계정과 다른 서비스는 그대로 이용할 수 있습니다.', action: 'reapply' },
   },
 };
@@ -55,7 +55,7 @@ export function ServiceUsageGate({ service, children }: { service: ServiceKey; c
     return (
       <div className="flex flex-col items-center justify-center min-h-screen text-center p-8" data-testid="service-gate-error">
         <h1 className="text-2xl font-bold text-gray-900 mb-4">이용 상태를 확인하지 못했습니다</h1>
-        <p className="text-gray-600 mb-6">{error ?? '잠시 후 다시 시도해 주세요.'}</p>
+        <p className="text-gray-600 mb-6">{error ?? '잠시 후 다시 시도해 주시기 바랍니다.'}</p>
         <div className="flex gap-4">
           <button type="button" onClick={reload} className="px-4 py-2 rounded-lg bg-primary-600 text-white text-sm font-medium hover:bg-primary-700">
             다시 시도

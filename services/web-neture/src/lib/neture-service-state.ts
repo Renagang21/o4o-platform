@@ -63,7 +63,7 @@ export function useNetureServiceStates(enabled: boolean): UseNetureServiceStates
             if (cancelled) return;
             if (me?.status === 'pending' && me?.accountAccess === 'restricted') {
               setRestrictedAccount(true);
-              setError('Neture 계정 확인이 필요합니다. 계정의 이메일 확인이나 이용 제한 상태를 확인해 주세요.');
+              setError('Neture 계정 확인이 필요합니다. 계정의 이메일 확인이나 이용 제한 상태를 확인해 주시기 바랍니다.');
               return;
             }
           } catch {

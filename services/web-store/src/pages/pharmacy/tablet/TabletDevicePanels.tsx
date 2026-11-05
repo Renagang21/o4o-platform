@@ -90,7 +90,7 @@ export function TabletPairingModal({
         </div>
         <div className="px-5 py-5 space-y-4 text-sm text-slate-700">
           <p>
-            태블릿의 크롬 브라우저에서 아래 주소를 열고 연결 코드를 입력하세요.
+            태블릿의 크롬 브라우저에서 아래 주소를 열고 연결 코드를 입력하시기 바랍니다.
           </p>
           <div className="rounded-xl bg-slate-50 border border-slate-200 px-4 py-3">
             <div className="text-[11px] text-slate-400">연결 주소</div>
@@ -179,7 +179,7 @@ export function TabletDeviceList({
       )}
       {!loading && !loadError && connectedDevices.length === 0 && (
         <p className="text-sm text-slate-500">
-          연결된 실제 태블릿이 없습니다. 위치 카드에서 태블릿을 연결하세요.
+          연결된 실제 태블릿이 없습니다. 위치 카드에서 태블릿을 연결하시기 바랍니다.
         </p>
       )}
       {connectedDevices.length > 0 && (

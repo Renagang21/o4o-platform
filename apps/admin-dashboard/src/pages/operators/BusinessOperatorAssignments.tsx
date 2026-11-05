@@ -60,8 +60,8 @@ export default function BusinessOperatorAssignments() {
     } catch {
       setError(
         completed
-          ? "변경은 완료됐지만 최신 담당 지정을 확인하지 못했습니다. 담당 지정만 다시 조회해 주세요."
-          : "처리하지 못했습니다. 현재 Neture 운영 권한과 사업 상태를 확인한 뒤 다시 시도해 주세요.",
+          ? "변경은 완료됐지만 최신 담당 지정을 확인하지 못했습니다. 담당 지정만 다시 조회해 주시기 바랍니다."
+          : "처리하지 못했습니다. 현재 Neture 운영 권한과 사업 상태를 확인한 뒤 다시 시도해 주시기 바랍니다.",
       );
     } finally {
       setBusy(false);
@@ -75,7 +75,7 @@ export default function BusinessOperatorAssignments() {
       </summary>
       <p className="mt-2 text-sm text-gray-600">
         과거 개별 지정과 기타 사업의 담당자를 관리합니다.
-        Pharmacy·CarePharm·드럭스토어형 약국·연합회의 새 Admin 지정은 위 권한 지정 기능을, Operator 지정은 해당 서비스의 Admin 화면을 사용하세요.
+        Pharmacy·CarePharm·드럭스토어형 약국·연합회의 새 Admin 지정은 위 권한 지정 기능을, Operator 지정은 해당 서비스의 Admin 화면을 사용하시기 바랍니다.
       </p>
       {error && (
         <p role="alert" className="my-2 text-red-700">
@@ -114,7 +114,7 @@ export default function BusinessOperatorAssignments() {
                 onClick={() => {
                   if (
                     !window.confirm(
-                      `${item.name}의 개별 담당 지정을 해제할까요? 계정과 다른 역할은 유지됩니다.`,
+                      `${item.name}의 개별 담당 지정을 해제하시겠습니까? 계정과 다른 역할은 유지됩니다.`,
                     )
                   )
                     return;
@@ -146,7 +146,7 @@ export default function BusinessOperatorAssignments() {
                 setCandidates([]);
               }}
             >
-              <option value="">사업을 선택하세요</option>
+              <option value="">사업을 선택하시기 바랍니다</option>
               {custom.map((item) => (
                 <option key={item.key} value={item.key}>
                   {item.name}
@@ -156,7 +156,7 @@ export default function BusinessOperatorAssignments() {
           </label>
           <p className="text-sm text-gray-600">
             기타 사업의 담당자는 현재 Neture 운영 권한이 있어야 합니다. 사용자를
-            검색해서 선택하세요.
+            검색해서 선택하시기 바랍니다.
           </p>
           <div className="flex flex-wrap gap-2">
             <input
@@ -198,7 +198,7 @@ export default function BusinessOperatorAssignments() {
               value={selected}
               onChange={(e) => setSelected(e.target.value)}
             >
-              <option value="">검색 결과에서 선택하세요</option>
+              <option value="">검색 결과에서 선택하시기 바랍니다</option>
               {candidates.map((candidate) => (
                 <option
                   key={candidate.userId}

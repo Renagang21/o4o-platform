@@ -12,7 +12,7 @@ export function createCommunityManagementRoutes(authenticate: RequestHandler) {
   const router = Router();
   router.use('/community/management', apiLimiter, authenticate, centralOperationRequest('community'));
   router.param('id', (req, res, next, id) => {
-    if (!/^[a-f\d]{8}(-[a-f\d]{4}){3}-[a-f\d]{12}$/i.test(id)) { res.status(400).json({ success:false, code:'INVALID_RESOURCE_ID', error:'대상을 확인해 주세요.' }); return; }
+    if (!/^[a-f\d]{8}(-[a-f\d]{4}){3}-[a-f\d]{12}$/i.test(id)) { res.status(400).json({ success:false, code:'INVALID_RESOURCE_ID', error:'대상을 확인해 주시기 바랍니다.' }); return; }
     next();
   });
   const run = (fn: (req: AuthRequest) => Promise<unknown>): RequestHandler => asyncHandler(async (req, res) => {
@@ -21,7 +21,7 @@ export function createCommunityManagementRoutes(authenticate: RequestHandler) {
     catch (error) {
       if (sendDemoAccountForbidden(res, error)) return;
       if (error instanceof CommunityManagementError) { res.status(error.status).json({ success: false, code: error.code, error: error.message }); return; }
-      if ((error as {code?: string}).code === '40001') { res.status(409).json({success:false,code:'DELETION_PLAN_CHANGED',error:'데이터가 변경되었습니다. 다시 확인해 주세요.'}); return; }
+      if ((error as {code?: string}).code === '40001') { res.status(409).json({success:false,code:'DELETION_PLAN_CHANGED',error:'데이터가 변경되었습니다. 다시 확인해 주시기 바랍니다.'}); return; }
       throw error;
     }
   });

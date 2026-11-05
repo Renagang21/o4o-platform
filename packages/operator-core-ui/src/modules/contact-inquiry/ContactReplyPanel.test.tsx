@@ -67,7 +67,7 @@ it("keeps the draft blocked until history is refreshed after a competing operato
   await waitFor(() => expect(send.disabled).toBe(false));
   fireEvent.click(send);
   await screen.findByText(
-    "다른 답변의 발송 결과를 확인 중입니다. 답변 이력을 다시 확인해 주세요.",
+    "다른 답변의 발송 결과를 확인 중입니다. 답변 이력을 다시 확인해 주시기 바랍니다.",
   );
   expect(send.disabled).toBe(true);
   expect(

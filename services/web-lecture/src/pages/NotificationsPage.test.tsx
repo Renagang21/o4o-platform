@@ -22,5 +22,5 @@ it('loads lecture alerts and links the review action locally without changing co
 });
 it('does not request private alerts before login',()=>{
  state.user=null;state.get.mockClear();render(<MemoryRouter><NotificationsPage/></MemoryRouter>);
- expect(screen.getByText('로그인 후 알림을 확인해 주세요.')).toBeTruthy();expect(state.get).not.toHaveBeenCalled();
+ expect(screen.getByText('로그인 후 알림을 확인해 주시기 바랍니다.')).toBeTruthy();expect(state.get).not.toHaveBeenCalled();
 });

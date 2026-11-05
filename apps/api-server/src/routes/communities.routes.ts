@@ -33,7 +33,7 @@ export function createCommunitiesRoutes(optionalAuth: RequestHandler, authentica
   // Retired creation/entity membership APIs stay unavailable, including stale bookmarked mutations.
   router.use((req, res, next) => {
     if (/^\/(requests|operating|admin)(?:\/|$)/.test(req.path) || /^\/[^/]+\/(join|leave|memberships)(?:\/|$)/.test(req.path)) {
-      res.status(410).json({ success: false, code: 'COMMUNITY_ENTITY_RETIRED', error: '개별 커뮤니티 개설·가입 기능은 종료되었습니다. 커뮤니티 서비스의 회원 기능을 이용해 주세요.' });
+      res.status(410).json({ success: false, code: 'COMMUNITY_ENTITY_RETIRED', error: '개별 커뮤니티 개설·가입 기능은 종료되었습니다. 커뮤니티 서비스의 회원 기능을 이용해 주시기 바랍니다.' });
       return;
     }
     next();

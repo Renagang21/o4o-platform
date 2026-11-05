@@ -14,7 +14,7 @@ export function createYoutubeRouter(db:DataSource){
   const router=Router(),queue=new YoutubeUploadQueue(db),connection=new YoutubeConnectionService(db);
   const run=(fn:(req:AuthRequest)=>Promise<unknown>,status=200)=>asyncHandler(async(req,res)=>{
     try{res.set('Cache-Control','no-store').status(status).json({success:true,data:await fn(req as AuthRequest)});}
-    catch(error){if(!(error instanceof YoutubeError))throw error;res.status(error.statusCode).json({success:false,code:error.code,error:'YouTube 요청 상태를 확인해 주세요. 연결·전달 설정이 없으면 업로드되지 않습니다.'});}
+    catch(error){if(!(error instanceof YoutubeError))throw error;res.status(error.statusCode).json({success:false,code:error.code,error:'YouTube 요청 상태를 확인해 주시기 바랍니다. 연결·전달 설정이 없으면 업로드되지 않습니다.'});}
   });
   router.get('/youtube/uploads',apiLimiter,authenticate,run(async req=>({availability:await queue.availability(),items:await queue.list(actor(req))})));
   router.post('/youtube/uploads/:id/cancel',apiLimiter,authenticate,run(req=>queue.cancel(actor(req),req.params.id)));

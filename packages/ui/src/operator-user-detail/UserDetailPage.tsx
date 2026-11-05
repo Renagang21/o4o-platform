@@ -140,7 +140,7 @@ function RoleModal({ userId, existingRoles, isAdmin, serviceKey, apiAdapter, the
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedRole) { setError('역할을 선택하세요.'); return; }
+    if (!selectedRole) { setError('역할을 선택하시기 바랍니다.'); return; }
     setLoading(true);
     setError('');
     try {
@@ -329,7 +329,7 @@ export default function UserDetailPage({
   };
 
   const handleMembershipReject = async (membershipId: string) => {
-    const reason = prompt('거부 사유를 입력하세요 (선택사항):');
+    const reason = prompt('거부 사유를 입력하시기 바랍니다 (선택사항):');
     if (reason === null) return;
     setActionLoading(membershipId);
     try {

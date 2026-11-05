@@ -148,7 +148,7 @@ export function InstructorCourseFormShell({
     e.preventDefault();
     if (!isValid) return;
     if (config.requireTags && showTags && tags.length === 0) {
-      setError('태그를 1개 이상 입력해주세요');
+      setError('태그를 1개 이상 입력해 주시기 바랍니다');
       return;
     }
     setSubmitting(true);
@@ -190,7 +190,7 @@ export function InstructorCourseFormShell({
           type="text"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          placeholder="강의 제목을 입력하세요"
+          placeholder="강의 제목을 입력하시기 바랍니다"
           maxLength={255}
           disabled={disabled}
         />
@@ -202,7 +202,7 @@ export function InstructorCourseFormShell({
           style={styles.textarea}
           value={description}
           onChange={(e) => setDescription(e.target.value)}
-          placeholder="강의 내용과 목표를 설명해 주세요"
+          placeholder="강의 내용과 목표를 설명해 주시기 바랍니다"
           disabled={disabled}
         />
       </div>
@@ -295,7 +295,7 @@ export function InstructorCourseFormShell({
               disabled={disabled}
             />
           </div>
-          <span style={styles.hint}>Enter 키로 태그를 추가하세요</span>
+          <span style={styles.hint}>Enter 키로 태그를 추가하시기 바랍니다</span>
         </div>
       )}
 

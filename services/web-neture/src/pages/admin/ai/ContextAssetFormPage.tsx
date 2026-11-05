@@ -153,23 +153,23 @@ export default function ContextAssetFormPage() {
 
     // 유효성 검사
     if (!formData.title.trim()) {
-      toast.error('제목을 입력해주세요.');
+      toast.error('제목을 입력해 주시기 바랍니다.');
       return;
     }
     if (!formData.summary.trim()) {
-      toast.error('요약을 입력해주세요.');
+      toast.error('요약을 입력해 주시기 바랍니다.');
       return;
     }
     if (formData.serviceScope.length === 0) {
-      toast.error('적용 서비스를 선택해주세요.');
+      toast.error('적용 서비스를 선택해 주시기 바랍니다.');
       return;
     }
     if (formData.pageTypes.length === 0) {
-      toast.error('적용 페이지를 선택해주세요.');
+      toast.error('적용 페이지를 선택해 주시기 바랍니다.');
       return;
     }
     if (formData.purposeTags.length === 0) {
-      toast.error('목적 태그를 선택해주세요.');
+      toast.error('목적 태그를 선택해 주시기 바랍니다.');
       return;
     }
 
@@ -290,7 +290,7 @@ export default function ContextAssetFormPage() {
                       type="text"
                       value={formData.title}
                       onChange={(e) => handleChange('title', e.target.value)}
-                      placeholder="Asset 제목을 입력하세요"
+                      placeholder="Asset 제목을 입력하시기 바랍니다"
                       className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                     />
                   </div>
@@ -303,7 +303,7 @@ export default function ContextAssetFormPage() {
                     <textarea
                       value={formData.summary}
                       onChange={(e) => handleChange('summary', e.target.value)}
-                      placeholder="AI가 응답에 사용할 짧은 요약을 입력하세요"
+                      placeholder="AI가 응답에 사용할 짧은 요약을 입력하시기 바랍니다"
                       rows={2}
                       className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"
                     />
@@ -317,7 +317,7 @@ export default function ContextAssetFormPage() {
                     <textarea
                       value={formData.content}
                       onChange={(e) => handleChange('content', e.target.value)}
-                      placeholder="상세 설명을 입력하세요 (HTML 사용 가능)"
+                      placeholder="상세 설명을 입력하시기 바랍니다 (HTML 사용 가능)"
                       rows={6}
                       className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none font-mono text-sm"
                     />

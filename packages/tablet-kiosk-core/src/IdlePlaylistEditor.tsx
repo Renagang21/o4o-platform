@@ -126,7 +126,7 @@ export function IdlePlaylistEditor({
     // WO-O4O-KPA-TABLET-CORNER-IDLE-YOUTUBE-VIMEO-AUTO-RETURN-V1:
     //   youtube/vimeo 는 embed 변환 가능한 URL 인지 확인(id 추출 실패 시 거부).
     if ((type === 'youtube' || type === 'vimeo') && !toIdleEmbedUrl(url)) {
-      setError('YouTube/Vimeo 영상 URL을 인식할 수 없습니다. 주소를 확인해 주세요.');
+      setError('YouTube/Vimeo 영상 URL을 인식할 수 없습니다. 주소를 확인해 주시기 바랍니다.');
       return;
     }
     let durationMs: number | undefined;
@@ -250,8 +250,8 @@ export function IdlePlaylistEditor({
       {/* List */}
       {items.length === 0 ? (
         <div style={styles.empty}>
-          등록된 idle 항목이 없습니다. 위에서 URL 을 입력해 추가하세요.
-          <div style={styles.hint}>비어있어도 저장 가능 — kiosk 는 "화면을 터치해주세요" placeholder 를 표시합니다.</div>
+          등록된 idle 항목이 없습니다. 위에서 URL 을 입력해 추가하시기 바랍니다.
+          <div style={styles.hint}>비어있어도 저장 가능 — kiosk 는 "화면을 터치해 주시기 바랍니다" placeholder 를 표시합니다.</div>
         </div>
       ) : (
         <ul style={styles.list}>
@@ -381,7 +381,7 @@ function LibraryAssetPicker({ open, onClose, onSelect, fetchAssets }: LibraryAss
           ) : filtered.length === 0 ? (
             <div style={pickerStyles.empty}>
               자료함에 image/video 자산이 없습니다.
-              <div style={pickerStyles.emptyHint}>매장 자료실에서 image/video 자료를 가져온 뒤 다시 열어주세요.</div>
+              <div style={pickerStyles.emptyHint}>매장 자료실에서 image/video 자료를 가져온 뒤 다시 열어주시기 바랍니다.</div>
             </div>
           ) : (
             <div style={pickerStyles.grid}>

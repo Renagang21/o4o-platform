@@ -73,7 +73,7 @@ class UnifiedApiClient {
 
     switch (status) {
       case 401:
-        toast.error('인증이 만료되었습니다. 다시 로그인해 주세요.');
+        toast.error('인증이 만료되었습니다. 다시 로그인해 주시기 바랍니다.');
         break;
       case 403:
         toast.error('접근 권한이 없습니다.');
@@ -82,12 +82,12 @@ class UnifiedApiClient {
         // Silent fail for 404s (handled by fallback data)
         break;
       case 429:
-        toast.error('요청이 너무 많습니다. 잠시 후 다시 시도해주세요.');
+        toast.error('요청이 너무 많습니다. 잠시 후 다시 시도해 주시기 바랍니다.');
         break;
       case 500:
       case 502:
       case 503:
-        toast.error('서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+        toast.error('서버 오류가 발생했습니다. 잠시 후 다시 시도해 주시기 바랍니다.');
         break;
       default:
         if (error.code === 'ECONNABORTED') {

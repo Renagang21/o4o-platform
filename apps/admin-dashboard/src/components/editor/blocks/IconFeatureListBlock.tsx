@@ -86,7 +86,7 @@ const IconFeatureListBlock: React.FC<IconFeatureListBlockProps> = ({
     const newItem: FeatureItem = {
       icon: 'check-circle',
       title: '새 기능',
-      description: '기능 설명을 입력하세요',
+      description: '기능 설명을 입력하시기 바랍니다',
     };
     updateAttributes({ items: [...items, newItem] });
   };
@@ -359,7 +359,7 @@ const IconFeatureListBlock: React.FC<IconFeatureListBlockProps> = ({
         {items.length === 0 && (
           <div className="text-center py-8 text-gray-400">
             <Grid3x3 className="w-12 h-12 mx-auto mb-2 opacity-50" />
-            <p className="text-sm">항목을 추가해주세요</p>
+            <p className="text-sm">항목을 추가해 주시기 바랍니다</p>
           </div>
         )}
       </div>

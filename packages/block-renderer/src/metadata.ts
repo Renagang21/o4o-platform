@@ -52,7 +52,7 @@ export const blockMetadata: BlockMetadata[] = [
       backgroundColor: { type: 'string', description: '배경 색상' }
     },
     example: {
-      json: JSON.stringify({ type: 'o4o/paragraph', attributes: { content: '여기에 텍스트를 입력하세요' } }, null, 2),
+      json: JSON.stringify({ type: 'o4o/paragraph', attributes: { content: '여기에 텍스트를 입력하시기 바랍니다' } }, null, 2),
       text: '기본 텍스트 단락'
     },
     version: '1.0.0',
@@ -442,15 +442,15 @@ export const blockMetadata: BlockMetadata[] = [
     description: 'FAQ, 접었다 펼치는 콘텐츠 항목',
     category: 'widgets',
     attributes: {
-      title: { type: 'string', default: '질문을 입력하세요', description: '질문' },
-      content: { type: 'string', default: '답변을 입력하세요', description: '답변' },
+      title: { type: 'string', default: '질문을 입력하시기 바랍니다', description: '질문' },
+      content: { type: 'string', default: '답변을 입력하시기 바랍니다', description: '답변' },
       defaultOpen: { type: 'boolean', default: false, description: '기본 펼침 상태' }
     },
     example: {
       json: JSON.stringify({
         type: 'o4o/accordion-item',
         attributes: {
-          title: '이것은 무엇인가요?',
+          title: '이것은 무엇입니까?',
           content: '이것은 아코디언 아이템입니다.'
         }
       }, null, 2),

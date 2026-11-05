@@ -100,7 +100,7 @@ export function EmailSignupForm({ api, links, className }: EmailSignupFormProps)
       setConfirm('');
       setSentTo({ email: email.trim(), masked: res.maskedEmail ?? undefined, mailSent: res.mailSent });
     } catch (e) {
-      const failure = readEmailAuthError(e, '회원가입을 처리하지 못했습니다. 잠시 후 다시 시도해 주세요.');
+      const failure = readEmailAuthError(e, '회원가입을 처리하지 못했습니다. 잠시 후 다시 시도해 주시기 바랍니다.');
       if (failure.code === 'EMAIL_PENDING_VERIFICATION') {
         setPassword(''); setConfirm('');
         setSentTo({ email: email.trim() });
@@ -135,7 +135,7 @@ export function EmailSignupForm({ api, links, className }: EmailSignupFormProps)
           style={{ ...styles.input, ...(email.length > 0 && !emailOk ? styles.inputInvalid : null) }}
           placeholder="name@example.com"
         />
-        {email.length > 0 && !emailOk && <p style={styles.hintBad}>올바른 이메일 주소를 입력해 주세요.</p>}
+        {email.length > 0 && !emailOk && <p style={styles.hintBad}>올바른 이메일 주소를 입력해 주시기 바랍니다.</p>}
       </div>
       <div style={styles.field}>
         <label htmlFor="o4o-signup-name" style={styles.label}>이름</label>
@@ -166,7 +166,7 @@ export function EmailSignupForm({ api, links, className }: EmailSignupFormProps)
         />
         <p style={phone.length > 0 && !phoneOk ? styles.hintBad : styles.hint}>
           {phone.length > 0 && !phoneOk
-            ? '휴대전화 번호를 확인해 주세요. (예: 01012345678)'
+            ? '휴대전화 번호를 확인해 주시기 바랍니다. (예: 01012345678)'
             : '아이디(이메일)를 잊었을 때 찾는 용도로만 씁니다. 본인 인증은 하지 않습니다.'}
         </p>
       </div>
@@ -208,7 +208,7 @@ export function EmailSignupForm({ api, links, className }: EmailSignupFormProps)
       {error && <p role="alert" style={styles.error}>{error}</p>}
       {!submitting && missing.length > 0 && (
         <p id="o4o-signup-requirements" role="status" style={styles.hintBad}>
-          가입 버튼을 누르려면 다음 항목을 확인해 주세요: {missing.join(' · ')}
+          가입 버튼을 누르려면 다음 항목을 확인해 주시기 바랍니다: {missing.join(' · ')}
         </p>
       )}
       <button type="submit" disabled={!ready} aria-describedby={!submitting && missing.length > 0 ? 'o4o-signup-requirements' : undefined} style={{ ...styles.primaryBtn, opacity: ready ? 1 : 0.6 }}>
@@ -246,9 +246,9 @@ export function EmailSentNotice({ api, email, mailSent, links, className }: Emai
         메일의 링크를 열면 가입이 완료되고, 그다음 이메일과 비밀번호로 로그인할 수 있습니다. 링크는 24시간 동안 유효합니다.
       </p>
       {mailSent === false && (
-        <p style={styles.error}>메일 발송이 지연되고 있습니다. 잠시 후 아래 버튼으로 다시 보내 주세요.</p>
+        <p style={styles.error}>메일 발송이 지연되고 있습니다. 잠시 후 아래 버튼으로 다시 보내 주시기 바랍니다.</p>
       )}
-      <p style={styles.hint}>메일이 보이지 않으면 스팸함을 확인해 주세요.</p>
+      <p style={styles.hint}>메일이 보이지 않으면 스팸함을 확인해 주시기 바랍니다.</p>
       {resend.message && <p role="status" style={styles.hintOk}>{resend.message}</p>}
       {resend.error && <p role="alert" style={styles.error}>{resend.error}</p>}
       <button type="button" onClick={() => void resend.resend()} disabled={resend.busy || resend.remaining > 0} style={styles.ghostBtn}>

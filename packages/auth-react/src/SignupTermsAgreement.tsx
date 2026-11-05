@@ -51,7 +51,7 @@ export function SignupTermsAgreement({ load, checked, onChecked, onDocument, rel
   }, [reloadKey, attempt]);
   return <div style={styles.field} data-testid="signup-terms-agreement">
     {state === 'loading' && <p role="status" style={styles.muted}>이용약관을 불러오고 있습니다…</p>}
-    {state === 'error' && <><p role="alert" style={styles.error}>이용약관을 불러오지 못했습니다. 다시 확인해 주세요.</p><button type="button" style={styles.ghostBtn} onClick={() => setAttempt(value => value + 1)}>이용약관 다시 불러오기</button></>}
+    {state === 'error' && <><p role="alert" style={styles.error}>이용약관을 불러오지 못했습니다. 다시 확인해 주시기 바랍니다.</p><button type="button" style={styles.ghostBtn} onClick={() => setAttempt(value => value + 1)}>이용약관 다시 불러오기</button></>}
     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, alignItems: 'center' }}>
       <label style={styles.checkRow}><input type="checkbox" disabled={state !== 'ready'} checked={checked} onChange={e => onChecked(e.target.checked)} /><span>이용약관 동의 (필수)</span></label>
       {document && <a href={document.termsHref} target="_blank" rel="noopener noreferrer" style={styles.link}>내용 보기 · 버전 {document.version}</a>}

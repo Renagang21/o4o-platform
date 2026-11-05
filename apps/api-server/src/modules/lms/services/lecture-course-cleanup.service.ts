@@ -28,7 +28,7 @@ export async function hardDeleteLectureCourse(db: DataSource, id: string, actorI
         AND (r.role='platform:super_admin' OR (r.role='lecture:admin' AND EXISTS(SELECT 1 FROM service_memberships sm WHERE sm.user_id=u.id AND sm.service_key='lecture' AND sm.status='active'))) FOR SHARE OF u,r`,[actorId]);
       if(!roles.length)throw new OperationError(403,'COURSE_ADMIN_REQUIRED','현재 강의 관리자 권한이 필요합니다.');
       const plan=await lectureDeletionPlan(manager,id);
-      if(expectedDigest!==undefined && plan.digest!==expectedDigest)throw new OperationError(409,'DELETION_PLAN_CHANGED','자료가 변경되었습니다. 삭제 범위를 다시 확인해 주세요.');
+      if(expectedDigest!==undefined && plan.digest!==expectedDigest)throw new OperationError(409,'DELETION_PLAN_CHANGED','자료가 변경되었습니다. 삭제 범위를 다시 확인해 주시기 바랍니다.');
       if(plan.blockers.length)throw new OperationError(409,'DELETION_BLOCKED',plan.blockers.join(' '));
     }
     await manager.query(`DELETE FROM lms_progress WHERE "enrollmentId" IN (SELECT id FROM lms_enrollments WHERE "courseId"=$1)`, [id]);

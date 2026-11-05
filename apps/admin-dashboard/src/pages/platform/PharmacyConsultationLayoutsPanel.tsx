@@ -91,7 +91,7 @@ export default function PharmacyConsultationLayoutsPanel() {
     } catch {
       if (alive.current && generation.current === version)
         setError(
-          "저장하지 못했습니다. 선택한 값을 유지했습니다. 다시 시도해 주세요.",
+          "저장하지 못했습니다. 선택한 값을 유지했습니다. 다시 시도해 주시기 바랍니다.",
         );
     } finally {
       lock.current = false;

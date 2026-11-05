@@ -118,7 +118,7 @@ export function StoreHubTemplate({ config }: StoreHubTemplateProps) {
     headerAction,
     storeCta,
     resourceSectionTitle = '자원 탐색',
-    resourceSectionDesc = '플랫폼 자원을 탐색하고 내 매장으로 가져가세요',
+    resourceSectionDesc = '플랫폼 자원을 탐색하고 내 매장으로 가져가시기 바랍니다',
     resourceCards,
     aiBlock,
     storeCtaBlock,

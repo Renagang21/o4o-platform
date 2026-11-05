@@ -81,7 +81,7 @@ export function useSignageSchedules(organizationId: string) {
     } catch {
       if (isCurrent())
         setScheduleError(
-          "데이터를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.",
+          "데이터를 불러오지 못했습니다. 잠시 후 다시 시도해 주시기 바랍니다.",
         );
     } finally {
       if (isCurrent()) setScheduleLoading(false);
@@ -99,7 +99,7 @@ export function useSignageSchedules(organizationId: string) {
     } catch {
       if (isCurrent())
         setSchedulePlaylistError(
-          "데이터를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.",
+          "데이터를 불러오지 못했습니다. 잠시 후 다시 시도해 주시기 바랍니다.",
         );
     } finally {
       if (isCurrent()) setSchedulePlaylistLoading(false);
@@ -194,7 +194,7 @@ export function useSignageSchedules(organizationId: string) {
     } catch {
       if (isCurrent() && submittedRevision === draftRevision.current)
         setSchSaveError(
-          "스케줄을 저장하지 못했습니다. 입력 내용을 확인한 후 다시 시도해 주세요.",
+          "스케줄을 저장하지 못했습니다. 입력 내용을 확인한 후 다시 시도해 주시기 바랍니다.",
         );
     } finally {
       saving.current.delete(organizationId);
@@ -219,7 +219,7 @@ export function useSignageSchedules(organizationId: string) {
       if (isCurrent()) await loadSchedules();
     } catch {
       if (isCurrent())
-        setScheduleError("스케줄을 삭제하지 못했습니다. 다시 시도해 주세요.");
+        setScheduleError("스케줄을 삭제하지 못했습니다. 다시 시도해 주시기 바랍니다.");
     } finally {
       locks.delete(sch.id);
       if (!locks.size) deleting.current.delete(organizationId);

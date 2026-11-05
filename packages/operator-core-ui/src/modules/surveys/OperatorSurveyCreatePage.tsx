@@ -76,8 +76,8 @@ export function OperatorSurveyCreatePage({ client, config }: OperatorSurveyCreat
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!title.trim()) { toast.error('제목을 입력하세요'); return; }
-    if (questions.some((q) => !q.question.trim())) { toast.error('모든 질문을 입력하세요'); return; }
+    if (!title.trim()) { toast.error('제목을 입력하시기 바랍니다'); return; }
+    if (questions.some((q) => !q.question.trim())) { toast.error('모든 질문을 입력하시기 바랍니다'); return; }
 
     setSaving(true);
     try {

@@ -126,7 +126,7 @@ function sanitizeInput(
   // 자동 회신 ON 이면 제목·본문 필수(빈값이면 의미 없는 메일 방지)
   if (out.auto_reply_enabled === true) {
     if (out.auto_reply_subject === null || out.auto_reply_message === null) {
-      return { error: '자동 회신을 사용하려면 제목과 본문을 입력하세요.' };
+      return { error: '자동 회신을 사용하려면 제목과 본문을 입력하시기 바랍니다.' };
     }
   }
 
@@ -134,7 +134,7 @@ function sanitizeInput(
   if (out.email_notification_enabled === true) {
     const recipients = out.recipient_emails;
     if (Array.isArray(recipients) && recipients.length === 0) {
-      return { error: '이메일 알림을 사용하려면 수신 이메일을 1개 이상 입력하세요.' };
+      return { error: '이메일 알림을 사용하려면 수신 이메일을 1개 이상 입력하시기 바랍니다.' };
     }
   }
 

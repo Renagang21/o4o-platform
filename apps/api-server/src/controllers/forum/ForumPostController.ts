@@ -391,7 +391,7 @@ export class ForumPostController extends ForumControllerBase {
       }
 
       if (await isImprovementBoard(this.postRepository.manager, resolvedForumId)) {
-        res.status(409).json({ success: false, code: 'IMPROVEMENT_WORKSPACE_REQUIRED', error: 'O4O 개선·업데이트 화면에서 작성해 주세요.' }); return;
+        res.status(409).json({ success: false, code: 'IMPROVEMENT_WORKSPACE_REQUIRED', error: 'O4O 개선·업데이트 화면에서 작성해 주시기 바랍니다.' }); return;
       }
 
       const post = this.postRepository.create({
@@ -459,7 +459,7 @@ export class ForumPostController extends ForumControllerBase {
       }
 
       if (await isImprovementBoard(this.postRepository.manager, post.forumId)) {
-        res.status(409).json({ success: false, code: 'IMPROVEMENT_WORKSPACE_REQUIRED', error: 'O4O 개선·업데이트 화면에서 처리해 주세요.' }); return;
+        res.status(409).json({ success: false, code: 'IMPROVEMENT_WORKSPACE_REQUIRED', error: 'O4O 개선·업데이트 화면에서 처리해 주시기 바랍니다.' }); return;
       }
 
       // Check permission — WO-O4O-FORUM-AUTHOR-PII-GUARD-V1 (S2)
@@ -569,7 +569,7 @@ export class ForumPostController extends ForumControllerBase {
       }
 
       if (await isImprovementBoard(this.postRepository.manager, post.forumId)) {
-        res.status(409).json({ success: false, code: 'IMPROVEMENT_WORKSPACE_REQUIRED', error: 'O4O 개선·업데이트 화면에서 처리해 주세요.' }); return;
+        res.status(409).json({ success: false, code: 'IMPROVEMENT_WORKSPACE_REQUIRED', error: 'O4O 개선·업데이트 화면에서 처리해 주시기 바랍니다.' }); return;
       }
 
       // Check permission — WO-O4O-FORUM-AUTHOR-PII-GUARD-V1 (S2)

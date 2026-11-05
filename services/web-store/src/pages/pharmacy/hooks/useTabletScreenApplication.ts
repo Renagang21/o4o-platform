@@ -47,7 +47,7 @@ export function useTabletScreenApplication(
           onClick: async () => {
             if (!isCurrent() || busy.current.has(tabletId)) return;
             if (revisions.current.get(tabletId) !== revision) {
-              setToast({ type: 'error', message: '이후 화면 변경이 있어 이전 되돌리기를 사용할 수 없습니다. 현재 화면을 다시 확인해 주세요.' });
+              setToast({ type: 'error', message: '이후 화면 변경이 있어 이전 되돌리기를 사용할 수 없습니다. 현재 화면을 다시 확인해 주시기 바랍니다.' });
               return;
             }
             busy.current.add(tabletId);
@@ -55,7 +55,7 @@ export function useTabletScreenApplication(
               const latest = await fetchTablets();
               if (!isCurrent()) return;
               if (latest.find(item => item.id === tabletId)?.currentScreenSetId !== newId)
-                throw new Error('현재 저장된 화면이 변경되었습니다. 위치에서 현재 화면을 확인한 뒤 다시 변경해 주세요.');
+                throw new Error('현재 저장된 화면이 변경되었습니다. 위치에서 현재 화면을 확인한 뒤 다시 변경해 주시기 바랍니다.');
               if (prevId) await applyCurrentScreenSet(tabletId, prevId);
               else await clearCurrentScreenSet(tabletId);
               if (!isCurrent()) return;
@@ -63,7 +63,7 @@ export function useTabletScreenApplication(
               update(tabletId, prevId);
               if (isCurrent()) setToast({
                 type: "success",
-                message: "이전 화면으로 되돌렸어요.",
+                message: "이전 화면으로 되돌렸습니다.",
               });
             } catch (error) {
               setToast({
@@ -84,10 +84,10 @@ export function useTabletScreenApplication(
   );
   const handleApplyToTablet = useCallback(
     async (screenSetId: string, tabletId: string) => {
-      if (!isCurrent()) throw new Error('매장 문맥이 변경되었습니다. 현재 매장에서 다시 선택해 주세요.');
+      if (!isCurrent()) throw new Error('매장 문맥이 변경되었습니다. 현재 매장에서 다시 선택해 주시기 바랍니다.');
       if (busy.current.has(tabletId))
         throw new Error(
-          "이 태블릿의 변경을 처리 중입니다. 잠시 후 다시 시도해 주세요.",
+          "이 태블릿의 변경을 처리 중입니다. 잠시 후 다시 시도해 주시기 바랍니다.",
         );
       const target = tablets.find((t) => t.id === tabletId);
       const prevId = target?.currentScreenSetId ?? null;
@@ -107,7 +107,7 @@ export function useTabletScreenApplication(
           type: "error",
           message:
             code === "SCREEN_SET_NOT_ACTIVE"
-              ? "이 콘텐츠는 지금 적용할 수 없는 상태입니다. 콘텐츠를 열어 저장한 뒤 다시 시도해 주세요."
+              ? "이 콘텐츠는 지금 적용할 수 없는 상태입니다. 콘텐츠를 열어 저장한 뒤 다시 시도해 주시기 바랍니다."
               : error instanceof Error
                 ? error.message
                 : "태블릿에 적용하지 못했습니다.",

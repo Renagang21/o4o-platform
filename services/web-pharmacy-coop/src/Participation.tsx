@@ -11,7 +11,7 @@ export function workError(error: unknown) {
     ?.response?.data?.error;
   return typeof message === "string"
     ? message
-    : "정보를 불러오거나 저장하지 못했습니다. 다시 시도해 주세요.";
+    : "정보를 불러오거나 저장하지 못했습니다. 다시 시도해 주시기 바랍니다.";
 }
 export function useRows<T>(client: Client, path: string) {
   const [rows, setRows] = useState<T[] | null>(null);
@@ -210,7 +210,7 @@ export function EligibilitySettings({
       <h3>조합 가입 기준</h3>
       <p>
         약사·약국 경영자·일반 개인 등 정관에 맞는 가입 자격과 제출 정보를
-        안내하세요. 자격은 관리자가 심사하며 기존 조합원을 자동 변경하지
+        안내하시기 바랍니다. 자격은 관리자가 심사하며 기존 조합원을 자동 변경하지
         않습니다.
       </p>
       <label>

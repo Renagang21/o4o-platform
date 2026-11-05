@@ -357,7 +357,7 @@ export function createOperatorInboxRoutes(ds: DataSource) {
           throw new NeturePharmacyError(
             409,
             "CONTACT_CHANGED",
-            "문의가 변경되었거나 접근할 수 없습니다. 입력을 보존한 채 다시 조회해 주세요.",
+            "문의가 변경되었거나 접근할 수 없습니다. 입력을 보존한 채 다시 조회해 주시기 바랍니다.",
           );
         await recordOperation(
           manager,

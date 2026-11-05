@@ -163,7 +163,7 @@ export function CourseListView({
             type="text"
             value={search.value}
             onChange={(e) => search.onChange(e.target.value)}
-            placeholder={search.placeholder ?? '검색어를 입력하세요'}
+            placeholder={search.placeholder ?? '검색어를 입력하시기 바랍니다'}
             aria-label={search.placeholder ?? '검색'}
             style={searchInputStyle}
           />

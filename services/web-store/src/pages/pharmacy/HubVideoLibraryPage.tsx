@@ -211,7 +211,7 @@ export function HubVideoLibraryPage() {
         <div>
           <h1 className="text-2xl font-bold text-slate-900">제공 자료 동영상</h1>
           <p className="mt-1.5 text-sm text-slate-500">
-            KPA 운영자가 발행한 동영상을 선택해 내 약국으로 가져가세요(초안 사본).
+            KPA 운영자가 발행한 동영상을 선택해 내 약국으로 가져가시기 바랍니다(초안 사본).
             가져온 동영상은 QR-code 로 연결할 수 있습니다.
           </p>
         </div>
@@ -219,7 +219,7 @@ export function HubVideoLibraryPage() {
 
       {slugResolved && !slug && (
         <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 text-sm text-amber-800 mb-4">
-          매장 정보가 연결되지 않아 가져가기 기능을 사용할 수 없습니다. 매장 등록 후 다시 시도해 주세요.
+          매장 정보가 연결되지 않아 가져가기 기능을 사용할 수 없습니다. 매장 등록 후 다시 시도해 주시기 바랍니다.
         </div>
       )}
 

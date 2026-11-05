@@ -74,7 +74,7 @@ export function GuideEditableSection({
     setSaveError(null);
     try {
       if (typeof editorValue !== 'string') {
-        setSaveError('편집기 오류: 내용을 다시 입력해주세요.');
+        setSaveError('편집기 오류: 내용을 다시 입력해 주시기 바랍니다.');
         return;
       }
       await client.saveGuideContent(serviceKey, pageKey, sectionKey, editorValue);
@@ -91,7 +91,7 @@ export function GuideEditableSection({
     if (reverting) return;
     // override 제거 → 코드 기본 콘텐츠로 복귀
     if (typeof window !== 'undefined' &&
-        !window.confirm('이 섹션의 수정본을 제거하고 기본 콘텐츠로 되돌릴까요?')) {
+        !window.confirm('이 섹션의 수정본을 제거하고 기본 콘텐츠로 되돌리시겠습니까?')) {
       return;
     }
     setReverting(true);
@@ -116,7 +116,7 @@ export function GuideEditableSection({
           ) : (
             canEdit ? (
               <span style={{ color: '#aaa', fontStyle: 'italic' }}>
-                (내용을 작성하려면 수정 버튼을 누르세요)
+                (내용을 작성하려면 수정 버튼을 누르시기 바랍니다)
               </span>
             ) : null
           )

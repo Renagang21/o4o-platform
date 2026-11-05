@@ -98,7 +98,7 @@ export function HomePresentationEditor({
       .catch(() => {
         if (active) {
           setLoadError(true);
-          setError("홈 화면 구성을 불러오지 못했습니다. 다시 시도해 주세요.");
+          setError("홈 화면 구성을 불러오지 못했습니다. 다시 시도해 주시기 바랍니다.");
         }
       })
       .finally(() => {
@@ -163,8 +163,8 @@ export function HomePresentationEditor({
         409;
       setError(
         conflict
-          ? "다른 운영자가 수정했습니다. 현재 입력은 보존했습니다. 다시 불러온 뒤 변경 내용을 확인해 주세요."
-          : "저장하지 못했습니다. 입력은 보존했습니다. 다시 시도해 주세요.",
+          ? "다른 운영자가 수정했습니다. 현재 입력은 보존했습니다. 다시 불러온 뒤 변경 내용을 확인해 주시기 바랍니다."
+          : "저장하지 못했습니다. 입력은 보존했습니다. 다시 시도해 주시기 바랍니다.",
       );
     } finally {
       if (generation.current === version) {
@@ -229,7 +229,7 @@ export function HomePresentationEditor({
       </header>
       <p className="home-editor-help">
         이곳의 안내는 공개 콘텐츠입니다. 회원 전용 자료와 개인정보는 넣지
-        마세요. Hero는 서비스 안내 최대 3개입니다.{" "}
+        마시기 바랍니다. Hero는 서비스 안내 최대 3개입니다.{" "}
         {surface === "carepharm"
           ? "공지·안내 목록에는 현재 게시 기간에 해당하는 항목을 모두 표시합니다."
           : "홍보 영역은 현재 게시 기간에 해당하는 첫 번째 항목을 보여줍니다."}{" "}
@@ -243,7 +243,7 @@ export function HomePresentationEditor({
         <p>{design.guidance}</p>
         <p>
           권장 이미지: {design.image}. 가로형 이미지를 사용하고, 중요한 내용은
-          가운데에 배치해 주세요. 이미지가 없으면 서비스 전용 그래픽이
+          가운데에 배치해 주시기 바랍니다. 이미지가 없으면 서비스 전용 그래픽이
           표시됩니다.
         </p>
       </aside>
@@ -260,7 +260,7 @@ export function HomePresentationEditor({
           onClick={() => {
             if (
               !dirty ||
-              window.confirm("저장하지 않은 입력을 버리고 다시 불러올까요?")
+              window.confirm("저장하지 않은 입력을 버리고 다시 불러오시겠습니까?")
             )
               setRetry((n) => n + 1);
           }}

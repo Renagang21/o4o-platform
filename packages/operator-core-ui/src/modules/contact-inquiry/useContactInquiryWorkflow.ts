@@ -160,7 +160,7 @@ export function useContactInquiryWorkflow(
       setActionError(message(e, '저장에 실패했습니다.'));
       if (statusSaved) {
         setNotice(
-          '상태는 저장되었지만 내부 메모는 저장하지 못했습니다. 메모만 다시 저장해 주세요.',
+          '상태는 저장되었지만 내부 메모는 저장하지 못했습니다. 메모만 다시 저장해 주시기 바랍니다.',
         );
         await load(result?.pagination.page ?? 1);
       }

@@ -295,7 +295,7 @@ const CommentForm: React.FC<{
   placeholder?: string;
   isLocked?: boolean;
   isLoggedIn?: boolean;
-}> = ({ onSubmit, placeholder = '댓글을 입력하세요...', isLocked, isLoggedIn = true }) => {
+}> = ({ onSubmit, placeholder = '댓글을 입력하시기 바랍니다...', isLocked, isLoggedIn = true }) => {
   const [content, setContent] = React.useState('');
 
   if (isLocked) {
@@ -578,7 +578,7 @@ export const PostSingleTemplate: React.FC<PostSingleTemplateProps> = ({
           </div>
         ) : (
           <div className="text-center py-8 text-gray-500">
-            <p>아직 댓글이 없습니다. 첫 댓글을 작성해보세요!</p>
+            <p>아직 댓글이 없습니다. 첫 댓글을 작성해보시기 바랍니다!</p>
           </div>
         )}
       </section>

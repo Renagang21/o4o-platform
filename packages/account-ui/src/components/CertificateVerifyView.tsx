@@ -83,7 +83,7 @@ export function CertificateVerifyView({ certificateId, apiBaseUrl }: Certificate
             <div style={{ ...styles.statusBox, ...styles.errorBox }}>
               <div style={styles.iconLarge}>⚠️</div>
               <p style={styles.errorTitle}>검증 서비스에 일시적 오류가 발생했습니다.</p>
-              <p style={styles.errorSub}>잠시 후 다시 시도해 주세요.</p>
+              <p style={styles.errorSub}>잠시 후 다시 시도해 주시기 바랍니다.</p>
             </div>
           ) : result?.valid && result.certificate ? (
             <div style={styles.validBox}>
@@ -123,7 +123,7 @@ export function CertificateVerifyView({ certificateId, apiBaseUrl }: Certificate
               <div style={styles.iconLarge}>✗</div>
               <p style={styles.invalidTitle}>유효하지 않은 수료증입니다.</p>
               <p style={styles.invalidSub}>
-                인증번호 또는 발급 기관에 문의해 주세요.
+                인증번호 또는 발급 기관에 문의해 주시기 바랍니다.
               </p>
             </div>
           )}

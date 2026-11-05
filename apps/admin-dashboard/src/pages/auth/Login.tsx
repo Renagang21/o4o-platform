@@ -97,13 +97,13 @@ const Login: FC = () => {
       const serverMessage = error?.response?.data?.error;
       let errorMessage = 'Google 로그인에 실패했습니다.';
       if (errorCode === 'GOOGLE_SIGNUP_REQUIRED') {
-        errorMessage = '이 Google 계정은 아직 O4O 에 등록되지 않았습니다. 서비스 화면에서 먼저 계정을 만들어 주세요.';
+        errorMessage = '이 Google 계정은 아직 O4O 에 등록되지 않았습니다. 서비스 화면에서 먼저 계정을 만들어 주시기 바랍니다.';
       } else if (errorCode === 'ACCOUNT_NOT_ACTIVE') {
-        errorMessage = '계정이 비활성화되었습니다. 관리자에게 문의하세요.';
+        errorMessage = '계정이 비활성화되었습니다. 관리자에게 문의하시기 바랍니다.';
       } else if (errorCode === 'GOOGLE_ID_TOKEN_INVALID') {
-        errorMessage = 'Google 인증에 실패했습니다. 다시 시도해 주세요.';
+        errorMessage = 'Google 인증에 실패했습니다. 다시 시도해 주시기 바랍니다.';
       } else if (error?.response?.status === 429) {
-        errorMessage = '로그인 시도가 너무 많습니다. 잠시 후 다시 시도해주세요.';
+        errorMessage = '로그인 시도가 너무 많습니다. 잠시 후 다시 시도해 주시기 바랍니다.';
       } else if (serverMessage) {
         errorMessage = serverMessage;
       }
@@ -114,7 +114,7 @@ const Login: FC = () => {
 
   return (
     <LoginLayout brand="O4O Admin" tone="slate" headline={<>운영의 시작,<br />명확하고 간결하게.</>} description="O4O 서비스 운영을 위한 관리자 공간입니다.">
-      <LoginCard brand="O4O Admin" tone="slate" heading="h1" title="관리자 로그인" description="승인된 관리자 Google 계정으로 로그인하세요.">
+      <LoginCard brand="O4O Admin" tone="slate" heading="h1" title="관리자 로그인" description="승인된 관리자 Google 계정으로 로그인하시기 바랍니다.">
         {/* 세션 사용자 교체 안내 — 명시적 재로그인 전까지 기존 화면 · 서버 세션을 쓰지 않는다 */}
         {sessionConflict && (
           <div
@@ -123,7 +123,7 @@ const Login: FC = () => {
             className="mb-5 bg-amber-50 border border-amber-200 rounded-xl p-4 text-sm text-amber-900"
           >
             다른 계정의 로그인으로 이 브라우저의 관리자 세션이 바뀌었습니다. 보안을 위해 이전 화면을 닫았습니다.
-            계속하려면 관리자 계정으로 다시 로그인하세요.
+            계속하려면 관리자 계정으로 다시 로그인하시기 바랍니다.
           </div>
         )}
 

@@ -57,6 +57,6 @@ describe('resolveAuthError — 계정 상태 구분', () => {
 
 describe('admin session method errors', () => {
   it.each(['GOOGLE_SESSION_REQUIRED', 'PASSWORD_SESSION_NOT_ALLOWED'])('%s tells the user how to reauthenticate', (code) => {
-    expect(resolveAuthError({ code }, 403)).toBe('전체관리자 계정은 Google로 다시 로그인해 주세요.');
+    expect(resolveAuthError({ code }, 403)).toBe('전체관리자 계정은 Google로 다시 로그인해 주시기 바랍니다.');
   });
 });

@@ -37,7 +37,7 @@ export default function PartnerOperatorManagement({
     let active = true;
     void load().catch(() => {
       if (active)
-        setError("운영자 목록을 불러오지 못했습니다. 다시 조회해 주세요.");
+        setError("운영자 목록을 불러오지 못했습니다. 다시 조회해 주시기 바랍니다.");
     });
     return () => {
       active = false;
@@ -60,7 +60,7 @@ export default function PartnerOperatorManagement({
       setData(null);
       setError(
         completed
-          ? "처리는 완료됐지만 최신 목록을 불러오지 못했습니다. 목록을 다시 조회하세요."
+          ? "처리는 완료됐지만 최신 목록을 불러오지 못했습니다. 목록을 다시 조회하시기 바랍니다."
           : e instanceof Error
             ? e.message
             : "요청을 처리하지 못했습니다.",
@@ -139,7 +139,7 @@ export default function PartnerOperatorManagement({
                         void act(
                           () =>
                             request(`${base}/operators/${p.userId}`, "POST"),
-                          "확인 메일 발송을 요청했습니다. 수신함·스팸함을 확인해 주세요.",
+                          "확인 메일 발송을 요청했습니다. 수신함·스팸함을 확인해 주시기 바랍니다.",
                         );
                     }}
                   >
@@ -159,7 +159,7 @@ export default function PartnerOperatorManagement({
                   onClick={() => {
                     if (
                       window.confirm(
-                        "Partner Operator 권한을 해제할까요? 계정과 다른 권한은 유지됩니다.",
+                        "Partner Operator 권한을 해제하시겠습니까? 계정과 다른 권한은 유지됩니다.",
                       )
                     )
                       void act(
@@ -191,7 +191,7 @@ export default function PartnerOperatorManagement({
                   className="button"
                   disabled={busy}
                   onClick={() => {
-                    if (window.confirm("초대를 취소할까요?"))
+                    if (window.confirm("초대를 취소하시겠습니까?"))
                       void manage(i.id, "cancel");
                   }}
                 >

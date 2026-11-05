@@ -99,7 +99,7 @@ export function webUrl(value: string, required = true): string {
     return url.href;
   } catch {
     throw new Error(
-      "주소는 http:// 또는 https://로 시작하는 웹 주소를 입력해 주세요.",
+      "주소는 http:// 또는 https://로 시작하는 웹 주소를 입력해 주시기 바랍니다.",
     );
   }
 }
@@ -110,7 +110,7 @@ export function integer(value: string, minimum = 0): number {
     !Number.isSafeInteger(Number(value)) ||
     Number(value) < minimum
   ) {
-    throw new Error(`${minimum.toLocaleString()} 이상의 정수를 입력해 주세요.`);
+    throw new Error(`${minimum.toLocaleString()} 이상의 정수를 입력해 주시기 바랍니다.`);
   }
   return Number(value);
 }
@@ -122,7 +122,7 @@ export function calendarDate(value: string): string {
     !Number.isFinite(date.getTime()) ||
     date.toISOString().slice(0, 10) !== value
   ) {
-    throw new Error("올바른 날짜를 입력해 주세요.");
+    throw new Error("올바른 날짜를 입력해 주시기 바랍니다.");
   }
   const now = new Date();
   const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
@@ -137,7 +137,7 @@ export function trackingLink(
   channel: string,
 ): string {
   if (!creatorId || !proposalId)
-    throw new Error("홍보 제안과 홍보자를 선택해 주세요.");
+    throw new Error("홍보 제안과 홍보자를 선택해 주시기 바랍니다.");
   const url = new URL(webUrl(destination));
   url.searchParams.set("utm_source", channel);
   url.searchParams.set("utm_medium", "creator");
@@ -152,13 +152,13 @@ export function contentDraft(
   channel: Channel,
 ): string {
   if (!product.trim() || !facts.trim())
-    throw new Error("제품 이름과 전달할 정보를 입력해 주세요.");
+    throw new Error("제품 이름과 전달할 정보를 입력해 주시기 바랍니다.");
   const intro = `${product.trim()} 소개`;
   const body = facts.trim();
   if (["유튜브", "틱톡", "인스타그램"].includes(channel)) {
-    return `[${channel} 숏폼 구성안]\n\n장면 1 · 관심 끌기\n${intro}\n\n장면 2 · 제품 정보\n${body}\n\n장면 3 · 안내\n자세한 정보는 함께 제공된 링크에서 확인해 주세요.\n\n게시 전: 광고·협찬 표시, 사실관계와 자료 사용 범위를 확인하고 자신의 말투로 편집해 주세요.`;
+    return `[${channel} 숏폼 구성안]\n\n장면 1 · 관심 끌기\n${intro}\n\n장면 2 · 제품 정보\n${body}\n\n장면 3 · 안내\n자세한 정보는 함께 제공된 링크에서 확인해 주시기 바랍니다.\n\n게시 전: 광고·협찬 표시, 사실관계와 자료 사용 범위를 확인하고 자신의 말투로 편집해 주시기 바랍니다.`;
   }
-  return `[${channel} 공유 문구]\n\n${intro}\n\n${body}\n\n자세한 정보는 함께 제공된 링크에서 확인해 주세요.\n\n게시 전: 광고·협찬 표시와 자료 사용 범위를 확인해 주세요.`;
+  return `[${channel} 공유 문구]\n\n${intro}\n\n${body}\n\n자세한 정보는 함께 제공된 링크에서 확인해 주시기 바랍니다.\n\n게시 전: 광고·협찬 표시와 자료 사용 범위를 확인해 주시기 바랍니다.`;
 }
 
 function object(value: unknown): value is Record<string, unknown> {
@@ -347,7 +347,7 @@ export function validCalendarDate(value: string): string {
     !Number.isFinite(d.getTime()) ||
     d.toISOString().slice(0, 10) !== value
   )
-    throw new Error("올바른 날짜를 입력해 주세요.");
+    throw new Error("올바른 날짜를 입력해 주시기 바랍니다.");
   return value;
 }
 export function tags(value: string): string[] {
@@ -360,7 +360,7 @@ export function tags(value: string): string[] {
     ),
   ];
   if (result.length > 10 || result.some((v) => v.length > 30))
-    throw new Error("태그는 30자 이내로 최대 10개 입력해 주세요.");
+    throw new Error("태그는 30자 이내로 최대 10개 입력해 주시기 바랍니다.");
   return result;
 }
 export function channelProfiles(
@@ -375,7 +375,7 @@ export function channelProfiles(
     const [c, ...rest] = row.split("|");
     const channel = c.trim() as Channel;
     if (!channels.includes(channel))
-      throw new Error("채널명 | https://주소 형식으로 입력해 주세요.");
+      throw new Error("채널명 | https://주소 형식으로 입력해 주시기 바랍니다.");
     return { channel, url: webUrl(rest.join("|").trim()) };
   });
 }
@@ -391,7 +391,7 @@ export function loadWorkspace(storage: Pick<Storage, "getItem">): {
     return {
       data: emptyWorkspace(),
       error:
-        "저장 데이터를 읽지 못했습니다. 기존 데이터를 보호하기 위해 쓰기를 중지했습니다. 원본 백업을 내려받아 주세요.",
+        "저장 데이터를 읽지 못했습니다. 기존 데이터를 보호하기 위해 쓰기를 중지했습니다. 원본 백업을 내려받아 주시기 바랍니다.",
     };
   }
 }

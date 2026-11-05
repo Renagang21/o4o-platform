@@ -169,7 +169,7 @@ export default function SupplierCandidateMediaFields({
           <RichTextEditor
             value={consumerShortDesc}
             onChange={(c) => setConsumerShortDesc(c.html)}
-            placeholder="소비자에게 보이는 간이 설명을 입력하세요..."
+            placeholder="소비자에게 보이는 간이 설명을 입력하시기 바랍니다..."
             minHeight="120px"
             onImageUpload={editorImageUpload}
             onMediaLibraryPick={(insertMedia) => setMediaPickerTarget(() => insertMedia)}

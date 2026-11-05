@@ -118,7 +118,7 @@ const AiQuerySettings: React.FC = () => {
       setModels(listing);
     } catch {
       if (request !== modelRead.current) return;
-      setModelsError('모델 목록을 불러오지 못했습니다. 다시 조회해주세요.');
+      setModelsError('모델 목록을 불러오지 못했습니다. 다시 조회해 주시기 바랍니다.');
     } finally {
       if (request === modelRead.current) setModelsLoading(false);
     }
@@ -143,7 +143,7 @@ const AiQuerySettings: React.FC = () => {
       });
     } catch {
       if (request !== policyRead.current) return;
-      setLoadError('저장된 AI 정책을 불러오지 못했습니다. 다시 불러온 뒤 수정해주세요.');
+      setLoadError('저장된 AI 정책을 불러오지 못했습니다. 다시 불러온 뒤 수정해 주시기 바랍니다.');
     } finally {
       if (request === policyRead.current) setLoading(false);
     }
@@ -228,7 +228,7 @@ const AiQuerySettings: React.FC = () => {
             <div>
               <h3 className="text-lg font-semibold text-gray-900">공통 질문·요약 활성화</h3>
               <p className="text-sm text-gray-500 mt-1">
-                공통 질문·요약의 사용 여부를 설정합니다. 다른 AI 사용처의 중지 여부는 AI 운영 관리에서 연결 범위를 확인하세요.
+                공통 질문·요약의 사용 여부를 설정합니다. 다른 AI 사용처의 중지 여부는 AI 운영 관리에서 연결 범위를 확인하시기 바랍니다.
               </p>
             </div>
             <button
@@ -302,7 +302,7 @@ const AiQuerySettings: React.FC = () => {
           <h3 className="text-lg font-semibold text-gray-900 mb-4">AI 모델</h3>
           <p className="text-sm text-gray-500 mb-4">
             이 설정을 읽는 질의·편집 경로의 Gemini 모델을 선택합니다. 전체 AI의 공통 모델 설정은 아닙니다.
-            모델 목록의 출처와 조회 시각을 확인하세요.
+            모델 목록의 출처와 조회 시각을 확인하시기 바랍니다.
           </p>
 
           <div className="flex items-center gap-3">
@@ -369,7 +369,7 @@ const AiQuerySettings: React.FC = () => {
             value={formData.systemPrompt}
             onChange={(e) => handleChange('systemPrompt', e.target.value)}
             rows={6}
-            placeholder="AI의 역할과 응답 스타일을 정의하세요..."
+            placeholder="AI의 역할과 응답 스타일을 정의하시기 바랍니다..."
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm"
           />
           <p className="text-xs text-gray-500 mt-2">

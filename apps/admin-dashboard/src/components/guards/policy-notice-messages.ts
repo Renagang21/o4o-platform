@@ -105,7 +105,7 @@ export function getProgramRequiredMessage(
     type: 'program_required',
     title: '프로그램 참여 필요',
     description: `이 기능은 ${programName} 참여 약국만 이용할 수 있습니다.`,
-    guidance: '프로그램 참여를 원하시면 관리자에게 문의하세요.',
+    guidance: '프로그램 참여를 원하시면 관리자에게 문의하시기 바랍니다.',
   };
 }
 
@@ -134,7 +134,7 @@ export function getNotOperatorMessage(): PolicyNoticeMessage {
     type: 'not_operator',
     title: '서비스운영자 권한 필요',
     description: '이 기능은 서비스운영자 권한이 있는 사용자만 이용할 수 있습니다.',
-    guidance: '서비스운영자 권한이 필요하시면 관리자에게 문의하세요.',
+    guidance: '서비스운영자 권한이 필요하시면 관리자에게 문의하시기 바랍니다.',
   };
 }
 
@@ -164,7 +164,7 @@ export const POLICY_NOTICES = {
     type: 'program_required' as PolicyNoticeType,
     title: '혈당관리 프로그램 참여 필요',
     description: '이 기능은 혈당관리 프로그램 참여 약국만 이용할 수 있습니다.',
-    guidance: '프로그램 참여를 원하시면 관리자에게 문의하세요.',
+    guidance: '프로그램 참여를 원하시면 관리자에게 문의하시기 바랍니다.',
   },
 
   /** 일반 기능 제한 */

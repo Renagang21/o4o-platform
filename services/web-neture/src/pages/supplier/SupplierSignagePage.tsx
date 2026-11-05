@@ -122,8 +122,8 @@ export default function SupplierSignagePage() {
   }, [productId, editId, productsError, productsLoading, products]);
 
   const handleSave = async () => {
-    if (!form.name.trim()) { setMessage({ type: 'error', text: '제목을 입력해 주세요.' }); return; }
-    if (!form.sourceUrl.trim()) { setMessage({ type: 'error', text: 'YouTube URL 을 입력해 주세요.' }); return; }
+    if (!form.name.trim()) { setMessage({ type: 'error', text: '제목을 입력해 주시기 바랍니다.' }); return; }
+    if (!form.sourceUrl.trim()) { setMessage({ type: 'error', text: 'YouTube URL 을 입력해 주시기 바랍니다.' }); return; }
     setSaving(true);
     try {
       const product = products.find((p) => p.id === form.linkedProductId) || null;
@@ -153,7 +153,7 @@ export default function SupplierSignagePage() {
   };
 
   const doAction = async (m: SupplierSignageMedia, action: 'publish' | 'archive' | 'unarchive' | 'remove') => {
-    if (action === 'remove' && !window.confirm(`"${m.name}" 을(를) 삭제할까요? 이미 매장이 가져간 사본은 영향받지 않습니다.`)) return;
+    if (action === 'remove' && !window.confirm(`"${m.name}" 을(를) 삭제하시겠습니까? 이미 매장이 가져간 사본은 영향받지 않습니다.`)) return;
     setBusyId(m.id);
     try {
       if (action === 'publish') { await publishSupplierSignage(m.id); setMessage({ type: 'success', text: '게시했습니다. 매장 HUB에 노출됩니다.' }); }
@@ -173,7 +173,7 @@ export default function SupplierSignagePage() {
   return (
     <div className="mx-auto max-w-4xl px-4 py-8">
       <SupplierContentNavigation />
-      {targetError && <p role="alert" className="mb-4 rounded-lg bg-amber-50 p-3 text-sm text-amber-800">요청한 사이니지를 찾을 수 없습니다. 목록에서 대상을 확인해 주세요.</p>}
+      {targetError && <p role="alert" className="mb-4 rounded-lg bg-amber-50 p-3 text-sm text-amber-800">요청한 사이니지를 찾을 수 없습니다. 목록에서 대상을 확인해 주시기 바랍니다.</p>}
       <div className="mb-6 flex items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold text-slate-900">디지털 사이니지</h1>
@@ -232,7 +232,7 @@ export default function SupplierSignagePage() {
           </div>
         ) : items.length === 0 ? (
           <div className="py-16 text-center text-sm text-slate-400">
-            아직 만든 사이니지가 없습니다. [새 사이니지]로 시작하세요.
+            아직 만든 사이니지가 없습니다. [새 사이니지]로 시작하시기 바랍니다.
           </div>
         ) : (
           items.map((m) => {

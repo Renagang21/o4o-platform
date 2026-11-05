@@ -194,7 +194,7 @@ const productApprovalActionPolicy = defineActionPolicy<AllRegisteredOffer>('netu
         variant: 'danger',
         confirmText: '반려',
         showReason: true,
-        reasonPlaceholder: '반려 사유를 입력하세요 (선택)',
+        reasonPlaceholder: '반려 사유를 입력하시기 바랍니다 (선택)',
       }),
     },
     {
@@ -913,7 +913,7 @@ export default function AllRegisteredProductsPage() {
                     variant: 'danger' as const,
                     confirmText: '거절',
                     showReason: true,
-                    reasonPlaceholder: '거절 사유를 입력하세요 (선택)',
+                    reasonPlaceholder: '거절 사유를 입력하시기 바랍니다 (선택)',
                   },
                 },
                 {
@@ -972,7 +972,7 @@ export default function AllRegisteredProductsPage() {
         <div className="bg-white rounded-lg border border-slate-200 flex flex-col items-center py-20 text-slate-500">
           <AlertTriangle size={48} className="mb-4 text-red-300" />
           <p className="text-sm font-medium text-slate-700">상품 목록을 불러오지 못했습니다</p>
-          <p className="text-xs mt-1 text-slate-400">네트워크 또는 서버 오류일 수 있습니다. 잠시 후 다시 시도해주세요.</p>
+          <p className="text-xs mt-1 text-slate-400">네트워크 또는 서버 오류일 수 있습니다. 잠시 후 다시 시도해 주시기 바랍니다.</p>
           <button
             onClick={() => fetchOffers(page)}
             className="mt-4 px-4 py-2 bg-slate-100 hover:bg-slate-200 rounded-lg text-sm font-medium text-slate-700"

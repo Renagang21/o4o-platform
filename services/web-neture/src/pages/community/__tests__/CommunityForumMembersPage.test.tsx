@@ -26,10 +26,10 @@ it('the real member-management form sends the entered rejection reason using the
   </MemoryRouter>);
   await screen.findByText('APPLICANT');
   fireEvent.click(screen.getByRole('button', { name: '거절' }));
-  fireEvent.change(screen.getByPlaceholderText(/거절 사유/), { target: { value: '  자격 증빙을 확인해 주세요.  ' } });
+  fireEvent.change(screen.getByPlaceholderText(/거절 사유/), { target: { value: '  자격 증빙을 확인해 주시기 바랍니다.  ' } });
   fireEvent.click(screen.getByRole('button', { name: '거절 확인' }));
   await waitFor(() => expect(post).toHaveBeenCalledWith(
     '/communities/independent/forum/categories/board/join-requests/request/reject',
-    { reviewComment: '자격 증빙을 확인해 주세요.' },
+    { reviewComment: '자격 증빙을 확인해 주시기 바랍니다.' },
   ));
 });

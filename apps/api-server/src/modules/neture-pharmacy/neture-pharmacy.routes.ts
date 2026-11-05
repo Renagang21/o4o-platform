@@ -211,7 +211,7 @@ export function createNeturePharmacyRoutes(dataSource: DataSource, consultationD
   const parseDocument = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 * 1024 * 1024, files: 1 } }).single('file');
   const documentUpload: RequestHandler = (req, res, next) => {
     parseDocument(req, res, (error) => {
-      if (error) { res.status(400).json({ success: false, code: 'INVALID_DOCUMENT', error: '사업자등록증은 10MB 이하 파일 1개로 제출해 주세요.' }); return; }
+      if (error) { res.status(400).json({ success: false, code: 'INVALID_DOCUMENT', error: '사업자등록증은 10MB 이하 파일 1개로 제출해 주시기 바랍니다.' }); return; }
       next();
     });
   };
@@ -429,7 +429,7 @@ export function createNeturePharmacyRoutes(dataSource: DataSource, consultationD
     res.setHeader('Cache-Control', 'private, no-store'); return consultation.context(req.user!.id, org(req));
   }));
   const consultationLimiter = rateLimit({ windowMs: 60_000, max: 30, keyGenerator: req => req.user!.id,
-    message: { success: false, code: 'CONSULTATION_TOO_MANY_REQUESTS', error: '번역 요청이 많습니다. 잠시 후 다시 시도해 주세요.' } });
+    message: { success: false, code: 'CONSULTATION_TOO_MANY_REQUESTS', error: '번역 요청이 많습니다. 잠시 후 다시 시도해 주시기 바랍니다.' } });
   router.post('/pharmacy/multilingual-consultation/translate', ...store, consultationLimiter, handle(async (req, res) => {
     res.setHeader('Cache-Control', 'private, no-store');
     const input = req.body ?? {};
@@ -490,7 +490,7 @@ export function createNeturePharmacyRoutes(dataSource: DataSource, consultationD
   router.get('/supplier/content-requests', ...supplier, handle(async (req) => supplierContents.list(req.supplierId!)));
   router.post('/supplier/content-requests', ...supplier, handle(async (req, res) => {
     if (!isUuid(req.body?.itemId) || typeof req.body?.businessKey !== 'string' || !req.body.businessKey.trim()) {
-      throw new NeturePharmacyError(400, 'INVALID_REQUEST', '자료와 대상 협력사업을 선택하세요.');
+      throw new NeturePharmacyError(400, 'INVALID_REQUEST', '자료와 대상 협력사업을 선택하시기 바랍니다.');
     }
     const result = await supplierContents.request(req.supplierId!, req.user!.id, req.body.itemId, req.body.businessKey.trim());
     res.status(result.reused ? 200 : 201);

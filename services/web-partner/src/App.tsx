@@ -50,35 +50,35 @@ type Page = (typeof pages)[number][0];
 const titles: Record<Page, [string, string]> = {
   reports: [
     "기록을 다음 콘텐츠의 힌트로",
-    "게시한 콘텐츠와 직접 등록한 지표를 비교하세요.",
+    "게시한 콘텐츠와 직접 등록한 지표를 비교하시기 바랍니다.",
   ],
   home: [
     "홍보를 함께 만드는 공간",
-    "좋은 제품과 나다운 콘텐츠가 만나는 곳. 필요한 도구부터 시작하세요.",
+    "좋은 제품과 나다운 콘텐츠가 만나는 곳. 필요한 도구부터 시작하시기 바랍니다.",
   ],
   proposals: [
-    "새로운 홍보를 발견하세요",
-    "사업자가 소개한 제품과 홍보 제안을 살펴보세요.",
+    "새로운 홍보를 발견하시기 바랍니다",
+    "사업자가 소개한 제품과 홍보 제안을 살펴보시기 바랍니다.",
   ],
   creators: [
     "채널 너머의 크리에이터",
-    "활동 분야와 대표 콘텐츠로 나를 소개하세요.",
+    "활동 분야와 대표 콘텐츠로 나를 소개하시기 바랍니다.",
   ],
   library: [
     "좋은 콘텐츠의 출발점",
-    "제품 정보와 홍보 자료를 모으고, 필요한 곳에 활용하세요.",
+    "제품 정보와 홍보 자료를 모으고, 필요한 곳에 활용하시기 바랍니다.",
   ],
   studio: [
     "아이디어를 게시물로",
-    "제품 정보를 채널에 맞는 구성안으로 바꾸고 홍보 링크를 준비하세요.",
+    "제품 정보를 채널에 맞는 구성안으로 바꾸고 홍보 링크를 준비하시기 바랍니다.",
   ],
   activities: [
-    "나의 홍보를 기록하세요",
-    "게시한 콘텐츠와 직접 확인한 결과를 한곳에 모으세요.",
+    "나의 홍보를 기록하시기 바랍니다",
+    "게시한 콘텐츠와 직접 확인한 결과를 한곳에 모으시기 바랍니다.",
   ],
   settlements: [
     "정산을 더 명확하게",
-    "당사자가 정한 지급 내역을 기록하고 명세를 내려받으세요.",
+    "당사자가 정한 지급 내역을 기록하고 명세를 내려받으시기 바랍니다.",
   ],
 };
 const route = (): Page =>
@@ -248,7 +248,7 @@ export default function App({ remote, embedded = false }: { remote?: RemoteWorks
       setError(
         e instanceof Error
           ? e.message
-          : "처리하지 못했습니다. 다시 시도해 주세요.",
+          : "처리하지 못했습니다. 다시 시도해 주시기 바랍니다.",
       );
     };
     try {
@@ -264,7 +264,7 @@ export default function App({ remote, embedded = false }: { remote?: RemoteWorks
       if (remote.role === "viewer")
         throw new Error("이 공동공간은 열람만 할 수 있습니다.");
       if (savingRef.current)
-        throw new Error("저장 중입니다. 잠시 기다려 주세요.");
+        throw new Error("저장 중입니다. 잠시 기다려 주시기 바랍니다.");
       savingRef.current = true;
       setSaving(true);
       return remote
@@ -282,13 +282,13 @@ export default function App({ remote, embedded = false }: { remote?: RemoteWorks
     if (current.error) throw new Error(current.error);
     if (JSON.stringify(current.data) !== JSON.stringify(workspace))
       throw new Error(
-        "다른 탭에서 자료가 변경되었습니다. 새로고침 후 다시 저장해 주세요. 기존 자료는 덮어쓰지 않았습니다.",
+        "다른 탭에서 자료가 변경되었습니다. 새로고침 후 다시 저장해 주시기 바랍니다. 기존 자료는 덮어쓰지 않았습니다.",
       );
     try {
       saveWorkspace(window.localStorage, next);
     } catch {
       throw new Error(
-        "저장하지 못했습니다. 브라우저 저장 공간과 저장 허용 설정을 확인해 주세요.",
+        "저장하지 못했습니다. 브라우저 저장 공간과 저장 허용 설정을 확인해 주시기 바랍니다.",
       );
     }
     setWorkspace(next);
@@ -311,17 +311,17 @@ export default function App({ remote, embedded = false }: { remote?: RemoteWorks
   const text = (f: FormData, key: string) => {
     const value = String(f.get(key) ?? "").trim();
     if (value.length > 20000)
-      throw new Error("입력 내용은 20,000자 이내로 작성해 주세요.");
+      throw new Error("입력 내용은 20,000자 이내로 작성해 주시기 바랍니다.");
     return value;
   };
   const required = (f: FormData, key: string) => {
     const v = text(f, key);
-    if (!v) throw new Error("필수 항목을 입력해 주세요.");
+    if (!v) throw new Error("필수 항목을 입력해 주시기 바랍니다.");
     return v;
   };
   const selectedChannel = (f: FormData) => {
     const c = required(f, "channel") as Channel;
-    if (!channels.includes(c)) throw new Error("채널을 선택해 주세요.");
+    if (!channels.includes(c)) throw new Error("채널을 선택해 주시기 바랍니다.");
     return c;
   };
   const relation = (f: FormData) => {
@@ -331,7 +331,7 @@ export default function App({ remote, embedded = false }: { remote?: RemoteWorks
       !workspace.proposals.some((p) => p.id === proposalId) ||
       !workspace.creators.some((c) => c.id === creatorId)
     )
-      throw new Error("등록된 홍보 제안과 홍보자를 선택해 주세요.");
+      throw new Error("등록된 홍보 제안과 홍보자를 선택해 주시기 바랍니다.");
     return { proposalId, creatorId };
   };
   const relations = (
@@ -422,7 +422,7 @@ export default function App({ remote, embedded = false }: { remote?: RemoteWorks
       setNotice("복사했습니다.");
     } catch {
       setError(
-        "자동 복사를 사용할 수 없습니다. 내용란을 선택해 직접 복사해 주세요.",
+        "자동 복사를 사용할 수 없습니다. 내용란을 선택해 직접 복사해 주시기 바랍니다.",
       );
     }
   };
@@ -458,7 +458,7 @@ export default function App({ remote, embedded = false }: { remote?: RemoteWorks
                 );
               if (
                 !window.confirm(
-                  "이 기록을 삭제할까요? 연결된 외부 게시물이나 실제 지급 내역은 변경되지 않습니다.",
+                  "이 기록을 삭제하시겠습니까? 연결된 외부 게시물이나 실제 지급 내역은 변경되지 않습니다.",
                 )
               )
                 return;
@@ -579,7 +579,7 @@ export default function App({ remote, embedded = false }: { remote?: RemoteWorks
               if (!raw) throw new Error("백업할 저장 데이터가 없습니다.");
               download("o4o-partner-workspace.json", raw, "application/json");
               setNotice(
-                "자료·기록 JSON을 내려받았습니다. 첨부 파일은 별도로 보관해 주세요.",
+                "자료·기록 JSON을 내려받았습니다. 첨부 파일은 별도로 보관해 주시기 바랍니다.",
               );
             })
           }
@@ -608,7 +608,7 @@ export default function App({ remote, embedded = false }: { remote?: RemoteWorks
             <p>
               콘텐츠부터 활동 기록까지
               <br />
-              홍보에 필요한 도구를 만나세요.
+              홍보에 필요한 도구를 만나시기 바랍니다.
             </p>
           </div>
         </aside>
@@ -662,7 +662,7 @@ export default function App({ remote, embedded = false }: { remote?: RemoteWorks
                   <h2>
                     좋은 제품에
                     <br />
-                    당신의 이야기를 더하세요<span>.</span>
+                    당신의 이야기를 더하시기 바랍니다<span>.</span>
                   </h2>
                   <p>
                     사업자는 홍보할 자료를, 크리에이터는 자신만의 콘텐츠를.
@@ -714,10 +714,10 @@ export default function App({ remote, embedded = false }: { remote?: RemoteWorks
               <div className="section-title">
                 <div>
                   <p className="eyebrow">MADE FOR YOUR WORK</p>
-                  <h2>필요한 곳부터 시작하세요</h2>
+                  <h2>필요한 곳부터 시작하시기 바랍니다</h2>
                 </div>
                 <span className="muted">
-                  각 서비스는 독립적으로 이용할 수 있어요.
+                  각 서비스는 독립적으로 이용할 수 있습니다.
                 </span>
               </div>
               <section className="tools-grid">
@@ -726,28 +726,28 @@ export default function App({ remote, embedded = false }: { remote?: RemoteWorks
                     "01",
                     "좋은 만남의 시작",
                     "홍보 제안",
-                    "제품과 브랜드를 소개하고, 나에게 맞는 홍보를 발견하세요.",
+                    "제품과 브랜드를 소개하고, 나에게 맞는 홍보를 발견하시기 바랍니다.",
                     "proposals",
                   ],
                   [
                     "02",
                     "아이디어를 콘텐츠로",
                     "제작 도구",
-                    "채널에 맞는 문구와 영상 구성안을 준비하세요.",
+                    "채널에 맞는 문구와 영상 구성안을 준비하시기 바랍니다.",
                     "studio",
                   ],
                   [
                     "03",
                     "홍보 자료를 한곳에",
                     "콘텐츠 자료실",
-                    "제품 자료와 직접 만든 콘텐츠를 모아 활용하세요.",
+                    "제품 자료와 직접 만든 콘텐츠를 모아 활용하시기 바랍니다.",
                     "library",
                   ],
                   [
                     "04",
                     "활동 이후까지 명확하게",
                     "정산 내역",
-                    "지급 내역을 기록하고 명세를 정리하세요.",
+                    "지급 내역을 기록하고 명세를 정리하시기 바랍니다.",
                     "settlements",
                   ],
                 ].map(([n, caption, title, body, id]) => (
@@ -766,7 +766,7 @@ export default function App({ remote, embedded = false }: { remote?: RemoteWorks
                 <p>
                   홍보는 사업자와 홍보자가 자율적으로 진행합니다. O4O는 콘텐츠와
                   활동에 필요한 서비스를 제공합니다. 참여 조건과 보상에 대한
-                  협의는 양측이 각자의 방식으로 진행하세요.
+                  협의는 양측이 각자의 방식으로 진행하시기 바랍니다.
                 </p>
               </section>
             </>
@@ -803,10 +803,10 @@ export default function App({ remote, embedded = false }: { remote?: RemoteWorks
                       title={
                         query || filter
                           ? "검색 결과가 없습니다"
-                          : "첫 홍보 제안을 등록해 보세요"
+                          : "첫 홍보 제안을 등록해 보시기 바랍니다"
                       }
                     >
-                      사업자와 제품, 제공할 자료를 소개해 주세요.
+                      사업자와 제품, 제공할 자료를 소개해 주시기 바랍니다.
                     </Empty>
                   )}
                 </section>
@@ -846,7 +846,7 @@ export default function App({ remote, embedded = false }: { remote?: RemoteWorks
                       name="title"
                       required
                       maxLength={160}
-                      placeholder="어떤 제품을 소개하나요?"
+                      placeholder="어떤 제품을 소개합니까?"
                     />
                   </Field>
                   <Field label="활동 분야">
@@ -866,7 +866,7 @@ export default function App({ remote, embedded = false }: { remote?: RemoteWorks
                       required
                       maxLength={5000}
                       rows={4}
-                      placeholder="제품 정보와 제공 가능한 자료를 소개해 주세요."
+                      placeholder="제품 정보와 제공 가능한 자료를 소개해 주시기 바랍니다."
                     />
                   </Field>
                   <Field label="제품·서비스 주소">
@@ -924,7 +924,7 @@ export default function App({ remote, embedded = false }: { remote?: RemoteWorks
                       </article>
                     ))
                   ) : (
-                    <Empty title="나의 채널을 소개해 주세요">
+                    <Empty title="나의 채널을 소개해 주시기 바랍니다">
                       활동 분야와 대표 콘텐츠를 등록할 수 있습니다.
                     </Empty>
                   )}
@@ -1084,8 +1084,8 @@ export default function App({ remote, embedded = false }: { remote?: RemoteWorks
                       </article>
                     ))
                   ) : (
-                    <Empty title="활용할 자료를 모아보세요">
-                      제품 설명, 홍보 문구, 원본 자료 링크를 등록하세요.
+                    <Empty title="활용할 자료를 모아보시기 바랍니다">
+                      제품 설명, 홍보 문구, 원본 자료 링크를 등록하시기 바랍니다.
                     </Empty>
                   )}
                 </section>
@@ -1153,7 +1153,7 @@ export default function App({ remote, embedded = false }: { remote?: RemoteWorks
                       required
                       maxLength={2000}
                       rows={3}
-                      placeholder="편집 가능 여부, 기간, 출처 등을 적어 주세요."
+                      placeholder="편집 가능 여부, 기간, 출처 등을 적어 주시기 바랍니다."
                     />
                   </Field>
                   <p className="hint">
@@ -1253,7 +1253,7 @@ export default function App({ remote, embedded = false }: { remote?: RemoteWorks
                         value={studioFacts}
                         onChange={(e) => setStudioFacts(e.target.value)}
                         rows={5}
-                        placeholder="제품의 특징과 사용 방법 등 확인된 정보를 입력하세요."
+                        placeholder="제품의 특징과 사용 방법 등 확인된 정보를 입력하시기 바랍니다."
                       />
                     </Field>
                     <button className="button primary">구성안 만들기</button>
@@ -1288,7 +1288,7 @@ export default function App({ remote, embedded = false }: { remote?: RemoteWorks
                                 !studioBusiness.trim()
                               )
                                 throw new Error(
-                                  "제품과 제공자 이름을 입력해 주세요.",
+                                  "제품과 제공자 이름을 입력해 주시기 바랍니다.",
                                 );
                               return persist(
                                 {
@@ -1302,7 +1302,7 @@ export default function App({ remote, embedded = false }: { remote?: RemoteWorks
                                       content: draft,
                                       url: "",
                                       usage:
-                                        "초안: 게시 전 원본 자료의 권리·출처·사용 범위를 확인하세요.",
+                                        "초안: 게시 전 원본 자료의 권리·출처·사용 범위를 확인하시기 바랍니다.",
                                     },
                                     ...workspace.assets,
                                   ],
@@ -1317,7 +1317,7 @@ export default function App({ remote, embedded = false }: { remote?: RemoteWorks
                       </div>
                     </>
                   ) : (
-                    <Empty title="어떤 이야기를 들려줄까요?">
+                    <Empty title="공유할 이야기를 작성합니다?">
                       제품 정보를 입력하면 편집할 수 있는 초안이 나타납니다.
                     </Empty>
                   )}
@@ -1358,7 +1358,7 @@ export default function App({ remote, embedded = false }: { remote?: RemoteWorks
                 ) : (
                   <p className="hint">
                     먼저 <a href="#proposals">홍보 제안</a>과{" "}
-                    <a href="#creators">홍보자</a>를 등록해 주세요.
+                    <a href="#creators">홍보자</a>를 등록해 주시기 바랍니다.
                   </p>
                 )}
                 {generatedLink && (
@@ -1427,7 +1427,7 @@ export default function App({ remote, embedded = false }: { remote?: RemoteWorks
                       </article>
                     ))
                   ) : (
-                    <Empty title="게시한 콘텐츠를 기록해 보세요">
+                    <Empty title="게시한 콘텐츠를 기록해 보시기 바랍니다">
                       게시물 주소와 확인한 결과를 모을 수 있습니다.
                     </Empty>
                   )}
@@ -1469,7 +1469,7 @@ export default function App({ remote, embedded = false }: { remote?: RemoteWorks
                 >
                   {!hasRelations && (
                     <p className="hint">
-                      홍보 제안과 홍보자를 먼저 등록해 주세요.
+                      홍보 제안과 홍보자를 먼저 등록해 주시기 바랍니다.
                     </p>
                   )}
                   {relations}
@@ -1616,7 +1616,7 @@ export default function App({ remote, embedded = false }: { remote?: RemoteWorks
                               act(() => {
                                 if (
                                   window.confirm(
-                                    "외부에서 실제 지급한 내역을 기록할까요? 이 버튼은 송금하지 않습니다.",
+                                    "외부에서 실제 지급한 내역을 기록하시겠습니까? 이 버튼은 송금하지 않습니다.",
                                   )
                                 )
                                   return persist(
@@ -1652,7 +1652,7 @@ export default function App({ remote, embedded = false }: { remote?: RemoteWorks
                       </article>
                     ))
                   ) : (
-                    <Empty title="정산 내역을 정리해 보세요">
+                    <Empty title="정산 내역을 정리해 보시기 바랍니다">
                       외부에서 협의한 지급 금액도 기록할 수 있습니다.
                     </Empty>
                   )}
@@ -1684,7 +1684,7 @@ export default function App({ remote, embedded = false }: { remote?: RemoteWorks
                 >
                   {!hasRelations && (
                     <p className="hint">
-                      홍보 제안과 홍보자를 먼저 등록해 주세요.
+                      홍보 제안과 홍보자를 먼저 등록해 주시기 바랍니다.
                     </p>
                   )}
                   {relations}

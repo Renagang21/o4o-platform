@@ -62,7 +62,7 @@ export default function StoreOperationsPage({ config }: { config: StoreDashboard
     </section> : <p role="status" className="rounded-xl border bg-white p-5 text-sm text-slate-600">현재 이용할 수 있는 운영 업무가 없습니다.</p>}
     {details && <details className="rounded-xl border border-slate-200 bg-white px-4">
       <summary className="min-h-11 cursor-pointer content-center text-sm text-slate-600">배치·이용 현황 확인</summary>
-      <p className="mt-1 text-sm text-slate-500">저장 설정과 이용 기록을 확인합니다. 실제 연결·재생·QR 스캔은 현장에서 확인해 주세요.</p>
+      <p className="mt-1 text-sm text-slate-500">저장 설정과 이용 기록을 확인합니다. 실제 연결·재생·QR 스캔은 현장에서 확인해 주시기 바랍니다.</p>
       <nav aria-label="운영 현황 상세" className="flex flex-wrap gap-2 py-4">{[...details.primary, ...details.secondary].map(action)}</nav>
     </details>}
   </div>;

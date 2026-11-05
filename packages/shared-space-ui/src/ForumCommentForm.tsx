@@ -41,7 +41,7 @@ export function ForumCommentForm({
   authenticated = true,
   loginPrompt,
   error,
-  placeholder = '댓글을 입력하세요',
+  placeholder = '댓글을 입력하시기 바랍니다',
   rows = 3,
   submitLabel = '댓글 등록',
   submittingLabel = '등록 중...',

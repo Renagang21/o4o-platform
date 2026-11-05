@@ -67,7 +67,7 @@ async function account(m: Exec, user: string) {
     throw new OperationError(
       403,
       "ACCOUNT_NOT_ACTIVE",
-      "공통 계정의 이메일 확인과 이용 상태를 확인해 주세요.",
+      "공통 계정의 이메일 확인과 이용 상태를 확인해 주시기 바랍니다.",
     );
 }
 // node-postgres resolves toPostgres; query error serialization only sees the redacted value.
@@ -87,7 +87,7 @@ function normalizeLicense(raw: string) {
     throw new OperationError(
       400,
       "INVALID_LICENSE_NUMBER",
-      "면허번호를 100자 이내로 입력해 주세요.",
+      "면허번호를 100자 이내로 입력해 주시기 바랍니다.",
     );
   return value;
 }
@@ -162,7 +162,7 @@ export class PharmacistQualificationService {
       throw new OperationError(
         400,
         "INVALID_STATUS",
-        "검토 상태를 확인해 주세요.",
+        "검토 상태를 확인해 주시기 바랍니다.",
       );
     const offset =
       (Math.max(1, Math.min(100000, Math.floor(page) || 1)) - 1) * 20;
@@ -207,7 +207,7 @@ export class PharmacistQualificationService {
       throw new OperationError(
         403,
         "SELF_QUALIFICATION_APPROVAL_FORBIDDEN",
-        "본인의 자격 승인은 다른 검토 담당자에게 요청해 주세요.",
+        "본인의 자격 승인은 다른 검토 담당자에게 요청해 주시기 바랍니다.",
       );
     return this.db.transaction(async (m) => {
       await reviewer(m, actor, true);
@@ -248,13 +248,13 @@ export class PharmacistQualificationService {
         throw new OperationError(
           409,
           "QUALIFICATION_CHANGED",
-          "신청 정보가 변경되었습니다. 다시 조회한 뒤 검토해 주세요.",
+          "신청 정보가 변경되었습니다. 다시 조회한 뒤 검토해 주시기 바랍니다.",
         );
       if (input.action === "approve" && input.licenseEvidenceChecked !== true)
         throw new OperationError(
           400,
           "LICENSE_EVIDENCE_REQUIRED",
-          "면허 근거를 별도로 확인한 뒤 승인해 주세요.",
+          "면허 근거를 별도로 확인한 뒤 승인해 주시기 바랍니다.",
         );
       const transitions = {
         approve: ["pending", "unrequested", "rejected", "revoked"],

@@ -1,4 +1,4 @@
-import {hasApprovedPharmacist} from '../services/qualifications/pharmacist-qualification.service.js';
+import {hasApprovedStorePharmacist} from '../services/qualifications/store-pharmacist-qualification.js';
 import { resolveApprovedStoreMemberOrganization } from './store-member-access.js';
 /**
  * Store Owner Utilities
@@ -129,7 +129,7 @@ export interface StoreOwnerCheckResult {
 async function lacksUnscopedPharmacyQualification(db:DataSource,userId:string,serviceKey:StoreOwnerServiceKey|undefined,organizationId:string|null):Promise<boolean>{
   if(serviceKey || !organizationId)return false;
   const [organization]=await db.query('SELECT type FROM organizations WHERE id=$1',[organizationId]);
-  return organization?.type==='pharmacy' && !await hasApprovedPharmacist(db,userId);
+  return organization?.type==='pharmacy' && !await hasApprovedStorePharmacist(db,userId,organizationId);
 }
 
 export async function isStoreOwner(
@@ -169,7 +169,7 @@ export async function isStoreOwner(
     if (resolution.status === 'none') {
       return { isOwner: false, organizationId: null, memberRole: '', resolution, pendingAgreement: null };
     }
-    if(!await hasApprovedPharmacist(dataSource,userId))return {isOwner:false,organizationId:null,memberRole:'',resolution,pendingAgreement:null,qualificationRequired:true};
+    if(!await hasApprovedStorePharmacist(dataSource,userId,resolution.organizationId))return {isOwner:false,organizationId:null,memberRole:'',resolution,pendingAgreement:null,qualificationRequired:true};
     const pendingAgreements = await policyAcceptanceService.getPendingStoreOwnerAgreementsForUser(
       userId, resolveCanonicalServiceKey(serviceKey), dataSource,
     );
@@ -241,8 +241,8 @@ export async function isStoreOwner(
  *                    미지정 시 모든 서비스 store_owner role 허용 (back-compat).
  */
 export function storeOwnerRejection({isOwner,organizationId,resolution,pendingAgreement,qualificationRequired}:StoreOwnerCheckResult){
-  if(resolution.status==='ambiguous')return {status:409,body:{success:false,error:'연결된 매장이 여러 개입니다. 운영자에게 문의해 주세요.',code:'AMBIGUOUS_STORE_CONNECTION'}};
-  if(qualificationRequired)return {status:403,body:{success:false,code:'PHARMACIST_QUALIFICATION_REQUIRED',error:'약국 경영 업무에는 승인된 약사 자격이 필요합니다. My Home 설정에서 자격 신청·상태를 확인해 주세요.'}};
+  if(resolution.status==='ambiguous')return {status:409,body:{success:false,error:'연결된 매장이 여러 개입니다. 운영자에게 문의해 주시기 바랍니다.',code:'AMBIGUOUS_STORE_CONNECTION'}};
+  if(qualificationRequired)return {status:403,body:{success:false,code:'PHARMACIST_QUALIFICATION_REQUIRED',error:'약국 경영 업무에는 승인된 약사 자격이 필요합니다. My Home 설정에서 자격 신청·상태를 확인해 주시기 바랍니다.'}};
   if(pendingAgreement)return {status:428,body:{success:false,error:'매장 경영자 이용계약에 동의한 뒤 이용할 수 있습니다.',code:'STORE_OWNER_AGREEMENT_REQUIRED',pendingPolicyAcceptances:[pendingAgreement]}};
   if(!isOwner || !organizationId)return {status:403,body:{success:false,error:'Store owner access required',code:'STORE_OWNER_REQUIRED'}};
   return null;

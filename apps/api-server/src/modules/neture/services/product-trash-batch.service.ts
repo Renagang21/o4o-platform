@@ -4,7 +4,7 @@ import { OperationError, recordOperation } from '../../../services/operations/op
 
 const MAX = 10000;
 const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-function changed(): never { throw new OperationError(409, 'TRASH_CHANGED', '휴지통 대상이 변경됐습니다. 다시 미리보기해 주세요.'); }
+function changed(): never { throw new OperationError(409, 'TRASH_CHANGED', '휴지통 대상이 변경됐습니다. 다시 미리보기해 주시기 바랍니다.'); }
 type SnapshotRow = { id: string; version: string };
 function fingerprint(rows: SnapshotRow[], actor: string, cutoff: string, reason: string) {
   return createHash('sha256').update(JSON.stringify([actor, cutoff, reason, rows.map(r => [r.id, r.version])])).digest('hex');
@@ -48,7 +48,7 @@ export class ProductTrashBatchService {
   async empty(actor: string, body: any) {
     const reason = '관리자 휴지통 비우기';
     if (typeof body?.cutoff !== 'string' || !Number.isFinite(Date.parse(body.cutoff)) || typeof body?.fingerprint !== 'string' || !/^[a-f0-9]{64}$/.test(body.fingerprint) || !Number.isInteger(body?.count) || body.count < 1 || body.count > MAX)
-      throw new OperationError(400, 'PREVIEW_REQUIRED', '휴지통 미리보기를 먼저 확인해 주세요.');
+      throw new OperationError(400, 'PREVIEW_REQUIRED', '휴지통 미리보기를 먼저 확인해 주시기 바랍니다.');
     return this.db.transaction(async manager => {
       await this.limits(manager);
       const [{ age }] = await manager.query('SELECT EXTRACT(EPOCH FROM (clock_timestamp()-$1::timestamptz)) AS age', [body.cutoff]);

@@ -157,7 +157,7 @@ export async function readDrugFile(file: File, deps: ReadDrugFileDeps = defaultR
   try {
     decoded = decodeWorkbook(new Uint8Array(await file.arrayBuffer()));
   } catch {
-    throw new DrugFileError(`${file.name} 파일을 열지 못했습니다. 엑셀에서 열려 있지 않은지, 손상되지 않았는지 확인해 주세요.`, 'FILE_DECODE_FAILED');
+    throw new DrugFileError(`${file.name} 파일을 열지 못했습니다. 엑셀에서 열려 있지 않은지, 손상되지 않았는지 확인해 주시기 바랍니다.`, 'FILE_DECODE_FAILED');
   }
   const profile = profileWorkbook(decoded);
   const fingerprint = computeStructureFingerprint(profile);
@@ -177,7 +177,7 @@ export async function readDrugFile(file: File, deps: ReadDrugFileDeps = defaultR
     converted = normalizedRecordsToHospitalRows(normalized.records);
   }
   if (converted.rows.length === 0) {
-    throw new DrugFileError('이 파일에서 원내 약품 행을 찾지 못했습니다. 제품명 열이 있는 목록인지 확인해 주세요.', 'NO_ROWS');
+    throw new DrugFileError('이 파일에서 원내 약품 행을 찾지 못했습니다. 제품명 열이 있는 목록인지 확인해 주시기 바랍니다.', 'NO_ROWS');
   }
 
   const verdict = evaluateConfidence(inference, HOSPITAL_DRUG_TARGET_SCHEMA);

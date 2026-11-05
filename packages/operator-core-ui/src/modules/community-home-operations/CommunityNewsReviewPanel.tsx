@@ -78,7 +78,7 @@ export function CommunityNewsReviewPanel({
       )}
       {review?.state === "pending" && (
         <output className="block">
-          오늘의 정리 요청이 접수됐습니다. 저장된 결과를 다시 확인해 주세요.
+          오늘의 정리 요청이 접수됐습니다. 저장된 결과를 다시 확인해 주시기 바랍니다.
         </output>
       )}
       {review?.state === "failed" && (

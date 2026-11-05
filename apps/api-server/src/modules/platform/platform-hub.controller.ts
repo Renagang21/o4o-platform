@@ -20,7 +20,7 @@ export function createPlatformHubController(
       } catch {
         res.status(503).json({
           success: false,
-          error: "서비스 상태를 확인하지 못했습니다. 다시 조회해 주세요.",
+          error: "서비스 상태를 확인하지 못했습니다. 다시 조회해 주시기 바랍니다.",
         });
       }
     },

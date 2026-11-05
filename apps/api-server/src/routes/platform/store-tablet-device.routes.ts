@@ -439,7 +439,7 @@ export function registerStoreTabletDeviceRoutes(
   router.post('/tablet-runtime/devices/:id/content', withTabletRuntimeAuth(async (req, res, ctx) => {
     try {
       if (req.params.id !== ctx.device.id) { res.status(403).json({ success: false, error: 'Device mismatch', code: 'DEVICE_MISMATCH' }); return; }
-      if (!ctx.device.currentLocationId) { res.status(409).json({ success: false, error: '먼저 이 태블릿의 위치를 지정해 주세요.', code: 'DEVICE_NO_LOCATION' }); return; }
+      if (!ctx.device.currentLocationId) { res.status(409).json({ success: false, error: '먼저 이 태블릿의 위치를 지정해 주시기 바랍니다.', code: 'DEVICE_NO_LOCATION' }); return; }
       const screenSetId = req.body?.screenSetId;
       if (typeof screenSetId !== 'string' || !UUID_RE.test(screenSetId)) { res.status(400).json({ success: false, error: 'screenSetId is required', code: 'VALIDATION_ERROR' }); return; }
       await applyLocationContent(dataSource, ctx.device.organizationId, ctx.device.currentLocationId, screenSetId);
@@ -467,7 +467,7 @@ export function registerStoreTabletDeviceRoutes(
 const pairingLimiter = rateLimit({
   windowMs: 10 * 60 * 1000,
   max: 20,
-  message: { success: false, error: '요청이 너무 많습니다. 잠시 후 다시 시도해주세요.', code: 'RATE_LIMIT_EXCEEDED' },
+  message: { success: false, error: '요청이 너무 많습니다. 잠시 후 다시 시도해 주시기 바랍니다.', code: 'RATE_LIMIT_EXCEEDED' },
   standardHeaders: true,
   legacyHeaders: false,
   keyGenerator: (req: any) => getTrustedClientIp(req),
@@ -504,7 +504,7 @@ export function createStorePublicTabletDeviceRoutes(deps: { dataSource: DataSour
   router.post('/tablet-pairing/lookup', pairingLimiter as any, async (req: Request, res: Response): Promise<void> => {
     try {
       const code = readCode(req);
-      if (!code) { res.status(400).json({ success: false, error: '6자리 연결 코드를 입력해 주세요.', code: 'VALIDATION_ERROR' }); return; }
+      if (!code) { res.status(400).json({ success: false, error: '6자리 연결 코드를 입력해 주시기 바랍니다.', code: 'VALIDATION_ERROR' }); return; }
       const pending = await findPendingByCode(dataSource, code);
       if (!pending) { res.status(404).json({ success: false, error: '유효하지 않거나 만료된 코드입니다.', code: 'PAIRING_CODE_INVALID' }); return; }
       if (!await checkPharmacyFeature(dataSource, res, pending.organizationId, 'tablet')) return;
@@ -530,7 +530,7 @@ export function createStorePublicTabletDeviceRoutes(deps: { dataSource: DataSour
   router.post('/tablet-pairing/claim', pairingLimiter as any, async (req: Request, res: Response): Promise<void> => {
     try {
       const code = readCode(req);
-      if (!code) { res.status(400).json({ success: false, error: '6자리 연결 코드를 입력해 주세요.', code: 'VALIDATION_ERROR' }); return; }
+      if (!code) { res.status(400).json({ success: false, error: '6자리 연결 코드를 입력해 주시기 바랍니다.', code: 'VALIDATION_ERROR' }); return; }
       const deviceName = typeof req.body?.deviceName === 'string' ? req.body.deviceName.trim().slice(0, 100) : '';
       const requestedLocation = typeof req.body?.locationId === 'string' && UUID_RE.test(req.body.locationId) ? req.body.locationId : null;
       const pending = await findPendingByCode(dataSource, code);
@@ -554,7 +554,7 @@ export function createStorePublicTabletDeviceRoutes(deps: { dataSource: DataSour
         [hashDeviceToken(token), deviceName, locationId, pending.id, code],
       );
       const rows = Array.isArray(upd?.[0]) ? upd[0] : upd;
-      if (!rows?.[0]) { res.status(409).json({ success: false, error: '코드가 이미 사용되었습니다. 새 코드를 발급받아 주세요.', code: 'PAIRING_CODE_CONSUMED' }); return; }
+      if (!rows?.[0]) { res.status(409).json({ success: false, error: '코드가 이미 사용되었습니다. 새 코드를 발급받아 주시기 바랍니다.', code: 'PAIRING_CODE_CONSUMED' }); return; }
       res.status(201).json({
         success: true,
         data: { deviceToken: token, deviceId: rows[0].id, deviceName: rows[0].name, storeSlug: pending.storeSlug, storeName: pending.storeName, locationId },

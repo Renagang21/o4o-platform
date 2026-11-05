@@ -55,7 +55,7 @@ function SemiFranchiseRecords({ organizationId, canEnterCommunity }: { organizat
         ? new URL(returnPath, destination.origin).href
         : await requestServiceHandoff(api, { ...destination, returnPath });
       if (isCurrent()) window.location.assign(href);
-    } catch { if (isCurrent()) { setError('사업 참여자 공간으로 이동하지 못했습니다. 다시 시도해 주세요.'); setBusyKey(null); } }
+    } catch { if (isCurrent()) { setError('사업 참여자 공간으로 이동하지 못했습니다. 다시 시도해 주시기 바랍니다.'); setBusyKey(null); } }
   };
 
   return (
@@ -67,7 +67,7 @@ function SemiFranchiseRecords({ organizationId, canEnterCommunity }: { organizat
       {error && <Notice tone="error">{error}</Notice>}
       {!loading && rows.some(r => r.membershipStatus === 'active') && <section aria-label="가입한 약국 협력사업" className="mb-8">
         <h2 className="mb-3 text-lg font-semibold">가입한 약국 협력사업</h2>
-        <p className="mb-4 text-sm text-slate-600">가입자 공간에서 사업 소식과 회원들의 이야기를 확인하고, 상품과 자료는 이 매장에서 이용하세요.</p>
+        <p className="mb-4 text-sm text-slate-600">가입자 공간에서 사업 소식과 회원들의 이야기를 확인하고, 상품과 자료는 이 매장에서 이용하시기 바랍니다.</p>
         <div className="grid gap-4 sm:grid-cols-2">
           {rows.filter(r => r.membershipStatus === 'active').map(r => <article key={r.key} className="min-w-0 rounded-xl border bg-white p-5">
             <h3 className="break-words font-semibold">{r.name}</h3>

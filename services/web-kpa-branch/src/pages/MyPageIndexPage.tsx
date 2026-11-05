@@ -153,7 +153,7 @@ export default function MyPageIndexPage({ slug, basePath }: { slug: string; base
         <h2 className="mb-2 font-semibold text-gray-900">현재 소속</h2>
         {affiliation === null && <p className="text-gray-500">확인 중입니다…</p>}
         {affiliation === 'none' && (
-          <p className="text-gray-500">등록된 분회 소속이 없습니다. 분회 운영자에게 전입 등록을 요청하세요.</p>
+          <p className="text-gray-500">등록된 분회 소속이 없습니다. 분회 운영자에게 전입 등록을 요청하시기 바랍니다.</p>
         )}
         {affiliation && affiliation !== 'none' && (
           <p className="text-gray-800">

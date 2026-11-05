@@ -148,7 +148,7 @@ describe('AI modal generation and lifecycle preserve the caller context', () => 
     expect(
       (
         screen.getByPlaceholderText(
-          '원본 정보를 입력하거나 에디터에서 가져오세요...',
+          '원본 정보를 입력하거나 에디터에서 가져오시기 바랍니다...',
         ) as HTMLTextAreaElement
       ).value,
     ).toBe('Next context');
@@ -309,12 +309,12 @@ describe('independent save controllers preserve business requests and result sem
     fireEvent.click(screen.getByRole('button', { name: '내 매장 저장' }));
     fireEvent.click(screen.getByRole('button', { name: '제작 자료로 저장' }));
     expect(
-      screen.getByPlaceholderText('저장할 콘텐츠 제목을 입력하세요'),
+      screen.getByPlaceholderText('저장할 콘텐츠 제목을 입력하시기 바랍니다'),
     ).toBeTruthy();
     expect(
-      screen.getByPlaceholderText('저장할 매장 제작 자료 제목을 입력하세요'),
+      screen.getByPlaceholderText('저장할 매장 제작 자료 제목을 입력하시기 바랍니다'),
     ).toBeTruthy();
-    fireEvent.change(screen.getByPlaceholderText('게시글 제목을 입력하세요'), {
+    fireEvent.change(screen.getByPlaceholderText('게시글 제목을 입력하시기 바랍니다'), {
       target: { value: '  Forum draft  ' },
     });
     fireEvent.change(screen.getByRole('combobox'), {
@@ -423,7 +423,7 @@ describe('independent save controllers preserve business requests and result sem
         screen.getByRole('button', { name: '제작 자료로 저장', exact: true }),
       );
       fireEvent.change(
-        screen.getByPlaceholderText('저장할 매장 제작 자료 제목을 입력하세요'),
+        screen.getByPlaceholderText('저장할 매장 제작 자료 제목을 입력하시기 바랍니다'),
         { target: { value: '  Material draft  ' } },
       );
       fetchMock.mockResolvedValueOnce(

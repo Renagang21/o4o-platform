@@ -125,7 +125,7 @@ export function MediaDeleteDialog({ media, apiFetch, serviceKey, routeBase, link
             <div className="space-y-3">
               <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-sm text-amber-800">
                 이 미디어는 아래 위치에서 <strong>사용 중</strong>이라 삭제할 수 없습니다.
-                <br />먼저 모든 플레이리스트에서 이 미디어를 제거한 뒤 다시 시도하세요.
+                <br />먼저 모든 플레이리스트에서 이 미디어를 제거한 뒤 다시 시도하시기 바랍니다.
               </div>
 
               <div className="flex gap-4 text-xs text-slate-500">
@@ -170,7 +170,7 @@ export function MediaDeleteDialog({ media, apiFetch, serviceKey, routeBase, link
                     ))}
                   </ul>
                   <p className="text-[11px] text-slate-400 mt-1">
-                    매장 플레이리스트는 각 매장에서 직접 관리합니다. 필요 시 매장에 제거를 요청하세요.
+                    매장 플레이리스트는 각 매장에서 직접 관리합니다. 필요 시 매장에 제거를 요청하시기 바랍니다.
                   </p>
                 </div>
               )}

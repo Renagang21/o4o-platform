@@ -26,7 +26,7 @@ export default function MemberProfileForm({detail,editing,busy,perform,onCancel,
     </form>
     {!member.emailVerified&&<div className="text-sm"><button type="button" disabled={busy} onClick={async()=>{
       onBusyChange(true);setMailNotice('');
-      try{const response=await authClient.api.post(`/qualifications/pharmacist/members/${encodeURIComponent(member.userId)}/verification-email`,{version:member.version});const result=response.data?.data;if(result?.requested!==true&&result?.alreadyVerified!==true)throw new Error('INVALID_RESPONSE');if(active.current)setMailNotice(result.alreadyVerified?'이미 확인된 이메일입니다. 최신 정보를 조회해 주세요.':'확인 메일 요청을 접수했습니다.');}
+      try{const response=await authClient.api.post(`/qualifications/pharmacist/members/${encodeURIComponent(member.userId)}/verification-email`,{version:member.version});const result=response.data?.data;if(result?.requested!==true&&result?.alreadyVerified!==true)throw new Error('INVALID_RESPONSE');if(active.current)setMailNotice(result.alreadyVerified?'이미 확인된 이메일입니다. 최신 정보를 조회해 주시기 바랍니다.':'확인 메일 요청을 접수했습니다.');}
       catch(error){if(active.current){if([401,403].includes((error as {response?:{status?:number}}).response?.status??0))onAccessLost();else setMailNotice(memberError(error));}}finally{if(active.current)onBusyChange(false);}
     }}>확인 메일 보내기</button>{mailNotice&&<output className="block">{mailNotice}</output>}</div>}
     {editing && member.hasPassword!==false && <TemporaryPasswordIssue onAccessLost={onAccessLost} detail={detail} busy={busy} onBusyChange={onBusyChange} onFinished={()=>{void perform(async()=>undefined);}}/>}

@@ -116,7 +116,7 @@ export function ContentUtilizationGuide({
       <div style={styles.footer}>
         <p style={styles.footerText}>
           Neture는 콘텐츠 보관 및 안내만 제공합니다.
-          실제 콘텐츠 적용은 각 서비스의 판매자 센터에서 진행해 주세요.
+          실제 콘텐츠 적용은 각 서비스의 판매자 센터에서 진행해 주시기 바랍니다.
         </p>
       </div>
     </div>

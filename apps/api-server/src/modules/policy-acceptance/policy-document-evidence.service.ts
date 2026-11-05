@@ -22,7 +22,7 @@ export async function recordPublishedPolicyEvidence(m: Pick<EntityManager, 'quer
   documentType: 'terms' | 'privacy', reference: PolicyReference | undefined): Promise<PolicyEvidence> {
   if (!reference || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(reference.policyDocumentId)
     || !Number.isInteger(reference.version) || reference.version < 1) {
-    throw new PolicyAcceptanceError('POLICY_ACCEPTANCE_REQUIRED', '현재 정책 문서를 확인해 주세요.', 400);
+    throw new PolicyAcceptanceError('POLICY_ACCEPTANCE_REQUIRED', '현재 정책 문서를 확인해 주시기 바랍니다.', 400);
   }
   const doc = await readCurrentPolicyDocument(m, serviceKey, documentType, true);
   if (!doc) throw new PolicyAcceptanceError('POLICY_UNAVAILABLE', '정책 문서를 불러올 수 없습니다.', 503);
@@ -30,7 +30,7 @@ export async function recordPublishedPolicyEvidence(m: Pick<EntityManager, 'quer
     throw new PolicyAcceptanceError('POLICY_UNAVAILABLE', '정책 문서를 불러올 수 없습니다.', 503);
   }
   if (doc.id !== reference.policyDocumentId || Number(doc.version) !== reference.version) {
-    throw new PolicyAcceptanceError('POLICY_VERSION_MISMATCH', '정책 문서가 변경되었습니다. 다시 확인해 주세요.', 409);
+    throw new PolicyAcceptanceError('POLICY_VERSION_MISMATCH', '정책 문서가 변경되었습니다. 다시 확인해 주시기 바랍니다.', 409);
   }
   const evidence: PolicyEvidence = { serviceKey, documentType, policyDocumentId: doc.id, version: Number(doc.version),
     contentHash: computePolicyContentHash(doc.content), acceptanceKind: documentType === 'privacy' ? 'acknowledgement' : 'agreement' };

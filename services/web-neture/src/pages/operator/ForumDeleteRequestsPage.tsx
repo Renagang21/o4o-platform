@@ -51,7 +51,7 @@ export default function ForumDeleteRequestsPage() {
       serviceKey="neture"
       client={client}
       title="포럼 삭제 요청 관리"
-      description="포럼 소유자의 삭제 요청을 검토하고 승인하거나 반려하세요"
+      description="포럼 소유자의 삭제 요청을 검토하고 승인하거나 반려하시기 바랍니다"
       headerIcon={<Trash2 className="w-7 h-7 text-emerald-600" />}
       tableId="neture-forum-delete-requests"
       loadGuideSections={fetchGuidePageContent}

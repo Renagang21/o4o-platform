@@ -56,7 +56,7 @@ export class ContactReplyService {
       throw new OperationError(
         400,
         "INVALID_REPLY",
-        "답변은 1~5,000자로 입력해 주세요.",
+        "답변은 1~5,000자로 입력해 주시기 바랍니다.",
       );
     const replyId = input.requestId,
       body = input.message.trim();
@@ -85,13 +85,13 @@ export class ContactReplyService {
         throw new OperationError(
           409,
           "REPLY_IN_PROGRESS",
-          "다른 답변의 발송 결과를 확인 중입니다. 답변 이력을 다시 확인해 주세요.",
+          "다른 답변의 발송 결과를 확인 중입니다. 답변 이력을 다시 확인해 주시기 바랍니다.",
         );
       if (contact.status === "spam" || contact.status === "closed")
         throw new OperationError(
           409,
           "CONTACT_CLOSED",
-          "문의 상태를 확인 중으로 바꾼 뒤 답변해 주세요.",
+          "문의 상태를 확인 중으로 바꾼 뒤 답변해 주시기 바랍니다.",
         );
       await recordOperation(manager, serviceKey, actorId, "contact.reply", {
         contactId,

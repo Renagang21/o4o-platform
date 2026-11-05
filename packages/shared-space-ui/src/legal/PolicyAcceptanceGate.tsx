@@ -149,7 +149,7 @@ export function PolicyAcceptanceGate({
     setError(null);
     try {
       const result = await onAccept();
-      if (!result.success) setError(result.error ?? '약관 동의 처리에 실패했습니다. 잠시 후 다시 시도해 주세요.');
+      if (!result.success) setError(result.error ?? '약관 동의 처리에 실패했습니다. 잠시 후 다시 시도해 주시기 바랍니다.');
     } finally {
       setSubmitting(false);
     }
@@ -159,17 +159,17 @@ export function PolicyAcceptanceGate({
     <div style={inline ? { ...S.wrap, minHeight: 0, padding: 0 } : S.wrap} role={inline ? 'region' : 'dialog'} aria-modal={inline ? undefined : true} aria-labelledby={titleId}>
       <div style={S.card}>
         <p style={S.eyebrow}>{serviceName ? `${serviceName} · ` : ''}{agreementLabel} 동의</p>
-        <Heading id={titleId} style={S.h1}>{first?.title || '서비스 이용약관'}에 동의해 주세요</Heading>
+        <Heading id={titleId} style={S.h1}>{first?.title || '서비스 이용약관'}에 동의해 주시기 바랍니다</Heading>
         <p style={S.lead}>
           {leadText ?? `서비스를 계속 이용하려면 아래 ${agreementLabel}을(를) 확인하고 동의해야 합니다. 동의하기 전까지는 계약 열람, 문의, O4O 메인 복귀, 로그아웃만 이용할 수 있습니다.`}
-          {pending.length > 1 && <> 공통 계정 약관과 해당 서비스 약관을 각각 확인해 주세요.</>}
+          {pending.length > 1 && <> 공통 계정 약관과 해당 서비스 약관을 각각 확인해 주시기 바랍니다.</>}
         </p>
 
         {status === 'loading' && <div style={S.state}>약관을 불러오는 중입니다…</div>}
-        {status === 'empty' && <div style={S.state}>게시된 약관을 찾을 수 없습니다. 잠시 후 새로고침해 주세요.</div>}
-        {status === 'error' && <div style={S.state}>약관을 불러오지 못했습니다. 잠시 후 새로고침해 주세요.</div>}
+        {status === 'empty' && <div style={S.state}>게시된 약관을 찾을 수 없습니다. 잠시 후 새로고침해 주시기 바랍니다.</div>}
+        {status === 'error' && <div style={S.state}>약관을 불러오지 못했습니다. 잠시 후 새로고침해 주시기 바랍니다.</div>}
         {status === 'stale' && (
-          <div style={S.state}>약관이 갱신되었습니다. 최신 약관으로 다시 동의하려면 화면을 새로고침해 주세요.</div>
+          <div style={S.state}>약관이 갱신되었습니다. 최신 약관으로 다시 동의하려면 화면을 새로고침해 주시기 바랍니다.</div>
         )}
         {(status === 'ok' || status === 'stale') && docs.map((doc) => (
           <section key={doc.id ?? `${doc.serviceKey}:${doc.documentType}`} aria-label={doc.title}>

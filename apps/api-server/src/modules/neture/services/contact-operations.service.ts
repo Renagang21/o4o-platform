@@ -10,13 +10,13 @@ export function contactDetail(m: NetureContactMessage) {
 }
 export async function updateOperatorContact(db: DataSource, id: string, actorId: string, body: any) {
   if (!['new', 'in_progress', 'resolved'].includes(body?.status) || typeof body?.adminNotes !== 'string' || [...body.adminNotes].length > 10000 || body.adminNotes.includes('\0') || typeof body?.expectedUpdatedAt !== 'string') {
-    throw new OperationError(400, 'INVALID_CONTACT_UPDATE', '상태·내부 메모(10,000자 이하)·조회 시점을 확인해 주세요.');
+    throw new OperationError(400, 'INVALID_CONTACT_UPDATE', '상태·내부 메모(10,000자 이하)·조회 시점을 확인해 주시기 바랍니다.');
   }
   return db.transaction(async manager => {
     const repo = manager.getRepository(NetureContactMessage);
     const message = await repo.findOne({ where: { id }, lock: { mode: 'pessimistic_write' } });
     if (!message) throw new OperationError(404, 'NOT_FOUND', '문의를 찾을 수 없습니다.');
-    if (message.updatedAt.toISOString() !== body.expectedUpdatedAt) throw new OperationError(409, 'CONTACT_CHANGED', '다른 처리가 반영됐습니다. 입력을 보관한 뒤 최신 내용을 다시 조회해 주세요.');
+    if (message.updatedAt.toISOString() !== body.expectedUpdatedAt) throw new OperationError(409, 'CONTACT_CHANGED', '다른 처리가 반영됐습니다. 입력을 보관한 뒤 최신 내용을 다시 조회해 주시기 바랍니다.');
     const previousStatus = message.status;
     message.resolvedAt = body.status === 'resolved' ? message.resolvedAt ?? new Date() : null;
     message.status = body.status;

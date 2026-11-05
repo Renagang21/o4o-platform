@@ -91,7 +91,7 @@ export function useSupplierOnboarding() {
           ? mailOrderReportFile
           : bankbookFile;
     if (!file) {
-      setOnboardingError('PDF 파일을 선택해 주세요.');
+      setOnboardingError('PDF 파일을 선택해 주시기 바랍니다.');
       return;
     }
     if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) {

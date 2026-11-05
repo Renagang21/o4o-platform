@@ -203,7 +203,7 @@ export async function cancelStoreOrderBeforePayment(
       ok: false,
       httpStatus: 409,
       code: 'ORDER_NOT_CANCELLABLE',
-      message: '주문 상태가 바뀌었습니다. 다시 확인해 주세요.',
+      message: '주문 상태가 바뀌었습니다. 다시 확인해 주시기 바랍니다.',
     };
   }
 

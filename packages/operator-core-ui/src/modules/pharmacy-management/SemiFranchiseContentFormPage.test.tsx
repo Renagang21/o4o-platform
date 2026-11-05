@@ -120,7 +120,7 @@ it('blocks empty title and archived content without a write', async () => {
   api.getContent.mockResolvedValueOnce(content('가상 초안'));
   const view = show(); await screen.findByDisplayValue('가상 초안');
   fireEvent.change(screen.getByLabelText('제목'), { target: { value: ' ' } });
-  fireEvent.click(screen.getByRole('button', { name: '수정 저장' })); await screen.findByText('제목을 입력해 주세요.');
+  fireEvent.click(screen.getByRole('button', { name: '수정 저장' })); await screen.findByText('제목을 입력해 주시기 바랍니다.');
   expect(api.updateContent).not.toHaveBeenCalled(); view.unmount();
   api.getContent.mockResolvedValueOnce({ ...content('보관'), status: 'archived' });
   show(); await screen.findByText(/보관되거나 반려된 콘텐츠는 수정할 수 없습니다/);

@@ -236,7 +236,7 @@ it('opens the selected confirmed location once and rejects its navigation after 
   expect(screen.queryByRole('heading', { name: 'Corner B', level: 3 })).toBeNull();
   expect(screen.getByRole('link', { name: '위치별 현황으로 돌아가기' }).getAttribute('href')).toBe('/store/execution?workspace=use');
   api.store = api.active = 'B'; h.rerender(<MemoryRouter initialEntries={[]}><TabletPage /></MemoryRouter>);
-  await screen.findByText('매장 또는 업무가 변경되었습니다. 현재 매장의 위치를 다시 선택해 주세요.');
+  await screen.findByText('매장 또는 업무가 변경되었습니다. 현재 매장의 위치를 다시 선택해 주시기 바랍니다.');
   expect(screen.queryByRole('link', { name: '위치별 현황으로 돌아가기' })).toBeNull();
   expect(screen.queryByRole('heading', { name: 'Corner B', level: 3 })).toBeNull();
 });

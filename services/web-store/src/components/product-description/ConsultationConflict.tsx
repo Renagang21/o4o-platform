@@ -7,7 +7,7 @@ export function ConsultationConflict({ saved, acknowledged, disabled, onAcknowle
 }>) {
   const context = readProductConsultation(saved.contentJson.productConsultation);
   return <section aria-label="상담자료 수정 충돌" className="my-3 rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm">
-    <p role="alert">다른 저장 내용이 확인됐습니다. 내 작성 내용은 유지했습니다. 최신 저장본을 비교한 뒤 다시 저장하세요.</p>
+    <p role="alert">다른 저장 내용이 확인됐습니다. 내 작성 내용은 유지했습니다. 최신 저장본을 비교한 뒤 다시 저장하시기 바랍니다.</p>
     <details className="mt-2"><summary className="min-h-11 cursor-pointer content-center">최신 저장본 비교</summary>
       <p className="font-medium">{saved.title}</p>
       {context && <div className="my-2 space-y-2">

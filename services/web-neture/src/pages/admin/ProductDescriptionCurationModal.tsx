@@ -109,7 +109,7 @@ export default function ProductDescriptionCurationModal({ master, onClose }: Pro
 
   const handleCanonical = async (item: SharedProductDescription) => {
     if (item.status === 'canonical') return;
-    if (!window.confirm('이 후보를 대표 상품설명으로 지정하면 상품 상세에 노출됩니다. 진행할까요?')) return;
+    if (!window.confirm('이 후보를 대표 상품설명으로 지정하면 상품 상세에 노출됩니다. 진행하시겠습니까?')) return;
     setBusyId(item.id);
     try {
       await sharedProductDescriptionApi.setCanonical(item.id);
@@ -135,7 +135,7 @@ export default function ProductDescriptionCurationModal({ master, onClose }: Pro
   };
 
   const handleDelete = async (item: SharedProductDescription) => {
-    if (!window.confirm('이 후보를 삭제(숨김)할까요?')) return;
+    if (!window.confirm('이 후보를 삭제(숨김)하시겠습니까?')) return;
     setBusyId(item.id);
     try {
       await sharedProductDescriptionApi.remove(item.id);
@@ -182,7 +182,7 @@ export default function ProductDescriptionCurationModal({ master, onClose }: Pro
             <p className="text-sm text-slate-400 text-center py-8">불러오는 중…</p>
           ) : items.length === 0 ? (
             <p className="text-sm text-slate-400 text-center py-8">
-              후보가 없습니다. "기존 설명에서 후보 가져오기"로 공급자/AI/의약품 정보 후보를 생성하세요.
+              후보가 없습니다. "기존 설명에서 후보 가져오기"로 공급자/AI/의약품 정보 후보를 생성하시기 바랍니다.
             </p>
           ) : (
             items.map((item) => (

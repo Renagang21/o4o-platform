@@ -63,19 +63,19 @@ it("preserves failed request inputs and retries without changing supplier approv
   await screen.findByText("진행 중인 보완 요청이 없습니다.");
   fireEvent.click(screen.getByRole("checkbox", { name: "사업자등록증" }));
   fireEvent.change(screen.getByRole("textbox"), {
-    target: { value: "서류를 보완해 주세요." },
+    target: { value: "서류를 보완해 주시기 바랍니다." },
   });
   fireEvent.click(screen.getByRole("button", { name: "보완 요청 저장" }));
   await screen.findByRole("alert");
   expect((screen.getByRole("textbox") as HTMLTextAreaElement).value).toBe(
-    "서류를 보완해 주세요.",
+    "서류를 보완해 주시기 바랍니다.",
   );
   fireEvent.click(screen.getByRole("button", { name: "보완 요청 저장" }));
   await waitFor(() => expect(api.create).toHaveBeenCalledTimes(2));
   expect(api.create.mock.calls[1]).toEqual([
     "supplier-a",
     ["business_registration"],
-    "서류를 보완해 주세요.",
+    "서류를 보완해 주시기 바랍니다.",
   ]);
 });
 it("retries only reads after a committed request and failed refresh", async () => {

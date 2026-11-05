@@ -68,7 +68,7 @@ export default function PopListPage() {
       {/* CTA */}
       <div className="bg-orange-50 rounded-xl border border-orange-200 p-6 text-center">
         <Download className="w-8 h-8 text-orange-500 mx-auto mb-3" />
-        <h3 className="text-base font-semibold text-gray-800 mb-1">POP를 만들어 보세요</h3>
+        <h3 className="text-base font-semibold text-gray-800 mb-1">POP를 만들어 보시기 바랍니다</h3>
         <p className="text-sm text-gray-500 mb-4">상품을 선택하면 AI가 POP 문구를 자동으로 생성합니다.<br/>A4/A5 레이아웃으로 바로 PDF 출력이 가능합니다.</p>
         <button
           onClick={() => navigate('/store/pop/create')}

@@ -106,7 +106,7 @@ export function createKpaCheckoutController(
       success: false,
       code: 'STORE_CONSUMER_ORDER_RETIRED',
       message:
-        '매장 소비자 주문은 O4O에서 제공하지 않습니다. 현장 판매는 매장의 POS, 온라인 판매는 외부 판매채널을 이용해 주세요.',
+        '매장 소비자 주문은 O4O에서 제공하지 않습니다. 현장 판매는 매장의 POS, 온라인 판매는 외부 판매채널을 이용해 주시기 바랍니다.',
     });
   });
 

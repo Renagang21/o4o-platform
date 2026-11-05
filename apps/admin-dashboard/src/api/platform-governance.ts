@@ -52,7 +52,7 @@ function toError(err: any): Error {
   if (status === 401) return new Error('로그인이 필요합니다.');
   if (status === 403) return new Error(typeof serverMsg === 'string' ? serverMsg : '이 영역은 O4O 플랫폼 관리자 권한이 필요합니다.');
   if (status === 404) return new Error(typeof serverMsg === 'string' ? serverMsg : '대상을 찾을 수 없습니다.');
-  if (status === 400 || status === 422) return new Error(typeof serverMsg === 'string' ? serverMsg : '입력값을 확인해 주세요.');
+  if (status === 400 || status === 422) return new Error(typeof serverMsg === 'string' ? serverMsg : '입력값을 확인해 주시기 바랍니다.');
   return new Error(typeof serverMsg === 'string' ? serverMsg : '서버 오류가 발생했습니다.');
 }
 

@@ -176,7 +176,7 @@ export function createOperatorSupplierStoreDescriptionReviewController(dataSourc
       const actor = actorId(req);
       const reason = typeof req.body?.reason === 'string' ? req.body.reason.trim() : '';
       if (!reason) {
-        res.status(400).json({ success: false, error: '수정 요청 사유를 입력하세요', code: 'REASON_REQUIRED' });
+        res.status(400).json({ success: false, error: '수정 요청 사유를 입력하시기 바랍니다', code: 'REASON_REQUIRED' });
         return;
       }
       const detail = await service.getSupplierStoreReviewDetail(req.params.id);

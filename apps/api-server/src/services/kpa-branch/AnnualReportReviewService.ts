@@ -305,7 +305,7 @@ export class AnnualReportReviewService {
   }) {
     const reason = typeof params.reason === 'string' ? params.reason.trim() : '';
     if (!reason) {
-      throw new AnnualReportReviewError('REVISION_REASON_REQUIRED', '보완 사유를 입력해 주세요.', 422);
+      throw new AnnualReportReviewError('REVISION_REASON_REQUIRED', '보완 사유를 입력해 주시기 바랍니다.', 422);
     }
     if (reason.length > REVISION_REASON_MAX) {
       throw new AnnualReportReviewError(

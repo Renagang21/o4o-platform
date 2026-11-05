@@ -204,14 +204,14 @@ export function SignagePlaylistCreateShell({
   const handleSave = async () => {
     setError(null);
     if (!name.trim()) {
-      setError('제목을 입력하세요');
+      setError('제목을 입력하시기 바랍니다');
       return;
     }
 
     const pendingFromInput = tagInput.split(',').map((t) => t.trim().replace(/^#/, '')).filter(Boolean);
     const tagArr = Array.from(new Set([...tags, ...pendingFromInput]));
     if (showTags && requireTags && tagArr.length === 0) {
-      setError('태그를 최소 1개 이상 입력하세요');
+      setError('태그를 최소 1개 이상 입력하시기 바랍니다');
       return;
     }
 
@@ -266,7 +266,7 @@ export function SignagePlaylistCreateShell({
           type="text"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          placeholder={config.namePlaceholder ?? '플레이리스트 제목을 입력하세요'}
+          placeholder={config.namePlaceholder ?? '플레이리스트 제목을 입력하시기 바랍니다'}
           style={styles.input}
         />
       </div>
@@ -364,7 +364,7 @@ export function SignagePlaylistCreateShell({
           </div>
 
           {items.length === 0 ? (
-            <p style={styles.emptyHint}>항목을 추가하세요. URL{perItemDuration ? '과 재생시간을' : '을'} 입력합니다.</p>
+            <p style={styles.emptyHint}>항목을 추가하시기 바랍니다. URL{perItemDuration ? '과 재생시간을' : '을'} 입력합니다.</p>
           ) : (
             <div style={styles.itemList}>
               {items.map((item, index) => (

@@ -51,7 +51,7 @@ export function TabletSetupPage() {
       const loc = r.locations.find((l) => l.id === (r.defaultLocationId || r.locations[0]?.id));
       setDeviceName(loc ? `${loc.location || loc.name} 태블릿` : `${r.storeName} 태블릿`);
     } catch (e: any) {
-      setError(e?.code === 'PAIRING_CODE_INVALID' ? '연결 코드가 올바르지 않거나 만료되었습니다. PC 에서 코드를 다시 발급하세요.' : (e?.message || '연결 코드를 확인할 수 없습니다.'));
+      setError(e?.code === 'PAIRING_CODE_INVALID' ? '연결 코드가 올바르지 않거나 만료되었습니다. PC 에서 코드를 다시 발급하시기 바랍니다.' : (e?.message || '연결 코드를 확인할 수 없습니다.'));
     } finally {
       setBusy(false);
     }
@@ -66,7 +66,7 @@ export function TabletSetupPage() {
       saveStoredTabletDevice(device);
       navigate(`/tablet/${encodeURIComponent(device.storeSlug)}`, { replace: true });
     } catch (e: any) {
-      setError(e?.code === 'PAIRING_CODE_CONSUMED' ? '이미 사용된 연결 코드입니다. PC 에서 새 코드를 발급하세요.' : (e?.message || '태블릿을 연결할 수 없습니다.'));
+      setError(e?.code === 'PAIRING_CODE_CONSUMED' ? '이미 사용된 연결 코드입니다. PC 에서 새 코드를 발급하시기 바랍니다.' : (e?.message || '태블릿을 연결할 수 없습니다.'));
     } finally {
       setBusy(false);
     }
@@ -78,7 +78,7 @@ export function TabletSetupPage() {
         <h1 style={{ margin: 0, fontSize: 24 }}>태블릿 연결</h1>
         {!lookup ? (
           <>
-            <p style={{ margin: 0, color: '#4b5563' }}>PC 「내 매장 › 태블릿」의 위치 카드에서 [태블릿 연결] 을 눌러 받은 6자리 코드를 입력하세요.</p>
+            <p style={{ margin: 0, color: '#4b5563' }}>PC 「내 매장 › 태블릿」의 위치 카드에서 [태블릿 연결] 을 눌러 받은 6자리 코드를 입력하시기 바랍니다.</p>
             <input
               style={{ ...input, letterSpacing: 6, textAlign: 'center' }}
               inputMode="numeric"

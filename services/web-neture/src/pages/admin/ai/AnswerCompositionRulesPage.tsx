@@ -566,9 +566,9 @@ export default function AnswerCompositionRulesPage() {
                     잘못된 예시
                   </div>
                   <div className="space-y-2 text-sm text-red-700">
-                    <p>"지금 바로 이 제품을 구매하세요!"</p>
+                    <p>"지금 바로 이 제품을 구매하시기 바랍니다!"</p>
                     <p>"베스트셀러 추천드립니다"</p>
-                    <p>"최고의 선택, 놓치지 마세요"</p>
+                    <p>"최고의 선택, 놓치지 마시기 바랍니다"</p>
                   </div>
                 </div>
                 <div className="p-4 bg-green-50 rounded-lg">

@@ -106,7 +106,7 @@ export default function DashboardPage() {
           <h2 className="text-lg font-semibold text-gray-900 mb-4">내 서비스</h2>
           {myServices.length === 0 ? (
             <p className="text-sm text-gray-500">
-              가입된 서비스가 없습니다. 서비스 가입은 각 서비스 사이트에서 신청해 주세요.
+              가입된 서비스가 없습니다. 서비스 가입은 각 서비스 사이트에서 신청해 주시기 바랍니다.
             </p>
           ) : (
             <>
@@ -121,7 +121,7 @@ export default function DashboardPage() {
                 ))}
               </div>
               <p className="mt-4 text-xs text-gray-500">
-                다른 서비스에 가입하려면 해당 서비스 사이트에서 직접 신청해 주세요.
+                다른 서비스에 가입하려면 해당 서비스 사이트에서 직접 신청해 주시기 바랍니다.
               </p>
             </>
           )}

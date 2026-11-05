@@ -93,7 +93,7 @@ function ServiceMembersPanel() {
   };
 
   const reject = async (row: ServiceMemberRow) => {
-    const reason = window.prompt('반려 사유를 입력하세요.');
+    const reason = window.prompt('반려 사유를 입력하시기 바랍니다.');
     if (reason === null) return;
     if (!reason.trim()) {
       setError('반려 사유가 필요합니다.');
@@ -218,7 +218,7 @@ function BranchRequestsPanel() {
   };
 
   const reject = async (row: PendingBranchRequest) => {
-    const reason = window.prompt('거절 사유를 입력하세요. 신청자에게 표시됩니다.');
+    const reason = window.prompt('거절 사유를 입력하시기 바랍니다. 신청자에게 표시됩니다.');
     if (reason === null) return;
     if (!reason.trim()) {
       setError('거절 사유가 필요합니다.');
@@ -367,7 +367,7 @@ function BranchOperatorsPanel() {
         onChange={(e) => setBranchId(e.target.value)}
         className="mt-1 w-full max-w-sm rounded border border-gray-300 px-2 py-1"
       >
-        <option value="">분회를 선택하세요</option>
+        <option value="">분회를 선택하시기 바랍니다</option>
         {(branches ?? []).map((b) => (
           <option key={b.id} value={b.id}>
             {b.name}

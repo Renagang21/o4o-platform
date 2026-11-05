@@ -156,7 +156,7 @@ export default function OfferEditSection({
               입력을 남겨두면 저장된 것처럼 보이므로 읽기 전용으로 표시한다.
             */}
             <p className="text-xs text-slate-500">
-              O4O 기준 상품정보입니다. 공급자 화면에서는 수정되지 않습니다 — 수정이 필요하면 운영자에게 요청하세요.
+              O4O 기준 상품정보입니다. 공급자 화면에서는 수정되지 않습니다 — 수정이 필요하면 운영자에게 요청하시기 바랍니다.
             </p>
 
             <FormField label="카테고리">

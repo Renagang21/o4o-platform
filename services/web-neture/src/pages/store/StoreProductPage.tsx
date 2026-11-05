@@ -444,7 +444,7 @@ export default function StoreProductPage() {
           <div className="flex-1 flex flex-col gap-4 justify-center">
             <p className="text-sm text-gray-500">
               이 QR 코드를 스캔하면 이 상품 페이지로 바로 연결됩니다.
-              매장 POP나 전단지에 활용하세요.
+              매장 POP나 전단지에 활용하시기 바랍니다.
             </p>
             <button
               onClick={handleShare}

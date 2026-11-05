@@ -447,7 +447,7 @@ function ChannelPublicUrlCard({
       await navigator.clipboard.writeText(url);
       showToast('success', '공개 주소가 클립보드에 복사되었습니다.');
     } catch {
-      showToast('error', '복사에 실패했습니다. 주소를 직접 복사해 주세요.');
+      showToast('error', '복사에 실패했습니다. 주소를 직접 복사해 주시기 바랍니다.');
     }
   };
 
@@ -758,7 +758,7 @@ export function StoreChannelsView({
         <div className="text-center py-16 bg-white rounded-lg border border-slate-200">
           <Package className="w-10 h-10 mx-auto mb-3 text-slate-300" />
           <p className="text-sm text-slate-500">아직 등록된 채널이 없습니다.</p>
-          <p className="text-xs text-slate-400 mt-1">아래 버튼으로 첫 채널을 생성하세요.</p>
+          <p className="text-xs text-slate-400 mt-1">아래 버튼으로 첫 채널을 생성하시기 바랍니다.</p>
           <button
             onClick={handleCreateChannel}
             disabled={creating}
@@ -844,7 +844,7 @@ export function StoreChannelsView({
 
       {/* ─── 채널 선택 가이드 (WO-O4O-CHANNEL-UX-STEP1-GUIDE-V1) ─── */}
       <div className="mb-6 p-5 rounded-xl border border-slate-200 bg-slate-50">
-        <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-3">상품을 어디에 보여줄지 선택하세요</p>
+        <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-3">상품을 어디에 보여줄지 선택하시기 바랍니다</p>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {([
             // 메인 탭 CHANNEL_TABS 와 채널 타입별 동일 아이콘. SIGNAGE 는 가이드 문맥상 Tv.
@@ -921,7 +921,7 @@ export function StoreChannelsView({
               <span className="text-xl shrink-0">⬜</span>
               <div>
                 <p className="text-sm font-semibold text-slate-700">아직 추가된 상품이 없습니다</p>
-                <p className="text-xs text-slate-500 mt-1">HUB에서 상품을 선택하고 내 매장에서 판매를 시작하세요.</p>
+                <p className="text-xs text-slate-500 mt-1">HUB에서 상품을 선택하고 내 매장에서 판매를 시작하시기 바랍니다.</p>
               </div>
             </div>
             <Link to={routes.hubB2b} className={`shrink-0 px-4 py-2 text-sm font-medium border rounded-lg transition-colors ${theme.accentOutlineBtn}`}>
@@ -1079,7 +1079,7 @@ export function StoreChannelsView({
             <div className="text-center py-8 text-slate-400 bg-white rounded-lg border border-slate-200">
               <Package className="w-8 h-8 mx-auto mb-2 text-slate-300" />
               <p className="text-sm">이 채널에 등록된 제품이 없습니다.</p>
-              <p className="text-xs mt-1">"제품 추가" 버튼으로 제품을 진열하세요.</p>
+              <p className="text-xs mt-1">"제품 추가" 버튼으로 제품을 진열하시기 바랍니다.</p>
             </div>
           ) : (
             <div className="bg-white rounded-lg border border-slate-200 overflow-hidden">

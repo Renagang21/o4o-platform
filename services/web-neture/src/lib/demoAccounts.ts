@@ -67,7 +67,7 @@ export const DEMO_LOGIN_MESSAGES = {
   auth: 'Demo 체험 계정 로그인이 실패했습니다.',
   permission: 'Demo 계정의 체험 권한을 확인할 수 없습니다.',
   server: '현재 Demo 체험을 시작할 수 없습니다.',
-  storeMove: '매장 Demo 화면으로 이동하지 못했습니다. 홈의 매장 버튼으로 다시 시도해 주세요.',
+  storeMove: '매장 Demo 화면으로 이동하지 못했습니다. 홈의 매장 버튼으로 다시 시도해 주시기 바랍니다.',
 } as const;
 
 /** 서버가 Demo 계정의 변경 요청을 막을 때 돌려주는 code (`demo-account.service.ts`) */

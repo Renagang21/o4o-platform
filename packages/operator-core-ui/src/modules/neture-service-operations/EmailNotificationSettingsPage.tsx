@@ -94,7 +94,7 @@ export default function EmailNotificationSettingsPage() {
 
   const handleSave = async () => {
     if (!settings.operatorEmail) {
-      setMessage({ type: 'error', text: '운영자 이메일 주소를 입력해주세요.' });
+      setMessage({ type: 'error', text: '운영자 이메일 주소를 입력해 주시기 바랍니다.' });
       return;
     }
 
@@ -260,7 +260,7 @@ export default function EmailNotificationSettingsPage() {
           <h3 className="font-medium text-amber-900 mb-2">이메일 발송 설정 확인</h3>
           <p className="text-sm text-amber-700">
             이메일 알림을 받으려면 플랫폼 관리자가 SMTP 설정을 완료해야 합니다.
-            이메일이 발송되지 않는 경우 플랫폼 관리자에게 문의하세요.
+            이메일이 발송되지 않는 경우 플랫폼 관리자에게 문의하시기 바랍니다.
           </p>
         </div>
       </main>

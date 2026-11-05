@@ -77,7 +77,7 @@ describe('operator mail acceptance', () => {
     sessionStorage.setItem('o4o_operator_invite', TOKEN);
     window.history.replaceState(null, '', '/operator-invite#token=bad');
     render(<OperatorInvitePage />);
-    expect(screen.getByText('메일의 초대 링크를 열어 주세요.')).toBeTruthy();
+    expect(screen.getByText('메일의 초대 링크를 열어 주시기 바랍니다.')).toBeTruthy();
     expect(h.post).not.toHaveBeenCalled();
   });
   it('does not allow acceptance when the logged-in account differs from the bound target', async () => {
@@ -136,7 +136,7 @@ describe('operator mail acceptance', () => {
 it.each([['INVALID_OR_EXPIRED_INVITATION', false], ['INVITATION_ACCOUNT_MISMATCH', true], ['TEMPORARY_FAILURE', true]])('clears only terminal inspection failures: %s', async (code, retained) => {
   h.post.mockRejectedValue({ response: { data: { code } } });
   render(<OperatorInvitePage />);
-  await screen.findByText(code === 'INVITATION_ACCOUNT_MISMATCH' ? '지정된 계정과 다릅니다. 지정된 계정으로 다시 로그인하세요.' : '유효한 초대를 확인하지 못했습니다. 이미 처리되었거나 만료·취소된 링크인지 확인하세요.');
+  await screen.findByText(code === 'INVITATION_ACCOUNT_MISMATCH' ? '지정된 계정과 다릅니다. 지정된 계정으로 다시 로그인하시기 바랍니다.' : '유효한 초대를 확인하지 못했습니다. 이미 처리되었거나 만료·취소된 링크인지 확인하시기 바랍니다.');
   expect(sessionStorage.getItem('o4o_operator_invite')).toBe(retained ? TOKEN : null);
   expect(h.post.mock.calls.every(([path]) => path.endsWith('/inspect'))).toBe(true);
 });
@@ -150,7 +150,7 @@ it.each([['INVALID_OR_EXPIRED_INVITATION', false], ['INVITATION_ACCOUNT_MISMATCH
   render(<OperatorInvitePage />);
   await screen.findByText(/lecture · 서비스 운영자/);
   fireEvent.click(screen.getByRole('button', { name: '이 계정으로 확인·수락' }));
-  await screen.findByText(code === 'INVITATION_ACCOUNT_MISMATCH' ? '초대에 지정된 계정과 다릅니다. 지정된 계정으로 로그인하세요.' : '수락하지 못했습니다. 링크 만료·취소 또는 권한 회수 여부를 관리자에게 확인하세요.');
+  await screen.findByText(code === 'INVITATION_ACCOUNT_MISMATCH' ? '초대에 지정된 계정과 다릅니다. 지정된 계정으로 로그인하시기 바랍니다.' : '수락하지 못했습니다. 링크 만료·취소 또는 권한 회수 여부를 관리자에게 확인하시기 바랍니다.');
   expect(sessionStorage.getItem('o4o_operator_invite')).toBe(retained ? TOKEN : null);
   expect(operatorInvitationReturnPath()).toBe(retained ? '/operator-invite' : '/');
 });

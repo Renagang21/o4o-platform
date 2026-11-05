@@ -220,7 +220,7 @@ export function OperatorForumCategoriesPage({
       if (!result?.data || result.success === false) throw new Error('삭제 가능 여부를 확인할 수 없습니다');
       if (current()) setHardDeleteCheck(result.data);
     } catch {
-      if (current()) setActionError('삭제 가능 여부를 확인할 수 없습니다. 닫은 뒤 다시 시도하세요.');
+      if (current()) setActionError('삭제 가능 여부를 확인할 수 없습니다. 닫은 뒤 다시 시도하시기 바랍니다.');
     } finally { if (current()) setIsCheckLoading(false); }
   };
   const handleHardDelete = async () => {
@@ -282,7 +282,7 @@ export function OperatorForumCategoriesPage({
       toast.error('비활성화할 수 있는 활성 포럼이 없습니다');
       return;
     }
-    const reason = prompt(`선택한 ${targets.length}개 활성 포럼을 비활성화합니다.\n사유를 입력하세요:`);
+    const reason = prompt(`선택한 ${targets.length}개 활성 포럼을 비활성화합니다.\n사유를 입력하시기 바랍니다:`);
     if (!reason?.trim()) return;
     const reasonText = reason.trim();
     const targetIds = targets.map((t) => t.id);
@@ -347,7 +347,7 @@ export function OperatorForumCategoriesPage({
       toast.error('완전 삭제할 수 있는 비활성 포럼이 없습니다');
       return;
     }
-    const reason = prompt(`선택한 ${targets.length}개 비활성 포럼을 완전 삭제합니다.\n삭제 사유를 입력하세요 (복구 불가):`);
+    const reason = prompt(`선택한 ${targets.length}개 비활성 포럼을 완전 삭제합니다.\n삭제 사유를 입력하시기 바랍니다 (복구 불가):`);
     if (!reason?.trim()) return;
     if (!confirm(`${targets.length}개 포럼을 영구 삭제합니다.\n이 작업은 복구할 수 없습니다. 진행하시겠습니까?`)) return;
     const reasonText = reason.trim();
@@ -484,7 +484,7 @@ export function OperatorForumCategoriesPage({
       />
 
       {notice && <p role="status" className="rounded bg-green-50 p-3 text-sm text-green-800">{notice}</p>}
-      {refreshFailed && <p className="text-amber-800">처리는 완료됐지만 목록 갱신에 실패했습니다. 목록만 다시 조회해 주세요.</p>}
+      {refreshFailed && <p className="text-amber-800">처리는 완료됐지만 목록 갱신에 실패했습니다. 목록만 다시 조회해 주시기 바랍니다.</p>}
       {actionError && <p role="alert" className="text-red-700">{actionError}</p>}
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -529,7 +529,7 @@ export function OperatorForumCategoriesPage({
       </fieldset>
       {loadError && <div role="alert" className="rounded border border-red-200 bg-red-50 p-3 text-sm text-red-700">
         <p>포럼 목록을 불러오지 못했습니다. {loadError}</p>
-        <p>표가 남아 있으면 마지막 조회 결과입니다. 다시 조회한 뒤 처리해 주세요.</p>
+        <p>표가 남아 있으면 마지막 조회 결과입니다. 다시 조회한 뒤 처리해 주시기 바랍니다.</p>
         <button type="button" disabled={writing || isCatsLoading} onClick={() => { if (!read.current.writing) void loadCategories(); }} className="mt-2 min-h-11 rounded border px-3">포럼 목록 다시 조회</button>
       </div>}
       <fieldset disabled={writing || isCatsLoading || !!loadError} className="min-w-0 border-0 p-0 m-0 space-y-6">
@@ -693,7 +693,7 @@ export function OperatorForumCategoriesPage({
               {needsNameConfirm && (
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-1.5">
-                    확인을 위해 포럼명 <span className="font-semibold text-slate-900">{deactivateTarget?.name}</span> 을(를) 입력하세요 <span className="text-red-500">*</span>
+                    확인을 위해 포럼명 <span className="font-semibold text-slate-900">{deactivateTarget?.name}</span> 을(를) 입력하시기 바랍니다 <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
@@ -883,7 +883,7 @@ export function OperatorForumCategoriesPage({
                         {hardDeleteCheck.blockedReasons.map((r: string, i: number) => (
                           <p key={i} className="text-sm text-rose-600">&#8226; {r}</p>
                         ))}
-                        <p className="text-xs text-rose-500 mt-2">정상 게시글을 먼저 삭제한 뒤 다시 시도하세요.</p>
+                        <p className="text-xs text-rose-500 mt-2">정상 게시글을 먼저 삭제한 뒤 다시 시도하시기 바랍니다.</p>
                       </div>
                       {(hardDeleteCheck.orphanPostCount ?? 0) > 0 && (
                         <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg">

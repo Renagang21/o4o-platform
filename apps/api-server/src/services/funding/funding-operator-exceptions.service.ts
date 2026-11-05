@@ -24,7 +24,7 @@ export function fundingExceptionFilter(value: unknown) {
     throw new FundingError(
       400,
       "INVALID_EXCEPTION_FILTER",
-      "예외 조회 조건을 확인해 주세요.",
+      "예외 조회 조건을 확인해 주시기 바랍니다.",
     );
   return value as keyof typeof FUNDING_EXCEPTION_SQL;
 }
@@ -37,7 +37,7 @@ export class FundingOperatorExceptionsService {
       throw new FundingError(
         400,
         "INVALID_EXCEPTION_PAGE",
-        "페이지를 확인해 주세요.",
+        "페이지를 확인해 주시기 바랍니다.",
       );
     const entries = Object.entries(FUNDING_EXCEPTION_SQL);
     const conditions = type
@@ -61,7 +61,7 @@ export class FundingOperatorExceptionsService {
   async history(trialId: string, participantId: string, inputPage: unknown = 1) {
     const page = Number(inputPage);
     if (!Number.isSafeInteger(page) || page < 1 || page > 10000)
-      throw new FundingError(400, 'INVALID_HISTORY_PAGE', '이력 페이지를 확인해 주세요.');
+      throw new FundingError(400, 'INVALID_HISTORY_PAGE', '이력 페이지를 확인해 주시기 바랍니다.');
     const [target] = await this.ds.query(
       'SELECT id FROM market_trial_participants WHERE id = $1 AND "marketTrialId" = $2',
       [participantId, trialId],

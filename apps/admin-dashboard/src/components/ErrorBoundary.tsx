@@ -72,7 +72,7 @@ class ErrorBoundary extends Component<Props, State> {
                 문제가 발생했습니다
               </h2>
               <p className="mt-2 text-sm text-gray-600">
-                예기치 않은 오류가 발생했습니다. 잠시 후 다시 시도해주세요.
+                예기치 않은 오류가 발생했습니다. 잠시 후 다시 시도해 주시기 바랍니다.
               </p>
               
               {this.state.error && (

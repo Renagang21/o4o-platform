@@ -76,7 +76,7 @@ export function buildProductionState(opts: {
 export function composeSourceTextFromItems(items: ProductionSourceItem[]): string {
   if (items.length === 0) return '';
   const lines: string[] = [
-    '다음 콘텐츠를 참고하여 매장 제작 자료 형태로 정리해 주세요.',
+    '다음 콘텐츠를 참고하여 매장 제작 자료 형태로 정리해 주시기 바랍니다.',
     '',
   ];
   items.forEach((it, i) => {

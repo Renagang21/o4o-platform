@@ -29,7 +29,7 @@ export default function BusinessProductsPreview({ businessKey, organizationId, c
     <h2 className="text-lg font-semibold text-slate-900">제품 정보</h2>
     <p className="mt-2 text-sm leading-6 text-slate-600">이 사업에서 선택 약국에 제공하는 제품을 소개합니다. 공급 조건 확인과 주문은 내 매장에서 이어갑니다.</p>
     {canManage ? <p className="mt-3 text-sm text-slate-500">공급 승인과 상품 관리는 사업 운영 화면에서 진행합니다.</p> : !organizationId ?
-      <p className="mt-3 text-sm text-slate-500">이용할 약국을 먼저 선택해 주세요.</p> :
+      <p className="mt-3 text-sm text-slate-500">이용할 약국을 먼저 선택해 주시기 바랍니다.</p> :
       !current ? <p role="status" className="py-4 text-sm text-slate-500">공급 상품을 불러오고 있습니다…</p> :
       current.error ? <div className="py-3"><p role="alert">공급 상품을 불러오지 못했습니다.</p><button type="button" className="mt-2 min-h-11 text-blue-700" onClick={() => setRetry(n => n + 1)}>공급 상품 다시 확인</button></div> :
       !current.items?.length ? <p className="py-4 text-sm text-slate-500">현재 이용 가능한 사업 공급 상품이 없습니다.</p> : <>

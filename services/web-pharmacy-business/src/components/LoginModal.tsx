@@ -73,7 +73,7 @@ export default function LoginModal() {
       navigate('/');
     } catch (err: unknown) {
       console.error('[Login] Post-login error:', err);
-      setError('로그인 처리 중 오류가 발생했습니다. 다시 시도해주세요.');
+      setError('로그인 처리 중 오류가 발생했습니다. 다시 시도해 주시기 바랍니다.');
     }
   };
 
@@ -88,7 +88,7 @@ export default function LoginModal() {
     } else if (serviceAccess && serverError) {
       setError(serverError);
     } else {
-      setError('이 계정은 이 약국 서비스에 가입되어 있지 않습니다. 서비스 이용 절차를 진행해 주세요.');
+      setError('이 계정은 이 약국 서비스에 가입되어 있지 않습니다. 서비스 이용 절차를 진행해 주시기 바랍니다.');
     }
   };
 
@@ -98,7 +98,7 @@ export default function LoginModal() {
     <div className="o4o-login-overlay" role="dialog" aria-modal="true" aria-label={loginTitle}
     >
       <button type="button" className="o4o-login-backdrop" aria-label="로그인 창 배경 닫기" onClick={closeModal} />
-      <LoginCard brand="O4O 약국" tone="blue" heading="h2" title={loginTitle} description="약국의 일상과 비즈니스를 연결하세요." onClose={closeModal}>
+      <LoginCard brand="O4O 약국" tone="blue" heading="h2" title={loginTitle} description="약국의 일상과 비즈니스를 연결하시기 바랍니다." onClose={closeModal}>
 
           {error && !isNotMember && (
             <div className="mb-4 p-3 rounded-lg border bg-red-50 border-red-200">

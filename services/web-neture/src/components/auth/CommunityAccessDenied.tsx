@@ -13,17 +13,17 @@ export function CommunityAccessDenied({ onRecheck, verificationFailed = false }:
     setNotice('');
     try {
       await (onRecheck ?? refreshAuth)();
-      setNotice('권한을 다시 확인했습니다. 계속 접근이 거부되면 관리자에게 역할과 커뮤니티 서비스 가입 상태를 확인해 주세요.');
+      setNotice('권한을 다시 확인했습니다. 계속 접근이 거부되면 관리자에게 역할과 커뮤니티 서비스 가입 상태를 확인해 주시기 바랍니다.');
     } catch {
-      setNotice('권한을 확인하지 못했습니다. 잠시 후 다시 시도해 주세요.');
+      setNotice('권한을 확인하지 못했습니다. 잠시 후 다시 시도해 주시기 바랍니다.');
     } finally {
       setBusy(false);
     }
   };
   return <AccessDenied title={verificationFailed ? '권한을 확인하지 못했습니다' : undefined}
-    description={verificationFailed ? '연결 상태를 확인한 뒤 다시 시도해 주세요.' : '커뮤니티 관리에 필요한 운영 권한을 확인하지 못했습니다.'}>
+    description={verificationFailed ? '연결 상태를 확인한 뒤 다시 시도해 주시기 바랍니다.' : '커뮤니티 관리에 필요한 운영 권한을 확인하지 못했습니다.'}>
     {user?.email && <p className="mt-4 break-all text-sm text-slate-600">로그인 계정: {user.email}</p>}
-    <p className="mt-4 text-sm text-slate-600">다른 관리자 화면에서 역할을 지정했다면 권한을 다시 확인해 주세요. 이 화면은 커뮤니티 운영 역할과 활성 서비스 가입이 필요합니다.</p>
+    <p className="mt-4 text-sm text-slate-600">다른 관리자 화면에서 역할을 지정했다면 권한을 다시 확인해 주시기 바랍니다. 이 화면은 커뮤니티 운영 역할과 활성 서비스 가입이 필요합니다.</p>
     <button type="button" disabled={busy} onClick={recheck}
       className="mt-4 rounded bg-blue-700 px-4 py-2 text-sm text-white disabled:opacity-50">
       {busy ? '확인 중…' : '권한 다시 확인'}

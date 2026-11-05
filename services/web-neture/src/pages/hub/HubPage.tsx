@@ -548,14 +548,14 @@ export default function HubPage() {
   return (
     <HubLayout
       title="Neture Hub"
-      subtitle={`${user.name}님, 운영에 필요한 모든 기능을 한곳에서 관리하세요.`}
+      subtitle={`${user.name}님, 운영에 필요한 모든 기능을 한곳에서 관리하시기 바랍니다.`}
       sections={HUB_SECTIONS}
       userRoles={userRoles}
       signals={signals}
       onCardClick={(href) => navigate(href)}
       onActionTrigger={handleActionTrigger}
       beforeSections={<><div style={{ marginBottom: 12 }}><GuideBackLink to="/guide/for-seller#hub" label="매장 HUB 이용 안내" /></div><SellerInsightCards insight={signalData?.sellerInsight} /></>}
-      footerNote="허브는 각 기능의 진입점입니다. 상세 작업은 각 페이지에서 진행해주세요."
+      footerNote="허브는 각 기능의 진입점입니다. 상세 작업은 각 페이지에서 진행해 주시기 바랍니다."
     />
   );
 }

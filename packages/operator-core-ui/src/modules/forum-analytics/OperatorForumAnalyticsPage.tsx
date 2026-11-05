@@ -50,7 +50,7 @@ export function OperatorForumAnalyticsPage({
   client,
   accent,
   title = '포럼 분석',
-  description = '포럼 운영 현황과 트렌드를 확인하세요',
+  description = '포럼 운영 현황과 트렌드를 확인하시기 바랍니다',
 }: OperatorForumAnalyticsPageProps) {
   const [summary, setSummary] = useState<ForumAnalyticsSummary | null>(null);
   const [trend, setTrend] = useState<ForumAnalyticsTrendDay[]>([]);

@@ -27,7 +27,7 @@ export function canActivatePharmacy(detail: MemberDetail, pharmacy: MemberPharma
 }
 export function memberError(error: unknown) {
   const response = (error as { response?: { data?: { error?: unknown } } })?.response?.data?.error;
-  return typeof response === 'string' ? response : '처리하지 못했습니다. 권한과 최신 정보를 다시 확인해 주세요.';
+  return typeof response === 'string' ? response : '처리하지 못했습니다. 권한과 최신 정보를 다시 확인해 주시기 바랍니다.';
 }
 
 export type MemberWorkMode = 'detail' | 'edit' | 'reject' | 'delete' | 'pharmacy';

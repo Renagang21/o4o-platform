@@ -1315,7 +1315,7 @@ export class MembershipConsoleController {
 
       if (scope.isPlatformAdmin && (ASSIGNABLE_OPERATOR_ROLES.includes(role) || ASSIGNABLE_OPERATOR_ROLES.includes(roleEntity.name)
         || roleEntity.isAdminRole || roleEntity.roleKey === 'operator' || isAdminTierRoleName(role) || isAdminTierRoleName(roleEntity.name))) {
-        res.status(403).json({ success: false, code: 'OPERATOR_INVITATION_REQUIRED', error: '서비스 운영자 지정은 전체관리자의 이메일 초대·수락 절차를 이용하세요.' });
+        res.status(403).json({ success: false, code: 'OPERATOR_INVITATION_REQUIRED', error: '서비스 운영자 지정은 전체관리자의 이메일 초대·수락 절차를 이용하시기 바랍니다.' });
         return;
       }
 
@@ -1503,7 +1503,7 @@ export class MembershipConsoleController {
           res.status(409).json({
             success: false,
             error:
-              '마지막 platform:super_admin 역할은 회수할 수 없습니다. 다른 활성 플랫폼 관리자를 먼저 확보하세요.',
+              '마지막 platform:super_admin 역할은 회수할 수 없습니다. 다른 활성 플랫폼 관리자를 먼저 확보하시기 바랍니다.',
             code: 'LAST_PLATFORM_SUPER_ADMIN',
           });
           return;

@@ -79,7 +79,7 @@ export function StoreSignageScheduleForm({
           {saveError}
         </p>
       )}
-      <p className="text-sm text-slate-600">보여줄 재생목록과 요일·시간을 정하세요. 일정 저장 후 실제 화면은 기기에서 확인하세요.</p>
+      <p className="text-sm text-slate-600">보여줄 재생목록과 요일·시간을 정하시기 바랍니다. 일정 저장 후 실제 화면은 기기에서 확인하시기 바랍니다.</p>
       {broadcast && <p className="text-sm text-amber-800">기존 방송 자료의 일정을 수정합니다. 매장 안내 목록과 별도로 유지됩니다.</p>}
       {playlistsLoading && <p role="status" className="text-sm text-slate-600">재생목록 확인 중…</p>}
       {playlistsError && <p role="alert" className="text-sm text-red-700">재생목록을 확인하지 못했습니다. 입력은 유지됩니다. <button type="button" onClick={onRetryPlaylists} className="min-h-11 underline">재생목록 다시 시도</button></p>}
@@ -99,7 +99,7 @@ export function StoreSignageScheduleForm({
           {!playlistsLoading && !playlistsError && options.length === 0 && (
             <p className="text-xs text-amber-600 mb-1">
               게시된 플레이리스트가 없습니다. &lsquo;내 플레이리스트&rsquo;
-              탭에서 플레이리스트를 게시해주세요.
+              탭에서 플레이리스트를 게시해 주시기 바랍니다.
             </p>
           )}
           <select

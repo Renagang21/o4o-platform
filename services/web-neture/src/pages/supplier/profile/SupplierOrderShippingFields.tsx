@@ -131,7 +131,7 @@ export default function SupplierOrderShippingFields({
             <p>
               현재 기본 배송비가 비어 있어{' '}
               <strong>장바구니와 주문에서 배송비가 0원으로 계산</strong>됩니다. 공급 상품 주문의
-              실제 배송비 반영을 위해 기본 배송비를 입력해 주세요.
+              실제 배송비 반영을 위해 기본 배송비를 입력해 주시기 바랍니다.
             </p>
             {freeShippingThreshold.trim() === '' && (
               <p>

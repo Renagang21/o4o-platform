@@ -19,7 +19,7 @@ type Guide = {
 };
 export default function StoreStaffSupportPage() {
   const { organizationId, stores } = useUnifiedStore();
-  if (!organizationId) return <p>먼저 내 매장을 선택해 주세요.</p>;
+  if (!organizationId) return <p>먼저 내 매장을 선택해 주시기 바랍니다.</p>;
   const owner = stores.some(
     (s) => s.organizationId === organizationId && s.memberRole === "owner",
   );
@@ -81,7 +81,7 @@ function StaffSupportBody({ owner }: Readonly<{ owner: boolean }>) {
       setMessage(success);
     } catch {
       setMessage(
-        "저장하지 못했습니다. 이용 자격과 연결 상태를 확인하고 다시 시도해 주세요.",
+        "저장하지 못했습니다. 이용 자격과 연결 상태를 확인하고 다시 시도해 주시기 바랍니다.",
       );
     } finally {
       setBusy(false);
@@ -102,7 +102,7 @@ function StaffSupportBody({ owner }: Readonly<{ owner: boolean }>) {
         <h1 className="text-2xl font-semibold">직원 현장 지원</h1>
         <p className="mt-2">
           상품 위치와 게시된 제품 자료를 안내합니다. 증상·의약품 선택·복약
-          상담은 약사에게 연결해 주세요.
+          상담은 약사에게 연결해 주시기 바랍니다.
         </p>
       </header>
       <section
@@ -135,7 +135,7 @@ function StaffSupportBody({ owner }: Readonly<{ owner: boolean }>) {
         </form>
         {loading && <output>찾는 중…</output>}
         {productError && (
-          <p role="alert">상품을 불러오지 못했습니다. 다시 찾아 주세요.</p>
+          <p role="alert">상품을 불러오지 못했습니다. 다시 찾아 주시기 바랍니다.</p>
         )}
         {!loading && !productError && query && !products.length && (
           <p className="mt-3">일치하는 내 매장 상품이 없습니다.</p>
@@ -172,7 +172,7 @@ function StaffSupportBody({ owner }: Readonly<{ owner: boolean }>) {
       >
         <h2 className="font-semibold">고객 요구 간단 기록</h2>
         <p className="mt-2 text-sm">
-          필요할 때 한 번만 누르세요. 고객 정보나 상담 내용은 입력하지 않습니다.
+          필요할 때 한 번만 누르시기 바랍니다. 고객 정보나 상담 내용은 입력하지 않습니다.
         </p>
         <div className="mt-3 flex flex-wrap gap-2">
           {[

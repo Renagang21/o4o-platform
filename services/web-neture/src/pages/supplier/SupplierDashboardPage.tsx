@@ -76,7 +76,7 @@ export default function SupplierDashboardPage() {
         <div className="min-w-0">
           <h1 className="text-2xl font-bold text-slate-900">공급자 홈</h1>
           <p className="text-sm text-slate-500 mt-1">
-            {supplierLabel ? `${supplierLabel}님의 ` : ''}주문·재고·정산과 상품·콘텐츠 운영 현황을 확인하세요.
+            {supplierLabel ? `${supplierLabel}님의 ` : ''}주문·재고·정산과 상품·콘텐츠 운영 현황을 확인하시기 바랍니다.
           </p>
           <div className="mt-2"><GuideBackLink to="/guide/features/copilot-dashboard" label="Copilot 이용 안내" /></div>
         </div>

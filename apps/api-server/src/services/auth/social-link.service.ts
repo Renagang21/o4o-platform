@@ -52,7 +52,7 @@ export class SocialLinkService {
   async reauthenticatePassword(context: SocialLinkContext, password: string) {
     return this.db.transaction(async manager=>{
       await this.lockOwner(context,manager);
-      if (!(await this.passwords.verifyPassword(context.userId,password,manager))) throw new SocialAuthError('CURRENT_PASSWORD_MISMATCH','현재 비밀번호를 확인해 주세요.',401);
+      if (!(await this.passwords.verifyPassword(context.userId,password,manager))) throw new SocialAuthError('CURRENT_PASSWORD_MISMATCH','현재 비밀번호를 확인해 주시기 바랍니다.',401);
       return this.flows.create('link-permit','google',context.origin,context.serviceKey,{method:'password'},context,manager);
     });
   }
@@ -61,7 +61,7 @@ export class SocialLinkService {
     return this.db.transaction(async manager=>{
       await this.lockOwner(context,manager);
       const links: IdentityLink[]=await manager.query(`SELECT "userId","providerId",provider FROM linked_accounts WHERE "userId"=$1 AND provider=$2`,[context.userId,provider]);
-      if(!links[0]?.providerId)throw new SocialAuthError('REAUTH_METHOD_NOT_LINKED','현재 계정에 연결된 로그인 수단으로 다시 인증해 주세요.',403);
+      if(!links[0]?.providerId)throw new SocialAuthError('REAUTH_METHOD_NOT_LINKED','현재 계정에 연결된 로그인 수단으로 다시 인증해 주시기 바랍니다.',403);
       const nonce=randomBytes(32).toString('base64url');
       return {...await this.flows.create('link-reauth',provider,context.origin,context.serviceKey,{nonce,returnTo},context,manager),nonce};
     });
@@ -74,7 +74,7 @@ export class SocialLinkService {
     return this.db.transaction(async manager=>{
       await this.lockOwner(context,manager);
       const links: IdentityLink[]=await manager.query(`SELECT "userId","providerId",provider FROM linked_accounts WHERE "userId"=$1 AND provider=$2 AND "providerId"=$3`,[context.userId,flow.provider,providerId]);
-      if(!links[0])throw new SocialAuthError('REAUTH_IDENTITY_MISMATCH','현재 O4O 계정에 연결된 소셜 계정을 선택해 주세요.',403);
+      if(!links[0])throw new SocialAuthError('REAUTH_IDENTITY_MISMATCH','현재 O4O 계정에 연결된 소셜 계정을 선택해 주시기 바랍니다.',403);
       return this.flows.create('link-permit',flow.provider,context.origin,context.serviceKey,{method:flow.provider},context,manager);
     });
   }
@@ -112,7 +112,7 @@ export class SocialLinkService {
   }
 
   async confirm(context: SocialLinkContext, token: string, binding: string, confirmation: boolean) {
-    if(confirmation!==true)throw new SocialAuthError('LINK_CONFIRMATION_REQUIRED','소셜 계정 연결을 확인해 주세요.');
+    if(confirmation!==true)throw new SocialAuthError('LINK_CONFIRMATION_REQUIRED','소셜 계정 연결을 확인해 주시기 바랍니다.');
     try {
       await this.db.transaction(async manager=>{
         await this.lockOwner(context,manager);
@@ -129,7 +129,7 @@ export class SocialLinkService {
       return {linked:true};
     } catch(error) {
       const e=error as{code?:string;driverError?:{code?:string}};
-      if((e.code??e.driverError?.code)==='23505')throw new SocialAuthError('SOCIAL_IDENTITY_CONFLICT','소셜 계정 연결이 충돌했습니다. 다시 확인해 주세요.',409);
+      if((e.code??e.driverError?.code)==='23505')throw new SocialAuthError('SOCIAL_IDENTITY_CONFLICT','소셜 계정 연결이 충돌했습니다. 다시 확인해 주시기 바랍니다.',409);
       throw error;
     }
   }

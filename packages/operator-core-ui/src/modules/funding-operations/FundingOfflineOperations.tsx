@@ -122,21 +122,21 @@ export default function FundingOfflineOperations({
       ? data.participants.find((v) => v.id === target)
       : null;
     if (["withdraw", "refund", "pledge"].includes(action) && !participant) {
-      setError("참여자를 선택해 주세요.");
+      setError("참여자를 선택해 주시기 바랍니다.");
       return;
     }
     if (
       ["refund", "pledge"].includes(action) &&
       (!amount.trim() || !/^\d+(\.\d{1,2})?$/.test(amount))
     ) {
-      setError("금액을 확인해 주세요.");
+      setError("금액을 확인해 주시기 바랍니다.");
       return;
     }
     if (
       action === "refund" &&
       (!date || !Number.isFinite(new Date(date).getTime()))
     ) {
-      setError("실제 환급 처리일을 입력해 주세요.");
+      setError("실제 환급 처리일을 입력해 주시기 바랍니다.");
       return;
     }
     const state = lifecycle.current;
@@ -178,7 +178,7 @@ export default function FundingOfflineOperations({
       if (state.alive)
         setError(
           e.response?.data?.message ||
-            "저장 결과를 확인하지 못했습니다. 입력을 보존했습니다. 현황을 다시 조회해 주세요.",
+            "저장 결과를 확인하지 못했습니다. 입력을 보존했습니다. 현황을 다시 조회해 주시기 바랍니다.",
         );
     } finally {
       state.writing = false;
@@ -213,7 +213,7 @@ export default function FundingOfflineOperations({
       {error && (
         <p role="alert" className="text-red-700">
           {error}
-          {notice ? " 저장은 완료됐으니 조회만 재시도해 주세요." : ""}
+          {notice ? " 저장은 완료됐으니 조회만 재시도해 주시기 바랍니다." : ""}
         </p>
       )}
       <button
@@ -376,7 +376,7 @@ export default function FundingOfflineOperations({
               />
             </label>
             <p className="text-xs">
-              계좌번호·개인 연락처는 입력하지 마세요. 중지·철회는 실제 환급
+              계좌번호·개인 연락처는 입력하지 마시기 바랍니다. 중지·철회는 실제 환급
               완료와 별도입니다.
             </p>
             <button

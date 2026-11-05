@@ -102,7 +102,7 @@ export function createConsultationSupportRunner(db: DataSource): ConsultationSup
     } catch (error) {
       if (error instanceof NeturePharmacyError) throw error;
       if (error instanceof AiExtensionError && error.code === 'ACCESS_DENIED')
-        throw new NeturePharmacyError(403, 'STORE_ACCESS_REQUIRED', '상담 이용 권한을 다시 확인해 주세요.');
+        throw new NeturePharmacyError(403, 'STORE_ACCESS_REQUIRED', '상담 이용 권한을 다시 확인해 주시기 바랍니다.');
       if (error instanceof AiExtensionError && error.code === 'QUOTA_EXCEEDED')
         throw new NeturePharmacyError(429, 'CONSULTATION_SUPPORT_QUOTA', 'AI 이용 한도에 도달했습니다. 게시 자료와 직접 작성으로 계속할 수 있습니다.');
       throw new NeturePharmacyError(503, 'CONSULTATION_SUPPORT_UNAVAILABLE', '판단 지원 초안을 준비하지 못했습니다. 질문과 선택 자료를 유지했습니다.');

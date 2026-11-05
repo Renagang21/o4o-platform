@@ -98,7 +98,7 @@ export function createProductMasterDescriptionController(dataSource: DataSource)
       const descriptionType = normalizeType(req.body?.descriptionType);
 
       if (!content) {
-        res.status(400).json({ success: false, error: '설명서 본문을 입력하세요', code: 'CONTENT_EMPTY' });
+        res.status(400).json({ success: false, error: '설명서 본문을 입력하시기 바랍니다', code: 'CONTENT_EMPTY' });
         return;
       }
       if (content.length > MAX_CONTENT_LEN) {
@@ -139,7 +139,7 @@ export function createProductMasterDescriptionController(dataSource: DataSource)
       });
     } catch (err) {
       if (err instanceof CorrectionError) {
-        res.status(err.status).json({ success: false, code: err.code, error: '다른 설명서가 먼저 저장됐습니다. 최신 설명서를 다시 확인해 주세요.' });
+        res.status(err.status).json({ success: false, code: err.code, error: '다른 설명서가 먼저 저장됐습니다. 최신 설명서를 다시 확인해 주시기 바랍니다.' });
         return;
       }
       const msg = err instanceof Error ? err.message : String(err);

@@ -325,3 +325,14 @@ Account Security UI    Google 사용자 첫 비밀번호 추가 · 비밀번호 
 **반대 도메인 관계 보호:** 각 유형은 의도한 조직과 역할의 활성 관계만 허용한다. 매장 경영자·직원의 canonical 공급자 관계 또는 legacy supplier pointer, 공급자의 반대 매장 관계가 있으면 공유 credential 적용 전 중단한다. legacy pointer 검사는 기존 supplier resolver 안의 read-only protection probe이며 컨텍스트 선택/권한 부여/로그 식별자 출력은 하지 않는다.
 
 **registry·census:** target user에 비활성 Demo registry가 있으면 plan에서 명확히 중단하고 자동 재활성화/중복 insert하지 않는다. staff가 생성한 user-scoped membership/role/creator 행과 활성 staff 조직 관계는 매장 Demo census에 포함하며 owner/staff가 같은 조직을 가리켜도 행을 중복 집계하지 않는다.
+
+
+## Demo 약국 경영 체험 자격 — 2026-11-05 사용자 확정
+
+사용자의 "데모 아이디는 코드상에서 연결" 지시에 따라 약국 경영자 체험의 합성 자격을 application 코드에서 판정한다. 실제 면허 승인 기록을 생성하거나 일반 회원의 약사 자격을 자동 승인하지 않는다.
+
+- 정본 `demo_accounts`의 활성 STORE_OWNER와 정상 공통 계정·이메일 확인·활성 neture 가입이 필요하다. 이메일 문자열이나 프런트 표시만으로 권한을 얻지 않는다.
+- 현재 해석된 조직이 본인의 active 약국 승인 원장과 owner 소속에 일치해야 한다. 다른 약국·직원·공급자·비활성 Demo에는 적용하지 않는다.
+- 실제 자격이 pending/rejected/revoked/approved 상태라면 체험 예외로 덮어쓰지 않는다. 기존 일반 약사 자격 검사에서 정상 승인된 경우는 그대로 처리한다.
+- 이 합성 자격은 매장 경영 접근 검사에만 적용하며 전역 약사/중앙 심사/운영 권한을 부여하지 않는다. 기존 약국 해석·조직 범위·정책 동의·업무별 인가를 유지한다.
+- 원장 누락·복수 조직·DB 오류를 코드가 새 데이터 생성이나 임의 조직 선택으로 복구하지 않는다. 운영 DB 보정·seed는 이번 코드 변경에 포함하지 않는다.

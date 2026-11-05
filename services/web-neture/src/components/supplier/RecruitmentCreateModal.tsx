@@ -41,11 +41,11 @@ export default function RecruitmentCreateModal({ product, onClose, onCreated }: 
   const handleSubmit = async () => {
     setError(null);
     if (serviceKeys.length === 0) {
-      setError('모집할 서비스를 한 개 이상 선택해 주세요.');
+      setError('모집할 서비스를 한 개 이상 선택해 주시기 바랍니다.');
       return;
     }
     const price=Number(supplyUnitPrice);
-    if(!supplyUnitPrice.trim() || !Number.isInteger(price) || price<=0 || price>2147483647){setError('공급가는 1~2,147,483,647원의 정수로 입력해 주세요.');return;}
+    if(!supplyUnitPrice.trim() || !Number.isInteger(price) || price<=0 || price>2147483647){setError('공급가는 1~2,147,483,647원의 정수로 입력해 주시기 바랍니다.');return;}
     if(submitting)return;
     setSubmitting(true);
     const result = await supplierRecruitmentApi.create({
@@ -83,7 +83,7 @@ export default function RecruitmentCreateModal({ product, onClose, onCreated }: 
 
           {notPrivate && (
             <p className="text-xs text-amber-700 bg-amber-50 border border-amber-100 rounded px-2 py-1.5">
-              판매자 모집은 <strong>PRIVATE(판매자 제한)</strong> 유통 제품만 가능합니다. 제품 편집에서 유통 타입을 PRIVATE 로 설정한 뒤 다시 시도해 주세요.
+              판매자 모집은 <strong>PRIVATE(판매자 제한)</strong> 유통 제품만 가능합니다. 제품 편집에서 유통 타입을 PRIVATE 로 설정한 뒤 다시 시도해 주시기 바랍니다.
             </p>
           )}
 

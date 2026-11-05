@@ -43,7 +43,7 @@ export default function MyEnrollmentsPage() {
       const target = lessons.find(l => l.id === bookmark?.lessonId && !enrollment.metadata?.completedLessonIds?.includes(l.id))
         ?? lessons.find(l => !enrollment.metadata?.completedLessonIds?.includes(l.id));
       navigate(target ? lessonPath(enrollment.courseId, target.id) : coursePath(enrollment.courseId));
-    } catch (err) { setError(errorMessage(err, '이어서 학습할 레슨을 확인하지 못했습니다. 다시 시도해 주세요.')); }
+    } catch (err) { setError(errorMessage(err, '이어서 학습할 레슨을 확인하지 못했습니다. 다시 시도해 주시기 바랍니다.')); }
     finally { setContinuing(null); }
   }
 
@@ -51,7 +51,7 @@ export default function MyEnrollmentsPage() {
     <div className="page-head"><h1>내 강의</h1><p className="muted">수강 신청한 강의와 진행 상황입니다.</p></div>
     {loading && <LmsLoading message="불러오는 중..." />}
     {error && <div className="notice notice-error" role="alert">{error}<button type="button" className="btn mt-3" onClick={() => setReloadKey((key) => key + 1)}>다시 시도</button></div>}
-    {!loading && !error && items.length === 0 && <LmsEmptyState title="수강 중인 강의가 없습니다" description="강의 목록에서 관심 있는 강의를 신청해 보세요." actionLabel="강의 둘러보기" onAction={() => navigate('/courses')} />}
+    {!loading && !error && items.length === 0 && <LmsEmptyState title="수강 중인 강의가 없습니다" description="강의 목록에서 관심 있는 강의를 신청해 보시기 바랍니다." actionLabel="강의 둘러보기" onAction={() => navigate('/courses')} />}
     <ul className="list">
       {items.map((e) => <li key={e.id} className="list-item">
         <div className="list-main">

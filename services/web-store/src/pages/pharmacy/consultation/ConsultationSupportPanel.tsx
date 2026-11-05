@@ -35,12 +35,12 @@ export function ConsultationSupportPanel({ organizationId, mode, product, room, 
       });
       if (!alive.current || request !== generation.current) return;
       if (data.organizationId !== organizationId || data.mode !== mode || data.productId !== product.id || data.productKind !== product.kind)
-        throw new Error('상담 매장이나 상품이 변경되었습니다. 다시 확인해 주세요.');
+        throw new Error('상담 매장이나 상품이 변경되었습니다. 다시 확인해 주시기 바랍니다.');
       if (useDraft) {
         if (data.state !== 'verified' || data.sourceVersion !== captured?.sourceVersion || !captured?.brief)
-          throw new Error('현재 근거로 다시 준비해 주세요.');
+          throw new Error('현재 근거로 다시 준비해 주시기 바랍니다.');
         onUseDraft(captured.brief.customerDraft.text, { mode, productKind: product.kind, productId: product.id, sourceVersion: captured.sourceVersion! });
-        setNotice('검토한 고객 설명을 문장 영역에 넣었습니다. 문장을 확인한 뒤 안내를 준비해 주세요.');
+        setNotice('검토한 고객 설명을 문장 영역에 넣었습니다. 문장을 확인한 뒤 안내를 준비해 주시기 바랍니다.');
       } else setResult(data);
     } catch (e) {
       if (alive.current && request === generation.current) {
@@ -61,7 +61,7 @@ export function ConsultationSupportPanel({ organizationId, mode, product, room, 
       const data = await findConsultationProducts({ mode, question, context: turns.slice(-3),
         ...(room?.active ? { stationId: room.id, epoch: room.epoch } : {}) });
       if (!alive.current || request !== generation.current) return;
-      if (data.organizationId !== organizationId || data.mode !== mode) throw new Error('현재 상담을 다시 확인해 주세요.');
+      if (data.organizationId !== organizationId || data.mode !== mode) throw new Error('현재 상담을 다시 확인해 주시기 바랍니다.');
       setSearch(data); setTurns(previous => [...previous.filter(turn => turn !== question.trim()), question.trim()].slice(-3));
     } catch (cause) {
       if (alive.current && request === generation.current) {
@@ -89,9 +89,9 @@ export function ConsultationSupportPanel({ organizationId, mode, product, room, 
       {onSelectProduct && <button className={button} disabled={busy || locked || !question.trim()} onClick={() => void find()}>상담 맥락으로 매장 상품 찾기</button>}
       {!!turns.length && <details><summary>이번 상담에서 확인할 질문 ({turns.length})</summary><ul>{turns.map(turn => <li key={turn}>{turn}</li>)}</ul><button className={button} disabled={busy || locked} onClick={() => change(() => { setTurns([]); setSearch(null); })}>이번 상담 맥락 비우기</button></details>}
       {search && <div role="status" className="space-y-2 rounded border p-3"><p>{search.message}</p>{search.candidates.map(item => <button className={button} key={`${item.kind}:${item.id}`} disabled={busy || locked} onClick={() => { change(() => setSearch(null)); onSelectProduct?.(item); }}>{item.name} · 상품 확인</button>)}</div>}
-      {product ? <p className="text-sm">선택 상품: {product.name} · 상품 사실과 전문 근거를 나누어 검토합니다.{product.kind === 'local' && ' 매장 자체 상품은 공통 표준자료가 연결되지 않을 수 있습니다.'}</p> : <p className="text-sm">상품 자료가 필요하면 맥락으로 후보를 찾거나 위의 상품 찾기를 사용할 수 있습니다. 상품이 필요 없는 상담은 그대로 이어가세요.</p>}
+      {product ? <p className="text-sm">선택 상품: {product.name} · 상품 사실과 전문 근거를 나누어 검토합니다.{product.kind === 'local' && ' 매장 자체 상품은 공통 표준자료가 연결되지 않을 수 있습니다.'}</p> : <p className="text-sm">상품 자료가 필요하면 맥락으로 후보를 찾거나 위의 상품 찾기를 사용할 수 있습니다. 상품이 필요 없는 상담은 그대로 이어가시기 바랍니다.</p>}
       {product && <details><summary className="min-h-11 cursor-pointer content-center">검토한 자료 보완·재사용</summary>
-        <p className="text-sm">자료 부족·오류는 상품과 자료 버전, 확인할 항목으로 정리해 주세요. 고객 원문·이름·연락처는 옮기지 마세요. 작성·저장·중앙 제안·검토·승인은 각각 확인하며 AI 초안을 자동 학습하거나 게시하지 않습니다.</p>
+        <p className="text-sm">자료 부족·오류는 상품과 자료 버전, 확인할 항목으로 정리해 주시기 바랍니다. 고객 원문·이름·연락처는 옮기지 마시기 바랍니다. 작성·저장·중앙 제안·검토·승인은 각각 확인하며 AI 초안을 자동 학습하거나 게시하지 않습니다.</p>
         <a className="inline-flex min-h-11 items-center underline" href={`/store/products/multilingual/${product.kind}/${encodeURIComponent(product.id)}`} target="_blank" rel="noopener noreferrer">선택 상품의 기존 자료 편집 열기</a>
       </details>}
       <details><summary className="min-h-11 cursor-pointer content-center">전문 참고자료 추가</summary>
@@ -102,7 +102,7 @@ export function ConsultationSupportPanel({ organizationId, mode, product, room, 
         <label className="mt-3 flex min-h-11 items-center gap-2"><input type="checkbox" checked={reviewed} disabled={busy || locked || !reference.trim() || !source.trim()}
           onChange={e => change(() => setReviewed(e.target.checked))} />전문 자료의 출처와 내용을 확인했습니다</label>
       </details>
-      <p className="text-xs text-slate-500">이름·연락처 등 고객 식별 정보는 넣지 마세요. 이 질문과 참고자료는 현재 작업에만 사용하며 장기 상담 이력에 저장하지 않습니다.</p>
+      <p className="text-xs text-slate-500">이름·연락처 등 고객 식별 정보는 넣지 마시기 바랍니다. 이 질문과 참고자료는 현재 작업에만 사용하며 장기 상담 이력에 저장하지 않습니다.</p>
       <button className={`${button} bg-teal-700 text-white`} disabled={busy || locked || !product || !question.trim() || (!!reference.trim() && (!source.trim() || !reviewed))}
         onClick={() => void prepare()}>{busy ? '확인 중…' : error ? '같은 근거로 다시 준비' : '근거로 판단 지원 준비'}</button>
       {error && <p role="alert" className="text-red-800">{error}</p>}

@@ -59,7 +59,7 @@ describe('supplier inventory writes and stale editor recovery', () => {
   it('restores editing controls after an unexpected write rejection', async () => {
     mocks.update.mockRejectedValue(new Error('Fixture unexpected failure'));
     await open(); edit(); save();
-    await screen.findByText('재고를 저장하지 못했습니다. 다시 시도해 주세요.');
+    await screen.findByText('재고를 저장하지 못했습니다. 다시 시도해 주시기 바랍니다.');
     expect((screen.getByRole('button', { name: '저장' }) as HTMLButtonElement).disabled).toBe(false);
     expect(screen.getByLabelText('재고 수량')).toBeTruthy();
   });

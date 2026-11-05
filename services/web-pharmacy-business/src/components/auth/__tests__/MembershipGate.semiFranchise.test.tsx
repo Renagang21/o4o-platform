@@ -61,27 +61,27 @@ describe('MembershipGate — 세미프랜차이즈 자격', () => {
   });
 
   it('G3 미충족(apply_semi_franchise) → 서버 문구 + Pharmacy 회원 연결 버튼', async () => {
-    get.mockResolvedValueOnce(access({ pharmacyMembershipStatus: 'active', next: 'apply_semi_franchise', message: 'Pharmacy 기본 회원 연결을 확인해 주세요.' }));
+    get.mockResolvedValueOnce(access({ pharmacyMembershipStatus: 'active', next: 'apply_semi_franchise', message: 'Pharmacy 기본 회원 연결을 확인해 주시기 바랍니다.' }));
     renderGate();
-    expect(await screen.findByText('Pharmacy 기본 회원 연결을 확인해 주세요.')).toBeTruthy();
+    expect(await screen.findByText('Pharmacy 기본 회원 연결을 확인해 주시기 바랍니다.')).toBeTruthy();
     expect(screen.getByRole('button', { name: 'Pharmacy 기본 회원 연결 확인' })).toBeTruthy();
     expect(screen.queryByText('보호된 화면')).toBeNull();
   });
 
   it('G3 정지(semi_franchise_suspended) → 문구만 · 신청 버튼 없음', async () => {
-    get.mockResolvedValueOnce(access({ pharmacyMembershipStatus: 'active', semiFranchiseMembershipStatus: 'suspended', next: 'semi_franchise_suspended', message: '운영자에게 문의해 주세요.' }));
+    get.mockResolvedValueOnce(access({ pharmacyMembershipStatus: 'active', semiFranchiseMembershipStatus: 'suspended', next: 'semi_franchise_suspended', message: '운영자에게 문의해 주시기 바랍니다.' }));
     renderGate();
-    expect(await screen.findByText('운영자에게 문의해 주세요.')).toBeTruthy();
+    expect(await screen.findByText('운영자에게 문의해 주시기 바랍니다.')).toBeTruthy();
     expect(screen.queryByRole('button', { name: /신청/ })).toBeNull();
     expect(screen.getByRole('button', { name: '홈으로 돌아가기' })).toBeTruthy();
   });
 
   it('G4 기존 kpa-society pending + 미충족 → 기존 상태 안내(세미프랜차이즈 안내 아님)', async () => {
     mockUser = { id: 'u1', roles: [], memberships: [{ serviceKey: 'kpa-society', status: 'pending' }] };
-    get.mockResolvedValueOnce(access({ next: 'apply_pharmacy', message: '약국 가입을 먼저 신청해 주세요.' }));
+    get.mockResolvedValueOnce(access({ next: 'apply_pharmacy', message: '약국 가입을 먼저 신청해 주시기 바랍니다.' }));
     renderGate();
     expect(await screen.findByRole('button', { name: '홈으로 돌아가기' })).toBeTruthy();
-    expect(screen.queryByText('약국 가입을 먼저 신청해 주세요.')).toBeNull();
+    expect(screen.queryByText('약국 가입을 먼저 신청해 주시기 바랍니다.')).toBeNull();
     expect(screen.queryByText('보호된 화면')).toBeNull();
   });
 

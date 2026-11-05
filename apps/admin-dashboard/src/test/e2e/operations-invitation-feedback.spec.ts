@@ -16,7 +16,7 @@ async function fixture(page: Page, outcome: 'failure' | 'success' = 'failure') {
         writes.push(req.postDataJSON());
         await pending;
         if (outcome === 'success') return ok({ id: '22222222-2222-4222-8222-222222222222' });
-        return route.fulfill({ status: 503, json: { success: false, code: 'INVITATION_MAIL_FAILED', error: '초대 상태는 저장되었지만 메일 발송이 확인되지 않았습니다. 목록을 새로고침하고 1분 후 재발송하거나 취소해 주세요.' } });
+        return route.fulfill({ status: 503, json: { success: false, code: 'INVITATION_MAIL_FAILED', error: '초대 상태는 저장되었지만 메일 발송이 확인되지 않았습니다. 목록을 새로고침하고 1분 후 재발송하거나 취소해 주시기 바랍니다.' } });
       }
       if (url.pathname === '/api/v1/admin/operations-operators') return ok([]);
       if (url.pathname === '/api/v1/admin/service-operator-invitations') return ok(writes.length ? [{ id: '22222222-2222-4222-8222-222222222222', scope_type: 'platform', scope_key: 'admin-operations', invited_email: 'invitee@example.test', status: 'pending', expired: false }] : []);

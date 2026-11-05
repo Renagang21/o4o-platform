@@ -266,7 +266,7 @@ export function workspaceGroups(
               group(
                 "consultation",
                 "상담",
-                "고객 응대에 필요한 상담 방식과 자료를 선택하세요.",
+                "고객 응대에 필요한 상담 방식과 자료를 선택하시기 바랍니다.",
                 ["multilingual-consultation", "staff-support"],
                 ["tablet-requests"],
               ),

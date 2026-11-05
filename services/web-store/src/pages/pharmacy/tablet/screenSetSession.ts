@@ -10,7 +10,7 @@ export function createScreenSetSession(
   let pendingBlocksId: string | null = null;
   const assertCurrent = () => {
     if (!current())
-      throw new Error("화면 편집 대상이 변경되었습니다. 다시 열어 주세요.");
+      throw new Error("화면 편집 대상이 변경되었습니다. 다시 열어 주시기 바랍니다.");
   };
   const read = async <T>(operation: () => Promise<T>) => {
     assertCurrent();

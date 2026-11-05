@@ -36,7 +36,7 @@ describe('pharmacy business entity classification', () => {
     expect(select.value).toBe('');
     expect(Array.from(select.options, (option) => option.value)).toEqual(['', 'individual', 'corporation']);
     fireEvent.click(screen.getByRole('button', { name: '저장' }));
-    await screen.findByText('세금계산서 발행을 위한 개인 / 법인 구분을 선택해 주세요.');
+    await screen.findByText('세금계산서 발행을 위한 개인 / 법인 구분을 선택해 주시기 바랍니다.');
     expect(api.update).not.toHaveBeenCalled();
     fireEvent.change(select, { target: { value: 'individual' } });
     fireEvent.click(screen.getByRole('button', { name: '저장' }));
@@ -100,7 +100,7 @@ describe('shared pharmacy information behavior through the Store adapter', () =>
     render(<PharmacyInfoPage />);
     fireEvent.click(await screen.findByRole('button', { name: '수정' }));
     fireEvent.click(screen.getByRole('button', { name: '저장' }));
-    await screen.findByText('저장에 실패했습니다. 다시 시도해 주세요.');
+    await screen.findByText('저장에 실패했습니다. 다시 시도해 주시기 바랍니다.');
     expect(screen.getByRole('combobox', { name: /사업자 구분/ })).toBeTruthy();
     expect(api.get).toHaveBeenCalledTimes(1);
   });

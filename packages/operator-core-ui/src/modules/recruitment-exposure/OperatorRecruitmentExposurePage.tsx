@@ -79,7 +79,7 @@ export function OperatorRecruitmentExposurePage({
         await client.decide(id, action, note);
         await load();
       } catch {
-        toast.error('처리에 실패했습니다. 잠시 후 다시 시도해 주세요.');
+        toast.error('처리에 실패했습니다. 잠시 후 다시 시도해 주시기 바랍니다.');
       }
       setBusyId(null);
     },

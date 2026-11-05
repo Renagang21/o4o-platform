@@ -64,7 +64,7 @@ export default function CategoryMappingRulesPage() {
   // ─── Create ──────────────────────────────────────────────────────────────
   const handleCreate = async () => {
     if (!newKeyword.trim() || !newCategoryId) {
-      toast.error('키워드와 카테고리를 입력해주세요');
+      toast.error('키워드와 카테고리를 입력해 주시기 바랍니다');
       return;
     }
     setCreating(true);

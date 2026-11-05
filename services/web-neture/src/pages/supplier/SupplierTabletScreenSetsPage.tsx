@@ -220,11 +220,11 @@ export default function SupplierTabletScreenSetsPage() {
       // 의약품/대상/상태 오류를 사용자 문구로 구분(무조건 의약품 문구로 단정하지 않음).
       let msg = e?.message || '게시하지 못했습니다.';
       if (e?.code === 'MEDICATION_PHARMACY_ONLY') {
-        msg = '의약품이 포함된 콘텐츠는 약국에만 게시할 수 있습니다. 게시 대상을 약국으로 변경한 후 다시 시도해 주세요.';
+        msg = '의약품이 포함된 콘텐츠는 약국에만 게시할 수 있습니다. 게시 대상을 약국으로 변경한 후 다시 시도해 주시기 바랍니다.';
       } else if (e?.code === 'HUB_TARGET_REQUIRED') {
-        msg = '게시 대상(약국/비약국/전체 매장)을 선택해 주세요.';
+        msg = '게시 대상(약국/비약국/전체 매장)을 선택해 주시기 바랍니다.';
       } else if (e?.code === 'EMPTY_SCREEN_SET') {
-        msg = '화면 구성(블록)이 비어 있어 게시할 수 없습니다. 먼저 콘텐츠를 추가해 주세요.';
+        msg = '화면 구성(블록)이 비어 있어 게시할 수 없습니다. 먼저 콘텐츠를 추가해 주시기 바랍니다.';
       } else if (e?.code === 'SCREEN_SET_NAME_REQUIRED') {
         msg = '이름이 필요합니다.';
       }
@@ -269,7 +269,7 @@ export default function SupplierTabletScreenSetsPage() {
   return (
     <div className="p-4 lg:p-6 space-y-4">
       <SupplierContentNavigation />
-      {targetError && <p role="alert" className="mb-4 rounded-lg bg-amber-50 p-3 text-sm text-amber-800">요청한 태블릿 화면을 열 수 없습니다. 대상을 확인하거나 다시 시도해 주세요.</p>}
+      {targetError && <p role="alert" className="mb-4 rounded-lg bg-amber-50 p-3 text-sm text-amber-800">요청한 태블릿 화면을 열 수 없습니다. 대상을 확인하거나 다시 시도해 주시기 바랍니다.</p>}
 
       <div className="flex items-center justify-between gap-2 flex-wrap">
         <div>
@@ -300,7 +300,7 @@ export default function SupplierTabletScreenSetsPage() {
           /* 지속 오류 상태 — 토스트가 사라져도 유지된다. 빈 상태 문구는 노출하지 않는다. */
           <div className="text-center py-12 px-4">
             <p className="text-sm text-slate-600 leading-relaxed">
-              태블릿 화면 목록을 불러오지 못했습니다.<br />잠시 후 다시 시도해 주세요.
+              태블릿 화면 목록을 불러오지 못했습니다.<br />잠시 후 다시 시도해 주시기 바랍니다.
             </p>
             <button
               type="button"
@@ -312,7 +312,7 @@ export default function SupplierTabletScreenSetsPage() {
           </div>
         ) : !sets || sets.length === 0 ? (
           <div className="text-center py-12 px-4">
-            <p className="text-sm text-slate-500 leading-relaxed">아직 만든 원본이 없습니다.<br />‘원본 만들기’로 매장 배포용 태블릿 화면 세트를 제작해 주세요.</p>
+            <p className="text-sm text-slate-500 leading-relaxed">아직 만든 원본이 없습니다.<br />‘원본 만들기’로 매장 배포용 태블릿 화면 세트를 제작해 주시기 바랍니다.</p>
           </div>
         ) : (
           <div className="overflow-x-auto">

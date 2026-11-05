@@ -32,7 +32,7 @@ export async function resolveStoreProductAccessResult(
   const rejection = storeOwnerRejection(owner);
   if (rejection && rejection.body.code !== 'STORE_OWNER_REQUIRED') return { organizationId: null, rejection };
   if (!preferred && candidates.length > 1) return { organizationId: null, rejection: {
-    status: 409, body: { success: false, code: 'AMBIGUOUS_STORE_CONNECTION', error: '연결된 매장이 여러 개입니다. 이용할 매장을 선택해 주세요.' },
+    status: 409, body: { success: false, code: 'AMBIGUOUS_STORE_CONNECTION', error: '연결된 매장이 여러 개입니다. 이용할 매장을 선택해 주시기 바랍니다.' },
   } };
   return { organizationId: null, rejection: { status: 403, body: { success: false,
     code: preferred ? 'STORE_SELECTION_ACCESS_REQUIRED' : 'STORE_CONNECTION_REQUIRED',

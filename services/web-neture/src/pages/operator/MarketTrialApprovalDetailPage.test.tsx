@@ -145,12 +145,12 @@ it('retains rejection reason on write failure and closes after successful retry'
   mocks.reject.mockRejectedValueOnce(new Error('반려 저장 실패')).mockResolvedValue({});
   renderPage(); await screen.findByRole('button', { name: '반려' });
   fireEvent.click(screen.getByRole('button', { name: '반려' }));
-  fireEvent.change(screen.getByPlaceholderText('반려 사유를 입력해주세요.'), { target: { value: '포럼 운영 기준 보완' } });
+  fireEvent.change(screen.getByPlaceholderText('반려 사유를 입력해 주시기 바랍니다.'), { target: { value: '포럼 운영 기준 보완' } });
   fireEvent.click(screen.getByRole('button', { name: '반려하기' }));
   await screen.findByText('반려 저장 실패');
-  expect((screen.getByPlaceholderText('반려 사유를 입력해주세요.') as HTMLTextAreaElement).value).toBe('포럼 운영 기준 보완');
+  expect((screen.getByPlaceholderText('반려 사유를 입력해 주시기 바랍니다.') as HTMLTextAreaElement).value).toBe('포럼 운영 기준 보완');
   fireEvent.click(screen.getByRole('button', { name: '반려하기' }));
-  await waitFor(() => expect(screen.queryByPlaceholderText('반려 사유를 입력해주세요.')).toBeNull());
+  await waitFor(() => expect(screen.queryByPlaceholderText('반려 사유를 입력해 주시기 바랍니다.')).toBeNull());
   expect(mocks.reject).toHaveBeenNthCalledWith(2, 'project-a', '포럼 운영 기준 보완');
 });
 

@@ -79,7 +79,7 @@ export function ForeignVisitorSalesSupportPanel({
       await onSubscribe();
     } catch (e) {
       // 결제 준비 실패 / 사용자 취소 등 → 잠금 화면 복귀 + 안내
-      setSubscribeError(e instanceof Error ? e.message : '결제를 시작하지 못했습니다. 잠시 후 다시 시도해 주세요.');
+      setSubscribeError(e instanceof Error ? e.message : '결제를 시작하지 못했습니다. 잠시 후 다시 시도해 주시기 바랍니다.');
       setState('locked');
     }
   };
@@ -116,7 +116,7 @@ export function ForeignVisitorSalesSupportPanel({
         <div className="flex items-center gap-3 p-4 rounded-xl border border-amber-200 bg-amber-50">
           <AlertCircle className="w-5 h-5 text-amber-500 shrink-0" />
           <p className="text-sm text-amber-800">
-            이용권 상태를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.
+            이용권 상태를 불러오지 못했습니다. 잠시 후 다시 시도해 주시기 바랍니다.
           </p>
         </div>
       )}

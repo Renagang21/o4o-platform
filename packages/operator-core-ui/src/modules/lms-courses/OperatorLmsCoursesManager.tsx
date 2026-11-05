@@ -250,7 +250,7 @@ export function OperatorLmsCoursesManager({ config }: OperatorLmsCoursesManagerP
   const handleRejectSubmit = async () => {
     if (!rejectModal.course) return;
     const reason = rejectModal.reason.trim();
-    if (!reason) { toast.error('반려 사유를 입력해주세요'); return; }
+    if (!reason) { toast.error('반려 사유를 입력해 주시기 바랍니다'); return; }
     setRejectModal((s) => ({ ...s, submitting: true }));
     try {
       await api.reject(rejectModal.course.id, reason);
@@ -587,12 +587,12 @@ export function OperatorLmsCoursesManager({ config }: OperatorLmsCoursesManagerP
           <div style={{ background: '#fff', borderRadius: 12, padding: '24px 28px', width: '100%', maxWidth: 480 }}>
             <h3 style={{ fontSize: 16, fontWeight: 700, color: '#1e293b', margin: 0, marginBottom: 8 }}>강의 반려</h3>
             <p style={{ fontSize: 13, color: '#64748b', margin: 0, marginBottom: 16 }}>
-              "<strong>{rejectModal.course.title}</strong>" 반려 사유를 입력해주세요. 강사에게 표시되며 수정 후 재요청 시 참고합니다.
+              "<strong>{rejectModal.course.title}</strong>" 반려 사유를 입력해 주시기 바랍니다. 강사에게 표시되며 수정 후 재요청 시 참고합니다.
             </p>
             <textarea
               value={rejectModal.reason}
               onChange={(e) => setRejectModal((s) => ({ ...s, reason: e.target.value }))}
-              placeholder="예: 강의 본문이 비어있습니다. 레슨을 추가한 뒤 다시 요청해주세요."
+              placeholder="예: 강의 본문이 비어있습니다. 레슨을 추가한 뒤 다시 요청해 주시기 바랍니다."
               rows={5}
               style={{
                 width: '100%', padding: '10px 12px', border: '1px solid #e2e8f0', borderRadius: 8,

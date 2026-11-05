@@ -51,7 +51,7 @@ export default function MyPolicyPage() {
           <AlertTitle>서비스운영자 권한 없음</AlertTitle>
           <AlertDescription>
             이 페이지는 서비스운영자 권한이 있는 사용자만 접근할 수 있습니다.
-            서비스운영자 권한이 필요하시면 관리자에게 문의하세요.
+            서비스운영자 권한이 필요하시면 관리자에게 문의하시기 바랍니다.
           </AlertDescription>
         </Alert>
       </div>

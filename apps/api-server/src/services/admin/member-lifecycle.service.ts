@@ -117,7 +117,7 @@ export class MemberLifecycleService {
           throw new OperationError(
             409,
             "MEMBER_CHANGED",
-            "회원 정보가 변경되었습니다. 다시 조회해 주세요.",
+            "회원 정보가 변경되었습니다. 다시 조회해 주시기 바랍니다.",
           );
         const state = await getNetureMainMembershipStatus(m, target);
         if (
@@ -127,7 +127,7 @@ export class MemberLifecycleService {
           throw new OperationError(
             409,
             "MEMBER_SERVICE_STATE_CHANGED",
-            "현재 서비스 이용 상태를 다시 확인해 주세요.",
+            "현재 서비스 이용 상태를 다시 확인해 주시기 바랍니다.",
           );
         // Scoped main suspension also covers verified-email users without an explicit membership row.
         const approvals = new MembershipApprovalService();
@@ -196,7 +196,7 @@ export class MemberLifecycleService {
         throw new OperationError(
           409,
           "PHARMACY_OWNER_CHANGED",
-          "현재 약국 경영자를 다시 확인해 주세요.",
+          "현재 약국 경영자를 다시 확인해 주시기 바랍니다.",
         );
       const items = await closureInventory(m, organizationId);
       return {
@@ -260,7 +260,7 @@ export class MemberLifecycleService {
             throw new OperationError(
               409,
               "PHARMACY_OWNER_CHANGED",
-              "현재 약국 경영자를 다시 확인해 주세요.",
+              "현재 약국 경영자를 다시 확인해 주시기 바랍니다.",
             );
           const [organization] = await m.query(
             'SELECT id,"isActive" FROM organizations WHERE id=$1 FOR UPDATE',
@@ -396,7 +396,7 @@ export class MemberLifecycleService {
           throw new OperationError(
             409,
             "NEXT_OWNER_REQUIRED",
-            "가입된 새 경영자의 이메일을 확인해 주세요.",
+            "가입된 새 경영자의 이메일을 확인해 주시기 바랍니다.",
           );
         nextId = next.id;
         await lockMembers(m, [actor, target, next.id]);
@@ -436,7 +436,7 @@ export class MemberLifecycleService {
             throw new OperationError(
               409,
               "PHARMACY_OWNER_CHANGED",
-              "현재 승인된 약국과 경영자 소속을 다시 확인해 주세요.",
+              "현재 승인된 약국과 경영자 소속을 다시 확인해 주시기 바랍니다.",
             );
           const pending = await m.query(
             `SELECT 1 FROM store_owner_termination_cases WHERE organization_id=$1 AND status<>'cancelled' LIMIT 1`,
@@ -456,7 +456,7 @@ export class MemberLifecycleService {
             throw new OperationError(
               409,
               "OTHER_EMPLOYER_EXISTS",
-              "새 경영자의 기존 사업체 소속을 먼저 정리해 주세요.",
+              "새 경영자의 기존 사업체 소속을 먼저 정리해 주시기 바랍니다.",
             );
           const [qualification] = await m.query(
             `SELECT license_number FROM kpa_pharmacist_profiles WHERE user_id=$1 AND qualification_status='approved' AND license_verified=true AND verified_at IS NOT NULL AND verified_by IS NOT NULL AND NULLIF(BTRIM(license_number),'') IS NOT NULL FOR SHARE`,

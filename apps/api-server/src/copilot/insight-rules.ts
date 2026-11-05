@@ -224,13 +224,13 @@ function checkInactivity(
   if (service === 'neture' && monthlyOrders === 0) {
     items.push({
       id: 'no-orders',
-      message: '최근 주문 데이터가 아직 충분하지 않습니다. 공급사 활성화·상품 노출 흐름을 먼저 확인하세요.',
+      message: '최근 주문 데이터가 아직 충분하지 않습니다. 공급사 활성화·상품 노출 흐름을 먼저 확인하시기 바랍니다.',
       level: 'info',
     });
   } else if (service === 'cosmetics' && monthlyOrders === 0) {
     items.push({
       id: 'no-orders',
-      message: '최근 주문 데이터가 아직 충분하지 않습니다. 상품 노출·콘텐츠·프로모션 흐름을 먼저 확인하세요.',
+      message: '최근 주문 데이터가 아직 충분하지 않습니다. 상품 노출·콘텐츠·프로모션 흐름을 먼저 확인하시기 바랍니다.',
       level: 'info',
     });
   }

@@ -75,14 +75,14 @@ export function useEventProposal({
   }, []);
 
   const validateEventConditions = useCallback((): string | null => {
-    if (!selectedOffer) return '제안할 상품을 먼저 선택하세요.';
+    if (!selectedOffer) return '제안할 상품을 먼저 선택하시기 바랍니다.';
     const epNum = Number(eventPrice);
     if (!eventPrice || !Number.isFinite(epNum) || epNum <= 0) {
-      return '이벤트 가격을 0보다 큰 숫자로 입력하세요.';
+      return '이벤트 가격을 0보다 큰 숫자로 입력하시기 바랍니다.';
     }
     // 대상별 서비스 공급가가 다르므로 가격 상한은 서버가 대상 문맥으로 판정한다.
-    if (!startAt) return '시작 일시를 입력하세요.';
-    if (!endAt) return '종료 일시를 입력하세요.';
+    if (!startAt) return '시작 일시를 입력하시기 바랍니다.';
+    if (!endAt) return '종료 일시를 입력하시기 바랍니다.';
     const startMs = new Date(startAt).getTime();
     const endMs = new Date(endAt).getTime();
     if (!Number.isFinite(startMs)) return '시작 일시 형식이 올바르지 않습니다.';
@@ -177,11 +177,11 @@ export function useEventProposal({
 
   const handlePropose = useCallback(async () => {
     if (!selectedOffer) {
-      toast.error('제안할 상품을 선택하세요.');
+      toast.error('제안할 상품을 선택하시기 바랍니다.');
       return;
     }
     if (selectedTargets.length === 0) {
-      toast.error('대상 서비스를 1개 이상 선택해 주세요.');
+      toast.error('대상 서비스를 1개 이상 선택해 주시기 바랍니다.');
       return;
     }
     const errMsg = validateEventConditions();

@@ -202,7 +202,7 @@ export default function ProductCandidateReviewPage() {
       if (page > lastPage) { setPage(lastPage); return; }
       setItems(res.items); setTotal(res.total); setSummary(stats); setError('');
     } catch {
-      if (seq === sequence.current) { setItems([]); setSummary(null); setError('상품 후보를 조회하지 못했습니다. 다시 조회해 주세요.'); }
+      if (seq === sequence.current) { setItems([]); setSummary(null); setError('상품 후보를 조회하지 못했습니다. 다시 조회해 주시기 바랍니다.'); }
     } finally { if (seq === sequence.current) setLoading(false); }
   }, [filter, page, operatorProductCandidateApi, scopeKey]);
 
@@ -323,7 +323,7 @@ export default function ProductCandidateReviewPage() {
     try {
       const preview=await operatorProductCandidateApi.workflowPreview({filter,action:dialog.action,ids:allMatching?undefined:[...selected],note:dialog.note});
       if(mounted.current && sequence.current===seq) setDialog(previous=>previous?{...previous,preview,error:''}:null);
-    } catch {if(mounted.current && sequence.current===seq) setDialog(previous=>previous?{...previous,preview:null,error:'대상 건수를 확인하지 못했습니다. 다시 확인해 주세요.'}:null);}
+    } catch {if(mounted.current && sequence.current===seq) setDialog(previous=>previous?{...previous,preview:null,error:'대상 건수를 확인하지 못했습니다. 다시 확인해 주시기 바랍니다.'}:null);}
     finally {batchLock.current=false;if(mounted.current)setActionLoading(false);}
   };
   const executeWorkflow = async () => {
@@ -337,7 +337,7 @@ export default function ProductCandidateReviewPage() {
         setNotice(`${result.updated.toLocaleString()}건 ${workflowLabels[dialog.action]} 처리 완료. 정식 상품은 자동 생성·삭제하지 않았습니다.`);
         await load();
       }
-    } catch (failure: any) {if(mounted.current && sequence.current===seq) setDialog(previous=>previous?{...previous,preview:null,error:failure?.response?.status===409?'후보가 변경됐거나 확인 시간이 지났습니다. 대상 건수를 다시 확인해 주세요.':'처리 결과를 확인하지 못했습니다. 목록과 대상 건수를 다시 확인해 주세요.'}:null);}
+    } catch (failure: any) {if(mounted.current && sequence.current===seq) setDialog(previous=>previous?{...previous,preview:null,error:failure?.response?.status===409?'후보가 변경됐거나 확인 시간이 지났습니다. 대상 건수를 다시 확인해 주시기 바랍니다.':'처리 결과를 확인하지 못했습니다. 목록과 대상 건수를 다시 확인해 주시기 바랍니다.'}:null);}
     finally {batchLock.current=false;if(mounted.current)setActionLoading(false);}
   };
 
@@ -456,7 +456,7 @@ export default function ProductCandidateReviewPage() {
       <section aria-label="후보 업무 구분" className="my-4 grid gap-3 sm:grid-cols-3">
         {([['all','조회 조건 전체',summary?.total],['review','운영 검토',summary?.review],['intake','수집 자료 등록 준비',summary?.intake]] as const).map(([key,label,count])=><button key={key} type="button" disabled={actionLoading} aria-pressed={queue===key} className={`rounded-lg border p-4 text-left ${queue===key?'border-blue-600 bg-blue-50':'bg-white'}`} onClick={()=>{setQueue(key);setPage(1);}}><span className="text-sm">{label}</span><strong className="mt-1 block text-2xl">{error||count==null?'—':count.toLocaleString()}</strong></button>)}
       </section>
-      <p className="mb-4 text-sm text-slate-600">수집 자료는 미등록 원천 데이터입니다. 운영자가 모두 승인해야 한다는 뜻이 아닙니다. 아래 사유와 등록 경로를 먼저 확인하세요. 사유별 건수는 중복될 수 있습니다.</p>
+      <p className="mb-4 text-sm text-slate-600">수집 자료는 미등록 원천 데이터입니다. 운영자가 모두 승인해야 한다는 뜻이 아닙니다. 아래 사유와 등록 경로를 먼저 확인하시기 바랍니다. 사유별 건수는 중복될 수 있습니다.</p>
       {/* Filters */}
       <div className="flex flex-wrap items-center gap-4 mb-4">
         <div className="flex flex-wrap gap-1">
@@ -522,7 +522,7 @@ export default function ProductCandidateReviewPage() {
         data={filtered}
         rowKey="id"
         loading={loading}
-        emptyMessage={error ? '상품 후보를 다시 조회해 주세요.' : items.length === 0 ? '검토할 상품 후보가 없습니다' : '검색 결과가 없습니다'}
+        emptyMessage={error ? '상품 후보를 다시 조회해 주시기 바랍니다.' : items.length === 0 ? '검토할 상품 후보가 없습니다' : '검색 결과가 없습니다'}
         onRowClick={openCandidate}
         tableId="neture-product-candidates"
       />
@@ -549,7 +549,7 @@ export default function ProductCandidateReviewPage() {
             </div>
 
             <div className="p-5 space-y-4">
-              <section aria-label="후보 대기 사유" className="rounded border border-amber-200 bg-amber-50 p-3 text-sm"><h4 className="font-semibold">{detail.triage?.queue==='intake'?'수집 자료 등록 준비':'운영 검토'}</h4><p className="mt-1">{detail.triage?.reasons.join(' · ')||'원천 정보 확인 필요'}</p><p className="mt-1">{detail.triage?.nextStep}</p>{(detail.triage?.registration==='drug'||detail.triage?.registration==='supplier')&&renderCandidateRegistrationReview&&user?.roles?.includes('platform:super_admin')&&<button type="button" className="mt-3 rounded bg-blue-700 px-3 py-2 text-white" onClick={()=>{setRegistration(detail.id);setDetail(null);}}>기본상품 등록 검토</button>}{detail.triage?.registration==='unsupported'&&<p className="mt-2">이 자료는 현재 일반 등록 경로에서 처리할 수 없습니다. 원천 식별자·허가·필수 정보를 검증하고 보완 사항을 기록하세요.</p>}</section>
+              <section aria-label="후보 대기 사유" className="rounded border border-amber-200 bg-amber-50 p-3 text-sm"><h4 className="font-semibold">{detail.triage?.queue==='intake'?'수집 자료 등록 준비':'운영 검토'}</h4><p className="mt-1">{detail.triage?.reasons.join(' · ')||'원천 정보 확인 필요'}</p><p className="mt-1">{detail.triage?.nextStep}</p>{(detail.triage?.registration==='drug'||detail.triage?.registration==='supplier')&&renderCandidateRegistrationReview&&user?.roles?.includes('platform:super_admin')&&<button type="button" className="mt-3 rounded bg-blue-700 px-3 py-2 text-white" onClick={()=>{setRegistration(detail.id);setDetail(null);}}>기본상품 등록 검토</button>}{detail.triage?.registration==='unsupported'&&<p className="mt-2">이 자료는 현재 일반 등록 경로에서 처리할 수 없습니다. 원천 식별자·허가·필수 정보를 검증하고 보완 사항을 기록하시기 바랍니다.</p>}</section>
               {/* F3: 상품 분류 + 기본 노출/판매 정책 (표시용 — 권한 변경 아님) */}
               {detail.classification && (
                 <div className="rounded-lg border border-slate-100 bg-slate-50 p-3">
@@ -673,7 +673,7 @@ export default function ProductCandidateReviewPage() {
               <div className="border-t border-slate-100 pt-4">
                 <label className="block text-sm font-medium text-slate-700 mb-1">활용 상품으로 추가 (내 약국/내 매장)</label>
                 {!detail.matchedProductMasterId ? (
-                  <p className="text-xs text-slate-400">매칭된 상품(ProductMaster)이 있어야 활용 상품으로 추가할 수 있습니다. 먼저 재매칭/수동매칭하세요.</p>
+                  <p className="text-xs text-slate-400">매칭된 상품(ProductMaster)이 있어야 활용 상품으로 추가할 수 있습니다. 먼저 재매칭/수동매칭하시기 바랍니다.</p>
                 ) : (
                   <>
                     <div className="grid grid-cols-2 gap-2">
@@ -720,7 +720,7 @@ export default function ProductCandidateReviewPage() {
                 <textarea
                   value={rejectReason}
                   onChange={(e) => setRejectReason(e.target.value)}
-                  placeholder="반려 사유를 입력하세요"
+                  placeholder="반려 사유를 입력하시기 바랍니다"
                   className="w-full border border-slate-200 rounded-lg p-2 text-sm resize-none h-16 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
@@ -773,8 +773,8 @@ function SupplyGateNotice({ candidate }: { candidate: ProductCandidate }) {
   if (cls === 'otc_drug') {
     return (
       <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-xs text-amber-800">
-        <strong>비처방 의약품(OTC) 후보입니다.</strong> 일반 매장 공급·이벤트 오퍼·유통참여형 펀딩으로 자동 연결하지 마세요.
-        <strong> 약국 매장 유형 대상 공급 후보로만</strong> 검토하세요. 고객 노출·온라인 판매는 별도 검토 정책이 필요합니다.
+        <strong>비처방 의약품(OTC) 후보입니다.</strong> 일반 매장 공급·이벤트 오퍼·유통참여형 펀딩으로 자동 연결하지 마시기 바랍니다.
+        <strong> 약국 매장 유형 대상 공급 후보로만</strong> 검토하시기 바랍니다. 고객 노출·온라인 판매는 별도 검토 정책이 필요합니다.
       </div>
     );
   }
@@ -789,7 +789,7 @@ function SupplyGateNotice({ candidate }: { candidate: ProductCandidate }) {
   if (cls === 'drug_unspecified') {
     return (
       <div className="rounded-lg border border-orange-200 bg-orange-50 p-3 text-xs text-orange-800">
-        <strong>의약품 분류가 필요합니다.</strong> 비처방/처방 여부가 확정되기 전까지 후속 공급 활동을 진행하지 마세요. 아래 "의약품 분류 수정"으로 분류를 확정하세요.
+        <strong>의약품 분류가 필요합니다.</strong> 비처방/처방 여부가 확정되기 전까지 후속 공급 활동을 진행하지 마시기 바랍니다. 아래 "의약품 분류 수정"으로 분류를 확정하시기 바랍니다.
       </div>
     );
   }

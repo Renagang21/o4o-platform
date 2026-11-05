@@ -19,7 +19,7 @@ export function useStorePublishing() {
   const [notice, setNotice] = useState<string | null>(null);
   const reload = useCallback(async () => {
     if (writing.current) return;
-    if (!organizationId) { setLoading(false); setError('매장을 선택한 뒤 다시 시도해 주세요.'); return; }
+    if (!organizationId) { setLoading(false); setError('매장을 선택한 뒤 다시 시도해 주시기 바랍니다.'); return; }
     if (!isCurrent()) return;
     const current = read.begin();
     reading.current = true; rows.current = [];
@@ -31,7 +31,7 @@ export function useStorePublishing() {
       if (!current() || !isCurrent()) return;
       rows.current = result.data.items; setItems(result.data.items); setTotal(result.data.total);
     } catch {
-      if (current() && isCurrent()) setError('게시 상태를 불러오지 못했습니다. 다시 시도해 주세요.');
+      if (current() && isCurrent()) setError('게시 상태를 불러오지 못했습니다. 다시 시도해 주시기 바랍니다.');
     } finally {
       if (current() && isCurrent()) { reading.current = false; setLoading(false); }
     }
@@ -68,7 +68,7 @@ export function useStorePublishing() {
       setItems(rows.current);
       if (failed.length) setRetry({ ids: failed, status });
       if (failed.length || blocked) setActionError(`${succeeded.size}건 변경, ${failed.length}건 실패${blocked ? `, 정책 제한 ${blocked}건 제외` : ''}. 변경되지 않은 자료는 이전 상태를 유지합니다.`);
-      else setNotice(`${succeeded.size}건의 게시 설정을 변경했습니다. 기기 적용·재생 여부는 활용 화면에서 확인해 주세요.`);
+      else setNotice(`${succeeded.size}건의 게시 설정을 변경했습니다. 기기 적용·재생 여부는 활용 화면에서 확인해 주시기 바랍니다.`);
     } finally {
       writing.current = false;
       if (isCurrent()) { setBusy(false); setUpdatingId(null); }

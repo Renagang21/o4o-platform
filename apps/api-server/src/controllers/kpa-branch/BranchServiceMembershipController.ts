@@ -181,7 +181,7 @@ export class BranchServiceMembershipController {
     }
     const reason = String((req.body ?? {}).reason ?? '').trim();
     if (!reason) {
-      return res.status(400).json({ success: false, error: '반려 사유를 입력해 주세요.', code: 'REJECTION_REASON_REQUIRED' });
+      return res.status(400).json({ success: false, error: '반려 사유를 입력해 주시기 바랍니다.', code: 'REJECTION_REASON_REQUIRED' });
     }
 
     try {

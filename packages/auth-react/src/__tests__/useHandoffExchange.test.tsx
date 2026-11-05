@@ -77,6 +77,6 @@ it('unmount before the exchange response cannot store a session', async () => {
 it('missing token makes no exchange request', async () => {
   window.history.replaceState({}, '', '/handoff');
   render(<Probe />);
-  await screen.findByText(':이동 정보가 없습니다. 다시 시도해 주세요.');
+  await screen.findByText(':이동 정보가 없습니다. 다시 시도해 주시기 바랍니다.');
   expect(mocks.exchange).not.toHaveBeenCalled();
 });

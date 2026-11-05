@@ -95,12 +95,12 @@ export class SupplierOfferRegistrationService {
           success: false,
           error: 'OFFER_IN_RECYCLE_BIN',
           message:
-            '이 상품은 휴지통에 있습니다. 새로 등록하지 말고 휴지통에서 복원하거나 완전 삭제 후 등록해 주세요.',
+            '이 상품은 휴지통에 있습니다. 새로 등록하지 말고 휴지통에서 복원하거나 완전 삭제 후 등록해 주시기 바랍니다.',
         }
       : {
           success: false,
           error: 'OFFER_ALREADY_EXISTS',
-          message: '이미 등록된 공급 상품입니다. 기존 상품을 수정해 주세요.',
+          message: '이미 등록된 공급 상품입니다. 기존 상품을 수정해 주시기 바랍니다.',
         };
   }
 
@@ -120,7 +120,7 @@ export class SupplierOfferRegistrationService {
     return {
       success: false,
       error: 'OFFER_ALREADY_EXISTS',
-      message: '이미 등록된 공급 상품입니다. 기존 상품을 수정해 주세요.',
+      message: '이미 등록된 공급 상품입니다. 기존 상품을 수정해 주시기 바랍니다.',
     };
   }
 
@@ -279,7 +279,7 @@ export class SupplierOfferRegistrationService {
       }
       const input = body as unknown as CreateOfferFromExistingMasterInput;
       if (input.isPublic || input.distributionType === OfferDistributionType.PUBLIC || input.serviceKeys?.length) {
-        return { success: false as const, error: 'PUBLICATION_REQUIRES_SEPARATE_ACTION', message: '등록 후 승인된 제품의 서비스 게시에서 공급 조건을 설정해 주세요.' };
+        return { success: false as const, error: 'PUBLICATION_REQUIRES_SEPARATE_ACTION', message: '등록 후 승인된 제품의 서비스 게시에서 공급 조건을 설정해 주시기 바랍니다.' };
       }
 
 
@@ -315,7 +315,7 @@ export class SupplierOfferRegistrationService {
         return {
           success: false as const,
           error: OfferErrorCode.MASTER_REGULATORY_TYPE_UNSUPPORTED,
-          message: '이 제품의 규제 분류를 확인할 수 없어 연결할 수 없습니다. 운영자에게 문의해 주세요.',
+          message: '이 제품의 규제 분류를 확인할 수 없어 연결할 수 없습니다. 운영자에게 문의해 주시기 바랍니다.',
         };
       }
 

@@ -60,7 +60,7 @@ export function HubQrLibraryPage() {
       core={hub}
       accent="blue"
       title="제공 자료 QR-code"
-      description="KPA 운영자가 발행한 QR 템플릿을 선택해 가져가거나(매장별 slug 새로 발급), 내 약국용 QR-code 를 직접 만드세요."
+      description="KPA 운영자가 발행한 QR 템플릿을 선택해 가져가거나(매장별 slug 새로 발급), 내 약국용 QR-code 를 직접 만드시기 바랍니다."
       tableId="store-hub-qr"
       titleIcon={<QrCode className="w-3.5 h-3.5" />}
       labels={{

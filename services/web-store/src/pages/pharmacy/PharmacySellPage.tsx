@@ -76,7 +76,7 @@ export function PharmacySellPage() {
             상품 진열 관리
           </h1>
           <p style={{ color: '#64748B', fontSize: '0.95rem' }}>
-            취급 중인 상품의 매장 진열과 채널별 노출을 관리합니다. 새 공급 상품은 내 매장의 공급 상품 화면에서 주문하세요.
+            취급 중인 상품의 매장 진열과 채널별 노출을 관리합니다. 새 공급 상품은 내 매장의 공급 상품 화면에서 주문하시기 바랍니다.
           </p>
         </div>
         <Link
@@ -145,7 +145,7 @@ function ListingsTab() {
     } else {
       // 실패 시 기존 목록을 지우지 않는다(재조회 실패면 직전 목록 유지).
       console.error('Failed to load listings:', listingsResult.reason);
-      setListingsError('판매 상품 정보를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.');
+      setListingsError('판매 상품 정보를 불러오지 못했습니다. 잠시 후 다시 시도해 주시기 바랍니다.');
     }
 
     if (channelsResult.status === 'fulfilled') {
@@ -252,7 +252,7 @@ function ListingsTab() {
           <p style={{ fontSize: '1.05rem', fontWeight: 600, color: '#991B1B' }}>
             판매 상품 정보를 불러오지 못했습니다.
           </p>
-          <p style={{ fontSize: '0.875rem', marginTop: 8, color: '#B91C1C' }}>잠시 후 다시 시도해 주세요.</p>
+          <p style={{ fontSize: '0.875rem', marginTop: 8, color: '#B91C1C' }}>잠시 후 다시 시도해 주시기 바랍니다.</p>
           <button
             type="button"
             onClick={() => void loadData()}

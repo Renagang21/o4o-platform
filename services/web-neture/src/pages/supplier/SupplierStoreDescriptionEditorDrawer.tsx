@@ -222,7 +222,7 @@ export default function SupplierStoreDescriptionEditorDrawer({ product, open, on
     if (readOnly || loading || loadError || saving || withdrawing) return;
     const trimmed = content.trim();
     if (!trimmed || trimmed === '<p></p>') {
-      toast.error('설명서 본문을 입력하세요');
+      toast.error('설명서 본문을 입력하시기 바랍니다');
       return;
     }
     setSaving(true);
@@ -330,7 +330,7 @@ export default function SupplierStoreDescriptionEditorDrawer({ product, open, on
               <div>
                 <p className="text-sm font-medium text-slate-700">설명서를 불러오지 못했습니다</p>
                 <p className="text-xs text-slate-400 mt-1">
-                  기존 작업 내용을 덮어쓰지 않도록 편집기를 열지 않았습니다. 잠시 후 다시 시도해 주세요.
+                  기존 작업 내용을 덮어쓰지 않도록 편집기를 열지 않았습니다. 잠시 후 다시 시도해 주시기 바랍니다.
                 </p>
               </div>
               <button
@@ -355,14 +355,14 @@ export default function SupplierStoreDescriptionEditorDrawer({ product, open, on
                 <div className="mb-3 px-3 py-2 rounded-lg bg-orange-50 border border-orange-200 text-xs text-orange-800">
                   <div className="font-semibold">운영자가 수정을 요청했습니다 · {fmtDay(existing?.revisionDueAt)}까지 재요청</div>
                   {existing?.reviewNote && <div className="mt-1 whitespace-pre-wrap text-orange-900">사유: {existing.reviewNote}</div>}
-                  <div className="mt-1 text-orange-700">수정 후 <strong>다시 검수 요청</strong>하세요. 기한이 지나면 이 설명서는 자동 삭제됩니다.</div>
+                  <div className="mt-1 text-orange-700">수정 후 <strong>다시 검수 요청</strong>하시기 바랍니다. 기한이 지나면 이 설명서는 자동 삭제됩니다.</div>
                 </div>
               )}
               <RichTextEditor
                 value={content}
                 onChange={(c) => { if (!readOnly) { setContent(c.html); setDirty(true); } }}
                 editable={!saving && !withdrawing && !readOnly}
-                placeholder="매장 경영자가 고객 응대·QR·태블릿에 활용할 매장용 설명서를 작성하세요"
+                placeholder="매장 경영자가 고객 응대·QR·태블릿에 활용할 매장용 설명서를 작성하시기 바랍니다"
                 minHeight="360px"
                 onImageUpload={readOnly ? undefined : editorImageUpload}
                 showTemplateActions={!readOnly}

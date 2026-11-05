@@ -5,7 +5,7 @@ export const PUBLIC_SERVICE_ENTRIES = {
   supplier: {
     name: "공급자",
     description:
-      "제품과 자료를 등록하고, 참여 매장에 공급하는 서비스를 알아보세요.",
+      "제품과 자료를 등록하고, 참여 매장에 공급하는 서비스를 알아보시기 바랍니다.",
     features: [
       "공급 제품과 자료 관리",
       "참여 매장과의 공급 업무",
@@ -15,7 +15,7 @@ export const PUBLIC_SERVICE_ENTRIES = {
   funding: {
     name: "유통참여형 펀딩",
     description:
-      "제품과 유통참여형 펀딩 소식을 확인하고 참여 방법을 알아보세요.",
+      "제품과 유통참여형 펀딩 소식을 확인하고 참여 방법을 알아보시기 바랍니다.",
     features: [
       "제품과 사업 소식",
       "참여 조건과 이용 안내",
@@ -24,7 +24,7 @@ export const PUBLIC_SERVICE_ENTRIES = {
   },
   pharmacy: {
     name: "O4O 약국 경영지원",
-    description: "약국 운영에 필요한 소식과 자료, 협력사업을 만나보세요.",
+    description: "약국 운영에 필요한 소식과 자료, 협력사업을 만나보시기 바랍니다.",
     features: [
       "약국 운영 자료",
       "협력약국 소식과 커뮤니티",
@@ -33,7 +33,7 @@ export const PUBLIC_SERVICE_ENTRIES = {
   },
   drugstore: {
     name: "드럭스토어형 약국",
-    description: "드럭스토어형 약국 협력사업의 참여 방법과 제공 기능을 알아보세요.",
+    description: "드럭스토어형 약국 협력사업의 참여 방법과 제공 기능을 알아보시기 바랍니다.",
     features: [
       "협력사업 참여 안내",
       "회원 약국의 소식",
@@ -42,7 +42,7 @@ export const PUBLIC_SERVICE_ENTRIES = {
   },
   carepharm: {
     name: "CarePharm · 만성질환관리",
-    description: "만성질환관리 협력사업과 약국의 참여 방법을 알아보세요.",
+    description: "만성질환관리 협력사업과 약국의 참여 방법을 알아보시기 바랍니다.",
     features: [
       "협력사업 소개",
       "회원 활동과 소식",
@@ -51,22 +51,22 @@ export const PUBLIC_SERVICE_ENTRIES = {
   },
   pharmcoop: {
     name: "약국·약사 협동조합",
-    description: "협동조합을 둘러보고 조합별 참여 조건과 활동을 확인하세요.",
+    description: "협동조합을 둘러보고 조합별 참여 조건과 활동을 확인하시기 바랍니다.",
     features: ["협동조합 탐색", "조합별 참여 안내", "회원 활동과 소식"],
   },
   community: {
     name: "커뮤니티",
-    description: "공개 콘텐츠를 둘러보고 정보와 경험을 나누세요.",
+    description: "공개 콘텐츠를 둘러보고 정보와 경험을 나누시기 바랍니다.",
     features: ["공개 콘텐츠와 소식", "회원 커뮤니티", "가입과 이용 안내"],
   },
   lecture: {
     name: "O4O 강의",
-    description: "공개 강의를 둘러보고 필요한 교육을 찾아보세요.",
+    description: "공개 강의를 둘러보고 필요한 교육을 찾아보시기 바랍니다.",
     features: ["강의 탐색", "수강과 학습", "강의 개설과 협업 문의"],
   },
   "kpa-branch": {
     name: "약사회 분회",
-    description: "소속 분회를 찾고 가입과 회원 활동을 알아보세요.",
+    description: "소속 분회를 찾고 가입과 회원 활동을 알아보시기 바랍니다.",
     features: ["분회 찾기", "분회별 가입 안내", "회원 활동과 소식"],
   },
   store: {
@@ -175,16 +175,16 @@ export function PublicServiceEntry({
           후 서비스별 가입·승인 또는 소속 확인을 거쳐 이용합니다.
         </p>
         <details style={{ marginTop: 14 }}>
-          <summary>이미 O4O 계정이 있나요?</summary>
+          <summary>이미 O4O 계정이 있습니까?</summary>
           <p>
-            기존 계정으로 로그인하세요. 서비스별 가입 상태와 이용 가능한 업무는
+            기존 계정으로 로그인하시기 바랍니다. 서비스별 가입 상태와 이용 가능한 업무는
             로그인 후 확인할 수 있습니다.
           </p>
         </details>
         <details style={{ marginTop: 14 }}>
-          <summary>가입 전에도 문의할 수 있나요?</summary>
+          <summary>가입 전에도 문의할 수 있습니까?</summary>
           <p>
-            Contact Us에서 문의를 남겨 주세요. 해당 서비스 담당자가 확인합니다.
+            Contact Us에서 문의를 남겨 주시기 바랍니다. 해당 서비스 담당자가 확인합니다.
           </p>
         </details>
       </section>

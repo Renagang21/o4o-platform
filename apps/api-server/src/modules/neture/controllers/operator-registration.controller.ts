@@ -92,7 +92,7 @@ export function createOperatorRegistrationController(dataSource: DataSource, act
             success: false,
             error: 'ROLE_PROMOTION_NOT_ALLOWED',
             message:
-              '운영자·관리자 역할은 가입 승인으로 부여할 수 없습니다. 중앙 관리자(admin.neture.co.kr)의 운영자 관리를 사용하세요.',
+              '운영자·관리자 역할은 가입 승인으로 부여할 수 없습니다. 중앙 관리자(admin.neture.co.kr)의 운영자 관리를 사용하시기 바랍니다.',
           });
           return;
         }

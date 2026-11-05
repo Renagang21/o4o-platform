@@ -607,7 +607,7 @@ export default function StoreContentEditorPage() {
                       alt="QR Code"
                       className="mx-auto w-32 h-32"
                     />
-                    <p className="text-xs text-gray-400 mt-2">QR 코드를 스캔하세요</p>
+                    <p className="text-xs text-gray-400 mt-2">QR 코드를 스캔하시기 바랍니다</p>
                   </div>
                 )}
               </div>

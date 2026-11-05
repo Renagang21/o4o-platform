@@ -83,7 +83,7 @@ describe("external AI management", () => {
       target: { value: "직원 안내" },
     });
     fireEvent.change(screen.getByLabelText("예제 요청문"), {
-      target: { value: "확인된 정보로 안내문을 작성해 주세요." },
+      target: { value: "확인된 정보로 안내문을 작성해 주시기 바랍니다." },
     });
     fireEvent.click(screen.getByText("설정 저장"));
     await waitFor(() =>

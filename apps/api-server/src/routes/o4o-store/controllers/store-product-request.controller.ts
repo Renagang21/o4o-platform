@@ -110,15 +110,15 @@ interface RequestFields {
 function parseRequestBody(body: any): { fields: RequestFields } | { error: { code: string; message: string } } {
   const productName = typeof body?.productName === 'string' ? body.productName.trim() : '';
   if (!productName) {
-    return { error: { code: 'INVALID_INPUT', message: '포장 표시 상품명을 입력하세요.' } };
+    return { error: { code: 'INVALID_INPUT', message: '포장 표시 상품명을 입력하시기 바랍니다.' } };
   }
   if (productName.length > 255) {
-    return { error: { code: 'INVALID_INPUT', message: '상품명은 255자 이하로 입력하세요.' } };
+    return { error: { code: 'INVALID_INPUT', message: '상품명은 255자 이하로 입력하시기 바랍니다.' } };
   }
 
   const classification = body?.classification;
   if (!isValidClassification(classification)) {
-    return { error: { code: 'INVALID_CLASSIFICATION', message: 'O4O 표준 분류를 선택하세요.' } };
+    return { error: { code: 'INVALID_CLASSIFICATION', message: 'O4O 표준 분류를 선택하시기 바랍니다.' } };
   }
 
   const noBarcode = body?.noBarcode === true;
@@ -127,7 +127,7 @@ function parseRequestBody(body: any): { fields: RequestFields } | { error: { cod
 
   // 바코드 없으면 명시적 '바코드 없음' 체크 필수 (오입력 방지)
   if (!barcode && !noBarcode) {
-    return { error: { code: 'BARCODE_REQUIRED_OR_NONE', message: '바코드를 입력하거나 ‘바코드 없음’을 선택하세요.' } };
+    return { error: { code: 'BARCODE_REQUIRED_OR_NONE', message: '바코드를 입력하거나 ‘바코드 없음’을 선택하시기 바랍니다.' } };
   }
   if (barcode && barcode.length > 128) {
     return { error: { code: 'INVALID_INPUT', message: '바코드 형식이 올바르지 않습니다.' } };
@@ -247,7 +247,7 @@ export function createStoreProductRequestController(dataSource: DataSource): Rou
           success: false,
           error: {
             code: 'EXISTING_PRODUCT_FOUND',
-            message: '이미 O4O 표준 상품에 등록된 바코드입니다. 기존 상품을 매장 경영활용 제품으로 추가하세요.',
+            message: '이미 O4O 표준 상품에 등록된 바코드입니다. 기존 상품을 매장 경영활용 제품으로 추가하시기 바랍니다.',
           },
           data: { masterId: existing[0].id, name: existing[0].name },
         });
@@ -331,7 +331,7 @@ export function createStoreProductRequestController(dataSource: DataSource): Rou
           success: false,
           error: {
             code: 'EXISTING_PRODUCT_FOUND',
-            message: '이미 O4O 표준 상품에 등록된 바코드입니다. 기존 상품을 매장 경영활용 제품으로 추가하세요.',
+            message: '이미 O4O 표준 상품에 등록된 바코드입니다. 기존 상품을 매장 경영활용 제품으로 추가하시기 바랍니다.',
           },
           data: { masterId: existing[0].id, name: existing[0].name },
         });

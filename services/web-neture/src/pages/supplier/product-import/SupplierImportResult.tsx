@@ -107,7 +107,7 @@ export default function SupplierImportResult({
             이미지 ({selectedImages.size}/{parsed.imageUrls.length} 선택)
           </h3>
           <p className="mb-1 text-xs text-slate-500">
-            등록할 이미지를 직접 선택하세요. 별표(★)로 대표 이미지를 지정합니다.
+            등록할 이미지를 직접 선택하시기 바랍니다. 별표(★)로 대표 이미지를 지정합니다.
           </p>
           {selectedImages.size === 0 && (
             <p className="mb-3 text-xs text-amber-600 bg-amber-50 px-3 py-1.5 rounded-lg">

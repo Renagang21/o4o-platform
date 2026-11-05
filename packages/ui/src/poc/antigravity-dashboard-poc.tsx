@@ -91,7 +91,7 @@ export function AntigravityDashboardPoC() {
       {/* Page Header */}
       <AGPageHeader
         title="Dashboard Overview"
-        description="플랫폼 운영 현황을 한눈에 확인하세요"
+        description="플랫폼 운영 현황을 한눈에 확인하시기 바랍니다"
       />
 
       {/* Main Content */}

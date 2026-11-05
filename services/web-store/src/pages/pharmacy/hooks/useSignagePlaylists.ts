@@ -77,7 +77,7 @@ export function useSignagePlaylists(organizationId: string) {
     } catch {
       if (isCurrent())
         setPlaylistError(
-          "데이터를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.",
+          "데이터를 불러오지 못했습니다. 잠시 후 다시 시도해 주시기 바랍니다.",
         );
     } finally {
       if (isCurrent()) setPlaylistLoading(false);
@@ -102,7 +102,7 @@ export function useSignagePlaylists(organizationId: string) {
         if (isCurrent()) setPlaylistItems([]);
         if (isCurrent())
           setPlaylistItemsError(
-            "데이터를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.",
+            "데이터를 불러오지 못했습니다. 잠시 후 다시 시도해 주시기 바랍니다.",
           );
       } finally {
         if (isCurrent()) setPlaylistItemsLoading(false);
@@ -149,7 +149,7 @@ export function useSignagePlaylists(organizationId: string) {
     } catch {
       if (isViewCurrent())
         setPlaylistActionError(
-          "재생목록 작업을 완료하지 못했습니다. 다시 시도해 주세요.",
+          "재생목록 작업을 완료하지 못했습니다. 다시 시도해 주시기 바랍니다.",
         );
     } finally {
       busy.current.delete(key);
@@ -174,7 +174,7 @@ export function useSignagePlaylists(organizationId: string) {
       } catch {
         if (isStoreCurrent())
           setPlaylistActionError(
-            "재생목록 게시 상태를 변경하지 못했습니다. 다시 시도해 주세요.",
+            "재생목록 게시 상태를 변경하지 못했습니다. 다시 시도해 주시기 바랍니다.",
           );
       }
     });
@@ -190,7 +190,7 @@ export function useSignagePlaylists(organizationId: string) {
       } catch {
         if (isStoreCurrent())
           setPlaylistActionError(
-            "재생목록을 삭제하지 못했습니다. 다시 시도해 주세요.",
+            "재생목록을 삭제하지 못했습니다. 다시 시도해 주시기 바랍니다.",
           );
       }
     });
@@ -253,7 +253,7 @@ export function useSignagePlaylists(organizationId: string) {
             }
             if (failed.size)
               setPlaylistActionError(
-                `${failed.size}개 자료를 추가하지 못했습니다. 실패한 자료만 다시 시도해 주세요.`,
+                `${failed.size}개 자료를 추가하지 못했습니다. 실패한 자료만 다시 시도해 주시기 바랍니다.`,
               );
           }
           if (isStoreCurrent()) await loadPlaylistItems(playlistId);
@@ -290,7 +290,7 @@ export function useSignagePlaylists(organizationId: string) {
           if (isStoreCurrent()) await loadPlaylistItems(playlistId);
           if (isViewCurrent())
             setPlaylistActionError(
-              "순서를 변경하지 못했습니다. 다시 시도해 주세요.",
+              "순서를 변경하지 못했습니다. 다시 시도해 주시기 바랍니다.",
             );
         }
       },

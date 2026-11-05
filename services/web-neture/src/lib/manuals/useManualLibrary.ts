@@ -19,7 +19,7 @@ export function useManualLibrary(owner: string | null) {
     setDocuments([]); setSelected([]); setError(''); setLoadedOwner(null); setBusy(false);
     if (owner) void loadManuals(owner).then(data => {
       if (active) { setDocuments(data); setLoadedOwner(owner); }
-    }).catch(() => { if (active) setError('매뉴얼 자료함을 읽지 못했습니다. 브라우저 저장 설정을 확인해 주세요.'); });
+    }).catch(() => { if (active) setError('매뉴얼 자료함을 읽지 못했습니다. 브라우저 저장 설정을 확인해 주시기 바랍니다.'); });
     return () => { active = false; };
   }, [owner]);
   const ready = !!owner && loadedOwner === owner;
@@ -47,7 +47,7 @@ export function useManualLibrary(owner: string | null) {
     await mutate(async () => {
       let imported: ManualDocument[];
       if (/\.json$/i.test(file.name)) {
-        if (file.size > MANUAL_LIMITS.libraryBytes) throw Error('자료함 파일은 64MB 이하로 가져와 주세요.');
+        if (file.size > MANUAL_LIMITS.libraryBytes) throw Error('자료함 파일은 64MB 이하로 가져와 주시기 바랍니다.');
         imported = parseManualLibrary(await file.text());
       } else imported = [await importManualPdf(file, program.trim() || file.name.replace(/\.pdf(?:\.crdownload)?$/i, '').slice(0, 80))];
       return latest => {

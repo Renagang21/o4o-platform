@@ -182,9 +182,9 @@ export default function ProductLandingPage() {
           {data.product?.name && (
             <p className="text-base font-semibold text-gray-900 break-keep [overflow-wrap:anywhere] mb-1">{data.product.name}</p>
           )}
-          <h1 className="text-lg font-bold text-gray-900 mb-2">로그인 후 제품 설명을 볼 수 있어요</h1>
+          <h1 className="text-lg font-bold text-gray-900 mb-2">로그인 후 제품 설명을 볼 수 있습니다</h1>
           <p className="text-sm text-gray-600 mb-6 break-keep">
-            이 제품 상세설명서는 O4O 회원에게만 제공됩니다. 로그인하거나 가입하면 바로 이 화면에서 이어서 볼 수 있어요.
+            이 제품 상세설명서는 O4O 회원에게만 제공됩니다. 로그인하거나 가입하면 바로 이 화면에서 이어서 볼 수 있습니다.
           </p>
           <div className="flex flex-col gap-2.5">
             <button

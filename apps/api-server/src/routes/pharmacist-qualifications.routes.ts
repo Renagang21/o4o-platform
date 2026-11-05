@@ -45,7 +45,7 @@ const handle =
           .json({
             success: false,
             code: "INVALID_QUALIFICATION_INPUT",
-            error: "자격 정보와 확인 항목을 다시 확인해 주세요.",
+            error: "자격 정보와 확인 항목을 다시 확인해 주시기 바랍니다.",
           });
         return;
       }
@@ -54,7 +54,7 @@ const handle =
         .json({
           success: false,
           code: "QUALIFICATION_UNAVAILABLE",
-          error: "자격 정보를 처리하지 못했습니다. 다시 조회해 주세요.",
+          error: "자격 정보를 처리하지 못했습니다. 다시 조회해 주시기 바랍니다.",
         });
     }
   };

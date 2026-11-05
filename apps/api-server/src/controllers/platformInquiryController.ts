@@ -49,7 +49,7 @@ export async function submitInquiry(req: Request, res: Response) {
     if (!name || !email || !subject || !message) {
       return res.status(400).json({
         success: false,
-        error: '필수 항목을 입력해 주세요.',
+        error: '필수 항목을 입력해 주시기 바랍니다.',
         code: 'MISSING_REQUIRED_FIELDS',
       });
     }
@@ -77,7 +77,7 @@ export async function submitInquiry(req: Request, res: Response) {
     if (!emailRegex.test(email)) {
       return res.status(400).json({
         success: false,
-        error: '올바른 이메일 주소를 입력해 주세요.',
+        error: '올바른 이메일 주소를 입력해 주시기 바랍니다.',
         code: 'INVALID_EMAIL',
       });
     }

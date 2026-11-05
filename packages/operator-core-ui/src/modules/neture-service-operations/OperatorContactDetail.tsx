@@ -63,6 +63,6 @@ export default function OperatorContactDetail({ id, onClose, onSaved, onBusy }: 
       <label className="block">내부 메모<textarea aria-label="문의 내부 메모" value={notes} maxLength={10000} disabled={reading || writing} onChange={e => setNotes(e.target.value)} className="block w-full border rounded p-2" /></label>
       <button type="button" disabled={reading || writing} onClick={() => void save()} className="px-4 py-2 bg-emerald-700 text-white rounded">{writing ? '저장 중…' : '문의 저장'}</button>
     </>}
-    <button type="button" disabled={reading || writing} onClick={() => { if (!detail || window.confirm('작성 중인 입력을 최신 저장 내용으로 바꿉니다. 다시 조회할까요?')) void read(); }} className="ml-3 underline">최신 상세 다시 조회</button>
+    <button type="button" disabled={reading || writing} onClick={() => { if (!detail || window.confirm('작성 중인 입력을 최신 저장 내용으로 바꿉니다. 다시 조회하시겠습니까?')) void read(); }} className="ml-3 underline">최신 상세 다시 조회</button>
   </section>;
 }

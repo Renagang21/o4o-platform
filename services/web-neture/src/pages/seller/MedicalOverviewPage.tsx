@@ -372,7 +372,7 @@ function NextStepSection() {
       <p style={styles.nextStepText}>
         이 구조에 공감하신다면,
         <br />
-        o4o 플랫폼 전체 구조를 확인해 보세요.
+        o4o 플랫폼 전체 구조를 확인해 보시기 바랍니다.
       </p>
       <p style={styles.nextStepSubtext}>
         공감이 전제되지 않으면 다음 단계로 진행하지 않습니다.

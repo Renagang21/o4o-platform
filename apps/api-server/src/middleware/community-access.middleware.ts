@@ -18,7 +18,7 @@ export function requireCommunityAccess(communityKey: string): RequestHandler {
       if (!workspace?.allowed) {
         res.status(workspace ? 403 : 404).json({
           success: false,
-          error: '이 커뮤니티의 가입 상태를 확인해 주세요.',
+          error: '이 커뮤니티의 가입 상태를 확인해 주시기 바랍니다.',
           code: workspace?.reason ?? 'COMMUNITY_NOT_FOUND',
         });
         return;

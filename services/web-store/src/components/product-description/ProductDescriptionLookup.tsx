@@ -20,8 +20,8 @@ export function ProductDescriptionLookup() {
       setItems(result.items);
       if (result.state === 'matched') setSelected(result.items[0]);
       if (!result.items.length) setMessage('등록된 설명을 찾지 못했습니다. 새 상품이나 빈 설명은 저장하지 않습니다.');
-      else if (result.state !== 'matched') setMessage('상품명·제조사·바코드를 확인하고 설명을 볼 상품을 선택하세요.');
-    } catch { if (request.current === key && scope.isCurrent()) setMessage('조회하지 못했습니다. 바코드 숫자·검증번호 또는 상품명을 확인해 주세요.'); }
+      else if (result.state !== 'matched') setMessage('상품명·제조사·바코드를 확인하고 설명을 볼 상품을 선택하시기 바랍니다.');
+    } catch { if (request.current === key && scope.isCurrent()) setMessage('조회하지 못했습니다. 바코드 숫자·검증번호 또는 상품명을 확인해 주시기 바랍니다.'); }
     finally { if (request.current === key) setBusy(false); }
   };
   return <section className="mt-5 rounded-xl border border-slate-200 bg-white p-4 space-y-3" aria-label="상담용 상품 설명 조회">

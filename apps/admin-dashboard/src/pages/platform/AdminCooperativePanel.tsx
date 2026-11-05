@@ -50,7 +50,7 @@ export default function AdminCooperativePanel() {
       );
       setData(parseCooperativeFederation(response.data));
     } catch {
-      setError("연합회 현황을 불러오지 못했습니다. 다시 시도해 주세요.");
+      setError("연합회 현황을 불러오지 못했습니다. 다시 시도해 주시기 바랍니다.");
     } finally {
       setLoading(false);
     }

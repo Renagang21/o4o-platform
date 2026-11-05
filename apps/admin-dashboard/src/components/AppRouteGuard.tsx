@@ -58,7 +58,7 @@ export const AppRouteGuard: React.FC<AppRouteGuardProps> = ({
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center px-4">
           <p className="text-lg font-semibold text-gray-800 mb-1">앱 상태를 확인할 수 없습니다</p>
-          <p className="text-gray-600">잠시 후 다시 시도해 주세요.</p>
+          <p className="text-gray-600">잠시 후 다시 시도해 주시기 바랍니다.</p>
         </div>
       </div>
     );

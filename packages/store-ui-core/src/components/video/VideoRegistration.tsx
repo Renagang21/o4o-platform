@@ -48,20 +48,20 @@ function RegistrationSession({ contextKey, mediaApi, ask, save, onSaved, request
     return () => clearInterval(timer);
   }, [busy]);
   const run = useCallback(async (request: string, useAi = true) => {
-    if (lock.current) throw new Error('등록 중입니다. 결과를 기다려 주세요.');
+    if (lock.current) throw new Error('등록 중입니다. 결과를 기다려 주시기 바랍니다.');
     const enteredUrl = url.trim() || request.match(/https?:\/\/[^\s<>]+/)?.[0]?.replace(/[),.]+$/, '') || '';
     const video = hostedVideo(enteredUrl);
-    if (!asset && !video) throw new Error('업로드·처리가 끝난 개별 영상 주소를 넣거나 O4O 보관 영상을 선택해 주세요.');
+    if (!asset && !video) throw new Error('업로드·처리가 끝난 개별 영상 주소를 넣거나 O4O 보관 영상을 선택해 주시기 바랍니다.');
     const key = JSON.stringify([asset?.id, video?.id, video?.provider, request, name, useAi, destination]);
     lock.current = true; setError(''); setSavedName(''); setQueued(false);
     try {
-      if(asset&&youtube&&destination==='youtube'&&!(await youtube.list()).availability.ready)throw new Error('지금은 YouTube 자동 등록을 이용할 수 없습니다. O4O 보관 등록을 선택하거나 운영자에게 확인해 주세요.');
+      if(asset&&youtube&&destination==='youtube'&&!(await youtube.list()).availability.ready)throw new Error('지금은 YouTube 자동 등록을 이용할 수 없습니다. O4O 보관 등록을 선택하거나 운영자에게 확인해 주시기 바랍니다.');
       if(!live.current)throw new Error('작업 화면이 변경됐습니다.');
       let payload = prepared.current?.key === key ? prepared.current.payload : null;
       if (!payload) {
         setStage('preparing');
         const fields = useAi ? draftFields(await ask(
-          '동영상 등록 정보만 JSON으로 준비해 주세요. 제공한 요청·파일명에 없는 약효·내용을 추측하지 마세요. URL·권한·게시 작업은 하지 마세요. '
+          '동영상 등록 정보만 JSON으로 준비해 주시기 바랍니다. 제공한 요청·파일명에 없는 약효·내용을 추측하지 마시기 바랍니다. URL·권한·게시 작업은 하지 마시기 바랍니다. '
           + '형식: {"name":"255자 이내 제목","description":"2000자 이내 설명","tags":["50자 이내 분류"]}. 자료: '
           + JSON.stringify({ request: request.slice(0,1000), fileName: asset?.originalName.slice(0,200), title: name }),
         )) : { name: name.trim() || asset?.originalName || '등록 영상', description: request, tags: ['디지털사이니지'] };
@@ -72,14 +72,14 @@ function RegistrationSession({ contextKey, mediaApi, ask, save, onSaved, request
       const toYoutube=!!asset&&!!youtube&&destination==='youtube';
       setStage(toYoutube?'queueing':'saving');
       const result = toYoutube ? await youtube!.enqueue(payload) : await save(payload);
-      if (!result.id || !result.name) throw new Error('등록 결과를 확인하지 못했습니다. 같은 요청으로 다시 확인해 주세요.');
-      if (!live.current) return '등록 결과는 영상 목록에서 확인해 주세요.';
+      if (!result.id || !result.name) throw new Error('등록 결과를 확인하지 못했습니다. 같은 요청으로 다시 확인해 주시기 바랍니다.');
+      if (!live.current) return '등록 결과는 영상 목록에서 확인해 주시기 바랍니다.';
       setSavedName(result.name); setStage('saved');
       if(toYoutube&&(!('state' in result)||result.state!=='completed')){setQueued(true);setRevision(value=>value+1);return `“${result.name}” YouTube 등록 요청을 접수했습니다. 순서대로 처리한 뒤 실제 등록이 끝나면 알림을 보냅니다.`;}
       onSaved();
-      return `“${result.name}” 영상을 목록에 등록했습니다. 매장 재생 화면 적용은 목록에서 진행해 주세요.`;
+      return `“${result.name}” 영상을 목록에 등록했습니다. 매장 재생 화면 적용은 목록에서 진행해 주시기 바랍니다.`;
     } catch (cause) {
-      const message = cause instanceof Error ? cause.message : '등록을 확인하지 못했습니다. 같은 요청으로 다시 시도해 주세요.';
+      const message = cause instanceof Error ? cause.message : '등록을 확인하지 못했습니다. 같은 요청으로 다시 시도해 주시기 바랍니다.';
       if (live.current) { setError(message); setStage('idle'); }
       throw cause;
     } finally { lock.current = false; }
@@ -87,12 +87,12 @@ function RegistrationSession({ contextKey, mediaApi, ask, save, onSaved, request
   const submit = async (useAi: boolean) => { try { await run(question, useAi); } catch (cause) { if (live.current) setError(cause instanceof Error ? cause.message : '등록하지 못했습니다.'); } };
   return <section aria-label="AI 동영상 등록" className="space-y-3 rounded-xl border border-slate-300 bg-white p-4">
     <h3 className="font-semibold text-slate-900">AI 동영상 등록</h3>
-    <p className="text-sm text-slate-600">주소나 보관 영상을 선택하고 요청하세요. 등록 정보 준비부터 목록 저장까지 이어서 진행합니다.</p>
+    <p className="text-sm text-slate-600">주소나 보관 영상을 선택하고 요청하시기 바랍니다. 등록 정보 준비부터 목록 저장까지 이어서 진행합니다.</p>
     <div className="flex flex-wrap gap-2">
       <a href={`${O4O_VIDEO_STUDIO}/videos/upload`} target="_blank" rel="noopener noreferrer" className="min-h-11 content-center rounded-lg border border-slate-300 px-3 text-sm">YouTube에 직접 올리기 ↗</a>
       <button type="button" disabled={busy} onClick={() => setPicker(true)} className="min-h-11 rounded-lg border border-slate-300 px-3 text-sm">O4O 영상 보관·선택</button>
     </div>
-    <p className="text-sm text-slate-600">YouTube 업로드와 영상 처리에는 수 분 이상 걸릴 수 있습니다. 열린 YouTube 화면에서 완료를 확인한 뒤 개별 영상 주소를 넣어 주세요. 창을 연 것만으로 업로드되지 않으며, O4O는 YouTube 처리 진행률을 알 수 없습니다.</p>
+    <p className="text-sm text-slate-600">YouTube 업로드와 영상 처리에는 수 분 이상 걸릴 수 있습니다. 열린 YouTube 화면에서 완료를 확인한 뒤 개별 영상 주소를 넣어 주시기 바랍니다. 창을 연 것만으로 업로드되지 않으며, O4O는 YouTube 처리 진행률을 알 수 없습니다.</p>
     <p className="text-sm text-slate-600">O4O에 보관한 영상은 서비스에서 함께 이용합니다. 파일 보관과 아래 영상 목록 등록은 진행 상태로 구분해 안내합니다.</p>
     {asset ? <div className="flex flex-wrap items-center gap-2 text-sm"><span>보관 영상 선택: {asset.originalName}</span><button type="button" disabled={busy} onClick={() => { setAsset(null); prepared.current = null; }} className="min-h-11 underline">선택 해제</button></div>
       : <label className="block text-sm" htmlFor={`${id}-url`}>개별 영상 주소<input id={`${id}-url`} type="url" value={url} disabled={busy} onChange={e => { setUrl(e.target.value); setStage('idle'); }} placeholder="https://www.youtube.com/watch?v=..." className="mt-1 min-h-11 w-full rounded-lg border-2 border-slate-500 px-3" /></label>}
@@ -100,7 +100,7 @@ function RegistrationSession({ contextKey, mediaApi, ask, save, onSaved, request
     {asset&&youtube&&destination==='youtube'&&<p className="text-sm text-slate-600">선택한 파일을 지정 YouTube 채널에 공개 업로드합니다. 요청 접수와 실제 등록 완료를 구분해 안내합니다.</p>}
     {requestSlot ? requestSlot({ run, label: asset&&youtube&&destination==='youtube'?'YouTube 등록 요청 · 처리 완료 시 알림':'영상 등록 요청 · 입력 후 전송하면 목록에 저장합니다' }) : <form onSubmit={e => { e.preventDefault(); void submit(true); }}><AiRequestInput value={question} onChange={e => setQuestion(e.target.value)} placeholder="이 영상을 매장 안내 영상으로 등록해 줘" busy={busy} submitDisabled={busy || !question.trim()} submitLabel="AI로 등록" maxLength={2000} /></form>}
     <details><summary className="min-h-11 cursor-pointer content-center text-sm">직접 등록</summary><label className="block text-sm" htmlFor={`${id}-name`}>등록 영상 이름<input id={`${id}-name`} value={name} maxLength={255} disabled={busy} onChange={e => setName(e.target.value)} className="mt-1 min-h-11 w-full rounded-lg border-2 border-slate-500 px-3" /></label><button type="button" disabled={busy || (!name.trim() && !asset)} onClick={() => void submit(false)} className="mt-2 min-h-11 rounded-lg border border-slate-300 px-3">AI 없이 등록</button></details>
-    {busy && <output className="block text-sm text-blue-800"><progress aria-label="영상 등록 진행 중" className="w-full" />{stage === 'preparing' ? '등록 정보를 준비하고 있어요.' : stage==='queueing'?'YouTube 등록 요청을 접수하고 있어요.':'영상 목록에 저장하고 있어요.'} {seconds}초 경과 · 완료될 때까지 기다려 주세요.</output>}
+    {busy && <output className="block text-sm text-blue-800"><progress aria-label="영상 등록 진행 중" className="w-full" />{stage === 'preparing' ? '등록 정보를 준비하고 있습니다.' : stage==='queueing'?'YouTube 등록 요청을 접수하고 있습니다.':'영상 목록에 저장하고 있습니다.'} {seconds}초 경과 · 완료될 때까지 기다려 주시기 바랍니다.</output>}
     {error && <p role="alert" className="text-sm text-red-700">{error} 입력과 준비한 정보는 유지됩니다.</p>}
     {savedName && <output className="block text-sm text-emerald-800">“{savedName}” {queued?'YouTube 등록 요청 접수 · 완료되면 알림으로 알려드립니다':'목록 등록 완료'}</output>}
     {youtube&&<YoutubeUploadRequests api={youtube} revision={revision} onCompleted={onSaved}/>}

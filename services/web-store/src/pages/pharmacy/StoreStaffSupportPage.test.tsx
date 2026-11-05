@@ -88,7 +88,7 @@ it("allows the owner to save a short location and preserves failed demand input 
   await screen.findByText("위치를 저장했습니다.");
   fireEvent.click(screen.getByRole("button", { name: "상품 위치를 못 찾음" }));
   await screen.findByText(
-    "저장하지 못했습니다. 이용 자격과 연결 상태를 확인하고 다시 시도해 주세요.",
+    "저장하지 못했습니다. 이용 자격과 연결 상태를 확인하고 다시 시도해 주시기 바랍니다.",
   );
   fireEvent.click(screen.getByRole("button", { name: "상품 위치를 못 찾음" }));
   await screen.findByText("기록했습니다.");

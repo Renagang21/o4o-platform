@@ -6,5 +6,5 @@ export const PROFESSIONAL_FIELDS: Array<[keyof ProfessionalInfo, string]> = [
 export function ProfessionalInfoSummary({ value }: { value?: ProfessionalInfo }) {
   if (!value || !PROFESSIONAL_FIELDS.some(([key]) => typeof value[key] === 'string' && value[key])) return null;
   return <section className="panel"><h2>이 강의의 학습 안내</h2><dl>{PROFESSIONAL_FIELDS.map(([key, label]) => typeof value[key] === 'string' && value[key] ? <div key={key}><dt><strong>{label}</strong></dt><dd style={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}>{value[key]}</dd></div> : null)}</dl>
-    <p className="muted">공인 자격·법정 보수교육 이수 여부는 해당 기관의 별도 인정 기준을 확인하세요.</p></section>;
+    <p className="muted">공인 자격·법정 보수교육 이수 여부는 해당 기관의 별도 인정 기준을 확인하시기 바랍니다.</p></section>;
 }

@@ -161,7 +161,7 @@ function WorkspaceContents({ area }: WorkspaceProps) {
       {navigation}
       <p role="status" className="text-sm text-slate-600">
         {groups.length
-          ? "전체 업무에서 이용할 작업을 선택하세요."
+          ? "전체 업무에서 이용할 작업을 선택하시기 바랍니다."
           : "현재 이용할 수 있는 업무가 없습니다."}
       </p>
     </div>

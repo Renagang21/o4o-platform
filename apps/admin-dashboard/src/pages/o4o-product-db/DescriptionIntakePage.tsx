@@ -20,14 +20,14 @@ export default function DescriptionIntakePage() {
   useEffect(() => { void list(); return () => { listGeneration.current++; }; }, [page, status]);
   useEffect(() => () => { generation.current++; }, []);
   const show = (d: IntakeDetail) => { setDetail(d); setBody(d.entry.content); setSelected([]); setArchived(false); setNote(''); };
-  const run = async (task: () => Promise<void>) => { setBusy(true); setMessage(''); try { await task(); } catch { setMessage('처리하지 못했습니다. 최신 자료를 다시 열어 입력·선택·변경 여부를 확인하세요.'); } finally { setBusy(false); } };
+  const run = async (task: () => Promise<void>) => { setBusy(true); setMessage(''); try { await task(); } catch { setMessage('처리하지 못했습니다. 최신 자료를 다시 열어 입력·선택·변경 여부를 확인하시기 바랍니다.'); } finally { setBusy(false); } };
   const open = (id: string) => { const key = ++generation.current; void run(async () => { const d = await api.detail(id); if (generation.current === key) show(d); }); };
   const loadFile = (file: File | undefined) => { if (!file) { return; }
     void run(async () => {
     setEntries([]); setPreview([]); setProgress('');
     if (file.size > 40 * 1024 * 1024) throw new Error('File too large');
     const result = readPublicDescriptionCatalog(JSON.parse(await file.text()), purpose, language);
-    setEntries(result.entries); setMessage(`${result.entries.length}개 설명 준비 · 본문 없는 ${result.excludedEmpty}개 제외. 아래에서 기존 상품과 비교한 후 검토 대기로 등록하세요.`);
+    setEntries(result.entries); setMessage(`${result.entries.length}개 설명 준비 · 본문 없는 ${result.excludedEmpty}개 제외. 아래에서 기존 상품과 비교한 후 검토 대기로 등록하시기 바랍니다.`);
   }); };
   const compare = () => void run(async () => {
     const result: typeof preview = [];
@@ -75,14 +75,14 @@ export default function DescriptionIntakePage() {
           {detail.entry.source.currentness === 'archived' && <label className="block bg-amber-50 p-3"><input type="checkbox" checked={archived} disabled={busy || !mutable} onChange={e => setArchived(e.target.checked)} /> 현행성이 재확인되지 않은 보관자료임을 확인했습니다.</label>}
           {detail.authorContext && <div className="rounded border p-3 whitespace-pre-wrap"><h4>작성자가 입력한 근거 (별도 검토 필요)</h4><p>상품 사실: {detail.authorContext.facts}</p><p>출처: {detail.authorContext.factSource}</p><p>전문 참고: {detail.authorContext.reference}</p><p>출처: {detail.authorContext.referenceSource}</p></div>}
           {!!detail.entry.aiSections?.length && <details className="rounded border p-3"><summary>AI 구조화 항목·근거 ({detail.entry.aiSections.length})</summary>
-            <p className="text-sm">자유 HTML 본문을 수정하면 이전 구조화 항목은 해제됩니다. 항목을 보완하려면 수정한 원천 JSON을 다시 접수하세요.</p>
+            <p className="text-sm">자유 HTML 본문을 수정하면 이전 구조화 항목은 해제됩니다. 항목을 보완하려면 수정한 원천 JSON을 다시 접수하시기 바랍니다.</p>
             {detail.entry.aiSections.map(section => <section key={section.key} className="my-2 whitespace-pre-wrap break-words"><h4>{section.kind} · {section.title}</h4><p>{section.text}</p>{section.referenceUrls.map(url => <p key={url}>{url}</p>)}</section>)}
           </details>}
           <label className="block">검토 본문 (HTML)<textarea aria-label="검토 본문" className={`${box} h-48 font-mono text-sm`} value={body} disabled={!mutable || busy} onChange={e => setBody(e.target.value)} /></label>
           <button className={button} disabled={!mutable || busy || body === detail.entry.content} onClick={() => void run(async () => show(await api.edit(detail.id, detail.revision, body)))}>수정 본문 저장</button>
           <Html html={body} />
           <h4 className="font-semibold">반영할 기존 상품을 직접 선택</h4>
-          {!detail.targets.length && <p>연결할 기존 상품이 없습니다. <Link className="text-blue-700" to="/admin/o4o-product-db/masters">기본 상품을 확인</Link>한 뒤 이 설명을 다시 여세요. 자동으로 상품을 만들지 않습니다.</p>}
+          {!detail.targets.length && <p>연결할 기존 상품이 없습니다. <Link className="text-blue-700" to="/admin/o4o-product-db/masters">기본 상품을 확인</Link>한 뒤 이 설명을 다시 여시기 바랍니다. 자동으로 상품을 만들지 않습니다.</p>}
           {detail.targets.map(target => <div key={target.id} className="rounded border p-3 space-y-2"><label><input type="checkbox" checked={selected.includes(target.id)} disabled={!mutable || busy} onChange={e => setSelected(ids => e.target.checked ? [...ids, target.id] : ids.filter(id => id !== target.id))} /> {target.name} · {target.manufacturer} · {target.barcode} · 연결 근거 {target.matchedBy}</label><p>현재 공통 설명</p>{target.canonical ? <Html html={target.canonical.content} /> : <p>이 목적·언어의 설명 없음</p>}</div>)}
           <p className="text-sm">승인하면 선택한 상품의 같은 목적·언어 설명을 교체합니다. 다른 목적·언어 설명은 유지합니다.</p>
           <button className={button} disabled={!mutable || busy || !selected.length || body !== detail.entry.content || (detail.entry.source.currentness === 'archived' && !archived)} onClick={() => void run(async () => { show(await api.approve(detail, detail.targets.filter(t => selected.includes(t.id)), archived)); setMessage('선택한 상품에 설명을 반영했습니다.'); await list(); })}>선택 상품에 승인·반영 ({selected.length})</button>

@@ -342,7 +342,7 @@ export const AuthProvider: FC<AuthProviderProps> = ({
     sessionGeneration.current += 1;
     setIsLoading(false);
     void Promise.resolve(authClient.logout()).catch(() => {
-      onAuthError?.('서버 세션 종료에 실패했습니다. 다시 로그인한 뒤 로그아웃을 시도해 주세요.');
+      onAuthError?.('서버 세션 종료에 실패했습니다. 다시 로그인한 뒤 로그아웃을 시도해 주시기 바랍니다.');
     });
     setUser(null);
     setError(null);

@@ -50,7 +50,7 @@ const SERVICE_ENTRY_TARGETS: Readonly<Record<string, ServiceEntryTarget>> = Obje
     publicPaths: ['/', '/community'],
     publicPathPrefixes: [],
     browsePath: '/community',
-    publicDescription: '파트너 공개 화면에서 이용 안내를 확인할 수 있습니다. 서비스 이용 문의는 문의하기로 남겨 주세요.',
+    publicDescription: '파트너 공개 화면에서 이용 안내를 확인할 수 있습니다. 서비스 이용 문의는 문의하기로 남겨 주시기 바랍니다.',
     browseLabel: '파트너 둘러보기',
   },
 });

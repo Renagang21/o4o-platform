@@ -11,7 +11,7 @@ export function normalizedConsultationLanguage(language: string): string | null 
 }
 export type ConsultationCloudAccess = { actorId: string; authorize: () => Promise<boolean> };
 async function authorize(access: ConsultationCloudAccess) {
-  if (!await access.authorize()) throw new NeturePharmacyError(403, 'STORE_ACCESS_REQUIRED', '현재 상담 권한을 확인해 주세요.');
+  if (!await access.authorize()) throw new NeturePharmacyError(403, 'STORE_ACCESS_REQUIRED', '현재 상담 권한을 확인해 주시기 바랍니다.');
 }
 export type GoogleConsultationRequest = <T>(host: 'translate' | 'speech' | 'tts', path: string, data: unknown) => Promise<T>;
 function googleRequest(): GoogleConsultationRequest {
@@ -33,7 +33,7 @@ export function readConsultationWav(base64: unknown) {
     throw new NeturePharmacyError(400, 'INVALID_CONSULTATION_AUDIO', '최대 60초의 16kHz 단일 채널 WAV 음성만 사용할 수 있습니다.');
   const buffer = Buffer.from(base64, 'base64');
   if (buffer.length < 44 || buffer.toString('ascii', 0, 4) !== 'RIFF' || buffer.toString('ascii', 8, 12) !== 'WAVE' || buffer.readUInt32LE(4) + 8 !== buffer.length)
-    throw new NeturePharmacyError(400, 'INVALID_CONSULTATION_AUDIO', '음성 형식을 확인해 주세요.');
+    throw new NeturePharmacyError(400, 'INVALID_CONSULTATION_AUDIO', '음성 형식을 확인해 주시기 바랍니다.');
   let format = false, bytes = 0;
   for (let offset = 12; offset + 8 <= buffer.length;) {
     const size = buffer.readUInt32LE(offset + 4), start = offset + 8;
@@ -44,7 +44,7 @@ export function readConsultationWav(base64: unknown) {
     offset = start + size + (size % 2);
   }
   const seconds = bytes / 32000;
-  if (!format || seconds < 0.2 || seconds > 60 || bytes % 2) throw new NeturePharmacyError(400, 'INVALID_CONSULTATION_AUDIO', '음성 길이와 형식을 확인해 주세요.');
+  if (!format || seconds < 0.2 || seconds > 60 || bytes % 2) throw new NeturePharmacyError(400, 'INVALID_CONSULTATION_AUDIO', '음성 길이와 형식을 확인해 주시기 바랍니다.');
   return { content: base64, seconds, units: Math.ceil(seconds) };
 }
 
@@ -62,7 +62,7 @@ export class ConsultationGoogleService {
       });
       const item = response.translations?.[0];
       const detected = input.source === 'auto' ? normalizedConsultationLanguage(item?.detectedLanguageCode ?? '') : null;
-      if (!item?.translatedText || (input.source === 'auto' && !detected)) throw new NeturePharmacyError(422, 'CONSULTATION_LANGUAGE_UNCERTAIN', '입력 언어를 확인하지 못했습니다. 언어를 직접 선택하고 다시 시도해 주세요.');
+      if (!item?.translatedText || (input.source === 'auto' && !detected)) throw new NeturePharmacyError(422, 'CONSULTATION_LANGUAGE_UNCERTAIN', '입력 언어를 확인하지 못했습니다. 언어를 직접 선택하고 다시 시도해 주시기 바랍니다.');
       await authorize(access);
       return { value: { translation: item.translatedText, ...(detected ? { detectedLanguage: detected } : {}) }, usage: { units: [...input.text].length } };
     });
@@ -70,7 +70,7 @@ export class ConsultationGoogleService {
   async recognize(audio: unknown, languages: string[], access: ConsultationCloudAccess) {
     const wav = readConsultationWav(audio);
     if (!languages.length || languages.length > 3 || languages.some(language => !speechLocales[language]))
-      throw new NeturePharmacyError(400, 'INVALID_CONSULTATION_SPEECH', '지원하는 음성 후보 언어를 최대 3개 선택해 주세요.');
+      throw new NeturePharmacyError(400, 'INVALID_CONSULTATION_SPEECH', '지원하는 음성 후보 언어를 최대 3개 선택해 주시기 바랍니다.');
     await authorize(access);
     return this.account.invokeNative({ kind: 'stt', provider: 'google-cloud', model: 'stt-short', units: wav.units, unit: 'second', maxOutputTokens: 0 },
       { scope: 'CONTENT_TRANSLATION', userId: access.actorId }, async () => {
@@ -85,13 +85,13 @@ export class ConsultationGoogleService {
           return (typeof confidence === 'number' && (!Number.isFinite(confidence) || confidence < 0.5)) ||
             (result.languageCode && normalizedConsultationLanguage(result.languageCode) !== language);
         });
-        if (!text || text.length > 1000 || !language || !languages.includes(language) || uncertain) throw new NeturePharmacyError(422, 'CONSULTATION_LANGUAGE_UNCERTAIN', '입력 언어를 확인하지 못했습니다. 언어를 직접 선택하고 다시 시도해 주세요.');
+        if (!text || text.length > 1000 || !language || !languages.includes(language) || uncertain) throw new NeturePharmacyError(422, 'CONSULTATION_LANGUAGE_UNCERTAIN', '입력 언어를 확인하지 못했습니다. 언어를 직접 선택하고 다시 시도해 주시기 바랍니다.');
         await authorize(access);
         return { value: { text, language }, usage: { units: wav.units } };
       });
   }
   async synthesize(text: string, language: string, access: ConsultationCloudAccess) {
-    if (!text.trim() || text.length > 4000 || !speechLocales[language]) throw new NeturePharmacyError(400, 'INVALID_CONSULTATION_SPEECH', '읽을 문장과 언어를 확인해 주세요.');
+    if (!text.trim() || text.length > 4000 || !speechLocales[language]) throw new NeturePharmacyError(400, 'INVALID_CONSULTATION_SPEECH', '읽을 문장과 언어를 확인해 주시기 바랍니다.');
     const locale = language === 'zh' ? 'cmn-CN' : speechLocales[language];
     await authorize(access);
     return this.account.invokeNative({ kind: 'tts', provider: 'google-cloud', model: 'tts-standard', units: [...text].length, unit: 'character', maxOutputTokens: 0 },

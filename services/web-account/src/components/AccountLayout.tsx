@@ -37,7 +37,7 @@ export default function AccountLayout() {
             서비스 계정을 관리하고 서비스를 이동합니다.
           </p>
           <p className="text-sm text-gray-600 mb-6">
-            로그인 세션이 없습니다. O4O 대표 진입점에서 Google 계정으로 로그인한 뒤 다시 들어와 주세요.
+            로그인 세션이 없습니다. O4O 대표 진입점에서 Google 계정으로 로그인한 뒤 다시 들어와 주시기 바랍니다.
           </p>
           <a
             href={CANONICAL_ENTRY_URL}

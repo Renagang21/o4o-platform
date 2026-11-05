@@ -190,7 +190,7 @@ export const CornerAiButton: React.FC<CornerAiButtonProps> = ({
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 aria-label="AI 상담 요청"
-                placeholder="예: 이 제품의 특징이 뭐예요? / 추천 상품 알려주세요"
+                placeholder="예: 이 제품의 특징이 뭐입니다? / 추천 상품 알려주시기 바랍니다"
                 submitLabel={isProcessing ? '처리 중...' : '질문하기'}
                 busy={isProcessing}
                 disabled={isButtonDisabled}
@@ -198,7 +198,7 @@ export const CornerAiButton: React.FC<CornerAiButtonProps> = ({
                 autoFocus
               />
               <p className="mt-2 text-sm text-gray-500">
-                Enter를 눌러 전송하거나 아래 버튼을 클릭하세요
+                Enter를 눌러 전송하거나 아래 버튼을 클릭하시기 바랍니다
               </p>
             </div>
 

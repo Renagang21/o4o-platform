@@ -13,7 +13,7 @@ export async function connectDefaultPharmacyMembership(
     "SELECT id,status FROM semi_franchises WHERE key='pharmacy' FOR SHARE",
   );
   if (!business || business.status !== 'active')
-    throw new NeturePharmacyError(409, 'DEFAULT_PHARMACY_UNAVAILABLE', 'Pharmacy 회원 연결을 준비하고 있습니다. 운영자에게 문의해 주세요.');
+    throw new NeturePharmacyError(409, 'DEFAULT_PHARMACY_UNAVAILABLE', 'Pharmacy 회원 연결을 준비하고 있습니다. 운영자에게 문의해 주시기 바랍니다.');
 
   // The unique key also serializes older clients using the independent apply path.
   const [created] = await manager.query(

@@ -100,7 +100,7 @@ function PlayerSelectionSession({ isCurrent }: Readonly<{ isCurrent: () => boole
               </button>
             </div>
             <p className="text-xs text-teal-500 mt-2">
-              실제 TV 재생 완료를 뜻하지 않습니다. 변경 후 재생 화면을 다시 열고 기기에서 확인하세요.
+              실제 TV 재생 완료를 뜻하지 않습니다. 변경 후 재생 화면을 다시 열고 기기에서 확인하시기 바랍니다.
             </p>
             {activeContent.schedule.storePlaylistId && <Link to={`${base}/marketing/signage/playlist`} state={{ signagePlaylistId: activeContent.schedule.storePlaylistId }} className="inline-flex min-h-11 items-center text-sm text-teal-800 underline">현재 안내 수정</Link>}
           </div>

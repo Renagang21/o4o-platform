@@ -21,12 +21,12 @@ export class PharmacyServicePolicyService {
       if (!value || typeof value !== 'object' || !Array.isArray(value.features)) throw new Error('Invalid policy');
       return readServiceFeatures(value.features);
     } catch {
-      throw new NeturePharmacyError(503, 'FEATURE_ACCESS_UNAVAILABLE', '서비스 제공 설정을 확인하지 못했습니다. 다시 시도해 주세요.');
+      throw new NeturePharmacyError(503, 'FEATURE_ACCESS_UNAVAILABLE', '서비스 제공 설정을 확인하지 못했습니다. 다시 시도해 주시기 바랍니다.');
     }
   }
 
   async set(target: string, features: unknown, actorId: string) {
-    if (target !== 'default' && target !== 'paid') throw new NeturePharmacyError(400, 'INVALID_POLICY_TARGET', '설정 대상을 확인해 주세요.');
+    if (target !== 'default' && target !== 'paid') throw new NeturePharmacyError(400, 'INVALID_POLICY_TARGET', '설정 대상을 확인해 주시기 바랍니다.');
     const selected = validateServiceFeatures(features);
     await this.db.query(`INSERT INTO settings(key,value,type,description)
       VALUES ($1,$2::jsonb,'pharmacy-service-features','약국 서비스 제공 기능')

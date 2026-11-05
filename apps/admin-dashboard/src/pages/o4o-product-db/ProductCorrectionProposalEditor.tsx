@@ -130,7 +130,7 @@ export default function ProductCorrectionProposalEditor({
       if (active.current) {
         remember(result);
         setNotice(
-          '변경안을 저장했습니다. 아래에서 실제 저장된 내용을 검토하세요. 아직 원본에 반영되지 않았습니다.',
+          '변경안을 저장했습니다. 아래에서 실제 저장된 내용을 검토하시기 바랍니다. 아직 원본에 반영되지 않았습니다.',
         );
       }
     });
@@ -149,7 +149,7 @@ export default function ProductCorrectionProposalEditor({
       {error && (
         <p role="alert">
           {error} 입력은 유지됩니다. 원본 충돌 시 최신 원본을 불러와 다시 비교하고 새 변경안을
-          저장하세요.
+          저장하시기 바랍니다.
         </p>
       )}
       {notice && <p role="status">{notice}</p>}
@@ -210,7 +210,7 @@ export default function ProductCorrectionProposalEditor({
           <h6 className="font-semibold">구조화 근거</h6>
           <p className="text-sm">
             기본정보 승인에는 확인된 상품 사실 근거가 필요합니다. 일반 전문자료를 제품 고유 사실로
-            간주하지 마세요.
+            간주하지 마시기 바랍니다.
           </p>
           {evidence.map((item, index) => {
             const update = (patch: Partial<ProductCorrectionEvidence>) =>
@@ -339,7 +339,7 @@ export default function ProductCorrectionProposalEditor({
               if (item) showProposal(item);
             }}
           >
-            <option value="">선택하세요</option>
+            <option value="">선택하시기 바랍니다</option>
             {history.map((p) => (
               <option key={p.id} value={p.id}>
                 {new Date(p.createdAt).toLocaleString()} · v{p.revision} ·{' '}
@@ -366,7 +366,7 @@ export default function ProductCorrectionProposalEditor({
                 if (latest.id !== proposal.id || latest.batchId !== batchId || latest.taskId !== taskId)
                   throw new Error('요청한 작업의 변경안이 아닙니다.');
                 remember(latest);
-                setNotice('현재 변경안의 최신 저장본을 열었습니다. 저장된 판정을 확인하세요.');
+                setNotice('현재 변경안의 최신 저장본을 열었습니다. 저장된 판정을 확인하시기 바랍니다.');
               })
             }
           >
@@ -450,7 +450,7 @@ export default function ProductCorrectionProposalEditor({
           {proposal.reviewedAt && !proposal.appliedAt && (
             <div className="space-y-2 rounded border p-2">
               <p>
-                저장된 승인 항목 중 실제 반영할 항목을 선택하세요. 한 번 반영하면 이 변경안은
+                저장된 승인 항목 중 실제 반영할 항목을 선택하시기 바랍니다. 한 번 반영하면 이 변경안은
                 종료되며 나머지 항목은 새 변경안으로 처리합니다.
               </p>
               {proposal.changes
@@ -498,7 +498,7 @@ export default function ProductCorrectionProposalEditor({
                       remember(result);
                       setContext(null);
                       setNotice(
-                        '선택 항목을 반영했습니다. 다른 변경은 최신 원본을 다시 불러와 작성하세요.',
+                        '선택 항목을 반영했습니다. 다른 변경은 최신 원본을 다시 불러와 작성하시기 바랍니다.',
                       );
                     }
                   })

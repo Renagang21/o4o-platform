@@ -390,7 +390,7 @@ export function LmsHubTemplate({ config }: { config: LmsHubConfig }) {
         ) : loadError ? (
           <div style={styles.errorState}>
             <p style={styles.errorTitle}>강의 목록을 불러오지 못했습니다</p>
-            <p style={styles.errorDesc}>잠시 후 다시 시도해 주세요.</p>
+            <p style={styles.errorDesc}>잠시 후 다시 시도해 주시기 바랍니다.</p>
             <button type="button" onClick={() => void loadCourses()} style={{ ...styles.retryBtn, color: accent, borderColor: accent }}>
               다시 시도
             </button>
@@ -419,7 +419,7 @@ export function LmsHubTemplate({ config }: { config: LmsHubConfig }) {
                     </p>
                     <p style={styles.emptyDesc}>
                       {currentSearch
-                        ? '검색어를 변경하거나 전체 목록을 확인해 보세요.'
+                        ? '검색어를 변경하거나 전체 목록을 확인해 보시기 바랍니다.'
                         : '강의가 등록되면 이곳에 표시됩니다.'}
                     </p>
                   </div>

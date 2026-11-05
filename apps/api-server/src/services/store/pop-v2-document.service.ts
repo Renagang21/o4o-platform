@@ -98,7 +98,7 @@ function assertValid(input: PopV2DocumentInput): void {
     throw new PopV2ValidationError('지원하지 않는 용지 규격입니다.', 'POP_LAYOUT_INVALID');
   }
   if (!input.templateId?.trim()) {
-    throw new PopV2ValidationError('템플릿을 선택해 주세요.', 'POP_TEMPLATE_REQUIRED');
+    throw new PopV2ValidationError('템플릿을 선택해 주시기 바랍니다.', 'POP_TEMPLATE_REQUIRED');
   }
 }
 

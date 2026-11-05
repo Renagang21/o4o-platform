@@ -20,18 +20,18 @@ const powershell = path.join(
 );
 const messages = {
   CLOSE_PC_PROGRAM_FIRST:
-    "진행 중 업무를 마친 뒤 열린 PC 연결 프로그램을 정상 종료하고 다시 실행해 주세요.",
+    "진행 중 업무를 마친 뒤 열린 PC 연결 프로그램을 정상 종료하고 다시 실행해 주시기 바랍니다.",
   PC_STATE_UNKNOWN:
-    "PC 실행 상태를 확인하지 못했습니다. 실행 중인 프로그램과 연결 권한을 확인해 주세요.",
+    "PC 실행 상태를 확인하지 못했습니다. 실행 중인 프로그램과 연결 권한을 확인해 주시기 바랍니다.",
   ANOTHER_INSTALL_RUNNING:
-    "다른 설치가 진행 중입니다. 끝난 뒤 다시 실행해 주세요.",
-  UNSAFE_INSTALL_LOCATION: "프로그램 설치 폴더와 데이터 폴더를 분리해 주세요.",
+    "다른 설치가 진행 중입니다. 끝난 뒤 다시 실행해 주시기 바랍니다.",
+  UNSAFE_INSTALL_LOCATION: "프로그램 설치 폴더와 데이터 폴더를 분리해 주시기 바랍니다.",
   UNRECOGNIZED_INSTALLATION:
     "기존 설치 위치를 안전하게 확인할 수 없습니다. 기존 파일을 보존한 채 설치를 중단했습니다.",
 };
 try {
   if (process.platform !== "win32")
-    throw new Error("Windows 10/11 x64에서 실행해 주세요.");
+    throw new Error("Windows 10/11 x64에서 실행해 주시기 바랍니다.");
   if (process.arch !== "x64")
     throw new Error("이 패키지는 Windows x64용입니다.");
   const targets = locations();
@@ -60,7 +60,7 @@ try {
           [
             "-NoProfile",
             "-Command",
-            "[void][Reflection.Assembly]::LoadWithPartialName('PresentationFramework'); $answer=[System.Windows.MessageBox]::Show('처음 설치하는 PC인가요? 기존에 사용하던 PC라면 아니요를 누르고 기존 데이터 위치를 확인해 주세요.','O4O PC 연결','YesNo','Question','No'); if ($answer -eq 'Yes') { 'yes' } else { 'no' }",
+            "[void][Reflection.Assembly]::LoadWithPartialName('PresentationFramework'); $answer=[System.Windows.MessageBox]::Show('처음 설치하는 PC입니까? 기존에 사용하던 PC라면 아니요를 누르고 기존 데이터 위치를 확인해 주시기 바랍니다.','O4O PC 연결','YesNo','Question','No'); if ($answer -eq 'Yes') { 'yes' } else { 'no' }",
           ],
           { encoding: "utf8", windowsHide: true },
         ).trim() === "yes";
@@ -73,7 +73,7 @@ try {
         allowNewData =
           (
             await prompt.question(
-              "처음 설치하는 PC입니까? 기존 PC를 업데이트하는 경우 N을 선택하세요. [Y/N] ",
+              "처음 설치하는 PC입니까? 기존 PC를 업데이트하는 경우 N을 선택하시기 바랍니다. [Y/N] ",
             )
           )
             .trim()
@@ -84,14 +84,14 @@ try {
     }
     if (!allowNewData) {
       console.log(
-        "기존 데이터 위치를 확인한 뒤 다시 실행해 주세요. 새 데이터는 만들지 않았습니다.",
+        "기존 데이터 위치를 확인한 뒤 다시 실행해 주시기 바랍니다. 새 데이터는 만들지 않았습니다.",
       );
       process.exitCode = 1;
     } else console.log("새 PC 설치를 진행합니다.");
   }
   if (process.exitCode) process.exit(process.exitCode);
   console.log(
-    "[3/4] 프로그램과 기존 데이터를 확인하고 설치합니다. 잠시 기다려 주세요.",
+    "[3/4] 프로그램과 기존 데이터를 확인하고 설치합니다. 잠시 기다려 주시기 바랍니다.",
   );
   const result = await installPackage({
     source: path.dirname(fileURLToPath(import.meta.url)),
@@ -111,7 +111,7 @@ try {
       [
         "-NoProfile",
         "-Command",
-        '$ErrorActionPreference="Stop"; $p=[Diagnostics.ProcessStartInfo]::new(); $p.FileName=$env:O4O_RUN_NODE; $p.Arguments=([char]34 + $env:O4O_RUN_ENTRY + [char]34); $p.WorkingDirectory=$env:O4O_RUN_CWD; $p.UseShellExecute=$true; $p.WindowStyle=[Diagnostics.ProcessWindowStyle]::Normal; [void][Diagnostics.Process]::Start($p)',
+        '$ErrorActionPreference="Stop"; $p=[Diagnostics.ProcessStartInfo]::new(); $p.FileName=$env:O4O_RUN_NODE; $p.Arguments=([char]34 + $env:O4O_RUN_ENTRY + [char]34); $p.WorkingDirectory=$env:O4O_RUN_CWD; $p.UseShellExecute=$true; $p.WindowStyle=[Diagnostics.ProcessWindowStyle]::Hidden; [void][Diagnostics.Process]::Start($p)',
       ],
       {
         windowsHide: true,
@@ -159,16 +159,16 @@ try {
     }
     if (!ready) throw new Error("PC_START_NOT_CONFIRMED");
     console.log(
-      "설치와 프로그램 실행을 확인했습니다. O4O 화면으로 돌아가 주세요. 새로 열린 PC 연결 창은 켜 두세요. 종료하려면 그 창에서 Ctrl+C를 누르세요.",
+      "설치와 프로그램 실행을 확인했습니다. O4O 화면으로 돌아가 주시기 바랍니다. PC 연결 창은 실행 상태를 표시합니다. 창을 닫으면 정상 종료를 요청합니다.",
     );
   } else {
     console.log(
       result.shortcut
-        ? "시작 메뉴의 O4O PC 연결을 실행해 주세요."
-        : "설치 폴더의 Start.cmd를 실행해 주세요.",
+        ? "시작 메뉴의 O4O PC 연결을 실행해 주시기 바랍니다."
+        : "설치 폴더의 Start.cmd를 실행해 주시기 바랍니다.",
     );
     console.log(
-      "Main의 이 PC 연결에서 다시 확인을 눌러 실제 버전과 데이터 준비 상태를 확인하세요. 실행 확인 전에는 업데이트 완료로 표시하지 않습니다.",
+      "Main의 이 PC 연결에서 다시 확인을 눌러 실제 버전과 데이터 준비 상태를 확인하시기 바랍니다. 실행 확인 전에는 업데이트 완료로 표시하지 않습니다.",
     );
   }
 } catch (error) {
@@ -181,9 +181,9 @@ try {
     );
   console.error(
     (installed
-      ? "설치는 끝났지만 실행하지 못했습니다. 시작 메뉴의 O4O PC 연결을 열어 주세요."
+      ? "설치는 끝났지만 실행하지 못했습니다. 시작 메뉴의 O4O PC 연결을 열어 주시기 바랍니다."
       : messages[error.message]) ||
-      "설치를 완료하지 못했습니다. 기존 데이터를 보존한 채 중단했습니다. 패키지를 다시 내려받아 확인해 주세요.",
+      "설치를 완료하지 못했습니다. 기존 데이터를 보존한 채 중단했습니다. 패키지를 다시 내려받아 확인해 주시기 바랍니다.",
   );
   process.exitCode = 1;
 }

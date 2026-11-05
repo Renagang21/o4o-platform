@@ -54,10 +54,10 @@ export function useSupplierSpotPolicies(product: SupplierProduct | null, open: b
 
   // WO-NETURE-PRODUCT-DRAWER-FORM-STANDARD-COMPLIANCE-V1: validation 분리
   const validateSpotForm = (): string | null => {
-    if (!spotForm.policyName.trim()) return '정책명을 입력하세요';
-    if (!spotForm.spotPrice) return '스팟 가격을 입력하세요';
-    if (!spotForm.startAt) return '시작일을 입력하세요';
-    if (!spotForm.endAt) return '종료일을 입력하세요';
+    if (!spotForm.policyName.trim()) return '정책명을 입력하시기 바랍니다';
+    if (!spotForm.spotPrice) return '스팟 가격을 입력하시기 바랍니다';
+    if (!spotForm.startAt) return '시작일을 입력하시기 바랍니다';
+    if (!spotForm.endAt) return '종료일을 입력하시기 바랍니다';
     return null;
   };
 

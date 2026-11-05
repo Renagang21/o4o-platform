@@ -117,7 +117,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         // NOT_STORE_MEMBER 등 — 서버 판정이 정본. 선택값을 버리고 다시 고르게 한다.
         clearSelectedOrganizationId();
         setSelectedId(null);
-        setError('선택한 매장에 대한 접근 권한이 확인되지 않습니다. 매장을 다시 선택해 주세요.');
+        setError('선택한 매장에 대한 접근 권한이 확인되지 않습니다. 매장을 다시 선택해 주시기 바랍니다.');
         setListState('error');
       })
       .catch(() => { if (!cancelled) { setListState('error'); setError('매장의 서비스 목록을 불러오지 못했습니다.'); } });

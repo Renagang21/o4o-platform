@@ -198,7 +198,7 @@ export function ForeignVisitorPartnersPage() {
           <div className="flex flex-col items-center gap-2 py-16 px-6 text-center">
             <Users className="w-7 h-7 text-slate-300" />
             <p className="text-sm font-medium text-slate-600">아직 등록된 파트너가 없습니다.</p>
-            <p className="text-xs text-slate-400">여행사, 가이드, 호텔 등 관광객 유입 파트너를 등록해 보세요.</p>
+            <p className="text-xs text-slate-400">여행사, 가이드, 호텔 등 관광객 유입 파트너를 등록해 보시기 바랍니다.</p>
           </div>
         )}
 
@@ -309,7 +309,7 @@ function PartnerFormModal({ initial, onClose, onSaved, onEntitlementDenied }: Mo
 
   const handleSave = async () => {
     if (!partnerName.trim()) {
-      toast.error('파트너명을 입력해 주세요.');
+      toast.error('파트너명을 입력해 주시기 바랍니다.');
       return;
     }
     setSaving(true);

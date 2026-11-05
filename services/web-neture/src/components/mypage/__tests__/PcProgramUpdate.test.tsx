@@ -7,7 +7,7 @@ it('reports an old connected PC as needing update and requires matching running 
  vi.stubGlobal('fetch',vi.fn().mockImplementation(async()=>({ok:true,json:async()=>release})));
  const verify=vi.fn(),health={agentVersion:'0.3.0',connected:true,nonce:'fixture'};
  const view=render(<PcProgramUpdate health={health} onVerify={verify}/>);
- await screen.findByText('프로그램 업데이트가 필요해요.');
+ await screen.findByText('프로그램 업데이트가 필요합니다.');
  expect(screen.queryByText('최신 프로그램입니다.')).toBeNull();
  view.rerender(<PcProgramUpdate health={{...health,agentVersion:'0.4.0',releaseId:release.releaseId,localData:{ready:true,schemaVersion:8}}} onVerify={verify}/>);
  expect(screen.getByText('최신 프로그램입니다.')).toBeTruthy();
@@ -17,7 +17,7 @@ it('reports an old connected PC as needing update and requires matching running 
 it('unreachable PC is unknown rather than up-to-date; failed manifest can be retried',async()=>{
  const fetcher=vi.fn().mockRejectedValueOnce(Error('offline')).mockResolvedValue({ok:true,json:async()=>release});vi.stubGlobal('fetch',fetcher);
  render(<PcProgramUpdate health={null} onVerify={vi.fn()}/>);await screen.findByRole('alert');
- fireEvent.click(screen.getByRole('button',{name:'이미 설치했어요 · 연결 확인'}));
+ fireEvent.click(screen.getByRole('button',{name:'설치된 프로그램 연결 확인'}));
  await screen.findByText('버전 0.4.0');expect(screen.queryByText('최신 프로그램입니다.')).toBeNull();
 });
 
@@ -32,11 +32,11 @@ it('one install button downloads the verified launcher without claiming installa
  const verify=vi.fn();render(<PcProgramUpdate health={null} onVerify={verify}/>);
  await waitFor(()=>expect(screen.getByRole('button',{name:'설치 파일 받기'}).hasAttribute('disabled')).toBe(false));
  fireEvent.click(screen.getByRole('button',{name:'설치 파일 받기'}));
- await screen.findByText('이제 받은 파일을 열어 주세요.');
+ await screen.findByText('이제 받은 파일을 열어 주시기 바랍니다.');
  expect(click).toHaveBeenCalledOnce();expect(click.mock.instances[0].download).toBe('O4O-PC-Setup.cmd');
  expect(verify).not.toHaveBeenCalled();expect(screen.queryByText('최신 프로그램입니다.')).toBeNull();
  expect(screen.queryByText(/압축을 풀고/)).toBeNull();
- fireEvent.click(screen.getByRole('button',{name:'이미 설치했어요 · 연결 확인'}));expect(verify).toHaveBeenCalledOnce();
+ fireEvent.click(screen.getByRole('button',{name:'설치된 프로그램 연결 확인'}));expect(verify).toHaveBeenCalledOnce();
  click.mockRestore();
 });
 
@@ -52,7 +52,7 @@ async function renderInstaller(probe:()=>Promise<Response>, connect=vi.fn().mock
  if(fakeClock) vi.useFakeTimers();
  fireEvent.click(screen.getByRole('button',{name:'설치 파일 받기'}));
  if(fakeClock) await vi.waitFor(()=>expect(screen.getByLabelText('PC 연결 진행 단계')).toBeTruthy());
- else await screen.findByText('이제 받은 파일을 열어 주세요.');
+ else await screen.findByText('이제 받은 파일을 열어 주시기 바랍니다.');
  return {view,connect};
 }
 it('an old running release cannot trigger auto pairing, and stopping prevents further observation',async()=>{
@@ -78,16 +78,16 @@ it('shows elapsed wait, actionable guidance after a minute, and stops after ten 
  const probe=vi.fn(async()=>{throw Error('unreachable')});
  const {connect}=await renderInstaller(probe,vi.fn().mockResolvedValue(true),true);
  expect(screen.getByLabelText('PC 연결 진행 단계')).toBeTruthy();
- expect(screen.getByText('설치 진행률은 이 화면에서 확인할 수 없어요. 파일을 열었다면 설치 창을 확인해 주세요.')).toBeTruthy();
+ expect(screen.getByText('설치 진행률은 이 화면에서 확인할 수 없습니다. 파일을 열었다면 설치 창을 확인해 주시기 바랍니다.')).toBeTruthy();
  await act(async()=>{await vi.advanceTimersByTimeAsync(61000)});
  expect(screen.getByText(/연결 확인 경과 1분/)).toBeTruthy();
- expect(screen.getByText(/기다리기만 해서는 설치되지 않아요/)).toBeTruthy();
+ expect(screen.getByText(/기다리기만 해서는 설치되지 않습니다/)).toBeTruthy();
  await act(async()=>{await vi.advanceTimersByTimeAsync(120000)});
- expect(screen.getByText(/3분 이상 응답이 없어요/)).toBeTruthy();
+ expect(screen.getByText(/3분 이상 응답이 없습니다/)).toBeTruthy();
  await act(async()=>{await vi.advanceTimersByTimeAsync(419000)});
  expect(screen.getByText(/10분 동안 연결을 확인하지 못해/)).toBeTruthy();
  expect(screen.queryByRole('button',{name:'자동 연결 중지'})).toBeNull();
- expect(screen.getByRole('button',{name:'이미 설치했어요 · 연결 확인'})).toBeTruthy();
+ expect(screen.getByRole('button',{name:'설치된 프로그램 연결 확인'})).toBeTruthy();
  const stopped=probe.mock.calls.length;
  await act(async()=>{await vi.advanceTimersByTimeAsync(10000)});
  expect(probe).toHaveBeenCalledTimes(stopped);expect(connect).not.toHaveBeenCalled();
@@ -97,9 +97,9 @@ it('distinguishes account connection from waiting for installation and aborts a 
  let signal:AbortSignal|undefined;
  const connect=vi.fn((_health,abortSignal:AbortSignal)=>{signal=abortSignal;return new Promise<boolean>(()=>{})});
  await renderInstaller(async()=>new Response(JSON.stringify({ok:true,agentVersion:'0.4.0',releaseId:release.releaseId,connected:false,nonce:'synthetic',localData:{ready:true,schemaVersion:8}})),connect,true);
- await vi.waitFor(()=>expect(screen.getByText('프로그램을 확인했어요. 이 계정에 연결하고 있어요.')).toBeTruthy());
+ await vi.waitFor(()=>expect(screen.getByText('프로그램을 확인했습니다. 이 계정에 연결하고 있습니다.')).toBeTruthy());
  expect(screen.getByText('이 계정에 PC 연결').closest('li')?.getAttribute('aria-current')).toBe('step');
  await act(async()=>{await vi.advanceTimersByTimeAsync(600000)});
  expect(signal?.aborted).toBe(true);
- expect(screen.getByText(/자동 확인을 멈췄어요/)).toBeTruthy();
+ expect(screen.getByText(/자동 확인을 멈췄습니다/)).toBeTruthy();
 });

@@ -67,7 +67,7 @@ export interface MembershipStatusNoticeContent {
 export const DEFAULT_MEMBERSHIP_STATUS_NOTICE: Record<string, MembershipStatusNoticeContent> = {
   none: {
     title: '서비스 가입이 필요합니다',
-    message: `${MEMBERSHIP_SERVICE_TOKEN} 서비스를 이용하려면 먼저 가입 신청을 해주세요.`,
+    message: `${MEMBERSHIP_SERVICE_TOKEN} 서비스를 이용하려면 먼저 가입 신청을 해 주시기 바랍니다.`,
     icon: '📝',
   },
   pending: {
@@ -82,17 +82,17 @@ export const DEFAULT_MEMBERSHIP_STATUS_NOTICE: Record<string, MembershipStatusNo
   },
   rejected: {
     title: '가입 신청 반려',
-    message: '가입 신청이 반려되었습니다. 자세한 사항은 운영자에게 문의해주세요.',
+    message: '가입 신청이 반려되었습니다. 자세한 사항은 운영자에게 문의해 주시기 바랍니다.',
     icon: '🚫',
   },
   suspended: {
     title: '서비스 이용 정지',
-    message: '서비스 이용이 정지되었습니다. 자세한 사항은 운영자에게 문의해주세요.',
+    message: '서비스 이용이 정지되었습니다. 자세한 사항은 운영자에게 문의해 주시기 바랍니다.',
     icon: '🚫',
   },
   withdrawn: {
     title: '탈퇴 처리된 서비스',
-    message: '이 서비스에서 탈퇴 처리되었습니다. 재가입을 원하시면 운영자에게 문의해주세요.',
+    message: '이 서비스에서 탈퇴 처리되었습니다. 재가입을 원하시면 운영자에게 문의해 주시기 바랍니다.',
     icon: '🚫',
   },
 };

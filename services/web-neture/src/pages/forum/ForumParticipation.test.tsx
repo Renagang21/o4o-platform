@@ -123,14 +123,14 @@ it("댓글 작성 중 다른 글로 이동하면 입력과 늦은 응답을 격�
       }),
   );
   mount();
-  fireEvent.change(await screen.findByPlaceholderText("댓글을 입력하세요..."), {
+  fireEvent.change(await screen.findByPlaceholderText("댓글을 입력하시기 바랍니다..."), {
     target: { value: "이전 글의 댓글" },
   });
   fireEvent.click(screen.getByRole("button", { name: "댓글 작성" }));
   fireEvent.click(screen.getByRole("link", { name: "다른 글" }));
   await screen.findByText("글 next");
   expect(
-    (screen.getByPlaceholderText("댓글을 입력하세요...") as HTMLTextAreaElement)
+    (screen.getByPlaceholderText("댓글을 입력하시기 바랍니다...") as HTMLTextAreaElement)
       .value,
   ).toBe("");
   await act(async () =>
@@ -160,7 +160,7 @@ it("댓글 수정 실패는 입력을 보존하고 오류를 표시하여 다시
   m.edit
     .mockResolvedValueOnce({
       success: false,
-      error: "권한 또는 상태를 확인해 주세요.",
+      error: "권한 또는 상태를 확인해 주시기 바랍니다.",
     })
     .mockResolvedValue({
       success: true,
@@ -183,7 +183,7 @@ it("댓글 수정 실패는 입력을 보존하고 오류를 표시하여 다시
 });
 it("같은 글에서 계정이 바뀌면 이전 댓글 입력이 남지 않는다", async () => {
   const v = mount();
-  fireEvent.change(await screen.findByPlaceholderText("댓글을 입력하세요..."), {
+  fireEvent.change(await screen.findByPlaceholderText("댓글을 입력하시기 바랍니다..."), {
     target: { value: "이전 계정 내용" },
   });
   m.actor = "other";
@@ -220,7 +220,7 @@ it.each([{ isLocked: true }, { allowComments: false }])(
     m.read.mockResolvedValue({ success: true, data: { ...post(), ...flags } });
     mount();
     await screen.findByText("이 게시글은 댓글 작성이 제한되어 있습니다.");
-    expect(screen.queryByPlaceholderText("댓글을 입력하세요...")).toBeNull();
+    expect(screen.queryByPlaceholderText("댓글을 입력하시기 바랍니다...")).toBeNull();
     expect(m.create).not.toHaveBeenCalled();
   },
 );
@@ -259,7 +259,7 @@ it("댓글 재조회와 새 댓글 작성을 직렬화하여 늦은 조회의 �
   fireEvent.click(
     await screen.findByRole("button", { name: "댓글 다시 불러오기" }),
   );
-  fireEvent.change(screen.getByPlaceholderText("댓글을 입력하세요..."), {
+  fireEvent.change(screen.getByPlaceholderText("댓글을 입력하시기 바랍니다..."), {
     target: { value: "새 댓글" },
   });
   const submit = screen.getByRole("button", { name: "댓글 조회 중..." });
@@ -284,7 +284,7 @@ it("새 댓글 작성 중 재조회 버튼은 기존 작성 요청을 방해하�
   const retry = await screen.findByRole("button", {
     name: "댓글 다시 불러오기",
   });
-  fireEvent.change(screen.getByPlaceholderText("댓글을 입력하세요..."), {
+  fireEvent.change(screen.getByPlaceholderText("댓글을 입력하시기 바랍니다..."), {
     target: { value: "새 댓글" },
   });
   fireEvent.click(screen.getByRole("button", { name: "댓글 작성" }));
@@ -295,7 +295,7 @@ it("새 댓글 작성 중 재조회 버튼은 기존 작성 요청을 방해하�
     release({ success: true, data: { ...comment, content: "새 댓글" } }),
   );
   expect(
-    (screen.getByPlaceholderText("댓글을 입력하세요...") as HTMLTextAreaElement)
+    (screen.getByPlaceholderText("댓글을 입력하시기 바랍니다...") as HTMLTextAreaElement)
       .value,
   ).toBe("");
   expect(screen.getByText("새 댓글", { exact: true })).toBeTruthy();

@@ -125,21 +125,21 @@ const messages: Record<string, string> = {
   MAIL_RULE_CHANGED:
     "발신처 규칙이 변경되어 대기 중이던 자동 작업을 취소했습니다.",
   MAIL_CONFIRMATION_EXPIRED:
-    "검토 시간이 지났습니다. 대상을 새로 확인해 주세요.",
-  MAIL_ACCOUNT_CHANGED: "계정 연결이 바뀌었습니다. 대상을 새로 확인해 주세요.",
-  MAIL_RECONNECT_REQUIRED: "메일 계정을 다시 연결해 주세요.",
+    "검토 시간이 지났습니다. 대상을 새로 확인해 주시기 바랍니다.",
+  MAIL_ACCOUNT_CHANGED: "계정 연결이 바뀌었습니다. 대상을 새로 확인해 주시기 바랍니다.",
+  MAIL_RECONNECT_REQUIRED: "메일 계정을 다시 연결해 주시기 바랍니다.",
   MAIL_DELEGATION_REVOKED:
     "ChatGPT 연결 권한이 종료되어 중단됐습니다. 이 화면에서 내용을 확인한 뒤 직접 재개할 수 있습니다.",
-  MAIL_SCOPE_FORBIDDEN: "이 메일 계정의 연결 권한을 확인해 주세요.",
+  MAIL_SCOPE_FORBIDDEN: "이 메일 계정의 연결 권한을 확인해 주시기 바랍니다.",
   MAIL_ACTION_UNSUPPORTED: "이 계정에서 선택한 처리 방식을 사용할 수 없습니다.",
   MAIL_NO_MATCHING_MESSAGES:
-    "수집된 수신함에 해당하는 메일이 없습니다. 중요 메일 보호 설정도 확인해 주세요.",
+    "수집된 수신함에 해당하는 메일이 없습니다. 중요 메일 보호 설정도 확인해 주시기 바랍니다.",
   MAILBOX_CHANGED:
-    "메일함 식별 정보가 바뀌었습니다. 새로 수집한 뒤 대상을 다시 확인해 주세요.",
+    "메일함 식별 정보가 바뀌었습니다. 새로 수집한 뒤 대상을 다시 확인해 주시기 바랍니다.",
   MAIL_PROVIDER_RATE_LIMITED:
-    "메일 서비스의 요청 한도에 도달했습니다. 잠시 후 작업을 재개해 주세요.",
+    "메일 서비스의 요청 한도에 도달했습니다. 잠시 후 작업을 재개해 주시기 바랍니다.",
   MAIL_MESSAGE_TOO_LARGE:
-    "이 메일은 미리보기 크기를 초과합니다. 원래 메일 서비스에서 확인해 주세요.",
+    "이 메일은 미리보기 크기를 초과합니다. 원래 메일 서비스에서 확인해 주시기 바랍니다.",
   PERSONAL_MAIL_DISABLED: "개인 메일 관리를 아직 사용할 수 없습니다.",
 };
 export function mailErrorMessage(error: unknown) {
@@ -147,7 +147,7 @@ export function mailErrorMessage(error: unknown) {
     ?.data?.code;
   return (
     messages[code ?? ""] ??
-    "처리하지 못했습니다. 연결 상태를 확인하고 다시 시도해 주세요."
+    "처리하지 못했습니다. 연결 상태를 확인하고 다시 시도해 주시기 바랍니다."
   );
 }
 export const mailActionLabels: Record<MailAction, string> = {

@@ -60,6 +60,11 @@ export default function LocalAgentCard({
         return false;
       const request = new AbortController();
       pairingRequest.current = request;
+      let timedOut = false;
+      const timeout = setTimeout(() => {
+        timedOut = true;
+        request.abort();
+      }, 15000);
       const cancel = () => request.abort();
       signal?.addEventListener("abort", cancel, { once: true });
       setStatus("pairing");
@@ -78,6 +83,11 @@ export default function LocalAgentCard({
         setMessage(null);
         return true;
       } finally {
+        clearTimeout(timeout);
+        if (active.current && timedOut)
+          setMessage(
+            "계정 연결 응답 시간이 초과됐습니다. 네트워크와 로그인 상태를 확인한 뒤 다시 시도하시기 바랍니다.",
+          );
         signal?.removeEventListener("abort", cancel);
         if (pairingRequest.current === request) pairingRequest.current = null;
         if (active.current && request.signal.aborted) setStatus("unavailable");
@@ -108,15 +118,14 @@ export default function LocalAgentCard({
       }
 
       setHealth(probe.health);
-      if (probe.health.connected) {
-        setStatus("connected");
-        return;
-      }
       if (autoPair) {
         await pair(probe.health);
         return;
       }
       setStatus("ready");
+      setMessage(
+        "PC 프로그램이 응답했습니다. 현재 계정과의 연결은 연결 확인 버튼으로 확인할 수 있습니다.",
+      );
     },
     [pair],
   );
@@ -138,11 +147,13 @@ export default function LocalAgentCard({
         <div className="min-w-0 flex-1">
           <h3 className="text-base font-semibold text-gray-900">이 PC 연결</h3>
           <p className="mt-1 text-sm text-gray-600">
-            업무 도우미가 이 PC에서 일할 수 있게 준비해요.
+            업무 도우미가 이 PC에서 일할 수 있게 준비합니다.
           </p>
 
           <PcProgramUpdate
-            health={health}
+            health={
+              health ? { ...health, connected: status === "connected" } : null
+            }
             onVerify={() => {
               setManualChecks((value) => value + 1);
               void refresh(true);
@@ -156,13 +167,16 @@ export default function LocalAgentCard({
           />
           <div className="mt-4">
             {status === "checking" && (
-              <p className="flex items-center gap-2 text-sm text-gray-500">
+              <p
+                role="status"
+                className="flex items-center gap-2 text-sm text-gray-500"
+              >
                 <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
                 PC 연결 프로그램을 확인하는 중입니다...
               </p>
             )}
 
-            {status === "unavailable" && message && (
+            {(status === "unavailable" || status === "ready") && message && (
               <div
                 key={manualChecks}
                 role="status"
@@ -170,7 +184,7 @@ export default function LocalAgentCard({
               >
                 {manualChecks > 0 && (
                   <p className="mb-1 font-medium">
-                    다시 확인했지만 아직 연결되지 않았어요.
+                    다시 확인했지만 아직 연결되지 않았습니다.
                   </p>
                 )}
                 <p>
@@ -180,7 +194,7 @@ export default function LocalAgentCard({
                 {failureHelp.length > 0 && (
                   <details className="mt-2 text-gray-500">
                     <summary className="cursor-pointer">
-                      연결이 안 되나요?
+                      연결이 안 됩니까?
                     </summary>
                     <p className="mt-2">{failureHelp.join(". ")}</p>
                   </details>
@@ -189,13 +203,19 @@ export default function LocalAgentCard({
             )}
 
             {status === "connected" && (
-              <p className="flex items-center gap-2 text-sm font-medium text-emerald-700">
-                <CheckCircle2 className="h-4 w-4" aria-hidden />이 PC 연결됨
+              <p
+                role="status"
+                className="flex items-center gap-2 text-sm font-medium text-emerald-700"
+              >
+                <CheckCircle2 className="h-4 w-4" aria-hidden />이 PC가 현재
+                계정에 연결됐습니다.
               </p>
             )}
 
             {status === "pairing" && (
-              <p className="text-sm text-gray-500">연결 중…</p>
+              <p role="status" className="text-sm text-gray-500">
+                현재 계정과 PC의 연결을 확인하고 있습니다…
+              </p>
             )}
           </div>
         </div>

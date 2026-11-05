@@ -25,7 +25,7 @@ export async function uninstall(context: AppLifecycleContext): Promise<Uninstall
       return {
         success: false,
         message: '먼저 비활성화가 필요합니다.',
-        errors: ['앱 비활성화 후 삭제해주세요.'],
+        errors: ['앱 비활성화 후 삭제해 주시기 바랍니다.'],
       };
     }
 

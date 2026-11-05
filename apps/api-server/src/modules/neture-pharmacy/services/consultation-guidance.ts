@@ -392,7 +392,7 @@ export class ConsultationGuidanceService {
           intent,
           product,
           message:
-            "질문에 맞는 게시 문단을 찾지 못했습니다. 원문을 확인하거나 질문을 바꿔 주세요.",
+            "질문에 맞는 게시 문단을 찾지 못했습니다. 원문을 확인하거나 질문을 바꿔 주시기 바랍니다.",
           publicKey: material.publicKey,
         };
     }

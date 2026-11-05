@@ -35,7 +35,7 @@ export default function RecruitmentSupplyPricePanel({
       price <= 0 ||
       price > 2147483647
     ) {
-      setMessage("공급가는 1~2,147,483,647원의 정수로 입력해 주세요.");
+      setMessage("공급가는 1~2,147,483,647원의 정수로 입력해 주시기 바랍니다.");
       return;
     }
     setPending(true);
@@ -53,7 +53,7 @@ export default function RecruitmentSupplyPricePanel({
     } else {
       setMessage(
         result.message ||
-          "확정 결과를 확인하지 못했습니다. 같은 금액으로 다시 확인해 주세요.",
+          "확정 결과를 확인하지 못했습니다. 같은 금액으로 다시 확인해 주시기 바랍니다.",
       );
       setConflict(result.error === "SUPPLY_PRICE_ALREADY_CONFIRMED");
     }
@@ -90,7 +90,7 @@ export default function RecruitmentSupplyPricePanel({
             className="w-full rounded border border-slate-200 p-2 sm:max-w-xs"
           />
           <p className="text-xs text-slate-500">
-            직접 확인한 금액을 입력하세요. 확정 후 이 화면에서 변경할 수
+            직접 확인한 금액을 입력하시기 바랍니다. 확정 후 이 화면에서 변경할 수
             없습니다.
           </p>
           <button

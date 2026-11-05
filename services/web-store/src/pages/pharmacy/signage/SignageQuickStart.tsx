@@ -28,7 +28,7 @@ export function SignageQuickStart({ videos: sourceVideos, organizationId, isCurr
   const save = async () => {
     if (lock.current || uncertain || !selected.length || !isCurrent()) return;
     if (selected.some(key => !videos.some(video => video.id === key))) {
-      setError('선택한 자료의 상태가 바뀌었습니다. 창을 닫고 자료를 다시 확인해 주세요.');
+      setError('선택한 자료의 상태가 바뀌었습니다. 창을 닫고 자료를 다시 확인해 주시기 바랍니다.');
       return;
     }
     lock.current = true; setSaving(true); setError('');
@@ -48,10 +48,10 @@ export function SignageQuickStart({ videos: sourceVideos, organizationId, isCurr
       const unknownResult = !status || status >= 500 || status === 408;
       setUncertain(unknownResult);
       setError(unknownResult
-        ? '저장 결과를 확인하지 못했습니다. 중복 생성을 피하려면 먼저 저장된 초안과 자료를 확인한 뒤 이어서 추가하세요.'
+        ? '저장 결과를 확인하지 못했습니다. 중복 생성을 피하려면 먼저 저장된 초안과 자료를 확인한 뒤 이어서 추가하시기 바랍니다.'
         : header.current
           ? `초안을 저장했고 자료 ${added.current.size}개를 추가했습니다. 다시 시도하면 같은 초안에 남은 자료만 추가합니다.`
-          : '초안을 저장하지 못했습니다. 선택한 자료를 유지했으니 다시 시도해 주세요.');
+          : '초안을 저장하지 못했습니다. 선택한 자료를 유지했으니 다시 시도해 주시기 바랍니다.');
     } finally { lock.current = false; if (isCurrent()) setSaving(false); }
   };
   const close = () => { if (!lock.current) onClose(header.current); };
@@ -60,7 +60,7 @@ export function SignageQuickStart({ videos: sourceVideos, organizationId, isCurr
     <div className="space-y-4 overflow-y-auto p-5">
       <h2 id={id} className="text-lg font-semibold">새 사이니지 안내</h2>
       <StoreAiSlot priority={2} label="사이니지 안내 작성" />
-      <p className="text-sm text-slate-600">보여줄 자료를 고르세요. 선택한 순서로 초안을 저장한 뒤 재생 시간과 게시를 정합니다.</p>
+      <p className="text-sm text-slate-600">보여줄 자료를 고르시기 바랍니다. 선택한 순서로 초안을 저장한 뒤 재생 시간과 게시를 정합니다.</p>
       {error && <p role="alert" className="rounded-lg bg-amber-50 p-3 text-sm text-amber-900">{error}</p>}
       <fieldset disabled={saving || uncertain || !!header.current} className="space-y-3 disabled:opacity-70">
         <label htmlFor={`${id}-search`} className="block text-sm">자료 찾기</label>
@@ -70,7 +70,7 @@ export function SignageQuickStart({ videos: sourceVideos, organizationId, isCurr
             <input type="checkbox" checked={selected.includes(video.id)} onChange={event => setSelected(previous => event.target.checked ? [...previous, video.id] : previous.filter(key => key !== video.id))} />
             <span className="min-w-0 flex-1 break-words">{video.title}<span className="ml-2 text-xs text-slate-500">{video.source === 'direct' ? '등록한 영상의 사본' : '매장 자료'}</span></span>
           </label>)}
-          {!videos.length && <p className="p-4 text-sm text-slate-600">아직 사용할 자료가 없습니다. 내 동영상에서 등록하거나 제공 자료를 가져오세요.</p>}
+          {!videos.length && <p className="p-4 text-sm text-slate-600">아직 사용할 자료가 없습니다. 내 동영상에서 등록하거나 제공 자료를 가져오시기 바랍니다.</p>}
           {videos.length > 0 && !videos.some(video => video.title.toLowerCase().includes(search.trim().toLowerCase())) && <p className="p-4 text-sm text-slate-600">검색 결과가 없습니다.</p>}
         </div>
         <details className="rounded-lg border border-slate-200 p-3"><summary className="min-h-11 cursor-pointer text-sm">관리 이름 변경 · 선택</summary>

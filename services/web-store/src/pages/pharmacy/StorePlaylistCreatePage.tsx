@@ -56,7 +56,7 @@ function PlaylistCreateSession({ isCurrent }: Readonly<{ isCurrent: () => boolea
       onBack={() => navigate(listPath)}
       onSubmit={handleSubmit}
       config={{
-        descriptionPlaceholder: '이 플레이리스트의 사용 목적이나 적용 위치를 간략히 기록하세요',
+        descriptionPlaceholder: '이 플레이리스트의 사용 목적이나 적용 위치를 간략히 기록하시기 바랍니다',
       }}
     />
   );

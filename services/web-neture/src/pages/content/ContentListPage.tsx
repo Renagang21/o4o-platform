@@ -106,7 +106,7 @@ export default function ContentListPage() {
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-4">콘텐츠</h1>
         <p className="text-lg text-gray-600">
-          네뚜레 플랫폼의 공지사항과 가이드를 확인하세요
+          네뚜레 플랫폼의 공지사항과 가이드를 확인하시기 바랍니다
         </p>
       </div>
 

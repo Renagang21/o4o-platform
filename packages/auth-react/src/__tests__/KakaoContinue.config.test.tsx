@@ -29,7 +29,7 @@ describe('Kakao configuration recovery', () => {
   it('reports transport failure and restores the button through a read-only retry', async () => {
     const getConfig = vi.fn().mockRejectedValueOnce(new Error('synthetic network failure')).mockResolvedValueOnce({ enabled: true });
     const methods = setup(getConfig);
-    expect(await screen.findByText('카카오 로그인을 불러오지 못했습니다. 다시 시도해 주세요.')).toBeTruthy();
+    expect(await screen.findByText('카카오 로그인을 불러오지 못했습니다. 다시 시도해 주시기 바랍니다.')).toBeTruthy();
     fireEvent.click(screen.getByRole('button', { name: '카카오 로그인 다시 불러오기' }));
     expect(await screen.findByRole('button', { name: '카카오로 계속하기' })).toBeTruthy();
     expect(getConfig).toHaveBeenCalledTimes(2);
@@ -44,7 +44,7 @@ describe('Kakao configuration recovery', () => {
     const getConfig = vi.fn().mockReturnValueOnce(pending.promise).mockResolvedValueOnce({ enabled: true });
     setup(getConfig);
     await act(async () => { await vi.advanceTimersByTimeAsync(10_000); });
-    expect(screen.getByText('카카오 로그인을 불러오지 못했습니다. 다시 시도해 주세요.')).toBeTruthy();
+    expect(screen.getByText('카카오 로그인을 불러오지 못했습니다. 다시 시도해 주시기 바랍니다.')).toBeTruthy();
     await act(async () => { fireEvent.click(screen.getByRole('button', { name: '카카오 로그인 다시 불러오기' })); });
     expect(screen.getByRole('button', { name: '카카오로 계속하기' })).toBeTruthy();
     await act(async () => { pending.resolve({ enabled: false }); });
@@ -54,7 +54,7 @@ describe('Kakao configuration recovery', () => {
 
   it('reports an invalid configuration response instead of treating it as disabled', async () => {
     setup(vi.fn().mockResolvedValue(undefined));
-    expect(await screen.findByText('카카오 로그인을 불러오지 못했습니다. 다시 시도해 주세요.')).toBeTruthy();
+    expect(await screen.findByText('카카오 로그인을 불러오지 못했습니다. 다시 시도해 주시기 바랍니다.')).toBeTruthy();
     expect(screen.getByRole('button', { name: '카카오 로그인 다시 불러오기' })).toBeTruthy();
   });
 

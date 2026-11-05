@@ -276,7 +276,7 @@ it("does not record failed handoff attempts and permits retry", async () => {
   render(app());
   fireEvent.click(screen.getByRole("button", { name: /합성 매장 B 매장/ }));
   expect((await screen.findByRole("alert")).textContent).toContain(
-    "이동하지 못했습니다. 이용 상태를 확인하고 다시 시도해 주세요.",
+    "이동하지 못했습니다. 이용 상태를 확인하고 다시 시도해 주시기 바랍니다.",
   );
   expect(resolve).toHaveBeenCalledWith({
     kind: "workspace",

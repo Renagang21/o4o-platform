@@ -529,7 +529,7 @@ export class B2BCheckoutConfirmCore {
         // 다중 조직 사용자를 차단하지 않는다 — 어느 매장인지 선택을 요구할 뿐이다.
         throw new B2BConfirmError(
           'AMBIGUOUS_STORE_ORGANIZATION',
-          '주문할 매장(조직)을 선택해 주세요.',
+          '주문할 매장(조직)을 선택해 주시기 바랍니다.',
           400,
         );
       case 'forbidden':

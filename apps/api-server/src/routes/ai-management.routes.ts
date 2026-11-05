@@ -113,7 +113,7 @@ export function createAiManagementRouter(db: DataSource): Router {
         throw new AiManagementError(
           400,
           "AI_USAGE_PERIOD_INVALID",
-          "조회 기간은 7일, 30일, 90일 중 선택하세요.",
+          "조회 기간은 7일, 30일, 90일 중 선택하시기 바랍니다.",
         );
       return res.json({
         success: true,

@@ -93,7 +93,7 @@ export default function PlatformHubPage() {
           role="alert"
           className="rounded border border-amber-300 p-4 text-amber-900"
         >
-          오래된 점검 결과입니다. 현재 상태는 다시 확인해 주세요.
+          오래된 점검 결과입니다. 현재 상태는 다시 확인해 주시기 바랍니다.
         </p>
       )}
       {data && (

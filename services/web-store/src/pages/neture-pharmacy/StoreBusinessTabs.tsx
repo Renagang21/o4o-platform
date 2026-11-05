@@ -18,6 +18,6 @@ export function StoreBusinessTabs({ businesses, value, onChange, history = false
     <BusinessTabs businesses={choices} value={value} onChange={onChange} />
     {businesses.loading && <output className="block text-sm text-slate-500">가입한 협업체를 확인하고 있습니다…</output>}
     {businesses.error && <div role="alert" className="text-sm text-red-700">가입한 협업체를 확인하지 못했습니다. <button type="button" className="min-h-11 underline" onClick={businesses.reload}>협업체 다시 확인</button></div>}
-    {!businesses.loading && !businesses.error && !businesses.joined.length && <p className="text-sm text-slate-500">현재 선택한 약국에 가입 승인된 협업체가 없습니다. 가입 상태는 이용 사업에서 확인하세요.</p>}
+    {!businesses.loading && !businesses.error && !businesses.joined.length && <p className="text-sm text-slate-500">현재 선택한 약국에 가입 승인된 협업체가 없습니다. 가입 상태는 이용 사업에서 확인하시기 바랍니다.</p>}
   </section>;
 }

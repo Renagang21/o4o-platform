@@ -41,7 +41,7 @@ const output = (body: any) => ({
     language: body.language,
     intent: body.intent,
     state: body.productId || body.intent === "pharmacist" ? "ready" : "clarify",
-    message: body.productId ? undefined : "어떤 상품을 안내할까요?",
+    message: body.productId ? undefined : "어떤 상품을 안내하시겠습니까?",
     ...(body.productId || body.intent === "pharmacist"
       ? {
           card: {
@@ -118,7 +118,7 @@ it("only calls AI on explicit request and only shares the resulting server-issue
   await selectProduct();
   expect(api.post.mock.calls.every((c) => c[1].useAi === false)).toBe(true);
   fireEvent.change(screen.getByLabelText("상담 안내 요청"), {
-    target: { value: "이 상품의 설명을 간단히 알려주세요" },
+    target: { value: "이 상품의 설명을 간단히 알려주시기 바랍니다" },
   });
   fireEvent.click(
     screen.getByRole("button", { name: "AI로 관련 문단 추리기" }),

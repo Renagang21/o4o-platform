@@ -131,11 +131,11 @@ export function PharmacyVideoPage() {
   const handleSave = async () => {
     if (!slug || !editing) return;
     if (!editTitle.trim()) {
-      toast.error('제목을 입력하세요');
+      toast.error('제목을 입력하시기 바랍니다');
       return;
     }
     if (!editVideoUrl.trim()) {
-      toast.error('동영상 URL 을 입력하세요');
+      toast.error('동영상 URL 을 입력하시기 바랍니다');
       return;
     }
     setIsSaving(true);
@@ -335,7 +335,7 @@ export function PharmacyVideoPage() {
 
       {slugResolved && !slug && (
         <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 text-sm text-amber-800">
-          매장 정보가 연결되지 않아 동영상을 사용할 수 없습니다. 매장 등록 후 다시 시도해 주세요.
+          매장 정보가 연결되지 않아 동영상을 사용할 수 없습니다. 매장 등록 후 다시 시도해 주시기 바랍니다.
         </div>
       )}
 

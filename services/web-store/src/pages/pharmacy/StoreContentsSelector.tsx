@@ -362,7 +362,7 @@ function DocumentsSection({
     try {
       const n = await onRemoveSnapshots(snapshotIds);
       if (!isCurrent()) return;
-      if (n < snapshotIds.length) toast.error(`${n}개 삭제, ${snapshotIds.length - n}개 실패했습니다. 목록을 확인하고 다시 시도해 주세요.`);
+      if (n < snapshotIds.length) toast.error(`${n}개 삭제, ${snapshotIds.length - n}개 실패했습니다. 목록을 확인하고 다시 시도해 주시기 바랍니다.`);
       if (n > 0) {
         if (n === snapshotIds.length) toast.success(`${n}개 콘텐츠를 내 자료함에서 삭제했습니다`);
         setSelected(new Set());
@@ -422,7 +422,7 @@ function DocumentsSection({
   //   기존 사본(본문/QR/태블릿 연결)은 그대로 유지되고, 새 사본이 별도로 목록에 추가된다.
   const handleReimport = useCallback(async (row: DocumentRow) => {
     if (!isCurrent() || mutation.current) return;
-    if (!confirm('현재 사본은 그대로 두고, 새 원본을 별도 사본으로 가져옵니다.\n(기존 QR·태블릿 연결은 변경되지 않습니다.)\n계속할까요?')) return;
+    if (!confirm('현재 사본은 그대로 두고, 새 원본을 별도 사본으로 가져옵니다.\n(기존 QR·태블릿 연결은 변경되지 않습니다.)\n계속하시겠습니까?')) return;
     mutation.current = true; setReimportingId(row.id);
     try {
       const res = await storeLibraryApi.reimportSource(row.id);
@@ -478,7 +478,7 @@ function DocumentsSection({
             {row.hasSourceUpdate && (
               <span
                 style={{ ...styles.badge, background: '#FEF3C7', color: '#B45309', flexShrink: 0 }}
-                title="원본 설명서가 갱신되었습니다. 현재 매장 사본은 자동으로 바뀌지 않습니다. 필요하면 새 원본을 다시 가져오세요."
+                title="원본 설명서가 갱신되었습니다. 현재 매장 사본은 자동으로 바뀌지 않습니다. 필요하면 새 원본을 다시 가져오시기 바랍니다."
               >
                 원본 갱신됨
               </span>
@@ -708,7 +708,7 @@ function DocumentsSection({
 
       {/* WO-O4O-KPA-CONTENT-LIST-INLINE-QR-CREATE-V1 / INLINE-POP: QR·POP 만들기 선택 안내 */}
       {(showInlineQr || showInlinePop) && selected.size >= 2 && (
-        <p style={styles.pdfHint}>QR-code · POP은 콘텐츠 1개를 선택해 주세요.</p>
+        <p style={styles.pdfHint}>QR-code · POP은 콘텐츠 1개를 선택해 주시기 바랍니다.</p>
       )}
       {showInlineQr && selected.size === 1 && !qrEligible && (
         <p style={styles.pdfHint}>가져온 콘텐츠(운영자 제공/커뮤니티)는 QR-code 대상이 아닙니다(POP은 가능). 내가 만든 콘텐츠/제작 자료를 선택하면 QR도 만들 수 있습니다.</p>

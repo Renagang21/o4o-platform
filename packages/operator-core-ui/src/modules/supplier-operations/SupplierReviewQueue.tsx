@@ -78,7 +78,7 @@ export default function SupplierReviewQueue({
       <h2 className="font-semibold">보완 요청 대기 목록</h2>
       <p className="text-xs text-slate-500">
         제출된 보완 내용을 찾고 검토합니다. 기본정보·서류는 아래 공급자 목록의
-        상세에서 함께 확인해 주세요.
+        상세에서 함께 확인해 주시기 바랍니다.
       </p>
       <div className="flex flex-wrap gap-3">
         <select

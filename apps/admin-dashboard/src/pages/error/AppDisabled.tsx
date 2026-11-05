@@ -33,7 +33,7 @@ export default function AppDisabled() {
             <span className="font-semibold text-gray-800">"{appId}"</span> 기능은 현재 비활성화되어 있습니다.
           </p>
           <p className="text-gray-600 mb-8">
-            이 기능을 사용하려면 관리자에게 문의하세요.
+            이 기능을 사용하려면 관리자에게 문의하시기 바랍니다.
           </p>
 
           {/* Actions */}

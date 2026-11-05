@@ -19,7 +19,7 @@ function Field({ label, value }: Readonly<{ label: string; value: unknown }>) {
 function pharmacyGuidance(detail: MemberDetail, pharmacy: MemberPharmacy) {
   if (!detail.permissions.qualifications) return '약사 자격 담당자의 확인이 필요합니다. 현재 화면의 권한만으로 승인 가능 여부를 확정할 수 없습니다.';
   if (!canActivatePharmacy(detail, pharmacy)) return '약국 승인·재개 전에 이메일 확인과 신청 면허번호에 일치하는 약사 자격 승인이 필요합니다.';
-  return '일치하는 약사 자격이 승인됐습니다. 제출 사업자 정보와 약국 여부를 확인한 후 처리해 주세요.';
+  return '일치하는 약사 자격이 승인됐습니다. 제출 사업자 정보와 약국 여부를 확인한 후 처리해 주시기 바랍니다.';
 }
 const actionLabels: Record<string, string> = {
   'member.profile_corrected': '기본정보 정정', 'qualification.pharmacist_requested': '약사 자격 신청',

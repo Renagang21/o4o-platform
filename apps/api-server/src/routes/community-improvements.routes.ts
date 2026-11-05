@@ -20,8 +20,8 @@ export function createCommunityImprovementRoutes(optional: RequestHandler, authe
     }
   };
   const manage = async (req: AuthRequest) => {
-    if (!req.user?.id) throw new CommunityManagementError(401, 'AUTH_REQUIRED', '로그인해 주세요.');
-    if (centralRequestAuthMethod(req) !== 'google') throw new CommunityManagementError(403, 'GOOGLE_SESSION_REQUIRED', '공식 운영 업무는 Google로 로그인해 주세요.');
+    if (!req.user?.id) throw new CommunityManagementError(401, 'AUTH_REQUIRED', '로그인해 주시기 바랍니다.');
+    if (centralRequestAuthMethod(req) !== 'google') throw new CommunityManagementError(403, 'GOOGLE_SESSION_REQUIRED', '공식 운영 업무는 Google로 로그인해 주시기 바랍니다.');
     await requireCommunityManager(AppDataSource, req.user!.id, false, 'forums');
     await assertCentralOperationRequest(AppDataSource, req.user!.id, 'community', ['community.forums'], centralRequestAuthMethod(req));
   };

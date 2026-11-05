@@ -50,7 +50,7 @@ it('requires a reason and evidence, then submits the exact selected qualificatio
   expect(await screen.findByText(/처리 결과를 저장했습니다/)).toBeInTheDocument();
 });
 it('keeps a conflict and the operator draft visible until explicit reload without claiming success', async () => {
-  api.patch.mockRejectedValueOnce({ response: { data: { error: '회원 정보가 변경되었습니다. 다시 조회해 주세요.' } } });
+  api.patch.mockRejectedValueOnce({ response: { data: { error: '회원 정보가 변경되었습니다. 다시 조회해 주시기 바랍니다.' } } });
   render(<CentralMemberWorkspace actorId="reviewer" />); await select();
   fireEvent.click(await screen.findByRole('button', { name: '수정',exact:true }));
   fireEvent.change(screen.getByLabelText('이름'), { target: { value: '정정 합성 회원' } });
@@ -233,7 +233,7 @@ it('removes private fields when authority is lost during temporary password issu
  fireEvent.change(screen.getByLabelText('발급 사유'),{target:{value:'본인 요청'}});
  fireEvent.click(screen.getByLabelText('본인 요청과 비밀번호 전달 대상을 확인했습니다.'));
  fireEvent.click(screen.getByRole('button',{name:'발급',exact:true}));
- await screen.findByText('현재 회원 업무 권한을 다시 확인해 주세요.');
+ await screen.findByText('현재 회원 업무 권한을 다시 확인해 주시기 바랍니다.');
  expect(screen.queryByLabelText('이메일')).toBeNull();expect(screen.queryByRole('region',{name:'선택 회원 작업'})).toBeNull();
 });
 

@@ -32,7 +32,7 @@ export function AccountSecuritySettings({
     try {
       await onLogout();
     } catch {
-      notify?.error('로그아웃에 실패했습니다. 다시 시도해주세요.');
+      notify?.error('로그아웃에 실패했습니다. 다시 시도해 주시기 바랍니다.');
     } finally {
       setLoggingOut(false);
     }

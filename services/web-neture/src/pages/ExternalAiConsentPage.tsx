@@ -41,7 +41,7 @@ export default function ExternalAiConsentPage() {
       .catch(() => {
         if (!cancelled)
           setMessage(
-            "연결 요청이 만료되었거나 연결할 수 없습니다. 원래 AI 화면에서 다시 연결해 주세요.",
+            "연결 요청이 만료되었거나 연결할 수 없습니다. 원래 AI 화면에서 다시 연결해 주시기 바랍니다.",
           );
       });
     return () => {
@@ -62,7 +62,7 @@ export default function ExternalAiConsentPage() {
         : await denyExternalConsent(request);
       window.location.assign(redirect);
     } catch {
-      setMessage("연결을 처리하지 못했습니다. 상태를 다시 확인해 주세요.");
+      setMessage("연결을 처리하지 못했습니다. 상태를 다시 확인해 주시기 바랍니다.");
       setBusy(false);
     }
   }
@@ -73,7 +73,7 @@ export default function ExternalAiConsentPage() {
         <p role="status">계정을 확인하는 중입니다.</p>
       ) : !isAuthenticated ? (
         <>
-          <p>연결할 O4O 계정으로 로그인해 주세요.</p>
+          <p>연결할 O4O 계정으로 로그인해 주시기 바랍니다.</p>
           <button
             className="rounded bg-blue-600 px-4 py-3 text-white"
             onClick={() =>
@@ -178,7 +178,7 @@ export default function ExternalAiConsentPage() {
                 {data.scopes.includes('o4o:mail:body')&&<label className="flex items-center gap-2"><input type="checkbox" checked={mailBody} disabled={!mailRead} onChange={e=>setMailBody(e.target.checked)}/>선택한 메일 본문을 연결한 AI에 전달</label>}
                 <p className="text-sm text-gray-600">본문에는 개인정보가 포함될 수 있습니다. 일괄 정리와 자동 규칙은 O4O 확인 화면에서 대상과 건수를 직접 승인해야 합니다.</p>
                 {(data.mailAccounts??[]).map(account=><label key={account.id} className="flex items-start gap-2"><input type="checkbox" checked={selectedMail.includes(account.id)} disabled={!mailRead} onChange={e=>setSelectedMail(current=>e.target.checked?[...current,account.id]:current.filter(id=>id!==account.id))}/><span className="break-all">{account.name}</span></label>)}
-                {!data.mailAccounts?.length&&<p>연결 가능한 개인 메일 계정이 없습니다. My Home의 개인 메일 관리에서 먼저 연결하세요.</p>}
+                {!data.mailAccounts?.length&&<p>연결 가능한 개인 메일 계정이 없습니다. My Home의 개인 메일 관리에서 먼저 연결하시기 바랍니다.</p>}
               </fieldset>}
               {(data.existingConnections ?? 0) > 0 && (
                 <fieldset
@@ -201,7 +201,7 @@ export default function ExternalAiConsentPage() {
                     이전 연결을 이 연결로 바꾸기(이전 연결 해제)
                   </label>
                   <p className="text-sm text-gray-600">
-                    다른 AI 계정에서 따로 쓰는 연결이면 선택을 해제하세요. 연결은
+                    다른 AI 계정에서 따로 쓰는 연결이면 선택을 해제하시기 바랍니다. 연결은
                     내 계정 설정에서 언제든 해제할 수 있습니다.
                   </p>
                 </fieldset>

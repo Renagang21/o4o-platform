@@ -248,7 +248,7 @@ const ForumPostDetail: FC = () => {
             <Textarea
               value={replyContent}
               onChange={(e: any) => setReplyContent(e.target.value)}
-              placeholder="답글을 작성하세요..."
+              placeholder="답글을 작성하시기 바랍니다..."
               rows={3}
               className="w-full mb-2"
             />
@@ -391,7 +391,7 @@ const ForumPostDetail: FC = () => {
               <Textarea
                 value={replyContent}
                 onChange={(e: any) => setReplyContent(e.target.value)}
-                placeholder="댓글을 작성하세요..."
+                placeholder="댓글을 작성하시기 바랍니다..."
                 rows={4}
                 className="w-full mb-2"
               />

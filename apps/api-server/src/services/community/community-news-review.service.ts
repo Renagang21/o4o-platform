@@ -133,7 +133,7 @@ async function runReview(
       throw new CommunityManagementError(
         409,
         "NEWS_REVIEW_BUSY",
-        "뉴스 정리를 시작하고 있습니다. 잠시 후 결과를 확인해 주세요.",
+        "뉴스 정리를 시작하고 있습니다. 잠시 후 결과를 확인해 주시기 바랍니다.",
       );
     const existing = await read(m, day);
     if (existing) return { review: existing, input: null };
@@ -142,7 +142,7 @@ async function runReview(
       throw new CommunityManagementError(
         400,
         "NO_NEWS_DRAFTS",
-        "세 매체의 미처리 뉴스 초안을 먼저 등록해 주세요.",
+        "세 매체의 미처리 뉴스 초안을 먼저 등록해 주시기 바랍니다.",
       );
     const id = randomUUID();
     const review: NewsReview = { id, day, state: "pending", items: [] };
@@ -199,7 +199,7 @@ export async function recommendationFor(
     throw new CommunityManagementError(
       400,
       "INVALID_NEWS_REVIEW",
-      "AI 정리 결과를 다시 확인해 주세요.",
+      "AI 정리 결과를 다시 확인해 주시기 바랍니다.",
     );
   const [row] = await db.query(
     `SELECT metadata FROM cms_contents WHERE ${control} AND id=$1 AND metadata->>'state'='done'`,
