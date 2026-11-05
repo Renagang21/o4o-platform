@@ -57,7 +57,7 @@ describe('WO-O4O-STORE-EXTERNAL-LLM-CONTENT-AUTHORING-V1 — (A) LlmAssistPanel 
     expect(src).toContain('현재 내용 복사');
     expect(src).toContain('편집기에 넣기');
     expect(src).toMatch(/\{onApplyHtml \? \(/);
-    expect(src).toContain('편집기의 <b>HTML 탭</b>에 붙여 넣으세요');
+    expect(src).toContain('편집기의 <b>HTML 탭</b>에 붙여 넣으시기 바랍니다');
   });
   it('provider-neutral — 패널 기본 라벨은 LLM 일반 표현이며 특정 제품 자동 열기(window.open) 없음', () => {
     expect(src).toContain("label = 'LLM으로 작업하기'");
@@ -154,7 +154,7 @@ describe('WO-O4O-STORE-EXTERNAL-LLM-CONTENT-AUTHORING-V1 — (C) Store 소비처
     expect(src).toContain('{LlmAssistComponent && (');
     expect(src).toContain('value={editorValue}');
     expect(src).toContain('<h1 style={styles.pageTitle}>매장 제작 자료 편집</h1>');
-    expect(src).toContain('placeholder="직접 작성하거나 ChatGPT 등 외부 AI에서 만든 내용을 붙여넣으세요."');
+    expect(src).toContain('placeholder="직접 작성하거나 ChatGPT 등 외부 AI에서 만든 내용을 붙여넣으시기 바랍니다."');
     expect(src).not.toContain('AI 제작 자료 초안 편집');
     expect(src).not.toContain('AI가 정리한 내용을 편집하거나');
     expect(src).toContain('showInternalAi={false}');

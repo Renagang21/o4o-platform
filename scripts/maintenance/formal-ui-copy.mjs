@@ -17,8 +17,9 @@ const files = execFileSync(
   .split("\n")
   .filter(
     (f) =>
-      /\/src\/.*\.(tsx?|jsx?)$/.test(f) &&
-      !/(fixture|mock|seed|prompt|knowledge|example|context-builder|editing-preset|forum-cosmetics|\/data\/)/i.test(
+      (/\/src\/.*\.(tsx?|jsx?)$/.test(f) ||
+        /\/tests\/.*\.(test|spec)\.tsx?$/.test(f)) &&
+      !/(fixture|mock|seed|prompt|knowledge|example|context-builder|editing-preset|content-authoring-guide|localIntent|nl\.ts|forum-cosmetics|\/data\/)/i.test(
         f,
       ),
   );
@@ -101,8 +102,13 @@ for (const file of files) {
     ) {
       for (let owner = node.parent; owner; owner = owner.parent) {
         if (
+          ts.isNewExpression(owner) &&
+          owner.expression.getText(ast) === "Set"
+        )
+          return;
+        if (
           ts.isPropertyAssignment(owner) &&
-          /^(systemPrompt|systemPromptOverride|guideText|instructions?)$/.test(
+          /^(systemPrompt|systemPromptOverride|guideText|instructions?|prompt|examples?|samples?)$/.test(
             owner.name.getText(ast).replaceAll(/['"]/g, ""),
           )
         )
@@ -111,7 +117,9 @@ for (const file of files) {
       if (
         node.parent &&
         ts.isCallExpression(node.parent) &&
-        /^expect\(prompt\)\./.test(node.parent.expression.getText(ast))
+        /^expect\(.*(prompt|guide|instruction)/i.test(
+          node.parent.expression.getText(ast),
+        )
       )
         return;
       if (file.startsWith("apps/api-server/")) {

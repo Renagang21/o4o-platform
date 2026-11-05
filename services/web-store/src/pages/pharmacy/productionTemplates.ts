@@ -69,7 +69,7 @@ export const PRODUCTION_TEMPLATE_REGISTRY: ProductionTemplate[] = [
     systemPromptOverride:
       '현대적이고 깔끔한 약국 POP 인쇄물을 작성합니다. ' +
       '제목은 15자 이내로 굵고 임팩트 있게, 핵심 포인트는 3개 이하의 짧은 불릿으로, ' +
-      '하단 본문은 30자 이내 한 문장으로 마무리하시기 바랍니다. ' +
+      '하단 본문은 30자 이내 한 문장으로 마무리하세요. ' +
       '불필요한 수식어 없이 핵심만 전달합니다.',
     starterHtml:
       '<h2>제목을 입력하시기 바랍니다</h2>' +
@@ -95,7 +95,7 @@ export const PRODUCTION_TEMPLATE_REGISTRY: ProductionTemplate[] = [
     systemPromptOverride:
       '고객에게 친근하게 다가가는 약국 POP 인쇄물을 작성합니다. ' +
       '제목은 친근한 어투로 20자 이내, 설명은 쉬운 말로 풀어쓰고, ' +
-      '전문 용어는 최소화합니다. 고객이 한눈에 이해할 수 있도록 구성하시기 바랍니다.',
+      '전문 용어는 최소화합니다. 고객이 한눈에 이해할 수 있도록 구성하세요.',
     starterHtml:
       '<h2>친근한 제목을 입력하시기 바랍니다</h2>' +
       '<p>고객을 위한 안내 메시지를 여기에 작성합니다.</p>' +
@@ -119,7 +119,7 @@ export const PRODUCTION_TEMPLATE_REGISTRY: ProductionTemplate[] = [
     },
     systemPromptOverride:
       '약사의 전문성과 신뢰를 전달하는 약국 POP 인쇄물을 작성합니다. ' +
-      '제목에 전문성을 담고, 효능/효과/주의사항을 구조적으로 안내하시기 바랍니다. ' +
+      '제목에 전문성을 담고, 효능/효과/주의사항을 구조적으로 안내하세요. ' +
       '과장 표현 없이 정확한 정보를 전달하며, 복약지도 관점을 유지합니다.',
     starterHtml:
       '<h2>전문 약국 안내</h2>' +
@@ -147,7 +147,7 @@ export const PRODUCTION_TEMPLATE_REGISTRY: ProductionTemplate[] = [
     },
     systemPromptOverride:
       'QR 코드 스캔 직후 보여줄 제품 소개 안내문을 작성합니다. ' +
-      '제목은 20자 이내, 스캔 직후 첫 문장(shortText)은 50자 이내로 핵심만 전달하시기 바랍니다. ' +
+      '제목은 20자 이내, 스캔 직후 첫 문장(shortText)은 50자 이내로 핵심만 전달하세요. ' +
       '제품명, 주요 효능, 구매/상담 안내를 간결하게 포함합니다.',
   },
 
@@ -166,7 +166,7 @@ export const PRODUCTION_TEMPLATE_REGISTRY: ProductionTemplate[] = [
     },
     systemPromptOverride:
       'QR 코드 스캔 직후 이벤트·프로모션 참여를 유도하는 안내문을 작성합니다. ' +
-      '제목에 혜택/기간을 포함하고, 첫 문장(shortText)은 50자 이내 행동 유도 문구로 작성하시기 바랍니다. ' +
+      '제목에 혜택/기간을 포함하고, 첫 문장(shortText)은 50자 이내 행동 유도 문구로 작성하세요. ' +
       '"지금 바로", "오늘만" 등 긴박감을 부여하는 표현을 적절히 활용합니다.',
   },
 
@@ -185,7 +185,7 @@ export const PRODUCTION_TEMPLATE_REGISTRY: ProductionTemplate[] = [
     },
     systemPromptOverride:
       'QR 코드 스캔 후 건강·의약 정보를 안내하는 신뢰감 있는 안내문을 작성합니다. ' +
-      '제목은 20자 이내, 설명은 50자 이내로 핵심 건강 정보를 간결하게 전달하시기 바랍니다. ' +
+      '제목은 20자 이내, 설명은 50자 이내로 핵심 건강 정보를 간결하게 전달하세요. ' +
       '"약사가 직접 안내합니다", "전문 건강 정보" 등 신뢰감을 주는 표현을 포함하고, ' +
       '과장 없이 정확한 정보를 제공합니다.',
   },
@@ -208,9 +208,9 @@ export const PRODUCTION_TEMPLATE_REGISTRY: ProductionTemplate[] = [
     systemPromptOverride:
       '소비자의 구매 결정을 돕는 상품 상세설명을 작성합니다. ' +
       '상품의 핵심 효능·특징을 소비자 관점에서 설명하고, ' +
-      '주요 성분·용법·용량을 쉬운 말로 정리하시기 바랍니다. ' +
+      '주요 성분·용법·용량을 쉬운 말로 정리하세요. ' +
       '마지막에 "이런 분께 추천합니다" 항목을 포함하면 좋습니다. ' +
-      '과장 표현과 허위 광고성 문구는 절대 사용하지 마시기 바랍니다.',
+      '과장 표현과 허위 광고성 문구는 절대 사용하지 마세요.',
     starterHtml:
       '<h2>상품 소개</h2>' +
       '<p>상품에 대한 간단한 소개를 여기에 작성합니다.</p>' +
@@ -236,7 +236,7 @@ export const PRODUCTION_TEMPLATE_REGISTRY: ProductionTemplate[] = [
     systemPromptOverride:
       '전문가(약사·의료인) 대상 의약품/건강기능식품 상세설명을 작성합니다. ' +
       '성분·함량, 효능·효과, 용법·용량, 주의사항, 금기사항, 보관방법을 ' +
-      '구조화된 섹션으로 정리하시기 바랍니다. ' +
+      '구조화된 섹션으로 정리하세요. ' +
       '전문 용어를 정확하게 사용하고, 공식 허가 내용 기반으로 작성합니다.',
     starterHtml:
       '<h2>성분·함량</h2>' +
