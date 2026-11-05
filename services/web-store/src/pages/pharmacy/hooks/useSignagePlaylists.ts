@@ -178,6 +178,14 @@ export function useSignagePlaylists(organizationId: string) {
           );
       }
     });
+  const handleRenamePlaylist = (playlist: StorePlaylist, name: string) => {
+    const trimmed = name.trim();
+    if (!trimmed || trimmed.length > 255) return;
+    return runPlaylistMutation(playlist.id, async (isStoreCurrent) => {
+      await updateStorePlaylist(playlist.id, { name: trimmed });
+      if (isStoreCurrent()) await loadPlaylists();
+    });
+  };
   const handleDeletePlaylist = (playlist: StorePlaylist) => {
     if (!confirm(`"${playlist.name}" 플레이리스트를 삭제하시겠습니까?`)) return;
     return runPlaylistMutation(playlist.id, async (isStoreCurrent) => {
@@ -377,6 +385,7 @@ export function useSignagePlaylists(organizationId: string) {
     setShowLibrarySelector: changeLibrarySelector,
     handleTogglePublish,
     handleDeletePlaylist,
+    handleRenamePlaylist,
     handleAddFromLibrary,
     handleDeleteItem,
     handleBulkAdd,

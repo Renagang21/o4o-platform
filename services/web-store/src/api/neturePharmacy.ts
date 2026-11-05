@@ -1,4 +1,3 @@
-import type { EnrollmentPolicyReference } from '@o4o/shared-space-ui';
 /**
  * Neture 약국 매장 commerce API — WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1
  * 설계: docs/design/DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1.md §3-1 · §3-2 · §4 · §8
@@ -28,22 +27,7 @@ export interface PharmacyMembership {
   business_profile?: Record<string, string>;
 }
 
-export interface PharmacyMembershipInput {
-  policyReferences?: EnrollmentPolicyReference[];
-  pharmacyName: string;
-  businessNumber: string;
-  pharmacistLicenseNumber: string;
-  address?: string;
-  phone?: string;
-  businessRegistrationDocumentId?: string | null;
-  contactName?: string;
-  managerPhone?: string;
-  contactEmail?: string;
-  taxInvoiceEmail?: string;
-  representativeName?: string;
-  businessType?: string;
-  businessCategory?: string;
-}
+
 
 export type PaymentMode = 'test' | 'live' | 'disabled';
 
@@ -184,15 +168,7 @@ export interface SemiFranchiseContent {
 const P = '/neture/pharmacy';
 
 export const neturePharmacyApi = {
-  // ─── 내 매장(약국) 신청 (매장 게이트 이전 — 로그인 + 서버의 Neture 가입 승인 확인) ───
-  async getMembership(): Promise<PharmacyMembership | null> {
-    return (await coreApiClient.get<Envelope<PharmacyMembership | null>>(`${P}/membership`)).data;
-  },
-  async applyMembership(input: PharmacyMembershipInput): Promise<PharmacyMembership> {
-    return (await coreApiClient.post<Envelope<PharmacyMembership>>(`${P}/membership`, input)).data;
-  },
-
-  // ─── 내 매장 (내 매장(약국) 신청 active) ───
+  // ─── 내 매장 (약국 승인 active) ───
   async getStoreContext(): Promise<PharmacyStoreContext> {
     return (await coreApiClient.get<Envelope<PharmacyStoreContext>>(`${P}/store/context`)).data;
   },

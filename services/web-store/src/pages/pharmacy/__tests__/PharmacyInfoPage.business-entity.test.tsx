@@ -46,14 +46,15 @@ describe('pharmacy business entity classification', () => {
 
 
 describe('shared pharmacy information behavior through the Store adapter', () => {
-  it.each(['missing', 'failed'])('keeps the pharmacy gate for %s data', async (state) => {
+  it.each(['missing', 'failed'])('shows recoverable information failure for %s data', async (state) => {
     if (state === 'missing') api.get.mockResolvedValue(null);
     else api.get.mockRejectedValue(new Error('fixture load failure'));
     render(<MemoryRouter initialEntries={['/pharmacy/info']}><Routes>
       <Route path="/pharmacy/info" element={<PharmacyInfoPage />} />
       <Route path="/pharmacy" element={<p>약국 게이트</p>} />
     </Routes></MemoryRouter>);
-    await screen.findByText('약국 게이트');
+    await screen.findByRole('button', { name: '매장 정보 다시 확인' });
+    expect(screen.queryByText('약국 게이트')).toBeNull();
     expect(api.update).not.toHaveBeenCalled();
   });
 
@@ -131,4 +132,24 @@ describe('business email validation after commonization', () => {
       expect(api.update).not.toHaveBeenCalled();
     }
   });
+});
+
+it('shows synthetic Demo data separately and never submits it as real pharmacy information', async () => {
+  api.get.mockResolvedValue({ name: '실제 표시 이름', demoExample: { name: 'O4O 체험 약국', businessNumber: 'DEMO-BIZ-0001', licenseNumber: 'DEMO-LICENSE-0001', address: '가상 주소', representativeName: '체험', businessType: '소매업', businessItem: '약국' } });
+  render(<PharmacyInfoPage />);
+  await screen.findByRole('region', { name: 'Demo 약국 가상 정보' });
+  expect(screen.getByText('DEMO-LICENSE-0001')).toBeTruthy();
+  expect(screen.getByRole('link', { name: '체험용 사업자등록증 예시 받기' }).getAttribute('href')).toBe('/samples/demo-pharmacy-business.svg');
+  fireEvent.click(screen.getByRole('button', { name: '수정' }));
+  expect(screen.getByDisplayValue('실제 표시 이름')).toBeTruthy();
+  expect(screen.queryByDisplayValue('DEMO-BIZ-0001')).toBeNull();
+  expect(api.update).not.toHaveBeenCalled();
+});
+it('retries a failed information request without redirecting or creating a store', async () => {
+  api.get.mockRejectedValueOnce(new Error('unavailable')).mockResolvedValueOnce({ name: '복구 매장' });
+  render(<PharmacyInfoPage />);
+  fireEvent.click(await screen.findByRole('button', { name: '매장 정보 다시 확인' }));
+  await screen.findByText('복구 매장');
+  expect(api.get).toHaveBeenCalledTimes(2);
+  expect(api.update).not.toHaveBeenCalled();
 });

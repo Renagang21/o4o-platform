@@ -33,7 +33,7 @@ it('home starts work before overview finishes and loads recent activity only whe
   let resolve!: (value: unknown) => void;
   api.analytics.mockReturnValueOnce(new Promise(r => { resolve = r; }));
   render(<MemoryRouter><StoreHomePage /></MemoryRouter>);
-  expect(screen.getByRole('link', { name: '매장 컨텐츠' })).toBeTruthy();
+  expect(screen.getByRole('link', { name: '매장 콘텐츠' })).toBeTruthy();
   expect(api.scans).not.toHaveBeenCalled();
   expect(screen.getByText(/매장 현황을 불러오는 중/)).toBeTruthy();
   await act(async () => resolve({ success: true, data: { activeQrCount: 0, weeklyScans: 0, topQrCodes: [] } }));
@@ -59,7 +59,7 @@ it('home overview and optional activity failures have separate retries and never
 });
 it('home shortcuts preserve the selected service path without displaying all tools', async () => {
   render(<MemoryRouter initialEntries={['/work/kpa-society/store']}><StoreHomePage /></MemoryRouter>);
-  expect(screen.getByRole('link', { name: '매장 컨텐츠' }).getAttribute('href')).toBe('/work/kpa-society/store/workspace/studio');
+  expect(screen.getByRole('link', { name: '매장 콘텐츠' }).getAttribute('href')).toBe('/work/kpa-society/store/workspace/studio');
   expect(screen.getByRole('link', { name: '운영 확인' }).getAttribute('href')).toBe('/work/kpa-society/store/workspace/use');
   expect(screen.queryByRole('link', { name: 'QR 배치·출력' })).toBeNull();
   await screen.findByText('확인된 업무에는 대기 항목이 없습니다.');
