@@ -1,6 +1,7 @@
-export type MemberTask = 'all' | 'qualifications' | 'pharmacies' | 'corrections';
+import type {MemberRegistration,MemberRegistrationType} from '@o4o/types';
+export type MemberTask = 'all' | 'pending' | 'inactive' | 'qualifications' | 'pharmacies' | 'corrections';
 export interface MemberPermissions { qualifications: boolean; pharmacies: boolean; applications?: boolean; edit: boolean; manageAccount?: boolean; erase?: boolean }
-export interface MemberRow { userId: string; name: string | null; email: string; accountStatus: string; accountActive?:boolean; serviceStatus?: string; qualificationStatus: string; pharmacyStatus: string | null }
+export interface MemberRow { userId: string; name: string | null; nickname?:string|null;email: string; loginMethods?:string[];registrationType?:MemberRegistrationType|null;accountStatus: string; accountActive?:boolean; serviceStatus?: string; qualificationStatus?: string; pharmacyStatus?: string | null }
 export interface MemberProfile { hasPassword?:boolean; userId: string; name: string | null; nickname: string | null; email: string; phone: string | null; accountStatus: string; accountActive?:boolean; serviceStatus?: string; emailVerified: boolean; joinedAt: string; version: string }
 export interface Qualification { licenseNumber: string | null; status: string; reason: string | null; approvedAt: string | null; reviewedBy: string | null; version: string }
 export interface MemberPharmacy {
@@ -10,6 +11,7 @@ export interface MemberPharmacy {
   contactName: string | null; managerPhone: string | null; contactEmail: string | null; taxInvoiceEmail: string | null;
 }
 export interface MemberDetail {
+  registration?:MemberRegistration|null;
   member: MemberProfile; qualification: Qualification | null; legacyLicense: string | null; legacyBusiness?: Record<string, string> | null; pharmacies: MemberPharmacy[];
   history: Array<{ action: string; createdAt: string; actorId: string | null; reason: string | null }>; permissions: MemberPermissions;
 }

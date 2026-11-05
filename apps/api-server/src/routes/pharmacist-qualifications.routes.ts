@@ -1,4 +1,5 @@
 import {MemberVerificationService} from '../services/admin/member-verification.service.js';
+import {memberRegistrationSchema} from '../services/admin/member-registration-contract.js';
 import {MemberCredentialRecoveryService} from '../services/admin/member-credential-recovery.service.js';
 import { Router } from "express";
 import { z } from "zod";
@@ -67,11 +68,16 @@ const google = (req: AuthRequest) => {
     );
 };
 const workspace = () => new CentralMemberWorkspaceService(AppDataSource);
+pharmacistQualificationsRouter.post('/members/:userId/restore-access',handle(req=>{
+  google(req);
+  const input=z.object({reason:z.string().trim().min(1).max(2000),version:z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{6}$/)}).strict().parse(req.body);
+  return new MemberLifecycleService(AppDataSource).restoreAccess(req.user!.id,z.string().uuid().parse(req.params.userId),{reason:input.reason!,version:input.version!});
+}));
 const memberId = (req: AuthRequest) => z.string().uuid().parse(req.params.userId);
 pharmacistQualificationsRouter.get('/members', handle(req => {
   google(req);
   const query = z.object({
-    task: z.enum(['all', 'qualifications', 'pharmacies', 'corrections']).default('all'),
+    task: z.enum(['all', 'pending', 'inactive', 'qualifications', 'pharmacies', 'corrections']).default('all'),
     page: z.coerce.number().int().min(1).max(100000).default(1),
     q: z.string().trim().max(100).default(''),
   }).strict().parse(req.query);
@@ -84,13 +90,17 @@ pharmacistQualificationsRouter.get('/members/:userId', handle(req => {
 pharmacistQualificationsRouter.patch('/members/:userId', handle(req => {
   google(req);
   const input = z.object({
-    name: z.string().trim().min(1).max(50), nickname: z.string().trim().max(50),
+    name: z.string().trim().min(1).max(100), nickname: z.string().trim().max(100),
     email:z.string().trim().email().max(255).optional(),licenseNumber:z.string().trim().max(100).refine(value=>[...value].every(char=>char.charCodeAt(0)>=32&&char.charCodeAt(0)!==127)).optional(),qualificationVersion:z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{6}$/).nullable().optional(),evidenceConfirmed:z.boolean().optional(),
     phone: z.string().trim().max(20), reason: z.string().trim().min(1).max(2000),
     version: z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{6}$/),
+    registration:memberRegistrationSchema.optional(),businessVersion:z.string().regex(/^[a-f0-9]{32}$/).nullable().optional(),
   }).strict().parse(req.body);
   return workspace().correct(req.user!.id, memberId(req), {
     name: input.name!, nickname: input.nickname!, phone: input.phone!, reason: input.reason!, version: input.version!,
+    ...(input.registration?{registration:input.registration as import('@o4o/types').MemberRegistrationInput}:{}),
+    ...(input.businessVersion!==undefined?{businessVersion:input.businessVersion}:{}),
+    ...(input.qualificationVersion!==undefined?{qualificationVersion:input.qualificationVersion}:{}),
     ...(input.email!==undefined?{email:input.email}:{}),...(input.licenseNumber!==undefined?{licenseNumber:input.licenseNumber,qualificationVersion:input.qualificationVersion,evidenceConfirmed:input.evidenceConfirmed}:{}),...(input.evidenceConfirmed!==undefined?{evidenceConfirmed:input.evidenceConfirmed}:{}),
   });
 }));

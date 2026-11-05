@@ -12,14 +12,14 @@ export default function MemberLifecycleActions({
   initialAction = null,
 }: Readonly<{
   adminMode?: boolean;
-  initialAction?: "stop" | "terminate" | null;
+  initialAction?: "restore" | "terminate" | null;
   detail: MemberDetail;
   actorId: string;
   busy: boolean;
   perform: (work: () => Promise<unknown>) => Promise<void>;
 }>) {
   const [action, setAction] = useState<
-    "stop" | "terminate" | "transfer" | "close" | null
+    "restore" | "terminate" | "transfer" | "close" | null
   >(initialAction);
   const [reason, setReason] = useState("");
   const [email, setEmail] = useState("");
@@ -62,7 +62,7 @@ export default function MemberLifecycleActions({
       ? pharmacies.filter((pharmacy) => pharmacy.status === "active")
       : pharmacies;
   if (!detail.permissions.edit || actorId === detail.member.userId) return null;
-  const choose = (next: "stop" | "terminate" | "transfer" | "close") => {
+  const choose = (next: "restore" | "terminate" | "transfer" | "close") => {
     setAction(next);
     setReason("");
     setEmail("");
@@ -80,16 +80,8 @@ export default function MemberLifecycleActions({
     >
       <h4 className="font-semibold">이용 관리</h4>
       <div className="flex flex-wrap gap-3">
-        <button type="button" disabled={busy} onClick={() => choose("stop")}>
-          이용 정지
-        </button>
-        <button
-          type="button"
-          disabled={busy}
-          onClick={() => choose("terminate")}
-        >
-          회원 해지
-        </button>
+        {['suspended','withdrawn'].includes(detail.member.serviceStatus??'') ? <button type="button" disabled={busy} onClick={()=>choose('restore')}>이용 복구</button>
+          : detail.member.serviceStatus==='active' && <button type="button" disabled={busy} onClick={()=>choose('terminate')}>회원 해지</button>}
         {adminMode &&
           detail.permissions.manageAccount &&
           pharmacies.some((pharmacy) => pharmacy.status === "active") && (
@@ -121,15 +113,15 @@ export default function MemberLifecycleActions({
             if (
               busy ||
               !reason.trim() ||
-              !confirmed ||
+              ((action === "transfer" || action === "close") && !confirmed) ||
               (action === "close" && !plan)
             )
               return;
             const base = `/qualifications/pharmacist/members/${encodeURIComponent(detail.member.userId)}`;
             void perform(() =>
-              action === "stop" || action === "terminate"
+              action === "restore" || action === "terminate"
                 ? authClient.api.post(
-                    `${base}/${action === "terminate" ? "terminate-access" : "stop-access"}`,
+                    `${base}/${action === "terminate" ? "terminate-access" : "restore-access"}`,
                     { reason: reason.trim(), version: detail.member.version },
                   )
                 : action === "close"
@@ -150,9 +142,9 @@ export default function MemberLifecycleActions({
         >
           <p>
             {action === "terminate"
-              ? "Neture 서비스 이용 자격과 직원 소속·접근을 해제합니다. 공통 계정과 사업체 자료는 유지합니다. 다른 서비스의 회원 자격은 변경하지 않습니다."
-              : action === "stop"
-                ? "Neture 서비스 이용을 일시 정지합니다. 계정·직원 소속·사업체 자료는 유지합니다."
+              ? "회원 이용을 해지합니다. 이후 이용 복구가 가능합니다."
+              : action === "restore"
+                ? "해지된 회원의 이용을 복구합니다."
                 : action === "close"
                   ? "완전폐업한 약국의 모든 소속과 이용을 종료하고 기존 약국 자료·파일 파기 절차를 실행합니다. 매도한 약국에는 사용하지 마시기 바랍니다. 실패한 경우 같은 버튼으로 재시도할 수 있습니다. 회원 계정은 별도로 삭제합니다."
                   : "약국 자료를 유지하고 새 경영자에게 관리 권한을 이전합니다. 이전 경영자의 해당 약국 접근은 해제됩니다. 새 경영자의 사업자 정보는 이전 후 확인·정정해 주시기 바랍니다."}
@@ -221,27 +213,13 @@ export default function MemberLifecycleActions({
               onChange={(event) => setReason(event.target.value)}
             />
           </label>
-          <label className="flex items-start gap-2">
-            <input
-              type="checkbox"
-              disabled={busy}
-              checked={confirmed}
-              onChange={(event) => setConfirmed(event.target.checked)}
-            />
-            {action === "transfer"
-              ? "약국 매도와 자료 이전에 대해 양측의 확인을 받았습니다."
-              : action === "close"
-                ? "매도가 아닌 완전폐업이며 약국 자료 삭제를 확인했습니다."
-                : action === "terminate"
-                  ? "서비스 회원 해지와 직원 접근 해제를 확인했습니다."
-                  : "일시 이용 정지와 자료 유지를 확인했습니다."}
-          </label>
+          {(action === 'transfer' || action === 'close') && <label className="block"><input type="checkbox" disabled={busy} checked={confirmed} onChange={event=>setConfirmed(event.target.checked)}/>{action==='transfer'?'약국 매도와 자료 이전에 대해 양측의 확인을 받았습니다.':'매도가 아닌 완전폐업이며 약국 자료 삭제를 확인했습니다.'}</label>}
           <button
             type="submit"
             disabled={
               busy ||
               (action === "close" && !plan) ||
-              !confirmed ||
+              ((action === "transfer" || action === "close") && !confirmed) ||
               !reason.trim() ||
               ((action === "transfer" || action === "close") &&
                 !organizationId) ||
@@ -250,8 +228,8 @@ export default function MemberLifecycleActions({
           >
             {action === "terminate"
               ? "회원 해지 실행"
-              : action === "stop"
-                ? "이용 정지 실행"
+              : action === "restore"
+                ? "이용 복구 실행"
                 : action === "close"
                   ? "완전폐업·자료삭제 실행"
                   : "경영자 이전 실행"}

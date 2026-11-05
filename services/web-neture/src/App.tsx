@@ -9,6 +9,7 @@ import ServiceContactPage from './pages/operator/ServiceContactPage';
 import HomePresentationPage from './pages/operator/HomePresentationPage';
 import CarePharmNewsPage from './pages/carepharm/CarePharmNotices';
 import { consumeLoginNavigation } from './lib/loginNavigation';
+import MemberRegistrationCompletion from './components/auth/MemberRegistrationCompletion';
 import AccountPolicyNoticePage from './pages/legal/AccountPolicyNoticePage';
 import PartnerServicePage from './pages/PartnerServicePage';
 import ServiceMembersPage from './pages/operator/ServiceMembersPage';
@@ -674,6 +675,7 @@ function App() {
           <SeoWatcher />
           <O4OToastProvider />
           <PostLoginRedirect />
+          <MemberRegistrationCompletion />
           <ModalRenderer />
           {/* WO-O4O-INTEGRATED-TERMS-ACCEPTANCE-AND-SIGNUP-ALIGNMENT-V1 §17: 기존 회원 약관 재동의 게이트 */}
           <TermsAcceptanceGate>

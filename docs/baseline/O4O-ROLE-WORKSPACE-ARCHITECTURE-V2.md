@@ -1,5 +1,7 @@
 # O4O-ROLE-WORKSPACE-ARCHITECTURE-V2
 
+> **2026-11-04 사용자 확정:** [통합 회원 가입·관리 기준](O4O-UNIFIED-MEMBER-REGISTRATION-V1.md)이 신규 가입 분류·단일 승인·운영자 전체 가입정보 정정·한 줄 목록·회원 해지/복구의 현행 정책이다. 해당 범위의 종전 이메일 확인만으로 가입 완료·별도 약사/약국 대기·직원 동반 해제 설명은 대체한다. 기존 데이터·타 서비스·직원 경영자 권한·Admin 삭제/매도/폐업 경계는 유지하며 구현 상태는 새 TODO/CHECK로 구분한다.
+
 > **상태**: ACTIVE
 > **작성일**: 2026-10-28 · **최종 갱신**: 2026-11-01 (Asia/Seoul)
 > **근거 WO/IR**: [WO-O4O-UNIFIED-OPERATING-RESPONSIBILITY-V1](../work-orders/WO-O4O-UNIFIED-OPERATING-RESPONSIBILITY-V1.md) · 사용자 수용 완료 IR-1~IR-4 및 WO-1 추가 지침

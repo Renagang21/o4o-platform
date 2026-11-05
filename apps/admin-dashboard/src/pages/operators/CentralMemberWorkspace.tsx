@@ -1,21 +1,18 @@
+import {MEMBER_REGISTRATION_TYPES,MEMBER_STATUS_LABELS} from '@o4o/types';
 import {ActionBar} from '@o4o/ui';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { authClient } from '@o4o/auth-client';
 import { DataTable, type ListColumnDef } from '@o4o/operator-ux-core';
 import MemberWorkPanel from './MemberWorkPanel';
-import { memberError, memberServiceLabels, pharmacyLabels, qualificationLabels, type MemberDetail, type MemberPermissions, type MemberRow, type MemberTask, type MemberWorkMode } from './member-workspace-model';
+import { memberError, type MemberDetail, type MemberPermissions, type MemberRow, type MemberTask, type MemberWorkMode } from './member-workspace-model';
 
 const base = '/qualifications/pharmacist/members';
-const tasks: Array<[MemberTask, string]> = [['all', '전체 회원'], ['qualifications', '약사 검토 대기'], ['pharmacies', '약국 심사 대기'], ['corrections', '반려·보완']];
+const tasks: Array<[MemberTask, string]> = [['all', '전체 회원'], ['pending', '가입 대기'], ['corrections', '반려·보완'], ['inactive', '해지 회원']];
 function taskAllowed(task: MemberTask, permissions: MemberPermissions) {
-  if (task === 'all') return true;
+  if (['all','pending','inactive','corrections'].includes(task)) return true;
   if (task === 'qualifications') return permissions.qualifications;
   if (task === 'pharmacies') return permissions.pharmacies;
   return permissions.qualifications || permissions.pharmacies;
-}
-function statusLabel(labels: Record<string, string>, value: unknown, fallback: string) {
-  if (typeof value !== 'string') return fallback;
-  return labels[value] ?? fallback;
 }
 export default function CentralMemberWorkspace({ actorId, initialQuery = '', adminMode=false }: Readonly<{ actorId: string; initialQuery?: string; adminMode?:boolean }>) {
   const [task, setTask] = useState<MemberTask>('all'), [page, setPage] = useState(1);
@@ -100,11 +97,12 @@ export default function CentralMemberWorkspace({ actorId, initialQuery = '', adm
   const selectedIndex = reviewRows.findIndex(row => row.userId === selectedId);
   const nextMember = reviewRows[selectedIndex + 1];
   const columns: ListColumnDef<MemberRow>[] = [
-    { key: 'name', header: '회원', stickyOnMobile: true, render: (_value, row) => <button type="button" disabled={busy} aria-pressed={selectedId === row.userId} className="text-left underline" onClick={event => { event.stopPropagation(); void openMember(row.userId); }}><strong>{row.name || '회원'}</strong><span className="block text-sm">{row.email}</span></button> },
-    { key: 'serviceStatus', header: 'Neture 이용', render:value=>statusLabel(memberServiceLabels,value,'확인 필요') },
-    { key: 'accountStatus', header: '공통 계정', render:(value,row)=>row.accountActive===false?'비활성':statusLabel({...memberServiceLabels,approved:'정상',inactive:'비활성'},value,'확인 필요') },
-    { key: 'qualificationStatus', header: '약사 자격', render: value => statusLabel(qualificationLabels, value, '확인 필요') },
-    ...(permissions.pharmacies ? [{ key: 'pharmacyStatus', header: '약국 신청', render: (value: unknown) => statusLabel(pharmacyLabels, value, '신청 없음') }] : []),
+    {key:'name',header:'이름',stickyOnMobile:true,minWidth:120,render:(_value,row)=><button type="button" disabled={busy} aria-label={`회원 ${row.name||'미등록'} ${row.email||'이메일 미제공'}`} aria-pressed={selectedId===row.userId} className="whitespace-nowrap text-left underline" onClick={event=>{event.stopPropagation();void openMember(row.userId);}}>{row.name||'미등록'}</button>},
+    {key:'nickname',header:'닉네임',minWidth:120,render:value=><span className="whitespace-nowrap">{value||'미등록'}</span>},
+    {key:'email',header:'이메일',minWidth:240,render:value=><span className="whitespace-nowrap">{value||'미제공'}</span>},
+    {key:'loginMethods',header:'로그인 방식',minWidth:120,render:value=><span className="whitespace-nowrap">{Array.isArray(value)&&value.length?value.map(key=>({google:'Google',kakao:'카카오',email:'이메일'})[key]??'기타').join(' · '):'미등록'}</span>},
+    {key:'registrationType',header:'가입 유형',minWidth:110,render:value=><span className="whitespace-nowrap">{MEMBER_REGISTRATION_TYPES[value as keyof typeof MEMBER_REGISTRATION_TYPES]??'미등록'}</span>},
+    {key:'serviceStatus',header:'회원 상태',minWidth:100,render:value=><span className="whitespace-nowrap">{MEMBER_STATUS_LABELS[String(value)]??'확인 필요'}</span>},
   ];
   let panelContent = <button type="button" disabled={busy} onClick={() => { if (selectedId) void openMember(selectedId); }}>선택 회원 다시 조회</button>;
   if (reading) { panelContent = <output>회원 제출 정보를 확인하는 중…</output>; }
@@ -116,15 +114,15 @@ export default function CentralMemberWorkspace({ actorId, initialQuery = '', adm
     <form className="flex flex-wrap gap-2" onSubmit={event => { event.preventDefault(); setPage(1); setQuery(search.trim()); }}><input aria-label="회원 이름·이메일 검색" maxLength={100} disabled={busy} value={search} onChange={event => setSearch(event.target.value)} className="rounded border p-2" /><button type="submit" disabled={busy}>검색</button><button type="button" disabled={busy || loading} onClick={() => { ++detailSequence.current; setDetail(null); setSelectedId(null); setSelectedIds(new Set()); void load(); }}>새로고침</button></form>
     {error && <p role="alert">{error}{selectedId&&<button type="button" disabled={busy} onClick={()=>void openMember(selectedId,workMode,true)}>최신 정보 다시 조회</button>}</p>}{notice && <output>{notice}</output>}
     <div className="[&>div>div]:flex-wrap"><ActionBar selectedCount={selectedIds.size} onClearSelection={()=>{if(busy)return;++detailSequence.current;setSelectedIds(new Set());setSelectedId(null);setDetail(null);setReading(false);}} actions={([
-      ['detail','회원 상세보기'],['edit','회원 정보 수정'],['reject','가입 거부'],['delete',adminMode?'계정·개인자료 삭제 확인':'회원 해지'],['pharmacy','약국·사업자 정보'],
-    ] as const).map(([key,label])=>({key,label,variant:key==='delete'?'danger':key===workMode?'primary':'default',tooltip:key==='delete'&&(adminMode?!permissions.erase:!permissions.edit)?'전체 관리자 권한이 필요합니다.':key==='reject'&&!permissions.manageAccount?'계정 가입 거부는 전체 관리자 권한이 필요합니다.':undefined,disabled:busy||loading||(key!=='detail'&&selectedIds.size!==1)||(key==='edit'&&!permissions.edit)||(key==='reject'&&!permissions.manageAccount)||(key==='delete'&&(adminMode?!permissions.erase:!permissions.edit)),onClick:()=>{const first=rows.find(row=>selectedIds.has(row.userId));if(first)void openMember(first.userId,key);}}))}/></div>
+      ['detail','회원 상세보기'],['edit','회원 정보 수정'],['reject','가입 반려'],['delete',adminMode?'계정·개인자료 삭제 확인':'회원 해지·복구'],['pharmacy','약국·사업자 정보'],
+    ] as const).map(([key,label])=>({key,label,variant:key==='delete'?'danger':key===workMode?'primary':'default',tooltip:key==='delete'&&(adminMode?!permissions.erase:!permissions.edit)?'전체 관리자 권한이 필요합니다.':undefined,disabled:busy||loading||(key!=='detail'&&selectedIds.size!==1)||(key==='edit'&&!permissions.edit)||(key==='reject'&&!permissions.edit)||(key==='delete'&&(adminMode?!permissions.erase:!permissions.edit)),onClick:()=>{const first=rows.find(row=>selectedIds.has(row.userId));if(first)void openMember(first.userId,key);}}))}/></div>
     {selectedIds.size>0 && !adminMode && workMode==='delete' && <p className="text-sm text-slate-600">회원 해지는 해당 서비스 이용 자격을 종료하며 계정을 삭제하지 않습니다. 계정·개인자료 완전삭제는 Admin 회원·사업체 관리에서 처리합니다.</p>}
     {selectedIds.size>1 && <p className="text-sm text-slate-600">선택 회원은 순서대로 상세 검토할 수 있습니다. 수정·거부·삭제는 한 명씩 확인 후 진행합니다.</p>}
     {selectedId && <section ref={panel} aria-label="선택 회원 작업" className="rounded-xl border border-blue-200 bg-blue-50 p-4 space-y-3">
       <div className="flex flex-wrap gap-3"><h3 className="font-semibold">{workMode==='edit'?'회원 정보 수정':workMode==='detail'?'회원 정보 보기':workMode==='pharmacy'?'약국·사업자 정보':'선택 회원 작업'}</h3><button type="button" disabled={busy} onClick={() => { ++detailSequence.current; setSelectedId(null); setSelectedIds(new Set()); setDetail(null); setReading(false); }}>선택 해제</button><button type="button" disabled={busy || reading || !nextMember} onClick={() => { if (nextMember) void openMember(nextMember.userId); }}>다음 회원 검토</button></div>
       {panelContent}
     </section>}
-    <DataTable<MemberRow> tableId="central-common-member-workspace" columns={columns} data={rows} selectable selectedKeys={selectedIds} onSelectionChange={keys=>{if(busy)return;const next=new Set(keys);setSelectedIds(next);if(selectedId&&!next.has(selectedId)){++detailSequence.current;setSelectedId(null);setDetail(null);setReading(false);}}} rowKey="userId" loading={loading} emptyMessage="현재 조건에 해당하는 회원이 없습니다." onRowClick={row => { if (!busy) void openMember(row.userId); }} />
+    <DataTable<MemberRow> tableId="central-member-registration-workspace-v2" columns={columns} data={rows} selectable selectedKeys={selectedIds} onSelectionChange={keys=>{if(busy)return;const next=new Set(keys);setSelectedIds(next);if(selectedId&&!next.has(selectedId)){++detailSequence.current;setSelectedId(null);setDetail(null);setReading(false);}}} rowKey="userId" loading={loading} emptyMessage="현재 조건에 해당하는 회원이 없습니다." onRowClick={row => { if (!busy) void openMember(row.userId); }} />
     <nav aria-label="회원 목록 페이지" className="flex gap-3"><button type="button" disabled={busy || page === 1} onClick={() => setPage(page - 1)}>이전</button><span>{page} 페이지</span><button type="button" disabled={busy || !hasNext} onClick={() => setPage(page + 1)}>다음</button></nav>
   </section>;
 }

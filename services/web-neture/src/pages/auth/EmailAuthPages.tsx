@@ -1,3 +1,4 @@
+import MemberRegistrationForm from '../../components/auth/MemberRegistrationForm';
 /**
  * 이메일·비밀번호 인증 페이지 — WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1
  *
@@ -17,7 +18,7 @@
  * (서버 요청 로그 · 방문 기록 · Referer 로 남지 않게).
  */
 import { useLayoutEffect, useMemo, useState, type ReactNode } from 'react';
-import { Navigate, useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import {
   O4OHomeButton,
   LoginCard,
@@ -84,13 +85,13 @@ function useOneTimeToken(): string | null {
 }
 
 export function SignupPage() {
-  const { isAuthenticated, isLoading, loginWithGoogle, signupWithGoogle, getGoogleAuthConfig, loginWithKakao, signupWithKakao } = useAuth();
+  const { isAuthenticated, isLoading, user, loginWithGoogle, signupWithGoogle, getGoogleAuthConfig, loginWithKakao, signupWithKakao } = useAuth();
   const links = useAuthLinks();
   const navigate = useNavigate();
   const [googleError, setGoogleError] = useState<string | null>(null);
   const [emailSignup, setEmailSignup] = useState(false);
   if (isLoading) return null;
-  if (isAuthenticated) return <Navigate to={operatorInvitationReturnPath()} replace />;
+  if (isAuthenticated) return <AuthCard title="가입 정보"><MemberRegistrationForm key={user?.id}/></AuthCard>;
   return (
     <AuthCard title="회원가입" subtitle={emailSignup ? '이메일로 가입' : '개인정보 보호를 위해 Google·카카오 가입을 권장합니다.'}>
       {emailSignup ? (
@@ -98,7 +99,7 @@ export function SignupPage() {
           <button type="button" className="mb-4 min-h-11 text-sm text-gray-600 underline" onClick={() => { setEmailSignup(false); setGoogleError(null); }}>
             다른 방법으로 가입
           </button>
-          <EmailSignupForm api={authClient} links={links} termsHref="/terms" privacyHref="/privacy" />
+          <EmailSignupForm api={authClient} links={{...links,login:'/login?returnTo=%2Fsignup'}} termsHref="/terms" privacyHref="/privacy" />
         </>
       ) : (
         <>
@@ -111,14 +112,14 @@ export function SignupPage() {
               loginWithGoogle={loginWithGoogle}
               signupWithGoogle={signupWithGoogle}
               onStart={() => setGoogleError(null)}
-              onSuccess={() => { setGoogleError(null); navigate(operatorInvitationReturnPath(), { replace: true }); }}
+              onSuccess={() => { setGoogleError(null); navigate(operatorInvitationReturnPath()==='/operator-invite'?'/operator-invite':'/signup', { replace: true }); }}
               onError={({ message }) => setGoogleError(message)}
               termsHref="/terms"
               privacyHref="/privacy"
             />
             <KakaoContinue<User> intent="signup" client={authClient} loginWithKakao={loginWithKakao} signupWithKakao={signupWithKakao}
               returnTo={new URLSearchParams(window.location.search).get('returnTo') ?? '/'}
-              onSuccess={() => { navigate(operatorInvitationReturnPath(), { replace: true }); }} />
+              onSuccess={() => { navigate(operatorInvitationReturnPath()==='/operator-invite'?'/operator-invite':'/signup', { replace: true }); }} />
             {googleError && (
               <p role="alert" className="mt-3 text-sm text-red-600">{googleError}</p>
             )}

@@ -11,21 +11,25 @@
  * 요청값으로 바꿀 수 없다.
  */
 import type { EntityManager } from 'typeorm';
+import {MEMBER_REGISTRATION_KEY} from '@o4o/types';
 import type { ServiceMembershipStatus } from '../../../utils/service-membership.js';
 
 export const NETURE_MAIN_SERVICE_KEY = 'neture';
 
 type QueryExec = { query: EntityManager['query'] };
 
-/** Main access is verified email plus a usable account, not manual service approval.
- * Explicit service suspension/withdrawal remains effective. Old pending/rejected
- * application rows do not require an operator to approve an email-verified account.
+/** New signup snapshots require one reviewed role application. Legacy accounts without
+ * the reserved marker retain their email-confirmed policy. Explicit suspension/withdrawal wins.
+ * Initial approval may connect the selected role's existing domain ledgers atomically;
+ * this status reader itself never writes membership, business or employee records.
  */
 export async function getNetureMainMembershipStatus(exec: QueryExec, userId: string): Promise<ServiceMembershipStatus> {
   if (!userId) return 'none';
   const rows = await exec.query(
     `SELECT u.status AS account_status, u."isActive" AS account_active,
-            u."isEmailVerified" AS email_verified, sm.status AS membership_status
+            u."isEmailVerified" AS email_verified, sm.status AS membership_status,
+            u."businessInfo"::jsonb->'${MEMBER_REGISTRATION_KEY}'->>'state' AS registration_state,
+            (u."businessInfo"::jsonb->'${MEMBER_REGISTRATION_KEY}'->>'legacyMainAccess'='true') AS legacy_main_access
        FROM users u
        LEFT JOIN service_memberships sm ON sm.user_id = u.id AND sm.service_key = $2
       WHERE u.id = $1 LIMIT 1`,
@@ -39,6 +43,8 @@ export interface NetureMainMembershipRow {
   account_active?: boolean | null;
   email_verified?: boolean | null;
   membership_status?: string | null;
+  registration_state?: string | null;
+  legacy_main_access?: boolean | null;
 }
 
 /** Single-user and joined list reads share the same policy; this function does no IO. */
@@ -48,13 +54,14 @@ export function resolveNetureMainMembershipStatus(row?: NetureMainMembershipRow)
   if (row.account_status === 'rejected') return 'rejected';
   if (row.account_status !== 'active' && row.account_status !== 'approved') return 'pending';
   if (row.membership_status === 'suspended' || row.membership_status === 'withdrawn') return row.membership_status;
+  if (row.legacy_main_access !== true && (row.registration_state === 'pending' || row.registration_state === 'rejected')) return row.registration_state;
   return row.email_verified === true ? 'active' : 'pending';
 }
 
 /** 상태별 안내 문구 — API 오류 메시지와 화면 안내가 같은 말을 쓰게 한다. */
 export const NETURE_MAIN_MEMBERSHIP_MESSAGES: Record<Exclude<ServiceMembershipStatus, 'active'>, string> = {
   none: 'Neture 계정 가입과 이메일 확인이 필요합니다.',
-  pending: '이메일 확인 또는 계정 상태 확인이 필요합니다.',
+  pending: '가입 정보·승인 및 계정 상태를 확인해 주세요.',
   rejected: 'Neture 가입이 반려되었습니다.',
   suspended: 'Neture 이용이 정지된 상태입니다.',
   withdrawn: 'Neture 가입이 해지된 상태입니다.',
@@ -87,7 +94,7 @@ export async function assertNetureMainMembershipActive(
   const status = await getNetureMainMembershipStatus(exec, userId);
   if (status === 'active') return;
   const message = subject === 'applicant'
-    ? `신청자의 메인 이용 자격이 확인되지 않았습니다(${status}). 이메일 확인과 계정 상태를 확인해 주세요.`
+    ? `신청자의 메인 이용 자격이 확인되지 않았습니다(${status}). 가입 정보·승인 및 계정 상태를 확인해 주세요.`
     : undefined;
   throw new NetureMainMembershipRequiredError(status, message, subject === 'applicant' ? 409 : 403);
 }

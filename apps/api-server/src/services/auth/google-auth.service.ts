@@ -1,3 +1,4 @@
+import {initialMemberRegistration} from './new-member-registration.js';
 import { recordSignupTerms, recordSignupPrivacy, type SignupTermsReference } from './signup-policy.service.js';
 import { isPhoneShapeValid, normalizePhoneDigits } from '../../common/auth/phone-shape.js';
 /**
@@ -361,7 +362,7 @@ export class GoogleAuthService {
     }
 
     const now = new Date();
-    const user = userRepo.create({
+    const user = userRepo.create({businessInfo:initialMemberRegistration(),
       // WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1 Phase B-1: `password: null` write 제거 — 컬럼이 B-2 에서 사라진다.
       email,
       name: consents.name.trim(),
