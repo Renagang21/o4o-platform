@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useId, type ComponentType, type CSSProperties } from 'react';
+import { useState, useEffect, useCallback, useId, type ComponentType, type ReactNode, type CSSProperties } from 'react';
 import { Navigate } from 'react-router-dom';
 import { BusinessRegistrationFields } from './BusinessRegistrationFields.js';
 import { getBusinessEntityTypeLabel, isSelectableBusinessEntityType } from '@o4o/types';
@@ -37,6 +37,8 @@ export interface PharmacyBusinessInfoTheme {
 }
 
 export interface PharmacyBusinessInfoProps {
+  /** Service adapter may show a recoverable error instead of legacy /pharmacy redirect. */
+  unavailable?: ReactNode;
   loadInfo: () => Promise<PharmacyBusinessInfoData | null>;
   saveInfo: (patch: PharmacyBusinessInfoPatch) => Promise<unknown>;
   theme: PharmacyBusinessInfoTheme;
@@ -102,7 +104,7 @@ function isBusinessEmail(value: string): boolean {
   return dot >= 0 && dot < value.length - 1;
 }
 
-export function PharmacyBusinessInfo({ loadInfo, saveInfo, theme, AddressSearch }: Readonly<PharmacyBusinessInfoProps>) {
+export function PharmacyBusinessInfo({ loadInfo, saveInfo, theme, AddressSearch, unavailable }: Readonly<PharmacyBusinessInfoProps>) {
   const formId = useId();
   const { colors } = theme;
   const styles = createStyles(theme);
@@ -230,7 +232,7 @@ export function PharmacyBusinessInfo({ loadInfo, saveInfo, theme, AddressSearch 
 
   // WO-KPA-PHARMACY-OWNER-WITHOUT-STORE-HANDLING-V1: 데이터 없음 → 게이트로 리다이렉트
   if (loadState === 'error' || !data) {
-    return <Navigate to="/pharmacy" replace />;
+    return unavailable ?? <Navigate to="/pharmacy" replace />;
   }
 
   // ─── View / Edit Mode ───

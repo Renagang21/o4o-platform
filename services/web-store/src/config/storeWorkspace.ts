@@ -3,7 +3,7 @@ import type {
   StoreMenuSectionItem,
 } from "@o4o/store-ui-core";
 
-export type StoreWorkspaceArea = "home" | "commerce" | "studio" | "use";
+export type StoreWorkspaceArea = "home" | "commerce" | "studio" | "use" | "signage";
 export const STORE_WORKSPACE_AREAS = [
   {
     key: "home",
@@ -25,9 +25,15 @@ export const STORE_WORKSPACE_AREAS = [
   },
   {
     key: "studio",
-    label: "매장 컨텐츠",
+    label: "매장 콘텐츠",
     subPath: "/workspace/studio",
     description: "상품과 자료를 골라 매장에서 사용할 안내를 준비합니다.",
+  },
+  {
+    key: "signage",
+    label: "사이니지",
+    subPath: "/marketing/signage/videos",
+    description: "동영상을 보관하고 재생목록과 재생 일정을 관리합니다.",
   },
 ] as const;
 
@@ -45,19 +51,16 @@ const studioKeys = new Set([
   "tablet-displays",
   "library-contents",
   "pharmacy-contents",
-  "signage-playlist",
-  "signage-videos",
 ]);
 const useKeys = new Set([
   "store-execution",
   "tablet-requests",
   "staff-support",
   "multilingual-consultation",
-  "signage-schedules",
-  "signage-player",
   "analytics-marketing",
 ]);
-const dualKeys = new Set(["qr", "tablet-displays", "signage-playlist", "pop"]);
+const signageKeys = new Set(["signage-videos", "signage-playlist", "signage-schedules", "signage-player"]);
+const dualKeys = new Set(["qr", "tablet-displays", "pop"]);
 
 export function withWorkspaceMode(
   path: string,
@@ -76,7 +79,7 @@ export function workspaceItems(
 ): StoreMenuSectionItem[] {
   const items = (config.menuSections ?? []).flatMap((section) => section.items);
   if (area === "home") return [];
-  const keys = { commerce: commerceKeys, studio: studioKeys, use: useKeys }[
+  const keys = { commerce: commerceKeys, studio: studioKeys, use: useKeys, signage: signageKeys }[
     area
   ];
   const selected = items.filter(
@@ -85,7 +88,6 @@ export function workspaceItems(
   const useLabels: Record<string, string> = {
     qr: "QR 배치·출력",
     "tablet-displays": "태블릿 적용",
-    "signage-playlist": "사이니지 적용",
     pop: "POP 출력",
   };
   const mode = area === "use" ? "use" : "studio";
@@ -125,7 +127,8 @@ export function workspaceSupportItems(
         item.key !== "home" &&
         !commerceKeys.has(item.key) &&
         !studioKeys.has(item.key) &&
-        !useKeys.has(item.key),
+        !useKeys.has(item.key) &&
+        !signageKeys.has(item.key),
     );
 }
 
@@ -149,12 +152,13 @@ export function currentWorkspaceArea(
       : null;
   }
   if (!relative || relative === "/") return "home";
+  if (/^\/marketing\/signage(?:\/|$)/.test(relative)) return "signage";
   const landing = STORE_WORKSPACE_AREAS.find(
     (area) => area.subPath && relative === area.subPath,
   );
   if (landing) return landing.key;
   if (
-    /^\/(marketing\/qr(?:\/|$)|commerce\/tablet-displays(?:\/|$)|marketing\/pop-v2(?:\/|$)|marketing\/signage\/playlist(?:\/|$))/.test(
+    /^\/(marketing\/qr(?:\/|$)|commerce\/tablet-displays(?:\/|$)|marketing\/pop-v2(?:\/|$))/.test(
       relative,
     )
   ) {
@@ -165,13 +169,13 @@ export function currentWorkspaceArea(
       : "studio";
   }
   if (
-    /^\/(execution|requests|staff-support|multilingual-consultation|analytics|content$|marketing\/signage\/(schedules|player))(?:\/|$)/.test(
+    /^\/(execution|requests|staff-support|multilingual-consultation|analytics|content$)(?:\/|$)/.test(
       relative,
     )
   )
     return "use";
   if (
-    /^\/(library|content\/|marketing\/product-descriptions|products\/multilingual|marketing\/signage\/videos)/.test(
+    /^\/(library|content\/|marketing\/product-descriptions|products\/multilingual)/.test(
       relative,
     ) ||
     relative === "/pharmacy/contents"
@@ -215,7 +219,13 @@ export function workspaceGroups(
     ),
   });
   const groups =
-    area === "commerce"
+    area === "signage"
+      ? [
+          group("signage-library", "동영상 보관함", "외부 영상과 가져온 자료를 보관합니다.", ["signage-videos"]),
+          group("signage-playlists", "재생목록", "보관함의 영상을 선택해 추가하고 순서를 편집합니다.", ["signage-playlist"]),
+          group("signage-playback", "재생·편성", "재생목록을 화면에 적용하고 시간을 지정합니다.", ["signage-player", "signage-schedules"]),
+        ]
+      : area === "commerce"
       ? [
           group(
             "products",
@@ -255,8 +265,6 @@ export function workspaceGroups(
                 "product-descriptions",
                 "tablet-displays",
                 "qr",
-                "signage-playlist",
-                "signage-videos",
                 "pop",
               ],
             ),
@@ -269,13 +277,6 @@ export function workspaceGroups(
                 "고객 응대에 필요한 상담 방식과 자료를 선택하세요.",
                 ["multilingual-consultation", "staff-support"],
                 ["tablet-requests"],
-              ),
-              group(
-                "signage",
-                "사이니지",
-                "매장에서 재생할 안내를 고르고 순서와 재생 일정을 관리합니다.",
-                ["signage-playlist"],
-                ["signage-schedules", "signage-player"],
               ),
               group(
                 "tablet",

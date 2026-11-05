@@ -239,10 +239,10 @@ export function createNeturePharmacyRoutes(dataSource: DataSource, consultationD
 
   // ─── 내 매장(약국) 신청 (매장 게이트 이전) ─────────────────────────────────────────
   router.get('/pharmacy/membership', requireAuth, handle(async (req) => membership.findMine(req.user!.id)));
-  router.post('/pharmacy/membership', requireAuth, handle(async (req, res) => {
-    res.status(201);
-    return membership.apply(req.user!.id, req.body ?? {});
-  }));
+  // MemberRegistrationService.approvePharmacy owns new store creation. No second application.
+  router.post('/pharmacy/membership', requireAuth, (_req, res) => {
+    res.status(410).json({ success: false, error: { code: 'PHARMACY_APPLICATION_RETIRED', message: '약국 경영자 회원 등록 승인 시 매장이 자동 연결됩니다. 회원 등록 상태를 확인하시기 바랍니다.' } });
+  });
   // 세미프랜차이즈로 이용하는 서비스 호스트(pharmacy.neture.co.kr = kpa-society)의 화면 게이트용 — 로그인 · handoff 와 같은 판정.
   router.get('/pharmacy/service-access/:serviceKey', requireAuth, handle(async (req) => {
     const semiFranchiseKey = semiFranchiseAccessKeyFor(req.params.serviceKey);
