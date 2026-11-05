@@ -74,6 +74,7 @@ describe('메뉴 트리 — 플랫폼 관리자 사이트 canonical 구조', () 
     //   `/content/analytics` 제거. 둘 다 cms_media 하나에 의존했고 운영에 그 테이블이 없다.
     '/content',
     '/content-resource/media-assets',
+    '/operator/signage/required',
     // CMS
     '/admin/cms/contents',
     '/admin/cms/slots',

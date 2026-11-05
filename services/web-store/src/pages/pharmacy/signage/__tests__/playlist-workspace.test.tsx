@@ -39,3 +39,21 @@ it.each([['community','커뮤니티'],['semi-franchise','가입 협업체'],['un
   expect(signageVideoOrigin({source:'snapshot',_snapshot:{sourceService:service}} as any)).toBe(label);
   expect(signageVideoOrigin({source:'direct',sourceType:'youtube'} as any)).toBe('직접 등록');
 });
+
+it('reorders the visible IDs after a requirement expires before the next successful poll', async () => {
+  vi.useFakeTimers();
+  try {
+    api.fetchStorePlaylists.mockResolvedValue([playlist]);
+    const expired = { id: 'forced-window', isForced: true, forcedEndAt: new Date(Date.now() + 2000).toISOString() };
+    api.fetchPlaylistItems.mockResolvedValue([expired, { id: 'A' }, { id: 'B' }] as never[]);
+    api.reorderPlaylistItems.mockResolvedValue(undefined);
+    let result!: ReturnType<typeof renderHook<ReturnType<typeof useSignagePlaylists>, unknown>>['result'];
+    await act(async () => { result = renderHook(() => useSignagePlaylists('store-a')).result; });
+    await act(async () => { result.current.setSelectedPlaylistId('list'); });
+    await act(async () => { vi.advanceTimersByTime(3000); });
+    expect(result.current.playlistItems.map(item => item.id)).toEqual(['A', 'B']);
+    await act(async () => { await result.current.handleMoveItem('A', 1); });
+    expect(api.reorderPlaylistItems).toHaveBeenCalledWith('list', ['B', 'A']);
+    expect(result.current.playlistActionError).toBeNull();
+  } finally { vi.useRealTimers(); }
+});

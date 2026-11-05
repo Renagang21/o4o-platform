@@ -272,22 +272,24 @@ export function useSignagePlaylists(organizationId: string) {
       },
     );
   };
-  const handleMoveItem = (index: number, direction: -1 | 1) => {
+  const handleMoveItem = (itemId: string, direction: -1 | 1) => {
     if (!selectedPlaylistId || playlistItemsLoading || playlistItemsError)
       return;
+    const visibleItems = playlistItems.filter(item => inRequiredWindow(item));
+    const index = visibleItems.findIndex(item => item.id === itemId);
     const playlistId = selectedPlaylistId,
       swapIndex = index + direction;
     if (
       index < 0 ||
-      index >= playlistItems.length ||
+      index >= visibleItems.length ||
       swapIndex < 0 ||
-      swapIndex >= playlistItems.length
+      swapIndex >= visibleItems.length
     )
       return;
     return runPlaylistMutation(
       playlistId,
       async (isStoreCurrent, isViewCurrent) => {
-        const next = [...playlistItems];
+        const next = [...visibleItems];
         [next[index], next[swapIndex]] = [next[swapIndex], next[index]];
         setPlaylistItems(next);
         try {

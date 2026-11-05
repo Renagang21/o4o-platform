@@ -959,7 +959,7 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
                         <div className="flex flex-col items-center gap-0 flex-shrink-0">
                           <span className="text-[10px] text-slate-400 w-5 text-center leading-none mb-0.5">{idx + 1}</span>
                           <button
-                            onClick={() => handleMoveItem(idx, -1)}
+                            onClick={() => handleMoveItem(item.id, -1)}
                             disabled={playlistBusy || idx === 0}
                             className="text-slate-300 hover:text-slate-600 disabled:opacity-20 p-0.5"
                             title="위로"
@@ -967,7 +967,7 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
                             <ChevronLeft className="w-3 h-3 rotate-90" />
                           </button>
                           <button
-                            onClick={() => handleMoveItem(idx, 1)}
+                            onClick={() => handleMoveItem(item.id, 1)}
                             disabled={playlistBusy || idx === playlistItems.length - 1}
                             className="text-slate-300 hover:text-slate-600 disabled:opacity-20 p-0.5"
                             title="아래로"

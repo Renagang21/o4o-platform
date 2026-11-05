@@ -58,7 +58,7 @@ export function SignageQuickStart({ videos: sourceVideos, initialSelected = [], 
     const video = videos.find(item => item.id === key);
     const content = forced?.contentJson ?? video?._snapshot?.contentJson;
     const duration = Number(content?.duration ?? video?._media?.duration);
-    return { key, title: forced?.title ?? video?.title ?? '선택한 자료', required: !!forced, duration: Number.isFinite(duration) && duration > 0 ? duration : 0, url: (content?.sourceUrl ?? content?.url ?? video?.sourceUrl) as string | undefined };
+    return { key, title: forced?.title ?? video?.title ?? '선택한 자료', required: !!forced, stored: video?._media?.sourceType === 'url' || content?.sourceType === 'url', duration: Number.isFinite(duration) && duration > 0 ? duration : 0, url: (content?.sourceUrl ?? content?.url ?? video?.sourceUrl) as string | undefined };
   }).filter(row => !row.key.startsWith('forced-') || row.required);
   const total = rows.reduce((sum, row) => sum + row.duration, 0);
   const unknown = rows.filter(row => !row.duration).length;
@@ -127,7 +127,7 @@ export function SignageQuickStart({ videos: sourceVideos, initialSelected = [], 
             <button type="button" aria-label={`${row.title} 위로`} disabled={index === 0} onClick={() => move(row.key, -1)} className="min-h-11 border rounded px-2 disabled:opacity-40">위로</button>
             <button type="button" aria-label={`${row.title} 아래로`} disabled={index === rows.length - 1} onClick={() => move(row.key, 1)} className="min-h-11 border rounded px-2 disabled:opacity-40">아래로</button>
             {!row.required && <button type="button" aria-label={`${row.title} 목록에서 제거`} onClick={() => setSelected(previous => previous.filter(key => key !== row.key))} className="min-h-11 border rounded px-2">제거</button>}
-            {row.url && videoPreviewUrl(row.url) && <button type="button" onClick={() => setPreview(previous => previous === row.url ? null : row.url!)} className="min-h-11 px-2 text-teal-800 underline">영상 확인</button>}
+            {row.url && (row.stored || videoPreviewUrl(row.url)) && <button type="button" onClick={() => setPreview(previous => previous === row.url ? null : row.url!)} className="min-h-11 px-2 text-teal-800 underline">영상 확인</button>}
           </li>)}</ol>
         </section>
         <label className="block text-sm">태그 (쉼표로 구분)<input aria-label="재생목록 태그" value={tags} onChange={event => setTags(event.target.value)} className="mt-1 min-h-11 w-full rounded-lg border px-3" /></label>

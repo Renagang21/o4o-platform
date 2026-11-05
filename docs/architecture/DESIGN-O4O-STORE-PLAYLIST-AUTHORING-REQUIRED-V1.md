@@ -1,6 +1,6 @@
 # Store 재생목록 제작과 필수 영상 기간
 
-> 유형: Design · 상태: 구현/로컬 검증, 운영 미적용 · 작성일: 2026-11-05
+> 유형: Design · 상태: 구현/로컬 검증 완료 · 통합/운영 상태는 [PR #947](https://github.com/Renagang21/o4o-platform/pull/947) 참조 · 작성일: 2026-11-05
 > 근거: 본 작업의 사용자 확정 사항. 정본 색인·기존 저장 모델 경계를 변경하지 않는다.
 > 작업 기록: [TODO](../work-orders/TODO-O4O-PLAYLIST-AUTHORING-REQUIRED-20261105.md)
 
@@ -36,4 +36,4 @@ O4O 콘텐츠를 내 매장으로 가져오는 것은 복사다. 사본 조회·
 
 ## 적용 조건
 
-태그와 작성 요청 식별자용 additive migration `AddStorePlaylistTags1793857542325`가 필요하다. 격리 PostgreSQL 15에서 canonical bootstrap, incremental 적용, 스키마 fingerprint와 down 복원을 확인한다. 적용 이력·스키마 지문은 정식 registry에 등록하며 운영에서는 정식 migration job보다 먼저 새 API를 배포하지 않는다. 이 개발 작업은 운영 migration, seed, main 병합, 배포를 실행하지 않는다.
+태그와 작성 요청 식별자용 additive migration `AddStorePlaylistTags1793857542325`가 필요하다. 격리 PostgreSQL 15에서 canonical bootstrap, incremental 적용, 스키마 fingerprint와 down 복원을 확인한다. 적용 이력·스키마 지문은 정식 registry에 등록하며 운영에서는 정식 migration job보다 먼저 새 API를 배포하지 않는다. 개발 단계에서는 운영 migration, seed, main 병합, 배포를 실행하지 않았다. 이후 사용자가 이 공간의 미반영 작업 통합·배포를 요청하여 PR #947에서 정식 migration 포함 배포를 진행한다. 실제 반영 상태는 PR의 CI·production 결과와 최종 기록을 확인한다.

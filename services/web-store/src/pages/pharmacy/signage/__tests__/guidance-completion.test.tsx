@@ -128,3 +128,21 @@ it('reuses the same request identity after an unknown header response', async ()
   expect(m.create).toHaveBeenCalledTimes(2);
   expect(m.create.mock.calls[0][0]).toEqual(m.create.mock.calls[1][0]);
 });
+
+it('keeps the preview action for stored uploads and their snapshots', () => {
+  const play = vi.spyOn(HTMLMediaElement.prototype, 'play').mockResolvedValue(undefined);
+  const pause = vi.spyOn(HTMLMediaElement.prototype, 'pause').mockImplementation(() => {});
+  try {
+  const stored = [
+    { id: 'media_stored', title: 'Stored upload', source: 'direct', sourceUrl: 'https://storage.example.test/video.mp4', _media: { sourceType: 'url' } },
+    { id: 'stored-copy', title: 'Stored copy', source: 'snapshot', _snapshot: { contentJson: { sourceType: 'url', sourceUrl: 'https://storage.example.test/copy.mp4' } } },
+  ] as UnifiedVideoItem[];
+  render(<SignageQuickStart videos={stored} initialSelected={stored.map(video => video.id)} organizationId="store-A" isCurrent={() => true} onSaved={saved} onClose={closed} />);
+  const preview = screen.getAllByRole('button', { name: '영상 확인' });
+  expect(preview).toHaveLength(2);
+  fireEvent.click(preview[0]);
+  expect(screen.getByLabelText('선택 영상 미리보기').tagName).toBe('VIDEO');
+  fireEvent.click(preview[1]);
+  expect(screen.getByLabelText('선택 영상 미리보기').getAttribute('src')).toBe('https://storage.example.test/copy.mp4');
+  } finally { cleanup(); play.mockRestore(); pause.mockRestore(); }
+});
