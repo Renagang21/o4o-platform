@@ -7,7 +7,7 @@ import { OperatorInboxLink } from '@o4o/operator-core-ui';
  * 홈 · 내 매장 · 서비스 업무 · 내 서비스 · 설정을 제공한다. HUB 기능은 내 매장에 배치한다.
  * `내 매장: ○○ ▼` 로 언제든 매장을 바꾼다(Selector 재진입).
  */
-import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
 import { PublicLegalFooterInfo } from '@o4o/shared-space-ui';
 import { getUserDisplayName } from '@o4o/account-ui';
 import { BRAND, PLATFORM_LEGAL_SERVICE_KEY, PLATFORM_ORIGIN, ROOT_NAV_ITEMS, WORKSPACE_PATHS } from '../config/workspace';
@@ -18,23 +18,11 @@ import { authClient } from '../lib/apiClient';
 import { useUnifiedStore } from '../contexts/StoreContext';
 import { withReturnTo } from '../lib/returnTo';
 
-function StoreSwitcher() {
-  const { status, organizationName, stores, clearStore } = useUnifiedStore();
-  const navigate = useNavigate();
-  if (status !== 'ready' && status !== 'resolving') return null;
-  const canSwitch = stores.length > 1;
-  return (
-    <button
-      type="button"
-      className="store-switcher"
-      data-testid="store-switcher"
-      disabled={!canSwitch}
-      title={canSwitch ? '다른 매장 선택' : '접근 가능한 매장이 1개입니다'}
-      onClick={() => { clearStore(); navigate(WORKSPACE_PATHS.select); }}
-    >
-      내 매장: {organizationName || '이름 없음'}{canSwitch ? ' ▼' : ''}
-    </button>
-  );
+function StoreIdentity() {
+  const { status, organizationName } = useUnifiedStore();
+  return status === 'ready' || status === 'resolving'
+    ? <span className="store-switcher" data-testid="store-identity">내 매장: {organizationName || '내 매장'}</span>
+    : null;
 }
 
 export default function RootShell() {
@@ -47,7 +35,7 @@ export default function RootShell() {
     <header className="header o4o-service-header">
       <div className="header-left">
         <Link className="brand" to={WORKSPACE_PATHS.home}><img src={`${import.meta.env.BASE_URL}brand/store/logo-mark.svg`} alt="" aria-hidden="true" width="36" height="36" style={{display:"inline-block",verticalAlign:"middle",marginRight:8,flexShrink:0}} />{BRAND.name}</Link>
-        <StoreSwitcher />
+        <StoreIdentity />
       </div>
       <nav className="nav" aria-label="매장 업무공간" data-testid="root-nav">
         {navItems.map((item) => (
@@ -55,7 +43,7 @@ export default function RootShell() {
             {item.label}
           </NavLink>
         ))}
-        {user?.roles?.some(r => ['neture:operator', 'neture:admin', 'platform:super_admin'].includes(r)) && <><NavLink to="/operator/pharmacy-memberships">매장 신청 심사</NavLink><OperatorInboxLink key={user?.id} client={authClient.api} endpoint="/operator-inbox/service/store" href="/operator/inbox"/></>}
+        {user?.roles?.some(r => ['neture:operator', 'neture:admin', 'platform:super_admin'].includes(r)) && <><OperatorInboxLink key={user?.id} client={authClient.api} endpoint="/operator-inbox/service/store" href="/operator/inbox"/></>}
         <a href="https://neture.co.kr/contact?service=store">Contact Us</a>
       </nav>
       {/* WO-O4O-CROSS-SERVICE-PUBLIC-DESIGN-FINAL-POLISH-V1: O4O 홈 · 계정은 nav 와 분리한다 — 모바일에서 brand 와 같은 첫 줄에 두고 nav 만 둘째 줄로 내린다.

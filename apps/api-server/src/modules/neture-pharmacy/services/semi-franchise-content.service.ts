@@ -13,6 +13,7 @@ import { recordOperation } from '../../../services/operations/operation-audit.js
 import type { DataSource } from 'typeorm';
 import { NeturePharmacyError, rowsOf } from '../constants.js';
 import type { SemiFranchiseRow } from './semi-franchise.service.js';
+import { businessVideos } from './business-videos.js';
 
 export const SEMI_FRANCHISE_CONTENT_SOURCE = 'semi-franchise';
 
@@ -199,7 +200,7 @@ export class SemiFranchiseContentService {
       `SELECT count(*)::int AS count FROM semi_franchise_contents c JOIN semi_franchises sf ON sf.id = c.semi_franchise_id ${where}`,
       [organizationId, sfKey, q, tag],
     );
-    return { items, total: count };
+    return { items: items.map((item: Record<string, unknown>) => ({ ...item, videos: businessVideos(item) })), total: count };
   }
 
   /** 상세 — 볼 수 없으면 존재를 드러내지 않는다(404). */
@@ -207,6 +208,21 @@ export class SemiFranchiseContentService {
     const [row] = await this.dataSource.query(`${VIEW} WHERE ${PHARMACY_SCOPE} AND c.id = $2::uuid`, [organizationId, id]);
     if (!row) throw new NeturePharmacyError(404, 'CONTENT_NOT_AVAILABLE', '이용할 수 없는 콘텐츠입니다.');
     return row;
+  }
+
+  /** Recheck membership/publication on every import; retain a store-owned video snapshot. */
+  async pharmacyCopyVideo(organizationId: string, userId: string, id: string, sourceUrl: unknown) {
+    const content = await this.pharmacyGet(organizationId, id);
+    const video = businessVideos(content).find(item => item.sourceUrl === sourceUrl);
+    if (!video) throw new NeturePharmacyError(400, 'VIDEO_NOT_AVAILABLE', '제공 자료에 포함된 지원 영상을 선택해 주세요.');
+    return this.copier({
+      sourceService: 'semi-franchise-video', sourceAssetId: id,
+      assetType: 'signage', targetOrganizationId: organizationId, createdBy: userId, title: content.title,
+      contentJson: { title: content.title, mediaType: 'video', ...video,
+        sourceContentId: id, semiFranchiseKey: content.semiFranchiseKey, semiFranchiseName: content.semiFranchiseName,
+        sourceRevision: content.revision, sourceLabel: content.semiFranchiseName, thumbnailUrl: content.thumbnailUrl,
+        capturedAt: new Date().toISOString() },
+    });
   }
 
   /** 내 매장 편집용 사본 — 원본 변경은 사본에 전파되지 않는다(Store 소유 독립 사본). */

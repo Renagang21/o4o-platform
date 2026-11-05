@@ -41,6 +41,7 @@ export interface PharmacyBusinessInfoProps {
   saveInfo: (patch: PharmacyBusinessInfoPatch) => Promise<unknown>;
   theme: PharmacyBusinessInfoTheme;
   AddressSearch: ComponentType<AddressSearchProps>;
+  renderUnavailable?: (state: 'missing' | 'error', retry: () => void, error: unknown) => import('react').ReactNode;
 }
 
 type LoadState = 'loading' | 'loaded' | 'error';
@@ -102,12 +103,13 @@ function isBusinessEmail(value: string): boolean {
   return dot >= 0 && dot < value.length - 1;
 }
 
-export function PharmacyBusinessInfo({ loadInfo, saveInfo, theme, AddressSearch }: Readonly<PharmacyBusinessInfoProps>) {
+export function PharmacyBusinessInfo({ loadInfo, saveInfo, theme, AddressSearch, renderUnavailable }: Readonly<PharmacyBusinessInfoProps>) {
   const formId = useId();
   const { colors } = theme;
   const styles = createStyles(theme);
   const [data, setData] = useState<PharmacyBusinessInfoData | null>(null);
   const [loadState, setLoadState] = useState<LoadState>('loading');
+  const [loadError, setLoadError] = useState<unknown>(null);
   const [isEditMode, setIsEditMode] = useState(false);
   const [form, setForm] = useState<FormState>({ name: '', phone: '', ownerPhone: '', ceoName: '', contactName: '', managerPhone: '', taxInvoiceEmail: '', businessEmail: '', contactEmail: '', zipCode: '', baseAddress: '', detailAddress: '', businessType: '', businessItem: '', businessEntityType: '', businessStartDate: '' });
   const [isSaving, setIsSaving] = useState(false);
@@ -115,11 +117,14 @@ export function PharmacyBusinessInfo({ loadInfo, saveInfo, theme, AddressSearch 
   const [successMsg, setSuccessMsg] = useState('');
 
   const loadData = useCallback(async () => {
+    setLoadState('loading');
+    setLoadError(null);
     try {
       const result = await loadInfo();
       setData(result);
       setLoadState('loaded');
-    } catch {
+    } catch (error) {
+      setLoadError(error);
       setLoadState('error');
     }
   }, [loadInfo]);
@@ -230,6 +235,7 @@ export function PharmacyBusinessInfo({ loadInfo, saveInfo, theme, AddressSearch 
 
   // WO-KPA-PHARMACY-OWNER-WITHOUT-STORE-HANDLING-V1: 데이터 없음 → 게이트로 리다이렉트
   if (loadState === 'error' || !data) {
+    if (renderUnavailable) return renderUnavailable(loadState === 'error' ? 'error' : 'missing', () => { void loadData(); }, loadError);
     return <Navigate to="/pharmacy" replace />;
   }
 

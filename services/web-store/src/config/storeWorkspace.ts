@@ -246,6 +246,7 @@ export function workspaceGroups(
               "이용 가능한 제공 자료를 찾아 내 매장에서 사용할 사본을 가져옵니다.",
               ["pharmacy-contents"],
             ),
+            group('signage-content', '사이니지', '동영상함에서 영상을 모으고 재생목록을 구성합니다.', ['signage-videos', 'signage-playlist']),
             group(
               "editors",
               "직접 만들기",
@@ -255,8 +256,6 @@ export function workspaceGroups(
                 "product-descriptions",
                 "tablet-displays",
                 "qr",
-                "signage-playlist",
-                "signage-videos",
                 "pop",
               ],
             ),

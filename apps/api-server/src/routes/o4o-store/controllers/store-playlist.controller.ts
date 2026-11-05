@@ -104,7 +104,7 @@ export function createStorePlaylistController(
 
         const organizationId = await resolveStoreAccess(dataSource, userId, userRoles, storeOwnerServiceKey, readPreferredStoreOrganizationId(req));
         if (!organizationId) {
-          res.json({ success: true, data: [] });
+          res.status(403).json({ success: false, error: { code: 'STORE_ACCESS_REQUIRED', message: '승인된 매장 이용 자격을 확인해 주세요.' } });
           return;
         }
 
@@ -141,7 +141,7 @@ export function createStorePlaylistController(
         }
 
         const { name, playlistType } = req.body;
-        if (!name || typeof name !== 'string') {
+        if (typeof name !== 'string' || !name.trim() || name.trim().length > 255) {
           res.status(400).json({ success: false, error: { code: 'INVALID_INPUT', message: 'name is required' } });
           return;
         }
@@ -183,7 +183,11 @@ export function createStorePlaylistController(
 
         // Validate: at least one valid field to update
         const updates: { name?: string; publishStatus?: string; isActive?: boolean } = {};
-        if (name !== undefined) updates.name = name;
+        if (name !== undefined && (typeof name !== 'string' || !name.trim() || name.trim().length > 255)) {
+          res.status(400).json({ success: false, error: { code: 'INVALID_INPUT', message: '재생목록 이름은 1~255자로 입력해 주세요.' } });
+          return;
+        }
+        if (name !== undefined) updates.name = name.trim();
         if (publishStatus === 'draft' || publishStatus === 'published') updates.publishStatus = publishStatus;
         if (isActive !== undefined) updates.isActive = isActive;
 
@@ -408,8 +412,12 @@ export function createStorePlaylistController(
 
         const { id } = req.params;
         const { mediaId, organizationId } = req.body;
-        // Use body organizationId for signage media context (matches frontend kpaMembership.organizationId)
-        const signageOrgId = organizationId || storeOrgId;
+        // Only the server-authorized playlist store may supply the media.
+        if (organizationId && organizationId !== storeOrgId) {
+          res.status(403).json({ success: false, error: { code: 'STORE_SELECTION_ACCESS_REQUIRED', message: '다른 매장의 영상을 추가할 수 없습니다.' } });
+          return;
+        }
+        const signageOrgId = storeOrgId;
 
         if (!mediaId) {
           res.status(400).json({ success: false, error: { code: 'INVALID_INPUT', message: 'mediaId is required' } });

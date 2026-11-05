@@ -20,7 +20,8 @@ import { resolveCommunityWorkspace, listCommunityWorkspaces, createCommunityBoar
  */
 import { DataSource } from 'typeorm';
 import { randomUUID } from 'crypto';
-import { PharmacyMembershipService, type PharmacyStoreProvisioner } from '../services/pharmacy-membership.service.js';
+import { PharmacyMembershipService } from '../../../__tests__/fixtures/legacy-pharmacy-membership.js';
+import type { PharmacyStoreProvisioner } from '../services/pharmacy-membership.service.js';
 import { SemiFranchiseService } from '../services/semi-franchise.service.js';
 import { getSupplyOption, listSupplyOptions } from '../services/supply-access.js';
 import { SupplyProposalService } from '../services/supply-proposal.service.js';
@@ -404,7 +405,7 @@ d('Neture 약국 매장 commerce — 격리 PostgreSQL 통합 검증', () => {
         );
         return { snapshotId: r.id };
       });
-      const created = await svc.operatorCreate(sf, op, { title: '판촉 가이드', summary: '요약', body: '<p>본문</p>', tags: ['가이드'] });
+      const created = await svc.operatorCreate(sf, op, { title: '판촉 가이드', summary: '요약', body: '<p>본문</p>', tags: ['가이드'], attachments: [{ url: 'https://youtu.be/abcdefghijk' }] });
       const member = await approvedPharmacy();
       const outsider = await approvedPharmacy();
       await joinSemiFranchise(member.orgId, member.owner, key, op);
@@ -414,6 +415,13 @@ d('Neture 약국 매장 commerce — 격리 PostgreSQL 통합 검증', () => {
       await svc.operatorSetStatus(sf, op, created.id, 'publish');
       const list = await svc.pharmacyList(member.orgId, { sfKey: key });
       expect(list.items.map((c: any) => c.title)).toEqual(['판촉 가이드']);
+      const videoUrl = 'https://www.youtube.com/watch?v=abcdefghijk';
+      expect(list.items[0].videos).toEqual([{ sourceType: 'youtube', embedId: 'abcdefghijk', sourceUrl: videoUrl }]);
+      await expect(svc.pharmacyCopyVideo(outsider.orgId, outsider.owner, created.id, videoUrl)).rejects.toHaveProperty('httpStatus', 404);
+      await expect(svc.pharmacyCopyVideo(member.orgId, member.owner, created.id, 'https://youtu.be/bbbbbbbbbbb')).rejects.toHaveProperty('code', 'VIDEO_NOT_AVAILABLE');
+      const videoCopy = await svc.pharmacyCopyVideo(member.orgId, member.owner, created.id, videoUrl);
+      expect((await ds.query('SELECT organization_id,source_service,asset_type,content_json FROM o4o_asset_snapshots WHERE id=$1', [videoCopy.snapshotId]))[0]).toMatchObject({ organization_id: member.orgId, source_service: 'semi-franchise-video', asset_type: 'signage', content_json: { sourceUrl: videoUrl, sourceContentId: created.id, semiFranchiseKey: key } });
+
       expect((await svc.pharmacyList(outsider.orgId)).total).toBe(0);
       await expect(svc.pharmacyGet(outsider.orgId, created.id)).rejects.toMatchObject({ httpStatus: 404 });
       await expect(svc.pharmacyCopy(outsider.orgId, outsider.owner, created.id)).rejects.toMatchObject({ httpStatus: 404 });
@@ -430,6 +438,7 @@ d('Neture 약국 매장 commerce — 격리 PostgreSQL 통합 검증', () => {
 
       // 보관하면 약국에 보이지 않지만 사본은 남는다
       await svc.operatorSetStatus(sf, op, created.id, 'archive');
+      await expect(svc.pharmacyCopyVideo(member.orgId, member.owner, created.id, videoUrl)).rejects.toHaveProperty('httpStatus', 404);
       expect((await svc.pharmacyList(member.orgId)).total).toBe(0);
       const [still] = await ds.query(`SELECT count(*)::int AS c FROM o4o_asset_snapshots WHERE id = $1`, [snapshotId]);
       expect(still.c).toBe(1);
@@ -438,6 +447,7 @@ d('Neture 약국 매장 commerce — 격리 PostgreSQL 통합 검증', () => {
       await svc.operatorSetStatus(sf, op, created.id, 'publish');
       const [m] = await ds.query(`SELECT id FROM semi_franchise_memberships WHERE organization_id = $1 AND semi_franchise_id = $2`, [member.orgId, sf.id]);
       await sfs.decideMembership(sf, op, m.id, 'suspend');
+      await expect(svc.pharmacyCopyVideo(member.orgId, member.owner, created.id, videoUrl)).rejects.toHaveProperty('httpStatus', 404);
       expect((await svc.pharmacyList(member.orgId)).total).toBe(0);
     });
   });

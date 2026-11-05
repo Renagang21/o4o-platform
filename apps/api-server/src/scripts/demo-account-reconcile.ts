@@ -3,6 +3,7 @@ import { Client } from 'pg';
 import { writeFileSync } from 'node:fs';
 import { runDemoOwnerParticipation } from './demo-owner-participation.service.js';
 import { runDemoAccountReconcile } from './demo-account-reconcile.service.js';
+import { runDemoOwnerQualification } from './demo-owner-qualification.service.js';
 import { readPassword, safeInventoryError } from '../../../../scripts/deployment/pharmacy-hub-qr-probes.mjs';
 
 async function main() {
@@ -14,9 +15,10 @@ async function main() {
     ...(mode==='plan'?{options:'-c default_transaction_read_only=on'}:{})});
   try {
     await client.connect();
-    const operation=process.env.DEMO_ACCOUNTS_PARTICIPATION==='true' ? runDemoOwnerParticipation : runDemoAccountReconcile;
+    if (process.env.DEMO_ACCOUNTS_PARTICIPATION==='true' && process.env.DEMO_ACCOUNTS_QUALIFICATION==='true') throw new Error('CONFLICTING_DEMO_OPERATIONS');
+    const operation=process.env.DEMO_ACCOUNTS_QUALIFICATION==='true' ? runDemoOwnerQualification : process.env.DEMO_ACCOUNTS_PARTICIPATION==='true' ? runDemoOwnerParticipation : runDemoAccountReconcile;
     const summary=await operation({query:async(sql,params)=>(await client.query(sql,params)).rows},
-      {apply:mode==='apply',expectedDigest:process.env.DEMO_ACCOUNTS_DIGEST});
+      {apply:mode==='apply',expectedDigest:process.env.DEMO_ACCOUNTS_DIGEST,reviewerId:process.env.DEMO_ACCOUNTS_REVIEWER_ID});
     console.log(JSON.stringify(summary));
     // Same sanitized result in native Actions annotations, independently reviewable through the GitHub API.
     const notice=JSON.stringify(summary).replaceAll('%','%25').replaceAll('\r','%0D').replaceAll('\n','%0A');

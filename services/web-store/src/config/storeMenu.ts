@@ -40,8 +40,8 @@ export const UNIFIED_STORE_CONFIG: StoreDashboardConfig = {
       { key: 'library-contents', label: '내 자료함', subPath: '/library/contents' },
     ]},
     { label: '디지털 사이니지', items: [
-      { key: 'signage-playlist',  label: '플레이리스트', subPath: '/marketing/signage/playlist' },
-      { key: 'signage-videos',    label: '동영상',       subPath: '/marketing/signage/videos' },
+      { key: 'signage-playlist',  label: '재생목록', subPath: '/marketing/signage/playlist' },
+      { key: 'signage-videos',    label: '동영상함',       subPath: '/marketing/signage/videos' },
       { key: 'signage-schedules', label: '스케줄',       subPath: '/marketing/signage/schedules' },
       { key: 'signage-player',    label: 'TV 재생',      subPath: '/marketing/signage/player' },
     ]},
@@ -79,10 +79,6 @@ export const PHARMACY_STORE_MENU_SECTIONS: NonNullable<StoreDashboardConfig['men
   { label: '직원 지원', items: [
       { key: 'staff-support', label: '직원 현장 지원', subPath: '/staff-support' },
       { key: 'multilingual-consultation', label: '다국어 상담', subPath: '/multilingual-consultation' },
-  ]},
-  { label: '가입', items: [
-    { key: 'pharmacy-semi-franchises', label: '이용 사업 · 가입 관리', subPath: '/businesses' },
-    { key: 'pharmacy-membership',      label: '내 매장 신청',   subPath: '/pharmacy/membership' },
   ]},
 ];
 

@@ -13,7 +13,7 @@ import {
 import { groupCheckoutLines, type CheckoutLine } from '../services/pharmacy-cart.service.js';
 import { nextProposalStatus } from '../services/supply-proposal.service.js';
 import { nextEventStatus, validateEventInput } from '../services/semi-franchise-event.service.js';
-import { normalizeBusinessNumber, validateApplication } from '../services/pharmacy-membership.service.js';
+import { normalizeBusinessNumber, validateApplication } from '../../../__tests__/fixtures/legacy-pharmacy-membership.js';
 import { resolvePaymentMode } from '../services/pharmacy-payment.service.js';
 
 jest.mock('../../../utils/logger.js', () => ({

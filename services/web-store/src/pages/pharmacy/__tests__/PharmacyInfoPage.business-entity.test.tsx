@@ -46,14 +46,18 @@ describe('pharmacy business entity classification', () => {
 
 
 describe('shared pharmacy information behavior through the Store adapter', () => {
-  it.each(['missing', 'failed'])('keeps the pharmacy gate for %s data', async (state) => {
-    if (state === 'missing') api.get.mockResolvedValue(null);
-    else api.get.mockRejectedValue(new Error('fixture load failure'));
-    render(<MemoryRouter initialEntries={['/pharmacy/info']}><Routes>
-      <Route path="/pharmacy/info" element={<PharmacyInfoPage />} />
-      <Route path="/pharmacy" element={<p>약국 게이트</p>} />
+  it.each(['missing', 'failed'])('shows an inline %s state and retries without leaving the store', async (state) => {
+    if (state === 'missing') api.get.mockResolvedValueOnce(null);
+    else api.get.mockRejectedValueOnce(Object.assign(new Error('fixture'), {code:'PHARMACIST_QUALIFICATION_REQUIRED'}));
+    api.get.mockResolvedValue({ name: '검증 약국' });
+    render(<MemoryRouter initialEntries={['/store/info']}><Routes>
+      <Route path="/store/info" element={<PharmacyInfoPage />} />
+      <Route path="/pharmacy" element={<p>오래된 약국 게이트</p>} />
     </Routes></MemoryRouter>);
-    await screen.findByText('약국 게이트');
+    await screen.findByRole('alert');
+    expect(screen.queryByText('오래된 약국 게이트')).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: '다시 시도' }));
+    await screen.findByText('검증 약국');
     expect(api.update).not.toHaveBeenCalled();
   });
 

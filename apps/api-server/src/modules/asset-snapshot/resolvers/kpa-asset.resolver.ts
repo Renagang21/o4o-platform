@@ -188,7 +188,7 @@ export class KpaAssetResolver implements ContentResolver {
   private async resolveSignage(id: string): Promise<ResolvedContent | null> {
     const rows = await this.dataSource.query(
       `SELECT "id", "name", "description", "mediaType", "sourceType", "sourceUrl",
-              "thumbnailUrl", "duration", "resolution", "content", "tags", "metadata"
+              "thumbnailUrl", "duration", "resolution", "content", "tags", "metadata", "source"
        FROM "signage_media"
        WHERE "id" = $1 AND "deletedAt" IS NULL AND "status" = 'active'
          -- WO-O4O-KPA-CONTENT-ACCESS-AND-COPY-POLICY-FINAL-ALIGNMENT-V1:
@@ -219,6 +219,7 @@ export class KpaAssetResolver implements ContentResolver {
       contentJson: {
         title: media.name,
         mediaType: media.mediaType,
+        source: media.source,
         sourceType: media.sourceType,
         sourceUrl: media.sourceUrl,
         thumbnailUrl: media.thumbnailUrl,

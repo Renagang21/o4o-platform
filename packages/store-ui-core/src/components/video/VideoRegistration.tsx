@@ -12,6 +12,7 @@ export interface VideoRegistrationPayload {
 export interface VideoRegistrationAction { run: (question: string) => Promise<string>; label: string }
 interface Props {
   contextKey: string;
+  defaultDestination?: "youtube" | "o4o";
   mediaApi: MediaPickerApi;
   ask: (question: string) => Promise<string>;
   save: (payload: VideoRegistrationPayload) => Promise<{ id: string; name: string }>;
@@ -31,12 +32,12 @@ function draftFields(answer: string) {
 export function VideoRegistration(props: Readonly<Props>) {
   return <RegistrationSession key={props.contextKey} {...props} />;
 }
-function RegistrationSession({ contextKey, mediaApi, ask, save, onSaved, requestSlot, youtube }: Readonly<Props>) {
+function RegistrationSession({ contextKey, mediaApi, ask, save, onSaved, requestSlot, youtube, defaultDestination = "youtube" }: Readonly<Props>) {
   const id = useId();
   const [url, setUrl] = useState(''), [asset, setAsset] = useState<MediaAssetItem | null>(null);
   const [picker, setPicker] = useState(false), [question, setQuestion] = useState(''), [name, setName] = useState('');
   const [stage, setStage] = useState<'idle'|'preparing'|'saving'|'queueing'|'saved'>('idle');
-  const [destination,setDestination]=useState<'youtube'|'o4o'>('youtube'),[queued,setQueued]=useState(false),[revision,setRevision]=useState(0);
+  const [destination,setDestination]=useState<'youtube'|'o4o'>(defaultDestination),[queued,setQueued]=useState(false),[revision,setRevision]=useState(0);
   const [error, setError] = useState(''), [savedName, setSavedName] = useState(''), [seconds, setSeconds] = useState(0);
   const lock = useRef(false), live = useRef(true), prepared = useRef<{key: string; payload: VideoRegistrationPayload} | null>(null);
   const busy = stage === 'preparing' || stage === 'saving' || stage === 'queueing';

@@ -7,7 +7,7 @@ import SemiFranchisesPage from './neture-pharmacy/SemiFranchisesPage';
 export default function MyServicesPage() {
   const { effectiveServiceKey } = useUnifiedStore();
   if (effectiveServiceKey === 'kpa-society') return <SemiFranchisesPage />;
-  return <main className="page"><h1>이용 사업</h1>
+  return <main className="page"><h1>이용 사업·가입 관리</h1>
     <p>약국 매장에서 사업별 가입 상태와 이용 조건을 확인할 수 있습니다.</p>
     <Link to={WORKSPACE_PATHS.myStore}>내 매장으로</Link>
   </main>;

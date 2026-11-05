@@ -1,3 +1,4 @@
+import { StoreContentNavigation } from '../store/StoreContentNavigation';
 import type { ReactNode } from "react";
 import { Link, Outlet, useLocation } from "react-router-dom";
 import type { StoreDashboardConfig } from "@o4o/store-ui-core";
@@ -8,11 +9,6 @@ import {
   workspaceSupportItems,
   workspaceGroups,
 } from "../../config/storeWorkspace";
-import { MyHomeButton } from "@o4o/auth-react";
-import { useAuth } from "../../contexts/AuthContext";
-import { withReturnTo } from "../../lib/returnTo";
-import { WORKSPACE_PATHS } from "../../config/workspace";
-import { authClient } from "../../lib/apiClient";
 import { StoreAiAssistant } from '../store/StoreAiAssistant';
 import { StoreAiPlacementProvider, StoreAiSlot } from '../store/StoreAiPlacement';
 import { StoreOperationsNavigation } from '../store/StoreOperationsNavigation';
@@ -24,7 +20,6 @@ export interface StoreWorkspaceOutlet {
 /** Service-local composition; the shared StoreDashboardLayout contract is unchanged. */
 export function StoreWorkspaceShell({
   config,
-  organizationName,
   serviceWorkConfig,
   children,
 }: {
@@ -34,13 +29,14 @@ export function StoreWorkspaceShell({
   children?: ReactNode;
 }) {
   const location = useLocation();
-  const { user, isAuthenticated, isLoading: authLoading } = useAuth();
   const active = currentWorkspaceArea(
     location.pathname,
     location.search,
     config.basePath,
   );
-  const items = active ? workspaceItems(config, active) : [];
+  const allItems = active ? workspaceItems(config, active) : [];
+  const signage = location.pathname.includes('/marketing/signage/');
+  const items = active === 'studio' ? allItems.filter(item => signage === item.key.startsWith('signage-')) : allItems;
   const support = workspaceSupportItems(config);
   const landing = STORE_WORKSPACE_AREAS.find((area) => area.key === active);
   const isLanding =
@@ -72,32 +68,12 @@ export function StoreWorkspaceShell({
               aria-label="매장 보조 메뉴"
               className="absolute right-0 z-30 mt-2 flex w-64 flex-col rounded-xl border border-slate-200 bg-white p-2 shadow-lg"
             >
-              <Link to={withReturnTo(WORKSPACE_PATHS.select, config.basePath)} aria-label="매장 선택" className="min-h-11 rounded-lg px-3 py-2.5 text-sm hover:bg-slate-50">{organizationName ?? '내 매장'} · 매장 선택</Link>
-              {support.map((item) => (
-                <Link
-                  key={item.key}
-                  className="rounded-lg px-3 py-2.5 text-sm hover:bg-slate-50"
-                  to={`${config.basePath}${item.subPath}`}
-                >
-                  {item.label}
-                </Link>
-              ))}
-              <MyHomeButton
-                api={authClient.api}
-                accountId={user?.id}
-                isAuthenticated={isAuthenticated}
-                authLoading={authLoading}
-                className="rounded-lg px-3 py-2.5 text-sm hover:bg-slate-50"
-              />
-              <Link
-                className="rounded-lg px-3 py-2.5 text-sm hover:bg-slate-50"
-                to="/services"
-              >
-                이용 사업
-              </Link>
+              {support.map(item => <Link key={item.key} className="min-h-11 rounded-lg px-3 py-2.5 text-sm hover:bg-slate-50" to={`${config.basePath}${item.subPath}`}>{item.label}</Link>)}
             </nav>
           </details>
         </div>
+        {active === 'studio' && <StoreContentNavigation basePath={config.basePath} signage={signage}
+          showGeneral={allItems.some(item => !item.key.startsWith('signage-'))} showSignage={allItems.some(item => item.key.startsWith('signage-'))} />}
         {active === "use" && !isLanding && (
           <div className="mt-3"><StoreOperationsNavigation config={config} /></div>
         )}

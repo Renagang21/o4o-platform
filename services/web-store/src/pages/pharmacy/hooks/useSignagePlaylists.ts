@@ -163,6 +163,12 @@ export function useSignagePlaylists(organizationId: string) {
         );
     }
   };
+  const handleUpdateDetails = (playlist: StorePlaylist, name: string) =>
+    runPlaylistMutation(playlist.id, async (isStoreCurrent) => {
+      if (!name.trim()) throw new Error('NAME_REQUIRED');
+      await updateStorePlaylist(playlist.id, { name: name.trim() });
+      if (isStoreCurrent()) await loadPlaylists();
+    });
   const handleTogglePublish = (playlist: StorePlaylist) =>
     runPlaylistMutation(playlist.id, async (isStoreCurrent) => {
       try {
@@ -375,6 +381,7 @@ export function useSignagePlaylists(organizationId: string) {
     addModalSaving,
     showLibrarySelector,
     setShowLibrarySelector: changeLibrarySelector,
+    handleUpdateDetails,
     handleTogglePublish,
     handleDeletePlaylist,
     handleAddFromLibrary,

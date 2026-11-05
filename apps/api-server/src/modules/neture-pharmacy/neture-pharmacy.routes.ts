@@ -237,12 +237,12 @@ export function createNeturePharmacyRoutes(dataSource: DataSource, consultationD
   router.get('/operator/pharmacy-documents/:id', ...operator,
     (_req, res, next) => { res.locals.documentReviewer = true; next(); }, downloadDocument);
 
-  // ─── 내 매장(약국) 신청 (매장 게이트 이전) ─────────────────────────────────────────
+  // ─── 가입 승인 자동 연결 원장 읽기 (최초 신청 writer 폐기) ─────────────────────────────────────────
   router.get('/pharmacy/membership', requireAuth, handle(async (req) => membership.findMine(req.user!.id)));
-  router.post('/pharmacy/membership', requireAuth, handle(async (req, res) => {
-    res.status(201);
-    return membership.apply(req.user!.id, req.body ?? {});
-  }));
+  // Retired standalone application: unified registration approval provisions the store.
+  router.post('/pharmacy/membership', requireAuth, (_req, res) => {
+    res.status(410).json({ success: false, code: 'UNIFIED_REGISTRATION_REQUIRED', error: '약국경영자 가입 승인 시 내 매장이 자동으로 연결됩니다.' });
+  });
   // 세미프랜차이즈로 이용하는 서비스 호스트(pharmacy.neture.co.kr = kpa-society)의 화면 게이트용 — 로그인 · handoff 와 같은 판정.
   router.get('/pharmacy/service-access/:serviceKey', requireAuth, handle(async (req) => {
     const semiFranchiseKey = semiFranchiseAccessKeyFor(req.params.serviceKey);
@@ -308,6 +308,10 @@ export function createNeturePharmacyRoutes(dataSource: DataSource, consultationD
   router.post('/pharmacy/store/contents/:id/copy', ...store, handle(async (req, res) => {
     res.status(201);
     return contents.pharmacyCopy(org(req), req.user!.id, uuidParam(req, 'id'));
+  }));
+  router.post('/pharmacy/store/contents/:id/copy-video', ...store, handle(async (req, res) => {
+    res.status(201);
+    return contents.pharmacyCopyVideo(org(req), req.user!.id, uuidParam(req, 'id'), req.body?.sourceUrl);
   }));
 
   router.get('/pharmacy/recruitments', ...store, handle(async (req) => recruitments.pharmacyBrowse(org(req))));

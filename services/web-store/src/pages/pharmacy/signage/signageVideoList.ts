@@ -19,6 +19,8 @@ export interface UnifiedVideoItem {
   id: string;
   title: string;
   source: "snapshot" | "direct";
+  origin?: "community" | "business" | "own" | "provided";
+  originLabel?: string;
   sourceUrl?: string;
   sourceType?: string;
   publishStatus?: AssetPublishStatus;
@@ -36,23 +38,47 @@ export function buildSignageVideoList(
   snapshots: StoreAssetItem[],
   direct: SignageMediaItem[],
 ): UnifiedVideoItem[] {
-  const copied: UnifiedVideoItem[] = snapshots.map((snapshot) => ({
-    id: snapshot.id,
-    title: snapshot.title,
-    source: "snapshot",
-    publishStatus: snapshot.publishStatus,
-    channelMap: snapshot.channelMap,
-    isForced: snapshot.isForced,
-    isLocked: snapshot.isLocked,
-    forcedStartAt: snapshot.forcedStartAt,
-    forcedEndAt: snapshot.forcedEndAt,
-    createdAt: snapshot.createdAt,
-    _snapshot: snapshot,
-  }));
+  const copied: UnifiedVideoItem[] = snapshots
+    .filter(
+      (snapshot) =>
+        !snapshot.contentJson?.mediaType ||
+        snapshot.contentJson.mediaType === "video",
+    )
+    .map((snapshot) => ({
+      id: snapshot.id,
+      title: snapshot.title,
+      source: "snapshot",
+      origin:
+        snapshot.sourceService === "semi-franchise-video" ||
+        snapshot.contentJson?.semiFranchiseKey
+          ? "business"
+          : snapshot.sourceService === "community" ||
+              snapshot.contentJson?.source === "community"
+            ? "community"
+            : "provided",
+      originLabel:
+        typeof snapshot.contentJson?.semiFranchiseName === "string"
+          ? snapshot.contentJson.semiFranchiseName
+          : snapshot.sourceService === "community" ||
+              snapshot.contentJson?.source === "community"
+            ? "커뮤니티"
+            : "제공 자료",
+
+      publishStatus: snapshot.publishStatus,
+      channelMap: snapshot.channelMap,
+      isForced: snapshot.isForced,
+      isLocked: snapshot.isLocked,
+      forcedStartAt: snapshot.forcedStartAt,
+      forcedEndAt: snapshot.forcedEndAt,
+      createdAt: snapshot.createdAt,
+      _snapshot: snapshot,
+    }));
   const uploaded: UnifiedVideoItem[] = direct.map((media) => ({
     id: `media_${media.id}`,
     title: media.name,
     source: "direct",
+    origin: "own",
+    originLabel: "직접 등록",
     sourceUrl: media.sourceUrl,
     sourceType: media.sourceType,
     createdAt: media.createdAt,
@@ -97,11 +123,18 @@ export function filterSignageVideos(
     status: SignageStatusFilter;
     sort: SignageSortKey;
     keyword: string;
+    origin?: UnifiedVideoItem["origin"] | "all";
   },
 ): UnifiedVideoItem[] {
   const keyword = filter.keyword.toLowerCase();
   return videos
     .filter((video) => matchesStatus(video, filter.status))
+    .filter(
+      (video) =>
+        !filter.origin ||
+        filter.origin === "all" ||
+        video.origin === filter.origin,
+    )
     .filter(
       (video) =>
         !filter.keyword.trim() || video.title.toLowerCase().includes(keyword),

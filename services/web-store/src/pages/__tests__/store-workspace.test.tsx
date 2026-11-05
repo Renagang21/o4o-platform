@@ -1,7 +1,7 @@
 import { authClient } from "../../lib/apiClient";
 import UnifiedStoreLayout from "../../components/layouts/UnifiedStoreLayout";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import { MemoryRouter, Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import {
   UNIFIED_STORE_CONFIG,
@@ -270,17 +270,10 @@ it("공통 URL에서 서비스 지정 URL로 전환할 때 제작 자료 전달�
   expect(location.state).toEqual(state);
 });
 
- it("My Home은 직접 도메인 링크 대신 기존 인증 handoff를 사용하고 실패를 표시한다", async () => {
-  const post = vi.spyOn(authClient.api, "post").mockRejectedValueOnce(new Error("fixture handoff failure"));
-  try {
-    render(<MemoryRouter initialEntries={["/store"]}><StoreWorkspaceShell config={config}><h1>내 매장</h1></StoreWorkspaceShell></MemoryRouter>);
-    fireEvent.click(screen.getByTestId("my-home-button"));
-    await waitFor(() => expect(post).toHaveBeenCalledWith("/auth/handoff", { targetServiceKey: "neture", returnPath: "/mypage" }));
-    expect((await screen.findByRole("alert")).textContent).toContain("My Home으로 이동하지 못했습니다");
-    expect(screen.queryByRole("link", { name: /My Home/ })).toBeNull();
-  } finally {
-    post.mockRestore();
-  }
+it('My Home과 이용 사업은 공통 헤더에 맡기고 보조 메뉴에서 반복하지 않는다', () => {
+  render(<MemoryRouter initialEntries={["/store"]}><StoreWorkspaceShell config={config}><h1>내 매장</h1></StoreWorkspaceShell></MemoryRouter>);
+  expect(screen.queryByTestId('my-home-button')).toBeNull();
+  expect(screen.queryByRole('link', { name: '이용 사업' })).toBeNull();
 });
 
 it('업무 그룹은 필터된 기존 기능을 빠짐없이 한 번씩 배치한다', () => {
@@ -293,11 +286,13 @@ it('업무 그룹은 필터된 기존 기능을 빠짐없이 한 번씩 배치�
   expect(workspaceGroups(filtered, 'studio')).toEqual([]);
   expect(workspaceGroups(filtered, 'use')).toEqual([]);
 });
-it('목적지 첫 화면에는 중복 하위 메뉴를 펼치지 않고 매장 선택은 해당 홈으로 복귀한다', () => {
+it('목적지 첫 화면에는 일반 콘텐츠/사이니지를 분리하고 매장 선택을 반복하지 않는다', () => {
   const base = '/work/kpa-society/store';
   render(<MemoryRouter initialEntries={[base + '/workspace/studio']}><StoreWorkspaceShell config={{ ...config, basePath: base }}><h1>준비</h1></StoreWorkspaceShell></MemoryRouter>);
   expect(screen.queryByRole('navigation', { name: '현재 업무 메뉴' })).toBeNull();
-  expect(screen.getByRole('link', { name: '매장 선택' }).getAttribute('href')).toBe('/select-store?returnTo=%2Fwork%2Fkpa-society%2Fstore');
+  expect(screen.queryByRole('link', { name: '매장 선택' })).toBeNull();
+  expect(screen.getByRole('link', { name: '일반 콘텐츠' }).getAttribute('href')).toBe(base + '/workspace/studio');
+  expect(screen.getByRole('link', { name: '사이니지' }).getAttribute('href')).toBe(base + '/marketing/signage/videos?workspace=studio');
 });
 
 it.each(['/store', '/work/kpa-society/store'])('목적지에서 미구현 예고를 내리고 기존 편집기는 세부 진입으로 유지한다: %s', async base => {

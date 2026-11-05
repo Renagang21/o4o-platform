@@ -46,7 +46,7 @@ function WorkspaceContents({ area }: WorkspaceProps) {
   const { workServiceKeys } = useUnifiedStore();
   const productReturn = readProductGuidanceReturn(location.state, scope, config.basePath);
   const returningToProducts = productReturn?.path === location.pathname + location.search;
-  const groups = workspaceGroups(config, area);
+  const groups = workspaceGroups(config, area).filter(group => area !== 'studio' || group.key !== 'signage-content');
   const items = workspaceItems(config, area);
   const has = (key: string) => items.some((item) => item.key === key);
   const productAllowed = config.menuSections?.some((section) =>
