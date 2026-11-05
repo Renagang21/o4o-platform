@@ -7,6 +7,7 @@
 > 매장 HUB 항목 = 내 매장 제작/활용 메뉴 = 동일 실행 자산 축.
 
 - **작성일:** 2026-05-23
+- **최종 갱신:** 2026-11-05 — 사용자 승인: 매장 사이니지는 동영상 보관함 → 재생목록 → 디스플레이 재생. 시간표 기능은 폐기하며 [현행 재생 정책](O4O-SIGNAGE-STORE-PLAYLIST-MODEL-BOUNDARY-V1.md#0-1-현재-매장-재생-정책--2026-11-05-사용자-승인)을 따른다. §12 구현 로그의 이전 스케줄/TV 표기는 당시 이력이다.
 - **분류:** Baseline (Standard)
 - **버전:** V1
 - **상태:** Active (정정 2026-09-17 — §1.3 적용 서비스 · §5.1 출처↔유입 경로 대응 · SMT-G8 을 `O4O-ROLE-WORKSPACE-ARCHITECTURE-V1` §1 · §2-1 · §6 기준으로 정렬, `WO-O4O-FINAL-ROLE-WORKSPACE-ARCHITECTURE-CENSUS-AND-CLOSURE-V1`)

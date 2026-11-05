@@ -11,6 +11,8 @@ function setup() {
   return props;
 }
 function enter() {
+  fireEvent.click(screen.getByRole('button', {name: '외부 영상 연결'}));
+  screen.getByText('AI로 제목·설명 작성 보조(선택)').closest('details')!.open = true;
   fireEvent.change(screen.getByLabelText('개별 영상 주소'), {target:{value:'https://youtu.be/abcdefghijk'}});
   fireEvent.change(screen.getByPlaceholderText('이 영상을 매장 안내 영상으로 등록해 줘'), {target:{value:'이 영상 등록해 줘'}});
   fireEvent.click(screen.getByRole('button',{name:'AI로 등록'}));
@@ -38,11 +40,14 @@ describe('one request video registration', () => {
     const view = render(<VideoRegistration {...props}/>); enter();
     await waitFor(() => expect(props.ask).toHaveBeenCalledTimes(1));
     view.rerender(<VideoRegistration {...props} contextKey="store-b"/>); resolve(answer);
+    fireEvent.click(screen.getByRole('button', {name: '외부 영상 연결'}));
     await waitFor(() => expect((screen.getByLabelText('개별 영상 주소') as HTMLInputElement).value).toBe(''));
     expect(props.save).not.toHaveBeenCalled();
   });
   it('blocks channel URLs and explains that upload/processing is external', async () => {
     const props = setup();render(<VideoRegistration {...props}/>);
+    fireEvent.click(screen.getByRole('button', {name:'외부 영상 연결'}));
+    screen.getByText('AI로 제목·설명 작성 보조(선택)').closest('details')!.open = true;
     fireEvent.change(screen.getByLabelText('개별 영상 주소'),{target:{value:'https://studio.youtube.com/channel/UCG9wb2OKmCBZ63g_ONuFkzg'}});
     fireEvent.change(screen.getByPlaceholderText('이 영상을 매장 안내 영상으로 등록해 줘'),{target:{value:'등록해 줘'}});
     fireEvent.click(screen.getByRole('button',{name:'AI로 등록'}));
@@ -61,6 +66,8 @@ async function selectStoredVideo(props: ReturnType<typeof setup>) {
 it('accepts a YouTube request without calling the catalog saved before background completion',async()=>{
   const props=setup();const youtube={enqueue:vi.fn().mockResolvedValue({id:'job',name:'약국 안내',queued:true,state:'queued'}),list:vi.fn().mockResolvedValue({availability:{ready:true},items:[]}),retry:vi.fn()};
   render(<VideoRegistration {...props} youtube={youtube}/>);await selectStoredVideo(props);
+  fireEvent.change(screen.getByLabelText('등록할 곳'),{target:{value:'youtube'}});
+  screen.getByText('AI로 제목·설명 작성 보조(선택)').closest('details')!.open = true;
   fireEvent.change(screen.getByPlaceholderText('이 영상을 매장 안내 영상으로 등록해 줘'),{target:{value:'이 영상 채널에 등록해 줘'}});
   fireEvent.click(screen.getByRole('button',{name:'AI로 등록'}));
   await screen.findByText(/YouTube 등록 요청 접수 · 완료되면/);
@@ -70,7 +77,21 @@ it('accepts a YouTube request without calling the catalog saved before backgroun
 it('does not spend AI cost or claim progress when automatic upload is not connected',async()=>{
   const props=setup();const youtube={enqueue:vi.fn(),list:vi.fn().mockResolvedValue({availability:{ready:false},items:[]}),retry:vi.fn()};
   render(<VideoRegistration {...props} youtube={youtube}/>);await selectStoredVideo(props);
+  fireEvent.change(screen.getByLabelText('등록할 곳'),{target:{value:'youtube'}});
+  screen.getByText('AI로 제목·설명 작성 보조(선택)').closest('details')!.open = true;
   fireEvent.change(screen.getByPlaceholderText('이 영상을 매장 안내 영상으로 등록해 줘'),{target:{value:'이 영상 채널에 등록해 줘'}});
   fireEvent.click(screen.getByRole('button',{name:'AI로 등록'}));
   await screen.findByRole('alert');expect(props.ask).not.toHaveBeenCalled();expect(youtube.enqueue).not.toHaveBeenCalled();expect(props.save).not.toHaveBeenCalled();
+});
+
+it('defaults to O4O storage and registers directly without AI or a YouTube connection',async()=>{
+  const props=setup(); const youtube={enqueue:vi.fn(),list:vi.fn().mockResolvedValue({availability:{ready:false},items:[]}),retry:vi.fn()};
+  render(<VideoRegistration {...props} youtube={youtube}/>);
+  expect(screen.queryByLabelText('개별 영상 주소')).toBeNull();
+  expect(screen.queryByText(/자동 등록을 이용/)).toBeNull();
+  await selectStoredVideo(props);
+  fireEvent.click(screen.getByRole('button',{name:'영상 등록'}));
+  await screen.findByText('“약국 안내” 목록 등록 완료');
+  expect(props.ask).not.toHaveBeenCalled(); expect(youtube.enqueue).not.toHaveBeenCalled();
+  expect(props.save.mock.calls[0][0]).toMatchObject({mediaLibraryAssetId:'90000000-0000-4000-a000-000000000001'});
 });

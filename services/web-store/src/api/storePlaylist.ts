@@ -136,3 +136,15 @@ export async function deletePlaylistItem(
 ): Promise<void> {
   await apiClient.delete(`/store-playlists/${playlistId}/items/${itemId}`);
 }
+
+/** Published playback reader output, including forced snapshot time-window filtering. */
+export interface StorePlaylistActiveItem {
+  id: string;
+  snapshotId: string;
+  displayOrder: number;
+  isForced: boolean;
+  isLocked: boolean;
+  title: string;
+  contentJson: Record<string, unknown>;
+  assetType: string;
+}

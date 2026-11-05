@@ -198,7 +198,7 @@ function storeChildRoutes() {
         <Route path="marketing/signage/playlist" element={<StoreSignagePage />} />
         <Route path="marketing/signage/playlist/new" element={<StorePlaylistCreatePage />} />
         <Route path="marketing/signage/videos" element={<StoreSignagePage />} />
-        <Route path="marketing/signage/schedules" element={<StoreSignagePage />} />
+        <Route path="marketing/signage/schedules" element={<Navigate to={`${S}/marketing/signage/player`} replace />} />
         <Route path="marketing/signage/player" element={<SignagePlayerSelectPage />} />
         {/* 매장 구성원 — Owner 전용 화면. 권한은 서버가 판정한다(StoreOwnerOnly 는 화면 가드일 뿐) */}
         <Route path="members" element={<StoreOwnerOnly><StoreMembersPage /></StoreOwnerOnly>} />
@@ -235,6 +235,7 @@ export function WorkspaceApp() {
     <Route path="/consultation/staff" element={gated(<StoreMultilingualConsultationPage />)} />
     <Route path={WORKSPACE_PATHS.handoff} element={<HandoffPage />} />
     {/* 사이니지 재생은 chrome-free (KPA 와 동일하게 layout 밖) */}
+    <Route path={`${S}/marketing/signage/display`} element={gated(<SignagePlayerSelectPage selection />)} />
     <Route path={`${S}/marketing/signage/play/:playlistId`} element={gated(<SignagePlaybackPage />)} />
 
     <Route element={<RootShell />}>

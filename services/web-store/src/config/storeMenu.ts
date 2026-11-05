@@ -40,10 +40,9 @@ export const UNIFIED_STORE_CONFIG: StoreDashboardConfig = {
       { key: 'library-contents', label: '내 자료함', subPath: '/library/contents' },
     ]},
     { label: '디지털 사이니지', items: [
-      { key: 'signage-playlist',  label: '재生목록', subPath: '/marketing/signage/playlist' },
+      { key: 'signage-playlist',  label: '재생목록', subPath: '/marketing/signage/playlist' },
       { key: 'signage-videos',    label: '동영상 보관함',       subPath: '/marketing/signage/videos' },
-      { key: 'signage-schedules', label: '재생 일정',       subPath: '/marketing/signage/schedules' },
-      { key: 'signage-player',    label: 'TV 재생',      subPath: '/marketing/signage/player' },
+      { key: 'signage-player',    label: '디스플레이 재생',      subPath: '/marketing/signage/player' },
     ]},
     { label: '분석', items: [
       { key: 'analytics-marketing', label: '마케팅 분석', subPath: '/analytics/marketing' },

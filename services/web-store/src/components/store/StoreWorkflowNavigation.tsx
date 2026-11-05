@@ -20,7 +20,7 @@ export function StoreWorkflowNavigation({
   const requested = new URLSearchParams(location.search).get("workspace");
   const mode =
     requested === "use" ||
-    (!requested && /tablet-displays|signage\/schedules/.test(location.pathname))
+    (!requested && /tablet-displays/.test(location.pathname))
       ? "use"
       : "studio";
   return (

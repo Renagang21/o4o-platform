@@ -61,7 +61,7 @@ export function SignageQuickStart({ videos: sourceVideos, initialSelected = [], 
     <div className="space-y-4 overflow-y-auto p-5">
       <h2 id={id} className="text-lg font-semibold">새 재생목록</h2>
       <StoreAiSlot priority={2} label="사이니지 안내 작성" />
-      <p className="text-sm text-slate-600">동영상 보관함에서 재생할 영상을 선택하시기 바랍니다. 선택한 순서로 초안을 저장한 뒤 재생 시간과 게시를 정합니다.</p>
+      <p className="text-sm text-slate-600">동영상 보관함에서 재생할 영상을 선택하시기 바랍니다. 선택한 순서로 초안을 저장한 뒤 내용을 확인해 게시하고 디스플레이에서 선택합니다.</p>
       {error && <p role="alert" className="rounded-lg bg-amber-50 p-3 text-sm text-amber-900">{error}</p>}
       <fieldset disabled={saving || uncertain || !!header.current} className="space-y-3 disabled:opacity-70">
         <label htmlFor={`${id}-search`} className="block text-sm">자료 찾기</label>

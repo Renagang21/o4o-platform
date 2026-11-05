@@ -398,6 +398,6 @@ it.each(['/store', '/work/kpa-society/store'])('상담 직접 진입도 매장 �
 
 it('signage has its own area and cannot leak into general content or settings', () => {
   for (const area of ['studio', 'use'] as const) expect(workspaceItems(config, area).some(item => item.key.startsWith('signage-'))).toBe(false);
-  expect(workspaceItems(config, 'signage').map(item => item.key)).toEqual(['signage-playlist', 'signage-videos', 'signage-schedules', 'signage-player']);
+  expect(workspaceItems(config, 'signage').map(item => item.key)).toEqual(['signage-playlist', 'signage-videos', 'signage-player']);
   for (const path of ['videos','playlist','playlist/new','schedules','player']) expect(currentWorkspaceArea(`/store/marketing/signage/${path}`, '?workspace=use', '/store')).toBe('signage');
 });

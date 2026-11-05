@@ -8,8 +8,7 @@ import { hostedVideo } from '@o4o/tablet-kiosk-core/video-embed';
  * /store/marketing/signage/play/:playlistId
  * 단일 Playlist fullscreen 루프 재생
  *
- * playlistId === '_schedule' → 스케줄 기준 재생 (resolve-active API)
- * playlistId === UUID → 기존 수동 재생
+ * Playlist ID lives in the URL; each display/tab owns its selection.
  *
  * WO-O4O-SIGNAGE-PLAYLIST-FULLSCREEN-CORE-PROMOTION-V1:
  *   재생 시작 전 "전체화면으로 재생 / 일반 화면으로 재생" 선택 화면 추가.
@@ -18,11 +17,12 @@ import { hostedVideo } from '@o4o/tablet-kiosk-core/video-embed';
  */
 
 import { useState, useEffect, useRef } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { X, Loader2, AlertCircle, List, Calendar, Maximize, Minimize, Play, MonitorPlay } from 'lucide-react';
+import { useParams, useNavigate, useLocation, Navigate } from 'react-router-dom';
+import { X, Loader2, AlertCircle, List, Maximize, Minimize, Play, MonitorPlay } from 'lucide-react';
 import { publicContentApi, type SignagePlaylist } from '../../lib/api/signageV2';
 import { getAccessToken } from '../../contexts/AuthContext';
-import { fetchActiveContent, type StorePlaylistActiveItem } from '../../api/signageSchedule';
+import type { StorePlaylistActiveItem } from '../../api/storePlaylist';
+import { storeWorkspaceBase } from '../../components/store/StoreWorkflowNavigation';
 import { useStoreOrganizationId } from '../../hooks/useStoreOrganizationId';
 import { getActiveServiceKey } from '../../lib/serviceContext';
 import { apiClient } from '../../api/client';
@@ -112,18 +112,24 @@ function signagePlaylistToPlaybackData(pl: SignagePlaylist): PlaybackData {
 }
 
 // ── Fullscreen helpers ───────────────────────────────────────────────────────
-function requestFullscreen(el: HTMLElement) {
-  if (el.requestFullscreen) el.requestFullscreen();
-  else if ((el as any).webkitRequestFullscreen) (el as any).webkitRequestFullscreen();
+async function requestFullscreen(el: HTMLElement) {
+  const target = el as HTMLElement & { webkitRequestFullscreen?: () => void | Promise<void> };
+  if (target.requestFullscreen) await target.requestFullscreen();
+  else if (target.webkitRequestFullscreen) await target.webkitRequestFullscreen();
+  else throw new Error('UNSUPPORTED_FULLSCREEN');
 }
-function exitFullscreen() {
-  if (document.exitFullscreen) document.exitFullscreen();
-  else if ((document as any).webkitExitFullscreen) (document as any).webkitExitFullscreen();
+async function exitFullscreen() {
+  const target = document as Document & { webkitExitFullscreen?: () => void | Promise<void> };
+  if (document.fullscreenElement && target.exitFullscreen) await target.exitFullscreen();
+  else if (target.webkitExitFullscreen) await target.webkitExitFullscreen();
 }
 
 // ── Main ─────────────────────────────────────────────────────────────────────
 export function SignagePlaybackPage() {
   const scope = useStoreOperationScope();
+  const { playlistId } = useParams();
+  const { pathname } = useLocation();
+  if (playlistId === '_schedule') return <Navigate to={`${storeWorkspaceBase(pathname)}/marketing/signage/display`} replace />;
   return <PlaybackSession key={scope.key} />;
 }
 
@@ -132,7 +138,10 @@ function PlaybackSession() {
   const navigate = useNavigate();
   const { organizationId: storeOrganizationId, loading: storeOrgLoading } = useStoreOrganizationId();
 
-  const isScheduleMode = playlistId === '_schedule';
+  const { pathname } = useLocation();
+  const displayPath = `${storeWorkspaceBase(pathname)}/marketing/signage/display`;
+  const [copyNotice, setCopyNotice] = useState('');
+  const [fullscreenNotice, setFullscreenNotice] = useState('');
 
   const [playbackData, setPlaybackData] = useState<PlaybackData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -153,12 +162,6 @@ function PlaybackSession() {
     setLoading(true); setError(null); setPlaybackData(null); setPhase('start');
     if (storeOrgLoading) return () => { current = false; };
     const load = async (): Promise<PlaybackData> => {
-      if (isScheduleMode) {
-        if (!storeOrganizationId) throw new Error('STORE_REQUIRED');
-        const result = await fetchActiveContent(storeOrganizationId);
-        if (!result.schedule) throw new Error('NO_SCHEDULE');
-        return { name: result.schedule.name, isLoop: true, defaultDuration: 10, items: result.items.map(storeItemToPlaybackItem) };
-      }
       // The selection page lists store_playlists. Resolve that same model with its existing
       // public playback reader (published + active + forced/time-window filtering).
       try {
@@ -185,10 +188,10 @@ function PlaybackSession() {
       return signagePlaylistToPlaybackData(result.data);
     };
     void load().then(result => { if (current) setPlaybackData(result); })
-      .catch(cause => { if (current) setError(cause.message === 'NO_SCHEDULE' ? '현재 시간에 적용된 일정이 없습니다. 재생 시간을 확인하거나 게시된 안내를 선택하시기 바랍니다.' : '재생 자료를 불러오지 못했습니다. 게시 상태와 접근 권한을 확인하고 다시 시도해 주시기 바랍니다.'); })
+      .catch(() => { if (current) setError('재생 자료를 불러오지 못했습니다. 게시 상태와 접근 권한을 확인하고 다시 시도해 주시기 바랍니다.'); })
       .finally(() => { if (current) setLoading(false); });
     return () => { current = false; };
-  }, [playlistId, isScheduleMode, storeOrganizationId, storeOrgLoading, retry]);
+  }, [playlistId, storeOrganizationId, storeOrgLoading, retry]);
 
   // ── 아이템 순서 정렬 ────────────────────────────────────────────────────────
   const items = playbackData?.items ?? [];
@@ -228,21 +231,24 @@ function PlaybackSession() {
   }, []);
 
   const handleFullscreenToggle = () => {
-    if (isFullscreen) exitFullscreen();
-    else if (containerRef.current) requestFullscreen(containerRef.current);
+    if (isFullscreen) void exitFullscreen().catch(() => setFullscreenNotice('ESC 키로 전체화면을 해제할 수 있습니다.'));
+    else if (containerRef.current) void requestFullscreen(containerRef.current).catch(() => setFullscreenNotice('전체화면을 사용할 수 없어 일반 화면으로 재생합니다.'));
   };
 
   // ── Start screen handlers ─────────────────────────────────────────────────
   const handleStartNormal = () => setPhase('playing');
   const handleStartFullscreen = () => {
-    if (containerRef.current) requestFullscreen(containerRef.current);
+    if (containerRef.current) void requestFullscreen(containerRef.current).catch(() => setFullscreenNotice('전체화면을 사용할 수 없어 일반 화면으로 재생합니다.'));
     setPhase('playing');
   };
 
   const handleClose = () => {
-    if (isFullscreen) exitFullscreen();
-    if (isScheduleMode) navigate('/store/marketing/signage/player');
-    else navigate(-1);
+    void exitFullscreen().catch(() => {});
+    navigate(displayPath);
+  };
+  const copyAddress = async () => {
+    try { await navigator.clipboard.writeText(window.location.href); setCopyNotice('재생 주소를 복사했습니다.'); }
+    catch { setCopyNotice('주소 복사에 실패했습니다. 브라우저 주소창의 주소를 복사해 주시기 바랍니다.'); }
   };
 
   // ── Single root container — always in DOM ─────────────────────────────────
@@ -251,14 +257,23 @@ function PlaybackSession() {
       ref={containerRef}
       className="fixed inset-0 bg-black z-50 overflow-hidden"
       onMouseMove={handleMouseMove}
+      onPointerDown={handleMouseMove}
+      onFocusCapture={handleMouseMove}
+      onKeyDown={handleMouseMove}
     >
+      {(phase !== 'playing' || showControls) && <div className="absolute bottom-10 left-4 right-4 z-10 flex flex-wrap items-center gap-2 text-sm text-white">
+        <button type="button" onClick={handleClose} className="min-h-11 rounded bg-slate-800 px-3">재생목록 변경</button>
+        <button type="button" onClick={() => void copyAddress()} className="min-h-11 rounded bg-slate-800 px-3">재생 주소 복사</button>
+        {(copyNotice || fullscreenNotice) && <output role="status">{copyNotice} {fullscreenNotice}</output>}
+      </div>}
+      {phase === 'playing' && !showControls && <button type="button" onClick={handleMouseMove} className="absolute bottom-4 right-4 z-10 min-h-11 rounded bg-black/40 px-3 text-sm text-white/70">재생 설정 열기</button>}
       {/* ── Loading ─────────────────────────────────────────────────────── */}
       {loading && (
         <div className="flex items-center justify-center w-full h-full">
           <div className="text-center">
             <Loader2 className="w-10 h-10 animate-spin text-white/60 mx-auto mb-3" />
             <p className="text-white/40 text-sm">
-              {isScheduleMode ? '스케줄 콘텐츠 로딩 중...' : '플레이리스트 로딩 중...'}
+              재생목록을 불러오는 중…
             </p>
           </div>
         </div>
@@ -268,28 +283,10 @@ function PlaybackSession() {
       {!loading && (error || !playbackData) && (
         <div className="flex items-center justify-center w-full h-full">
           <div className="text-center max-w-md">
-            {isScheduleMode ? (
-              <Calendar className="w-10 h-10 text-amber-400 mx-auto mb-3" />
-            ) : (
-              <AlertCircle className="w-10 h-10 text-red-400 mx-auto mb-3" />
-            )}
+            <AlertCircle className="w-10 h-10 text-red-400 mx-auto mb-3" />
             <p className="text-white/60 mb-4 whitespace-pre-line">{error ?? '플레이리스트를 찾을 수 없습니다.'}</p>
             <button type="button" onClick={() => setRetry(value => value + 1)} className="mb-3 min-h-11 rounded-lg bg-white/10 px-4 text-sm text-white">다시 시도</button>
-            {isScheduleMode ? (
-              <button
-                onClick={() => navigate('/store/marketing/signage/player')}
-                className="px-4 py-2 bg-white/10 text-white rounded-lg text-sm hover:bg-white/20"
-              >
-                플레이리스트 선택으로 이동
-              </button>
-            ) : (
-              <button
-                onClick={() => navigate(-1)}
-                className="px-4 py-2 bg-white/10 text-white rounded-lg text-sm hover:bg-white/20"
-              >
-                돌아가기
-              </button>
-            )}
+
           </div>
         </div>
       )}
@@ -301,7 +298,7 @@ function PlaybackSession() {
             <List className="w-10 h-10 text-white/20 mx-auto mb-3" />
             <p className="text-white/40 mb-4">재생할 항목이 없습니다.</p>
             <button
-              onClick={() => navigate(-1)}
+              onClick={handleClose}
               className="px-4 py-2 bg-white/10 text-white rounded-lg text-sm hover:bg-white/20"
             >
               돌아가기
@@ -317,7 +314,7 @@ function PlaybackSession() {
             <MonitorPlay className="w-12 h-12 text-white/40 mx-auto mb-4" />
             <p className="text-white/80 text-lg font-medium mb-1 truncate">{playbackData.name}</p>
             <p className="text-white/40 text-sm mb-8">
-              {items.length}개 콘텐츠{isScheduleMode ? ' · 스케줄 기반' : ''}
+              {items.length}개 콘텐츠 · 기본 음소거 · 반복 재생
             </p>
 
             <div className="flex flex-col gap-3">
@@ -361,7 +358,7 @@ function PlaybackSession() {
             <p>{sequence.allFailed ? '재생할 수 있는 영상이 없습니다.' : '재생하지 못한 자료를 건너뜁니다.'} {sequence.error}</p>
             <button type="button" onClick={sequence.retry} className="min-h-11 underline">다시 재생</button>
           </output>}
-          <button type="button" onClick={() => setRetry(value => value + 1)} className="absolute right-4 bottom-20 min-h-11 rounded bg-slate-800 px-3 text-sm text-white">변경한 목록 다시 적용</button>
+          {showControls && <button type="button" onClick={() => setRetry(value => value + 1)} className="absolute right-4 bottom-20 min-h-11 rounded bg-slate-800 px-3 text-sm text-white">변경한 목록 다시 적용</button>}
 
           {/* Progress dots */}
           {items.length > 1 && showControls && (
@@ -376,14 +373,6 @@ function PlaybackSession() {
                   }`}
                 />
               ))}
-            </div>
-          )}
-
-          {/* Schedule mode info */}
-          {isScheduleMode && showControls && (
-            <div className="absolute bottom-14 left-1/2 -translate-x-1/2 bg-black/50 rounded-lg px-3 py-1.5 text-xs text-white/60 flex items-center gap-1.5">
-              <Calendar className="w-3 h-3" />
-              스케줄 기반 재생 · 변경 시 새로고침 필요
             </div>
           )}
 

@@ -10,7 +10,6 @@ const actionLabels: Record<string, string> = {
   'staff-support': '상품 위치·기본 안내',
   'tablet-requests': '상담 요청 확인',
   'signage-playlist': '재생할 안내·순서 변경',
-  'signage-schedules': '재생 일정 관리',
   'signage-player': '재생 화면 열기',
   'tablet-displays': '태블릿 위치·화면 관리',
   'store-execution': '위치별 저장 설정',
