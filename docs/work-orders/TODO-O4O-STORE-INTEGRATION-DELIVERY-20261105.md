@@ -15,13 +15,13 @@
 - [x] Git·PR·required checks·다른 배포 현황·승인된 테스트 계정 접근 조사
 - [x] 최신 main 로고와 합니다체 충돌 5곳 정합
 - [x] 사이니지 브랜치를 PR #943에 통합, 신청 폐기·Demo 정책 양쪽 보존
-- [ ] 통합 소스 로컬 검사·exact-head CI·기존 리뷰/차단 요인 확인
-- [ ] PR #943 main 병합 및 post-merge CI 확인
-- [ ] Delivery 판정·실행 서비스/serving→target 범위와 migration 포함 여부 확인
-- [ ] 기술 gate에 따른 자동 배포 또는 소유자 promote, serving SHA 확인
-- [ ] 승인된 운영 테스트 계정으로 조회·권한·매장 정보·사이니지 확인
-- [ ] 운영 TV 재생 페이지의 실제 미디어 상태 확인 및 물리 기기 확인 여부 구분
-- [ ] 최종 PR 기록/검증 결과·남은 문제·문서 정합·worktree 보존 판단
+- [x] 통합 소스 로컬 검사·exact-head CI·기존 리뷰/차단 요인 확인
+- [x] PR #943 main 병합 및 post-merge CI 확인
+- [x] Delivery 판정·실행 서비스/serving→target 범위와 migration 포함 여부 확인
+- [x] 기술 gate에 따른 자동 배포 또는 소유자 promote, serving SHA 확인
+- [x] 승인된 운영 테스트 계정으로 조회·권한·매장 정보·사이니지 확인
+- [x] 운영 TV 재생 페이지의 실제 미디어 상태 확인 및 물리 기기 확인 여부 구분
+- [x] 최종 PR 기록/검증 결과·남은 문제·문서 정합·worktree 보존 판단
 
 운영 업무 데이터 생성·삭제·seed·실제 면허 승인·기기 pairing을 이 검증의 대체 수단으로 실행하지 않는다. 로그인 보안/감사 기록은 보존 정책을 따른다. 자격값·실제 사용자/매장 이름·응답 원문·토큰·credential은 공개 문서/로그에 남기지 않는다. 새 migration/DDL이 포함된 promote는 별도 명시 승인이 필요하므로 판정 전에 실행하지 않는다.
 
@@ -30,3 +30,16 @@
 - 배포 전 승인된 Store 테스트 계정의 이메일 로그인 HTTP 200·세션 발급을 확인했다. 이는 매장 권한·TV 재생 성공과 별도다.
 - 기존 main Delivery #41957641867은 완료·성공이다. 이번 배포는 같은 직렬화 workflow를 사용한다.
 - 초기 각 개발 브랜치 로컬 검증/제한은 각 TODO에 보존한다. 운영 결과는 통합 PR과 후속 기록에 근거를 남긴다.
+
+## 최종 결과
+
+- PR #943 병합: `4db39d8368361d0b03b419138aa5e9b31dd2df60`. 두 작업 브랜치와 이전 파트너 작업은 main에 포함됐다.
+- exact-head PR CI #41958987693 및 main CI #41960410532 전체 성공. Delivery #41961466041은 LEVEL 3 보류, 승인된 Promote #41961643478로 핵심 9개 서비스 DEPLOYED·동일 source SHA를 확인했다.
+- 별도 약국협동조합 앱은 #41962930715 `frontend_only=true, apply=false` 성공. 등록/provision·회원 데이터 변경을 실행하지 않았다. 미배포 보류 자산 web-account는 새 인프라를 만들지 않았다.
+- 운영 Demo 계정 로그인·단일 매장 연결·매장 정보/영상/재생목록/일정 조회 HTTP 200. 기존 매장 정보의 자격 403이 코드 연결로 해소됐고 본인 조직 일치·가상 예시를 확인했다. 실제 면허 원장 보정·seed는 실행하지 않았다.
+- 운영 Chromium에서 /pharmacy→/store/info, Demo 예시, 사이니지 별도 활성화, 중복 설정 0, PC/mobile 가로 넘침 0, pageerror 0, 업무 쓰기 차단/발생 0을 확인했다.
+- 공개 PC 설치 파일 source SHA 일치·SHA256·바이트 수 검증 PASS. 버전 0.6.0, 내장 Node 22.18.0 유지.
+- **실제 영상/물리 TV 재생은 미검증:** 운영 영상·목록·일정은 0건이다. 사용자의 공개 YouTube 선택·테스트 지시에 따라 검색/영상 정보 요청을 시도했으나 현재 클라우드 프록시가 CONNECT 403을 반환했다. 네트워크 우회나 TLS 검증 해제는 하지 않았다.
+- 현재 Store 목록/영상 삭제는 soft delete이므로 운영 일회성 테스트 자료를 생성하지 않았다. 생성 후 완전 정리 불가인 경로를 임의로 운영 테스트에 사용하지 않는다. 외부 영상 엔진 검증과 실제 저장·기기 송출은 구분한다.
+- **남은 품질 항목:** Sonar 새 코드 보안 등급 B 실패가 남아 있다. 상세 이슈 API는 CloudFront 403이며 GitHub annotation은 확인했다. required CI Gate·CodeQL은 통과했다. 검사 기준은 완화하지 않았다.
+- 상세 증적: [통합·배포 CHECK](../checks/CHECK-O4O-STORE-INTEGRATION-DELIVERY-20261105.md). 후속 기록 PR은 문서-only이며 runtime 추가 배포는 NOT_APPLICABLE이다.
