@@ -94,10 +94,6 @@ vi.mock("../../../../api/assetSnapshot", () => ({
 vi.mock("../../../../api/storePlaylist", () => ({
   fetchStorePlaylists: async () => [],
 }));
-vi.mock("../../../../api/signageSchedule", () => ({
-  fetchSchedules: async () => [],
-  fetchSignagePlaylists: async () => [],
-}));
 vi.mock("../../../../api/signageMedia", () => ({
   createYoutubeVideoApi: () => ({list:async()=>({availability:{ready:false},items:[]}),enqueue:vi.fn(),retry:vi.fn(),cancel:vi.fn()}),
   fetchSignageMedia: api.media,

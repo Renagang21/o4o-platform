@@ -6,7 +6,7 @@
 > **유형:** Baseline (경계 고정 / 통합 금지선)
 > **WO:** `WO-O4O-SIGNAGE-STORE-PLAYLISTS-CANONICAL-KEEP-LEGACY-V1`
 > **선행 조사:** [`IR-O4O-SIGNAGE-STORE-PLAYLISTS-CANONICAL-DATA-MODEL-V1`](../investigations/IR-O4O-SIGNAGE-STORE-PLAYLISTS-CANONICAL-DATA-MODEL-V1.md)
-> **일자:** 2026-06-17 · **최종 갱신:** 2026-10-05 (§3 재생기 범위 현행화 — 은퇴한 `signage-player-web` 제외)
+> **일자:** 2026-06-17 · **최종 갱신:** 2026-11-05 (사용자 승인: 매장 시간표 폐기·디스플레이별 직접 선택)
 > **상태:** Active — 항목 모델 reconciliation 완료 전까지 유효
 
 ---
@@ -25,6 +25,28 @@
 > 따라서 **항목 모델 reconciliation 없이 dual-write, 단순 migration, big-bang 통합을 금지한다.**
 
 ---
+
+## 0-1. 현재 매장 재생 정책 — 2026-11-05 사용자 승인
+
+매장 시간·요일 기반 **재생 일정 기능은 폐기**한다. 작은 매장에서 디스플레이마다 게시된 재생목록 하나를 골라 반복 재생한다.
+이 결정은 아래 §3의 재생기/API 변경 금지 중 **매장 시간표 제거와 직접 목록 선택 UX**를 대체한다.
+플레이리스트 모델 통합·dual-write·스냅샷/forced 노출 기간 변경 금지는 유지한다.
+
+- 동영상 보관함 → 재생목록 → **디스플레이 재생**.
+- 디스플레이의 브라우저에서 **재생 화면 열기** → 새 탭(`/store/marketing/signage/display`) → 게시 목록 선택 → 명시적으로 일반/전체화면 재생 시작.
+- 새 탭은 클릭한 기기에서 열린다. 원격 제어/기기 등록 기능은 추가하지 않는다. 매장 로그인·접근 권한은 기존 StoreGate를 유지한다.
+- 재생 URL(`/store/marketing/signage/play/:playlistId`)에 선택을 담는다. 각 탭/기기는 독립적이며 전역 선택 저장이나 다른 화면 동기화가 없다. 새로고침하면 같은 목록을 다시 읽고 사용자 시작을 기다린다.
+- 재생 주소 복사·재생목록 변경·즉시 목록 다시 적용을 제공한다. 선택한 목록 ID는 기기별로 유지한다. #947의 필수 영상 정책에 따라 같은 목록의 서버 변경은 15초마다 확인하고, 받은 필수 영상 만료는 1초 시계로 적용한다. 다른 기기에서도 해당 매장 로그인/권한이 필요하다.
+- 기본 음소거. 전체화면을 지원하지 않거나 브라우저가 거절하면 일반 화면으로 재생한다. 개별 실패는 다음 자료, 모두 실패하면 재시도를 제공한다.
+- 매장 전용 `/api/signage/:serviceKey/schedules*` 및 `/active-content`는 제거한다(auth 이후 404). 이전 schedules 화면과 `_schedule` 재생 주소는 직접 선택 화면으로 안내한다.
+- DB 테이블/과거 일정 데이터와 공통 digital-signage-core scheduler/entity는 삭제하지 않는다. Tablet ScreenSet은 별도 경로다.
+- 공개 published snapshot reader와 필수 영상 노출 기간을 유지한다. 기존 방송 ID reader도 별도 모델로 유지하고 권한 실패를 다른 reader로 우회하지 않는다.
+
+동영상 등록은 **O4O 영상 등록**(파일 업로드/보관 영상 선택), **외부 영상 연결**(YouTube/Vimeo 개별 URL)로 나눈다.
+**제공 영상 가져오기**는 커뮤니티/가입 협업체의 기존 복사 흐름을 유지한다. 두 등록 경로의 영상은 같은 동영상 보관함에 출처와 함께 표시한다.
+직접 등록을 기본으로 하고 AI 제목·설명 작성은 선택적 보조다. YouTube 업로드/연결 상태·작업 목록은 해당 업로드 경로를 선택한 경우에 안내한다.
+
+구현·검증과 PR 전달 상태는 [현재 TODO](../work-orders/TODO-O4O-DISPLAY-PLAYBACK-SIMPLIFICATION-V1.md)를 따른다. 이 작업은 PR까지만 진행하며 병합·배포는 별도다.
 
 ## 1. 목적
 

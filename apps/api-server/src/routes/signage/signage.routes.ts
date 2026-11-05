@@ -2,7 +2,6 @@ import { Router, Request, Response, NextFunction } from 'express';
 import type { DataSource } from 'typeorm';
 import { SignagePlaylistController } from './controllers/playlist.controller.js';
 import { SignageMediaController } from './controllers/media.controller.js';
-import { SignageScheduleController } from './controllers/schedule.controller.js';
 import { SignageTemplateController } from './controllers/template.controller.js';
 import { SignageContentController } from './controllers/content.controller.js';
 import { SignageGlobalContentController } from './controllers/global-content.controller.js';
@@ -39,7 +38,6 @@ export function createSignageRoutes(dataSource: DataSource): Router {
   const router = Router({ mergeParams: true });
   const playlistCtrl = new SignagePlaylistController(dataSource);
   const mediaCtrl = new SignageMediaController(dataSource);
-  const scheduleCtrl = new SignageScheduleController(dataSource);
   const templateCtrl = new SignageTemplateController(dataSource);
   const contentCtrl = new SignageContentController(dataSource);
   const globalCtrl = new SignageGlobalContentController(dataSource);
@@ -115,31 +113,7 @@ export function createSignageRoutes(dataSource: DataSource): Router {
   // DELETE /api/signage/:serviceKey/media/:id - Delete media (soft delete)
   router.delete('/media/:id', requireSignageStore, validateUuidParams('id'), mediaCtrl.deleteMedia);
 
-  // ========== Store Schedule Routes (Store-only) ==========
-  // GET /api/signage/:serviceKey/schedules - List schedules
-  router.get('/schedules', requireSignageStore, scheduleCtrl.getSchedules);
-
-  // POST /api/signage/:serviceKey/schedules - Create schedule
-  router.post('/schedules', requireSignageStore, scheduleCtrl.createSchedule);
-
-  // GET /api/signage/:serviceKey/schedules/calendar - Get schedule calendar view
-  // NOTE: static path MUST stay registered before '/schedules/:id',
-  // otherwise Express matches it as :id='calendar' (route shadowing).
-  router.get('/schedules/calendar', requireSignageStore, scheduleCtrl.getScheduleCalendar);
-
-  // GET /api/signage/:serviceKey/schedules/:id - Get schedule by ID
-  router.get('/schedules/:id', requireSignageStore, validateUuidParams('id'), scheduleCtrl.getSchedule);
-
-  // PATCH /api/signage/:serviceKey/schedules/:id - Update schedule
-  router.patch('/schedules/:id', requireSignageStore, validateUuidParams('id'), scheduleCtrl.updateSchedule);
-
-  // DELETE /api/signage/:serviceKey/schedules/:id - Delete schedule (soft delete)
-  router.delete('/schedules/:id', requireSignageStore, validateUuidParams('id'), scheduleCtrl.deleteSchedule);
-
-  // ========== Active Content Resolution (Player - less strict) ==========
-  // GET /api/signage/:serviceKey/active-content - Resolve active content for channel
-  // Note: Player devices need access, so we use a looser check
-  router.get('/active-content', allowSignageStoreRead, scheduleCtrl.resolveActiveContent);
+  // Store schedules and active-content were retired: displays choose a published playlist directly.
 
   // ========== Template Routes (Operator/HQ managed) ==========
   // Templates are created by Operators, used by Stores (read-only)
