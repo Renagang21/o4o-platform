@@ -1,6 +1,6 @@
 # 디스플레이 재생 단순화 TODO
 
-> **상태**: ACTIVE
+> **상태**: COMPLETED — 개발·PR 전달 범위
 > **작성일**: 2026-11-05 · **최종 갱신**: 2026-11-05
 > **근거**: 사용자 요청 — 매장 재생 일정 폐기, 화면별 재생목록 직접 선택, 영상 등록 구분; 종료점 PR까지
 
@@ -57,7 +57,7 @@ main 병합·배포·운영 DB 변경은 하지 않는다. 기존 자료/테이�
 - [x] 관련 테스트·type-check·production build
 - [x] PC/mobile·두 재생 창·새로고침·주소 복사·실패 복구 실제 Chromium 검증
 - [x] TODO 재점검·문서 정합·미확인/기존 실패 구분
-- [ ] 경로 단위 commit·push, 기존 PR 중복 없이 후속 PR 생성
+- [x] 경로 단위 commit·push, 기존 PR 중복 없이 후속 PR 생성
 
 ## 검증 기록 — 2026-11-05
 
@@ -85,3 +85,9 @@ main 병합·배포·운영 DB 변경은 하지 않는다. 기존 자료/테이�
 - [PC 재생목록 선택](../design/assets/display-playback/desktop-chooser.png)
 - [모바일 디스플레이 재생](../design/assets/display-playback/mobile-playback.png)
 - [모바일 외부 영상 연결](../design/assets/display-playback/mobile-registration.png)
+
+## PR 전달
+
+- PR: [#948 — 재생 일정 폐기 및 디스플레이별 재생목록 선택](https://github.com/Renagang21/o4o-platform/pull/948)
+- branch: `wo/display-playback-simplification`; 구현 commit: `00d5148cc9`.
+- 지정된 개발·PR 생성 범위는 완료했다. GitHub CI 결과와 #945 중복 파일 확인·main 통합·배포/현장 TV 검증은 후속 통합 단계다. 이 문서의 COMPLETED는 운영 배포 완료를 의미하지 않는다.
