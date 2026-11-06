@@ -272,6 +272,7 @@ verdict: SAFE_TO_REMOVE | KEEP | UNCERTAIN
 **DB·보안 경계:**
 
 - **기본 환경은 프로덕션이다.** 대상 환경을 확인하고, read-only 검증은 허용된 범위에서 수행한다.
+- **운영 DB 접속은 읽기 전용 계정(`o4o_readonly`)만 사용한다.** 사용자가 명시 승인한 운영 작업만 예외다. 조회가 막히면 다른 계정으로 우회하지 않고 사용자에게 확인한다. 범위는 [`SETUP.md`](SETUP.md)의 운영 DB identity 절을 따른다.
 - **DB write(INSERT / UPDATE / DELETE 등), DDL(DROP / ALTER 등), migration 적용은 사용자 명시 승인이 필요하다.**
   코드 수정 승인만으로 운영 DB write까지 승인되었다고 간주하지 않는다.
 - 실제 DB host / password / 계정값을 문서·로그·커밋·스크린샷에 기록하지 않는다.
