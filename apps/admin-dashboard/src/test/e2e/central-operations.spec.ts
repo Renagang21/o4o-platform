@@ -1,5 +1,5 @@
 import { test, expect, type Page } from "@playwright/test";
-async function fixture(page: Page, delegated: string[] | null) {
+async function fixture(page: Page, delegated: string[] | null, menuKeys?: string[]) {
   let current = delegated;
   const writes: string[] = [];
   const user = {
@@ -32,7 +32,7 @@ async function fixture(page: Page, delegated: string[] | null) {
         return route.fulfill({
           status: current?.length ? 200 : 403,
           json: current?.length
-            ? { success: true, data: { roles: current } }
+            ? { success: true, data: { roles: current, menuKeys } }
             : { success: false, code: "CENTRAL_DELEGATION_REQUIRED" },
         });
       return route.fulfill({
@@ -89,7 +89,7 @@ for (const viewport of [
     test("manual credential approval records evidence and reason in the central workflow", async ({
       page,
     }) => {
-      await fixture(page, ["neture:operator"]);
+      await fixture(page, ["neture:operator"], ["neture.qualifications"]);
       const decisions: unknown[] = [];
       let pending = true;
       await page.route(
@@ -102,6 +102,18 @@ for (const viewport of [
               json: { success: true, data: { status: "approved" } },
             });
           }
+          if (new URL(route.request().url()).pathname.endsWith("22222222-2222-4222-8222-222222222222"))
+            return route.fulfill({
+              json: {
+                success: true,
+                data: {
+                  member: { userId: "22222222-2222-4222-8222-222222222222", name: "합성 자격 신청자", nickname: "합성", email: "member@example.test", phone: null, accountStatus: "active", emailVerified: true, joinedAt: "2026-11-01", version: "2026-10-28T00:00:00.123456", hasPassword: false },
+                  qualification: { licenseNumber: "SYNTHETIC-LICENSE", status: "pending", reason: null, approvedAt: null, reviewedBy: null, version: "2026-10-28T00:00:00.123456" },
+                  registration: null, legacyLicense: null, pharmacies: [], history: [],
+                  permissions: { edit: false, qualifications: true, pharmacies: false },
+                },
+              },
+            });
           return route.fulfill({
             json: {
               success: true,
@@ -126,16 +138,16 @@ for (const viewport of [
       );
       await page.goto("/operations/neture/qualifications");
       await expect(
-        page.getByRole("heading", { name: "공통 약사 자격 검토" }),
+        page.getByRole("heading", { name: "회원 가입 승인" }),
       ).toBeVisible();
-      await page.getByRole("button", { name: "승인 검토" }).click();
-      const save = page.getByRole("button", { name: "검토 결과 저장" });
+      await page.getByRole("button", { name: "가입승인", exact: true }).click();
+      const save = page.getByRole("dialog").getByRole("button", { name: "승인", exact: true });
       await expect(save).toBeDisabled();
       await page
         .getByLabel("신청자에게 안내할 확인·반려 사유")
         .fill("합성 면허 근거를 별도로 확인함");
       await expect(save).toBeDisabled();
-      await page.getByRole("checkbox").check();
+      await page.getByLabel("신청자 본인의 면허 근거를 별도로 확인했습니다.").check();
       await save.click();
       await expect(
         page.getByText(
