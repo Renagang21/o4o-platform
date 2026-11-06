@@ -1,7 +1,7 @@
 # 매장 콘텐츠 제작·자료·목록·게시 흐름 정비
 
 > 작성일: 2026-11-06 (Asia/Seoul)
-> 상태: LOCAL_VERIFIED · PR 준비 · 종료점: 로컬 검증·commit·push·PR. main 병합·배포 제외.
+> 상태: PR_OPEN · 로컬 검증 완료 · 종료점: 로컬 검증·commit·push·PR. main 병합·배포 제외.
 > 시작 SHA: `051b7ede63135d8ae163e8121c370eff3da5b1ed`
 
 ## 기준과 범위
@@ -19,7 +19,7 @@
 - [x] 선택/필터/빈 목록/오류/숨김 의미 안내와 모달 접근성 보완. 기존 기능·권한·사본 독립성 보존.
 - [x] 현행 메뉴 정본·사용자 안내 정합. 과거 기록 재작성·무관 문서 삭제 없음.
 - [x] 관련 회귀 테스트·런타임 검사·Store 타입/빌드 및 PC/모바일 브라우저 검증. 쓰기는 로컬 가상 응답으로 격리.
-- [ ] 자체 검토·실패 보완·범위별 stage/commit·명시적 branch push·기존 PR 확인 후 PR 작성.
+- [x] 자체 검토·실패 보완·범위별 stage/commit·명시적 branch push·기존 PR 확인 후 PR 작성: [PR #953](https://github.com/Renagang21/o4o-platform/pull/953).
 
 ## 조사로 확정된 문제
 
@@ -51,4 +51,4 @@
 - 서버 권한 계약을 바꾸지 않았다. 실제 계정별 운영 쓰기·현장 기기 검증은 미실행이다. UI 테스트의 합성 응답은 실제 DB/API 운영 검증을 대신하지 않는다.
 - 기존 10개 worktree와 변경을 보존했다. 개발은 `/workspace/o4o-wt/store-content-flow-20261106`, branch `wo/store-content-flow-20261106`에서만 수행했다.
 - WORKTREE_DISPOSITION: KEEP — PR 검토와 후속 수정용. 병합·배포는 별도 작업이다.
-- 최종 commit SHA와 PR은 Git/PR 기록 및 완료 보고로 인계한다.
+- 구현 commit: `d91e0b70d62d33365b7d8142c5c32a24aa29d718`. [PR #953](https://github.com/Renagang21/o4o-platform/pull/953)에 push했다. 이 문서 완료 기록은 같은 branch의 후속 commit으로 보존한다. GitHub CI는 PR에서 확인하며 로컬 검증 통과와 CI 완료를 구분한다.
