@@ -1,8 +1,9 @@
-import { useNavigate, useLocation, Link } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { SignagePlayerSelectView } from '@o4o/store-ui-core';
 import { fetchStorePlaylists } from '../../api/storePlaylist';
 import { useStoreOperationScope } from '../../hooks/useStoreOperationScope';
 import { storeWorkspaceBase } from '../../components/store/StoreWorkflowNavigation';
+import { SignageTabs } from './signage/SignageTabs';
 
 /** A display chooses its own playlist. No device registry or cross-window playback state. */
 export function SignagePlayerSelectPage({ selection = false }: Readonly<{ selection?: boolean }>) {
@@ -16,11 +17,7 @@ function DisplaySelection({ selection }: Readonly<{ selection: boolean }>) {
   const base = storeWorkspaceBase(pathname);
   const displayPath = `${base}/marketing/signage/display`;
   return <main className="mx-auto w-full max-w-5xl space-y-4 p-4">
-    <nav aria-label="사이니지 업무" className="flex flex-wrap gap-2 text-sm">
-      <Link className="min-h-11 content-center rounded-lg border px-3" to={`${base}/marketing/signage/videos`}>동영상 보관함</Link>
-      <Link className="min-h-11 content-center rounded-lg border px-3" to={`${base}/marketing/signage/playlist`}>재생목록</Link>
-      <span aria-current="page" className="min-h-11 content-center rounded-lg bg-teal-50 px-3">디스플레이 재생</span>
-    </nav>
+    <SignageTabs base={base} active="player" />
     {selection ? <SignagePlayerSelectView fetchStorePlaylists={fetchStorePlaylists}
       playButtonClassName="inline-flex min-h-11 items-center gap-1.5 rounded-lg bg-teal-700 px-3 text-sm text-white hover:bg-teal-800"
       searchInputClassName="w-full min-h-11 rounded-lg border border-slate-300 py-2 pl-9 pr-3 text-sm focus:ring-2 focus:ring-teal-500"

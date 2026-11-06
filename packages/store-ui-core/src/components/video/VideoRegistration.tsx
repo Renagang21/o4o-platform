@@ -102,7 +102,7 @@ function RegistrationSession({ contextKey, mediaApi, ask, save, onSaved, request
       }} className={`min-h-11 rounded-lg border px-4 py-3 text-left ${source === value ? 'border-teal-700 bg-teal-50' : 'border-slate-300'}`}>{label}</button>)}
     </fieldset>
     {source === 'o4o' ? <div className="space-y-2">
-      <p className="text-sm text-slate-600">파일을 업로드하거나 O4O에 보관한 영상을 선택합니다. 파일 보관과 동영상 보관함 등록은 각각 완료 여부를 안내합니다.</p>
+      <p className="text-sm text-slate-600">파일을 업로드하거나 O4O에 보관한 영상을 선택합니다. 파일 보관과 동영상 등록은 각각 완료 여부를 안내합니다.</p>
       <button type="button" disabled={busy} onClick={() => setPicker(true)} className="min-h-11 rounded-lg border border-slate-300 px-3 text-sm">O4O 영상 보관·선택</button>
       {asset && <div className="flex flex-wrap items-center gap-2 text-sm"><span>보관 영상 선택: {asset.originalName}</span><button type="button" disabled={busy} onClick={() => { setAsset(null); prepared.current = null; }} className="min-h-11 underline">선택 해제</button></div>}
     </div> : <div className="space-y-2">

@@ -28,6 +28,10 @@ export interface PlaylistDto {
   updatedAt: Date;
   itemCount: number;
   forcedCount: number;
+  /** 재생시간을 아는 항목의 합(초). 항목 snapshot 의 contentJson.duration 기준 */
+  totalDurationSec: number;
+  /** 재생시간을 알 수 없는 항목 수. 필수 영상은 재생시간을 저장하지 않아 여기에 포함된다. */
+  missingDurationCount: number;
 }
 
 export interface PlaylistCreateDto {
@@ -215,16 +219,25 @@ export class StorePlaylistRepository {
          p.created_at AS "createdAt",
          p.updated_at AS "updatedAt",
          (COALESCE(ic.item_count, 0) + (SELECT count FROM required))::int AS "itemCount",
-         (COALESCE(ic.forced_count, 0) + (SELECT count FROM required))::int AS "forcedCount"
+         (COALESCE(ic.forced_count, 0) + (SELECT count FROM required))::int AS "forcedCount",
+         COALESCE(ic.total_duration_sec, 0)::int AS "totalDurationSec",
+         (COALESCE(ic.missing_duration_count, 0) + (SELECT count FROM required))::int AS "missingDurationCount"
        FROM store_playlists p
        LEFT JOIN (
          SELECT
-           playlist_id,
+           i.playlist_id,
            COUNT(*)::int AS item_count,
-           COUNT(*) FILTER (WHERE is_forced = true)::int AS forced_count
-         FROM store_playlist_items
-         WHERE is_forced = false OR ((forced_start_at IS NULL OR NOW() >= forced_start_at) AND (forced_end_at IS NULL OR NOW() < forced_end_at))
-         GROUP BY playlist_id
+           COUNT(*) FILTER (WHERE i.is_forced = true)::int AS forced_count,
+           SUM(CASE WHEN d.seconds > 0 THEN ROUND(d.seconds) ELSE 0 END) AS total_duration_sec,
+           COUNT(*) FILTER (WHERE d.seconds IS NULL OR d.seconds <= 0)::int AS missing_duration_count
+         FROM store_playlist_items i
+         LEFT JOIN o4o_asset_snapshots s ON s.id = i.snapshot_id
+         LEFT JOIN LATERAL (
+           SELECT CASE WHEN (s.content_json::jsonb ->> 'duration') ~ '^[0-9]+([.][0-9]+)?$'
+             THEN (s.content_json::jsonb ->> 'duration')::numeric END AS seconds
+         ) d ON true
+         WHERE i.is_forced = false OR ((i.forced_start_at IS NULL OR NOW() >= i.forced_start_at) AND (i.forced_end_at IS NULL OR NOW() < i.forced_end_at))
+         GROUP BY i.playlist_id
        ) ic ON ic.playlist_id = p.id
        WHERE p.organization_id = $1 AND p.is_active = true
        ORDER BY p.updated_at DESC`,

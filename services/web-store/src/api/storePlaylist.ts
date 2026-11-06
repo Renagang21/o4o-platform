@@ -27,6 +27,10 @@ export interface StorePlaylist {
   updatedAt: string;
   itemCount: number;
   forcedCount: number;
+  /** 재생시간을 아는 항목의 합(초) */
+  totalDurationSec?: number;
+  /** 재생시간을 알 수 없는 항목 수 */
+  missingDurationCount?: number;
 }
 
 export interface StorePlaylistItem {

@@ -106,11 +106,14 @@ export function filterSignageVideos(
     status: SignageStatusFilter;
     sort: SignageSortKey;
     keyword: string;
+    /** 출처 표기(signageVideoOrigin). 비우면 전체. */
+    origin?: string;
   },
 ): UnifiedVideoItem[] {
   const keyword = filter.keyword.trim().toLowerCase();
   return videos
     .filter((video) => matchesStatus(video, filter.status))
+    .filter((video) => !filter.origin || signageVideoOrigin(video) === filter.origin)
     .filter(
       (video) =>
         !keyword || video.title.toLowerCase().includes(keyword) ||
@@ -118,6 +121,8 @@ export function filterSignageVideos(
     )
     .sort((a, b) => compareVideos(a, b, filter.sort));
 }
+
+export const SIGNAGE_VIDEO_ORIGINS = ['직접 등록', '커뮤니티', '가입 협업체', '제공 자료'] as const;
 
 export function summarizePlaylistDuration(
   items: ReadonlyArray<Pick<StorePlaylistItem, "contentJson">>,
@@ -137,6 +142,6 @@ export function signageVideoOrigin(video: UnifiedVideoItem): string {
   if (video.source === 'direct') return '직접 등록';
   const service = video._snapshot?.sourceService;
   if (service === 'community') return '커뮤니티';
-  if (service === 'semi-franchise') return '가입 협업체';
+  if (service === 'semi-franchise' || service === 'semi-franchise-video') return '가입 협업체';
   return '제공 자료';
 }
