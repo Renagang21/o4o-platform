@@ -75,7 +75,7 @@ export default function TabletSetupPage() {
       <section className="w-full max-w-lg space-y-5 rounded-xl border bg-white p-6">
         <h1 className="text-2xl font-bold">진열 태블릿 연결</h1>
         <p>
-          내 매장의 태블릿 위치 관리에서 발급한 6자리 코드를 입력하세요. 상담
+          내 매장의 태블릿 위치 관리에서 발급한 6자리 코드를 입력하시기 바랍니다. 상담
           고객 화면의 연결 코드와는 다릅니다.
         </p>
         <form

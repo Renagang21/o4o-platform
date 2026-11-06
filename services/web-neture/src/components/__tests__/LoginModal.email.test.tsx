@@ -51,6 +51,7 @@ afterEach(() => { cleanup(); host.profile = 'main'; });
 describe('LoginModal — 이메일 로그인', () => {
   it('이메일 · 비밀번호 · 로그인 + 계정 도움말 링크 + 대표 호스트 부제', () => {
     mount();
+    fireEvent.click(screen.getByText('이메일로 로그인'));
     expect(screen.getByLabelText('이메일')).toBeTruthy();
     expect(screen.getByLabelText('비밀번호')).toBeTruthy();
     expect(screen.getByRole('button', { name: '로그인' })).toBeTruthy();
@@ -83,6 +84,7 @@ describe('LoginModal — 이메일 로그인', () => {
 
   it('이메일 로그인 성공 → 모달 닫힘', async () => {
     const onClose = mount();
+    fireEvent.click(screen.getByText('이메일로 로그인'));
     fireEvent.change(screen.getByLabelText('이메일'), { target: { value: 'a@b.co' } });
     fireEvent.change(screen.getByLabelText('비밀번호'), { target: { value: 'abcd123!' } });
     fireEvent.click(screen.getByRole('button', { name: '로그인' }));

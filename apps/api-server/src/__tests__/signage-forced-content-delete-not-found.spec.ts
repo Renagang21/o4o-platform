@@ -46,9 +46,6 @@ jest.mock('../routes/signage/controllers/media.controller.js', () => ({
 jest.mock('../routes/signage/controllers/playlist.controller.js', () => ({
   SignagePlaylistController: stubController(),
 }));
-jest.mock('../routes/signage/controllers/schedule.controller.js', () => ({
-  SignageScheduleController: stubController(),
-}));
 jest.mock('../routes/signage/controllers/template.controller.js', () => ({
   SignageTemplateController: stubController(),
 }));
@@ -60,7 +57,7 @@ jest.mock('../routes/signage/controllers/global-content.controller.js', () => ({
 }));
 
 /** 역할은 테스트마다 바꾼다 (권한 회귀 검증용) */
-let currentRoles: string[] = ['kpa:operator'];
+let currentRoles: string[] = ['platform:super_admin'];
 
 jest.mock('../middleware/auth.middleware.js', () => ({
   requireAuth: (req: any, res: any, next: any) => {
@@ -111,7 +108,7 @@ const row = (id: string) => ({
 });
 
 beforeEach(() => {
-  currentRoles = ['kpa:operator'];
+  currentRoles = ['platform:super_admin'];
   query.mockReset();
 });
 
@@ -259,7 +256,7 @@ describe('serviceKey canonicalization 회귀', () => {
     ['k-cosmetics', 'k-cosmetics'],
     ['cosmetics', 'k-cosmetics'],
   ])('%s → canonical %s 로 scope 되고 대상 없음이면 404', async (raw, canonical) => {
-    currentRoles = ['kpa:operator', 'cosmetics:operator'];
+    currentRoles = ['platform:super_admin'];
     query.mockResolvedValue(pgWriteResult([]));
 
     const res = await authed(request(app).delete(`/api/signage/${raw}/hq/forced-content/${MISSING}`));
@@ -267,4 +264,19 @@ describe('serviceKey canonicalization 회귀', () => {
     expect(res.status).toBe(404);
     expect(query.mock.calls[0][1]).toEqual([MISSING, canonical]);
   });
+});
+
+it('denies service operators access to the global required-video endpoints', async () => {
+  currentRoles = ['kpa:operator'];
+  const res = await authed(request(app).get('/api/signage/kpa-society/hq/forced-content'));
+  expect(res.status).toBe(403); expect(query).not.toHaveBeenCalled();
+});
+
+it('rejects malformed and reversed posting periods without reaching the database', async () => {
+  currentRoles = ['platform:super_admin'];
+  for (const [startAt, endAt] of [['invalid', '2026-11-05T01:00:00Z'], ['2026-11-05T01:00:00Z', '2026-11-05T00:00:00Z']]) {
+    const res = await authed(request(app).post('/api/signage/kpa-society/hq/forced-content')).send({ title: 'Period fixture', videoUrl: 'https://youtu.be/abcdefghijk', startAt, endAt });
+    expect(res.status).toBe(400);
+  }
+  expect(query).not.toHaveBeenCalled();
 });

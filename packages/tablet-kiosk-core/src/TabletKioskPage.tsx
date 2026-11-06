@@ -734,7 +734,7 @@ export function TabletKioskPage({
   }, [idleTimeoutMs, mode, screen?.mode, openContentCard, qrModalOpen, productQrZoom]);
 
   const statusLabels: Record<string, { label: string; color: string; message: string }> = {
-    REQUESTED: { label: '요청 접수됨', color: '#eab308', message: '직원이 곧 확인합니다. 잠시 기다려주세요.' },
+    REQUESTED: { label: '요청 접수됨', color: '#eab308', message: '직원이 곧 확인합니다. 잠시 기다려주시기 바랍니다.' },
     ACKNOWLEDGED: { label: '직원 확인 중', color: '#3b82f6', message: '직원이 요청을 확인했습니다. 곧 안내드리겠습니다.' },
     COMPLETED: { label: '완료', color: '#22c55e', message: '안내가 완료되었습니다. 감사합니다!' },
     CANCELLED: { label: '취소됨', color: '#ef4444', message: '요청이 취소되었습니다.' },
@@ -811,7 +811,7 @@ export function TabletKioskPage({
             <div style={styles.detailHeaderQr}>
               <div style={styles.detailQrText}>
                 <span style={styles.detailQrTitle}>휴대전화로 이어서 보기</span>
-                <span style={styles.detailQrDesc}>QR을 스캔하세요</span>
+                <span style={styles.detailQrDesc}>QR을 스캔하시기 바랍니다</span>
               </div>
               <QrImage url={qrGuide.url} size={60} />
             </div>
@@ -915,12 +915,12 @@ export function TabletKioskPage({
             {isLocal ? (
               <div style={styles.guideNoteLocal}>
                 <p style={{ fontSize: '15px', fontWeight: 600, color: '#92400e', margin: 0 }}>매장에서 직접 안내하는 상품입니다</p>
-                <p style={{ fontSize: '14px', color: '#b45309', margin: '4px 0 0' }}>자세한 내용은 이 화면을 직원에게 보여주세요.</p>
+                <p style={{ fontSize: '14px', color: '#b45309', margin: '4px 0 0' }}>자세한 내용은 이 화면을 직원에게 보여주시기 바랍니다.</p>
               </div>
             ) : (
               <div style={styles.guideNote}>
-                <p style={{ fontSize: '15px', fontWeight: 600, color: '#0369a1', margin: 0 }}>궁금하신 점이 있나요?</p>
-                <p style={{ fontSize: '14px', color: '#0284c7', margin: '4px 0 0' }}>이 화면을 직원에게 보여주세요. 직원이 상품을 더 쉽게 안내할 수 있습니다.</p>
+                <p style={{ fontSize: '15px', fontWeight: 600, color: '#0369a1', margin: 0 }}>궁금하신 점이 있습니까?</p>
+                <p style={{ fontSize: '14px', color: '#0284c7', margin: '4px 0 0' }}>이 화면을 직원에게 보여주시기 바랍니다. 직원이 상품을 더 쉽게 안내할 수 있습니다.</p>
               </div>
             )}
           </div>
@@ -997,7 +997,7 @@ export function TabletKioskPage({
               </div>
             )}
             <h1 style={styles.cornerTitle}>{cornerInfo?.title || (previewLayoutOnly ? '코너 제목' : '매장 상품 안내')}</h1>
-            <p style={styles.cornerHint}>{isCornerOverview ? '안내를 읽고 필요한 정보를 확인하세요' : '궁금한 제품을 눌러 자세히 살펴보세요'}</p>
+            <p style={styles.cornerHint}>{isCornerOverview ? '안내를 읽고 필요한 정보를 확인하시기 바랍니다' : '궁금한 제품을 눌러 자세히 살펴보시기 바랍니다'}</p>
             {showQrBadge && displaySettings?.showQr !== false && <span style={styles.qrBadge}>QR 코드로 접속</span>}
           </div>
           {showFloatingQr && cornerQrUrl && (
@@ -1007,7 +1007,7 @@ export function TabletKioskPage({
             </button>
           )}
           {cornerQrUnavailable && displaySettings?.showQr !== false && (
-            <p role="status" style={styles.floatingQrFailed}>QR을 준비하지 못했습니다<br />매장 관리자에게 문의해 주세요</p>
+            <p role="status" style={styles.floatingQrFailed}>QR을 준비하지 못했습니다<br />매장 관리자에게 문의해 주시기 바랍니다</p>
           )}
         </header>
       )}
@@ -1113,7 +1113,7 @@ export function TabletKioskPage({
             <div style={styles.emptyCard}>
               <div style={styles.emptyIcon} aria-hidden>🗂️</div>
               <p style={styles.emptyTitle}>이 코너의 상품을 준비 중입니다</p>
-              <p style={styles.emptyDesc}>코너 안내를 확인하시고, 필요한 제품은 직원에게 문의해 주세요.</p>
+              <p style={styles.emptyDesc}>코너 안내를 확인하시고, 필요한 제품은 직원에게 문의해 주시기 바랍니다.</p>
             </div>
           </div>
           )
@@ -1278,12 +1278,12 @@ function IdleTouchHero({ items, qrUrl, qrLabel, qrUnavailable }: { items: IdlePl
       {first ? (
         <div style={styles.heroHintBar}>
           <TouchHintIcon />
-          <span style={styles.heroHintKo}>화면을 터치하여 자세히 보세요</span>
+          <span style={styles.heroHintKo}>화면을 터치하여 자세히 보시기 바랍니다</span>
           <span style={styles.heroHintEn}>Touch to explore</span>
         </div>
       ) : (
         <div style={styles.heroOverlay}>
-          <span style={styles.heroTouchKo}>화면을 터치하세요</span>
+          <span style={styles.heroTouchKo}>화면을 터치하시기 바랍니다</span>
           <span style={styles.heroTouchEn}>Touch to start</span>
         </div>
       )}
@@ -1330,7 +1330,7 @@ function IdleOverlay({ items, onUserInteraction, defaultDurationMs, qrUrl, qrLab
       {!current && (
         <div style={styles.idleEmpty}>
           <span style={{ fontSize: '20px', color: '#cbd5e1' }}>
-            화면을 터치해주세요
+            화면을 터치해 주시기 바랍니다
           </span>
         </div>
       )}
@@ -1344,7 +1344,7 @@ function IdleOverlay({ items, onUserInteraction, defaultDurationMs, qrUrl, qrLab
       {current && (
         <div style={styles.heroHintBar}>
           <TouchHintIcon />
-          <span style={styles.heroHintKo}>화면을 터치하여 자세히 보세요</span>
+          <span style={styles.heroHintKo}>화면을 터치하여 자세히 보시기 바랍니다</span>
           <span style={styles.heroHintEn}>Touch to explore</span>
         </div>
       )}

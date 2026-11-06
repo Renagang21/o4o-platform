@@ -107,10 +107,10 @@ export function CommunityContentWriteShell({
 
   const handleSave = async (status: 'draft' | 'published') => {
     setError(null);
-    if (!title.trim()) { setError('제목을 입력해주세요'); return; }
+    if (!title.trim()) { setError('제목을 입력해 주시기 바랍니다'); return; }
     const pendingFromInput = tagInput.split(',').map((t) => t.trim()).filter(Boolean);
     const tagArr = Array.from(new Set([...tags, ...pendingFromInput]));
-    if (requireTags && tagArr.length === 0) { setError('태그를 1개 이상 입력해주세요'); return; }
+    if (requireTags && tagArr.length === 0) { setError('태그를 1개 이상 입력해 주시기 바랍니다'); return; }
 
     setSaving(true);
     try {
@@ -138,7 +138,7 @@ export function CommunityContentWriteShell({
           type="text"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          placeholder={config?.titlePlaceholder ?? '콘텐츠 제목을 입력하세요'}
+          placeholder={config?.titlePlaceholder ?? '콘텐츠 제목을 입력하시기 바랍니다'}
           style={styles.input}
         />
       </div>
@@ -160,7 +160,7 @@ export function CommunityContentWriteShell({
         <RichTextEditor
           value={body}
           onChange={(content) => setBody(content.html)}
-          placeholder={config?.bodyPlaceholder ?? '내용을 입력하세요'}
+          placeholder={config?.bodyPlaceholder ?? '내용을 입력하시기 바랍니다'}
           minHeight="300px"
           aiRequestHeaders={aiRequestHeaders}
           showCommunitySave={config?.showCommunitySave ?? true}
@@ -174,7 +174,7 @@ export function CommunityContentWriteShell({
         <textarea
           value={summary}
           onChange={(e) => setSummary(e.target.value)}
-          placeholder={config?.summaryPlaceholder ?? '콘텐츠 요약을 입력하세요 (목록에서 미리보기로 표시됩니다)'}
+          placeholder={config?.summaryPlaceholder ?? '콘텐츠 요약을 입력하시기 바랍니다 (목록에서 미리보기로 표시됩니다)'}
           rows={3}
           style={styles.textarea}
         />

@@ -28,6 +28,7 @@ export interface SignageMediaItem {
   thumbnailUrl: string | null;
   status: string;
   source: string;
+  duration?: number | null;
   tags?: string[];
   createdAt: string;
   updatedAt: string;
@@ -68,7 +69,7 @@ function headers(organizationId: string): Record<string, string> {
 function mediaResult(json: { success?: boolean; data?: SignageMediaItem } & Partial<SignageMediaItem>): SignageMediaItem {
   const value = json.data ?? json;
   if (json.success === false || typeof value.id !== 'string' || !value.id || typeof value.name !== 'string')
-    throw new Error('동영상 저장 결과를 확인하지 못했습니다. 목록을 확인해 주세요.');
+    throw new Error('동영상 저장 결과를 확인하지 못했습니다. 목록을 확인해 주시기 바랍니다.');
   return value as SignageMediaItem;
 }
 
@@ -151,9 +152,9 @@ export async function registerSignageVideo(organizationId: string, payload: impo
 export function createYoutubeVideoApi(organizationId: string, current:()=>boolean): import('@o4o/store-ui-core').YoutubeUploadApi {
   const root=`${API_BASE}/api/v1/youtube/uploads`;
   async function read(url:string,init:RequestInit={}) {
-    if(!current())throw new Error('매장이 변경됐습니다. 현재 매장에서 다시 시작해 주세요.');
+    if(!current())throw new Error('매장이 변경됐습니다. 현재 매장에서 다시 시작해 주시기 바랍니다.');
     const response=await storeScopedFetch(url,{...init,headers:{...headers(organizationId),...init.headers}});
-    const body=await response.json();if(!response.ok||!body.success)throw new Error(body.code?.startsWith('YOUTUBE_')?'YouTube 채널 연결·전달 설정이나 요청 상태를 확인해 주세요.':'등록 요청을 확인하지 못했습니다.');return body.data;
+    const body=await response.json();if(!response.ok||!body.success)throw new Error(body.code?.startsWith('YOUTUBE_')?'YouTube 채널 연결·전달 설정이나 요청 상태를 확인해 주시기 바랍니다.':'등록 요청을 확인하지 못했습니다.');return body.data;
   }
   return {enqueue:input=>read(`${BASE}/youtube-jobs`,{method:'POST',body:JSON.stringify(input)}),list:async()=>{const value=await read(root);return{availability:value.availability,items:value.items.filter((row:{organizationId?:string})=>row.organizationId===organizationId)};},retry:id=>read(`${root}/${encodeURIComponent(id)}/retry`,{method:'POST',body:'{}'}),cancel:id=>read(`${root}/${encodeURIComponent(id)}/cancel`,{method:'POST',body:'{}'})};
 }

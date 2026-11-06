@@ -247,7 +247,7 @@ export async function assertInboxWriter(
         throw new NeturePharmacyError(
           403,
           "INBOX_FORBIDDEN",
-          "현재 담당 운영 권한을 확인해 주세요.",
+          "현재 담당 운영 권한을 확인해 주시기 바랍니다.",
         );
     }
   }
@@ -259,7 +259,7 @@ export async function assertInboxWriter(
     throw new NeturePharmacyError(
       409,
       "INBOX_SCOPE_CHANGED",
-      "담당 공간이 변경되었습니다. 다시 조회해 주세요.",
+      "담당 공간이 변경되었습니다. 다시 조회해 주시기 바랍니다.",
     );
 }
 

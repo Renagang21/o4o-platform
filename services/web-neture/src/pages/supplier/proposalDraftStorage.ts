@@ -83,7 +83,7 @@ export function readProposalDrafts(scope?: string): {
               ...d,
               status: "error",
               error:
-                "이전 요청의 응답을 확인하지 못했습니다. 같은 내용으로 접수 결과를 확인하세요.",
+                "이전 요청의 응답을 확인하지 못했습니다. 같은 내용으로 접수 결과를 확인하시기 바랍니다.",
             }
           : d,
       ),

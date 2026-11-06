@@ -161,7 +161,7 @@ async function fixture(
         ) {
           if (grantFail)
             return json(
-              { success: false, error: "대상 계정을 확인해 주세요." },
+              { success: false, error: "대상 계정을 확인해 주시기 바랍니다." },
               400,
             );
           accounts = [
@@ -302,7 +302,7 @@ for (const viewport of [
         .getByRole("button", { name: "전체 관리자 지정", exact: true })
         .click();
       await expect(page.locator("main").getByRole("alert")).toHaveText(
-        "대상 계정을 확인해 주세요.",
+        "대상 계정을 확인해 주시기 바랍니다.",
       );
       await expect(
         page.getByText("전체 관리자 권한을 부여했습니다.", { exact: true }),

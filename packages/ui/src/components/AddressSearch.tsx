@@ -151,7 +151,7 @@ export function AddressSearch({
           value={addressDetail}
           onChange={(e) => onChange({ zipCode, address, addressDetail: e.target.value })}
           disabled={disabled}
-          placeholder="상세주소를 입력하세요 (동/호수 등)"
+          placeholder="상세주소를 입력하시기 바랍니다 (동/호수 등)"
           className={inputClass}
         />
       </div>

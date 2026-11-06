@@ -9,7 +9,7 @@
  *  2) 형식 정상 + 없음 → 기존 404 (handler 진입 후 판정 — 여기서는 handler 진입으로 고정)
  *  3) 형식 정상 + 존재 → 기존 정상 동작
  *  4) 인증 / serviceKey / 권한 우선순위는 id validation 보다 앞선다
- *  5) static route(`/media/library`, `/schedules/calendar`) 는 validator 에 잡히지 않는다
+ *  5) static route(`/media/library`) 는 validator 에 잡히지 않는다
  *  6) `:source` 는 UUID 가 아니다 — validator 를 적용하지 않는다
  *
  * DB 는 붙이지 않는다. controller 는 stub 으로 대체해 "handler 진입 여부"로 판정한다.
@@ -48,9 +48,6 @@ jest.mock('../routes/signage/controllers/media.controller.js', () => ({
 jest.mock('../routes/signage/controllers/playlist.controller.js', () => ({
   SignagePlaylistController: stubController(),
 }));
-jest.mock('../routes/signage/controllers/schedule.controller.js', () => ({
-  SignageScheduleController: stubController(),
-}));
 jest.mock('../routes/signage/controllers/template.controller.js', () => ({
   SignageTemplateController: stubController(),
 }));
@@ -72,7 +69,8 @@ jest.mock('../middleware/auth.middleware.js', () => ({
         .json({ success: false, error: 'Authentication required', code: 'AUTH_REQUIRED' });
     }
     // operator + store_owner → operator / store / community guard 를 모두 통과한다.
-    req.user = { id: 'u1', roles: ['kpa:operator', 'kpa:store_owner'], isActive: true };
+    const roles = req.path.includes('/hq/forced-content') ? ['platform:super_admin'] : ['kpa:operator', 'kpa:store_owner'];
+    req.user = { id: 'u1', roles, isActive: true };
     next();
   },
 }));
@@ -138,12 +136,13 @@ beforeEach(() => {
 });
 
 describe('census — UUID parameter route 전수 (미조사 0)', () => {
-  it('authenticated router: UUID parameter route 33개가 모두 validator 를 가진다', () => {
+  it('authenticated router: UUID parameter route 30개가 모두 validator 를 가진다', () => {
     const router: any = createSignageRoutes(fakeDataSource);
     const targets = uuidParamRoutes(router);
     // WO-O4O-SIGNAGE-LEGACY-STACK-SIMPLIFICATION-AND-TABLET-AUTHORING-CLOSURE-V1:
     //   content-blocks/:id (get·patch·delete) + layout-presets/:id (get·patch·delete) 6건 은퇴로 39 → 33.
-    expect(targets.length).toBe(33);
+    // Store schedule GET/PATCH/DELETE retired: 33 → 30.
+    expect(targets).toHaveLength(30);
 
     const layers = router.stack.filter((l: any) => l.route);
     for (const t of targets) {
@@ -209,8 +208,6 @@ describe('invalid UUID → 400 INVALID_ID (handler 미진입)', () => {
     const cases: [string, string][] = [
       ['patch', '/media/not-a-uuid'],
       ['delete', '/media/not-a-uuid'],
-      ['patch', '/schedules/not-a-uuid'],
-      ['delete', '/schedules/not-a-uuid'],
       ['patch', '/playlists/not-a-uuid'],
       ['delete', '/playlists/not-a-uuid'],
       ['delete', '/hq/media/not-a-uuid'],
@@ -290,15 +287,6 @@ describe('static route 회귀 방지 (§9)', () => {
     expect(entered).toEqual(['getMediaLibrary']);
   });
 
-  it('/schedules/calendar 는 validator 에 잡히지 않는다', async () => {
-    allowStore();
-    const res = await authed(
-      request(buildApp()).get('/api/signage/kpa-society/schedules/calendar')
-    );
-    expect(res.status).toBe(200);
-    expect(entered).toEqual(['getScheduleCalendar']);
-  });
-
   it('/templates/preview 같은 static POST 도 정상', async () => {
     allowStore();
     const preview = await authed(
@@ -364,5 +352,24 @@ describe('우선순위 — 인증 · serviceKey · 권한이 id validation 보�
     );
     expect(res.status).toBe(400);
     expect(res.body.code).toBe('INVALID_SERVICE_KEY');
+  });
+});
+
+describe('store schedules are retired', () => {
+  it.each([
+    ['get', '/schedules'], ['post', '/schedules'], ['get', '/schedules/calendar'],
+    ['get', `/schedules/${VALID_UUID}`], ['patch', `/schedules/${VALID_UUID}`],
+    ['delete', `/schedules/${VALID_UUID}`], ['get', '/active-content'],
+  ])('%s %s has no handler or writes', async (method, path) => {
+    allowStore();
+    const result = await (request(buildApp()) as any)[method]('/api/signage/kpa-society' + path)
+      .set('Authorization', 'Bearer fixture').set('X-Organization-Id', KPA_ORG);
+    expect(result.status).toBe(404);
+    expect(entered).toEqual([]);
+    expect(q).not.toHaveBeenCalled();
+  });
+  it('preserves authentication for the retired URLs', async () => {
+    const result = await request(buildApp()).get('/api/signage/kpa-society/schedules');
+    expect(result.status).toBe(401);
   });
 });

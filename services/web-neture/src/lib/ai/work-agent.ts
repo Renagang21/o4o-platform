@@ -124,12 +124,12 @@ export async function runWorkAgent(request: string, image?: { mimeType: string; 
   try {
     const res = await api.post(`${API_BASE_URL}/api/ai/work-agent/run`, { request, ...(image ? { image } : {}) });
     const data = res?.data?.data as WorkAgentResult | undefined;
-    if (!data || typeof data.message !== 'string') throw new WorkAgentError('작업을 수행하지 못했습니다. 다시 시도해 주세요.', 'WORK_AGENT_FAILED');
+    if (!data || typeof data.message !== 'string') throw new WorkAgentError('작업을 수행하지 못했습니다. 다시 시도해 주시기 바랍니다.', 'WORK_AGENT_FAILED');
     return data;
   } catch (err) {
     if (err instanceof WorkAgentError) throw err;
     const resp = (err as { response?: { status?: number; data?: { error?: string; code?: string } } }).response;
-    if (resp) throw new WorkAgentError(resp.data?.error || '작업을 수행하지 못했습니다. 다시 시도해 주세요.', resp.data?.code || 'WORK_AGENT_FAILED', resp.status);
-    throw new WorkAgentError('네트워크 오류가 발생했습니다. 다시 시도해 주세요.', 'NETWORK_ERROR');
+    if (resp) throw new WorkAgentError(resp.data?.error || '작업을 수행하지 못했습니다. 다시 시도해 주시기 바랍니다.', resp.data?.code || 'WORK_AGENT_FAILED', resp.status);
+    throw new WorkAgentError('네트워크 오류가 발생했습니다. 다시 시도해 주시기 바랍니다.', 'NETWORK_ERROR');
   }
 }

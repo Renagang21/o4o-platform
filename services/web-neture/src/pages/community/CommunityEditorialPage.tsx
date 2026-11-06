@@ -63,7 +63,7 @@ export default function CommunityEditorialPage({
       {loading && <output className="block">불러오는 중입니다…</output>}
       {!loading && error && (
         <div role="alert">
-          항목을 불러올 수 없습니다. 열람 자격과 주소를 확인해 주세요.{" "}
+          항목을 불러올 수 없습니다. 열람 자격과 주소를 확인해 주시기 바랍니다.{" "}
           <button
             type="button"
             onClick={() => setRetry((n) => n + 1)}

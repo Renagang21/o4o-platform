@@ -19,15 +19,41 @@ afterEach(cleanup);
 const start = vi.fn(), remove = vi.fn(), afterRemove = vi.fn();
 function Location() { const location = useLocation(); return <p data-testid="location">{location.pathname}{location.search}</p>; }
 function show(entry = '/library', modal = false) {
-  return render(<MemoryRouter initialEntries={[entry]}><Location /><Routes>
+  const view = render(<MemoryRouter initialEntries={[entry]}><Location /><Routes>
     <Route path="/library" element={<StoreContentsSelector onStartProduction={start} onRemoveSnapshots={remove} onAfterRemove={afterRemove} enablePdfExport mode={modal ? 'modal' : 'page'} />} />
     <Route path="/store/content/direct/:id" element={<p>Editor fixture</p>} />
   </Routes></MemoryRouter>);
+  if (!modal) fireEvent.click(screen.getByText(/^필터 ·/));
+  return view;
 }
 async function select(id = 'one') {
   const link = await screen.findByRole('link', { name: `Fixture ${id}` });
   fireEvent.click(within(link.closest('tr')!).getByRole('checkbox'));
 }
+it('single selected content opens its editor with the scoped library return', async () => {
+  show('/library?librarySearch=Fixture'); await select();
+  fireEvent.click(screen.getByRole('button', { name: '선택 콘텐츠 편집' }));
+  expect(await screen.findByText('Editor fixture')).toBeTruthy();
+  expect(screen.getByTestId('location').textContent).toBe('/store/content/direct/one?edit=1');
+});
+it('only a single snapshot can open its own publishing settings', async () => {
+  api.list.mockResolvedValue(feed([row('copy', 'snapshot'), row()]));
+  show(); await select();
+  expect((screen.getByRole('button', { name: '선택 사본 게시 설정' }) as HTMLButtonElement).disabled).toBe(true);
+  expect((screen.getByRole('button', { name: '선택 사본 숨기기' }) as HTMLButtonElement).disabled).toBe(true);
+  await select(); await select('copy');
+  fireEvent.click(screen.getByRole('button', { name: '선택 사본 게시 설정' }));
+  expect(screen.getByTestId('location').textContent).toBe('/store/content?snapshotId=copy');
+  expect(api.reimport).not.toHaveBeenCalled();
+});
+it('empty filtered results expose a reset which retains unrelated product context', async () => {
+  api.list.mockResolvedValue(feed([]));
+  show('/library?librarySource=franchise&libraryBusiness=network-a&pId=fixture');
+  await screen.findByText(/검색·필터 조건에 맞는 콘텐츠가 없습니다/);
+  fireEvent.click(screen.getByRole('button', { name: '검색·필터 초기화' }));
+  await waitFor(() => expect(api.list.mock.calls[api.list.mock.calls.length - 1][0]).toMatchObject({ page: 1, source: undefined, search: undefined }));
+  expect(screen.getByTestId('location').textContent).toBe('/library?pId=fixture');
+});
 it('selects the current row and preserves execution-asset identity in production handoff', async () => {
   api.list.mockResolvedValue(feed([row('asset', 'execution-asset')])); show(); await select('asset');
   fireEvent.click(screen.getByRole('button', { name: '제작 시작' }));
@@ -86,7 +112,7 @@ it('modal mode never rewrites its host URL or exposes destructive actions', asyn
   fireEvent.change(screen.getByRole('searchbox'), { target: { value: 'Modal query' } });
   await waitFor(() => expect(api.list.mock.calls[api.list.mock.calls.length - 1][0].search).toBe('Modal query'));
   expect(screen.getByTestId('location').textContent).toBe('/library?host=retained');
-  expect(screen.queryByRole('button', { name: '선택 삭제' })).toBeNull();
+  expect(screen.queryByRole('button', { name: '선택 사본 숨기기' })).toBeNull();
   expect(api.businesses).not.toHaveBeenCalled();
 });
 it('business filter reads owned copies independently and keeps unrelated URL parameters', async () => {
@@ -113,7 +139,7 @@ it('store switch before React rerenders prevents using the old selected rows', a
 it('duplicate snapshot removal is locked and reports only confirmed results', async () => {
   let resolve!: (count: number) => void; remove.mockReturnValue(new Promise(done => { resolve = done; }));
   vi.spyOn(window, 'confirm').mockReturnValue(true); api.list.mockResolvedValue(feed([row('copy', 'snapshot')]));
-  show(); await select('copy'); const button = screen.getByRole('button', { name: '선택 삭제' });
+  show(); await select('copy'); const button = screen.getByRole('button', { name: '선택 사본 숨기기' });
   fireEvent.click(button); fireEvent.click(button); expect(remove).toHaveBeenCalledOnce();
   await act(async () => { resolve(1); }); expect(afterRemove).toHaveBeenCalledOnce();
 });

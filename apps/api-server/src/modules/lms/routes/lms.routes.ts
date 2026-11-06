@@ -1,5 +1,5 @@
 import { PublicPreviewController } from '../controllers/PublicPreviewController.js';
-import { hardDeleteLectureCourse } from '../services/lecture-course-cleanup.service.js';
+import { hardDeleteLectureCourse, lectureDeletionPlan } from '../services/lecture-course-cleanup.service.js';
 import { OperationError } from '../../../services/operations/operation-audit.js';
 import { Router, Request, Response } from 'express';
 import { CourseController } from '../controllers/CourseController.js';
@@ -360,7 +360,7 @@ router.post('/operator/courses/:id/reject', ipBurstLimiter, requireAuth, apiLimi
     return res.json({ success: true, data: { course: updated } });
   } catch (err: any) {
     if (err.message === 'REJECTION_REASON_REQUIRED') {
-      return res.status(400).json({ success: false, error: '반려 사유를 입력해주세요.', code: 'REJECTION_REASON_REQUIRED' });
+      return res.status(400).json({ success: false, error: '반려 사유를 입력해 주시기 바랍니다.', code: 'REJECTION_REASON_REQUIRED' });
     }
     if (err.message?.startsWith('INVALID_STATUS_TRANSITION')) {
       return res.status(400).json({ success: false, error: '검토 대기(PENDING_REVIEW) 상태의 강의만 반려할 수 있습니다.', code: 'INVALID_STATUS_TRANSITION' });
@@ -392,9 +392,13 @@ router.post('/operator/courses/:id/archive', ipBurstLimiter, requireAuth, apiLim
 }));
 
 // DELETE /api/v1/lms/operator/courses/:id/hard — service admin only, ARCHIVED, transactional hard delete
+router.get('/operator/courses/:id/deletion-plan', ipBurstLimiter, requireAuth, apiLimiter, requireLectureAdmin, asyncHandler(async (req:Request,res:Response)=>{
+ try{return res.json({success:true,data:await AppDataSource.transaction('REPEATABLE READ',m=>lectureDeletionPlan(m,req.params.id))});}
+ catch(error){if(error instanceof OperationError)return res.status(error.status).json({success:false,code:error.code,error:error.message});throw error;}
+}));
 router.delete('/operator/courses/:id/hard', ipBurstLimiter, requireAuth, apiLimiter, requireLectureAdmin, asyncHandler(async (req: Request, res: Response) => {
   try {
-    const data = await hardDeleteLectureCourse(AppDataSource, req.params.id, (req as any).user.id, req.body?.reason);
+    const data = await hardDeleteLectureCourse(AppDataSource, req.params.id, (req as any).user.id, req.body?.reason, req.body?.expectedDigest);
     return res.json({ success: true, data });
   } catch (error) {
     if (error instanceof OperationError) return res.status(error.status).json({ success: false, code: error.code, error: error.message });

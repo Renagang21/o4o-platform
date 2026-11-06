@@ -42,7 +42,7 @@ export default function AdminServiceApprovalPage({api: adminServiceApprovalApi}:
     try {
       const data = await adminServiceApprovalApi.getServiceApprovals();
       setApprovals(data || []);
-    } catch { setError('서비스 승인 목록을 불러오지 못했습니다. 다시 조회해 주세요.'); }
+    } catch { setError('서비스 승인 목록을 불러오지 못했습니다. 다시 조회해 주시기 바랍니다.'); }
     finally { setLoading(false); }
   }, [adminServiceApprovalApi]);
 
@@ -58,8 +58,8 @@ export default function AdminServiceApprovalPage({api: adminServiceApprovalApi}:
     try {
       const ok = await adminServiceApprovalApi.approveServiceApproval(id);
       if (ok) await loadApprovals();
-      else setError('승인 처리를 확인하지 못했습니다. 목록을 새로 조회한 뒤 확인해 주세요.');
-    } catch { setError('승인 처리를 확인하지 못했습니다. 목록을 새로 조회한 뒤 확인해 주세요.'); }
+      else setError('승인 처리를 확인하지 못했습니다. 목록을 새로 조회한 뒤 확인해 주시기 바랍니다.');
+    } catch { setError('승인 처리를 확인하지 못했습니다. 목록을 새로 조회한 뒤 확인해 주시기 바랍니다.'); }
     finally { setActionLoading(null); locked.current = false; }
   };
 
@@ -227,7 +227,7 @@ export default function AdminServiceApprovalPage({api: adminServiceApprovalApi}:
         data={filtered}
         rowKey={(a) => a.id}
         loading={loading}
-        emptyMessage={error ? '목록 조회·처리 결과를 확인해 주세요.' : approvals.length === 0 ? '등록된 서비스 승인 요청이 없습니다' : '검색 결과가 없습니다'}
+        emptyMessage={error ? '목록 조회·처리 결과를 확인해 주시기 바랍니다.' : approvals.length === 0 ? '등록된 서비스 승인 요청이 없습니다' : '검색 결과가 없습니다'}
       />
 
       {reasonModal && (
@@ -242,7 +242,7 @@ export default function AdminServiceApprovalPage({api: adminServiceApprovalApi}:
               disabled={!!actionLoading}
               value={reason}
               onChange={(e) => setReason(e.target.value)}
-              placeholder="사유를 입력하세요 (선택)"
+              placeholder="사유를 입력하시기 바랍니다 (선택)"
               className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 mb-4"
               rows={3}
             />

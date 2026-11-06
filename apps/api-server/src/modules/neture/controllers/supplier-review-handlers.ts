@@ -79,7 +79,7 @@ export function createSupplierReviewHandlers(ds: DataSource) {
                 serviceKey: "neture",
                 title: "공급자 정보 보완 요청",
                 message:
-                  "사업자 정보에서 보완 항목을 확인하고 수정 후 제출해 주세요.",
+                  "사업자 정보에서 보완 항목을 확인하고 수정 후 제출해 주시기 바랍니다.",
                 metadata: {
                   supplierId: req.params.id,
                   requestId: request.id,

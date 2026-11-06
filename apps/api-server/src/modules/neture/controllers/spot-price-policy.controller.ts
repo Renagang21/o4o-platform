@@ -163,7 +163,7 @@ export function createSpotPricePolicyRouter(dataSource: DataSource): Router {
         return;
       }
       if (msg === 'ALREADY_ACTIVE_EXISTS') {
-        res.status(409).json({ success: false, error: '이미 활성화된 스팟 정책이 있습니다. 기존 정책을 취소하고 활성화하세요.' });
+        res.status(409).json({ success: false, error: '이미 활성화된 스팟 정책이 있습니다. 기존 정책을 취소하고 활성화하시기 바랍니다.' });
         return;
       }
       if (msg === 'ALREADY_CANCELLED') {

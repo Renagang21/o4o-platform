@@ -57,8 +57,8 @@ function ParticipationForm({ organizationId, onBusyChange }: Readonly<{ organiza
       if (['POLICY_VERSION_MISMATCH', 'ENROLLMENT_POLICY_REQUIRED'].includes(code)) agreement.reload();
       if (code === 'CONDITIONS_CHANGED') {
         setAccepted(false);
-        try { const fresh = await businessApi.get<{ key: string; registrationConditions?: string }>(`${pharmacyApiBase}/businesses/${encodeURIComponent(business.key)}`); if (!current.current) return; if (fresh.key !== business.key) throw new Error('Wrong business'); setConditions(fresh.registrationConditions ?? ''); setError('참여 조건이 변경되었습니다. 입력 내용은 유지됩니다. 최신 조건을 다시 확인해 주세요.'); }
-        catch { if (current.current) setError('최신 참여 조건을 불러오지 못했습니다. 다시 확인해 주세요.'); }
+        try { const fresh = await businessApi.get<{ key: string; registrationConditions?: string }>(`${pharmacyApiBase}/businesses/${encodeURIComponent(business.key)}`); if (!current.current) return; if (fresh.key !== business.key) throw new Error('Wrong business'); setConditions(fresh.registrationConditions ?? ''); setError('참여 조건이 변경되었습니다. 입력 내용은 유지됩니다. 최신 조건을 다시 확인해 주시기 바랍니다.'); }
+        catch { if (current.current) setError('최신 참여 조건을 불러오지 못했습니다. 다시 확인해 주시기 바랍니다.'); }
       } else setError(businessError(e));
     }
     finally { if (current.current) { setBusy(false); onBusyChange?.(false); } }
@@ -75,7 +75,7 @@ function ParticipationForm({ organizationId, onBusyChange }: Readonly<{ organiza
     {loading && <output aria-live="polite" className="mt-4">가입 상태를 확인하고 있습니다…</output>}
     {error && <div className="mt-4"><p role="alert">{error}</p><button type="button" className="mt-3 text-blue-700" onClick={() => applicationError ? setError('') : setVersion(n => n + 1)}>다시 확인</button><a href="https://store.neture.co.kr/start-pharmacy" className="ml-4 text-blue-700">내 매장 신청 · 승인 상태 확인</a></div>}
     {!loading && (!error || applicationError) && <>
-      <p className="my-4">{access?.canManage ? '이 사업의 담당 운영자입니다.' : STATUS[membership?.membershipStatus ?? ''] ?? (defaultPharmacy ? 'Pharmacy 기본 회원 연결을 확인해 주세요.' : '아직 참여 신청하지 않았습니다.')}</p>
+      <p className="my-4">{access?.canManage ? '이 사업의 담당 운영자입니다.' : STATUS[membership?.membershipStatus ?? ''] ?? (defaultPharmacy ? 'Pharmacy 기본 회원 연결을 확인해 주시기 바랍니다.' : '아직 참여 신청하지 않았습니다.')}</p>
       {membership?.reason && <p className="mb-4">처리 사유: {membership.reason}</p>}
       {!defaultPharmacy && conditions && <div className="my-4 rounded-lg bg-slate-50 p-4"><h3 className="font-semibold">참여 조건</h3><p className="mt-2 whitespace-pre-wrap">{conditions}</p></div>}
       {defaultPharmacy && membership && (!membership.membershipStatus || membership.membershipStatus === 'pending') && !access?.canManage && <button type="button" disabled={busy} onClick={apply} className="min-h-11 rounded-lg bg-blue-700 px-4 py-2 text-white disabled:opacity-50">{busy ? '연결 확인 중…' : '기본 회원 연결 확인'}</button>}

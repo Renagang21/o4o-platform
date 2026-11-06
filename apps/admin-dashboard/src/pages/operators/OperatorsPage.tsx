@@ -365,7 +365,7 @@ function ServiceAdministratorsPage() {
   const searchCandidates = async () => {
     const q = candidateQuery.trim();
     if (q.length < 2) {
-      setFormErrors((prev) => ({ ...prev, candidate: '두 글자 이상 입력하세요.' }));
+      setFormErrors((prev) => ({ ...prev, candidate: '두 글자 이상 입력하시기 바랍니다.' }));
       return;
     }
     setCandidatesLoading(true);
@@ -396,19 +396,19 @@ function ServiceAdministratorsPage() {
 
     if (editingUserId) {
       // 편집: 이름·역할만 다룬다. 비밀번호는 이 화면 어디에도 없다.
-      if (!formData.lastName) errors.lastName = '성을 입력하세요.';
-      if (!formData.firstName) errors.firstName = '이름을 입력하세요.';
-      if (formData.roles.length === 0) errors.roles = '역할을 최소 1개 선택하세요.';
+      if (!formData.lastName) errors.lastName = '성을 입력하시기 바랍니다.';
+      if (!formData.firstName) errors.firstName = '이름을 입력하시기 바랍니다.';
+      if (formData.roles.length === 0) errors.roles = '역할을 최소 1개 선택하시기 바랍니다.';
       setFormErrors(errors);
       return Object.keys(errors).length === 0;
     }
 
     // ── 등록 — 대상 서비스와 역할은 **명시 선택**이어야 한다 ──
-    if (!targetServiceKey) errors.targetService = '대상 서비스를 선택하세요.';
-    else if (!targetRole) errors.roles = '역할을 선택하세요.';
+    if (!targetServiceKey) errors.targetService = '대상 서비스를 선택하시기 바랍니다.';
+    else if (!targetRole) errors.roles = '역할을 선택하시기 바랍니다.';
 
     if (!selectedCandidate && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(inviteEmail.trim())) {
-      errors.candidate = '기존 사용자를 선택하거나 미가입자의 초대 이메일을 입력하세요.';
+      errors.candidate = '기존 사용자를 선택하거나 미가입자의 초대 이메일을 입력하시기 바랍니다.';
     }
 
     setFormErrors(errors);
@@ -449,7 +449,7 @@ function ServiceAdministratorsPage() {
         serviceKey: canonicalServiceKey, role: targetRole,
         centralDelegation: false,
       });
-      setAssignmentNotice(`${serviceLabel} 운영자 확인 메일 발송을 요청했습니다. 수신함·스팸함에서 메일을 확인해 주세요. 대상자의 로그인·이메일 확인·수락 후 새 권한이 부여됩니다. 기존 서비스 가입 상태는 유지됩니다.`);
+      setAssignmentNotice(`${serviceLabel} 운영자 확인 메일 발송을 요청했습니다. 수신함·스팸함에서 메일을 확인해 주시기 바랍니다. 대상자의 로그인·이메일 확인·수락 후 새 권한이 부여됩니다. 기존 서비스 가입 상태는 유지됩니다.`);
       toast.success('운영자 확인 메일 발송을 요청했습니다.');
       setInvitationVersion(v => v + 1);
       closeModal();
@@ -734,7 +734,7 @@ function ServiceAdministratorsPage() {
             <p className="mt-1 break-all">{loadError}</p>
             <p className="mt-1 text-xs text-red-700">
               아래 표는 마지막으로 조회에 성공한 내용이거나 비어 있을 수 있습니다. 실제 권한 현황과 다를 수 있으니
-              다시 시도한 뒤 확인하세요.
+              다시 시도한 뒤 확인하시기 바랍니다.
             </p>
           </div>
           <button
@@ -757,7 +757,7 @@ function ServiceAdministratorsPage() {
         loading={loading}
         emptyMessage={
           loadError
-            ? '목록을 불러오지 못해 표시할 수 없습니다. 위의 [다시 시도]를 눌러 주세요.'
+            ? '목록을 불러오지 못해 표시할 수 없습니다. 위의 [다시 시도]를 눌러 주시기 바랍니다.'
             : '조건에 맞는 운영 권한이 없습니다.'
         }
         selectable
@@ -899,7 +899,7 @@ function ServiceAdministratorsPage() {
                   <input type="email" aria-label="미가입자 초대 이메일" value={inviteEmail}
                     onChange={e => { setInviteEmail(e.target.value); setSelectedCandidate(null); }}
                     className="w-full rounded border p-2 mb-3" placeholder="operator@example.com" />
-                  <p className="text-xs text-gray-500 mb-2">가입자는 아래에서 선택하세요. 이메일로 기존 계정을 자동 연결하지 않습니다.</p>
+                  <p className="text-xs text-gray-500 mb-2">가입자는 아래에서 선택하시기 바랍니다. 이메일로 기존 계정을 자동 연결하지 않습니다.</p>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     대상 사용자 <span className="text-red-500">*</span>
                   </label>
@@ -979,7 +979,7 @@ function ServiceAdministratorsPage() {
                     </p>
                   )}
                   <p className="mt-1 text-xs text-slate-500">
-                    검색 결과가 없으면 이름·이메일과 검색어를 먼저 확인하세요. 공통 계정이 없다면 본인이 가입하고,
+                    검색 결과가 없으면 이름·이메일과 검색어를 먼저 확인하시기 바랍니다. 공통 계정이 없다면 본인이 가입하고,
                     이메일 계정도 본인 인증과 초대 수락을 완료하면 서비스 운영 권한을 받을 수 있습니다.
                     해당 서비스의 사전 가입은 지정의 필수 조건이 아닙니다.
                   </p>
@@ -1078,7 +1078,7 @@ function ServiceAdministratorsPage() {
                     )}
                     {!targetServiceKey ? (
                       <div className="rounded-lg bg-slate-50 border border-dashed border-slate-300 px-3 py-3 text-sm text-slate-500">
-                        먼저 대상 서비스를 선택하세요. 선택한 서비스의 역할만 표시됩니다.
+                        먼저 대상 서비스를 선택하시기 바랍니다. 선택한 서비스의 역할만 표시됩니다.
                       </div>
                     ) : (
                       <>

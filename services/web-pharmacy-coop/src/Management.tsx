@@ -1,3 +1,5 @@
+import { DataTable } from '@o4o/operator-ux-core';
+import { ActionBar } from '@o4o/ui';
 import {base,labels,eventLabel,errorText,useWork,Feedback,History,RoleManagement} from '@o4o/operator-core-ui/modules/cooperative-federation';
 import type {Client,Event,Affiliation} from '@o4o/operator-core-ui/modules/cooperative-federation';
 export {RoleManagement,FederationManagementPanel} from '@o4o/operator-core-ui/modules/cooperative-federation';
@@ -14,6 +16,7 @@ import {
 import type { Cooperative } from "./domain";
 
 type Member = {
+  operatorReadOnly?: boolean;
   id: string;
   userId: string;
   name: string;
@@ -62,6 +65,13 @@ export function MemberManagementPanel({
 }>) {
   const work = useWork(client, `${base}/${cooperative.id}/members`);
   const [reason, setReason] = useState("");
+  const [selectedIds,setSelectedIds] = useState<Set<string>>(new Set());
+  useEffect(()=>setSelectedIds(new Set()),[cooperative.id,userId,admin,work.data]);
+  const selected = selectedIds.size===1 ? (work.data as Member[] | null)?.find(m=>selectedIds.has(m.id)) : undefined;
+  const memberActions = !selected || selected.operatorReadOnly ? [] : [
+    ...(selected.status==='pending'?['review','request_changes']:[]),
+    ...actionsFor(selected.status).map(action=>admin?action:`request_${action}`),
+  ];
   return (
     <section className="section coop-management">
       <h2>조합원 관리 · {admin ? "admin" : "operator"}</h2>
@@ -84,7 +94,7 @@ export function MemberManagementPanel({
       )}
       <p>
         {admin
-          ? "최종 자격 결정은 해당 조합에만 적용됩니다. 제명은 정관에 따른 의결 결과를 기록하세요."
+          ? "최종 자격 결정은 해당 조합에만 적용됩니다. 제명은 정관에 따른 의결 결과를 기록하시기 바랍니다."
           : "신청 검토·보완 요청과 최종 처리 요청을 기록합니다. 자격 결정은 조합 admin이 처리합니다."}
       </p>
       <Feedback {...work} />
@@ -97,42 +107,18 @@ export function MemberManagementPanel({
         />
       </label>
       {!work.data && !work.error && <p>조합원을 불러오고 있습니다…</p>}
-      <div className="cards two">
-        {(work.data as Member[] | null)?.map((m) => (
-          <article className="card" key={m.id}>
-            <h3>{m.name || m.email}</h3>
-            <p>
-              {m.email} · {labels[m.status]}
-            </p>
-            <div className="actions">
-              {[
-                ...(m.status === "pending"
-                  ? ["review", "request_changes"]
-                  : []),
-                ...actionsFor(m.status).map((a) =>
-                  admin ? a : `request_${a}`,
-                ),
-              ].map((a) => (
-                <button
-                  type="button"
-                  key={a}
-                  disabled={work.busy || !reason.trim()}
-                  onClick={() =>
-                    void work.send(
-                      `${base}/${cooperative.id}/members/${m.id}/actions/${a}`,
-                      { reason },
-                    )
-                  }
-                >
-                  {a.startsWith("request_")
-                    ? `${labels[a.slice(8)]} 요청`
-                    : labels[a]}
-                </button>
-              ))}
-            </div>
-          </article>
-        ))}
-      </div>
+      <ActionBar selectedCount={selectedIds.size} onClearSelection={()=>setSelectedIds(new Set())} actions={memberActions.map(action=>({
+        key:action,label:action.startsWith('request_')?`${labels[action.slice(8)]} 요청`:labels[action],disabled:work.busy||!reason.trim(),
+        onClick:()=>{if(selected&&!selected.operatorReadOnly)void work.send(`${base}/${cooperative.id}/members/${selected.id}/actions/${action}`,{reason});},
+      }))} />
+      <DataTable<Member> tableId="cooperative-member-management" data={(work.data as Member[]|null)??[]} rowKey="id"
+        selectable selectedKeys={selectedIds} onSelectionChange={keys=>{if(!work.busy)setSelectedIds(keys);}}
+        columns={[
+          {key:'name',header:'이름',stickyOnMobile:true,render:(_v,m)=>m.name||m.email},
+          {key:'email',header:'이메일'},
+          {key:'status',header:'조합원 상태',render:(_v,m)=>labels[m.status]},
+          {key:'operatorReadOnly',header:'업무 대상',render:(_v,m)=>m.operatorReadOnly?'전체 관리자 — 처리 대상 아님':'조합원'},
+        ]} />
       <History
         client={client}
         coop={cooperative.id}

@@ -159,7 +159,7 @@ export function ConsultationGuidancePanel({
     try {
       if (room?.active) {
         if (!captured.deliveryId)
-          throw new Error("현재 매대 상담에 맞는 안내를 다시 준비해 주세요.");
+          throw new Error("현재 매대 상담에 맞는 안내를 다시 준비해 주시기 바랍니다.");
         const ok = await onShare(captured.deliveryId);
         if (ok && alive.current && generation.current === request)
           setNotice("연결된 고객 화면에 전달했습니다.");
@@ -179,7 +179,7 @@ export function ConsultationGuidancePanel({
           checked.sourceVersion !== captured.sourceVersion
         )
           throw new Error(
-            "상품 또는 게시 자료가 변경되었습니다. 현재 자료로 다시 준비해 주세요.",
+            "상품 또는 게시 자료가 변경되었습니다. 현재 자료로 다시 준비해 주시기 바랍니다.",
           );
         if (alive.current && generation.current === request) {
           setShowing(true);
@@ -190,7 +190,7 @@ export function ConsultationGuidancePanel({
       if (alive.current && generation.current === request)
         setError(
           (e as Error).message ||
-            "안내를 확인하지 못했습니다. 다시 준비해 주세요.",
+            "안내를 확인하지 못했습니다. 다시 준비해 주시기 바랍니다.",
         );
     } finally {
       lock.current = false;
@@ -245,7 +245,7 @@ export function ConsultationGuidancePanel({
           aria-label="상담 안내 요청"
           submitLabel="안내 찾기"
           busy={busy}
-          placeholder="원하는 안내를 말하거나 적어주세요"
+          placeholder="원하는 안내를 말하거나 적어주시기 바랍니다"
           maxLength={1000}
           value={question}
           disabled={busy}
@@ -266,10 +266,10 @@ export function ConsultationGuidancePanel({
           </button>
         )}
       </form>
-      {voiceListening && <p role="status">요청을 듣고 있습니다. 말을 마친 뒤 안내를 찾아 주세요.</p>}
+      {voiceListening && <p role="status">요청을 듣고 있습니다. 말을 마친 뒤 안내를 찾아 주시기 바랍니다.</p>}
       {voice?.text && (
         <p className="text-xs text-slate-500">
-          음성으로 입력한 요청을 확인한 뒤 안내를 찾아 주세요.
+          음성으로 입력한 요청을 확인한 뒤 안내를 찾아 주시기 바랍니다.
         </p>
       )}
       {inquiry && (
@@ -376,7 +376,7 @@ export function ConsultationGuidancePanel({
             {result.aiSelected
               ? "AI가 질문에 맞춰 고른 게시 문단입니다."
               : "현재 매장의 상품·게시 자료에서 발췌한 안내입니다."}{" "}
-            원문과 안내를 확인한 뒤 고객에게 보여 주세요.
+            원문과 안내를 확인한 뒤 고객에게 보여 주시기 바랍니다.
           </p>
           <div className="flex flex-wrap gap-2">
             <button

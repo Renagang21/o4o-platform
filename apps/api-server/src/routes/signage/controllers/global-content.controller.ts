@@ -349,7 +349,7 @@ export class SignageGlobalContentController {
           res.status(409).json({
             success: false,
             code: 'SIGNAGE_MEDIA_IN_USE',
-            error: '사용 중인 사이니지 미디어는 삭제할 수 없습니다. 먼저 모든 사용처에서 연결을 제거하세요.',
+            error: '사용 중인 사이니지 미디어는 삭제할 수 없습니다. 먼저 모든 사용처에서 연결을 제거하시기 바랍니다.',
             usage: result.usage
               ? {
                   hqPlaylists: result.usage.directPlaylistUsageCount,

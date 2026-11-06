@@ -154,7 +154,7 @@ export function GuideContentsManager({ serviceKey, config, client }: GuideConten
     // Schema validation — invalid payload 저장 차단
     const validation = validateGuideContent(payload);
     if (!validation.valid) {
-      setErr(validation.error ?? '입력값을 확인해 주세요.');
+      setErr(validation.error ?? '입력값을 확인해 주시기 바랍니다.');
       return;
     }
 

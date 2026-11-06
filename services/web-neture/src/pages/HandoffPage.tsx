@@ -23,13 +23,13 @@ import { HandoffEntryPage } from '@o4o/auth-react';
 import { API_BASE_URL } from '../lib/apiClient';
 
 const ERROR_MESSAGES: Record<string, string> = {
-  HANDOFF_TOKEN_INVALID: '이동 링크가 만료되었거나 이미 사용되었습니다. 다시 로그인해 주세요.',
+  HANDOFF_TOKEN_INVALID: '이동 링크가 만료되었거나 이미 사용되었습니다. 다시 로그인해 주시기 바랍니다.',
   HANDOFF_TARGET_NO_MEMBERSHIP: '이 서비스에 가입되어 있지 않습니다.',
   HANDOFF_TARGET_WITHDRAWN: '탈퇴한 서비스는 이동할 수 없습니다.',
   HANDOFF_TARGET_NOT_ACTIVE: '이 서비스 이용이 아직 승인되지 않았거나 정지 상태입니다.',
-  INVALID_USER: '계정을 확인할 수 없습니다. 다시 로그인해 주세요.',
+  INVALID_USER: '계정을 확인할 수 없습니다. 다시 로그인해 주시기 바랍니다.',
   // WO-O4O-REPRESENTATIVE-ENTRY-RETURN-HANDOFF-AND-HOME-NAVIGATION-V1
-  HANDOFF_SESSION_REVOKED: '로그인 세션이 종료되었습니다. 다시 로그인해 주세요.',
+  HANDOFF_SESSION_REVOKED: '로그인 세션이 종료되었습니다. 다시 로그인해 주시기 바랍니다.',
   ACCOUNT_NOT_ACTIVE: '이용할 수 없는 계정 상태입니다.',
 };
 

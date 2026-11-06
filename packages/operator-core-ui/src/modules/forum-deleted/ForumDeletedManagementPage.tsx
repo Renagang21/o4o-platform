@@ -327,7 +327,7 @@ export function ForumDeletedManagementPage({ client: forumAdminApi, operatorDele
           <p>
             운영에서 내려진(비활성화된) 포럼을 복구하거나 영구 삭제합니다.
             영구 삭제는 포럼과 연결된 게시글·댓글·회원 관계가 함께 제거되며 <strong>복구할 수 없습니다.</strong>
-            운영 삭제(비활성화)는 <a href={operatorDeleteHref} className="underline">포럼 삭제(운영자)</a>에서 수행하세요.
+            운영 삭제(비활성화)는 <a href={operatorDeleteHref} className="underline">포럼 삭제(운영자)</a>에서 수행하시기 바랍니다.
           </p>
         </div>
       </div>
@@ -509,7 +509,7 @@ export function ForumDeletedManagementPage({ client: forumAdminApi, operatorDele
 
                       <div>
                         <label className="block text-sm font-medium text-slate-700 mb-1.5">
-                          확인을 위해 포럼명 <span className="font-semibold text-slate-900">{hdTarget.name}</span> 을(를) 입력하세요 <span className="text-red-500">*</span>
+                          확인을 위해 포럼명 <span className="font-semibold text-slate-900">{hdTarget.name}</span> 을(를) 입력하시기 바랍니다 <span className="text-red-500">*</span>
                         </label>
                         <input
                           type="text"

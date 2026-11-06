@@ -111,7 +111,7 @@ export default function ContentLibraryPage() {
   const config: ContentHubConfig = useMemo(() => ({
     serviceKey: 'neture',
     heroTitle: '콘텐츠 라이브러리',
-    heroDesc: 'Neture 콘텐츠를 한눈에 확인하세요',
+    heroDesc: 'Neture 콘텐츠를 한눈에 확인하시기 바랍니다',
     headerAction: (
       <Link
         to="/"

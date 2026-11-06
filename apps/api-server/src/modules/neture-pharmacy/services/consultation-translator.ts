@@ -39,7 +39,7 @@ export function createConsultationTranslator(db: DataSource): ConsultationTransl
       const validate = (output: ConsultationTranslationOutput) => {
         if (numericSignatures(input.text) !== numericSignatures(output.translation)) throw new Error('Invalid numeric translation');
         if (input.source === 'auto' && (!output.detectedLanguage || output.detectedLanguage === 'unknown'))
-          throw new NeturePharmacyError(422, 'CONSULTATION_LANGUAGE_UNCERTAIN', '입력 언어를 확인하지 못했습니다. 고객 언어를 직접 선택해 주세요.');
+          throw new NeturePharmacyError(422, 'CONSULTATION_LANGUAGE_UNCERTAIN', '입력 언어를 확인하지 못했습니다. 고객 언어를 직접 선택해 주시기 바랍니다.');
         return output;
       };
       if (settings.consultation?.translation === 'google-cloud') {
@@ -61,15 +61,15 @@ export function createConsultationTranslator(db: DataSource): ConsultationTransl
       if (error instanceof NeturePharmacyError) throw error;
       const reason = error instanceof Error ? error.message : '';
       if (reason === 'QUOTA_EXCEEDED')
-        throw new NeturePharmacyError(429, 'CONSULTATION_QUOTA_EXCEEDED', '번역 이용 한도에 도달했습니다. 잠시 후 다시 시도해 주세요.');
+        throw new NeturePharmacyError(429, 'CONSULTATION_QUOTA_EXCEEDED', '번역 이용 한도에 도달했습니다. 잠시 후 다시 시도해 주시기 바랍니다.');
       if (reason.startsWith('AI_PRICING_'))
-        throw new NeturePharmacyError(503, 'CONSULTATION_PRICING_REQUIRED', '선택한 번역 수단의 가격 설정을 관리자에게 확인해 주세요.');
+        throw new NeturePharmacyError(503, 'CONSULTATION_PRICING_REQUIRED', '선택한 번역 수단의 가격 설정을 관리자에게 확인해 주시기 바랍니다.');
       if (reason.startsWith('AI_DISABLED'))
         throw new NeturePharmacyError(503, 'CONSULTATION_AI_DISABLED', '관리자가 현재 번역 실행을 중지했습니다.');
       if (error instanceof AiExtensionError && error.code === 'QUOTA_EXCEEDED') {
-        throw new NeturePharmacyError(429, 'CONSULTATION_QUOTA_EXCEEDED', '번역 이용 한도에 도달했습니다. 잠시 후 다시 시도해 주세요.');
+        throw new NeturePharmacyError(429, 'CONSULTATION_QUOTA_EXCEEDED', '번역 이용 한도에 도달했습니다. 잠시 후 다시 시도해 주시기 바랍니다.');
       }
-      throw new NeturePharmacyError(503, 'CONSULTATION_TRANSLATION_UNAVAILABLE', '번역을 완료하지 못했습니다. 입력 문장을 확인하고 다시 시도해 주세요.');
+      throw new NeturePharmacyError(503, 'CONSULTATION_TRANSLATION_UNAVAILABLE', '번역을 완료하지 못했습니다. 입력 문장을 확인하고 다시 시도해 주시기 바랍니다.');
     }
   };
 }

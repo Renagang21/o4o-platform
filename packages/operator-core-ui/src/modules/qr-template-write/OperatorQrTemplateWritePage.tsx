@@ -95,11 +95,11 @@ export function OperatorQrTemplateWritePage({
   }, [id, isNew]);
 
   function validateInputs(): string | null {
-    if (!title.trim()) return '제목을 입력하세요';
+    if (!title.trim()) return '제목을 입력하시기 바랍니다';
     if (targetType === 'url') {
-      if (!targetUrl.trim()) return '대상 URL 을 입력하세요';
+      if (!targetUrl.trim()) return '대상 URL 을 입력하시기 바랍니다';
     } else {
-      if (!targetContentRef.trim()) return '대상 콘텐츠 식별자를 입력하세요';
+      if (!targetContentRef.trim()) return '대상 콘텐츠 식별자를 입력하시기 바랍니다';
     }
     return null;
   }
@@ -256,7 +256,7 @@ export function OperatorQrTemplateWritePage({
           </label>
           <textarea
             value={description} onChange={(e) => setDescription(e.target.value)}
-            placeholder="이 QR 이 어떤 용도인지 짧게 설명하세요 (매장이 가져갈 때 참고)"
+            placeholder="이 QR 이 어떤 용도인지 짧게 설명하시기 바랍니다 (매장이 가져갈 때 참고)"
             rows={2} className={`${inputCls} resize-none`} disabled={disabled}
           />
         </div>

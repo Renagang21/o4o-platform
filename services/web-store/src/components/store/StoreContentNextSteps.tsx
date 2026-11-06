@@ -52,7 +52,7 @@ function ContentNextStepsSession({ contentId, title }: NextStepsProps) {
           매장에서 활용
         </Link>
       </div>
-      <p className="mt-3 text-xs text-teal-800">저장한 콘텐츠를 활용할 수 있습니다. 게시 설정과 QR·기기 적용 결과는 각각 확인해 주세요.</p>
+      <p className="mt-3 text-xs text-teal-800">저장한 콘텐츠를 활용할 수 있습니다. 게시 설정과 QR·기기 적용 결과는 각각 확인해 주시기 바랍니다.</p>
       <StoreQrCreateModal
         open={qrOpen}
         target={target}

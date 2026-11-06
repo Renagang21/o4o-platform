@@ -14,18 +14,18 @@ export function SocialAccountConnections({ client }: { client: AuthClient }) {
   const current = useRef(client); current.current = client;
   const returnTo = () => window.location.pathname + window.location.search;
   const reload = async () => { const data = await current.current.getSocialAccounts(); if (alive.current) setStatus(data); };
-  useEffect(() => { alive.current = true; void reload().catch(() => { if (alive.current) setMessage('로그인 수단을 불러오지 못했습니다. 새로고침해 주세요.'); }); return () => { alive.current = false; }; }, []);
+  useEffect(() => { alive.current = true; void reload().catch(() => { if (alive.current) setMessage('로그인 수단을 불러오지 못했습니다. 새로고침해 주시기 바랍니다.'); }); return () => { alive.current = false; }; }, []);
   async function run(operation: () => Promise<void>) {
     if (working.current) return; working.current = true; setBusy(true); setMessage('');
     try { await operation(); }
-    catch (error) { if (alive.current) setMessage((error as { response?: { data?: { error?: string } } })?.response?.data?.error ?? '인증이 만료되었거나 처리하지 못했습니다. 다시 인증해 주세요.'); }
+    catch (error) { if (alive.current) setMessage((error as { response?: { data?: { error?: string } } })?.response?.data?.error ?? '인증이 만료되었거나 처리하지 못했습니다. 다시 인증해 주시기 바랍니다.'); }
     finally { working.current = false; if (alive.current) setBusy(false); }
   }
   async function complete(kind: 'link-reauth' | 'link-proof', proof: SocialProof) {
     const grant = kind === 'link-reauth' ? await current.current.completeSocialReauthentication(proof) : await current.current.verifySocialLink(proof);
     if (!alive.current) return;
     setChallenge(undefined);
-    if (kind === 'link-reauth') { setPermit(grant.token); setMessage('현재 계정을 확인했습니다. 연결할 로그인 수단을 선택해 주세요.'); }
+    if (kind === 'link-reauth') { setPermit(grant.token); setMessage('현재 계정을 확인했습니다. 연결할 로그인 수단을 선택해 주시기 바랍니다.'); }
     else { setPermit(undefined); setConfirm(grant); }
   }
   useLayoutEffect(() => {
@@ -35,7 +35,7 @@ export function SocialAccountConnections({ client }: { client: AuthClient }) {
       if (!proof) return;
       if (proof.cancelled) { setMessage('카카오 인증을 취소했습니다.'); return; }
       void run(() => complete(proof.kind as 'link-reauth' | 'link-proof', proof));
-    } catch { setMessage('인증이 만료되었거나 올바르지 않습니다. 다시 인증해 주세요.'); }
+    } catch { setMessage('인증이 만료되었거나 올바르지 않습니다. 다시 인증해 주시기 바랍니다.'); }
   }, []);
   useEffect(() => {
     if (!challenge || !googleContainer.current) return;

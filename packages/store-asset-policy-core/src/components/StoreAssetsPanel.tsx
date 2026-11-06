@@ -384,7 +384,7 @@ export function StoreAssetsPanel({
           {allItems.length === 0 ? (
             <>
               <p className="text-sm">복사된 자산이 없습니다.</p>
-              <p className="text-xs mt-1">커뮤니티 콘텐츠/사이니지 관리에서 "매장으로 복사" 버튼을 이용해주세요.</p>
+              <p className="text-xs mt-1">커뮤니티 콘텐츠/사이니지 관리에서 "매장으로 복사" 버튼을 이용해 주시기 바랍니다.</p>
             </>
           ) : (
             <p className="text-sm">선택한 필터 조건에 해당하는 자산이 없습니다.</p>

@@ -19,7 +19,7 @@ export default function CourseDetailPage() {
   const port = useMemo(() => ({ ...lecturePort, enroll: async (id: string) => {
     const existing = await lecturePort.getEnrollment(id);
     if (existing?.status === 'approved') return lecturePort.enroll(id);
-    if (!latest.current.ready) throw new Error('서비스 약관을 먼저 확인해 주세요.');
+    if (!latest.current.ready) throw new Error('서비스 약관을 먼저 확인해 주시기 바랍니다.');
     try { return await enrollWithPolicy(id, latest.current.references!); }
     catch (error: any) { if (['POLICY_VERSION_MISMATCH', 'ENROLLMENT_POLICY_REQUIRED'].includes(error?.response?.data?.code)) latest.current.reload(); throw error; }
   } }), [courseId, user?.id]);

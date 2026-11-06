@@ -678,7 +678,7 @@ export const tabletRequestLimiter = rateLimit({
   max: 10,
   message: {
     success: false,
-    error: { code: 'RATE_LIMIT_EXCEEDED', message: '요청이 너무 많습니다. 잠시 후 다시 시도해주세요.' },
+    error: { code: 'RATE_LIMIT_EXCEEDED', message: '요청이 너무 많습니다. 잠시 후 다시 시도해 주시기 바랍니다.' },
   },
   standardHeaders: true,
   legacyHeaders: false,

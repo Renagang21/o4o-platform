@@ -39,7 +39,7 @@ export function useAiModelControls() {
     } catch {
       if (alive.current && current === version.current) {
         setData(null);
-        setError("모델 설정을 조회하지 못했습니다. 다시 불러와 주세요.");
+        setError("모델 설정을 조회하지 못했습니다. 다시 불러와 주시기 바랍니다.");
       }
     } finally {
       if (alive.current && current === version.current) setLoading(false);
@@ -76,7 +76,7 @@ export function useAiModelControls() {
         setError(
           typeof detail === "string"
             ? detail
-            : "처리 결과를 확인하지 못했습니다. 최신 목록을 다시 조회해 주세요.",
+            : "처리 결과를 확인하지 못했습니다. 최신 목록을 다시 조회해 주시기 바랍니다.",
         );
       return false;
     } finally {
@@ -129,7 +129,7 @@ export function AiModelCatalog({
       <p className="text-sm text-gray-600">
         모델을 등록·수정·삭제하고 사용처에서 사용할 모델을 지정합니다. 등록은
         공급자의 실제 제공 여부·인증 성공·가격 확인을 뜻하지 않습니다. 지원
-        기능은 확인한 범위로 등록하세요.
+        기능은 확인한 범위로 등록하시기 바랍니다.
       </p>
       {!data && !control.loading && (
         <p>모델 목록을 확인할 수 없어 변경할 수 없습니다.</p>
@@ -246,7 +246,7 @@ export function AiModelCatalog({
                                   provider.name +
                                     "의 " +
                                     model.id +
-                                    " 모델을 삭제할까요? 새로운 요청에서 이 모델을 사용할 수 없게 됩니다.",
+                                    " 모델을 삭제하시겠습니까? 새로운 요청에서 이 모델을 사용할 수 없게 됩니다.",
                                 )
                               )
                                 return;
@@ -298,7 +298,7 @@ export function AiModelCatalog({
                   : createAiModel(model, editing.revision),
               editing.previous
                 ? "모델 정보를 수정했습니다."
-                : "모델을 등록했습니다. 사용처에서 사용할 모델로 지정해 주세요.",
+                : "모델을 등록했습니다. 사용처에서 사용할 모델로 지정해 주시기 바랍니다.",
             );
             if (done) setEditing(null);
           }}
@@ -349,9 +349,9 @@ function ModelDeletionDialog({
         모델 삭제 · {model.name}
       </h3>
       <p className="my-3 text-sm">
-        이 모델을 사용하는 곳에 다른 모델을 지정하고 저장해 주세요. 모든 사용
+        이 모델을 사용하는 곳에 다른 모델을 지정하고 저장해 주시기 바랍니다. 모든 사용
         관계가 해제되면 삭제할 수 있습니다. 다른 호환 모델이 없다면 먼저 모델을
-        등록해 주세요.
+        등록해 주시기 바랍니다.
       </p>
       {references.some((x) => x.kind === "policy") && (
         <div className="my-3 text-sm text-amber-800">
@@ -394,7 +394,7 @@ function ModelDeletionDialog({
       {protectedModel && !references.length && (
         <p className="my-3 text-sm text-amber-800">
           기존 설정에서 보호하는 모델입니다. 최신 모델 설정을 다시 불러와 사용
-          관계를 확인해 주세요.
+          관계를 확인해 주시기 바랍니다.
         </p>
       )}
       {!protectedModel && (

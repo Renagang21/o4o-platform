@@ -152,7 +152,7 @@ describe('EmailSignupForm', () => {
     expect(submit().disabled).toBe(false);
     fireEvent.click(submit());
     await screen.findByTestId('email-sent-notice');
-    expect(screen.getByText('n**@x.com')).toBeTruthy();
+    expect(screen.getByText('new@x.com')).toBeTruthy();
     expect(screen.getByText('로그인하러 가기')).toBeTruthy();
     expect(signup).toHaveBeenCalledWith({
       email: 'new@x.com', nickname: 'Fixture nickname',
@@ -196,7 +196,7 @@ describe('EmailSignupForm', () => {
   });
 
   it('중복 이메일 → 서버 안내 문구 그대로', async () => {
-    const msg = '이미 가입된 이메일입니다. 처음 가입한 방법(Google 또는 이메일)으로 로그인해 주세요.';
+    const msg = '이미 가입된 이메일입니다. 처음 가입한 방법(Google 또는 이메일)으로 로그인해 주시기 바랍니다.';
     const signup = vi.fn(async () => {
       throw axiosError(409, { success: false, error: msg, code: 'EMAIL_IN_USE' });
     });

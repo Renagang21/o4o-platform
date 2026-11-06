@@ -95,7 +95,7 @@ export function StoreAssetsView({
         );
       } catch {
         // 실패 시 publishStatus 를 갱신하지 않아 이전 상태가 그대로 유지된다(성공으로 표시하지 않음).
-        setActionError('게시 상태를 변경하지 못했습니다. 잠시 후 다시 시도해 주세요.');
+        setActionError('게시 상태를 변경하지 못했습니다. 잠시 후 다시 시도해 주시기 바랍니다.');
       } finally {
         setUpdatingId(null);
       }

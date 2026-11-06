@@ -50,7 +50,7 @@ export function createJoinInquiryPublicRoutes(dataSource: DataSource): Router {
       if (!contact || typeof contact !== 'string' || !contact.trim()) {
         return res.status(400).json({
           success: false,
-          error: '연락처를 입력해주세요.',
+          error: '연락처를 입력해 주시기 바랍니다.',
           code: 'MISSING_CONTACT',
         });
       }
@@ -64,7 +64,7 @@ export function createJoinInquiryPublicRoutes(dataSource: DataSource): Router {
       if (!emailRegex.test(trimmedContact) && !phoneRegex.test(trimmedContact)) {
         return res.status(400).json({
           success: false,
-          error: '올바른 이메일 또는 전화번호를 입력해주세요.',
+          error: '올바른 이메일 또는 전화번호를 입력해 주시기 바랍니다.',
           code: 'INVALID_CONTACT_FORMAT',
         });
       }

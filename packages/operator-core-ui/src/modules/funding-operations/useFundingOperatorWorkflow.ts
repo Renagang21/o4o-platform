@@ -157,7 +157,7 @@ export function useFundingOperatorWorkflow(id: string) {
     approve: () => mutate(() => approveTrialFirst(id), '승인에 실패했습니다.'),
     reject: (reason: string) => mutate(() => rejectTrialFirst(id, reason), '반려에 실패했습니다.'),
     changeStatus: (status: TrialStatus) => mutate(() => updateTrialStatus(id, status), '유통참여형 펀딩 상태 변경에 실패했습니다.'),
-    retryForum: () => mutate(() => retryTrialForumSync(id), '포럼 개설을 다시 시도해 주세요.'),
+    retryForum: () => mutate(() => retryTrialForumSync(id), '포럼 개설을 다시 시도해 주시기 바랍니다.'),
     handleToggleRewardStatus: (participant: TrialParticipant) => mutate(
       () => updateParticipantRewardStatus(id, participant.id, participant.rewardStatus === 'fulfilled' ? 'pending' : 'fulfilled'),
       '상태 변경에 실패했습니다.', { id: participant.id, payment: false },

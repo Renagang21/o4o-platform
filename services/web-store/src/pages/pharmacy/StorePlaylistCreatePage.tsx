@@ -53,10 +53,13 @@ function PlaylistCreateSession({ isCurrent }: Readonly<{ isCurrent: () => boolea
   return (
     <StorePlaylistCreateView
       accentColor="#2563eb"
+      title="새 재생목록"
+      subtitle="재생목록을 만든 뒤 동영상 보관함에서 영상을 선택해 추가합니다."
+      backLabel="재생목록으로"
       onBack={() => navigate(listPath)}
       onSubmit={handleSubmit}
       config={{
-        descriptionPlaceholder: '이 플레이리스트의 사용 목적이나 적용 위치를 간략히 기록하세요',
+        descriptionPlaceholder: '재생목록의 용도나 적용 위치를 기록하시기 바랍니다.',
       }}
     />
   );

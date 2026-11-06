@@ -168,7 +168,6 @@ export default defineConfig({
     '@nestjs/event-emitter',
     '@nestjs/websockets',
     '@nestjs/microservices',
-    '@nestjs/platform-express',
     '@nestjs/websockets/socket-module',
     '@nestjs/microservices/microservices-module',
 

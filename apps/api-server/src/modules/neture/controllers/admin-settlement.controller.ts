@@ -39,7 +39,7 @@ export function createAdminSettlementController(dataSource: DataSource): Router 
   const notificationError=(res:Response,error:unknown)=>{
     if(error instanceof SettlementNotificationError)return res.status(error.status).json({success:false,error:error.code});
     logger.warn('[Neture Settlement] notification recovery unavailable');
-    return res.status(503).json({success:false,error:'SETTLEMENT_NOTIFICATION_UNAVAILABLE',message:'알림 처리 결과를 확인하지 못했습니다. 상태를 다시 조회해 주세요.'});
+    return res.status(503).json({success:false,error:'SETTLEMENT_NOTIFICATION_UNAVAILABLE',message:'알림 처리 결과를 확인하지 못했습니다. 상태를 다시 조회해 주시기 바랍니다.'});
   };
   router.get('/settlements/notification-jobs',requireAuth,adminGuard,async(req,res)=>{
     const state=req.query.state??'failed',page=Number(req.query.page??1),limit=Number(req.query.limit??20);

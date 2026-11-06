@@ -49,18 +49,18 @@ export interface RenewalDetail {
   description: { id: string; content: string; summary: string | null } | null;
 }
 const messages: Record<string, string> = {
-  BULK_CHANGED: '다른 요청이 실행 상태를 바꿨습니다. 최신 실행을 다시 불러오세요.',
-  BULK_TERMINAL: '완료·취소된 실행은 재개할 수 없습니다. 새 점검을 만드세요.',
-  BULK_SCOPE_TOO_LARGE: '대상 50,000개를 초과합니다. 상품군·검색 조건으로 범위를 나누세요.',
-  BULK_STEP_FAILED: '점검 처리에 실패했습니다. 실행 현황에서 재시도 상태를 확인하세요.',
-  RULE_CHANGED: '기준이 변경됐습니다. 최신 기준을 다시 불러오세요.',
+  BULK_CHANGED: '다른 요청이 실행 상태를 바꿨습니다. 최신 실행을 다시 불러오시기 바랍니다.',
+  BULK_TERMINAL: '완료·취소된 실행은 재개할 수 없습니다. 새 점검을 만드시기 바랍니다.',
+  BULK_SCOPE_TOO_LARGE: '대상 50,000개를 초과합니다. 상품군·검색 조건으로 범위를 나누시기 바랍니다.',
+  BULK_STEP_FAILED: '점검 처리에 실패했습니다. 실행 현황에서 재시도 상태를 확인하시기 바랍니다.',
+  RULE_CHANGED: '기준이 변경됐습니다. 최신 기준을 다시 불러오시기 바랍니다.',
   RULE_DISABLED: '사용 중지된 기준입니다.',
-  SCHEDULE_CHANGED: '예약이 변경됐습니다. 최신 예약을 다시 불러오세요.',
-  SCHEDULE_FUTURE_REQUIRED: '한국시간 기준으로 미래 최초 실행 시각을 지정하세요.',
-  RENEWAL_CHANGED: '갱신 작업이 변경됐습니다. 최신 기록을 다시 확인하세요.',
-  PRODUCT_SOURCE_CHANGED: '상품·설명서 원문이 바뀌었습니다. 최신 자료를 다시 불러와 검토하세요.',
-  MASTER_NOT_FOUND: '상품을 찾을 수 없습니다. 상품 ID를 확인하세요.',
-  INVALID_INPUT: '입력값을 확인하세요. 갱신 검토에는 목적과 메모가 필요합니다.',
+  SCHEDULE_CHANGED: '예약이 변경됐습니다. 최신 예약을 다시 불러오시기 바랍니다.',
+  SCHEDULE_FUTURE_REQUIRED: '한국시간 기준으로 미래 최초 실행 시각을 지정하시기 바랍니다.',
+  RENEWAL_CHANGED: '갱신 작업이 변경됐습니다. 최신 기록을 다시 확인하시기 바랍니다.',
+  PRODUCT_SOURCE_CHANGED: '상품·설명서 원문이 바뀌었습니다. 최신 자료를 다시 불러와 검토하시기 바랍니다.',
+  MASTER_NOT_FOUND: '상품을 찾을 수 없습니다. 상품 ID를 확인하시기 바랍니다.',
+  INVALID_INPUT: '입력값을 확인하시기 바랍니다. 갱신 검토에는 목적과 메모가 필요합니다.',
 };
 async function call<T>(
   method: 'get' | 'post' | 'put' | 'patch',
@@ -78,7 +78,7 @@ async function call<T>(
     const e = error as { message?: string; response?: { data?: { code?: string } } };
     throw new Error(
       messages[e.response?.data?.code ?? e.message ?? ''] ??
-        '상품 정기 관리 요청이 실패했습니다. 다시 확인하세요.',
+        '상품 정기 관리 요청이 실패했습니다. 다시 확인하시기 바랍니다.',
     );
   }
 }

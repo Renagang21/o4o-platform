@@ -186,12 +186,12 @@ export default function HospitalDrugPage() {
       if (outcome.missingNameColumn) {
         const seen = outcome.detectedHeaders.length > 0 ? `\n이 파일에서 인식한 열 제목: ${outcome.detectedHeaders.join(', ')}` : '';
         setLocalError(
-          `약품명 열을 찾지 못했습니다. 제품명 · 약품명 · 품목명 등 약품 이름 열이 있는 파일인지 확인해 주세요.${seen}`,
+          `약품명 열을 찾지 못했습니다. 제품명 · 약품명 · 품목명 등 약품 이름 열이 있는 파일인지 확인해 주시기 바랍니다.${seen}`,
         );
         return;
       }
       if (outcome.rows.length === 0) {
-        setLocalError('약품 행을 찾지 못했습니다. 파일 내용을 확인해 주세요.');
+        setLocalError('약품 행을 찾지 못했습니다. 파일 내용을 확인해 주시기 바랍니다.');
         return;
       }
       const next = makeDataset(file.name, outcome.rows);
@@ -199,14 +199,14 @@ export default function HospitalDrugPage() {
       if (!saved.ok) {
         setLocalError(
           saved.reason === 'quota'
-            ? '이 브라우저의 저장 공간이 부족해 원내 자료를 저장하지 못했습니다. 항목 수가 더 적은 파일로 시도해 주세요.'
+            ? '이 브라우저의 저장 공간이 부족해 원내 자료를 저장하지 못했습니다. 항목 수가 더 적은 파일로 시도해 주시기 바랍니다.'
             : '원내 자료를 이 브라우저에 저장하지 못했습니다.',
         );
         return;
       }
       setDataset(next); // 즉시 상태 갱신(criterion B·C).
     } catch {
-      setLocalError('파일을 읽지 못했습니다. xlsx · xls · csv 형식인지 확인해 주세요.');
+      setLocalError('파일을 읽지 못했습니다. xlsx · xls · csv 형식인지 확인해 주시기 바랍니다.');
     } finally {
       setLocalBusy(false);
     }
@@ -290,7 +290,7 @@ export default function HospitalDrugPage() {
           setReconnectNeeded(true);
           return;
         }
-        setError(err instanceof Error ? err.message : '응답을 생성하지 못했습니다. 다시 시도해 주세요.');
+        setError(err instanceof Error ? err.message : '응답을 생성하지 못했습니다. 다시 시도해 주시기 바랍니다.');
       } finally {
         setPending(false);
       }
@@ -348,7 +348,7 @@ export default function HospitalDrugPage() {
         <div className="w-full max-w-3xl">
           {!hasThread && (
             <div className="mb-6 text-center">
-              <p className="m-0 text-base text-slate-600">찾으시는 약품이나 궁금한 점을 입력해 주세요.</p>
+              <p className="m-0 text-base text-slate-600">찾으시는 약품이나 궁금한 점을 입력해 주시기 바랍니다.</p>
             </div>
           )}
 
@@ -484,7 +484,7 @@ export default function HospitalDrugPage() {
                   「원내 약품 안내」 아이콘이 바탕화면에 만들어집니다.
                 </p>
                 <p className="m-0 mt-2">
-                  설치 메뉴가 보이지 않는 브라우저에서는 이 주소를 즐겨찾기에 추가해 사용하세요:{' '}
+                  설치 메뉴가 보이지 않는 브라우저에서는 이 주소를 즐겨찾기에 추가해 사용하시기 바랍니다:{' '}
                   <span className="font-mono text-slate-800">neture.co.kr/hospital-drug</span>
                 </p>
               </div>

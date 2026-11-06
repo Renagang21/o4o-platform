@@ -187,7 +187,7 @@ async function writeModelControl(
     .safeParse(response.data);
   if (!parsed.success)
     throw new Error(
-      "저장 응답을 확인하지 못했습니다. 최신 목록을 다시 조회해 주세요.",
+      "저장 응답을 확인하지 못했습니다. 최신 목록을 다시 조회해 주시기 바랍니다.",
     );
   return parsed.data.data;
 }

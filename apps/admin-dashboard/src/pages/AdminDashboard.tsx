@@ -55,7 +55,7 @@ const AdminDashboard: FC = () => {
 };
 
 const SectionCard: FC<{ item: MenuItem }> = ({ item }) => {
-  const children = (item.children ?? []).filter((c) => !c.separator && c.path);
+  const children = (item.children ?? []).flatMap(child => child.children?.length ? child.children : [child]).filter(child => !child.separator && child.path);
   return (
     <section
       className="bg-white rounded-lg shadow-sm border border-gray-200 p-5"

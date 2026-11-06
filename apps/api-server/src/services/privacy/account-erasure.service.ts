@@ -1,3 +1,6 @@
+import { systemLogProjection, systemLogReviews, minimizeSystemLogs, privateLogPointerPredicate, EMAIL_LOG_OWNER_SQL, PROFILE_AUDIT_SQL } from './account-system-logs.js';
+import { CLOSED_STORE_WRITER_GAPS_SQL } from '../store/store-closure-inventory.js';
+import { personalPredicate, removePersonalDerived } from './account-personal-data.js';
 import { businessErasureProjection, businessErasureReviews, removeBusinessAccountLinks } from './account-business-data.js';
 import { cooperativeAdminTransferRequired } from './cooperative-erasure-review.js';
 import { createHash, randomUUID } from 'node:crypto';
@@ -14,10 +17,11 @@ export class AccountErasureError extends Error {
   constructor(readonly code: string, readonly statusCode: number) { super(code); }
 }
 export type ErasureState = 'pending' | 'processing' | 'review_required' | 'retry_required' | 'completed';
-export interface ErasureResult { operationId: string; state: ErasureState; erased: boolean; reviewCodes: string[]; reviewDueAt: string | null }
+export interface ErasureResult { operationId: string; state: ErasureState; erased: boolean; reviewCodes: string[]; reviewDueAt: string | null; errorCode?: string | null; remainingFileTasks?: number; requestedAt?: string; updatedAt?: string }
 export interface PersonalStorage {
-  generation(bucket: string, path: string, ownerId: string): Promise<string | null>;
-  deleteGeneration(bucket: string, path: string, generation: string, ownerId: string): Promise<void>;
+  discover?(ownerId:string,db:Pick<EntityManager,'query'>):Promise<string[]>;
+  generation(bucket: string, path: string, ownerId: string, db?:Pick<EntityManager,'query'>): Promise<string | null>;
+  deleteGeneration(bucket: string, path: string, generation: string, ownerId: string, db?:Pick<EntityManager,'query'>): Promise<void>;
 }
 export interface ErasureOptions {
   enabled: boolean;
@@ -37,12 +41,17 @@ const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 /** These are exclusively owned individual rows; business/shared/statutory rows are NOT in this list. */
 const PRIVATE_OWNERS: Readonly<Record<string, readonly string[]>> = {
+  user_policy_acceptances:['user_id'],
+  personal_mail_accounts: ['user_id'], personal_mail_jobs: ['user_id'], personal_mail_oauth_flows: ['user_id'],
+  external_ai_connections: ['user_id'],
   linked_accounts: ['userId'], user_password_credentials: ['user_id'],
   email_verification_tokens: ['user_id'], password_reset_tokens: ['user_id'], auth_social_flows: ['user_id'],
   browser_session_revocations: ['user_id'], service_session_revocations: ['user_id'],
   handoff_tokens: ['user_id'], notifications: ['userId'],
   cafe24_member_links: ['user_id'], kpa_pharmacist_profiles: ['user_id'], kpa_student_profiles: ['user_id'],
   member_qualifications: ['user_id'], qualification_requests: ['user_id'], kyc_documents: ['user_id'],
+  lms_attendance:['userId'], lms_certificates:['userId'], lms_enrollments:['userId'], lms_instructor_applications:['userId'], lms_quiz_attempts:['userId'], lms_submissions:['userId'], lms_survey_responses:['userId'],
+  forum_join_requests:['user_id'], forum_post_like:['user_id'],
   instructor_profiles: ['user_id'], forum_bookmark: ['userId'], forum_like: ['userId'],
   forum_notifications: ['userId'], forum_category_members: ['user_id'],
   assistant_method_sharing_consents:['user_id'], assistant_work_data_consents:['user_id'],
@@ -92,10 +101,29 @@ export class AccountErasureService {
       AND to_regclass('public.account_erasure_community_evidence') IS NOT NULL
       AND to_regclass('public.account_erasure_audit_events') IS NOT NULL
       AND to_regproc('public.account_erasure_write_fence') IS NOT NULL
+      AND to_regclass('public.store_closure_file_tasks') IS NOT NULL
+      AND EXISTS(SELECT 1 FROM pg_attribute WHERE attrelid=to_regclass('public.organizations') AND attname='full_closure_at' AND NOT attisdropped)
+      AND NOT EXISTS(${CLOSED_STORE_WRITER_GAPS_SQL})
       AND NOT EXISTS(${ERASURE_WRITER_GAPS_SQL})
       AND EXISTS(SELECT 1 FROM pg_constraint WHERE conrelid=to_regclass('public.account_erasure_reference_keys')
         AND conname='account_erasure_uuid_keys_only' AND contype='c' AND convalidated) AS ready`);
     return {enabled:r?.ready===true};
+  }
+
+  async readiness(actorId:string){
+    return this.db.transaction(async m=>{
+      await this.assertActor(m,actorId);
+      const blockers:string[]=[];
+      if(!this.options.enabled)blockers.push('ACCOUNT_ERASURE_ROLLOUT_REQUIRED');
+      if(this.options.inventoryReviewed!==true)blockers.push('PERSONAL_FILE_INVENTORY_REVIEW_REQUIRED');
+      if(![1,2].includes(this.options.systemYears??0)||!/^[a-zA-Z0-9:_-]{1,100}$/.test(this.options.systemBasis??''))blockers.push('ERASURE_SYSTEM_CLASSIFICATION_REQUIRED');
+      const gaps=await m.query(`SELECT c.oid::regclass::text AS relation FROM pg_class c WHERE c.oid IN (${ERASURE_WRITER_GAPS_SQL}) ORDER BY 1`);
+      const [schema]=await m.query(`SELECT to_regclass('public.account_erasure_operations') IS NOT NULL
+        AND to_regclass('public.account_erasure_file_tasks') IS NOT NULL AND to_regproc('public.account_erasure_write_fence') IS NOT NULL AS ready`);
+      const closureGaps=await m.query(CLOSED_STORE_WRITER_GAPS_SQL);
+      if(!schema.ready||gaps.length||closureGaps.length)blockers.push('ACCOUNT_ERASURE_MIGRATION_REQUIRED');
+      return {enabled:(await this.capabilities()).enabled,blockers,missingWriterFences:gaps.map(row=>row.relation)};
+    });
   }
 
   async request(userId: string, actorId: string): Promise<ErasureResult> {
@@ -133,12 +161,35 @@ export class AccountErasureService {
     return this.resume(operationId,actorId);
   }
 
-  async get(operationId: string): Promise<ErasureResult> {
+  async get(operationId: string, actorId: string): Promise<ErasureResult> {
     if (!UUID.test(operationId)) throw new AccountErasureError('INVALID_OPERATION_ID', 400);
-    await this.ready();
-    const [o] = await this.db.query('SELECT * FROM account_erasure_operations WHERE id=$1', [operationId]);
-    if (!o) throw new AccountErasureError('ERASURE_OPERATION_NOT_FOUND', 404);
-    return this.result(o);
+    // Status remains readable when execution is disabled. It never starts a worker.
+    return this.db.transaction(async m => {
+      await this.assertActor(m,actorId);
+      const [o] = await m.query(`SELECT o.*, (SELECT count(*)::int FROM account_erasure_file_tasks f
+        WHERE f.operation_id=o.id AND f.state NOT IN ('deleted','already_absent')) AS remaining
+        FROM account_erasure_operations o WHERE o.id=$1`, [operationId]);
+      if (!o) throw new AccountErasureError('ERASURE_OPERATION_NOT_FOUND', 404);
+      return { ...this.result(o), errorCode:o.error_code, remainingFileTasks:o.remaining,
+        requestedAt:new Date(o.created_at).toISOString(), updatedAt:new Date(o.updated_at).toISOString() };
+    });
+  }
+
+  async list(actorId:string, page=1, state?:ErasureState) {
+    if (!Number.isInteger(page) || page<1 || page>100000 ||
+      (state!==undefined && !['pending','processing','review_required','retry_required','completed'].includes(state)))
+      throw new AccountErasureError('INVALID_ERASURE_FILTER',400);
+    return this.db.transaction(async m => {
+      await this.assertActor(m,actorId);
+      const rows=await m.query(`SELECT o.id AS "operationId",o.state,o.state='completed' AS erased,
+        o.error_code AS "errorCode",o.review_codes AS "reviewCodes",o.review_due_at AS "reviewDueAt",
+        o.created_at AS "requestedAt",o.updated_at AS "updatedAt",
+        (SELECT count(*)::int FROM account_erasure_file_tasks f WHERE f.operation_id=o.id
+          AND f.state NOT IN ('deleted','already_absent')) AS "remainingFileTasks"
+        FROM account_erasure_operations o WHERE ($1::text IS NULL OR o.state=$1)
+        ORDER BY o.updated_at DESC,o.id DESC LIMIT 21 OFFSET $2`,[state??null,(page-1)*20]);
+      return {items:rows.slice(0,20).map(r=>({...r,reviewDueAt:r.erased?null:r.reviewDueAt})),hasNext:rows.length>20,page};
+    });
   }
 
   async resume(operationId: string, actorId: string): Promise<ErasureResult> {
@@ -167,6 +218,8 @@ export class AccountErasureService {
           await m.query("UPDATE account_erasure_operations SET state='review_required',review_codes=$2,updated_at=now() WHERE id=$1", [operationId, JSON.stringify(reviews)]);
           return false;
         }
+        const discovered=await this.options.storage?.discover?.(o.subject_id!,m)??[];
+        for(const pointer of discovered)await this.prepareAvatar(m,operationId,pointer);
         await this.prepareAvatar(m, operationId, user.avatar);
         await this.reviewPrivateFiles(m, operationId, o.subject_id!);
         // Keep source identities/credentials until file completion; retries never lose a manifest.
@@ -180,7 +233,7 @@ export class AccountErasureService {
         await this.finish(operationId,actorId);
       }
     } catch (e) {
-      if((e as {code?:string}).code==='55P03')return this.get(operationId);
+      if((e as {code?:string}).code==='55P03')return this.get(operationId,actorId);
       if (e instanceof AccountErasureError && ['ERASURE_OPERATION_NOT_FOUND','INVALID_OPERATION_ID','FORBIDDEN','AUTH_REQUIRED'].includes(e.code)) throw e;
       const code = e instanceof AccountErasureError ? e.code : 'ERASURE_STEP_FAILED';
       // Never log a SQL error's detail, source profile or GCS path.
@@ -188,7 +241,7 @@ export class AccountErasureService {
       await this.db.query(`UPDATE account_erasure_operations SET state=$3,error_code=$2,review_codes=$4,updated_at=now()
         WHERE id=$1 AND state<>'completed'`, [operationId, code,review ? 'review_required' : 'retry_required',JSON.stringify(review ? [code] : [])]);
     }
-    return this.get(operationId);
+    return this.get(operationId,actorId);
   }
 
   private async tables(m: EntityManager): Promise<Array<{ schema_name: string; table_name: string; columns: string[] }>> {
@@ -204,9 +257,10 @@ export class AccountErasureService {
     const ids = new Set<string>([userId]);
     for (const t of await this.tables(m)) {
       const owners = t.schema_name === 'public' ? PRIVATE_OWNERS[t.table_name] : undefined;
-      const where = t.schema_name === 'public' && t.table_name === 'central_operation_menu_grants'
+      let where = t.schema_name === 'public' && t.table_name === 'central_operation_menu_grants'
         ? CENTRAL_MENU_GRANT_OWNER_SQL
         : owners?.filter(c => t.columns.includes(c)).map(c => `r.${quote(c)}::text=$1`).join(' OR ');
+      if (t.schema_name === 'public') where = personalPredicate(t.table_name,where);
       if (!where || !t.columns.includes('id')) continue;
       const rows = await m.query(`SELECT r.id FROM public.${quote(t.table_name)} r WHERE ${where}`, [userId]);
       for (const r of rows) if (UUID.test(String(r.id))) ids.add(r.id);
@@ -290,7 +344,9 @@ export class AccountErasureService {
       } finally { await m.query('CLOSE erasure_provider_scan'); }
     };
     const tables = await this.tables(m);
-    const codes = await businessErasureReviews(m, String(user.id), tables);
+    const subjectId=user.id;
+    if(typeof subjectId!=='string'||!UUID.test(subjectId))throw new AccountErasureError('INVALID_ERASURE_SUBJECT',409);
+    const codes = [...await businessErasureReviews(m,subjectId,tables),...await systemLogReviews(m,subjectId)];
     const [otherUsers]=await m.query(`SELECT count(*)::int AS n FROM users r WHERE r.id<>$1
       AND (${leaf('r')}::text ~* ANY($2::text[]) OR ${leaf('r')} ?| $3::text[])`,[user.id,patterns,shortTokens]);
     if(otherUsers.n || await providerReview('public.users','AND r.id::text<>$1'))codes.push('REVIEW:public.users');
@@ -307,6 +363,7 @@ export class AccountErasureService {
       const table = `${quote(t.schema_name)}.${quote(t.table_name)}`;
       const owners = t.schema_name === 'public' ? PRIVATE_OWNERS[t.table_name] : undefined;
       let predicate = owners?.filter(c => t.columns.includes(c)).map(c => `r.${quote(c)}::text=$1`).join(' OR ');
+      if(t.schema_name==='public')predicate=personalPredicate(t.table_name,predicate);
       // Personal work copies cascade with the user's consent row; organizational
       // copies are reviewed independently and never erased as the grant actor's data.
       if(t.schema_name==='public' && t.table_name==='assistant_work_data_records')predicate="r.owner_key='user:'||$1::text";
@@ -343,7 +400,7 @@ export class AccountErasureService {
       // The grant belongs to user_id. assigned_by is attribution only and its
       // existing ON DELETE SET NULL FK clears it; every other field is still scanned.
       const roleAttribution = t.schema_name === 'public' && ['role_assignments','assistant_work_data_consents'].includes(t.table_name);
-      const projection = businessErasureProjection(t);
+      const projection = systemLogProjection(t,businessErasureProjection(t));
       const projectedLeaf = leaf('r',roleAttribution).replace('to_jsonb(r)', projection);
       const [r] = await m.query(`SELECT count(*)::int AS n FROM ${table} r
         WHERE $1::text IS NOT NULL AND (${projectedLeaf}::text ~* ANY($2::text[]) OR ${projectedLeaf} ?| $3::text[])
@@ -382,7 +439,9 @@ export class AccountErasureService {
 
   private async removePrivateRows(m: EntityManager, userId: string): Promise<void> {
     const tables = await this.tables(m);
+    await minimizeSystemLogs(m,userId,hash(userId));
     await removeBusinessAccountLinks(m, userId, tables);
+    await removePersonalDerived(m, userId);
     if (tables.some(t => t.schema_name === 'public' && t.table_name === 'action_logs')) {
       await minimizeCentralMenuAudit(m,userId,hash(userId));
     }
@@ -407,7 +466,8 @@ export class AccountErasureService {
           WHERE ${where}`,[userId]);
         continue;
       }
-      if (where) await m.query(`DELETE FROM public.${quote(table)} WHERE ${where}`, [userId]);
+      where = personalPredicate(table,where) ?? '';
+      if (where) await m.query(`DELETE FROM public.${quote(table)} r WHERE ${where}`, [userId]);
     }
   }
 
@@ -415,16 +475,19 @@ export class AccountErasureService {
     if (typeof avatar !== 'string' || !avatar) return;
     let url: URL;
     try { url = new URL(avatar); } catch { throw new AccountErasureError('PERSONAL_FILE_MANIFEST_REVIEW_REQUIRED', 409); }
-    if (url.protocol !== 'https:') throw new AccountErasureError('PERSONAL_FILE_MANIFEST_REVIEW_REQUIRED', 409);
-    if (url.hostname !== 'storage.googleapis.com') return; // provider URL is not an owned object
-    const [bucket, ...parts] = url.pathname.slice(1).split('/');
-    const path = decodeURIComponent(parts.join('/'));
+    if (!['https:','gcs:','gs:'].includes(url.protocol)) throw new AccountErasureError('PERSONAL_FILE_MANIFEST_REVIEW_REQUIRED', 409);
+    if (url.protocol==='https:' && url.hostname !== 'storage.googleapis.com') return; // external avatar is not an owned object
+    const [httpBucket, ...parts] = url.pathname.slice(1).split('/');
+    const bucket=url.protocol==='https:'?httpBucket:url.hostname;
+    const path = decodeURIComponent(url.protocol==='https:'?parts.join('/'):url.pathname.slice(1));
     if (!this.options.personalBuckets.includes(bucket) || !path || path.includes('..') || url.search) {
       throw new AccountErasureError('PERSONAL_FILE_MANIFEST_REVIEW_REQUIRED', 409);
     }
     // A library/shared asset requires ownership/link review, never uploader-based deletion.
     const [used] = await m.query('SELECT count(*)::int AS n FROM media_assets WHERE url=$1 OR gcs_path=$2', [avatar,path]);
     if (used.n) throw new AccountErasureError('PERSONAL_FILE_SHARED_USAGE_REVIEW_REQUIRED', 409);
+    const [operation]=await m.query('SELECT subject_id FROM account_erasure_operations WHERE id=$1',[operationId]);
+    await this.assertPersonalFileUnshared(m,operation.subject_id,bucket,path);
     const objectHash = createHash('sha256').update(`${bucket}/${path}`).digest('hex');
     await m.query(`INSERT INTO account_erasure_file_tasks(operation_id,object_hash,bucket,object_path)
       VALUES($1,$2,$3,$4) ON CONFLICT(operation_id,object_hash) DO NOTHING`, [operationId,objectHash,bucket,path]);
@@ -432,27 +495,57 @@ export class AccountErasureService {
 
   private async reviewPrivateFiles(m: EntityManager, operationId: string, userId: string): Promise<void> {
     const tables = await this.tables(m);
+    const documents=await m.query(`SELECT r."fileUrl" AS url FROM kyc_documents r WHERE ${personalPredicate('kyc_documents',undefined)}`,[userId]);
+    for(const document of documents) {
+      if(!/^(gcs|gs):\/\/|^https:\/\/storage\.googleapis\.com\//.test(document.url))throw new AccountErasureError('PRIVATE_ATTACHMENT_MANIFEST_REVIEW_REQUIRED',409);
+      await this.prepareAvatar(m,operationId,document.url);
+    }
+    const logFiles=await m.query(`SELECT to_jsonb(r) AS payload FROM email_logs r WHERE ${EMAIL_LOG_OWNER_SQL}
+      UNION ALL SELECT r.changes AS payload FROM audit_logs r WHERE ${PROFILE_AUDIT_SQL}
+      UNION ALL SELECT jsonb_build_object('errorMessage',r."errorMessage") AS payload FROM ai_usage_logs r WHERE r."userId"::text=$1`,[userId]);
+    for(const log of logFiles){
+      const text=JSON.stringify(log.payload??{});
+      const pointers=text.match(/(?:https:\/\/storage\.googleapis\.com\/|(?:gcs|gs):\/\/)[^\s"<>\\]+/g)??[];
+      for(const pointer of pointers)await this.prepareAvatar(m,operationId,pointer);
+      if(/(?:^|\s)(?:uploads|media)\//i.test(text))throw new AccountErasureError('PRIVATE_ATTACHMENT_MANIFEST_REVIEW_REQUIRED',409);
+    }
     for (const [name, owners] of Object.entries(PRIVATE_OWNERS)) {
       const t = tables.find(x => x.schema_name === 'public' && x.table_name === name);
       if (!t) continue;
-      const fields = t.columns.filter(c => /(?:file|attachment|document|image|avatar|picture|path|url|metadata|payload|body|content)/i.test(c));
+      const fields = t.columns.filter(c => !(name==='kyc_documents'&&c==='fileUrl') && /(?:file|attachment|document|image|avatar|picture|path|url|metadata|payload|body|content)/i.test(c));
       if (!fields.length) continue;
-      const where = owners.filter(c => t.columns.includes(c)).map(c => `${quote(c)}::text=$1`).join(' OR ');
+      const where = personalPredicate(name,owners.filter(c => t.columns.includes(c)).map(c => `r.${quote(c)}::text=$1`).join(' OR '));
       if (!where) continue;
-      const rows = await m.query(`SELECT ${fields.map(quote).join(',')} FROM public.${quote(name)} WHERE ${where}`, [userId]);
+      const rows = await m.query(`SELECT ${fields.map(quote).join(',')} FROM public.${quote(name)} r WHERE ${where}`, [userId]);
       // Private credentials may contain provider URLs; owned GCS pointers/local attachments
       // must be reviewed before removing their only database manifest.
       for (const row of rows) for (const [field, value] of Object.entries(row)) {
         if (value == null || value === '' || (Array.isArray(value) && !value.length)) continue;
         const text = typeof value === 'string' ? value : JSON.stringify(value);
-        if (/storage\.googleapis\.com|(?:gcs|gs):\/\/|(?:^|\s)(?:uploads|media)\//i.test(text) ||
-            /(?:file_?path|file_?url|attachment|gcs_?path)/i.test(field)) {
-          throw new AccountErasureError('PRIVATE_ATTACHMENT_MANIFEST_REVIEW_REQUIRED', 409);
+        const pointers=text.match(/(?:https:\/\/storage\.googleapis\.com\/|(?:gcs|gs):\/\/)[^\s"<>\\]+/g)??[];
+        for(const pointer of pointers)await this.prepareAvatar(m,operationId,pointer);
+        if ((!pointers.length && /(?:file_?path|file_?url|attachment|gcs_?path)/i.test(field)) ||
+            /(?:^|\s)(?:uploads|media)\//i.test(text)) {
+          throw new AccountErasureError('PRIVATE_ATTACHMENT_MANIFEST_REVIEW_REQUIRED',409);
         }
       }
     }
     // Keep operationId in the signature to make the required manifest boundary explicit.
     if (!operationId) throw new AccountErasureError('INVALID_OPERATION_ID', 400);
+  }
+
+  private async assertPersonalFileUnshared(m:EntityManager,userId:string,bucket:string,path:string){
+    const pointers=[`gcs://${bucket}/${path}`,`gs://${bucket}/${path}`,`https://storage.googleapis.com/${bucket}/${path}`];
+    const [peer]=await m.query(`SELECT 1 FROM users r WHERE r.id::text<>$1 AND EXISTS(SELECT 1 FROM unnest($2::text[]) p WHERE strpos(to_jsonb(r)::text,p)>0) LIMIT 1`,[userId,pointers]);
+    if(peer)throw new AccountErasureError('PERSONAL_FILE_SHARED_USAGE_REVIEW_REQUIRED',409);
+    for(const table of await this.tables(m)){
+      const owners=table.schema_name==='public'?PRIVATE_OWNERS[table.table_name]:undefined;
+      const predicate=table.schema_name==='public'?(privateLogPointerPredicate(table.table_name)??personalPredicate(table.table_name,owners?.filter(column=>table.columns.includes(column)).map(column=>`r.${quote(column)}::text=$1`).join(' OR '))):undefined;
+      const rows=await m.query(`SELECT 1 FROM ${quote(table.schema_name)}.${quote(table.table_name)} r WHERE $1::text IS NOT NULL
+        AND EXISTS(SELECT 1 FROM unnest($2::text[]) p WHERE strpos(to_jsonb(r)::text,p)>0)
+        ${predicate?`AND NOT COALESCE((${predicate}),false)`:''} LIMIT 1`,[userId,pointers]);
+      if(rows.length)throw new AccountErasureError('PERSONAL_FILE_SHARED_USAGE_REVIEW_REQUIRED',409);
+    }
   }
 
   private async assertTarget(m:EntityManager,userId:string):Promise<void> {
@@ -466,6 +559,7 @@ export class AccountErasureService {
   }
 
   private async assertActor(m:EntityManager,actorId:string):Promise<void> {
+    if(!UUID.test(actorId??''))throw new AccountErasureError('AUTH_REQUIRED',401);
     const [actor]=await m.query(`SELECT u.id FROM users u JOIN role_assignments ra ON ra.user_id=u.id
       WHERE u.id=$1 AND u."isActive"=true AND ra.role='platform:super_admin' AND ra.is_active=true
         AND ra.valid_from<=statement_timestamp() AND (ra.valid_until IS NULL OR ra.valid_until>=statement_timestamp()) FOR SHARE OF u,ra`,[actorId]);
@@ -474,6 +568,8 @@ export class AccountErasureService {
 
   private async removeFiles(operationId: string,actorId: string): Promise<void> {
     await this.db.transaction(async m => {
+      // Keep the reference scan and external generation deletion in one writer boundary.
+      await m.query("SELECT pg_advisory_xact_lock(hashtextextended('o4o-account-erasure-writes',0))");
       await this.assertActor(m,actorId);
       const [o] = await m.query('SELECT * FROM account_erasure_operations WHERE id=$1 FOR UPDATE', [operationId]);
       if (o.state === 'completed') return;
@@ -487,13 +583,15 @@ export class AccountErasureService {
 
   private async removeFileTask(m:EntityManager,task:ErasureFileTask,ownerId:string):Promise<void> {
     if (!this.options.storage) throw new AccountErasureError('PERSONAL_STORAGE_REQUIRED',503);
-    const generation=task.generation ?? await this.options.storage.generation(task.bucket,task.object_path,ownerId);
+    await this.assertPersonalFileUnshared(m,ownerId,task.bucket,task.object_path);
+    const generation=task.generation ?? await this.options.storage.generation(task.bucket,task.object_path,ownerId,m);
+    if(generation!==null && (typeof generation!=='string'||!/^\d+$/.test(generation)))throw new AccountErasureError('PERSONAL_FILE_GENERATION_REVIEW_REQUIRED',409);
     if(!task.generation && generation){
       // Persist in this transaction; external deletion happens only after this commit.
       await m.query("UPDATE account_erasure_file_tasks SET generation=$2,attempts=attempts+1 WHERE id=$1",[task.id,generation]);
       return;
     }
-    if(generation)await this.options.storage.deleteGeneration(task.bucket,task.object_path,generation,ownerId);
+    if(generation)await this.options.storage.deleteGeneration(task.bucket,task.object_path,generation,ownerId,m);
     await m.query(`UPDATE account_erasure_file_tasks SET state=$2,bucket=NULL,object_path=NULL,generation=NULL,
       error_code=NULL,updated_at=now() WHERE id=$1`,[task.id,generation ? 'deleted':'already_absent']);
   }

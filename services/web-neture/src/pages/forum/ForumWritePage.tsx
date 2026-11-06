@@ -66,8 +66,8 @@ interface ForumWritePageProps {
 
 function forumWriteHeading(isEditMode: boolean, communityLabel: string | undefined) {
   if (isEditMode) return { title: '게시글 수정', description: '게시글 내용을 수정합니다.' };
-  if (communityLabel) return { title: `${communityLabel} 글 작성`, description: '회원들과 나눌 소식과 자료를 작성해 주세요.' };
-  return { title: '의견 남기기', description: 'o4o와 네뚜레 구조에 대한 질문과 의견을 남겨주세요.' };
+  if (communityLabel) return { title: `${communityLabel} 글 작성`, description: '회원들과 나눌 소식과 자료를 작성해 주시기 바랍니다.' };
+  return { title: '의견 남기기', description: 'o4o와 네뚜레 구조에 대한 질문과 의견을 남겨주시기 바랍니다.' };
 }
 
 export function ForumWritePage(props: ForumWritePageProps = {}) {
@@ -174,7 +174,7 @@ function ForumWriter({
       const text = libraryDocumentText(item.blocks);
       setTitle(item.title); setEditorHtml(`<p>${escape(text || item.description || '').replace(/\n/g, '</p><p>')}</p>`);
       setLibraryReady(true);
-    }).catch(() => { if (live) setError('원본 자료를 불러오지 못했습니다. 자료함에서 다시 시작하세요.'); })
+    }).catch(() => { if (live) setError('원본 자료를 불러오지 못했습니다. 자료함에서 다시 시작하시기 바랍니다.'); })
       .finally(() => { if (live) setIsLoadingPost(false); });
     return () => { live = false; };
   }, [libraryId, isAuthenticated, user?.id]);
@@ -221,7 +221,7 @@ function ForumWriter({
     return (
       <div style={{ maxWidth: '640px', margin: '0 auto', padding: '80px 20px', textAlign: 'center' as const }}>
         <h2 style={{ fontSize: '20px', fontWeight: 600, color: '#1e293b', marginBottom: '12px' }}>로그인이 필요합니다</h2>
-        <p style={{ fontSize: '14px', color: '#64748b', marginBottom: '24px' }}>게시글을 작성하려면 로그인해주세요.</p>
+        <p style={{ fontSize: '14px', color: '#64748b', marginBottom: '24px' }}>게시글을 작성하려면 로그인해 주시기 바랍니다.</p>
         <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
           <button
             onClick={() => openLoginModal(backPath ? `${backPath.replace(/\/$/, '')}/write` : '/forum/write')}
@@ -249,7 +249,7 @@ function ForumWriter({
     const current = beginSave();
     const textLength = payload.editorHtml.replace(/<[^>]*>/g, '').trim().length;
     if (!payload.title.trim() || textLength < MIN_CONTENT_LENGTH) {
-      setError(`제목과 내용을 모두 입력해주세요. (내용은 최소 ${MIN_CONTENT_LENGTH}자 이상)`);
+      setError(`제목과 내용을 모두 입력해 주시기 바랍니다. (내용은 최소 ${MIN_CONTENT_LENGTH}자 이상)`);
       return;
     }
     setError(null);
@@ -271,7 +271,7 @@ function ForumWriter({
       }
     } catch (err) {
       console.error('Error updating post:', err);
-      if (current()) setError('네트워크 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+      if (current()) setError('네트워크 오류가 발생했습니다. 잠시 후 다시 시도해 주시기 바랍니다.');
     }
   }
 
@@ -280,11 +280,11 @@ function ForumWriter({
   async function handleCreateSubmit(payload: ForumWriteFormPayload) {
     const current = beginSave();
     if (libraryId && (!libraryReady || !publicationConfirmed)) {
-      setError('원본을 확인하고 커뮤니티 공개 범위 확인에 동의해 주세요.'); return;
+      setError('원본을 확인하고 커뮤니티 공개 범위 확인에 동의해 주시기 바랍니다.'); return;
     }
     const textLength = payload.editorHtml.replace(/<[^>]*>/g, '').trim().length;
     if (!payload.title.trim() || textLength < MIN_CONTENT_LENGTH) {
-      setError(`제목과 내용을 모두 입력해주세요. (내용은 최소 ${MIN_CONTENT_LENGTH}자 이상)`);
+      setError(`제목과 내용을 모두 입력해 주시기 바랍니다. (내용은 최소 ${MIN_CONTENT_LENGTH}자 이상)`);
       return;
     }
     setError(null);
@@ -292,7 +292,7 @@ function ForumWriter({
       const blocks = htmlToBlocks(payload.editorHtml);
       const base = (backPath || '/forum').replace(/\/$/, '');
       if (!forumId) {
-        setError(forumSlugParam ? '지정한 게시판을 확인할 수 없습니다. 목록에서 게시판을 다시 선택해 주세요.' : '현재 글을 등록할 수 있는 게시판이 없습니다. 잠시 후 다시 시도해주세요.');
+        setError(forumSlugParam ? '지정한 게시판을 확인할 수 없습니다. 목록에서 게시판을 다시 선택해 주시기 바랍니다.' : '현재 글을 등록할 수 있는 게시판이 없습니다. 잠시 후 다시 시도해 주시기 바랍니다.');
         return;
       }
       const response = await createForumPost({
@@ -312,7 +312,7 @@ function ForumWriter({
       }
     } catch (err) {
       console.error('Error submitting post:', err);
-      if (current()) setError('네트워크 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+      if (current()) setError('네트워크 오류가 발생했습니다. 잠시 후 다시 시도해 주시기 바랍니다.');
     }
   }
 
@@ -381,7 +381,7 @@ function ForumWriter({
           <select value={forumId} className="ml-2 max-w-full rounded border p-2" onChange={e => {
             const forum = availableForums.find(f => String(f.id) === e.target.value);
             setForumId(forum ? String(forum.id) : ''); setTargetForum(forum ?? null);
-          }}><option value="">게시판을 선택하세요</option>{availableForums.map(f => <option key={f.id} value={f.id}>{f.name}</option>)}</select>
+          }}><option value="">게시판을 선택하시기 바랍니다</option>{availableForums.map(f => <option key={f.id} value={f.id}>{f.name}</option>)}</select>
         </label>
         <label className="flex gap-2"><input type="checkbox" checked={publicationConfirmed} onChange={e => setPublicationConfirmed(e.target.checked)} />선택한 커뮤니티의 공개 범위를 확인했으며, 거래 조건·비공개 자료를 제외했습니다.</label>
       </section>}
@@ -392,8 +392,8 @@ function ForumWriter({
           setForumId(selected ? String(selected.id) : '');
           setTargetForum(selected ? { ...selected, id: String(selected.id), tags: Array.isArray(selected.tags) ? selected.tags : [] } : null);
           setClassification('');
-        }}><option value="">게시판을 선택하세요</option>{availableForums.map(forum => <option key={forum.id} value={forum.id}>{forum.name}</option>)}</select></label>
-        <p>운영 사례·자료 요청·제품 문의에 맞는 게시판을 선택해 주세요.</p>
+        }}><option value="">게시판을 선택하시기 바랍니다</option>{availableForums.map(forum => <option key={forum.id} value={forum.id}>{forum.name}</option>)}</select></label>
+        <p>운영 사례·자료 요청·제품 문의에 맞는 게시판을 선택해 주시기 바랍니다.</p>
         {!availableForums.length && <p>이용 가능한 게시판이 없거나 목록을 불러오지 못했습니다. <Link className="underline" to={backPath || '/'}>회원 게시판으로 돌아가기</Link></p>}
       </section>}
 
@@ -412,17 +412,17 @@ function ForumWriter({
           initialTitle={title}
           initialContentHtml={editorHtml}
           titleLabel="제목"
-          titlePlaceholder="제목을 입력하세요"
+          titlePlaceholder="제목을 입력하시기 바랍니다"
           titleMaxLength={200}
           contentLabel={`내용 (최소 ${MIN_CONTENT_LENGTH}자)`}
-          contentPlaceholder="의견을 작성해주세요..."
+          contentPlaceholder="의견을 작성해 주시기 바랍니다..."
           submitLabel={isEditMode ? editStatus === 'draft' ? '검토한 초안 게시' : '수정하기' : '등록하기'}
           submittingLabel={isEditMode ? editStatus === 'draft' ? '게시 중...' : '수정 중...' : '등록 중...'}
           cancelLabel="취소"
           theme="blue"
           onCancel={handleCancel}
           onSubmit={isEditMode ? handleUpdateSubmit : handleCreateSubmit}
-          onInvalid={() => setError(`제목과 내용을 모두 입력해주세요. (내용은 최소 ${MIN_CONTENT_LENGTH}자 이상)`)}
+          onInvalid={() => setError(`제목과 내용을 모두 입력해 주시기 바랍니다. (내용은 최소 ${MIN_CONTENT_LENGTH}자 이상)`)}
           renderContentMeta={({ textLength }) => (
             <div style={styles.charCount}>
               {textLength}자

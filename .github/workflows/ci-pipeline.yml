@@ -36,7 +36,7 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 env:
-  NODE_VERSION: '22.18.0'
+  NODE_VERSION: '22.23.4'
   CI_BUILD_CACHE_DISABLED: ${{ vars.CI_BUILD_CACHE_DISABLED }}
 
 jobs:
@@ -106,9 +106,27 @@ jobs:
         node-version: ${{ env.NODE_VERSION }}
         # WO-O4O-CI-BLOCKING-GATE-FINALIZATION-V1: 검증 경로에서는 lockfile drift 를 실패로 만든다.
         strict-lockfile: 'true'
+        build-packages: 'false'
+
+    # root build:packages는 개별 빌드 후 API closure에서 같은 패키지를 다시 빌드한다.
+    # API closure는 기존 checksum 검증 캐시/실제 빌드로 준비하고, 그 밖의 패키지만
+    # 기존 root script로 빌드한다. quality-package-build.test.mjs가 전체 대상의 동등성을 검사한다.
+    - name: Build API dependency closure
+      uses: ./.github/actions/api-dependency-build
+
+    - name: Build remaining shared packages
+      run: |
+        pnpm run build:appearance-system
+        pnpm run build:auth-context
+        pnpm run build:lms-client
+        pnpm run build:account-ui
+        echo "O4O_PACKAGES_PREBUILT=1" >> "$GITHUB_ENV"
+
+    - name: Check Node and dependency installation consistency
+      run: pnpm run check:runtime
 
     # WO-O4O-TYPES-AUTO-BUILD-GUARD-V1
-    # setup-build-env가 이미 pnpm run build:packages를 실행하지만,
+    # 위 두 단계가 root build:packages와 같은 패키지를 준비하지만,
     # types/dist가 stale인 채로 type-check가 도는 회귀를 다시 방지하기 위한 명시 가드.
     - name: Build shared types (explicit guard)
       run: pnpm --filter=@o4o/types run build
@@ -132,8 +150,7 @@ jobs:
     - name: Run TypeScript check (App Store packages)
       run: pnpm run typecheck:app-store-packages
 
-    # setup-build-env가 이미 root build:packages를 실행하고, 그 체인에는
-    # build:api-deps (`pnpm --filter "@o4o/api-server^..." run build`)가 포함된다.
+    # 위 Build API dependency closure가 API type-check의 의존성을 준비했다.
     # 따라서 같은 quality-check runner에서 API dependency를 다시 빌드하지 않는다.
     # API type-check 자체는 그대로 blocking으로 유지한다.
     - name: Run TypeScript check (api-server)
@@ -214,8 +231,11 @@ jobs:
       run: >-
         node --test
         scripts/ci/__tests__/detect-affected.test.mjs
+        scripts/ci/__tests__/scheduled-jest.test.mjs
         scripts/ci/__tests__/actions-cost.test.mjs
         scripts/ci/__tests__/api-build-cache.test.mjs
+        scripts/ci/__tests__/api-runtime-dependencies.test.mjs
+        scripts/ci/__tests__/quality-package-build.test.mjs
         scripts/ci/__tests__/deploy-risk.test.mjs
         scripts/ci/__tests__/ci-gate.test.mjs
         scripts/ci/__tests__/cloud-run-rollout.test.mjs
@@ -483,6 +503,8 @@ jobs:
     # 이 명령의 **선별 범위**는 Phase 1 승인 전까지 바뀌지 않는다.
     # `--shard` 는 범위가 아니라 분할이다 — 3 shard 의 합집합이 전체 suite 다.
     - name: Run tests (api-server Jest, serial to prevent OOM)
+      env:
+        O4O_JEST_SHARD_STRATEGY: ${{ vars.O4O_JEST_SHARD_STRATEGY }}
       run: cd apps/api-server && npx jest --maxWorkers=1 --shard=${{ matrix.shard }}/3
 
   # 3. Build all applications
@@ -613,7 +635,7 @@ jobs:
         done
         { echo "### Web production build (affected)"; echo ""; echo "| service | vite build |"; echo "|---|---|"; cat "$RUNNER_TEMP/web-build.md"; } >> "$GITHUB_STEP_SUMMARY"
 
-  # ===========================================================================
+  # ====================================================================
   # 4. Docs-only fast path
   #
   # WO-O4O-DOCS-ONLY-CI-SECURITY-FAST-PATH-AND-PUSH-CONCURRENCY-PRESERVATION-V1
@@ -689,7 +711,7 @@ jobs:
           cd apps/api-server && npx jest --maxWorkers=1 $SPECS
         fi
 
-  # ===========================================================================
+  # ====================================================================
   # 4. Admin-only fast path
   #
   # WO-O4O-ADMIN-CI-CD-AFFECTED-SCOPE-AND-DUPLICATE-WORK-REDUCTION-V1
@@ -873,6 +895,7 @@ jobs:
         sparse-checkout: tools/o4o-local-agent
     - uses: actions/setup-node@v7
       with:
+        # Tests embed this executable; match the separately pinned PC release runtime.
         node-version: '22.18.0'
     - name: Verify installation, data preservation and packaged runtime health
       # Readable output also preserves bounded failure annotations from this suite.
@@ -926,10 +949,47 @@ jobs:
         CANDIDATE_WORKFLOW_CI_PORT: '55432'
       run: pnpm --filter @o4o/api-server exec jest --runInBand --runTestsByPath src/modules/neture/services/__tests__/candidate-workflow.postgres.spec.ts src/modules/neture/services/__tests__/product-trash-batch.postgres.spec.ts
 
+    - name: Verify member profile correction and temporary credential transactions
+      env:
+        MEMBER_WORKSPACE_TEST_DATABASE_URL: postgresql://agent@127.0.0.1:55432/postgres
+        OPERATOR_INVITE_TEST_PORT: '55432'
+      run: pnpm --filter @o4o/api-server exec jest --runInBand --runTestsByPath src/services/admin/__tests__/central-member-workspace.postgres.spec.ts src/services/admin/__tests__/member-profile-recovery.postgres.spec.ts src/services/admin/__tests__/member-registration.postgres.spec.ts
+
+  # Check the actual npm tree used by Docker in parallel with the long Jest jobs.
+  api-runtime-dependencies:
+    name: API production dependency smoke
+    permissions:
+      contents: read
+    runs-on: ubuntu-latest
+    needs: [detect]
+    if: needs.detect.outputs.defer_full != 'true' && (needs.detect.outputs.api_affected == 'true' || needs.detect.outputs.global_or_unknown == 'true')
+    timeout-minutes: 10
+    steps:
+    - uses: actions/checkout@v6
+      with:
+        sparse-checkout: |
+          apps/api-server/package.production.json
+          apps/api-server/package.production-lock.json
+          scripts/ci/smoke-api-runtime.mjs
+        sparse-checkout-cone-mode: false
+    - uses: actions/setup-node@v7
+      with:
+        node-version: '22.23.4'
+        cache: npm
+        cache-dependency-path: apps/api-server/package.production-lock.json
+    - name: Install the frozen production dependency tree
+      run: |
+        mkdir -p "$RUNNER_TEMP/api-runtime"
+        cp apps/api-server/package.production.json "$RUNNER_TEMP/api-runtime/package.json"
+        cp apps/api-server/package.production-lock.json "$RUNNER_TEMP/api-runtime/package-lock.json"
+        npm ci --prefix "$RUNNER_TEMP/api-runtime" --omit=dev --ignore-scripts --no-audit --no-fund
+    - name: Verify dependency loading and native image processing
+      run: node scripts/ci/smoke-api-runtime.mjs "$RUNNER_TEMP/api-runtime"
+
   ci-gate:
     name: CI Gate
     runs-on: ubuntu-latest
-    needs: [detect, quality-check, api-tests, build, web-build, docs-fast-validate, admin-fast-validate, admin-fast-guards, docs-sensitive-guard, pc-installer-windows, central-operator-integration]
+    needs: [detect, quality-check, api-tests, build, web-build, docs-fast-validate, admin-fast-validate, admin-fast-guards, docs-sensitive-guard, pc-installer-windows, central-operator-integration, api-runtime-dependencies]
     if: always()
     timeout-minutes: 5
     steps:

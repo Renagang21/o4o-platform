@@ -45,15 +45,15 @@ describe('real AiContentModal save-panel lifecycle', () => {
     render(<Harness />);
     await generate();
     fireEvent.click(screen.getByRole('button', { name: '내 매장 저장' }));
-    const title = screen.getByPlaceholderText('저장할 콘텐츠 제목을 입력하세요');
+    const title = screen.getByPlaceholderText('저장할 콘텐츠 제목을 입력하시기 바랍니다');
     expect((title as HTMLInputElement).value).toBe('Generated title');
     fireEvent.change(title, { target: { value: 'Old draft' } });
     fireEvent.click(screen.getByRole('button', { name: '×' }));
-    expect(screen.queryByPlaceholderText('저장할 콘텐츠 제목을 입력하세요')).toBeNull();
+    expect(screen.queryByPlaceholderText('저장할 콘텐츠 제목을 입력하시기 바랍니다')).toBeNull();
     fireEvent.click(screen.getByRole('button', { name: 'Reopen fixture' }));
     await generate();
     fireEvent.click(screen.getByRole('button', { name: '내 매장 저장' }));
-    expect((screen.getByPlaceholderText('저장할 콘텐츠 제목을 입력하세요') as HTMLInputElement).value).toBe('Generated title');
+    expect((screen.getByPlaceholderText('저장할 콘텐츠 제목을 입력하시기 바랍니다') as HTMLInputElement).value).toBe('Generated title');
   });
 
   it('store and material panels keep independent drafts while both are open', async () => {
@@ -61,8 +61,8 @@ describe('real AiContentModal save-panel lifecycle', () => {
     await generate();
     fireEvent.click(screen.getByRole('button', { name: '내 매장 저장' }));
     fireEvent.click(screen.getByRole('button', { name: '제작 자료로 저장' }));
-    const store = screen.getByPlaceholderText('저장할 콘텐츠 제목을 입력하세요');
-    const material = screen.getByPlaceholderText('저장할 매장 제작 자료 제목을 입력하세요');
+    const store = screen.getByPlaceholderText('저장할 콘텐츠 제목을 입력하시기 바랍니다');
+    const material = screen.getByPlaceholderText('저장할 매장 제작 자료 제목을 입력하시기 바랍니다');
     fireEvent.change(store, { target: { value: 'Store draft' } });
     fireEvent.change(material, { target: { value: 'Material draft' } });
     expect((store as HTMLInputElement).value).toBe('Store draft');
@@ -98,7 +98,7 @@ describe('real AiContentModal save-panel lifecycle', () => {
     expect(screen.queryByText('Old failure')).toBeNull();
     await act(async () => current.resolve(response('New title')));
     fireEvent.click(await screen.findByRole('button', { name: '내 매장 저장' }));
-    expect((screen.getByPlaceholderText('저장할 콘텐츠 제목을 입력하세요') as HTMLInputElement).value).toBe('New title');
+    expect((screen.getByPlaceholderText('저장할 콘텐츠 제목을 입력하시기 바랍니다') as HTMLInputElement).value).toBe('New title');
   });
 
   it('external open=false invalidates the old request without relying on handleClose', async () => {
@@ -158,7 +158,7 @@ describe('real AiContentModal save-panel lifecycle', () => {
     selectUrl();
     fireEvent.click(screen.getByRole('button', { name: '🔗 URL로 생성' }));
     fireEvent.click(await screen.findByRole('button', { name: '내 매장 저장' }));
-    expect((screen.getByPlaceholderText('저장할 콘텐츠 제목을 입력하세요') as HTMLInputElement).value).toBe('URL title');
+    expect((screen.getByPlaceholderText('저장할 콘텐츠 제목을 입력하시기 바랍니다') as HTMLInputElement).value).toBe('URL title');
   });
 
   it('current text failure still shows the error and releases the spinner', async () => {
@@ -178,7 +178,7 @@ describe('real AiContentModal save-panel lifecycle', () => {
     selectUrl();
     fireEvent.click(screen.getByRole('button', { name: '🔗 URL로 생성' }));
     await act(async () => { await vi.advanceTimersByTimeAsync(90000); });
-    expect(screen.getByText('URL 분석 시간이 초과되었습니다. (90초) 다시 시도하거나 다른 URL을 입력해 주세요.')).toBeTruthy();
+    expect(screen.getByText('URL 분석 시간이 초과되었습니다. (90초) 다시 시도하거나 다른 URL을 입력해 주시기 바랍니다.')).toBeTruthy();
     expect((screen.getByRole('button', { name: '🔗 URL로 생성' }) as HTMLButtonElement).disabled).toBe(false);
   });
 

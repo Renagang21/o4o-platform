@@ -11,6 +11,7 @@ export interface KakaoContinueProps<TUser = unknown> {
   onSuccess: (user: TUser) => void;
   onError?: (result: AuthLoginResult<TUser>) => void;
   returnTo?: string;
+  intent?: 'login' | 'signup';
   termsHref?: string; privacyHref?: string;
 }
 export function KakaoContinue<TUser> (props: KakaoContinueProps<TUser>) {
@@ -54,9 +55,9 @@ export function KakaoContinue<TUser> (props: KakaoContinueProps<TUser>) {
     setBusy(false);
     if (result.success && result.user) { ref.current.onSuccess(result.user); return; }
     if (result.nextStep === 'signup' && result.signupTicket) { setTicket(result.signupTicket); setEmail(result.email ?? ''); return; }
-    if (result.nextStep === 'verify-email') { setTicket(undefined); setMessage(result.mailSent ? '확인 메일을 보냈습니다. 이메일을 확인한 뒤 카카오로 다시 로그인해 주세요.' : '확인 메일을 보내지 못했습니다. 잠시 후 카카오로 다시 로그인해 주세요.'); return; }
+    if (result.nextStep === 'verify-email') { setTicket(undefined); setMessage(result.mailSent ? '확인 메일을 보냈습니다. 이메일을 확인한 뒤 카카오로 다시 로그인해 주시기 바랍니다.' : '확인 메일을 보내지 못했습니다. 잠시 후 카카오로 다시 로그인해 주시기 바랍니다.'); return; }
     if (result.code?.startsWith('POLICY_')) { setPolicy(null); setTerms(false); setPrivacy(false); setPolicyReload(value => value + 1); }
-    setMessage(result.error ?? '인증을 다시 시작해 주세요.'); ref.current.onError?.(result);
+    setMessage(result.error ?? '인증을 다시 시작해 주시기 바랍니다.'); ref.current.onError?.(result);
   }, []);
   useLayoutEffect(() => {
     if (consumed.current) return; consumed.current = true;
@@ -65,23 +66,23 @@ export function KakaoContinue<TUser> (props: KakaoContinueProps<TUser>) {
       if (!callback) return;
       if (callback.cancelled) { setMessage('카카오 인증을 취소했습니다.'); return; }
       setBusy(true); void ref.current.loginWithKakao(callback).then(finish);
-    } catch { setMessage('카카오 인증이 만료되었거나 올바르지 않습니다. 다시 시작해 주세요.'); }
+    } catch { setMessage('카카오 인증이 만료되었거나 올바르지 않습니다. 다시 시작해 주시기 바랍니다.'); }
   }, [finish]);
   async function start() {
     setMessage(''); setBusy(true);
     try { redirectToKakao(await ref.current.client.startKakaoLogin(ref.current.returnTo ?? '/'), 'kakao-login'); }
-    catch { setBusy(false); setMessage('카카오 인증을 시작하지 못했습니다. 잠시 후 다시 시도해 주세요.'); }
+    catch { setBusy(false); setMessage('카카오 인증을 시작하지 못했습니다. 잠시 후 다시 시도해 주시기 바랍니다.'); }
   }
   return <div data-testid="kakao-continue" style={{ display: 'grid', gap: 10 }}>
     {configState === 'loading' && !ticket && <p role="status">카카오 로그인을 불러오고 있습니다…</p>}
     {configState === 'error' && !ticket && <>
-      <p role="alert">카카오 로그인을 불러오지 못했습니다. 다시 시도해 주세요.</p>
+      <p role="alert">카카오 로그인을 불러오지 못했습니다. 다시 시도해 주시기 바랍니다.</p>
       <button type="button" disabled={busy} onClick={() => setConfigAttempt(attempt => attempt + 1)}>카카오 로그인 다시 불러오기</button>
     </>}
-    {configState === 'enabled' && !ticket && <button type="button" disabled={busy} style={{ background: '#fee500', color: '#191919', minHeight: 44, border: 0, borderRadius: 6 }} onClick={() => void start()}>카카오로 계속하기</button>}
+    {configState === 'enabled' && !ticket && <button type="button" disabled={busy} style={{ background: '#fee500', color: '#191919', minHeight: props.intent === 'signup' ? 32 : 44, ...(props.intent === 'signup' ? { height: 32, paddingBlock: 0, boxSizing: 'border-box' as const } : {}), border: 0, borderRadius: 6 }} onClick={() => void start()}>{props.intent === 'signup' ? '카카오로 가입' : '카카오로 계속하기'}</button>}
     {busy && <p role="status">카카오 계정을 확인하고 있습니다…</p>}
-    {ticket && <form onSubmit={e => { e.preventDefault(); if (busy || !policy || !terms || !privacy) return; setBusy(true); void ref.current.signupWithKakao(ticket, { email, name, nickname: nickname.trim(), phone, consents: { terms, privacy, marketing, ...signupPolicyReferences(policy!) } }).then(finish).catch((error: any) => { if (mounted.current) { setBusy(false); if (['POLICY_VERSION_MISMATCH', 'POLICY_UNAVAILABLE'].includes(error?.response?.data?.code ?? error?.response?.data?.error?.code)) { setPolicy(null); setTerms(false); setPrivacy(false); setPolicyReload(n => n + 1); setMessage('정책이 변경되었습니다. 입력 내용은 유지됩니다. 최신 내용을 확인해 주세요.'); } else setMessage('가입을 처리하지 못했습니다. 입력 내용을 확인하고 다시 시도해 주세요.'); } }); }} style={{ display: 'grid', gap: 10 }}>
-      <p>계정을 만들려면 정보를 입력하고 약관에 동의해 주세요.</p>
+    {ticket && <form onSubmit={e => { e.preventDefault(); if (busy || !policy || !terms || !privacy) return; setBusy(true); void ref.current.signupWithKakao(ticket, { email, name, nickname: nickname.trim(), phone, consents: { terms, privacy, marketing, ...signupPolicyReferences(policy!) } }).then(finish).catch((error: any) => { if (mounted.current) { setBusy(false); if (['POLICY_VERSION_MISMATCH', 'POLICY_UNAVAILABLE'].includes(error?.response?.data?.code ?? error?.response?.data?.error?.code)) { setPolicy(null); setTerms(false); setPrivacy(false); setPolicyReload(n => n + 1); setMessage('정책이 변경되었습니다. 입력 내용은 유지됩니다. 최신 내용을 확인해 주시기 바랍니다.'); } else setMessage('가입을 처리하지 못했습니다. 입력 내용을 확인하고 다시 시도해 주시기 바랍니다.'); } }); }} style={{ display: 'grid', gap: 10 }}>
+      <p>계정을 만들려면 정보를 입력하고 약관에 동의해 주시기 바랍니다.</p>
       <label style={styles.field}>이메일<input style={styles.input} type="email" autoComplete="email" required maxLength={255} value={email} onChange={e => setEmail(e.target.value)} /></label>
       <label style={styles.field}>닉네임<input style={styles.input} required maxLength={50} value={nickname} onChange={e => setNickname(e.target.value)} /></label>
       <label style={styles.field}>이름<input style={styles.input} autoComplete="name" required maxLength={100} value={name} onChange={e => setName(e.target.value)} /></label>

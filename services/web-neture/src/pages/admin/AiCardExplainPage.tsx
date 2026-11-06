@@ -145,7 +145,7 @@ export default function AiCardExplainPage() {
             <div className="p-4 bg-gray-50 rounded-lg">
               <p className="font-medium text-gray-900 mb-2">매장 페이지에서 질문</p>
               <p className="text-sm text-gray-600">
-                "이 매장에서 가장 인기 있는 상품이 뭐예요?"
+                "이 매장에서 가장 인기 있는 상품이 무엇입니까?"
               </p>
               <p className="text-sm text-green-600 mt-2">
                 → 해당 매장의 상품 카드 우선 노출 (same_store)
@@ -154,7 +154,7 @@ export default function AiCardExplainPage() {
             <div className="p-4 bg-gray-50 rounded-lg">
               <p className="font-medium text-gray-900 mb-2">상품 상세에서 질문</p>
               <p className="text-sm text-gray-600">
-                "이 상품과 비슷한 다른 상품 있나요?"
+                "이 상품과 비슷한 다른 상품 있습니까?"
               </p>
               <p className="text-sm text-blue-600 mt-2">
                 → 관련 상품 카드 노출 (same_product)
@@ -163,7 +163,7 @@ export default function AiCardExplainPage() {
             <div className="p-4 bg-gray-50 rounded-lg">
               <p className="font-medium text-gray-900 mb-2">카테고리 페이지에서 질문</p>
               <p className="text-sm text-gray-600">
-                "건강식품 중에서 추천해주세요"
+                "건강식품 중에서 추천해 주시기 바랍니다"
               </p>
               <p className="text-sm text-purple-600 mt-2">
                 → 같은 카테고리 상품 카드 노출 (same_category)
@@ -172,7 +172,7 @@ export default function AiCardExplainPage() {
             <div className="p-4 bg-gray-50 rounded-lg">
               <p className="font-medium text-gray-900 mb-2">홈에서 일반 질문</p>
               <p className="text-sm text-gray-600">
-                "이 서비스에서 뭘 할 수 있나요?"
+                "이 서비스에서 뭘 할 수 있습니까?"
               </p>
               <p className="text-sm text-gray-500 mt-2">
                 → 서비스 대표 정보 카드 노출 (service_fallback)

@@ -192,7 +192,7 @@ export interface MailSender {
 export type PasswordStore = Pick<
   typeof passwordCredentialService,
   'hasPassword' | 'setPassword' | 'verifyPassword'
->;
+> & Partial<Pick<typeof passwordCredentialService, 'temporaryStatus'>>;
 
 export type PasswordSessionIssuer = (
   user: User,

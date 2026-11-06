@@ -232,9 +232,9 @@ export default function SupplierLandingPage() {
       {/* ── 6. CTA ── */}
       <section className="py-20 bg-white border-t border-gray-100">
         <div className="max-w-3xl mx-auto px-4 text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">공급자로 참여하세요</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">공급자로 참여하시기 바랍니다</h2>
           <p className="text-gray-600 mb-8">
-            전국 매장 네트워크를 통해 제품을 공급하고 비즈니스를 성장시키세요.
+            전국 매장 네트워크를 통해 제품을 공급하고 비즈니스를 성장시키시기 바랍니다.
           </p>
           {isAuthenticated ? (
             <a

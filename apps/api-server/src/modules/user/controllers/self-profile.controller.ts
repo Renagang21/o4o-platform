@@ -167,7 +167,7 @@ export class SelfProfileController {
 
       let value = normalizeText(body[field]);
       if (field === 'phone') {
-        if (!isPhoneShapeValid(value)) { res.status(400).json({ success: false, code: 'VALIDATION_FAILED', error: '개인 휴대전화 번호를 입력해 주세요.' }); return; }
+        if (!isPhoneShapeValid(value)) { res.status(400).json({ success: false, code: 'VALIDATION_FAILED', error: '개인 휴대전화 번호를 입력해 주시기 바랍니다.' }); return; }
         value = normalizePhoneDigits(value);
       }
       if (value === undefined) {
@@ -188,7 +188,7 @@ export class SelfProfileController {
       }
       // name 은 NOT NULL 컬럼이다 (표시명 정본).
       if (field === 'name' && value === null) {
-        res.status(400).json({ success: false, error: '이름을 입력해 주세요.', code: 'VALIDATION_FAILED' });
+        res.status(400).json({ success: false, error: '이름을 입력해 주시기 바랍니다.', code: 'VALIDATION_FAILED' });
         return;
       }
 

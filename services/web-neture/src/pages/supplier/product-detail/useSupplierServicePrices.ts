@@ -49,7 +49,7 @@ export function useSupplierServicePrices(
         if (!raw) continue; // 빈 값 = 기본가 적용(서비스가 미설정)
         const n = Number(raw);
         if (!Number.isInteger(n) || n <= 0) {
-          toast.error(`${SERVICE_PRICE_LABELS[sk] || sk}: 0보다 큰 정수를 입력하세요`);
+          toast.error(`${SERVICE_PRICE_LABELS[sk] || sk}: 0보다 큰 정수를 입력하시기 바랍니다`);
           setSvcPriceSaving(false);
           return;
         }

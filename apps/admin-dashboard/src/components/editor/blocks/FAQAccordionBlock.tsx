@@ -72,7 +72,7 @@ const FAQAccordionBlock: React.FC<FAQAccordionBlockProps> = ({
   const addItem = () => {
     const newItem: FAQItem = {
       question: '새 질문',
-      answer: '답변을 입력하세요',
+      answer: '답변을 입력하시기 바랍니다',
       defaultOpen: false,
     };
     updateAttributes({ items: [...items, newItem] });
@@ -209,7 +209,7 @@ const FAQAccordionBlock: React.FC<FAQAccordionBlockProps> = ({
                     <Input
                       value={item.question}
                       onChange={(e) => updateItem(index, 'question', e.target.value)}
-                      placeholder="질문을 입력하세요"
+                      placeholder="질문을 입력하시기 바랍니다"
                       className="text-sm"
                     />
                   </div>
@@ -219,7 +219,7 @@ const FAQAccordionBlock: React.FC<FAQAccordionBlockProps> = ({
                     <Textarea
                       value={item.answer}
                       onChange={(e) => updateItem(index, 'answer', e.target.value)}
-                      placeholder="답변을 입력하세요"
+                      placeholder="답변을 입력하시기 바랍니다"
                       className="text-sm"
                       rows={4}
                     />
@@ -319,7 +319,7 @@ const FAQAccordionBlock: React.FC<FAQAccordionBlockProps> = ({
         {items.length === 0 && (
           <div className="text-center py-8 text-gray-400">
             <HelpCircle className="w-12 h-12 mx-auto mb-2 opacity-50" />
-            <p className="text-sm">FAQ 항목을 추가해주세요</p>
+            <p className="text-sm">FAQ 항목을 추가해 주시기 바랍니다</p>
           </div>
         )}
       </div>

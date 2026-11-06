@@ -52,7 +52,7 @@ export function useConsultationAudio(scope: string, onTranscript: (text: string)
     return () => { hide(); window.removeEventListener('pagehide', hide); document.removeEventListener('visibilitychange', visibility); };
   }, [scope, options.recognition, options.synthesis]);
   const failure = (cause: unknown) => {
-    setMessage((cause as Error).message || '음성 처리를 완료하지 못했습니다. 문자 입력·표시를 이용해 주세요.');
+    setMessage((cause as Error).message || '음성 처리를 완료하지 못했습니다. 문자 입력·표시를 이용해 주시기 바랍니다.');
     if ([401, 403].includes((cause as { status?: number }).status ?? 0)) callbacks.current.options.onAccessDenied?.();
   };
   const startListening = (language: string) => {
@@ -66,7 +66,7 @@ export function useConsultationAudio(scope: string, onTranscript: (text: string)
         const recorder = new MediaRecorder(media); recording.current = recorder;
         const chunks: Blob[] = []; let size = 0;
         recorder.ondataavailable = event => { size += event.data.size; if (size <= 4_000_000) chunks.push(event.data); else resetRef.current(); };
-        recorder.onerror = () => { if (version === generation.current) { resetRef.current(); setMessage('마이크 녹음에 실패했습니다. 문자를 입력해 주세요.'); } };
+        recorder.onerror = () => { if (version === generation.current) { resetRef.current(); setMessage('마이크 녹음에 실패했습니다. 문자를 입력해 주시기 바랍니다.'); } };
         recorder.onstop = () => {
           media.getTracks().forEach(track => track.stop());
           if (timer.current) clearTimeout(timer.current);
@@ -76,7 +76,7 @@ export function useConsultationAudio(scope: string, onTranscript: (text: string)
             try {
               context = new AudioContext();
               const audio = await context.decodeAudioData(await new Blob(chunks, { type: recorder.mimeType }).arrayBuffer());
-              if (audio.duration > 60 || audio.duration < 0.2) throw new Error('0.2초 이상, 최대 60초까지 말해 주세요.');
+              if (audio.duration > 60 || audio.duration < 0.2) throw new Error('0.2초 이상, 최대 60초까지 말해 주시기 바랍니다.');
               const offline = new OfflineAudioContext(1, Math.floor(audio.duration * 16000), 16000);
               const source = offline.createBufferSource(); source.buffer = audio; source.connect(offline.destination); source.start();
               const resampled = await offline.startRendering();
@@ -102,7 +102,7 @@ export function useConsultationAudio(scope: string, onTranscript: (text: string)
       const address = URL.createObjectURL(new Blob([bytes], { type: 'audio/mpeg' })); url.current = address;
       const audio = new Audio(address); player.current = audio;
       audio.onended = () => { if (version === generation.current) resetRef.current(); };
-      audio.onerror = () => { if (version === generation.current) { resetRef.current(); setMessage('음성 재생에 실패했습니다. 표시된 문장을 이용해 주세요.'); } };
+      audio.onerror = () => { if (version === generation.current) { resetRef.current(); setMessage('음성 재생에 실패했습니다. 표시된 문장을 이용해 주시기 바랍니다.'); } };
       return audio.play();
     }).catch(cause => { if (version === generation.current) { setSpeaking(false); failure(cause); } });
   };

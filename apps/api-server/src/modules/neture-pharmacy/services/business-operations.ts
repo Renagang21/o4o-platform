@@ -49,7 +49,7 @@ export async function businessDemandSummary(
     throw new NeturePharmacyError(
       400,
       "INVALID_MONTH",
-      "조회 월을 확인해 주세요.",
+      "조회 월을 확인해 주시기 바랍니다.",
     );
   const access = await businessOperationsAccess(db, actor, key);
   const stores = await db.query(
@@ -77,7 +77,7 @@ export async function businessDemandSummary(
       throw new NeturePharmacyError(
         503,
         "DEMAND_COUNTS_UNAVAILABLE",
-        "고객 요구 집계를 확인하지 못했습니다. 다시 시도해 주세요.",
+        "고객 요구 집계를 확인하지 못했습니다. 다시 시도해 주시기 바랍니다.",
       );
   }
   return {

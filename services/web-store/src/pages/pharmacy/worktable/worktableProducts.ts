@@ -22,7 +22,7 @@ export interface WorktableProduct {
 
 const PAGE_SIZE = 100;
 const MAX_PAGES = 200;
-const INCOMPLETE = "전체 상품 목록을 확인하지 못했습니다. 다시 시도해 주세요.";
+const INCOMPLETE = "전체 상품 목록을 확인하지 못했습니다. 다시 시도해 주시기 바랍니다.";
 
 function integer(value: unknown, minimum: number): number {
   if (

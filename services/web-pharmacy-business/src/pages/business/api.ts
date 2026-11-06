@@ -56,5 +56,5 @@ export const pharmacyApiBase = '/neture/pharmacy';
 
 export function businessError(error: unknown): string {
   const data = (error as { response?: { data?: { error?: unknown } } })?.response?.data;
-  return typeof data?.error === 'string' ? data.error : '요청을 처리하지 못했습니다. 다시 시도해 주세요.';
+  return typeof data?.error === 'string' ? data.error : '요청을 처리하지 못했습니다. 다시 시도해 주시기 바랍니다.';
 }

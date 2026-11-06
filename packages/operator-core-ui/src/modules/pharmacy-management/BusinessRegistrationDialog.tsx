@@ -95,8 +95,8 @@ export function BusinessRegistrationDialog({
             } catch {
               setError(
                 committed
-                  ? "사업은 등록됐지만 목록을 확인하지 못했습니다. 다시 조회해 주세요."
-                  : "등록하지 못했습니다. 등록 현황과 입력 내용을 확인하고 다시 시도해 주세요.",
+                  ? "사업은 등록됐지만 목록을 확인하지 못했습니다. 다시 조회해 주시기 바랍니다."
+                  : "등록하지 못했습니다. 등록 현황과 입력 내용을 확인하고 다시 시도해 주시기 바랍니다.",
               );
             } finally {
               setBusy(false);
@@ -127,7 +127,7 @@ export function BusinessRegistrationDialog({
                   setError("");
                 }}
               >
-                <option value="">서비스를 선택하세요</option>
+                <option value="">서비스를 선택하시기 바랍니다</option>
                 {services.map((service) => (
                   <option
                     key={service}
@@ -174,12 +174,12 @@ export function BusinessRegistrationDialog({
               />
             </label>
             <p className="text-sm text-gray-600">
-              등록 후 해당 사업 가입자를 선택해 제공 기능을 설정하세요. 회원
+              등록 후 해당 사업 가입자를 선택해 제공 기능을 설정하시기 바랍니다. 회원
               가입 승인과 사이트 주소 연결은 별도입니다.
             </p>
             {duplicate && (
               <p role="alert">
-                이미 등록된 사업입니다. 기존 대상을 선택해 설정하세요.
+                이미 등록된 사업입니다. 기존 대상을 선택해 설정하시기 바랍니다.
               </p>
             )}
           </fieldset>

@@ -42,7 +42,7 @@ const QR_TEMPLATES: QRTemplate[] = [
     text: [
       '이 매장은',
       'o4o 플랫폼 구조에 참여하고 있습니다.',
-      '자세한 안내는 QR로 확인하세요.',
+      '자세한 안내는 QR로 확인하시기 바랍니다.',
     ],
   },
   {
@@ -164,7 +164,7 @@ export default function SellerQRGuidePage() {
         <section style={styles.qrHub} className="no-print">
           <h2 style={styles.sectionTitle}>QR 코드 다운로드</h2>
           <p style={styles.sectionDesc}>
-            각 업종별 안내 페이지로 연결되는 QR 코드입니다. 클릭하여 PNG 이미지로 다운로드하세요.
+            각 업종별 안내 페이지로 연결되는 QR 코드입니다. 클릭하여 PNG 이미지로 다운로드하시기 바랍니다.
           </p>
 
           <div style={styles.qrGrid}>
@@ -270,7 +270,7 @@ export default function SellerQRGuidePage() {
             이 문안 인쇄하기
           </button>
           <p style={styles.printNote}>
-            인쇄하거나 위에서 QR 코드를 다운로드하여 사용하세요.
+            인쇄하거나 위에서 QR 코드를 다운로드하여 사용하시기 바랍니다.
           </p>
         </div>
 
@@ -295,10 +295,10 @@ export default function SellerQRGuidePage() {
           <h2 style={styles.guidelinesTitle}>배치 가이드라인</h2>
           <ul style={styles.guidelinesList}>
             <li style={styles.guidelineItem}>
-              <strong>플랫폼 설명 ❌</strong> - o4o가 무엇인지 장황하게 설명하지 마세요
+              <strong>플랫폼 설명 ❌</strong> - o4o가 무엇인지 장황하게 설명하지 마시기 바랍니다
             </li>
             <li style={styles.guidelineItem}>
-              <strong>판매 유도 ❌</strong> - 구매, 가입, 결제를 암시하지 마세요
+              <strong>판매 유도 ❌</strong> - 구매, 가입, 결제를 암시하지 마시기 바랍니다
             </li>
             <li style={styles.guidelineItem}>
               <strong>안내 / 참여 / 정보 ✔</strong> - 중립적인 정보 안내 톤 유지

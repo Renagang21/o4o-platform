@@ -280,7 +280,7 @@ describe('resources operator workflow', () => {
     fireEvent.change(screen.getByLabelText('자료 상태'),{target:{value:'published'}});
     await waitFor(()=>expect(api.operatorList).toHaveBeenCalledTimes(2));
     fireEvent.click(screen.getAllByRole('button',{name:'숨김'}).at(-1)!);
-    await screen.findByText('목록을 다시 확인한 뒤 처리해 주세요.');expect(api.operatorUpdateStatus).not.toHaveBeenCalled();
+    await screen.findByText('목록을 다시 확인한 뒤 처리해 주시기 바랍니다.');expect(api.operatorUpdateStatus).not.toHaveBeenCalled();
   });
 
 });

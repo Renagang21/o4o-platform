@@ -65,7 +65,7 @@ it("preserves selection after a failed write and supports retry and cancellation
   fireEvent.click(screen.getByRole("button", { name: "회원 조회" }));
   fireEvent.click(await screen.findByLabelText("유료 자격 활성"));
   fireEvent.click(screen.getByRole("button", { name: "유료 자격 저장" }));
-  await screen.findByText("저장하지 못했습니다. 다시 시도해 주세요.");
+  await screen.findByText("저장하지 못했습니다. 다시 시도해 주시기 바랍니다.");
   expect(
     (screen.getByLabelText("유료 자격 활성") as HTMLInputElement).checked,
   ).toBe(true);

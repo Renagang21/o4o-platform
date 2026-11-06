@@ -42,7 +42,7 @@ const EVENT_SOURCE_TYPES = new Set(['event_offer']);
  * 주문하도록 안내한다 — 새 cart 구조를 만들지 않는 최소 처리다.
  */
 export const MIXED_CART_AXIS_MESSAGE =
-  '이벤트 상품과 공급자 상품은 함께 주문할 수 없습니다. 한 축씩 나눠 주문해 주세요.';
+  '이벤트 상품과 공급자 상품은 함께 주문할 수 없습니다. 한 축씩 나눠 주문해 주시기 바랍니다.';
 
 export interface UseStoreCartOptions {
   api: StoreCartApi;

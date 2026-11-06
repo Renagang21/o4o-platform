@@ -59,7 +59,7 @@ export function StoreOwnerAgreementGate({
       // 계약 상태를 확인하지 못한 경우 children 을 열지 않는다.
       // server-side 428 gate 와 같은 fail-closed UX를 유지한다.
       setPending([]);
-      setLoadError('매장 이용계약 상태를 확인하지 못했습니다. 다시 시도해 주세요.');
+      setLoadError('매장 이용계약 상태를 확인하지 못했습니다. 다시 시도해 주시기 바랍니다.');
     } finally {
       setLoading(false);
     }

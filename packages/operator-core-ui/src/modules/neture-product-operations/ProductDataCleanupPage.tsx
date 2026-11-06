@@ -102,7 +102,7 @@ export default function ProductDataCleanupPage({initialTab = 'duplicates'}: {ini
       if (!current()) return;
       if (action.kind === 'merge') {
         // Never replay the successfully committed prefix or an uncertain response.
-        setNotice(`${completed}개 병합 응답을 확인했습니다. ${failure(e)} 남은 대상은 최신 목록에서 다시 선택해 주세요.`);
+        setNotice(`${completed}개 병합 응답을 확인했습니다. ${failure(e)} 남은 대상은 최신 목록에서 다시 선택해 주시기 바랍니다.`);
         setAction(null); await load();
       } else setActionError(failure(e));
     } finally { lock.current = false; if (current()) setWriting(false); }
@@ -148,12 +148,12 @@ export default function ProductDataCleanupPage({initialTab = 'duplicates'}: {ini
       <legend className="sr-only">상품 정리</legend>
       <div className="flex flex-wrap gap-2" role="tablist" aria-label="정리 유형">{tabs.map(t => <button type="button" role="tab" aria-selected={tab === t.key} key={t.key} onClick={() => { if (!lock.current) { setPage(1); setTab(t.key); } }} className={`border rounded px-3 py-2 ${tab === t.key ? 'bg-emerald-100' : ''}`}>{t.label}</button>)}</div>
       {loading ? <p role="status">목록 조회 중…</p> : error ? <div role="alert" className="text-red-700">
-        {notice && <p>처리 결과는 위와 같습니다. 최신 목록을 확인하지 못했으므로 조회만 다시 시도해 주세요.</p>}{error}
+        {notice && <p>처리 결과는 위와 같습니다. 최신 목록을 확인하지 못했으므로 조회만 다시 시도해 주시기 바랍니다.</p>}{error}
         <button type="button" onClick={() => void load()} className="ml-3 underline">목록 다시 조회</button>
       </div> : <>
         {tab === 'duplicates' && (duplicates.length ? duplicates.map(d => <section className="border rounded p-4 space-y-2" key={d.barcode}>
           <p className="font-medium">{d.barcode} · {d.count}개 중복</p><ul>{d.names.map((name, i) => <li key={d.masterIds[i]}>{i === 0 ? '유지: ' : '병합: '}{name}</li>)}</ul>
-          {canAdmin ? <button type="button" disabled={blocked} onClick={() => open({ kind: 'merge', item: d })} className="border rounded p-2">중복 병합</button> : <p className="text-sm">병합은 서비스 admin에게 요청해 주세요.</p>}
+          {canAdmin ? <button type="button" disabled={blocked} onClick={() => open({ kind: 'merge', item: d })} className="border rounded p-2">중복 병합</button> : <p className="text-sm">병합은 서비스 admin에게 요청해 주시기 바랍니다.</p>}
         </section>) : <p>중복 상품이 없습니다.</p>)}
         {(tab === 'missing-category' || tab === 'missing-brand') && (missing.length ? <>
           <div className="flex flex-wrap gap-3"><select aria-label="수정할 분류" value={field} onChange={e => setField(e.target.value)} className="border p-2"><option value="">분류 선택</option>{options.map(o => <option key={o.id} value={o.id}>{o.name}</option>)}</select><button type="button" disabled={blocked || !ids.length || !field} onClick={() => void fix()} className="border rounded p-2">선택 {ids.length}개 수정</button></div>
@@ -170,14 +170,14 @@ export default function ProductDataCleanupPage({initialTab = 'duplicates'}: {ini
     </fieldset>
     {emptyOpen && <OperatorDialog label="휴지통 비우기 확인" fallbackFocus={fallback} busy={writing} onCancel={() => { if (!lock.current) setEmptyOpen(false); }} className="bg-white rounded-lg p-6 max-w-lg w-full space-y-3">
       <h2 className="font-bold">휴지통 비우기</h2>
-      {preview ? <p>휴지통 전체에서 확인한 {preview.count.toLocaleString()}개 상품의 완전 삭제를 진행합니다. 되돌릴 수 없습니다. 연결 보호 대상은 남깁니다.</p> : <p>{writing ? '휴지통 전체 대상 확인 중…' : '최신 휴지통 대상을 다시 확인해 주세요.'}</p>}
+      {preview ? <p>휴지통 전체에서 확인한 {preview.count.toLocaleString()}개 상품의 완전 삭제를 진행합니다. 되돌릴 수 없습니다. 연결 보호 대상은 남깁니다.</p> : <p>{writing ? '휴지통 전체 대상 확인 중…' : '최신 휴지통 대상을 다시 확인해 주시기 바랍니다.'}</p>}
       {actionError && <p role="alert" className="text-red-700">{actionError}</p>}
       <button type="button" data-dialog-initial-focus disabled={writing} onClick={() => setEmptyOpen(false)} className="border rounded p-2">취소</button>
       {preview ? <button type="button" disabled={writing || !preview.count} onClick={() => void emptyTrash()} className="ml-3 bg-red-600 text-white rounded p-2">{writing ? '처리 중…' : '확인한 상품 완전 삭제'}</button> : !writing && <button type="button" onClick={() => void previewTrash()} className="ml-3 border rounded p-2">대상 다시 확인</button>}
     </OperatorDialog>}
     {action && <OperatorDialog label={action.kind === 'merge' ? '상품 병합' : action.kind === 'delete' ? '상품 완전 삭제' : '휴지통 복원'} fallbackFocus={fallback} busy={writing} onCancel={() => { if (!lock.current) setAction(null); }} className="bg-white rounded-lg p-6 max-w-lg w-full space-y-3">
       <h2 className="font-bold">{action.kind === 'merge' ? `${action.item.names[0]} 기준 병합` : action.item.name}</h2>
-      <p>{action.kind === 'restore' ? '휴지통에서 복원하며, 비활성 상태를 유지합니다.' : action.kind === 'merge' ? '이 조치는 되돌릴 수 없습니다. 병합 대상과 사유를 확인해 주세요.' : '이 조치는 되돌릴 수 없습니다. 삭제 대상을 확인해 주세요.'}</p>
+      <p>{action.kind === 'restore' ? '휴지통에서 복원하며, 비활성 상태를 유지합니다.' : action.kind === 'merge' ? '이 조치는 되돌릴 수 없습니다. 병합 대상과 사유를 확인해 주시기 바랍니다.' : '이 조치는 되돌릴 수 없습니다. 삭제 대상을 확인해 주시기 바랍니다.'}</p>
       {action.kind === 'merge' && <label className="block">처리 사유<textarea aria-label="처리 사유" maxLength={2000} value={reason} disabled={writing} onChange={e => setReason(e.target.value)} className="block border rounded w-full p-2" /></label>}
       {actionError && <p role="alert" className="text-red-700">{actionError}</p>}
       <button type="button" data-dialog-initial-focus disabled={writing} onClick={() => { if (!lock.current) setAction(null); }} className="border rounded p-2">취소</button>

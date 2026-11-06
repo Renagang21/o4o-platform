@@ -238,7 +238,7 @@ export function ProgramRequiredBanner({
       message={getProgramRequiredMessage(programName)}
       className={className}
       compact={compact}
-      helpText={helpText || `${programName} 참여 조건에 대해 자세히 알아보세요.`}
+      helpText={helpText || `${programName} 참여 조건에 대해 자세히 알아보시기 바랍니다.`}
     />
   );
 }

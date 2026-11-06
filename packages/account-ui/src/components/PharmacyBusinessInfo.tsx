@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useId, type ComponentType, type CSSProperties } from 'react';
+import { useState, useEffect, useCallback, useId, type ComponentType, type ReactNode, type CSSProperties } from 'react';
 import { Navigate } from 'react-router-dom';
 import { BusinessRegistrationFields } from './BusinessRegistrationFields.js';
 import { getBusinessEntityTypeLabel, isSelectableBusinessEntityType } from '@o4o/types';
@@ -37,6 +37,8 @@ export interface PharmacyBusinessInfoTheme {
 }
 
 export interface PharmacyBusinessInfoProps {
+  /** Service adapter may show a recoverable error instead of legacy /pharmacy redirect. */
+  unavailable?: ReactNode;
   loadInfo: () => Promise<PharmacyBusinessInfoData | null>;
   saveInfo: (patch: PharmacyBusinessInfoPatch) => Promise<unknown>;
   theme: PharmacyBusinessInfoTheme;
@@ -102,7 +104,7 @@ function isBusinessEmail(value: string): boolean {
   return dot >= 0 && dot < value.length - 1;
 }
 
-export function PharmacyBusinessInfo({ loadInfo, saveInfo, theme, AddressSearch }: Readonly<PharmacyBusinessInfoProps>) {
+export function PharmacyBusinessInfo({ loadInfo, saveInfo, theme, AddressSearch, unavailable }: Readonly<PharmacyBusinessInfoProps>) {
   const formId = useId();
   const { colors } = theme;
   const styles = createStyles(theme);
@@ -148,10 +150,10 @@ export function PharmacyBusinessInfo({ loadInfo, saveInfo, theme, AddressSearch 
   const validate = (): string[] => {
     const errs: string[] = [];
     if (form.businessEntityType && !isSelectableBusinessEntityType(form.businessEntityType)) {
-      errs.push('세금계산서 발행을 위한 개인 / 법인 구분을 선택해 주세요.');
+      errs.push('세금계산서 발행을 위한 개인 / 법인 구분을 선택해 주시기 바랍니다.');
     }
     if (!form.name.trim() || form.name.trim().length < 2) {
-      errs.push('약국명은 2자 이상 입력해 주세요.');
+      errs.push('약국명은 2자 이상 입력해 주시기 바랍니다.');
     }
     if (form.taxInvoiceEmail && !isBusinessEmail(form.taxInvoiceEmail)) {
       errs.push('세금계산서 이메일 형식이 올바르지 않습니다.');
@@ -164,7 +166,7 @@ export function PharmacyBusinessInfo({ loadInfo, saveInfo, theme, AddressSearch 
       errs.push('담당자 이메일 형식이 올바르지 않습니다.');
     }
     if (form.baseAddress.length > 0 && form.baseAddress.trim().length === 0) {
-      errs.push('기본주소를 입력해 주세요.');
+      errs.push('기본주소를 입력해 주시기 바랍니다.');
     }
     return errs;
   };
@@ -211,7 +213,7 @@ export function PharmacyBusinessInfo({ loadInfo, saveInfo, theme, AddressSearch 
       setSuccessMsg('약국 정보가 저장되었습니다.');
       setTimeout(() => setSuccessMsg(''), 3000);
     } catch {
-      setErrors(['저장에 실패했습니다. 다시 시도해 주세요.']);
+      setErrors(['저장에 실패했습니다. 다시 시도해 주시기 바랍니다.']);
     } finally {
       setIsSaving(false);
     }
@@ -230,7 +232,7 @@ export function PharmacyBusinessInfo({ loadInfo, saveInfo, theme, AddressSearch 
 
   // WO-KPA-PHARMACY-OWNER-WITHOUT-STORE-HANDLING-V1: 데이터 없음 → 게이트로 리다이렉트
   if (loadState === 'error' || !data) {
-    return <Navigate to="/pharmacy" replace />;
+    return unavailable ?? <Navigate to="/pharmacy" replace />;
   }
 
   // ─── View / Edit Mode ───
@@ -272,7 +274,7 @@ export function PharmacyBusinessInfo({ loadInfo, saveInfo, theme, AddressSearch 
                 style={styles.formInput}
                 value={form.name}
                 onChange={e => updateField('name', e.target.value)}
-                placeholder="약국명을 입력하세요"
+                placeholder="약국명을 입력하시기 바랍니다"
               />
             </div>
 
@@ -330,7 +332,7 @@ export function PharmacyBusinessInfo({ loadInfo, saveInfo, theme, AddressSearch 
                 value={data.businessNumber || ''}
                 disabled
               />
-              <span style={styles.formHint}>사업자등록번호 변경은 관리자에게 문의해 주세요.</span>
+              <span style={styles.formHint}>사업자등록번호 변경은 관리자에게 문의해 주시기 바랍니다.</span>
             </div>
 
             <div style={styles.formGroup}>

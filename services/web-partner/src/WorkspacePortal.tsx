@@ -6,6 +6,7 @@ import {
   type FormEvent,
 } from "react";
 import App from "./App";
+import { PartnerAccountCard } from "./PartnerAccountCard";
 import { PasswordInput } from "@o4o/auth-react";
 import {
   partnerApi,
@@ -147,9 +148,9 @@ export default function WorkspacePortal({
   };
   const save = async (workspace: Workspace): Promise<Workspace> => {
     const s = snapshot.current;
-    if (!s) throw new Error("공동공간을 다시 선택해 주세요.");
+    if (!s) throw new Error("공동공간을 다시 선택해 주시기 바랍니다.");
     if (busyRef.current)
-      throw new Error("서버 요청이 처리 중입니다. 잠시 기다려 주세요.");
+      throw new Error("서버 요청이 처리 중입니다. 잠시 기다려 주시기 바랍니다.");
     busyRef.current = true;
     setBusy(true);
     try {
@@ -330,10 +331,10 @@ export default function WorkspacePortal({
               <h1>
                 함께 쓸 자료는
                 <br />
-                공동공간에 모으세요.
+                공동공간에 모으시기 바랍니다.
               </h1>
               <p>
-                기존 O4O 계정으로 로그인하고 필요한 사람을 초대하세요.
+                기존 O4O 계정으로 로그인하고 필요한 사람을 초대하시기 바랍니다.
                 <br />
                 자료는 공동공간별로 분리하고, 참여 권한은 소유자가 관리합니다.
               </p>
@@ -345,63 +346,55 @@ export default function WorkspacePortal({
                 O4O 가입·계정 안내 ↗
               </a>
             </div>
-            <form
-              className="panel"
-              onSubmit={(e) => {
-                e.preventDefault();
-                const el = e.currentTarget,
-                  f = new FormData(el);
-                const email = String(f.get("email") || ""),
-                  password = String(f.get("password") || "");
-                setLoginPassword("");
-                void run(async () => {
-                  await partnerApi.login(email, password);
-                  if (onSessionChange) {
-                    onSessionChange({
-                      type: "signed-in",
-                      inviteToken: joinToken,
-                    });
-                    return;
-                  }
-                  await connect();
-                });
-              }}
+            <PartnerAccountCard
+              busy={busy}
+              heading="h2"
+              onCheck={() => void run(connect)}
             >
-              <h2>O4O 계정 로그인</h2>
-              <label className="field">
-                이메일
-                <input
-                  name="email"
-                  type="email"
-                  autoComplete="username"
-                  required
-                />
-              </label>
-              <PasswordInput
-                label="비밀번호"
-                name="password"
-                value={loginPassword}
-                onChange={setLoginPassword}
-                autoComplete="current-password"
-                disabled={busy}
-              />
-              <button className="button primary" disabled={busy}>
-                로그인
-              </button>
-              <button
-                className="button secondary"
-                type="button"
-                disabled={busy}
-                onClick={() => void run(connect)}
+              <form
+                className="o4o-login-email-form"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  const el = e.currentTarget,
+                    f = new FormData(el);
+                  const email = String(f.get("email") || ""),
+                    password = String(f.get("password") || "");
+                  setLoginPassword("");
+                  void run(async () => {
+                    await partnerApi.login(email, password);
+                    if (onSessionChange) {
+                      onSessionChange({
+                        type: "signed-in",
+                        inviteToken: joinToken,
+                      });
+                      return;
+                    }
+                    await connect();
+                  });
+                }}
               >
-                기존 로그인 확인
-              </button>
-              <p className="hint">
-                비밀번호는 기존 인증 API에만 전달하고 저장하지 않습니다. Google
-                계정 이용자는 O4O 메인에서 로그인한 뒤 기존 로그인 확인을
-                이용하세요.
-              </p>
-            </form>
+                <label className="field">
+                  이메일
+                  <input
+                    name="email"
+                    type="email"
+                    autoComplete="username"
+                    required
+                  />
+                </label>
+                <PasswordInput
+                  label="비밀번호"
+                  name="password"
+                  value={loginPassword}
+                  onChange={setLoginPassword}
+                  autoComplete="current-password"
+                  disabled={busy}
+                />
+                <button className="button primary" disabled={busy}>
+                  로그인
+                </button>
+              </form>
+            </PartnerAccountCard>
           </div>
         ) : (
           <>
@@ -461,7 +454,7 @@ export default function WorkspacePortal({
             </div>
             {!selected && (
               <p className="hint">
-                새 공동공간을 만들거나 초대 링크를 이용해 참여하세요.
+                새 공동공간을 만들거나 초대 링크를 이용해 참여하시기 바랍니다.
               </p>
             )}
             <details className="space-actions" open={!selected}>
@@ -523,7 +516,7 @@ export default function WorkspacePortal({
                 <p className="hint">
                   참여자는 이 공동공간의 자료·활동·정산 내역을 볼 수 있습니다.
                   편집자는 자료를 변경할 수 있지만 정산은 소유자만 기록합니다.
-                  비공개 자료는 별도의 공동공간에 보관하세요.
+                  비공개 자료는 별도의 공동공간에 보관하시기 바랍니다.
                 </p>
                 <ul className="member-list">
                   {members.map((m) => (
@@ -537,7 +530,7 @@ export default function WorkspacePortal({
                           disabled={busy}
                           onClick={() => {
                             if (
-                              confirm("이 참여자의 공동공간 접근을 해제할까요?")
+                              confirm("이 참여자의 공동공간 접근을 해제하시겠습니까?")
                             )
                               void run(async () => {
                                 await partnerApi.removeMember(
@@ -569,18 +562,18 @@ export default function WorkspacePortal({
                           void run(async () => {
                             if (file.size > 1024 * 1024)
                               throw new Error(
-                                "백업 파일은 1MB 이내로 선택해 주세요.",
+                                "백업 파일은 1MB 이내로 선택해 주시기 바랍니다.",
                               );
                             const data = parseWorkspace(await file.text());
                             if (
                               !confirm(
-                                "현재 공동공간 자료를 이 백업으로 교체할까요? 기존 자료가 있다면 먼저 자료 백업을 내려받아 주세요. 정산 변경 이력은 유지됩니다.",
+                                "현재 공동공간 자료를 이 백업으로 교체하시겠습니까? 기존 자료가 있다면 먼저 자료 백업을 내려받아 주시기 바랍니다. 정산 변경 이력은 유지됩니다.",
                               )
                             )
                               return;
                             const s = snapshot.current;
                             if (!s)
-                              throw new Error("공동공간을 다시 선택해 주세요.");
+                              throw new Error("공동공간을 다시 선택해 주시기 바랍니다.");
                             const updated = await partnerApi.save(
                               s.id,
                               s.revision,
@@ -637,7 +630,7 @@ export default function WorkspacePortal({
                         </label>
                         <p className="hint">
                           링크를 받은 계정이 참여할 수 있습니다. 신뢰할 수 있는
-                          상대에게 직접 전달하세요. 원문 링크는 다시 조회할 수
+                          상대에게 직접 전달하시기 바랍니다. 원문 링크는 다시 조회할 수
                           없습니다.
                         </p>
                         <button

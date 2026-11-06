@@ -1,3 +1,4 @@
+import MemberRegistrationForm from '../../components/auth/MemberRegistrationForm';
 /**
  * 이메일·비밀번호 인증 페이지 — WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1
  *
@@ -17,9 +18,11 @@
  * (서버 요청 로그 · 방문 기록 · Referer 로 남지 않게).
  */
 import { useLayoutEffect, useMemo, useState, type ReactNode } from 'react';
-import { Navigate, useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import {
   O4OHomeButton,
+  LoginCard,
+  NETURE_LOGO_SRC,
   GoogleContinue, KakaoContinue,
   EmailSignupForm,
   VerifyEmailView,
@@ -36,20 +39,12 @@ import { operatorInvitationReturnPath, recoverOperatorInvitationContinuation } f
 function AuthCard({ title, subtitle, children }: { title: string; subtitle?: string; children: ReactNode }) {
   const { isAuthenticated, isLoading } = useAuth();
   return (
-    <div className="min-h-screen bg-gray-50 flex items-start sm:items-center justify-center px-4 py-10">
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        <div className="flex items-center gap-3 px-6 py-4 border-b border-gray-100">
-          <span className="text-2xl" aria-hidden>🌿</span>
-          <div>
-            <h1 className="text-lg font-bold text-gray-900">{title}</h1>
-            {subtitle && <p className="text-xs text-gray-500 break-keep">{subtitle}</p>}
-          </div>
-        </div>
-        <div className="p-6">{children}
-          <div className="mt-6"><O4OHomeButton api={authClient.api} isAuthenticated={isAuthenticated} authLoading={isLoading} label="O4O 메인으로" className="o4o-home-link" /></div>
-        </div>
-      </div>
-    </div>
+    <main className="o4o-login-page">
+      <LoginCard brand="Neture" title={title} description={subtitle} tone="green" logoSrc={NETURE_LOGO_SRC}>
+        {children}
+        <div className="o4o-login-footnote"><O4OHomeButton api={authClient.api} isAuthenticated={isAuthenticated} authLoading={isLoading} label="O4O 메인으로" className="o4o-home-link" /></div>
+      </LoginCard>
+    </main>
   );
 }
 
@@ -90,40 +85,41 @@ function useOneTimeToken(): string | null {
 }
 
 export function SignupPage() {
-  const { isAuthenticated, isLoading, loginWithGoogle, signupWithGoogle, getGoogleAuthConfig, loginWithKakao, signupWithKakao } = useAuth();
+  const { isAuthenticated, isLoading, user, loginWithGoogle, signupWithGoogle, getGoogleAuthConfig, loginWithKakao, signupWithKakao } = useAuth();
   const links = useAuthLinks();
   const navigate = useNavigate();
   const [googleError, setGoogleError] = useState<string | null>(null);
   const [emailSignup, setEmailSignup] = useState(false);
   if (isLoading) return null;
-  if (isAuthenticated) return <Navigate to={operatorInvitationReturnPath()} replace />;
+  if (isAuthenticated) return <AuthCard title="가입 정보"><MemberRegistrationForm key={user?.id}/></AuthCard>;
   return (
-    <AuthCard title="회원가입" subtitle={emailSignup ? '이메일(아이디)로 가입' : '개인정보 보호를 위해 Google·카카오 가입을 권장합니다.'}>
+    <AuthCard title="회원가입" subtitle={emailSignup ? '이메일로 가입' : '개인정보 보호를 위해 Google·카카오 가입을 권장합니다.'}>
       {emailSignup ? (
         <>
           <button type="button" className="mb-4 min-h-11 text-sm text-gray-600 underline" onClick={() => { setEmailSignup(false); setGoogleError(null); }}>
             다른 방법으로 가입
           </button>
-          <EmailSignupForm api={authClient} links={links} termsHref="/terms" privacyHref="/privacy" />
+          <EmailSignupForm api={authClient} links={{...links,login:'/login?returnTo=%2Fsignup'}} termsHref="/terms" privacyHref="/privacy" />
         </>
       ) : (
         <>
-          <section aria-label="소셜 계정으로 가입" className="space-y-3">
+          <section aria-label="소셜 계정으로 가입" className="space-y-3" style={{maxWidth:400,marginInline:'auto'}}>
             <GoogleContinue<User>
               personalizedButton={false}
+              buttonText="signup_with"
               getSignupTerms={() => authClient.getSignupTerms()}
               getConfig={getGoogleAuthConfig}
               loginWithGoogle={loginWithGoogle}
               signupWithGoogle={signupWithGoogle}
               onStart={() => setGoogleError(null)}
-              onSuccess={() => { setGoogleError(null); navigate(operatorInvitationReturnPath(), { replace: true }); }}
+              onSuccess={() => { setGoogleError(null); navigate(operatorInvitationReturnPath()==='/operator-invite'?'/operator-invite':'/signup', { replace: true }); }}
               onError={({ message }) => setGoogleError(message)}
               termsHref="/terms"
               privacyHref="/privacy"
             />
-            <KakaoContinue<User> client={authClient} loginWithKakao={loginWithKakao} signupWithKakao={signupWithKakao}
+            <KakaoContinue<User> intent="signup" client={authClient} loginWithKakao={loginWithKakao} signupWithKakao={signupWithKakao}
               returnTo={new URLSearchParams(window.location.search).get('returnTo') ?? '/'}
-              onSuccess={() => { navigate(operatorInvitationReturnPath(), { replace: true }); }} />
+              onSuccess={() => { navigate(operatorInvitationReturnPath()==='/operator-invite'?'/operator-invite':'/signup', { replace: true }); }} />
             {googleError && (
               <p role="alert" className="mt-3 text-sm text-red-600">{googleError}</p>
             )}
@@ -133,8 +129,8 @@ export function SignupPage() {
             또는
             <span className="h-px flex-1 bg-gray-200" />
           </div>
-          <button type="button" className="min-h-11 w-full rounded-lg border border-gray-300 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50" onClick={() => setEmailSignup(true)}>
-            이메일(아이디)로 가입
+          <button type="button" className="o4o-auth-choice w-full" style={{ minHeight: 32, height: 32, paddingBlock: 0, maxWidth:400, display:'block', marginInline:'auto' }} onClick={() => setEmailSignup(true)}>
+            이메일로 가입
           </button>
         </>
       )}

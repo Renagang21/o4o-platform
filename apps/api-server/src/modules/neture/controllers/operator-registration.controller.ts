@@ -1,3 +1,4 @@
+import { operatorMemberTarget } from '../../../middleware/operator-member-target.middleware.js';
 import { requireNetureScope } from '../../../middleware/neture-scope.middleware.js';
 /**
  * OperatorRegistrationController
@@ -68,6 +69,7 @@ export function createOperatorRegistrationController(dataSource: DataSource, act
     '/registrations/:userId/approve',
     requireAuth,
     requireOperatorOrAdmin,
+    operatorMemberTarget,
     async (req: AuthenticatedRequest, res: Response) => {
       try {
         const { userId } = req.params;
@@ -92,7 +94,7 @@ export function createOperatorRegistrationController(dataSource: DataSource, act
             success: false,
             error: 'ROLE_PROMOTION_NOT_ALLOWED',
             message:
-              '운영자·관리자 역할은 가입 승인으로 부여할 수 없습니다. 중앙 관리자(admin.neture.co.kr)의 운영자 관리를 사용하세요.',
+              '운영자·관리자 역할은 가입 승인으로 부여할 수 없습니다. 중앙 관리자(admin.neture.co.kr)의 운영자 관리를 사용하시기 바랍니다.',
           });
           return;
         }
@@ -122,6 +124,7 @@ export function createOperatorRegistrationController(dataSource: DataSource, act
     '/registrations/:userId/reject',
     requireAuth,
     requireOperatorOrAdmin,
+    operatorMemberTarget,
     async (req: AuthenticatedRequest, res: Response) => {
       try {
         const { userId } = req.params;
@@ -205,6 +208,7 @@ export function createOperatorRegistrationController(dataSource: DataSource, act
     '/registrations/batch',
     requireAuth,
     requireOperatorOrAdmin,
+    operatorMemberTarget,
     async (req: AuthenticatedRequest, res: Response) => {
       try {
         const { ids, action, reason } = req.body;

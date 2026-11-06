@@ -74,7 +74,7 @@ export function OperatorServiceSwitcher({
       const url = await api.resolveServiceEntryUrl(s.serviceKey, path);
       window.location.assign(url);
     } catch {
-      setEntryError('서비스로 이동하지 못했습니다. 잠시 후 다시 시도해 주세요.');
+      setEntryError('서비스로 이동하지 못했습니다. 잠시 후 다시 시도해 주시기 바랍니다.');
       setEntering(null);
     }
   }

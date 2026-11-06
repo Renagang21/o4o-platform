@@ -287,7 +287,7 @@ export function ForumOwnerMemberManagement({
                         <textarea
                           value={rejectComment}
                           onChange={(e) => setRejectComment(e.target.value)}
-                          placeholder="거절 사유를 입력해주세요"
+                          placeholder="거절 사유를 입력해 주시기 바랍니다"
                           rows={2}
                           className="w-full px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-red-400 focus:border-transparent text-sm resize-none"
                         />

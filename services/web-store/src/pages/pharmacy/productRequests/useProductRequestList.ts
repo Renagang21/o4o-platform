@@ -40,7 +40,7 @@ export function useProductRequestList(organizationId: string, refreshKey?: numbe
         if (page > lastPage) { cancel(); setPage(lastPage); return; }
         setItems(reply.items); setTotal(reply.meta.total);
       } catch {
-        if (active() && current()) setError('요청 현황을 불러오지 못했습니다. 다시 시도해 주세요.');
+        if (active() && current()) setError('요청 현황을 불러오지 못했습니다. 다시 시도해 주시기 바랍니다.');
       } finally { if (active() && current()) { setLoading(false); setSettled(subject); } }
     })();
     return cancel;

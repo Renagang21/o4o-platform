@@ -23,6 +23,7 @@ export type PlaylistPublishStatus = 'draft' | 'published';
 
 @Entity('store_playlists')
 @Index('IDX_store_playlists_org', ['organization_id'])
+@Index('idx_store_playlist_request', ['organization_id', 'client_request_id'], { unique: true })
 export class StorePlaylist {
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -32,6 +33,12 @@ export class StorePlaylist {
 
   @Column({ type: 'varchar', length: 255 })
   name: string;
+
+  @Column({ type: 'uuid', nullable: true })
+  client_request_id: string | null;
+
+  @Column({ type: 'text', array: true, default: '{}' })
+  tags: string[];
 
   @Column({ type: 'varchar', length: 20, default: 'LIST' })
   playlist_type: PlaylistType;

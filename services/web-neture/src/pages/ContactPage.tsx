@@ -8,5 +8,5 @@ export default function ContactPage() {
   const requested = params.get('service');
   const key = CURRENT_HOST_PROFILE === 'main' ? (requested || 'neture') : CURRENT_HOST_PROFILE;
   const valid = key === 'neture' || key === 'kpa-society' || isPublicServiceKey(key);
-  return valid ? <PublicServiceContact key={key} serviceKey={key === 'pharmacy' ? 'kpa-society' : key} client={api} /> : <p role="alert">문의할 서비스를 확인해 주세요.</p>;
+  return valid ? <PublicServiceContact key={key} serviceKey={key === 'pharmacy' ? 'kpa-society' : key} client={api} /> : <p role="alert">문의할 서비스를 확인해 주시기 바랍니다.</p>;
 }

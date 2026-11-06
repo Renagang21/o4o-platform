@@ -22,7 +22,7 @@ export function FundingCreatorOperations({ trial, forum, onChange }: { trial: Tr
       const data = await getFundingCreatorParticipants(trial.id);
       if (current()) { setRows(data); setLoadedId(trial.id); }
     } catch {
-      if (current()) { setRows([]); setParticipantsError('참여 현황을 불러오지 못했습니다. 다시 시도해 주세요.'); }
+      if (current()) { setRows([]); setParticipantsError('참여 현황을 불러오지 못했습니다. 다시 시도해 주시기 바랍니다.'); }
     } finally { if (current()) setParticipantsLoading(false); }
   }, [trial.id, beginParticipants]);
   useEffect(() => { setRows([]); setError(''); setBusy(false); setLoadedId(''); }, [trial.id]);
@@ -35,7 +35,7 @@ export function FundingCreatorOperations({ trial, forum, onChange }: { trial: Tr
       if (trial.status === 'draft') await submitTrial(trial.id);
       else if (NEXT[trial.status]) await changeFundingCreatorStatus(trial.id, NEXT[trial.status].status);
       if (current()) onChange();
-    } catch (e: any) { if (current()) setError(e.response?.data?.message || '처리하지 못했습니다. 다시 시도해 주세요.'); }
+    } catch (e: any) { if (current()) setError(e.response?.data?.message || '처리하지 못했습니다. 다시 시도해 주시기 바랍니다.'); }
     finally { if (current()) setBusy(false); }
   };
   return <section className="my-6 rounded-lg border bg-white p-4">

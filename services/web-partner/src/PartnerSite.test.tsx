@@ -38,7 +38,7 @@ vi.mock("./WorkspacePortal", () => ({
 const board = {
   id: "00000000-0000-4000-8000-000000000001",
   name: "자유 소통",
-  description: "경험을 나누세요",
+  description: "경험을 나누시기 바랍니다",
   operator_only: false,
   revision: 0,
 };
@@ -289,7 +289,7 @@ describe("Partner public entry, login, opt-in and community", () => {
   it("shows a public community introduction without implicitly enrolling a visitor", async () => {
     mount();
     await screen.findByText("로그인하고 참여하기");
-    expect(screen.getByText("경험을 나누세요")).toBeTruthy();
+    expect(screen.getByText("경험을 나누시기 바랍니다")).toBeTruthy();
     expect(communityApi.join).not.toHaveBeenCalled();
     expect(communityApi.list).not.toHaveBeenCalled();
   });
@@ -331,7 +331,8 @@ describe("Partner public entry, login, opt-in and community", () => {
     await waitFor(() =>
       expect(screen.queryByText("계정 연결을 확인하고 있습니다…")).toBeNull(),
     );
-    fireEvent.change(screen.getByLabelText("이메일"), {
+    fireEvent.click(screen.getByText("이메일로 로그인"));
+  fireEvent.change(screen.getByLabelText("이메일"), {
       target: { value: "member@example.invalid" },
     });
     fireEvent.change(screen.getByLabelText("비밀번호"), {
@@ -430,6 +431,8 @@ describe("Partner public entry, login, opt-in and community", () => {
     vi.mocked(communityApi.member).mockResolvedValue({});
     mount("/operator");
     fireEvent.click(await screen.findByRole("button", { name: "회원 관리" }));
+    await screen.findByText("대상 회원");
+    fireEvent.click(screen.getAllByRole("checkbox").at(-1)!);
     fireEvent.click(await screen.findByRole("button", { name: "이용 정지" }));
     expect(communityApi.member).not.toHaveBeenCalled();
     fireEvent.change(screen.getByLabelText("처리 사유"), {
@@ -446,6 +449,23 @@ describe("Partner public entry, login, opt-in and community", () => {
   });
 });
 
+it("checks the social session without submitting email credentials or losing the return path", async () => {
+  vi.mocked(partnerApi.me)
+    .mockRejectedValueOnce(new ApiError(401, "UNAUTHENTICATED"))
+    .mockResolvedValue(user);
+  mount("/login?returnTo=%2Fworkspace%3Fmode%3Dlocal%23assets");
+  const social = await screen.findByRole("link", { name: "Google·카카오로 로그인 ↗" });
+  expect(social.getAttribute("href")).toBe("https://neture.co.kr/service-entry/partner-support?returnPath=%2Fcommunity");
+  expect(social.getAttribute("target")).toBe("_blank");
+  expect(social.getAttribute("rel")).toContain("noopener");
+  expect(screen.getByTestId("email-login-option").hasAttribute("open")).toBe(false);
+  const check = screen.getByRole("button", { name: "로그인 상태 확인" });
+  await waitFor(() => expect((check as HTMLButtonElement).disabled).toBe(false));
+  fireEvent.click(check);
+  await screen.findByText("資料作業空間");
+  expect(partnerApi.login).not.toHaveBeenCalled();
+});
+
 it("returns to the requested workspace tab after login without replacing the invitation/session handler", async () => {
   vi.mocked(partnerApi.me)
     .mockRejectedValueOnce(new ApiError(401, "UNAUTHENTICATED"))
@@ -453,6 +473,7 @@ it("returns to the requested workspace tab after login without replacing the inv
   vi.mocked(partnerApi.login).mockResolvedValue({});
   mount("/login?returnTo=%2Fworkspace%3Fmode%3Dlocal%23assets");
   await screen.findByRole("heading", { name: "O4O 계정 로그인" });
+  fireEvent.click(screen.getByText("이메일로 로그인"));
   fireEvent.change(screen.getByLabelText("이메일"), {
     target: { value: "fixture@example.test" },
   });

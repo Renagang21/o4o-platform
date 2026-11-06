@@ -81,7 +81,7 @@ export default function EmailSettingsPage() {
 
   const handleTestEmail = async () => {
     if (!testEmail) {
-      setMessage({ type: 'error', text: '테스트 이메일 주소를 입력해주세요.' });
+      setMessage({ type: 'error', text: '테스트 이메일 주소를 입력해 주시기 바랍니다.' });
       return;
     }
 
@@ -318,7 +318,7 @@ export default function EmailSettingsPage() {
             </div>
             {!settings.enabled && (
               <p className="mt-2 text-sm text-amber-600">
-                이메일 서비스를 먼저 활성화해주세요.
+                이메일 서비스를 먼저 활성화해 주시기 바랍니다.
               </p>
             )}
           </div>

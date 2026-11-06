@@ -104,7 +104,7 @@ export function ServiceContactSettingsPage({ serviceKey, api, title }: ServiceCo
   function addEmail() {
     const e = newEmail.trim().toLowerCase();
     if (!e) return;
-    if (!EMAIL_RE.test(e)) { setError('올바른 이메일 주소를 입력해 주세요.'); return; }
+    if (!EMAIL_RE.test(e)) { setError('올바른 이메일 주소를 입력해 주시기 바랍니다.'); return; }
     if (recipients.includes(e)) { setNewEmail(''); return; }
     setRecipients([...recipients, e]);
     setNewEmail('');
@@ -124,11 +124,11 @@ export function ServiceContactSettingsPage({ serviceKey, api, title }: ServiceCo
     setError(null);
     setNotice(null);
     if (emailEnabled && recipients.length === 0) {
-      setError('이메일 알림을 사용하려면 수신 이메일을 1개 이상 입력하세요.');
+      setError('이메일 알림을 사용하려면 수신 이메일을 1개 이상 입력하시기 바랍니다.');
       return;
     }
     if (autoReplyEnabled && (!autoReplySubject.trim() || !autoReplyMessage.trim())) {
-      setError('자동 회신을 사용하려면 제목과 본문을 입력하세요.');
+      setError('자동 회신을 사용하려면 제목과 본문을 입력하시기 바랍니다.');
       return;
     }
     setSaving(true);
@@ -162,7 +162,7 @@ export function ServiceContactSettingsPage({ serviceKey, api, title }: ServiceCo
       <h1 style={S.h1}>{title || '문의 설정'}</h1>
       <p style={S.lead}>
         Contact Us로 접수된 문의의 알림 방식을 설정합니다. in-app 알림은 운영자 화면 알림으로 표시되며,
-        이메일 알림은 수신 이메일이 설정된 경우에만 발송됩니다. 이메일 수신자는 실제 운영자가 확인 가능한 주소만 입력하세요.
+        이메일 알림은 수신 이메일이 설정된 경우에만 발송됩니다. 이메일 수신자는 실제 운영자가 확인 가능한 주소만 입력하시기 바랍니다.
       </p>
 
       {notice ? <div style={S.banner('success')}>{notice}</div> : null}

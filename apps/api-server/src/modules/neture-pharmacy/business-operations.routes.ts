@@ -46,7 +46,7 @@ export function businessOperationsRoutes(db: DataSource) {
           throw new NeturePharmacyError(
             404,
             "BUSINESS_NOT_FOUND",
-            "사업 정보를 다시 확인해 주세요.",
+            "사업 정보를 다시 확인해 주시기 바랍니다.",
           );
         if (level === "admin" && !access.canManagePolicies)
           throw new NeturePharmacyError(

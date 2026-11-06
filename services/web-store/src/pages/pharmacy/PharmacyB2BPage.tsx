@@ -53,9 +53,9 @@ const SOURCE_BADGE: Record<OrderableProduct['sourceType'], { text: string; color
 
 const EMPTY_STATE: Record<OrderableSourceTab, { title: string; desc: string }> = {
   all: { title: '현재 주문할 수 있는 상품이 없습니다', desc: '내 매장의 공급 상품 화면에서 가입한 세미프랜차이즈의 공급 상품을 바로 주문할 수 있습니다.' },
-  b2b: { title: '현재 주문할 수 있는 B2B 상품이 없습니다', desc: '내 매장의 공급 상품 화면에서 공급 상품을 확인하세요.' },
+  b2b: { title: '현재 주문할 수 있는 B2B 상품이 없습니다', desc: '내 매장의 공급 상품 화면에서 공급 상품을 확인하시기 바랍니다.' },
   operator: { title: '현재 운영자 승인 주문 가능 상품이 없습니다', desc: '운영자 승인(SERVICE) 완료 후 주문할 수 있습니다.' },
-  event: { title: '현재 진행 중인 이벤트·특가 상품이 없습니다', desc: '이벤트 홈에서 안내를 확인하세요.' },
+  event: { title: '현재 진행 중인 이벤트·특가 상품이 없습니다', desc: '이벤트 홈에서 안내를 확인하시기 바랍니다.' },
   'seller-recruitment': { title: '판매자 모집 신청 후 승인된 주문 가능 상품이 없습니다', desc: '판매자 모집에 신청하고 공급자 승인을 받으면 여기에 표시됩니다.' },
 };
 
@@ -187,7 +187,7 @@ export function PharmacyB2BPage() {
   const handleAddToWorktable = useCallback(() => {
     if (!organizationId || !hasContext() || loading || error) return;
     if (selectedIds.size === 0) {
-      toast.error('상품을 선택해주세요.');
+      toast.error('상품을 선택해 주시기 바랍니다.');
       return;
     }
     const validItems: [string, number][] = [];
@@ -203,7 +203,7 @@ export function PharmacyB2BPage() {
     }
 
     if (validItems.length === 0) {
-      if (noQtyCount > 0) toast.error('선택한 상품의 수량을 입력해주세요.');
+      if (noQtyCount > 0) toast.error('선택한 상품의 수량을 입력해 주시기 바랍니다.');
       else if (noOfferCount > 0) toast.error('이 상품은 작업대에 담을 수 없습니다.');
       return;
     }
@@ -213,7 +213,7 @@ export function PharmacyB2BPage() {
 
     const preselect = Object.fromEntries(validItems);
     if (!saveWorktablePreselection(organizationId, serviceKey, preselect)) {
-      toast.error('작업대에 선택을 전달하지 못했습니다. 브라우저 저장 설정을 확인해 주세요.');
+      toast.error('작업대에 선택을 전달하지 못했습니다. 브라우저 저장 설정을 확인해 주시기 바랍니다.');
       return;
     }
     toast.success(`${validItems.length}건의 상품을 작업대에 담았습니다.`);
@@ -427,16 +427,16 @@ export function PharmacyB2BPage() {
                 {error === 'network' ? '🌐' : error === 'unauthorized' ? '🔒' : error === 'forbidden' ? '🚫' : '⚠️'}
               </span>
               <h3 style={styles.emptyTitle}>
-                {error === 'network' && '네트워크 연결을 확인해주세요'}
+                {error === 'network' && '네트워크 연결을 확인해 주시기 바랍니다'}
                 {error === 'unauthorized' && '로그인이 필요합니다'}
                 {error === 'forbidden' && '매장 등록 후 이용할 수 있습니다'}
                 {error === 'server' && '일시적인 오류가 발생했습니다'}
               </h3>
               <p style={styles.emptyDesc}>
-                {error === 'network' && '인터넷 연결 상태를 확인한 후 다시 시도해주세요.'}
+                {error === 'network' && '인터넷 연결 상태를 확인한 후 다시 시도해 주시기 바랍니다.'}
                 {error === 'unauthorized' && '상품을 조회하려면 로그인이 필요합니다.'}
                 {error === 'forbidden' && '약국 매장 등록이 완료된 후 상품을 조회할 수 있습니다.'}
-                {error === 'server' && '잠시 후 다시 시도해주세요.'}
+                {error === 'server' && '잠시 후 다시 시도해 주시기 바랍니다.'}
               </p>
               {(error === 'network' || error === 'server') && (
                 <button onClick={loadData} style={styles.retryButton}>다시 시도</button>

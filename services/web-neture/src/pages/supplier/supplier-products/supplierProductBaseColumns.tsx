@@ -158,7 +158,7 @@ export const baseColumns: ListColumnDef<SupplierProduct>[] = [
         return (
           <span
             className="text-[10px] bg-amber-50 text-amber-600 px-1.5 py-0.5 rounded font-medium"
-            title="승인요청 전 상품 편집에서 서비스를 선택하세요"
+            title="승인요청 전 상품 편집에서 서비스를 선택하시기 바랍니다"
           >
             서비스 미설정
           </span>

@@ -140,7 +140,7 @@ function RoleModal({ userId, existingRoles, isAdmin, serviceKey, apiAdapter, the
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedRole) { setError('역할을 선택하세요.'); return; }
+    if (!selectedRole) { setError('역할을 선택하시기 바랍니다.'); return; }
     setLoading(true);
     setError('');
     try {
@@ -197,11 +197,16 @@ function RoleModal({ userId, existingRoles, isAdmin, serviceKey, apiAdapter, the
 
 // ─── Main Component ──────────────────────────────────────────
 
+function memberActionAuthority(user:UserDetailData|null,isAdmin:boolean,canManageMembers:boolean) {
+  if(user?.operatorReadOnly)return {isAdmin:false,canManageMembers:false};
+  return {isAdmin,canManageMembers};
+}
+
 export default function UserDetailPage({
   apiAdapter,
   config,
-  isAdmin,
-  canManageMembers = isAdmin,
+  isAdmin: adminAuthority,
+  canManageMembers: memberAuthority = adminAuthority,
   actions,
   navigate,
   userId: id,
@@ -216,6 +221,7 @@ export default function UserDetailPage({
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [showRoleModal, setShowRoleModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
+  const {isAdmin,canManageMembers}=memberActionAuthority(user,adminAuthority,memberAuthority);
 
   const fetchDetail = useCallback(async () => {
     if (!id) return;
@@ -237,7 +243,7 @@ export default function UserDetailPage({
   useEffect(() => { fetchDetail(); }, [fetchDetail]);
 
   const handleStatusChange = async (status: string) => {
-    if (!id || !user) return;
+    if (!id || !user || user.operatorReadOnly) return;
     const label = status === 'approved' ? '승인' : status === 'rejected' ? '거부' : status === 'suspended' ? '정지' : status;
     if (!confirm(`이 사용자를 ${label} 처리하시겠습니까?`)) return;
     setActionLoading('status');
@@ -279,7 +285,7 @@ export default function UserDetailPage({
 
   // WO-O4O-USER-MEMBERSHIP-REACTIVATION-V1: 서비스 멤버십 + 역할 복구
   const handleReactivate = async () => {
-    if (!id || !user) return;
+    if (!id || !user || user.operatorReadOnly) return;
     if (!confirm('해당 서비스의 가입 상태와 일반 회원 역할을 복구하시겠습니까?\n운영 권한 지정·회수는 별도 업무입니다.')) return;
     setActionLoading('reactivate');
     try {
@@ -329,7 +335,7 @@ export default function UserDetailPage({
   };
 
   const handleMembershipReject = async (membershipId: string) => {
-    const reason = prompt('거부 사유를 입력하세요 (선택사항):');
+    const reason = prompt('거부 사유를 입력하시기 바랍니다 (선택사항):');
     if (reason === null) return;
     setActionLoading(membershipId);
     try {
@@ -462,9 +468,10 @@ export default function UserDetailPage({
             </tbody>
           </table>
 
+          {user.operatorReadOnly && <output className="block">전체 관리자 — 처리 대상 아님</output>}
           {/* Actions */}
           <div className="flex items-center gap-2 mt-4 pt-4 border-t border-slate-100">
-            {lifecycleStatus === 'pending' && (
+            {!user.operatorReadOnly && lifecycleStatus === 'pending' && (
               <>
                 <button
                   onClick={() => handleStatusChange('approved')}
@@ -500,7 +507,7 @@ export default function UserDetailPage({
                 <CheckCircle className="w-4 h-4" />{lifecycleStatus === 'withdrawn' ? '탈퇴 회원 복구' : '복구'}
               </button>
             )}
-            {lifecycleStatus === 'rejected' && (
+            {!user.operatorReadOnly && lifecycleStatus === 'rejected' && (
               <button
                 onClick={() => handleStatusChange('approved')}
                 disabled={actionLoading === 'status'}
@@ -509,12 +516,12 @@ export default function UserDetailPage({
                 <CheckCircle className="w-4 h-4" />활성화
               </button>
             )}
-            <button
+            {!user.operatorReadOnly && <button
               onClick={() => setShowEditModal(true)}
               className="flex items-center gap-1.5 px-3 py-1.5 text-sm border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50"
             >
               <Pencil className="w-4 h-4" />정보 수정
-            </button>
+            </button>}
             {isAdmin && (<button
               onClick={handleDelete}
               disabled={actionLoading === 'delete'}
@@ -680,7 +687,7 @@ export default function UserDetailPage({
                           <Loader2 className="w-4 h-4 animate-spin text-slate-400" />
                         ) : (
                           <>
-                            {(m.status === 'pending' || m.status === 'rejected') && (
+                            {!user.operatorReadOnly && (m.status === 'pending' || m.status === 'rejected') && (
                               <button
                                 onClick={() => handleMembershipApprove(m.id)}
                                 title="멤버십 승인"
@@ -689,7 +696,7 @@ export default function UserDetailPage({
                                 <UserCheck className="w-4 h-4" />
                               </button>
                             )}
-                            {(m.status === 'pending' || (isAdmin && m.status === 'active')) && (
+                            {!user.operatorReadOnly && (m.status === 'pending' || (isAdmin && m.status === 'active')) && (
                               <button
                                 onClick={() => handleMembershipReject(m.id)}
                                 title="멤버십 거부"
@@ -713,7 +720,7 @@ export default function UserDetailPage({
       </section>
 
       {/* Role Modal */}
-      {showRoleModal && (
+      {!user?.operatorReadOnly && showRoleModal && (
         <RoleModal
           userId={user.id}
           existingRoles={roles.filter(r => r.isActive).map(r => r.role)}
@@ -727,7 +734,7 @@ export default function UserDetailPage({
       )}
 
       {/* Edit User Modal */}
-      {showEditModal && (
+      {!user?.operatorReadOnly && showEditModal && (
         <EditUserModal
           userId={user.id}
           serviceKey={config.serviceKey}

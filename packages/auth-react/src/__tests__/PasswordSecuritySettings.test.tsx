@@ -43,3 +43,11 @@ describe('password security settings', () => {
     expect(ended).not.toHaveBeenCalled();
   });
 });
+
+it('shows temporary-password guidance and sends the temporary value as the current password',async()=>{
+ const client={getPasswordStatus:vi.fn(async()=>({hasPassword:true,canManage:true,temporaryExpiresAt:'2026-11-05T00:00:00Z'})),setPassword:vi.fn(async()=>{})};
+ const ended=vi.fn();render(<PasswordSecuritySettings client={client} onSessionEnded={ended}/>);
+ expect((await screen.findByRole('status')).textContent).toContain('임시 비밀번호');
+ await fill('TemporaryFixture123!');await waitFor(()=>expect(ended).toHaveBeenCalledTimes(1));
+ expect(client.setPassword).toHaveBeenCalledWith({currentPassword:'TemporaryFixture123!',newPassword:'newFixture123!'});
+});

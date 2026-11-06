@@ -36,8 +36,8 @@ export class ForumComment {
   @Column({ type: 'uuid' })
   postId!: string;
 
-  @Column({ name: 'author_id', type: 'uuid' })
-  authorId!: string;
+  @Column({ name: 'author_id', type: 'uuid', nullable: true })
+  authorId!: string | null;
 
   @Column({ type: 'uuid', nullable: true })
   parentId?: string;

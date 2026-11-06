@@ -97,7 +97,7 @@ export async function createScreenSet(
   );
   if (!res.success || !res.data?.id)
     throw new Error(
-      "화면 저장 결과를 확인하지 못했습니다. 다시 시도해 주세요.",
+      "화면 저장 결과를 확인하지 못했습니다. 다시 시도해 주시기 바랍니다.",
     );
   return res.data;
 }
@@ -123,7 +123,7 @@ export async function updateScreenSet(
   );
   if (!res.success || res.data?.id !== id)
     throw new Error(
-      "화면 저장 결과를 확인하지 못했습니다. 다시 시도해 주세요.",
+      "화면 저장 결과를 확인하지 못했습니다. 다시 시도해 주시기 바랍니다.",
     );
   return res.data;
 }
@@ -150,7 +150,7 @@ export async function saveScreenSetBlocks(
   );
   if (!res.success || !Array.isArray(res.data))
     throw new Error(
-      "화면 저장 결과를 확인하지 못했습니다. 다시 시도해 주세요.",
+      "화면 저장 결과를 확인하지 못했습니다. 다시 시도해 주시기 바랍니다.",
     );
   return res.data;
 }

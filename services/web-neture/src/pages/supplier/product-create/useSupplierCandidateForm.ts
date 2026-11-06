@@ -143,7 +143,7 @@ export function useSupplierCandidateForm(importDraft: ImportDraft | null) {
         }
       } catch {
         // 조회 실패를 '새 상품'으로 오인시키지 않는다 — checked 미설정 + 안내.
-        toast.error('바코드 조회에 실패했습니다. 잠시 후 다시 시도해 주세요.');
+        toast.error('바코드 조회에 실패했습니다. 잠시 후 다시 시도해 주시기 바랍니다.');
       } finally {
         setSearching(false);
       }
@@ -236,10 +236,10 @@ export function useSupplierCandidateForm(importDraft: ImportDraft | null) {
   // Step validation
   const validateStep = (step: number): string | null => {
     if (step === 1) {
-      if (!form.marketingName.trim()) return '상품명을 입력해주세요.';
+      if (!form.marketingName.trim()) return '상품명을 입력해 주시기 바랍니다.';
       if (categoriesError)
-        return '카테고리 목록을 불러오지 못했습니다. 카테고리 항목의 [다시 시도]로 목록을 불러온 뒤 진행해 주세요.';
-      if (!form.categoryId) return '카테고리를 선택해주세요.';
+        return '카테고리 목록을 불러오지 못했습니다. 카테고리 항목의 [다시 시도]로 목록을 불러온 뒤 진행해 주시기 바랍니다.';
+      if (!form.categoryId) return '카테고리를 선택해 주시기 바랍니다.';
       if (isRegulated && (!form.regulatoryType || !form.regulatoryName.trim())) {
         return '규제 카테고리 상품은 규제 유형과 규제명이 필수입니다.';
       }

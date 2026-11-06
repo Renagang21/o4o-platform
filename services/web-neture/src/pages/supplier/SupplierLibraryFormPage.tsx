@@ -136,34 +136,34 @@ function SupplierLibraryForm() {
     if (saveInFlight.current || (isEditMode && loadState !== 'success')) return;
     // 공통 검증
     if (!formData.title.trim()) {
-      setError('제목을 입력하세요.');
+      setError('제목을 입력하시기 바랍니다.');
       return;
     }
 
     // 타입별 검증
     if (formData.contentType === 'media') {
       if (!formData.fileUrl.trim()) {
-        setError('파일 URL을 입력하세요.');
+        setError('파일 URL을 입력하시기 바랍니다.');
         return;
       }
       if (!formData.fileName.trim()) {
-        setError('파일명을 입력하세요.');
+        setError('파일명을 입력하시기 바랍니다.');
         return;
       }
       const fileSize = Number(formData.fileSize);
       if (!formData.fileSize || isNaN(fileSize) || fileSize <= 0) {
-        setError('파일 크기를 올바르게 입력하세요.');
+        setError('파일 크기를 올바르게 입력하시기 바랍니다.');
         return;
       }
       if (!formData.mimeType.trim()) {
-        setError('MIME 타입을 입력하세요.');
+        setError('MIME 타입을 입력하시기 바랍니다.');
         return;
       }
     } else {
       // document 검증: 내용이 비어 있지 않아야 함
       const plainText = formData.documentHtml.replace(/<[^>]*>/g, '').trim();
       if (!plainText) {
-        setError('문서 본문을 입력하세요.');
+        setError('문서 본문을 입력하시기 바랍니다.');
         return;
       }
     }
@@ -214,7 +214,7 @@ function SupplierLibraryForm() {
         setError(result.error || '저장에 실패했습니다.');
       }
     } catch {
-      if (mounted.current) setError('저장에 실패했습니다. 작성 내용은 유지됩니다. 다시 시도해 주세요.');
+      if (mounted.current) setError('저장에 실패했습니다. 작성 내용은 유지됩니다. 다시 시도해 주시기 바랍니다.');
     } finally {
       saveInFlight.current = false;
       if (mounted.current) setSaving(false);
@@ -254,7 +254,7 @@ function SupplierLibraryForm() {
           </p>
           <p style={{ fontSize: '13px', color: '#94a3b8' }}>
             {isError
-              ? '잠시 후 다시 시도해 주세요.'
+              ? '잠시 후 다시 시도해 주시기 바랍니다.'
               : '이미 삭제되었거나 접근할 수 없는 자료입니다.'}
           </p>
           {/* not-found 는 다시 시도 대상이 아니다. */}
@@ -365,7 +365,7 @@ function SupplierLibraryForm() {
             value={formData.title}
             onChange={(e) => handleChange('title', e.target.value)}
             maxLength={200}
-            placeholder="자료 제목을 입력하세요"
+            placeholder="자료 제목을 입력하시기 바랍니다"
             style={inputStyle}
           />
         </div>
@@ -376,7 +376,7 @@ function SupplierLibraryForm() {
           <textarea
             value={formData.description}
             onChange={(e) => handleChange('description', e.target.value)}
-            placeholder="자료에 대한 설명을 입력하세요"
+            placeholder="자료에 대한 설명을 입력하시기 바랍니다"
             rows={3}
             style={{ ...inputStyle, resize: 'vertical', minHeight: '80px' }}
           />
@@ -458,7 +458,7 @@ function SupplierLibraryForm() {
               <RichTextEditor
                 value={formData.documentHtml}
                 onChange={handleEditorChange}
-                placeholder="문서 내용을 입력하세요..."
+                placeholder="문서 내용을 입력하시기 바랍니다..."
                 preset="compact"
                 showInternalAi={false}
                 editable={!saving}
@@ -481,7 +481,7 @@ function SupplierLibraryForm() {
           />
         </div>
 
-        <p className="mb-3 rounded border p-3 text-sm">저장은 자료함의 원본만 변경합니다. 커뮤니티 게시와 서비스 등재 요청은 자료함에서 별도로 진행하세요.</p>
+        <p className="mb-3 rounded border p-3 text-sm">저장은 자료함의 원본만 변경합니다. 커뮤니티 게시와 서비스 등재 요청은 자료함에서 별도로 진행하시기 바랍니다.</p>
         {/* 공개 여부 */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <input

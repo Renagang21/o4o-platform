@@ -1,5 +1,6 @@
 import { useLocation } from 'react-router-dom';
 import { storeWorkspaceBase } from '../../components/store/StoreWorkflowNavigation';
+import { useNativeStoreDialog } from '../../hooks/useNativeStoreDialog';
 /**
  * StartProductionModal — KPA wrapper
  *
@@ -34,14 +35,24 @@ export type { ProductionTarget, ProductionSource, ProductionSourceItem };
 type KpaStartProductionModalProps = Omit<StartProductionModalProps, 'targets' | 'getTemplates'>;
 
 export function StartProductionModal(props: KpaStartProductionModalProps) {
+  if (!props.open || !props.source) return null;
+  return <ProductionDialog {...props} />;
+}
+
+function ProductionDialog(props: KpaStartProductionModalProps) {
   const { pathname } = useLocation();
+  const ref = useNativeStoreDialog();
   const base = storeWorkspaceBase(pathname);
   const targets = PRODUCTION_TARGET_CATALOG.map(item => ({ ...item, route: base + item.route.slice('/store'.length) }));
   return (
+    <dialog ref={ref} aria-modal="true" aria-label="제작 시작"
+      onCancel={event => { event.preventDefault(); props.onClose(); }}
+      className="m-0 h-screen max-h-none w-screen max-w-none border-0 bg-transparent p-0">
     <SharedStartProductionModal
       {...props}
       targets={targets}
       getTemplates={getTemplatesForTarget}
     />
+    </dialog>
   );
 }

@@ -9,7 +9,7 @@ import { useMarketingAnalytics } from './monitoring/useMarketingAnalytics';
 
 export function MarketingAnalyticsPage() {
   const scope = useMonitoringScope();
-  if (!scope.ready) return <p role="status">매장을 선택하고 서비스 연결을 확인해 주세요.</p>;
+  if (!scope.ready) return <p role="status">매장을 선택하고 서비스 연결을 확인해 주시기 바랍니다.</p>;
   return <MarketingAnalytics key={scope.key} organizationId={scope.organizationId!} />;
 }
 

@@ -133,12 +133,12 @@ export function ClosedForumJoinPanel({
     try {
       await api.requestJoin(forumId);
       setJoinStatus('pending');
-      notify('success', '가입 신청이 완료되었습니다. 포럼 운영자의 승인을 기다려주세요.');
+      notify('success', '가입 신청이 완료되었습니다. 포럼 운영자의 승인을 기다려주시기 바랍니다.');
     } catch (err: any) {
       const code = errorCode(err);
       if (code === 'ALREADY_MEMBER') {
         setJoinStatus('member');
-        notify('info', '이미 회원입니다. 페이지를 새로고침해 주세요.');
+        notify('info', '이미 회원입니다. 페이지를 새로고침해 주시기 바랍니다.');
       } else if (code === 'PENDING_REQUEST') {
         setJoinStatus('pending');
         notify('info', '이미 가입 신청이 진행 중입니다.');
@@ -187,7 +187,7 @@ export function ClosedForumJoinPanel({
       return (
         <div style={variant === 'page' ? pendingBoxPage : pendingBoxCell}>
           <p style={{ margin: 0, fontSize: '14px', color: '#92400e' }}>
-            가입 신청이 진행 중입니다. 포럼 운영자의 승인을 기다려주세요.
+            가입 신청이 진행 중입니다. 포럼 운영자의 승인을 기다려주시기 바랍니다.
           </p>
         </div>
       );

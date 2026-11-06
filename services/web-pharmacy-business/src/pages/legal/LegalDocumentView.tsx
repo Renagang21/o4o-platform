@@ -77,7 +77,7 @@ export function LegalDocumentView({ documentType, heading }: LegalDocumentViewPr
         )}
         {state === 'loading' && <p style={styles.stateText}>불러오는 중…</p>}
         {state === 'empty' && <p style={styles.stateText}>현재 공개된 문서가 없습니다.</p>}
-        {state === 'error' && <p style={styles.stateText}>문서를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.</p>}
+        {state === 'error' && <p style={styles.stateText}>문서를 불러오지 못했습니다. 잠시 후 다시 시도해 주시기 바랍니다.</p>}
       </div>
     </div>
   );

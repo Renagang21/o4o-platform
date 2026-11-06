@@ -43,7 +43,7 @@ const STATUS_COLOR: Record<string, string> = {
 const NEXT_ACTION: Record<string, { title: string; desc: string }> = {
   draft: {
     title: '초안 상태입니다',
-    desc: '내용을 완성하고 "제출"하여 펀딩 운영자의 검토를 요청하세요.',
+    desc: '내용을 완성하고 "제출"하여 펀딩 운영자의 검토를 요청하시기 바랍니다.',
   },
   submitted: {
     title: '펀딩 운영자가 심사 중입니다',
@@ -59,15 +59,15 @@ const NEXT_ACTION: Record<string, { title: string; desc: string }> = {
   },
   outcome_confirming: {
     title: '결과 확인 중입니다',
-    desc: '참여자들의 후기와 결과를 집계하고 있습니다. 포럼 링크에서 피드백을 확인하세요.',
+    desc: '참여자들의 후기와 결과를 집계하고 있습니다. 포럼 링크에서 피드백을 확인하시기 바랍니다.',
   },
   fulfilled: {
     title: '이행이 완료되었습니다',
-    desc: '진행 단계가 이행 완료로 등록되었습니다. 개별 입금·환급·이행 기록은 별도로 확인하세요.',
+    desc: '진행 단계가 이행 완료로 등록되었습니다. 개별 입금·환급·이행 기록은 별도로 확인하시기 바랍니다.',
   },
   closed: {
     title: '유통참여형 펀딩이 종료되었습니다',
-    desc: '최종 결과 데이터를 참고하여 향후 제품 개발에 활용하세요.',
+    desc: '최종 결과 데이터를 참고하여 향후 제품 개발에 활용하시기 바랍니다.',
   },
 };
 
@@ -367,7 +367,7 @@ export default function FundingDetailPage() {
             })()}
           {/* WO-O4O-NETURE-DISTRIBUTION-FUNDING-SUPPLIER-DESIGN-FIELDS-V1: 운영 모델 안내 */}
           <p style={{ fontSize: '12px', color: '#6B7280', lineHeight: 1.6, margin: '10px 0 0 0' }}>
-            참여금(송금)은 <strong>펀딩 운영자가 수령</strong>하고 송금 완료자 명단을 공유합니다(온라인 결제 미제공). 제품 개발 진행·보상 조건·송금 기한·미송금자 처리는 <strong>제품 개발자가 포럼에서 운영</strong>합니다. 제품 보상 기준·보상 제품 구성·매장 활용 방식은 상세 설명/판매 시나리오 영역에 작성한 내용으로 안내하세요.
+            참여금(송금)은 <strong>펀딩 운영자가 수령</strong>하고 송금 완료자 명단을 공유합니다(온라인 결제 미제공). 제품 개발 진행·보상 조건·송금 기한·미송금자 처리는 <strong>제품 개발자가 포럼에서 운영</strong>합니다. 제품 보상 기준·보상 제품 구성·매장 활용 방식은 상세 설명/판매 시나리오 영역에 작성한 내용으로 안내하시기 바랍니다.
           </p>
         </div>
       )}
@@ -420,7 +420,7 @@ export default function FundingDetailPage() {
       {forumPostId && (
         <div style={s.section}>
           <h2 style={s.sectionTitle}>포럼 피드백</h2>
-          <p style={s.muted}>이전 공고 게시글입니다. 현재 펀딩 포럼은 운영 기능에서 이용하세요.</p>
+          <p style={s.muted}>이전 공고 게시글입니다. 현재 펀딩 포럼은 운영 기능에서 이용하시기 바랍니다.</p>
           <a
             href={`https://community.neture.co.kr/communities/o4o-general/forum/post/${forumPostId}`}
             style={s.forumLink}

@@ -25,7 +25,7 @@ export class FundingForumMembershipService {
     return this.ds.transaction(async m => {
       await this.scope(m, trialId, forumId, actor, false);
       const [participant] = await m.query(`SELECT id FROM market_trial_participants WHERE "marketTrialId" = $1 AND "participantId" = $2`, [trialId, actor]);
-      if (!participant) throw new FundingError(403, 'NOT_PARTICIPANT', '참여 신청 후 포럼 이용을 신청해 주세요.');
+      if (!participant) throw new FundingError(403, 'NOT_PARTICIPANT', '참여 신청 후 포럼 이용을 신청해 주시기 바랍니다.');
       const [member] = await m.query(`SELECT id FROM forum_category_members WHERE forum_category_id = $1 AND user_id = $2`, [forumId, actor]);
       if (member) throw new FundingError(409, 'ALREADY_MEMBER', '이미 포럼 회원입니다.');
       const [pending] = await m.query(`SELECT id FROM forum_join_requests WHERE forum_category_id = $1 AND user_id = $2 AND status = 'pending'`, [forumId, actor]);
@@ -36,7 +36,7 @@ export class FundingForumMembershipService {
   }
 
   async review(trialId: string, forumId: string, requestId: string, actor: string, approve: boolean, comment?: string) {
-    if (comment !== undefined && (typeof comment !== 'string' || comment.length > 1000)) throw new FundingError(400, 'INVALID_COMMENT', '검토 메모는 1,000자 이내로 입력해 주세요.');
+    if (comment !== undefined && (typeof comment !== 'string' || comment.length > 1000)) throw new FundingError(400, 'INVALID_COMMENT', '검토 메모는 1,000자 이내로 입력해 주시기 바랍니다.');
     return await this.ds.transaction(async m => {
       await this.scope(m, trialId, forumId, actor, true);
       const [request] = await m.query(`SELECT id, user_id FROM forum_join_requests WHERE id = $1 AND forum_category_id = $2 AND status = 'pending' FOR UPDATE`, [requestId, forumId]);

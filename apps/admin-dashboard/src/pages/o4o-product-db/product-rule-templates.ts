@@ -40,7 +40,7 @@ export const productRuleTemplates: Array<{
 
 export function createProductRuleDraft(id: string, current: ProductCorrectionRuleInput): ProductCorrectionRuleInput {
   const template = productRuleTemplates.find((item) => item.id === id);
-  if (!template) throw new Error('기준 초안을 선택하세요.');
+  if (!template) throw new Error('기준 초안을 선택하시기 바랍니다.');
   return {
     ...current,
     title: template.title,

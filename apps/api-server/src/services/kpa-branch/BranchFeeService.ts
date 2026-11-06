@@ -422,7 +422,7 @@ export class BranchFeeService {
 
     const category = typeof params.feeCategory === 'string' ? params.feeCategory.trim() : '';
     if (!category || category.length > FEE_CATEGORY_MAX) {
-      throw new BranchFeeError('FEE_VALUE_INVALID', '회비구분을 선택해 주세요.', 422);
+      throw new BranchFeeError('FEE_VALUE_INVALID', '회비구분을 선택해 주시기 바랍니다.', 422);
     }
 
     /**
@@ -518,7 +518,7 @@ export class BranchFeeService {
       throw new BranchFeeError('FEE_VALUE_INVALID', '납부액이 있는 회원은 면제로 지정할 수 없습니다.', 422);
     }
     if (!exempt && assessed === 0) {
-      throw new BranchFeeError('FEE_VALUE_INVALID', '부과액이 0원이면 면제로 지정해 주세요.', 422);
+      throw new BranchFeeError('FEE_VALUE_INVALID', '부과액이 0원이면 면제로 지정해 주시기 바랍니다.', 422);
     }
 
     const status = this.deriveStatus(assessed, paid, exempt);
@@ -586,7 +586,7 @@ export class BranchFeeService {
       }
       if (!exemptionType) {
         // 면제로 전환하는데 사유가 없다 — DB 가 거부하기 전에 422 로 알려준다
-        throw new BranchFeeError('FEE_VALUE_INVALID', '면제로 지정하려면 면제 사유 구분을 선택해 주세요.', 422);
+        throw new BranchFeeError('FEE_VALUE_INVALID', '면제로 지정하려면 면제 사유 구분을 선택해 주시기 바랍니다.', 422);
       }
 
       if (p.exemptionReason !== undefined) {
@@ -595,7 +595,7 @@ export class BranchFeeService {
       }
       if (exemptionType === 'other') {
         if (!exemptionReason) {
-          throw new BranchFeeError('FEE_VALUE_INVALID', '기타 면제는 사유를 입력해 주세요.', 422);
+          throw new BranchFeeError('FEE_VALUE_INVALID', '기타 면제는 사유를 입력해 주시기 바랍니다.', 422);
         }
         if (exemptionReason.length > EXEMPTION_REASON_MAX) {
           throw new BranchFeeError(

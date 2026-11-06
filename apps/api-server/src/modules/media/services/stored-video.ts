@@ -3,7 +3,7 @@ import { MediaAsset } from '../entities/MediaAsset.entity.js';
 import { isRetiredServiceValue } from '../../../middleware/retired-service.middleware.js';
 
 export function storedVideoUnavailable() {
-  return Object.assign(new Error('사용할 수 있는 O4O 보관 영상을 다시 선택해 주세요.'), { code: 'MEDIA_LIBRARY_VIDEO_UNAVAILABLE', statusCode: 400 });
+  return Object.assign(new Error('사용할 수 있는 O4O 보관 영상을 다시 선택해 주시기 바랍니다.'), { code: 'MEDIA_LIBRARY_VIDEO_UNAVAILABLE', statusCode: 400 });
 }
 
 /** Serializes registration/reference creation with the existing asset deletion lock. */

@@ -33,7 +33,7 @@ export function ActivityImporter({
       <p className="hint">
         선택한 제안·홍보자에 대해 url,publishedAt,views,likes,comments,shares
         열을 가져옵니다. 날짜는 YYYY-MM-DD, 지표는 비워두거나 0 이상의 정수로
-        입력하세요. 동일 홍보자의 같은 게시물은 중복 추가하지 않습니다.
+        입력하시기 바랍니다. 동일 홍보자의 같은 게시물은 중복 추가하지 않습니다.
       </p>
       <div className="inline-fields">
         <label className="field">
@@ -97,7 +97,7 @@ export function ActivityImporter({
               setBusy(true);
               try {
                 if (file.size > 1024 * 1024)
-                  throw new Error("CSV는 1MB 이내로 선택해 주세요.");
+                  throw new Error("CSV는 1MB 이내로 선택해 주시기 바랍니다.");
                 const result = activitiesCsv(
                   await file.text(),
                   workspace,
@@ -184,12 +184,12 @@ export function PaymentImporter({
             setMessage("");
             try {
               if (file.size > 1024 * 1024)
-                throw new Error("CSV는 1MB 이내로 선택해 주세요.");
+                throw new Error("CSV는 1MB 이내로 선택해 주시기 바랍니다.");
               const result = paymentsCsv(await file.text(), workspace);
               if (
                 result.updated &&
                 !confirm(
-                  `${result.updated}건의 외부 지급 결과를 기록할까요? 실제 송금은 수행하지 않습니다.`,
+                  `${result.updated}건의 외부 지급 결과를 기록하시겠습니까? 실제 송금은 수행하지 않습니다.`,
                 )
               )
                 return;
@@ -306,7 +306,7 @@ export function PerformanceReports({ workspace }: { workspace: Workspace }) {
       </div>
       {invalid && (
         <p role="alert" className="message failure">
-          시작일은 종료일 이전으로 선택해 주세요.
+          시작일은 종료일 이전으로 선택해 주시기 바랍니다.
         </p>
       )}
       <div className="table-scroll">

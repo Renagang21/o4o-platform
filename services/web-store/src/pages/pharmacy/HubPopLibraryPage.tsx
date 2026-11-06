@@ -60,7 +60,7 @@ export function HubPopLibraryPage() {
       core={hub}
       accent="blue"
       title="제공 자료 POP"
-      description="KPA 운영자가 발행한 POP 을 선택해 내 약국으로 가져가거나(초안 사본), 내 약국용 POP 을 직접 만드세요."
+      description="KPA 운영자가 발행한 POP 을 선택해 내 약국으로 가져가거나(초안 사본), 내 약국용 POP 을 직접 만드시기 바랍니다."
       tableId="store-hub-pop"
       titleIcon={<Megaphone className="w-3.5 h-3.5" />}
       labels={{

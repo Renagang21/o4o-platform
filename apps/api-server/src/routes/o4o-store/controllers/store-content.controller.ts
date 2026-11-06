@@ -629,7 +629,7 @@ export function createStoreContentController(
       res.status(201).json({ success: true, data });
     } catch (error) {
       if (error instanceof DescriptionIntakeError) {
-        res.status(error.status).json({ success: false, error: { code: error.code, message: '저장된 상담자료·상품 연결을 다시 확인해 주세요.' } }); return;
+        res.status(error.status).json({ success: false, error: { code: error.code, message: '저장된 상담자료·상품 연결을 다시 확인해 주시기 바랍니다.' } }); return;
       }
       res.status(500).json({ success: false, error: { code: 'CONTRIBUTION_FAILED', message: '설명서 제안에 실패했습니다.' } });
     }
@@ -789,7 +789,7 @@ export function createStoreContentController(
         const currentJson = (stillOwned.content.content_json ?? {}) as Record<string, unknown>;
         const currentHtml = typeof currentJson.html === 'string' ? currentJson.html : '';
         if (stillOwned.content.title !== content.title || currentHtml !== html) {
-          res.status(409).json({ success: false, error: { code: 'CONTENT_CHANGED', message: '원문이 변경되었습니다. 다시 번역해 주세요.' } });
+          res.status(409).json({ success: false, error: { code: 'CONTENT_CHANGED', message: '원문이 변경되었습니다. 다시 번역해 주시기 바랍니다.' } });
           return;
         }
         const translations = (currentJson.translations && typeof currentJson.translations === 'object')

@@ -41,7 +41,7 @@ interface SettingsResponse<T> {
 
 function unwrapSettings<T>(response: SettingsResponse<T>): T {
   if (!response?.success || !response.data || typeof response.data !== 'object' || Array.isArray(response.data)) {
-    throw new Error('설정 응답을 확인할 수 없습니다. 다시 시도해주세요.');
+    throw new Error('설정 응답을 확인할 수 없습니다. 다시 시도해 주시기 바랍니다.');
   }
   return response.data;
 }

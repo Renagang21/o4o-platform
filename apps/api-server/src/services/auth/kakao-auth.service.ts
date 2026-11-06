@@ -1,3 +1,4 @@
+import {initialMemberRegistration} from './new-member-registration.js';
 import { recordSignupTerms, recordSignupPrivacy, resolveSignupPolicyServiceKey, type SignupTermsReference } from './signup-policy.service.js';
 import type { DataSource } from 'typeorm';
 import { normalizeLoginEmail, isLoginEmailShapeValid, maskLoginEmail } from '@o4o/auth-utils';
@@ -42,21 +43,21 @@ export class KakaoAuthService {
 
   async signup(token: string, binding: string, origin: string, input: KakaoSignupInput) {
     const email=normalizeLoginEmail(input.email);
-    if (!isLoginEmailShapeValid(email)) throw new SocialAuthError('INVALID_EMAIL','이메일 주소를 확인해 주세요.');
-    if (!input.name?.trim() || input.name.trim().length>100) throw new SocialAuthError('INVALID_NAME','이름을 100자 이내로 입력해 주세요.');
-    if (!isPhoneShapeValid(input.phone)) throw new SocialAuthError('INVALID_PHONE','개인 휴대전화 번호를 입력해 주세요.');
-    if (!input.consents?.terms || !input.consents?.privacy) throw new SocialAuthError('CONSENT_REQUIRED','이용약관과 개인정보 처리방침에 동의해 주세요.');
+    if (!isLoginEmailShapeValid(email)) throw new SocialAuthError('INVALID_EMAIL','이메일 주소를 확인해 주시기 바랍니다.');
+    if (!input.name?.trim() || input.name.trim().length>100) throw new SocialAuthError('INVALID_NAME','이름을 100자 이내로 입력해 주시기 바랍니다.');
+    if (!isPhoneShapeValid(input.phone)) throw new SocialAuthError('INVALID_PHONE','개인 휴대전화 번호를 입력해 주시기 바랍니다.');
+    if (!input.consents?.terms || !input.consents?.privacy) throw new SocialAuthError('CONSENT_REQUIRED','이용약관과 개인정보 처리방침에 동의해 주시기 바랍니다.');
     let serviceKey='';
     try {
       const user=await this.db.transaction(async manager=>{
         const flow=await this.flows.consume(token,binding,'kakao-signup',origin,undefined,manager);serviceKey=flow.service_key;
         const identity=flow.payload as unknown as VerifiedKakaoIdentity;
-        if (!identity.providerId) throw new SocialAuthError('SOCIAL_FLOW_INVALID','인증을 다시 시작해 주세요.',401);
+        if (!identity.providerId) throw new SocialAuthError('SOCIAL_FLOW_INVALID','인증을 다시 시작해 주시기 바랍니다.',401);
         if (await demoAccountService.isDemoLoginEmail(email,manager)) throw new SocialAuthError('DEMO_ACCOUNT_FORBIDDEN','테스트 계정의 인증 수단은 변경할 수 없습니다.',403);
         const duplicate: unknown[] = await manager.query('SELECT 1 FROM users WHERE lower(email)=$1 LIMIT 1',[email]);
-        if (duplicate.length) throw new SocialAuthError('EMAIL_IN_USE','이미 사용 중인 이메일입니다. 기존 계정으로 로그인한 뒤 명시적으로 연결해 주세요.',409);
+        if (duplicate.length) throw new SocialAuthError('EMAIL_IN_USE','이미 사용 중인 이메일입니다. 기존 계정으로 로그인한 뒤 명시적으로 연결해 주시기 바랍니다.',409);
         const now=new Date();const repo=manager.getRepository(User);
-        const created=repo.create({email,name:input.name.trim(),nickname:input.nickname?.trim() || undefined,phone:normalizePhoneDigits(input.phone),
+        const created=repo.create({businessInfo:initialMemberRegistration(),email,name:input.name.trim(),nickname:input.nickname?.trim() || undefined,phone:normalizePhoneDigits(input.phone),
           status:UserStatus.ACTIVE,isActive:true,isEmailVerified:identity.emailVerified===true&&normalizeLoginEmail(identity.email??'')===email,
           tosAcceptedAt:now,privacyAcceptedAt:now,marketingAccepted:input.consents.marketing===true});
         await repo.save(created);
@@ -70,7 +71,7 @@ export class KakaoAuthService {
       });
       return this.sessionOrVerification(user,serviceKey,true);
     } catch(error) {
-      if (uniqueViolation(error)) throw new SocialAuthError('SOCIAL_IDENTITY_CONFLICT','이미 등록된 이메일 또는 소셜 계정입니다. 기존 계정으로 로그인해 주세요.',409);
+      if (uniqueViolation(error)) throw new SocialAuthError('SOCIAL_IDENTITY_CONFLICT','이미 등록된 이메일 또는 소셜 계정입니다. 기존 계정으로 로그인해 주시기 바랍니다.',409);
       throw error;
     }
   }
@@ -78,7 +79,7 @@ export class KakaoAuthService {
   private async sessionOrVerification(user: User, serviceKey: string, isNewUser: boolean, gateKey?: string | null) {
     if (!user.isActive || resolveAccountAccess(user.status)==='blocked') throw new SocialAuthError('ACCOUNT_NOT_ACTIVE','이용할 수 없는 계정입니다.',403);
     const context=await freshenUserContext(user.id);
-    if (!isSessionAuthMethodAllowed('kakao',serviceKey,context.roles)) throw new SocialAuthError('GOOGLE_SESSION_REQUIRED','전체관리자 계정은 Google로 로그인해 주세요.',403);
+    if (!isSessionAuthMethodAllowed('kakao',serviceKey,context.roles)) throw new SocialAuthError('GOOGLE_SESSION_REQUIRED','전체관리자 계정은 Google로 로그인해 주시기 바랍니다.',403);
     if (!user.isEmailVerified) {
       const mailSent=await emailAuthService.sendVerificationMail(user,serviceKey);
       return {nextStep:'verify-email' as const,maskedEmail:maskLoginEmail(user.email),mailSent};

@@ -85,7 +85,7 @@ export const PROPOSE_ERROR_MESSAGES: Record<string, string> = {
   OFFER_NOT_OWNED: '해당 상품에 대한 권한이 없습니다.',
   OFFER_NOT_FOUND: '공급자 상품을 찾을 수 없습니다.',
   SUPPLIER_NOT_FOUND: '공급자 계정이 연결되어 있지 않습니다.',
-  ORG_UNAVAILABLE: 'KPA 조직 정보를 확인할 수 없습니다. 관리자에게 문의하세요.',
+  ORG_UNAVAILABLE: 'KPA 조직 정보를 확인할 수 없습니다. 관리자에게 문의하시기 바랍니다.',
   INVALID_PARAMS: '필수 정보가 누락되었습니다.',
 };
 

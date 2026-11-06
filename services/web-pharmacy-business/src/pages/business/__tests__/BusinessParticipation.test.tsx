@@ -82,7 +82,7 @@ it('clears another pharmacy status and ignores its late enrollment response', as
   mocks.get.mockImplementation((path, config) => path.endsWith('/semi-franchises') && config?.headers?.['X-Store-Organization-Id'] === 'store-a' ? new Promise(r => { resolve = r; }) : initial(path, config));
   mount('?store=store-a'); await waitFor(() => expect(resolve).toBeDefined());
   fireEvent.change(screen.getByRole('combobox'), { target: { value: 'store-b' } });
-  await screen.findByText('Pharmacy 기본 회원 연결을 확인해 주세요.');
+  await screen.findByText('Pharmacy 기본 회원 연결을 확인해 주시기 바랍니다.');
   await act(async () => resolve(envelope([{ key: 'pharmacy', membershipStatus: 'active' }])));
   expect(screen.queryByText('참여 중')).toBeNull();
 });

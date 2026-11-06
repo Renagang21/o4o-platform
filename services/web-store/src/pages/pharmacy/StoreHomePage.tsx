@@ -44,7 +44,7 @@ function StoreHomeSession() {
     return (
       <StoreHomeStateView
         state="empty"
-        title="매장을 선택해 주세요"
+        title="매장을 선택해 주시기 바랍니다"
         description="선택한 매장의 업무를 시작할 수 있습니다."
       />
     );
@@ -105,7 +105,7 @@ function StoreHomeSession() {
             <StoreOverviewExplanation />
             <nav aria-label="매장 빠른 작업" className="mb-4 flex flex-wrap gap-2 text-sm">
               {product && <Link className="min-h-11 content-center rounded-lg border bg-white px-3" to={`${base}${product.subPath}`}>상품 보기</Link>}
-              <Link className="min-h-11 content-center rounded-lg border bg-white px-3" to={`${base}/workspace/studio`}>매장 컨텐츠</Link>
+              <Link className="min-h-11 content-center rounded-lg border bg-white px-3" to={`${base}/workspace/studio`}>매장 콘텐츠</Link>
               <Link className="min-h-11 content-center rounded-lg border bg-white px-3" to={`${base}/workspace/use`}>운영 확인</Link>
             </nav>
           </>
@@ -174,7 +174,7 @@ function StoreHomeSession() {
             />
             <p className="mt-4 text-xs text-slate-500">
               게시 설정·실제 배치·기기 동작은 서로 다릅니다. 매장 운영에서 각각
-              확인하세요.
+              확인하시기 바랍니다.
             </p>
           </section>
         }

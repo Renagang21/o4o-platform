@@ -35,7 +35,7 @@ export default function ForumRequestPage({ basePath = '/forum' }: { basePath?: s
       title="새 포럼 신청"
       description={(
         <>
-          원하시는 포럼이 없나요? 새 포럼을 신청해주세요.
+          원하시는 포럼이 없습니까? 새 포럼을 신청해 주시기 바랍니다.
           <br />관리자 검토 후 승인되면 포럼이 생성됩니다.
         </>
       )}

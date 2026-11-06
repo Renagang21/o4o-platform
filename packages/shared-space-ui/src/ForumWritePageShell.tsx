@@ -41,7 +41,7 @@ const DEFAULT_LABELS: Required<ForumWritePageShellLabels> = {
   editHeading: '글 수정',
   loadingText: '불러오는 중...',
   loginTitle: '로그인이 필요합니다',
-  loginDescription: '게시글을 작성하려면 로그인해주세요.',
+  loginDescription: '게시글을 작성하려면 로그인해 주시기 바랍니다.',
   authorLabel: '작성자 표시명:',
   authorHint: '(표시명은 프로필에서 변경할 수 있습니다)',
   forumLabel: '게시판',

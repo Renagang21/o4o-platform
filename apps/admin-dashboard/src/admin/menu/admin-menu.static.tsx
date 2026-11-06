@@ -116,7 +116,15 @@ export const adminMenuStatic: MenuItem[] = [
   // PLATFORM HUB — 유일한 진짜 플랫폼 전역 집계 화면
   //   현행 12개 공식 주소의 기본 접속 상태를 확인한다. 업무 승인 집계/실행은 각 서비스 소관.
   // ============================================
-  { id: 'platform-account-governance', label: '계정 · 운영 권한', icon: <Layers className="w-5 h-5" />, path: '/admin/platform' },
+  { id: 'platform-account-governance', label: '계정 · 운영 권한', icon: <Layers className="w-5 h-5" />, children: [
+    { id: 'platform-account-overview', label: '계정·운영 권한 개요', icon: <Shield className="w-5 h-5" />, path: '/admin/platform' },
+    { id: 'member-business-management', label: '회원·사업체 관리', icon: <Layers className="w-5 h-5" />, children: [
+      { id: 'platform-members', label: '전체 회원', icon: <Layers className="w-5 h-5" />, path: '/admin/platform/users' },
+      { id: 'platform-suppliers', label: '공급자', icon: <Package className="w-5 h-5" />, path: '/admin/platform/suppliers' },
+      { id: 'platform-stores', label: '내 매장', icon: <Layers className="w-5 h-5" />, path: '/admin/platform/stores' },
+      { id: 'platform-erasure-history', label: '삭제 처리 내역', icon: <ClipboardList className="w-5 h-5" />, path: '/admin/platform/erasure-operations' },
+    ] },
+  ] },
   { id: 'operations-operators', label: '업무 운영자 지정', icon: <Shield className="w-5 h-5" />, path: '/admin/operations-operators' },
   { id: 'central-operations', label: '업무 운영', icon: <ClipboardList className="w-5 h-5" />, path: '/operations' },
   { id: 'pharmacy-service-settings', label: '약국 서비스 설정', icon: <Layers className="w-5 h-5" />, path: '/admin/pharmacy-service-settings' },
@@ -244,6 +252,8 @@ export const adminMenuStatic: MenuItem[] = [
     label: '콘텐츠·자료',
     icon: <FileText className="w-5 h-5" />,
     children: [
+      { id: 'content-required-signage', label: '전체 매장 필수 영상', icon: <FileText className="w-4 h-4" />, path: '/operator/signage/required' },
+      {id:'content-resource-deletion',label:'포럼·강의 최종 삭제',icon:<ClipboardList className="w-4 h-4"/>,path:'/admin/platform/resource-deletion'},
       {
         id: 'content-overview',
         label: '자료 안내',

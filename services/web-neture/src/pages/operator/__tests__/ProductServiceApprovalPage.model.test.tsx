@@ -36,7 +36,7 @@ it.each(['approve', 'reject'])('bulk %s passes only pending approval ids with th
   await screen.findByText('검증상품-pending-a');
   fireEvent.click(screen.getByRole('checkbox', { name: '전체 선택' }));
   fireEvent.click(screen.getByRole('button', { name: action === 'approve' ? '일괄 승인 (1)' : '일괄 거절 (1)', exact: true }));
-  fireEvent.change(screen.getByPlaceholderText(action === 'approve' ? '승인 메모를 입력하세요 (선택)' : '거절 사유를 입력하세요 (선택)'), { target: { value: '검증 사유' } });
+  fireEvent.change(screen.getByPlaceholderText(action === 'approve' ? '승인 메모를 입력하시기 바랍니다 (선택)' : '거절 사유를 입력하시기 바랍니다 (선택)'), { target: { value: '검증 사유' } });
   fireEvent.click(screen.getByRole('button', { name: action === 'approve' ? '승인 확인' : '거절 확인', exact: true }));
   await waitFor(() => expect(action === 'approve' ? mocks.batchApprove : mocks.batchReject).toHaveBeenCalledWith(['pending-a'], '검증 사유'));
   await waitFor(() => expect(mocks.list).toHaveBeenCalledTimes(2));

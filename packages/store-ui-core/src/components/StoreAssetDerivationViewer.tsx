@@ -93,7 +93,7 @@ export function StoreAssetDerivationViewer({
         if (!cancelled) setItems(res?.items ?? []);
       })
       .catch(() => {
-        if (!cancelled) setError('원본 정보를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.');
+        if (!cancelled) setError('원본 정보를 불러오지 못했습니다. 잠시 후 다시 시도해 주시기 바랍니다.');
       })
       .finally(() => {
         if (!cancelled) setLoading(false);

@@ -48,7 +48,7 @@ describe("settlement notification recovery", () => {
       .mockResolvedValueOnce({ items: [], page: 1, limit: 10, total: 0 });
     render(<Recovery />);
     await screen.findByText(
-      "알림 처리 목록을 확인하지 못했습니다. 다시 조회해 주세요.",
+      "알림 처리 목록을 확인하지 못했습니다. 다시 조회해 주시기 바랍니다.",
     );
     expect(screen.queryByText(/선택한 상태의 추적 대상이 없습니다/)).toBeNull();
     fireEvent.click(screen.getByText("목록 다시 조회"));

@@ -127,7 +127,7 @@ const UserEditTest: React.FC = () => {
 
   const testGetUser = async () => {
     if (!testUserId) {
-      alert('사용자 ID를 입력해주세요');
+      alert('사용자 ID를 입력해 주시기 바랍니다');
       return;
     }
 
@@ -187,7 +187,7 @@ const UserEditTest: React.FC = () => {
 
   const testGetUserApprovalHistory = async () => {
     if (!testUserId) {
-      alert('사용자 ID를 입력해주세요');
+      alert('사용자 ID를 입력해 주시기 바랍니다');
       return;
     }
 
@@ -348,11 +348,11 @@ const UserEditTest: React.FC = () => {
           type="text"
           value={testUserId}
           onChange={(e) => setTestUserId(e.target.value)}
-          placeholder="사용자 UUID를 입력하세요"
+          placeholder="사용자 UUID를 입력하시기 바랍니다"
           className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
         <p className="text-sm text-gray-600 mt-2">
-          💡 먼저 "전체 사용자 조회"를 클릭하여 사용자 목록을 확인하고, 그 중 하나의 ID를 복사하세요
+          💡 먼저 "전체 사용자 조회"를 클릭하여 사용자 목록을 확인하고, 그 중 하나의 ID를 복사하시기 바랍니다
         </p>
       </div>
 
@@ -405,11 +405,11 @@ const UserEditTest: React.FC = () => {
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
         <h3 className="font-semibold mb-2">사용 방법:</h3>
         <ol className="list-decimal list-inside space-y-1 text-sm">
-          <li>브라우저 개발자 도구를 열고 <strong>Console 탭</strong>을 확인하세요</li>
+          <li>브라우저 개발자 도구를 열고 <strong>Console 탭</strong>을 확인하시기 바랍니다</li>
           <li><strong>Network 탭</strong>도 함께 확인하면 더 상세한 정보를 볼 수 있습니다</li>
-          <li>먼저 "전체 사용자 조회" 버튼을 클릭하여 사용자 목록을 확인하세요</li>
-          <li>결과에서 사용자 ID를 복사하여 위 입력창에 붙여넣으세요</li>
-          <li>"사용자 상세 조회" 및 "승인 이력 조회" 버튼을 클릭하여 테스트하세요</li>
+          <li>먼저 "전체 사용자 조회" 버튼을 클릭하여 사용자 목록을 확인하시기 바랍니다</li>
+          <li>결과에서 사용자 ID를 복사하여 위 입력창에 붙여넣으시기 바랍니다</li>
+          <li>"사용자 상세 조회" 및 "승인 이력 조회" 버튼을 클릭하여 테스트하시기 바랍니다</li>
           <li>에러가 발생해도 로그인 페이지로 리다이렉트되지 않고 여기에 결과가 표시됩니다</li>
           <li>모든 요청/응답은 콘솔에도 자세히 기록됩니다</li>
           <li>"Unified Client 테스트"는 실제 프로덕션 코드와 동일한 방식으로 요청합니다 (401 시 리다이렉트 발생)</li>

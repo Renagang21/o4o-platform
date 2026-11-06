@@ -52,7 +52,7 @@ export function ConsultationLauncher() {
   return (
     <div className="space-y-3">
       <p className="text-sm text-slate-600">
-        이곳에서는 상담 화면을 준비합니다. 실제 상담은 별도 화면에서 진행하세요.
+        이곳에서는 상담 화면을 준비합니다. 실제 상담은 별도 화면에서 진행하시기 바랍니다.
       </p>
       {error ? (
         <div role="alert">

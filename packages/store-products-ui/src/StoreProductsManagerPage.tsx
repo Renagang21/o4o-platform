@@ -82,7 +82,7 @@ function RegisterModal({ onClose, onSuccess }: { onClose: () => void; onSuccess:
         } else if (status === 401) {
           setSearchError('로그인이 필요합니다.');
         } else {
-          setSearchError('검색 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.');
+          setSearchError('검색 중 오류가 발생했습니다. 잠시 후 다시 시도해 주시기 바랍니다.');
         }
       } finally {
         setIsSearching(false);
@@ -239,7 +239,7 @@ function EditDescModal({ listing, onClose, onSuccess }: { listing: StoreListingI
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSave = async () => {
-    if (!shortDesc.trim()) { toast.error('설명을 입력하세요.'); return; }
+    if (!shortDesc.trim()) { toast.error('설명을 입력하시기 바랍니다.'); return; }
     setIsSubmitting(true);
     try {
       if (!listing.offerId) { toast.error('공급 연결이 없는 상품은 설명을 수정할 수 없습니다.'); return; }
@@ -258,7 +258,7 @@ function EditDescModal({ listing, onClose, onSuccess }: { listing: StoreListingI
         <label className="block text-sm font-medium text-gray-700 mb-1">짧은 설명</label>
         <textarea
           autoFocus rows={3}
-          placeholder="고객에게 표시될 짧은 설명을 입력하세요."
+          placeholder="고객에게 표시될 짧은 설명을 입력하시기 바랍니다."
           value={shortDesc} onChange={(e) => setShortDesc(e.target.value)}
           className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-300 mb-5 resize-none"
         />
@@ -513,14 +513,14 @@ export interface StoreProductsManagerPageProps {
 
 export default function StoreProductsManagerPage({
   title = '내 매장 상품',
-  description = '진열 상품을 관리하고 채널별 노출을 제어하세요.',
+  description = '진열 상품을 관리하고 채널별 노출을 제어하시기 바랍니다.',
   headerSlot,
   containerClassName = 'p-6',
   guideSlot,
   registerButtonLabel = '내 매장 상품 등록',
-  infoText = '상품 정보(ProductMaster)를 검색하여 매장 상품으로 등록하세요. 등록 후 채널별 노출을 개별 제어할 수 있습니다.',
+  infoText = '상품 정보(ProductMaster)를 검색하여 매장 상품으로 등록하시기 바랍니다. 등록 후 채널별 노출을 개별 제어할 수 있습니다.',
   emptyTitle = '등록된 내 매장 상품이 없습니다',
-  emptyDescription = '상품을 검색하여 내 매장 상품으로 등록해 주세요.',
+  emptyDescription = '상품을 검색하여 내 매장 상품으로 등록해 주시기 바랍니다.',
 }: StoreProductsManagerPageProps = {}) {
   const [activeModal, setActiveModal] = useState<ActiveModal>(null);
   const [selectedListing, setSelectedListing] = useState<StoreListingItem | null>(null);
@@ -725,7 +725,7 @@ export default function StoreProductsManagerPage({
         <div className="rounded border border-red-200 bg-red-50 p-6 text-center">
           <p className="text-sm font-semibold text-red-700 mb-1">오류가 발생했습니다</p>
           <p className="text-xs text-red-500 mb-4">
-            {httpStatus ? `서버 오류 (${httpStatus})` : '네트워크 연결을 확인해 주세요.'}
+            {httpStatus ? `서버 오류 (${httpStatus})` : '네트워크 연결을 확인해 주시기 바랍니다.'}
           </p>
           <button
             onClick={() => refetch()}

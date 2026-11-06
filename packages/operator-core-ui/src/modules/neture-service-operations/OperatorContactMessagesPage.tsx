@@ -88,7 +88,7 @@ export default function OperatorContactMessagesPage() {
         setPagination(result.pagination);
         return true;
       } else {
-        throw new Error('목록을 불러오지 못했습니다. 다시 시도해 주세요.');
+        throw new Error('목록을 불러오지 못했습니다. 다시 시도해 주시기 바랍니다.');
       }
     } catch (e: any) {
       if (current()) setError(contactError(e, '목록을 불러오지 못했습니다.'));

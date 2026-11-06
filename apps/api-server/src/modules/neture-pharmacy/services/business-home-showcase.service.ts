@@ -50,7 +50,7 @@ export class BusinessHomeShowcaseService {
     if (typeof input.id !== 'string' || !/^(product|content):[a-f0-9-]{36}$/i.test(input.id)
       || typeof input.hidden !== 'boolean' || !Number.isInteger(input.position) || Number(input.position)<0 || Number(input.position)>9999
       || !Number.isInteger(input.version) || Number(input.version)<0)
-      throw new NeturePharmacyError(400, 'INVALID_SHOWCASE', '진열 항목과 순서를 확인해 주세요.');
+      throw new NeturePharmacyError(400, 'INVALID_SHOWCASE', '진열 항목과 순서를 확인해 주시기 바랍니다.');
     const itemId = input.id;
     const hidden = input.hidden;
     return this.ds.transaction(async manager => {
@@ -60,7 +60,7 @@ export class BusinessHomeShowcaseService {
       const [active] = await manager.query(`SELECT 1 FROM semi_franchises WHERE id=$1 AND status='active' FOR SHARE`, [sf.id]);
       if (!active) throw new NeturePharmacyError(409, 'BUSINESS_CLOSED', '운영 중인 사업만 진열을 변경할 수 있습니다.');
       const settings: Settings = owner.metadata?.businessHomeShowcase?.[sf.id] ?? { version: 0, items: {} };
-      if (settings.version !== input.version) throw new NeturePharmacyError(409, 'SHOWCASE_CHANGED', '다른 처리가 반영되었습니다. 목록을 다시 조회해 주세요.');
+      if (settings.version !== input.version) throw new NeturePharmacyError(409, 'SHOWCASE_CHANGED', '다른 처리가 반영되었습니다. 목록을 다시 조회해 주시기 바랍니다.');
       const candidate = (await this.candidates(sf, null, true, manager)).find(item => item.id === itemId);
       if (!candidate) throw new NeturePharmacyError(409, 'ITEM_NOT_AVAILABLE', '현재 승인·게시된 항목만 변경할 수 있습니다.');
       const before = settings.items[itemId] ?? { hidden: false, position: 1000 };

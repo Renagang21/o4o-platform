@@ -268,7 +268,7 @@ export default function StoreQrAiDescriptionPage() {
 
   const handleSaveAndCreate = useCallback(async () => {
     if (!slug.trim()) {
-      toast.error('QR 공개 URL(slug)을 입력해 주세요');
+      toast.error('QR 공개 URL(slug)을 입력해 주시기 바랍니다');
       return;
     }
     setSaving(true);
@@ -350,7 +350,7 @@ export default function StoreQrAiDescriptionPage() {
         <p style={styles.subtitle}>
           {isEdit
             ? '본문을 직접 수정하거나, 항목을 바꿔 "ChatGPT로 작업" 결과를 다시 넣은 뒤 저장하면 연결된 QR에 그대로 반영됩니다(같은 QR 주소 유지).'
-            : '상품명·강조점(또는 코너·상품 항목)을 입력하고 "ChatGPT로 작업"으로 안내 본문을 만들어 붙여 넣으세요. 확인·수정 후 콘텐츠로 저장하면 QR이 함께 생성됩니다.'}
+            : '상품명·강조점(또는 코너·상품 항목)을 입력하고 "ChatGPT로 작업"으로 안내 본문을 만들어 붙여 넣으시기 바랍니다. 확인·수정 후 콘텐츠로 저장하면 QR이 함께 생성됩니다.'}
         </p>
       </div>
 
@@ -381,7 +381,7 @@ export default function StoreQrAiDescriptionPage() {
         <>
           {/* 1단계: 입력 */}
           <div style={styles.card}>
-            <h3 style={styles.cardTitle}>1. 무엇을 안내할까요?</h3>
+            <h3 style={styles.cardTitle}>1. 무엇을 안내하시겠습니까?</h3>
             {/* 모드 선택 — 단일 상품 / 코너·다품목 */}
             <div style={styles.modeRow}>
               <button
@@ -497,8 +497,8 @@ export default function StoreQrAiDescriptionPage() {
               <h3 style={styles.cardTitle}>2. 확인 후 저장</h3>
               <p style={styles.helper}>
                 {isEdit
-                  ? '내용을 확인하고 필요하면 수정한 뒤 저장하세요. 같은 콘텐츠를 갱신하므로 연결된 QR(주소·landingTarget)은 그대로 유지됩니다.'
-                  : '외부 AI 결과를 편집기에 넣었습니다. 내용을 확인하고 필요하면 수정한 뒤 저장하세요. 저장하면 내 자료함 콘텐츠로 보관되고 QR이 생성됩니다.'}
+                  ? '내용을 확인하고 필요하면 수정한 뒤 저장하시기 바랍니다. 같은 콘텐츠를 갱신하므로 연결된 QR(주소·landingTarget)은 그대로 유지됩니다.'
+                  : '외부 AI 결과를 편집기에 넣었습니다. 내용을 확인하고 필요하면 수정한 뒤 저장하시기 바랍니다. 저장하면 내 자료함 콘텐츠로 보관되고 QR이 생성됩니다.'}
               </p>
               <label style={styles.label}>제목</label>
               <input
@@ -554,7 +554,7 @@ export default function StoreQrAiDescriptionPage() {
                 </button>
               ) : savedContentId && !createdSlug ? (
                 <div style={styles.retryBox}>
-                  <p style={styles.retryText}>콘텐츠는 저장되었지만 QR 생성에 실패했습니다. slug를 확인하고 다시 시도해 주세요.</p>
+                  <p style={styles.retryText}>콘텐츠는 저장되었지만 QR 생성에 실패했습니다. slug를 확인하고 다시 시도해 주시기 바랍니다.</p>
                   <button type="button" onClick={handleRetryQr} disabled={saving} style={styles.saveBtn}>
                     {saving ? 'QR 생성 중…' : 'QR 다시 만들기'}
                   </button>

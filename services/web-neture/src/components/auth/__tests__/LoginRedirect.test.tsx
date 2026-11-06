@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { cleanup, render, screen } from '@testing-library/react';
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom';
 import { LoginModalProvider, useLoginModal } from '../../../contexts/LoginModalContext';
 import { LoginRedirect } from '../LoginRedirect';
@@ -9,6 +9,10 @@ import MarketTrialHubPage from '../../../pages/market-trial/MarketTrialHubPage';
 const state = vi.hoisted(() => ({ profile: 'supplier', isAuthenticated: false, isLoading: false }));
 vi.mock('../../../contexts/AuthContext', () => ({ useAuth: () => state }));
 vi.mock('../../../lib/hostProfile', () => ({ get CURRENT_HOST_PROFILE() { return state.profile; } }));
+// 공개 홈의 배너 조회도 격리한다. 로그인 복귀 검사가 실제 HTTP에 의존하지 않게 한다.
+vi.mock('../../../lib/apiClient', () => ({
+  api: { get: vi.fn(async () => ({ data: { success: true, data: null } })) },
+}));
 
 vi.mock('../ServiceApplyPanel', () => ({ ServiceApplyPanel: () => <div>신청 상태</div> }));
 vi.mock('../../../api/trial', () => ({ getTrials: vi.fn(), getMyParticipations: vi.fn() }));

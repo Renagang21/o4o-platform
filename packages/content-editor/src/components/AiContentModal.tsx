@@ -539,7 +539,7 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
                 <textarea
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
-                  placeholder="원본 정보를 입력하거나 에디터에서 가져오세요..."
+                  placeholder="원본 정보를 입력하거나 에디터에서 가져오시기 바랍니다..."
                   rows={5}
                   style={{
                     width: '100%',
@@ -666,7 +666,7 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
                   }}
                 />
                 <p style={{ fontSize: '12px', color: '#9ca3af', marginTop: '4px' }}>
-                  공개 접근 가능한 URL을 입력하세요
+                  공개 접근 가능한 URL을 입력하시기 바랍니다
                 </p>
               </div>
 
@@ -820,7 +820,7 @@ export function AiContentModal({ open, onClose, editor, onInsert, aiRequestHeade
 
           {/* Disclaimer */}
           <p style={{ fontSize: '11px', color: '#9ca3af', margin: 0, textAlign: 'center' }}>
-            AI가 생성한 내용은 참고용입니다. 반드시 검토 후 사용하세요.
+            AI가 생성한 내용은 참고용입니다. 반드시 검토 후 사용하시기 바랍니다.
           </p>
         </div>
 

@@ -10,8 +10,9 @@ export function StoreTaskPageShell({
   children,
   headerActions,
   state,
+  listFirst = false,
   ...props
-}: StorePageShellProps) {
+}: StorePageShellProps & { listFirst?: boolean }) {
   const body = !state ? (
     children
   ) : state.loading ? (
@@ -30,7 +31,7 @@ export function StoreTaskPageShell({
   );
   return (
     <CorePageShell {...props}>
-      <StoreAiSlot label={props.labels.pageTitle} />
+      {!listFirst && <StoreAiSlot label={props.labels.pageTitle} />}
       {headerActions && (
         <div
           className="mb-3 flex flex-wrap items-center gap-2"
@@ -40,6 +41,10 @@ export function StoreTaskPageShell({
         </div>
       )}
       {body}
+      {listFirst && <details className="mt-5 rounded-lg border border-slate-200 bg-white px-3">
+        <summary className="min-h-11 cursor-pointer content-center text-sm text-teal-800">AI 도움 요청</summary>
+        <StoreAiSlot label={props.labels.pageTitle} />
+      </details>}
     </CorePageShell>
   );
 }

@@ -8,11 +8,6 @@ import {
   workspaceSupportItems,
   workspaceGroups,
 } from "../../config/storeWorkspace";
-import { MyHomeButton } from "@o4o/auth-react";
-import { useAuth } from "../../contexts/AuthContext";
-import { withReturnTo } from "../../lib/returnTo";
-import { WORKSPACE_PATHS } from "../../config/workspace";
-import { authClient } from "../../lib/apiClient";
 import { StoreAiAssistant } from '../store/StoreAiAssistant';
 import { StoreAiPlacementProvider, StoreAiSlot } from '../store/StoreAiPlacement';
 import { StoreOperationsNavigation } from '../store/StoreOperationsNavigation';
@@ -34,7 +29,6 @@ export function StoreWorkspaceShell({
   children?: ReactNode;
 }) {
   const location = useLocation();
-  const { user, isAuthenticated, isLoading: authLoading } = useAuth();
   const active = currentWorkspaceArea(
     location.pathname,
     location.search,
@@ -51,7 +45,7 @@ export function StoreWorkspaceShell({
         <div className="flex items-start gap-2">
         <nav
           aria-label="내 매장 주요 업무"
-          className="grid min-w-0 flex-1 grid-cols-2 gap-1 rounded-xl border border-slate-200 bg-white p-1 sm:grid-cols-4"
+          className="grid min-w-0 flex-1 grid-cols-2 gap-1 rounded-xl border border-slate-200 bg-white p-1 sm:grid-cols-5"
         >
           {STORE_WORKSPACE_AREAS.map((area) => (
             <Link
@@ -72,7 +66,7 @@ export function StoreWorkspaceShell({
               aria-label="매장 보조 메뉴"
               className="absolute right-0 z-30 mt-2 flex w-64 flex-col rounded-xl border border-slate-200 bg-white p-2 shadow-lg"
             >
-              <Link to={withReturnTo(WORKSPACE_PATHS.select, config.basePath)} aria-label="매장 선택" className="min-h-11 rounded-lg px-3 py-2.5 text-sm hover:bg-slate-50">{organizationName ?? '내 매장'} · 매장 선택</Link>
+              <p className="px-3 py-2 text-sm text-slate-500">{organizationName ?? '내 매장'}</p>
               {support.map((item) => (
                 <Link
                   key={item.key}
@@ -82,19 +76,6 @@ export function StoreWorkspaceShell({
                   {item.label}
                 </Link>
               ))}
-              <MyHomeButton
-                api={authClient.api}
-                accountId={user?.id}
-                isAuthenticated={isAuthenticated}
-                authLoading={authLoading}
-                className="rounded-lg px-3 py-2.5 text-sm hover:bg-slate-50"
-              />
-              <Link
-                className="rounded-lg px-3 py-2.5 text-sm hover:bg-slate-50"
-                to="/services"
-              >
-                이용 사업
-              </Link>
             </nav>
           </details>
         </div>

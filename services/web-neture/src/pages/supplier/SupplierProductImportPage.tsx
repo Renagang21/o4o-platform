@@ -75,7 +75,7 @@ export default function SupplierProductImportPage({ onApplyDraft, onCancel }: Re
         <div className="mb-6 rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
           <h2 className="mb-1 text-base font-semibold text-slate-800">제품 유형 선택</h2>
           <p className="mb-3 text-xs text-slate-500">
-            의약품 / 비의약품만 선택하세요. 앞 단계에서 선택했다면 미리 선택되어 있으며, 세부 분류는
+            의약품 / 비의약품만 선택하시기 바랍니다. 앞 단계에서 선택했다면 미리 선택되어 있으며, 세부 분류는
             분석 후 정식 등록 화면에서 확정합니다.
           </p>
           <div className="grid sm:grid-cols-2 gap-2">
@@ -124,7 +124,7 @@ export default function SupplierProductImportPage({ onApplyDraft, onCancel }: Re
 
           <p className="mb-3 text-sm text-slate-500">
             쇼핑몰 관리자 상품 수정 페이지의 HTML을 붙여넣거나{' '}
-            <strong>HTML 파일을 불러오세요.</strong>
+            <strong>HTML 파일을 불러오시기 바랍니다.</strong>
             관리자 페이지에서 Ctrl+U(페이지 소스 보기) → 전체 복사가 가장 정확합니다.
           </p>
 
@@ -173,7 +173,7 @@ export default function SupplierProductImportPage({ onApplyDraft, onCancel }: Re
             value={html}
             onChange={(e) => setHtml(e.target.value)}
             rows={12}
-            placeholder="관리자 상품 수정 페이지의 HTML을 붙여넣으세요"
+            placeholder="관리자 상품 수정 페이지의 HTML을 붙여넣으시기 바랍니다"
             className="w-full rounded-lg border border-slate-300 px-3 py-2 font-mono text-xs focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
           />
 

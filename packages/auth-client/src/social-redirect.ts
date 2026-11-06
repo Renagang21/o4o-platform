@@ -16,7 +16,7 @@ export function takeSocialCallback(expected: Kind[]): (SocialProof & { kind: Kin
   window.history.replaceState(window.history.state, '', window.location.pathname + window.location.search);
   const raw = window.sessionStorage.getItem(KEY); window.sessionStorage.removeItem(KEY);
   let pending: { token?: string; kind?: string; at?: number };
-  try { pending = JSON.parse(raw ?? '{}'); } catch { throw new Error('인증을 다시 시작해 주세요.'); }
+  try { pending = JSON.parse(raw ?? '{}'); } catch { throw new Error('인증을 다시 시작해 주시기 바랍니다.'); }
   if (pending.token !== hash.get('token') || pending.kind !== kind || typeof pending.at !== 'number' || Date.now() - pending.at > 300000 || pending.at > Date.now()) throw new Error('인증이 만료되었거나 이 화면에서 시작한 요청이 아닙니다.');
   return { token: pending.token!, code: hash.get('code') ?? undefined, kind, cancelled: hash.has('error') };
 }

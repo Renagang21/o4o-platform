@@ -55,7 +55,7 @@ export function useChannelWorkspace(
       setLastFetched(new Date());
     } catch {
       if (!isCurrent()) return;
-      setLoadError("채널 정보를 불러오지 못했습니다. 다시 시도해 주세요.");
+      setLoadError("채널 정보를 불러오지 못했습니다. 다시 시도해 주시기 바랍니다.");
       showToast("error", "채널 정보를 불러오지 못했습니다.");
     } finally {
       if (isCurrent()) setLoading(false);
@@ -93,7 +93,7 @@ export function useChannelWorkspace(
         setAvailableProducts(available);
       } catch {
         if (!isCurrent()) return;
-        setProductError("제품 목록을 불러오지 못했습니다. 다시 시도해 주세요.");
+        setProductError("제품 목록을 불러오지 못했습니다. 다시 시도해 주시기 바랍니다.");
         showToast("error", "제품 목록을 불러오지 못했습니다.");
       } finally {
         if (isCurrent()) setProductLoading(false);

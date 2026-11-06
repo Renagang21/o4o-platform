@@ -442,8 +442,8 @@ export const blockMetadata: BlockMetadata[] = [
     description: 'FAQ, 접었다 펼치는 콘텐츠 항목',
     category: 'widgets',
     attributes: {
-      title: { type: 'string', default: '질문을 입력하세요', description: '질문' },
-      content: { type: 'string', default: '답변을 입력하세요', description: '답변' },
+      title: { type: 'string', default: '질문을 입력하시기 바랍니다', description: '질문' },
+      content: { type: 'string', default: '답변을 입력하시기 바랍니다', description: '답변' },
       defaultOpen: { type: 'boolean', default: false, description: '기본 펼침 상태' }
     },
     example: {

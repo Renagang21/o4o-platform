@@ -93,7 +93,7 @@ export class OperatorNotificationController {
       if (!operatorEmail) {
         return res.status(400).json({
           success: false,
-          error: '운영자 이메일 주소를 입력해주세요.'
+          error: '운영자 이메일 주소를 입력해 주시기 바랍니다.'
         });
       }
 
@@ -102,7 +102,7 @@ export class OperatorNotificationController {
       if (!emailRegex.test(operatorEmail)) {
         return res.status(400).json({
           success: false,
-          error: '올바른 이메일 형식을 입력해주세요.'
+          error: '올바른 이메일 형식을 입력해 주시기 바랍니다.'
         });
       }
 

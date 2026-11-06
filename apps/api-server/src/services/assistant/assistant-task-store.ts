@@ -42,7 +42,7 @@ export interface TaskOwnership {
 
 export interface AssistantTaskRow {
   taskId: string;
-  requestedByUserId: string;
+  requestedByUserId: string | null;
   ownershipScope: TaskOwnershipScope;
   organizationId: string | null;
   serviceKey: string | null;
@@ -80,7 +80,7 @@ const SELECT_COLUMNS = `id, requested_by_user_id, ownership_scope, organization_
 function mapRow(r: Record<string, unknown>): AssistantTaskRow {
   return {
     taskId: String(r.id),
-    requestedByUserId: String(r.requested_by_user_id),
+    requestedByUserId: r.requested_by_user_id == null ? null : String(r.requested_by_user_id),
     ownershipScope: r.ownership_scope as TaskOwnershipScope,
     organizationId: (r.organization_id as string | null) ?? null,
     serviceKey: (r.service_key as string | null) ?? null,

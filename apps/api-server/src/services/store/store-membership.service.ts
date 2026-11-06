@@ -274,9 +274,9 @@ async function assertSingleEmployer(manager: EntityManager, userId: string, orga
   // happened after the owner's initial authorization check.
   const [organization] = await manager.query('SELECT id FROM organizations WHERE id=$1 AND "isActive"=true FOR SHARE', [organizationId]);
   if (!organization) fail('STORE_NOT_RESOLVED',403);
-  const other = await manager.query(`SELECT 1 FROM organization_members
-    WHERE user_id=$1 AND organization_id<>$2 AND left_at IS NULL
-      AND role IN ('staff','accepted','owner','admin','manager') LIMIT 1`, [userId, organizationId]);
+  const other = await manager.query(`SELECT 1 FROM organization_members m JOIN organizations o ON o.id=m.organization_id
+    WHERE m.user_id=$1 AND m.organization_id<>$2 AND m.left_at IS NULL AND o.type IN ('store','pharmacy','supplier','semi_franchise')
+      AND m.role IN ('staff','accepted','owner','admin','manager') LIMIT 1`, [userId, organizationId]);
   if (other.length) fail('OTHER_EMPLOYER_EXISTS', 409);
 }
 

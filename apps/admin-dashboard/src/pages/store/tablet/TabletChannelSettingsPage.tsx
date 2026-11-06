@@ -215,7 +215,7 @@ export default function TabletChannelSettingsPage() {
       );
       showToast(true, newVisible ? '타블렛 노출이 켜졌습니다.' : '타블렛 노출이 꺼졌습니다.');
     } catch {
-      showToast(false, '설정 변경에 실패했습니다. 다시 시도해주세요.');
+      showToast(false, '설정 변경에 실패했습니다. 다시 시도해 주시기 바랍니다.');
     } finally {
       setTogglingId(null);
     }
@@ -370,7 +370,7 @@ export default function TabletChannelSettingsPage() {
                     <p className="text-sm text-gray-400">
                       {search || visibleFilter !== 'all'
                         ? '검색 결과가 없습니다.'
-                        : '진열된 상품이 없습니다. 먼저 상품 진열을 등록하세요.'}
+                        : '진열된 상품이 없습니다. 먼저 상품 진열을 등록하시기 바랍니다.'}
                     </p>
                   </td>
                 </tr>

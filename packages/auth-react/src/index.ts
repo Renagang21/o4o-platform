@@ -71,7 +71,8 @@ export { ServiceReturnLink } from './ServiceReturnLink';
 
 export { useHandoffExchange, type HandoffExchangeState } from './useHandoffExchange';
 
-export { LoginCard, LoginLayout } from './LoginPresentation';
+export { LoginCard, LoginLayout, O4O_LOGO_SRC, NETURE_LOGO_SRC } from './LoginPresentation';
+export { EmailLoginDisclosure, EmailLoginOption } from './EmailLoginDisclosure';
 export { ServiceAccountMenu } from './ServiceAccountMenu';
 export { ServiceSpaceSwitcher } from './ServiceSpaceSwitcher';
 export type { ServiceSpaceSwitcherProps } from './ServiceSpaceSwitcher';

@@ -4,8 +4,10 @@
 
 O4O Platform repository의 Codex 및 일반 coding agent를 위한 독립 진입점이다.
 
-- `CLAUDE.md`는 Claude Code의 **동급 진입점**이다. 다른 AI용 지침을 import하거나 상속하지 않는다.
+- **이 문서가 저장소 공통 실행 규칙의 정본이다.** 이 문서는 다른 AI용 지침을 import하거나 상속하지 않는다.
 - 이 문서만으로 작업을 시작할 수 있어야 하며, 다른 AI용 지침을 선행 조건으로 요구하지 않는다.
+- `CLAUDE.md`는 Claude Code 진입점으로, 이 문서를 `@AGENTS.md`로 가져온 뒤 **Claude Code 전용 내용**(세션 유형 · 도구 · 권한 설정 · 커맨드)과
+  소스가 참조하는 `CLAUDE.md §N` 호환 앵커만 더한다(2026-11-06 사용자 확정). 공통 규칙은 `CLAUDE.md`에 다시 쓰지 않고 이 문서에서 고친다.
 - 공통 사업·architecture 지식은 [정본 지도](docs/CANONICAL-INDEX.md)와 각 canonical 문서에 둔다.
 - 본문에는 저장소 특유의 안전 경계와 실행 규칙만 직접 유지한다.
 
@@ -146,6 +148,7 @@ O4O Platform repository의 Codex 및 일반 coding agent를 위한 독립 진입
   owner direct push · fast-forward push(`git push origin <branch>:main`) 로 PR 을 우회하지 않는다.
 - **개발 담당은 로컬 검증 · commit · push까지만 수행하고 인계한다.** PR 생성·재사용 · CI·Codex 리뷰 운영 · PR merge · auto-merge 설정 · 배포 dispatch · 운영 DB · IAM/WIF 변경은 수행하지 않는다. 통합 담당이 지적 보완을 요청하면 같은 작업 branch에서 수정 · 로컬 검증 · commit · push 후 새 HEAD를 재인계한다. 추가 수정용 PR은 만들지 않는다.
 - **사용자가 해당 공간을 통합 담당으로 명시적으로 지정한 경우에만** PR 생성·재사용 · CI·Codex 리뷰 운영 · main 병합 · auto-merge 설정 · post-merge 확인 · 배포 결과 검증을 진행한다. 기존 PR이 있으면 재사용하고 없으면 생성하며 동일 변경의 중복 PR은 만들지 않는다. 지정은 세션 문맥에서 확인하며 계정·branch 이름이나 CI 성공만으로 추정하지 않는다. HEAD · CI · Codex · 미해결 스레드 · main 대비 위치 · blocker를 확인하고 §5의 미승인 위험 변경 경계를 유지한다.
+- **사용자가 그 세션에 배포 · merge 를 요청하면 통합 담당으로 지정된 것으로 본다.** 이 경우 작업 branch push → PR 생성(또는 재사용) → 필수 CI 통과 → PR merge → 배포 결과 확인(merge 후 `delivery.yml` 자동 · 필요 시 `deploy-api` · `deploy-web-services` · `deploy-admin` workflow 실행)까지 중간 승인 없이 진행한다. CI · branch protection 우회 · 비활성화는 금지한다.
 - 통합 담당의 확인에서 코드 문제가 발견되면 원인 · 실패 근거 · 수정 범위를 개발 담당에게 전달한다. 개발 담당은 같은 branch에서 수정 · 로컬 검증 · commit · push 후 새 HEAD를 재인계한다. 새 HEAD의 PR CI·리뷰 재검증과 병합 준비 판정은 통합 담당이 수행한다.
 - **필수 human approval 은 기본 merge gate 가 아니다.** 다른 개발자 review 는 선택적으로 쓴다 — 고위험 구조 변경 ·
   보안 · 권한 · DB · 공통 Core 변경, 또는 사용자가 요구할 때. 개발자들은 각자 작업공간에서 독립적으로 일하며
@@ -165,6 +168,7 @@ O4O Platform repository의 Codex 및 일반 coding agent를 위한 독립 진입
 - 문서-only 처럼 Delivery 가 배포를 skip 하는 작업은 `NOT_APPLICABLE` 로 기록하고 배포 완료를 기다리지 않는다.
   배포가 필요한 작업의 closure 는 해당 WO 의 현재 배포 · 검증 정책을 따른다.
 - **배포 실행과 결과 검증은 명시적으로 지정된 통합 담당 공간이 담당한다.** 개발 담당은 배포를 dispatch하지 않는다. GitHub Actions의 기존 자동 배포는 유지하며 통합 담당이 병합 후 그 결과를 확인한다. 이 역할 분리를 이유로 workflow · 자동 배포 설정을 변경하지 않는다. LEVEL 3의 promote 실행은 통합 담당이 현재 기술 gate와 실행 계정 권한을 확인하고 진행한다. migration 포함 promote는 운영 DB write/DDL을 수반하므로, 해당 실행이 명시적으로 승인되지 않았다면 dispatch 전에 §5의 사용자 확인을 받는다. 새 DB 변경 · 데이터 삭제 · 배포 인프라 변경 등의 미승인 위험 범위는 §5를 따른다. freeze · CI · ref · 계정 권한 경계를 우회하지 않는다.
+- **`promote.yml`(LEVEL_3: migration · auth)** 은 사용자 메시지에 promote 또는 LEVEL_3 가 명시된 경우에만 실행한다.
 - 과거 운영 방식 · 플래그(`DEPLOY_FREEZE` · `DEPLOY_ENABLED` 등)를 현재 사실 확인 없이 재사용하지 않는다.
 
 **(g) 공유 Mutable Resource — serialized**
@@ -331,6 +335,7 @@ verdict: SAFE_TO_REMOVE | KEEP | UNCERTAIN
 | 작업 | 먼저 확인할 정본 |
 |---|---|
 | 환경 / 설치 / 검증 명령 | [SETUP.md](SETUP.md) — 설치는 `pnpm install --frozen-lockfile`. 버전·CI 수치는 복제하지 않고 현재 설정·스크립트를 확인 |
+| 사업 철학 (참여 주체 · HUB · AI 역할) | [O4O-BUSINESS-PHILOSOPHY-V1](docs/baseline/O4O-BUSINESS-PHILOSOPHY-V1.md) — 역할 경계 · 업무공간 · 콘텐츠 유입 · Partner 는 아래 Architecture 가 우선 |
 | 역할 경계 · 업무공간 · 콘텐츠 유입 경로 · Legacy Partner · 리팩터링 단계 WO | [O4O-ROLE-WORKSPACE-ARCHITECTURE-V1](docs/baseline/O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md) — §9 실행 규칙(매 단계 최신 `origin/main` 에서 모집단 재산출) 적용 |
 | commerce | [STORE-COMMERCE-BOUNDARY](docs/baseline/O4O-STORE-COMMERCE-BOUNDARY-V1.md) + [B2B-SUPPLIER-TO-STORE-ORDER-CONTRACT](docs/baseline/O4O-B2B-SUPPLIER-TO-STORE-ORDER-CONTRACT-V1.md) |
 | Core / Frozen / Boundary / 도메인 | [CANONICAL-INDEX](docs/CANONICAL-INDEX.md)의 해당 정본 |
@@ -342,6 +347,8 @@ verdict: SAFE_TO_REMOVE | KEEP | UNCERTAIN
 
 ## 8. 문서 Drift
 
+- **대상은 기준 문서뿐**이다 — `docs/baseline/` · `architecture/` · `rules/` · `rbac/` · `platform/` · `guides/` 와 `docs/CANONICAL-INDEX.md`.
+  `checks/` · `investigations/` · `ir/` · `work-orders/` · `archive/**` 는 기록물이므로 대상이 아니다. 일괄 정리가 아니라 조사 · 개발 중 발견 시 처리한다.
 - **기본 동작은 보고**다. 작업 범위 밖 canonical 내용·판정을 임의 수정하지 않는다.
 - 인라인 허용은 ① 대체 문서가 확정된 경우 아래 SUPERSEDED 한 줄 추가(본문 불변)
   ② 깨진 링크·이동 경로의 의미 변경 없는 기계적 수정뿐이다. 명시적 파일 수정 금지 지시가 있으면 수행하지 않는다.
@@ -350,4 +357,5 @@ verdict: SAFE_TO_REMOVE | KEEP | UNCERTAIN
 - **canonical index의 행 추가 / 삭제 / 상태 변경은 별도 문서 작업**으로 취급한다.
 - 기록물(WO / CHECK / IR / archive)을 현재 정책에 맞게 다시 쓰지 않는다.
 - 대체 문서를 특정할 수 없거나 판단이 애매하면 상태를 임의 변경하지 않고 보고만 한다.
-- 발견 사항·인라인 조치·후속 문서 작업을 `문서 정합` 항목에 보고한다.
+- 발견 사항·인라인 조치·후속 문서 작업을 `문서 정합` 항목에 보고한다. 형식:
+  `문서 정합: 발견 N건 / SUPERSEDED 표기 N건 / 링크 수정 N건 / 별도 WO 제안 N건` (없으면 `해당 없음`).

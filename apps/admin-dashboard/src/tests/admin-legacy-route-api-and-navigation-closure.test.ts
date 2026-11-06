@@ -15,6 +15,7 @@
  * 소스 계약만 검사한다 — 렌더링·API 호출·운영 데이터 write 0.
  */
 import { describe, it, expect } from 'vitest';
+import ts from 'typescript';
 import { readFileSync, existsSync, readdirSync, statSync } from 'fs';
 import { join } from 'path';
 import { adminMenuStatic } from '../admin/menu/admin-menu.static';
@@ -43,23 +44,41 @@ const ALL_ROUTES = ROUTE_SOURCES.map(file=>stripAllComments(read(file))).join('\
  * route path 목록. 절대 path(`path="/…"`) 에 더해, 부모 `<Route path="/x">` 아래
  * 상대 child(`path="y"`) 는 `/x/y` 로 펼친다 (o4o-product-db.routes 가 이 형태).
  */
-const ROUTE_PATHS: string[] = [];
-for (const file of ROUTE_SOURCES) {
-  const src = stripAllComments(read(file));
-  const parents: string[] = [];
-  const tag = /<Route\b([^>]*?)(\/?)>|<\/Route>/g;
-  let m: RegExpExecArray | null;
-  while ((m = tag.exec(src))) {
-    if (m[0] === '</Route>') { parents.pop(); continue; }
-    const pathMatch = /\bpath=["']([^"']+)["']/.exec(m[1]);
-    const p = pathMatch?.[1];
-    const parent = parents[parents.length - 1] ?? '';
-    const abs = p === undefined ? undefined : p.startsWith('/') ? p : `${parent}/${p}`;
-    // App's layout and 404 catch-alls do not prove that a retired leaf exists.
-    if (abs && !(file === 'App.tsx' && p?.includes('*'))) ROUTE_PATHS.push(abs);
-    if (m[2] !== '/') parents.push(abs ?? parent);
+function collectRoutePaths(source: string, file: string): string[] {
+  const paths: string[] = [];
+  const root = ts.createSourceFile(file, source, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
+  function visit(node: ts.Node, parent = '') {
+    if (ts.isJsxElement(node) || ts.isJsxSelfClosingElement(node)) {
+      const opening = ts.isJsxElement(node) ? node.openingElement : node;
+      if (opening.tagName.getText(root) === 'Route') {
+        const attr = opening.attributes.properties.find((property): property is ts.JsxAttribute =>
+          ts.isJsxAttribute(property) && property.name.getText(root) === 'path');
+        const value = attr?.initializer;
+        const path = value && ts.isStringLiteral(value) ? value.text : undefined;
+        const absolute = path === undefined ? parent : path.startsWith('/') ? path : `${parent}/${path}`;
+        // A layout/catch-all does not establish an otherwise missing leaf route.
+        if (path && !(file === 'App.tsx' && path.includes('*'))) paths.push(absolute);
+        if (ts.isJsxElement(node)) node.children.forEach(child => visit(child, absolute));
+        return;
+      }
+    }
+    ts.forEachChild(node, child => visit(child, parent));
   }
+  visit(root);
+  return paths;
 }
+const ROUTE_PATHS = ROUTE_SOURCES.flatMap(file => collectRoutePaths(read(file), file));
+
+describe('route source traversal', () => {
+  it('keeps relative children under a parent whose element is self-closing JSX', () => {
+    const paths = collectRoutePaths('<Route path="/admin/platform" element={<Wrapper />}><Route path="users" element={<Users />} /></Route>', 'fixture.tsx');
+    expect(paths).toEqual(['/admin/platform', '/admin/platform/users']);
+    expect(paths).not.toContain('/admin/platform/missing');
+  });
+  it('ignores commented routes and App catch-alls when proving a live leaf', () => {
+    expect(collectRoutePaths('{/* <Route path="/retired" /> */}<Route path="/admin/*" element={<Layout />} />', 'App.tsx')).toEqual([]);
+  });
+});
 
 /** route 패턴이 링크를 덮는가 (`:param` · `/*` 지원). */
 const routeCovers = (route: string, link: string): boolean => {

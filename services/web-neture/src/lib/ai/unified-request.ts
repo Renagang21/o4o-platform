@@ -209,7 +209,7 @@ export interface UnifiedRequestInput {
  */
 async function legacyHomeChatFallback(input: UnifiedRequestInput): Promise<UnifiedRequestResult> {
   if (input.attachments.length > 0 || input.runId || input.routeHint || input.manualReferences?.length) {
-    throw new UnifiedRequestError('서버가 아직 파일 첨부 · 매뉴얼 참조 · 작업 이어가기를 지원하는 버전으로 업데이트되지 않았습니다. 잠시 후 다시 시도해 주세요.', 'UNIFIED_REQUEST_UNAVAILABLE', 404);
+    throw new UnifiedRequestError('서버가 아직 파일 첨부 · 매뉴얼 참조 · 작업 이어가기를 지원하는 버전으로 업데이트되지 않았습니다. 잠시 후 다시 시도해 주시기 바랍니다.', 'UNIFIED_REQUEST_UNAVAILABLE', 404);
   }
   const chat = await sendHomeChat(input.text, input.workScope);
   return { kind: 'chat', route: 'chat', reason: 'legacy_fallback', chat };
@@ -230,13 +230,13 @@ export async function sendUnifiedRequest(input: UnifiedRequestInput): Promise<Un
       workScope: toHomeChatScope(input.workScope),
     });
     const data = res?.data?.data as UnifiedRequestResult | undefined;
-    if (!data || typeof data.kind !== 'string') throw new UnifiedRequestError('응답을 생성하지 못했습니다. 다시 시도해 주세요.', 'AI_ERROR');
+    if (!data || typeof data.kind !== 'string') throw new UnifiedRequestError('응답을 생성하지 못했습니다. 다시 시도해 주시기 바랍니다.', 'AI_ERROR');
     return data;
   } catch (err) {
     if (err instanceof UnifiedRequestError) throw err;
     const resp = (err as { response?: { status?: number; data?: { error?: string; code?: string } } }).response;
     if (resp?.status === 404) return legacyHomeChatFallback(input);
-    if (resp) throw new UnifiedRequestError(resp.data?.error || '응답을 생성하지 못했습니다. 다시 시도해 주세요.', resp.data?.code || 'AI_ERROR', resp.status);
-    throw new UnifiedRequestError('네트워크 오류가 발생했습니다. 다시 시도해 주세요.', 'NETWORK_ERROR');
+    if (resp) throw new UnifiedRequestError(resp.data?.error || '응답을 생성하지 못했습니다. 다시 시도해 주시기 바랍니다.', resp.data?.code || 'AI_ERROR', resp.status);
+    throw new UnifiedRequestError('네트워크 오류가 발생했습니다. 다시 시도해 주시기 바랍니다.', 'NETWORK_ERROR');
   }
 }

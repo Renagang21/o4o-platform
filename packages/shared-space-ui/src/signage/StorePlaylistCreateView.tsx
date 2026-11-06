@@ -61,7 +61,7 @@ export function StorePlaylistCreateView({
         config={{
           surface: 'store',
           submitLabel: '생성',
-          namePlaceholder: '플레이리스트 이름을 입력하세요',
+          namePlaceholder: '플레이리스트 이름을 입력하시기 바랍니다',
           ...config,
         }}
         onSubmit={onSubmit}

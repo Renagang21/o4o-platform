@@ -1,58 +1,119 @@
 name: Scheduled API Full Jest
 
-# WO-O4O-API-JEST-AFFECTED-TEST-EXECUTION-PHASE0-SHADOW-V1 §17 · §18
-#
-# **왜 필요한가.**
-# 일반 push 의 `api-tests` 는 `admin_only` / `docs_fast_eligible` 판정에서 skip 된다.
-# 그래서 코드가 깨진 뒤 문서·CHECK commit 이 연달아 올라오면 **red 인 main 이
-# green 처럼 보인다.** 실제로 IR 조사에서 그 상태가 확인됐다(마지막 green 이후
-# 문서 commit 들이 API Jest 를 계속 skip 시킴).
-#
-# 그래서 affected 선별과 **무관하게** 하루 1회 main 기준 전체 API Jest 를 돌린다.
-# Phase 1 로 넘어가 선별 실행을 켜더라도 이 workflow 가 최종 안전망이다.
-#
-# §18 — 범위는 checkout · install · API 의존성 빌드 · full Jest 뿐이다.
-# Docker 빌드 · Cloud Run 배포 · migration Job 과 연결하지 않는다.
-# §19 — 일반 push 의 docs/admin fast path 에는 손대지 않는다. 별도 workflow 다.
-
+# All discovered suites remain blocking. The plan pins one main SHA and execution policy;
+# the three runners preserve serial Jest execution and the aggregate checks exact coverage.
 on:
   schedule:
-    # 매일 18:00 UTC = 03:00 KST. 국내 근무시간 밖이라 러너 경합이 적다.
     - cron: '0 18 * * *'
   workflow_dispatch:
+    inputs:
+      cache_mode:
+        description: 'Controlled comparison: disable both build/Jest caches without changing test scope'
+        type: choice
+        options: [default, disabled]
+        default: default
 
 concurrency:
   group: scheduled-api-full-jest
   cancel-in-progress: false
-
 permissions:
   contents: read
-
 env:
-  NODE_VERSION: '22.18.0'
+  NODE_VERSION: '22.23.4'
   CI_BUILD_CACHE_DISABLED: ${{ vars.CI_BUILD_CACHE_DISABLED }}
-
 jobs:
+  plan:
+    name: Discover full Jest scope
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    outputs:
+      sha: ${{ steps.plan.outputs.sha }}
+      strategy: ${{ steps.plan.outputs.strategy }}
+      cache_mode: ${{ steps.plan.outputs.cache_mode }}
+      build_cache_disabled: ${{ steps.plan.outputs.build_cache_disabled }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: main
+      - name: Setup build environment
+        uses: ./.github/actions/setup-build-env
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          strict-lockfile: 'true'
+          build-packages: 'false'
+      - name: Discover all tests and verify the three partitions
+        id: plan
+        env:
+          O4O_JEST_SHARD_STRATEGY: ${{ vars.O4O_JEST_SHARD_STRATEGY }}
+          CACHE_MODE: ${{ inputs.cache_mode || 'default' }}
+        run: node scripts/ci/scheduled-jest.mjs plan --cache-mode "$CACHE_MODE" --output reports/plan.json
+      - uses: actions/upload-artifact@v7
+        with:
+          name: scheduled-jest-plan-${{ github.run_id }}
+          path: reports/plan.json
+          overwrite: true
+          retention-days: 7
+          if-no-files-found: error
   full-jest:
-    name: API Server Jest (full, scheduled)
+    name: API Server Jest (scheduled ${{ matrix.shard }}/3)
+    needs: plan
     runs-on: ubuntu-latest
     timeout-minutes: 45
-
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3]
+    env:
+      CI_BUILD_CACHE_DISABLED: ${{ needs.plan.outputs.build_cache_disabled }}
     steps:
-    - uses: actions/checkout@v6
-      with:
-        ref: main
-
-    - name: Setup build environment
-      uses: ./.github/actions/setup-build-env
-      with:
-        node-version: ${{ env.NODE_VERSION }}
-        strict-lockfile: 'true'
-        build-packages: 'false'
-
-    - name: Build api-server workspace dependencies
-      uses: ./.github/actions/api-dependency-build
-
-    # 선별하지 않는다. 전체 suite 를 그대로 돌린다.
-    - name: Run tests (api-server Jest, serial to prevent OOM)
-      run: cd apps/api-server && npx jest --maxWorkers=1
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ needs.plan.outputs.sha }}
+      - name: Setup build environment
+        uses: ./.github/actions/setup-build-env
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          strict-lockfile: 'true'
+          build-packages: 'false'
+      - name: Build api-server workspace dependencies
+        uses: ./.github/actions/api-dependency-build
+      - uses: actions/download-artifact@v8
+        with:
+          name: scheduled-jest-plan-${{ github.run_id }}
+          path: plan
+      - name: Run the full assigned shard and record memory/runtime evidence
+        env:
+          SHARD: ${{ matrix.shard }}
+        run: node scripts/ci/scheduled-jest.mjs run --plan plan/plan.json --shard "$SHARD" --output reports
+      - name: Preserve results even after failure or OOM
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: scheduled-jest-shard-${{ matrix.shard }}-${{ github.run_id }}
+          path: reports/
+          overwrite: true
+          retention-days: 7
+          if-no-files-found: error
+  aggregate:
+    name: Scheduled full Jest result
+    if: always()
+    needs: [plan, full-jest]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ needs.plan.outputs.sha || github.sha }}
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: scheduled-jest-*-${{ github.run_id }}
+          path: artifacts
+      - name: Reconcile every discovered suite and every required job
+        if: always()
+        env:
+          PLAN_RESULT: ${{ needs.plan.result }}
+          MATRIX_RESULT: ${{ needs.full-jest.result }}
+        run: node scripts/ci/scheduled-jest.mjs aggregate --artifacts artifacts

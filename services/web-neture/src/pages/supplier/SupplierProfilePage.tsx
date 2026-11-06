@@ -84,7 +84,7 @@ export default function SupplierProfilePage() {
         <div className="mb-6 flex items-start gap-2 bg-amber-50 border border-amber-200 rounded-xl p-4">
           <Info className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" />
           <p className="text-sm text-amber-800">
-            가입 시 입력한 사업자 정보가 자동으로 채워졌습니다. 확인 후 저장해주세요.
+            가입 시 입력한 사업자 정보가 자동으로 채워졌습니다. 확인 후 저장해 주시기 바랍니다.
           </p>
         </div>
       )}

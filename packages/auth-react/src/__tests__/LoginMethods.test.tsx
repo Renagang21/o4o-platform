@@ -41,8 +41,20 @@ beforeEach(() => { onCredential = null; });
 afterEach(() => cleanup());
 
 describe('LoginMethods', () => {
+  it('소셜 진입을 이메일보다 먼저 표시하고 이메일 입력은 선택 후 펼친다', async () => {
+    mount(true);
+    const google = await screen.findByTestId('google-continue-button');
+    const email = screen.getByTestId('email-login-option');
+    expect(google.compareDocumentPosition(email) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(email.hasAttribute('open')).toBe(false);
+    fireEvent.click(screen.getByText('이메일로 로그인'));
+    expect(email.hasAttribute('open')).toBe(true);
+    expect(screen.getByRole('textbox', { name: '이메일' })).toBeTruthy();
+  });
+
   it('이메일 로그인 성공 → onSuccess(user)', async () => {
     const p = mount(false);
+    fireEvent.click(screen.getByText('이메일로 로그인'));
     fireEvent.change(screen.getByLabelText('이메일'), { target: { value: 'a@b.co' } });
     fireEvent.change(screen.getByLabelText('비밀번호'), { target: { value: 'abcd123!' } });
     fireEvent.click(screen.getByRole('button', { name: '로그인' }));

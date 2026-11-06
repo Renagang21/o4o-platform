@@ -1,7 +1,8 @@
 # KPA Signage Structure — Baseline V1
 
 > **기준일:** 2026-04-17  
-> **상태:** Frozen (구조 정비 완료)  
+> **상태:** Frozen (구조 정비 완료)
+> **최종 갱신:** 2026-11-05 — 사용자 승인으로 매장 재생 일정 폐기. [현행 매장 재생 정책](O4O-SIGNAGE-STORE-PLAYLIST-MODEL-BOUNDARY-V1.md#0-1-현재-매장-재생-정책--2026-11-05-사용자-승인)이 매장 시간표 부분을 대체한다. 공통 모델/과거 데이터는 보존한다.
 > **관련 WO:** WO-KPA-SIGNAGE-DEAD-CODE-CLEANUP-V1 · WO-KPA-SIGNAGE-UI-RESTRUCTURE-V1 · WO-KPA-SIGNAGE-UI-FINAL-CLEANUP-V1
 
 ---
@@ -12,7 +13,7 @@
 |------|-----|------|
 | **커뮤니티 탐색** | `/signage`, `/intranet/signage/content` | 약사회 회원 — 영상 탐색·공유 |
 | **운영자 관리** | `/operator/signage/*` | KPA 운영자 — HQ 미디어·플레이리스트·카테고리 관리 |
-| **매장 운영** | `/store/marketing/signage` | 약국 — 콘텐츠 가져오기·플레이리스트·스케줄 |
+| **매장 운영** | `/store/marketing/signage` | 약국 — 콘텐츠 가져오기·재생목록·디스플레이 재생 |
 
 > `/hub/signage` — 매장 진입 전 탐색 전용 (copy-to-store 게이트)
 
@@ -23,10 +24,10 @@
 ```
 탐색 (/hub/signage)
   → 내 매장에 추가 (assetSnapshotApi.copy)
-  → 내 동영상 (/store/marketing/signage#assets)
-  → 플레이리스트 구성 (#playlist)
-  → 스케줄 적용 (#schedules)
-  → 공개 재생 (/public/signage?playlist=:id)
+  → 동영상 보관함 (/store/marketing/signage/videos)
+  → 재생목록 구성·게시 (/store/marketing/signage/playlist)
+  → 디스플레이 재생 화면 열기 (/store/marketing/signage/display)
+  → 목록 선택·사용자 시작 (/store/marketing/signage/play/:playlistId)
 ```
 
 ---
@@ -38,7 +39,7 @@
 | `signage_media` | HQ + 커뮤니티 원본 미디어 |
 | `signage_playlists` | HQ 원본 플레이리스트 |
 | `signage_playlist_items` | 플레이리스트 항목 |
-| `signage_schedules` | 매장 재생 스케줄 |
+| `signage_schedules` | 공통 entity/과거 데이터 보존. 매장 시간표 기능은 폐기 |
 | `signage_templates` | 레이아웃 템플릿 |
 | `signage_ai_generation_logs` | AI 생성 이력 |
 | `o4o_asset_snapshots` | 매장 복사본 (Hub→Store 전달 경로) |
@@ -58,7 +59,7 @@
 | GET/POST | `/api/signage/kpa-society/hq/playlists` | HQ 플레이리스트 CRUD |
 | POST | `/api/asset-snapshot/copy` | Hub → 매장 복사 (단일 경로) |
 | GET/POST | `/api/store/playlists` | 매장 플레이리스트 CRUD |
-| GET/POST | `/api/signage/schedules/:orgId` | 매장 스케줄 CRUD |
+| GET | `/store-playlists/public/:id` | 게시된 매장 snapshot 재생 조회 (API client의 서비스별 `/api/v1/<service>` base 사용) |
 | GET | `/public/signage?playlist=:id` | 공개 재생 엔드포인트 |
 
 ---
@@ -77,7 +78,8 @@ Hub (탐색 게이트)
        ├─ [Tab 1] 가져올 콘텐츠  → /hub/signage CTA
        ├─ [Tab 2] 내 동영상      asset snapshots (toggle/filter/search)
        ├─ [Tab 3] 내 플레이리스트 DataTable + 편집 인라인
-       └─ [Tab 4] 스케줄         시간·요일 기반 CRUD
+  ├─ SignagePlayerSelectPage.tsx  디스플레이 재생 · 새 탭에서 목록 선택
+  └─ SignagePlaybackPage.tsx      URL의 목록을 사용자 시작 후 반복 재생
 
 운영자
   ├─ HqMediaPage.tsx            /operator/signage/hq-media       (DataTable)
@@ -109,7 +111,7 @@ Hub (탐색 게이트)
 | 새 HQ 미디어 추가 | `/operator/signage/hq-media` |
 | 커뮤니티 콘텐츠 등록 | `/signage` (콘텐츠 등록 버튼) |
 | 매장 콘텐츠 확보 | `/hub/signage` → 내 매장에 추가 |
-| 재생 스케줄 설정 | `/store/marketing/signage` > 스케줄 탭 |
+| 디스플레이별 재생목록 선택 | `/store/marketing/signage/player` > 재생 화면 열기 |
 | AI 콘텐츠 생성 | `/operator/signage/hq-media` > AI 초안 생성 |
 
 ---

@@ -41,8 +41,10 @@ export interface GoogleContinueProps<TUser = unknown> {
   privacyHref?: string;
   /** Google 버튼 아래 안내(선택). 버튼이 보이는 동안에만 렌더한다. */
   hint?: ReactNode;
-  /** 가입 선택 화면에서 브라우저 계정 이름·이메일이 표시되는 맞춤 버튼을 끈다. */
+  /** 기본 false: 브라우저 계정 이름·이메일을 버튼에 표시하지 않는다. */
   personalizedButton?: boolean;
+  /** 로그인·가입 화면의 동작에 맞는 GIS 공식 버튼 문구. */
+  buttonText?: 'continue_with' | 'signin_with' | 'signup_with';
   className?: string;
 }
 
@@ -75,7 +77,8 @@ export function GoogleContinue<TUser = unknown>({
   onError,
   onStart,
   hint,
-  personalizedButton = true,
+  personalizedButton = false,
+  buttonText = 'continue_with',
   className,
 }: GoogleContinueProps<TUser>) {
   const [policy, setPolicy] = useState<SignupTermsDocument | null>(null);
@@ -156,14 +159,14 @@ export function GoogleContinue<TUser = unknown>({
       container: containerRef.current,
       // GIS 공식 지원: medium 버튼에는 계정 이름·이메일 맞춤 표시가 없다.
       // https://developers.google.com/identity/gsi/web/guides/personalized-button
-      ...(!personalizedButton && { button: { size: 'medium' as const, text: 'signup_with' as const } }),
+      ...(!personalizedButton && { button: { size: 'medium' as const, text: buttonText } }),
       onCredential: (token) => { void handleCredential(token); },
       onError: (err) => {
         if (mountedRef.current) setMessage(err.message || 'Google 버튼을 불러오지 못했습니다.');
       },
     }).then((fn) => { if (disposed) fn(); else cleanup = fn; });
     return () => { disposed = true; cleanup?.(); };
-  }, [stage, handleCredential, personalizedButton]);
+  }, [stage, handleCredential, personalizedButton, buttonText]);
 
   /** consent → signup */
   const submitSignup = useCallback(async () => {
@@ -172,10 +175,10 @@ export function GoogleContinue<TUser = unknown>({
       setMessage('이용약관과 개인정보 처리방침에 동의해야 계정을 만들 수 있습니다.');
       return;
     }
-    if (!name.trim() || name.trim().length > 100) { setMessage('이름을 100자 이내로 입력해 주세요.'); return; }
-    if (!nickname.trim()) { setMessage('닉네임을 입력해 주세요.'); return; }
+    if (!name.trim() || name.trim().length > 100) { setMessage('이름을 100자 이내로 입력해 주시기 바랍니다.'); return; }
+    if (!nickname.trim()) { setMessage('닉네임을 입력해 주시기 바랍니다.'); return; }
     const phoneDigits = phone.replace(/\D/g, '');
-    if (!/^01\d{8,9}$/.test(phoneDigits)) { setMessage('개인 휴대전화 번호를 입력해 주세요.'); return; }
+    if (!/^01\d{8,9}$/.test(phoneDigits)) { setMessage('개인 휴대전화 번호를 입력해 주시기 바랍니다.'); return; }
     const idToken = stage.idToken;
     setMessage(null);
     setStage({ kind: 'busy' });
@@ -201,7 +204,8 @@ export function GoogleContinue<TUser = unknown>({
       {stage.kind === 'button' && (
         <div
           ref={containerRef}
-          style={{ display: 'flex', justifyContent: 'center', minHeight: 44 }}
+          aria-label={buttonText==='signup_with'?'Google로 가입':undefined}
+          style={{ display: 'flex', justifyContent: 'center', minHeight: buttonText==='signup_with'?32:44 }}
           data-testid="google-continue-button"
         />
       )}
@@ -209,7 +213,7 @@ export function GoogleContinue<TUser = unknown>({
       {stage.kind === 'consent' && (
         <div style={box} data-testid="google-continue-consent">
           <p style={{ fontSize: 14, color: '#111827', margin: 0 }}>
-            처음 오셨네요. 계정을 만들려면 아래 항목에 동의해 주세요.
+            처음 오셨네요. 계정을 만들려면 아래 항목에 동의해 주시기 바랍니다.
           </p>
           <label style={styles.field}>닉네임 (필수)<input style={styles.input} type="text" maxLength={50} value={nickname} onChange={(e) => setNickname(e.target.value)} /></label>
           <label style={styles.field}>이름 (필수)<input style={styles.input} type="text" autoComplete="name" maxLength={100} value={name} onChange={(e) => setName(e.target.value)} /></label>

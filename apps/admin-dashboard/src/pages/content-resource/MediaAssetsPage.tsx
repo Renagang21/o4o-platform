@@ -341,7 +341,7 @@ const MetadataEditModal: React.FC<{
                   <p className="font-semibold">사용처를 확인하지 못했습니다.</p>
                   <p className="mt-1 break-all">{usageError}</p>
                   <p className="mt-1 text-xs text-red-700">
-                    사용처가 없다는 뜻이 아닙니다. 확인 전에는 삭제 판단을 하지 마세요.
+                    사용처가 없다는 뜻이 아닙니다. 확인 전에는 삭제 판단을 하지 마시기 바랍니다.
                   </p>
                   <button
                     type="button"

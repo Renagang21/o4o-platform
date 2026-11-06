@@ -46,10 +46,10 @@ export class ConsultationContextService {
     actorId: string; organizationId: string; authorize: () => Promise<boolean>;
   }) {
     const parsed = inquiry.safeParse({ question: raw.question, context: raw.context });
-    if (!parsed.success) throw new NeturePharmacyError(400, 'INVALID_CONSULTATION_CONTEXT', '현재 질문과 이번 상담의 확인 내용을 4,000자 이내로 입력해 주세요.');
-    if (!await access.authorize()) throw new NeturePharmacyError(403, 'STORE_ACCESS_REQUIRED', '현재 매장의 상담 권한을 확인해 주세요.');
+    if (!parsed.success) throw new NeturePharmacyError(400, 'INVALID_CONSULTATION_CONTEXT', '현재 질문과 이번 상담의 확인 내용을 4,000자 이내로 입력해 주시기 바랍니다.');
+    if (!await access.authorize()) throw new NeturePharmacyError(403, 'STORE_ACCESS_REQUIRED', '현재 매장의 상담 권한을 확인해 주시기 바랍니다.');
     const plan = planSchema.parse(await this.plan(parsed.data, access));
-    if (!await access.authorize()) throw new NeturePharmacyError(403, 'STORE_ACCESS_REQUIRED', '현재 매장의 상담 권한을 확인해 주세요.');
+    if (!await access.authorize()) throw new NeturePharmacyError(403, 'STORE_ACCESS_REQUIRED', '현재 매장의 상담 권한을 확인해 주시기 바랍니다.');
     if (!plan.needsProduct) return { state: 'not-needed', message: '이 질문은 상품 선택 없이 상담을 이어갈 수 있습니다.', candidates: [] };
     if (plan.clarification || !plan.terms.length) return { state: 'clarify', message: plan.clarification ?? '어떤 내용을 확인하고 싶은지 조금 더 알려 주세요.', candidates: [] };
     // Scope before ranking/limit. Global catalog top-N and unhandled-product recommendations are not used.
@@ -70,7 +70,7 @@ export class ConsultationContextService {
     FROM store_products
     WHERE EXISTS(SELECT 1 FROM unnest($2::text[]) term WHERE position(lower(term) in lower(searchable))>0)
     ORDER BY score DESC,name,id LIMIT 12`, [access.organizationId, [...new Set(plan.terms)]]);
-    if (!await access.authorize()) throw new NeturePharmacyError(403, 'STORE_ACCESS_REQUIRED', '현재 매장의 상담 권한을 확인해 주세요.');
+    if (!await access.authorize()) throw new NeturePharmacyError(403, 'STORE_ACCESS_REQUIRED', '현재 매장의 상담 권한을 확인해 주시기 바랍니다.');
     return { state: candidates.length ? 'candidates' : 'empty',
       message: candidates.length ? '현재 매장의 후보입니다. 상품·규격을 확인한 뒤 상담 근거를 읽어 주세요.'
         : '현재 매장의 취급 상품에서 관련 후보를 찾지 못했습니다. 조건을 확인하거나 상품을 직접 찾아 주세요.',

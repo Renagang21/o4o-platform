@@ -70,9 +70,6 @@ const stubController = () =>
 jest.mock('../routes/signage/controllers/playlist.controller.js', () => ({
   SignagePlaylistController: stubController(),
 }));
-jest.mock('../routes/signage/controllers/schedule.controller.js', () => ({
-  SignageScheduleController: stubController(),
-}));
 jest.mock('../routes/signage/controllers/template.controller.js', () => ({
   SignageTemplateController: stubController(),
 }));

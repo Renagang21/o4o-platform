@@ -39,7 +39,7 @@ export async function dispatchContactInquiry(
       throw new OperationError(
         409,
         "NOTIFICATION_IN_PROGRESS",
-        "접수 알림의 발송 결과를 확인 중입니다. 문의 상세를 다시 확인해 주세요.",
+        "접수 알림의 발송 결과를 확인 중입니다. 문의 상세를 다시 확인해 주시기 바랍니다.",
       );
     // The bounded existing field retains successful-channel evidence while a claim is unresolved.
     const completed = ["inapp", "email", "autoreply"]
@@ -64,7 +64,7 @@ export async function dispatchContactInquiry(
     throw new OperationError(
       409,
       "NOTIFICATION_STATE_CHANGED",
-      "알림 상태가 변경되었습니다. 문의 상세를 다시 확인해 주세요.",
+      "알림 상태가 변경되었습니다. 문의 상세를 다시 확인해 주시기 바랍니다.",
     );
   return repo.findOne({ where: { id, service_key: serviceKey, organization_id: IsNull() } });
 }

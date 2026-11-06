@@ -1302,7 +1302,8 @@ test('J17. Phase 0 계약 — workflow 는 selected 여부와 무관하게 full 
 test('J18. 정기 full Jest workflow 가 존재하고 선별하지 않는다 (§17 · §18)', () => {
   const wf = readFileSync(path.join(REPO_ROOT, '.github/workflows/scheduled-api-full-jest.yml'), 'utf-8');
   assert.match(wf, /schedule:/, 'docs/admin fast path 가 red main 을 가리는 것을 막는 최종 안전망이다');
-  assert.ok(wf.includes('npx jest --maxWorkers=1\n'), '선별 인자 없이 전체를 돌려야 한다');
+  for(const mode of ['plan','run','aggregate'])assert.ok(wf.includes(`node scripts/ci/scheduled-jest.mjs ${mode}`),'발견·전체 분할 실행·집계가 모두 필요하다');
+  assert.ok(wf.includes('shard: [1, 2, 3]'),'전체 3분할을 빠짐없이 실행한다');
   // §18 — Docker / Cloud Run / migration Job 과 연결하지 않는다
   for (const forbidden of ['docker', 'gcloud', 'Cloud Run', 'migration']) {
     assert.ok(!new RegExp(forbidden, 'i').test(wf.replace(/^\s*#.*$/gm, '')),

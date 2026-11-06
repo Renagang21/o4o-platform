@@ -46,3 +46,13 @@ it('community daily workspace suppresses destructive actions even for its admin'
  expect(screen.queryByRole('button',{name:'삭제'})).toBeNull();
  expect(api.delete).not.toHaveBeenCalled();
 });
+
+it.each(['lecture','supplier','funding','community','neture'])('%s preserves a protected Admin row and exposes no mutation',async serviceKey=>{
+ const api=fixture(serviceKey,'pending');
+ api.get.mockImplementation(async()=>({users:[{id:'admin-target',name:'합성 관리자',email:'admin@example.test',status:'pending',operatorReadOnly:true,createdAt:'2026-01-01'}],pagination:{page:1,limit:20,total:1,totalPages:1},statistics:{total:1}}));
+ render(<MemoryRouter><ServiceMembersWorkspace serviceKey={serviceKey} basePath="/members" api={api} roles={['platform:super_admin']} navigate={vi.fn()} /></MemoryRouter>);
+ await screen.findByText('전체 관리자 — 처리 대상 아님');
+ fireEvent.click(screen.getByText('합성 관리자'));
+ expect(screen.queryByRole('button',{name:'승인',exact:true})).toBeNull();expect(screen.queryByRole('button',{name:'반려',exact:true})).toBeNull();
+ expect(screen.queryByRole('button',{name:'비활성화'})).toBeNull();expect(api.patch).not.toHaveBeenCalled();
+});

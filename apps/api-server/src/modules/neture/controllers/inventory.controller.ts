@@ -74,7 +74,7 @@ export function createInventoryController(dataSource: DataSource): Router {
         return res.status(400).json({ success: false, error: 'NO_UPDATES', message: 'No fields to update' });
       }
       if (result === 'INVENTORY_CONFLICT') {
-        return res.status(409).json({ success: false, error: 'INVENTORY_CONFLICT', message: '재고가 변경되었습니다. 최신 재고를 확인하고 다시 수정해 주세요.' });
+        return res.status(409).json({ success: false, error: 'INVENTORY_CONFLICT', message: '재고가 변경되었습니다. 최신 재고를 확인하고 다시 수정해 주시기 바랍니다.' });
       }
       res.json({ success: true, data: result });
     } catch (error) {

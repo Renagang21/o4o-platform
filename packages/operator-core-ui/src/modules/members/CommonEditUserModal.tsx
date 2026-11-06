@@ -200,7 +200,7 @@ export function CommonEditUserModal({ userId, config, onClose, onSuccess }: Comm
         console.warn('[CommonEditUserModal] Invalid userId — fetch skipped', { userId });
       }
       setLoading(false);
-      setActionError('회원 ID가 없거나 유효하지 않아 정보를 불러올 수 없습니다. 목록을 새로고침 후 다시 시도해 주세요.');
+      setActionError('회원 ID가 없거나 유효하지 않아 정보를 불러올 수 없습니다. 목록을 새로고침 후 다시 시도해 주시기 바랍니다.');
       return;
     }
     (async () => {

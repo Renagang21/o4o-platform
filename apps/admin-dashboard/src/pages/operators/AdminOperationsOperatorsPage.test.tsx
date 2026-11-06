@@ -84,9 +84,9 @@ it('keeps confirmed success visible until acknowledgement and prevents duplicate
 it('renders structured server errors as readable feedback without losing the invite draft',async()=>{
  mount();await screen.findByText('지정된 업무 운영자가 없습니다.');fireEvent.click(screen.getByRole('button',{name:'업무 운영자 초대'}));
  const dialog=within(screen.getByRole('dialog'));fireEvent.change(dialog.getByLabelText('미가입자 초대 이메일'),{target:{value:'new@example.test'}});
- api.post.mockRejectedValueOnce({response:{data:{error:{code:'FORBIDDEN',message:'현재 초대 권한을 확인해 주세요.'}}}});
+ api.post.mockRejectedValueOnce({response:{data:{error:{code:'FORBIDDEN',message:'현재 초대 권한을 확인해 주시기 바랍니다.'}}}});
  fireEvent.click(dialog.getByRole('button',{name:'초대 메일 보내기'}));
- expect(await dialog.findByRole('alert')).toHaveTextContent('현재 초대 권한을 확인해 주세요.');
+ expect(await dialog.findByRole('alert')).toHaveTextContent('현재 초대 권한을 확인해 주시기 바랍니다.');
  expect(dialog.getByLabelText('미가입자 초대 이메일')).toHaveValue('new@example.test');
  expect(dialog.getByRole('button',{name:'초대 메일 보내기'})).toBeEnabled();
 });
@@ -112,7 +112,7 @@ it('shows an empty search result inside the open invitation without presenting i
  mount();await screen.findByText('지정된 업무 운영자가 없습니다.');fireEvent.click(screen.getByRole('button',{name:'업무 운영자 초대'}));
  const dialog=within(screen.getByRole('dialog'));api.get.mockResolvedValueOnce({data:{data:{candidates:[]}}});
  fireEvent.change(dialog.getByLabelText('기존 사용자 검색'),{target:{value:'unknown'}});fireEvent.click(dialog.getByRole('button',{name:'사용자 검색'}));
- expect(await dialog.findByRole('status')).toHaveTextContent('검색 결과가 없습니다. 공통 계정이 없다면 이메일로 초대하세요.');
+ expect(await dialog.findByRole('status')).toHaveTextContent('검색 결과가 없습니다. 공통 계정이 없다면 이메일로 초대하시기 바랍니다.');
  expect(api.post).not.toHaveBeenCalled();
  fireEvent.change(dialog.getByLabelText('기존 사용자 검색'),{target:{value:'different'}});expect(dialog.queryByRole('status')).toBeNull();
  fireEvent.click(dialog.getByRole('button',{name:'취소'}));expect(screen.queryByText(/검색 결과가 없습니다/)).toBeNull();

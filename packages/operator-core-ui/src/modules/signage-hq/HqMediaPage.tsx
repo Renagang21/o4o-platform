@@ -136,12 +136,12 @@ export function HqMediaPage({ apiFetch, config, navigate }: SignageHqPageProps) 
   const handleCreate = async () => {
     if (!formName.trim() || !formSourceUrl.trim()) return;
     if (formTags.length === 0) {
-      setFormError('태그를 최소 1개 이상 입력해주세요');
+      setFormError('태그를 최소 1개 이상 입력해 주시기 바랍니다');
       return;
     }
     const durationSec = parseDuration(formDuration);
     if (!formDuration.trim() || durationSec <= 0) {
-      setFormError('재생시간을 입력하세요 (예: 10:30)');
+      setFormError('재생시간을 입력하시기 바랍니다 (예: 10:30)');
       return;
     }
     setIsCreating(true);
@@ -404,7 +404,7 @@ export function HqMediaPage({ apiFetch, config, navigate }: SignageHqPageProps) 
                 <label className="block text-xs font-medium text-slate-500 mb-1">제목 *</label>
                 <input
                   type="text" value={formName} onChange={(e) => setFormName(e.target.value)}
-                  placeholder="동영상 제목을 입력하세요"
+                  placeholder="동영상 제목을 입력하시기 바랍니다"
                   className={`w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 ${accent.focusRing}`}
                 />
               </div>
@@ -420,7 +420,7 @@ export function HqMediaPage({ apiFetch, config, navigate }: SignageHqPageProps) 
                 <label className="block text-xs font-medium text-slate-500 mb-1">설명 / 용도 메모</label>
                 <textarea
                   value={formDescription} onChange={(e) => setFormDescription(e.target.value)}
-                  placeholder="이 동영상의 활용 위치나 용도를 간략히 기록하세요" rows={2}
+                  placeholder="이 동영상의 활용 위치나 용도를 간략히 기록하시기 바랍니다" rows={2}
                   className={`w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 ${accent.focusRing} resize-none`}
                 />
               </div>

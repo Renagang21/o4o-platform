@@ -111,14 +111,14 @@ export const channelRule: InsightRule = {
     if (travelChannel && travelChannel.revenue / totalRevenue > 0.6) {
       insights.push({
         level: 'info',
-        message: '관광객 매출 비중이 높습니다. 관광 시즌 프로모션을 활용해보세요.',
+        message: '관광객 매출 비중이 높습니다. 관광 시즌 프로모션을 활용해보시기 바랍니다.',
       });
     }
 
     if (localChannel && localChannel.revenue / totalRevenue > 0.8) {
       insights.push({
         level: 'info',
-        message: '지역 고객 중심 매출 구조입니다. 단골 프로그램을 고려해보세요.',
+        message: '지역 고객 중심 매출 구조입니다. 단골 프로그램을 고려해보시기 바랍니다.',
       });
     }
 
@@ -145,7 +145,7 @@ export const productRule: InsightRule = {
     if (topProduct.revenue / totalRevenue > 0.5) {
       insights.push({
         level: 'warning',
-        message: `"${topProduct.productName}" 상품에 매출이 집중되고 있습니다. 상품 다양화를 고려해보세요.`,
+        message: `"${topProduct.productName}" 상품에 매출이 집중되고 있습니다. 상품 다양화를 고려해보시기 바랍니다.`,
       });
     }
 
@@ -153,7 +153,7 @@ export const productRule: InsightRule = {
     if (topProducts.length < 3 && ctx.summary.stats.monthlyOrders > 0) {
       insights.push({
         level: 'info',
-        message: '판매 상품 수가 적습니다. 추가 상품 등록을 고려해보세요.',
+        message: '판매 상품 수가 적습니다. 추가 상품 등록을 고려해보시기 바랍니다.',
       });
     }
 
@@ -181,7 +181,7 @@ export const activityRule: InsightRule = {
     if (todayOrders === 0 && monthlyRevenue > 0) {
       insights.push({
         level: 'info',
-        message: '오늘 아직 주문이 없습니다. 프로모션을 고려해보세요.',
+        message: '오늘 아직 주문이 없습니다. 프로모션을 고려해보시기 바랍니다.',
       });
     }
 

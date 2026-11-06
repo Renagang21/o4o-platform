@@ -71,7 +71,7 @@ it("returns a stale target conflict without converting it into success", async (
       new SupplierReviewError(
         409,
         "REVIEW_REQUEST_CHANGED",
-        "다시 조회해 주세요.",
+        "다시 조회해 주시기 바랍니다.",
       ),
     );
   const res = response();

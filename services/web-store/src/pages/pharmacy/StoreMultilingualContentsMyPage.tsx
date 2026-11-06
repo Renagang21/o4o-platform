@@ -29,7 +29,7 @@ function MyContentsSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>
       const data = await listMyMlcGroups({ includeArchived: false });
       if (current() && isCurrent()) setGroups(data);
     } catch {
-      if (current() && isCurrent()) setError('내 매장 다국어 콘텐츠를 불러오지 못했습니다. 다시 시도해 주세요.');
+      if (current() && isCurrent()) setError('내 매장 다국어 콘텐츠를 불러오지 못했습니다. 다시 시도해 주시기 바랍니다.');
     } finally {
       if (current() && isCurrent()) setLoading(false);
     }
@@ -45,7 +45,7 @@ function MyContentsSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>
       : loading ? <p role="status">콘텐츠 불러오는 중…</p>
       : groups.length === 0 ? <p>아직 가져오거나 작성한 다국어 콘텐츠가 없습니다.</p>
       : <>
-        {selected && !groups.some(g => g.id === selected) && <p role="status">선택한 콘텐츠가 현재 매장 목록에 없습니다. 목록에서 다시 선택해 주세요.</p>}
+        {selected && !groups.some(g => g.id === selected) && <p role="status">선택한 콘텐츠가 현재 매장 목록에 없습니다. 목록에서 다시 선택해 주시기 바랍니다.</p>}
         {ordered.map(group => <ContentCard key={group.id} group={group} base={base} selected={group.id === selected} isCurrent={isCurrent} />)}
       </>}
   </div>;
@@ -67,15 +67,15 @@ function ContentCard({ group: initialGroup, base, selected, isCurrent }: Readonl
       if (current() && isCurrent()) setResult(data);
     } catch (e) {
       if (current() && isCurrent()) setError((e as { code?: string }).code === 'PUBLISHED_PAGE_NOT_FOUND'
-        ? '발행된 대체 언어가 없습니다. 언어별 내용 확인·편집에서 발행하거나 고객용 링크를 준비해 주세요.'
-        : '언어별 보기를 불러오지 못했습니다. 다시 시도해 주세요.');
+        ? '발행된 대체 언어가 없습니다. 언어별 내용 확인·편집에서 발행하거나 고객용 링크를 준비해 주시기 바랍니다.'
+        : '언어별 보기를 불러오지 못했습니다. 다시 시도해 주시기 바랍니다.');
     } finally { if (current() && isCurrent()) setLoading(false); }
   };
   const html = result?.page.content?.html;
   return <section aria-label={group.title} className={`bg-white rounded-xl border p-4 sm:p-5 space-y-3 ${selected ? 'border-blue-500' : 'border-slate-200'}`}>
     <h2 className="font-semibold break-words">{group.title}{selected && <span className="ml-2 text-xs text-blue-700">선택한 콘텐츠</span>}</h2>
     <p className="text-sm text-slate-600">연결 제품: {group.targetKind === 'local' ? '매장 경영활용 제품' : 'O4O DB 기반 제품'} · 기본 언어 {STORE_MLC_LOCALE_LABELS[group.defaultLocale]}</p>
-    {group.targetActive === false && <p role="status" className="rounded bg-amber-50 p-3 text-sm">연결 제품이 현재 매장의 활성 취급 목록에 없습니다. 게시 내용과 제품 연결을 확인해 주세요. 기존 고객용 링크는 별도로 관리됩니다. <Link className="underline" to={`${base}/products`}>매장 제품 확인</Link></p>}
+    {group.targetActive === false && <p role="status" className="rounded bg-amber-50 p-3 text-sm">연결 제품이 현재 매장의 활성 취급 목록에 없습니다. 게시 내용과 제품 연결을 확인해 주시기 바랍니다. 기존 고객용 링크는 별도로 관리됩니다. <Link className="underline" to={`${base}/products`}>매장 제품 확인</Link></p>}
     <p className="text-xs text-slate-500">{group.sourceType === 'operator_hub' ? '제공 자료의 독립 사본' : '매장 직접 작성'} · 작성 언어: {group.pages.map(p => `${STORE_MLC_LOCALE_LABELS[p.locale]} (${p.status === 'published' ? '발행' : p.status === 'archived' ? '보관' : '초안'})`).join(', ') || '없음'}</p>
     <Link className="inline-flex items-center min-h-11 text-blue-700 underline text-sm" to={`${base}/products/multilingual/${group.targetKind}/${encodeURIComponent(group.targetId)}?groupId=${encodeURIComponent(group.id)}`}>연결 제품의 언어별 내용 확인·편집</Link>
     <div className="flex flex-wrap items-center gap-2">
@@ -89,7 +89,7 @@ function ContentCard({ group: initialGroup, base, selected, isCurrent }: Readonl
     {result && <div role="status" className="rounded-lg border p-3 space-y-2 break-words">
       <p className="text-sm">요청 {STORE_MLC_LOCALE_LABELS[locale]} → 표시 {STORE_MLC_LOCALE_LABELS[result.page.resolvedLocale || result.page.locale]}{result.page.fallbackReason && ' (대체 언어)'}</p>
       <h3 className="font-semibold">{result.page.title}</h3><p>{result.page.summary}</p>
-      {typeof html === 'string' ? <div className="prose max-w-full overflow-x-auto" dangerouslySetInnerHTML={{ __html: sanitizeRichHtml(html) }} /> : <p className="text-sm">이 형식의 전체 내용은 고객용 보기에서 확인해 주세요.</p>}
+      {typeof html === 'string' ? <div className="prose max-w-full overflow-x-auto" dangerouslySetInnerHTML={{ __html: sanitizeRichHtml(html) }} /> : <p className="text-sm">이 형식의 전체 내용은 고객용 보기에서 확인해 주시기 바랍니다.</p>}
     </div>}
     <MultilingualChannelActions groupId={group.id} locale={locale} published={group.pages.some(p => p.status === 'published')} />
     <MultilingualPublicActions groupId={group.id} publishable={hasPublishableMlcPage(group)} onPublished={async () => {

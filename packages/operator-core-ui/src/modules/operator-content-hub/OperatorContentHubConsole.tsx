@@ -197,13 +197,13 @@ export function OperatorContentHubConsole({
     const sanitizedTags = [...new Set(
       form.tags.split(',').map((t) => t.trim().replace(/^#/, '')).filter(Boolean).filter((t) => t.length <= 30),
     )];
-    if (sanitizedTags.length === 0) { toast.error('태그를 1개 이상 입력해주세요'); return; }
+    if (sanitizedTags.length === 0) { toast.error('태그를 1개 이상 입력해 주시기 바랍니다'); return; }
 
     const normalizedBody = bodyEditor === 'rich'
       ? (isBlankHtml(form.body) ? null : form.body)
       : (form.body || null);
     if (requireBodyForManual && form.source_type === 'manual' && !normalizedBody) {
-      toast.error('내용이 없습니다. 본문을 입력해주세요');
+      toast.error('내용이 없습니다. 본문을 입력해 주시기 바랍니다');
       return;
     }
 

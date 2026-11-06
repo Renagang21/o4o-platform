@@ -73,7 +73,7 @@ function makeDs(seed: { members?: Row[]; users?: Row[]; pharmacy?: boolean } = {
   const query = jest.fn(async (q: string, p: any[] = []) => {
     const s = q.replace(/\s+/g, ' ').trim();
     sql.push(s);
-    if (s.startsWith('SELECT 1 FROM organization_members WHERE user_id=$1 AND organization_id<>$2')) {
+    if (s.startsWith('SELECT 1 FROM organization_members m JOIN organizations o ON o.id=m.organization_id WHERE m.user_id=$1 AND m.organization_id<>$2')) {
       return members.filter(m=>m.user_id===p[0] && m.organization_id!==p[1] && m.left_at==null && ['staff','accepted','owner','admin','manager'].includes(m.role)).map(()=>({ok:1}));
     }
     if (s.startsWith('SELECT id FROM organizations')) return [{id:p[0]}];

@@ -130,7 +130,7 @@ export class ForumDirectoryController extends ForumControllerBase {
   async createForum(req: Request, res: Response): Promise<void> {
     res.status(410).json({
       success: false,
-      error: '포럼 직접 생성은 더 이상 지원되지 않습니다. 포럼 신청을 통해 생성하세요.',
+      error: '포럼 직접 생성은 더 이상 지원되지 않습니다. 포럼 신청을 통해 생성하시기 바랍니다.',
       code: 'DIRECT_CREATE_REMOVED',
     });
   }

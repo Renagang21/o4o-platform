@@ -19,7 +19,7 @@ export class MemberPaidFeatureService {
 
   async find(email: unknown) {
     if (typeof email !== 'string' || email.length > 255 || !email.includes('@')) {
-      throw new NeturePharmacyError(400, 'INVALID_EMAIL', '회원 이메일을 확인해 주세요.');
+      throw new NeturePharmacyError(400, 'INVALID_EMAIL', '회원 이메일을 확인해 주시기 바랍니다.');
     }
     const rows = await this.db.query(`SELECT u.id, u.email, u.name, u.status,
       COALESCE(p.active,false) AS active, p.ends_at AS "endsAt", p.updated_at AS "updatedAt"
@@ -55,14 +55,14 @@ export class MemberPaidFeatureService {
       return { paidEligible: paid !== null, accountStatus: user.status, accountActive: user.isActive, pharmacies };
     } catch (error) {
       if (error instanceof NeturePharmacyError) throw error;
-      throw new NeturePharmacyError(503, 'FEATURE_ACCESS_UNAVAILABLE', '회원 이용 자격을 확인하지 못했습니다. 다시 시도해 주세요.');
+      throw new NeturePharmacyError(503, 'FEATURE_ACCESS_UNAVAILABLE', '회원 이용 자격을 확인하지 못했습니다. 다시 시도해 주시기 바랍니다.');
     }
   }
 
   async set(userId: string, actorId: string, input: { active?: unknown; endsAt?: unknown }) {
     if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(userId) || typeof input.active !== 'boolean' ||
       (input.endsAt != null && (typeof input.endsAt !== 'string' || !/^\d{4}-\d{2}-\d{2}T/.test(input.endsAt) || !Number.isFinite(Date.parse(input.endsAt))))) {
-      throw new NeturePharmacyError(400, 'INVALID_MEMBER_ENTITLEMENT', '회원 유료 자격과 만료일을 확인해 주세요.');
+      throw new NeturePharmacyError(400, 'INVALID_MEMBER_ENTITLEMENT', '회원 유료 자격과 만료일을 확인해 주시기 바랍니다.');
     }
     const rows = await this.db.query(`INSERT INTO member_paid_service_entitlements (user_id,active,ends_at,updated_by)
       SELECT id,$2,$3,$4 FROM users WHERE id=$1

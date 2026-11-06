@@ -34,7 +34,7 @@ export default function ExternalAiConnections() {
       })
       .catch(() => {
         if (!cancelled)
-          setMessage("연결 설정을 불러오지 못했습니다. 다시 불러와 주세요.");
+          setMessage("연결 설정을 불러오지 못했습니다. 다시 불러와 주시기 바랍니다.");
       });
     return () => {
       cancelled = true;
@@ -52,7 +52,7 @@ export default function ExternalAiConnections() {
       setMessage("설정을 저장했습니다. 이후 요청부터 적용됩니다.");
     } catch {
       setMessage(
-        "저장하지 못했습니다. 다른 관리자가 변경했다면 다시 불러온 뒤 수정해 주세요.",
+        "저장하지 못했습니다. 다른 관리자가 변경했다면 다시 불러온 뒤 수정해 주시기 바랍니다.",
       );
     } finally {
       setBusy(false);

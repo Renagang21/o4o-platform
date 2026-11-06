@@ -1,7 +1,7 @@
 # O4O Platform — 로컬 실행환경 정본
 
 > 이 문서는 **로컬 개발 실행환경의 단일 기준(SSOT)** 입니다.
-> **최종 갱신**: 2026-10-14 — AI 공통 기반·운영 적용, API 의존성 빌드와 신규 개발자 착수 안내 정합
+> **최종 갱신**: 2026-11-04 — Node 22·TypeORM 공동 정렬 및 API 실행 의존성 정합
 > 개발 규칙·아키텍처 경계·운영 정책은 사용하는 에이전트의 진입점([AGENTS.md](AGENTS.md) / [CLAUDE.md](CLAUDE.md))과 해당 정본을 따릅니다.
 
 ## 현재 AI 기반과 개발 착수 — 2026-10-14
@@ -47,7 +47,8 @@ CHECK·WO·IR·archive 등 과거 기록에 남은 `TEST-ACCOUNT.txt` 표기는 
 
 | 도구 | 버전 | 확인 | 필요한 사람 |
 |---|---|---|---|
-| Node.js | 22.18.0 | `node --version` | 전원 |
+| Node.js | 22.23.4 | `node --version` | 전원 |
+| npm | 10.9.9 | `npm --version` | 전원 (Node 배포판 포함) |
 | pnpm | 10.25.0 | `pnpm --version` | 전원 |
 | PostgreSQL (로컬 개발 DB) | 15 | `psql --version` | 로컬 API 를 띄우는 개발자 (운영 DB 와 같은 major) |
 | gcloud CLI | 최신 | `gcloud --version` | **운영자 전용** — 공동개발 로컬환경에는 필요 없음 |
@@ -60,9 +61,64 @@ CHECK·WO·IR·archive 등 과거 기록에 남은 `TEST-ACCOUNT.txt` 표기는 
 TypeScript · Vite 는 workspace 별로 여러 버전이 공존합니다(예: web-neture 는 TS 5.9 · Vite 5, 일부 서비스는 Vite 7).
 **직접 맞추지 않습니다** — `pnpm-lock.yaml` 이 패키지별로 해결합니다.
 
-**기준값은 루트 `package.json`의 `volta` 필드입니다** (`node 22.18.0` · `pnpm 10.25.0`).
+**기준값은 루트 `package.json`의 `volta` 필드입니다** (`node 22.23.4` · `pnpm 10.25.0`).
 CI(`.github/actions/setup-build-env`)도 동일 버전을 사용하므로, 로컬을 이 값에 맞추면
 "로컬은 되는데 CI 는 실패" 를 줄일 수 있습니다. Volta 사용 시 저장소 디렉터리에서 자동 적용됩니다.
+루트 `package.json` 의 `packageManager`(`pnpm@10.25.0`, 2026-11-06)도 같은 값으로 고정되어 있어, Corepack 이나 pnpm 의 버전 자동 전환을 쓰는 환경(Claude Code 클라우드 세션 포함)은 다른 pnpm 이 설치돼 있어도 10.25.0 으로 설치합니다. 두 값은 `pnpm run check:runtime` 이 일치를 검사합니다.
+
+Node 22 계열을 유지하며 개발·CI·서버 Docker는 보안 릴리스 **22.23.4**,
+npm은 해당 릴리스의 **10.9.9**, pnpm은 **10.25.0**을 기준으로 합니다.
+`pnpm run check:runtime`으로 `.nvmrc`·활성 workflow·Docker의 버전과 frozen 설치를 확인합니다.
+배포용 설치도 lockfile 불일치 시 실패하며 잠금 없이 재시도하지 않습니다.
+Node 버전을 바꾼 뒤에는 기존 `node_modules`를 다른 major의 바이너리로 재사용하지 말고
+해당 버전에서 `pnpm install --frozen-lockfile`을 다시 실행합니다.
+
+Windows Local Agent의 오프라인 패키지에 내장되는 Node **22.18.0**은 별도 배포 계약입니다.
+실제 Windows 설치 검증 전에는 `tools/o4o-local-agent/release/`의 버전과 manifest 검사를
+서버 런타임에 맞춰 일괄 변경하지 않습니다.
+Windows installer CI도 패키지에 실제로 넣는 실행 파일을 검사하므로 **22.18.0**을 사용합니다.
+`check:runtime`은 이 job과 installer manifest를 서버 버전이 아닌 내장 런타임 버전에 대조합니다.
+
+### API 테스트·운영 의존성 일치
+
+API의 외부 실행 의존성은 `pnpm-lock.yaml`의 `apps/api-server` importer에서 해결된
+**정확한 버전**을 `package.production.json`에 생성합니다. Docker의 npm 설치 방식은 유지합니다.
+`pnpm run check:runtime`은 운영 manifest와 `package.production-lock.json`의 최상위 설치 버전까지
+대조하며, CI의 별도 병렬 job은 Docker와 같은 `npm ci --omit=dev --ignore-scripts` 설치 후
+각 의존성의 로딩과 Sharp 네이티브 PNG 생성을 검사합니다. 애플리케이션이나 DB는 시작하지 않습니다.
+
+workspace 패키지는 API bundle에 포함되므로 이 manifest에서 제외하며 `@types/*`도 제외합니다.
+TypeORM은 API와 공통 workspace가 **0.3.31**을 함께 해석하도록 루트 `pnpm.overrides.typeorm`으로 고정합니다.
+API만 올리면 공통 패키지의 `DataSource` 타입 identity와 갈라질 수 있으므로, 변경 시 공통 dependency closure 빌드와
+API type-check·실제 PostgreSQL 회귀 검사를 함께 수행합니다. `check:runtime`은 lockfile override와 모든 importer의
+TypeORM 버전 및 단일 패키지 버전 해석을 검사합니다. 기존 CI/운영 TypeORM 버전 예외는 제거했습니다.
+
+API는 Express를 직접 기동하며 Nest HTTP factory를 사용하지 않습니다. 운영 전용 `@nestjs/platform-express`와
+기존 npm lock에 남던 optional adapter 설치 항목도 제거했습니다. 향후 Nest HTTP 기동을 도입한다면 adapter를
+API 의존성과 테스트에 명시적으로 추가해야 합니다. 현재 API 외부 실행 의존성은 예외 없이 CI/운영 직접 버전이 일치합니다.
+다만 npm/pnpm의 **전이 의존성 전체 일치**를 보장하지는 않습니다.
+
+API 의존성을 의도적으로 변경한 뒤에는 일반 frozen 설치를 바꾸지 않고 다음과 같이 갱신합니다
+(PowerShell 예시, §1의 Node/npm/pnpm 사용). 임시 폴더를 사용해 workspace의 `node_modules`를 건드리지 않습니다.
+
+```powershell
+pnpm run sync:api-runtime
+if ($LASTEXITCODE -ne 0) { throw 'Runtime manifest generation failed' }
+$runtime = Join-Path ([IO.Path]::GetTempPath()) ('o4o-runtime-' + [guid]::NewGuid())
+New-Item -ItemType Directory $runtime | Out-Null
+Copy-Item apps/api-server/package.production.json (Join-Path $runtime 'package.json')
+Copy-Item apps/api-server/package.production-lock.json (Join-Path $runtime 'package-lock.json')
+npm install --prefix $runtime --package-lock-only --ignore-scripts --omit=dev --no-audit --no-fund
+if ($LASTEXITCODE -ne 0) { throw 'Runtime lock generation failed; do not copy the lock' }
+Copy-Item (Join-Path $runtime 'package-lock.json') apps/api-server/package.production-lock.json
+pnpm run check:runtime
+```
+
+생성된 두 파일과 API 의존성 변경을 함께 검토·커밋합니다. 잠금 없이 설치하는 fallback은 추가하지 않습니다.
+기존 운영 버전이 CI보다 최신이면 오래된 CI 버전으로 단순 하향하지 않습니다. Node 22 호환 범위에서
+운영 버전을 보존하며 API manifest와 pnpm 잠금을 먼저 맞춘 뒤 재검증합니다. 의존성 변경 시 기존 운영
+잠금과 변경 잠금의 `npm audit --omit=dev --package-lock-only --json` 결과도 비교하며, 전체 보안 정비용
+`npm audit fix`나 주 버전 일괄 갱신으로 범위를 넓히지 않습니다.
 
 > `package.json`의 `engines.pnpm` 은 아직 `>=9.0.0` 으로 남아 있으나, 실제 기준은 위
 > `volta.pnpm` (10.25.0) 입니다. pnpm 9 로는 lockfile 형식이 어긋날 수 있습니다.
@@ -204,7 +260,7 @@ Admin 개발 서버의 기준 포트는 **3001**입니다. `apps/admin-dashboard
 
 첫 공동개발 대상(neture.co.kr Main · O4O Agent) 기준 절차입니다. **운영 credential 은 필요 없습니다.**
 
-1. **설치** — §1 도구(Node 22.18.0 · pnpm 10.25.0 · PostgreSQL 15) 준비 후 `pnpm install --frozen-lockfile` (§2-1).
+1. **설치** — §1 도구(Node 22.23.4 · pnpm 10.25.0 · PostgreSQL 15) 준비 후 `pnpm install --frozen-lockfile` (§2-1).
 2. **공통 패키지 빌드** — `pnpm run build:packages`.
    web-neture 가 쓰는 `@o4o/*` 일부(types · auth-client · ui · content-editor · forum-core 등)는 소스가 아니라 `dist` 를 import 하므로, 이 빌드 없이는 dev server 가 뜨지 않습니다.
    현재 이 명령에는 `build:api-deps`도 포함됩니다. API workspace 의존성을 pnpm의 의존 순서로 빌드하므로 이전 checkout의 `dist`에 의존하지 않습니다. API 의존성만 변경했으면 `pnpm run build:api-deps`로 다시 빌드합니다.

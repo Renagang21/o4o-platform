@@ -1,3 +1,4 @@
+import { assertOperatorMemberTarget, protectedMemberSql } from '../operations/protected-member-target.js';
 import { notifyQualification } from './pharmacist-qualification-notifications.js';
 import { centralOperationMenuKeys } from '../admin/central-operation-menu-grants.js';
 import type { DataSource, EntityManager } from "typeorm";
@@ -67,7 +68,7 @@ async function account(m: Exec, user: string) {
     throw new OperationError(
       403,
       "ACCOUNT_NOT_ACTIVE",
-      "공통 계정의 이메일 확인과 이용 상태를 확인해 주세요.",
+      "공통 계정의 이메일 확인과 이용 상태를 확인해 주시기 바랍니다.",
     );
 }
 // node-postgres resolves toPostgres; query error serialization only sees the redacted value.
@@ -87,7 +88,7 @@ function normalizeLicense(raw: string) {
     throw new OperationError(
       400,
       "INVALID_LICENSE_NUMBER",
-      "면허번호를 100자 이내로 입력해 주세요.",
+      "면허번호를 100자 이내로 입력해 주시기 바랍니다.",
     );
   return value;
 }
@@ -162,7 +163,7 @@ export class PharmacistQualificationService {
       throw new OperationError(
         400,
         "INVALID_STATUS",
-        "검토 상태를 확인해 주세요.",
+        "검토 상태를 확인해 주시기 바랍니다.",
       );
     const offset =
       (Math.max(1, Math.min(100000, Math.floor(page) || 1)) - 1) * 20;
@@ -184,7 +185,7 @@ export class PharmacistQualificationService {
     const selection = directory ? columns.replace('p.license_number AS "licenseNumber"','NULL::text AS "licenseNumber"').replace('p.qualification_reason AS reason','NULL::text AS reason').replace('p.verified_at AS "approvedAt"','NULL::timestamp AS "approvedAt"') : columns;
     const rows = await this.db.query(
       `SELECT ${selection.replace('p.user_id AS "userId"', 'u.id AS "userId"').replace('p.qualification_status AS status', "COALESCE(p.qualification_status,'unrequested') AS status")},
-       COALESCE(NULLIF(u.name,''),'회원') AS name,u.email,u.status AS "accountStatus"
+       COALESCE(NULLIF(u.name,''),'회원') AS name,u.email,u.status AS "accountStatus",${protectedMemberSql("u.id")} AS "operatorReadOnly"
        FROM users u LEFT JOIN kpa_pharmacist_profiles p ON p.user_id=u.id
        WHERE ${matches} AND ($2='all' OR COALESCE(p.qualification_status,'unrequested')=$2)
        ORDER BY p.updated_at DESC NULLS LAST,u.id LIMIT 21 OFFSET $3`,
@@ -207,10 +208,11 @@ export class PharmacistQualificationService {
       throw new OperationError(
         403,
         "SELF_QUALIFICATION_APPROVAL_FORBIDDEN",
-        "본인의 자격 승인은 다른 검토 담당자에게 요청해 주세요.",
+        "본인의 자격 승인은 다른 검토 담당자에게 요청해 주시기 바랍니다.",
       );
     return this.db.transaction(async (m) => {
       await reviewer(m, actor, true);
+      await assertOperatorMemberTarget(m, target);
       if (input.action === "approve") await account(m, target);
       else if (
         !(
@@ -248,13 +250,13 @@ export class PharmacistQualificationService {
         throw new OperationError(
           409,
           "QUALIFICATION_CHANGED",
-          "신청 정보가 변경되었습니다. 다시 조회한 뒤 검토해 주세요.",
+          "신청 정보가 변경되었습니다. 다시 조회한 뒤 검토해 주시기 바랍니다.",
         );
       if (input.action === "approve" && input.licenseEvidenceChecked !== true)
         throw new OperationError(
           400,
           "LICENSE_EVIDENCE_REQUIRED",
-          "면허 근거를 별도로 확인한 뒤 승인해 주세요.",
+          "면허 근거를 별도로 확인한 뒤 승인해 주시기 바랍니다.",
         );
       const transitions = {
         approve: ["pending", "unrequested", "rejected", "revoked"],

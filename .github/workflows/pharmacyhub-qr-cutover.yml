@@ -237,7 +237,7 @@ jobs:
       - uses: actions/checkout@v6
       - uses: ./.github/actions/setup-build-env
         with:
-          node-version: '22.18.0'
+          node-version: '22.23.4'
           build-packages: 'false'
           strict-lockfile: 'true'
       - name: Test cutover safety

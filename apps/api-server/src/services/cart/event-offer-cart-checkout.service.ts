@@ -387,7 +387,7 @@ export class EventOfferCartCheckoutService {
     const cartOrgs = [...new Set(items.map((it) => it.organizationId).filter((o): o is string => !!o))];
     const requested = explicit || (cartOrgs.length === 1 ? cartOrgs[0] : null);
     if (!requested && cartOrgs.length > 1) {
-      throw new B2BConfirmError('AMBIGUOUS_STORE_ORGANIZATION', '주문할 매장(조직)을 선택해 주세요.', 400);
+      throw new B2BConfirmError('AMBIGUOUS_STORE_ORGANIZATION', '주문할 매장(조직)을 선택해 주시기 바랍니다.', 400);
     }
     const resolution = await resolveBuyerOrganization(this.dataSource, scope.buyerId, scope.serviceKey, requested);
     switch (resolution.status) {
@@ -396,7 +396,7 @@ export class EventOfferCartCheckoutService {
       case 'none':
         throw new B2BConfirmError('STORE_ORGANIZATION_NOT_FOUND', '주문할 수 있는 매장(조직)이 없습니다.', 403);
       case 'ambiguous':
-        throw new B2BConfirmError('AMBIGUOUS_STORE_ORGANIZATION', '주문할 매장(조직)을 선택해 주세요.', 400);
+        throw new B2BConfirmError('AMBIGUOUS_STORE_ORGANIZATION', '주문할 매장(조직)을 선택해 주시기 바랍니다.', 400);
       case 'forbidden':
       default:
         throw new B2BConfirmError('FOREIGN_STORE_ORGANIZATION', '선택한 매장에 대한 권한이 없습니다.', 403);

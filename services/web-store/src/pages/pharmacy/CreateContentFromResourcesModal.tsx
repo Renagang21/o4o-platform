@@ -76,7 +76,7 @@ export function CreateContentFromResourcesModal({ open, onClose, onCreated, prod
     saveErrorMessage: consultationSaveError,
     onSaved: (saved, unchanged, visible) => {
       if (!visible) return;
-      if (saved.conflict) { session.notify('다른 저장본을 확인했습니다. 최신 내용과 비교한 뒤 다시 저장하세요.', false); return; }
+      if (saved.conflict) { session.notify('다른 저장본을 확인했습니다. 최신 내용과 비교한 뒤 다시 저장하시기 바랍니다.', false); return; }
       if (saved.verification === false) {
         session.notify('저장 요청은 처리됐으나 본문·상품 연결을 다시 확인하지 못했습니다. 입력을 유지했습니다. 다시 저장하면 같은 자료를 확인합니다.', false);
         return;
@@ -138,7 +138,7 @@ export function CreateContentFromResourcesModal({ open, onClose, onCreated, prod
           {product && <ProductGuidanceContext product={product} compact={showEditor} disabled={saving} onOpenContent={openLinkedContent} />}
           {showEditor ? <>
           <p style={styles.guideHint}>
-            외부 AI 도구(ChatGPT·Claude·Gemini 등)나 문서에서 작성한 초안을 붙여넣고 편집한 뒤 저장하세요.
+            외부 AI 도구(ChatGPT·Claude·Gemini 등)나 문서에서 작성한 초안을 붙여넣고 편집한 뒤 저장하시기 바랍니다.
           </p>
 
           <div style={styles.composeRow}>
@@ -188,17 +188,17 @@ export function CreateContentFromResourcesModal({ open, onClose, onCreated, prod
               <RichTextEditor showInternalAi={false}
                 value={session.seed.html}
                 onChange={handleEditorChange}
-                placeholder="본문을 직접 작성하거나, 외부 AI에서 만든 초안을 붙여넣은 뒤 편집하세요."
+                placeholder="본문을 직접 작성하거나, 외부 AI에서 만든 초안을 붙여넣은 뒤 편집하시기 바랍니다."
                 minHeight="320px"
                 preset="full"
               />
             </div>
           </div>
-          </> : <p style={styles.guideHint}>상품 정보를 확인한 뒤 기존 안내를 수정하거나 새 안내를 작성하세요.</p>}
+          </> : <p style={styles.guideHint}>상품 정보를 확인한 뒤 기존 안내를 수정하거나 새 안내를 작성하시기 바랍니다.</p>}
         </div>
 
         <footer style={styles.footer}>
-          <span style={styles.footerHint}>{showEditor ? '내용을 확인한 뒤 저장하세요' : '상품 한 개의 안내를 준비합니다'}</span>
+          <span style={styles.footerHint}>{showEditor ? '내용을 확인한 뒤 저장하시기 바랍니다' : '상품 한 개의 안내를 준비합니다'}</span>
           <div style={styles.footerActions}>
             <button type="button" onClick={requestClose} style={styles.secondaryBtn} disabled={saving}>
               취소

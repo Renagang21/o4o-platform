@@ -1,7 +1,7 @@
 import { authClient } from "../../lib/apiClient";
 import UnifiedStoreLayout from "../../components/layouts/UnifiedStoreLayout";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import { MemoryRouter, Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import {
   UNIFIED_STORE_CONFIG,
@@ -24,7 +24,7 @@ import {
 vi.mock('../../api/consultationWorkspace', () => ({ fetchConsultationLayout: vi.fn(async () => ({ organizationId: 'fixture-store', name: 'Fixture', operatingType: 'large' })) }));
 vi.mock('../pharmacy/StoreHandledProductsPage', () => ({ default: ({ navigation }: { navigation?: React.ReactNode }) => <><h1>상품 목록</h1>{navigation}</> }));
 vi.mock('../neture-pharmacy/SupplyOptionsPage', () => ({default:({navigation}:{navigation?:React.ReactNode})=><><h1>상품 주문</h1>{navigation}</>}));
-vi.mock('../pharmacy/StoreLibraryContentsPage', () => ({ default: ({ navigation, quickLinks }: { navigation?: React.ReactNode; quickLinks?: React.ReactNode }) => <><h1>저장한 안내 목록</h1>{quickLinks}{navigation}</> }));
+vi.mock('../pharmacy/StoreLibraryContentsPage', () => ({ default: ({ navigation, quickLinks, productLink, moreNavigation }: { navigation?: React.ReactNode; quickLinks?: React.ReactNode; productLink?: React.ReactNode; moreNavigation?: React.ReactNode }) => <><h1>저장한 안내 목록</h1>{quickLinks}{productLink}{navigation}{moreNavigation}</> }));
 vi.mock('../pharmacy/StoreExecutionPage', () => ({ default: ({ navigation }: { navigation?: React.ReactNode }) => <><h1>실행 현황</h1>{navigation}</> }));
 
 vi.mock("../../contexts/AuthContext", () => ({
@@ -97,7 +97,7 @@ describe("업무 배치와 기존 경로", () => {
     const before = JSON.stringify(config);
     const keys = new Set([
       "home",
-      ...(["commerce", "studio", "use"] as const).flatMap((area) =>
+      ...(["commerce", "studio", "use", "signage"] as const).flatMap((area) =>
         workspaceItems(config, area).map((item) => item.key),
       ),
       ...workspaceSupportItems(config).map((item) => item.key),
@@ -154,7 +154,7 @@ describe("업무 배치와 기존 경로", () => {
     ["/store/marketing/qr", "", "studio"],
     ["/store/commerce/tablet-displays", "", "use"],
     ["/store/commerce/tablet-displays", "?workspace=studio", "studio"],
-    ["/store/marketing/signage/schedules", "", "use"],
+    ["/store/marketing/signage/schedules", "", "signage"],
     ["/store/info", "", null],
     ["/storefront", "", null],
   ] as const)(
@@ -184,7 +184,7 @@ describe("업무 배치와 기존 경로", () => {
   });
 });
 
-it("서비스 지정 메뉴와 직접 진입에서 동일한 상단 4개 메뉴를 제공한다", () => {
+it("서비스 지정 메뉴와 직접 진입에서 동일한 상단 5개 메뉴를 제공한다", () => {
   const base = "/work/kpa-society/store";
   render(
     <MemoryRouter initialEntries={[`${base}/marketing/qr?workspace=use`]}>
@@ -201,7 +201,7 @@ it("서비스 지정 메뉴와 직접 진입에서 동일한 상단 4개 메뉴�
     </MemoryRouter>,
   );
   const main = screen.getByRole("navigation", { name: "내 매장 주요 업무" });
-  expect(main.querySelectorAll("a")).toHaveLength(4);
+  expect(main.querySelectorAll("a")).toHaveLength(5);
   expect(
     screen
       .getByRole("link", { name: "매장 운영" })
@@ -270,21 +270,16 @@ it("공통 URL에서 서비스 지정 URL로 전환할 때 제작 자료 전달�
   expect(location.state).toEqual(state);
 });
 
- it("My Home은 직접 도메인 링크 대신 기존 인증 handoff를 사용하고 실패를 표시한다", async () => {
-  const post = vi.spyOn(authClient.api, "post").mockRejectedValueOnce(new Error("fixture handoff failure"));
-  try {
-    render(<MemoryRouter initialEntries={["/store"]}><StoreWorkspaceShell config={config}><h1>내 매장</h1></StoreWorkspaceShell></MemoryRouter>);
-    fireEvent.click(screen.getByTestId("my-home-button"));
-    await waitFor(() => expect(post).toHaveBeenCalledWith("/auth/handoff", { targetServiceKey: "neture", returnPath: "/mypage" }));
-    expect((await screen.findByRole("alert")).textContent).toContain("My Home으로 이동하지 못했습니다");
-    expect(screen.queryByRole("link", { name: /My Home/ })).toBeNull();
-  } finally {
-    post.mockRestore();
-  }
+it('workspace settings contain no duplicate My Home, service management or store selector', () => {
+  render(<MemoryRouter><StoreWorkspaceShell config={config}><h1>내 매장</h1></StoreWorkspaceShell></MemoryRouter>);
+  const menu = screen.getByRole('navigation', { name: '매장 보조 메뉴' });
+  expect(within(menu).queryByTestId('my-home-button')).toBeNull();
+  expect(within(menu).queryByRole('link', { name: '매장 선택' })).toBeNull();
+  expect(within(menu).queryByRole('link', { name: /가입 관리|내 매장 신청/ })).toBeNull();
 });
 
 it('업무 그룹은 필터된 기존 기능을 빠짐없이 한 번씩 배치한다', () => {
-  for (const area of ['commerce', 'studio', 'use'] as const) {
+  for (const area of ['commerce', 'studio', 'use', 'signage'] as const) {
     const grouped = workspaceGroups(config, area).flatMap(group => [...group.primary, ...group.secondary]);
     expect(grouped.map(item => item.key).sort()).toEqual(workspaceItems(config, area).map(item => item.key).sort());
     expect(new Set(grouped.map(item => item.key)).size).toBe(grouped.length);
@@ -297,7 +292,7 @@ it('목적지 첫 화면에는 중복 하위 메뉴를 펼치지 않고 매장 �
   const base = '/work/kpa-society/store';
   render(<MemoryRouter initialEntries={[base + '/workspace/studio']}><StoreWorkspaceShell config={{ ...config, basePath: base }}><h1>준비</h1></StoreWorkspaceShell></MemoryRouter>);
   expect(screen.queryByRole('navigation', { name: '현재 업무 메뉴' })).toBeNull();
-  expect(screen.getByRole('link', { name: '매장 선택' }).getAttribute('href')).toBe('/select-store?returnTo=%2Fwork%2Fkpa-society%2Fstore');
+  expect(screen.queryByRole('link', { name: '매장 선택' })).toBeNull();
 });
 
 it.each(['/store', '/work/kpa-society/store'])('목적지에서 미구현 예고를 내리고 기존 편집기는 세부 진입으로 유지한다: %s', async base => {
@@ -370,14 +365,14 @@ it('업무 선택은 뒤로가기로 복구하며 query·hash·state를 보존�
     </Route>
   </Routes></MemoryRouter>);
   await screen.findByRole('heading', {name:'상담'});
-  fireEvent.click(within(screen.getByRole('navigation', {name:'매장 운영 업무'})).getByRole('link', {name:'사이니지'}));
-  expect(screen.getByRole('heading', {name:'사이니지'})).toBeTruthy();
+  fireEvent.click(within(screen.getByRole('navigation', {name:'매장 운영 업무'})).getByRole('link', {name:'태블릿'}));
+  expect(screen.getByRole('heading', {name:'태블릿'})).toBeTruthy();
   expect(screen.queryByRole('link', {name:'다국어 상담 시작'})).toBeNull();
   const location = JSON.parse(screen.getByTestId('location').textContent!);
-  expect(location.search).toBe('?topic=signage&view=compact');
+  expect(location.search).toBe('?topic=tablet&view=compact');
   expect(location.hash).toBe('#work');
   expect(location.state).toEqual({selection:'fixture'});
-  expect(screen.getByRole('link', {name:'재생할 안내·순서 변경'}).getAttribute('href')).toBe('/store/marketing/signage/playlist?workspace=use');
+  expect(screen.getByRole('link', {name:'태블릿 위치·화면 관리'}).getAttribute('href')).toBe('/store/commerce/tablet-displays?workspace=use');
   fireEvent.click(screen.getByRole('button', {name:'뒤로'}));
   expect(screen.getByRole('heading', {name:'상담'})).toBeTruthy();
 });
@@ -399,4 +394,10 @@ it.each(['/store', '/work/kpa-society/store'])('상담 직접 진입도 매장 �
   const consultation = within(screen.getByRole('navigation', {name:'매장 운영 업무'})).getByRole('link', {name:'상담'});
   expect(consultation.getAttribute('aria-current')).toBe('page');
   expect(consultation.getAttribute('href')).toBe(base + '/workspace/use?topic=consultation');
+});
+
+it('signage has its own area and cannot leak into general content or settings', () => {
+  for (const area of ['studio', 'use'] as const) expect(workspaceItems(config, area).some(item => item.key.startsWith('signage-'))).toBe(false);
+  expect(workspaceItems(config, 'signage').map(item => item.key)).toEqual(['signage-playlist', 'signage-videos', 'signage-player']);
+  for (const path of ['videos','playlist','playlist/new','schedules','player']) expect(currentWorkspaceArea(`/store/marketing/signage/${path}`, '?workspace=use', '/store')).toBe('signage');
 });

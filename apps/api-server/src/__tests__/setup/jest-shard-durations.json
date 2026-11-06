@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "sourceRunIds": [
+    41567071809,
+    41622106735
+  ],
+  "defaultSeconds": 1,
+  "seconds": {
+    "src/__tests__/archive-retention-and-tracked-backup-disposition.spec.ts": 6.079,
+    "src/__tests__/browser-dom-control.spec.ts": 6.008,
+    "src/__tests__/computer-use.spec.ts": 7.444,
+    "src/__tests__/content-editor-modal-lifecycle-runner.spec.ts": 7.014,
+    "src/__tests__/healthkr-adapter.spec.ts": 57.798,
+    "src/__tests__/personal-assistant-memory-cloud-continuity.spec.ts": 35.712,
+    "src/__tests__/personal-assistant-memory-continuity.spec.ts": 11.179,
+    "src/__tests__/personal-assistant-planning-separation.spec.ts": 15.37,
+    "src/__tests__/personal-assistant-task-understanding-completion.spec.ts": 40.377,
+    "src/__tests__/supplier-site-adapter.spec.ts": 22.149,
+    "src/__tests__/typeorm-entity-registry-guard.spec.ts": 6.859,
+    "src/__tests__/windows-automation-safety.spec.ts": 33.563,
+    "src/__tests__/windows-ui-automation.spec.ts": 17.498,
+    "src/__tests__/work-agent-discovery-routing.spec.ts": 24.131,
+    "src/__tests__/work-agent-llm-closure.spec.ts": 43.894,
+    "src/__tests__/work-agent-recovery-runtime.spec.ts": 23.475,
+    "src/__tests__/work-agent-task-unit-dispatch.spec.ts": 110.13,
+    "src/__tests__/work-agent-visual-fastloop.spec.ts": 20.394,
+    "src/__tests__/work-agent.spec.ts": 56.171,
+    "src/__tests__/work-assistance.spec.ts": 25.326,
+    "src/__tests__/work-experience.spec.ts": 32.031,
+    "src/__tests__/work-target-discovery.spec.ts": 25.657,
+    "src/__tests__/workflow-candidate.spec.ts": 41.898
+  }
+}

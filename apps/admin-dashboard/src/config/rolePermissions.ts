@@ -45,7 +45,15 @@ export const menuPermissions: MenuPermission[] = [
   //   deny-by-default 전환에 따라 'dashboard' 도 명시적인 설정을 갖는다.
   //   관리자 SPA 진입 floor(App.tsx)가 이미 platform:super_admin 전용이므로
   //   노출 범위는 변하지 않고 선언만 명시화된다.
+  { menuId: 'content-resource-deletion', roles: [...PLATFORM_ADMIN_ROLES] },
   { menuId: 'platform-account-governance', roles: [...PLATFORM_ADMIN_ROLES] },
+  { menuId: 'platform-account-overview', roles: [...PLATFORM_ADMIN_ROLES] },
+  { menuId: 'member-business-management', roles: [...PLATFORM_ADMIN_ROLES] },
+  { menuId: 'platform-members', roles: [...PLATFORM_ADMIN_ROLES] },
+  { menuId: 'platform-suppliers', roles: [...PLATFORM_ADMIN_ROLES] },
+  { menuId: 'platform-stores', roles: [...PLATFORM_ADMIN_ROLES] },
+  { menuId: 'platform-erasure-history', roles: [...PLATFORM_ADMIN_ROLES] },
+
   { menuId: 'operations-operators', roles: [...PLATFORM_ADMIN_ROLES] },
   { menuId: 'central-operations', roles: [...PLATFORM_ADMIN_ROLES] },
   { menuId: 'pharmacy-service-settings', roles: [...PLATFORM_ADMIN_ROLES] },
@@ -169,6 +177,7 @@ export const menuPermissions: MenuPermission[] = [
     menuId: 'o4o-product-db-maintenance',
     roles: [...PLATFORM_ADMIN_ROLES]
   },
+  { menuId: 'content-required-signage', roles: [...PLATFORM_ADMIN_ROLES] },
   {
     menuId: 'content-overview',
     roles: [...PLATFORM_ADMIN_ROLES]

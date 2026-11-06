@@ -65,7 +65,8 @@ describe('L1 연결 서비스 처리는 Neture 원장을 바꾸지 않는다', (
     'modules/neture-pharmacy/services/semi-franchise.service.ts',
   ])('%s — 신청(본인)과 승인(신청자) 모두 Neture 가입 승인을 확인한다', (rel) => {
     const src = read(rel);
-    expect(src).toMatch(/assertNetureMainMembershipActive\(m, userId\)/);
+    if (rel.includes('pharmacy-membership')) expect(src).not.toMatch(/async apply\(/);
+    else expect(src).toMatch(/assertNetureMainMembershipActive\(m, userId\)/);
     expect(src).toMatch(/assertNetureMainMembershipActive\(m, [\w.]+applicant_user_id, 'applicant'\)/);
   });
 

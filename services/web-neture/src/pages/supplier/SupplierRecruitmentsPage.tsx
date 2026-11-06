@@ -67,7 +67,7 @@ export default function SupplierRecruitmentsPage() {
     const result = await supplierRecruitmentApi.close(id);
     setClosingId(null);
     if (!result.success) {
-      setActionError(result.message || '모집을 마감하지 못했습니다. 잠시 후 다시 시도해 주세요.');
+      setActionError(result.message || '모집을 마감하지 못했습니다. 잠시 후 다시 시도해 주시기 바랍니다.');
       return;
     }
     await load();
@@ -81,7 +81,7 @@ export default function SupplierRecruitmentsPage() {
     const result = await supplierRecruitmentApi.reopen(id);
     setClosingId(null);
     if (!result.success) {
-      setActionError(result.message || '모집을 재개하지 못했습니다. 잠시 후 다시 시도해 주세요.');
+      setActionError(result.message || '모집을 재개하지 못했습니다. 잠시 후 다시 시도해 주시기 바랍니다.');
       return;
     }
     await load();

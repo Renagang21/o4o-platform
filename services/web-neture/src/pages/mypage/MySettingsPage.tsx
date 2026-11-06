@@ -52,7 +52,7 @@ export default function MySettingsPage() {
       <MyPageLayout title="설정" width="form" navItems={getNetureMyPageNavItems([])}>
         <MyPageAuthRequired
           icon={<User className="w-8 h-8 text-gray-400" />}
-          description="My Home을 이용하려면 로그인해주세요."
+          description="My Home을 이용하려면 로그인해 주시기 바랍니다."
           onAction={() => openLoginModal('/mypage/settings')}
         />
       </MyPageLayout>

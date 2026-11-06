@@ -46,7 +46,7 @@ export default function HostBoundary({ children }: { children: ReactNode }) {
       const issued = new URL(href);
       if (issued.origin !== target.origin || issued.pathname !== '/handoff') throw new Error('Invalid target');
       window.location.replace(href);
-    }).catch(() => { if (active) setError('로그인 상태를 전달하지 못했습니다. 다시 시도해 주세요.'); });
+    }).catch(() => { if (active) setError('로그인 상태를 전달하지 못했습니다. 다시 시도해 주시기 바랍니다.'); });
     return () => { active = false; };
   }, [externalHref, isLoading, isAuthenticated, attempt]);
 

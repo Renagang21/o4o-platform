@@ -18,12 +18,12 @@ export async function consultationProfessionalConfirmed(db: Executor, userId: st
     if (rows.length !== 1 || rows[0].invalid === true || typeof rows[0].confirmed !== 'boolean') throw new Error('Invalid confirmation');
     return rows[0].confirmed;
   } catch {
-    throw new NeturePharmacyError(503, 'PROFESSIONAL_ACCESS_UNAVAILABLE', '약사 상담 사용 확인을 조회하지 못했습니다. 다시 시도해 주세요.');
+    throw new NeturePharmacyError(503, 'PROFESSIONAL_ACCESS_UNAVAILABLE', '약사 상담 사용 확인을 조회하지 못했습니다. 다시 시도해 주시기 바랍니다.');
   }
 }
 
 export async function confirmOwnerPharmacist(db: Executor, userId: string, organizationId: string, confirmed: unknown) {
-  if (typeof confirmed !== 'boolean') throw new NeturePharmacyError(400, 'INVALID_PHARMACIST_CONFIRMATION', '약사 사용 확인 여부를 선택해 주세요.');
+  if (typeof confirmed !== 'boolean') throw new NeturePharmacyError(400, 'INVALID_PHARMACIST_CONFIRMATION', '약사 사용 확인 여부를 선택해 주시기 바랍니다.');
   const result = await db.query(`UPDATE organization_members
     SET metadata=jsonb_set(COALESCE(metadata,'{}'::jsonb),'{pharmacyPharmacistConfirmed}',$3::jsonb,true),updated_at=NOW()
     WHERE organization_id=$1 AND user_id=$2 AND role='owner' AND left_at IS NULL RETURNING user_id`,

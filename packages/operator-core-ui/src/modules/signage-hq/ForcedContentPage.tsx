@@ -1,5 +1,5 @@
 /**
- * ForcedContentPage — 운영자 사이니지 강제 콘텐츠 관리 (공통 콘솔)
+ * ForcedContentPage — 운영자 사이니지 필수 영상 관리 (공통 콘솔)
  *
  * WO-KPA-SIGNAGE-FORCED-CONTENT-IMPLEMENTATION-V1 (원본)
  * WO-O4O-SIGNAGE-TABLE-STANDARD-V1: O4O 표준 테이블 (체크 선택 + bulk delete + RowActionMenu)
@@ -16,6 +16,7 @@
  * API: /api/signage/:serviceKey/hq/forced-content (GET/POST/PATCH/DELETE)
  */
 
+import { toKstInput, fromKstInput } from './forcedContentTime';
 import { useState, useEffect, useCallback, useMemo, type ReactNode } from 'react';
 import { Shield, RefreshCw, Plus, Trash2, Search, Edit2, X, Check } from 'lucide-react';
 import { ActionBar, BulkResultModal, RowActionMenu } from '@o4o/ui';
@@ -48,14 +49,14 @@ const statusBadge = (item: ForcedContentItem) => {
   const end = new Date(item.endAt);
   if (!item.isActive) return { text: '비활성', cls: 'bg-slate-100 text-slate-500' };
   if (now < start) return { text: '예약', cls: 'bg-blue-100 text-blue-700' };
-  if (now > end) return { text: '만료', cls: 'bg-slate-100 text-slate-400' };
+  if (now >= end) return { text: '만료', cls: 'bg-slate-100 text-slate-400' };
   return { text: '적용 중', cls: 'bg-green-100 text-green-700' };
 };
 
 const fmtDate = (d: string) => {
   try {
     return new Date(d).toLocaleString('ko-KR', {
-      year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit',
+      year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Seoul',
     });
   } catch { return '-'; }
 };
@@ -104,7 +105,7 @@ export function ForcedContentPage({ apiFetch, config }: SignageHqPageProps) {
           variant: 'danger',
           divider: true,
           confirm: (row) => ({
-            title: '강제 콘텐츠 삭제',
+            title: '필수 영상 삭제',
             message: `"${row.title}"\n\n삭제 후 즉시 모든 ${storeLabel} 플레이리스트에서 제거됩니다.`,
             variant: 'danger' as const,
             confirmText: '삭제',
@@ -122,7 +123,7 @@ export function ForcedContentPage({ apiFetch, config }: SignageHqPageProps) {
       const data = await apiFetch(`/api/signage/${serviceKey}/hq/forced-content`);
       setItems(data.data || []);
     } catch (err: any) {
-      setError(err?.message || '강제 콘텐츠를 불러올 수 없습니다');
+      setError(err?.message || '필수 영상를 불러올 수 없습니다');
     } finally {
       setIsLoading(false);
     }
@@ -143,8 +144,8 @@ export function ForcedContentPage({ apiFetch, config }: SignageHqPageProps) {
     setFormTitle(item.title);
     setFormVideoUrl(item.videoUrl);
     setFormThumbnailUrl(item.thumbnailUrl || '');
-    setFormStartAt(item.startAt.slice(0, 16));
-    setFormEndAt(item.endAt.slice(0, 16));
+    setFormStartAt(toKstInput(item.startAt));
+    setFormEndAt(toKstInput(item.endAt));
     setFormNote(item.note || '');
     setFormTargetSurface(item.targetSurface || 'signage');
     setFormTabletDuration(String(item.tabletDurationSeconds ?? 30));
@@ -161,8 +162,8 @@ export function ForcedContentPage({ apiFetch, config }: SignageHqPageProps) {
         title: formTitle.trim(),
         videoUrl: formVideoUrl.trim(),
         thumbnailUrl: formThumbnailUrl.trim() || undefined,
-        startAt: new Date(formStartAt).toISOString(),
-        endAt: new Date(formEndAt).toISOString(),
+        startAt: fromKstInput(formStartAt),
+        endAt: fromKstInput(formEndAt),
         note: formNote.trim() || undefined,
       };
       // 태블릿 서브시스템이 있는 서비스에서만 노출 대상 필드를 전송한다.
@@ -238,10 +239,10 @@ export function ForcedContentPage({ apiFetch, config }: SignageHqPageProps) {
     total: items.length,
     active: items.filter((i) => {
       const now = new Date();
-      return i.isActive && now >= new Date(i.startAt) && now <= new Date(i.endAt);
+      return i.isActive && now >= new Date(i.startAt) && now < new Date(i.endAt);
     }).length,
     scheduled: items.filter((i) => i.isActive && new Date() < new Date(i.startAt)).length,
-    expired: items.filter((i) => new Date() > new Date(i.endAt)).length,
+    expired: items.filter((i) => new Date() >= new Date(i.endAt)).length,
   };
 
   const columns: ListColumnDef<ForcedContentItem>[] = [
@@ -303,11 +304,11 @@ export function ForcedContentPage({ apiFetch, config }: SignageHqPageProps) {
       icon: <Trash2 size={14} />,
       loading: batch.loading,
       group: 'danger',
-      tooltip: '선택된 강제 콘텐츠를 일괄 삭제합니다',
+      tooltip: '선택된 필수 영상를 일괄 삭제합니다',
       visible: selectedIds.size > 0,
       confirm: {
         title: '일괄 삭제 확인',
-        message: `${selectedIds.size}개의 강제 콘텐츠를 삭제합니다. 삭제 후 즉시 모든 ${storeLabel} 플레이리스트에서 제거됩니다.`,
+        message: `${selectedIds.size}개의 필수 영상를 삭제합니다. 삭제 후 즉시 모든 ${storeLabel} 플레이리스트에서 제거됩니다.`,
         variant: 'danger' as const,
         confirmText: '삭제',
       },
@@ -320,13 +321,13 @@ export function ForcedContentPage({ apiFetch, config }: SignageHqPageProps) {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-slate-800 flex items-center gap-2">
-            <Shield className="w-6 h-6 text-red-600" /> 강제 콘텐츠 관리
+            <Shield className="w-6 h-6 text-red-600" /> 필수 영상 관리
           </h1>
-          <p className="text-slate-500 text-sm mt-1">전체 {storeLabel} 플레이리스트에 자동 삽입되는 강제 콘텐츠</p>
+          <p className="text-slate-500 text-sm mt-1">전체 {storeLabel} 플레이리스트에 자동 삽입되는 필수 영상</p>
         </div>
         <div className="flex items-center gap-2">
           <button onClick={openCreateForm} className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm font-medium">
-            <Plus className="w-4 h-4" /> 새 강제 콘텐츠
+            <Plus className="w-4 h-4" /> 새 필수 영상
           </button>
           <button onClick={() => void fetchItems()} disabled={isLoading} className="flex items-center gap-2 px-4 py-2 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors text-sm disabled:opacity-50">
             <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} /> 새로고침
@@ -343,7 +344,7 @@ export function ForcedContentPage({ apiFetch, config }: SignageHqPageProps) {
 
       {/* Info Banner */}
       <div className="bg-red-50 border border-red-100 rounded-lg p-4 text-sm text-red-700">
-        <strong>강제 콘텐츠란?</strong> 운영자가 지정한 기간 동안 모든 {storeLabel}의 플레이리스트에 자동으로 삽입되는 콘텐츠입니다.
+        <strong>필수 영상란?</strong> 운영자가 지정한 기간 동안 모든 {storeLabel}의 플레이리스트에 자동으로 삽입되는 콘텐츠입니다.
         {storeLabel}은 순서를 변경할 수 있지만 삭제할 수 없습니다.
       </div>
 
@@ -366,28 +367,28 @@ export function ForcedContentPage({ apiFetch, config }: SignageHqPageProps) {
       {showForm && (
         <div className="bg-white rounded-xl border border-red-100 p-6">
           <h2 className="text-lg font-semibold text-slate-800 mb-4">
-            {editingId ? '강제 콘텐츠 수정' : '새 강제 콘텐츠'}
+            {editingId ? '필수 영상 수정' : '새 필수 영상'}
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="md:col-span-2">
               <label className="block text-xs font-medium text-slate-500 mb-1">제목 *</label>
-              <input type="text" value={formTitle} onChange={(e) => setFormTitle(e.target.value)} placeholder="예: 독감 예방접종 안내" className={inputCls} />
+              <input type="text" aria-label="필수 영상 제목" value={formTitle} onChange={(e) => setFormTitle(e.target.value)} placeholder="예: 독감 예방접종 안내" className={inputCls} />
             </div>
             <div className="md:col-span-2">
               <label className="block text-xs font-medium text-slate-500 mb-1">YouTube / Vimeo URL *</label>
-              <input type="text" value={formVideoUrl} onChange={(e) => setFormVideoUrl(e.target.value)} placeholder="https://www.youtube.com/watch?v=..." className={inputCls} />
+              <input type="text" aria-label="필수 영상 주소" value={formVideoUrl} onChange={(e) => setFormVideoUrl(e.target.value)} placeholder="https://www.youtube.com/watch?v=..." className={inputCls} />
             </div>
             <div className="md:col-span-2">
               <label className="block text-xs font-medium text-slate-500 mb-1">썸네일 URL (선택)</label>
               <input type="text" value={formThumbnailUrl} onChange={(e) => setFormThumbnailUrl(e.target.value)} placeholder="https://..." className={inputCls} />
             </div>
             <div>
-              <label className="block text-xs font-medium text-slate-500 mb-1">시작 일시 *</label>
-              <input type="datetime-local" value={formStartAt} onChange={(e) => setFormStartAt(e.target.value)} className={inputCls} />
+              <label className="block text-xs font-medium text-slate-500 mb-1">시작 일시 (한국 시간) *</label>
+              <input type="datetime-local" aria-label="게시 시작 일시 (한국 시간)" value={formStartAt} onChange={(e) => setFormStartAt(e.target.value)} className={inputCls} />
             </div>
             <div>
-              <label className="block text-xs font-medium text-slate-500 mb-1">종료 일시 *</label>
-              <input type="datetime-local" value={formEndAt} onChange={(e) => setFormEndAt(e.target.value)} className={inputCls} />
+              <label className="block text-xs font-medium text-slate-500 mb-1">종료 일시 (한국 시간) *</label>
+              <input type="datetime-local" aria-label="게시 종료 일시 (한국 시간)" value={formEndAt} onChange={(e) => setFormEndAt(e.target.value)} className={inputCls} />
             </div>
 
             {/* 노출 대상 — 태블릿 서브시스템 보유 서비스 전용 */}
@@ -475,7 +476,7 @@ export function ForcedContentPage({ apiFetch, config }: SignageHqPageProps) {
         data={filtered}
         rowKey="id"
         loading={isLoading}
-        emptyMessage="등록된 강제 콘텐츠가 없습니다"
+        emptyMessage="등록된 필수 영상가 없습니다"
         tableId={`${config.tableIdPrefix}-forced-content`}
         selectable
         selectedKeys={selectedIds}

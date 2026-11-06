@@ -78,7 +78,7 @@ export function createOperatorSupplierController(dataSource: DataSource): Router
   router.get('/suppliers/review-requests', review.operatorQueue);
   router.get('/suppliers/:id/active-fundings', async (req, res) => {
     if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(req.params.id)) {
-      return res.status(400).json({success:false,error:'공급자 대상을 확인해 주세요.'});
+      return res.status(400).json({success:false,error:'공급자 대상을 확인해 주시기 바랍니다.'});
     }
     try {
       res.json({success:true,data:await listSupplierActiveFundings(dataSource, req.params.id)});

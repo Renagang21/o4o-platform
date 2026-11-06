@@ -340,7 +340,7 @@ describe("personal mail end-to-end screen contract", () => {
     fireEvent.click(
       await screen.findByRole("checkbox", { name: "notice@example.invalid" }),
     );
-    await screen.findByText("메일 계정을 다시 연결해 주세요.");
+    await screen.findByText("메일 계정을 다시 연결해 주시기 바랍니다.");
     expect(
       (
         screen.getByRole("button", {
@@ -463,7 +463,7 @@ describe("personal mail end-to-end screen contract", () => {
     const sender = await screen.findByRole("checkbox", {
       name: "notice@example.invalid",
     });
-    await screen.findByText("메일 계정을 다시 연결해 주세요.");
+    await screen.findByText("메일 계정을 다시 연결해 주시기 바랍니다.");
     fireEvent.click(sender);
     fireEvent.click(screen.getByRole("button", { name: "현황 새로고침" }));
     await waitFor(() =>

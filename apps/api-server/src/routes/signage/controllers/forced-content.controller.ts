@@ -112,20 +112,20 @@ export class SignageForcedContentController {
         tabletDurationSeconds = Number.isFinite(n) && n >= 5 && n <= 600 ? Math.floor(n) : 30;
       }
 
-      if (!title?.trim()) {
+      if (typeof title !== 'string' || !title.trim()) {
         res.status(400).json({ success: false, error: { code: 'INVALID_INPUT', message: 'title is required' } });
         return;
       }
-      if (!videoUrl?.trim()) {
+      if (typeof videoUrl !== 'string' || !videoUrl.trim()) {
         res.status(400).json({ success: false, error: { code: 'INVALID_INPUT', message: 'videoUrl is required' } });
         return;
       }
-      if (!startAt || !endAt) {
+      if (typeof startAt !== 'string' || typeof endAt !== 'string' || !startAt || !endAt) {
         res.status(400).json({ success: false, error: { code: 'INVALID_INPUT', message: 'startAt and endAt are required' } });
         return;
       }
-      if (new Date(startAt) >= new Date(endAt)) {
-        res.status(400).json({ success: false, error: { code: 'INVALID_INPUT', message: 'startAt must be before endAt' } });
+      if (!Number.isFinite(Date.parse(startAt)) || !Number.isFinite(Date.parse(endAt)) || new Date(startAt) >= new Date(endAt)) {
+        res.status(400).json({ success: false, error: { code: 'INVALID_INPUT', message: '게시 종료는 시작 이후여야 합니다.' } });
         return;
       }
 
@@ -173,6 +173,11 @@ export class SignageForcedContentController {
    */
   update = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
+      for (const field of ['startAt', 'endAt']) {
+        if (req.body[field] !== undefined && (typeof req.body[field] !== 'string' || !Number.isFinite(Date.parse(req.body[field])))) {
+          res.status(400).json({ success: false, error: { code: 'INVALID_INPUT', message: '게시 일시가 올바르지 않습니다.' } }); return;
+        }
+      }
       const serviceKey = getSignageServiceKey(req);
       const { id } = req.params;
       const { title, videoUrl, thumbnailUrl, startAt, endAt, isActive, note } = req.body;
@@ -181,6 +186,18 @@ export class SignageForcedContentController {
       if (targetSurface !== undefined && !VALID_TARGET_SURFACES.includes(targetSurface)) {
         res.status(400).json({ success: false, error: { code: 'INVALID_INPUT', message: `targetSurface must be one of ${VALID_TARGET_SURFACES.join(', ')}` } });
         return;
+      }
+
+      if (startAt !== undefined || endAt !== undefined) {
+        let start = startAt, end = endAt;
+        if (start === undefined || end === undefined) {
+          const [existing] = await this.dataSource.query('SELECT start_at, end_at FROM signage_forced_content WHERE id = $1 AND service_key = $2 AND deleted_at IS NULL', [id, serviceKey]);
+          if (!existing) { res.status(404).json({ success: false, error: { code: 'NOT_FOUND' } }); return; }
+          start ??= existing.start_at; end ??= existing.end_at;
+        }
+        if (new Date(start).getTime() >= new Date(end).getTime()) {
+          res.status(400).json({ success: false, error: { code: 'INVALID_INPUT', message: '게시 종료는 시작 이후여야 합니다.' } }); return;
+        }
       }
 
       const sets: string[] = ['updated_at = NOW()'];

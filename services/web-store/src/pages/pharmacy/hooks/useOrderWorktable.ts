@@ -66,7 +66,7 @@ export function useOrderWorktable(
     if (!hasContext()) {
       setProducts([]);
       setLoading(false);
-      setError("매장을 선택한 뒤 다시 시도해 주세요.");
+      setError("매장을 선택한 뒤 다시 시도해 주시기 바랍니다.");
       return;
     }
     const isLatest = listRequest.begin();
@@ -115,7 +115,7 @@ export function useOrderWorktable(
     } catch {
       if (isCurrent())
         setError(
-          "전체 상품 목록을 확인하지 못했습니다. 네트워크와 공급 정보를 확인한 뒤 다시 시도해 주세요.",
+          "전체 상품 목록을 확인하지 못했습니다. 네트워크와 공급 정보를 확인한 뒤 다시 시도해 주시기 바랍니다.",
         );
     } finally {
       if (isLatest()) setLoading(false);
@@ -206,7 +206,7 @@ export function useOrderWorktable(
       ) {
         if (confirmationRef.current === submitted)
           setOrderError(
-            "장바구니에 이벤트 상품이 담겨 있습니다. 이벤트 주문을 먼저 완료하거나 비운 뒤에 B2B 발주를 담아주세요.",
+            "장바구니에 이벤트 상품이 담겨 있습니다. 이벤트 주문을 먼저 완료하거나 비운 뒤에 B2B 발주를 담아주시기 바랍니다.",
           );
         return;
       }
@@ -261,7 +261,7 @@ export function useOrderWorktable(
       if (failed.length) {
         changeConfirmation({ ...submitted, targets: failed });
         setOrderError(
-          `${failed.length}건을 담지 못했습니다: ${failed.map((target) => target.product.productName).join(", ")}. 실패한 상품만 다시 시도해 주세요.`,
+          `${failed.length}건을 담지 못했습니다: ${failed.map((target) => target.product.productName).join(", ")}. 실패한 상품만 다시 시도해 주시기 바랍니다.`,
         );
       } else {
         changeConfirmation(null);
@@ -270,7 +270,7 @@ export function useOrderWorktable(
       }
     } catch {
       if (isCurrent() && confirmationRef.current === submitted)
-        setOrderError("장바구니를 확인하지 못했습니다. 다시 시도해 주세요.");
+        setOrderError("장바구니를 확인하지 못했습니다. 다시 시도해 주시기 바랍니다.");
     } finally {
       busy.current.delete(scope);
       if (currentScope.current === scope) setAdding(false);

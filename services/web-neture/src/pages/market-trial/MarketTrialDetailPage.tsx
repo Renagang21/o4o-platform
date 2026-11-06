@@ -89,7 +89,7 @@ export function MarketTrialDetailPage() {
           if (active && partData) setParticipation(partData);
         }
       } catch {
-        if (active) setError('펀딩 또는 참여 현황을 불러오지 못했습니다. 다시 조회해 주세요.');
+        if (active) setError('펀딩 또는 참여 현황을 불러오지 못했습니다. 다시 조회해 주시기 바랍니다.');
       } finally {
         if (active) {setIsLoading(false);setLoadedScope(scope);}
       }
@@ -122,7 +122,7 @@ export function MarketTrialDetailPage() {
     setJoinLoading(true);
     setJoinError(null);
     try {
-      if (!agreement.ready) { setJoinError('서비스 약관을 먼저 확인해 주세요.'); return; }
+      if (!agreement.ready) { setJoinError('서비스 약관을 먼저 확인해 주시기 바랍니다.'); return; }
       const res = await joinTrial(id, selectedReward, agreement.references);
       if(!current())return;
       if (res?.id) {
@@ -163,7 +163,7 @@ export function MarketTrialDetailPage() {
       } else if (msg) {
         setJoinError(msg);
       } else {
-        setJoinError('네트워크 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.');
+        setJoinError('네트워크 오류가 발생했습니다. 잠시 후 다시 시도해 주시기 바랍니다.');
       }
     } finally {
       if(current()){joining.current=false;setJoinLoading(false);}
@@ -433,7 +433,7 @@ export function MarketTrialDetailPage() {
           <div>
             <p style={{ fontSize: '0.8125rem', color: '#6B7280', lineHeight: 1.5, marginBottom: '14px' }}>
               {isAuthenticated
-                ? '이 유통참여형 펀딩에 참여하시겠습니까? 보상 방식을 선택한 후 신청해 주세요.'
+                ? '이 유통참여형 펀딩에 참여하시겠습니까? 보상 방식을 선택한 후 신청해 주시기 바랍니다.'
                 : '참여 신청은 로그인이 필요합니다. 신청 버튼을 누르면 로그인 화면으로 이동합니다.'}
             </p>
 
@@ -494,7 +494,7 @@ export function MarketTrialDetailPage() {
                 ? '로그인하고 참여하기'
                 : selectedReward
                 ? '유통참여형 펀딩 참여 신청'
-                : '보상 방식을 선택해 주세요'}
+                : '보상 방식을 선택해 주시기 바랍니다'}
             </button>
           </div>
         )}
@@ -533,7 +533,7 @@ export function MarketTrialDetailPage() {
                 포럼 토론
               </h3>
               <p style={{ fontSize: '0.8125rem', color: '#6B7280', margin: 0 }}>
-                이 유통참여형 펀딩에 관한 공지 및 토론을 포럼에서 확인하세요.
+                이 유통참여형 펀딩에 관한 공지 및 토론을 포럼에서 확인하시기 바랍니다.
               </p>
             </div>
             <Link

@@ -55,13 +55,13 @@ describe('independent community participation workspace', () => {
  it('does not treat an ineligible account as a pending service approval', async () => {
   membershipStatus='inactive';
   render(<MemoryRouter><Workspace /></MemoryRouter>);
-  await screen.findByText('커뮤니티 이용 자격을 확인할 수 없습니다. 계정 상태를 확인하거나 운영자에게 문의해 주세요.');
+  await screen.findByText('커뮤니티 이용 자격을 확인할 수 없습니다. 계정 상태를 확인하거나 운영자에게 문의해 주시기 바랍니다.');
   expect(screen.queryByText('서비스 게시판')).toBeNull();
  });
  it.each(['suspended','withdrawn'])('does not offer re-enrollment for %s', async status => {
   membershipStatus=status;
   render(<MemoryRouter><Workspace /></MemoryRouter>);
-  await screen.findByText(status==='suspended'?'커뮤니티 서비스 이용이 정지되었습니다. 운영자에게 문의해 주세요.':'커뮤니티 서비스에서 탈퇴한 상태입니다. 운영자에게 문의해 주세요.');
+  await screen.findByText(status==='suspended'?'커뮤니티 서비스 이용이 정지되었습니다. 운영자에게 문의해 주시기 바랍니다.':'커뮤니티 서비스에서 탈퇴한 상태입니다. 운영자에게 문의해 주시기 바랍니다.');
   expect(screen.queryByRole('button',{name:'가입 신청'})).toBeNull();
  });
  it('shows own member management only to the service operator', async () => {

@@ -123,17 +123,17 @@ const ForumPostForm: FC = () => {
     e.preventDefault();
 
     if (!formData.title.trim()) {
-      toast.error('제목을 입력하세요');
+      toast.error('제목을 입력하시기 바랍니다');
       return;
     }
 
     if (!editorHtml.trim()) {
-      toast.error('내용을 입력하세요');
+      toast.error('내용을 입력하시기 바랍니다');
       return;
     }
 
     if (!formData.forumId) {
-      toast.error('카테고리를 선택하세요');
+      toast.error('카테고리를 선택하시기 바랍니다');
       return;
     }
 
@@ -193,7 +193,7 @@ const ForumPostForm: FC = () => {
                   id="title"
                   value={formData.title}
                   onChange={(e: any) => handleChange('title', e.target.value)}
-                  placeholder="게시글 제목을 입력하세요"
+                  placeholder="게시글 제목을 입력하시기 바랍니다"
                   required
                 />
               </div>
@@ -206,7 +206,7 @@ const ForumPostForm: FC = () => {
                 >
                   <SelectTrigger>
                       <SelectValue 
-                        placeholder="카테고리를 선택하세요"
+                        placeholder="카테고리를 선택하시기 바랍니다"
                       getDisplayValue={(forumId) => {
                         const forum = categories.find((c: any) => c.id === forumId);
                         return forum?.name || forumId;
@@ -230,7 +230,7 @@ const ForumPostForm: FC = () => {
                   onChange={(content) => {
                     setEditorHtml(content.html);
                   }}
-                  placeholder="게시글 내용을 입력하세요..."
+                  placeholder="게시글 내용을 입력하시기 바랍니다..."
                   minHeight="400px"
                 />
               </div>

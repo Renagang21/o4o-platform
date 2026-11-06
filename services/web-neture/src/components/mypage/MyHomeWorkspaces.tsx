@@ -165,7 +165,7 @@ function WorkspaceExplorer({ user, data, loading, error, onReload }: Props) {
       setMoveError(
         error instanceof ServiceEntryError
           ? error.message
-          : "이동하지 못했습니다. 이용 상태를 확인하고 다시 시도해 주세요.",
+          : "이동하지 못했습니다. 이용 상태를 확인하고 다시 시도해 주시기 바랍니다.",
       );
     }
   };
@@ -273,7 +273,7 @@ function WorkspaceExplorer({ user, data, loading, error, onReload }: Props) {
             내 업무 바로가기
           </h2>
           <p className="mt-2 text-sm text-slate-600">
-            이용할 공간을 선택하세요. 매장 업무와 개인 활동을 함께 찾을 수
+            이용할 공간을 선택하시기 바랍니다. 매장 업무와 개인 활동을 함께 찾을 수
             있습니다.
           </p>
         </div>
@@ -315,7 +315,7 @@ function WorkspaceExplorer({ user, data, loading, error, onReload }: Props) {
               )
             ) : (
               <p className="text-sm text-slate-500">
-                자주 가는 공간의 별표를 눌러 여기에 모아두세요.
+                자주 가는 공간의 별표를 눌러 여기에 모아두시기 바랍니다.
               </p>
             )}
           </div>
@@ -373,13 +373,13 @@ function WorkspaceExplorer({ user, data, loading, error, onReload }: Props) {
           {preferences.pinned.length === PIN_LIMIT && (
             <p role="status" className="mb-3 text-xs text-slate-600">
               즐겨찾기가 {PIN_LIMIT}개입니다. 다른 공간을 고정하려면 기존 별표를
-              해제하세요.
+              해제하시기 바랍니다.
             </p>
           )}
           {destinations.length === 0 ? (
             <p className="rounded-xl bg-slate-50 p-4 text-sm text-slate-500">
               현재 바로 이동할 수 있는 공간이 없습니다. 참여 서비스에서
-              가입·이용 상태를 확인하세요.
+              가입·이용 상태를 확인하시기 바랍니다.
             </p>
           ) : (
             (() => {
@@ -395,7 +395,7 @@ function WorkspaceExplorer({ user, data, loading, error, onReload }: Props) {
                   role="status"
                   className="rounded-xl bg-slate-50 p-4 text-sm text-slate-500"
                 >
-                  검색 결과가 없습니다. 다른 공간 이름으로 찾아보세요.
+                  검색 결과가 없습니다. 다른 공간 이름으로 찾아보시기 바랍니다.
                 </p>
               );
             })()

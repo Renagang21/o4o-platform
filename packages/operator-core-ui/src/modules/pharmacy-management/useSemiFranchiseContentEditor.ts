@@ -58,7 +58,7 @@ export function useSemiFranchiseContentEditor(businessKey?: string, returnPath?:
     if (state.saving || loading || loadError || loadedScope !== scope || archived || (businessKey && businessKey !== key)) return;
     const title = form.title.trim();
     if (!title) {
-      setMessage({ type: 'error', text: '제목을 입력해 주세요.' });
+      setMessage({ type: 'error', text: '제목을 입력해 주시기 바랍니다.' });
       return;
     }
     const input = { ...buildContentInput(form), ...(typeof current?.revision === 'number' ? { expectedRevision: current.revision } : {}) };

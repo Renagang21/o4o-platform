@@ -249,15 +249,15 @@ export class SimpleAIGenerator {
         if (status === 429) {
           const retryAfter = error.response.headers?.['retry-after'];
           const waitTime = retryAfter ? `${retryAfter}초` : '잠시';
-          throw new Error(`요청 한도를 초과했습니다. ${waitTime} 후 다시 시도해 주세요.`);
+          throw new Error(`요청 한도를 초과했습니다. ${waitTime} 후 다시 시도해 주시기 바랍니다.`);
         }
 
         if (status === 401) {
-          throw new Error('인증이 만료되었습니다. 다시 로그인해 주세요.');
+          throw new Error('인증이 만료되었습니다. 다시 로그인해 주시기 바랍니다.');
         }
 
         if (status === 504) {
-          throw new Error('요청 시간이 초과되었습니다. 프롬프트를 간단히 하거나 다시 시도해 주세요.');
+          throw new Error('요청 시간이 초과되었습니다. 프롬프트를 간단히 하거나 다시 시도해 주시기 바랍니다.');
         }
       }
 
@@ -273,7 +273,7 @@ export class SimpleAIGenerator {
       VALIDATION_ERROR: `잘못된 요청: ${error.error}`,
       AUTH_ERROR: '인증 오류: 로그인이 필요합니다.',
       PROVIDER_ERROR: `AI 서비스 오류: ${error.error}`,
-      TIMEOUT_ERROR: '요청 시간 초과: 프롬프트를 간단히 하거나 다시 시도해 주세요.',
+      TIMEOUT_ERROR: '요청 시간 초과: 프롬프트를 간단히 하거나 다시 시도해 주시기 바랍니다.',
       RATE_LIMIT_ERROR: `요청 한도 초과: ${error.error}`,
     };
 

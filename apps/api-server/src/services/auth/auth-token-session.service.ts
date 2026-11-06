@@ -113,7 +113,7 @@ export class AuthTokenSessionService {
         userId: user.id,
         status: user.status,
       });
-      const error = new Error('계정 상태가 유효하지 않습니다. 다시 로그인해 주세요.') as Error & {
+      const error = new Error('계정 상태가 유효하지 않습니다. 다시 로그인해 주시기 바랍니다.') as Error & {
         code: string;
       };
       error.code = 'ACCOUNT_NOT_ACTIVE';
@@ -134,7 +134,7 @@ export class AuthTokenSessionService {
     //   이전에는 이 조건이 family 검사 전체를 우회시켜 보안 세션 폐기가 무력했다.
     if (!user.refreshTokenFamily) {
       logger.warn('[refreshTokens] refresh rejected — token family revoked', { userId: user.id });
-      const error = new Error('세션이 종료되었습니다. 다시 로그인해 주세요.') as Error & {
+      const error = new Error('세션이 종료되었습니다. 다시 로그인해 주시기 바랍니다.') as Error & {
         code: string;
       };
       error.code = 'TOKEN_FAMILY_REVOKED';
@@ -173,7 +173,7 @@ export class AuthTokenSessionService {
 
   private throwServiceSessionRevoked(userId: string, serviceKey: string): never {
     logger.warn('[refreshTokens] refresh rejected — service session revoked', { userId, serviceKey });
-    const error = new Error('세션이 종료되었습니다. 다시 로그인해 주세요.') as Error & {
+    const error = new Error('세션이 종료되었습니다. 다시 로그인해 주시기 바랍니다.') as Error & {
       code: string;
     };
     error.code = 'SERVICE_SESSION_REVOKED';

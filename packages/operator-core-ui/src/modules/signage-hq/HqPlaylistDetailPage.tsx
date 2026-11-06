@@ -400,7 +400,7 @@ export function HqPlaylistDetailPage({ id: playlistId, apiFetch, config, navigat
               value={urlInput}
               onChange={(e) => setUrlInput(e.target.value)}
               onKeyDown={(e) => { if (e.key === 'Enter' && urlInput.trim()) void handleAddByUrl(); }}
-              placeholder="YouTube 또는 Vimeo URL을 입력하세요"
+              placeholder="YouTube 또는 Vimeo URL을 입력하시기 바랍니다"
               className={`w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 ${accent.focusRing} bg-white`}
             />
             <div className="flex items-center gap-2">
@@ -429,7 +429,7 @@ export function HqPlaylistDetailPage({ id: playlistId, apiFetch, config, navigat
         {/* Item List */}
         {items.length === 0 ? (
           <p className="py-8 text-center text-sm text-slate-400">
-            등록된 항목이 없습니다. URL을 입력하거나 HQ 미디어에서 선택하여 추가하세요.
+            등록된 항목이 없습니다. URL을 입력하거나 HQ 미디어에서 선택하여 추가하시기 바랍니다.
           </p>
         ) : (
           <div className="space-y-2">
@@ -529,7 +529,7 @@ export function HqPlaylistDetailPage({ id: playlistId, apiFetch, config, navigat
                 </div>
               ) : filteredHqMedia.length === 0 ? (
                 <p className="text-center py-12 text-sm text-slate-400">
-                  {mediaSearch ? '검색 결과가 없습니다' : 'HQ 미디어가 없습니다. URL 입력으로 먼저 미디어를 등록하세요.'}
+                  {mediaSearch ? '검색 결과가 없습니다' : 'HQ 미디어가 없습니다. URL 입력으로 먼저 미디어를 등록하시기 바랍니다.'}
                 </p>
               ) : (
                 <div className="space-y-2">

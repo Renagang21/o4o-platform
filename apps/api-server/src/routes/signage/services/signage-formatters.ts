@@ -2,7 +2,6 @@ import type {
   SignagePlaylist,
   SignagePlaylistItem,
   SignageMedia,
-  SignageSchedule,
   SignageTemplate,
   SignageTemplateZone,
   SignageContentBlock,
@@ -13,7 +12,6 @@ import type {
   PlaylistDetailResponseDto,
   PlaylistItemResponseDto,
   MediaResponseDto,
-  ScheduleResponseDto,
   TemplateResponseDto,
   TemplateDetailResponseDto,
   TemplateZoneResponseDto,
@@ -98,28 +96,6 @@ export function toMediaResponse(media: SignageMedia): MediaResponseDto {
     status: media.status,
     createdAt: media.createdAt?.toISOString(),
     updatedAt: media.updatedAt?.toISOString(),
-  };
-}
-
-export function toScheduleResponse(schedule: SignageSchedule): ScheduleResponseDto {
-  return {
-    id: schedule.id,
-    serviceKey: schedule.serviceKey,
-    organizationId: schedule.organizationId,
-    name: schedule.name,
-    channelId: schedule.channelId,
-    playlistId: schedule.playlistId,
-    storePlaylistId: schedule.storePlaylistId || null,
-    daysOfWeek: schedule.daysOfWeek,
-    startTime: schedule.startTime,
-    endTime: schedule.endTime,
-    validFrom: schedule.validFrom?.toISOString()?.slice(0, 10) || null,
-    validUntil: schedule.validUntil?.toISOString()?.slice(0, 10) || null,
-    priority: schedule.priority,
-    isActive: schedule.isActive,
-    createdAt: schedule.createdAt?.toISOString(),
-    updatedAt: schedule.updatedAt?.toISOString(),
-    playlist: schedule.playlist ? toPlaylistResponse(schedule.playlist) : undefined,
   };
 }
 

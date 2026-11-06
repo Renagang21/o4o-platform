@@ -50,7 +50,7 @@ export default function MyEducationPage({ slug }: { slug: string }) {
       <header>
         <h1 className="text-xl font-semibold text-gray-900">연수교육</h1>
         <p className="mt-1 text-sm text-gray-500">
-          분회가 확인한 연도별 연수교육 평점입니다. 정정이 필요하면 분회 사무국으로 문의해 주세요.
+          분회가 확인한 연도별 연수교육 평점입니다. 정정이 필요하면 분회 사무국으로 문의해 주시기 바랍니다.
         </p>
       </header>
 

@@ -244,7 +244,7 @@ export const postApi = {
         if (errorData?.code === 'CONFLICT' && errorData?.message === 'Slug already exists') {
           return {
             success: false,
-            error: '이 슬러그(URL)는 이미 사용 중입니다. 다른 슬러그를 사용해주세요.'
+            error: '이 슬러그(URL)는 이미 사용 중입니다. 다른 슬러그를 사용해 주시기 바랍니다.'
           };
         }
       }
@@ -309,7 +309,7 @@ export const postApi = {
         if (errorData?.code === 'CONFLICT' && errorData?.message === 'Slug already exists') {
           return {
             success: false,
-            error: '이 슬러그(URL)는 이미 사용 중입니다. 다른 슬러그를 사용해주세요.'
+            error: '이 슬러그(URL)는 이미 사용 중입니다. 다른 슬러그를 사용해 주시기 바랍니다.'
           };
         }
       }

@@ -24,7 +24,7 @@ const adminSupplierApi = {
       return response.data.data;
     } catch (error: any) {
       if (error?.response?.status === 403) throw new Error('접근 권한이 없습니다');
-      throw new Error('공급자 상태 목록을 불러오지 못했습니다. 다시 시도해 주세요.');
+      throw new Error('공급자 상태 목록을 불러오지 못했습니다. 다시 시도해 주시기 바랍니다.');
     }
   },
 

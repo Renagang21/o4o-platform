@@ -171,7 +171,7 @@ export default function SupplierProductsPage() {
       return (
         <div className="flex flex-col items-center gap-2 py-8">
           <p className="text-sm text-slate-500">현재 필터/검색 조건에 맞는 상품이 없습니다.</p>
-          <p className="text-xs text-slate-400">검색어나 필터를 초기화한 뒤 다시 확인해 주세요.</p>
+          <p className="text-xs text-slate-400">검색어나 필터를 초기화한 뒤 다시 확인해 주시기 바랍니다.</p>
           <button
             type="button"
             onClick={resetAllFilters}
@@ -288,7 +288,7 @@ export default function SupplierProductsPage() {
       {/* WO-NETURE-OPERATOR-PRODUCT-MENU-LABEL-ALIGNMENT-V1: 운영자 노출 조건 안내 */}
       <div className="flex items-start gap-2 mb-4 px-3 py-2.5 bg-blue-50 border border-blue-200 rounded-lg text-xs text-blue-700">
         <Info size={14} className="shrink-0 mt-0.5" />
-        <p>운영자 화면에는 <strong>공개(PUBLIC/SERVICE)</strong> 및 <strong>활성</strong> 상태의 상품만 노출됩니다. 등록 후 운영자에게 보이려면 상품을 활성화하고 유통 타입을 공개로 설정해 주세요.</p>
+        <p>운영자 화면에는 <strong>공개(PUBLIC/SERVICE)</strong> 및 <strong>활성</strong> 상태의 상품만 노출됩니다. 등록 후 운영자에게 보이려면 상품을 활성화하고 유통 타입을 공개로 설정해 주시기 바랍니다.</p>
       </div>
 
       {/* WO-O4O-SUPPLIER-PRODUCT-LIST-NEXT-ACTIONS-CLARITY-V1: 제품 등록 후 다음 단계 안내 */}
@@ -439,7 +439,7 @@ export default function SupplierProductsPage() {
         emptyMessage={loadError ? (
           <div className="flex flex-col items-center gap-2 py-8">
             <p className="text-sm text-slate-600">상품 목록을 불러오지 못했습니다.</p>
-            <p className="text-xs text-slate-400">잠시 후 다시 시도해 주세요.</p>
+            <p className="text-xs text-slate-400">잠시 후 다시 시도해 주시기 바랍니다.</p>
             <button
               type="button"
               onClick={() => fetchProducts(pagination.page)}
@@ -484,7 +484,7 @@ export default function SupplierProductsPage() {
             </p>
             {/* WO-O4O-NETURE-SUPPLIER-DELETE-POLICY-AND-REVIEW-ROUNDTRIP-BATCH-V1: soft delete 로 정합화 */}
             <p className="text-xs text-slate-500 mb-1">
-              삭제하면 목록에서 사라지고 판매가 중지됩니다. 기록은 남으므로 복구가 필요하면 운영자에게 요청하세요.
+              삭제하면 목록에서 사라지고 판매가 중지됩니다. 기록은 남으므로 복구가 필요하면 운영자에게 요청하시기 바랍니다.
             </p>
             <p className="text-xs text-amber-600 mb-4">
               매장에 진열 중이거나 서비스에 연결된 상품은 삭제되지 않습니다.
@@ -556,7 +556,7 @@ export default function SupplierProductsPage() {
                 <div className="text-center py-12">
                   <FileText size={32} className="mx-auto text-slate-300 mb-3" />
                   <p className="text-sm text-slate-400">소비자 상세 설명이 아직 작성되지 않았습니다.</p>
-                  <p className="text-xs text-slate-300 mt-1">상품 편집에서 상세 설명을 입력해 주세요.</p>
+                  <p className="text-xs text-slate-300 mt-1">상품 편집에서 상세 설명을 입력해 주시기 바랍니다.</p>
                 </div>
               )}
             </div>

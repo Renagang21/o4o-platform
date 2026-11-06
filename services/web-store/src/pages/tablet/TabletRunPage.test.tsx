@@ -15,7 +15,7 @@ afterEach(cleanup);
 it('retains device revocation and its reconnect action after a successful settings reload', async () => {
   api.heartbeat.mockRejectedValue(Object.assign(new Error('revoked'), { status: 401 }));
   display();
-  expect(await screen.findByText('태블릿 연결이 해제되었습니다. 기기를 다시 연결해 주세요.')).toBeTruthy();
+  expect(await screen.findByText('태블릿 연결이 해제되었습니다. 기기를 다시 연결해 주시기 바랍니다.')).toBeTruthy();
   await waitFor(() => expect(api.settings.mock.calls.length).toBeGreaterThanOrEqual(2));
   expect(screen.getByRole('link', { name: '기기 다시 연결' }).getAttribute('href')).toBe('/tablet/setup?reset=1');
   expect(api.clear).toHaveBeenCalledTimes(1);

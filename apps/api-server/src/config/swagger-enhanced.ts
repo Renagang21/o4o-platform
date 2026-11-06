@@ -358,7 +358,7 @@ Authorization: Bearer <your-jwt-token>
               },
               example: {
                 success: false,
-                error: '너무 많은 요청입니다. 잠시 후 다시 시도해주세요',
+                error: '너무 많은 요청입니다. 잠시 후 다시 시도해 주시기 바랍니다',
                 code: 'SYS_RATE_LIMIT_EXCEEDED'
               }
             }

@@ -12,13 +12,13 @@ export function createCommunitySignageRoutes(optionalAuth: RequestHandler, authe
   const router = Router();
   const access: RequestHandler = asyncHandler(async (req, res, next) => {
     const workspace = await resolveCommunityWorkspace(AppDataSource, await resolveUser(req), 'community');
-    if (!workspace?.allowed) { res.status(403).json({ success:false, code:'COMMUNITY_ACCESS_REQUIRED', error:'커뮤니티 이용 상태를 확인해 주세요.' }); return; }
+    if (!workspace?.allowed) { res.status(403).json({ success:false, code:'COMMUNITY_ACCESS_REQUIRED', error:'커뮤니티 이용 상태를 확인해 주시기 바랍니다.' }); return; }
     next();
   });
   router.get('/community/signage', apiLimiter, optionalAuth, asyncHandler(async (req, res) => {
     const user = await resolveUser(req);
     const workspace = await resolveCommunityWorkspace(AppDataSource, user, 'community');
-    if (user && !workspace?.allowed) { res.status(403).json({success:false,error:'커뮤니티 이용 상태를 확인해 주세요.'}); return; }
+    if (user && !workspace?.allowed) { res.status(403).json({success:false,error:'커뮤니티 이용 상태를 확인해 주시기 바랍니다.'}); return; }
     const page = typeof req.query.page === 'string' && /^\d{1,4}$/.test(req.query.page) ? Math.max(1,Number(req.query.page)) : 1;
     const items = await AppDataSource.query(`SELECT id,name,description,"sourceType","sourceUrl","thumbnailUrl",tags,"createdAt" FROM signage_media
       WHERE "serviceKey"='community' AND source='community' AND scope='global' AND status='active' AND "deletedAt" IS NULL
@@ -45,10 +45,10 @@ export function createCommunitySignageRoutes(optionalAuth: RequestHandler, authe
       import('@o4o/asset-copy-core'), import('./o4o-store/controllers/kpa-content-organization.js'), import('../utils/store-organization.resolver.js'), import('../services/community/community-video-copy.service.js'),
     ]);
     const user=(req as AuthRequest).user!;
-    if(!new AssetCopyService(AppDataSource).checkPermission(user.roles??[],['kpa:admin','kpa:operator','kpa:store_owner','neture:store_owner','kpa:store_member'])) { res.status(403).json({success:false,error:'내 매장 이용 권한을 확인해 주세요.'});return; }
+    if(!new AssetCopyService(AppDataSource).checkPermission(user.roles??[],['kpa:admin','kpa:operator','kpa:store_owner','neture:store_owner','kpa:store_member'])) { res.status(403).json({success:false,error:'내 매장 이용 권한을 확인해 주시기 바랍니다.'});return; }
     const selected=readPreferredStoreOrganizationId(req);
     const organizationId=selected?await resolveKpaContentOrganization(AppDataSource,user.id,selected):null;
-    if(!organizationId){res.status(403).json({success:false,error:'가져올 매장을 선택하고 이용 상태를 확인해 주세요.'});return;}
+    if(!organizationId){res.status(403).json({success:false,error:'가져올 매장을 선택하고 이용 상태를 확인해 주시기 바랍니다.'});return;}
     const data=await copyCommunityVideoOnce(AppDataSource,user.id,organizationId,req.body??{});
     res.status(201).json({success:true,data});
   }));

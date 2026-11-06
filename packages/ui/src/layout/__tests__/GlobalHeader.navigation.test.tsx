@@ -43,3 +43,13 @@ it.each([
   await waitFor(() => expect(screen.queryByRole('button', { name: '메뉴 닫기' })).toBeNull());
   expect(screen.getAllByRole('link', { name: '이동할 곳' })).toHaveLength(1);
 });
+
+it('renders an approved service mark without changing the accessible brand link or mobile navigation', () => {
+  render(<MemoryRouter><GlobalHeader brand={{ name: '합성 서비스', icon: 'S', logoSrc: '/brand/test/logo-mark.svg', href: '/service' }} publicNav={[{label:'공개 안내',href:'/guide'}]} /></MemoryRouter>);
+  const link=screen.getByRole('link',{name:'합성 서비스'});
+  expect(link.getAttribute('href')).toBe('/service');
+  expect(link.querySelector('img')?.getAttribute('src')).toBe('/brand/test/logo-mark.svg');
+  expect(link.querySelector('img')?.getAttribute('alt')).toBe('');
+  fireEvent.click(screen.getByRole('button',{name:'메뉴 열기'}));
+  expect(screen.getAllByRole('link',{name:'공개 안내'}).length).toBeGreaterThan(0);
+});

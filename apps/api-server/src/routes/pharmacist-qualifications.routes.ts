@@ -1,3 +1,6 @@
+import {MemberVerificationService} from '../services/admin/member-verification.service.js';
+import {memberRegistrationSchema} from '../services/admin/member-registration-contract.js';
+import {MemberCredentialRecoveryService} from '../services/admin/member-credential-recovery.service.js';
 import { Router } from "express";
 import { z } from "zod";
 import {
@@ -43,7 +46,7 @@ const handle =
           .json({
             success: false,
             code: "INVALID_QUALIFICATION_INPUT",
-            error: "자격 정보와 확인 항목을 다시 확인해 주세요.",
+            error: "자격 정보와 확인 항목을 다시 확인해 주시기 바랍니다.",
           });
         return;
       }
@@ -52,7 +55,7 @@ const handle =
         .json({
           success: false,
           code: "QUALIFICATION_UNAVAILABLE",
-          error: "자격 정보를 처리하지 못했습니다. 다시 조회해 주세요.",
+          error: "자격 정보를 처리하지 못했습니다. 다시 조회해 주시기 바랍니다.",
         });
     }
   };
@@ -65,11 +68,20 @@ const google = (req: AuthRequest) => {
     );
 };
 const workspace = () => new CentralMemberWorkspaceService(AppDataSource);
+pharmacistQualificationsRouter.post('/members/:userId/restore-access',handle(req=>{
+  google(req);
+  const input=z.object({reason:z.string().trim().min(1).max(2000),version:z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{6}$/)}).strict().parse(req.body);
+  return new MemberLifecycleService(AppDataSource).restoreAccess(req.user!.id,z.string().uuid().parse(req.params.userId),{reason:input.reason!,version:input.version!});
+}));
 const memberId = (req: AuthRequest) => z.string().uuid().parse(req.params.userId);
+pharmacistQualificationsRouter.get('/review/:userId',handle(req=>{
+  google(req);
+  return new CentralMemberWorkspaceService(AppDataSource).detail(req.user!.id,memberId(req),true);
+}));
 pharmacistQualificationsRouter.get('/members', handle(req => {
   google(req);
   const query = z.object({
-    task: z.enum(['all', 'qualifications', 'pharmacies', 'corrections']).default('all'),
+    task: z.enum(['all', 'pending', 'inactive', 'qualifications', 'pharmacies', 'corrections']).default('all'),
     page: z.coerce.number().int().min(1).max(100000).default(1),
     q: z.string().trim().max(100).default(''),
   }).strict().parse(req.query);
@@ -82,19 +94,44 @@ pharmacistQualificationsRouter.get('/members/:userId', handle(req => {
 pharmacistQualificationsRouter.patch('/members/:userId', handle(req => {
   google(req);
   const input = z.object({
-    name: z.string().trim().min(1).max(50), nickname: z.string().trim().max(50),
+    name: z.string().trim().min(1).max(100), nickname: z.string().trim().max(100),
+    email:z.string().trim().email().max(255).optional(),licenseNumber:z.string().trim().max(100).refine(value=>[...value].every(char=>char.charCodeAt(0)>=32&&char.charCodeAt(0)!==127)).optional(),qualificationVersion:z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{6}$/).nullable().optional(),evidenceConfirmed:z.boolean().optional(),
     phone: z.string().trim().max(20), reason: z.string().trim().min(1).max(2000),
     version: z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{6}$/),
+    registration:memberRegistrationSchema.optional(),businessVersion:z.string().regex(/^[a-f0-9]{32}$/).nullable().optional(),
   }).strict().parse(req.body);
   return workspace().correct(req.user!.id, memberId(req), {
     name: input.name!, nickname: input.nickname!, phone: input.phone!, reason: input.reason!, version: input.version!,
+    ...(input.registration?{registration:input.registration as import('@o4o/types').MemberRegistrationInput}:{}),
+    ...(input.businessVersion!==undefined?{businessVersion:input.businessVersion}:{}),
+    ...(input.qualificationVersion!==undefined?{qualificationVersion:input.qualificationVersion}:{}),
+    ...(input.email!==undefined?{email:input.email}:{}),...(input.licenseNumber!==undefined?{licenseNumber:input.licenseNumber,qualificationVersion:input.qualificationVersion,evidenceConfirmed:input.evidenceConfirmed}:{}),...(input.evidenceConfirmed!==undefined?{evidenceConfirmed:input.evidenceConfirmed}:{}),
   });
+}));
+pharmacistQualificationsRouter.post('/members/:userId/verification-email',handle(req=>{
+  google(req);
+  const input=z.object({version:z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{6}$/)}).strict().parse(req.body);
+  return new MemberVerificationService(AppDataSource).request(req.user!.id,memberId(req),input.version!);
+}));
+pharmacistQualificationsRouter.post('/members/:userId/temporary-password',handle(req=>{
+  google(req);
+  const input=z.object({reason:z.string().trim().min(1).max(2000),version:z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{6}$/),evidenceConfirmed:z.literal(true)}).strict().parse(req.body);
+  return new MemberCredentialRecoveryService(AppDataSource).issue(req.user!.id,memberId(req),{version:input.version!,reason:input.reason!,evidenceConfirmed:true});
+}));
+pharmacistQualificationsRouter.get('/members/:userId/pharmacies/:organizationId/closure-plan',handle(req=>{
+ google(req);
+ return new MemberLifecycleService(AppDataSource).closurePlan(req.user!.id,memberId(req),z.string().uuid().parse(req.params.organizationId));
 }));
 pharmacistQualificationsRouter.post('/members/:userId/stop-access', handle(req => {
   google(req);
   const input = z.object({reason:z.string().trim().min(1).max(2000),
     version:z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{6}$/)}).strict().parse(req.body);
   return new MemberLifecycleService(AppDataSource).stopAccess(req.user!.id, memberId(req), {reason:input.reason!,version:input.version!});
+}));
+pharmacistQualificationsRouter.post('/members/:userId/terminate-access', handle(req => {
+  google(req);
+  const input=z.object({reason:z.string().trim().min(1).max(2000),version:z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{6}$/)}).strict().parse(req.body);
+  return new MemberLifecycleService(AppDataSource).terminateAccess(req.user!.id,memberId(req),{reason:input.reason!,version:input.version!});
 }));
 pharmacistQualificationsRouter.post('/members/:userId/pharmacies/:organizationId/transfer', handle(req => {
   google(req);
@@ -128,7 +165,7 @@ pharmacistQualificationsRouter.patch('/members/:userId/legacy-business',handle(r
 }));
 pharmacistQualificationsRouter.patch('/members/:userId/pharmacies/:pharmacyId',handle(req=>{
   google(req);
-  const input=z.object({fields:z.object({...businessFields,phone:businessPhone,contactEmail:businessEmail}).strict(),reason:z.string().trim().min(1).max(2000),version:z.string().regex(/^[a-f0-9]{32}$/),evidenceConfirmed:z.literal(true)}).strict().parse(req.body);
+  const input=z.object({fields:z.object({...businessFields,licenseNumber:z.string().trim().min(1).max(30).refine(value=>[...value].every(char=>char.charCodeAt(0)>=32&&char.charCodeAt(0)!==127)).optional(),phone:businessPhone,contactEmail:businessEmail}).strict(),reason:z.string().trim().min(1).max(2000),version:z.string().regex(/^[a-f0-9]{32}$/),evidenceConfirmed:z.literal(true)}).strict().parse(req.body);
   return workspace().correctPharmacy(req.user!.id,memberId(req),z.string().uuid().parse(req.params.pharmacyId),{fields:input.fields as Record<string,string>,reason:input.reason!,version:input.version!,evidenceConfirmed:true});
 }));
 pharmacistQualificationsRouter.get(

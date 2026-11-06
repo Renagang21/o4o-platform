@@ -5,7 +5,7 @@ export function createStorePopSession(base: PopV2Api, isCurrent: () => boolean):
   let writing = false;
   const failedSaves = new Set<string>();
   const assertCurrent = () => {
-    if (!isCurrent()) throw new Error('매장이 변경되었습니다. 현재 매장에서 다시 열어 주세요.');
+    if (!isCurrent()) throw new Error('매장이 변경되었습니다. 현재 매장에서 다시 열어 주시기 바랍니다.');
   };
   const read = async <T>(task: () => Promise<T>): Promise<T> => {
     assertCurrent(); const result = await task(); assertCurrent(); return result;
@@ -29,7 +29,7 @@ export function createStorePopSession(base: PopV2Api, isCurrent: () => boolean):
     duplicate: id => write(() => base.duplicate(id)),
     setArchived: (id, archived) => write(() => base.setArchived(id, archived)),
     render: (id, format) => {
-      if (failedSaves.has(id)) return Promise.reject(new Error('변경 내용을 저장하지 못해 출력하지 않았습니다. 저장 후 다시 출력해 주세요.'));
+      if (failedSaves.has(id)) return Promise.reject(new Error('변경 내용을 저장하지 못해 출력하지 않았습니다. 저장 후 다시 출력해 주시기 바랍니다.'));
       return write(() => base.render(id, format));
     },
     listContentSources: () => read(() => base.listContentSources()),

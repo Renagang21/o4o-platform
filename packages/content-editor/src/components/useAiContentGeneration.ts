@@ -78,7 +78,7 @@ export function useAiContentGeneration({
     customPrompt: string;
   }) => {
     if (!body.input.trim()) {
-      dispatch({ type: 'error', error: '변환할 텍스트를 입력해 주세요.' });
+      dispatch({ type: 'error', error: '변환할 텍스트를 입력해 주시기 바랍니다.' });
       return;
     }
     const request = begin();
@@ -120,7 +120,7 @@ export function useAiContentGeneration({
     customInstruction: string;
   }) => {
     if (!body.url.trim()) {
-      dispatch({ type: 'error', error: 'URL을 입력해 주세요.' });
+      dispatch({ type: 'error', error: 'URL을 입력해 주시기 바랍니다.' });
       return;
     }
     try {
@@ -147,7 +147,7 @@ export function useAiContentGeneration({
         throw new Error(data.error || 'URL 콘텐츠 생성에 실패했습니다.');
       if (!data.blocks || data.blocks.length === 0)
         throw new Error(
-          '생성된 블록이 없습니다. URL 접근 가능 여부를 확인해 주세요.',
+          '생성된 블록이 없습니다. URL 접근 가능 여부를 확인해 주시기 바랍니다.',
         );
       const html = blocksToHtml(data.blocks);
       if (!html.trim()) throw new Error('HTML 변환 결과가 비어있습니다.');
@@ -171,7 +171,7 @@ export function useAiContentGeneration({
           type: 'error',
           error:
             err?.name === 'AbortError'
-              ? 'URL 분석 시간이 초과되었습니다. (90초) 다시 시도하거나 다른 URL을 입력해 주세요.'
+              ? 'URL 분석 시간이 초과되었습니다. (90초) 다시 시도하거나 다른 URL을 입력해 주시기 바랍니다.'
               : err.message || 'URL 콘텐츠 생성 중 오류가 발생했습니다.',
         });
     } finally {

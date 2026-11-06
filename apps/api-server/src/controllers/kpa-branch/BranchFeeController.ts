@@ -146,7 +146,7 @@ export class BranchFeeController {
     const userId = String(req.body?.userId ?? '').trim();
 
     if (!userId) {
-      return res.status(400).json({ success: false, error: '회원을 선택해 주세요.', code: 'USER_ID_REQUIRED' });
+      return res.status(400).json({ success: false, error: '회원을 선택해 주시기 바랍니다.', code: 'USER_ID_REQUIRED' });
     }
 
     try {

@@ -206,7 +206,7 @@ export type AiInsightResponseDto = AiInsightOutput;
 // 상수 & 헬퍼
 // ========================================
 
-export const AI_DISCLAIMER = '이 정보는 AI가 생성한 참고 자료입니다. 의료적 판단이나 처방을 대체하지 않습니다. 필요시 의료 전문가와 상담하세요.';
+export const AI_DISCLAIMER = '이 정보는 AI가 생성한 참고 자료입니다. 의료적 판단이나 처방을 대체하지 않습니다. 필요시 의료 전문가와 상담하시기 바랍니다.';
 
 export const PRODUCT_TYPES = [
   'blood-glucose-monitor',

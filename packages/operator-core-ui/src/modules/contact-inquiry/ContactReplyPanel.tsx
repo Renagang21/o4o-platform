@@ -64,12 +64,12 @@ export function ContactReplyPanel({
         setText("");
       } else if (result.status === "failed")
         setError(
-          "답변을 발송하지 못했습니다. 메일 설정을 확인한 뒤 다시 보내 주세요.",
+          "답변을 발송하지 못했습니다. 메일 설정을 확인한 뒤 다시 보내 주시기 바랍니다.",
         );
       else {
         setUncertain(true);
         setError(
-          "발송 결과를 확인 중입니다. 이력을 확인하고, 같은 답변을 다시 보내지 마세요.",
+          "발송 결과를 확인 중입니다. 이력을 확인하고, 같은 답변을 다시 보내지 마시기 바랍니다.",
         );
       }
       try {
@@ -78,7 +78,7 @@ export function ContactReplyPanel({
           setHistory(rows);
       } catch {
         if (current === generation.current)
-          setError("답변 이력을 갱신하지 못했습니다. 다시 확인해 주세요.");
+          setError("답변 이력을 갱신하지 못했습니다. 다시 확인해 주시기 바랍니다.");
       }
     } catch (failure) {
       if (current === generation.current) {
@@ -88,8 +88,8 @@ export function ContactReplyPanel({
         )?.response?.data?.error?.code;
         setError(
           code === "REPLY_IN_PROGRESS"
-            ? "다른 답변의 발송 결과를 확인 중입니다. 답변 이력을 다시 확인해 주세요."
-            : "발송 결과를 확인하지 못했습니다. 답변 이력을 다시 확인해 주세요.",
+            ? "다른 답변의 발송 결과를 확인 중입니다. 답변 이력을 다시 확인해 주시기 바랍니다."
+            : "발송 결과를 확인하지 못했습니다. 답변 이력을 다시 확인해 주시기 바랍니다.",
         );
       }
     } finally {
@@ -157,7 +157,7 @@ export function ContactReplyPanel({
               try {
                 await api.retryNotifications!(serviceKey, contactId);
                 setNotice(
-                  "알림 재처리 후 문의 상세를 다시 열어 결과를 확인해 주세요.",
+                  "알림 재처리 후 문의 상세를 다시 열어 결과를 확인해 주시기 바랍니다.",
                 );
               } catch (failure) {
                 const code = (
@@ -167,7 +167,7 @@ export function ContactReplyPanel({
                 )?.response?.data?.error?.code;
                 setError(
                   code === "NOTIFICATION_IN_PROGRESS"
-                    ? "접수 알림의 발송 결과를 확인 중입니다. 문의 상세를 다시 확인해 주세요."
+                    ? "접수 알림의 발송 결과를 확인 중입니다. 문의 상세를 다시 확인해 주시기 바랍니다."
                     : "알림을 재처리하지 못했습니다.",
                 );
               } finally {

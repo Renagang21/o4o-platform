@@ -3,31 +3,12 @@ import "./login-presentation.css";
 
 type Tone = "green" | "blue" | "indigo" | "slate";
 
-function AccountMark() {
-  return (
-    <svg viewBox="0 0 32 32" fill="none" aria-hidden="true">
-      <rect x="3" y="3" width="11" height="11" rx="4" fill="currentColor" />
-      <rect
-        x="18"
-        y="3"
-        width="11"
-        height="11"
-        rx="4"
-        fill="currentColor"
-        opacity=".35"
-      />
-      <rect
-        x="3"
-        y="18"
-        width="11"
-        height="11"
-        rx="4"
-        fill="currentColor"
-        opacity=".35"
-      />
-      <rect x="18" y="18" width="11" height="11" rx="4" fill="currentColor" />
-    </svg>
-  );
+/** 실제 도형으로 구성한 SVG 원본. 협업체는 logoSrc를 지정해 독자 로고로 교체한다. */
+export const O4O_LOGO_SRC = new URL('./assets/o4o-logo.svg', import.meta.url).href;
+export const NETURE_LOGO_SRC = new URL('./assets/neture-logo.svg', import.meta.url).href;
+
+function AccountMark({ src = O4O_LOGO_SRC }: { src?: string }) {
+  return <img src={src} alt="" aria-hidden="true" />;
 }
 
 /** Presentation only: each service retains its own authentication and return navigation. */
@@ -38,6 +19,7 @@ export function LoginCard({
   tone = "green",
   onClose,
   heading = "h1",
+  logoSrc,
   children,
 }: {
   brand: string;
@@ -46,6 +28,7 @@ export function LoginCard({
   tone?: Tone;
   onClose?: () => void;
   heading?: "h1" | "h2";
+  logoSrc?: string;
   children: ReactNode;
 }) {
   const id = useId();
@@ -77,7 +60,7 @@ export function LoginCard({
       <header className="o4o-login-header">
         <div className="o4o-login-brand">
           <span className="o4o-login-mark">
-            <AccountMark />
+            <AccountMark src={logoSrc} />
           </span>
           <span>
             {brand}
@@ -99,12 +82,14 @@ export function LoginLayout({
   headline,
   description,
   tone = "green",
+  logoSrc,
   children,
 }: {
   brand: string;
   headline: ReactNode;
   description: string;
   tone?: Tone;
+  logoSrc?: string;
   children: ReactNode;
 }) {
   return (
@@ -112,7 +97,7 @@ export function LoginLayout({
       <div className="o4o-login-layout">
         <aside className="o4o-login-story">
           <div className="o4o-login-story-brand">
-            <AccountMark />
+            <AccountMark src={logoSrc} />
             {brand}
           </div>
           <p className="o4o-login-story-label">오늘의 연결, 더 나은 내일</p>

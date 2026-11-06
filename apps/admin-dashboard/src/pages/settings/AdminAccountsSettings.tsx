@@ -27,7 +27,7 @@ function errorMessage(error: unknown) {
     ?.response?.data?.error;
   return typeof message === "string"
     ? message
-    : "처리 결과를 확인하지 못했습니다. 최신 목록을 다시 조회해 주세요.";
+    : "처리 결과를 확인하지 못했습니다. 최신 목록을 다시 조회해 주시기 바랍니다.";
 }
 export default function AdminAccountsSettings() {
   const [accounts, setAccounts] = useState<Account[]>([]),
@@ -65,7 +65,7 @@ export default function AdminAccountsSettings() {
     } catch {
       if (alive.current && currentRead === readVersion.current) {
         setReadFailed(true);
-        setError("전체 관리자 목록을 조회하지 못했습니다. 다시 불러와 주세요.");
+        setError("전체 관리자 목록을 조회하지 못했습니다. 다시 불러와 주시기 바랍니다.");
       }
     } finally {
       if (alive.current && currentRead === readVersion.current)
@@ -135,7 +135,7 @@ export default function AdminAccountsSettings() {
     } catch {
       if (alive.current && current === generation.current)
         setCandidateError(
-          "지정할 사용자를 검색하지 못했습니다. 다시 시도해 주세요.",
+          "지정할 사용자를 검색하지 못했습니다. 다시 시도해 주시기 바랍니다.",
         );
     } finally {
       if (alive.current && current === generation.current) setSearching(false);
@@ -224,7 +224,7 @@ export default function AdminAccountsSettings() {
               disabled={busy}
               onChange={(e) => setSelected(e.target.value)}
             >
-              <option value="">사용자를 선택하세요</option>
+              <option value="">사용자를 선택하시기 바랍니다</option>
               {candidates.map((x) => (
                 <option
                   key={x.userId}
@@ -245,7 +245,7 @@ export default function AdminAccountsSettings() {
             if (
               candidate &&
               window.confirm(
-                `${candidate.email} 사용자를 전체 관리자로 지정할까요? O4O 전체 관리자 권한을 부여합니다.`,
+                `${candidate.email} 사용자를 전체 관리자로 지정하시겠습니까? O4O 전체 관리자 권한을 부여합니다.`,
               )
             )
               void mutate(
@@ -321,7 +321,7 @@ export default function AdminAccountsSettings() {
                           onClick={() => {
                             if (
                               window.confirm(
-                                `${x.email} 공통 계정을 ${x.isActive ? "비활성화" : "활성화"}할까요? 이 변경은 계정 전체에 적용됩니다.`,
+                                `${x.email} 공통 계정을 ${x.isActive ? "비활성화" : "활성화"}하시겠습니까? 이 변경은 계정 전체에 적용됩니다.`,
                               )
                             )
                               void mutate(

@@ -105,7 +105,7 @@ export default function StoreProductImageManagerModal({ masterId, productName, o
   const handleImport = useCallback(async (url: string, type: ImageType) => {
     const trimmed = url.trim();
     if (!isImageUrl(trimmed)) {
-      toast.error('유효한 이미지 URL을 입력하세요. (http:// 또는 https://)');
+      toast.error('유효한 이미지 URL을 입력하시기 바랍니다. (http:// 또는 https://)');
       return;
     }
 
@@ -119,7 +119,7 @@ export default function StoreProductImageManagerModal({ masterId, productName, o
       } else {
         const code = res.error?.code;
         if (code === 'FETCH_FAILED') {
-          toast.error('이미지를 가져올 수 없습니다. URL이 공개 접근 가능한지 확인하세요.');
+          toast.error('이미지를 가져올 수 없습니다. URL이 공개 접근 가능한지 확인하시기 바랍니다.');
         } else if (code === 'INVALID_IMAGE_TYPE') {
           toast.error('지원하지 않는 이미지 형식입니다. (JPEG/PNG/WebP/GIF 허용)');
         } else {
@@ -127,7 +127,7 @@ export default function StoreProductImageManagerModal({ masterId, productName, o
         }
       }
     } catch {
-      toast.error('등록 중 오류가 발생했습니다. 잠시 후 다시 시도하세요.');
+      toast.error('등록 중 오류가 발생했습니다. 잠시 후 다시 시도하시기 바랍니다.');
     } finally {
       setImporting(false);
     }
@@ -155,7 +155,7 @@ export default function StoreProductImageManagerModal({ masterId, productName, o
     if (url && isImageUrl(url)) {
       await handleImport(url, selectedType);
     } else {
-      toast.error('이미지 URL을 드롭하세요.');
+      toast.error('이미지 URL을 드롭하시기 바랍니다.');
     }
   };
 
@@ -283,7 +283,7 @@ export default function StoreProductImageManagerModal({ masterId, productName, o
             <div className="mb-3 flex items-start gap-2 rounded-lg bg-blue-50 border border-blue-100 px-3 py-2 text-xs text-blue-700">
               <Link2 size={13} className="mt-0.5 flex-shrink-0" />
               <span>
-                Google 이미지 검색 또는 Google Lens에서 이미지 우클릭 → <b>"이미지 주소 복사"</b> 후 아래에 붙여넣으세요.
+                Google 이미지 검색 또는 Google Lens에서 이미지 우클릭 → <b>"이미지 주소 복사"</b> 후 아래에 붙여넣으시기 바랍니다.
                 이미지 파일만 GCS에 저장되고 원본 URL은 저장되지 않습니다.
               </span>
             </div>
@@ -357,7 +357,7 @@ export default function StoreProductImageManagerModal({ masterId, productName, o
               <div className="flex flex-col items-center justify-center py-10 rounded-xl border border-dashed border-gray-200 bg-gray-50">
                 <ImageIcon size={32} className="text-gray-300 mb-2" />
                 <p className="text-sm text-gray-500">등록된 이미지가 없습니다.</p>
-                <p className="text-xs text-gray-400 mt-1">위에서 URL을 입력하여 첫 이미지를 추가하세요.</p>
+                <p className="text-xs text-gray-400 mt-1">위에서 URL을 입력하여 첫 이미지를 추가하시기 바랍니다.</p>
               </div>
             ) : (
               <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">

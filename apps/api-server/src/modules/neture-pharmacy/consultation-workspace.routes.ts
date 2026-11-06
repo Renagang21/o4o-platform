@@ -19,7 +19,7 @@ const org = (req: StoreRequest) => {
     throw new NeturePharmacyError(
       403,
       "STORE_ACCESS_REQUIRED",
-      "약국을 선택해 주세요.",
+      "약국을 선택해 주시기 바랍니다.",
     );
   return req.organizationId;
 };
@@ -33,9 +33,9 @@ const handle =
       const reason = error instanceof Error ? error.message : '';
       let failure = error;
       if (!(error instanceof NeturePharmacyError)) {
-        if (reason === 'QUOTA_EXCEEDED') failure = new NeturePharmacyError(429, 'CONSULTATION_QUOTA_EXCEEDED', '상담 AI 이용 한도에 도달했습니다. 문자 입력·표시를 이용해 주세요.');
-        else if (reason.startsWith('AI_PRICING_')) failure = new NeturePharmacyError(503, 'CONSULTATION_PRICING_REQUIRED', '선택한 실행 수단의 가격 설정을 관리자에게 확인해 주세요.');
-        else if (reason.startsWith('AI_DISABLED')) failure = new NeturePharmacyError(503, 'CONSULTATION_AI_DISABLED', '관리자가 현재 상담 AI 실행을 중지했습니다. 문자 입력·표시를 이용해 주세요.');
+        if (reason === 'QUOTA_EXCEEDED') failure = new NeturePharmacyError(429, 'CONSULTATION_QUOTA_EXCEEDED', '상담 AI 이용 한도에 도달했습니다. 문자 입력·표시를 이용해 주시기 바랍니다.');
+        else if (reason.startsWith('AI_PRICING_')) failure = new NeturePharmacyError(503, 'CONSULTATION_PRICING_REQUIRED', '선택한 실행 수단의 가격 설정을 관리자에게 확인해 주시기 바랍니다.');
+        else if (reason.startsWith('AI_DISABLED')) failure = new NeturePharmacyError(503, 'CONSULTATION_AI_DISABLED', '관리자가 현재 상담 AI 실행을 중지했습니다. 문자 입력·표시를 이용해 주시기 바랍니다.');
       }
       if (failure instanceof NeturePharmacyError)
         res
@@ -45,7 +45,7 @@ const handle =
         res.status(503).json({
           success: false,
           code: "CONSULTATION_UNAVAILABLE",
-          error: "상담 연결을 확인하지 못했습니다. 다시 시도해 주세요.",
+          error: "상담 연결을 확인하지 못했습니다. 다시 시도해 주시기 바랍니다.",
         });
     }
   };
@@ -73,7 +73,7 @@ export function consultationWorkspaceRoutes(
       message: {
         success: false,
         code: "RATE_LIMITED",
-        error: "요청이 많습니다. 잠시 후 다시 시도해 주세요.",
+        error: "요청이 많습니다. 잠시 후 다시 시도해 주시기 바랍니다.",
       },
     });
   router.post('/pharmacy/consultation-speech/:operation', ...store, limits(30), handle(async req => {
@@ -88,7 +88,7 @@ export function consultationWorkspaceRoutes(
     const operation = req.params.operation;
     if (!['recognize', 'synthesize'].includes(operation) ||
       (operation === 'recognize' ? runtime.recognition : runtime.synthesis) !== 'google-cloud')
-      throw new NeturePharmacyError(409, 'CONSULTATION_PROVIDER_CHANGED', '현재 상담 실행 수단을 다시 확인해 주세요.');
+      throw new NeturePharmacyError(409, 'CONSULTATION_PROVIDER_CHANGED', '현재 상담 실행 수단을 다시 확인해 주시기 바랍니다.');
     await createPolicyExecutor(db).assertEnabled('CONTENT_TRANSLATION');
     const cloud = new ConsultationGoogleService(db), access = { actorId: req.user!.id!, authorize };
     const data = operation === 'recognize'
@@ -177,7 +177,7 @@ export function consultationWorkspaceRoutes(
         throw new NeturePharmacyError(
           400,
           "INVALID_STORE",
-          "약국을 선택해 주세요.",
+          "약국을 선택해 주시기 바랍니다.",
         );
       return layouts.save(req.params.organizationId, req.body?.operatingType);
     }),
@@ -223,13 +223,13 @@ export function consultationWorkspaceRoutes(
       const current = await stations.deviceSpeechAccess(input);
       if (current.actorId !== owner.actorId || current.organizationId !== owner.organizationId || current.mode !== owner.mode ||
         current.language !== owner.language || JSON.stringify(current.shared) !== JSON.stringify(owner.shared))
-        throw new NeturePharmacyError(409, 'CONSULTATION_CHANGED', '현재 안내가 변경되었습니다. 다시 확인해 주세요.');
+        throw new NeturePharmacyError(409, 'CONSULTATION_CHANGED', '현재 안내가 변경되었습니다. 다시 확인해 주시기 바랍니다.');
       return true;
     };
     const runtime = consultationRuntimeSchema.parse((await new ModelControlService(db).read()).consultation ?? {});
     const operation = req.params.operation;
     if (!['recognize', 'synthesize'].includes(operation) || (operation === 'recognize' ? runtime.recognition : runtime.synthesis) !== 'google-cloud')
-      throw new NeturePharmacyError(409, 'CONSULTATION_PROVIDER_CHANGED', '상담 실행 수단을 다시 확인해 주세요.');
+      throw new NeturePharmacyError(409, 'CONSULTATION_PROVIDER_CHANGED', '상담 실행 수단을 다시 확인해 주시기 바랍니다.');
     await createPolicyExecutor(db).assertEnabled('CONTENT_TRANSLATION');
     const cloud = new ConsultationGoogleService(db), access = { actorId: owner.actorId, authorize };
     return operation === 'recognize'

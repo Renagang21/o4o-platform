@@ -37,7 +37,7 @@ export function usePaymentMode(): PaymentModeState {
 }
 
 export function paymentUnavailableText(mode: PaymentModeState): string | null {
-  if (mode === 'unknown') return '결제 정보를 불러오지 못했습니다. 새로고침 후 다시 시도해 주세요.';
+  if (mode === 'unknown') return '결제 정보를 불러오지 못했습니다. 새로고침 후 다시 시도해 주시기 바랍니다.';
   if (mode === 'disabled') return UNAVAILABLE_TEXT.PAYMENT_NOT_CONFIGURED;
   if (mode === 'live') return UNAVAILABLE_TEXT.PAYMENT_PROVIDER_NOT_SELECTED;
   return null;

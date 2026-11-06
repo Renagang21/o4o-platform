@@ -145,7 +145,7 @@ function Step1ProductSelect({
   return (
     <div>
       <h2 className="text-lg font-semibold text-gray-800 mb-1">상품 선택</h2>
-      <p className="text-sm text-gray-500 mb-5">POP를 제작할 상품을 선택하세요.</p>
+      <p className="text-sm text-gray-500 mb-5">POP를 제작할 상품을 선택하시기 바랍니다.</p>
 
       {/* Search */}
       <div className="flex gap-2 mb-5">
@@ -179,7 +179,7 @@ function Step1ProductSelect({
       {!searched && !loading && (
         <div className="text-center py-12 text-gray-400">
           <Search className="w-8 h-8 mx-auto mb-2 opacity-40" />
-          <p className="text-sm">상품명 또는 브랜드를 검색하세요</p>
+          <p className="text-sm">상품명 또는 브랜드를 검색하시기 바랍니다</p>
         </div>
       )}
 
@@ -275,7 +275,7 @@ function Step2LayoutSelect({
   return (
     <div>
       <h2 className="text-lg font-semibold text-gray-800 mb-1">레이아웃 선택</h2>
-      <p className="text-sm text-gray-500 mb-5">출력할 POP 크기를 선택하세요.</p>
+      <p className="text-sm text-gray-500 mb-5">출력할 POP 크기를 선택하시기 바랍니다.</p>
 
       <div className="grid grid-cols-2 gap-4">
         {layouts.map((l) => (
@@ -356,7 +356,7 @@ function Step3AiGenerate({
         }
       }, 2000);
     } catch {
-      setError('AI 문구 생성 요청에 실패했습니다. 다시 시도해주세요.');
+      setError('AI 문구 생성 요청에 실패했습니다. 다시 시도해 주시기 바랍니다.');
       setGenerating(false);
     }
   };
@@ -430,7 +430,7 @@ function Step3AiGenerate({
 
       {done && contents.length === 0 && (
         <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 text-sm text-amber-700">
-          AI 문구 생성이 완료되었으나 결과를 가져오지 못했습니다. 다음 단계에서 직접 입력해주세요.
+          AI 문구 생성이 완료되었으나 결과를 가져오지 못했습니다. 다음 단계에서 직접 입력해 주시기 바랍니다.
         </div>
       )}
     </div>
@@ -477,7 +477,7 @@ function Step4Edit({
           </button>
         )}
       </div>
-      <p className="text-sm text-gray-500 mb-5">POP에 표시될 내용을 수정하세요.</p>
+      <p className="text-sm text-gray-500 mb-5">POP에 표시될 내용을 수정하시기 바랍니다.</p>
 
       <div className="space-y-4">
         {/* Title */}
@@ -489,7 +489,7 @@ function Step4Edit({
             type="text"
             value={form.title}
             onChange={(e) => onChange({ title: e.target.value })}
-            placeholder="POP 제목을 입력하세요 (15자 이내 권장)"
+            placeholder="POP 제목을 입력하시기 바랍니다 (15자 이내 권장)"
             className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-400"
           />
         </div>
@@ -517,7 +517,7 @@ function Step4Edit({
           <RichTextEditor
             value={form.longText}
             onChange={({ html }) => onChange({ longText: html })}
-            placeholder="상품의 특징과 효능을 설명하는 문구를 입력하세요."
+            placeholder="상품의 특징과 효능을 설명하는 문구를 입력하시기 바랍니다."
             preset="compact"
             minHeight="120px"
             onImageUpload={uploadImage}
@@ -587,7 +587,7 @@ function Step5Output({
       URL.revokeObjectURL(url);
       setDone(true);
     } catch {
-      setError('PDF 다운로드에 실패했습니다. 다시 시도해주세요.');
+      setError('PDF 다운로드에 실패했습니다. 다시 시도해 주시기 바랍니다.');
     } finally {
       setDownloading(false);
     }
@@ -599,7 +599,7 @@ function Step5Output({
   return (
     <div>
       <h2 className="text-lg font-semibold text-gray-800 mb-1">출력</h2>
-      <p className="text-sm text-gray-500 mb-5">PDF를 다운로드하거나 바로 인쇄하세요.</p>
+      <p className="text-sm text-gray-500 mb-5">PDF를 다운로드하거나 바로 인쇄하시기 바랍니다.</p>
 
       {/* Summary */}
       <div className="bg-gray-50 rounded-xl border border-gray-200 p-5 mb-5 space-y-3">

@@ -70,7 +70,7 @@ export function SignagePreviewSection(props: SignagePreviewSectionProps) {
     playlistItems,
     loading = false,
     emptyMessage = '사이니지 콘텐츠가 준비 중입니다.',
-    emptyHint = '디지털 사이니지로 매장을 꾸며보세요.',
+    emptyHint = '디지털 사이니지로 매장을 꾸며보시기 바랍니다.',
     viewAllHref,
     viewAllLabel = '사이니지 콘텐츠 보기 →',
     accentColor = '#2563EB',

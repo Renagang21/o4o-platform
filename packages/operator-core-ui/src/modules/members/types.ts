@@ -30,6 +30,7 @@ export interface MembershipData {
 }
 
 export interface UserData {
+  operatorReadOnly?: boolean;
   id: string;
   email: string;
   firstName?: string;

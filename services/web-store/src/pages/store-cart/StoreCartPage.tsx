@@ -50,7 +50,7 @@ export function StoreCartPage() {
         <EmptyState
           icon="🛒"
           title="장바구니가 비어 있습니다"
-          description="이벤트 상품을 둘러보고 장바구니에 담아보세요."
+          description="이벤트 상품을 둘러보고 장바구니에 담아보시기 바랍니다."
           action={{ label: '이벤트 상품 보기', onClick: goEventOffers }}
         />
       }

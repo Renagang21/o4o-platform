@@ -41,7 +41,7 @@ export function useProductRequestForm({ organizationId, editRequest, onSubmitted
   const runSearch = useCallback(async () => {
     if (lock.current || !current()) return;
     const q = searchInput.trim();
-    if (!q) { toast.info('상품명 또는 바코드를 입력하세요.'); return; }
+    if (!q) { toast.info('상품명 또는 바코드를 입력하시기 바랍니다.'); return; }
     const active = latest.begin();
     setSearchLoading(true); setSearched(true); setSearchError(null); setResults([]);
     try {
@@ -51,7 +51,7 @@ export function useProductRequestForm({ organizationId, editRequest, onSubmitted
         (p.classification != null && typeof p.classification.label !== 'string'))) throw new Error('Invalid product search');
       if (active() && current()) setResults(result.items);
     } catch {
-      if (active() && current()) setSearchError('검색에 실패했습니다. 다시 검색해 주세요.');
+      if (active() && current()) setSearchError('검색에 실패했습니다. 다시 검색해 주시기 바랍니다.');
     } finally { if (active() && current()) setSearchLoading(false); }
   }, [current, latest, searchInput]);
   const goToForm = () => {
@@ -74,17 +74,17 @@ export function useProductRequestForm({ organizationId, editRequest, onSubmitted
       onSubmitted(); onClose();
     } catch (error) {
       if (current()) setActionError((error as StoreRequestApiError)?.code === 'NO_ACTIVE_MEMBERSHIP'
-        ? '활성화된 매장 멤버십이 없어 추가할 수 없습니다.' : '추가 결과를 확인하지 못했습니다. 목록을 확인한 뒤 다시 시도해 주세요.');
+        ? '활성화된 매장 멤버십이 없어 추가할 수 없습니다.' : '추가 결과를 확인하지 못했습니다. 목록을 확인한 뒤 다시 시도해 주시기 바랍니다.');
     } finally { lock.current = false; if (current()) setRegisteringId(null); }
   };
   const handleSubmit = async () => {
     if (lock.current || !current()) return;
-    if (editRequest && (!editRequest.editable || editRequest.displayStatus !== 'revision_requested')) { setActionError('보완 요청 상태에서만 다시 제출할 수 있습니다. 요청 현황을 확인해 주세요.'); return; }
+    if (editRequest && (!editRequest.editable || editRequest.displayStatus !== 'revision_requested')) { setActionError('보완 요청 상태에서만 다시 제출할 수 있습니다. 요청 현황을 확인해 주시기 바랍니다.'); return; }
     const productName = form.productName.trim();
-    if (!productName) { setActionError('포장 표시 상품명을 입력하세요.'); return; }
-    if (!form.classification) { setActionError('O4O 표준 분류를 선택하세요.'); return; }
+    if (!productName) { setActionError('포장 표시 상품명을 입력하시기 바랍니다.'); return; }
+    if (!form.classification) { setActionError('O4O 표준 분류를 선택하시기 바랍니다.'); return; }
     const barcode = form.barcode.trim();
-    if (!barcode && !form.noBarcode) { setActionError('바코드를 입력하거나 ‘바코드 없음’을 선택하세요.'); return; }
+    if (!barcode && !form.noBarcode) { setActionError('바코드를 입력하거나 ‘바코드 없음’을 선택하시기 바랍니다.'); return; }
     const input: StoreProductRequestInput = { productName, classification: form.classification,
       barcode: barcode || undefined, noBarcode: barcode ? false : form.noBarcode,
       manufacturer: form.manufacturer.trim() || undefined, spec: form.spec.trim() || undefined,
@@ -100,8 +100,8 @@ export function useProductRequestForm({ organizationId, editRequest, onSubmitted
       if (!current()) return;
       const code = (error as StoreRequestApiError)?.code;
       setExistingFound(code === 'EXISTING_PRODUCT_FOUND');
-      setActionError(code === 'EXISTING_PRODUCT_FOUND' ? '이미 O4O 표준 상품에 등록된 바코드입니다. 기존 상품 추가에서 확인해 주세요.' :
-        code === 'NOT_EDITABLE' ? '현재 보완 가능한 상태가 아닙니다. 요청 현황을 다시 확인해 주세요.' : '제출 결과를 확인하지 못했습니다. 요청 현황을 확인한 뒤 다시 시도해 주세요.');
+      setActionError(code === 'EXISTING_PRODUCT_FOUND' ? '이미 O4O 표준 상품에 등록된 바코드입니다. 기존 상품 추가에서 확인해 주시기 바랍니다.' :
+        code === 'NOT_EDITABLE' ? '현재 보완 가능한 상태가 아닙니다. 요청 현황을 다시 확인해 주시기 바랍니다.' : '제출 결과를 확인하지 못했습니다. 요청 현황을 확인한 뒤 다시 시도해 주시기 바랍니다.');
     } finally { lock.current = false; if (current()) setSubmitting(false); }
   };
   return { step, setStep, form, patch, searchInput, setSearchInput, searched, searchLoading, searchError, searchResults,

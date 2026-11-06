@@ -1,3 +1,4 @@
+import { ServiceBrandIdentity } from './components/ServiceBrandIdentity';
 import CommunitySignagePage from './pages/community/CommunitySignagePage';
 import CommunityImprovementsPage from './pages/community/CommunityImprovementsPage';
 import { serveOperatorInvitationContinuation } from './lib/operatorInvitationReturn';
@@ -9,6 +10,7 @@ import ServiceContactPage from './pages/operator/ServiceContactPage';
 import HomePresentationPage from './pages/operator/HomePresentationPage';
 import CarePharmNewsPage from './pages/carepharm/CarePharmNotices';
 import { consumeLoginNavigation } from './lib/loginNavigation';
+import MemberRegistrationCompletion from './components/auth/MemberRegistrationCompletion';
 import AccountPolicyNoticePage from './pages/legal/AccountPolicyNoticePage';
 import PartnerServicePage from './pages/PartnerServicePage';
 import ServiceMembersPage from './pages/operator/ServiceMembersPage';
@@ -667,6 +669,7 @@ function App() {
     <AuthProvider>
       <LoginModalProvider>
         <BrowserRouter>
+          <ServiceBrandIdentity />
           {/* WO-O4O-WORK-SCOPE-CONTRACT-V0: active Work Scope(route+인증 파생) 제공.
               useLocation/useAuth 를 쓰므로 BrowserRouter 안 · AuthProvider 아래에 둔다.
               화면·route 동작은 바꾸지 않는다 — Phase 3 중앙 AI 입력의 연결점이다. */}
@@ -674,6 +677,7 @@ function App() {
           <SeoWatcher />
           <O4OToastProvider />
           <PostLoginRedirect />
+          <MemberRegistrationCompletion />
           <ModalRenderer />
           {/* WO-O4O-INTEGRATED-TERMS-ACCEPTANCE-AND-SIGNUP-ALIGNMENT-V1 §17: 기존 회원 약관 재동의 게이트 */}
           <TermsAcceptanceGate>

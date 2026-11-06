@@ -39,9 +39,9 @@ export class AuthSessionController extends BaseController {
       const code = (failure as { code?: string }).code;
       if (code && INVALID_SESSION_CODES.has(code)) {
         authenticationService.clearAuthCookies(req, res);
-        return res.status(401).json({ success: false, code, error: '세션이 종료되었습니다. 다시 로그인해 주세요.', retryable: false });
+        return res.status(401).json({ success: false, code, error: '세션이 종료되었습니다. 다시 로그인해 주시기 바랍니다.', retryable: false });
       }
-      return res.status(503).json({ success: false, code: 'AUTH_SERVICE_UNAVAILABLE', error: '서버 세션 종료를 잠시 처리할 수 없습니다. 다시 시도해 주세요.', retryable: true });
+      return res.status(503).json({ success: false, code: 'AUTH_SERVICE_UNAVAILABLE', error: '서버 세션 종료를 잠시 처리할 수 없습니다. 다시 시도해 주시기 바랍니다.', retryable: true });
     }
   }
 
@@ -172,7 +172,7 @@ export class AuthSessionController extends BaseController {
       const errorCode = error.code || 'AUTH_SERVICE_UNAVAILABLE';
       const invalidSession = INVALID_SESSION_CODES.has(errorCode);
       if (!invalidSession) {
-        return res.status(503).json({ success: false, error: '인증 서비스를 잠시 사용할 수 없습니다. 다시 시도해 주세요.',
+        return res.status(503).json({ success: false, error: '인증 서비스를 잠시 사용할 수 없습니다. 다시 시도해 주시기 바랍니다.',
           code: 'AUTH_SERVICE_UNAVAILABLE', retryable: true });
       }
       authenticationService.clearAuthCookies(req, res);

@@ -46,7 +46,7 @@ export function ConfirmActionDialog({
   variant = 'default',
   requireReason = false,
   showReason = false,
-  reasonPlaceholder = '사유를 입력하세요',
+  reasonPlaceholder = '사유를 입력하시기 바랍니다',
   loading = false,
 }: ConfirmActionDialogProps) {
   const [reason, setReason] = useState('');

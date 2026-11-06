@@ -47,12 +47,12 @@ import { StoreLibraryNavigation } from '../../components/StoreLibraryNavigation'
 import { useLibraryScope } from './library/useLibraryScope';
 import { StoreContentsSelector } from './StoreContentsSelector';
 
-interface LibraryPageProps { workspace?: boolean; navigation?: ReactNode; quickLinks?: ReactNode }
+interface LibraryPageProps { workspace?: boolean; navigation?: ReactNode; quickLinks?: ReactNode; productLink?: ReactNode; moreNavigation?: ReactNode }
 export default function StoreLibraryContentsPage(props: LibraryPageProps) {
   const { scope } = useLibraryScope();
   return <LibraryContents key={scope} {...props} />;
 }
-function LibraryContents({ workspace, navigation, quickLinks }: LibraryPageProps) {
+function LibraryContents({ navigation, quickLinks, productLink, moreNavigation }: LibraryPageProps) {
   const { organizationId } = useLibraryScope();
   const { base, productReturn } = useStoreLibraryRoute();
   const navigate = useNavigate();
@@ -123,14 +123,14 @@ function LibraryContents({ workspace, navigation, quickLinks }: LibraryPageProps
     <StorePageShell
       labels={{
         ...STORE_CONTENTS_HEADING,
-        ...(workspace ? { pageTitle: '매장 컨텐츠' } : {}),
-        subtitle:
-          '저장한 안내를 선택해 수정하거나 새 안내를 만드세요.',
+        pageTitle: '매장 콘텐츠',
+        breadcrumbRoot: undefined,
+        subtitle: undefined,
       }}
       Icon={BookOpen}
       iconColor={colors.primary}
       maxWidth={1100}
-      onReload={reload}
+      listFirst
       headerActions={
         <>
           <button
@@ -139,19 +139,26 @@ function LibraryContents({ workspace, navigation, quickLinks }: LibraryPageProps
             style={styles.createBtn}
           >
             <PenSquare size={14} />
-            새 안내
+            새 콘텐츠
           </button>
           {quickLinks}
-          {/* WO-O4O-KPA-STORE-LIBRARY-CONTENT-CREATION-GUIDE-MODAL-V1: 보조 버튼(가이드 모달) */}
-          <button type="button" onClick={() => setGuideOpen(true)} style={styles.guideBtn}>
-            <Lightbulb size={14} />
-            콘텐츠 제작 가이드
-          </button>
+          <details className="rounded-lg border border-slate-200 bg-white px-3 text-sm">
+            <summary aria-label="제작·도움말" className="min-h-11 cursor-pointer content-center">더보기</summary>
+            <div className="flex max-w-full flex-wrap items-start gap-2 pb-3">
+              {productLink}
+              <button type="button" onClick={event => { event.currentTarget.closest('details')?.removeAttribute('open'); setGuideOpen(true); }} style={styles.guideBtn}>
+                <Lightbulb size={14} />
+                콘텐츠 제작 가이드
+              </button>
+              <button type="button" className="min-h-11 rounded-lg border px-3 text-sm" onClick={event => { event.currentTarget.closest('details')?.removeAttribute('open'); reload(); }}>새로고침</button>
+              {moreNavigation}
+            </div>
+          </details>
         </>
       }
     >
       {navigation ?? <StoreLibraryNavigation section="mine" />}
-      {searchParams.get('create') === '1' && searchParams.has('pStore') && searchParams.get('pStore') !== organizationId && <p role="alert" className="mb-4 rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm">매장이 변경되었습니다. 현재 매장의 제품을 다시 선택해 주세요. <Link className="underline" to={`${base}/my-products`}>내 상품 선택</Link></p>}
+      {searchParams.get('create') === '1' && searchParams.has('pStore') && searchParams.get('pStore') !== organizationId && <p role="alert" className="mb-4 rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm">매장이 변경되었습니다. 현재 매장의 제품을 다시 선택해 주시기 바랍니다. <Link className="underline" to={`${base}/my-products`}>내 상품 선택</Link></p>}
       {/* WO-O4O-STORE-PRODUCTION-MATERIALS-CONTENT-SELECTOR-MODAL-V1:
           공통 selector 를 'page' 모드로 mount — 콘텐츠 목록 + 검색 + 선택 + 제작 시작 + 선택 제거 */}
       <StoreContentsSelector
@@ -198,6 +205,7 @@ const styles: Record<string, CSSProperties> = {
     fontWeight: 500,
     color: colors.white,
     cursor: 'pointer',
+    minHeight: 44,
   },
   // WO-O4O-KPA-STORE-LIBRARY-CONTENT-CREATION-GUIDE-MODAL-V1: 보조(outline) 버튼
   guideBtn: {

@@ -62,6 +62,7 @@ export type PartnerCommunityOverview = {
   availableAreas?: string[];
   boards: PartnerCommunityBoard[];
   members: {
+    operatorReadOnly?: boolean;
     id: string;
     name: string;
     status: string;

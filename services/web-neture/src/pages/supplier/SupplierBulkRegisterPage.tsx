@@ -137,8 +137,8 @@ export default function SupplierBulkRegisterPage() {
       <div className="mb-5 flex gap-2 rounded-md bg-amber-50 border border-amber-200 p-3 text-xs text-amber-800">
         <AlertTriangle className="w-4 h-4 flex-shrink-0 mt-0.5" />
         <div>
-          한 파일에 <strong>여러 제품 유형을 섞지 마세요.</strong> 유형마다 필요한 항목과 검증 기준이 다릅니다.
-          비의약품·의약외품·비처방 의약품·처방의약품·미분류를 <strong>각각 별도 파일</strong>로 등록하세요.
+          한 파일에 <strong>여러 제품 유형을 섞지 마시기 바랍니다.</strong> 유형마다 필요한 항목과 검증 기준이 다릅니다.
+          비의약품·의약외품·비처방 의약품·처방의약품·미분류를 <strong>각각 별도 파일</strong>로 등록하시기 바랍니다.
         </div>
       </div>
 
@@ -171,8 +171,8 @@ export default function SupplierBulkRegisterPage() {
         <div className="rounded-lg border border-slate-200 bg-white p-5">
           <h2 className="font-semibold text-slate-800 mb-2">{selected.label} — 대량 등록</h2>
           <ul className="text-sm text-slate-600 space-y-1.5 mb-4 list-disc pl-5">
-            <li>아래 <strong>{selected.label} 전용 템플릿</strong>을 받아 작성한 뒤 업로드하세요.</li>
-            <li>업로드 파일에는 <strong>{selected.label}만</strong> 포함하세요 (다른 유형 혼합 금지).</li>
+            <li>아래 <strong>{selected.label} 전용 템플릿</strong>을 받아 작성한 뒤 업로드하시기 바랍니다.</li>
+            <li>업로드 파일에는 <strong>{selected.label}만</strong> 포함하시기 바랍니다 (다른 유형 혼합 금지).</li>
             {selected.pharmacyTarget && <li>약국 대상 의약품류는 업로드 후 <strong>운영자 검토</strong>를 거쳐 공개됩니다.</li>}
             {selected.rx && (
               <li>
@@ -211,7 +211,7 @@ export default function SupplierBulkRegisterPage() {
               </label>
             </div>
             <p className="text-[11px] text-slate-500 leading-relaxed">
-              이 파일에는 <strong>선택한 유형({selected.label})의 제품만</strong> 포함해야 합니다. 유형이 다르면 각 템플릿으로 따로 업로드하세요.
+              이 파일에는 <strong>선택한 유형({selected.label})의 제품만</strong> 포함해야 합니다. 유형이 다르면 각 템플릿으로 따로 업로드하시기 바랍니다.
               업로드 시 형식·오류를 <strong>저장 전에</strong> 확인합니다(저장은 아직 실행되지 않습니다).
             </p>
             {fileName && <p className="mt-2 text-xs text-slate-600">선택한 파일: <span className="font-medium">{fileName}</span></p>}
@@ -466,7 +466,7 @@ function BulkPreview({ result, onRequestSave }: { result: BulkValidationResult; 
           제품 후보 제출 ({saveableCount}건)
         </button>
         {result.hasError ? (
-          <span className="text-xs text-red-600">오류가 있어 제출할 수 없습니다. 오류를 수정한 뒤 다시 업로드하세요.</span>
+          <span className="text-xs text-red-600">오류가 있어 제출할 수 없습니다. 오류를 수정한 뒤 다시 업로드하시기 바랍니다.</span>
         ) : (
           <span className="text-xs text-slate-500">제출하면 제품을 즉시 확정 등록하지 않고, 운영자 검토용 후보로 저장합니다.</span>
         )}

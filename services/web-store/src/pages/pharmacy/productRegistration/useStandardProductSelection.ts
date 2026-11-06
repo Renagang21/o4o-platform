@@ -38,7 +38,7 @@ export function useStandardProductSelection(organizationId: string, onRegistered
           const last = Math.max(1, Math.ceil(result.meta.total / 20));
           if (page > last) { latest.cancel(); setPage(last); return; }
           setItems(result.items); setTotal(result.meta.total);
-        } catch { if (active() && current()) setError('O4O 표준 상품을 불러오지 못했습니다. 다시 시도해 주세요.'); }
+        } catch { if (active() && current()) setError('O4O 표준 상품을 불러오지 못했습니다. 다시 시도해 주시기 바랍니다.'); }
         finally { if (active() && current()) setLoading(false); }
       })();
     }, 300);
@@ -55,7 +55,7 @@ export function useStandardProductSelection(organizationId: string, onRegistered
       if (result.message === 'ALREADY_LISTED') toast.info('이미 매장에 등록된 상품입니다.');
       else toast.success('매장 경영활용 제품으로 추가했습니다.');
       onRegistered();
-    } catch { if (current()) setActionError('추가 결과를 확인하지 못했습니다. 매장 목록을 확인한 뒤 다시 시도해 주세요.'); }
+    } catch { if (current()) setActionError('추가 결과를 확인하지 못했습니다. 매장 목록을 확인한 뒤 다시 시도해 주시기 바랍니다.'); }
     finally { lock.current = false; if (current()) setRegisteringId(null); }
   };
   return { searchInput, setSearchInput: changeSearch, classification, setClassification: changeClassification,

@@ -176,7 +176,7 @@ function ForumPostDetail({ basePath = '/forum', canModerate = false, readOnly = 
     const current = beginPin();
     setPinBusy(true); setPinError(null);
     try { await refreshPinnedPost(current); }
-    catch { if (current()) setPinError('게시글을 다시 불러오지 못했습니다. 다시 조회해 주세요.'); }
+    catch { if (current()) setPinError('게시글을 다시 불러오지 못했습니다. 다시 조회해 주시기 바랍니다.'); }
     finally { if (current()) { pinProcessing.current = false; setPinBusy(false); } }
   };
 
@@ -282,8 +282,8 @@ function ForumPostDetail({ basePath = '/forum', canModerate = false, readOnly = 
 
   const handleUpdateComment = async (commentId: string, content: string) => {
     const comment = comments.find(item => item.id === commentId);
-    if (!comment || !canEditForumContent(readOnly, isAdmin, currentUserId, comment.authorId)) throw new Error('댓글 수정 권한을 확인해 주세요.');
-    if (interactionProcessing.current || pinProcessing.current) throw new Error('진행 중인 처리가 끝난 뒤 다시 시도해 주세요.');
+    if (!comment || !canEditForumContent(readOnly, isAdmin, currentUserId, comment.authorId)) throw new Error('댓글 수정 권한을 확인해 주시기 바랍니다.');
+    if (interactionProcessing.current || pinProcessing.current) throw new Error('진행 중인 처리가 끝난 뒤 다시 시도해 주시기 바랍니다.');
     interactionProcessing.current = true; setMutationBusy(true);
     const current = beginInteraction();
     try {
@@ -445,7 +445,7 @@ function ForumPostDetail({ basePath = '/forum', canModerate = false, readOnly = 
             <h4 style={styles.contactTitle}>작성자에게 연락하기</h4>
           </div>
           <p style={styles.contactDescription}>
-            {authorName}님과 대화를 원하시면 아래 링크를 통해 연락하세요.
+            {authorName}님과 대화를 원하시면 아래 링크를 통해 연락하시기 바랍니다.
           </p>
           <div style={styles.contactLinks}>
             {post.author?.kakaoOpenChatUrl && (
@@ -503,7 +503,7 @@ function ForumPostDetail({ basePath = '/forum', canModerate = false, readOnly = 
           submitting={isSubmitting || mutationBusy || commentsLoading}
           authenticated={isAuthenticated}
           error={commentError}
-          placeholder="댓글을 입력하세요..."
+          placeholder="댓글을 입력하시기 바랍니다..."
           rows={4}
           submitLabel="댓글 작성"
           submittingLabel={commentsLoading ? '댓글 조회 중...' : isSubmitting ? '작성 중...' : '처리 중...'}

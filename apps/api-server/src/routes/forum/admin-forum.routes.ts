@@ -335,7 +335,7 @@ router.delete('/forums/:id/hard', async (req: Request, res: Response): Promise<v
     const { reason } = req.body;
 
     if (!reason?.trim()) {
-      res.status(400).json({ success: false, error: '삭제 사유를 입력해주세요', code: 'REASON_REQUIRED' });
+      res.status(400).json({ success: false, error: '삭제 사유를 입력해 주시기 바랍니다', code: 'REASON_REQUIRED' });
       return;
     }
 

@@ -1,7 +1,11 @@
+import AdminResourceDeletionPage from '@/pages/platform/account-governance/AdminResourceDeletionPage';
 import AdminCooperationBusinessesPage from '@/pages/platform/AdminCooperationBusinessesPage';
 import PlatformAdminLandingPage from '@/pages/platform/account-governance/PlatformAdminLandingPage';
 import PlatformSectionLayout from '@/pages/platform/account-governance/PlatformSectionLayout';
 import PlatformAccountsPage from '@/pages/platform/account-governance/PlatformAccountsPage';
+import AdminErasureHistoryPage from '@/pages/platform/account-governance/AdminErasureHistoryPage';
+import CentralSupplierReview from '@/pages/operators/CentralSupplierReview';
+import AdminStoresPage from '@/pages/platform/account-governance/AdminStoresPage';
 import PlatformUsersPage from '@/pages/platform/account-governance/PlatformUsersPage';
 import AdminPharmacyServiceSettingsPage from '@/pages/platform/AdminPharmacyServiceSettingsPage';
 import { configurePharmacyManagementClient } from '@o4o/operator-core-ui/modules/pharmacy-management';
@@ -45,6 +49,7 @@ const StoreContentWorkspacePage = lazy(() => import('@/pages/kpa/StoreContentWor
 const HubNoticeListPage = lazy(() => import('@/pages/kpa/HubNoticeListPage'));
 
 // KPA Force Asset Console (WO-O4O-ADMIN-FORCE-ASSET-CONSOLE-V1)
+const AdminRequiredSignagePage = lazy(() => import('@/pages/kpa/AdminRequiredSignagePage'));
 const AdminForceAssetPage = lazy(() => import('@/pages/kpa/AdminForceAssetPage'));
 
 // KPA Snapshot Browser (WO-O4O-KPA-ADMIN-SNAPSHOT-BROWSE-V1)
@@ -66,6 +71,10 @@ export function PlatformRoutes() {
       <Route index element={<PlatformAdminLandingPage />} />
       <Route path="accounts" element={<PlatformAccountsPage />} />
       <Route path="users" element={<PlatformUsersPage />} />
+      <Route path="suppliers" element={<CentralSupplierReview adminMode />} />
+      <Route path="stores" element={<AdminStoresPage />} />
+      <Route path="resource-deletion" element={<AdminResourceDeletionPage />} />
+      <Route path="erasure-operations" element={<AdminErasureHistoryPage />} />
       {/* Removed administration tools: old bookmarks return to the platform home. */}
       {['services', 'roles', 'service-audience'].map(path =>
         <Route key={path} path={path} element={<Navigate to="/admin/platform" replace />} />
@@ -198,6 +207,12 @@ export function PlatformRoutes() {
         <Suspense fallback={<PageLoader />}>
           <HubNoticeListPage />
         </Suspense>
+      </AdminProtectedRoute>
+    } />,
+
+    <Route key="/operator/signage/required" path="/operator/signage/required" element={
+      <AdminProtectedRoute requiredRoles={['platform:super_admin']}>
+        <Suspense fallback={<PageLoader />}><AdminRequiredSignagePage /></Suspense>
       </AdminProtectedRoute>
     } />,
 

@@ -46,7 +46,7 @@ export default function Cafe24AppEntryPage() {
   const startConnect = useCallback(async () => {
     const trimmed = mallId.trim();
     if (!trimmed) {
-      setStatus({ kind: 'error', title: 'mall_id 가 필요합니다', detail: 'Cafe24 쇼핑몰 ID 를 입력해 주세요.' });
+      setStatus({ kind: 'error', title: 'mall_id 가 필요합니다', detail: 'Cafe24 쇼핑몰 ID 를 입력해 주시기 바랍니다.' });
       return;
     }
     setStatus({ kind: 'loading' });
@@ -54,7 +54,7 @@ export default function Cafe24AppEntryPage() {
       const res = await api.get('/admin/cafe24/authorize', { params: { mallId: trimmed } });
       const url = res.data?.data?.authorizeUrl;
       if (!url) {
-        setStatus({ kind: 'error', title: '승인 URL 을 받지 못했습니다', detail: '잠시 후 다시 시도해 주세요.' });
+        setStatus({ kind: 'error', title: '승인 URL 을 받지 못했습니다', detail: '잠시 후 다시 시도해 주시기 바랍니다.' });
         return;
       }
       // Cafe24 승인은 반드시 브라우저에서 진행된다 (Cafe24 OAuth 가이드).
@@ -65,7 +65,7 @@ export default function Cafe24AppEntryPage() {
         setStatus({
           kind: 'error',
           title: 'O4O 관리자 로그인이 필요합니다',
-          detail: '현재 Cafe24 연결은 O4O 관리자만 시작할 수 있습니다. neture.co.kr 에 관리자 계정으로 로그인한 뒤 다시 시도해 주세요.',
+          detail: '현재 Cafe24 연결은 O4O 관리자만 시작할 수 있습니다. neture.co.kr 에 관리자 계정으로 로그인한 뒤 다시 시도해 주시기 바랍니다.',
         });
         return;
       }
@@ -80,7 +80,7 @@ export default function Cafe24AppEntryPage() {
       setStatus({
         kind: 'error',
         title: '연결을 시작하지 못했습니다',
-        detail: res?.data?.code ? `서버 응답: ${res.data.code}` : '잠시 후 다시 시도해 주세요.',
+        detail: res?.data?.code ? `서버 응답: ${res.data.code}` : '잠시 후 다시 시도해 주시기 바랍니다.',
       });
     }
   }, [mallId]);

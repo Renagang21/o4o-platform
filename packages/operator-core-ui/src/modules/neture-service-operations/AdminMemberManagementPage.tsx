@@ -161,7 +161,7 @@ export default function AdminMemberManagementPage({api}: {api:AxiosInstance}) {
       // WO-O4O-NETURE-ADMIN-OPERATORS-GUIDE-REPLACE-V1: /admin/operators 는 더 이상 해제 화면이 아니다.
       //   권한 해제 위치를 중앙 관리자로 정정한다(안내 문구만 변경, 차단 조건은 그대로).
       // toast import is not in this file — use window alert as fallback
-      alert(`이 계정은 '${blockingRole}' 운영자 권한을 보유하고 있습니다.\n중앙 관리자(admin.neture.co.kr)의 운영자 관리에서 권한을 해제한 후 삭제해주세요.`);
+      alert(`이 계정은 '${blockingRole}' 운영자 권한을 보유하고 있습니다.\n중앙 관리자(admin.neture.co.kr)의 운영자 관리에서 권한을 해제한 후 삭제해 주시기 바랍니다.`);
       return;
     }
     setDeleteTarget({ id: onlyId, name: getDisplayName(target) });
@@ -235,7 +235,7 @@ export default function AdminMemberManagementPage({api}: {api:AxiosInstance}) {
           <p>
             해당 서비스의 가입·일반 역할 관계를 정리합니다. 공통 계정과 활동 기록은 유지됩니다.
             승인·반려·정지·비활성화(soft delete)는{' '}
-            <a href="/operator/members" className="underline">운영자 회원관리</a>에서 수행하세요.
+            <a href="/operator/members" className="underline">운영자 회원관리</a>에서 수행하시기 바랍니다.
           </p>
         </div>
       </div>
@@ -313,7 +313,7 @@ export default function AdminMemberManagementPage({api}: {api:AxiosInstance}) {
           {getSelectedOperatorBlock() ? (
             <div className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-amber-700 bg-amber-50 border border-amber-200 rounded-lg">
               <ShieldAlert className="w-4 h-4" />
-              운영자 권한 보유 — 먼저 운영자 관리에서 권한을 해제하세요
+              운영자 권한 보유 — 먼저 운영자 관리에서 권한을 해제하시기 바랍니다
             </div>
           ) : (
             <button

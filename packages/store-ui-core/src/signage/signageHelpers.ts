@@ -12,9 +12,6 @@
 /** 강제 노출 만료 임박 경고 기준(일) */
 export const FORCED_WARN_DAYS = 7;
 
-/** 요일 라벨 (0=일) */
-export const SIGNAGE_DAY_LABELS = ['일', '월', '화', '수', '목', '금', '토'] as const;
-
 /** 강제 노출 판정에 필요한 최소 형태 */
 export interface SignageForcedLike {
   isForced?: boolean;
@@ -26,18 +23,6 @@ export interface SignageForcedLike {
 export interface SignageAssetLike extends SignageForcedLike {
   publishStatus?: string;
   channelMap?: { signage?: unknown } | null;
-}
-
-/** 스케줄 활성 판정에 필요한 최소 형태 */
-export interface SignageScheduleLike {
-  id: string;
-  isActive: boolean;
-  daysOfWeek: number[];
-  startTime: string;
-  endTime: string;
-  validFrom?: string | null;
-  validUntil?: string | null;
-  priority: number;
 }
 
 export function formatDate(dateStr: string): string {
@@ -72,49 +57,6 @@ export function isForcedExpiringSoon(item: SignageForcedLike): boolean {
 export function isForcedExpired(item: SignageForcedLike): boolean {
   if (!item.isForced || !item.forcedEndAt) return false;
   return new Date(item.forcedEndAt) < new Date();
-}
-
-/** HH:MM:SS → HH:MM 비교용 문자열 */
-export function toHHMM(t: string): string {
-  return t.slice(0, 5);
-}
-
-/** 현재 시간 기준으로 스케줄이 활성인지 판단 */
-export function isScheduleNowActive(sch: SignageScheduleLike, now: Date): boolean {
-  if (!sch.isActive) return false;
-  const day = now.getDay();
-  if (!sch.daysOfWeek.includes(day)) return false;
-  const hhmm = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-  if (hhmm < toHHMM(sch.startTime) || hhmm >= toHHMM(sch.endTime)) return false;
-  const today = now.toISOString().slice(0, 10);
-  if (sch.validFrom && today < sch.validFrom) return false;
-  if (sch.validUntil && today > sch.validUntil) return false;
-  return true;
-}
-
-/** 현재 활성 스케줄 (priority 높은 순) */
-export function getCurrentSchedule<T extends SignageScheduleLike>(schedules: T[]): T | null {
-  const now = new Date();
-  return schedules
-    .filter((s) => isScheduleNowActive(s, now))
-    .sort((a, b) => b.priority - a.priority)[0] ?? null;
-}
-
-/** 오늘 현재 이후 가장 빠른 예정 스케줄 */
-export function getNextSchedule<T extends SignageScheduleLike>(
-  schedules: T[],
-  currentId: string | null,
-): T | null {
-  const now = new Date();
-  const day = now.getDay();
-  const hhmm = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-  return schedules
-    .filter((s) => {
-      if (!s.isActive || s.id === currentId) return false;
-      if (!s.daysOfWeek.includes(day)) return false;
-      return toHHMM(s.startTime) > hhmm;
-    })
-    .sort((a, b) => a.startTime.localeCompare(b.startTime))[0] ?? null;
 }
 
 export function computeSignageKpi(items: SignageAssetLike[]) {

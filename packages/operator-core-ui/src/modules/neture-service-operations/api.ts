@@ -133,7 +133,7 @@ const operatorContactApi = {
     const detail = response.data?.data;
     if (response.data?.success !== true || !detail || detail.id !== item.id) throw new Error('문의 상세를 확인하지 못했습니다.');
     if (detail.status !== 'new') return { skipped: true };
-    if (typeof item.updatedAt !== 'string' || detail.updatedAt !== item.updatedAt) throw new Error('다른 운영자가 수정한 문의입니다. 목록을 새로고침한 뒤 다시 선택해 주세요.');
+    if (typeof item.updatedAt !== 'string' || detail.updatedAt !== item.updatedAt) throw new Error('다른 운영자가 수정한 문의입니다. 목록을 새로고침한 뒤 다시 선택해 주시기 바랍니다.');
     const saved = await api.patch(path, { status: 'in_progress', adminNotes: detail.adminNotes ?? '', expectedUpdatedAt: item.updatedAt });
     if (saved.data?.success !== true) throw new Error('문의 확인을 저장하지 못했습니다.');
     return { skipped: false };

@@ -16,7 +16,7 @@ export default function SiteShell() {
   const location = useLocation();
   return <div className="site">
     <header className="header o4o-service-header">
-      <Link className="brand" to="/">{BRAND.name}</Link>
+      <Link className="brand" to="/"><img src={`${import.meta.env.BASE_URL}brand/lecture/logo-mark.svg`} alt="" aria-hidden="true" width="36" height="36" style={{display:"inline-block",verticalAlign:"middle",marginRight:8,flexShrink:0}} />{BRAND.name}</Link>
       <nav className="nav">
         <Link to="/courses">강의</Link>
         <Link to="/contact">이용 · 개설 문의</Link>

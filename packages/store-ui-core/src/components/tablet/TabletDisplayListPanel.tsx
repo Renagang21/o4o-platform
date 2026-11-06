@@ -23,7 +23,7 @@ export function TabletDisplayListPanel({ displays, onMove, onRemove }: TabletDis
       <div className="max-h-[400px] overflow-y-auto">
         {displays.length === 0 ? (
           <div className="py-8 text-center text-sm text-slate-400">
-            진열할 상품이 없습니다. 왼쪽 상품 풀에서 추가하세요.
+            진열할 상품이 없습니다. 왼쪽 상품 풀에서 추가하시기 바랍니다.
           </div>
         ) : (
           <div className="divide-y">

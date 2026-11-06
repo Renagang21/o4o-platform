@@ -260,15 +260,15 @@ export async function connectThisPc(
 export function describeLocalAgentUnavailable(reason: LocalAgentUnavailableReason): string {
   switch (reason) {
     case 'AGENT_NOT_RUNNING':
-      return 'PC 연결 프로그램이 실행되고 있지 않습니다. 프로그램을 실행한 뒤 다시 연결해 주세요.';
+      return '이 브라우저에서 PC 프로그램의 응답을 받지 못했습니다. 프로그램이 실행 중이라면 브라우저의 로컬 네트워크 권한과 보안 프로그램을 확인한 뒤 다시 연결해 주시기 바랍니다.';
     case 'PERMISSION_REQUIRED':
-      return '브라우저에서 이 PC 연결 권한을 허용해 주세요. 권한을 허용한 뒤 다시 연결을 눌러 주세요.';
+      return '브라우저에서 이 PC 연결 권한을 허용해 주시기 바랍니다. 권한을 허용한 뒤 다시 연결을 눌러 주시기 바랍니다.';
     case 'CONNECTION_FAILED':
-      return '이 PC의 연결 프로그램에 연결할 수 없습니다. 프로그램 실행 상태를 확인한 뒤 다시 시도해 주세요.';
+      return '이 PC의 연결 프로그램에 연결할 수 없습니다. 프로그램 실행 상태를 확인한 뒤 다시 시도해 주시기 바랍니다.';
     case 'INDETERMINATE':
     default:
       // 브라우저가 원인을 알려주지 않았다. 둘 다 짚어 주고 확정하지 않는다 (§8).
-      return 'PC 연결 프로그램이 실행 중이 아니거나 브라우저 연결 권한이 필요합니다. 프로그램 실행 상태와 브라우저 연결 권한을 확인한 뒤 다시 연결해 주세요.';
+      return 'PC 연결 프로그램이 실행 중이 아니거나 브라우저 연결 권한이 필요합니다. 프로그램 실행 상태와 브라우저 연결 권한을 확인한 뒤 다시 연결해 주시기 바랍니다.';
   }
 }
 
@@ -276,22 +276,22 @@ export function describeLocalAgentUnavailable(reason: LocalAgentUnavailableReaso
 export function describeConnectFailure(code: string): string {
   switch (code) {
     case 'DEVICE_ALREADY_PAIRED':
-      return '이 PC 는 다른 O4O 계정에 이미 연결되어 있습니다. 해당 계정에서 연결을 해제한 뒤 다시 시도해 주세요.';
+      return '이 PC 는 다른 O4O 계정에 이미 연결되어 있습니다. 해당 계정에서 연결을 해제한 뒤 다시 시도해 주시기 바랍니다.';
     case 'PAIRING_EXPIRED':
     case 'INVALID_PAIRING_GRANT':
-      return '연결 승인 시간이 지났습니다. 다시 한 번 눌러 주세요.';
+      return '연결 승인 시간이 지났습니다. 다시 한 번 눌러 주시기 바랍니다.';
     case 'UNSUPPORTED_PLATFORM':
       return '지원하지 않는 운영체제입니다.';
     case 'NETURE_MEMBERSHIP_REQUIRED':
-      return 'Neture 가입 승인 후 이 PC 를 연결할 수 있습니다. 홈 화면에서 가입 상태를 확인해 주세요.';
+      return 'Neture 가입 승인 후 이 PC 를 연결할 수 있습니다. 홈 화면에서 가입 상태를 확인해 주시기 바랍니다.';
     case 'GRANT_ISSUE_FAILED':
-      return '연결 승인을 받지 못했습니다. 잠시 후 다시 시도해 주세요.';
+      return '연결 승인을 받지 못했습니다. 잠시 후 다시 시도해 주시기 바랍니다.';
     case 'AGENT_NOT_RUNNING':
     case 'PERMISSION_REQUIRED':
     case 'CONNECTION_FAILED':
     case 'INDETERMINATE':
       return describeLocalAgentUnavailable(code as LocalAgentUnavailableReason);
     default:
-      return '연결에 실패했습니다. 잠시 후 다시 시도해 주세요.';
+      return '연결에 실패했습니다. 잠시 후 다시 시도해 주시기 바랍니다.';
   }
 }

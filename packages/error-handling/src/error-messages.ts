@@ -15,12 +15,12 @@ export const ERROR_MESSAGES: Record<string, string> = {
   // WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1: password 계열 코드(INVALID_CREDENTIALS ·
   //   PASSWORD_VALIDATION_FAILED · INVALID_RESET_TOKEN · SOCIAL_LOGIN_REQUIRED)는 은퇴했다.
   AUTH_REQUIRED: '로그인이 필요합니다.',
-  INVALID_TOKEN: '인증 토큰이 유효하지 않습니다. 다시 로그인해주세요.',
-  TOKEN_EXPIRED: '세션이 만료되었습니다. 다시 로그인해주세요.',
+  INVALID_TOKEN: '인증 토큰이 유효하지 않습니다. 다시 로그인해 주시기 바랍니다.',
+  TOKEN_EXPIRED: '세션이 만료되었습니다. 다시 로그인해 주시기 바랍니다.',
   INVALID_USER: '등록되지 않은 이메일입니다.',
   USER_INACTIVE: '계정이 비활성 상태입니다.',
-  INVALID_REFRESH_TOKEN: '세션을 갱신할 수 없습니다. 다시 로그인해주세요.',
-  NO_REFRESH_TOKEN: '로그인 정보가 없습니다. 다시 로그인해주세요.',
+  INVALID_REFRESH_TOKEN: '세션을 갱신할 수 없습니다. 다시 로그인해 주시기 바랍니다.',
+  NO_REFRESH_TOKEN: '로그인 정보가 없습니다. 다시 로그인해 주시기 바랍니다.',
 
   // ─── Authorization (403) ───────────────────────────────────────────────
   FORBIDDEN: '접근 권한이 없습니다.',
@@ -33,16 +33,16 @@ export const ERROR_MESSAGES: Record<string, string> = {
   GUEST_TOKEN_REQUIRED: '게스트 토큰이 필요합니다.',
   // WO-O4O-AUTH-ACCOUNT-STATUS-UX-AND-PH-MOBILE-LOGOUT-CLOSURE-V1:
   //   pending 은 제한 로그인으로 성공하므로 이 코드는 '승인 대기' 를 뜻하지 않는다.
-  ACCOUNT_NOT_ACTIVE: '현재 로그인할 수 없는 계정 상태입니다. 운영자에게 문의해 주세요.',
+  ACCOUNT_NOT_ACTIVE: '현재 로그인할 수 없는 계정 상태입니다. 운영자에게 문의해 주시기 바랍니다.',
   ACCOUNT_LOCKED: '로그인 시도가 너무 많아 계정이 일시적으로 잠겼습니다.',
-  ACCOUNT_SUSPENDED: '계정이 정지되었습니다. 관리자에게 문의하세요.',
+  ACCOUNT_SUSPENDED: '계정이 정지되었습니다. 관리자에게 문의하시기 바랍니다.',
   EMAIL_NOT_VERIFIED: '이메일 인증이 필요합니다.',
 
   // ─── Validation (400) ──────────────────────────────────────────────────
-  VALIDATION_ERROR: '입력 정보를 확인해주세요.',
+  VALIDATION_ERROR: '입력 정보를 확인해 주시기 바랍니다.',
   BAD_REQUEST: '잘못된 요청입니다.',
   INVALID_REQUEST: '잘못된 요청입니다.',
-  MISSING_REQUIRED_FIELD: '필수 항목을 입력해주세요.',
+  MISSING_REQUIRED_FIELD: '필수 항목을 입력해 주시기 바랍니다.',
   INVALID_FORMAT: '입력 형식이 올바르지 않습니다.',
   EMAIL_EXISTS: '이미 가입된 이메일입니다.',
   INVALID_VERIFICATION_TOKEN: '인증 링크가 만료되었습니다.',
@@ -58,11 +58,11 @@ export const ERROR_MESSAGES: Record<string, string> = {
   DUPLICATE_ENTRY: '중복된 항목입니다.',
 
   // ─── Rate Limit (429) ──────────────────────────────────────────────────
-  RATE_LIMITED: '요청이 너무 많습니다. 잠시 후 다시 시도해주세요.',
-  TOO_MANY_ATTEMPTS: '시도 횟수가 초과되었습니다. 잠시 후 다시 시도해주세요.',
+  RATE_LIMITED: '요청이 너무 많습니다. 잠시 후 다시 시도해 주시기 바랍니다.',
+  TOO_MANY_ATTEMPTS: '시도 횟수가 초과되었습니다. 잠시 후 다시 시도해 주시기 바랍니다.',
 
   // ─── Server (500+) ────────────────────────────────────────────────────
-  INTERNAL_ERROR: '서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.',
+  INTERNAL_ERROR: '서버 오류가 발생했습니다. 잠시 후 다시 시도해 주시기 바랍니다.',
   SERVICE_UNAVAILABLE: '서비스를 일시적으로 사용할 수 없습니다.',
   DATABASE_ERROR: '데이터 처리 중 오류가 발생했습니다.',
   QUERY_FAILED: '데이터 조회에 실패했습니다.',
@@ -78,8 +78,8 @@ export const ERROR_MESSAGES: Record<string, string> = {
   UPLOAD_FAILED: '파일 업로드에 실패했습니다.',
 
   // ─── Frontend-specific ────────────────────────────────────────────────
-  NETWORK_ERROR: '네트워크 연결을 확인해주세요.',
-  TIMEOUT: '요청 시간이 초과되었습니다. 다시 시도해주세요.',
+  NETWORK_ERROR: '네트워크 연결을 확인해 주시기 바랍니다.',
+  TIMEOUT: '요청 시간이 초과되었습니다. 다시 시도해 주시기 바랍니다.',
   UNKNOWN: '알 수 없는 오류가 발생했습니다.',
 };
 

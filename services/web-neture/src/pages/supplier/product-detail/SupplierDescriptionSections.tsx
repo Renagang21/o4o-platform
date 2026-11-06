@@ -11,7 +11,7 @@ export default function SupplierDescriptionSections({ product }: { product: Supp
       <Section title="소비자 공개 설명 (B2C)">
         {!product.consumerShortDescription && !product.consumerDetailDescription && (
           <p className="text-xs text-amber-600 mb-2">
-            소비자 공개용 설명이 비어 있습니다. 편집 모드에서 입력해 주세요.
+            소비자 공개용 설명이 비어 있습니다. 편집 모드에서 입력해 주시기 바랍니다.
           </p>
         )}
         {product.consumerShortDescription ? (
@@ -49,7 +49,7 @@ export default function SupplierDescriptionSections({ product }: { product: Supp
       <Section title="판매자 지원 설명 (B2B)">
         {!product.businessShortDescription && !product.businessDetailDescription && (
           <p className="text-xs text-amber-600 mb-2">
-            판매자 지원 설명이 비어 있습니다. 편집 모드에서 입력해 주세요.
+            판매자 지원 설명이 비어 있습니다. 편집 모드에서 입력해 주시기 바랍니다.
           </p>
         )}
         {product.businessShortDescription ? (

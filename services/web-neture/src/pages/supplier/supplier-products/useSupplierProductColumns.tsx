@@ -224,7 +224,7 @@ export function useSupplierProductColumns({
             if (!row.priceGeneral || row.priceGeneral <= 0)
               missing.push({
                 label: '가격',
-                action: () => showToast('공급가 셀을 클릭하여 편집하세요'),
+                action: () => showToast('공급가 셀을 클릭하여 편집하시기 바랍니다'),
               });
             if (!row.consumerShortDescription)
               missing.push({ label: '간단 소개', action: () => setDrawerProduct(row) });
@@ -233,7 +233,7 @@ export function useSupplierProductColumns({
             if (!row.distributionType)
               missing.push({
                 label: '유통 타입',
-                action: () => showToast('유통 셀을 클릭하여 편집하세요'),
+                action: () => showToast('유통 셀을 클릭하여 편집하시기 바랍니다'),
               });
             const next = missing[0];
             const isHighlighted = highlightRowId === row.id;

@@ -146,4 +146,8 @@ export interface UserErasureResult {
   erased: boolean;
   reviewDueAt: string | null;
   reviewCodes?: string[];
+  errorCode?: string | null;
+  remainingFileTasks?: number;
+  requestedAt?: string;
+  updatedAt?: string;
 }

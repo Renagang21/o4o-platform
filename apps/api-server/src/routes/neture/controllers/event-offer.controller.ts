@@ -114,7 +114,7 @@ export function createNetureEventOfferController(
       res.status(410).json({
         success: false,
         code: 'EVENT_OFFER_PARTICIPATE_RETIRED',
-        message: '이벤트오퍼 주문은 장바구니를 통해 진행해 주세요.',
+        message: '이벤트오퍼 주문은 장바구니를 통해 진행해 주시기 바랍니다.',
         canonicalAction: 'store_cart_checkout',
       });
     })

@@ -63,7 +63,7 @@ export function requireStoreAuth(dataSource: DataSource, serviceKey?: StoreOwner
     if (isOwner && resolution.status === 'ambiguous') {
       res.status(409).json({
         success: false,
-        error: '연결된 매장이 여러 개입니다. 운영자에게 문의해 주세요.',
+        error: '연결된 매장이 여러 개입니다. 운영자에게 문의해 주시기 바랍니다.',
         code: 'AMBIGUOUS_STORE_CONNECTION',
       });
       return;

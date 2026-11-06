@@ -145,11 +145,11 @@ export function PharmacyPopPage() {
   const handleSave = async () => {
     if (!slug || !editing) return;
     if (!editTitle.trim()) {
-      toast.error('제목을 입력하세요');
+      toast.error('제목을 입력하시기 바랍니다');
       return;
     }
     if (!editContent.trim() || editContent.trim() === '<p></p>') {
-      toast.error('본문을 입력하세요');
+      toast.error('본문을 입력하시기 바랍니다');
       return;
     }
     setIsSaving(true);
@@ -305,7 +305,7 @@ export function PharmacyPopPage() {
             <RichTextEditor showInternalAi={false}
               value={editContent}
               onChange={(c) => setEditContent(c.html)}
-              placeholder="POP 본문을 작성하세요"
+              placeholder="POP 본문을 작성하시기 바랍니다"
               minHeight="500px"
               editable={!isSaving}
             />
@@ -348,7 +348,7 @@ export function PharmacyPopPage() {
       {/* No store hint */}
       {slugResolved && !slug && (
         <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 text-sm text-amber-800">
-          매장 정보가 연결되지 않아 POP 을 사용할 수 없습니다. 매장 등록 후 다시 시도해 주세요.
+          매장 정보가 연결되지 않아 POP 을 사용할 수 없습니다. 매장 등록 후 다시 시도해 주시기 바랍니다.
         </div>
       )}
 

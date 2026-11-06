@@ -279,6 +279,16 @@ describe("signage list retains source-specific policies", () => {
       }).map((item) => item.id),
     ).toEqual(["draft"]);
   });
+  it("published-only includes active direct videos, excludes drafts/hidden and searches tags", () => {
+    const videos = buildSignageVideoList(
+      [snapshot("published", "published"), snapshot("draft", "draft"), snapshot("hidden", "hidden")],
+      [{ ...media("active"), status: "active", tags: ["건강"] }, { ...media("draft-media"), status: "draft" }],
+    );
+    expect(filterSignageVideos(videos, { status: "published", sort: "newest", keyword: "" }).map(v => v.id))
+      .toEqual(["media_active", "published"]);
+    expect(filterSignageVideos(videos, { status: "published", sort: "newest", keyword: " 건강 " }).map(v => v.id))
+      .toEqual(["media_active"]);
+  });
   it("sorting returns a new list and preserves mixed-source date ordering and case-insensitive search", () => {
     const videos = buildSignageVideoList(
       [snapshot("Alpha", "published")],

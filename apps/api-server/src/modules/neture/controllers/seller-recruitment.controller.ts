@@ -179,7 +179,7 @@ export function createSellerRecruitmentController(deps: {
         return res.status(error.status).json({success:false,error:error.code,message:messages[error.code]});
       }
       logger.error('[SellerRecruitment API] Supply price confirmation failed');
-      return res.status(500).json({success:false,error:'INTERNAL_ERROR',message:'확정 결과를 확인하지 못했습니다. 같은 금액으로 다시 확인해 주세요.'});
+      return res.status(500).json({success:false,error:'INTERNAL_ERROR',message:'확정 결과를 확인하지 못했습니다. 같은 금액으로 다시 확인해 주시기 바랍니다.'});
     }
   });
 
@@ -222,7 +222,7 @@ export function createSellerRecruitmentController(deps: {
       if (msg === 'RECRUITMENT_NOT_EXPOSED') {
         return res.status(400).json({ success: false, error: 'RECRUITMENT_NOT_EXPOSED', message: '아직 서비스 노출 승인이 완료되지 않은 모집입니다.' });
       }
-      if (msg === 'STORE_CONTEXT_REQUIRED') return res.status(400).json({ success: false, error: msg, message: '내 매장을 선택해 주세요.' });
+      if (msg === 'STORE_CONTEXT_REQUIRED') return res.status(400).json({ success: false, error: msg, message: '내 매장을 선택해 주시기 바랍니다.' });
       if (msg === 'SEMI_FRANCHISE_MEMBERSHIP_REQUIRED') {
         return res.status(403).json({ success: false, error: 'SEMI_FRANCHISE_MEMBERSHIP_REQUIRED', message: '세미프랜차이즈 가입 승인 후 참여할 수 있는 모집입니다.' });
       }

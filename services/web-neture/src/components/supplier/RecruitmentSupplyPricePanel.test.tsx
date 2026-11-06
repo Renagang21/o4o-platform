@@ -55,7 +55,7 @@ describe("supplier recruitment explicit price", () => {
     api.confirmSupplyPrice.mockResolvedValue({
       success: false,
       error: "SUPPLY_PRICE_ALREADY_CONFIRMED",
-      message: "최신 모집 정보를 확인해 주세요.",
+      message: "최신 모집 정보를 확인해 주시기 바랍니다.",
     });
     const saved = vi.fn();
     const reload=vi.fn();
@@ -66,7 +66,7 @@ describe("supplier recruitment explicit price", () => {
       target: { value: "2500" },
     });
     fireEvent.click(screen.getByText("공급가 확정"));
-    await screen.findByText("최신 모집 정보를 확인해 주세요.");
+    await screen.findByText("최신 모집 정보를 확인해 주시기 바랍니다.");
     expect(saved).not.toHaveBeenCalled();
     fireEvent.click(screen.getByText("최신 모집 정보 확인"));expect(reload).toHaveBeenCalledTimes(1);
   });

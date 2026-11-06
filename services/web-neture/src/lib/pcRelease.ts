@@ -121,7 +121,7 @@ export async function downloadPcRelease(
     b.toString(16).padStart(2, "0"),
   ).join("");
   if (hash !== artifact.sha256)
-    throw new Error("설치 파일 검증에 실패했습니다. 다시 내려받아 주세요.");
+    throw new Error("설치 파일 검증에 실패했습니다. 다시 내려받아 주시기 바랍니다.");
   return new Blob([bytes], {
     type: release.setup ? "application/octet-stream" : "application/zip",
   });

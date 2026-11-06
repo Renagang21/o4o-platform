@@ -282,7 +282,7 @@ export default function SupplierOrderDetailPage() {
     return (
       <div style={styles.notFound}>
         <h2 style={styles.notFoundTitle}>주문 정보를 불러오지 못했습니다</h2>
-        <p style={styles.notFoundText}>잠시 후 다시 시도해 주세요.</p>
+        <p style={styles.notFoundText}>잠시 후 다시 시도해 주시기 바랍니다.</p>
         <button
           onClick={fetchOrder}
           style={{
@@ -307,7 +307,7 @@ export default function SupplierOrderDetailPage() {
     return (
       <div style={styles.notFound}>
         <h2 style={styles.notFoundTitle}>주문을 찾을 수 없습니다</h2>
-        <p style={styles.notFoundText}>주문번호를 확인해 주세요.</p>
+        <p style={styles.notFoundText}>주문번호를 확인해 주시기 바랍니다.</p>
         <Link to={backPath} style={styles.backLink}>
           <ArrowLeft size={16} />
           주문 목록으로 돌아가기
@@ -532,7 +532,7 @@ export default function SupplierOrderDetailPage() {
             <SectionCard title="배송 관리" icon={<Truck size={18} style={{ color: '#64748b' }} />}>
               <div style={styles.shipmentError}>
                 <p style={styles.shipmentErrorTitle}>배송 정보를 불러오지 못했습니다.</p>
-                <p style={styles.shipmentErrorText}>잠시 후 다시 시도해 주세요.</p>
+                <p style={styles.shipmentErrorText}>잠시 후 다시 시도해 주시기 바랍니다.</p>
                 <button onClick={loadShipment} style={styles.shipmentRetryButton}>
                   다시 시도
                 </button>
@@ -561,7 +561,7 @@ export default function SupplierOrderDetailPage() {
                     type="text"
                     value={trackingNumber}
                     onChange={(e) => setTrackingNumber(e.target.value)}
-                    placeholder="송장번호를 입력하세요"
+                    placeholder="송장번호를 입력하시기 바랍니다"
                     style={styles.formInput}
                   />
                 </div>

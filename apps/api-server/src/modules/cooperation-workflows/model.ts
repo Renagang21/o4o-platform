@@ -5,7 +5,7 @@ export const conflict = () =>
   new NeturePharmacyError(
     409,
     "COOPERATION_WORK_CHANGED",
-    "다른 처리가 반영됐습니다. 다시 조회한 뒤 처리해 주세요.",
+    "다른 처리가 반영됐습니다. 다시 조회한 뒤 처리해 주시기 바랍니다.",
   );
 export const uuid = (value: unknown): value is string =>
   typeof value === "string" &&

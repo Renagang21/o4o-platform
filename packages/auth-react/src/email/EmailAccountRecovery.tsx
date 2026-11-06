@@ -96,7 +96,7 @@ export function ForgotPasswordForm({ api, links, className }: ForgotPasswordForm
     setError(null);
     try {
       const res = await api.requestPasswordReset(email.trim());
-      setNotice(res.message ?? '가입된 이메일이면 비밀번호 재설정 메일을 보냈습니다. 메일함을 확인해 주세요.');
+      setNotice(res.message ?? '가입된 이메일이면 비밀번호 재설정 메일을 보냈습니다. 메일함을 확인해 주시기 바랍니다.');
     } catch (e) {
       setError(readEmailAuthError(e, '요청을 처리하지 못했습니다.').message);
     } finally {
@@ -108,7 +108,7 @@ export function ForgotPasswordForm({ api, links, className }: ForgotPasswordForm
     <form onSubmit={handleSubmit} style={styles.box} className={className} noValidate data-testid="forgot-password-form">
       <p style={styles.hint}>
         가입한 이메일(로그인 아이디)을 입력하면 비밀번호 재설정 링크를 보냅니다. 링크는 30분 동안 유효합니다.
-        비밀번호를 만든 적이 없는 Google 가입 계정은 재설정 메일이 가지 않습니다 — Google 로 로그인해 주세요.
+        비밀번호를 만든 적이 없는 Google 가입 계정은 재설정 메일이 가지 않습니다 — Google 로 로그인해 주시기 바랍니다.
       </p>
       <div style={styles.field}>
         <label htmlFor="o4o-forgot-email" style={styles.label}>이메일</label>
@@ -157,7 +157,7 @@ export function ResetPasswordForm({ api, token, links, className }: ResetPasswor
   if (!token) {
     return (
       <div style={styles.box} className={className}>
-        <p role="alert" style={styles.error}>재설정 링크가 올바르지 않습니다. 비밀번호 찾기를 다시 진행해 주세요.</p>
+        <p role="alert" style={styles.error}>재설정 링크가 올바르지 않습니다. 비밀번호 찾기를 다시 진행해 주시기 바랍니다.</p>
         {links?.forgotPassword && (
           <a href={links.forgotPassword} onClick={linkHandler(links, links.forgotPassword)} style={styles.link}>비밀번호 찾기</a>
         )}
@@ -187,7 +187,7 @@ export function ResetPasswordForm({ api, token, links, className }: ResetPasswor
       const res = await api.resetPassword(token, password);
       setPassword('');
       setConfirm('');
-      setDone(res.message ?? '비밀번호를 바꿨습니다. 새 비밀번호로 다시 로그인해 주세요.');
+      setDone(res.message ?? '비밀번호를 바꿨습니다. 새 비밀번호로 다시 로그인해 주시기 바랍니다.');
     } catch (e) {
       setError(readEmailAuthError(e, '비밀번호를 바꾸지 못했습니다.').message);
     } finally {
@@ -259,7 +259,7 @@ export function FindLoginIdForm({ api, links, className }: FindLoginIdFormProps)
   return (
     <form onSubmit={handleSubmit} style={styles.box} className={className} noValidate data-testid="find-login-id-form">
       <p style={styles.hint}>
-        이메일로 가입할 때 입력한 이름과 휴대전화 번호로 로그인 아이디(이메일)를 찾습니다. Google 로 가입했다면 Google 로 로그인해 주세요.
+        이메일로 가입할 때 입력한 이름과 휴대전화 번호로 로그인 아이디(이메일)를 찾습니다. Google 로 가입했다면 Google 로 로그인해 주시기 바랍니다.
       </p>
       <div style={styles.field}>
         <label htmlFor="o4o-findid-name" style={styles.label}>이름</label>

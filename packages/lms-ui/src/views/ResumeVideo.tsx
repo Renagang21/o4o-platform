@@ -44,7 +44,7 @@ export function ResumeVideo({ videoRef, src, courseId, lessonId, enabled, port, 
       await port.savePlayback(courseId, lessonId, seconds);
       if (active.current) setMessage('이어보기 위치를 저장했습니다.');
     } catch {
-      if (active.current) { setMessage('이어보기 위치 저장에 실패했습니다. 다시 저장해 주세요.'); }
+      if (active.current) { setMessage('이어보기 위치 저장에 실패했습니다. 다시 저장해 주시기 바랍니다.'); }
     } finally {
       saving.current = false;
       if (pendingForce.current) {
@@ -67,7 +67,7 @@ export function ResumeVideo({ videoRef, src, courseId, lessonId, enabled, port, 
       {readCaptionTracks(captions).map((track, index) => <track key={`${track.src}:${index}`} kind="captions" src={track.src} srcLang={track.srcLang} label={track.label} ref={element => { if (element) element.onerror = () => setCaptionError(true); }} />)}
     </video>
     {captionError && <p role="alert">자막을 불러오지 못했습니다. 영상은 계속 재생할 수 있습니다.</p>}
-    {videoError && <div role="alert">영상을 재생하지 못했습니다. 주소와 접근 권한을 확인해 주세요. <button type="button" onClick={() => { setVideoError(false); videoRef.current?.load(); }}>다시 불러오기</button></div>}
+    {videoError && <div role="alert">영상을 재생하지 못했습니다. 주소와 접근 권한을 확인해 주시기 바랍니다. <button type="button" onClick={() => { setVideoError(false); videoRef.current?.load(); }}>다시 불러오기</button></div>}
     {enabled && port.savePlayback && <button type="button" onClick={() => void save(true)}>현재 위치 저장</button>}
     {readFailed && <button type="button" onClick={() => setReadAttempt(n => n + 1)}>이어보기 위치 다시 조회</button>}
     {message && <p role="status">{message}</p>}

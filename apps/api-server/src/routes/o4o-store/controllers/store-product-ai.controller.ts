@@ -23,7 +23,7 @@ export function registerStoreProductAiRoutes(router: Router, db: DataSource, sto
       if (known) { status = error.status; code = error.code; }
       else if (error instanceof z.ZodError) { status = 400; code = 'INVALID_INPUT'; }
       res.status(status).json({ success: false, code,
-        message: '파일의 상품명·바코드 열과 현재 매장을 확인해 주세요.' });
+        message: '파일의 상품명·바코드 열과 현재 매장을 확인해 주시기 바랍니다.' });
     });
   };
   router.post('/ai-context/import-preview', requireAuth, storeAccess, apiLimiter, (req, res, next) => {

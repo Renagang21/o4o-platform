@@ -98,13 +98,13 @@ export function createSupplierStoreDescriptionController(dataSource: DataSource)
         if (!offerId) {
           res
             .status(400)
-            .json({ success: false, error: '상품(offer)을 선택하세요', code: 'OFFER_REQUIRED' });
+            .json({ success: false, error: '상품(offer)을 선택하시기 바랍니다', code: 'OFFER_REQUIRED' });
           return;
         }
         if (!content) {
           res
             .status(400)
-            .json({ success: false, error: '설명서 본문을 입력하세요', code: 'CONTENT_EMPTY' });
+            .json({ success: false, error: '설명서 본문을 입력하시기 바랍니다', code: 'CONTENT_EMPTY' });
           return;
         }
         if (content.length > MAX_CONTENT_LEN) {
