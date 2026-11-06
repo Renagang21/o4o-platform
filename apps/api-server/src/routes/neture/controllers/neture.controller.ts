@@ -219,8 +219,12 @@ export function createNetureController(dataSource: DataSource): Router {
   /**
    * GET /home/forum
    * Home page forum preview (recent posts)
+   *
+   * requireCommunityAccess 는 로그인 사용자를 요구하므로 optionalAuth 가 아닌 requireAuth 를 쓴다.
+   * optionalAuth 는 비활성 · 세션 철회 · 약관 미동의 계정을 오류 없이 비로그인으로 처리해
+   * requireAuth 의 계정 · 약관 게이트를 건너뛴다 (service-forum 커뮤니티 읽기 경로와 동일한 순서).
    */
-  router.get('/home/forum', optionalAuth, requireCommunityAccess('o4o-general'), async (req: Request, res: Response) => {
+  router.get('/home/forum', requireAuth, requireCommunityAccess('o4o-general'), async (req: Request, res: Response) => {
     try {
       const limit = parseInt(req.query.limit as string) || 5;
       const posts = await forumService.listRecentPosts(limit);
