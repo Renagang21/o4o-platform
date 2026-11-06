@@ -118,7 +118,7 @@ export function MemberManagementPanel({
         </div>
       )}
       <ActionBar selectedCount={selectedIds.size} onClearSelection={()=>setSelectedIds(new Set())} actions={memberActions.map(action=>({
-        key:action,label:action.startsWith('request_')?`${labels[action.slice(8)]} 요청`:labels[action],disabled:work.busy||!reason.trim(),
+        key:action,label:labels[action]??`${labels[action.slice(8)]} 요청`,disabled:work.busy||!reason.trim(),
         onClick:()=>{if(selected&&!selected.operatorReadOnly)void work.send(`${base}/${cooperative.id}/members/${selected.id}/actions/${action}`,{reason});},
       }))} />
       <DataTable<Member> tableId="cooperative-member-management" data={(work.data as Member[]|null)??[]} rowKey="id"

@@ -84,6 +84,8 @@ describe("scoped administration work", () => {
     await screen.findByText("회원");
     fireEvent.click(screen.getAllByRole("checkbox").at(-1)!);
     expect(screen.queryByRole("button", { name: "가입 승인" })).toBeNull();
+    expect(screen.getByRole("button", { name: "보완 요청" })).toBeTruthy();
+    expect(screen.queryByRole("button", { name: /undefined/ })).toBeNull();
     expect(screen.queryByText("조합 operator 지정·해제")).toBeNull();
     fireEvent.change(screen.getByLabelText("검토·처리 사유"), {
       target: { value: "자격 검토 완료" },
