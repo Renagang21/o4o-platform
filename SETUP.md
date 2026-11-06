@@ -325,12 +325,22 @@ API 서버는 **`apps/api-server/.env`** 만 읽습니다 (루트 `.env` 아님)
 
 운영 DB에 대한 write는 CLAUDE.md §0의 승인 규칙을 그대로 따릅니다 (read-only 검증만 자유).
 
-**운영 DB identity** (2026-09-30 기준):
+**운영 DB 조회는 읽기 전용 계정 `o4o_readonly` 만 사용합니다.** 사용자가 명시 승인한 운영 작업이 아니면 조회에 `o4o_api_v2` 를 쓰지 않습니다.
+
+**운영 DB identity** (2026-11-06 기준):
 
 | role | 성격 | 사용처 |
 |---|---|---|
-| `o4o_api_v2` | **login / runtime identity** (비밀번호 = Secret Manager `o4o-db-password`) | `o4o-core-api` · migration Job `o4o-api-migrations` · 운영 DB read-only 조회 |
+| `o4o_readonly` | **읽기 전용 login** (비밀번호 = Secret Manager `o4o-db-readonly-password`) | 운영 DB read-only 조회 · 검증 |
+| `o4o_api_v2` | **login / runtime identity** (비밀번호 = Secret Manager `o4o-db-password`) | `o4o-core-api` · migration Job `o4o-api-migrations` · 사용자가 명시 승인한 운영 작업 |
 | `o4o_api` | **NOLOGIN owner role** — 운영 스키마 객체(테이블 · 시퀀스 · enum · 함수 등)의 소유자 | 직접 접속하지 않는다. `o4o_api_v2` 가 member 이며 role 설정(`SET role=o4o_api`)으로 세션이 이 role 권한으로 동작한다 |
+
+`o4o_readonly` 의 조회 범위:
+
+- 인증값 · 비밀값이 든 표와 컬럼은 읽을 수 없습니다. 이런 컬럼이 있는 표는 `SELECT *` 도 거부되므로 컬럼을 지정해 조회합니다.
+- **새 표는 기본 거부입니다.** 운영자가 분류 스크립트를 다시 실행해 분류한 뒤에만 읽을 수 있습니다. 새 표가 조회되지 않는 것은 장애가 아닙니다.
+- 조회가 막히면 다른 계정으로 우회하지 말고 사용자에게 확인합니다.
+- 분류 스크립트와 점검 출력에는 운영 표 · 컬럼 이름이 있어 저장소에 넣지 않고 운영자 로컬에 보관합니다.
 
 `o4o_api` 로 직접 로그인하는 현행 스크립트 · Job 은 없다. 운영 스크립트는 로그인 identity 기본값을 두지 않고
 `DB_USERNAME` 이 없으면 즉시 실패한다(`apps/api-server/src/scripts/require-db-username.mjs`). 운영 접속 시 `DB_USERNAME` 을 명시한다.

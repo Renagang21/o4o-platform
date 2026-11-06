@@ -11,6 +11,7 @@ description: 운영 DB read-only 조회 (데스크톱 로컬 세션 전용) - �
    - **`SELECT` · `EXPLAIN`(ANALYZE 없이) · 카탈로그 조회만.** `INSERT` · `UPDATE` · `DELETE` · `MERGE` · `TRUNCATE` · `CREATE` · `ALTER` · `DROP` · `GRANT` · `COPY ... FROM` · 함수 호출로 상태를 바꾸는 문이 섞여 있으면 멈추고 보고한다.
    - 가능하면 세션을 `SET default_transaction_read_only = on;` 으로 시작하고, 대용량 테이블은 `LIMIT` 을 붙인다.
 3. 접속
+   - 계정은 `o4o_readonly`(secret `o4o-db-readonly-password`)만 쓴다. 표나 컬럼 권한 때문에 막히면 `o4o_api_v2` 로 우회하지 않고 멈춰서 보고한다.
    - Cloud SQL Proxy 기동과 `psql` 실행은 `.claude/settings.json` ask 대상이다. ask 명령을 다른 명령과 `;` · `&&` · `|` 로 묶지 않는다.
    - 실제 host · password · 계정값을 화면 출력 · 문서 · 커밋에 남기지 않는다(secret 이름만).
 4. 결과 기록
