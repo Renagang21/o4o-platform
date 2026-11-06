@@ -10,6 +10,7 @@ let writes: jest.Mock;
 function app() {
   const a = express(); a.use(express.json()); writes = jest.fn((_req,res)=>res.json({ok:true}));
   a.patch('/members/:userId/status', operatorMemberTarget, writes);
+  a.post('/registrations/:userId/reject',operatorMemberTarget,writes);
   a.patch('/memberships/:membershipId/approve', operatorMemberTarget, writes);
   a.post('/batch-status', operatorMemberTarget, writes);
   a.use((_err: unknown,_req: unknown,res: express.Response,_next: unknown)=>res.status(503).json({ok:false}));
@@ -44,4 +45,28 @@ it('uses active, time-valid role assignments rather than email or service role',
  expect(protectedMemberSql('u.id')).toContain('valid_from<=now()');expect(protectedMemberSql('u.id')).toContain('valid_until>=now()');
  query.mockResolvedValue([{protected:true}]);
  await expect(assertOperatorMemberTarget({query} as any,target)).rejects.toMatchObject({status:403,code:'ADMIN_ACCOUNT_PROTECTED'});
+});
+
+it.each([
+ target.replaceAll('-',''),
+ `{${target}}`,
+ 'invalid',
+])('rejects a noncanonical direct target before any handler or DB lookup (%s)',async id=>{
+ const result=await request(app()).patch(`/members/${encodeURIComponent(id)}/status`).send({status:'suspended'});
+ expect(result.status).toBe(400);expect(writes).not.toHaveBeenCalled();expect(query).not.toHaveBeenCalled();
+});
+it.each([target.replaceAll('-',''),`{${target}}`,null,123])('rejects mixed batches with an unchecked target (%s)',async id=>{
+ const result=await request(app()).post('/batch-status').send({ids:[membership,id],status:'suspended'});
+ expect(result.status).toBe(400);expect(writes).not.toHaveBeenCalled();expect(query).not.toHaveBeenCalled();
+});
+it('rejects compact membership IDs and oversized batches before lookup or writes',async()=>{
+ expect((await request(app()).patch(`/memberships/${membership.replaceAll('-','')}/approve`)).status).toBe(400);
+ expect(writes).not.toHaveBeenCalled();expect(query).not.toHaveBeenCalled();
+ expect((await request(app()).post('/batch-status').send({ids:Array(51).fill(target),status:'suspended'})).status).toBe(400);
+ expect(writes).not.toHaveBeenCalled();expect(query).not.toHaveBeenCalled();
+});
+
+it('rejects a compact target on the legacy registration rejection route',async()=>{
+ const result=await request(app()).post(`/registrations/${target.replaceAll('-','')}/reject`).send({reason:'합성 반려'});
+ expect(result.status).toBe(400);expect(writes).not.toHaveBeenCalled();expect(query).not.toHaveBeenCalled();
 });

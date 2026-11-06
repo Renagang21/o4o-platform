@@ -62,3 +62,7 @@ CANONICAL-INDEX·ROLE-WORKSPACE V2·CURRENT-ADMIN-ROLE-POLICY의 현재 규칙�
 자격 전용 검토 상세의 `readDocuments`는 실제 `neture.members` 위임에서 별도로 파생한다. 회원 조회 권한 없이 자격 검토만 위임받은 경우 첨부 존재는 표시하지만 문서 버튼을 비활성화해 403으로 검토가 닫히는 경로를 제거한다. 서류 API의 회원 조회·문서 소유 경계는 확대하지 않았다. false/true grant의 서버 계약과 화면 회귀를 추가했다.
 
 리뷰 보완 로컬 검증: 중앙 회원·자격 UI 24건, 관련 서버 19건, PC/mobile Chromium 6건, API/admin type-check PASS.
+
+두 번째 리뷰 보완: PostgreSQL이 허용하는 하이픈 없는/중괄호 UUID를 요청에서 거부한다. URL·가입 ID·batch 각 항목은 정형 UUID로 검증한 뒤에만 보호 검사와 핸들러로 전달한다. 검증할 수 없는 ID를 건너뛰지 않으며, 혼합 batch와 기존 등록 반려 경로의 우회 요청을 회귀에 추가했다.
+
+UUID 보완 검증: 관련 API 5 suites / 116 tests 및 API type-check PASS.
