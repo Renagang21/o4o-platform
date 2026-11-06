@@ -12,7 +12,7 @@
 |---|---|
 | Core 계약(`ListWorkspace` · `useListSelection` · `ActionBar`) | PASS |
 | 사이니지 동영상 · 재생목록 · 디스플레이 재생 | PASS (모의 API 브라우저 검증) |
-| 기존 비준수 화면 20개 전환 | 타입검사 · 테스트 PASS. **배치 전환이며 `ListWorkspace` 직접 채택은 사이니지뿐** |
+| 기존 비준수 화면 20개 전환 | 타입검사 · 테스트 PASS. 모의 API 브라우저는 일부 화면만 PASS(아래 표). **배치 전환이며 `ListWorkspace` 직접 채택은 사이니지뿐** |
 | 재생목록 재생시간 집계 SQL | **실행 미검증** (아래 미해결 1) |
 | 운영 환경 smoke | **미수행** (미배포 코드 · 운영 데이터 변경 금지) |
 
@@ -60,6 +60,30 @@ Node 22.23.4 / pnpm 10.25.0 기준.
 - 1회성 403 주입은 다음 호출이 복구해 목록이 나온 것이어서 판정에 쓸 수 없었다. 거절을 유지하는 시나리오로 교체해 위 표의 결과를 얻었다. 최종 전체 실행의 잔여 FAIL 4건이 이 폐기된 1회성 시나리오이다.
 - 디스플레이 선택 화면에서 확정 용어와 어긋난 제품 문구(`플레이리스트` · `재생` · `항목 수`)를 발견해 수정했다.
 
+### 전환 화면 (web-neture · web-pharmacy-coop · admin-dashboard · web-store)
+
+로컬 dev 서버 + 모의 API, PC 1280 · mobile 390. 응답은 대부분 빈 목록이다. 아래 화면은 모두 렌더 크래시와 가로 넘침이 없었다. **표의 위치(y)는 첫 화면 800 / 844px 기준으로 읽는다.** 행 체크 · ActionBar 를 브라우저로 실행한 전환 화면은 조합원 관리뿐이고, 나머지 화면의 행 동작은 단위 테스트 근거다.
+
+| 화면 | 확인 내용 | 결과 |
+|---|---|---|
+| web-neture `/admin/brands` | 안내 접힘, 표 y422 | PASS |
+| web-neture `/store/orders` | 안내 접힘, 빈 목록 | PASS |
+| web-neture `/operator/product-approvals` | 안내 접힘, 표 y468. `휴지통 열기` 는 제목 아래 왼쪽(기존 보조 작업) | PASS |
+| web-neture `/operator/product-candidates` | 안내 접힘. 표 y731(PC) · y1352(mobile) | 배치 PASS, 첫 화면에 표 없음(미해결 7) |
+| web-neture `/admin/settlements` | `정산 계산` 상단 오른쪽, 눌러야 `계산 실행` 표시 | PASS. 알림 오류 표시는 모의 응답 형식 때문이며 표는 미확인 |
+| web-neture `/admin/settings/legal-terms` | 렌더 | PASS |
+| web-neture `/admin/community` | 공통 콘솔, 표 y284 | PASS |
+| web-neture `/operator/suppliers` (supplier 호스트) | 표 y471, 빈 목록 | PASS |
+| web-neture `/supplier/library` (supplier 호스트) | `자료 등록` 오른쪽(PC) · 제목 아래(mobile), 안내 접힘, 빈 목록 | 배치 PASS, 표 미확인 |
+| web-pharmacy-coop 조합원 관리 | 2행 표시, 행 체크 → ActionBar · 선택 해제 표시. 표 y828(PC) · y1132(mobile) | 배치 PASS, **기존 결함 발견**(미해결 8) |
+| admin-dashboard `/operator/kpa/force-assets` | `강제 배포 생성` 상단 오른쪽(right 1199), 클릭 동작, 표 y368 | PASS |
+| admin-dashboard `/kpa/my-store-contents` | 표 y304 | PASS |
+| admin-dashboard `/admin/o4o-product-db/masters` | `새 상품 등록` 오른쪽, 표 y484 | PASS |
+| admin-dashboard `/operators` | `서비스 담당자 지정` 상단 오른쪽. 표 y680(PC) · y990(mobile) | 배치 PASS, 표가 낮음(미해결 7) |
+| web-store `commerce/tablet-displays` 태블릿 콘텐츠 탭 | `태블릿 화면 만들기` 오른쪽(PC), 표 y773(PC) · y817(mobile) | PASS |
+| web-store `commerce/order-worktable` | 모의 응답 형식이 맞지 않아 오류 · 다시 시도만 표시 | **배치 미확인** |
+| 포럼 삭제 요청 콘솔 | 일반 경로로 화면을 열 수 없어 미실행(미해결 9) | **미확인** |
+
 ## Consumer Impact Matrix
 
 전체 소비처 분류는 [TODO §5](../work-orders/TODO-O4O-STANDARD-LIST-WORKSPACE-CONTRACT-V1.md#5-소비처-표) 가 정본이다. 집계: 전환 23 · 준수 20 · 읽기 전용 예외 51 · 목록 업무 아님 7 · 하위 표 2.
@@ -67,10 +91,10 @@ Node 22.23.4 / pnpm 10.25.0 기준.
 | 소비처 | 사용 여부 | 변경 영향 | route/role/capability 영향 | 검증 방식 | 결과 |
 |---|---:|---|---|---|---|
 | web-store | 사용 | 사이니지 재구성, 화면 전환 | 신규 `videos/new` · 폐기 경로 redirect, 권한 변경 없음 | typecheck + test + 모의 브라우저 | PASS |
-| web-neture | 사용 | 화면 3개 배치 | 없음 | typecheck + test | PASS, 브라우저 미실행 |
-| web-pharmacy-coop | 사용 | 관리 화면 배치 | 없음 | typecheck + test | PASS, 브라우저 미실행 |
-| admin-dashboard | 사용 | 화면 4개 배치 | 없음 | typecheck + 관련 test | PASS, 브라우저 미실행 |
-| operator-core-ui 소비 서비스 | 사용 | 공통 콘솔 배치 | 없음 | package test | PASS, 브라우저 미실행 |
+| web-neture | 사용 | 화면 3개 배치 | 없음 | typecheck + test + 모의 브라우저 | PASS |
+| web-pharmacy-coop | 사용 | 관리 화면 배치 | 없음 | typecheck + test + 모의 브라우저 | PASS, 기존 결함 1건(미해결 8) |
+| admin-dashboard | 사용 | 화면 4개 배치 | 없음 | typecheck + 관련 test + 모의 브라우저 | PASS |
+| operator-core-ui 소비 서비스 | 사용 | 공통 콘솔 배치 | 없음 | package test + web-neture 모의 브라우저 | PASS, 포럼 삭제 요청 콘솔은 브라우저 미확인(미해결 9) |
 | api-server | 사용 | 재생목록 응답 필드 추가, 접근 없음 403, #945 누락 포팅 | API 응답 additive · 접근 거절 명확화 | typecheck + boundary test | PASS, SQL 실행 미검증 |
 
 `check-literal-consumers`: `ListWorkspace` · `GuideBlock` 경로 리터럴 0, `ActionBar` 는 기록 문서만. 원문 소스를 읽는 계약 테스트는 위 테스트 실행에서 통과했다.
@@ -79,7 +103,10 @@ Node 22.23.4 / pnpm 10.25.0 기준.
 
 1. **재생목록 집계 SQL 실행 미검증.** 운영 DB 접속과 로컬 임시 PostgreSQL 실행을 모두 수행하지 않았다(후자는 도구 권한에서 거절). 컬럼 · 타입은 마이그레이션과 대조했다. 병합 전 read-only 또는 CI 에서 실행 확인이 필요하다.
 2. **실서버 · 실기기 미검증.** YouTube/Vimeo embed 재생, 실제 TV 브라우저의 자동재생 · 전체화면 제약은 확인하지 못했다.
-3. **다른 소비처의 행 동작 미확인.** `commerce/local-products` 는 모의 응답 형식이 맞지 않아 오류 상태에서 머리 · 재시도 표시만 확인했다. web-neture · coop · admin 은 브라우저 실행이 없다.
+3. **다른 소비처의 행 동작 미확인.** `commerce/local-products` 와 `commerce/order-worktable` 은 모의 응답 형식이 맞지 않아 오류 상태만 확인했다. web-neture · admin 전환 화면은 빈 목록 모의라 행 체크 · ActionBar 를 브라우저로 실행하지 않았고 단위 테스트 근거다.
 4. **내 자료함은 첫 화면에 목록이 보이지 않는다.** 상단 오른쪽 버튼은 맞췄지만 탭 · 안내 · 필터가 여러 단이다. 탐색 구조 개편이라 후속 WO 후보로 남긴다.
 5. **셸 AI 입력.** `StoreAiAssistant` 한 줄 입력은 `StoreWorkspaceShell` 기본 위치라 유지했고 정본에 예외로 기록했다. mobile 390 에서는 셸 영역 때문에 첫 행이 화면 아래쪽(y≈797)에 온다.
 6. **`ListWorkspace` 직접 채택.** 사이니지 외 화면은 배치만 계약에 맞췄다. 컴포넌트 채택은 후속 WO 후보다.
+7. **첫 화면에 표가 보이지 않는 전환 화면.** 상품 후보 검토(통계 · 설명 · 필터 · 선택 안내), 서비스 관리자, 조합원 관리는 표가 첫 화면 아래에 있다. 순서는 계약에 맞지만 "기존 목록 먼저" 의 체감은 약하다. 위 내 자료함과 묶어 후속 WO 후보로 남긴다.
+8. **조합원 관리 `undefined 요청` 버튼(기존 결함).** `services/web-pharmacy-coop/src/Management.tsx` 의 라벨 계산이 `request_changes` 에서 `request_` 를 잘라 없는 키를 찾는다. 심사 대기 조합원을 선택하면 ActionBar 에 `undefined 요청` 이 표시된다. 같은 줄이 `origin/main` 에도 있어 이번 범위에서 고치지 않았다. 별도 WO 대상이다.
+9. **포럼 삭제 요청 콘솔은 일반 경로로 열리지 않는 것으로 보인다.** 코드 기준으로 neture 호스트에서는 `HostBoundary` 가 community 호스트로 보내고, community 호스트에서는 게시판 화면으로 redirect 한다. 운영 동작은 확인하지 못했다. 처분은 별도 WO 판단 대상이다.
