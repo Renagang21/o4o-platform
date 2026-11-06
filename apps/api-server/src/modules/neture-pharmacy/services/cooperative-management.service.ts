@@ -1,3 +1,4 @@
+import { assertOperatorMemberTarget, protectedMemberSql } from '../../../services/operations/protected-member-target.js';
 import { assertCentralOperationMenu } from '../../../services/admin/central-operation-menu-grants.js';
 import { OperationError } from '../../../services/operations/operation-audit.js';
 import { recordOperatorRevocation } from '../../../services/admin/operator-invitation-retention.js';
@@ -19,7 +20,7 @@ const invalid = () =>
   new NeturePharmacyError(
     400,
     "COOPERATIVE_INVALID_INPUT",
-    "입력값과 처리 사유를 확인해 주세요.",
+    "입력값과 처리 사유를 확인해 주시기 바랍니다.",
   );
 export const MEMBER_TRANSITIONS: Readonly<
   Record<string, readonly [readonly string[], string]>
@@ -280,7 +281,7 @@ export class CooperativeManagementService {
       await this.validateInvitationGrant(m,actor,coop,role);
       const [user]=await m.query(`SELECT id FROM users WHERE lower(email)=lower($1) AND status IN ('active','approved')
         AND "isActive"=true AND "isEmailVerified"=true FOR SHARE`,[email.trim()]);
-      if (!user) throw new NeturePharmacyError(400,'COOPERATIVE_TARGET_UNAVAILABLE','활성 계정을 확인해 주세요.');
+      if (!user) throw new NeturePharmacyError(400,'COOPERATIVE_TARGET_UNAVAILABLE','활성 계정을 확인해 주시기 바랍니다.');
       return user.id as string;
     });
     const { ServiceOperatorInvitationService }=await import('../../../services/admin/service-operator-invitation.service.js');
@@ -501,7 +502,7 @@ export class CooperativeManagementService {
   async members(actor: string, coop: string) {
     await this.requireLocal(this.db, actor, coop);
     return this.db.query(
-      `SELECT m.id,m.user_id AS "userId",m.status,u.name,u.email,m.created_at AS "createdAt"
+      `SELECT m.id,m.user_id AS "userId",m.status,u.name,u.email,${protectedMemberSql("u.id")} AS "operatorReadOnly",m.created_at AS "createdAt"
       FROM cooperative_memberships m JOIN users u ON u.id=m.user_id WHERE m.cooperative_id=$1 ORDER BY m.created_at DESC,m.id`,
       [coop],
     );
@@ -527,6 +528,7 @@ export class CooperativeManagementService {
           "COOPERATIVE_MEMBER_NOT_FOUND",
           "조합원을 찾을 수 없습니다.",
         );
+      await assertOperatorMemberTarget(m, member.user_id);
       const request = action.startsWith("request_");
       const requestedAction = request ? action.slice(8) : action;
       const transition = MEMBER_TRANSITIONS[requestedAction];

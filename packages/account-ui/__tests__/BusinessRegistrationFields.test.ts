@@ -22,7 +22,7 @@ describe('invoice business entity selection', () => {
         value: { businessEntityType }, onChange,
       }));
       expect(html).toContain('value="" selected=""');
-      expect(html).toContain('다시 선택해 주세요.');
+      expect(html).toContain('다시 선택해 주시기 바랍니다.');
       expect(onChange).not.toHaveBeenCalled();
       expect(isSelectableBusinessEntityType(businessEntityType)).toBe(false);
       expect(getBusinessEntityTypeLabel(businessEntityType)).not.toBe(businessEntityType);

@@ -142,7 +142,7 @@ function getExampleContent(blockName: string): any {
     },
     'o4o/accordion-item': {
       title: '자주 묻는 질문 1',
-      content: '답변 내용을 입력하세요',
+      content: '답변 내용을 입력하시기 바랍니다',
       defaultOpen: false
     },
     'o4o/feature-card': {

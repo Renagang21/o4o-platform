@@ -56,7 +56,7 @@ describe('SignagePlayerSelectView — playPathPrefix 기본값 = 기존 동작',
   });
 
   it('재생 경로 문자열이 더 이상 하드코딩되지 않는다', () => {
-    expect(src).toContain('window.open(`${playPathPrefix}/${playlistId}`');
+    expect(src).toContain('window.open(`${playPathPrefix}/${encodeURIComponent(playlistId)}`');
     expect(src).not.toContain('window.open(`/store/marketing/signage/play/');
   });
 });
@@ -82,12 +82,11 @@ describe('기존 3서비스 메뉴 회귀 0', () => {
   ];
 
   for (const [name, config] of cases) {
-    it(`${name} 는 4단계 사이니지 메뉴를 그대로 유지한다`, () => {
+    it(`${name} 는 3단계 사이니지 메뉴를 제공한다`, () => {
       expect(keys(config)).toEqual(
         expect.arrayContaining([
           'signage-playlist',
           'signage-videos',
-          'signage-schedules',
           'signage-player',
         ]),
       );

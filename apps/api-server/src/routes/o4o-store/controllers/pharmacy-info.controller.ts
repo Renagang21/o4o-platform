@@ -10,6 +10,7 @@
  * 조직: organization_members 기반 자동 결정
  */
 
+import { demoPharmacyExample, DEMO_PHARMACY_EXAMPLE } from '../../../services/auth/demo-pharmacy-example.js';
 import { Router, Request, Response, RequestHandler } from 'express';
 import { isSelectableBusinessEntityType } from '@o4o/types';
 import { DataSource } from 'typeorm';
@@ -26,6 +27,7 @@ import { buildBusinessInfoUpdateStatement } from '../../../utils/business-info-w
 type AuthMiddleware = RequestHandler;
 
 interface PharmacyInfoResponse {
+  demoExample?: typeof DEMO_PHARMACY_EXAMPLE;
   organizationId: string;
   name: string;
   phone: string | null;
@@ -200,6 +202,7 @@ export function createPharmacyInfoController(
       }
     }
 
+    data.demoExample = await demoPharmacyExample(dataSource, userId, organizationId);
     res.json({ success: true, data });
   }));
 

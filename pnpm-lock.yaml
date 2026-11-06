@@ -2388,9 +2388,15 @@ importers:
       '@o4o/auth-utils':
         specifier: workspace:*
         version: link:../../packages/auth-utils
+      '@o4o/operator-ux-core':
+        specifier: workspace:*
+        version: link:../../packages/operator-ux-core
       '@o4o/shared-space-ui':
         specifier: workspace:*
         version: link:../../packages/shared-space-ui
+      '@o4o/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
       lucide-react:
         specifier: ^0.523.0
         version: 0.523.0(react@19.2.0)
@@ -2746,6 +2752,9 @@ importers:
       '@o4o/operator-core-ui':
         specifier: workspace:*
         version: link:../../packages/operator-core-ui
+      '@o4o/operator-ux-core':
+        specifier: workspace:*
+        version: link:../../packages/operator-ux-core
       '@o4o/shared-space-ui':
         specifier: workspace:*
         version: link:../../packages/shared-space-ui

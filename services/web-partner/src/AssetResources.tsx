@@ -67,7 +67,7 @@ export default function AssetResources({
     if (!file || !spaceId) return;
     void run(async () => {
       if (file.size > 25 * 1024 * 1024)
-        throw new Error("파일은 25MB 이내로 선택해 주세요.");
+        throw new Error("파일은 25MB 이내로 선택해 주시기 바랍니다.");
       await partnerApi.upload(spaceId, asset.id, file, previous);
       await refresh();
     });
@@ -172,7 +172,7 @@ export default function AssetResources({
                         className="text-button"
                         disabled={busy}
                         onClick={() => {
-                          if (confirm("이 첨부 파일의 모든 버전을 삭제할까요?"))
+                          if (confirm("이 첨부 파일의 모든 버전을 삭제하시겠습니까?"))
                             void run(async () => {
                               const result = await partnerApi.removeFile(
                                 spaceId,
@@ -257,7 +257,7 @@ export default function AssetResources({
                       onClick={() => {
                         if (
                           confirm(
-                            "이 버전의 내용과 자료 정보를 새 변경으로 복원할까요?",
+                            "이 버전의 내용과 자료 정보를 새 변경으로 복원하시겠습니까?",
                           )
                         )
                           void run(async () => {

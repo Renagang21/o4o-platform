@@ -82,7 +82,10 @@ describe("scoped administration work", () => {
       />,
     );
     await screen.findByText("회원");
+    fireEvent.click(screen.getAllByRole("checkbox").at(-1)!);
     expect(screen.queryByRole("button", { name: "가입 승인" })).toBeNull();
+    expect(screen.getByRole("button", { name: "보완 요청" })).toBeTruthy();
+    expect(screen.queryByRole("button", { name: /undefined/ })).toBeNull();
     expect(screen.queryByText("조합 operator 지정·해제")).toBeNull();
     fireEvent.change(screen.getByLabelText("검토·처리 사유"), {
       target: { value: "자격 검토 완료" },
@@ -109,6 +112,7 @@ describe("scoped administration work", () => {
       />,
     );
     await screen.findByText("회원");
+    fireEvent.click(screen.getAllByRole("checkbox").at(-1)!);
     fireEvent.change(screen.getByLabelText("검토·처리 사유"), {
       target: { value: "승인 심사" },
     });
@@ -162,4 +166,14 @@ it("federation admin manages federation Operators independently of local coopera
   await screen.findByText("지정된 Operator가 없습니다.");
   expect(api.get).toHaveBeenCalledWith("/service-operator-management/pharmcoop");
   expect(screen.getByRole("heading", {name:"연합회 Operator 지정 · 해제"})).toBeTruthy();
+});
+
+it('keeps platform Admin membership visible and read-only for both cooperative roles', async()=>{
+ const api=client();const original=api.get.getMockImplementation()!;
+ api.get.mockImplementation(async(path:string)=>path.endsWith('/members')?{data:{data:[{...member,operatorReadOnly:true}]}}:original(path));
+ render(<MemberManagementPanel client={api} cooperative={coop} admin userId="local-admin" />);
+ await screen.findByText('전체 관리자 — 처리 대상 아님');
+ fireEvent.click(screen.getAllByRole('checkbox').at(-1)!);
+ expect(screen.queryByRole('button',{name:'가입 승인',exact:true})).toBeNull();
+ expect(screen.queryByRole('button',{name:'보완 요청',exact:true})).toBeNull();expect(api.post).not.toHaveBeenCalled();
 });

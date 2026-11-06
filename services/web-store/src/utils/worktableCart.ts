@@ -65,7 +65,7 @@ export const ORDERABILITY_LABEL: Record<WorktableOrderability, string> = {
 
 export const ORDERABILITY_HINT: Record<WorktableOrderability, string> = {
   ORDERABLE: '장바구니에 담을 수 있습니다.',
-  NOT_ORDERABLE: '공급 승인 또는 공급 상태를 확인해 주세요.',
+  NOT_ORDERABLE: '공급 승인 또는 공급 상태를 확인해 주시기 바랍니다.',
   EVENT_OFFER_AXIS: '이벤트 상품은 이벤트 화면에서 주문합니다.',
   RECRUITMENT_AXIS: '판매자 모집 상품은 주문 대상이 아닙니다.',
 };

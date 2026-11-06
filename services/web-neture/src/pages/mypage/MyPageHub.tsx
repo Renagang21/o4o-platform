@@ -80,7 +80,7 @@ function MyHomeContent({ view }: { view: View }) {
     <>
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <p className="text-slate-600">
-          {user.name}님의 개인 공간입니다. 필요한 업무로 이동하고 내 소식을 확인하세요.
+          {user.name}님의 개인 공간입니다. 필요한 업무로 이동하고 내 소식을 확인하시기 바랍니다.
         </p>
         {source && (
           <ServiceReturnLink sourceKey={sourceKey} returnPath={returnPath} api={api} accountId={user.id} />
@@ -163,7 +163,7 @@ export default function MyPageHub({ view = "overview" }: { view?: View }) {
         <MyPageLoadingState message="My Home을 불러오는 중…" />
       ) : !isAuthenticated || !user ? (
         <MyPageAuthRequired
-          description="My Home을 이용하려면 로그인해 주세요."
+          description="My Home을 이용하려면 로그인해 주시기 바랍니다."
           onAction={() => openLoginModal(location.pathname + location.search)}
         />
       ) : CURRENT_HOST_PROFILE !== "main" ? (

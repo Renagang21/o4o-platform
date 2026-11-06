@@ -140,7 +140,7 @@ export class MarketTrialOperatorController {
   }
   static async participantHistory(req: AuthRequest, res: Response) {
     try {
-      if (![req.params.id, req.params.participantId].every(id => /^[0-9a-f]{8}-[0-9a-f-]{27}$/i.test(id))) throw new FundingError(400, 'INVALID_PARTICIPANT_ID', '대상 정보를 확인해 주세요.');
+      if (![req.params.id, req.params.participantId].every(id => /^[0-9a-f]{8}-[0-9a-f-]{27}$/i.test(id))) throw new FundingError(400, 'INVALID_PARTICIPANT_ID', '대상 정보를 확인해 주시기 바랍니다.');
       const ds = MarketTrialOperatorController.dataSource;
       if (!ds) throw new Error('DataSource unavailable');
       const data = await new FundingOperatorExceptionsService(ds).history(req.params.id, req.params.participantId, req.query.page ?? 1);
@@ -646,7 +646,7 @@ export class MarketTrialOperatorController {
       if (error instanceof FundingError) return res.status(error.status).json({ success: false, code: error.code, message: error.message });
       // Database errors can include raw reference/note values; keep them out of application logs.
       logger.error('[Funding] payment record transaction failed');
-      return res.status(500).json({ success: false, message: '입금 기록 저장에 실패했습니다. 다시 확인해 주세요.' });
+      return res.status(500).json({ success: false, message: '입금 기록 저장에 실패했습니다. 다시 확인해 주시기 바랍니다.' });
     }
   }
 
@@ -868,7 +868,7 @@ export class MarketTrialOperatorController {
       if (error instanceof FundingError) return res.status(error.status).json({ success: false, code: error.code, message: error.message });
       const trial = await MarketTrialOperatorController.trialRepo.findOne({ where: { id: req.params.id } });
       if (trial) await MarketTrialOperatorController.recordForumSyncFailure(trial, 'forum_post_create', 'critical', error);
-      return res.status(502).json({ success: false, message: '포럼 개설에 실패했습니다. 다시 시도해 주세요.' });
+      return res.status(502).json({ success: false, message: '포럼 개설에 실패했습니다. 다시 시도해 주시기 바랍니다.' });
     }
   }
 
@@ -880,7 +880,7 @@ export class MarketTrialOperatorController {
   static async listForumSyncFailures(req: AuthRequest, res: Response) {
     try {
       const filters = forumFailureFilters(req.query);
-      if (!filters) return res.status(400).json({ success: false, message: '조회 조건을 확인해 주세요.' });
+      if (!filters) return res.status(400).json({ success: false, message: '조회 조건을 확인해 주시기 바랍니다.' });
       const { trialId, resolved, limit, page, offset } = filters;
 
       const qb = MarketTrialOperatorController.forumSyncFailureRepo
@@ -922,7 +922,7 @@ export class MarketTrialOperatorController {
       const { failureId } = req.params;
       const { note } = req.body ?? {};
       if (!isForumFailureId(failureId) || (note != null && typeof note !== 'string')) {
-        return res.status(400).json({ success: false, message: '해결 처리 입력을 확인해 주세요.' });
+        return res.status(400).json({ success: false, message: '해결 처리 입력을 확인해 주시기 바랍니다.' });
       }
 
       const record = await MarketTrialOperatorController.forumSyncFailureRepo.findOne({

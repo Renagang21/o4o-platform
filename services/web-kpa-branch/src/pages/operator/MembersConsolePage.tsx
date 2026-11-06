@@ -190,7 +190,7 @@ export default function MembersConsolePage({ slug, basePath }: { slug: string; b
 
   const onLeave = useCallback(async () => {
     if (!selected) return;
-    const raw = window.prompt('전출일을 입력하세요 (YYYY-MM-DD, 비우면 오늘).', '');
+    const raw = window.prompt('전출일을 입력하시기 바랍니다 (YYYY-MM-DD, 비우면 오늘).', '');
     if (raw === null) return;
     setAffError(null);
     setBusy(true);

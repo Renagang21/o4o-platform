@@ -16,8 +16,8 @@ export default function LoginPage() {
   // 원래 경로 보존(§21-14) — 같은 앱 경로만
   const next = readReturnTo(useLocation().search) ?? WORKSPACE_PATHS.home;
   if (isAuthenticated) return <Navigate to={next} replace />;
-  return <LoginLayout logoSrc={`${import.meta.env.BASE_URL}brand/store/logo-mark.svg`} tone="blue" brand={BRAND.name} headline={<>매장의 하루를,<br />한곳에서.</>} description="매장에 필요한 업무와 서비스를 O4O 계정으로 이어가세요.">
-    <LoginCard logoSrc={`${import.meta.env.BASE_URL}brand/store/logo-mark.svg`} tone="blue" brand={BRAND.name} title={`${BRAND.name} 로그인`} heading="h1" description="O4O 계정으로 내 매장 업무공간에 연결하세요.">
+  return <LoginLayout logoSrc={`${import.meta.env.BASE_URL}brand/store/logo-mark.svg`} tone="blue" brand={BRAND.name} headline={<>매장의 하루를,<br />한곳에서.</>} description="매장에 필요한 업무와 서비스를 O4O 계정으로 이어가시기 바랍니다.">
+    <LoginCard logoSrc={`${import.meta.env.BASE_URL}brand/store/logo-mark.svg`} tone="blue" brand={BRAND.name} title={`${BRAND.name} 로그인`} heading="h1" description="O4O 계정으로 내 매장 업무공간에 연결하시기 바랍니다.">
     <LoginMethods
       loginWithEmail={loginWithEmail}
       api={authClient}

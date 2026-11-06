@@ -203,7 +203,7 @@ export default function StoreContentListPage() {
           <FileText className="w-12 h-12 mx-auto mb-3 opacity-50" />
           <p className="text-lg font-medium">매장 콘텐츠가 없습니다</p>
           <p className="text-sm mt-1">
-            {search ? '검색 결과가 없습니다' : '템플릿 라이브러리에서 콘텐츠를 복사해보세요'}
+            {search ? '검색 결과가 없습니다' : '템플릿 라이브러리에서 콘텐츠를 복사해보시기 바랍니다'}
           </p>
           <Link
             to="/store-content/templates"

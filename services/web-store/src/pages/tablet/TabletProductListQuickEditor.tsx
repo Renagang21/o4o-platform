@@ -81,7 +81,7 @@ export function TabletProductListQuickEditor({
       })
       .catch(() => {
         if (current() && owner.current === load && isCurrent())
-          setError("상품 목록을 불러오지 못했습니다. 다시 시도해 주세요.");
+          setError("상품 목록을 불러오지 못했습니다. 다시 시도해 주시기 바랍니다.");
       })
       .finally(() => {
         if (current() && owner.current === load && isCurrent())
@@ -144,7 +144,7 @@ export function TabletProductListQuickEditor({
     } catch {
       if (current() && owner.current === load && isCurrent())
         setError(
-          "상품 저장에 실패했습니다. 선택과 순서를 유지했습니다. 다시 시도해 주세요.",
+          "상품 저장에 실패했습니다. 선택과 순서를 유지했습니다. 다시 시도해 주시기 바랍니다.",
         );
     } finally {
       if (current() && owner.current === load && isCurrent()) {

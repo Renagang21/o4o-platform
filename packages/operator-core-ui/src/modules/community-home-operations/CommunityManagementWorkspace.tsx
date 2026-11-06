@@ -35,7 +35,7 @@ const countLabels: Record<string, string> = {
 const base = "/communities/community/management";
 const errorText = (e: unknown) =>
   (e as { response?: { data?: { error?: string } } }).response?.data?.error ??
-  "처리하지 못했습니다. 다시 시도해 주세요.";
+  "처리하지 못했습니다. 다시 시도해 주시기 바랍니다.";
 const statuses: Record<string, string> = {
   completed: "운영 중",
   archived: "운영 중지",

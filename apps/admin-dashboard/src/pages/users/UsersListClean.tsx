@@ -328,7 +328,7 @@ export default function UsersListClean() {
             <p className="mt-1 break-all">{loadError}</p>
             <p className="mt-1 text-xs text-red-700">
               아래 통계와 표는 마지막으로 조회에 성공한 내용이거나 비어 있을 수 있습니다. 실제 권한 현황과 다를 수
-              있으니 다시 시도한 뒤 확인하세요.
+              있으니 다시 시도한 뒤 확인하시기 바랍니다.
             </p>
           </div>
           <button
@@ -397,7 +397,7 @@ export default function UsersListClean() {
           onSelectionChange={setSelectedKeys}
           emptyMessage={
             loadError
-              ? '목록을 불러오지 못해 표시할 수 없습니다. 위의 [다시 시도]를 눌러 주세요.'
+              ? '목록을 불러오지 못해 표시할 수 없습니다. 위의 [다시 시도]를 눌러 주시기 바랍니다.'
               : '조건에 맞는 권한 할당이 없습니다.'
           }
         />

@@ -1,4 +1,3 @@
-import { runDemoOwnerQualification } from '../demo-owner-qualification.service';
 import { Client } from 'pg';
 import { PUBLIC_DEMO_ACCOUNTS } from '@o4o/auth-utils';
 import { runDemoAccountReconcile, assertFoundationDemoProvisionIdentity } from '../demo-account-reconcile.service';
@@ -51,48 +50,6 @@ integration('Demo transition on isolated PostgreSQL 15',()=>{
       VALUES($1,$2,'active','Fixture Pharmacy','DEMO-BUSINESS','DEMO-LICENSE')`,[store,owner]);
     await query("INSERT INTO neture_suppliers(user_id,organization_id,slug,status) VALUES($1,$2,'fixture-demo-supplier','ACTIVE')",[supplier,org]);
   },30000);
-
-  async function prepareQualificationRepair() {
-    const transition = await runDemoAccountReconcile(client);
-    await runDemoAccountReconcile(client, { apply: true, expectedDigest: transition.digest });
-    const [reviewer] = await query(`INSERT INTO users(email,name,status,"isActive","isEmailVerified") VALUES('synthetic-admin@example.invalid','Synthetic fixture reviewer','active',true,true) RETURNING id`);
-    await query("INSERT INTO role_assignments(user_id,role,is_active) VALUES($1,'platform:super_admin',true)", [reviewer.id]);
-    return reviewer.id as string;
-  }
-  it('plans and prepares only the registered Demo qualification while preserving identity and credential data', async () => {
-    const reviewerId = await prepareQualificationRepair();
-    const before = await query('SELECT user_id,password_hash FROM user_password_credentials ORDER BY user_id');
-    const relationships = await query('SELECT * FROM organization_members ORDER BY id');
-    const plan = await runDemoOwnerQualification(client);
-    expect(plan.qualification).toBe('prepare-synthetic');
-    expect(await query('SELECT * FROM kpa_pharmacist_profiles WHERE user_id=$1', [owner])).toHaveLength(0);
-    await runDemoOwnerQualification(client, { apply: true, expectedDigest: plan.digest, reviewerId });
-    const [profile] = await query('SELECT * FROM kpa_pharmacist_profiles WHERE user_id=$1', [owner]);
-    expect(profile).toMatchObject({ license_number: 'DEMO-LICENSE', license_verified: true, qualification_status: 'approved', verified_by: reviewerId });
-    expect(profile.qualification_reason).toContain('Synthetic Demo');
-    expect(await query('SELECT user_id,password_hash FROM user_password_credentials ORDER BY user_id')).toEqual(before);
-    expect(await query('SELECT * FROM organization_members ORDER BY id')).toEqual(relationships);
-    expect((await query('SELECT business_number FROM organizations WHERE id=$1', [store]))[0].business_number).toBe('DEMO-BUSINESS');
-    const second = await runDemoOwnerQualification(client);
-    expect(second.qualification).toBe('preserve');
-    await runDemoOwnerQualification(client, { apply: true, expectedDigest: second.digest, reviewerId });
-    expect((await query("SELECT count(*)::int AS n FROM action_logs WHERE action_key='member.demo_qualification_prepared' AND user_id=$1", [reviewerId]))[0].n).toBe(1);
-  });
-  it('refuses a stale plan and a non-admin actor before preparing any Demo qualification', async () => {
-    const reviewerId = await prepareQualificationRepair(), plan = await runDemoOwnerQualification(client);
-    await expect(runDemoOwnerQualification(client, { apply: true, expectedDigest: plan.digest, reviewerId: owner })).rejects.toThrow('ADMIN_REVIEWER_REQUIRED');
-    await query("UPDATE organizations SET phone='SYNTHETIC-CHANGED' WHERE id=$1", [store]);
-    await expect(runDemoOwnerQualification(client, { apply: true, expectedDigest: plan.digest, reviewerId })).rejects.toThrow('PLAN_CHANGED');
-    expect(await query('SELECT * FROM kpa_pharmacist_profiles WHERE user_id=$1', [owner])).toHaveLength(0);
-  });
-  it('never prepares a non-registry owner or restores a revoked qualification', async () => {
-    const reviewerId = await prepareQualificationRepair(), plan = await runDemoOwnerQualification(client);
-    await runDemoOwnerQualification(client, { apply: true, expectedDigest: plan.digest, reviewerId });
-    await query("UPDATE kpa_pharmacist_profiles SET qualification_status='revoked' WHERE user_id=$1", [owner]);
-    await expect(runDemoOwnerQualification(client)).rejects.toThrow('EXISTING_QUALIFICATION_REQUIRES_REVIEW');
-    await query("UPDATE users SET email='ordinary-member@example.invalid' WHERE id=$1", [owner]);
-    await expect(runDemoOwnerQualification(client)).rejects.toThrow('AMBIGUOUS_OWNER_DEMO');
-  });
 
   it('plan is read-only; apply preserves UUID/data links, sets all credentials and real staff scope, then becomes no-op',async()=>{
     const before=await query('SELECT id,email,"refreshTokenFamily" FROM users ORDER BY id');

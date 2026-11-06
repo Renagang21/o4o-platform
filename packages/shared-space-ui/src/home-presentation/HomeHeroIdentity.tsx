@@ -9,9 +9,9 @@ export function initialIdentityPresentation(surface: HomeSurface, businessKey?: 
   const config = initialHomePresentation(surface);
   if (heroIdentity(surface, businessKey) !== 'drugstore') {
     const copy: Partial<Record<HomeSurface, { title?: string; description?: string; secondTitle?: string }>> = {
-      supplier: { secondTitle: '제품의 특징을 매장에 전하세요' },
-      funding: { title: '새로운 제품, 참여 조건부터 살펴보세요', description: '제품 소개와 사업별 참여 조건을 확인하고, 나에게 맞는 유통 기회를 검토하세요.' },
-      community: { title: '현장의 질문에, 서로의 경험으로', description: '궁금한 점을 묻고, 현장에서 얻은 경험과 도움이 되는 자료를 나누세요.' },
+      supplier: { secondTitle: '제품의 특징을 매장에 전하시기 바랍니다' },
+      funding: { title: '새로운 제품, 참여 조건부터 살펴보시기 바랍니다', description: '제품 소개와 사업별 참여 조건을 확인하고, 나에게 맞는 유통 기회를 검토하시기 바랍니다.' },
+      community: { title: '현장의 질문에, 서로의 경험으로', description: '궁금한 점을 묻고, 현장에서 얻은 경험과 도움이 되는 자료를 나누시기 바랍니다.' },
       carepharm: { title: '관리 자료를 나누고, 약국의 협업을 잇습니다' },
       lecture: { title: '배운 지식을, 현장에서 쓰는 힘으로' },
     };
@@ -27,24 +27,24 @@ export function initialIdentityPresentation(surface: HomeSurface, businessKey?: 
     slides: config.slides.map((item, index) => ({
       ...item, eyebrow: '드럭스토어형 약국',
       title: index === 0 ? '사업 소식과 제품 자료, 가입 약국과 함께' : '필요한 사업 자료를 내 약국에서',
-      description: index === 0 ? '드럭스토어형 약국 사업자의 운영 소식과 제품 자료를 확인하고 가입 약국의 활동을 이어가세요.' : '공유된 자료와 참여 조건을 확인하고, 이용 가능한 업무는 내 약국에서 이어갑니다.',
+      description: index === 0 ? '드럭스토어형 약국 사업자의 운영 소식과 제품 자료를 확인하고 가입 약국의 활동을 이어가시기 바랍니다.' : '공유된 자료와 참여 조건을 확인하고, 이용 가능한 업무는 내 약국에서 이어갑니다.',
     })),
     promotions: config.promotions.map(item => ({...item, eyebrow:'드럭스토어형 약국', title:'드럭스토어형 약국 사업 안내', description:'사업 소식과 제품·운영 자료를 공유하는 가입 약국의 공동공간'})),
   };
 }
 
 export const HERO_DESIGN: Record<HeroIdentity, { name: string; guidance: string; image: string }> = {
-  neture: { name: '서비스 연결', guidance: '여러 서비스 중 무엇을 찾고 어떤 업무를 이어갈 수 있는지 한 문장으로 알려 주세요.', image: '서비스 연결을 보여주는 이미지나 대표 서비스 화면' },
-  supplier: { name: '제품과 공급', guidance: '제품의 특징, 제공할 콘텐츠, 매장과의 협업 내용을 구체적으로 소개해 주세요.', image: '제품 패키지·활용 장면·공급 콘텐츠 이미지' },
-  funding: { name: '제품과 참여 조건', guidance: '소개할 제품과 확인할 참여 조건을 명확히 적어 주세요. 실제 모집 상태는 사업 상세에서 확인하도록 연결하세요.', image: '제품과 사용 맥락이 보이는 프로젝트 이미지' },
-  lecture: { name: '강의와 학습', guidance: '배울 주제와 대상, 학습 후 활용할 업무를 소개하고 실제 강의로 연결해 주세요.', image: '강의 표지·수업 자료·학습 주제 이미지' },
-  community: { name: '질문과 경험', guidance: '함께 나눌 질문·경험·자료를 소개해 주세요. 공개할 수 있는 콘텐츠만 사용하세요.', image: '대화·현장 활동·관심 주제를 보여주는 이미지' },
-  carepharm: { name: '관리 자료와 약국 협업', guidance: '사업 소식과 약국이 활용할 관리 자료를 소개해 주세요. 환자 정보나 확인되지 않은 건강 성과는 넣지 마세요.', image: '관리 자료·교육·약국 협업 이미지' },
-  pharmacy: { name: '본부와 가입 약국', guidance: '가입 약국에 필요한 본부 소식과 사업 자료를 소개해 주세요. 게시한 내용만 공동공간에 표시됩니다.', image: '본부의 실제 사업 소식·공유 자료 이미지' },
-  drugstore: { name: '드럭스토어형 약국 협력사업', guidance: '이 사업의 운영 소식과 제품 자료를 소개해 주세요. 실제 운영 정보는 해당 사업의 담당 범위에서 확인하세요.', image: '사업 운영 현장·제품·활용 자료 이미지' },
-  pharmcoop: { name: '협동조합의 연결', guidance: '연합회의 소식과 협동조합 공동 활동을 소개해 주세요. 개별 조합 소식은 각 조합에서 관리합니다.', image: '연합회 공동 활동·협동조합 협력 이미지' },
-  cooperative: { name: '우리 조합의 소식', guidance: '우리 조합의 소식과 참여 안내를 소개해 주세요. 공개 가능한 내용만 게시합니다.', image: '우리 조합의 활동·참여 안내 이미지' },
-  branch: { name: '지역 회원의 소식', guidance: '우리 분회의 공지·행사·자료를 소개하고 실제 일정이나 게시글로 연결해 주세요.', image: '지역 회원 활동·행사 안내 이미지' },
+  neture: { name: '서비스 연결', guidance: '여러 서비스 중 무엇을 찾고 어떤 업무를 이어갈 수 있는지 한 문장으로 알려 주시기 바랍니다.', image: '서비스 연결을 보여주는 이미지나 대표 서비스 화면' },
+  supplier: { name: '제품과 공급', guidance: '제품의 특징, 제공할 콘텐츠, 매장과의 협업 내용을 구체적으로 소개해 주시기 바랍니다.', image: '제품 패키지·활용 장면·공급 콘텐츠 이미지' },
+  funding: { name: '제품과 참여 조건', guidance: '소개할 제품과 확인할 참여 조건을 명확히 적어 주시기 바랍니다. 실제 모집 상태는 사업 상세에서 확인하도록 연결하시기 바랍니다.', image: '제품과 사용 맥락이 보이는 프로젝트 이미지' },
+  lecture: { name: '강의와 학습', guidance: '배울 주제와 대상, 학습 후 활용할 업무를 소개하고 실제 강의로 연결해 주시기 바랍니다.', image: '강의 표지·수업 자료·학습 주제 이미지' },
+  community: { name: '질문과 경험', guidance: '함께 나눌 질문·경험·자료를 소개해 주시기 바랍니다. 공개할 수 있는 콘텐츠만 사용하시기 바랍니다.', image: '대화·현장 활동·관심 주제를 보여주는 이미지' },
+  carepharm: { name: '관리 자료와 약국 협업', guidance: '사업 소식과 약국이 활용할 관리 자료를 소개해 주시기 바랍니다. 환자 정보나 확인되지 않은 건강 성과는 넣지 마시기 바랍니다.', image: '관리 자료·교육·약국 협업 이미지' },
+  pharmacy: { name: '본부와 가입 약국', guidance: '가입 약국에 필요한 본부 소식과 사업 자료를 소개해 주시기 바랍니다. 게시한 내용만 공동공간에 표시됩니다.', image: '본부의 실제 사업 소식·공유 자료 이미지' },
+  drugstore: { name: '드럭스토어형 약국 협력사업', guidance: '이 사업의 운영 소식과 제품 자료를 소개해 주시기 바랍니다. 실제 운영 정보는 해당 사업의 담당 범위에서 확인하시기 바랍니다.', image: '사업 운영 현장·제품·활용 자료 이미지' },
+  pharmcoop: { name: '협동조합의 연결', guidance: '연합회의 소식과 협동조합 공동 활동을 소개해 주시기 바랍니다. 개별 조합 소식은 각 조합에서 관리합니다.', image: '연합회 공동 활동·협동조합 협력 이미지' },
+  cooperative: { name: '우리 조합의 소식', guidance: '우리 조합의 소식과 참여 안내를 소개해 주시기 바랍니다. 공개 가능한 내용만 게시합니다.', image: '우리 조합의 활동·참여 안내 이미지' },
+  branch: { name: '지역 회원의 소식', guidance: '우리 분회의 공지·행사·자료를 소개하고 실제 일정이나 게시글로 연결해 주시기 바랍니다.', image: '지역 회원 활동·행사 안내 이미지' },
 };
 
 /** Decorative, illustrative content only: no invented metrics, members, products or outcomes. */
@@ -77,7 +77,7 @@ export function HeroArtwork({ identity }: { identity: HeroIdentity }) {
         <rect x="216" y="158" width="145" height="90" rx="14" className="hero-art-soft"/><text x="288" y="190" textAnchor="middle" className="hero-art-ink">배운 내용을</text><text x="288" y="217" textAnchor="middle" className="hero-art-ink">현장 업무로</text>
       </> : identity === 'community' ? <>
         <path d="M38 46H269Q287 46 287 64V133Q287 151 269 151H91L60 178V151H38Q20 151 20 133V64Q20 46 38 46z" className="hero-art-paper"/>
-        <text x="63" y="88" className="hero-art-ink hero-art-large">어떻게 하세요?</text><path d="M62 115H235" className="hero-art-line"/>
+        <text x="63" y="88" className="hero-art-ink hero-art-large">어떻게 하시기 바랍니다?</text><path d="M62 115H235" className="hero-art-line"/>
         <path d="M161 156H362Q380 156 380 174V232Q380 250 362 250H333V270L307 250H161Q143 250 143 232V174Q143 156 161 156z" className="hero-art-primary"/>
         <text x="179" y="194" className="hero-art-on-primary">현장의 경험을</text><text x="179" y="221" className="hero-art-on-primary">함께 나눠요</text>
       </> : identity === 'carepharm' ? <>

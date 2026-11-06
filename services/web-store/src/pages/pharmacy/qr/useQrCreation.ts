@@ -109,7 +109,7 @@ export function useQrCreation(
   const save = async () => {
     if (!target || busy.current.has(organizationId)) return;
     if (!draft.slug.trim()) {
-      setError("슬러그를 입력해주세요");
+      setError("슬러그를 입력해 주시기 바랍니다");
       return;
     }
     const submittedRevision = revision.current;

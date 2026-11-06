@@ -215,7 +215,10 @@ export default function OperatorSupplierApprovalPage() {
         </p>
       </div>
 
-      <SupplierReviewQueue disabled={busy || reviewBusy} onBusyChange={onReviewBusy} />
+      <details className="rounded-lg border border-slate-200 bg-white p-3">
+        <summary className="min-h-11 cursor-pointer content-center text-sm font-medium text-slate-700">보완 요청 대기 목록</summary>
+        <div className="mt-2"><SupplierReviewQueue disabled={busy || reviewBusy} onBusyChange={onReviewBusy} /></div>
+      </details>
 
       {actionMessage && (
         <div
@@ -386,7 +389,7 @@ export default function OperatorSupplierApprovalPage() {
               disabled={busy}
               value={rejectReason}
               onChange={(e) => setRejectReason(e.target.value)}
-              placeholder="거절 사유를 입력하세요 (선택)"
+              placeholder="거절 사유를 입력하시기 바랍니다 (선택)"
               className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 mb-4"
               rows={3}
             />

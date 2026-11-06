@@ -1,8 +1,8 @@
 import type {MemberRegistration,MemberRegistrationType} from '@o4o/types';
 export type MemberTask = 'all' | 'pending' | 'inactive' | 'qualifications' | 'pharmacies' | 'corrections';
-export interface MemberPermissions { qualifications: boolean; pharmacies: boolean; applications?: boolean; edit: boolean; manageAccount?: boolean; erase?: boolean }
-export interface MemberRow { userId: string; name: string | null; nickname?:string|null;email: string; loginMethods?:string[];registrationType?:MemberRegistrationType|null;accountStatus: string; accountActive?:boolean; serviceStatus?: string; qualificationStatus?: string; pharmacyStatus?: string | null }
-export interface MemberProfile { hasPassword?:boolean; userId: string; name: string | null; nickname: string | null; email: string; phone: string | null; accountStatus: string; accountActive?:boolean; serviceStatus?: string; emailVerified: boolean; joinedAt: string; version: string }
+export interface MemberPermissions { readDocuments?: boolean; qualifications: boolean; pharmacies: boolean; applications?: boolean; edit: boolean; manageAccount?: boolean; erase?: boolean }
+export interface MemberRow { operatorReadOnly?:boolean; userId: string; name: string | null; nickname?:string|null;email: string; loginMethods?:string[];registrationType?:MemberRegistrationType|null;accountStatus: string; accountActive?:boolean; serviceStatus?: string; qualificationStatus?: string; pharmacyStatus?: string | null }
+export interface MemberProfile { operatorReadOnly?:boolean; loginMethods?:string[]; hasPassword?:boolean; userId: string; name: string | null; nickname: string | null; email: string; phone: string | null; accountStatus: string; accountActive?:boolean; serviceStatus?: string; emailVerified: boolean; joinedAt: string; version: string }
 export interface Qualification { licenseNumber: string | null; status: string; reason: string | null; approvedAt: string | null; reviewedBy: string | null; version: string }
 export interface MemberPharmacy {
   id: string; version?: string; organizationId: string; name: string; businessNumber: string; licenseNumber: string; status: string; reason: string | null;
@@ -29,7 +29,7 @@ export function canActivatePharmacy(detail: MemberDetail, pharmacy: MemberPharma
 }
 export function memberError(error: unknown) {
   const response = (error as { response?: { data?: { error?: unknown } } })?.response?.data?.error;
-  return typeof response === 'string' ? response : '처리하지 못했습니다. 권한과 최신 정보를 다시 확인해 주세요.';
+  return typeof response === 'string' ? response : '처리하지 못했습니다. 권한과 최신 정보를 다시 확인해 주시기 바랍니다.';
 }
 
 export type MemberWorkMode = 'detail' | 'edit' | 'reject' | 'delete' | 'pharmacy';

@@ -114,7 +114,7 @@ export function useSupplierImportTransfers(context: TransferContext) {
         if (!o4oThumb && o4oDetailUrls.length === 0) {
           setNavStatus('idle');
           setNavError(
-            '선택 이미지를 O4O 저장소로 복사하지 못했습니다. 내 쇼핑몰 주소가 올바른지 확인해 주세요.',
+            '선택 이미지를 O4O 저장소로 복사하지 못했습니다. 내 쇼핑몰 주소가 올바른지 확인해 주시기 바랍니다.',
           );
           return;
         }
@@ -230,7 +230,7 @@ export function useSupplierImportTransfers(context: TransferContext) {
       if (!html) {
         setImageCopyStatus('error');
         setImageCopyError(
-          '선택한 이미지를 O4O 저장소로 복사하지 못했습니다. 쇼핑몰 주소가 올바른지 확인해 주세요.',
+          '선택한 이미지를 O4O 저장소로 복사하지 못했습니다. 쇼핑몰 주소가 올바른지 확인해 주시기 바랍니다.',
         );
         return;
       }

@@ -45,7 +45,7 @@ export function presentationHandlers(
     return res.status(500).json({
       success: false,
       message:
-        "홈 화면 구성을 처리하지 못했습니다. 잠시 후 다시 시도해 주세요.",
+        "홈 화면 구성을 처리하지 못했습니다. 잠시 후 다시 시도해 주시기 바랍니다.",
     });
   };
   return {
@@ -72,7 +72,7 @@ export function presentationHandlers(
       ) {
         res
           .status(400)
-          .json({ success: false, message: "저장 요청을 확인해 주세요." });
+          .json({ success: false, message: "저장 요청을 확인해 주시기 바랍니다." });
         return;
       }
       // Validate before acquiring a transaction. No arbitrary fields reach storage.
@@ -185,7 +185,7 @@ export function createHomePresentationRoutes(ds: DataSource) {
     } catch (error) {
       res.status((error as { httpStatus?: number }).httpStatus ?? 500).json({
         success: false,
-        message: "CarePharm의 현재 운영 권한을 확인해 주세요.",
+        message: "CarePharm의 현재 운영 권한을 확인해 주시기 바랍니다.",
       });
     }
   };

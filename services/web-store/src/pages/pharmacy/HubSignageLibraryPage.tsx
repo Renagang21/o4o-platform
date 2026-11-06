@@ -85,7 +85,7 @@ export function HubSignageLibraryPage() {
       copySuccess: (item: HubContentItemResponse) =>
         `"${item.title}" 이(가) ${OWNER_LABEL}에 추가되었습니다.`,
       copyDuplicate: '이미 매장에 추가된 항목입니다.',
-      copyForbidden: '추가 권한이 없습니다. 매장 계정으로 로그인되어 있는지 확인하세요.',
+      copyForbidden: '추가 권한이 없습니다. 매장 계정으로 로그인되어 있는지 확인하시기 바랍니다.',
       copyFailed: (reason: string) => `매장 추가에 실패했습니다. (${reason})`,
       bulkSuccess: (n: number) => `${n}개 항목이 ${OWNER_LABEL}에 추가되었습니다.`,
       bulkFailed: (n: number) => `${n}개 항목 추가에 실패했습니다.`,
@@ -106,7 +106,7 @@ export function HubSignageLibraryPage() {
       accent="blue"
       ownerLabel={OWNER_LABEL}
       title="플랫폼 디지털사이니지"
-      description="플랫폼이 제공하는 매장 화면 콘텐츠·플레이리스트를 탐색해 내 약국에 추가하거나, 내 약국 전용 플레이리스트를 직접 구성하세요."
+      description="플랫폼이 제공하는 매장 화면 콘텐츠·플레이리스트를 탐색해 내 약국에 추가하거나, 내 약국 전용 플레이리스트를 직접 구성하시기 바랍니다."
       tableId="store-hub-signage"
       producerTabs={PRODUCER_TABS}
       guide={{ href: PLAYLIST_PATH, linkLabel: '디지털사이니지 운영 화면' }}

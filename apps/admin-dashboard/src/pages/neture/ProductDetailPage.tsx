@@ -334,7 +334,7 @@ const ProductDetailPage: React.FC = () => {
 
         {saveMutation.isError && (
           <div className="text-red-600 text-sm">
-            저장에 실패했습니다. 다시 시도해주세요.
+            저장에 실패했습니다. 다시 시도해 주시기 바랍니다.
           </div>
         )}
       </form>

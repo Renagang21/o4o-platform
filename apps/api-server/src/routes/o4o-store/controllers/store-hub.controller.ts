@@ -495,7 +495,7 @@ export function createStoreHubController(
         if (typeof newSlugInput !== 'string' || newSlugInput.trim().length === 0) {
           res.status(400).json({
             success: false,
-            error: { code: 'INVALID_INPUT', message: '새 주소(slug)를 입력해주세요.' },
+            error: { code: 'INVALID_INPUT', message: '새 주소(slug)를 입력해 주시기 바랍니다.' },
           });
           return;
         }
@@ -550,7 +550,7 @@ export function createStoreHubController(
             success: false,
             error: {
               code: 'SLUG_ALREADY_CHANGED',
-              message: '이 매장은 이미 주소가 변경되었습니다. 추가 변경은 운영팀에 문의하세요.',
+              message: '이 매장은 이미 주소가 변경되었습니다. 추가 변경은 운영팀에 문의하시기 바랍니다.',
             },
           });
           return;
@@ -579,7 +579,7 @@ export function createStoreHubController(
             success: false,
             error: {
               code: 'SLUG_ALREADY_CHANGED',
-              message: '이 매장은 이미 주소가 변경되었습니다. 추가 변경은 운영팀에 문의하세요.',
+              message: '이 매장은 이미 주소가 변경되었습니다. 추가 변경은 운영팀에 문의하시기 바랍니다.',
             },
           });
           return;

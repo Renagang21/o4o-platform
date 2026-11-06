@@ -9,7 +9,7 @@ export default function CentralOperationDirectory({ services, menus }: {
   const links = (items: readonly CentralOperationMenu[]) => <ul className="mt-3 grid gap-2 border-t pt-3">{items.map(menu => <li key={menu.key}><Link className="block rounded border px-3 py-2 text-sm text-blue-700 hover:bg-blue-50" to={`/operations/${menu.service}/${menu.area}`}>{menu.label}</Link></li>)}</ul>;
   return <section aria-label="전체 업무 바로가기" className="space-y-3">
     <h2 className="text-lg font-semibold">업무 바로가기</h2>
-    <p className="text-sm text-slate-500">서비스와 업무 그룹을 펼쳐 필요한 메뉴로 이동하세요.</p>
+    <p className="text-sm text-slate-500">서비스와 업무 그룹을 펼쳐 필요한 메뉴로 이동하시기 바랍니다.</p>
     <div className="grid items-start gap-3 md:grid-cols-2">
       {services.map(([key, name]) => {
         const items = menus.filter(menu => menu.service === key);

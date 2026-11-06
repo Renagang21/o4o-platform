@@ -35,7 +35,7 @@ export default function CentralFundingReview() {
   const act = async (row: Trial, action: "approve" | "reject") => {
     const reason =
       action === "reject"
-        ? window.prompt("반려 사유를 입력해 주세요.")
+        ? window.prompt("반려 사유를 입력해 주시기 바랍니다.")
         : undefined;
     if (action === "reject" && !reason?.trim()) return;
     if (
@@ -55,7 +55,7 @@ export default function CentralFundingReview() {
       await load();
     } catch {
       setRows([]);
-      setError("처리하지 못했습니다. 최신 상태를 다시 확인해 주세요.");
+      setError("처리하지 못했습니다. 최신 상태를 다시 확인해 주시기 바랍니다.");
     } finally {
       setBusy(false);
     }

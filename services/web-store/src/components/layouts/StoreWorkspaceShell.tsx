@@ -1,4 +1,3 @@
-import { StoreContentNavigation } from '../store/StoreContentNavigation';
 import type { ReactNode } from "react";
 import { Link, Outlet, useLocation } from "react-router-dom";
 import type { StoreDashboardConfig } from "@o4o/store-ui-core";
@@ -20,6 +19,7 @@ export interface StoreWorkspaceOutlet {
 /** Service-local composition; the shared StoreDashboardLayout contract is unchanged. */
 export function StoreWorkspaceShell({
   config,
+  organizationName,
   serviceWorkConfig,
   children,
 }: {
@@ -34,9 +34,7 @@ export function StoreWorkspaceShell({
     location.search,
     config.basePath,
   );
-  const allItems = active ? workspaceItems(config, active) : [];
-  const signage = location.pathname.includes('/marketing/signage/');
-  const items = active === 'studio' ? allItems.filter(item => signage === item.key.startsWith('signage-')) : allItems;
+  const items = active ? workspaceItems(config, active) : [];
   const support = workspaceSupportItems(config);
   const landing = STORE_WORKSPACE_AREAS.find((area) => area.key === active);
   const isLanding =
@@ -47,7 +45,7 @@ export function StoreWorkspaceShell({
         <div className="flex items-start gap-2">
         <nav
           aria-label="내 매장 주요 업무"
-          className="grid min-w-0 flex-1 grid-cols-2 gap-1 rounded-xl border border-slate-200 bg-white p-1 sm:grid-cols-4"
+          className="grid min-w-0 flex-1 grid-cols-2 gap-1 rounded-xl border border-slate-200 bg-white p-1 sm:grid-cols-5"
         >
           {STORE_WORKSPACE_AREAS.map((area) => (
             <Link
@@ -68,12 +66,19 @@ export function StoreWorkspaceShell({
               aria-label="매장 보조 메뉴"
               className="absolute right-0 z-30 mt-2 flex w-64 flex-col rounded-xl border border-slate-200 bg-white p-2 shadow-lg"
             >
-              {support.map(item => <Link key={item.key} className="min-h-11 rounded-lg px-3 py-2.5 text-sm hover:bg-slate-50" to={`${config.basePath}${item.subPath}`}>{item.label}</Link>)}
+              <p className="px-3 py-2 text-sm text-slate-500">{organizationName ?? '내 매장'}</p>
+              {support.map((item) => (
+                <Link
+                  key={item.key}
+                  className="rounded-lg px-3 py-2.5 text-sm hover:bg-slate-50"
+                  to={`${config.basePath}${item.subPath}`}
+                >
+                  {item.label}
+                </Link>
+              ))}
             </nav>
           </details>
         </div>
-        {active === 'studio' && <StoreContentNavigation basePath={config.basePath} signage={signage}
-          showGeneral={allItems.some(item => !item.key.startsWith('signage-'))} showSignage={allItems.some(item => item.key.startsWith('signage-'))} />}
         {active === "use" && !isLanding && (
           <div className="mt-3"><StoreOperationsNavigation config={config} /></div>
         )}

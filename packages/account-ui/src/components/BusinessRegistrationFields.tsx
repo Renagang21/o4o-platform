@@ -160,7 +160,7 @@ export function BusinessRegistrationFields({
         </select>
         <p id={`${entityTypeId}-help`} className="mt-1 text-xs text-gray-500">
           {value.businessEntityType && !entityTypeSelected
-            ? '기존 입력값으로는 개인·법인을 확인할 수 없습니다. 다시 선택해 주세요.'
+            ? '기존 입력값으로는 개인·법인을 확인할 수 없습니다. 다시 선택해 주시기 바랍니다.'
             : '세금계산서 발행에 사용할 개인·법인 구분입니다.'}
         </p>
       </div>

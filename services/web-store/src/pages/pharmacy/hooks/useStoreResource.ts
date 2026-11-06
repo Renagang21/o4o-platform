@@ -15,7 +15,7 @@ export function useStoreResource<T>(load: () => Promise<T>, initial: T, enabled 
       const value = await load();
       if (current === revision.current) setData(value);
     } catch {
-      if (current === revision.current) setError('목록을 불러오지 못했습니다. 다시 시도해 주세요.');
+      if (current === revision.current) setError('목록을 불러오지 못했습니다. 다시 시도해 주시기 바랍니다.');
     } finally {
       if (current === revision.current) setLoading(false);
     }

@@ -39,7 +39,7 @@ export function createProductMasterCreateController(_dataSource: DataSource): Ro
       const b = (req.body ?? {}) as Record<string, unknown>;
       const name = str(b.name);
       if (!name) {
-        res.status(400).json({ success: false, error: '상품명을 입력하세요', code: 'NAME_REQUIRED' });
+        res.status(400).json({ success: false, error: '상품명을 입력하시기 바랍니다', code: 'NAME_REQUIRED' });
         return;
       }
 

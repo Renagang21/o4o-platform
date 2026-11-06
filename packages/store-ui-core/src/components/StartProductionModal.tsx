@@ -83,7 +83,7 @@ export interface StartProductionModalProps {
 const DIRECT_ORIGIN_NOTES: Partial<Record<ProductionTarget, { disabled: boolean; note: string }>> = {
   qr: {
     disabled: true,
-    note: 'QR 코드는 파일·링크 자료에서만 생성할 수 있습니다. 파일 또는 외부 링크 자료를 선택하세요.',
+    note: 'QR 코드는 파일·링크 자료에서만 생성할 수 있습니다. 파일 또는 외부 링크 자료를 선택하시기 바랍니다.',
   },
   pop: {
     disabled: false,

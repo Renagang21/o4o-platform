@@ -138,7 +138,7 @@ export function StorePopV2ListView(props: StorePopV2ListViewProps) {
           <div style={{ ...mutedStyle, padding: '24px 0', textAlign: 'center' }}>
             {state.showArchived
               ? '보관한 POP 이 없습니다.'
-              : '아직 만든 POP 이 없습니다. [새 POP 만들기] 로 시작해 보세요.'}
+              : '아직 만든 POP 이 없습니다. [새 POP 만들기] 로 시작해 보시기 바랍니다.'}
           </div>
         )}
 

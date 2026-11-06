@@ -45,7 +45,7 @@ export function useConsultationRequests(organizationId: string) {
       setError(null);
     } catch {
       if (ownerRef.current() && token === revision.current)
-        setError('상담 요청을 불러오지 못했습니다. 최신 목록을 확인한 뒤 처리해 주세요.');
+        setError('상담 요청을 불러오지 못했습니다. 최신 목록을 확인한 뒤 처리해 주시기 바랍니다.');
     } finally {
       // A write may have invalidated this read and started a newer refresh.
       if (token === revision.current) {
@@ -83,7 +83,7 @@ export function useConsultationRequests(organizationId: string) {
         acknowledgedAt.set(id, reply.updatedAt);
         return { id, status: 'success' as const };
       } catch {
-        return { id, status: 'failed' as const, error: '처리 결과를 확인하지 못했습니다. 최신 목록 확인 후 다시 시도해 주세요.' };
+        return { id, status: 'failed' as const, error: '처리 결과를 확인하지 못했습니다. 최신 목록 확인 후 다시 시도해 주시기 바랍니다.' };
       }
     }));
     if (!ownerRef.current()) return;

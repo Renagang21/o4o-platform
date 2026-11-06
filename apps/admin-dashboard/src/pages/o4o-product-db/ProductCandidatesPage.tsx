@@ -242,17 +242,17 @@ export default function ProductCandidatesPage() {
             actions={[
               {
                 key: 'archive', label: 'archive', icon: <Archive size={14} />, disabled: bulkBusy,
-                confirm: { title: 'archive 처리', message: `선택한 ${selectedKeys.size}개 후보를 archive 처리합니다. 원천 데이터는 삭제되지 않습니다. 계속할까요?`, confirmText: 'archive' },
+                confirm: { title: 'archive 처리', message: `선택한 ${selectedKeys.size}개 후보를 archive 처리합니다. 원천 데이터는 삭제되지 않습니다. 계속하시겠습니까?`, confirmText: 'archive' },
                 onClick: () => runBulk('archive'),
               },
               {
                 key: 'ignore', label: '제외(ignored)', icon: <XCircle size={14} />, disabled: bulkBusy,
-                confirm: { title: 'ignored 처리', message: `선택한 ${selectedKeys.size}개 후보를 O4O 상품화 대상 아님(제외)으로 처리합니다. 원천 데이터는 삭제되지 않습니다. 계속할까요?`, variant: 'warning', confirmText: '제외' },
+                confirm: { title: 'ignored 처리', message: `선택한 ${selectedKeys.size}개 후보를 O4O 상품화 대상 아님(제외)으로 처리합니다. 원천 데이터는 삭제되지 않습니다. 계속하시겠습니까?`, variant: 'warning', confirmText: '제외' },
                 onClick: () => runBulk('ignore'),
               },
               {
                 key: 'manual_review', label: '보류(manual review)', icon: <PauseCircle size={14} />, disabled: bulkBusy,
-                confirm: { title: 'manual review', message: `선택한 ${selectedKeys.size}개 후보를 판단 보류(검토 중)로 표시합니다. 계속할까요?`, confirmText: '보류' },
+                confirm: { title: 'manual review', message: `선택한 ${selectedKeys.size}개 후보를 판단 보류(검토 중)로 표시합니다. 계속하시겠습니까?`, confirmText: '보류' },
                 onClick: () => runBulk('manual_review'),
               },
             ]}

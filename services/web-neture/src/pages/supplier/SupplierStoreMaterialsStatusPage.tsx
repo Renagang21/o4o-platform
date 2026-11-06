@@ -325,7 +325,7 @@ export default function SupplierStoreMaterialsStatusPage() {
   ].filter(Boolean) as string[];
 
   const allFailed = failedSources.length === 3;
-  const emptyMessage = rows.length ? '선택한 상태의 자료가 없습니다.' : '아직 매장에 제공한 자료가 없습니다. 위에서 자료 만들기를 선택하세요.';
+  const emptyMessage = rows.length ? '선택한 상태의 자료가 없습니다.' : '아직 매장에 제공한 자료가 없습니다. 위에서 자료 만들기를 선택하시기 바랍니다.';
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-6">

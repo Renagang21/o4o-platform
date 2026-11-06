@@ -24,7 +24,7 @@ export function BusinessDecisionDialog({ decision, businessName, reason, onReaso
     <section ref={panel} onKeyDown={handleKey} role="dialog" aria-modal="true" aria-label={`${decision.label} 확인`} className="max-h-[90vh] w-full max-w-lg space-y-4 overflow-y-auto rounded-xl bg-white p-5 shadow-xl">
       <h2 className="text-lg font-semibold">{decision.label} 확인</h2>
       <p className="text-sm text-gray-700">{businessName} · {decision.target}</p>
-      <p className="text-sm">이 대상을 {decision.label} 처리할까요?</p>
+      <p className="text-sm">이 대상을 {decision.label} 처리하시겠습니까?</p>
       {decision.needsReason && <label className="block text-sm">처리 사유 ({decision.reasonRequired ? '필수' : '선택'})
         <textarea aria-label="처리 사유" required={decision.reasonRequired} aria-required={decision.reasonRequired} value={reason} disabled={saving} onChange={e => onReasonChange(e.target.value)}
           className="mt-2 w-full rounded border p-2" rows={3} />

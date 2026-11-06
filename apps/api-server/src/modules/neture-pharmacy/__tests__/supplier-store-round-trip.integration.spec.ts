@@ -35,7 +35,7 @@ import { SettlementCommandService } from '../../neture/services/settlement-comma
 import { NetureOrderStatus } from '../../../routes/neture/entities/neture-order.entity.js';
 import { CheckoutFulfillmentBridgeService } from '../../../services/neture/checkout-fulfillment-bridge.service.js';
 import { checkoutService } from '../../../services/checkout.service.js';
-import { PharmacyMembershipService } from '../../../__tests__/fixtures/legacy-pharmacy-membership.js';
+import { PharmacyMembershipService } from '../../../__tests__/fixtures/legacy-pharmacy-application.js';
 import { SemiFranchiseService } from '../services/semi-franchise.service.js';
 import { PharmacyCartService } from '../services/pharmacy-cart.service.js';
 import { PharmacyPaymentService } from '../services/pharmacy-payment.service.js';

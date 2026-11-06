@@ -46,7 +46,7 @@ function WorkspaceContents({ area }: WorkspaceProps) {
   const { workServiceKeys } = useUnifiedStore();
   const productReturn = readProductGuidanceReturn(location.state, scope, config.basePath);
   const returningToProducts = productReturn?.path === location.pathname + location.search;
-  const groups = workspaceGroups(config, area).filter(group => area !== 'studio' || group.key !== 'signage-content');
+  const groups = workspaceGroups(config, area);
   const items = workspaceItems(config, area);
   const has = (key: string) => items.some((item) => item.key === key);
   const productAllowed = config.menuSections?.some((section) =>
@@ -125,14 +125,11 @@ function WorkspaceContents({ area }: WorkspaceProps) {
     return (
       <StoreLibraryContentsPage
         workspace
-        navigation={<><StoreLibraryNavigation section="mine" />{navigation}</>}
+        navigation={<StoreLibraryNavigation section="mine" showSources={false} />}
+        moreNavigation={navigation}
+        productLink={productAllowed && <Link className={linkStyle} to={`${config.basePath}/my-products`}>상품에서 만들기</Link>}
         quickLinks={
           <>
-            {productAllowed && (
-              <Link className={linkStyle} to={`${config.basePath}/my-products`}>
-                상품에서 만들기
-              </Link>
-            )}
             <Link
               className={linkStyle}
               to={
@@ -147,6 +144,10 @@ function WorkspaceContents({ area }: WorkspaceProps) {
         }
       />
     );
+  if (area === "use" && new URLSearchParams(location.search).get('topic') === 'signage') {
+    const params = new URLSearchParams(location.search); params.delete('topic');
+    return <Navigate to={{ pathname: `${config.basePath}/marketing/signage/playlist`, search: params.toString(), hash: location.hash }} replace state={location.state} />;
+  }
   if (area === "use") return <StoreOperationsPage config={config} />;
   // A missing capability must never be restored by composing its page directly.
   return (
@@ -155,13 +156,13 @@ function WorkspaceContents({ area }: WorkspaceProps) {
         {area === "commerce"
           ? "상품·거래"
           : area === "studio"
-            ? "매장 컨텐츠"
+            ? "매장 콘텐츠"
             : "매장 운영"}
       </h1>
       {navigation}
       <p role="status" className="text-sm text-slate-600">
         {groups.length
-          ? "전체 업무에서 이용할 작업을 선택하세요."
+          ? "전체 업무에서 이용할 작업을 선택하시기 바랍니다."
           : "현재 이용할 수 있는 업무가 없습니다."}
       </p>
     </div>

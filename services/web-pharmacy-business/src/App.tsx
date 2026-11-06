@@ -141,7 +141,7 @@ function LoginRoute() {
     openLoginModal();
   }, [openLoginModal, location.state, searchParams, setOnLoginSuccess, navigate, isAuthenticated, isLoading]);
 
-  return <Layout serviceName={SERVICE_NAME}><p className="mx-auto max-w-4xl px-4 py-12">약국 협력사업을 이용하려면 로그인해 주세요.</p></Layout>;
+  return <Layout serviceName={SERVICE_NAME}><p className="mx-auto max-w-4xl px-4 py-12">약국 협력사업을 이용하려면 로그인해 주시기 바랍니다.</p></Layout>;
 }
 
 /**

@@ -288,24 +288,26 @@ export default function StoreContentWorkspacePage() {
     <div className="p-6">
       <PageHeader
         title="매장 콘텐츠 작업 공간"
-        subtitle="내 매장 자산을 선택하여 QR·POP·블로그·사이니지 등 결과물을 만드세요."
+        subtitle="내 매장 자산을 선택하여 QR·POP·블로그·사이니지 등 결과물을 만드시기 바랍니다."
         actions={[
           { id: 'refresh', label: '새로고침', icon: <RefreshCw size={14} />, onClick: () => refetch() },
         ]}
       />
 
       {/* 안내 배너 */}
-      <div className="mb-5 flex items-start gap-3 rounded-lg border border-blue-200 bg-blue-50 p-4">
-        <AlertCircle size={18} className="mt-0.5 flex-shrink-0 text-blue-600" />
-        <div className="text-sm text-blue-800">
-          <p className="font-medium">작업 공간 안내</p>
-          <p className="mt-0.5 text-blue-700">
+      <details className="mb-5 rounded-lg border border-blue-200 bg-blue-50 p-3 text-sm text-blue-800">
+        <summary className="cursor-pointer font-medium">
+          <AlertCircle size={16} className="mr-1 inline text-blue-600" />
+          작업 공간 안내
+        </summary>
+        <div>
+          <p className="mt-2 text-blue-700">
             여기에 표시된 자산은 매장이 보유한 실행 자산입니다.
-            자산을 선택하여 QR·POP 등 결과물을 만들고, 매장에서 활용하세요.
+            자산을 선택하여 QR·POP 등 결과물을 만들고, 매장에서 활용하시기 바랍니다.
             커뮤니티 원본은 복제되지 않으며 참조(reference) 방식으로 연결됩니다.
           </p>
         </div>
-      </div>
+      </details>
 
       {/* usageType 필터 */}
       <div className="mb-4 flex items-center gap-2">
@@ -339,7 +341,7 @@ export default function StoreContentWorkspacePage() {
           data={assets}
           emptyMessage={
             usageTypeFilter === 'all'
-              ? '등록된 자산이 없습니다. 자산을 먼저 추가해 주세요.'
+              ? '등록된 자산이 없습니다. 자산을 먼저 추가해 주시기 바랍니다.'
               : `'${USAGE_TYPE_CONFIG[usageTypeFilter]?.label ?? usageTypeFilter}' 용도의 자산이 없습니다.`
           }
         />
@@ -367,7 +369,7 @@ export default function StoreContentWorkspacePage() {
             <div className="px-6 py-5">
               <div className="mb-4 rounded-lg border border-amber-200 bg-amber-50 p-4">
                 <p className="text-sm font-medium text-amber-800 mb-2">
-                  ⚠ QR 코드를 출력하기 전에 확인하세요.
+                  ⚠ QR 코드를 출력하기 전에 확인하시기 바랍니다.
                 </p>
                 <p className="text-sm text-amber-700 whitespace-pre-line leading-relaxed">
                   {QR_WARNING_MESSAGE}

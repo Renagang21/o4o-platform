@@ -142,7 +142,7 @@ export class SupplyProposalService {
           throw new NeturePharmacyError(
             409,
             "PROPOSAL_REQUEST_CONFLICT",
-            "이미 사용한 요청입니다. 기존 접수 내용을 확인한 후 새 초안을 작성하세요.",
+            "이미 사용한 요청입니다. 기존 접수 내용을 확인한 후 새 초안을 작성하시기 바랍니다.",
           );
         }
         return { id: existing.id, status: existing.status, reused: true };

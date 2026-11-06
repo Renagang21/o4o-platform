@@ -83,7 +83,7 @@ export function ServiceReturnLink({
       </button>
       {error && (
         <span role="alert">
-          원래 화면으로 이동하지 못했습니다. 다시 시도해 주세요.
+          원래 화면으로 이동하지 못했습니다. 다시 시도해 주시기 바랍니다.
         </span>
       )}
     </span>

@@ -154,6 +154,8 @@ export interface PharmacyOrder {
 export interface SemiFranchiseContent {
   id: string;
   title: string;
+  /** 자료에 포함된 지원 영상(서버 파생). 가입 매장 목록 조회에서 내려온다. */
+  videos?: Array<{ sourceType: 'youtube' | 'vimeo'; sourceUrl: string; embedId: string }>;
   summary: string | null;
   body: string | null;
   thumbnailUrl: string | null;
@@ -163,18 +165,12 @@ export interface SemiFranchiseContent {
   publishedAt: string | null;
   semiFranchiseKey: string;
   semiFranchiseName: string;
-  videos?: Array<{ sourceType: 'youtube' | 'vimeo'; sourceUrl: string; embedId: string }>;
 }
 
 const P = '/neture/pharmacy';
 
 export const neturePharmacyApi = {
-  // ─── 약국 연결 원장 조회 (별도 최초 신청 writer는 폐기) ───
-  async getMembership(): Promise<PharmacyMembership | null> {
-    return (await coreApiClient.get<Envelope<PharmacyMembership | null>>(`${P}/membership`)).data;
-  },
-
-  // ─── 내 매장 (약국 연결 active) ───
+  // ─── 내 매장 (약국 승인 active) ───
   async getStoreContext(): Promise<PharmacyStoreContext> {
     return (await coreApiClient.get<Envelope<PharmacyStoreContext>>(`${P}/store/context`)).data;
   },
@@ -212,11 +208,11 @@ export const neturePharmacyApi = {
     return (await coreApiClient.get<Envelope<SemiFranchiseContent>>(`${P}/store/contents/${encodeURIComponent(id)}`)).data;
   },
   /** 내 매장 편집용 사본(매장 소유 독립 사본) 생성 — 원본 변경은 사본에 전파되지 않는다. */
-  async copyContent(id: string): Promise<{ snapshotId: string }> {
-    return (await coreApiClient.post<Envelope<{ snapshotId: string }>>(`${P}/store/contents/${encodeURIComponent(id)}/copy`, {})).data;
-  },
   async copyVideo(id: string, sourceUrl: string): Promise<{ snapshotId: string }> {
     return (await coreApiClient.post<Envelope<{ snapshotId: string }>>(`${P}/store/contents/${encodeURIComponent(id)}/copy-video`, { sourceUrl })).data;
+  },
+  async copyContent(id: string): Promise<{ snapshotId: string }> {
+    return (await coreApiClient.post<Envelope<{ snapshotId: string }>>(`${P}/store/contents/${encodeURIComponent(id)}/copy`, {})).data;
   },
 
   async listRecruitments(): Promise<PharmacyRecruitment[]> {

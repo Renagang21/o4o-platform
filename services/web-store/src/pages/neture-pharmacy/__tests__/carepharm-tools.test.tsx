@@ -131,6 +131,6 @@ it('retains staff store work without a manager-only community entry', async () =
 });
 it.each(['signed-out', 'no-store'])('does not read protected data with %s', async scenario => {
   if (scenario === 'signed-out') state.account = null; else state.organizationId = null;
-  render(tree()); expect(screen.getByText(scenario === 'signed-out' ? '로그인 후 이용해 주세요.' : '약국을 먼저 선택해 주세요.')).toBeTruthy();
+  render(tree()); expect(screen.getByText(scenario === 'signed-out' ? '로그인 후 이용해 주시기 바랍니다.' : '약국을 먼저 선택해 주시기 바랍니다.')).toBeTruthy();
   expect(state.get).not.toHaveBeenCalled(); expect(state.list).not.toHaveBeenCalled();
 });

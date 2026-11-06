@@ -1,8 +1,21 @@
+import { assertOperatorMemberTarget, protectedMemberSql } from '../../../services/operations/protected-member-target.js';
 /**
- * 통합 가입 승인으로 연결되는 약국 원장과 기존 상태 전이.
- * 최초 조직·owner·약사 자격 연결은 MemberRegistrationService의 단일 승인에서 처리한다.
- * 별도 최초 신청 writer는 폐기했다. 과거 pending 원장 처리와 정지/종료 등 기존 생명주기는 보존한다.
- * 이 원장은 Neture 회원·직원 소속·개별 세미프렌챠이즈 서비스 가입과 서로 다른 축이다.
+ * 내 매장(약국) 신청 · 승인 원장 (약국 1 = 원장 1 행 = 조직 1 = 내 매장 1)
+ *
+ * 명칭 정정(2026-10-07): 과거 "Neture 약국 기본 가입"으로 불렀으나 Neture 메인 가입(service_memberships 'neture')이
+ * 아니다. 메인 가입 승인은 이 신청의 **전제조건**이며, 이 원장의 처리는 메인 가입 원장을 바꾸지 않는다.
+ *
+ * **인계 대상 — 인증 · 가입 트랙 (DESIGN §13)**: 가입 원장 · 신청 입력(자격 정보) · 상태 전이 · 운영자 승인/반려 ·
+ * 승인 orchestration 은 인증 · 가입 트랙 소유다. 조직 · 매장 연결은 pharmacy-store-link.ts(Store 트랙 계약)를 호출한다.
+ * DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1 §3-1 · §5
+ *
+ * - 신규 신청은 폐기했다. MemberRegistrationService의 통합 등록 승인이 약국과 owner를 연결한다.
+ * - 본 서비스는 기존 원장 조회 및 정지/종료·기존 대기 기록 처리를 유지한다.
+ * - 자격 확인: 운영자가 원장의 사업자번호 · 약사 면허번호를 검토(operator_review). 자동 검증 · 점수 없음.
+ * - KPA 가입은 자격으로 재해석하지 않는다. 공통 약사 자격 승인과 약국 경영 권한은 별도로 검사한다.
+ * - 기존 원장 승인(재활성화 포함) 시 Neture 메인 가입 active 를 확인한다(neture-main-membership.ts).
+ * - 매장 판정은 원장 status='active' 가 한다. 승인 시 role 기반 소비처용 표식(neture:store_owner 등)을 붙이고
+ *   정지 · 종료 시 거둔다(provisioner). 표식 실패는 원장 판정에 영향 없음.
  */
 import type { DataSource, EntityManager } from 'typeorm';
 import {
@@ -76,7 +89,7 @@ export class PharmacyMembershipService {
     const where = `($1::text IS NULL OR npm.status = $1)
       AND ($2::text IS NULL OR npm.pharmacy_name ILIKE $2 OR npm.business_number LIKE $2)`;
     const items = await this.dataSource.query(
-      `SELECT ${SELECT_COLUMNS}, o.name AS organization_name, o.address AS organization_address, ${BUSINESS_PROFILE_SQL} AS business_profile
+      `SELECT ${SELECT_COLUMNS}, ${protectedMemberSql("npm.applicant_user_id")} AS "operatorReadOnly", o.name AS organization_name, o.address AS organization_address, ${BUSINESS_PROFILE_SQL} AS business_profile
          FROM neture_pharmacy_memberships npm
          JOIN organizations o ON o.id = npm.organization_id
         WHERE ${where}
@@ -104,6 +117,7 @@ export class PharmacyMembershipService {
         [membershipId],
       );
       if (!current) throw new NeturePharmacyError(404, 'MEMBERSHIP_NOT_FOUND', '가입 신청을 찾을 수 없습니다.');
+      await assertOperatorMemberTarget(m, current.applicant_user_id);
       const next = nextMembershipStatus(current.status, action);
       if (!next) {
         throw new NeturePharmacyError(409, 'INVALID_TRANSITION', `현재 상태(${current.status})에서 처리할 수 없습니다.`);
@@ -114,7 +128,7 @@ export class PharmacyMembershipService {
         const qualified = await m.query(`SELECT id FROM kpa_pharmacist_profiles WHERE user_id=$1 AND qualification_status='approved'
           AND license_verified=true AND verified_at IS NOT NULL AND verified_by IS NOT NULL AND BTRIM(license_number)=BTRIM($2) FOR SHARE`,
           [current.applicant_user_id,current.pharmacist_license_number]);
-        if(!qualified.length)throw new NeturePharmacyError(409,'PHARMACIST_QUALIFICATION_REQUIRED','신청 면허번호와 일치하는 공통 약사 자격을 먼저 승인해 주세요.');
+        if(!qualified.length)throw new NeturePharmacyError(409,'PHARMACIST_QUALIFICATION_REQUIRED','신청 면허번호와 일치하는 공통 약사 자격을 먼저 승인해 주시기 바랍니다.');
 
       }
       const [row] = rowsOf(await m.query(

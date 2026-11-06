@@ -1,3 +1,5 @@
+import {DataTable} from '@o4o/operator-ux-core';
+import {ActionBar} from '@o4o/ui';
 import { PendingOperatorInvitations } from '@o4o/shared-space-ui';
 import { api } from '../../lib/apiClient';
 /**
@@ -67,9 +69,12 @@ function ServiceMembersPanel() {
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
+  const [selectedIds,setSelectedIds]=useState<Set<string>>(new Set());
+  const selected=selectedIds.size===1?rows?.find(row=>selectedIds.has(row.id)):undefined;
 
   const load = useCallback(() => {
     setRows(null);
+    setSelectedIds(new Set());
     setError(null);
     listServiceMembers(status)
       .then(setRows)
@@ -93,7 +98,7 @@ function ServiceMembersPanel() {
   };
 
   const reject = async (row: ServiceMemberRow) => {
-    const reason = window.prompt('반려 사유를 입력하세요.');
+    const reason = window.prompt('반려 사유를 입력하시기 바랍니다.');
     if (reason === null) return;
     if (!reason.trim()) {
       setError('반려 사유가 필요합니다.');
@@ -133,50 +138,20 @@ function ServiceMembersPanel() {
       {rows === null && !error ? (
         <p className="mt-4 text-sm text-gray-500">불러오는 중입니다…</p>
       ) : rows && rows.length > 0 ? (
-        <div className="mt-4 overflow-x-auto">
-          <table className="w-full border-collapse text-sm">
-            <thead>
-              <tr className="border-b border-gray-200 text-left text-xs text-gray-500">
-                <th className="py-2">이름</th>
-                <th className="py-2">이메일</th>
-                <th className="py-2">신청일</th>
-                {status === 'rejected' && <th className="py-2">반려 사유</th>}
-                {status === 'active' && <th className="py-2">승인일</th>}
-                {status === 'pending' && <th className="py-2 text-right">처리</th>}
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((r) => (
-                <tr key={r.id} className="border-b border-gray-100">
-                  <td className="py-2 text-gray-800">{r.name ?? '-'}</td>
-                  <td className="py-2 text-gray-600">{r.email ?? '-'}</td>
-                  <td className="py-2 text-gray-600">{fmtDate(r.appliedAt)}</td>
-                  {status === 'rejected' && <td className="py-2 text-gray-500">{r.rejectionReason ?? '-'}</td>}
-                  {status === 'active' && <td className="py-2 text-gray-600">{fmtDate(r.approvedAt)}</td>}
-                  {status === 'pending' && (
-                    <td className="py-2 text-right">
-                      <button
-                        type="button"
-                        disabled={busyId === r.id}
-                        onClick={() => approve(r)}
-                        className="rounded bg-primary-600 px-3 py-1 text-xs text-white disabled:opacity-50"
-                      >
-                        승인
-                      </button>
-                      <button
-                        type="button"
-                        disabled={busyId === r.id}
-                        onClick={() => reject(r)}
-                        className="ml-2 rounded border border-gray-300 px-3 py-1 text-xs text-gray-700 disabled:opacity-50"
-                      >
-                        반려
-                      </button>
-                    </td>
-                  )}
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="mt-4 space-y-3">
+          <ActionBar selectedCount={selectedIds.size} onClearSelection={()=>setSelectedIds(new Set())} actions={selected&&!selected.operatorReadOnly&&selected.status==='pending'?[
+            {key:'approve',label:'가입 승인',disabled:!!busyId,onClick:()=>void approve(selected)},
+            {key:'reject',label:'가입 반려',disabled:!!busyId,onClick:()=>void reject(selected)},
+          ]:[]} />
+          <DataTable<ServiceMemberRow> tableId="branch-service-members" rowKey="id" data={rows} selectable selectedKeys={selectedIds} onSelectionChange={keys=>{if(!busyId)setSelectedIds(keys);}} columns={[
+            {key:'name',header:'이름',stickyOnMobile:true,render:(_v,r)=>r.name??'-'},
+            {key:'email',header:'이메일'},
+            {key:'appliedAt',header:'신청일',render:value=>fmtDate(value)},
+            {key:'status',header:'상태',render:value=>SERVICE_STATUS_LABEL[value]??value},
+            {key:'approvedAt',header:'승인일',render:value=>fmtDate(value)},
+            {key:'rejectionReason',header:'반려 사유'},
+            {key:'operatorReadOnly',header:'업무 대상',render:(_v,r)=>r.operatorReadOnly?'전체 관리자 — 처리 대상 아님':'회원'},
+          ]} />
         </div>
       ) : (
         <p className="mt-4 text-sm text-gray-500">해당 상태의 가입 신청이 없습니다.</p>
@@ -218,7 +193,7 @@ function BranchRequestsPanel() {
   };
 
   const reject = async (row: PendingBranchRequest) => {
-    const reason = window.prompt('거절 사유를 입력하세요. 신청자에게 표시됩니다.');
+    const reason = window.prompt('거절 사유를 입력하시기 바랍니다. 신청자에게 표시됩니다.');
     if (reason === null) return;
     if (!reason.trim()) {
       setError('거절 사유가 필요합니다.');
@@ -367,7 +342,7 @@ function BranchOperatorsPanel() {
         onChange={(e) => setBranchId(e.target.value)}
         className="mt-1 w-full max-w-sm rounded border border-gray-300 px-2 py-1"
       >
-        <option value="">분회를 선택하세요</option>
+        <option value="">분회를 선택하시기 바랍니다</option>
         {(branches ?? []).map((b) => (
           <option key={b.id} value={b.id}>
             {b.name}

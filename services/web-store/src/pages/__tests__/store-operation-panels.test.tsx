@@ -9,7 +9,6 @@ import {
 import { MemoryRouter } from "react-router-dom";
 import { useState, type ComponentProps } from "react";
 import { ChannelPublicUrlCard } from "../pharmacy/channels/ChannelPublicUrlCard";
-import { StoreSignageScheduleForm } from "../pharmacy/StoreSignageScheduleForm";
 import {
   TabletCommonIdlePicker,
   TabletOperationNotice,
@@ -86,69 +85,6 @@ it("주소 저장 실패는 공개 URL을 바꾸지 않고 수정 입력을 유�
   });
   fireEvent.click(screen.getByRole("button", { name: "저장" }));
   await waitFor(() => expect(changed).toHaveBeenCalledWith("updated"));
-});
-
-function scheduleProps(): ComponentProps<typeof StoreSignageScheduleForm> {
-  return {
-    editing: false,
-    playlists: [],
-    schName: "예시 일정",
-    schPlaylistId: "published",
-    schPriority: 0,
-    schDays: [],
-    schStartTime: "09:00",
-    schEndTime: "18:00",
-    schValidFrom: "",
-    schValidUntil: "",
-    schIsActive: true,
-    schSaving: false,
-    saveError: null,
-    setSchName: vi.fn(),
-    setSchPlaylistId: vi.fn(),
-    setSchPriority: vi.fn(),
-    setSchStartTime: vi.fn(),
-    setSchEndTime: vi.fn(),
-    setSchValidFrom: vi.fn(),
-    setSchValidUntil: vi.fn(),
-    setSchIsActive: vi.fn(),
-    toggleSchDay: vi.fn(),
-    handleSaveSchedule: vi.fn(),
-    resetScheduleForm: vi.fn(),
-  };
-}
-it("스케줄은 게시된 플레이리스트만 선택하고 요일 없는 저장을 막는다", () => {
-  const value = scheduleProps();
-  const playlists = [
-    { id: "published", name: "게시 목록", publishStatus: "published" },
-    { id: "draft", name: "초안 목록", publishStatus: "draft" },
-  ] as ComponentProps<typeof StoreSignageScheduleForm>["playlists"];
-  const { rerender } = render(
-    <StoreSignageScheduleForm {...value} playlists={playlists} />,
-  );
-  expect(screen.getByRole("option", { name: "게시 목록" })).toBeTruthy();
-  expect(screen.getByLabelText("우선순위")).toBeTruthy();
-  expect(screen.getByRole("group", { name: "요일 선택 *" })).toBeTruthy();
-  expect(screen.queryByRole("option", { name: "초안 목록" })).toBeNull();
-  expect(
-    (screen.getByRole("button", { name: "저장" }) as HTMLButtonElement)
-      .disabled,
-  ).toBe(true);
-  rerender(
-    <StoreSignageScheduleForm
-      {...value}
-      playlists={playlists}
-      schDays={[1]}
-      saveError="저장 실패"
-    />,
-  );
-  expect(screen.getByRole("alert").textContent).toBe("저장 실패");
-  expect(
-    (screen.getByPlaceholderText("스케줄명 *") as HTMLInputElement).value,
-  ).toBe("예시 일정");
-  expect(
-    (screen.getByRole("button", { name: "저장" }) as HTMLButtonElement)
-      .disabled,
-  ).toBe(false);
 });
 it("공통 영상은 만료된 후보를 숨기고 조회 실패를 빈 상태와 구분한다", () => {
   const callbacks = { onRetry: vi.fn(), onSelect: vi.fn(), onClose: vi.fn() };

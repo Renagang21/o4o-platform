@@ -106,7 +106,7 @@ export const InstructorLessonListManager = forwardRef<InstructorLessonListHandle
       title = '레슨 목록',
       headerExtra,
       emptyTitle = '아직 강의 내용이 없습니다',
-      emptyDesc = '첫 번째 레슨을 추가하여 강의를 구성하세요',
+      emptyDesc = '첫 번째 레슨을 추가하여 강의를 구성하시기 바랍니다',
       addLabel = '+ 새 레슨 추가',
       emptyAddLabel = '+ 레슨 추가',
     },

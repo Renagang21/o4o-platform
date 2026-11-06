@@ -21,7 +21,7 @@ function validDate(value: unknown) {
 
 /** Validate against existing column types; no new payment transition policy. */
 export function validatePaymentRecord(input: Record<string, unknown>) {
-  const invalid = () => new FundingError(400, 'INVALID_PAYMENT_RECORD', '입금 상태·금액·날짜·참조값을 확인해 주세요.');
+  const invalid = () => new FundingError(400, 'INVALID_PAYMENT_RECORD', '입금 상태·금액·날짜·참조값을 확인해 주시기 바랍니다.');
   if (!isPaymentStatus(input.paymentStatus)) throw invalid();
   for (const field of [...Object.keys(TEXT_LIMITS), 'paymentNote']) {
     const value = input[field];
@@ -56,7 +56,7 @@ export class FundingPaymentRecordService {
   async update(trialId: string, participantId: string, actorId: string, input: Record<string, unknown>) {
     const status = validatePaymentRecord(input);
     if (!Number.isSafeInteger(input.version) || Number(input.version) < 0) {
-      throw new FundingError(400, 'PAYMENT_VERSION_REQUIRED', '최신 참여자 현황을 다시 조회한 뒤 저장해 주세요.');
+      throw new FundingError(400, 'PAYMENT_VERSION_REQUIRED', '최신 참여자 현황을 다시 조회한 뒤 저장해 주시기 바랍니다.');
     }
     return this.ds.transaction(async manager => {
       await manager.query('SELECT id FROM market_trials WHERE id=$1 FOR UPDATE',[trialId]);
@@ -70,15 +70,15 @@ export class FundingPaymentRecordService {
 
       const version = before.offlineState?.version ?? 0;
       if (version !== input.version) {
-        throw new FundingError(409, 'PAYMENT_VERSION_CONFLICT', '다른 처리로 현황이 변경됐습니다. 다시 조회하고 입력 내용을 확인해 주세요.');
+        throw new FundingError(409, 'PAYMENT_VERSION_CONFLICT', '다른 처리로 현황이 변경됐습니다. 다시 조회하고 입력 내용을 확인해 주시기 바랍니다.');
       }
       const refund=Number((before as PaymentRow & {offlineState?:{refundAmount?:number}}).offlineState?.refundAmount??0);
       if (status === 'refunded' && refund === 0) {
-        throw new FundingError(409,'OFFLINE_REFUND_RECORD_REQUIRED','환급 완료는 오프라인 사후 처리에서 누적 환급액·처리일·사유와 함께 기록해 주세요.');
+        throw new FundingError(409,'OFFLINE_REFUND_RECORD_REQUIRED','환급 완료는 오프라인 사후 처리에서 누적 환급액·처리일·사유와 함께 기록해 주시기 바랍니다.');
       }
       if(input.paidAmount!==undefined&&Number(input.paidAmount??0)<refund)throw new FundingError(400,'REFUND_EXCEEDS_PAYMENT','입금액은 기록된 환급액 이상이어야 합니다.');
       if (refund > 0 && !['paid','refunded'].includes(status)) {
-        throw new FundingError(409,'REFUND_RECORD_EXISTS','환급 기록이 있는 입금은 미입금·취소로 바꿀 수 없습니다. 입금·누적 환급 금액을 정정해 주세요.');
+        throw new FundingError(409,'REFUND_RECORD_EXISTS','환급 기록이 있는 입금은 미입금·취소로 바꿀 수 없습니다. 입금·누적 환급 금액을 정정해 주시기 바랍니다.');
       }
       const nextAmount = input.paidAmount === undefined ? Number(before.paidAmount ?? 0) : Number(input.paidAmount ?? 0);
       const recordedStatus = refund > 0 ? (refund === nextAmount ? 'refunded' : 'paid') : status;

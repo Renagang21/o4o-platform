@@ -87,13 +87,13 @@ function App() {
 
     switch (error) {
       case 'token_refresh_failed':
-        toast.error('세션이 만료되었습니다. 다시 로그인해 주세요.');
+        toast.error('세션이 만료되었습니다. 다시 로그인해 주시기 바랍니다.');
         break;
       case 'insufficient_permissions':
         toast.error('관리자 권한이 필요합니다.');
         break;
       case 'account_locked':
-        toast.error('계정이 잠겨있습니다. 관리자에게 문의하세요.');
+        toast.error('계정이 잠겨있습니다. 관리자에게 문의하시기 바랍니다.');
         break;
       default:
         toast.error('인증 오류가 발생했습니다.');
@@ -137,9 +137,8 @@ function App() {
                 정확히 플랫폼 전역 관리자만 통과시킨다. 백엔드도 같은 경계다
                 (`routes/admin/platform-users.routes.ts` ADMIN_ACCESS_ROLES).
 
-                잠금 방지: 프로덕션 role_assignments 실측 후 적용했다. 활성 보유자는
-                super-admin@o4o.com · renariver21@gmail.com · sohae2100@gmail.com 3계정이며,
-                서비스 역할만으로 진입하던 계정은 전부 suspended 상태의 e2e/smoke 계정이었다.
+                잠금 방지: 적용 전 프로덕션 role_assignments 로 활성 보유자를 확인했다.
+                보유자 수는 시점마다 달라지므로 여기에 적지 않고, 변경 전에 다시 실측한다.
                 거부 시 AdminProtectedRoute 는 안내 화면을 렌더한다(redirect loop 없음).
             */}
             <Route path="/*" element={

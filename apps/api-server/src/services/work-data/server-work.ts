@@ -38,15 +38,15 @@ export async function runServerContentWork(db:DataSource,userId:string,text:stri
  let json=content.trim();
  if(json.startsWith('```')){json=json.slice(3);if(json.startsWith('json'))json=json.slice(4);}
  if(json.endsWith('```'))json=json.slice(0,-3);
- try{plan=planSchema.parse(JSON.parse(json));}catch{return {message:'어떤 자료를 찾거나 작성할지 한 문장으로 알려 주세요.',taskId:null};}
+ try{plan=planSchema.parse(JSON.parse(json));}catch{return {message:'어떤 자료를 찾거나 작성할지 한 문장으로 알려 주시기 바랍니다.',taskId:null};}
  if(plan.action==='help')return {message:plan.message,taskId:null};
  const workspace=workspaces.find(w=>w.id===plan.workspace);
- if(!workspace)return {message:'이용할 수 있는 업무공간을 확인해 주세요.',taskId:null};
+ if(!workspace)return {message:'이용할 수 있는 업무공간을 확인해 주시기 바랍니다.',taskId:null};
  const write=plan.action==='draft';
- if(write && !/(?:작성|만들|저장|등록|초안\s*(?:부탁|해\s*줘))/.test(text))return {message:'조회 요청에서는 자료를 저장하지 않았어요.',taskId:null};
+ if(write && !/(?:작성|만들|저장|등록|초안\s*(?:부탁|해\s*줘))/.test(text))return {message:'조회 요청에서는 자료를 저장하지 않았습니다.',taskId:null};
  const resolved=registry.resolve(plan.workspace,plan.action==='draft'?plan.destination:undefined);
  await resolved.adapter.authorize(userId,resolved.id,write,db);
- if(write && !workspace.writable)return {message:'이 업무공간에는 초안을 저장할 수 없어요.',taskId:null};
+ if(write && !workspace.writable)return {message:'이 업무공간에는 초안을 저장할 수 없습니다.',taskId:null};
  const ownership=await resolveTaskOwnership(db,{userId,workScope});
  const task=await createAssistantTask(db,{requestedByUserId:userId,ownership});
  try{

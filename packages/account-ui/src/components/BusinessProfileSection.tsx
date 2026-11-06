@@ -194,7 +194,7 @@ export function BusinessProfileSection({
   const validate = (): string[] => {
     const errs: string[] = [];
     if (form.businessEntityType && !isSelectableBusinessEntityType(form.businessEntityType)) {
-      errs.push('세금계산서 발행을 위한 개인 / 법인 구분을 선택해 주세요.');
+      errs.push('세금계산서 발행을 위한 개인 / 법인 구분을 선택해 주시기 바랍니다.');
     }
     if (form.taxInvoiceEmail && !EMAIL_RE.test(form.taxInvoiceEmail)) {
       errs.push('세금계산서 이메일 형식이 올바르지 않습니다.');
@@ -236,7 +236,7 @@ export function BusinessProfileSection({
       setSuccessMsg(`${entityLabel}/사업자 정보가 저장되었습니다.`);
       setTimeout(() => setSuccessMsg(''), 3000);
     } catch {
-      setErrors(['저장에 실패했습니다. 다시 시도해 주세요.']);
+      setErrors(['저장에 실패했습니다. 다시 시도해 주시기 바랍니다.']);
     } finally {
       setSaving(false);
     }
@@ -339,7 +339,7 @@ export function BusinessProfileSection({
                   className={inputCls}
                   value={form.entityName}
                   onChange={(e) => updateField('entityName', e.target.value)}
-                  placeholder={`${entityLabel}명을 입력하세요`}
+                  placeholder={`${entityLabel}명을 입력하시기 바랍니다`}
                   maxLength={200}
                 />
               </Field>
@@ -351,7 +351,7 @@ export function BusinessProfileSection({
                   disabled
                 />
                 <p className="text-xs text-gray-500 mt-1">
-                  사업자등록번호 변경은 관리자에게 문의해 주세요.
+                  사업자등록번호 변경은 관리자에게 문의해 주시기 바랍니다.
                 </p>
               </Field>
 

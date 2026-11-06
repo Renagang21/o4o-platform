@@ -88,7 +88,7 @@ export function useMyHomeReturn({
       if (mine !== generation) return;
       update({
         busy: false,
-        error: "My Home으로 이동하지 못했습니다. 다시 눌러 주세요.",
+        error: "My Home으로 이동하지 못했습니다. 다시 눌러 주시기 바랍니다.",
       });
     }
   }, [api, isAuthenticated, authLoading, local, navigate]);

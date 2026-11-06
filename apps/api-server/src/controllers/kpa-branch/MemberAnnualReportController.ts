@@ -69,7 +69,7 @@ function editableOrConflict(status: AnnualReportStatus | null) {
   }
   return {
     success: false,
-    error: '이미 제출한 신고서입니다. 수정이 필요하면 분회 사무국에 보완요청을 문의해 주세요.',
+    error: '이미 제출한 신고서입니다. 수정이 필요하면 분회 사무국에 보완요청을 문의해 주시기 바랍니다.',
     code: 'ALREADY_SUBMITTED',
   };
 }

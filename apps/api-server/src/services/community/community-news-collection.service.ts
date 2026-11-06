@@ -122,7 +122,7 @@ async function collect(
       throw new CommunityManagementError(
         409,
         "NEWS_COLLECTION_BUSY",
-        "뉴스 수집을 시작하고 있습니다. 잠시 후 결과를 확인해 주세요.",
+        "뉴스 수집을 시작하고 있습니다. 잠시 후 결과를 확인해 주시기 바랍니다.",
       );
     const existing = await read(m, day);
     if (existing) return { value: existing, created: false };

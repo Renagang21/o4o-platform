@@ -272,14 +272,22 @@ export function CommunityHomeConsole({
   return (
     <div className="py-6">
       {/* Header */}
-      <div className="flex items-center gap-3 mb-6">
-        <div className={`w-10 h-10 rounded-[10px] ${theme.iconBg} flex items-center justify-center`}>
-          <Monitor size={20} className={theme.iconText} />
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
+        <div className="flex items-center gap-3 min-w-0">
+          <div className={`w-10 h-10 rounded-[10px] ${theme.iconBg} flex items-center justify-center`}>
+            <Monitor size={20} className={theme.iconText} />
+          </div>
+          <div className="min-w-0">
+            <h1 className="text-xl font-semibold text-slate-800 m-0">{title}</h1>
+            <p className="text-[0.8125rem] text-slate-500 m-0">{subtitle}</p>
+          </div>
         </div>
-        <div>
-          <h1 className="text-xl font-semibold text-slate-800 m-0">{title}</h1>
-          <p className="text-[0.8125rem] text-slate-500 m-0">{subtitle}</p>
-        </div>
+        <button
+          onClick={openCreate}
+          className={`flex items-center gap-1.5 px-4 py-2 text-[0.8125rem] font-medium text-white rounded-lg ${theme.button}`}
+        >
+          <Plus size={14} /> {addButtonLabel}
+        </button>
       </div>
 
       {notice}
@@ -297,16 +305,6 @@ export function CommunityHomeConsole({
             <Icon size={14} /> {label}
           </button>
         ))}
-      </div>
-
-      {/* Action Bar */}
-      <div className="flex justify-end mb-4">
-        <button
-          onClick={openCreate}
-          className={`flex items-center gap-1.5 px-4 py-2 text-[0.8125rem] font-medium text-white rounded-lg ${theme.button}`}
-        >
-          <Plus size={14} /> {addButtonLabel}
-        </button>
       </div>
 
       {/* Content */}

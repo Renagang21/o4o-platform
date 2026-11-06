@@ -202,81 +202,6 @@ export interface MediaResponseDto {
   updatedAt: string;
 }
 
-// ========== Schedule DTOs ==========
-export interface CreateScheduleDto {
-  name: string;
-  channelId?: string;
-  playlistId?: string;
-  storePlaylistId?: string;
-  daysOfWeek: number[];
-  startTime: string;
-  endTime: string;
-  validFrom?: string;
-  validUntil?: string;
-  priority?: number;
-  isActive?: boolean;
-  metadata?: Record<string, any>;
-}
-
-export interface UpdateScheduleDto {
-  name?: string;
-  channelId?: string;
-  playlistId?: string;
-  storePlaylistId?: string | null;
-  daysOfWeek?: number[];
-  startTime?: string;
-  endTime?: string;
-  validFrom?: string;
-  validUntil?: string;
-  priority?: number;
-  isActive?: boolean;
-  metadata?: Record<string, any>;
-}
-
-export interface ScheduleQueryDto {
-  page?: number;
-  limit?: number;
-  channelId?: string;
-  playlistId?: string;
-  isActive?: boolean;
-  sortBy?: 'name' | 'priority' | 'startTime' | 'createdAt';
-  sortOrder?: 'asc' | 'desc';
-}
-
-export interface ScheduleResponseDto {
-  id: string;
-  serviceKey: string;
-  organizationId: string | null;
-  name: string;
-  channelId: string | null;
-  playlistId: string | null;
-  storePlaylistId: string | null;
-  daysOfWeek: number[];
-  startTime: string;
-  endTime: string;
-  validFrom: string | null;
-  validUntil: string | null;
-  priority: number;
-  isActive: boolean;
-  createdAt: string;
-  updatedAt: string;
-  playlist?: PlaylistResponseDto;
-}
-
-// ========== Active Content Resolution ==========
-export interface ActiveContentRequestDto {
-  channelId?: string;
-  currentTime?: string; // ISO datetime, defaults to now
-}
-
-export interface ActiveContentResponseDto {
-  playlist: PlaylistResponseDto | null;
-  schedule: ScheduleResponseDto | null;
-  items: PlaylistItemResponseDto[];
-  resolvedAt: string;
-  nextScheduleChange: string | null;
-}
-
 // ========== Sprint 2-3: Template DTOs ==========
 export interface TemplateLayoutConfig {
   width: number;
@@ -619,32 +544,6 @@ export interface TemplatePreviewResponseDto {
   previewHtml: string;
   previewUrl: string | null;
   compiledAt: string;
-}
-
-// ========== Schedule Calendar DTOs ==========
-export interface ScheduleCalendarQueryDto {
-  channelId?: string;
-  startDate: string;
-  endDate: string;
-}
-
-export interface ScheduleCalendarEventDto {
-  scheduleId: string;
-  scheduleName: string;
-  playlistId: string | null;
-  storePlaylistId: string | null;
-  playlistName: string;
-  startTime: string;
-  endTime: string;
-  daysOfWeek: number[];
-  priority: number;
-  date: string;
-}
-
-export interface ScheduleCalendarResponseDto {
-  events: ScheduleCalendarEventDto[];
-  startDate: string;
-  endDate: string;
 }
 
 // ========== Sprint 2-6: Global Content DTOs ==========

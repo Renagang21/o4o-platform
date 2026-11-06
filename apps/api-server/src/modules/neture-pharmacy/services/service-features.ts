@@ -13,7 +13,7 @@ export type PharmacyServiceFeature = typeof PHARMACY_SERVICE_FEATURES[number]['k
 
 export function validateServiceFeatures(value: unknown): PharmacyServiceFeature[] {
   if (!Array.isArray(value) || value.some(key => !PHARMACY_SERVICE_FEATURES.some(feature => feature.key === key))) {
-    throw new NeturePharmacyError(400, 'INVALID_SERVICE_FEATURES', '제공 기능 목록을 다시 확인해 주세요.');
+    throw new NeturePharmacyError(400, 'INVALID_SERVICE_FEATURES', '제공 기능 목록을 다시 확인해 주시기 바랍니다.');
   }
   return PHARMACY_SERVICE_FEATURES.map(feature => feature.key).filter(key => value.includes(key));
 }
@@ -22,7 +22,7 @@ export function validateServiceFeatures(value: unknown): PharmacyServiceFeature[
 export function readServiceFeatures(value: unknown): PharmacyServiceFeature[] {
   if (value == null) return [];
   try { return validateServiceFeatures(value); }
-  catch { throw new NeturePharmacyError(503, 'FEATURE_ACCESS_UNAVAILABLE', '서비스 이용 자격을 확인하지 못했습니다. 다시 시도해 주세요.'); }
+  catch { throw new NeturePharmacyError(503, 'FEATURE_ACCESS_UNAVAILABLE', '서비스 이용 자격을 확인하지 못했습니다. 다시 시도해 주시기 바랍니다.'); }
 }
 
 export interface ServiceFeatureGrant {
@@ -65,7 +65,7 @@ export class PharmacyServiceFeatureService {
       })) };
     } catch (error) {
       if (error instanceof NeturePharmacyError) throw error;
-      throw new NeturePharmacyError(503, 'FEATURE_ACCESS_UNAVAILABLE', '서비스 이용 자격을 확인하지 못했습니다. 다시 시도해 주세요.');
+      throw new NeturePharmacyError(503, 'FEATURE_ACCESS_UNAVAILABLE', '서비스 이용 자격을 확인하지 못했습니다. 다시 시도해 주시기 바랍니다.');
     }
   }
 
@@ -109,7 +109,7 @@ export class PharmacyServiceFeatureService {
         })),
       };
     } catch {
-      throw new NeturePharmacyError(503, 'FEATURE_ACCESS_UNAVAILABLE', '서비스 이용 자격을 확인하지 못했습니다. 다시 시도해 주세요.');
+      throw new NeturePharmacyError(503, 'FEATURE_ACCESS_UNAVAILABLE', '서비스 이용 자격을 확인하지 못했습니다. 다시 시도해 주시기 바랍니다.');
     }
   }
 
@@ -126,7 +126,7 @@ export class PharmacyServiceFeatureService {
   private assertFeature<T extends Awaited<ReturnType<PharmacyServiceFeatureService['resolveStore']>>>(result: T, feature: PharmacyServiceFeature): T {
     if (!result.features.some(item => item.key === feature && item.allowed)) {
       if (result.memberEntitlement === 'not-connected') {
-        throw new NeturePharmacyError(503, 'MEMBER_ENTITLEMENT_NOT_CONNECTED', '회원 이용 자격 연결을 확인해 주세요.');
+        throw new NeturePharmacyError(503, 'MEMBER_ENTITLEMENT_NOT_CONNECTED', '회원 이용 자격 연결을 확인해 주시기 바랍니다.');
       }
       throw new NeturePharmacyError(403, 'SERVICE_FEATURE_REQUIRED', '이 서비스를 이용할 수 있는 자격이 필요합니다.');
     }

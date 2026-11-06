@@ -39,7 +39,7 @@ function JobView({
       {job.lastErrorCode && (
         <p className="text-sm">
           {job.lastErrorCode === "NO_CURRENT_OWNER"
-            ? "현재 공급자 수신자가 없습니다. 소유 관계를 확인한 뒤 재처리하세요."
+            ? "현재 공급자 수신자가 없습니다. 소유 관계를 확인한 뒤 재처리하시기 바랍니다."
             : "알림 저장을 완료하지 못했습니다. 상태를 확인하고 재처리할 수 있습니다."}
         </p>
       )}
@@ -90,7 +90,7 @@ export function SettlementNotificationStatus({
       if (alive.current && ticket === epoch.current) setJob(data);
     } catch {
       if (alive.current && ticket === epoch.current)
-        setError("알림 상태를 확인하지 못했습니다. 다시 조회해 주세요.");
+        setError("알림 상태를 확인하지 못했습니다. 다시 조회해 주시기 바랍니다.");
     } finally {
       if (alive.current && ticket === epoch.current) setBusy(false);
     }
@@ -109,7 +109,7 @@ export function SettlementNotificationStatus({
     } catch {
       if (alive.current && ticket === epoch.current)
         setError(
-          "처리 결과를 확인하지 못했습니다. 재지급하지 말고 알림 상태를 다시 조회해 주세요.",
+          "처리 결과를 확인하지 못했습니다. 재지급하지 말고 알림 상태를 다시 조회해 주시기 바랍니다.",
         );
     } finally {
       if (alive.current && ticket === epoch.current) setBusy(false);
@@ -159,7 +159,7 @@ export default function SettlementNotificationRecovery({
       if (ticket === epoch.current) setQueue(data);
     } catch {
       if (ticket === epoch.current)
-        setError("알림 처리 목록을 확인하지 못했습니다. 다시 조회해 주세요.");
+        setError("알림 처리 목록을 확인하지 못했습니다. 다시 조회해 주시기 바랍니다.");
     } finally {
       if (ticket === epoch.current) setLoading(false);
     }

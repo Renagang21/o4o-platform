@@ -81,7 +81,7 @@ function AssignedBusinessPanel({ businessKey, contactHref, forumHref, renderBusi
         <PageHeader title="담당 약국 협력사업" />
         <Message message={message} />
         <div className="rounded-lg border border-gray-200 bg-white p-8 text-center text-sm text-gray-500">
-          담당으로 지정된 약국 협력사업이 없습니다. 전체 관리자에게 담당 지정을 요청하세요.
+          담당으로 지정된 약국 협력사업이 없습니다. 전체 관리자에게 담당 지정을 요청하시기 바랍니다.
         </div>
       </div>
     );
@@ -137,7 +137,7 @@ function AssignedBusinessPanel({ businessKey, contactHref, forumHref, renderBusi
       {tab === 'contents' && (
         <div className="flex flex-wrap items-start justify-between gap-3 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-900">
           <ul className="list-disc space-y-1 pl-5">
-            <li>공급자가 요청한 자료는 검토 대기 상태입니다. 내용을 확인한 후 승인·게시하거나 사유를 적어 반려하세요. 커뮤니티에는 게시되지 않습니다.</li>
+            <li>공급자가 요청한 자료는 검토 대기 상태입니다. 내용을 확인한 후 승인·게시하거나 사유를 적어 반려하시기 바랍니다. 커뮤니티에는 게시되지 않습니다.</li>
             <li>게시된 콘텐츠는 이 약국 협력사업에 활성 가입한 약국에만 보입니다.</li>
             <li>약국은 게시된 콘텐츠를 자기 매장 사본으로 복사해 씁니다. 이후 여기서 수정해도 이미 만든 매장 사본에는 반영되지 않습니다.</li>
             <li>보관하면 약국 화면에서 내려가지만, 이미 만든 매장 사본은 그대로 남습니다.</li>

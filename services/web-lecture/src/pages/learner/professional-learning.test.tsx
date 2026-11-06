@@ -38,7 +38,7 @@ it('uses introduction-only curriculum without fetching protected lessons when si
 it('distinguishes an outline outage from an empty curriculum and supports retry', async () => {
  const getCurriculum = vi.fn().mockRejectedValueOnce(new Error('offline')).mockResolvedValueOnce([]);
  render(<CourseDetailView courseId="course" port={port({ getCurriculum })} config={config} />);
- expect(await screen.findByText('목차를 불러오지 못했습니다. 다시 시도해 주세요.')).toBeTruthy();
+ expect(await screen.findByText('목차를 불러오지 못했습니다. 다시 시도해 주시기 바랍니다.')).toBeTruthy();
  expect(screen.queryByText('등록된 레슨이 아직 없습니다.')).toBeNull();
  fireEvent.click(screen.getByRole('button', { name: '다시 시도' }));
  expect(await screen.findByText('등록된 레슨이 아직 없습니다.')).toBeTruthy();

@@ -18,7 +18,7 @@ export function FundingCreatorLayout() {
     getFundingCreatorEligibility().then(() => { if (active) setVerifiedScope(scope); }).catch(e => {
       if (!active) return;
       setCandidates(e.response?.data?.candidates ?? []);
-      setError(e.response?.data?.error?.message ?? '공급자 자격을 확인하지 못했습니다. 다시 시도해 주세요.');
+      setError(e.response?.data?.error?.message ?? '공급자 자격을 확인하지 못했습니다. 다시 시도해 주시기 바랍니다.');
     });
     return () => { active = false; };
   }, [isAuthenticated, user?.id, version, scope]);

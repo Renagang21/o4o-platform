@@ -101,3 +101,12 @@ it.each([['active', '정지'], ['suspended', '복구']])('operator daily authori
   expect(screen.queryByRole('option', { name: '서비스 운영자' })).toBeNull();
   expect(screen.getByRole('option', { name: '일반 회원' })).toBeTruthy();
 });
+
+it.each(['pending','active','suspended'])('keeps protected Admin detail read-only in Operator API context (%s)',async status=>{
+ const api={get:vi.fn(async()=>({user:{id:'admin-target',name:'합성 관리자',email:'admin@example.test',operatorReadOnly:true,status,isActive:true,createdAt:'2026-01-01'},roles:[],memberships:[{id:'membership',serviceKey:'neture',status,createdAt:'2026-01-01'}]})),put:vi.fn(),patch:vi.fn(),post:vi.fn(),delete:vi.fn()};
+ render(<UserDetailPage userId="admin-target" apiAdapter={api} isAdmin canManageMembers navigate={vi.fn()} config={{theme:'blue',serviceKey:'neture',labels:{businessInfoTitle:'사업자 정보',businessNameLabel:'사업자명'}}} />);
+ await screen.findByText('전체 관리자 — 처리 대상 아님');
+ for(const name of ['승인','거부','정지','복구','정보 수정','서비스 탈퇴','역할 추가']) expect(screen.queryByRole('button',{name})).toBeNull();
+ expect(screen.queryByTitle('멤버십 승인')).toBeNull();expect(screen.queryByTitle('멤버십 거부')).toBeNull();
+ expect(api.patch).not.toHaveBeenCalled();expect(api.post).not.toHaveBeenCalled();
+});

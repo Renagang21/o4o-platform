@@ -16,6 +16,7 @@ import type { SemiFranchiseRow } from './semi-franchise.service.js';
 import { businessVideos } from './business-videos.js';
 
 export const SEMI_FRANCHISE_CONTENT_SOURCE = 'semi-franchise';
+export const SEMI_FRANCHISE_VIDEO_SOURCE = 'semi-franchise-video';
 
 export interface ContentInput {
   expectedRevision?: number;
@@ -41,7 +42,7 @@ export type SnapshotCopier = (input: {
 function cleanContent(input: ContentInput, requireTitle: boolean) {
   const title = typeof input.title === 'string' ? input.title.trim() : '';
   if (requireTitle && (!title || title.length > 300)) {
-    throw new NeturePharmacyError(400, 'INVALID_TITLE', '제목을 입력해 주세요(300자 이하).');
+    throw new NeturePharmacyError(400, 'INVALID_TITLE', '제목을 입력해 주시기 바랍니다(300자 이하).');
   }
   const arr = (v: unknown) => (Array.isArray(v) ? v : undefined);
   const text = (v: unknown) => (typeof v === 'string' ? v : v === null ? null : undefined);
@@ -109,9 +110,9 @@ export class SemiFranchiseContentService {
   async operatorUpdate(sf: SemiFranchiseRow, userId: string, id: string, input: ContentInput) {
     const c = cleanContent(input, false);
     if (input.expectedRevision !== undefined && (!Number.isInteger(input.expectedRevision) || input.expectedRevision < 1))
-      throw new NeturePharmacyError(400, 'INVALID_REVISION', '자료 개정 번호를 확인해 주세요.');
+      throw new NeturePharmacyError(400, 'INVALID_REVISION', '자료 개정 번호를 확인해 주시기 바랍니다.');
     if (input.title !== undefined && !c.title) {
-      throw new NeturePharmacyError(400, 'INVALID_TITLE', '제목을 입력해 주세요(300자 이하).');
+      throw new NeturePharmacyError(400, 'INVALID_TITLE', '제목을 입력해 주시기 바랍니다(300자 이하).');
     }
     const rows = rowsOf(await this.dataSource.query(
       `UPDATE semi_franchise_contents SET
@@ -136,7 +137,7 @@ export class SemiFranchiseContentService {
     ));
     if (!rows[0]) {
       if (input.expectedRevision !== undefined && (await this.dataSource.query("SELECT id FROM semi_franchise_contents WHERE id=$1 AND semi_franchise_id=$2 AND status IN ('draft','pending','published')", [id,sf.id])).length)
-        throw new NeturePharmacyError(409, 'CONTENT_CHANGED', '다른 자료 개정이 반영됐습니다. 입력 내용을 보관하고 다시 조회해 주세요.');
+        throw new NeturePharmacyError(409, 'CONTENT_CHANGED', '다른 자료 개정이 반영됐습니다. 입력 내용을 보관하고 다시 조회해 주시기 바랍니다.');
       throw new NeturePharmacyError(404, 'CONTENT_NOT_FOUND', '수정할 수 있는 콘텐츠가 없습니다.');
     }
     return rows[0];
@@ -147,13 +148,13 @@ export class SemiFranchiseContentService {
     const to = action === 'publish' ? 'published' : action === 'reject' ? 'rejected' : 'archived';
     const from = action === 'publish' ? ['draft', 'pending', 'archived'] : action === 'reject' ? ['pending'] : ['draft', 'published'];
     if (action === 'reject' && (typeof reason !== 'string' || !reason.trim()))
-      throw new NeturePharmacyError(400, 'REASON_REQUIRED', '반려 사유를 입력해 주세요.');
+      throw new NeturePharmacyError(400, 'REASON_REQUIRED', '반려 사유를 입력해 주시기 바랍니다.');
     return this.dataSource.transaction(async manager => {
       const [current] = await manager.query(`SELECT c.title, c.status, c.revision, c.created_by, c.source_supplier_id,
         ns.organization_id FROM semi_franchise_contents c LEFT JOIN neture_suppliers ns ON ns.id=c.source_supplier_id
         WHERE c.id=$1 AND c.semi_franchise_id=$2 FOR UPDATE OF c`, [id, sf.id]);
       if (!current) throw new NeturePharmacyError(409, 'INVALID_TRANSITION', '처리할 수 없는 상태입니다.');
-      if (expectedRevision !== undefined && current.revision !== expectedRevision) throw new NeturePharmacyError(409, 'CONTENT_CHANGED', '다른 자료 개정이 반영됐습니다. 다시 검토해 주세요.');
+      if (expectedRevision !== undefined && current.revision !== expectedRevision) throw new NeturePharmacyError(409, 'CONTENT_CHANGED', '다른 자료 개정이 반영됐습니다. 다시 검토해 주시기 바랍니다.');
       if (!from.includes(current.status) || (action === 'publish' && current.status === 'archived' && current.source_supplier_id))
         throw new NeturePharmacyError(409, 'INVALID_TRANSITION', '처리할 수 없는 상태입니다.');
       if (action === 'publish' && current.source_supplier_id) {
@@ -210,22 +211,34 @@ export class SemiFranchiseContentService {
     return row;
   }
 
-  /** Recheck membership/publication on every import; retain a store-owned video snapshot. */
+  /** 내 매장 편집용 사본 — 원본 변경은 사본에 전파되지 않는다(Store 소유 독립 사본). */
   async pharmacyCopyVideo(organizationId: string, userId: string, id: string, sourceUrl: unknown) {
+    // 가입 · 게시 판정은 pharmacyGet 이 다시 수행하고, 주소는 자료에 실제 포함된 값만 허용한다.
     const content = await this.pharmacyGet(organizationId, id);
-    const video = businessVideos(content).find(item => item.sourceUrl === sourceUrl);
+    const video = businessVideos(content).find((item) => item.sourceUrl === sourceUrl);
     if (!video) throw new NeturePharmacyError(400, 'VIDEO_NOT_AVAILABLE', '제공 자료에 포함된 지원 영상을 선택해 주세요.');
     return this.copier({
-      sourceService: 'semi-franchise-video', sourceAssetId: id,
-      assetType: 'signage', targetOrganizationId: organizationId, createdBy: userId, title: content.title,
-      contentJson: { title: content.title, mediaType: 'video', ...video,
-        sourceContentId: id, semiFranchiseKey: content.semiFranchiseKey, semiFranchiseName: content.semiFranchiseName,
-        sourceRevision: content.revision, sourceLabel: content.semiFranchiseName, thumbnailUrl: content.thumbnailUrl,
-        capturedAt: new Date().toISOString() },
+      sourceService: SEMI_FRANCHISE_VIDEO_SOURCE,
+      sourceAssetId: id,
+      assetType: 'signage',
+      targetOrganizationId: organizationId,
+      createdBy: userId,
+      title: content.title,
+      contentJson: {
+        title: content.title,
+        mediaType: 'video',
+        ...video,
+        sourceContentId: id,
+        semiFranchiseKey: content.semiFranchiseKey,
+        semiFranchiseName: content.semiFranchiseName,
+        sourceRevision: content.revision,
+        sourceLabel: content.semiFranchiseName,
+        thumbnailUrl: content.thumbnailUrl,
+        capturedAt: new Date().toISOString(),
+      },
     });
   }
 
-  /** 내 매장 편집용 사본 — 원본 변경은 사본에 전파되지 않는다(Store 소유 독립 사본). */
   async pharmacyCopy(organizationId: string, userId: string, id: string) {
     const c = await this.pharmacyGet(organizationId, id);
     const { snapshotId } = await this.copier({

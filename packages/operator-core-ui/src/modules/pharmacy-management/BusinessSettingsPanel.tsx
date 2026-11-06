@@ -31,7 +31,7 @@ export function BusinessSettingsPanel({
         onSubmit={async (event) => {
           event.preventDefault();
           if (!form.name.trim()) {
-            setError("사업 이름을 입력해 주세요.");
+            setError("사업 이름을 입력해 주시기 바랍니다.");
             return;
           }
           setBusy(true);
@@ -58,8 +58,8 @@ export function BusinessSettingsPanel({
           } catch {
             setError(
               saved
-                ? "사업 정보는 저장됐지만 최신 상태를 확인하지 못했습니다. 설정을 다시 불러와 주세요."
-                : "사업 정보를 저장하지 못했습니다. 다시 시도해 주세요.",
+                ? "사업 정보는 저장됐지만 최신 상태를 확인하지 못했습니다. 설정을 다시 불러와 주시기 바랍니다."
+                : "사업 정보를 저장하지 못했습니다. 다시 시도해 주시기 바랍니다.",
             );
           } finally {
             setBusy(false);
@@ -128,7 +128,7 @@ export function BusinessSettingsPanel({
               />
             </label>
             <p className="mt-2 text-sm text-gray-600">
-              연결 정보를 확정한 경우에만 입력하세요. 수취 주체 설정은 실제 결제
+              연결 정보를 확정한 경우에만 입력하시기 바랍니다. 수취 주체 설정은 실제 결제
               연동을 완료하지 않습니다.
             </p>
           </details>

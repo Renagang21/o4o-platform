@@ -95,7 +95,7 @@ export function PolicyDocumentViewer({ serviceKey, documentType, heading, loadPo
       )}
       {status === 'loading' && <div style={S.state}>불러오는 중…</div>}
       {status === 'empty' && <div style={S.state}>현재 공개된 문서가 없습니다.</div>}
-      {status === 'error' && <div style={S.state}>문서를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.</div>}
+      {status === 'error' && <div style={S.state}>문서를 불러오지 못했습니다. 잠시 후 다시 시도해 주시기 바랍니다.</div>}
     </div>
   );
 }

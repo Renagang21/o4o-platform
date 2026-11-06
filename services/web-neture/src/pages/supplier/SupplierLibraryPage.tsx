@@ -121,7 +121,7 @@ function LibraryPage() {
       );
       setHandoffItem(null);
     } else {
-      setHandoffError(result.error || '제공에 실패했습니다. 잠시 후 다시 시도해 주세요.');
+      setHandoffError(result.error || '제공에 실패했습니다. 잠시 후 다시 시도해 주시기 바랍니다.');
     }
   };
 
@@ -348,13 +348,14 @@ function LibraryPage() {
         description={guideDesc ?? '자료함은 원본 보관 장소입니다. 커뮤니티 게시와 서비스 등재 요청은 독립된 작업입니다.'}
         steps={guideSteps ?? [
           '자료 등록 버튼으로 파일 또는 문서를 추가합니다. 기본은 비공개 보관이며 자동 게시하지 않습니다.',
-          '커뮤니티에 게시를 누르면 별도 작성기로 이동합니다. 회원에게 공개할 수 있는 내용인지 확인한 뒤 게시하세요.',
+          '커뮤니티에 게시를 누르면 별도 작성기로 이동합니다. 회원에게 공개할 수 있는 내용인지 확인한 뒤 게시하시기 바랍니다.',
           '협력사업에 등재 요청하면 해당 운영자가 사본을 검토·게시하며 요청 현황에서 결과를 확인합니다.',
           '"공개" 로 등록한 자료는 매장 HUB 의 공급자 콘텐츠 소스에 노출되며, 매장이 직접 선택해 가져갑니다.',
           '"서비스에 제공" 으로 서비스를 고르면 해당 서비스 운영자에게 전달됩니다. 이후 검토·수정·게시는 운영자 업무입니다.',
           '특정 매장에 직접 보내는 기능은 없습니다. 매장용 상품 설명서·태블릿·사이니지는 콘텐츠 메뉴의 각 화면에서 등록합니다.',
         ]}
         compact
+        collapsible
       />
 
       {requestSourceError && <p role="alert">{requestSourceError}</p>}
@@ -422,7 +423,7 @@ function LibraryPage() {
           <p style={{ fontSize: '15px', color: '#475569', marginBottom: '4px' }}>
             콘텐츠 라이브러리 목록을 불러오지 못했습니다.
           </p>
-          <p style={{ fontSize: '13px', color: '#94a3b8' }}>잠시 후 다시 시도해 주세요.</p>
+          <p style={{ fontSize: '13px', color: '#94a3b8' }}>잠시 후 다시 시도해 주시기 바랍니다.</p>
           <button
             onClick={fetchItems}
             style={{

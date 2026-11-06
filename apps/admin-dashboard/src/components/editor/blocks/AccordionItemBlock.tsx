@@ -50,8 +50,8 @@ const AccordionItemBlock: React.FC<AccordionItemBlockProps> = ({
   onSelect,
   attributes = {},
 }) => {
-  const title = attributes.title || '질문을 입력하세요';
-  const itemContent = attributes.content || '답변을 입력하세요';
+  const title = attributes.title || '질문을 입력하시기 바랍니다';
+  const itemContent = attributes.content || '답변을 입력하시기 바랍니다';
   const defaultOpen = attributes.defaultOpen ?? false;
   const borderColor = attributes.borderColor || '#e5e7eb';
   const backgroundColor = attributes.backgroundColor || '#ffffff';
@@ -86,7 +86,7 @@ const AccordionItemBlock: React.FC<AccordionItemBlockProps> = ({
             <Input
               value={title}
               onChange={(e) => handleAttributeChange('title', e.target.value)}
-              placeholder="질문을 입력하세요"
+              placeholder="질문을 입력하시기 바랍니다"
             />
           </div>
 
@@ -96,7 +96,7 @@ const AccordionItemBlock: React.FC<AccordionItemBlockProps> = ({
             <Textarea
               value={itemContent}
               onChange={(e) => handleAttributeChange('content', e.target.value)}
-              placeholder="답변을 입력하세요"
+              placeholder="답변을 입력하시기 바랍니다"
               rows={4}
             />
           </div>

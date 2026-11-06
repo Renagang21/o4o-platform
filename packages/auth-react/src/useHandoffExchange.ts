@@ -73,7 +73,7 @@ export function useHandoffExchange(
         data: null,
         message:
           cfg.missingTokenMessage ??
-          '이동 정보가 없습니다. 다시 시도해 주세요.',
+          '이동 정보가 없습니다. 다시 시도해 주시기 바랍니다.',
       });
       return;
     }
@@ -117,7 +117,7 @@ export function useHandoffExchange(
             code: '',
             message:
               cfg.networkErrorMessage ??
-              '네트워크 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.',
+              '네트워크 오류가 발생했습니다. 잠시 후 다시 시도해 주시기 바랍니다.',
           });
       }
     })();

@@ -1,129 +1,41 @@
 # CLAUDE.md — Claude Code 진입점
 
-> **이 문서는 Claude Code 가 이 저장소에서 안전하게 작업하기 위한 진입점 · 안전 경계 · 정본 지도다.**
-> 규칙의 원문은 canonical 문서에 있다. 이 파일은 그것을 **복사하지 않고 가리킨다.**
-> Codex / 일반 에이전트의 진입점은 [`AGENTS.md`](AGENTS.md) 이며 두 문서는 **동급**이다 — 한쪽이 다른 쪽을 import 하거나 선행 조건으로 요구하지 않는다. 단 저장소 공통 실행 규칙인 **Parallel Session / Worktree Policy** 의 정본은 `AGENTS.md` §4-1 에 두고 이 파일은 그것을 가리킨다. 공통 지식은 [`docs/CANONICAL-INDEX.md`](docs/CANONICAL-INDEX.md) 와 각 정본에 둔다.
+> **저장소 공통 실행 규칙은 [`AGENTS.md`](AGENTS.md) 가 정본이며 아래에서 그대로 가져온다.**
+> 이 파일에는 **Claude Code 전용 내용**(세션 유형 · 도구 · 권한 설정 · 커맨드)과 소스가 참조하는 **§ 번호 호환 앵커**(부록 A)만 둔다.
+> 공통 규칙을 바꿀 때는 `AGENTS.md` 를 고치고 이 파일에 다시 쓰지 않는다. Codex / 일반 에이전트는 `AGENTS.md` 만 읽는다.
 >
-> **§ 번호(§0~§16, §13-A)는 고정이다.** 소스 주석과 기준 문서가 `CLAUDE.md §N` 으로 참조한다. 부록의 번호·순서를 바꾸지 않는다.
+> **§ 번호(§0~§16, §13-A)는 고정이다.** 소스 주석 · CI 메시지 · 기준 문서가 `CLAUDE.md §N` 으로 참조한다. 부록의 번호·순서를 바꾸지 않는다.
+
+@AGENTS.md
 
 ---
+
+# Claude Code 전용
 
 ## 세션 시작 규칙
 - 세션 시작 시 HANDOFF.md가 있으면 먼저 읽을 것
 - 진행 상황은 CLAUDE.md가 아니라 HANDOFF.md에 기록할 것
+- 시작 · 종료 절차는 `/start` · `/handoff` 스킬(`.claude/skills/`)을 따른다.
+- 그 밖의 스킬: `/wo-new`(지시서 작성 · 인계) · `/db-readonly`(로컬 전용 운영 DB 조회) · `/verify`(변경 범위 검증) · `/integrate`(통합 담당 지정 시만) · `/worktree-cleanup`(merge 후 정리). 스킬은 규칙을 복사하지 않고 `AGENTS.md` · 정본 절을 가리킨다.
+- SessionStart 훅(`.claude/hooks/session-start.mjs`)이 `origin/main` 을 fetch 하고, **clean 한 기준 main checkout 에서만** `pull --ff-only` 한다. 작업 branch · worktree 에서는 ahead/behind 만 보고하며 merge/rebase 하지 않는다. 이 세션 유형(`실행 위치`)의 최근 미완료 지시서도 알려 준다.
 
----
+## 세션 유형 — 클라우드 · 데스크톱 로컬
 
-## Source of Truth
+| 세션 | 판별 | 하는 일 | 하지 않는 일 |
+|---|---|---|---|
+| **클라우드 세션** (claude.ai/code) | `CLAUDE_CODE_REMOTE=true` | 코드 · 문서 · 테스트 · branch push · (통합 담당 지정 시) PR | 운영 DB 접속 — gcloud 인증 · Cloud SQL Proxy 가 없다 |
+| **데스크톱 로컬 세션** | 그 밖 | 운영 DB read-only 조회 · 사용자가 승인한 운영 작업 · 실 PC smoke | 승인 없는 DB write · DDL · migration 수동 적용 (`AGENTS.md` §5) |
 
-시작 전 확인하는 정본:
+- 클라우드 세션에서 운영 DB 확인이 필요하면 멈추고, read-only SQL 과 판정 기준을 담은 지시서를 `docs/work-orders/` 에 작성해 작업 branch 로 push 한 뒤 `HANDOFF.md` 로 로컬 세션에 넘긴다. 로컬 세션은 결과를 마스킹해 같은 branch 에 기록하고 push 한다.
+- 두 세션 모두 `AGENTS.md` §4-1 의 전용 worktree · branch 규칙을 따른다.
 
-| 영역 | 정본 |
-|---|---|
-| **정본 지도 (전체 색인 · 상태)** | [`docs/CANONICAL-INDEX.md`](docs/CANONICAL-INDEX.md) |
-| **역할별 업무공간 Architecture** (Community · Store · Supplier · Service Operator · Supplier → Store Hub/Operator 경로 · 1 Store : N Services · Legacy Partner 은퇴 · 리팩터링 실행 규칙) | [`O4O-ROLE-WORKSPACE-ARCHITECTURE-V1`](docs/baseline/O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md) — 역할 경계 · 업무공간 · 콘텐츠 유입 · Partner 에 관해 PHILOSOPHY 와 충돌하면 이 문서 우선 |
-| 사업 철학 (참여 주체 · HUB · AI 역할) | [`O4O-BUSINESS-PHILOSOPHY-V1`](docs/baseline/O4O-BUSINESS-PHILOSOPHY-V1.md) |
-| **매장 commerce 경계** (cart · checkout · orders · payments · refund · PG · POS · tablet · QR · 외부 판매채널) | [`O4O-STORE-COMMERCE-BOUNDARY-V1`](docs/baseline/O4O-STORE-COMMERCE-BOUNDARY-V1.md) — **코드보다 먼저 읽는다** |
-| 공급자→매장 B2B 주문 (위 문서의 B2B 축 쌍) | [`O4O-B2B-SUPPLIER-TO-STORE-ORDER-CONTRACT-V1`](docs/baseline/O4O-B2B-SUPPLIER-TO-STORE-ORDER-CONTRACT-V1.md) |
-| 3자 Canonical Flow | [`O4O-3-ROLE-FLOW-BASELINE-V1`](docs/baseline/O4O-3-ROLE-FLOW-BASELINE-V1.md) — **§2 · §6 충돌 절 SUPERSEDED (판정 확정 2026-09-16)**, ROLE-WORKSPACE-ARCHITECTURE §2-1 · §6 이 대체. §4 · §5 만 참고 — [`CANONICAL-INDEX` §9](docs/CANONICAL-INDEX.md) |
-| **AI 자동화 진화 원칙** (Local Agent · Browser DOM · Computer Use · Site Adapter · Workflow · 주문/회계 자동화 WO 의 상위 기준) | [`O4O-AI-AUTOMATION-EVOLUTION-PRINCIPLES-V1`](docs/baseline/O4O-AI-AUTOMATION-EVOLUTION-PRINCIPLES-V1.md) — 사용자 행동은 학습 자료, 목적/결과가 기준 · 완전 자동화가 아닌 시간 절감 · 사이트별 업무 사전 정의 금지 · 구조(Personal Work Assistant · Task · Memory Ownership-first · PC = Execution Node · 개발 순서 §18)는 하위 정본 [`O4O-PERSONAL-ASSISTANT-ARCHITECTURE-V2`](docs/baseline/O4O-PERSONAL-ASSISTANT-ARCHITECTURE-V2.md) (ARCHITECTURE-V1 SUPERSEDED) |
-| Domain Boundary · Guard Rules 5종 | [`O4O-BOUNDARY-POLICY-V1`](docs/architecture/O4O-BOUNDARY-POLICY-V1.md) |
-| Core 동결 범위 | [`O4O-CORE-FREEZE-V1`](docs/architecture/O4O-CORE-FREEZE-V1.md) |
-| 공통 모듈 변경 절차 | [`O4O-SHARED-MODULE-CHANGE-PROTOCOL-V1`](docs/baseline/O4O-SHARED-MODULE-CHANGE-PROTOCOL-V1.md) |
-| 개발환경 · 검증 명령 · CI 게이트 · DB 접속 절차 | [`SETUP.md`](SETUP.md) |
-| **세션 격리 · worktree · branch · main 통합 · 공유 runtime 직렬화** | [`AGENTS.md` §4-1 Parallel Session / Worktree Policy](AGENTS.md#4-1-parallel-session--worktree-policy) — 저장소 공통 정본 |
-| Git 병렬 작업(stage · commit · push) · PC 이동 | [`O4O-GIT-PARALLEL-WORK-SAFETY-V1`](docs/baseline/operations/O4O-GIT-PARALLEL-WORK-SAFETY-V1.md) |
-| 프로덕션 마이그레이션 | [`PRODUCTION-MIGRATION-STANDARD`](docs/baseline/operations/PRODUCTION-MIGRATION-STANDARD.md) |
-
-충돌 시 우선순위:
-
-1. 사용자의 현재 명시적 작업 지시
-2. 사업 · 정책 정본 — ROLE-WORKSPACE-ARCHITECTURE · PHILOSOPHY · COMMERCE-BOUNDARY · B2B-ORDER-CONTRACT (3-ROLE-FLOW 의 충돌 절은 SUPERSEDED — 참고만)
-3. 구조 계약 — Frozen Baselines(§14) · Boundary · Core Freeze · Shared Module Protocol
-4. 도메인 · 서비스 정본 — `docs/CANONICAL-INDEX.md` 의 나머지
-5. WO / CHECK / IR / archive — **과거 시점의 실행 기록**. 현재 정책을 이기지 않는다
-
-아래 실행 안전 규칙(실행 원칙 · 중지 조건 · Git · DB · 검증 · 보고)은 이 체인 밖에서 **항상** 적용된다.
-
-> **역추론 금지.** 저장소에 cart / checkout / payment / refund / `platform-seller` 코드가 **존재한다는 사실은 그 기능이 현행 사업 기능이라는 근거가 아니다.** 사업 계약이 먼저이고 코드는 그 계약에 맞게 정리한다 (COMMERCE-BOUNDARY §8 · §14).
->
-> **현재 정책 ≠ 영구 계약.** "현재 하지 않는다"(예: 플랫폼 직접 판매 계약 NONE, 2026-08-25 확정 / POS 비개발) 를 "앞으로도 절대 하지 않는다"로 읽거나 쓰지 않는다. 사업 모델 변경은 COMMERCE-BOUNDARY §15 절차, Frozen 구조 변경은 명시적 WO 를 따른다.
-
----
-
-## 실행 원칙
-
-```text
-개발 담당: 조사 → 문제확정 → 최소 수정 → 검증 → 정본 반영 · (필요 시) CHECK/IR → path-specific stage → commit → push → branch · commit SHA · 검증 결과 · 미해결 사항 인계
-통합 담당: PR 검토 → CI · Codex → 순차 PR merge → post-merge 확인 → 필요한 배포 · 검증 → 결과 전달 → worktree 종료 정리
-```
-
-- **개발 담당의 기본 종료점은 로컬 검증 · commit · push 후 인계다.** 수정 요청을 받은 경우에도 같은 작업 branch에 추가 push하고 재인계한다. PR 생성 · CI·리뷰 운영 · PR merge · auto-merge 설정 · 배포 dispatch · 운영 DB · IAM/WIF 변경은 사용자가 명시적으로 지정한 통합 담당 공간에서만 수행한다. 통합 담당은 기존 PR 재사용 또는 PR 생성 후 기술 gate와 현재 Delivery 정책을 충족한 뒤 PR merge로 반영하고 기존 GitHub Actions 자동 배포 결과를 확인한다 — owner direct push · bypass로 우회하지 않는다. 경로 · gate 상세는 [`AGENTS.md` §4-1(e)](AGENTS.md#4-1-parallel-session--worktree-policy). 사용자가 배포 · merge 를 요청한 세션은 통합 담당으로 지정된 것으로 본다(아래 **명령 실행 원칙**).
-- **merge 후 자기 worktree 정리는 표준 종료 절차다.** 즉시 삭제하지 않는다 — main 포함 · clean · 남은 일 없음 · **junction / reparse point 해제와 재스캔 0** 을 확인한 뒤 삭제 → `git worktree prune` → branch 정리. 다른 세션의 worktree 는 대상이 아니다. 절차 상세는 [`AGENTS.md` §4-1(i)](AGENTS.md#4-1-parallel-session--worktree-policy).
-
-- CHECK 는 운영 반영 증적 · smoke 결과 · 트랙 최종 판정 · 미해결 사항이 있을 때만 쓴다. 그 밖에는 커밋 메시지로 충분하다. 새 문서 위치 · 헤더 · 민감정보 규칙: [`DOCUMENT-LIFECYCLE-AND-ARCHIVE-RULES-V1` §10](docs/rules/DOCUMENT-LIFECYCLE-AND-ARCHIVE-RULES-V1.md).
-
-- WO 가 **조사 전용**이면 구현하지 않는다.
-- WO 가 **구현을 명시**하면 조사 후 안전 범위 안에서 검증까지 불필요한 중간 승인 없이 진행한다. 승인된 범위 안의 review finding 처리 · 스레드 정리 · 상태 조회 같은 기계적 단계는 사용자에게 묻지 않는다.
-- **작업 범위 외 수정 금지.** 범위 밖에서 발견한 문제는 고치지 말고 보고 후 별도 WO 로 분리한다.
-
-## 중지 조건
-
-아래는 진행을 멈추고 사용자 판단을 요청한다.
-
-- WO 범위 밖 파일 수정 필요 / 다른 세션의 dirty · 미추적 파일 접촉 필요
-- DB schema · migration · 데이터 삭제 · 대량 update · seed 변경 필요
-- `package.json` · lockfile · dependency 변경 필요
-- Docker · CI · build 인프라 변경 필요
-- Core(§3) · Frozen Baseline(§14) · 공통 계약 변경 필요
-- 권한 · role · route · API contract 변경 필요
-- 결제 · 정산 · 법률 · 규제 판단 필요
-- 실제 계정 · 자격정보 · 외부 서비스 승인 필요
-- 현재 변경과 무관한 build · test 실패
-
-## Git · 병렬 작업 안전
-
-**다중 PC · 다중 세션(사람 + AI)이 같은 `main` 을 향해 작업**하는 환경이다.
-
-> **병렬 / 독립 작업을 시작하기 전에 [`AGENTS.md` §4-1 Parallel Session / Worktree Policy](AGENTS.md#4-1-parallel-session--worktree-policy) 를 확인하고 따른다.** 독립 작업은 최신 `origin/main` 에서 만든 전용 worktree · 전용 branch 에서 수행하고, 기준 main checkout 이나 다른 세션의 worktree · branch 를 변경하지 않는다. main 통합 경로와 공유 runtime / production 자원 변경의 직렬화도 그 정책을 따른다. (상세는 그곳에만 둔다.)
-
-stage · commit · push 절차의 정본은 [`O4O-GIT-PARALLEL-WORK-SAFETY-V1`](docs/baseline/operations/O4O-GIT-PARALLEL-WORK-SAFETY-V1.md). 아래는 예외 없이 지킨다.
-
-- 작업 전 `git fetch origin` → `git status -sb`. **pull(merge/rebase)은 작업트리가 clean 할 때만.**
-- **`git add .` · `git add -A` · `git commit -am` 금지.** path-specific stage 만 사용한다.
-- **커밋에도 pathspec 을 붙인다.** foreign staged 파일이 있으면 pathspec 없는 `git commit` 금지 — 커밋 직전 `node scripts/git/check-staged-scope.mjs <내 작업 경로...>` → `git commit -m "..." -- <내 파일...>`.
-- 다른 세션의 수정 · 미추적 · staged 파일은 **불가침** (판단 · 커밋 · 정리 · `restore` · `reset` · `stash` 대상 아님).
-- **`--force` push 금지.** 공유 `main` 이력은 재작성하지 않는다(오타 정정도 후속 커밋으로).
-- 개발 담당의 완료 조건은 **이번 WO 범위 미커밋 변경 0건 + 작업 branch push + 저장소 · branch · commit SHA · 변경 요약 · 검증 결과 · 미해결 사항 인계**다. PR 생성은 개발 담당의 완료 조건이 아니며, PR CI 미실행·확인된 실패는 인계에 명시한다. CI 성공만으로 병합 권한을 얻지 않는다. 명시적으로 지정된 통합 담당만 기존 PR 재사용 또는 PR 생성부터 CI·리뷰 운영 · 병합 · post-merge 확인 · 필요한 배포 검증까지 진행한다. 동일 변경의 중복 PR은 만들지 않는다. 병합 전 branch/worktree는 후속 수정을 위해 보존한다. 상세는 [`AGENTS.md` §4-2](AGENTS.md#4-2-stage--commit--push).
-
-## 명령 실행 원칙
-
-- **배포 요청 = 자율 진행.** 사용자가 배포 · merge 를 요청하면 그 세션은 통합 담당으로 지정된 것으로 보고, 작업 branch push → PR 생성 → 필수 CI 통과 → PR merge → 배포 workflow 실행(merge 후 `delivery.yml` 자동 · 필요 시 `deploy-api` · `deploy-web-services` · `deploy-admin` 을 `gh workflow run`)까지 중간 승인 없이 진행한다. CI · branch protection 우회 · 비활성화는 금지한다.
-- **`promote.yml`(LEVEL_3: migration · auth)** 은 사용자 메시지에 promote 또는 LEVEL_3 가 명시된 경우에만 실행한다.
+## 명령 실행 원칙 (Claude Code 도구)
 - **항상 사용자 확인:** 운영 DB 직접 접속 · 시크릿 · IAM · 프로덕션 리소스 삭제. `.claude/settings.json` 의 ask 규칙(allow 보다 우선)이 이 범위를 강제한다.
 - ask 대상 명령은 다른 명령과 `;` · `&&` · `|` 로 묶지 않는다 — 섞이면 한 줄 전체가 승인 대상이 되어 무엇을 승인하는지 흐려진다.
-
 - `gh pr view` · `gh pr checks` · `gh run view` 로 알 수 있는 정보는 `gh api` 를 쓰지 않는다.
 - `gh api` 는 GET 조회만 사용하고, `-X` · `--method` · `-f` · `-F` · `--input` 옵션은 쓰지 않는다.
 - 결과 표시용 `echo` 는 생략한다.
-
-## DB · 보안 경계
-
-- **기본 환경은 프로덕션이다.** 접속 절차 · 포트 · 프록시 · 도구는 [`SETUP.md`](SETUP.md) 가 유일 정본이다 (여기 복제하지 않는다).
-- read-only 검증(SELECT · 마이그레이션 이력 · 상태 조회)은 승인된 채널(`gcloud` · Admin API · Console)로 직접 수행 가능.
-- **UPDATE / DELETE / DDL · 대량 write · migration 수동 적용은 사용자 명시 승인 필요.** 마이그레이션은 CI/CD 자동 실행이 원칙 ([`PRODUCTION-MIGRATION-STANDARD`](docs/baseline/operations/PRODUCTION-MIGRATION-STANDARD.md)).
-- 실제 DB host · password · 계정값을 문서 · 로그 · 커밋 · 스크린샷에 기록하지 않는다. 운영 데이터 보고 시 민감정보는 요약 · 마스킹한다.
-- **이 저장소는 Public 이다.** CHECK · WO · IR · 주석에 비밀번호(과거 · 테스트 값 포함) · 실제 사용자 이메일 · 실명 · 전화번호 · 실제 약국/사업자명 · production 응답 원문을 쓰지 않는다 — credential 은 secret 이름만, 사람은 `[사용자 A]` · `[REDACTED_EMAIL]` 같은 placeholder 로. docs 의 개인 메일 · 전화번호 · 공인 IP 는 CI 가 막는다 (`node scripts/check-doc-sensitive.mjs`).
-  - 예외는 정본이 의도적으로 공개한 Demo credential 하나뿐이다 — 조건은 [`DOCUMENT-LIFECYCLE-AND-ARCHIVE-RULES-V1` §10-4](docs/rules/DOCUMENT-LIFECYCLE-AND-ARCHIVE-RULES-V1.md) 가 정본.
-- 진단 · seed · repair route 의 안전 규칙은 §8.
-
-## 검증 · 완료 보고
-
-- **검증하지 않은 것을 PASS 로 보고하지 않는다.** 빌드 성공만으로 UI 작업을 종결하지 않는다.
-- **실패하거나 건너뛴 검증을 숨기지 않는다.** 통과한 것만 골라 보고하지 않는다. smoke 가 불가하면 구체적 이유를 적는다.
-- 보고는 **한국어**. 파일명 · route · API · component · commit hash 등 기술 식별자는 원문 유지.
-- 긴 diff 나 전체 파일을 그대로 붙이지 않는다. 변경 / 미변경 / 검증 결과 / CHECK / Git 상태 중심.
-- 모든 완료 보고에 **`문서 정합`** 한 줄을 포함한다 (§16-5).
+- 권한 설정은 `.claude/settings.json`(공유 · 커밋) 이 정본이다. 개인 PC 전용 허용은 `.claude/settings.local.json`(미추적) 에 둔다.
 
 ---
 
@@ -134,11 +46,11 @@ stage · commit · push 절차의 정본은 [`O4O-GIT-PARALLEL-WORK-SAFETY-V1`](
 ## 0. 환경 원칙
 
 - 기본 환경은 프로덕션(`o4o-platform-db` / `o4o_platform`). 실제 endpoint 는 문서에 고정하지 않는다.
-- DB 접근 정책은 위 **DB · 보안 경계** 절. 접속 절차 · 포트 분리 · 프록시 기동 · 로컬 도구는 [`SETUP.md`](SETUP.md).
+- DB 접근 정책은 [`AGENTS.md` §5](AGENTS.md#5-위험-변경--사용자-확인) **DB·보안 경계**. 접속 절차 · 포트 분리 · 프록시 기동 · 로컬 도구는 [`SETUP.md`](SETUP.md).
 
 ## 1. 개발 기본 규칙
 
-- 브랜치: 독립 작업은 전용 worktree · 전용 branch 가 기본(2026-10-03~). 규칙은 위 **Git · 병렬 작업 안전** 절과 [`AGENTS.md` §4-1](AGENTS.md#4-1-parallel-session--worktree-policy).
+- 브랜치: 독립 작업은 전용 worktree · 전용 branch 가 기본(2026-10-03~). 규칙은 [`AGENTS.md` §4](AGENTS.md#4-git--병렬-작업-안전) (§4-1 worktree · §4-2 stage/commit/push).
 - App 계층: `Core → Extension → Feature → Service`. 역방향 의존 금지.
 - API 호출: `authClient.api.get()` / `.post()` 필수. 환경변수 직접 사용 · 하드코딩 URL 금지.
 - 공통 모듈 · config · sidebar · layout · capability map · core+extension contract 수정은 **모든 소비처를 먼저 식별**하고 단일 서비스 기준으로 완료 판단하지 않는다. 식별자 검색만으로 소비처 0 을 선언하지 않는다(`node scripts/quality/check-literal-consumers.mjs --source <파일>`). 절차: [`O4O-SHARED-MODULE-CHANGE-PROTOCOL-V1`](docs/baseline/O4O-SHARED-MODULE-CHANGE-PROTOCOL-V1.md).
@@ -257,7 +169,7 @@ forum · lms · signage 는 **플랫폼 공통 구조**. KPA 가 reference imple
 
 ## 16. 문서 Drift 발견 시 정비
 
-정본: [`DOCUMENT-LIFECYCLE-AND-ARCHIVE-RULES-V1`](docs/rules/DOCUMENT-LIFECYCLE-AND-ARCHIVE-RULES-V1.md). 본 절은 **발동 조건**만 정한다. 일괄 정리가 아니라 조사 · 개발 중 발견 시 처리한다.
+정본: [`DOCUMENT-LIFECYCLE-AND-ARCHIVE-RULES-V1`](docs/rules/DOCUMENT-LIFECYCLE-AND-ARCHIVE-RULES-V1.md) · 공통 규칙 [`AGENTS.md` §8](AGENTS.md#8-문서-drift). 본 절은 **발동 조건**만 정한다(16-1~16-6 번호는 기준 문서가 참조하므로 유지). 일괄 정리가 아니라 조사 · 개발 중 발견 시 처리한다.
 
 - **16-1 대상은 기준 문서뿐** — `docs/baseline/` · `architecture/` · `rules/` · `rbac/` · `platform/` · `guides/` 와 `docs/CANONICAL-INDEX.md`. `checks/` · `investigations/` · `ir/` · `work-orders/` · `archive/**` 는 기록물이므로 대상이 아니다.
 - **16-2 기본 동작은 보고다.** 범위 밖 문서를 즉시 고치는 것은 범위 외 수정이다.
@@ -274,6 +186,6 @@ forum · lms · signage 는 **플랫폼 공통 구조**. KPA 가 reference imple
 
 ---
 
-*Updated: 2026-10-07*
-*Version: 9.5*
+*Updated: 2026-11-06*
+*Version: 10.0 — `@AGENTS.md` import 구조*
 *Status: Active — Claude Code Entry Point*

@@ -88,7 +88,7 @@ describe('community recheck failure recovery', () => {
     await screen.findByRole('button', { name: '권한 다시 확인' });
     requests.mockRejectedValueOnce(new Error('temporary failure'));
     fireEvent.click(screen.getByRole('button', { name: '권한 다시 확인' }));
-    await screen.findByText('권한을 확인하지 못했습니다. 잠시 후 다시 시도해 주세요.');
+    await screen.findByText('권한을 확인하지 못했습니다. 잠시 후 다시 시도해 주시기 바랍니다.');
     expect(screen.queryByText('관리 목록')).toBeNull();
   });
 });

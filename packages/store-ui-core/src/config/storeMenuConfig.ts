@@ -21,7 +21,7 @@
  *     상품·거래        상품(거래·주문 대상) · [거래 신청] · 주문 관리        ← 최상단
  *     활성화          내 매장(약국) 제품 ★(제작 기준 데이터) · [자체 상품] · 상품 설명 · 블로그 · POP · QR
  *     자료함          콘텐츠 · 자료 · 제작 자료
- *     디지털 사이니지   플레이리스트 · 동영상 · 스케줄 · TV 재생   (변경 없음 — 제품 파생 아님)
+ *     디지털 사이니지   동영상 · 재생목록 · 디스플레이 재생   (변경 없음 — 제품 파생 아님)
  *     채널/마케팅     채널 관리 · [태블릿 · 상담요청 · 퍼널 · 콘텐츠 가져오기]
  *     분석           마케팅 분석 · [매출 요약]
  *     설정           매장(약국) 정보 · 설정
@@ -135,8 +135,7 @@ export const COSMETICS_STORE_CONFIG: StoreDashboardConfig = {
       // WO-O4O-MY-STORE-SIGNAGE-SUBMENU-ALIGNMENT-V1 / WO-O4O-KCOSMETICS-SIGNAGE-PLAYER-V1
       { key: 'signage-playlist',  label: '플레이리스트', subPath: '/marketing/signage/playlist' },
       { key: 'signage-videos',    label: '동영상',       subPath: '/marketing/signage/videos' },
-      { key: 'signage-schedules', label: '스케줄',       subPath: '/marketing/signage/schedules' },
-      { key: 'signage-player',    label: 'TV 재생',      subPath: '/marketing/signage/player' },
+      { key: 'signage-player',    label: '디스플레이 재생',      subPath: '/marketing/signage/player' },
     ]},
     { label: '채널', items: [
       { key: 'channels',        label: '채널 관리', subPath: '/channels' },
@@ -254,8 +253,7 @@ export const KPA_SOCIETY_STORE_CONFIG: StoreDashboardConfig = {
     { label: '디지털 사이니지', items: [
       { key: 'signage-playlist',  label: '플레이리스트', subPath: '/marketing/signage/playlist' },
       { key: 'signage-videos',    label: '동영상',       subPath: '/marketing/signage/videos' },
-      { key: 'signage-schedules', label: '스케줄',       subPath: '/marketing/signage/schedules' },
-      { key: 'signage-player',    label: 'TV 재생',      subPath: '/marketing/signage/player' },
+      { key: 'signage-player',    label: '디스플레이 재생',      subPath: '/marketing/signage/player' },
     ]},
     // WO-O4O-KPA-ONLINE-SALES-FIRST-CLASS-MENU-PHASE1-V1 (KPA 블록 한정):
     //   온라인 판매(B2C)를 '채널 관리'에서 분리해 1급 메뉴로 승격(판매 설정/판매 상품).

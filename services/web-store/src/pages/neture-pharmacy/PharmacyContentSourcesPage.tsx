@@ -100,7 +100,7 @@ function PharmacyContentSources() {
       if (sf && selected.semiFranchiseKey !== sf) throw new Error('Selected material belongs to another business');
       return { ...result, items: [selected, ...result.items] };
     } catch {
-      if (isCurrent()) setSelectionError('선택한 자료를 이용할 수 없습니다. 다른 자료를 선택해 주세요.');
+      if (isCurrent()) setSelectionError('선택한 자료를 이용할 수 없습니다. 다른 자료를 선택해 주시기 바랍니다.');
       return result;
     }
   }, [sf, q, tag, page, selectedContentId, invalidateCopy, beginSelection]);
@@ -172,7 +172,7 @@ function PharmacyContentSources() {
         {(q || tag) && <button type="button" className={btn.secondary} onClick={() => { setQInput(''); updateFilters({ q: '', tag: '' }); }}>검색 초기화</button>}
       </form>
       {sf === 'carepharm' && <section aria-label="CarePharm 자료 찾기" className="mb-4 space-y-3 rounded-lg border border-emerald-200 bg-emerald-50 p-4 text-sm">
-        <p>주제별 자료 묶음과 운영 실무자료를 사본으로 가져온 뒤 내 자료함에서 편집하세요.</p>
+        <p>주제별 자료 묶음과 운영 실무자료를 사본으로 가져온 뒤 내 자료함에서 편집하시기 바랍니다.</p>
         <label>자료 태그<select aria-label="자료 태그" value={tag} onChange={event => updateFilters({ tag: event.target.value })} className="ml-3 min-h-11 max-w-full rounded border px-3"><option value="">전체 태그</option>{[...new Set<string>([...CAREPHARM_MATERIAL_TAGS, ...(tag ? [tag] : [])])].map(value => <option key={value} value={value}>{value}</option>)}</select></label>
       </section>}
 
@@ -181,7 +181,7 @@ function PharmacyContentSources() {
       ) : error ? null : items.length === 0 ? (
         <div className="py-12 text-center text-sm text-gray-500">
           <p>{contentEmptyText(Boolean(q || tag), sf, storeBusinessName(businesses.rows, sf))}</p>
-          <p className="mt-1">{q || tag ? '검색어와 태그를 바꾸거나 검색을 초기화해 주세요.' : '협업체가 게시한 자료는 이 공간에 표시됩니다. 이미 가져온 사본은 내 컨텐츠에서 확인하세요.'}</p>
+          <p className="mt-1">{q || tag ? '검색어와 태그를 바꾸거나 검색을 초기화해 주시기 바랍니다.' : '협업체가 게시한 자료는 이 공간에 표시됩니다. 이미 가져온 사본은 내 컨텐츠에서 확인하시기 바랍니다.'}</p>
           <Link to={pharmacyStorePath('semiFranchises')} className="mt-3 inline-block text-emerald-700 underline">협업체 보기</Link>
         </div>
       ) : (

@@ -36,7 +36,7 @@ describe('pharmacy business entity classification', () => {
     expect(select.value).toBe('');
     expect(Array.from(select.options, (option) => option.value)).toEqual(['', 'individual', 'corporation']);
     fireEvent.click(screen.getByRole('button', { name: '저장' }));
-    await screen.findByText('세금계산서 발행을 위한 개인 / 법인 구분을 선택해 주세요.');
+    await screen.findByText('세금계산서 발행을 위한 개인 / 법인 구분을 선택해 주시기 바랍니다.');
     expect(api.update).not.toHaveBeenCalled();
     fireEvent.change(select, { target: { value: 'individual' } });
     fireEvent.click(screen.getByRole('button', { name: '저장' }));
@@ -46,18 +46,15 @@ describe('pharmacy business entity classification', () => {
 
 
 describe('shared pharmacy information behavior through the Store adapter', () => {
-  it.each(['missing', 'failed'])('shows an inline %s state and retries without leaving the store', async (state) => {
-    if (state === 'missing') api.get.mockResolvedValueOnce(null);
-    else api.get.mockRejectedValueOnce(Object.assign(new Error('fixture'), {code:'PHARMACIST_QUALIFICATION_REQUIRED'}));
-    api.get.mockResolvedValue({ name: '검증 약국' });
-    render(<MemoryRouter initialEntries={['/store/info']}><Routes>
-      <Route path="/store/info" element={<PharmacyInfoPage />} />
-      <Route path="/pharmacy" element={<p>오래된 약국 게이트</p>} />
+  it.each(['missing', 'failed'])('shows recoverable information failure for %s data', async (state) => {
+    if (state === 'missing') api.get.mockResolvedValue(null);
+    else api.get.mockRejectedValue(new Error('fixture load failure'));
+    render(<MemoryRouter initialEntries={['/pharmacy/info']}><Routes>
+      <Route path="/pharmacy/info" element={<PharmacyInfoPage />} />
+      <Route path="/pharmacy" element={<p>약국 게이트</p>} />
     </Routes></MemoryRouter>);
-    await screen.findByRole('alert');
-    expect(screen.queryByText('오래된 약국 게이트')).toBeNull();
-    fireEvent.click(screen.getByRole('button', { name: '다시 시도' }));
-    await screen.findByText('검증 약국');
+    await screen.findByRole('button', { name: '매장 정보 다시 확인' });
+    expect(screen.queryByText('약국 게이트')).toBeNull();
     expect(api.update).not.toHaveBeenCalled();
   });
 
@@ -104,7 +101,7 @@ describe('shared pharmacy information behavior through the Store adapter', () =>
     render(<PharmacyInfoPage />);
     fireEvent.click(await screen.findByRole('button', { name: '수정' }));
     fireEvent.click(screen.getByRole('button', { name: '저장' }));
-    await screen.findByText('저장에 실패했습니다. 다시 시도해 주세요.');
+    await screen.findByText('저장에 실패했습니다. 다시 시도해 주시기 바랍니다.');
     expect(screen.getByRole('combobox', { name: /사업자 구분/ })).toBeTruthy();
     expect(api.get).toHaveBeenCalledTimes(1);
   });
@@ -135,4 +132,24 @@ describe('business email validation after commonization', () => {
       expect(api.update).not.toHaveBeenCalled();
     }
   });
+});
+
+it('shows synthetic Demo data separately and never submits it as real pharmacy information', async () => {
+  api.get.mockResolvedValue({ name: '실제 표시 이름', demoExample: { name: 'O4O 체험 약국', businessNumber: 'DEMO-BIZ-0001', licenseNumber: 'DEMO-LICENSE-0001', address: '가상 주소', representativeName: '체험', businessType: '소매업', businessItem: '약국' } });
+  render(<PharmacyInfoPage />);
+  await screen.findByRole('region', { name: 'Demo 약국 가상 정보' });
+  expect(screen.getByText('DEMO-LICENSE-0001')).toBeTruthy();
+  expect(screen.getByRole('link', { name: '체험용 사업자등록증 예시 받기' }).getAttribute('href')).toBe('/samples/demo-pharmacy-business.svg');
+  fireEvent.click(screen.getByRole('button', { name: '수정' }));
+  expect(screen.getByDisplayValue('실제 표시 이름')).toBeTruthy();
+  expect(screen.queryByDisplayValue('DEMO-BIZ-0001')).toBeNull();
+  expect(api.update).not.toHaveBeenCalled();
+});
+it('retries a failed information request without redirecting or creating a store', async () => {
+  api.get.mockRejectedValueOnce(new Error('unavailable')).mockResolvedValueOnce({ name: '복구 매장' });
+  render(<PharmacyInfoPage />);
+  fireEvent.click(await screen.findByRole('button', { name: '매장 정보 다시 확인' }));
+  await screen.findByText('복구 매장');
+  expect(api.get).toHaveBeenCalledTimes(2);
+  expect(api.update).not.toHaveBeenCalled();
 });

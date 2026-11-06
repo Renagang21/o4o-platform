@@ -175,7 +175,7 @@ export function ProductApplicationManagementConsole({ api, config }: ProductAppl
   const refreshAfterWrite = async () => {
     const scope = reads.current;
     const refreshed = await Promise.all([loadApplications(), loadStats()]);
-    if (scope.mounted) setRefreshWarning(refreshed.every(Boolean) ? null : '처리는 완료했지만 최신 목록·통계를 확인하지 못했습니다. 다시 조회해 주세요.');
+    if (scope.mounted) setRefreshWarning(refreshed.every(Boolean) ? null : '처리는 완료했지만 최신 목록·통계를 확인하지 못했습니다. 다시 조회해 주시기 바랍니다.');
   };
   const startWrite = () => {
     if (writeLock.current) return null;
@@ -215,7 +215,7 @@ export function ProductApplicationManagementConsole({ api, config }: ProductAppl
             if (!scope.mounted) return;
             const listingActivated = result && typeof result === 'object' ? result.listingActivated : undefined;
             setToastMsg(listingActivated === false
-              ? { type: 'error', message: `"${app.product_name}" 승인은 완료됐지만 매장 진열 활성화에 실패했습니다. 진열 상태를 확인해주세요.` }
+              ? { type: 'error', message: `"${app.product_name}" 승인은 완료됐지만 매장 진열 활성화에 실패했습니다. 진열 상태를 확인해 주시기 바랍니다.` }
               : { type: 'success', message: `"${app.product_name}" 승인 완료. 매장 진열 상품이 생성되었습니다.` });
           } else {
             await api.reject(actionTargetId, reason || undefined);
@@ -807,7 +807,7 @@ export function ProductApplicationManagementConsole({ api, config }: ProductAppl
             {/* WO-O4O-KPA-OPERATOR-P2-P3-USABILITY-AND-ERROR-CLEANUP-CONSOLIDATED-V1:
                 내부 저장소 문서 경로(raw path) 사용자 노출 제거 → 사용자용 안내 문구로 대체.
                 공유 모듈(KPA/Cosmetics/Neture operator 공통) — 정적 안내 텍스트, 회귀 위험 없음. */}
-            공급 상품 승인 흐름은 위 안내를 참고하세요. 추가 문의는 플랫폼 운영팀에 요청할 수 있습니다.
+            공급 상품 승인 흐름은 위 안내를 참고하시기 바랍니다. 추가 문의는 플랫폼 운영팀에 요청할 수 있습니다.
           </div>
         </div>
       </BaseDetailDrawer>

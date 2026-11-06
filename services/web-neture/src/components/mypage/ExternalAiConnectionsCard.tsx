@@ -20,7 +20,7 @@ export default function ExternalAiConnectionsCard() {
       })
       .catch(() => {
         if (!cancelled)
-          setMessage("외부 AI 연결을 확인하지 못했습니다. 다시 확인해 주세요.");
+          setMessage("외부 AI 연결을 확인하지 못했습니다. 다시 확인해 주시기 바랍니다.");
       });
     return () => {
       cancelled = true;
@@ -40,7 +40,7 @@ export default function ExternalAiConnectionsCard() {
           : "연결을 해제했습니다. 저장된 콘텐츠는 유지됩니다.",
       );
     } catch {
-      setMessage("연결을 해제하지 못했습니다. 다시 시도해 주세요.");
+      setMessage("연결을 해제하지 못했습니다. 다시 시도해 주시기 바랍니다.");
     } finally {
       setBusy(false);
     }

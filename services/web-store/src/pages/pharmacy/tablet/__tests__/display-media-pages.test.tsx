@@ -94,10 +94,6 @@ vi.mock("../../../../api/assetSnapshot", () => ({
 vi.mock("../../../../api/storePlaylist", () => ({
   fetchStorePlaylists: async () => [],
 }));
-vi.mock("../../../../api/signageSchedule", () => ({
-  fetchSchedules: async () => [],
-  fetchSignagePlaylists: async () => [],
-}));
 vi.mock("../../../../api/signageMedia", () => ({
   createYoutubeVideoApi: () => ({list:async()=>({availability:{ready:false},items:[]}),enqueue:vi.fn(),retry:vi.fn(),cancel:vi.fn()}),
   fetchSignageMedia: api.media,
@@ -236,7 +232,7 @@ it('opens the selected confirmed location once and rejects its navigation after 
   expect(screen.queryByRole('heading', { name: 'Corner B', level: 3 })).toBeNull();
   expect(screen.getByRole('link', { name: '위치별 현황으로 돌아가기' }).getAttribute('href')).toBe('/store/execution?workspace=use');
   api.store = api.active = 'B'; h.rerender(<MemoryRouter initialEntries={[]}><TabletPage /></MemoryRouter>);
-  await screen.findByText('매장 또는 업무가 변경되었습니다. 현재 매장의 위치를 다시 선택해 주세요.');
+  await screen.findByText('매장 또는 업무가 변경되었습니다. 현재 매장의 위치를 다시 선택해 주시기 바랍니다.');
   expect(screen.queryByRole('link', { name: '위치별 현황으로 돌아가기' })).toBeNull();
   expect(screen.queryByRole('heading', { name: 'Corner B', level: 3 })).toBeNull();
 });
@@ -433,7 +429,8 @@ it("media save keeps a failed draft, serializes submissions and closes only afte
   const pending = deferred<typeof media>();
   api.updateMedia.mockReturnValueOnce(pending.promise);
   render(wrap(<StoreSignagePage />, "/store/marketing/signage/videos"));
-  fireEvent.click(await screen.findByRole("button", { name: "편집" }));
+  fireEvent.click(await screen.findByLabelText("Fixture video 영상 선택"));
+  fireEvent.click(screen.getByRole("button", { name: "선택 영상 상세·수정" }));
   const title = screen.getByLabelText(/제목/);
   fireEvent.change(title, { target: { value: "Updated" } });
   const save = screen.getByRole("button", { name: "저장" });
@@ -462,7 +459,7 @@ it.each([
       id: "snapshot",
       title: "Copied fixture",
       assetType: "signage",
-      publishStatus: "draft",
+      publishStatus: "published",
       channelMap: {},
       isForced: false,
       isLocked: false,
@@ -478,7 +475,8 @@ it.each([
         data: { ...snapshot, title: "Edited copy" },
       });
     render(wrap(<StoreSignagePage />, "/store/marketing/signage/videos"));
-    fireEvent.click(await screen.findByRole("button", { name: "편집" }));
+    fireEvent.click(await screen.findByLabelText("Copied fixture 영상 선택"));
+    fireEvent.click(screen.getByRole("button", { name: "선택 영상 상세·수정" }));
     expect(screen.queryByTitle("입력한 동영상 미리보기")).toBeNull();
     expect(
       (
@@ -504,3 +502,65 @@ it.each([
     expect(api.updateMedia).not.toHaveBeenCalled();
   },
 );
+
+it("video list shows name, origin and date columns with published videos only, preserving selection/edit actions", async () => {
+  api.media.mockResolvedValue([{ ...media, tags: ["건강"] }, { ...media, id: "draft-video", name: "Draft video", status: "draft" }]);
+  render(wrap(<StoreSignagePage />, "/store/marketing/signage/videos"));
+  await screen.findByText("Fixture video");
+  expect(screen.queryByText("Draft video")).toBeNull();
+  for (const label of ["썸네일", "영상 이름", "출처", "등록일"]) {
+    expect(screen.getByRole("columnheader", { name: label })).toBeTruthy();
+  }
+  expect(screen.queryByRole("columnheader", { name: "상태" })).toBeNull();
+  expect(screen.queryByRole("button", { name: "게시됨" })).toBeNull();
+  // 행마다 흩어져 있던 업무 버튼 없이 체크 후 ActionBar 로 실행한다.
+  for (const label of ["편집", "삭제", "담기"]) {
+    expect(screen.queryByRole("button", { name: label })).toBeNull();
+  }
+  expect(screen.queryByRole("button", { name: "선택 영상 상세·수정" })).toBeNull();
+  const heading = screen.getByRole("heading", { level: 1, name: "동영상" });
+  const create = screen.getByRole("link", { name: "동영상 등록" });
+  expect(create.getAttribute("href")).toContain("/store/marketing/signage/videos/new");
+  expect(heading.compareDocumentPosition(create) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  fireEvent.click(screen.getByLabelText("Fixture video 영상 선택"));
+  expect(screen.getByRole("button", { name: "선택 영상 상세·수정" })).toBeTruthy();
+  // 검색을 실행하면 이전 선택은 비워지고 태그로도 찾는다.
+  fireEvent.change(screen.getByPlaceholderText("제목·태그로 검색..."), { target: { value: "건강" } });
+  fireEvent.click(screen.getByRole("button", { name: "검색" }));
+  expect(screen.getByText("Fixture video")).toBeTruthy();
+  expect(screen.queryByRole("button", { name: "선택 영상 상세·수정" })).toBeNull();
+  fireEvent.change(screen.getByPlaceholderText("제목·태그로 검색..."), { target: { value: "없는 검색어" } });
+  fireEvent.click(screen.getByRole("button", { name: "검색" }));
+  await screen.findByText("검색 조건에 맞는 동영상이 없습니다.");
+  // 등록 버튼은 머리 영역 하나뿐이다(검색 결과 없음은 빈 목록이 아니다).
+  expect(screen.getAllByRole("link", { name: "동영상 등록" })).toHaveLength(1);
+});
+
+it("video list filters by origin, shows a central create action only when truly empty, and deletes through the action bar", async () => {
+  const removal = vi.spyOn(window, "confirm").mockReturnValue(true);
+  api.media.mockResolvedValue([media]);
+  render(wrap(<StoreSignagePage />, "/store/marketing/signage/videos"));
+  await screen.findByText("Fixture video");
+  fireEvent.change(screen.getByLabelText("출처"), { target: { value: "커뮤니티" } });
+  await screen.findByText("검색 조건에 맞는 동영상이 없습니다.");
+  fireEvent.change(screen.getByLabelText("출처"), { target: { value: "직접 등록" } });
+  await screen.findByText("Fixture video");
+  api.media.mockResolvedValue([]);
+  fireEvent.click(screen.getByLabelText("Fixture video 영상 선택"));
+  fireEvent.click(screen.getByRole("button", { name: "선택 영상 삭제" }));
+  await waitFor(() => expect(api.removeMedia).toHaveBeenCalledTimes(1));
+  await screen.findByText("검색 조건에 맞는 동영상이 없습니다.");
+  fireEvent.change(screen.getByLabelText("출처"), { target: { value: "" } });
+  await screen.findByText("아직 등록한 동영상이 없습니다.");
+  expect(screen.getAllByRole("link", { name: "동영상 등록" })).toHaveLength(2);
+  removal.mockRestore();
+});
+
+it("video registration opens on its own route, separated from the list, with an AI helper inside", async () => {
+  render(wrap(<StoreSignagePage />, "/store/marketing/signage/videos/new"));
+  expect(await screen.findByRole("heading", { level: 1, name: "동영상 등록" })).toBeTruthy();
+  expect(screen.getByRole("button", { name: "O4O 영상 등록" })).toBeTruthy();
+  expect(screen.getByRole("button", { name: "외부 영상 연결" })).toBeTruthy();
+  expect(screen.getByRole("link", { name: "동영상 목록으로" })).toBeTruthy();
+  expect(screen.queryByRole("columnheader", { name: "영상 이름" })).toBeNull();
+});

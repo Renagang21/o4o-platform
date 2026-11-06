@@ -40,7 +40,7 @@ export class ConsultationLayoutService {
       throw new NeturePharmacyError(
         400,
         "INVALID_PAGE",
-        "페이지를 확인해 주세요.",
+        "페이지를 확인해 주시기 바랍니다.",
       );
     const params = [q ? `%${q}%` : null, 20, (page - 1) * 20];
     const items = await this.db.query(
@@ -70,7 +70,7 @@ export class ConsultationLayoutService {
       throw new NeturePharmacyError(
         400,
         "INVALID_LAYOUT",
-        "화면 구성을 선택해 주세요.",
+        "화면 구성을 선택해 주시기 바랍니다.",
       );
     const [row] = await this.db.query(
       `WITH updated AS (UPDATE organizations o SET metadata=jsonb_set(COALESCE(o.metadata,'{}'::jsonb),'{consultationLayout}',to_jsonb($2::text))

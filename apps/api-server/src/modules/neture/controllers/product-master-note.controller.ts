@@ -52,7 +52,7 @@ export function createProductMasterNoteController(dataSource: DataSource): Route
       }
       const note = typeof req.body?.note === 'string' ? req.body.note.trim() : '';
       if (!note) {
-        res.status(400).json({ success: false, error: '메모 내용을 입력하세요', code: 'NOTE_EMPTY' });
+        res.status(400).json({ success: false, error: '메모 내용을 입력하시기 바랍니다', code: 'NOTE_EMPTY' });
         return;
       }
       if (note.length > MAX_NOTE_LEN) {

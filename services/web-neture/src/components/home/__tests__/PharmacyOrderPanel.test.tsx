@@ -21,7 +21,7 @@ describe('pharmacy order preparation', () => {
     const apply = vi.fn(); render(<PharmacyOrderPanel disabled={false} resuming={false} onApply={apply} />);
     expect(screen.getByText(/원하는 업무부터 요청/)).toBeTruthy();
     expect(screen.getByRole('button',{name:'화면 자료 내보내기'})).toBeTruthy();expect(screen.queryByRole('button',{name:'전체 자료 내보내기'})).toBeNull();
-    expect(screen.getByText(/조회한 이력만 파일에 담아요/)).toBeTruthy();
+    expect(screen.getByText(/조회한 이력만 파일에 담습니다/)).toBeTruthy();
     addSupplier(); addLine(); fireEvent.click(screen.getByRole('button', { name: '주문 요청 준비' }));
     expect(apply).toHaveBeenCalledOnce(); expect(apply.mock.calls[0][0]).toContain('합성 상품 / 500정 / 2포장');
     expect(apply.mock.calls[0][0]).toContain('최종 제출·결제는 사용자가 직접');
@@ -167,12 +167,12 @@ describe('connected pharmacy work data',()=>{
   });
   render(<PharmacyOrderPanel disabled={false} resuming={false} onApply={()=>{}} workScope={scope}/>);
   fireEvent.click(screen.getByRole('button',{name:'PC·서버 자료 불러오기'}));
-  await screen.findByText(/서버 자료를 불러왔어요/);
+  await screen.findByText(/서버 자료를 불러왔습니다/);
   addSupplier();await screen.findByRole('alert');expect(screen.getByText(/입력한 내용은 유지/)).toBeTruthy();
   expect(screen.getByText('합성 거래처',{selector:'legend'})).toBeTruthy();
   const attempts=vi.mocked(workDataRequest).mock.calls.filter(call=>call[0]==='save').length;
   await new Promise(resolve=>setTimeout(resolve,800));expect(vi.mocked(workDataRequest).mock.calls.filter(call=>call[0]==='save')).toHaveLength(attempts);
-  fail=false;fireEvent.click(screen.getByRole('button',{name:'자료 저장'}));await screen.findByText('저장했어요.');
+  fail=false;fireEvent.click(screen.getByRole('button',{name:'자료 저장'}));await screen.findByText('저장했습니다.');
  });
  it('retains conflicted edits until explicit discard and allows reloading without refresh',async()=>{
   vi.mocked(loadWorkingData).mockResolvedValue({location:'server',consent:permission,records:[],next:null,counts:{},versions:{}});
@@ -183,13 +183,13 @@ describe('connected pharmacy work data',()=>{
     return {} as any;
   });
   render(<PharmacyOrderPanel disabled={false} resuming={false} onApply={()=>{}} workScope={scope}/>);
-  fireEvent.click(screen.getByRole('button',{name:'PC·서버 자료 불러오기'}));await screen.findByText(/서버 자료를 불러왔어요/);
+  fireEvent.click(screen.getByRole('button',{name:'PC·서버 자료 불러오기'}));await screen.findByText(/서버 자료를 불러왔습니다/);
   addSupplier();await screen.findByRole('alert');
   expect(screen.getByText('합성 거래처',{selector:'legend'})).toBeTruthy();
   vi.mocked(loadWorkingData).mockRejectedValueOnce(Error('합성 재조회 실패'));
   fireEvent.click(screen.getByRole('button',{name:'수정 취소하고 최신 자료 불러오기'}));await screen.findByText('합성 재조회 실패');
   expect(screen.getByText('합성 거래처',{selector:'legend'})).toBeTruthy();
-  fireEvent.click(screen.getByRole('button',{name:'수정 취소하고 최신 자료 불러오기'}));await screen.findByText(/서버 자료를 불러왔어요/);
+  fireEvent.click(screen.getByRole('button',{name:'수정 취소하고 최신 자료 불러오기'}));await screen.findByText(/서버 자료를 불러왔습니다/);
   expect(screen.queryByText('합성 거래처',{selector:'legend'})).toBeNull();
   expect(screen.queryByRole('button',{name:'수정 취소하고 최신 자료 불러오기'})).toBeNull();
  });
@@ -208,8 +208,8 @@ describe('connected pharmacy work data',()=>{
   },20000);
   render(<PharmacyOrderPanel disabled={false} resuming={false} onApply={()=>{}} workScope={scope}/>);
   fireEvent.change(screen.getByLabelText('PC 자료함 JSON 가져오기'),{target:{files:[{size:1000,text:async()=>JSON.stringify({format:PHARMACY_FORMAT,records})}]}});
-  await screen.findByText(/파일을 미리 보고 있어요/);
-  fireEvent.click(screen.getByRole('button',{name:'현재 자료를 PC에 보관'}));await screen.findByText(/PC에 저장했어요/);
+  await screen.findByText(/파일을 미리 보고 있습니다/);
+  fireEvent.click(screen.getByRole('button',{name:'현재 자료를 PC에 보관'}));await screen.findByText(/PC에 저장했습니다/);
   const saves=vi.mocked(workDataRequest).mock.calls.filter(call=>call[0]==='save');
   expect(saves).toHaveLength(2);for(const [index,call] of saves.entries()){expect(call[2]).toMatchObject({mode:'restore',expectedRevision:7+index,deviceId,expectedOwner:permission.owner});expect((call[2] as any).records.length).toBeLessThanOrEqual(1000);}
   expect(saves.flatMap(call=>(call[2] as any).records)).toEqual(expect.arrayContaining(records));
@@ -225,7 +225,7 @@ describe('connected pharmacy work data',()=>{
     return {} as any;
   });
   render(<PharmacyOrderPanel disabled={false} resuming={false} onApply={()=>{}} workScope={scope}/>);
-  fireEvent.click(screen.getByRole('button',{name:'PC·서버 자료 불러오기'}));await screen.findByText(/서버 자료를 불러왔어요/);
+  fireEvent.click(screen.getByRole('button',{name:'PC·서버 자료 불러오기'}));await screen.findByText(/서버 자료를 불러왔습니다/);
   addSupplier();await waitFor(()=>expect(saves).toBe(1));
   expect(screen.getByLabelText('새 거래처명').hasAttribute('disabled')).toBe(false);
   fireEvent.change(screen.getByLabelText('새 거래처명'),{target:{value:'다음 합성 거래처'}});
@@ -246,7 +246,7 @@ describe('connected pharmacy work data',()=>{
     return {} as any;
   });
   render(<PharmacyOrderPanel disabled={false} resuming={false} onApply={()=>{}} workScope={scope}/>);
-  fireEvent.click(screen.getByRole('button',{name:'PC·서버 자료 불러오기'}));await screen.findByText(/서버 자료를 불러왔어요/);
+  fireEvent.click(screen.getByRole('button',{name:'PC·서버 자료 불러오기'}));await screen.findByText(/서버 자료를 불러왔습니다/);
   fireEvent.click(screen.getByRole('button',{name:'이력 다시 조회'}));
   await screen.findByText(/실물 확인 \/ 10정/);await screen.findByText(/합성 상품: 품절 \/ 합성 거래처/);
   fireEvent.click(screen.getByRole('button',{name:'이력 더 보기'}));await screen.findByText(/실물 확인 \/ 20정/);
@@ -275,7 +275,7 @@ describe('connected pharmacy work data',()=>{
    return {enabled:false} as any;
   });
   render(<PharmacyOrderPanel disabled={false} resuming={false} onApply={()=>{}} workScope={scope}/>);
-  fireEvent.click(screen.getByRole('button',{name:'PC·서버 자료 불러오기'}));await screen.findByText(/PC 자료를 불러왔어요/);
+  fireEvent.click(screen.getByRole('button',{name:'PC·서버 자료 불러오기'}));await screen.findByText(/PC 자료를 불러왔습니다/);
   addSupplier();fireEvent.click(screen.getByRole('button',{name:'동의하고 PC 자료를 서버로 옮기기'}));
   await screen.findByRole('alert');expect(vi.mocked(workDataRequest).mock.calls.some(c=>c[0]==='consent')).toBe(false);
   expect(screen.getByText('합성 거래처',{selector:'legend'})).toBeTruthy();
@@ -291,7 +291,7 @@ describe('connected pharmacy work data',()=>{
   vi.mocked(loadWorkingData).mockResolvedValue({location:'server',consent:permission,records:[],next:null,counts:{},versions:{}});
   vi.mocked(workDataRequest).mockImplementation(async(action)=>action==='status'?permission as any:action==='consent'?{...permission,enabled:false,storageMode:'stopped'} as any:{enabled:false} as any);
   render(<PharmacyOrderPanel disabled={false} resuming={false} onApply={()=>{}} workScope={scope}/>);
-  fireEvent.click(screen.getByRole('button',{name:'PC·서버 자료 불러오기'}));await screen.findByText(/서버 자료를 불러왔어요/);
+  fireEvent.click(screen.getByRole('button',{name:'PC·서버 자료 불러오기'}));await screen.findByText(/서버 자료를 불러왔습니다/);
   fireEvent.click(screen.getByRole('button',{name:'서버 이용 중단·서버 자료 삭제'}));
   await screen.findByText(/PC 저장 방식으로 돌아가지는/);
   expect(vi.mocked(workDataRequest).mock.calls.some(c=>c[0]==='pc-read'||c[0]==='transition-source')).toBe(false);
@@ -308,7 +308,7 @@ describe('connected pharmacy work data',()=>{
   expect(screen.getByRole('button',{name:'전환 예약 취소'})).toBeTruthy();
   expect(vi.mocked(workDataRequest).mock.calls.some(c=>c[0]==='consent')).toBe(false);
   view.rerender(<PharmacyOrderPanel disabled={false} resuming={false} onApply={()=>{}} workScope={scope}/>);
-  await screen.findByText(/이제 서버에 저장해요/);
+  await screen.findByText(/이제 서버에 저장합니다/);
   expect(vi.mocked(workDataRequest).mock.calls.filter(c=>c[0]==='consent')).toHaveLength(1);
  });
  it('retries a source conflict only on request and keeps the original collector bound',async()=>{

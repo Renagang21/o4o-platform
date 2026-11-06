@@ -74,7 +74,7 @@ const productApprovalPolicy = defineActionPolicy<AdminProduct>('neture:product-a
         showReason: true,
         // WO-O4O-NETURE-PRODUCT-APPROVAL-REJECTION-COPY-AND-RESUBMIT-UX-V1:
         // 공급자는 반려 후 보완하여 다시 승인 요청할 수 있으므로, 보완할 내용을 구체적으로 안내한다.
-        reasonPlaceholder: '예: 제품명과 상세 설명이 일치하지 않습니다. 상세 설명을 수정한 뒤 다시 승인 요청해 주세요.',
+        reasonPlaceholder: '예: 제품명과 상세 설명이 일치하지 않습니다. 상세 설명을 수정한 뒤 다시 승인 요청해 주시기 바랍니다.',
       }),
     },
     {
@@ -433,7 +433,7 @@ export default function OperatorProductApprovalPage() {
       {/* Header */}
       <div className="mb-6">
         <h1 ref={heading} tabIndex={-1} className="text-2xl font-bold text-slate-900">상품 승인 관리</h1>
-        {canOpenProductTrash ? <button type="button" onClick={() => setShowTrash(true)} className="mt-3 border rounded px-3 py-2 text-sm">휴지통 열기</button> : <p className="mt-3 text-sm text-slate-500">휴지통 조회·완전 삭제는 접근 권한이 있는 관리자에게 요청해 주세요.</p>}
+        {canOpenProductTrash ? <button type="button" onClick={() => setShowTrash(true)} className="mt-3 border rounded px-3 py-2 text-sm">휴지통 열기</button> : <p className="mt-3 text-sm text-slate-500">휴지통 조회·완전 삭제는 접근 권한이 있는 관리자에게 요청해 주시기 바랍니다.</p>}
         <p className="text-sm text-slate-500 mt-1">
           공급자가 등록한 상품을 검토합니다. 보완이 필요하면 반려하고, 잘못 등록된 상품은 삭제합니다.
         </p>
@@ -451,6 +451,7 @@ export default function OperatorProductApprovalPage() {
           '반려 시 사유를 입력하면 공급자에게 전달됩니다',
         ]}
         compact
+        collapsible
       />
 
       {/* WO-O4O-NETURE-OPERATOR-PRODUCTS-AND-OFFERS-LOAD-ERROR-CONTRACT-V1:
@@ -459,7 +460,7 @@ export default function OperatorProductApprovalPage() {
         <div className="flex flex-col items-center py-20 text-slate-500 bg-white rounded-lg border border-slate-200">
           <AlertTriangle size={48} className="mb-4 text-red-300" />
           <p className="text-sm font-medium text-slate-700">상품 목록을 불러오지 못했습니다</p>
-          <p className="text-xs mt-1 text-slate-400">네트워크 또는 서버 오류일 수 있습니다. 잠시 후 다시 시도해주세요.</p>
+          <p className="text-xs mt-1 text-slate-400">네트워크 또는 서버 오류일 수 있습니다. 잠시 후 다시 시도해 주시기 바랍니다.</p>
           <button
             onClick={() => loadProducts()}
             className="mt-4 px-4 py-2 bg-slate-100 hover:bg-slate-200 rounded-lg text-sm font-medium text-slate-700"
@@ -586,13 +587,13 @@ export default function OperatorProductApprovalPage() {
             <p className="text-sm text-slate-500 mb-2">{rejectTarget.name}</p>
             {/* WO-O4O-NETURE-PRODUCT-APPROVAL-REJECTION-COPY-AND-RESUBMIT-UX-V1 */}
             <p className="text-xs text-slate-500 mb-3">
-              공급자가 확인할 반려/보완 사유를 입력해 주세요. 수정 후 다시 승인 요청할 수 있으므로,
+              공급자가 확인할 반려/보완 사유를 입력해 주시기 바랍니다. 수정 후 다시 승인 요청할 수 있으므로,
               보완할 내용을 구체적으로 작성하는 것이 좋습니다.
             </p>
             <textarea
               value={rejectReason}
               onChange={(e) => setRejectReason(e.target.value)}
-              placeholder="예: 제품명과 상세 설명이 일치하지 않습니다. 상세 설명을 수정한 뒤 다시 승인 요청해 주세요."
+              placeholder="예: 제품명과 상세 설명이 일치하지 않습니다. 상세 설명을 수정한 뒤 다시 승인 요청해 주시기 바랍니다."
               className="w-full border border-slate-200 rounded-lg p-3 text-sm resize-none h-24 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             <div className="flex justify-end gap-2 mt-4">

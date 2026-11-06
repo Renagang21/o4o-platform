@@ -117,7 +117,7 @@ for (const viewport of [
       await page.getByLabel("예제 이름").fill("직원 안내");
       await page
         .getByLabel("예제 요청문")
-        .fill("확인된 자료로 안내문을 작성해 주세요.");
+        .fill("확인된 자료로 안내문을 작성해 주시기 바랍니다.");
       await page.getByRole("button", { name: "설정 저장" }).click();
       await expect(
         page.getByText("설정을 저장했습니다. 이후 요청부터 적용됩니다."),

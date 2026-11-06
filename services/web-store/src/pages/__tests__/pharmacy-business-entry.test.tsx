@@ -26,7 +26,7 @@ beforeEach(() => {
 afterEach(cleanup);
 it('활성 가입 사업만 카드로 제공하고 신청 관리 표는 보존한다', async () => {
   render(<MemoryRouter><SemiFranchisesPage /></MemoryRouter>);
-  const section = await screen.findByRole('region', { name: '가입한 약국대상 세미프렌챠이즈 서비스' });
+  const section = await screen.findByRole('region', { name: '가입한 약국대상 세미프랜차이즈 서비스' });
   expect(within(section).getByRole('heading', { name: 'network-a' })).toBeTruthy();
   expect(within(section).queryByText('pending')).toBeNull();
   expect(within(section).getByRole('link', { name: '공급 상품' }).getAttribute('href')).toBe('/store/pharmacy/supply?source=sf%3Anetwork-a');
@@ -68,7 +68,7 @@ it('매장을 바꾸면 이전 매장의 늦은 자료 응답을 버린다', asy
 it('직원에게는 가입자 공간 대신 매장 상품·자료 진입을 유지한다', async () => {
   mocks.role = 'staff';
   render(<MemoryRouter><SemiFranchisesPage /></MemoryRouter>);
-  const section = await screen.findByRole('region', { name: '가입한 약국대상 세미프렌챠이즈 서비스' });
+  const section = await screen.findByRole('region', { name: '가입한 약국대상 세미프랜차이즈 서비스' });
   expect(within(section).queryByRole('button', { name: '가입자 공간' })).toBeNull();
   expect(within(section).getByRole('link', { name: '자료 가져오기' })).toBeTruthy();
 });

@@ -18,7 +18,7 @@ export interface PharmacyManagementClient {
 let configuredClient: PharmacyManagementClient | undefined;
 export function configurePharmacyManagementClient(client: PharmacyManagementClient): void { configuredClient = client; }
 export function getPharmacyManagementClient(): PharmacyManagementClient {
-  if (!configuredClient) throw new Error('관리 화면의 API 연결을 확인해 주세요.');
+  if (!configuredClient) throw new Error('관리 화면의 API 연결을 확인해 주시기 바랍니다.');
   return configuredClient;
 }
 
@@ -30,6 +30,7 @@ export type SemiFranchiseContentAction = 'publish' | 'archive' | 'reject';
 export type SemiFranchiseContentStatus = 'draft' | 'pending' | 'rejected' | 'published' | 'archived';
 
 export interface PharmacyMembership {
+  operatorReadOnly?: boolean;
   id: string;
   organization_id: string;
   status: string;

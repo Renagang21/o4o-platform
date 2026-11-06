@@ -126,7 +126,7 @@ export function useServiceAuth<TUser>(config: ServiceAuthConfig<TUser>): Service
     // Route guards treat foreground resolution as a verified server snapshot.
     // A superseded check must fail closed; background reads may be discarded.
     const discardSuperseded = () => {
-      if (throwOnTransientError) throw new Error('인증 확인이 취소되었습니다. 다시 시도해 주세요.');
+      if (throwOnTransientError) throw new Error('인증 확인이 취소되었습니다. 다시 시도해 주시기 바랍니다.');
     };
     const cfg = cfgRef.current;
     if (!cfg.getAccessToken()) {
@@ -199,7 +199,7 @@ export function useServiceAuth<TUser>(config: ServiceAuthConfig<TUser>): Service
       const generation = advanceSession();
       authenticatingGeneration.current = generation;
       setIsLoading(true);
-      const cancelled = (): AuthLoginResult<TUser> => ({ success: false, error: '로그인이 취소되었습니다. 다시 시도해 주세요.' });
+      const cancelled = (): AuthLoginResult<TUser> => ({ success: false, error: '로그인이 취소되었습니다. 다시 시도해 주시기 바랍니다.' });
       try {
         const result = (await request()) as KakaoAuthResponse;
         if (!isCurrentSession(generation)) return cancelled();
@@ -236,7 +236,7 @@ export function useServiceAuth<TUser>(config: ServiceAuthConfig<TUser>): Service
         // CORS/네트워크 오류 vs 서버 오류 구분
         const e = error as { code?: string };
         if (error instanceof TypeError || e?.code === 'ERR_NETWORK') {
-          return { success: false, error: '서버에 연결할 수 없습니다. 잠시 후 다시 시도해주세요.' };
+          return { success: false, error: '서버에 연결할 수 없습니다. 잠시 후 다시 시도해 주시기 바랍니다.' };
         }
         return { success: false, error: failMessage };
       } finally {
@@ -319,7 +319,7 @@ export function useServiceAuth<TUser>(config: ServiceAuthConfig<TUser>): Service
     const ownsResponse = () => isCurrentSession(generation) && request === policyRequest.current &&
       authenticatingGeneration.current === null;
     const cancelled = (): PolicyAcceptanceResult => ({
-      success: false, error: '인증 상태가 변경되어 약관 동의를 중단했습니다. 현재 계정에서 다시 시도해 주세요.', pending: [],
+      success: false, error: '인증 상태가 변경되어 약관 동의를 중단했습니다. 현재 계정에서 다시 시도해 주시기 바랍니다.', pending: [],
     });
     let remaining = pendingPolicyAcceptances;
     for (const item of pendingPolicyAcceptances) {
@@ -340,8 +340,8 @@ export function useServiceAuth<TUser>(config: ServiceAuthConfig<TUser>): Service
         const message = typeof data?.error === 'string'
           ? data.error
           : status === 409
-            ? '약관이 갱신되었습니다. 화면을 새로고침한 뒤 다시 동의해 주세요.'
-            : '약관 동의 처리에 실패했습니다. 잠시 후 다시 시도해 주세요.';
+            ? '약관이 갱신되었습니다. 화면을 새로고침한 뒤 다시 동의해 주시기 바랍니다.'
+            : '약관 동의 처리에 실패했습니다. 잠시 후 다시 시도해 주시기 바랍니다.';
         return { success: false, error: message, code, pending: remaining };
       }
     }

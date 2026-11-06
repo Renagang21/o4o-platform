@@ -158,7 +158,7 @@ function BusinessOperations({
       {error && (
         <p role="alert">
           집계를 확인하지 못했습니다. 담당 사업과 연결 상태를 확인한 뒤 다시
-          조회해 주세요.
+          조회해 주시기 바랍니다.
         </p>
       )}
       {!state && !error && <output>현장 요구를 확인하고 있습니다…</output>}
@@ -208,7 +208,7 @@ function BusinessOperations({
                   <p>
                     이용약관과 개인정보처리방침을 같은 버전으로 게시하면 이 사업
                     참여 신청에 적용됩니다. 실제 확인한 문안과 정보만 입력해
-                    주세요.
+                    주시기 바랍니다.
                   </p>
                   <ServiceLegalSettingsPage
                     key={businessKey}

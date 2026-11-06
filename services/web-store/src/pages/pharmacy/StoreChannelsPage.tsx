@@ -281,7 +281,7 @@ export function StoreChannelsPage({ section }: { section?: 'settings' | 'product
   // WO-O4O-GUIDE-BLOCK-1ST-WAVE-APPLY-V1: store.channel.editor guide
   // WO-O4O-STORE-CHANNEL-MANAGEMENT-CLEANUP-V1: 사이니지 step 제거 (독립 메뉴)
   const [guideTitle, setGuideTitle] = useState('온라인 스토어를 관리합니다.');
-  const [guideDesc, setGuideDesc] = useState('온라인 스토어에 노출할 상품을 설정하고 공개 주소로 고객을 맞이하세요.');
+  const [guideDesc, setGuideDesc] = useState('온라인 스토어에 노출할 상품을 설정하고 공개 주소로 고객을 맞이하시기 바랍니다.');
   const [guideSteps, setGuideSteps] = useState([
     '온라인 스토어를 활성화합니다',
     '노출할 제품을 추가하고 순서를 조정합니다',
@@ -693,7 +693,7 @@ export function StoreChannelsPage({ section }: { section?: 'settings' | 'product
               <span className="text-xl shrink-0">⬜</span>
               <div>
                 <p className="text-sm font-semibold text-slate-700">아직 추가된 상품이 없습니다</p>
-                <p className="text-xs text-slate-500 mt-1">내 매장의 공급 상품 화면에서 공급 상품을 확인하세요.</p>
+                <p className="text-xs text-slate-500 mt-1">내 매장의 공급 상품 화면에서 공급 상품을 확인하시기 바랍니다.</p>
               </div>
             </div>
             <Link to={pharmacyStorePath('supply')} className="shrink-0 px-4 py-2 text-sm font-medium text-blue-700 bg-white border border-blue-200 rounded-lg hover:bg-blue-50 transition-colors">
@@ -787,7 +787,7 @@ export function StoreChannelsPage({ section }: { section?: 'settings' | 'product
             <div className="text-center py-8 text-slate-400 bg-white rounded-lg border border-slate-200">
               <Package className="w-8 h-8 mx-auto mb-2 text-slate-300" />
               <p className="text-sm">이 채널에 등록된 제품이 없습니다.</p>
-              <p className="text-xs mt-1">"제품 추가" 버튼으로 제품을 진열하세요.</p>
+              <p className="text-xs mt-1">"제품 추가" 버튼으로 제품을 진열하시기 바랍니다.</p>
             </div>
           ) : (
             <div className="bg-white rounded-lg border border-slate-200 overflow-hidden">
@@ -1002,7 +1002,7 @@ export function StoreChannelsPage({ section }: { section?: 'settings' | 'product
         channelAssets.length === 0 ? (
           <div className="text-center py-16 text-slate-400">
             <p className="text-sm">이 채널에 배치된 콘텐츠가 없습니다.</p>
-            <p className="text-xs mt-1">자산 관리에서 채널 배치를 설정하거나, 약국 HUB에서 콘텐츠를 가져오세요.</p>
+            <p className="text-xs mt-1">자산 관리에서 채널 배치를 설정하거나, 약국 HUB에서 콘텐츠를 가져오시기 바랍니다.</p>
           </div>
         ) : (
           <div className="bg-white rounded-lg border border-slate-200 overflow-hidden">

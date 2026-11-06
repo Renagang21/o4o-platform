@@ -153,14 +153,14 @@ export default function AnnualReportPage({ slug }: { slug: string }) {
         <p className="mt-3 rounded bg-green-50 px-3 py-2 text-sm text-green-800">
           {status === 'approved'
             ? '분회에서 승인이 완료되어 읽기 전용입니다.'
-            : '제출이 완료되어 검수를 기다리는 중입니다. 수정이 필요하면 분회 사무국에 문의해 주세요.'}
+            : '제출이 완료되어 검수를 기다리는 중입니다. 수정이 필요하면 분회 사무국에 문의해 주시기 바랍니다.'}
         </p>
       )}
       {isRevision && (
         <div className="mt-3 rounded bg-amber-50 px-3 py-2 text-sm text-amber-900">
           <p className="font-medium">분회에서 보완을 요청했습니다.</p>
           <p className="mt-1 whitespace-pre-wrap">{state.report?.revisionReason}</p>
-          <p className="mt-1 text-amber-700">내용을 수정한 뒤 다시 제출해 주세요.</p>
+          <p className="mt-1 text-amber-700">내용을 수정한 뒤 다시 제출해 주시기 바랍니다.</p>
         </div>
       )}
       {!locked && !isRevision && state.period.status !== 'open' && (

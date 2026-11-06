@@ -1,3 +1,4 @@
+import { OperationError } from '../../services/operations/operation-audit.js';
 import { ConsultationGuidanceService } from './services/consultation-guidance.js';
 import { createConsultationGuidanceSelector } from './services/consultation-guidance.extension.js';
 import { ConsultationSupportService } from './services/consultation-support.js';
@@ -93,7 +94,8 @@ function handle(fn: Handler): RequestHandler {
         res.status(err.httpStatus).json({ success: false, error: err.message, code: err.code });
         return;
       }
-      if (err instanceof NetureMainMembershipRequiredError) {
+      if (err instanceof OperationError) { res.status(err.status).json({success:false,code:err.code,error:err.message}); return; }
+        if (err instanceof NetureMainMembershipRequiredError) {
         res.status(err.httpStatus).json({
           success: false,
           error: err.message,
@@ -211,7 +213,7 @@ export function createNeturePharmacyRoutes(dataSource: DataSource, consultationD
   const parseDocument = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 * 1024 * 1024, files: 1 } }).single('file');
   const documentUpload: RequestHandler = (req, res, next) => {
     parseDocument(req, res, (error) => {
-      if (error) { res.status(400).json({ success: false, code: 'INVALID_DOCUMENT', error: '사업자등록증은 10MB 이하 파일 1개로 제출해 주세요.' }); return; }
+      if (error) { res.status(400).json({ success: false, code: 'INVALID_DOCUMENT', error: '사업자등록증은 10MB 이하 파일 1개로 제출해 주시기 바랍니다.' }); return; }
       next();
     });
   };
@@ -237,11 +239,11 @@ export function createNeturePharmacyRoutes(dataSource: DataSource, consultationD
   router.get('/operator/pharmacy-documents/:id', ...operator,
     (_req, res, next) => { res.locals.documentReviewer = true; next(); }, downloadDocument);
 
-  // ─── 가입 승인 자동 연결 원장 읽기 (최초 신청 writer 폐기) ─────────────────────────────────────────
+  // ─── 내 매장(약국) 신청 (매장 게이트 이전) ─────────────────────────────────────────
   router.get('/pharmacy/membership', requireAuth, handle(async (req) => membership.findMine(req.user!.id)));
-  // Retired standalone application: unified registration approval provisions the store.
+  // MemberRegistrationService.approvePharmacy owns new store creation. No second application.
   router.post('/pharmacy/membership', requireAuth, (_req, res) => {
-    res.status(410).json({ success: false, code: 'UNIFIED_REGISTRATION_REQUIRED', error: '약국경영자 가입 승인 시 내 매장이 자동으로 연결됩니다.' });
+    res.status(410).json({ success: false, error: { code: 'PHARMACY_APPLICATION_RETIRED', message: '약국 경영자 회원 등록 승인 시 매장이 자동 연결됩니다. 회원 등록 상태를 확인하시기 바랍니다.' } });
   });
   // 세미프랜차이즈로 이용하는 서비스 호스트(pharmacy.neture.co.kr = kpa-society)의 화면 게이트용 — 로그인 · handoff 와 같은 판정.
   router.get('/pharmacy/service-access/:serviceKey', requireAuth, handle(async (req) => {
@@ -433,7 +435,7 @@ export function createNeturePharmacyRoutes(dataSource: DataSource, consultationD
     res.setHeader('Cache-Control', 'private, no-store'); return consultation.context(req.user!.id, org(req));
   }));
   const consultationLimiter = rateLimit({ windowMs: 60_000, max: 30, keyGenerator: req => req.user!.id,
-    message: { success: false, code: 'CONSULTATION_TOO_MANY_REQUESTS', error: '번역 요청이 많습니다. 잠시 후 다시 시도해 주세요.' } });
+    message: { success: false, code: 'CONSULTATION_TOO_MANY_REQUESTS', error: '번역 요청이 많습니다. 잠시 후 다시 시도해 주시기 바랍니다.' } });
   router.post('/pharmacy/multilingual-consultation/translate', ...store, consultationLimiter, handle(async (req, res) => {
     res.setHeader('Cache-Control', 'private, no-store');
     const input = req.body ?? {};
@@ -494,7 +496,7 @@ export function createNeturePharmacyRoutes(dataSource: DataSource, consultationD
   router.get('/supplier/content-requests', ...supplier, handle(async (req) => supplierContents.list(req.supplierId!)));
   router.post('/supplier/content-requests', ...supplier, handle(async (req, res) => {
     if (!isUuid(req.body?.itemId) || typeof req.body?.businessKey !== 'string' || !req.body.businessKey.trim()) {
-      throw new NeturePharmacyError(400, 'INVALID_REQUEST', '자료와 대상 협력사업을 선택하세요.');
+      throw new NeturePharmacyError(400, 'INVALID_REQUEST', '자료와 대상 협력사업을 선택하시기 바랍니다.');
     }
     const result = await supplierContents.request(req.supplierId!, req.user!.id, req.body.itemId, req.body.businessKey.trim());
     res.status(result.reused ? 200 : 201);

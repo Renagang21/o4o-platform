@@ -85,7 +85,7 @@ export default function CentralOperationOverview({ roleKey }: { roleKey: string 
         { key: 'open', label: '첫 선택 업무 열기', variant: 'primary', onClick: () => { const first = activeSelected[0]; if (!first) return; const target = centralTaskHref(first.service, first.href); if (target.startsWith('/')) navigate(target); else window.location.assign(target); } },
         { key: 'collect', label: selectedOnly ? '선택 모아보기 해제' : '선택 업무 모아보기', onClick: () => setSelectedOnly(value => !value) },
       ]} /></div>
-      <div id="central-pending-tasks"><DataTable className="[&_td]:px-3 [&_th]:px-3 [&_td]:whitespace-normal [&_th]:whitespace-normal" tableId="central-operation-pending" columns={columns} data={rows} rowKey="id" selectable selectedKeys={selected} onSelectionChange={setSelected} emptyMessage={error ? '이전 대기 현황을 확인해 주세요.' : '표시할 대기 업무가 없습니다.'} /></div>
+      <div id="central-pending-tasks"><DataTable className="[&_td]:px-3 [&_th]:px-3 [&_td]:whitespace-normal [&_th]:whitespace-normal" tableId="central-operation-pending" columns={columns} data={rows} rowKey="id" selectable selectedKeys={selected} onSelectionChange={setSelected} emptyMessage={error ? '이전 대기 현황을 확인해 주시기 바랍니다.' : '표시할 대기 업무가 없습니다.'} /></div>
       <p className="text-xs text-slate-500">대기 현황은 1분마다 갱신합니다. 승인은 각 업무 상세에서 처리합니다.</p>
     </>}
   </section>;

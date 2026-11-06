@@ -125,7 +125,7 @@ export default function QrLandingPage() {
           </div>
           <h1 style={styles.errorTitle}>현재 사용할 수 없는 화면입니다</h1>
           <p style={styles.errorDesc}>
-            매장에서 새로 안내받은 QR을 이용해 주세요.
+            매장에서 새로 안내받은 QR을 이용해 주시기 바랍니다.
           </p>
         </div>
       </div>
@@ -259,7 +259,7 @@ export default function QrLandingPage() {
           )}
 
           {pageUnavailable && (
-            <p style={styles.description}>이 콘텐츠는 현재 공개되어 있지 않습니다. 매장에 문의해 주세요.</p>
+            <p style={styles.description}>이 콘텐츠는 현재 공개되어 있지 않습니다. 매장에 문의해 주시기 바랍니다.</p>
           )}
 
           {/* Action Button */}
@@ -361,7 +361,7 @@ function ConsultationCta(props: {
       });
       setDone(true);
     } catch (e) {
-      setError(e instanceof Error ? e.message : '상담 요청에 실패했습니다. 잠시 후 다시 시도해 주세요.');
+      setError(e instanceof Error ? e.message : '상담 요청에 실패했습니다. 잠시 후 다시 시도해 주시기 바랍니다.');
     } finally {
       setSubmitting(false);
     }

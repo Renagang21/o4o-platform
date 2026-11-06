@@ -14,23 +14,23 @@ export const APPROVAL_GATE_REASON_DISPLAY: Record<string, GateReasonDisplay> = {
   SUPPLIER_CATEGORY_NOT_SELECTED: {
     status: '공급 예정 품목군에 아직 등록되지 않았습니다.',
     nextAction:
-      '공급자 프로필 > 공급 예정 품목군에서 해당 품목군을 추가하고 필요한 증빙을 제출해 주세요.',
+      '공급자 프로필 > 공급 예정 품목군에서 해당 품목군을 추가하고 필요한 증빙을 제출해 주시기 바랍니다.',
     cta: true,
   },
   SUPPLIER_CATEGORY_NOT_APPROVED: {
     status: '해당 품목군이 운영자 확인 대기 중입니다.',
-    nextAction: '운영자 확인이 완료된 후 상품 승인 요청을 다시 진행해 주세요.',
+    nextAction: '운영자 확인이 완료된 후 상품 승인 요청을 다시 진행해 주시기 바랍니다.',
     cta: true,
   },
   SUPPLIER_CATEGORY_NEEDS_UPDATE: {
     status: '해당 품목군 증빙에 보완이 필요합니다.',
     nextAction:
-      '공급자 프로필 > 공급 예정 품목군에서 보완 요청 내용을 확인하고 증빙을 다시 제출해 주세요.',
+      '공급자 프로필 > 공급 예정 품목군에서 보완 요청 내용을 확인하고 증빙을 다시 제출해 주시기 바랍니다.',
     cta: true,
   },
   SUPPLIER_CATEGORY_REJECTED: {
     status: '해당 품목군 신청이 반려되었습니다.',
-    nextAction: '반려 사유를 확인한 뒤 필요한 증빙을 보완하여 다시 제출해 주세요.',
+    nextAction: '반려 사유를 확인한 뒤 필요한 증빙을 보완하여 다시 제출해 주시기 바랍니다.',
     cta: true,
   },
   SUPPLIER_CATEGORY_SUSPENDED: {
@@ -40,34 +40,34 @@ export const APPROVAL_GATE_REASON_DISPLAY: Record<string, GateReasonDisplay> = {
   },
   SUPPLIER_CATEGORY_UNRESOLVED: {
     status: '해당 상품의 품목군 상태를 확인할 수 없습니다.',
-    nextAction: '상품의 규제/품목군 정보를 확인하거나 공급 예정 품목군 등록 상태를 확인해 주세요.',
+    nextAction: '상품의 규제/품목군 정보를 확인하거나 공급 예정 품목군 등록 상태를 확인해 주시기 바랍니다.',
     cta: true,
   },
   NO_ELIGIBLE_SERVICE_KEYS: {
     status: '이 상품을 노출할 수 있는 서비스 대상이 없습니다.',
-    nextAction: '상품 편집에서 서비스 대상 또는 유통 설정을 확인해 주세요.',
+    nextAction: '상품 편집에서 서비스 대상 또는 유통 설정을 확인해 주시기 바랍니다.',
     cta: false,
   },
   DRUG_SERVICE_NOT_PHARMACY_AUDIENCE: {
     status: '의약품 상품은 약국 대상 서비스에만 승인 요청할 수 있습니다.',
-    nextAction: '상품 편집에서 서비스 대상 설정을 확인해 주세요.',
+    nextAction: '상품 편집에서 서비스 대상 설정을 확인해 주시기 바랍니다.',
     cta: false,
   },
   ALREADY_REQUESTED_OR_DECIDED: {
     status: '이미 승인 요청 중이거나 승인/반려 처리된 상품입니다.',
-    nextAction: '현재 승인 상태를 확인해 주세요.',
+    nextAction: '현재 승인 상태를 확인해 주시기 바랍니다.',
     cta: false,
   },
   // WO-O4O-NETURE-SUPPLIER-ACTIVATION-DOCUMENT-GATE-RELAXATION-V1: 판매 전 게이트(사업자등록증)
   SUPPLIER_BUSINESS_REGISTRATION_REQUIRED: {
     status: '사업자등록증이 제출되지 않아 판매 승인 요청을 할 수 없습니다.',
-    nextAction: '공급자 프로필 > 사업자 정보에서 사업자등록증을 제출한 뒤 다시 요청해 주세요.',
+    nextAction: '공급자 프로필 > 사업자 정보에서 사업자등록증을 제출한 뒤 다시 요청해 주시기 바랍니다.',
     cta: true,
   },
 };
 export const APPROVAL_GATE_FALLBACK: GateReasonDisplay = {
   status: '승인 요청 조건을 충족하지 못했습니다.',
-  nextAction: '상품 정보와 공급자 품목군 등록 상태를 확인해 주세요.',
+  nextAction: '상품 정보와 공급자 품목군 등록 상태를 확인해 주시기 바랍니다.',
   cta: false,
 };
 export type ApprovalSkippedItem = {

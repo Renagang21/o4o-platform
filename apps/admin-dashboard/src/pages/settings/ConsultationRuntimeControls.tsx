@@ -9,7 +9,7 @@ export function ConsultationRuntimeControls({ control }: { control: ModelControl
   useEffect(() => { setSettings(control.data?.consultation ?? defaults); }, [control.data]);
   return <section aria-label="상담 실행 수단" className="space-y-4 rounded border bg-white p-4">
     <h3 className="font-semibold">상담 실행 수단</h3>
-    <p className="text-sm">연결된 수단을 용도별로 선택합니다. 저장은 실제 인증·가격 준비 또는 현장 품질 검증을 뜻하지 않습니다. 서버 선택은 다음 요청에 적용됩니다. 음성 선택을 바꾼 뒤 상담 화면을 새로 열어 주세요. 진행 중 요청은 시작한 수단으로 마치며 다른 수단으로 자동 전환하지 않습니다.</p>
+    <p className="text-sm">연결된 수단을 용도별로 선택합니다. 저장은 실제 인증·가격 준비 또는 현장 품질 검증을 뜻하지 않습니다. 서버 선택은 다음 요청에 적용됩니다. 음성 선택을 바꾼 뒤 상담 화면을 새로 열어 주시기 바랍니다. 진행 중 요청은 시작한 수단으로 마치며 다른 수단으로 자동 전환하지 않습니다.</p>
     <form className="space-y-4" onSubmit={event => { event.preventDefault(); void control.run(() => setConsultationRuntime(settings, control.data!.revision), '상담 실행 수단을 저장했습니다. 다음 요청부터 적용합니다.'); }}>
       <fieldset disabled={!control.data || control.busy || control.loading} className="space-y-3">
         {(['recognition', 'translation', 'synthesis'] as const).map(key => <label key={key} className="block">

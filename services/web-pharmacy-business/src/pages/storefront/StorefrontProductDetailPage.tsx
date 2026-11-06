@@ -322,7 +322,7 @@ export function StorefrontProductDetailPage() {
               <RichTextEditor
                 value={editDesc}
                 onChange={(content) => setEditDesc(content.html)}
-                placeholder="상세 상품 설명을 입력하세요..."
+                placeholder="상세 상품 설명을 입력하시기 바랍니다..."
                 minHeight="250px"
                 preset="compact"
               />

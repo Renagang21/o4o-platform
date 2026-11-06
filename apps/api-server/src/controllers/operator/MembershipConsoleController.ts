@@ -1,3 +1,4 @@
+import { protectedMemberSql } from '../../services/operations/protected-member-target.js';
 import { ASSIGNABLE_OPERATOR_ROLES } from '../../config/operator-role-catalog.js';
 import { OperationError } from '../../services/operations/operation-audit.js';
 /**
@@ -315,7 +316,7 @@ export class MembershipConsoleController {
 
       // Fetch users (users 테이블: camelCase columns — SnakeNamingStrategy 비활성)
       const users = await AppDataSource.query(
-        `SELECT u.id, u.email, u."firstName", u."lastName", u.name, u.nickname, u.phone,
+        `SELECT ${protectedMemberSql("u.id")} AS "operatorReadOnly", u.id, u.email, u."firstName", u."lastName", u.name, u.nickname, u.phone,
                 u.status, u."isActive", u."createdAt", u."updatedAt",
                 u."businessInfo"->>'businessName' AS company
          FROM users u
@@ -414,6 +415,7 @@ export class MembershipConsoleController {
           status: effectiveStatus,
           isActive: u.isActive,
           roles: roleMap[u.id] || [],
+          operatorReadOnly: u.operatorReadOnly === true,
           memberships,
           createdAt: u.createdAt,
           updatedAt: u.updatedAt,
@@ -462,7 +464,7 @@ export class MembershipConsoleController {
 
       // Fetch user (users 테이블: camelCase columns)
       const userRows = await AppDataSource.query(
-        `SELECT id, email, "firstName", "lastName", name, nickname, phone,
+        `SELECT ${protectedMemberSql("users.id")} AS "operatorReadOnly", id, email, "firstName", "lastName", name, nickname, phone,
                 status, "isActive", "createdAt", "updatedAt",
                 "businessInfo",
                 "businessInfo"->>'businessName' AS company
@@ -520,6 +522,7 @@ export class MembershipConsoleController {
           status: u.status,
           isActive: u.isActive,
           businessInfo: u.businessInfo || null,
+          operatorReadOnly: u.operatorReadOnly === true,
           createdAt: u.createdAt,
           updatedAt: u.updatedAt,
         },
@@ -1315,7 +1318,7 @@ export class MembershipConsoleController {
 
       if (scope.isPlatformAdmin && (ASSIGNABLE_OPERATOR_ROLES.includes(role) || ASSIGNABLE_OPERATOR_ROLES.includes(roleEntity.name)
         || roleEntity.isAdminRole || roleEntity.roleKey === 'operator' || isAdminTierRoleName(role) || isAdminTierRoleName(roleEntity.name))) {
-        res.status(403).json({ success: false, code: 'OPERATOR_INVITATION_REQUIRED', error: '서비스 운영자 지정은 전체관리자의 이메일 초대·수락 절차를 이용하세요.' });
+        res.status(403).json({ success: false, code: 'OPERATOR_INVITATION_REQUIRED', error: '서비스 운영자 지정은 전체관리자의 이메일 초대·수락 절차를 이용하시기 바랍니다.' });
         return;
       }
 
@@ -1503,7 +1506,7 @@ export class MembershipConsoleController {
           res.status(409).json({
             success: false,
             error:
-              '마지막 platform:super_admin 역할은 회수할 수 없습니다. 다른 활성 플랫폼 관리자를 먼저 확보하세요.',
+              '마지막 platform:super_admin 역할은 회수할 수 없습니다. 다른 활성 플랫폼 관리자를 먼저 확보하시기 바랍니다.',
             code: 'LAST_PLATFORM_SUPER_ADMIN',
           });
           return;

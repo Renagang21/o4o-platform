@@ -143,7 +143,7 @@ const ForumCategories: FC = () => {
     e.preventDefault();
     
     if (!formData.name.trim()) {
-      toast.error('카테고리 이름을 입력하세요');
+      toast.error('카테고리 이름을 입력하시기 바랍니다');
       return;
     }
 
@@ -178,7 +178,7 @@ const ForumCategories: FC = () => {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-xl font-bold text-modern-text-primary">포럼 카테고리</h2>
-          <p className="text-modern-text-secondary mt-1">포럼 카테고리를 관리하세요.</p>
+          <p className="text-modern-text-secondary mt-1">포럼 카테고리를 관리하시기 바랍니다.</p>
         </div>
         <Button onClick={() => handleOpenDialog()}>
           <Plus className="w-4 h-4 mr-2" />
@@ -301,7 +301,7 @@ const ForumCategories: FC = () => {
                 {editingCategory ? '카테고리 수정' : '새 카테고리'}
               </DialogTitle>
               <DialogDescription>
-                포럼 카테고리 정보를 입력하세요.
+                포럼 카테고리 정보를 입력하시기 바랍니다.
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-4 py-4">
@@ -336,7 +336,7 @@ const ForumCategories: FC = () => {
                   id="description"
                   value={formData.description}
                   onChange={(e: any) => setFormData((prev: any) => ({ ...prev, description: e.target.value }))}
-                  placeholder="카테고리에 대한 설명을 입력하세요..."
+                  placeholder="카테고리에 대한 설명을 입력하시기 바랍니다..."
                   rows={3}
                 />
               </div>

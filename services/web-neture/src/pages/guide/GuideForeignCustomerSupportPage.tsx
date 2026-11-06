@@ -70,7 +70,7 @@ export function GuideForeignCustomerSupportPage() {
       <div className="mx-auto max-w-5xl px-6 py-12 space-y-16">
         {/* ── 1. 어떤 상황에서 사용하나요? ── */}
         <section>
-          <SectionTitle eyebrow="활용 상황">어떤 상황에서 사용하나요?</SectionTitle>
+          <SectionTitle eyebrow="활용 상황">어떤 상황에서 사용합니까?</SectionTitle>
           <p className="text-sm text-slate-600 leading-relaxed mb-6 max-w-2xl">
             외국인 고객이 상품 설명을 이해하기 어려울 때, 매장 직원은 QR 또는 태블릿을 통해 다국어 상품 안내
             콘텐츠를 보여줄 수 있습니다. 직원이 외국어로 직접 설명하지 않아도, 고객은 자신의 언어로 상품 정보를
@@ -240,7 +240,7 @@ export function GuideForeignCustomerSupportPage() {
             <h2 className="text-xl font-bold mb-2">매장 운영에 적용하기</h2>
             <p className="text-sm text-slate-300 leading-relaxed max-w-xl mx-auto">
               다국어 상품 안내 콘텐츠 · QR · 태블릿 활용은 매장의 취급 상품과 고객 구성에 따라 적용 방식이
-              달라질 수 있습니다. 내 매장 활용 가이드에서 전체 매장 운영 흐름을 함께 확인하세요.
+              달라질 수 있습니다. 내 매장 활용 가이드에서 전체 매장 운영 흐름을 함께 확인하시기 바랍니다.
             </p>
             <Link
               to="/guide/for-seller"

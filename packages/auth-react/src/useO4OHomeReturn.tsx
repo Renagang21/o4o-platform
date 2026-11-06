@@ -52,7 +52,7 @@ const ERROR_MESSAGES: Record<string, string> = {
   ACCOUNT_NOT_ACTIVE: '이용할 수 없는 계정 상태라 O4O 홈으로 이동할 수 없습니다.',
   ACCOUNT_ACCESS_RESTRICTED: '가입 승인 상태를 확인한 뒤 O4O 홈을 이용할 수 있습니다.',
 };
-const GENERIC_ERROR = 'O4O 홈으로 이동하지 못했습니다. 잠시 후 다시 시도해 주세요.';
+const GENERIC_ERROR = 'O4O 홈으로 이동하지 못했습니다. 잠시 후 다시 시도해 주시기 바랍니다.';
 
 // ── 모듈 단위 상태 ────────────────────────────────────────────────────────────
 type Snapshot = { busy: boolean; error: string | null };

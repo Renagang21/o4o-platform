@@ -26,7 +26,7 @@ export default function StorePaymentPage() {
   useEffect(() => {
     let cancelled = false;
     if (!paymentGroupId) {
-      setError('결제 정보(paymentGroupId)가 없습니다. 장바구니에서 다시 시도해 주세요.');
+      setError('결제 정보(paymentGroupId)가 없습니다. 장바구니에서 다시 시도해 주시기 바랍니다.');
       setLoading(false);
       return;
     }

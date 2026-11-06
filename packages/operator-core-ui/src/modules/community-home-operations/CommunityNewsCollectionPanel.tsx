@@ -46,7 +46,7 @@ export function CommunityNewsCollectionPanel({
     } catch {
       if (mounted.current)
         setError(
-          "수집 결과를 확인하지 못했습니다. 결과 다시 확인을 눌러 주세요.",
+          "수집 결과를 확인하지 못했습니다. 결과 다시 확인을 눌러 주시기 바랍니다.",
         );
     } finally {
       if (mounted.current) setBusy(false);
@@ -87,14 +87,14 @@ export function CommunityNewsCollectionPanel({
       )}
       {value?.state === "pending" && (
         <output className="block">
-          오늘의 수집 요청이 접수됐습니다. 결과를 다시 확인해 주세요.
+          오늘의 수집 요청이 접수됐습니다. 결과를 다시 확인해 주시기 바랍니다.
         </output>
       )}
       {value && value.state !== "pending" && (
         <>
           <p className="text-sm">
             {value.day} 수집 결과입니다. 새로 등록한 기사는 아래 등록 항목에서
-            확인해 주세요.
+            확인해 주시기 바랍니다.
           </p>
           <ul className="space-y-2 text-sm">
             {value.sources.map((source) => (

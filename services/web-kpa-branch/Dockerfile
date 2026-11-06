@@ -30,11 +30,13 @@ COPY tsconfig.packages.json ./
 # Copy workspace package manifests needed for this service
 #   auth-react → { auth-utils, auth-client } → types
 #   shared-space-ui → { ui → types, content-editor }
+#   operator-ux-core → { ui, types } (표준 회원 목록·ActionBar)
 COPY packages/types/package.json ./packages/types/
 COPY packages/auth-utils/package.json ./packages/auth-utils/
 COPY packages/auth-client/package.json ./packages/auth-client/
 COPY packages/auth-react/package.json ./packages/auth-react/
 COPY packages/ui/package.json ./packages/ui/
+COPY packages/operator-ux-core/package.json ./packages/operator-ux-core/
 COPY packages/content-editor/package.json ./packages/content-editor/
 COPY packages/shared-space-ui/package.json ./packages/shared-space-ui/
 
@@ -53,6 +55,7 @@ COPY packages/auth-utils/ ./packages/auth-utils/
 COPY packages/auth-client/ ./packages/auth-client/
 COPY packages/auth-react/ ./packages/auth-react/
 COPY packages/ui/ ./packages/ui/
+COPY packages/operator-ux-core/ ./packages/operator-ux-core/
 COPY packages/content-editor/ ./packages/content-editor/
 COPY packages/shared-space-ui/ ./packages/shared-space-ui/
 

@@ -187,7 +187,7 @@ export function StoreLocalProductsManager<
     labels?.description ??
     'O4O 주문과 무관하게 매장에서 자체적으로 취급·진열하는 상품입니다. 결제/주문 시스템과 연결되지 않습니다.';
   const emptyTitle = labels?.emptyTitle ?? '등록된 매장 취급 상품이 없습니다';
-  const emptyDescription = labels?.emptyDescription ?? '매장에서 자체적으로 취급하는 상품을 등록해 보세요.';
+  const emptyDescription = labels?.emptyDescription ?? '매장에서 자체적으로 취급하는 상품을 등록해 보시기 바랍니다.';
 
   // undefined = 기존 `/store/*` 기본 동작 · null = 숨김 · 함수 = 교체
   const onTabletDisplays =
@@ -481,8 +481,8 @@ export function StoreLocalProductsManager<
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="min-w-0">
           <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-3">
             <ShoppingBag className="w-7 h-7 text-teal-600" />
             {title}
@@ -490,15 +490,24 @@ export function StoreLocalProductsManager<
           </h1>
           <p className="text-sm text-slate-500 mt-1">{description}</p>
         </div>
-        {onTabletDisplays && (
+        <div className="flex flex-wrap items-center gap-2">
+          {onTabletDisplays && (
+            <button
+              onClick={onTabletDisplays}
+              className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-teal-700 bg-teal-50 rounded-xl hover:bg-teal-100 transition-colors"
+            >
+              <Tablet className="w-4 h-4" />
+              태블릿 진열 관리
+            </button>
+          )}
           <button
-            onClick={onTabletDisplays}
-            className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-teal-700 bg-teal-50 rounded-xl hover:bg-teal-100 transition-colors"
+            onClick={handleCreate}
+            className="flex items-center gap-2 px-4 py-2.5 bg-teal-600 text-white text-sm font-medium rounded-xl hover:bg-teal-700 transition-colors shadow-lg shadow-teal-600/25"
           >
-            <Tablet className="w-4 h-4" />
-            태블릿 진열 관리
+            <Plus className="w-4 h-4" />
+            상품 등록
           </button>
-        )}
+        </div>
       </div>
 
       {/* Filters */}
@@ -532,13 +541,6 @@ export function StoreLocalProductsManager<
           활성 상품만
         </label>
 
-        <button
-          onClick={handleCreate}
-          className="flex items-center gap-2 px-4 py-2.5 bg-teal-600 text-white text-sm font-medium rounded-xl hover:bg-teal-700 transition-colors shadow-lg shadow-teal-600/25"
-        >
-          <Plus className="w-4 h-4" />
-          상품 등록
-        </button>
       </div>
 
       {/* Error */}
@@ -569,7 +571,7 @@ export function StoreLocalProductsManager<
           </h3>
           <p className="text-slate-500 mb-6">
             {debouncedSearch
-              ? '다른 검색어로 시도해 보세요.'
+              ? '다른 검색어로 시도해 보시기 바랍니다.'
               : emptyDescription}
           </p>
           {!debouncedSearch && (
@@ -767,7 +769,7 @@ function ProductFormModal({
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="상품명을 입력하세요"
+              placeholder="상품명을 입력하시기 바랍니다"
               className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
               required
             />

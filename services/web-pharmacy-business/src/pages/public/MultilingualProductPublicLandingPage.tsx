@@ -58,7 +58,7 @@ function PageBody({ page, large = false }: { page: NonNullable<PublicMlcResolve[
     <div className="space-y-2">
       {page.summary && <p className={large ? 'text-lg leading-relaxed text-slate-700' : 'text-[15px] leading-relaxed text-slate-700'}>{page.summary}</p>}
       <p className={large ? 'text-sm text-slate-400' : 'text-xs text-slate-400'}>
-        지원하지 않는 콘텐츠 형식입니다. 매장 직원에게 문의해 주세요.
+        지원하지 않는 콘텐츠 형식입니다. 매장 직원에게 문의해 주시기 바랍니다.
       </p>
     </div>
   );
@@ -199,7 +199,7 @@ export function MultilingualProductPublicLandingPage() {
         </main>
 
         <footer className="px-8 py-8 text-center">
-          <p className="text-lg font-medium text-slate-600">매장 직원에게 문의해 주세요.</p>
+          <p className="text-lg font-medium text-slate-600">매장 직원에게 문의해 주시기 바랍니다.</p>
           <p className="text-sm text-slate-400 mt-1">Please ask our staff for assistance. · KPA-Society</p>
         </footer>
       </div>
@@ -269,7 +269,7 @@ export function MultilingualProductPublicLandingPage() {
       </main>
 
       <footer className="px-5 py-6 text-center text-[11px] text-slate-400">
-        문의는 매장에 직접 문의해 주세요 · KPA-Society
+        문의는 매장에 직접 문의해 주시기 바랍니다 · KPA-Society
       </footer>
     </div>
   );

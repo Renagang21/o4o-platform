@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useLayoutEffect, useRef } from 'react';
 import { useStoreOrganizationId } from './useStoreOrganizationId';
 import { getActiveStoreOrganizationId } from '../lib/storeOrganizationHeader';
 import { getActiveServiceKey } from '../lib/serviceContext';
@@ -10,7 +10,8 @@ export function useStoreOperationScope() {
   const key = `${organizationId}:${serviceKey}`;
   const selected = useRef(key), mounted = useRef(true);
   selected.current = key;
-  useEffect(() => {
+  // Child passive effects may issue requests immediately, including StrictMode effect replay.
+  useLayoutEffect(() => {
     mounted.current = true;
     return () => { mounted.current = false; };
   }, []);

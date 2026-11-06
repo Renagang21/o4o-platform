@@ -84,7 +84,7 @@ export class ForumRequestService {
       return { error: { status: 400, code: 'INVALID_DESC', message: 'description은 10자 이상 필수' } };
     }
     if (!tags || tags.length === 0) {
-      return { error: { status: 400, code: 'TAGS_REQUIRED', message: '태그를 1개 이상 선택해주세요' } };
+      return { error: { status: 400, code: 'TAGS_REQUIRED', message: '태그를 1개 이상 선택해 주시기 바랍니다' } };
     }
     if (tags.length > 5) {
       return { error: { status: 400, code: 'TAGS_TOO_MANY', message: '태그는 최대 5개까지 선택할 수 있습니다' } };
@@ -97,7 +97,7 @@ export class ForumRequestService {
         .filter((t: string) => t.length <= 30)
     )];
     if (sanitizedTags.length === 0) {
-      return { error: { status: 400, code: 'TAGS_REQUIRED', message: '유효한 태그를 1개 이상 입력해주세요' } };
+      return { error: { status: 400, code: 'TAGS_REQUIRED', message: '유효한 태그를 1개 이상 입력해 주시기 바랍니다' } };
     }
 
     const entity = this.requestRepo.create({

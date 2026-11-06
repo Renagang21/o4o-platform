@@ -33,7 +33,7 @@ export function ProductListEditorFields({
         <h4 style={{ margin: "0 0 8px" }}>표시 상품 ({selected.length})</h4>
         {selected.length === 0 && (
           <div style={{ color: "#6b7280" }}>
-            선택된 상품이 없습니다. 오른쪽에서 추가하세요.
+            선택된 상품이 없습니다. 오른쪽에서 추가하시기 바랍니다.
           </div>
         )}
         <ol

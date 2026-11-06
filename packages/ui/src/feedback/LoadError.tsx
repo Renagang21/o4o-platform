@@ -25,7 +25,7 @@ export interface LoadErrorProps {
 }
 
 export const LOAD_ERROR_TITLE = '데이터를 불러오지 못했습니다.';
-export const LOAD_ERROR_DESCRIPTION = '잠시 후 다시 시도해 주세요.';
+export const LOAD_ERROR_DESCRIPTION = '잠시 후 다시 시도해 주시기 바랍니다.';
 
 export function LoadError({
   title = LOAD_ERROR_TITLE,

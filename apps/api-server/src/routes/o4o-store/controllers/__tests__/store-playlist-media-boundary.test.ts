@@ -31,6 +31,13 @@ it('does not disguise denied list access as a successful empty catalog', async (
   expect(repository.findPlaylistsByOrganization).not.toHaveBeenCalled();
 });
 
+it('does not disguise denied item access as an empty playlist', async () => {
+  resolve.mockResolvedValue(null); repository.findPlaylistItems = jest.fn();
+  const res = await request(app()).get('/playlist/items');
+  expect(res.status).toBe(403); expect(res.body.success).toBe(false);
+  expect(repository.findPlaylistItems).not.toHaveBeenCalled();
+});
+
 it.each(['', '   ', 'x'.repeat(256), 123, null])('rejects invalid playlist names before persistence: %s', async name => {
   repository.updatePlaylist = jest.fn(); repository.createPlaylist = jest.fn();
   const a = app();

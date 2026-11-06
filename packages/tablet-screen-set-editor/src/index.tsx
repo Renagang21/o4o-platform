@@ -156,7 +156,7 @@ interface TemplateMeta {
 //   바뀌었으므로, 평문만 요구하던 이전 요청문을 HTML 산출용으로 교체한다.
 //   ContentRenderer 는 sanitizeRichHtml(DOMPurify)로 script/위험 속성을 제거하고
 //   iframe 은 youtube/vimeo 만 허용하므로, 요청문에서도 그 범위를 벗어나지 않게 지시한다.
-const CORNER_DESC_PROMPT = `약국 매장 태블릿의 코너 화면에 넣을 내용을 HTML로 만들어 주세요.
+const CORNER_DESC_PROMPT = `약국 매장 태블릿의 코너 화면에 넣을 내용을 HTML로 만들어 주시기 바랍니다.
 
 [코너 이름]
 예: 구강관리 코너
@@ -166,17 +166,17 @@ const CORNER_DESC_PROMPT = `약국 매장 태블릿의 코너 화면에 넣을 �
 
 [이번에 넣고 싶은 내용]
 예: 코너 소개 + 제품 고르는 기준 + 사용 순서 안내
-(짧은 소개 한 단락만 원할 수도 있고, 소제목이 여러 개인 긴 안내여도 됩니다 — 원하는 구성을 여기에 적어 주세요.)
+(짧은 소개 한 단락만 원할 수도 있고, 소제목이 여러 개인 긴 안내여도 됩니다 — 원하는 구성을 여기에 적어 주시기 바랍니다.)
 
 조건:
 - 손님이 태블릿 화면에서 읽는 글입니다. 문장은 짧고 읽기 쉽게.
-- O4O 편집기의 HTML 탭에 그대로 붙여 넣을 수 있는 형태로 만들어 주세요.
+- O4O 편집기의 HTML 탭에 그대로 붙여 넣을 수 있는 형태로 만들어 주시기 바랍니다.
 - 사용할 태그: p, h2, h3, strong, em, ul, ol, li, br, a, table, img 정도면 충분합니다.
-- 강조·여백 같은 꾸미기는 태그 안 style 속성(인라인 CSS)으로만 해 주세요.
-- script, iframe, 외부 CSS 파일, 외부 폰트, 외부 스크립트는 사용하지 마세요(자동 제거됩니다).
+- 강조·여백 같은 꾸미기는 태그 안 style 속성(인라인 CSS)으로만 해 주시기 바랍니다.
+- script, iframe, 외부 CSS 파일, 외부 폰트, 외부 스크립트는 사용하지 마시기 바랍니다(자동 제거됩니다).
 - 제품을 파는 광고 문구가 아니라, 이 코너에서 무엇을 확인할 수 있는지 안내하는 톤으로.
-- 질병을 치료·예방한다고 단정하지 마세요. 증상이 있으면 약사와 상담하라고 안내해 주세요.
-- 과장된 표현, 최상급 표현(최고·완벽 등)은 쓰지 마세요.`;
+- 질병을 치료·예방한다고 단정하지 마시기 바랍니다. 증상이 있으면 약사와 상담하라고 안내해 주시기 바랍니다.
+- 과장된 표현, 최상급 표현(최고·완벽 등)은 쓰지 마시기 바랍니다.`;
 
 const TEMPLATE_OPTIONS: TemplateMeta[] = [
   {
@@ -323,7 +323,7 @@ function ContentListEditor({ items, onChange, api, contentSources = DEFAULT_CONT
       {items.length === 0 ? (
         /* WO-O4O-KPA-TABLET-EXTRA-INFO-BUTTON-DEDUP-V1: 빈 상태 안내만 표시(중복 버튼 제거 — 추가는 상단 '추가 정보' 하나로). */
         <div className="rounded-xl border border-dashed border-slate-300 bg-slate-50/60 text-center py-6 px-4">
-          <p className="text-sm text-slate-500 leading-relaxed">아직 추가한 정보가 없습니다.<br />손님에게 함께 보여줄 상세설명서·안내 콘텐츠를 추가해 주세요.</p>
+          <p className="text-sm text-slate-500 leading-relaxed">아직 추가한 정보가 없습니다.<br />손님에게 함께 보여줄 상세설명서·안내 콘텐츠를 추가해 주시기 바랍니다.</p>
         </div>
       ) : (
         <div className="space-y-2">
@@ -491,7 +491,7 @@ function ContentPickerModal({ existingKeys, onClose, onAdd, baseSort, api, conte
           {loading ? (
             <div className="flex items-center gap-2 text-sm text-slate-400 py-6"><Loader2 className="w-4 h-4 animate-spin" /> 검색 중…</div>
           ) : tab === 'spd' ? (
-            o4o.length === 0 ? <div className="text-sm text-slate-400 py-6 text-center">검색 결과가 없습니다. 다른 검색어를 입력해 보세요.<br /><span className="text-[11px]">(매장용 표준 설명서가 있는 상품만 표시됩니다)</span></div> :
+            o4o.length === 0 ? <div className="text-sm text-slate-400 py-6 text-center">검색 결과가 없습니다. 다른 검색어를 입력해 보시기 바랍니다.<br /><span className="text-[11px]">(매장용 표준 설명서가 있는 상품만 표시됩니다)</span></div> :
             o4o.map((r) => {
               const added = existingKeys.has(`o4o:${r.masterId}:${lang}`);
               const sel = !!selO4o[r.masterId];
@@ -745,7 +745,7 @@ function ProductSelectEditor({ selected, onChange, fetchProductPool, fetchStoreQ
         <div className="rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-[11px] text-amber-800 leading-relaxed">
           {pool.tabletChannel.hasTabletChannel
             ? '매장의 태블릿 판매 채널이 아직 승인되지 않아, 취급 상품은 실제 태블릿 화면에 표시되지 않습니다. 채널 승인 후 자동으로 표시됩니다.'
-            : '매장에 태블릿 판매 채널이 없어 취급 상품이 실제 태블릿 화면에 표시되지 않습니다. 매장 관리에서 태블릿 채널을 먼저 신청해 주세요.'}
+            : '매장에 태블릿 판매 채널이 없어 취급 상품이 실제 태블릿 화면에 표시되지 않습니다. 매장 관리에서 태블릿 채널을 먼저 신청해 주시기 바랍니다.'}
         </div>
       )}
 
@@ -832,7 +832,7 @@ function ProductSelectEditor({ selected, onChange, fetchProductPool, fetchStoreQ
               {qrLoading ? (
                 <div className="flex items-center gap-2 text-sm text-slate-400 py-6"><Loader2 className="w-4 h-4 animate-spin" /> 불러오는 중…</div>
               ) : qrRows.length === 0 ? (
-                <div className="text-sm text-slate-400 py-6 text-center">사용할 수 있는 QR이 없습니다.<br />매장 QR 관리에서 QR을 먼저 만들어 주세요.</div>
+                <div className="text-sm text-slate-400 py-6 text-center">사용할 수 있는 QR이 없습니다.<br />매장 QR 관리에서 QR을 먼저 만들어 주시기 바랍니다.</div>
               ) : qrRows.map((o) => {
                 const sel = selected[qrTargetIndex!]?.qrCodeId === o.id;
                 return (
@@ -1184,8 +1184,8 @@ export function TabletContentStepBuilder({
 
   const handleSave = async () => {
     if (saveLock.current) return;
-    if (idleItemsRef.current.some(item => !item.url.trim() || (!['video', 'image'].includes(item.mediaType) && !hostedVideo(item.url)))) { onToast({ type: 'error', message: '재생할 개별 영상 주소를 확인하거나 사용하지 않는 빈 항목을 제거해 주세요.' }); return; }
-    if (!nameValid) { onToast({ type: 'error', message: '코너 제목 또는 콘텐츠 관리 이름을 입력해 주세요.' }); return; }
+    if (idleItemsRef.current.some(item => !item.url.trim() || (!['video', 'image'].includes(item.mediaType) && !hostedVideo(item.url)))) { onToast({ type: 'error', message: '재생할 개별 영상 주소를 확인하거나 사용하지 않는 빈 항목을 제거해 주시기 바랍니다.' }); return; }
+    if (!nameValid) { onToast({ type: 'error', message: '코너 제목 또는 콘텐츠 관리 이름을 입력해 주시기 바랍니다.' }); return; }
     saveLock.current = true;
     setSaveError(null);
     setSaving(true);
@@ -1214,7 +1214,7 @@ export function TabletContentStepBuilder({
     } catch (e: any) {
       // QR 준비 실패 = 저장 실패(부분 성공 아님). 사용자에게 재시도를 명확히 안내한다.
       const message = e?.code === 'SCREEN_SET_QR_FAILED'
-        ? 'QR을 준비하지 못했습니다. 입력한 내용은 유지됩니다. 잠시 후 다시 저장해 주세요.'
+        ? 'QR을 준비하지 못했습니다. 입력한 내용은 유지됩니다. 잠시 후 다시 저장해 주시기 바랍니다.'
         : (e?.message || '저장에 실패했습니다.');
       setSaveError(message);
       onToast({ type: 'error', message });
@@ -1233,7 +1233,7 @@ export function TabletContentStepBuilder({
     const items = idleItemsRef.current;
     const saveItems = (next: typeof items) => replaceConfigOf('idle_media', next.length ? { source: 'custom_media', items: next } : { source: 'legacy_idle_playlist' });
     return <div className="space-y-3">
-      <p className="text-sm">영상이 끝나면 다음 영상을 재생하고, 목록 마지막에서 처음으로 반복합니다. 목록 변경은 저장 후 직접 적용해 주세요.</p>
+      <p className="text-sm">영상이 끝나면 다음 영상을 재생하고, 목록 마지막에서 처음으로 반복합니다. 목록 변경은 저장 후 직접 적용해 주시기 바랍니다.</p>
       {items.map((item, index) => {
         const hosted = hostedVideo(item.url);
         const stored = item.mediaType === 'video' || item.mediaType === 'image';
@@ -1248,7 +1248,7 @@ export function TabletContentStepBuilder({
               }))}
               className="mt-1 min-h-11 w-full rounded-lg border px-3 text-sm" />
           </label>
-          {!stored && item.url.trim() && !hosted && <p role="alert" className="text-sm text-amber-700">채널 주소 대신 개별 영상 주소를 입력해 주세요.</p>}
+          {!stored && item.url.trim() && !hosted && <p role="alert" className="text-sm text-amber-700">채널 주소 대신 개별 영상 주소를 입력해 주시기 바랍니다.</p>}
           <div className="flex flex-wrap gap-2">
             <button type="button" disabled={index === 0} onClick={() => { const next = [...items]; [next[index - 1], next[index]] = [next[index], next[index - 1]]; saveItems(next); }} className="min-h-11 rounded border px-3 text-sm">위로</button>
             <button type="button" onClick={() => saveItems(items.filter((_, i) => i !== index))} className="min-h-11 rounded border px-3 text-sm">영상 제거</button>
@@ -1310,7 +1310,7 @@ export function TabletContentStepBuilder({
             <RichTextEditor
               value={normalizeCornerBody(c.body)}
               onChange={({ html }) => patchConfigOf('corner_description', { body: html })}
-              placeholder="이 코너에서 손님에게 보여줄 내용을 자유롭게 작성하세요. 글·이미지·표를 원하는 구성으로 넣을 수 있습니다."
+              placeholder="이 코너에서 손님에게 보여줄 내용을 자유롭게 작성하시기 바랍니다. 글·이미지·표를 원하는 구성으로 넣을 수 있습니다."
               minHeight="180px"
               editable={!saving}
               onImageUpload={onImageUpload}
@@ -1318,7 +1318,7 @@ export function TabletContentStepBuilder({
               showInternalAi={showInternalAi}
             />
           </div>
-          <p className="text-xs text-slate-500 mt-1">첫 화면의 설명은 짧게 작성하세요. 긴 사용법은 추가 정보로 연결하고, 고객 화면 미리보기에서 읽기 편한지 확인하세요.</p>
+          <p className="text-xs text-slate-500 mt-1">첫 화면의 설명은 짧게 작성하시기 바랍니다. 긴 사용법은 추가 정보로 연결하고, 고객 화면 미리보기에서 읽기 편한지 확인하시기 바랍니다.</p>
         </div>
       </div>
     );
@@ -1366,9 +1366,9 @@ export function TabletContentStepBuilder({
           </button>
         </div>
       </div>
-      {saveError && <p role="alert" className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-800">{saveError} 입력한 내용은 유지됩니다. 저장을 다시 눌러 시도하세요.</p>}
+      {saveError && <p role="alert" className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-800">{saveError} 입력한 내용은 유지됩니다. 저장을 다시 눌러 시도하시기 바랍니다.</p>}
       <p className="text-[11px] text-slate-500 leading-relaxed">
-        제목과 필요한 내용만 준비하면 저장할 수 있습니다. 추가 자료·대기 영상·화면 배치는 필요할 때 펼쳐서 변경하세요.
+        제목과 필요한 내용만 준비하면 저장할 수 있습니다. 추가 자료·대기 영상·화면 배치는 필요할 때 펼쳐서 변경하시기 바랍니다.
       </p>
 
       {/* ── WO-O4O-KPA-TABLET-TEMPLATE-PREVIEW-LAYOUT-FIX-V1: 2단 — 왼쪽 편집(≈58%) / 오른쪽 실제 결과 화면(≈42%).
@@ -1394,7 +1394,7 @@ export function TabletContentStepBuilder({
       </EditorSection>
 
       {/* 대기 화면 */}
-      <EditorSection optional title={`대기 화면 · ${idleItemsRef.current.length ? '영상 설정됨' : '선택'}`} note="손님이 화면을 만지지 않을 때 재생할 영상 목록입니다(YouTube·Vimeo·O4O 보관 영상). “화면을 터치하세요” 안내는 자동으로 표시됩니다.">
+      <EditorSection optional title={`대기 화면 · ${idleItemsRef.current.length ? '영상 설정됨' : '선택'}`} note="손님이 화면을 만지지 않을 때 재생할 영상 목록입니다(YouTube·Vimeo·O4O 보관 영상). “화면을 터치하시기 바랍니다” 안내는 자동으로 표시됩니다.">
         {renderIdleStep()}
       </EditorSection>
 
@@ -1448,7 +1448,7 @@ export function TabletContentStepBuilder({
             className="w-full mt-1 px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400" />
           <p className="text-[11px] text-slate-400 mt-1">콘텐츠 목록에서 구분하기 위한 이름입니다. 고객 화면에는 코너 제목이 표시됩니다.</p>
         </details>
-        {!nameValid && <p className="text-sm text-amber-700">저장하려면 코너 제목을 입력해 주세요. 관리 이름은 제목에서 자동으로 채워집니다.</p>}
+        {!nameValid && <p className="text-sm text-amber-700">저장하려면 코너 제목을 입력해 주시기 바랍니다. 관리 이름은 제목에서 자동으로 채워집니다.</p>}
         <p className="text-[11px] text-slate-500 leading-relaxed bg-slate-50 border border-slate-200 rounded-lg px-3 py-2">
           새 안내는 저장 후 사용할 위치를 선택합니다. 사용 중인 안내를 수정하면 같은 안내가 연결된 위치와 기존 QR에도 반영됩니다.
         </p>
@@ -1477,7 +1477,7 @@ export function TabletContentStepBuilder({
         </div>
         <p className="text-[11px] text-slate-400">
           오른쪽 미리보기와 같은 내용을 전체 화면으로 크게 봅니다. 상품 목록·코너 콘텐츠는 매장 데이터로 조회되며, 저장 전에는 DB에 반영되지 않습니다.
-          {!canPreview && ' (매장 공개 주소를 불러오는 중이면 잠시 후 다시 시도해 주세요.)'}
+          {!canPreview && ' (매장 공개 주소를 불러오는 중이면 잠시 후 다시 시도해 주시기 바랍니다.)'}
         </p>
         <button onClick={handleSave} disabled={saving || !nameValid}
           className="w-full sm:w-auto min-h-[44px] px-5 py-2 text-sm font-semibold text-white bg-indigo-600 rounded-xl hover:bg-indigo-700 disabled:opacity-50 inline-flex items-center justify-center gap-2">

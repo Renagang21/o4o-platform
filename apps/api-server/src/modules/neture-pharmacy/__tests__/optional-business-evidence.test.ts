@@ -1,4 +1,4 @@
-import { PharmacyMembershipService } from '../../../__tests__/fixtures/legacy-pharmacy-membership.js';
+import { PharmacyMembershipService } from '../../../__tests__/fixtures/legacy-pharmacy-application.js';
 import { assertNetureMainMembershipActive } from '../../neture/services/neture-main-membership.js';
 
 jest.mock('../../neture/services/neture-main-membership.js', () => ({ assertNetureMainMembershipActive: jest.fn() }));

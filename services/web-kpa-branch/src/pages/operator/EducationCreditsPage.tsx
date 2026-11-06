@@ -241,7 +241,7 @@ export default function EducationCreditsPage({ slug }: { slug: string }) {
             <p className="text-sm text-gray-500">불러오는 중입니다…</p>
           ) : items.length === 0 ? (
             <p className="text-sm text-gray-500">
-              해당 조건의 원장이 없습니다. 의무평점을 정한 뒤 «{year}년 개설» 을 실행해 주세요.
+              해당 조건의 원장이 없습니다. 의무평점을 정한 뒤 «{year}년 개설» 을 실행해 주시기 바랍니다.
             </p>
           ) : (
             <div className="overflow-x-auto">

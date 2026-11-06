@@ -46,17 +46,20 @@ function PlaylistCreateSession({ isCurrent }: Readonly<{ isCurrent: () => boolea
       description: values.description || undefined,
       tags: values.tags.length > 0 ? values.tags : undefined,
     });
-    if (isCurrent()) navigate(listPath, { state: { signagePlaylistId: playlist.id, addSignageMaterials: true } });
+    if (isCurrent()) navigate(withWorkspaceMode(`${storeWorkspaceBase(pathname)}/marketing/signage/playlist/${encodeURIComponent(playlist.id)}`, 'studio'), { state: { addSignageMaterials: true } });
     } finally { lock.current = false; }
-  }, [navigate, listPath, isCurrent]);
+  }, [navigate, pathname, isCurrent]);
 
   return (
     <StorePlaylistCreateView
       accentColor="#2563eb"
+      title="재생목록 만들기"
+      subtitle="재생목록을 만든 뒤 등록한 동영상을 선택해 추가합니다."
+      backLabel="재생목록으로"
       onBack={() => navigate(listPath)}
       onSubmit={handleSubmit}
       config={{
-        descriptionPlaceholder: '이 플레이리스트의 사용 목적이나 적용 위치를 간략히 기록하세요',
+        descriptionPlaceholder: '재생목록의 용도나 적용 위치를 기록하시기 바랍니다.',
       }}
     />
   );

@@ -300,7 +300,7 @@ export default function FeeLedgerPage({ slug }: { slug: string }) {
             <p className="text-sm text-gray-500">불러오는 중입니다…</p>
           ) : policies.length === 0 ? (
             <p className="text-sm text-gray-500">
-              {year}년 정책이 없습니다. 아래에서 회비구분을 추가한 뒤 저장해 주세요.
+              {year}년 정책이 없습니다. 아래에서 회비구분을 추가한 뒤 저장해 주시기 바랍니다.
             </p>
           ) : (
             <table className="w-full text-sm">
@@ -439,7 +439,7 @@ export default function FeeLedgerPage({ slug }: { slug: string }) {
             <p className="text-sm text-gray-500">불러오는 중입니다…</p>
           ) : ledgers.length === 0 ? (
             <p className="text-sm text-gray-500">
-              해당 조건의 회비 원장이 없습니다. 정책을 등록한 뒤 «{year}년 일괄 부과» 를 실행해 주세요.
+              해당 조건의 회비 원장이 없습니다. 정책을 등록한 뒤 «{year}년 일괄 부과» 를 실행해 주시기 바랍니다.
             </p>
           ) : (
             <div className="overflow-x-auto">

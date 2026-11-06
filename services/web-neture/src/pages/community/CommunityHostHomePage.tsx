@@ -180,12 +180,12 @@ export default function CommunityHostHomePage() {
             </div>
             <section aria-label="O4O 개선·업데이트" className="rounded-xl border border-emerald-200 bg-emerald-50 p-5">
               <h2 className="text-xl font-bold">O4O 개선·업데이트</h2>
-              <p className="mt-2 text-slate-700">업데이트 소식을 확인하고 오류·불편과 기능 개선 의견을 남겨 주세요.</p>
+              <p className="mt-2 text-slate-700">업데이트 소식을 확인하고 오류·불편과 기능 개선 의견을 남겨 주시기 바랍니다.</p>
               <Link className="mt-3 inline-block min-h-11 content-center font-semibold text-emerald-800 underline" to="/improvements">업데이트 확인·개선 요청 →</Link>
             </section>
             <HomeSection section="forum" data={data} />
             <HomeSection section="content" data={data} />
-            <section aria-label="디지털사이니지" className="rounded-xl border border-slate-300 bg-white p-5"><h2 className="text-xl font-bold">디지털사이니지</h2><p className="mt-2 text-sm text-slate-600">회원들의 영상을 등록하고 내 매장에서 이용하세요.</p><Link to="/communities/community/signage" className="mt-2 inline-block min-h-11 content-center text-emerald-700">영상 보기·AI로 등록 →</Link></section>
+            <section aria-label="디지털사이니지" className="rounded-xl border border-slate-300 bg-white p-5"><h2 className="text-xl font-bold">디지털사이니지</h2><p className="mt-2 text-sm text-slate-600">회원들의 영상을 등록하고 내 매장에서 이용하시기 바랍니다.</p><Link to="/communities/community/signage" className="mt-2 inline-block min-h-11 content-center text-emerald-700">영상 보기·AI로 등록 →</Link></section>
             <HomeSection section="resource" data={data} />
             <aside aria-label="커뮤니티 안내·광고" className="space-y-4">
               <ServiceHomePromotion surface="community" client={api} />
@@ -199,7 +199,7 @@ export default function CommunityHostHomePage() {
                 >
                   로그인·이용 자격 확인
                 </Link>{" "}
-                후 이용해 주세요.
+                후 이용해 주시기 바랍니다.
               </aside>
             )}
           </>

@@ -36,7 +36,7 @@ const memberApi={
 };
 const renderers:Record<string,Renderer>={
  'neture.members':c=><CentralMemberWorkspace key={c.userId ?? 'directory'} actorId={c.actorId} initialQuery={c.userId ?? ''} />,
- 'neture.qualifications':c=><CentralPharmacistQualifications key={c.search} actorId={c.actorId} initialQuery={new URLSearchParams(c.search).get('q') ?? ''} />,
+ 'neture.qualifications':c=><CentralPharmacistQualifications key={c.search} actorId={c.actorId} canManageMembers={c.menuKeys.includes('neture.members')} initialQuery={new URLSearchParams(c.search).get('q') ?? ''} />,
  'neture.service-members':c=><ServiceMembersWorkspace serviceKey="neture" basePath="/operations/neture/service-members" api={memberApi} roles={c.roles} userId={c.userId} navigate={c.navigate} />,
  'neture.pharmacies':()=> <PharmacyMembershipReviewPage />,
  'neture.stores':()=> <CentralNetureStores />,

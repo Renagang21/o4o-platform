@@ -1,3 +1,4 @@
+import { assertOperatorMemberTarget, protectedMemberSql } from '../../services/operations/protected-member-target.js';
 import { assertCentralOperationMenu, centralServiceMenuRestrictions } from '../../services/admin/central-operation-menu-grants.js';
 import { OperationError } from '../../services/operations/operation-audit.js';
 import type { DataSource, EntityManager } from "typeorm";
@@ -16,7 +17,12 @@ export class PartnerCommunityService {
   constructor(private db: DataSource) {}
   private async menu(m: EntityManager,user: string,...areas: string[]) {
     try { await assertCentralOperationMenu(m,user,'partner-support',areas.map(area=>`partner-support.${area}`)); }
-    catch(error) { if(error instanceof OperationError) fail(error.status,error.code); throw error; }
+    catch(error) {
+        if(error instanceof OperationError) {
+          fail(error.status,error.code);
+        }
+        throw error;
+      }
   }
   boards() {
     return this.db.query(
@@ -308,7 +314,7 @@ export class PartnerCommunityService {
         "SELECT * FROM partner_community_boards ORDER BY created_at,id",
       ) : [];
       const members = allowed('members') ? await m.query(
-        `SELECT sm.user_id id,sm.status,sm.created_at,sm.updated_at,to_char(sm.updated_at,'YYYY-MM-DD"T"HH24:MI:SS.US') version,COALESCE(NULLIF(u.nickname,''),'파트너 회원') name
+        `SELECT ${protectedMemberSql("sm.user_id")} AS "operatorReadOnly",sm.user_id id,sm.status,sm.created_at,sm.updated_at,to_char(sm.updated_at,'YYYY-MM-DD"T"HH24:MI:SS.US') version,COALESCE(NULLIF(u.nickname,''),'파트너 회원') name
         FROM service_memberships sm JOIN users u ON u.id=sm.user_id WHERE sm.service_key=$1 ORDER BY sm.created_at DESC,sm.id LIMIT 100`,
         [SERVICE],
       ) : [];
@@ -385,6 +391,14 @@ export class PartnerCommunityService {
       );
       await this.identity(m, user, true, true);
       await this.menu(m,user,'members');
+      try { await assertOperatorMemberTarget(m, id); }
+      catch(error) {
+        if(error instanceof OperationError) {
+          fail(error.status,error.code);
+        }
+        throw error;
+      }
+
       if (id === user) fail(403, "COMMUNITY_SELF_ACTION");
       if (!target) fail(404, "COMMUNITY_NOT_FOUND");
       if (target.version !== expected) fail(409, "REVISION_CONFLICT");

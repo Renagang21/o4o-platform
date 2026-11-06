@@ -98,7 +98,7 @@ export default function AdminPharmacyServiceSettingsPage({
         return data;
       } catch {
         if (alive.current && request.current === version)
-          setError("제공 설정을 불러오지 못했습니다. 다시 시도해 주세요.");
+          setError("제공 설정을 불러오지 못했습니다. 다시 시도해 주시기 바랍니다.");
       }
     },
     [federationPanel],
@@ -155,7 +155,7 @@ export default function AdminPharmacyServiceSettingsPage({
         "제공 기능을 저장했습니다. 다음 이용 자격 확인부터 적용됩니다.",
       );
     } catch {
-      if (alive.current) setError("저장하지 못했습니다. 다시 시도해 주세요.");
+      if (alive.current) setError("저장하지 못했습니다. 다시 시도해 주시기 바랍니다.");
     } finally {
       if (alive.current) setBusy(false);
     }
@@ -329,7 +329,7 @@ export default function AdminPharmacyServiceSettingsPage({
                           selected={selected}
                           disabled={busy}
                           onChange={setSelected}
-                          description="이 대상의 이용자에게 제공할 기능을 선택하세요. 체크를 해제해도 다른 자격으로 제공받는 기능은 유지됩니다."
+                          description="이 대상의 이용자에게 제공할 기능을 선택하시기 바랍니다. 체크를 해제해도 다른 자격으로 제공받는 기능은 유지됩니다."
                         />
                         <p className="text-sm text-gray-600">
                           유료 자격은 경영자 회원 기준이며, 직원의 사용 범위는
@@ -375,7 +375,7 @@ export default function AdminPharmacyServiceSettingsPage({
             )
               throw new Error("Registration refresh failed");
             setRegistration(null);
-            setNotice("사업을 등록했습니다. 제공할 기능을 선택해 저장하세요.");
+            setNotice("사업을 등록했습니다. 제공할 기능을 선택해 저장하시기 바랍니다.");
             setParams({ target: `business:${key}` }, { replace: true });
           }}
         />

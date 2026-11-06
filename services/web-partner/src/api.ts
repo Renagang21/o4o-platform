@@ -56,55 +56,55 @@ export type AuditEvent = {
 };
 const messages: Record<string, string> = {
   COMMUNITY_MEMBERSHIP_REQUIRED:
-    "파트너 커뮤니티 가입과 이용 상태를 확인해 주세요.",
+    "파트너 커뮤니티 가입과 이용 상태를 확인해 주시기 바랍니다.",
   COMMUNITY_MEMBERSHIP_MANAGED:
-    "커뮤니티 이용 상태는 운영자에게 확인해 주세요.",
+    "커뮤니티 이용 상태는 운영자에게 확인해 주시기 바랍니다.",
   SERVICE_ADMIN_REQUIRED: "해당 서비스의 활성 Admin 권한이 필요합니다.",
   INVITATION_RESEND_TOO_SOON: "재발송은 이전 발송 1분 후 가능합니다.",
-  INVITATION_MAIL_FAILED: "초대는 저장됐지만 메일 발송을 확인하지 못했습니다. 1분 후 재발송해 주세요.",
+  INVITATION_MAIL_FAILED: "초대는 저장됐지만 메일 발송을 확인하지 못했습니다. 1분 후 재발송해 주시기 바랍니다.",
   DEMO_ACCOUNT_FORBIDDEN: "Demo 계정은 운영자로 지정할 수 없습니다.",
   COMMUNITY_OPERATOR_REQUIRED: "Partner 운영 권한이 필요합니다.",
   COMMUNITY_AUTHOR_REQUIRED: "본인이 작성한 글·댓글만 변경할 수 있습니다.",
   COMMUNITY_NOT_FOUND: "현재 열람할 수 없는 글·댓글·게시판입니다.",
   COMMUNITY_SELF_ACTION: "본인의 이용 상태는 변경할 수 없습니다.",
   COMMUNITY_COMMENT_LIMIT:
-    "댓글 수 제한에 도달했습니다. 새 글로 이야기를 이어가세요.",
+    "댓글 수 제한에 도달했습니다. 새 글로 이야기를 이어가시기 바랍니다.",
   ENROLLMENT_POLICY_REQUIRED:
-    "서비스 약관이 변경되었습니다. 페이지를 새로 열고 다시 확인해 주세요.",
+    "서비스 약관이 변경되었습니다. 페이지를 새로 열고 다시 확인해 주시기 바랍니다.",
   POLICY_UNAVAILABLE:
-    "서비스 이용 안내를 불러오지 못했습니다. 잠시 후 다시 확인해 주세요.",
-  ACCOUNT_NOT_ACTIVE: "O4O 계정의 이메일 확인과 이용 상태를 확인해 주세요.",
-  UNAUTHENTICATED: "로그인이 필요합니다. 다시 로그인해 주세요.",
+    "서비스 이용 안내를 불러오지 못했습니다. 잠시 후 다시 확인해 주시기 바랍니다.",
+  ACCOUNT_NOT_ACTIVE: "O4O 계정의 이메일 확인과 이용 상태를 확인해 주시기 바랍니다.",
+  UNAUTHENTICATED: "로그인이 필요합니다. 다시 로그인해 주시기 바랍니다.",
   SPACE_NOT_FOUND:
-    "접근할 수 없는 공동공간입니다. 권한이 변경되었는지 확인해 주세요.",
+    "접근할 수 없는 공동공간입니다. 권한이 변경되었는지 확인해 주시기 바랍니다.",
   OWNER_REQUIRED: "공동공간 소유자만 처리할 수 있습니다.",
   READ_ONLY: "이 공동공간은 열람만 할 수 있습니다.",
   SETTLEMENT_OWNER_REQUIRED:
     "정산 내역은 공동공간 소유자만 변경할 수 있습니다.",
   REVISION_CONFLICT:
-    "다른 참여자가 자료를 변경했습니다. 입력 내용을 따로 보관한 뒤 서버 자료를 다시 불러와 주세요.",
-  INVALID_INPUT: "입력값과 연결된 자료를 확인해 주세요.",
+    "다른 참여자가 자료를 변경했습니다. 입력 내용을 따로 보관한 뒤 서버 자료를 다시 불러와 주시기 바랍니다.",
+  INVALID_INPUT: "입력값과 연결된 자료를 확인해 주시기 바랍니다.",
   PARTNER_UNAVAILABLE:
-    "Partner 서버를 이용할 수 없습니다. 연결과 서비스 준비 상태를 확인해 주세요.",
+    "Partner 서버를 이용할 수 없습니다. 연결과 서비스 준비 상태를 확인해 주시기 바랍니다.",
   INVITE_UNAVAILABLE: "만료되었거나 이미 사용·취소된 초대입니다.",
   ALREADY_MEMBER: "이미 참여 중인 공동공간입니다.",
   SPACE_LIMIT: "만들 수 있는 공동공간 수를 초과했습니다.",
   MEMBER_LIMIT: "공동공간의 참여자 수를 초과했습니다.",
-  INVITE_LIMIT: "사용하지 않은 초대가 많습니다. 이전 초대를 취소해 주세요.",
-  RATE_LIMITED: "요청이 많습니다. 잠시 후 다시 시도해 주세요.",
+  INVITE_LIMIT: "사용하지 않은 초대가 많습니다. 이전 초대를 취소해 주시기 바랍니다.",
+  RATE_LIMITED: "요청이 많습니다. 잠시 후 다시 시도해 주시기 바랍니다.",
   PAYLOAD_TOO_LARGE:
-    "공동공간 자료는 1MB 이내로 저장할 수 있습니다. 자료를 백업하고 별도 공동공간으로 나누어 주세요.",
+    "공동공간 자료는 1MB 이내로 저장할 수 있습니다. 자료를 백업하고 별도 공동공간으로 나누어 주시기 바랍니다.",
   MEDIA_NOT_CONFIGURED: "파일 저장소가 아직 연결되지 않았습니다.",
-  MEDIA_UNAVAILABLE: "파일을 이용하지 못했습니다. 잠시 후 다시 시도해 주세요.",
+  MEDIA_UNAVAILABLE: "파일을 이용하지 못했습니다. 잠시 후 다시 시도해 주시기 바랍니다.",
   MEDIA_INTEGRITY_ERROR:
-    "파일 무결성을 확인하지 못했습니다. 새 버전을 등록해 주세요.",
+    "파일 무결성을 확인하지 못했습니다. 새 버전을 등록해 주시기 바랍니다.",
   MEDIA_UPLOAD_REJECTED:
-    "한 번에 이미지·영상 한 개를 25MB 이내로 선택해 주세요.",
+    "한 번에 이미지·영상 한 개를 25MB 이내로 선택해 주시기 바랍니다.",
   UNSUPPORTED_MEDIA:
     "실제 파일 형식과 일치하는 PNG·JPEG·GIF·WebP·MP4·WebM만 등록할 수 있습니다.",
   MEDIA_QUOTA:
     "공동공간 파일은 버전 포함 100개·500MB 이내로 보관할 수 있습니다.",
-  ASSET_HAS_FILES: "첨부 파일을 먼저 삭제한 뒤 자료를 삭제해 주세요.",
+  ASSET_HAS_FILES: "첨부 파일을 먼저 삭제한 뒤 자료를 삭제해 주시기 바랍니다.",
 };
 let configuredOrigin =
   import.meta.env.VITE_PARTNER_API_ORIGIN ||
@@ -123,7 +123,7 @@ if (configuredOrigin) {
         ["localhost", "127.0.0.1", "[::1]"].includes(u.hostname)
       ))
   )
-    throw new Error("Partner API 주소 설정을 확인해 주세요.");
+    throw new Error("Partner API 주소 설정을 확인해 주시기 바랍니다.");
   configuredOrigin = u.origin;
 }
 export const PARTNER_API_ORIGIN = configuredOrigin;
@@ -175,10 +175,10 @@ export class ApiError extends Error {
     super(
       messages[code] ||
         (status === 401
-          ? "로그인 정보를 확인해 주세요."
+          ? "로그인 정보를 확인해 주시기 바랍니다."
           : status === 403
-            ? "계정 상태·약관 동의와 접근 권한을 확인해 주세요."
-            : "요청을 처리하지 못했습니다. 잠시 후 다시 시도해 주세요."),
+            ? "계정 상태·약관 동의와 접근 권한을 확인해 주시기 바랍니다."
+            : "요청을 처리하지 못했습니다. 잠시 후 다시 시도해 주시기 바랍니다."),
     );
   }
 }
@@ -210,7 +210,7 @@ export async function request<T>(
     });
   } catch {
     throw new Error(
-      "서버에 연결하지 못했습니다. 네트워크와 API 연결 설정을 확인해 주세요.",
+      "서버에 연결하지 못했습니다. 네트워크와 API 연결 설정을 확인해 주시기 바랍니다.",
     );
   }
   if (

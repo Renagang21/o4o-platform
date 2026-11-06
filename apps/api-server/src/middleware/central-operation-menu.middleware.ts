@@ -96,7 +96,7 @@ export function centralOperationRequest(service: CentralOperationService, resolv
       next();
     } catch (failure) {
       if (failure instanceof OperationError) { res.status(failure.status).json({success:false,code:failure.code,error:failure.message}); return; }
-      res.status(503).json({success:false,code:'CENTRAL_MENU_ACCESS_UNAVAILABLE',error:'업무 위임을 확인하지 못했습니다. 다시 조회해 주세요.'});
+      res.status(503).json({success:false,code:'CENTRAL_MENU_ACCESS_UNAVAILABLE',error:'업무 위임을 확인하지 못했습니다. 다시 조회해 주시기 바랍니다.'});
     }
   };
 }

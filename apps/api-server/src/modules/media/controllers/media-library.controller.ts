@@ -273,17 +273,17 @@ export function createMediaLibraryRouter(dataSource: DataSource): Router {
       }
       // WO-O4O-AUTOMATION-VIDEO-JOB-P0-ADMIN-WORKSPACE-V1: storage 삭제 실패는 DB row 를 남긴 채 구분 보고(과거엔 '삭제 완료'로 보였다).
       if (error.code === 'MEDIA_STORAGE_DELETE_FAILED') {
-        res.status(502).json({ success: false, code: 'MEDIA_STORAGE_DELETE_FAILED', error: 'storage 삭제에 실패해 자산을 보존했습니다. 다시 시도해 주세요.' });
+        res.status(502).json({ success: false, code: 'MEDIA_STORAGE_DELETE_FAILED', error: 'storage 삭제에 실패해 자산을 보존했습니다. 다시 시도해 주시기 바랍니다.' });
         return;
       }
       if (error.code === 'MEDIA_IN_USE_SIGNAGE') {
-        res.status(409).json({ success: false, code: error.code, error: '사이니지 자료 또는 재생목록에서 사용 중입니다. 연결 자료를 먼저 제거해 주세요.' }); return;
+        res.status(409).json({ success: false, code: error.code, error: '사이니지 자료 또는 재생목록에서 사용 중입니다. 연결 자료를 먼저 제거해 주시기 바랍니다.' }); return;
       }
       if (error.code === 'MEDIA_IN_USE_SCREEN_SET') {
         res.status(409).json({
           success: false,
           code: 'MEDIA_IN_USE_SCREEN_SET',
-          error: '이 미디어는 타블렛 콘텐츠에서 사용 중이므로 삭제할 수 없습니다. 사용 중인 콘텐츠에서 먼저 제거해 주세요.',
+          error: '이 미디어는 타블렛 콘텐츠에서 사용 중이므로 삭제할 수 없습니다. 사용 중인 콘텐츠에서 먼저 제거해 주시기 바랍니다.',
         });
         return;
       }

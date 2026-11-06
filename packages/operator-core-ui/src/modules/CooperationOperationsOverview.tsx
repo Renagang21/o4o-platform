@@ -68,7 +68,7 @@ function ScopedOverview({ client, endpoint, inboxHref, taskHref, areas }: Parame
       <p style={descriptionStyle}>실제 접수 기록의 대기 건입니다. 1분마다 갱신하며, 업무별 상태와 처리 권한은 각 관리 화면에서 확인합니다.</p>
       <button type="button" disabled={loading} onClick={() => setRevision(value => value + 1)} style={{ minHeight: 44, padding: '8px 12px', border: '1px solid #94a3b8', borderRadius: 6 }}>대기 건 새로고침</button>
       {loading && !summary && <p role="status">대기 건을 불러오고 있습니다…</p>}
-      {error && <p role="alert">대기 건을 조회하지 못했습니다.{summary ? ' 이전 조회 결과입니다. 다시 조회해 주세요.' : ' 0건으로 판단하지 말고 다시 조회해 주세요.'}</p>}
+      {error && <p role="alert">대기 건을 조회하지 못했습니다.{summary ? ' 이전 조회 결과입니다. 다시 조회해 주시기 바랍니다.' : ' 0건으로 판단하지 말고 다시 조회해 주시기 바랍니다.'}</p>}
       {summary && <ul style={listStyle}>
         <li><a style={linkStyle} href={inboxHref}>미처리 문의 {summary.contact.pending}건</a> · {oldest(summary.contact.oldest)}</li>
         <li><a style={linkStyle} href={inboxHref}>문의 알림 전달 확인 필요 {summary.contact.deliveryAttention}건</a></li>

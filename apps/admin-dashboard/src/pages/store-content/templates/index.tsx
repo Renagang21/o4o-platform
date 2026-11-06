@@ -126,7 +126,7 @@ export default function TemplateLibraryPage() {
           <LayoutTemplate className="w-8 h-8 text-gray-400" />
           <div>
             <h1 className="text-2xl font-semibold text-gray-900">템플릿 라이브러리</h1>
-            <p className="text-gray-500 text-sm">매장 콘텐츠로 사용할 템플릿을 선택하세요</p>
+            <p className="text-gray-500 text-sm">매장 콘텐츠로 사용할 템플릿을 선택하시기 바랍니다</p>
           </div>
         </div>
       </div>
@@ -228,7 +228,7 @@ export default function TemplateLibraryPage() {
           <p className="text-lg font-medium">사용 가능한 템플릿이 없습니다</p>
           <p className="text-sm mt-1">
             {search || selectedCategory || selectedTag
-              ? '필터를 변경해 보세요'
+              ? '필터를 변경해 보시기 바랍니다'
               : '관리자가 템플릿을 게시하면 여기에 표시됩니다'}
           </p>
         </div>

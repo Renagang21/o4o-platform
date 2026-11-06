@@ -29,11 +29,11 @@ import {
 
 const base = "/neture/pharmacy/multilingual-consultation";
 function translationErrorMessage(code?: string) {
-  if (code === "CONSULTATION_QUOTA_EXCEEDED") return "번역 이용 한도에 도달했습니다. 잠시 후 다시 시도해 주세요.";
-  if (code === 'CONSULTATION_LANGUAGE_UNCERTAIN') return '입력 언어가 불확실합니다. 고객 문장 언어를 직접 선택하고 자동 감지를 끈 뒤 다시 시도해 주세요.';
-  if (code === 'CONSULTATION_PRICING_REQUIRED') return '선택한 번역 수단의 가격 설정을 관리자에게 확인해 주세요. 입력 문장은 유지했습니다.';
+  if (code === "CONSULTATION_QUOTA_EXCEEDED") return "번역 이용 한도에 도달했습니다. 잠시 후 다시 시도해 주시기 바랍니다.";
+  if (code === 'CONSULTATION_LANGUAGE_UNCERTAIN') return '입력 언어가 불확실합니다. 고객 문장 언어를 직접 선택하고 자동 감지를 끈 뒤 다시 시도해 주시기 바랍니다.';
+  if (code === 'CONSULTATION_PRICING_REQUIRED') return '선택한 번역 수단의 가격 설정을 관리자에게 확인해 주시기 바랍니다. 입력 문장은 유지했습니다.';
   if (code === 'CONSULTATION_AI_DISABLED') return '관리자가 현재 번역 실행을 중지했습니다. 입력 문장은 유지했습니다.';
-  return consultationAccessError(code) ?? "번역을 완료하지 못했습니다. 입력 문장을 유지했습니다. 다시 시도해 주세요.";
+  return consultationAccessError(code) ?? "번역을 완료하지 못했습니다. 입력 문장을 유지했습니다. 다시 시도해 주시기 바랍니다.";
 }
 function matchingResult(
   data: Result,
@@ -56,7 +56,7 @@ export default function StoreMultilingualConsultationPage() {
   const { organizationId } = useUnifiedStore();
   const { user } = useAuth();
   if (!organizationId)
-    return <p className="p-4">먼저 내 매장을 선택해 주세요.</p>;
+    return <p className="p-4">먼저 내 매장을 선택해 주시기 바랍니다.</p>;
   const pinned = params.get("store");
   if (pinned && pinned !== organizationId)
     return (
@@ -65,7 +65,7 @@ export default function StoreMultilingualConsultationPage() {
         <p>
           다른 탭에서 선택한 매장이 바뀌었습니다. 진행하던 상담을 이 매장으로
           옮기지 않습니다. 내 매장에서 현재 매장을 확인한 뒤 상담 화면을 다시
-          열어 주세요.
+          열어 주시기 바랍니다.
         </p>
         <a href="/store/workspace/use">내 매장으로</a>
       </main>
@@ -160,7 +160,7 @@ function Consultation({
       setResult(null);
       setError(
         text.length + words.length + 1 > 1000
-          ? "음성 입력은 1,000자까지 반영했습니다. 문장을 확인해 주세요."
+          ? "음성 입력은 1,000자까지 반영했습니다. 문장을 확인해 주시기 바랍니다."
           : "",
       );
       setText((previous) =>
@@ -258,7 +258,7 @@ function Consultation({
       })
       .catch((cause: { code?: string }) => {
         if (!cancelled)
-          setError(consultationAccessError(cause?.code) ?? "상담 이용 상태를 확인하지 못했습니다. 다시 시도해 주세요.");
+          setError(consultationAccessError(cause?.code) ?? "상담 이용 상태를 확인하지 못했습니다. 다시 시도해 주시기 바랍니다.");
       }).finally(() => { if (!cancelled) setContextLoading(false); });
     return () => {
       cancelled = true;
@@ -343,9 +343,9 @@ function Consultation({
       if (!response.success || !matchingResult(data, organizationId, captured))
         throw new Error("Invalid result");
       if (captured.direction === 'to-staff' && autoLanguage && !data.detectedLanguage)
-        throw new Error('감지된 언어를 확인해 주세요.');
+        throw new Error('감지된 언어를 확인해 주시기 바랍니다.');
       if (data.detectedLanguage) {
-        if (!context?.languages.some(item => item.key === data.detectedLanguage)) throw new Error('감지된 언어를 확인해 주세요.');
+        if (!context?.languages.some(item => item.key === data.detectedLanguage)) throw new Error('감지된 언어를 확인해 주시기 바랍니다.');
         clearResults();
         languageWasDetected.current = true;
         setLanguage(data.detectedLanguage); setReplyLanguage(data.detectedLanguage);
@@ -357,7 +357,7 @@ function Consultation({
         const value = error_ as { code?: string; status?: number };
         if (value?.status === 401 || value?.status === 403) {
           clear(); setContext(null);
-          setError(consultationAccessError(value?.code) ?? '상담 이용 권한이 변경됐습니다. 이용 상태를 다시 확인해 주세요.');
+          setError(consultationAccessError(value?.code) ?? '상담 이용 권한이 변경됐습니다. 이용 상태를 다시 확인해 주시기 바랍니다.');
         } else setError(translationErrorMessage(value?.code));
       }
     } finally {
@@ -374,8 +374,8 @@ function Consultation({
     } catch (cause) {
       if (alive.current && request === version.current) {
         const failure = cause as { status?: number; code?: string; message?: string };
-        if ([401, 403].includes(failure.status ?? 0)) { clear(); setContext(null); setError(consultationAccessError(failure.code) ?? '상담 이용 권한을 다시 확인해 주세요.'); }
-        else { setResult(null); setError(failure.message || '상담 근거가 변경되었습니다. 다시 준비해 주세요.'); }
+        if ([401, 403].includes(failure.status ?? 0)) { clear(); setContext(null); setError(consultationAccessError(failure.code) ?? '상담 이용 권한을 다시 확인해 주시기 바랍니다.'); }
+        else { setResult(null); setError(failure.message || '상담 근거가 변경되었습니다. 다시 준비해 주시기 바랍니다.'); }
       }
       return false;
     }
@@ -474,7 +474,7 @@ function Consultation({
       {!context && !error && (contextLoading ? (
         <output className="block">상담 이용 상태를 확인하는 중…</output>
       ) : <section aria-label="상담 이용 상태 재확인" className="space-y-3 rounded border p-4">
-        <p>상담 이용 상태를 다시 확인해 주세요.</p>
+        <p>상담 이용 상태를 다시 확인해 주시기 바랍니다.</p>
         <ConsultationMyHomeLink />
         <button type="button" className="min-h-11 rounded border px-3 py-2" onClick={() => { clear(); setRetry(value => value + 1); }}>이용 상태 다시 확인</button>
       </section>)}
@@ -644,12 +644,12 @@ function Consultation({
                   </select>
                 </label>
                 <p className="text-xs text-slate-500">{context.runtime?.recognition === 'google-cloud' ? `음성 자동 감지는 관리자 후보 언어(${context.runtime.speechLanguages.join(', ')})에서 선택합니다.` : '브라우저 음성은 선택한 언어로 인식합니다. 문자 번역의 자동 감지와 다르며, 모바일에서 Chrome 언어 감지를 보장하지 않습니다.'}</p>
-                {result?.detectedLanguage && <p role="status">감지한 고객 언어: {context.languages.find(item => item.key === result.detectedLanguage)?.label} · 잘못 감지되면 직접 수정하세요.</p>}
+                {result?.detectedLanguage && <p role="status">감지한 고객 언어: {context.languages.find(item => item.key === result.detectedLanguage)?.label} · 잘못 감지되면 직접 수정하시기 바랍니다.</p>}
                 </div>
               )}
               <p className="text-xs text-slate-500">
                 같은 상담 중에는 양쪽의 마지막 입력과 번역을 유지합니다. 다른
-                고객을 응대할 때는 새 상담을 시작해 주세요.
+                고객을 응대할 때는 새 상담을 시작해 주시기 바랍니다.
               </p>
               <div className="flex flex-wrap gap-3" aria-label="발화 순서 선택">
                 {speech.inputSupported && (
@@ -728,7 +728,7 @@ function Consultation({
               {!speech.inputSupported && (
                 <p className="text-sm text-slate-600">
                   이 브라우저는 음성 입력을 지원하지 않습니다. 문자를 직접
-                  입력해 주세요.
+                  입력해 주시기 바랍니다.
                 </p>
               )}
               <details className="text-xs text-slate-500">
@@ -738,7 +738,7 @@ function Consultation({
                 <p>
                   문장은 번역 서비스로 전달됩니다. 음성 입력·읽어주기는
                   선택한 브라우저 또는 외부 음성 서비스에서 처리하며 지원 언어가
-                  다를 수 있습니다. 이름·연락처 등 식별 정보는 입력하지 마세요.
+                  다를 수 있습니다. 이름·연락처 등 식별 정보는 입력하지 마시기 바랍니다.
                   O4O에서 음성 파일을 영구 저장하지 않습니다. 고객 화면을 연결하면 확인한 안내와
                   고객 답변을 현재 상담 전달 상태로 보관합니다. 상담 종료 시
                   공유 내용을 비웁니다. 장기 상담 이력 기능은 제공하지 않습니다.

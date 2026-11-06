@@ -109,7 +109,8 @@ describe('내 매장 경영지원', () => {
   it('구매 이력 없이 두 등록 방식의 제품을 조회하고 직접 등록 후 같은 목록을 갱신한다', async () => {
     mount(<StoreHandledProductsPage />, '/store/my-products');
     await waitFor(() => expect(mocks.products).toHaveBeenCalledWith(expect.objectContaining({ source: 'all' })));
-    fireEvent.click(screen.getByRole('button', { name: /^직접 등록하기$/ }));
+    fireEvent.click(screen.getByText('제품 등록', { selector: 'summary' }));
+  fireEvent.click(screen.getByRole('button', { name: /^직접 등록하기$/ }));
     fireEvent.click(screen.getByRole('button', { name: '제품 저장' }));
     await waitFor(() => expect(mocks.create).toHaveBeenCalledWith({ name: '직접 등록 샘플' }));
     await waitFor(() => expect(mocks.products).toHaveBeenCalledTimes(2));
@@ -129,7 +130,7 @@ describe('내 매장 경영지원', () => {
   it('실제 사업 상태와 조건·업무 진입을 표시하며 대기 사업에는 공급 진입을 주지 않는다', async () => {
     mount(<MyServicesPage />, '/services');
     await screen.findByRole('heading', { name: '혈당관리 사업' });
-    expect(screen.getByRole('heading', { name: '이용 사업·가입 관리' })).toBeTruthy();
+    expect(screen.getByRole('heading', { name: '이용 사업/가입 관리' })).toBeTruthy();
     expect(screen.getAllByRole('link', { name: '공급 상품' }).map(x => x.getAttribute('href'))).toEqual([
       '/store/pharmacy/supply?source=sf%3Apharmacy', '/store/pharmacy/supply?source=sf%3Adiabetes',
     ]);
@@ -243,6 +244,7 @@ it('늦은 제품 조회가 새 직접 등록 양식을 덮어쓰지 않는다',
   mount(<StoreHandledProductsPage />);
   fireEvent.click(await screen.findByRole('checkbox', { name: 'local:local-a 선택' }));
   fireEvent.click(screen.getByRole('button', { name: '직접 등록 제품 수정' }));
+  fireEvent.click(screen.getByText('제품 등록', { selector: 'summary' }));
   fireEvent.click(screen.getByRole('button', { name: /^직접 등록하기$/ }));
   await act(async () => pending.resolve({ id: 'local-a', name: '이전 제품' }));
   expect(screen.getByTestId('local-form').textContent).toBe('신규 제품');
@@ -275,6 +277,7 @@ it('매장 전환 후 이전 제품 조회 실패를 표시하지 않는다', as
 it('저장 중 중복 제출과 다른 등록 화면 진입을 막는다', async () => {
   const pending = deferred<{ id: string }>(); mocks.create.mockReturnValue(pending.promise);
   mount(<StoreHandledProductsPage />);
+  fireEvent.click(screen.getByText('제품 등록', { selector: 'summary' }));
   fireEvent.click(screen.getByRole('button', { name: /^직접 등록하기$/ }));
   const save = screen.getByRole('button', { name: '제품 저장' });
   fireEvent.click(save); fireEvent.click(save);
@@ -286,6 +289,7 @@ it('저장 중 중복 제출과 다른 등록 화면 진입을 막는다', async
 it('매장 전환 후 이전 저장 완료가 성공 알림이나 새 목록 갱신을 만들지 않는다', async () => {
   const pending = deferred<{ id: string }>(); mocks.create.mockReturnValue(pending.promise);
   const view = mount(<StoreHandledProductsPage />);
+  fireEvent.click(screen.getByText('제품 등록', { selector: 'summary' }));
   fireEvent.click(screen.getByRole('button', { name: /^직접 등록하기$/ }));
   fireEvent.click(screen.getByRole('button', { name: '제품 저장' }));
   mocks.organizationId = 'store-b'; view.rerender(<MemoryRouter><StoreHandledProductsPage /></MemoryRouter>);

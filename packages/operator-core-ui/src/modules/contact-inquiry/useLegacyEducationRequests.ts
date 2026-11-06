@@ -73,7 +73,7 @@ export function useLegacyEducationRequests(api: LegacyEducationHttpClient) {
     if (!current()) return;
     if (!refreshed) {
       state.current.needsRefresh = true; setRefreshRequired(true);
-      setSavedNotice('문의 상태는 저장됐지만 목록을 갱신하지 못했습니다. 다시 저장하지 말고 다시 불러와 주세요.');
+      setSavedNotice('문의 상태는 저장됐지만 목록을 갱신하지 못했습니다. 다시 저장하지 말고 다시 불러와 주시기 바랍니다.');
     } else setSavedNotice('문의 상태가 저장되었습니다.');
     state.current.writing = false; setBusy(false);
   }

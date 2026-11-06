@@ -1,10 +1,16 @@
 import { useEffect, useRef, useState } from "react";
+import { ActionBar, DataTable, useListSelection, type Column } from "@o4o/ui";
+import { VideoPlayback } from "@o4o/tablet-kiosk-core";
 import {
   neturePharmacyApi,
   type SemiFranchiseContent,
 } from "../../../api/neturePharmacy";
-import { SignageSelectionTable } from "./SignageSelectionTable";
-import { VideoPlayback } from "@o4o/tablet-kiosk-core";
+
+type BusinessVideoRow = {
+  id: string;
+  item: SemiFranchiseContent;
+  video: NonNullable<SemiFranchiseContent["videos"]>[number];
+};
 
 /** Uses the existing member-only material catalog; every copy is authorized again by the server. */
 export function BusinessVideoImport({
@@ -35,6 +41,7 @@ export function BusinessVideoImport({
   } | null>(null);
   const lock = useRef(false),
     live = useRef(true);
+  const selection = useListSelection(`${organizationId}:${page}:${search}:${revision}`);
   useEffect(() => {
     live.current = true;
     return () => {
@@ -66,17 +73,18 @@ export function BusinessVideoImport({
       current = false;
     };
   }, [organizationId, isCurrent, page, search, revision]);
-  const copy = async (item: SemiFranchiseContent, url: string) => {
+  const copy = async (row: BusinessVideoRow) => {
     if (lock.current || !isCurrent()) return;
     lock.current = true;
     setBusy(true);
     setError("");
     setSaved("");
     try {
-      const result = await neturePharmacyApi.copyVideo(item.id, url);
+      const result = await neturePharmacyApi.copyVideo(row.item.id, row.video.sourceUrl);
       if (!result.snapshotId) throw new Error("UNCONFIRMED");
       if (live.current && isCurrent()) {
-        setSaved(`${item.title} 영상을 동영상함에 가져왔습니다.`);
+        setSaved(`${row.item.title} 영상을 동영상에 가져왔습니다.`);
+        selection.clear();
         onImported();
       }
     } catch {
@@ -89,13 +97,41 @@ export function BusinessVideoImport({
       if (live.current && isCurrent()) setBusy(false);
     }
   };
-  const videos = items.flatMap((item) =>
+  const videos: BusinessVideoRow[] = items.flatMap((item) =>
     (item.videos ?? []).map((video) => ({
       id: `${item.id}:${video.sourceUrl}`,
       item,
       video,
     })),
   );
+  const selected = videos.filter((row) => selection.isSelected(row.id));
+  const single = selected.length === 1 ? selected[0] : undefined;
+  const columns: Column<BusinessVideoRow>[] = [
+    {
+      key: "select",
+      title: "선택",
+      render: (_value, row) => (
+        <input
+          type="checkbox"
+          aria-label={`${row.item.title} 영상 선택`}
+          checked={selection.isSelected(row.id)}
+          disabled={busy}
+          onChange={(event) => selection.toggle(row.id, event.target.checked)}
+        />
+      ),
+    },
+    { key: "title", title: "영상", render: (_value, row) => row.item.title },
+    {
+      key: "business",
+      title: "제공 협업체",
+      render: (_value, row) => row.item.semiFranchiseName,
+    },
+    {
+      key: "provider",
+      title: "영상 서비스",
+      render: (_value, row) => row.video.sourceType,
+    },
+  ];
   return (
     <section
       aria-label="가입 협업체 영상 가져오기"
@@ -152,82 +188,74 @@ export function BusinessVideoImport({
       {loading ? (
         <p role="status">제공 영상을 확인하고 있습니다.</p>
       ) : (
-        (
-          <>
-            {!error && !videos.length && (
-              <p>
-                이 페이지에 제공 영상이 없습니다. 검색하거나 다음 자료를
-                확인하세요.
-              </p>
-            )}
-            <SignageSelectionTable
-              dataSource={videos}
-              rowKey="id"
-              selectionKey={`${organizationId}:${page}:${search}:${revision}`}
-              emptyText="제공 영상이 없습니다"
-              columns={[
-                {
-                  key: "title",
-                  title: "영상",
-                  render: (_value, row) => row.item.title,
-                },
-                {
-                  key: "business",
-                  title: "제공 협업체",
-                  render: (_value, row) => row.item.semiFranchiseName,
-                },
-                {
-                  key: "provider",
-                  title: "영상 서비스",
-                  render: (_value, row) => row.video.sourceType,
-                },
-              ]}
-              actions={[
-                {
-                  key: "preview",
-                  label: "미리보기",
-                  disabled: () => busy,
-                  onSelect: (row) =>
-                    setPreview({
-                      url: row.video.sourceUrl,
-                      kind: row.video.sourceType,
-                      title: row.item.title,
-                    }),
-                },
-                {
-                  key: "import",
-                  label: "동영상함에 가져오기",
-                  disabled: () => busy,
-                  onSelect: (row) => copy(row.item, row.video.sourceUrl),
-                },
-              ]}
-            />
-            <nav
-              aria-label="협업체 자료 페이지"
-              className="flex items-center gap-3"
+        <>
+          {!error && !videos.length && (
+            <p>
+              이 페이지에 제공 영상이 없습니다. 검색하거나 다음 자료를
+              확인하세요.
+            </p>
+          )}
+          {videos.length > 0 && (
+            <>
+              <ActionBar
+                selectedCount={selected.length}
+                onClearSelection={selection.clear}
+                actions={[
+                  {
+                    key: "preview",
+                    label: "미리보기",
+                    disabled: !single || busy,
+                    onClick: () => {
+                      if (single)
+                        setPreview({
+                          url: single.video.sourceUrl,
+                          kind: single.video.sourceType,
+                          title: single.item.title,
+                        });
+                    },
+                  },
+                  {
+                    key: "import",
+                    label: "동영상에 가져오기",
+                    variant: "primary",
+                    disabled: !single || busy,
+                    onClick: () => (single ? copy(single) : undefined),
+                  },
+                ]}
+              />
+              <DataTable<BusinessVideoRow>
+                columns={columns}
+                dataSource={videos}
+                rowKey="id"
+                emptyText="제공 영상이 없습니다"
+              />
+            </>
+          )}
+          <nav
+            aria-label="협업체 자료 페이지"
+            className="flex items-center gap-3"
+          >
+            <button
+              type="button"
+              disabled={page === 1 || busy}
+              onClick={() => setPage((value) => value - 1)}
+              className="min-h-11 px-3"
             >
-              <button
-                type="button"
-                disabled={page === 1 || busy}
-                onClick={() => setPage((value) => value - 1)}
-                className="min-h-11 px-3"
-              >
-                이전
-              </button>
-              <span>
-                {page} / {Math.max(1, Math.ceil(total / 20))}
-              </span>
-              <button
-                type="button"
-                disabled={page * 20 >= total || busy}
-                onClick={() => setPage((value) => value + 1)}
-                className="min-h-11 px-3"
-              >
-                다음
-              </button>
-            </nav>
-          </>
-        )
+              이전
+            </button>
+            <span>
+              {page} / {Math.max(1, Math.ceil(total / 20))}
+            </span>
+            <button
+              type="button"
+              disabled={page * 20 >= total || busy}
+              onClick={() => setPage((value) => value + 1)}
+              className="min-h-11 px-3"
+            >
+              다음
+            </button>
+          </nav>
+        </>
       )}
       {preview && (
         <div className="aspect-video max-w-lg">

@@ -51,9 +51,9 @@ function ProductGuidanceContextSession({ product, disabled, compact = false, onO
     <details>
       <summary className="min-h-11 cursor-pointer content-center font-medium text-slate-700">등록된 상품 정보 확인</summary>
       {materials.loading ? <p role="status">상품 정보 확인 중…</p> : materials.error ? <div role="alert">
-        <p>상품 정보를 불러오지 못했습니다. 내용을 추측하지 말고 다시 확인해 주세요.</p>
+        <p>상품 정보를 불러오지 못했습니다. 내용을 추측하지 말고 다시 확인해 주시기 바랍니다.</p>
         <button type="button" className={buttonClass} disabled={disabled} onClick={() => void materials.reload()}>상품 정보 다시 확인</button>
-      </div> : displayed.length === 0 ? <p className="text-slate-600">등록된 설명이 없습니다. 확인한 내용을 직접 작성해 주세요.</p> : <>
+      </div> : displayed.length === 0 ? <p className="text-slate-600">등록된 설명이 없습니다. 확인한 내용을 직접 작성해 주시기 바랍니다.</p> : <>
         {languages.length > 0 && <label className="mb-2 flex items-center gap-2">설명 언어
           <select aria-label="상품 설명 언어" value={activeLanguage} onChange={event => setLanguage(event.target.value)} className="min-h-11 rounded-lg border bg-white px-2">
             {languages.map(value => <option key={value} value={value}>{value === 'ko' ? '한국어' : value.toUpperCase()}</option>)}

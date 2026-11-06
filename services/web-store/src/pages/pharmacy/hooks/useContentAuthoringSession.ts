@@ -90,7 +90,7 @@ export function useContentAuthoringSession<D, R>(options: Options<D, R>) {
     const config = settings.current;
     if (!hasContext()) {
       setLoading(false);
-      setError("매장을 선택한 뒤 다시 시도해 주세요.");
+      setError("매장을 선택한 뒤 다시 시도해 주시기 바랍니다.");
       return;
     }
     const isCurrent = readRequest.begin();
@@ -111,7 +111,7 @@ export function useContentAuthoringSession<D, R>(options: Options<D, R>) {
       replaceDraft(config.toDraft(result));
     } catch {
       if (isCurrent() && hasContext())
-        setError("자료를 불러오지 못했습니다. 다시 시도해 주세요.");
+        setError("자료를 불러오지 못했습니다. 다시 시도해 주시기 바랍니다.");
     } finally {
       if (isCurrent()) setLoading(false);
     }
@@ -203,7 +203,7 @@ export function useContentAuthoringSession<D, R>(options: Options<D, R>) {
         setNotice({
           ok: false,
           message: config.saveErrorMessage?.(error) ??
-            "저장하지 못했습니다. 입력 내용을 유지한 채 다시 시도해 주세요.",
+            "저장하지 못했습니다. 입력 내용을 유지한 채 다시 시도해 주시기 바랍니다.",
         });
     } finally {
       busy.current.delete(scope);
@@ -235,7 +235,7 @@ export function useContentAuthoringSession<D, R>(options: Options<D, R>) {
       if (isCurrent() && hasContext())
         setNotice({
           ok: false,
-          message: "삭제하지 못했습니다. 다시 시도해 주세요.",
+          message: "삭제하지 못했습니다. 다시 시도해 주시기 바랍니다.",
         });
     } finally {
       busy.current.delete(scope);

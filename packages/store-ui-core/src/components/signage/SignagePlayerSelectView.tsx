@@ -7,13 +7,13 @@
  * Tailwind 는 동적 class 조합을 purge 하므로 accent 는 완성된 class 문자열로 주입받는다.
  *
  * WO-O4O-MY-STORE-REMAINING-FEATURE-VIEW-COMMONIZATION-V1 §5-B:
- *   KPA 사본이 유일하게 더 갖고 있던 두 가지(활성 스케줄 배너 · 행 선택)를 slot/optional prop 으로
- *   열어 KPA 도 같은 View 를 쓰게 한다. 미주입 서비스(KCos)의 렌더 결과는 이전과 동일하다.
+ *   서비스별 부가 정보와 행 선택을 slot/optional prop 으로
+ *   주입한다. 디스플레이별 직접 선택은 onPlay로 현재 탭에 연결한다.
  */
 
-import { useState, useEffect, useMemo, useCallback, type ReactNode } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef, type ReactNode } from 'react';
 import { Search, Play, ListVideo, AlertCircle } from 'lucide-react';
-import { DataTable, type Column } from '@o4o/ui';
+import { ActionBar, DataTable, type Column } from '@o4o/ui';
 
 /** 서비스 storePlaylist 응답 중 이 화면이 쓰는 필드 */
 export interface SignageSelectPlaylist {
@@ -22,6 +22,7 @@ export interface SignageSelectPlaylist {
   itemCount?: number;
   playlistType?: string;
   publishStatus?: string;
+  isActive?: boolean;
 }
 
 export interface SignagePlayerSelectViewProps {
@@ -31,7 +32,7 @@ export interface SignagePlayerSelectViewProps {
   /** 검색 input Tailwind class (서비스 accent) */
   searchInputClassName?: string;
   /**
-   * 제목과 검색창 사이 slot — KPA 의 "현재 활성 스케줄" 배너처럼
+   * 제목과 검색창 사이 slot — 서비스별 추가 안내처럼
    * 서비스에만 있는 부가 정보를 넣는다. 미주입 시 아무것도 렌더되지 않는다.
    */
   headerExtra?: ReactNode;
@@ -47,6 +48,8 @@ export interface SignagePlayerSelectViewProps {
    *   미주입 서비스의 동작은 이전과 완전히 동일하다.
    */
   playPathPrefix?: string;
+  /** Select in the current display tab instead of opening another tab. */
+  onPlay?: (playlistId: string) => void;
 }
 
 const DEFAULT_PLAY_BTN =
@@ -63,28 +66,38 @@ export function SignagePlayerSelectView({
   headerExtra,
   rowSelection,
   playPathPrefix = DEFAULT_PLAY_PATH_PREFIX,
+  onPlay,
 }: SignagePlayerSelectViewProps) {
   const [playlists, setPlaylists] = useState<SignageSelectPlaylist[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [keyword, setKeyword] = useState('');
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const generation = useRef(0);
+  const selectedKeys = rowSelection?.selectedRowKeys ?? [...selected];
+  const clearSelection = () => { setSelected(new Set()); rowSelection?.onChange([]); };
 
   const loadPlaylists = useCallback(async () => {
+    const current = ++generation.current;
     setLoading(true);
     setError(null);
+    setSelected(new Set());
     try {
       const data = await fetchStorePlaylists();
-      setPlaylists(data.filter((p) => p.publishStatus === 'published'));
+      if (current !== generation.current) return;
+      setPlaylists(data.filter((p) => p.publishStatus === 'published' && p.isActive !== false));
     } catch {
-      setError('플레이리스트를 불러오지 못했습니다.');
+      if (current !== generation.current) return;
+      setError('재생목록을 불러오지 못했습니다.');
       setPlaylists([]);
     } finally {
-      setLoading(false);
+      if (current === generation.current) setLoading(false);
     }
   }, [fetchStorePlaylists]);
 
   useEffect(() => {
-    loadPlaylists();
+    void loadPlaylists();
+    return () => { generation.current++; };
   }, [loadPlaylists]);
 
   const filtered = useMemo(() => {
@@ -94,7 +107,8 @@ export function SignagePlayerSelectView({
   }, [playlists, keyword]);
 
   const handlePlay = (playlistId: string) => {
-    window.open(`${playPathPrefix}/${playlistId}`, '_blank');
+    if (onPlay) onPlay(playlistId);
+    else window.open(`${playPathPrefix}/${encodeURIComponent(playlistId)}`, '_blank', 'noopener,noreferrer');
   };
 
   const columns: Column<SignageSelectPlaylist>[] = [
@@ -110,7 +124,7 @@ export function SignagePlayerSelectView({
     },
     {
       key: 'itemCount',
-      title: '항목 수',
+      title: '동영상 수',
       dataIndex: 'itemCount',
       align: 'center' as const,
       render: (v) => <span className="text-slate-600">{v}</span>,
@@ -143,6 +157,7 @@ export function SignagePlayerSelectView({
       align: 'right' as const,
       render: (_v, pl) => (
         <button
+          type="button"
           onClick={(e) => {
             e.stopPropagation();
             handlePlay(pl.id);
@@ -150,7 +165,7 @@ export function SignagePlayerSelectView({
           className={playButtonClassName}
         >
           <Play className="w-3.5 h-3.5" />
-          재생
+          재생 시작
         </button>
       ),
     },
@@ -161,9 +176,9 @@ export function SignagePlayerSelectView({
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-lg font-bold text-slate-900">디지털사이니지 송출</h2>
+          <h2 className="text-lg font-bold text-slate-900">디스플레이 재생</h2>
           <p className="text-sm text-slate-500 mt-0.5">
-            게시된 플레이리스트를 선택해 매장 화면으로 전체화면 송출합니다.
+            게시된 재생목록을 선택한 뒤 재생 시작을 누르시기 바랍니다. 이 화면의 선택은 다른 화면에 영향을 주지 않습니다.
           </p>
         </div>
       </div>
@@ -175,9 +190,9 @@ export function SignagePlayerSelectView({
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
         <input
           type="text"
-          placeholder="플레이리스트 검색..."
+          placeholder="재생목록 검색..."
           value={keyword}
-          onChange={(e) => setKeyword(e.target.value)}
+          onChange={(e) => { setKeyword(e.target.value); clearSelection(); }}
           className={searchInputClassName}
         />
       </div>
@@ -187,18 +202,22 @@ export function SignagePlayerSelectView({
         <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">
           <AlertCircle className="w-4 h-4 flex-shrink-0" />
           {error}
+          <button type="button" onClick={() => void loadPlaylists()} className="min-h-11 underline">다시 시도</button>
         </div>
       )}
 
+      <ActionBar selectedCount={selectedKeys.length} onClearSelection={clearSelection}
+        actions={[{ key: 'play', label: '선택한 재생목록 재생 시작', disabled: selectedKeys.length !== 1 || loading || !!error,
+          onClick: () => { if (selectedKeys.length === 1 && filtered.some(item => item.id === selectedKeys[0])) handlePlay(selectedKeys[0]); } }]} />
       {/* Table */}
-      <DataTable<SignageSelectPlaylist>
-        rowSelection={rowSelection}
+      {!error && <DataTable<SignageSelectPlaylist>
+        rowSelection={{ selectedRowKeys: selectedKeys, onChange: keys => { setSelected(new Set(keys)); rowSelection?.onChange(keys); } }}
         columns={columns}
         dataSource={filtered}
         rowKey="id"
         loading={loading}
-        emptyText="게시된 플레이리스트가 없습니다."
-      />
+        emptyText="게시된 재생목록이 없습니다."
+      />}
     </div>
   );
 }

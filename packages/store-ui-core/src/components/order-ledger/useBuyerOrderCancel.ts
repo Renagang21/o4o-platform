@@ -76,7 +76,7 @@ export function useBuyerOrderCancel({
         await onCancelled();
       } catch (e) {
         const message =
-          (e as { message?: string })?.message || '주문 취소에 실패했습니다. 잠시 후 다시 시도해 주세요.';
+          (e as { message?: string })?.message || '주문 취소에 실패했습니다. 잠시 후 다시 시도해 주시기 바랍니다.';
         setCancelError(message);
         notify?.(message, 'error');
       } finally {

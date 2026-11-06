@@ -108,7 +108,7 @@ export default function SupplierConditionModal({ supplierId, fallbackName, open,
             <div className="bg-red-50 border border-red-100 rounded-lg p-4 text-sm text-red-700">
               <div className="flex items-start gap-2">
                 <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                <span>주문 조건을 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.</span>
+                <span>주문 조건을 불러오지 못했습니다. 잠시 후 다시 시도해 주시기 바랍니다.</span>
               </div>
               <button
                 onClick={loadCondition}

@@ -79,7 +79,7 @@ export default function SupplierCandidateBasicFields({
             <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-3 text-sm text-red-700">
               <p className="font-medium">카테고리 목록을 불러오지 못했습니다.</p>
               <p className="mt-0.5 text-xs text-red-600">
-                카테고리는 필수 항목입니다. 다시 시도해 주세요.
+                카테고리는 필수 항목입니다. 다시 시도해 주시기 바랍니다.
               </p>
               <button
                 type="button"
@@ -208,7 +208,7 @@ export default function SupplierCandidateBasicFields({
                 setMaster(null);
               }}
               onKeyDown={(e) => e.key === 'Enter' && searchBarcode()}
-              placeholder="바코드가 있으면 입력하세요"
+              placeholder="바코드가 있으면 입력하시기 바랍니다"
               className="flex-1 px-4 py-3 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 font-mono"
             />
             <button
@@ -227,7 +227,7 @@ export default function SupplierCandidateBasicFields({
                 {master.isMfdsVerified && ' (MFDS 검증됨)'}
               </p>
               <p className="text-xs text-emerald-700/80 mt-1">
-                검토 요청 대신 기존 제품에 바로 공급을 연결하세요.
+                검토 요청 대신 기존 제품에 바로 공급을 연결하시기 바랍니다.
               </p>
               <button
                 type="button"

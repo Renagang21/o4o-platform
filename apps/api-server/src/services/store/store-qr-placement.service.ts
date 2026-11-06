@@ -199,7 +199,7 @@ export async function startQrPlacement(
       ok: false,
       status: 400,
       code: 'PLACEMENT_REQUIRED',
-      message: '사용처를 선택해 주세요.',
+      message: '사용처를 선택해 주시기 바랍니다.',
     };
   }
   const label = normalizeText(input.label, MAX_LABEL_LEN);

@@ -246,18 +246,6 @@ describe("signage list retains source-specific policies", () => {
     expect(videos[0]._snapshot).toBe(copied);
     expect(videos[1]._media).toBe(direct);
   });
-  it("separates business/community/own video sources and excludes non-video snapshots", () => {
-    const videos = buildSignageVideoList([
-      snapshot("business", "draft", { sourceService: "semi-franchise-video", contentJson: { mediaType: "video", semiFranchiseName: "합성 협업체" } }),
-      snapshot("community", "draft", { sourceService: "kpa", contentJson: { mediaType: "video", source: "community" } }),
-      snapshot("poster", "draft", { contentJson: { mediaType: "image" } }),
-    ], [media("own")]);
-    expect(videos.map(video => video.origin)).toEqual(["business", "community", "own"]);
-    expect(videos[0].originLabel).toBe("합성 협업체");
-    for (const origin of ["business", "community", "own"] as const) {
-      expect(filterSignageVideos(videos, { origin, status: "all", sort: "newest", keyword: "" })).toHaveLength(1);
-    }
-  });
   it("status filters exclude direct media; force uses the existing active period contract", () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date("2026-10-13T12:00:00Z"));
@@ -290,6 +278,16 @@ describe("signage list retains source-specific policies", () => {
         keyword: "",
       }).map((item) => item.id),
     ).toEqual(["draft"]);
+  });
+  it("published-only includes active direct videos, excludes drafts/hidden and searches tags", () => {
+    const videos = buildSignageVideoList(
+      [snapshot("published", "published"), snapshot("draft", "draft"), snapshot("hidden", "hidden")],
+      [{ ...media("active"), status: "active", tags: ["건강"] }, { ...media("draft-media"), status: "draft" }],
+    );
+    expect(filterSignageVideos(videos, { status: "published", sort: "newest", keyword: "" }).map(v => v.id))
+      .toEqual(["media_active", "published"]);
+    expect(filterSignageVideos(videos, { status: "published", sort: "newest", keyword: " 건강 " }).map(v => v.id))
+      .toEqual(["media_active"]);
   });
   it("sorting returns a new list and preserves mixed-source date ordering and case-insensitive search", () => {
     const videos = buildSignageVideoList(

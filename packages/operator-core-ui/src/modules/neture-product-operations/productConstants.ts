@@ -89,7 +89,7 @@ export const VISIBILITY_STATUS: Record<VisibilityStatusKey, {
     label: '반려됨',
     bg: 'bg-red-50',
     text: 'text-red-600',
-    description: '선택한 공급의 검토 상태를 확인해 주세요. 제품 등록 승인과 서비스 승인은 별도입니다.',
+    description: '선택한 공급의 검토 상태를 확인해 주시기 바랍니다. 제품 등록 승인과 서비스 승인은 별도입니다.',
   },
   PENDING: {
     label: '승인 대기',

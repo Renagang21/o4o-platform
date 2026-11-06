@@ -31,6 +31,11 @@ export interface GuideBlockProps {
   compact?: boolean;
   /** 우측 액션 슬롯 — 버튼/링크 (선택) */
   action?: ReactNode;
+  /**
+   * 목록 업무 화면용 — 기본 접힘(요약에 title 만 표시). 목록이 먼저 보이도록 한다.
+   * 정본: docs/architecture/O4O-STANDARD-LIST-WORKSPACE-CONTRACT-V1.md §4
+   */
+  collapsible?: boolean;
   /** className override */
   className?: string;
   /** 추가 스타일 override */
@@ -55,12 +60,37 @@ export function GuideBlock({
   variant = 'info',
   compact = false,
   action,
+  collapsible = false,
   className,
   style,
 }: GuideBlockProps) {
   const tone = TONE[variant];
   const hasSteps = !!steps && steps.length > 0;
   const padding = compact ? '8px 12px' : '12px 14px';
+
+  if (collapsible) {
+    return (
+      <details
+        className={className}
+        style={{
+          padding,
+          background: tone.bg,
+          border: `1px solid ${tone.border}`,
+          borderRadius: 8,
+          fontSize: 13,
+          color: tone.text,
+          ...style,
+        }}
+      >
+        <summary style={{ minHeight: 24, cursor: 'pointer', fontSize: 13, fontWeight: 600, color: tone.titleColor }}>
+          {title ?? '이용 안내'}
+        </summary>
+        <div style={{ marginTop: 6 }}>
+          <GuideBlock description={description} steps={steps} icon={icon} variant={variant} compact action={action} style={{ padding: 0, background: 'transparent', border: 0 }} />
+        </div>
+      </details>
+    );
+  }
 
   return (
     <div

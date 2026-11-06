@@ -63,7 +63,7 @@ const PROFILE_MAX_CELL_LEN = 200;
 // ── Rate limit (§11) ─────────────────────────────────────────────────────────
 const RATE_LIMIT_BODY = {
   success: false,
-  error: '요청이 너무 많습니다. 잠시 후 다시 시도해 주세요.',
+  error: '요청이 너무 많습니다. 잠시 후 다시 시도해 주시기 바랍니다.',
   code: 'RATE_LIMIT_EXCEEDED',
 };
 
@@ -217,7 +217,7 @@ export function createHospitalRoutes(): Router {
     const body = (req.body ?? {}) as Record<string, unknown>;
     const text = typeof body.text === 'string' ? body.text.trim() : '';
     if (!text) {
-      return res.status(400).json({ success: false, error: '요청 내용을 입력해 주세요.', code: 'TEXT_REQUIRED' });
+      return res.status(400).json({ success: false, error: '요청 내용을 입력해 주시기 바랍니다.', code: 'TEXT_REQUIRED' });
     }
     if (text.length > MAX_TEXT_LEN) {
       return res.status(400).json({ success: false, error: '요청이 너무 깁니다.', code: 'TEXT_TOO_LONG' });
@@ -229,7 +229,7 @@ export function createHospitalRoutes(): Router {
       const normalized = normalizeAiError(error);
       logger.error('hospital ai request failed', { code: normalized.code });
       if (isAiAccountingError(normalized.code)) return res.status(aiErrorHttpStatus(normalized.code)).json({ success: false, error: aiErrorUserMessage(normalized.code), code: normalized.code });
-      return res.status(502).json({ success: false, error: '응답을 생성하지 못했습니다. 다시 시도해 주세요.', code: 'AI_ERROR' });
+      return res.status(502).json({ success: false, error: '응답을 생성하지 못했습니다. 다시 시도해 주시기 바랍니다.', code: 'AI_ERROR' });
     }
   });
 

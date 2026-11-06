@@ -31,7 +31,7 @@ export function createServiceOperatorManagementRoutes(
           throw new OperationError(
             400,
             "UNEXPECTED_OPERATOR_FIELDS",
-            "대상 사용자만 선택해 주세요.",
+            "대상 사용자만 선택해 주시기 바랍니다.",
           );
         }
         const data =

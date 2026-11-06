@@ -97,7 +97,7 @@ export function UnifiedOrdersSection({
           </button>
         </div>
       ) : orders.length === 0 ? (
-        <div style={styles.unifiedEmpty}>{page > 1 ? '이 페이지에 표시할 주문이 없습니다. 이전 페이지로 이동해 주세요.' : '표시할 주문이 없습니다.'}</div>
+        <div style={styles.unifiedEmpty}>{page > 1 ? '이 페이지에 표시할 주문이 없습니다. 이전 페이지로 이동해 주시기 바랍니다.' : '표시할 주문이 없습니다.'}</div>
       ) : (
         <div style={styles.unifiedList}>
           {orders.map((o) => {
@@ -189,7 +189,7 @@ export function UnifiedOrdersSection({
       <p style={styles.unifiedFootnote}>
         이벤트 오퍼·서비스 주문은 checkout_orders 기반으로, 현재 화면에서는
         확인만 가능합니다. 결제 완료 후 배송 준비와 송장 등록을 진행합니다.
-        주문별 처리 가능 여부를 확인해 주세요.
+        주문별 처리 가능 여부를 확인해 주시기 바랍니다.
       </p>
     </div>
   );

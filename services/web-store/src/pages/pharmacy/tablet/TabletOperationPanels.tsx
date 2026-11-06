@@ -60,7 +60,7 @@ export function TabletCommonIdlePicker({
           데이터를 불러오지 못했습니다.
         </p>
         <p className="mt-1 text-sm text-slate-500">
-          잠시 후 다시 시도해 주세요.
+          잠시 후 다시 시도해 주시기 바랍니다.
         </p>
         <button
           type="button"

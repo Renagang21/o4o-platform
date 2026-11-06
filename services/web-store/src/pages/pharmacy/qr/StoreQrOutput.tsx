@@ -109,7 +109,7 @@ export function StoreQrOutputGuide({
         style={{ ...styles.guideModal, position: "relative" }}
       >
         <div style={styles.guideHeader}>
-          <h2 style={styles.guideTitle}>QR 출력 파일은 이렇게 선택하세요</h2>
+          <h2 style={styles.guideTitle}>QR 출력 파일은 이렇게 선택하시기 바랍니다</h2>
           <button
             onClick={() => onClose()}
             style={styles.iconBtn}
@@ -119,7 +119,7 @@ export function StoreQrOutputGuide({
           </button>
         </div>
         <div style={styles.guideBody}>
-          <p style={{ fontSize: 14, lineHeight: 1.7, margin: '0 0 12px' }}>이미 출력한 QR은 연결 주소를 유지하면 계속 사용할 수 있습니다. 연결된 자료를 수정한 뒤 휴대전화로 다시 열어 확인하세요. 다른 자료로 새 QR을 만들면 기존 인쇄물의 연결도 확인해야 합니다.</p>
+          <p style={{ fontSize: 14, lineHeight: 1.7, margin: '0 0 12px' }}>이미 출력한 QR은 연결 주소를 유지하면 계속 사용할 수 있습니다. 연결된 자료를 수정한 뒤 휴대전화로 다시 열어 확인하시기 바랍니다. 다른 자료로 새 QR을 만들면 기존 인쇄물의 연결도 확인해야 합니다.</p>
           {QR_EXPORT_GUIDE.map((g) => (
             <div key={g.situation} style={styles.guideCard}>
               <div style={{ flex: 1, minWidth: 0 }}>
@@ -132,7 +132,7 @@ export function StoreQrOutputGuide({
         </div>
         <div style={styles.guideFooterNote}>
           크기 조절이나 전문 출력소 전달이 필요하면 <strong>SVG (벡터)</strong>
-          를 선택하세요.
+          를 선택하시기 바랍니다.
           <br />
           약국에서 바로 종이에 출력할 때는 <strong>A4 PDF</strong>가 가장
           간단합니다.

@@ -34,7 +34,7 @@ const EmailSettings: FC = () => {
       const data = await settingsService.getEmailSettings();
       setSettings(data);
     } catch {
-      setLoadError('저장된 이메일 설정을 불러오지 못했습니다. 다시 불러온 뒤 수정해주세요.');
+      setLoadError('저장된 이메일 설정을 불러오지 못했습니다. 다시 불러온 뒤 수정해 주시기 바랍니다.');
     } finally {
       setLoading(false);
     }
@@ -46,7 +46,7 @@ const EmailSettings: FC = () => {
     
     // 필수 필드 검증
     if (!settings.smtpHost || !settings.smtpPort || !settings.smtpUser || !settings.fromEmail) {
-      toast.error('모든 필수 항목을 입력해주세요.');
+      toast.error('모든 필수 항목을 입력해 주시기 바랍니다.');
       return;
     }
 
@@ -208,7 +208,7 @@ const EmailSettings: FC = () => {
               </button>
             </div>
             <p className="mt-1 text-sm text-o4o-text-secondary">
-              Gmail의 경우 앱 비밀번호를 사용하세요
+              Gmail의 경우 앱 비밀번호를 사용하시기 바랍니다
             </p>
           </div>
 

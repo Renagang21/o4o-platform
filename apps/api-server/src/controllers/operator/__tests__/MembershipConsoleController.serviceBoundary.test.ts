@@ -17,7 +17,7 @@ function primeMemberReads() {
   mockQuery.mockImplementation(async (sql: string) => {
     if (sql.startsWith('SELECT 1')) return [{ ok: 1 }];
     if (sql.includes('COUNT(*)')) return [{ total: 1 }];
-    if (sql.includes('SELECT u.id') || sql.includes('FROM users WHERE')) return [{ id: ID }];
+    if (sql.includes('u."firstName"') || sql.includes('FROM users WHERE')) return [{ id: ID }];
     return [];
   });
 }
@@ -31,7 +31,7 @@ async function readMembers(method: 'getMembers' | 'getMemberDetail', keys: strin
 }
 
 function expectReadScope(subject: string | string[], serviceKey: string | null, prefix: string | null) {
-  const roleCall = mockQuery.mock.calls.find(([sql]) => sql.includes('FROM role_assignments'))!;
+  const roleCall = mockQuery.mock.calls.find(([sql]) => sql.includes('FROM role_assignments ra'))!;
   expect(roleCall[0]).toContain('ra.role LIKE ANY($2)');
   expect(roleCall[1]).toEqual([subject, prefix === null ? null : [`${prefix}:%`], prefix === null ? null : [prefix]]);
   const memberships = mockQuery.mock.calls.find(([sql]) => /SELECT id, (user_id, )?service_key/.test(sql))!;
@@ -100,8 +100,8 @@ describe('canonical member read scopes', () => {
     mockQuery.mockImplementation(async (sql: string) => {
       if (sql.startsWith('SELECT 1')) return [{ ok: 1 }];
       if (sql.includes('COUNT(*)')) return [{ total: 1 }];
-      if (sql.includes('SELECT u.id') || sql.includes('FROM users WHERE')) return [{ id: ID }];
-      if (sql.includes('FROM role_assignments')) return method === 'getMembers'
+      if (sql.includes('u."firstName"') || sql.includes('FROM users WHERE')) return [{ id: ID }];
+      if (sql.includes('FROM role_assignments ra')) return method === 'getMembers'
         ? [{ user_id: ID, roles: historical.map(row => row.role) }]
         : historical;
       return [];
@@ -132,7 +132,7 @@ describe('canonical member read scopes', () => {
       mockQuery.mockClear();
       await readMembers(method, [serviceKey], { serviceKey });
       expectReadScope(method === 'getMembers' ? [ID] : ID, serviceKey, prefix);
-      expect(mockQuery.mock.calls.filter(([sql]) => sql.includes('FROM role_assignments'))).toHaveLength(1);
+      expect(mockQuery.mock.calls.filter(([sql]) => sql.includes('FROM role_assignments ra'))).toHaveLength(1);
     }
   });
 
@@ -184,9 +184,9 @@ describe('list/detail membership projection preserves distinct response contract
     mockQuery.mockImplementation(async (sql: string) => {
       if (sql.startsWith('SELECT 1')) return [{ ok: 1 }];
       if (sql.includes('COUNT(*)')) return [{ total: 1 }];
-      if (sql.includes('SELECT u.id') || sql.includes('FROM users WHERE')) return [{ id: ID, status: 'inactive' }];
+      if (sql.includes('u."firstName"') || sql.includes('FROM users WHERE')) return [{ id: ID, status: 'inactive' }];
       if (sql.includes('FROM service_memberships')) return [membership];
-      if (sql.includes('FROM role_assignments')) return [];
+      if (sql.includes('FROM role_assignments ra')) return [];
       return [];
     });
   });

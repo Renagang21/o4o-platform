@@ -100,14 +100,14 @@ export function applySupplierProductDraft<T extends SupplierProductDraftTargetFo
 
   if (changedFields.includes('brandName') && form.brandId) {
     next.brandId = '' as T['brandId'];
-    notes.push('브랜드명이 바뀌어 선택된 O4O 브랜드 연결을 해제했습니다. 브랜드를 다시 선택해 주세요.');
+    notes.push('브랜드명이 바뀌어 선택된 O4O 브랜드 연결을 해제했습니다. 브랜드를 다시 선택해 주시기 바랍니다.');
   }
 
   if (draft.regulatoryType) {
     if (lockRegulatoryType) {
       notes.push('규제 구분은 진입 시 선택한 제품 유형을 따릅니다(AI 값 미적용).');
     } else if (draft.regulatoryType === 'DRUG') {
-      notes.push('AI 가 의약품(DRUG)으로 판단했지만 자동 적용하지 않습니다. 의약품은 등록 시작 화면에서 유형을 선택해 주세요.');
+      notes.push('AI 가 의약품(DRUG)으로 판단했지만 자동 적용하지 않습니다. 의약품은 등록 시작 화면에서 유형을 선택해 주시기 바랍니다.');
     } else if (mode === 'overwrite' || isBlank(form.regulatoryType) || form.regulatoryType === 'GENERAL') {
       if (next.regulatoryType !== draft.regulatoryType) {
         next.regulatoryType = draft.regulatoryType as T['regulatoryType'];

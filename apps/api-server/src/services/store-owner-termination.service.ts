@@ -209,10 +209,10 @@ export class StoreOwnerTerminationService {
       AND p.status IN ('active','suspended','terminated') AND (
         EXISTS(SELECT 1 FROM organization_members om WHERE om.organization_id=p.organization_id AND om.user_id=$2 AND om.role='owner' AND om.left_at IS NULL)
         OR (p.status='terminated' AND o."isActive"=false AND EXISTS(SELECT 1 FROM store_owner_termination_cases c WHERE c.organization_id=p.organization_id AND c.user_id=$2 AND c.status IN ('terminated','failed','purge_completed')))) FOR UPDATE OF p,o`,[input.organizationId,input.userId]);
-    if(!pharmacy)throw new StoreOwnerTerminationError('PHARMACY_OWNER_CHANGED','현재 승인된 약국과 경영자 소속을 다시 확인해 주세요.',409);
+    if(!pharmacy)throw new StoreOwnerTerminationError('PHARMACY_OWNER_CHANGED','현재 승인된 약국과 경영자 소속을 다시 확인해 주시기 바랍니다.',409);
     const [existing]=await this.dataSource.query(`SELECT * FROM store_owner_termination_cases WHERE organization_id=$1 AND user_id=$2 AND status<>'cancelled' ORDER BY created_at DESC LIMIT 1 FOR UPDATE`,[input.organizationId,input.userId]);
     if(existing?.status==='purge_completed')return mapCase(existing);
-    if(existing?.return_requested&&!existing.return_completed_at)throw new StoreOwnerTerminationError('RETURN_NOT_COMPLETED','기존 정보 반환 요청을 완료한 후 완전폐업 자료 삭제를 진행해 주세요.',409);
+    if(existing?.return_requested&&!existing.return_completed_at)throw new StoreOwnerTerminationError('RETURN_NOT_COMPLETED','기존 정보 반환 요청을 완료한 후 완전폐업 자료 삭제를 진행해 주시기 바랍니다.',409);
     const [row]=existing?await this.dataSource.query(`UPDATE store_owner_termination_cases SET status='terminated',termination_effective_at=now(),purge_due_at=now(),updated_at=now(),failure_reason=NULL WHERE id=$1 RETURNING *`,[existing.id]):
       await this.dataSource.query(`INSERT INTO store_owner_termination_cases(service_key,organization_id,user_id,status,requested_by,return_requested,termination_effective_at,purge_due_at) VALUES('kpa-society',$1,$2,'terminated',$3,false,now(),now()) RETURNING *`,[input.organizationId,input.userId,input.actorId]);
     return mapCase(row);

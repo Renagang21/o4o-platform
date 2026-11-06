@@ -252,3 +252,18 @@ WO · CHECK · IR 은 정본이 아니다. 작업 결과가 현행 기준을 바
 - §6 헤더 형식을 쓴다. 상태는 §2 의 6종(DRAFT · ACTIVE · SUPERSEDED · COMPLETED · ARCHIVED · OBSOLETE)만 쓴다.
 - `DONE` · `CLOSED` · `COMPLETE` · `FINAL` 같은 변형을 새로 쓰지 않는다. 세부 결과(PASS · smoke 대기 등)는 상태 줄이 아니라 본문에 적는다.
 - 파일명에 상태 · 회차(`-FINAL-` · `-CLOSURE-` · `-R3-` 등)를 넣지 않는다.
+
+### 10-6. 작업요청서(WO) 실행 위치 · 인계 (2026-11-06)
+
+클라우드 세션(코드 작업)과 데스크톱 로컬 세션(운영 DB 작업)이 `docs/work-orders/` 로 지시서를 주고받는다. WO 헤더(§6)에 아래 두 줄을 더한다.
+
+```markdown
+> **실행 위치**: CLOUD | LOCAL | BOTH
+> **인계**: <작업 branch> · <commit SHA> · 다음 실행자 CLOUD | LOCAL
+```
+
+- `CLOUD` = 코드 · 문서 · 테스트(운영 DB 접속 수단 없음). `LOCAL` = 운영 DB read-only 조회 · 사용자가 승인한 운영 작업(Cloud SQL Proxy 가 있는 PC). `BOTH` 는 TODO 항목마다 `[CLOUD]` · `[LOCAL]` 을 붙인다.
+- 상태는 §2 의 6종을 그대로 쓴다 — 작성 중 `DRAFT`, 실행 대기 · 진행 `ACTIVE`, 종료 `COMPLETED`. `READY` · `IN_PROGRESS` · `BLOCKED` 같은 진행 상태를 새로 만들지 않고, 막힌 사유는 본문에 적는다.
+- `LOCAL` 단계에는 실행할 SQL(read-only 는 SELECT 만)과 결과 판정 기준을 WO 안에 적는다. 결과는 §10-4 에 따라 날짜 · 상태 · 건수 수준으로 마스킹해 같은 branch 의 WO 결과 절 또는 CHECK 에 적는다.
+- 인계는 작업 branch push + `HANDOFF.md` 로 한다(main 병합 전에도 다음 실행자는 원격 branch 에서 읽는다). Claude Code 의 SessionStart 훅은 `origin/main` 에 최근 반영된 미완료 WO 중 자기 실행 위치 항목을 알려 준다.
+- `실행 위치` 가 없는 기존 WO 는 고치지 않는다(§6 · 일괄 수정 금지).

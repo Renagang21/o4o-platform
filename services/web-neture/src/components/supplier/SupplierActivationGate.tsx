@@ -41,11 +41,11 @@ const STATUS_NOTICES: Record<string, { title: string; body: string }> = {
   },
   REJECTED: {
     title: '공급자 가입이 거절되었습니다',
-    body: '거절 사유는 운영자에게 문의해 주세요.',
+    body: '거절 사유는 운영자에게 문의해 주시기 바랍니다.',
   },
   INACTIVE: {
     title: '공급자 이용이 정지되었습니다',
-    body: '이용 재개는 운영자에게 문의해 주세요.',
+    body: '이용 재개는 운영자에게 문의해 주시기 바랍니다.',
   },
 };
 
@@ -149,9 +149,9 @@ export default function SupplierActivationGate({ mode, children }: Props) {
       )}
       {!loading && active && !profileComplete && (
         <div className="mb-4 rounded-xl border border-sky-200 bg-sky-50 p-4 text-sky-900">
-          <p className="text-sm font-semibold">공급자 정보를 등록해 주세요</p>
+          <p className="text-sm font-semibold">공급자 정보를 등록해 주시기 바랍니다</p>
           <p className="mt-1 text-sm">
-            승인은 완료되었습니다. 원활한 거래를 위해 공급자 정보를 보완해 주세요.
+            승인은 완료되었습니다. 원활한 거래를 위해 공급자 정보를 보완해 주시기 바랍니다.
             {labels.length > 0 && (
               <>
                 {' '}
@@ -170,7 +170,7 @@ export default function SupplierActivationGate({ mode, children }: Props) {
       {showProfileModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
           <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
-            <h2 className="text-lg font-bold text-slate-900">공급자 정보를 등록해 주세요</h2>
+            <h2 className="text-lg font-bold text-slate-900">공급자 정보를 등록해 주시기 바랍니다</h2>
             <p className="mt-2 text-sm text-slate-600">
               승인은 완료되었습니다. 대표자명·담당자 정보 등 공급자 정보를 등록하면 매장과의 거래가
               더 원활해집니다.

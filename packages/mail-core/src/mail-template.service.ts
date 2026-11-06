@@ -180,7 +180,7 @@ export class MailTemplateService {
     </div>
     <div class="footer">
       <p>이 이메일은 ${data.companyName}에서 발송되었습니다.</p>
-      <p>문의사항이 있으시면 ${data.supportEmail}로 연락주세요.</p>
+      <p>문의사항이 있으시면 ${data.supportEmail}로 연락주시기 바랍니다.</p>
       <p>&copy; ${data.year} ${data.companyName}. All rights reserved.</p>
     </div>
   </div>
@@ -216,20 +216,20 @@ export class MailTemplateService {
       <div class="alert">
         <p><strong>보안 알림:</strong> 비정상적인 로그인 시도가 감지되어 귀하의 계정이 일시적으로 잠겼습니다.</p>
       </div>
-      <p>계정 보안을 위해 다음 조치를 취해주세요:</p>
+      <p>계정 보안을 위해 다음 조치를 취해 주시기 바랍니다:</p>
       <ol>
-        <li>아래 버튼을 클릭하여 계정을 확인하세요</li>
-        <li>비밀번호를 재설정하세요</li>
-        <li>2단계 인증을 활성화하세요</li>
+        <li>아래 버튼을 클릭하여 계정을 확인하시기 바랍니다</li>
+        <li>비밀번호를 재설정하시기 바랍니다</li>
+        <li>2단계 인증을 활성화하시기 바랍니다</li>
       </ol>
       <div style="text-align: center;">
         <a href="${data.actionUrl}" class="button">계정 확인하기</a>
       </div>
-      <p>이 활동이 본인의 것이 아니라면 즉시 고객 지원팀에 연락해주세요.</p>
+      <p>이 활동이 본인의 것이 아니라면 즉시 고객 지원팀에 연락해 주시기 바랍니다.</p>
     </div>
     <div class="footer">
       <p>이 이메일은 ${data.companyName}에서 발송되었습니다.</p>
-      <p>문의사항이 있으시면 ${data.supportEmail}로 연락주세요.</p>
+      <p>문의사항이 있으시면 ${data.supportEmail}로 연락주시기 바랍니다.</p>
       <p>&copy; ${data.year} ${data.companyName}. All rights reserved.</p>
     </div>
   </div>

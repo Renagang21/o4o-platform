@@ -48,7 +48,7 @@ import { storeWorkspaceBase } from '../../components/store/StoreWorkflowNavigati
 
 export default function StoreLocalProductsPage() {
   const scope = useStoreProductScope();
-  if (!scope.ready) return <p role="status">매장을 선택해 주세요.</p>;
+  if (!scope.ready) return <p role="status">매장을 선택해 주시기 바랍니다.</p>;
   return <LocalProductsWorkspace key={scope.key} organizationId={scope.organizationId!} />;
 }
 function LocalProductsWorkspace({ organizationId }: { organizationId: string }) {
@@ -102,7 +102,7 @@ function LocalProductsWorkspace({ organizationId }: { organizationId: string }) 
         //   store_local_products 등록·수정 원본 화면. 메뉴 라벨과 동일한 '직접 등록 제품'.
         description:
           'O4O 제품이 아니더라도 매장이 직접 등록해 타블렛 전시·매장 안내·콘텐츠 제작 등 경영 활동에 활용하는 제품입니다. 결제/주문 시스템과 연결되지 않습니다.',
-        emptyDescription: '매장 경영 활동에 활용할 제품을 등록해 보세요.',
+        emptyDescription: '매장 경영 활동에 활용할 제품을 등록해 보시기 바랍니다.',
       }}
       // 태블릿 진열 / 마케팅 자산 / POP 진입은 공통 기본 동작(=기존 KPA 경로)과 동일하다.
       tableVariant="base"
@@ -311,7 +311,7 @@ function ProductFormModal({
                     </button>
                   </div>
                   <p className="text-[11px] text-slate-400 leading-relaxed">
-                    사진이 충분히 좋으면 그대로 등록하세요. AI 보정 없이 원본을 사용합니다.
+                    사진이 충분히 좋으면 그대로 등록하시기 바랍니다. AI 보정 없이 원본을 사용합니다.
                   </p>
                 </div>
               </div>
@@ -337,7 +337,7 @@ function ProductFormModal({
                 data-request-autofocus
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="상품명을 입력하세요"
+                placeholder="상품명을 입력하시기 바랍니다"
                 className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
                 required
               />
@@ -400,7 +400,7 @@ function ProductFormModal({
               onChange={({ html }) => { if (!saving && !submitLock.current) setDescription(html); }}
               preset="full"
               minHeight="200px"
-              placeholder="상품 상세 설명을 직접 작성하거나 외부에서 작성한 내용을 붙여넣으세요..."
+              placeholder="상품 상세 설명을 직접 작성하거나 외부에서 작성한 내용을 붙여넣으시기 바랍니다..."
             />
           </div>
 
@@ -530,7 +530,7 @@ function ProductFormModal({
           <div className="bg-white rounded-2xl w-full max-w-sm p-5 shadow-2xl">
             <h4 className="text-sm font-bold text-slate-900 mb-1">기존 설명이 있습니다</h4>
             <p className="text-xs text-slate-500 mb-4 leading-relaxed">
-              가져온 콘텐츠를 어떻게 적용할까요?
+              가져온 콘텐츠를 어떻게 적용하시겠습니까?
             </p>
             <div className="flex flex-col gap-2">
               <button

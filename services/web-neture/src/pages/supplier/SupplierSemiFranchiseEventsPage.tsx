@@ -68,7 +68,7 @@ export default function SupplierSemiFranchiseEventsPage() {
   const submit = async () => {
     const eventPrice = Number(form.eventPrice);
     if (!form.offerId || !form.semiFranchiseKey || !(eventPrice > 0) || !form.startAt || !form.endAt) {
-      setMessage({ type: 'error', text: '제품 · 세미프랜차이즈 · 이벤트 가격 · 기간을 입력하세요.' });
+      setMessage({ type: 'error', text: '제품 · 세미프랜차이즈 · 이벤트 가격 · 기간을 입력하시기 바랍니다.' });
       return;
     }
     setBusy(true);
@@ -96,7 +96,7 @@ export default function SupplierSemiFranchiseEventsPage() {
   };
 
   const cancel = async (ev: SemiFranchiseEvent) => {
-    if (!window.confirm(`${ev.productName} 이벤트를 취소할까요? 취소한 이벤트는 되살릴 수 없습니다.`)) return;
+    if (!window.confirm(`${ev.productName} 이벤트를 취소하시겠습니까? 취소한 이벤트는 되살릴 수 없습니다.`)) return;
     setBusy(true);
     setMessage(null);
     try {
@@ -114,13 +114,13 @@ export default function SupplierSemiFranchiseEventsPage() {
     <div className="space-y-6 p-6">
       <SupplierEventNavigation />
       {params.has('returnTo') && <Link to={supplierReturnPath(params.get('returnTo'), '/supplier/products')} className="inline-block text-sm text-blue-700 underline">상품 업무로 돌아가기</Link>}
-      {selectionError && <p role="alert" className="rounded-lg bg-amber-50 p-3 text-sm text-amber-800">요청한 상품은 공급 가능한 승인 상품 목록에 없습니다. 다른 상품을 선택해 주세요.</p>}
+      {selectionError && <p role="alert" className="rounded-lg bg-amber-50 p-3 text-sm text-amber-800">요청한 상품은 공급 가능한 승인 상품 목록에 없습니다. 다른 상품을 선택해 주시기 바랍니다.</p>}
       <PageHeader title="이벤트·특가" description="등록 승인된 제품으로 약국 협력사업 대상 이벤트를 신청합니다. 일반 공급 게시 없이도 진행할 수 있습니다." />
 
       <section className="rounded-lg border border-gray-200 bg-white p-4">
         <h2 className="mb-1 text-base font-semibold text-gray-900">새 이벤트 신청</h2>
         <p className="mb-3 text-xs text-gray-500">
-          일반 공급가가 설정돼 있으면 이벤트 가격은 그 이하여야 합니다. 신청 후에는 수정할 수 없습니다. 바꾸려면 취소하고 다시 신청하세요.
+          일반 공급가가 설정돼 있으면 이벤트 가격은 그 이하여야 합니다. 신청 후에는 수정할 수 없습니다. 바꾸려면 취소하고 다시 신청하시기 바랍니다.
         </p>
         {options.error && <div className="mb-3 text-sm text-red-600">{options.error}</div>}
         <div className="grid gap-3 md:grid-cols-2">

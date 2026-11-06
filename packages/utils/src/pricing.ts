@@ -606,7 +606,7 @@ export function validatePrice(price: number): PriceValidationResult {
     warnings.push({
       ruleId: 'high-price',
       ruleName: '고액 가격 경고',
-      message: '가격이 매우 높습니다. 확인해주세요.',
+      message: '가격이 매우 높습니다. 확인해 주시기 바랍니다.',
       severity: 'medium'
     });
   }

@@ -213,7 +213,7 @@ const DEFAULT_LABELS: LmsViewLabels = {
   courseNotFoundTitle: '강의를 찾을 수 없습니다',
   courseNotFoundDesc: '삭제되었거나 존재하지 않는 강의입니다.',
   membersOnlyTitle: '회원 전용 강의입니다',
-  membersOnlyDesc: '이 강의는 로그인한 회원만 볼 수 있습니다. 로그인 후 다시 시도해 주세요.',
+  membersOnlyDesc: '이 강의는 로그인한 회원만 볼 수 있습니다. 로그인 후 다시 시도해 주시기 바랍니다.',
   loginLabel: '로그인하기',
   backToHubLabel: '목록으로',
   backToCourseLabel: '강의로',

@@ -76,7 +76,7 @@ export function useAssignedBusinessWorkspace(businessKey?: string, allowedTabs?:
     setLoading(true); setRows([]); setLoadError('');
     try {
       const data = await loadBusinessRows(sfKey, tab, status);
-      if (!Array.isArray(data)) throw new Error('목록 응답을 확인할 수 없습니다. 다시 조회해 주세요.');
+      if (!Array.isArray(data)) throw new Error('목록 응답을 확인할 수 없습니다. 다시 조회해 주시기 바랍니다.');
       if (!current()) return false;
       setRows(data); return true;
     } catch (error) {
@@ -98,7 +98,7 @@ export function useAssignedBusinessWorkspace(businessKey?: string, allowedTabs?:
   const confirmDecision = async () => {
     const selected = decisionRef.current;
     if (changingScope.current || !selected || submitting.current || loading || loadError) return;
-    if (selected.reasonRequired && !reason.trim()) { setDecisionError('반려 사유를 입력해 주세요.'); return; }
+    if (selected.reasonRequired && !reason.trim()) { setDecisionError('반려 사유를 입력해 주시기 바랍니다.'); return; }
     const state = lifecycle.current;
     const current = () => state.mounted && lifecycle.current === state;
     submitting.current = true; setBusyId(selected.id); setDecisionError('');
@@ -108,9 +108,9 @@ export function useAssignedBusinessWorkspace(businessKey?: string, allowedTabs?:
       decisionRef.current = null; setDecision(null); setReason('');
       setMessage({ type: 'success', text: `${selected.label} 처리했습니다.` });
       const refreshed = await load();
-      if (current() && !refreshed) setMessage({ type: 'success', text: `${selected.label} 처리는 완료되었습니다. 목록 다시 조회로 결과를 확인해 주세요.` });
+      if (current() && !refreshed) setMessage({ type: 'success', text: `${selected.label} 처리는 완료되었습니다. 목록 다시 조회로 결과를 확인해 주시기 바랍니다.` });
     } catch (error) {
-      if (current()) setDecisionError(errorText(error, '처리하지 못했습니다. 다시 시도해 주세요.'));
+      if (current()) setDecisionError(errorText(error, '처리하지 못했습니다. 다시 시도해 주시기 바랍니다.'));
     } finally {
       submitting.current = false;
       if (current()) setBusyId(null);

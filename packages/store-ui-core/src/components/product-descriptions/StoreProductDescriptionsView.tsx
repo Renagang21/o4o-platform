@@ -182,14 +182,14 @@ export function StoreProductDescriptionsView({
     subtitle: (
       <>
         저장된 {storeNoun} 상품 상세설명을 조회·재편집합니다.
-        신규 생성은 "내 자료함 → 제작 시작 → {storeNoun} 상품 설명"에서 진입하세요.
+        신규 생성은 "내 자료함 → 제작 시작 → {storeNoun} 상품 설명"에서 진입하시기 바랍니다.
       </>
     ),
     notice: (
       <>
         이 화면의 상세설명은 <strong>{storeNoun} 자체 상품에 저장</strong>되며, 해당 {storeNoun}에서만 조회·수정됩니다.
         O4O 공용 상품 DB(표준 상품)의 대표 설명은 O4O 관리자가 관리하며 이 화면에서 수정되지 않습니다.
-        {storeNoun} 특화 홍보문·이벤트 문구·POP/블로그용 문구가 필요하면 <strong>콘텐츠 만들기</strong>에서 별도 콘텐츠로 제작하세요.
+        {storeNoun} 특화 홍보문·이벤트 문구·POP/블로그용 문구가 필요하면 <strong>콘텐츠 만들기</strong>에서 별도 콘텐츠로 제작하시기 바랍니다.
       </>
     ),
     sidebarTitle: (count) => `내 ${storeNoun} 상품 (${count})`,
@@ -198,8 +198,8 @@ export function StoreProductDescriptionsView({
     emptyText: '등록된 자체 상품이 없습니다.',
     emptyLinkText: '상품 등록하기',
     saveSuccessToast: `내 ${storeNoun} 상품 설명이 저장되었습니다`,
-    placeholderExisting: `저장된 ${storeNoun} 상품 설명을 수정하세요.`,
-    placeholderFallback: `신규 생성은 "내 자료함 → 제작 시작 → ${storeNoun} 상품 설명"에서 시작하세요.`,
+    placeholderExisting: `저장된 ${storeNoun} 상품 설명을 수정하시기 바랍니다.`,
+    placeholderFallback: `신규 생성은 "내 자료함 → 제작 시작 → ${storeNoun} 상품 설명"에서 시작하시기 바랍니다.`,
     ...labelOverrides,
   };
 
@@ -313,7 +313,7 @@ export function StoreProductDescriptionsView({
     if (!selectedId) return;
     const trimmed = normalizeEditorHtml(content);
     if (!trimmed) {
-      toast.error('내용을 입력하세요');
+      toast.error('내용을 입력하시기 바랍니다');
       return;
     }
     setSaving(true);
@@ -452,7 +452,7 @@ export function StoreProductDescriptionsView({
         <section style={styles.editor}>
           {!selectedProduct ? (
             <div style={{ ...styles.editorEmpty, flexDirection: 'column' as const, gap: '12px' }}>
-              <span>왼쪽에서 상품을 선택하세요.</span>
+              <span>왼쪽에서 상품을 선택하시기 바랍니다.</span>
               <Link to={libraryHref} style={styles.libraryLink}>
                 <FolderOpen size={14} />
                 내 자료함에서 상세설명 만들기
@@ -528,7 +528,7 @@ export function StoreProductDescriptionsView({
                 placeholder: hasExisting
                   ? labels.placeholderExisting
                   : selectedTemplate
-                    ? `${selectedTemplate.name} 템플릿 구조로 작성하세요.`
+                    ? `${selectedTemplate.name} 템플릿 구조로 작성하시기 바랍니다.`
                     : labels.placeholderFallback,
               })}
 

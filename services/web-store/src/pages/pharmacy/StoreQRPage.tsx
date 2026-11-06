@@ -251,7 +251,7 @@ function QrSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
       if (!isCurrent()) return;
       setItems(previous => previous.map(qr => qr.id === id ? { ...qr, isActive: active, ...(!active ? { landable: false } : {}) } : qr));
       if (active) await fetchItems();
-      if (isCurrent()) setStatusNotice(active ? 'QR을 다시 올렸습니다. 고객용 링크를 확인해 주세요.' : 'QR을 내렸습니다. 기존 주소는 유지됩니다.');
+      if (isCurrent()) setStatusNotice(active ? 'QR을 다시 올렸습니다. 고객용 링크를 확인해 주시기 바랍니다.' : 'QR을 내렸습니다. 기존 주소는 유지됩니다.');
     } catch {
       if (isCurrent()) setStatusError({ id, active });
     } finally {
@@ -331,7 +331,7 @@ function QrSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
     try {
       await downloadQrExport(id, format, preset);
     } catch {
-      toast.error('QR 출력 파일을 만들지 못했습니다. 잠시 후 다시 시도해 주세요.');
+      toast.error('QR 출력 파일을 만들지 못했습니다. 잠시 후 다시 시도해 주시기 바랍니다.');
     } finally {
       setExportingId(null);
     }
@@ -348,7 +348,7 @@ function QrSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
       if (keep.size === 0) return;
     }
     if (selectedIds.size === 0) {
-      toast.error('출력할 QR을 먼저 선택해 주세요.');
+      toast.error('출력할 QR을 먼저 선택해 주시기 바랍니다.');
       return;
     }
     setShowPrintModal(true);
@@ -412,8 +412,8 @@ function QrSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
         entry={multilingualEntry} disabled={saving || creating} selected={creating && selectedLibrary?.source === 'mlc' && selectedLibrary.id === multilingualEntry.groupId}
         isCurrent={isCurrent} onSelect={handleLibrarySelect} />}
       {!!(location.state as { multilingualQrEntry?: unknown } | null)?.multilingualQrEntry && !multilingualEntry &&
-        <p role="status" className="mb-3 text-sm text-amber-800">선택한 안내의 매장 문맥이 변경되었습니다. 현재 매장에서 자료를 다시 선택해 주세요.</p>}
-      {hasStoreOperationEntry(location.state) && !operationEntry && <p role="status" className="mb-3 text-sm text-amber-800">매장 또는 업무가 변경되었습니다. 현재 매장의 QR을 다시 선택해 주세요.</p>}
+        <p role="status" className="mb-3 text-sm text-amber-800">선택한 안내의 매장 문맥이 변경되었습니다. 현재 매장에서 자료를 다시 선택해 주시기 바랍니다.</p>}
+      {hasStoreOperationEntry(location.state) && !operationEntry && <p role="status" className="mb-3 text-sm text-amber-800">매장 또는 업무가 변경되었습니다. 현재 매장의 QR을 다시 선택해 주시기 바랍니다.</p>}
       {operationEntry && !loading && !listError && <div className="mb-3 text-sm text-slate-600">
         {items.some(item => item.id === operationEntry.id) ? <><span>선택한 QR의 배치·출력을 열었습니다. </span>{focusTarget && <button type="button" className="min-h-11 underline" onClick={() => setFocusTarget(false)}>전체 QR 보기</button>}</>
           : <p role="alert">선택한 QR을 현재 조회한 목록에서 확인하지 못했습니다. <button type="button" className="min-h-11 underline" onClick={() => void fetchItems()}>QR 다시 확인</button></p>}
@@ -822,8 +822,8 @@ function QrSettingsModal({ qr, onClose, onSaved }: { qr: StoreQrCode; onClose: (
   const [saving, setSaving] = useState(false);
 
   const save = async () => {
-    if (!title.trim()) { toast.error('제목을 입력해 주세요'); return; }
-    if (!slug.trim()) { toast.error('공개 URL(slug)을 입력해 주세요'); return; }
+    if (!title.trim()) { toast.error('제목을 입력해 주시기 바랍니다'); return; }
+    if (!slug.trim()) { toast.error('공개 URL(slug)을 입력해 주시기 바랍니다'); return; }
     setSaving(true);
     try {
       const res = await updateStoreQrCode(qr.id, {

@@ -38,7 +38,7 @@ export async function retryInboxNotification(
       throw new OperationError(
         409,
         "NOTIFICATION_IN_PROGRESS",
-        "접수 알림의 결과를 확인 중입니다. 기존 발송 상태를 먼저 확인해 주세요.",
+        "접수 알림의 결과를 확인 중입니다. 기존 발송 상태를 먼저 확인해 주시기 바랍니다.",
       );
     let enabled = true;
     if (scope.kind === "service") {

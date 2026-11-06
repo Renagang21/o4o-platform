@@ -28,7 +28,7 @@ export default function ProductCorrectionProductPanel() {
   const sequence = useRef(0);
   const load = async (id: string, section: ProductWorkspaceSection = 'descriptions', page = 1) => {
     const seq = ++sequence.current;
-    if (!uuid.test(id)) { setBusy(false); setError('상품 상세의 연결을 이용하거나 올바른 상품 ID를 입력하세요.'); return; }
+    if (!uuid.test(id)) { setBusy(false); setError('상품 상세의 연결을 이용하거나 올바른 상품 ID를 입력하시기 바랍니다.'); return; }
     setBusy(true); setError('');
     try {
       const result = await api.productWorkspace(id, section, page);
@@ -48,7 +48,7 @@ export default function ProductCorrectionProductPanel() {
   }, []);
   return <section id="product-workspace" className="space-y-3 rounded border p-3" aria-label="상품별 자료와 관리 이력">
     <h4 className="font-semibold">상품별 자료 · 정비 · 갱신 이력</h4>
-    <p className="text-sm">상품 상세나 검토 작업에서 연결해 열 수 있습니다. 현행 원문과 과거 작업의 당시 자료를 구분해 확인하세요. 이 조회는 상품을 수정하거나 작업을 실행하지 않습니다.</p>
+    <p className="text-sm">상품 상세나 검토 작업에서 연결해 열 수 있습니다. 현행 원문과 과거 작업의 당시 자료를 구분해 확인하시기 바랍니다. 이 조회는 상품을 수정하거나 작업을 실행하지 않습니다.</p>
     <form className="flex flex-wrap gap-2" onSubmit={(e) => { e.preventDefault(); void load(input.trim()); }}>
       <label className="min-w-0 flex-1"><span className="block">상품 ID</span>
         <input className="w-full rounded border p-2" aria-label="상품 관리 이력 ID" value={input}
@@ -71,7 +71,7 @@ export default function ProductCorrectionProductPanel() {
         <p className="text-sm">{date(item.at)}</p>
         {item.sourceType && <p className="break-words text-sm">출처 유형: {item.sourceType} · 참조: {item.sourceRefId ?? '없음'}</p>}
         {item.content !== undefined && <pre className="max-h-64 overflow-auto whitespace-pre-wrap break-words text-sm">{item.content}</pre>}
-        {item.truncated && <p>원문 앞 20,000자입니다. 전체 내용은 상품 상세에서 확인하세요.</p>}
+        {item.truncated && <p>원문 앞 20,000자입니다. 전체 내용은 상품 상세에서 확인하시기 바랍니다.</p>}
         {item.summary && <p className="whitespace-pre-wrap break-words">요약: {item.summary}</p>}
         {item.notes && <p className="whitespace-pre-wrap break-words">검토 의견: {item.notes}</p>}
         {item.sources && <p className="whitespace-pre-wrap break-words">기록한 근거: {item.sources}</p>}

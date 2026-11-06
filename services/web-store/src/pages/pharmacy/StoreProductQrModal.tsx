@@ -148,7 +148,7 @@ export function StoreProductQrModal({ open, target, onClose }: Props) {
     if (!qr || !target || busy) return;
     const w = window.open('', '_blank', 'width=520,height=680');
     if (!w) {
-      toast.error('팝업이 차단되었습니다. 팝업 허용 후 다시 시도하세요.');
+      toast.error('팝업이 차단되었습니다. 팝업 허용 후 다시 시도하시기 바랍니다.');
       return;
     }
     const esc = (s: string) => s.replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c] as string));

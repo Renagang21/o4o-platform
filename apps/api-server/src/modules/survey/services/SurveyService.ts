@@ -36,9 +36,9 @@ export class SurveyService {
   }
 
   async createSurvey(userId: string, data: CreateSurveyDto): Promise<Survey> {
-    if (!data.title?.trim()) throw new Error('제목을 입력하세요');
+    if (!data.title?.trim()) throw new Error('제목을 입력하시기 바랍니다');
     if (!Array.isArray(data.questions) || data.questions.length === 0) {
-      throw new Error('질문을 1개 이상 추가하세요');
+      throw new Error('질문을 1개 이상 추가하시기 바랍니다');
     }
 
     const survey = this.surveyRepo.create({

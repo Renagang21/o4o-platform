@@ -284,7 +284,7 @@ export default function AdminMasterManagementPage() {
                 <input
                   value={resolveBarcode}
                   onChange={(e) => setResolveBarcode(e.target.value)}
-                  placeholder="바코드를 입력하세요"
+                  placeholder="바코드를 입력하시기 바랍니다"
                   className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
                 />
               </div>

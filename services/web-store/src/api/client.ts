@@ -69,7 +69,7 @@ export class ApiClient {
       throw new Error('Request failed after retries');
     } catch (error: any) {
       if (error.name === 'AbortError') {
-        throw Object.assign(new Error('요청 시간이 초과되었습니다. 다시 시도해 주세요.'), { status: 408, code: 'REQUEST_TIMEOUT' });
+        throw Object.assign(new Error('요청 시간이 초과되었습니다. 다시 시도해 주시기 바랍니다.'), { status: 408, code: 'REQUEST_TIMEOUT' });
       }
       throw error;
     } finally {

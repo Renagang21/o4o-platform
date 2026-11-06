@@ -389,7 +389,7 @@ export function usagePeriod(days: number, now: Date) {
     throw new AiManagementError(
       400,
       "AI_USAGE_PERIOD_INVALID",
-      "조회 기간은 7일, 30일, 90일 중 선택하세요.",
+      "조회 기간은 7일, 30일, 90일 중 선택하시기 바랍니다.",
     );
   const day = 86_400_000;
   const midnight =

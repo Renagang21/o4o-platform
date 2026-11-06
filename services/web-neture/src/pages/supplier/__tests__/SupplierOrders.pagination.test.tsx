@@ -65,7 +65,7 @@ it('keeps a way back when the last page disappears between requests', async () =
   api.unified.mockResolvedValueOnce(response()).mockResolvedValueOnce(response(2, 20)).mockResolvedValueOnce(response(1, 20));
   mount();await screen.findByText('TEST-1');
   fireEvent.click(screen.getByRole('button', { name: '통합 주문 다음 페이지' }));
-  await screen.findByText('이 페이지에 표시할 주문이 없습니다. 이전 페이지로 이동해 주세요.');
+  await screen.findByText('이 페이지에 표시할 주문이 없습니다. 이전 페이지로 이동해 주시기 바랍니다.');
   expect(screen.getByText('2페이지 · 이전 페이지 확인')).toBeTruthy();
   expect((screen.getByRole('button', { name: '통합 주문 다음 페이지' }) as HTMLButtonElement).disabled).toBe(true);
   fireEvent.click(screen.getByRole('button', { name: '통합 주문 이전 페이지' }));

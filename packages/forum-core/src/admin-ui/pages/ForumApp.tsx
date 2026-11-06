@@ -62,7 +62,7 @@ const ForumApp = () => {
             포럼 관리
           </h1>
           <p className="text-modern-text-secondary mt-1">
-            커뮤니티 포럼을 관리하고 모더레이션하세요.
+            커뮤니티 포럼을 관리하고 모더레이션하시기 바랍니다.
           </p>
         </div>
         <Button onClick={() => navigate('/forum/categories')}>

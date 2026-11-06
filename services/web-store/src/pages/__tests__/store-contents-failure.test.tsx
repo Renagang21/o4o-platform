@@ -42,9 +42,9 @@ it("transport failure displays an error, and retry can produce a real empty resu
     .mockResolvedValueOnce(empty);
   show();
   await waitFor(() => expect(screen.getByRole("alert")).toBeTruthy());
-  expect(screen.queryByText("가져온 문서형 콘텐츠가 없습니다")).toBeNull();
+  expect(screen.queryByText("저장한 콘텐츠가 없습니다. 새 콘텐츠를 만들거나 제공 자료에서 가져오시기 바랍니다.")).toBeNull();
   fireEvent.click(screen.getByRole("button", { name: "다시 시도" }));
-  await screen.findByText("가져온 문서형 콘텐츠가 없습니다");
+  await screen.findByText("저장한 콘텐츠가 없습니다. 새 콘텐츠를 만들거나 제공 자료에서 가져오시기 바랍니다.");
   expect(screen.queryByRole("alert")).toBeNull();
   expect(list).toHaveBeenCalledTimes(2);
 });
@@ -52,7 +52,7 @@ it("an unsuccessful response is not shown as an empty library", async () => {
   list.mockResolvedValue({ success: false, data: null });
   show();
   await screen.findByRole("alert");
-  expect(screen.queryByText("가져온 문서형 콘텐츠가 없습니다")).toBeNull();
+  expect(screen.queryByText("저장한 콘텐츠가 없습니다. 새 콘텐츠를 만들거나 제공 자료에서 가져오시기 바랍니다.")).toBeNull();
 });
 it("external reload replaces an error with the newly loaded content", async () => {
   list
@@ -65,6 +65,6 @@ it("external reload replaces an error with the newly loaded content", async () =
       <StoreContentsSelector reloadKey={1} onStartProduction={vi.fn()} />
     </MemoryRouter>,
   );
-  await screen.findByText("가져온 문서형 콘텐츠가 없습니다");
+  await screen.findByText("저장한 콘텐츠가 없습니다. 새 콘텐츠를 만들거나 제공 자료에서 가져오시기 바랍니다.");
   expect(screen.queryByRole("alert")).toBeNull();
 });

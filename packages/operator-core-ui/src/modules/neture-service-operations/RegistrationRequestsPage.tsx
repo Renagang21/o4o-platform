@@ -102,7 +102,7 @@ export default function RegistrationRequestsPage() {
       if (!current()) return false;
       const errMsg = error instanceof Error ? error.message : 'UNKNOWN';
       if (errMsg.includes('403')) {
-        setFetchError('가입 신청 데이터에 접근할 권한이 없습니다. 관리자에게 문의하세요.');
+        setFetchError('가입 신청 데이터에 접근할 권한이 없습니다. 관리자에게 문의하시기 바랍니다.');
       } else {
         setFetchError('가입 신청 데이터를 불러오지 못했습니다.');
       }
@@ -710,7 +710,7 @@ export default function RegistrationRequestsPage() {
                       <textarea
                         value={notesValue}
                         onChange={(e) => setNotesValue(e.target.value)}
-                        placeholder="내부 메모를 입력하세요 (신청자에게 표시되지 않습니다)"
+                        placeholder="내부 메모를 입력하시기 바랍니다 (신청자에게 표시되지 않습니다)"
                         rows={3}
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 resize-none"
                       />
@@ -784,7 +784,7 @@ export default function RegistrationRequestsPage() {
             loading={busy}
             error={message?.type === 'error' ? message.text : undefined}
             title="가입 신청 거부"
-            message={`${selectedRequest.name}님의 가입 신청을 거부합니다.\n\n거부 사유를 입력해주세요. 입력한 사유는 신청자에게 전달됩니다.`}
+            message={`${selectedRequest.name}님의 가입 신청을 거부합니다.\n\n거부 사유를 입력해 주시기 바랍니다. 입력한 사유는 신청자에게 전달됩니다.`}
             confirmText="거부 확인"
           />
         )}

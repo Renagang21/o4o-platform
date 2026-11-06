@@ -69,7 +69,7 @@ export default function DomainsPage({ slug }: { slug: string }) {
   }
 
   async function remove(d: BranchDomain) {
-    if (!window.confirm(`${d.hostname} 연결을 삭제할까요?`)) return;
+    if (!window.confirm(`${d.hostname} 연결을 삭제하시겠습니까?`)) return;
     setBusy(true);
     try {
       await removeDomain(slug, d.id);
@@ -118,7 +118,7 @@ export default function DomainsPage({ slug }: { slug: string }) {
 
             {d.status !== 'active' && (
               <div className="mt-3 rounded bg-gray-50 p-3 text-xs text-gray-600">
-                <p className="font-medium text-gray-700">DNS TXT 레코드를 추가한 뒤 검증을 요청하세요.</p>
+                <p className="font-medium text-gray-700">DNS TXT 레코드를 추가한 뒤 검증을 요청하시기 바랍니다.</p>
                 <p className="mt-1">이름: {d.verification.recordName}</p>
                 <p>유형: {d.verification.recordType}</p>
                 <p className="break-all">값: {d.verification.recordValue}</p>

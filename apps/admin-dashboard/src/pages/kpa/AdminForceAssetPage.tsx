@@ -236,7 +236,7 @@ function SnapshotSelectorDialog({
       <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle>Snapshot 선택</DialogTitle>
-          <DialogDescription>강제 배포할 Asset Snapshot을 선택하세요.</DialogDescription>
+          <DialogDescription>강제 배포할 Asset Snapshot을 선택하시기 바랍니다.</DialogDescription>
         </DialogHeader>
         <div className="flex gap-2 mb-3">
           <div className="relative flex-1">
@@ -373,7 +373,7 @@ function CreateForceAssetDialog({
               <Label>대상 매장 (Organization)</Label>
               <Select value={organizationId} onValueChange={setOrganizationId}>
                 <SelectTrigger>
-                  <SelectValue placeholder="매장을 선택하세요" />
+                  <SelectValue placeholder="매장을 선택하시기 바랍니다" />
                 </SelectTrigger>
                 <SelectContent>
                   {orgs.map((o) => (
@@ -661,6 +661,9 @@ export default function AdminForceAssetPage() {
       <PageHeader
         title="Force Asset 관리"
         subtitle="특정 매장에 Asset을 강제 배포하고 관리합니다."
+        actions={[
+          { id: 'create', label: '강제 배포 생성', icon: <Plus className="h-4 w-4" />, onClick: () => setCreateOpen(true), variant: 'primary' },
+        ]}
       />
 
       {/* Filters */}
@@ -681,10 +684,6 @@ export default function AdminForceAssetPage() {
 
         <Button variant="outline" size="icon" onClick={() => refetch()} title="새로고침">
           <RefreshCw className="h-4 w-4" />
-        </Button>
-        <Button onClick={() => setCreateOpen(true)}>
-          <Plus className="h-4 w-4 mr-2" />
-          강제 배포 생성
         </Button>
       </div>
 

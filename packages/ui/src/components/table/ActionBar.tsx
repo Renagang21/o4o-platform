@@ -17,9 +17,13 @@
  * V4-EXPANSION 추가 (optional — 하위 호환):
  * - confirm: ConfirmActionDialog 연동 (destructive bulk action 보호)
  * - onClick: reason 파라미터 지원 (confirm showReason에서 전달)
+ *
+ * WO-O4O-STANDARD-LIST-WORKSPACE-CONTRACT-V1 (하위 호환):
+ * - 비동기 onClick 진행 중 모든 작업 버튼을 잠가 중복 실행을 막는다.
+ * - 좁은 화면에서 줄바꿈하고 작업 버튼의 터치 높이를 보장한다.
  */
 
-import React, { useState, useCallback, type ReactNode } from 'react';
+import React, { useState, useCallback, useEffect, useRef, type ReactNode } from 'react';
 import type { ConfirmConfig } from './RowActionMenu';
 import { ConfirmActionDialog } from './ConfirmActionDialog';
 
@@ -67,11 +71,28 @@ export function ActionBar({ selectedCount, actions, onClearSelection, statusInfo
   const [confirmAction, setConfirmAction] = useState<ActionBarAction | null>(null);
   const [confirmLoading, setConfirmLoading] = useState(false);
 
+  const [runningAction, setRunningAction] = useState(false);
+  const runLock = useRef(false);
+  const mounted = useRef(true);
+  useEffect(() => {
+    mounted.current = true;
+    return () => { mounted.current = false; };
+  }, []);
+
   const handleActionClick = useCallback((action: ActionBarAction) => {
+    if (runLock.current) return;
     if (action.confirm) {
       setConfirmAction(action);
-    } else {
-      action.onClick();
+      return;
+    }
+    const result = action.onClick();
+    if (result && typeof result.then === 'function') {
+      runLock.current = true;
+      setRunningAction(true);
+      void result.finally(() => {
+        runLock.current = false;
+        if (mounted.current) setRunningAction(false);
+      });
     }
   }, []);
 
@@ -112,7 +133,7 @@ export function ActionBar({ selectedCount, actions, onClearSelection, statusInfo
   return (
     <>
       <div className="space-y-1">
-        <div className="flex items-center gap-3 px-4 py-2.5 bg-blue-50 border border-blue-200 rounded-lg">
+        <div className="flex flex-wrap items-center gap-3 px-4 py-2.5 bg-blue-50 border border-blue-200 rounded-lg">
           <span className="text-sm text-blue-700 font-medium">
             {selectedCount}개 선택
           </span>
@@ -124,10 +145,11 @@ export function ActionBar({ selectedCount, actions, onClearSelection, statusInfo
             return (
               <button
                 key={item.key}
+                type="button"
                 onClick={() => handleActionClick(item)}
-                disabled={item.disabled || item.loading}
+                disabled={item.disabled || item.loading || runningAction}
                 title={item.tooltip}
-                className={`flex items-center gap-1.5 px-3 py-1.5 text-sm rounded disabled:opacity-50 transition-colors ${
+                className={`flex min-h-11 sm:min-h-0 items-center gap-1.5 px-3 py-1.5 text-sm rounded disabled:opacity-50 transition-colors ${
                   variantClasses[item.variant ?? 'default']
                 }`}
               >
@@ -137,8 +159,10 @@ export function ActionBar({ selectedCount, actions, onClearSelection, statusInfo
             );
           })}
           <button
+            type="button"
             onClick={onClearSelection}
-            className="ml-auto text-sm text-slate-500 hover:text-slate-700"
+            disabled={runningAction}
+            className="ml-auto min-h-11 sm:min-h-0 text-sm text-slate-500 hover:text-slate-700 disabled:opacity-50"
           >
             선택 해제
           </button>

@@ -9,9 +9,9 @@ export function LessonMediaFields({ value, onChange }: { value: LessonInput; onC
   const setCaptions = (next: LmsCaptionTrack[]) => onChange({ ...value, metadata: { ...value.metadata, captions: next } });
   return <>
     {value.type === 'video' && <label className="field"><span>영상 URL (HTTPS MP4 · WebM · Ogg)</span><input type="url" value={value.videoUrl ?? ''} onChange={e => onChange({ ...value, videoUrl: e.target.value })} />
-      <small>YouTube·Vimeo 페이지 주소와 iframe은 지원하지 않습니다. 직접 재생 가능한 파일 주소와 접근 권한을 확인하세요. 공개 목차에는 영상 주소가 노출되지 않습니다.</small></label>}
+      <small>YouTube·Vimeo 페이지 주소와 iframe은 지원하지 않습니다. 직접 재생 가능한 파일 주소와 접근 권한을 확인하시기 바랍니다. 공개 목차에는 영상 주소가 노출되지 않습니다.</small></label>}
     {value.type === 'video' && <fieldset className="panel sub"><legend>자막</legend>
-      <p className="muted">HTTPS WebVTT(.vtt) 파일을 연결합니다. 자막 버튼에서 언어를 선택할 수 있습니다. 외부 파일의 CORS와 접근 권한을 확인하세요.</p>
+      <p className="muted">HTTPS WebVTT(.vtt) 파일을 연결합니다. 자막 버튼에서 언어를 선택할 수 있습니다. 외부 파일의 CORS와 접근 권한을 확인하시기 바랍니다.</p>
       {captions.map((track, index) => <div key={index} className="field-row">
         {(['label', 'srcLang', 'src'] as const).map(key => <label key={key} className="field"><span>{key === 'label' ? '자막 이름' : key === 'srcLang' ? '언어 코드' : '자막 URL'} {index + 1}</span><input type={key === 'src' ? 'url' : 'text'} value={track[key]} onChange={e => setCaptions(captions.map((t, i) => i === index ? { ...t, [key]: e.target.value } : t))} /></label>)}
         <button type="button" className="btn" onClick={() => setCaptions(captions.filter((_, i) => i !== index))}>자막 {index + 1} 삭제</button>

@@ -154,7 +154,7 @@ export default function ProductDbOverviewPage() {
     {
       key: 'before_registration', icon: <PackagePlus className="w-5 h-5" />, tone: 'indigo' as const,
       label: '등록 전 후보', count: ops.beforeRegistration,
-      desc: '아직 O4O 기본상품으로 등록되지 않은 후보입니다. 검토 후 등록 또는 제외하세요.',
+      desc: '아직 O4O 기본상품으로 등록되지 않은 후보입니다. 검토 후 등록 또는 제외하시기 바랍니다.',
       to: '/admin/o4o-product-db/candidates?groupedStatus=before_registration',
     },
     {

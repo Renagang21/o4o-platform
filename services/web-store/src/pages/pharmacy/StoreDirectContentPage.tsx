@@ -72,7 +72,7 @@ export default function StoreDirectContentPage() {
     saveErrorMessage: consultationSaveError,
     onSaved: (saved, unchanged, visible) => {
       if (!visible) return;
-      if (saved.conflict) { session.notify('다른 저장본을 확인했습니다. 최신 내용과 비교한 뒤 다시 저장하세요.', false); return; }
+      if (saved.conflict) { session.notify('다른 저장본을 확인했습니다. 최신 내용과 비교한 뒤 다시 저장하시기 바랍니다.', false); return; }
       if (saved.verification === false) { session.notify('저장 요청은 처리됐으나 본문·상품 연결을 다시 확인하지 못했습니다. 입력을 유지했습니다. 다시 저장하면 같은 자료를 확인합니다.', false); return; }
       if (session.draft.confirmedRevision) session.changeDraft({ confirmedRevision: undefined });
       if (unchanged) setEditing(false); },
@@ -276,7 +276,7 @@ export default function StoreDirectContentPage() {
           <RichTextEditor showInternalAi={false}
             value={editorInitialHtml}
             onChange={(c) => setEditorContent(c)}
-            placeholder="본문 내용을 입력하세요"
+            placeholder="본문 내용을 입력하시기 바랍니다"
             minHeight="420px"
             preset="full"
           />

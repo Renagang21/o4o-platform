@@ -82,7 +82,7 @@ export const O4O_SERVICE_DIRECTORY: readonly ServiceDestination[] = [
   {
     key: "lecture",
     label: "O4O 강의 · 교육·학습",
-    description: "공개 강의를 둘러보고 필요한 교육을 찾아보세요.",
+    description: "공개 강의를 둘러보고 필요한 교육을 찾아보시기 바랍니다.",
     href: "https://study.neture.co.kr/",
     category: "커뮤니티·단체활동",
     serviceKey: "lecture",

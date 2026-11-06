@@ -1,3 +1,4 @@
+import { protectedMemberSql } from '../../../services/operations/protected-member-target.js';
 /**
  * OperatorRegistrationService
  * WO-O4O-NETURE-REGISTRATION-SYSTEM-FIX-V1
@@ -33,7 +34,7 @@ export class OperatorRegistrationService {
     }
 
     const rows = await this.dataSource.query(
-      `SELECT u.id,
+      `SELECT ${protectedMemberSql("u.id")} AS "operatorReadOnly", u.id,
               u.email,
               u.name,
               u.phone,

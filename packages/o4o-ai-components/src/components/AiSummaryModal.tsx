@@ -48,7 +48,7 @@ export function AiSummaryModal({
         headers,
         credentials: 'include',
         body: JSON.stringify({
-          question: `${contextLabel || '현재 화면'}의 주요 지표와 현황을 요약해 주세요.`,
+          question: `${contextLabel || '현재 화면'}의 주요 지표와 현황을 요약해 주시기 바랍니다.`,
           contextType: 'service',
           serviceId,
           contextData: contextData || {},
@@ -61,7 +61,7 @@ export function AiSummaryModal({
           throw new Error('로그인이 필요합니다.');
         }
         if (response.status === 429) {
-          throw new Error('일일 사용량을 초과했습니다. 내일 다시 시도해 주세요.');
+          throw new Error('일일 사용량을 초과했습니다. 내일 다시 시도해 주시기 바랍니다.');
         }
         throw new Error('AI 서비스에 연결할 수 없습니다.');
       }

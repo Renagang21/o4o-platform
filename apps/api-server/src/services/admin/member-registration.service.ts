@@ -113,7 +113,7 @@ export class MemberRegistrationService {
       throw new OperationError(
         400,
         'INVALID_MEMBER_PROFILE',
-        '이름·닉네임·휴대전화를 확인해 주세요.',
+        '이름·닉네임·휴대전화를 확인해 주시기 바랍니다.',
       );
     return this.db.transaction(async (m) => {
       const row = await this.lock(m, user, input.version);
@@ -122,7 +122,7 @@ export class MemberRegistrationService {
         throw new OperationError(
           409,
           'ACCOUNT_NOT_ACTIVE',
-          '계정 이용 상태를 먼저 확인해 주세요.',
+          '계정 이용 상태를 먼저 확인해 주시기 바랍니다.',
         );
       const [membership] = await m.query(
         "SELECT status FROM service_memberships WHERE user_id=$1 AND service_key='neture' FOR UPDATE",
@@ -132,14 +132,14 @@ export class MemberRegistrationService {
         throw new OperationError(
           409,
           'MEMBER_SERVICE_INACTIVE',
-          '회원 복구는 운영자에게 요청해 주세요.',
+          '회원 복구는 운영자에게 요청해 주시기 바랍니다.',
         );
       const prior = await readRegistrationView(m, user);
       if (prior?.state === 'approved')
         throw new OperationError(
           409,
           'REGISTRATION_ALREADY_APPROVED',
-          '승인 후 정보 변경은 My Home의 해당 절차를 이용해 주세요.',
+          '승인 후 정보 변경은 My Home의 해당 절차를 이용해 주시기 바랍니다.',
         );
       await assertRegistrationDocument(m, user, value.fields);
       const scope = registrationPolicyScope(value.type);
@@ -190,7 +190,7 @@ export class MemberRegistrationService {
       throw new OperationError(
         409,
         'MEMBER_CHANGED',
-        '회원 정보가 변경되었습니다. 다시 조회해 주세요.',
+        '회원 정보가 변경되었습니다. 다시 조회해 주시기 바랍니다.',
       );
     return row;
   }
@@ -217,21 +217,21 @@ export class MemberRegistrationService {
         throw new OperationError(
           409,
           'ACCOUNT_NOT_ACTIVE',
-          '공통 계정 이용 상태를 먼저 확인해 주세요.',
+          '공통 계정 이용 상태를 먼저 확인해 주시기 바랍니다.',
         );
       const prior = await readRegistration(m, target);
       if (!prior)
         throw new OperationError(
           409,
           'REGISTRATION_REQUIRED',
-          '가입 유형과 제출 정보를 먼저 저장해 주세요.',
+          '가입 유형과 제출 정보를 먼저 저장해 주시기 바랍니다.',
         );
       if (prior.state === 'approved') {
         if (input.action !== 'approve')
           throw new OperationError(
             409,
             'REGISTRATION_ALREADY_APPROVED',
-            '승인된 회원은 회원 해지로 처리해 주세요.',
+            '승인된 회원은 회원 해지로 처리해 주시기 바랍니다.',
           );
         return {
           saved: true,
@@ -248,7 +248,7 @@ export class MemberRegistrationService {
         throw new OperationError(
           409,
           'MEMBER_SERVICE_INACTIVE',
-          '해지된 회원은 이용 복구 후 처리해 주세요.',
+          '해지된 회원은 이용 복구 후 처리해 주시기 바랍니다.',
         );
       if (input.action === 'reject') {
         await writeRegistration(m, target, {
@@ -358,7 +358,7 @@ export class MemberRegistrationService {
       throw new OperationError(
         409,
         'ENROLLMENT_POLICY_REQUIRED',
-        '회원이 해당 역할의 약관·개인정보 안내를 확인해야 합니다. 가입 정보 화면에서 해당 유형으로 제출해 주세요.',
+        '회원이 해당 역할의 약관·개인정보 안내를 확인해야 합니다. 가입 정보 화면에서 해당 유형으로 제출해 주시기 바랍니다.',
       );
   }
   private async approveLicense(
@@ -411,7 +411,7 @@ export class MemberRegistrationService {
       throw new OperationError(
         409,
         'PHARMACY_LIFECYCLE_REQUIRED',
-        '종료·정지 약국은 기존 약국 관리 절차로 처리해 주세요.',
+        '종료·정지 약국은 기존 약국 관리 절차로 처리해 주시기 바랍니다.',
       );
     const organizationId =
       existing?.organization_id ??
@@ -465,7 +465,7 @@ export class MemberRegistrationService {
       throw new OperationError(
         409,
         'SUPPLIER_LIFECYCLE_REQUIRED',
-        '이용 종료 공급자는 기존 공급자 관리 절차로 처리해 주세요.',
+        '이용 종료 공급자는 기존 공급자 관리 절차로 처리해 주시기 바랍니다.',
       );
     if (!supplier) {
       const [org] = await m.query(
@@ -490,7 +490,7 @@ export class MemberRegistrationService {
       throw new OperationError(
         409,
         'SUPPLIER_ORGANIZATION_REQUIRED',
-        '공급자 사업체 연결을 먼저 확인해 주세요.',
+        '공급자 사업체 연결을 먼저 확인해 주시기 바랍니다.',
       );
     await this.writeBusiness(m, target, supplier.organization_id, f, true);
     await m.query(
@@ -538,7 +538,7 @@ export class MemberRegistrationService {
       throw new OperationError(
         409,
         'BUSINESS_OWNER_CHANGED',
-        '현재 사업체 소유자를 다시 확인해 주세요.',
+        '현재 사업체 소유자를 다시 확인해 주시기 바랍니다.',
       );
     const metadata = supplier
       ? {
@@ -617,7 +617,7 @@ export class MemberRegistrationService {
       throw new OperationError(
         409,
         'BUSINESS_CHANGED',
-        '사업자 정보 또는 소유자가 변경되었습니다. 다시 조회해 주세요.',
+        '사업자 정보 또는 소유자가 변경되었습니다. 다시 조회해 주시기 바랍니다.',
       );
     if (
       registration.type === 'pharmacist' ||
@@ -632,13 +632,13 @@ export class MemberRegistrationService {
           throw new OperationError(
             409,
             'QUALIFICATION_CHANGED',
-            '면허 정보가 변경되었습니다. 다시 조회해 주세요.',
+            '면허 정보가 변경되었습니다. 다시 조회해 주시기 바랍니다.',
           );
         if (qualification.qualification_status !== 'approved')
           throw new OperationError(
             409,
             'QUALIFICATION_NOT_APPROVED',
-            '자격 이용 상태를 먼저 확인해 주세요.',
+            '자격 이용 상태를 먼저 확인해 주시기 바랍니다.',
           );
         await this.approveLicense(m, actor, target, f.licenseNumber!, reason);
       }
@@ -652,7 +652,7 @@ export class MemberRegistrationService {
         throw new OperationError(
           409,
           'PHARMACY_NOT_FOUND',
-          '기존 약국 연결을 확인해 주세요.',
+          '기존 약국 연결을 확인해 주시기 바랍니다.',
         );
       await this.writeBusiness(m, target, pharmacy.organization_id, f);
       await m.query(
@@ -671,7 +671,7 @@ export class MemberRegistrationService {
         throw new OperationError(
           409,
           'SUPPLIER_ORGANIZATION_REQUIRED',
-          '기존 공급자 사업체를 확인해 주세요.',
+          '기존 공급자 사업체를 확인해 주시기 바랍니다.',
         );
       await this.writeBusiness(m, target, supplier.organization_id, f, true);
       await m.query(

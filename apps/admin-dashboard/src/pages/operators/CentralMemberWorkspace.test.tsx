@@ -361,7 +361,7 @@ it('retains the focused member form after a validation error rather than reporti
   api.patch.mockRejectedValueOnce({
     response: {
       status: 400,
-      data: { error: '사업자등록번호를 확인해 주세요.' },
+      data: { error: '사업자등록번호를 확인해 주시기 바랍니다.' },
     },
   });
   mount();
@@ -374,6 +374,6 @@ it('retains the focused member form after a validation error rather than reporti
     target: { value: '합성 수정' },
   });
   fireEvent.click(screen.getByRole('button', { name: '회원 정보 저장' }));
-  await screen.findByText('사업자등록번호를 확인해 주세요.');
+  await screen.findByText('사업자등록번호를 확인해 주시기 바랍니다.');
   expect(screen.getByLabelText('사업자등록번호')).toHaveValue('123');
 });

@@ -34,14 +34,14 @@ interface Props {
 type Busy = 'link' | 'approve' | 'revision' | 'reject' | null;
 
 const ERROR_LABELS: Record<string, string> = {
-  DUPLICATE_MASTER_EXISTS: '동일 상품(바코드 또는 상품명+제조사)이 이미 존재합니다. 아래 중복 후보에서 기존 연결을 사용하세요.',
+  DUPLICATE_MASTER_EXISTS: '동일 상품(바코드 또는 상품명+제조사)이 이미 존재합니다. 아래 중복 후보에서 기존 연결을 사용하시기 바랍니다.',
   RX_NEW_MASTER_BLOCKED: '전문의약품은 매장 신규 승인 대상이 아닙니다.',
   RX_LISTING_BLOCKED: '전문의약품은 매장 경영활용 제품으로 연결할 수 없습니다.',
-  STATUS_NOT_REVIEWABLE: '이미 처리된 요청입니다. 목록을 새로고침하세요.',
+  STATUS_NOT_REVIEWABLE: '이미 처리된 요청입니다. 목록을 새로고침하시기 바랍니다.',
   ALREADY_LINKED: '이미 연결된 요청입니다.',
   CANDIDATE_SERVICE_KEY_MISSING: '요청의 서비스 정보가 없어 처리할 수 없습니다.',
   CANDIDATE_ORG_MISSING: '요청의 매장(조직) 정보가 없어 처리할 수 없습니다.',
-  REVISION_NOTE_REQUIRED: '보완 요청 사유를 입력하세요.',
+  REVISION_NOTE_REQUIRED: '보완 요청 사유를 입력하시기 바랍니다.',
 };
 
 function errMsg(e: any): string {
@@ -109,7 +109,7 @@ export default function StoreRequestReviewModal({ requestId, request, open, onCl
 
   const doApproveNew = async () => {
     if (!requestId || busy) return;
-    if (!window.confirm('이 요청을 신규 O4O 표준 상품으로 승인하고 요청 매장의 경영활용 제품에 연결합니다. 계속할까요?')) return;
+    if (!window.confirm('이 요청을 신규 O4O 표준 상품으로 승인하고 요청 매장의 경영활용 제품에 연결합니다. 계속하시겠습니까?')) return;
     setBusy('approve'); setError(null);
     try {
       await approveStoreRequestAsNewMaster(requestId, note || undefined);
@@ -127,7 +127,7 @@ export default function StoreRequestReviewModal({ requestId, request, open, onCl
 
   const doRevision = async () => {
     if (!requestId || busy) return;
-    if (!note.trim()) { setError('보완 요청 사유를 입력하세요.'); return; }
+    if (!note.trim()) { setError('보완 요청 사유를 입력하시기 바랍니다.'); return; }
     setBusy('revision'); setError(null);
     try {
       await requestStoreRequestRevision(requestId, note.trim());
@@ -137,7 +137,7 @@ export default function StoreRequestReviewModal({ requestId, request, open, onCl
 
   const doReject = async () => {
     if (!requestId || busy) return;
-    if (!window.confirm('이 요청을 등록 불가로 처리합니다. 계속할까요?')) return;
+    if (!window.confirm('이 요청을 등록 불가로 처리합니다. 계속하시겠습니까?')) return;
     setBusy('reject'); setError(null);
     try {
       await rejectStoreRequest(requestId, note.trim() || undefined);
@@ -288,7 +288,7 @@ export default function StoreRequestReviewModal({ requestId, request, open, onCl
                 </button>
               </div>
               <p className="text-xs text-gray-400">
-                ※ 기존 상품이 있으면 위 중복 후보에서 <b>연결</b>하세요. 없을 때만 <b>신규 상품 승인</b>을 사용합니다.
+                ※ 기존 상품이 있으면 위 중복 후보에서 <b>연결</b>하시기 바랍니다. 없을 때만 <b>신규 상품 승인</b>을 사용합니다.
                 승인·연결 시 요청 매장의 경영활용 제품에 자동 반영됩니다.
               </p>
             </>

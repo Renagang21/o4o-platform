@@ -19,7 +19,7 @@ export function lectureNotificationTarget(value: unknown): string | null {
 export default function NotificationsPage() {
   const { user, isAuthenticated } = useAuth();
   if (!user || !isAuthenticated) {
-    return <p>로그인 후 알림을 확인해 주세요.</p>;
+    return <p>로그인 후 알림을 확인해 주시기 바랍니다.</p>;
   }
   return (
     <OperatorNotifications

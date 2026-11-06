@@ -39,7 +39,7 @@ export default function ExternalAiDraftEntry({
   )
     return (
       <p role="alert">
-        이 약국의 자료를 열 수 없습니다. 내 매장 이용 권한을 확인해 주세요.
+        이 약국의 자료를 열 수 없습니다. 내 매장 이용 권한을 확인해 주시기 바랍니다.
       </p>
     );
   if (store.status !== "ready" || store.organizationId !== target)

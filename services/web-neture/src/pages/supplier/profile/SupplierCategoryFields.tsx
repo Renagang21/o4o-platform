@@ -29,7 +29,7 @@ export default function SupplierCategoryFields({
         <p className="text-xs text-gray-500 mb-5">
           공급 예정 품목군은 향후 상품 등록과 운영자 확인 기준을 정하기 위한 정보입니다. 일반 상품은
           별도 서류가 필요하지 않습니다. 의약품·의료기기·건강기능식품 등 일부 품목은 실제 판매 노출
-          또는 주문 가능 전 운영자 확인이 필요할 수 있습니다. 우선 공급 예정 품목군만 선택해 주세요.
+          또는 주문 가능 전 운영자 확인이 필요할 수 있습니다. 우선 공급 예정 품목군만 선택해 주시기 바랍니다.
         </p>
 
         {/* WO-O4O-NETURE-SUPPLIER-PROFILE-AUX-LOAD-ERROR-CONTRACT-V1:

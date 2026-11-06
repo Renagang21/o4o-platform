@@ -28,6 +28,10 @@ import { resolveStoreAccess, type StoreOwnerServiceKey } from '../../../utils/st
 import { readPreferredStoreOrganizationId } from '../../../utils/store-organization.resolver.js';
 import { StorePlaylistRepository } from '../repositories/store-playlist.repository.js';
 
+function validTags(tags: unknown): tags is string[] | undefined {
+  return tags === undefined || (Array.isArray(tags) && tags.length <= 20 && tags.every(tag => typeof tag === 'string' && tag.trim().length > 0 && tag.length <= 50));
+}
+
 type AuthMiddleware = RequestHandler;
 
 // ─────────────────────────────────────────────────────
@@ -70,7 +74,7 @@ export function createStorePlaylistController(
         }
 
         const items = await repo.findPublicPlaylistItems(id, serviceKey);
-        res.json({ success: true, data: { ...playlist, items } });
+        res.json({ success: true, data: { ...playlist, items, serverNow: new Date().toISOString() } });
       } catch (error: any) {
         res.status(500).json({
           success: false,
@@ -79,6 +83,16 @@ export function createStorePlaylistController(
       }
     },
   );
+
+  router.get('/required-videos', requireAuth, async (req: Request, res: Response): Promise<void> => {
+    const user = (req as AuthRequest).user;
+    if (!user?.id) { res.status(401).json({ success: false }); return; }
+    try {
+      const organizationId = await resolveStoreAccess(dataSource, user.id, user.roles || [], storeOwnerServiceKey, readPreferredStoreOrganizationId(req));
+      if (!organizationId || !serviceKey) { res.status(403).json({ success: false }); return; }
+      res.json({ success: true, data: await repo.findRequiredPlaylistItems(null, serviceKey), serverNow: new Date().toISOString() });
+    } catch { res.status(500).json({ success: false, error: { code: 'REQUIRED_VIDEOS_UNAVAILABLE' } }); }
+  });
 
   // ═══════════════════════════════════════════════════
   // AUTH ROUTES: requireAuth + pharmacy owner check
@@ -108,7 +122,7 @@ export function createStorePlaylistController(
           return;
         }
 
-        const playlists = await repo.findPlaylistsByOrganization(organizationId);
+        const playlists = await repo.findPlaylistsByOrganization(organizationId, serviceKey);
         res.json({ success: true, data: playlists });
       } catch (error: any) {
         res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: error.message } });
@@ -140,14 +154,17 @@ export function createStorePlaylistController(
           return;
         }
 
-        const { name, playlistType } = req.body;
-        if (typeof name !== 'string' || !name.trim() || name.trim().length > 255) {
+        const { name, playlistType, tags, clientRequestId } = req.body;
+        if (clientRequestId !== undefined && (typeof clientRequestId !== 'string' || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(clientRequestId))) {
+          res.status(400).json({ success: false, error: { code: 'INVALID_INPUT' } }); return;
+        }
+        if (typeof name !== 'string' || !name.trim() || name.trim().length > 255 || !validTags(tags)) {
           res.status(400).json({ success: false, error: { code: 'INVALID_INPUT', message: 'name is required' } });
           return;
         }
 
         const type = playlistType === 'SINGLE' ? 'SINGLE' : 'LIST';
-        const result = await repo.createPlaylist(organizationId, name.trim(), type);
+        const result = await repo.createPlaylist(organizationId, name.trim(), type, tags ?? [], clientRequestId);
         res.status(201).json({ success: true, data: result });
       } catch (error: any) {
         res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: error.message } });
@@ -179,14 +196,14 @@ export function createStorePlaylistController(
         }
 
         const { id } = req.params;
-        const { name, publishStatus, isActive } = req.body;
+        const { name, publishStatus, isActive, tags } = req.body;
+        if (!validTags(tags) || (name !== undefined && (typeof name !== 'string' || !name.trim() || name.trim().length > 255))) {
+          res.status(400).json({ success: false, error: { code: 'INVALID_INPUT' } }); return;
+        }
 
         // Validate: at least one valid field to update
-        const updates: { name?: string; publishStatus?: string; isActive?: boolean } = {};
-        if (name !== undefined && (typeof name !== 'string' || !name.trim() || name.trim().length > 255)) {
-          res.status(400).json({ success: false, error: { code: 'INVALID_INPUT', message: '재생목록 이름은 1~255자로 입력해 주세요.' } });
-          return;
-        }
+        const updates: { name?: string; tags?: string[]; publishStatus?: string; isActive?: boolean } = {};
+        if (tags !== undefined) updates.tags = tags;
         if (name !== undefined) updates.name = name.trim();
         if (publishStatus === 'draft' || publishStatus === 'published') updates.publishStatus = publishStatus;
         if (isActive !== undefined) updates.isActive = isActive;
@@ -269,7 +286,7 @@ export function createStorePlaylistController(
         }
         const organizationId = await resolveStoreAccess(dataSource, userId, userRoles, storeOwnerServiceKey, readPreferredStoreOrganizationId(req));
         if (!organizationId) {
-          res.json({ success: true, data: [] });
+          res.status(403).json({ success: false, error: { code: 'STORE_ACCESS_REQUIRED', message: '승인된 매장 이용 자격을 확인해 주세요.' } });
           return;
         }
 
@@ -478,6 +495,10 @@ export function createStorePlaylistController(
           return;
         }
 
+        const allowed = new Set((await repo.findPlaylistItems(id, serviceKey)).map(item => item.id));
+        if (order.some((key: unknown) => typeof key !== 'string' || !allowed.has(key)) || new Set(order).size !== order.length) {
+          res.status(400).json({ success: false, error: { code: 'INVALID_ITEM_ORDER' } }); return;
+        }
         const result = await repo.reorderItems(id, order);
         res.json({ success: true, data: result });
       } catch (error: any) {

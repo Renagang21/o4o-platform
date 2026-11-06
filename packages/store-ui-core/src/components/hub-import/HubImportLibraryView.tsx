@@ -150,7 +150,7 @@ export function HubImportLibraryView<T extends HubImportLibraryRow>({
       {core.slugResolved && !core.slug && (
         <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 text-sm text-amber-800 mb-4">
           매장 정보가 연결되지 않아 가져가기 기능을 사용할 수 없습니다. 매장 등록 후 다시 시도해
-          주세요.
+          주시기 바랍니다.
         </div>
       )}
 

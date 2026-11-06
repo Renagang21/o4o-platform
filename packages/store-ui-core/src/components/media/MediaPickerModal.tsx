@@ -232,7 +232,7 @@ export function MediaPickerModal({
     if (objectUrl.current) { URL.revokeObjectURL(objectUrl.current); objectUrl.current = null; }
     setPreview(null); setUploadedAsset(null); setUploadError(null);
     if (assetType === 'video' && (!['video/mp4', 'video/webm'].includes(f.type) || f.size > 30 * 1024 * 1024)) {
-      setFile(null); setUploadError('MP4/WebM 영상 30MB까지 올릴 수 있습니다. 큰 영상은 YouTube에 저장한 뒤 영상 주소를 등록해 주세요.'); return;
+      setFile(null); setUploadError('MP4/WebM 영상 30MB까지 올릴 수 있습니다. 큰 영상은 YouTube에 저장한 뒤 영상 주소를 등록해 주시기 바랍니다.'); return;
     }
     setFile(f);
     if (assetType === 'video') { objectUrl.current = URL.createObjectURL(f); setPreview(objectUrl.current); }
@@ -251,7 +251,7 @@ export function MediaPickerModal({
       const res = await api.upload(file, true, undefined, uploadFolder);
       if (key !== requestKey.current) return;
       if (!res.success || !res.data || (assetType === 'video' && !isStoredVideo(res.data)))
-        throw new Error(res.error || '업로드 결과를 확인하지 못했습니다. 라이브러리에서 먼저 확인해 주세요.');
+        throw new Error(res.error || '업로드 결과를 확인하지 못했습니다. 라이브러리에서 먼저 확인해 주시기 바랍니다.');
       setUploadedAsset(res.data);
     } catch (error) { if (key === requestKey.current) setUploadError(error instanceof Error ? error.message : '업로드를 확인하지 못했습니다.'); }
     finally { if (key === requestKey.current) { uploadLock.current = false; setUploading(false); } }
@@ -429,7 +429,7 @@ export function MediaPickerModal({
                     {preview && assetType !== 'video' && <img src={preview} alt="미리보기" className="max-h-40 mx-auto rounded-lg object-contain" />}
                     {!preview && <>
                         <Upload size={24} className="mx-auto text-slate-300 mb-2" />
-                        <p className="text-sm text-slate-500">클릭하여 {label}을 선택하세요</p>
+                        <p className="text-sm text-slate-500">클릭하여 {label}을 선택하시기 바랍니다</p>
                         <p className="text-xs text-slate-400 mt-1">{assetType === 'video' ? 'MP4, WebM · 30MB까지 · 일반 보관 자산으로 저장' : 'JPEG, PNG, WebP, GIF'}</p>
                       </>}
                   </div>
@@ -467,7 +467,7 @@ export function MediaPickerModal({
                     )}
                   </button>
 
-                  {uploading && assetType === 'video' && <output className="block text-sm text-blue-800"><progress aria-label="영상 파일 업로드 중" className="w-full" />영상 크기와 인터넷 속도에 따라 수 분 이상 걸릴 수 있습니다. 보관 완료 안내가 나올 때까지 기다려 주세요.</output>}
+                  {uploading && assetType === 'video' && <output className="block text-sm text-blue-800"><progress aria-label="영상 파일 업로드 중" className="w-full" />영상 크기와 인터넷 속도에 따라 수 분 이상 걸릴 수 있습니다. 보관 완료 안내가 나올 때까지 기다려 주시기 바랍니다.</output>}
               {uploadError && (
                     <p className="text-sm text-red-600 bg-red-50 rounded-lg px-3 py-2">{uploadError}</p>
                   )}
@@ -476,7 +476,7 @@ export function MediaPickerModal({
                 <div className="text-center space-y-4">
                   <div className="bg-emerald-50 rounded-xl p-4">
                     <Check size={24} className="mx-auto text-emerald-600 mb-2" />
-                    <p className="text-sm font-medium text-emerald-700">{assetType === 'video' ? '파일 보관 완료 · 선택 후 영상 목록에 등록해 주세요' : '업로드 완료'}</p>
+                    <p className="text-sm font-medium text-emerald-700">{assetType === 'video' ? '파일 보관 완료 · 선택 후 영상 목록에 등록해 주시기 바랍니다' : '업로드 완료'}</p>
                     {assetType === 'video' ? <video muted src={uploadedAsset.url} controls preload="metadata" aria-label="보관 영상 미리보기" className="max-h-32 mx-auto" /> : <img src={uploadedAsset.url} alt="업로드됨" className="max-h-32 mx-auto mt-3 rounded-lg object-contain" />}
                     <p className="text-xs text-slate-500 mt-2">{uploadedAsset.originalName}</p>
                     <p className="text-[10px] text-slate-400 mt-1">

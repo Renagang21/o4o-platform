@@ -13,7 +13,7 @@ import { authClient } from '../../lib/apiClient';
 import { useAuth } from '../../contexts/AuthContext';
 const errorMessage = (e: unknown) =>
   (e as { response?: { data?: { error?: string } } }).response?.data?.error ??
-  '처리하지 못했습니다. 다시 확인해 주세요.';
+  '처리하지 못했습니다. 다시 확인해 주시기 바랍니다.';
 export default function MemberRegistrationForm() {
   const { user } = useAuth();
   const [loading, setLoading] = useState(true),
@@ -157,7 +157,7 @@ export default function MemberRegistrationForm() {
       {state === 'approved' && (
         <p role="status">
           승인된 가입 정보입니다. 사업자 변경은 My Home의 해당 절차를 이용해
-          주세요.
+          주시기 바랍니다.
         </p>
       )}
       {state === 'pending' && <p role="status">가입 검토 대기 중입니다.</p>}

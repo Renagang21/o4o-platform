@@ -54,16 +54,16 @@ export function validateProductForm(
 ): Record<string, string> {
   const errors: Record<string, string> = {};
   if (mode === 'edit' && !data.marketingName?.trim()) {
-    errors.marketingName = '상품명을 입력해주세요';
+    errors.marketingName = '상품명을 입력해 주시기 바랍니다';
   }
   if (mode === 'create' && (!data.priceGeneral || data.priceGeneral <= 0)) {
-    errors.priceGeneral = '공급가를 입력해주세요';
+    errors.priceGeneral = '공급가를 입력해 주시기 바랍니다';
   }
   if (data.priceGeneral != null && data.priceGeneral < 0) {
-    errors.priceGeneral = '0 이상 입력해주세요';
+    errors.priceGeneral = '0 이상 입력해 주시기 바랍니다';
   }
   if (data.consumerReferencePrice != null && data.consumerReferencePrice < 0) {
-    errors.consumerReferencePrice = '0 이상 입력해주세요';
+    errors.consumerReferencePrice = '0 이상 입력해 주시기 바랍니다';
   }
   return errors;
 }
@@ -241,7 +241,7 @@ export default function ProductForm({ mode, initialData, onChange, disabled = fa
           />
           {masterNameReadOnly ? (
             <p className="mt-1 text-xs text-slate-500">
-              O4O 기준 상품정보입니다. 공급자 화면에서는 수정되지 않습니다 (수정이 필요하면 운영자에게 요청하세요).
+              O4O 기준 상품정보입니다. 공급자 화면에서는 수정되지 않습니다 (수정이 필요하면 운영자에게 요청하시기 바랍니다).
             </p>
           ) : (
             <FieldError error={errors.marketingName} />
@@ -354,7 +354,7 @@ export default function ProductForm({ mode, initialData, onChange, disabled = fa
       {/* ── B. 서비스별 공급 설정 ── */}
       <div>
         <FieldLabel>서비스별 공급</FieldLabel>
-        <p className="text-xs text-slate-400 mb-3">특정 서비스에 공급하려면 선택하세요 (승인 필요)</p>
+        <p className="text-xs text-slate-400 mb-3">특정 서비스에 공급하려면 선택하시기 바랍니다 (승인 필요)</p>
         <div className="grid grid-cols-2 gap-2">
           {AVAILABLE_SERVICES.map((svc) => {
             const selected = (data.serviceKeys || []).includes(svc.key);

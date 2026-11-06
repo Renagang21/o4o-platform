@@ -490,7 +490,7 @@ export default function ProductMasterDetailPage() {
               <textarea
                 value={noteText}
                 onChange={(e) => setNoteText(e.target.value)}
-                placeholder="확인 사항 / 보류 사유 / 후속 작업을 기록하세요"
+                placeholder="확인 사항 / 보류 사유 / 후속 작업을 기록하시기 바랍니다"
                 rows={3}
                 maxLength={4000}
                 className="border border-gray-300 rounded px-3 py-2 text-sm resize-y"
@@ -760,7 +760,7 @@ function StoreDescriptionPanel({ masterId, canWrite }: { masterId: string; canWr
   useEffect(() => { reload(); }, [masterId]);
 
   const save = async () => {
-    if (!content.trim()) { setError('설명서 본문을 입력하세요'); return; }
+    if (!content.trim()) { setError('설명서 본문을 입력하시기 바랍니다'); return; }
     setBusy(true); setError(null);
     try {
       await saveProductMasterStoreDescription(masterId, { content, summary: summary || null, language });

@@ -52,7 +52,7 @@ function Recruitments() {
     try {
       await neturePharmacyApi.applyRecruitment(r.id);
       if (!businesses.isCurrent()) return;
-      setMessage(`${r.productName} 모집에 참여 신청했습니다. 공급자의 참여 결정을 기다려 주세요.`);
+      setMessage(`${r.productName} 모집에 참여 신청했습니다. 공급자의 참여 결정을 기다려 주시기 바랍니다.`);
       await load();
     } catch (e) {
       if (businesses.isCurrent()) setActionError(pharmacyErrorMessage(e, '참여 신청에 실패했습니다.'));

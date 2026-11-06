@@ -280,7 +280,7 @@ export default function SupplierSettlementsPage() {
       {/* Header */}
       <div style={styles.header}>
         <h1 style={styles.title}>정산 관리</h1>
-        <p style={styles.subtitle}>배송 완료된 주문의 정산 현황을 확인하세요.</p>
+        <p style={styles.subtitle}>배송 완료된 주문의 정산 현황을 확인하시기 바랍니다.</p>
       </div>
 
       {/* KPI Cards */}

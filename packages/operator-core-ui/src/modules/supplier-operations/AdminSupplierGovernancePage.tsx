@@ -120,7 +120,7 @@ export default function AdminSupplierGovernancePage() {
         if (result.code === 'SUPPLIER_DEACTIVATION_BLOCKED' && result.blocked) {
           setActionMessage({
             type: 'error',
-            text: `비활성화할 수 없습니다 — 진행 주문 ${result.blocked.activeOrderCount}건 · 미정산 ${result.blocked.unsettledCount}건 · 정산 진행 ${result.blocked.settlementInProgressCount}건. 처리 완료 후 다시 시도해 주세요.`,
+            text: `비활성화할 수 없습니다 — 진행 주문 ${result.blocked.activeOrderCount}건 · 미정산 ${result.blocked.unsettledCount}건 · 정산 진행 ${result.blocked.settlementInProgressCount}건. 처리 완료 후 다시 시도해 주시기 바랍니다.`,
           });
           setDialog(null);
           await loadSuppliers();
@@ -138,9 +138,9 @@ export default function AdminSupplierGovernancePage() {
           await loadSuppliers();
           return;
         }
-        setActionMessage({ type: 'error', text: '상태 변경에 실패했습니다. 잠시 후 다시 시도해 주세요.' });
+        setActionMessage({ type: 'error', text: '상태 변경에 실패했습니다. 잠시 후 다시 시도해 주시기 바랍니다.' });
       } catch {
-        if (current()) setActionMessage({ type: 'error', text: '상태 변경에 실패했습니다. 입력한 사유를 확인하고 다시 시도해 주세요.' });
+        if (current()) setActionMessage({ type: 'error', text: '상태 변경에 실패했습니다. 입력한 사유를 확인하고 다시 시도해 주시기 바랍니다.' });
       } finally {
         submitting.current = false;
         if (current()) setActionLoading(false);
@@ -242,7 +242,7 @@ export default function AdminSupplierGovernancePage() {
         '',
         '비활성화하면 상품 승인이 회수되고 매장 진열·HUB 게시가 중단됩니다.',
         '진행 주문 또는 미정산이 있으면 비활성화할 수 없습니다.',
-        '변경 사유를 입력해 주세요.',
+        '변경 사유를 입력해 주시기 바랍니다.',
       ].join('\n')
     : '';
 
@@ -257,7 +257,7 @@ export default function AdminSupplierGovernancePage() {
         '다음은 자동 복구되지 않습니다 (운영자·공급자가 재수행):',
         '· 상품 승인 · 매장 진열 · HUB 게시 · 기타 상거래 상태',
         '',
-        '변경 사유를 입력해 주세요.',
+        '변경 사유를 입력해 주시기 바랍니다.',
       ].join('\n')
     : '';
 

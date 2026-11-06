@@ -1,3 +1,4 @@
+import MemberReviewInformation from './MemberReviewInformation';
 import { useState } from 'react';
 import { authClient } from '@o4o/auth-client';
 import { MEMBER_STATUS_LABELS } from '@o4o/types';
@@ -33,8 +34,9 @@ export default function MemberWorkPanel({
       mode === 'reject' ? 'reject' : null,
     ),
     [reason, setReason] = useState('');
-  const editing = mode === 'edit' && permissions.edit;
-  const reviewable = registration && registration.state !== 'approved';
+  const readOnly = member.operatorReadOnly && !adminMode;
+  const editing = !readOnly && mode === 'edit' && permissions.edit;
+  const reviewable = !readOnly && registration && registration.state !== 'approved';
   const initialLifecycle = ['suspended', 'withdrawn'].includes(
     member.serviceStatus ?? '',
   )
@@ -42,6 +44,7 @@ export default function MemberWorkPanel({
     : 'terminate';
   return (
     <div className="space-y-4">
+      {readOnly && <output className="block">전체 관리자 — 처리 대상 아님</output>}
       {adminMode &&
         mode === 'delete' &&
         permissions.erase &&
@@ -62,7 +65,7 @@ export default function MemberWorkPanel({
             />
           </section>
         )}
-      {mode === 'delete' && (
+      {!readOnly && mode === 'delete' && (
         <MemberLifecycleActions
           adminMode={adminMode}
           initialAction={!adminMode ? initialLifecycle : null}
@@ -76,7 +79,7 @@ export default function MemberWorkPanel({
         회원 상태:{' '}
         {MEMBER_STATUS_LABELS[member.serviceStatus ?? ''] ?? '확인 필요'}
       </p>
-      <MemberProfileForm
+      {!editing ? <MemberReviewInformation detail={detail} busy={busy} onBusyChange={onBusyChange} onAccessLost={onAccessLost} /> : <MemberProfileForm
         detail={detail}
         editing={editing}
         busy={busy}
@@ -84,7 +87,7 @@ export default function MemberWorkPanel({
         onCancel={() => onModeChange('detail')}
         onBusyChange={onBusyChange}
         onAccessLost={onAccessLost}
-      />
+      />}
       {!editing && reviewable && actorId !== member.userId && (
         <div className="flex gap-3">
           <button

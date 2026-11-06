@@ -13,7 +13,7 @@ const grantColumns = `menu_keys AS "menuKeys",to_char(updated_at,'YYYY-MM-DD"T"H
 export function validateCentralMenuKeys(role: string, input: unknown): string[] {
   const allowed = new Set(centralMenusForRole(role).map(menu => menu.key));
   if (!Array.isArray(input) || input.length > 256 || input.some(key => typeof key !== 'string' || !allowed.has(key)) || role === 'platform:super_admin')
-    throw new OperationError(400, 'INVALID_CENTRAL_MENU_GRANTS', '해당 서비스 역할에 위임할 수 있는 업무 메뉴를 선택해 주세요.');
+    throw new OperationError(400, 'INVALID_CENTRAL_MENU_GRANTS', '해당 서비스 역할에 위임할 수 있는 업무 메뉴를 선택해 주시기 바랍니다.');
   return [...new Set(input)].sort((left,right)=>left.localeCompare(right));
 }
 
@@ -55,7 +55,7 @@ export async function assertCentralOperationMenu(db: Db, userId: string, service
 export async function assertCentralOperationRequest(db: Db, userId: string, service: CentralOperationService, requested: readonly string[], authMethod?: string) {
   const keys = await centralServiceMenuRestrictions(db,userId,service);
   if (keys === null) return;
-  if (authMethod !== 'google') throw new OperationError(403,'CENTRAL_GOOGLE_REQUIRED','직영 운영 업무는 Google로 로그인해 주세요.');
+  if (authMethod !== 'google') throw new OperationError(403,'CENTRAL_GOOGLE_REQUIRED','직영 운영 업무는 Google로 로그인해 주시기 바랍니다.');
   if (!requested.some(key => keys.includes(key))) throw new OperationError(403,'CENTRAL_MENU_NOT_DELEGATED','이 업무를 위임받지 않았습니다.');
 }
 
@@ -69,7 +69,7 @@ async function assignment(db: Db, userId: string, role: string, lock = false) {
       SELECT 1 FROM central_operation_menu_grants g WHERE g.assignment_id=ra.id AND g.admin_operations=true)))
     AND (valid_from IS NULL OR valid_from<=now()) AND (valid_until IS NULL OR valid_until>=now()) ${lock ? 'FOR UPDATE' : ''}`, [userId, role, CENTRAL_DELEGATION_SCOPE, ADMIN_OPERATIONS_OPERATOR_ROLES]);
   if (!row || !centralMenusForRole(role).length || role === 'platform:super_admin')
-    throw new OperationError(404, 'CENTRAL_ASSIGNMENT_NOT_FOUND', '유효한 직영 업무 위임을 찾을 수 없습니다. 초대 수락과 역할 유효기간을 확인해 주세요.');
+    throw new OperationError(404, 'CENTRAL_ASSIGNMENT_NOT_FOUND', '유효한 직영 업무 위임을 찾을 수 없습니다. 초대 수락과 역할 유효기간을 확인해 주시기 바랍니다.');
   return String(row.id);
 }
 
@@ -92,7 +92,7 @@ export class CentralOperationMenuGrantService {
       await platformAdmin(m, actor);
       const id = await assignment(m, userId, role, true);
       const [prior]: Grant[] = await m.query(`SELECT ${grantColumns} FROM central_operation_menu_grants WHERE assignment_id=$1 FOR UPDATE`, [id]);
-      if ((prior?.version ?? null) !== input.version) throw new OperationError(409, 'CENTRAL_MENU_GRANTS_CHANGED', '다른 관리자가 변경했습니다. 다시 조회한 뒤 설정해 주세요.');
+      if ((prior?.version ?? null) !== input.version) throw new OperationError(409, 'CENTRAL_MENU_GRANTS_CHANGED', '다른 관리자가 변경했습니다. 다시 조회한 뒤 설정해 주시기 바랍니다.');
       const [saved]: Grant[] = await m.query(`INSERT INTO central_operation_menu_grants(assignment_id,menu_keys) VALUES($1,$2)
         ON CONFLICT(assignment_id) DO UPDATE SET menu_keys=$2,updated_at=clock_timestamp() RETURNING ${grantColumns}`, [id, menuKeys]);
       await recordOperation(m, role.split(':')[0], actor, 'operator.central_menu_grants_changed', { targetUserId: userId, role, menuKeys, reason });

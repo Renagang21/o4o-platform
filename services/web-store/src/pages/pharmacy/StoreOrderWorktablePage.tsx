@@ -295,7 +295,7 @@ export function StoreOrderWorktablePage() {
     return (
       <div style={S.container}>
         <Header />
-        <ProductDescriptionLookup />
+        <details><summary style={{ minHeight: '44px', cursor: 'pointer', fontSize: '14px', fontWeight: 600 }}>제품 설명 조회</summary><ProductDescriptionLookup /></details>
         <div style={S.stateCenter}>
           <Package size={48} style={{ color: colors.neutral300 }} />
           <p style={{ color: colors.neutral700, fontSize: '15px', fontWeight: 600, marginTop: '16px' }}>
@@ -315,7 +315,7 @@ export function StoreOrderWorktablePage() {
   return (
     <div style={S.container}>
       <Header />
-      <ProductDescriptionLookup />
+      <details><summary style={{ minHeight: '44px', cursor: 'pointer', fontSize: '14px', fontWeight: 600 }}>제품 설명 조회</summary><ProductDescriptionLookup /></details>
 
       <div className="grid grid-cols-1 gap-6 mt-5 items-start lg:grid-cols-[minmax(0,1fr)_320px]">
         {/* ── Left: Table ── */}

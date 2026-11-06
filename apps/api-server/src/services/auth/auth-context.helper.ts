@@ -70,7 +70,7 @@ export async function generateTokensWithContext(
   );
   const rows = Array.isArray(result[0]) ? result[0] : result;
   const reuseFamily: string | undefined = rows[0]?.refreshTokenFamily;
-  if (!reuseFamily) throw Object.assign(new Error('세션이 변경되었습니다. 다시 로그인해 주세요.'), { code: 'SESSION_CHANGED_RETRY_LOGIN', statusCode: 409 });
+  if (!reuseFamily) throw Object.assign(new Error('세션이 변경되었습니다. 다시 로그인해 주시기 바랍니다.'), { code: 'SESSION_CHANGED_RETRY_LOGIN', statusCode: 409 });
 
   const tokens = tokenUtils.generateTokens(
     user,

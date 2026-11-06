@@ -40,7 +40,7 @@ export function MultilingualImportDialog({ item, isCurrent, onClose, onImported 
       if (page > last) { setPage(last); return; }
       setProducts(data.items); setTotal(data.pagination.total);
     } catch {
-      if (current() && isCurrent()) setError('연결할 제품을 불러오지 못했습니다. 다시 시도해 주세요.');
+      if (current() && isCurrent()) setError('연결할 제품을 불러오지 못했습니다. 다시 시도해 주시기 바랍니다.');
     } finally {
       if (current() && isCurrent()) setLoading(false);
     }
@@ -63,7 +63,7 @@ export function MultilingualImportDialog({ item, isCurrent, onClose, onImported 
       if (!group?.id || group.targetId !== selected.sourceId || group.targetKind !== kind) throw new Error('Invalid import');
       onImported(group);
     } catch {
-      if (current() && isCurrent()) setWriteError('가져오기 결과를 확인하지 못했습니다. 선택한 제품을 유지했습니다. 내 매장 콘텐츠를 확인하거나 다시 시도해 주세요.');
+      if (current() && isCurrent()) setWriteError('가져오기 결과를 확인하지 못했습니다. 선택한 제품을 유지했습니다. 내 매장 콘텐츠를 확인하거나 다시 시도해 주시기 바랍니다.');
     } finally {
       writing.current = false;
       if (current() && isCurrent()) setSaving(false);
@@ -79,7 +79,7 @@ export function MultilingualImportDialog({ item, isCurrent, onClose, onImported 
   } else {
     productBody = <label className="block text-sm">연결할 제품<select aria-label="연결할 제품" value={products.some(p => p.sourceId === selected?.sourceId) ? selected?.sourceId || '' : ''}
       className="block border rounded p-2 w-full min-h-11" onChange={e => setSelected(products.find(p => p.sourceId === e.target.value) ?? null)}>
-      <option value="">제품을 선택하세요</option>{products.map(p => <option key={p.sourceId} value={p.sourceId}>{p.name}</option>)}
+      <option value="">제품을 선택하시기 바랍니다</option>{products.map(p => <option key={p.sourceId} value={p.sourceId}>{p.name}</option>)}
     </select></label>;
   }
   return <div className="fixed inset-0 z-50 flex items-center justify-center p-3">
@@ -102,7 +102,7 @@ export function MultilingualImportDialog({ item, isCurrent, onClose, onImported 
         <div><h2 id="mlc-import-heading" className="font-bold">가져오기 — 매장 제품 연결</h2><p className="text-sm break-words">{item.title}</p></div>
         <button type="button" aria-label="가져오기 닫기" disabled={saving} onClick={close} className="min-h-11 px-3">닫기</button>
       </div>
-      <p className="text-xs text-amber-800">같은 제품에 다시 가져오면 기존 사본의 내용이 덮어쓰기 됩니다. 선택한 제품을 확인해 주세요.</p>
+      <p className="text-xs text-amber-800">같은 제품에 다시 가져오면 기존 사본의 내용이 덮어쓰기 됩니다. 선택한 제품을 확인해 주시기 바랍니다.</p>
       <fieldset disabled={saving} className="space-y-3">
         <label className="block text-sm">제품 종류<select aria-label="제품 종류" className="block border rounded p-2 w-full min-h-11" value={kind} onChange={e => {
           if (writing.current) return;

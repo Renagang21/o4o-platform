@@ -143,7 +143,7 @@ export const supplierRecruitmentApi = {
     data?: { id: string; supplyUnitPrice: number; idempotent: boolean };
   }> {
     const unavailable = {success: false, error: 'SUPPLY_PRICE_CONFIRMATION_UNAVAILABLE',
-      message: '확정 결과를 확인하지 못했습니다. 같은 금액으로 다시 확인해 주세요.'};
+      message: '확정 결과를 확인하지 못했습니다. 같은 금액으로 다시 확인해 주시기 바랍니다.'};
     try {
       const response = await api.patch(`/neture/seller-recruitment/recruitments/${id}/supply-price`, {supplyUnitPrice});
       return typeof response.data?.success === 'boolean' ? response.data : unavailable;

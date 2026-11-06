@@ -120,7 +120,7 @@ export function StoreQrPlacementPanel({
         <div className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs leading-relaxed text-amber-900">
           이 QR 은 여러 사용처에 배치되어 있습니다.{' '}
           <span className="font-semibold">스캔이 어느 위치에서 발생했는지는 구분할 수 없습니다.</span>{' '}
-          위치별 통계가 필요하면 <span className="font-semibold">[같은 콘텐츠로 QR 추가]</span> 로 사용처별 QR 을 발급하세요.
+          위치별 통계가 필요하면 <span className="font-semibold">[같은 콘텐츠로 QR 추가]</span> 로 사용처별 QR 을 발급하시기 바랍니다.
         </div>
       )}
 

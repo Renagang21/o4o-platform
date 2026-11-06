@@ -185,7 +185,7 @@ export default function ContentFormModal({ content, onClose, onSave }: ContentFo
 
     // V2: 상세 조회 실패/미조회 상태에서는 저장을 허용하지 않는다.
     if (!isHydrated) {
-      toast.error('본문을 불러오지 못한 상태에서는 저장할 수 없습니다. 창을 닫고 다시 시도해 주세요.');
+      toast.error('본문을 불러오지 못한 상태에서는 저장할 수 없습니다. 창을 닫고 다시 시도해 주시기 바랍니다.');
       return;
     }
 
@@ -627,7 +627,7 @@ export default function ContentFormModal({ content, onClose, onSave }: ContentFo
                 <div className="p-3 bg-red-50 border border-red-200 rounded-md">
                   <p className="text-sm text-red-700">
                     기존 본문을 불러오지 못했습니다. 콘텐츠 훼손을 막기 위해 저장이 차단되었습니다.
-                    창을 닫고 다시 시도해 주세요.
+                    창을 닫고 다시 시도해 주시기 바랍니다.
                   </p>
                 </div>
               )}

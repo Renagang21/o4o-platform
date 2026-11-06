@@ -236,7 +236,7 @@ export default function TabletContentLibraryList({
     if (!renameFor || renameLock.current || !isCurrent()) return;
     const current = renameRequests.begin();
     const name = renameName.trim();
-    if (!name) { toast.error('이름을 입력해 주세요.'); return; }
+    if (!name) { toast.error('이름을 입력해 주시기 바랍니다.'); return; }
     renameLock.current = true; setRenameBusy(true);
     try {
       await updateScreenSet(renameFor.id, { name, description: renameDesc.trim() || null });
@@ -245,7 +245,7 @@ export default function TabletContentLibraryList({
       setRenameFor(null);
       onRefresh();
     } catch {
-      if (current() && isCurrent()) toast.error('이름·설명을 저장하지 못했습니다. 입력을 유지했습니다. 다시 시도해 주세요.');
+      if (current() && isCurrent()) toast.error('이름·설명을 저장하지 못했습니다. 입력을 유지했습니다. 다시 시도해 주시기 바랍니다.');
     } finally {
       renameLock.current = false; if (current() && isCurrent()) setRenameBusy(false);
     }
@@ -286,7 +286,7 @@ export default function TabletContentLibraryList({
   const openApply = useCallback((s: ScreenSet) => {
     if (!onApplyToTablet) return;
     if (!tablets || tablets.length === 0) {
-      toast.error('먼저 ‘위치별 운영’에서 위치를 추가해 주세요.');
+      toast.error('먼저 ‘위치별 운영’에서 위치를 추가해 주시기 바랍니다.');
       return;
     }
     setApplyError(null); setApplyFor(s);
@@ -302,7 +302,7 @@ export default function TabletContentLibraryList({
       setApplyFor(null);
       onRefresh();
     } catch (error) {
-      if (isCurrent()) setApplyError(error instanceof Error ? error.message : '적용하지 못했습니다. 위치를 다시 눌러 시도하세요.');
+      if (isCurrent()) setApplyError(error instanceof Error ? error.message : '적용하지 못했습니다. 위치를 다시 눌러 시도하시기 바랍니다.');
     } finally {
       applyLock.current = false; if (isCurrent()) setApplyBusyTabletId(null);
     }
@@ -313,7 +313,7 @@ export default function TabletContentLibraryList({
   const [preview, setPreview] = useState<{ name: string; screen: TabletScreenResponse; view: 'tablet' | 'mobile' } | null>(null);
   const [previewBusy, setPreviewBusy] = useState<string | null>(null);
   const handlePreview = useCallback(async (s: ScreenSet) => {
-    if (!canPreview) { toast.error('매장 공개 주소를 불러오는 중입니다. 잠시 후 다시 시도해 주세요.'); return; }
+    if (!canPreview) { toast.error('매장 공개 주소를 불러오는 중입니다. 잠시 후 다시 시도해 주시기 바랍니다.'); return; }
     if (!isCurrent()) return;
     const current = previewRequests.begin();
     // WO-...-PREVIEW-CORNER-CONTEXT-AND-LABEL-FIX-V1: 리스트 단독 미리보기 = 코너 문맥 없음 → Screen Set 원본 기준(상품 미표시).
@@ -325,7 +325,7 @@ export default function TabletContentLibraryList({
       const screen = await previewScreenSet({ templateKey: detail.templateKey, blocks: detail.blocks });
       if (current() && isCurrent()) setPreview({ name: s.name, screen, view: 'tablet' });
     } catch {
-      if (current() && isCurrent()) toast.error('미리보기를 불러오지 못했습니다. 다시 시도해 주세요.');
+      if (current() && isCurrent()) toast.error('미리보기를 불러오지 못했습니다. 다시 시도해 주시기 바랍니다.');
     } finally { if (current() && isCurrent()) setPreviewBusy(null); }
   }, [canPreview, previewRequests, isCurrent, onPreviewContext]);
 
@@ -434,7 +434,7 @@ export default function TabletContentLibraryList({
         if (r.status === 'fulfilled') return { id, status: 'success' as const };
         const err = r.reason as { code?: string; message?: string } | null;
         const error = (err?.code === 'SCREEN_SET_IN_USE' || err?.code === 'ARCHIVE_BLOCKED_CONNECTED')
-          ? '위치에 연결되어 있어 보관할 수 없습니다. 먼저 위치 연결을 해제하세요'
+          ? '위치에 연결되어 있어 보관할 수 없습니다. 먼저 위치 연결을 해제하시기 바랍니다'
           : err?.message || '보관하지 못했습니다';
         return { id, status: 'failed' as const, error };
       });
@@ -576,11 +576,21 @@ export default function TabletContentLibraryList({
 
   return (
     <div className="space-y-3" ref={listTopRef}>
+      {/* 신규 등록은 상단 오른쪽 — 정본 O4O-STANDARD-LIST-WORKSPACE-CONTRACT-V1 */}
+      <div className="flex justify-end">
+        <button
+          type="button"
+          onClick={onCreate}
+          className="inline-flex items-center gap-1.5 px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-semibold hover:bg-indigo-700 shrink-0"
+        >
+          <Plus className="w-4 h-4" /> 태블릿 화면 만들기
+        </button>
+      </div>
       {savedRow && (
         <section aria-label="저장한 안내 다음 작업" className="rounded-xl border border-teal-200 bg-teal-50 p-4 space-y-2">
           <p role="status" className="text-sm font-semibold text-teal-900">“{savedRow.name}” 내용을 저장했습니다.</p>
-          <p className="text-sm text-teal-800">현재 사용 위치: {(usageBySet[savedRow.id] ?? []).join(', ') || '아직 적용하지 않음'}. 실제 기기 재생은 현장에서 확인하세요.</p>
-          {savedRow.status === 'archived' && <p className="text-sm text-teal-800">보관된 안내입니다. 다시 사용하려면 목록에서 보관을 해제하세요.</p>}
+          <p className="text-sm text-teal-800">현재 사용 위치: {(usageBySet[savedRow.id] ?? []).join(', ') || '아직 적용하지 않음'}. 실제 기기 재생은 현장에서 확인하시기 바랍니다.</p>
+          {savedRow.status === 'archived' && <p className="text-sm text-teal-800">보관된 안내입니다. 다시 사용하려면 목록에서 보관을 해제하시기 바랍니다.</p>}
           <div className="flex flex-wrap gap-2">
             {onApplyToTablet && savedRow.status === 'active' && <button type="button" onClick={() => openApply(savedRow)} disabled={busy || loading} className="min-h-11 px-4 py-2 rounded-lg bg-teal-600 text-white disabled:opacity-50">사용할 위치 선택</button>}
             <button type="button" onClick={() => onEdit(savedRow.id)} disabled={busy || loading} className="min-h-11 px-4 py-2 rounded-lg border border-teal-300 bg-white text-teal-800 disabled:opacity-50">저장한 안내 수정</button>
@@ -592,11 +602,11 @@ export default function TabletContentLibraryList({
         <div className="flex items-center gap-2 rounded-xl border border-teal-200 bg-teal-50 px-3 py-2 text-sm text-teal-800">
           <Check className="w-4 h-4 shrink-0" />
           <span className="min-w-0">
-            방금 가져온 <b className="truncate">“{highlightedSet.name}”</b> 을(를) 표시했습니다. <b>태블릿에 적용</b>으로 원하는 태블릿에 바로 띄울 수 있어요.
+            방금 가져온 <b className="truncate">“{highlightedSet.name}”</b> 을(를) 표시했습니다. <b>태블릿에 적용</b>으로 원하는 태블릿에 바로 띄울 수 있습니다.
           </span>
         </div>
       )}
-      {/* ── 도구막대: 검색 + 필터(상태/템플릿/코너) + 만들기 ── */}
+      {/* ── 도구막대: 검색 + 필터(상태/템플릿/코너) ── */}
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="flex flex-1 flex-wrap items-center gap-2 min-w-0">
           <input
@@ -635,12 +645,6 @@ export default function TabletContentLibraryList({
             ))}
           </div>
         </div>
-        <button
-          onClick={onCreate}
-          className="inline-flex items-center gap-1.5 px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-semibold hover:bg-indigo-700 shrink-0"
-        >
-          <Plus className="w-4 h-4" /> 태블릿 화면 만들기
-        </button>
       </div>
 
       {/* ── 일괄 작업(선택 시) ── */}
@@ -678,7 +682,7 @@ export default function TabletContentLibraryList({
         emptyMessage={
           search || statusFilter !== 'available' || templateFilter || cornerFilter
             ? '조건에 맞는 태블릿 콘텐츠가 없습니다.'
-            : '아직 태블릿 콘텐츠가 없습니다. ‘태블릿 화면 만들기’로 첫 화면 세트를 만들어 주세요.'
+            : '아직 태블릿 콘텐츠가 없습니다. ‘태블릿 화면 만들기’로 첫 화면 세트를 만들어 주시기 바랍니다.'
         }
         tableId="kpa-tablet-content-list"
         onRowClick={(s) => handlePreview(s)}
@@ -800,7 +804,7 @@ export default function TabletContentLibraryList({
                 </div>
               ) : (
                 <p className="mt-4 text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 leading-relaxed">
-                  QR 파일 출력 정보를 찾지 못했습니다. ‘매장 QR 관리’에서 확인해 주세요.
+                  QR 파일 출력 정보를 찾지 못했습니다. ‘매장 QR 관리’에서 확인해 주시기 바랍니다.
                 </p>
               )}
               <p className="text-[11px] text-slate-400 mt-3 leading-relaxed">
@@ -820,9 +824,9 @@ export default function TabletContentLibraryList({
             <div className="px-5 py-4 border-b flex items-start justify-between gap-3">
               <div className="min-w-0">
                 <h3 id="tablet-apply-heading" className="text-base font-bold text-slate-800">태블릿에 적용</h3>
-                <p className="text-xs text-slate-500 mt-0.5 truncate">“{applyFor.name}” 을(를) 어느 위치에 띄울지 고르세요.</p>
-                <p className="text-xs text-slate-500 mt-1">위치의 설정을 바꿉니다. 연결된 기기의 실제 표시는 별도로 확인하세요.</p>
-                {applyError && <p role="alert" className="text-sm text-red-700 mt-2">{applyError} 위치를 다시 눌러 시도하세요.</p>}
+                <p className="text-xs text-slate-500 mt-0.5 truncate">“{applyFor.name}” 을(를) 어느 위치에 띄울지 고르시기 바랍니다.</p>
+                <p className="text-xs text-slate-500 mt-1">위치의 설정을 바꿉니다. 연결된 기기의 실제 표시는 별도로 확인하시기 바랍니다.</p>
+                {applyError && <p role="alert" className="text-sm text-red-700 mt-2">{applyError} 위치를 다시 눌러 시도하시기 바랍니다.</p>}
               </div>
               <button onClick={() => !applyLock.current && setApplyFor(null)} disabled={!!applyBusyTabletId} className="min-h-11 min-w-11 rounded hover:bg-slate-100 shrink-0" aria-label="닫기">
                 <X className="w-4 h-4 text-slate-500" />

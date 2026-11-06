@@ -31,7 +31,7 @@ export default function InstructorCoursesPage() {
 
   return <main className="page page-wide">
     <div className="page-head row">
-      <div><h1>내 강의</h1><p className="muted">강의를 만들고 레슨·퀴즈·과제를 구성한 뒤 검토를 요청하세요. 게시는 운영자가 승인합니다.</p></div>
+      <div><h1>내 강의</h1><p className="muted">강의를 만들고 레슨·퀴즈·과제를 구성한 뒤 검토를 요청하시기 바랍니다. 게시는 운영자가 승인합니다.</p></div>
       <div className="row-actions">
         <Link className="btn btn-ghost" to="/instructor/enrollments">수강 승인</Link>
         <Link className="btn btn-primary" to="/instructor/courses/new">새 강의</Link>
@@ -39,7 +39,7 @@ export default function InstructorCoursesPage() {
     </div>
     {loading && <LmsLoading message="불러오는 중..." />}
     {error && <div className="notice notice-error">{error}</div>}
-    {!loading && !error && items.length === 0 && <LmsEmptyState title="개설한 강의가 없습니다" description="새 강의를 만들어 시작하세요." />}
+    {!loading && !error && items.length === 0 && <LmsEmptyState title="개설한 강의가 없습니다" description="새 강의를 만들어 시작하시기 바랍니다." />}
     <ul className="list">
       {items.map((c) => <li key={c.id} className="list-item">
         <div className="list-main">
@@ -51,7 +51,7 @@ export default function InstructorCoursesPage() {
           <Link className="btn btn-ghost" to={`/instructor/courses/${c.id}/edit`}>편집</Link>
           {(c.status === 'draft' || c.status === 'rejected') && <button type="button" className="btn" disabled={busy === c.id} onClick={() => void act(c.id, '검토 요청', () => instructorApi.submitForReview(c.id))}>검토 요청</button>}
           {c.status === 'published' && <button type="button" className="btn" disabled={busy === c.id} onClick={() => void act(c.id, '게시 중단', () => instructorApi.unpublish(c.id))}>게시 중단</button>}
-          {c.status !== 'archived' && <button type="button" className="btn btn-ghost" disabled={busy === c.id} onClick={() => { if (window.confirm('강의를 보관 처리할까요?')) void act(c.id, '보관', () => instructorApi.archive(c.id)); }}>보관</button>}
+          {c.status !== 'archived' && <button type="button" className="btn btn-ghost" disabled={busy === c.id} onClick={() => { if (window.confirm('강의를 보관 처리하시겠습니까?')) void act(c.id, '보관', () => instructorApi.archive(c.id)); }}>보관</button>}
         </div>
       </li>)}
     </ul>

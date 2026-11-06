@@ -81,14 +81,14 @@ function fail(error: unknown, res: Response) {
     res.status(400).json({
       success: false,
       code: 'INVALID_DOCUMENT',
-      error: '8MB 이하 파일 한 개만 선택해 주세요.',
+      error: '8MB 이하 파일 한 개만 선택해 주시기 바랍니다.',
     });
     return;
   }
   res.status(503).json({
     success: false,
     code: 'MEMBER_REGISTRATION_UNAVAILABLE',
-    error: '처리하지 못했습니다. 최신 정보와 권한을 확인해 주세요.',
+    error: '처리하지 못했습니다. 최신 정보와 권한을 확인해 주시기 바랍니다.',
   });
 }
 /** Identity middleware is common; central commands additionally require Google + current delegated authority. */
@@ -210,7 +210,7 @@ export function createMemberRegistrationRoutes(
         throw new OperationError(
           409,
           'REGISTRATION_ALREADY_APPROVED',
-          '승인 후 서류 변경은 My Home의 해당 절차를 이용해 주세요.',
+          '승인 후 서류 변경은 My Home의 해당 절차를 이용해 주시기 바랍니다.',
         );
     }
     return id;

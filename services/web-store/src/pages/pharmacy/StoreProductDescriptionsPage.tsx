@@ -88,15 +88,15 @@ function DescriptionsSession() {
         subtitle: (
           <>
             저장된 상품 상세설명을 조회·재편집·삭제(빈값 저장)합니다.
-            신규 생성은 "내 자료함 → 제작 시작 → 상품 상세설명"에서 진입하세요.
+            신규 생성은 "내 자료함 → 제작 시작 → 상품 상세설명"에서 진입하시기 바랍니다.
           </>
         ),
         notice: DIRECT_PRODUCT_DESCRIPTION_NOTICE,
         // WO-O4O-KPA-STORE-LOCAL-PRODUCTS-ENTRY-ALIGNMENT-V1: 메뉴 라벨 '직접 등록 제품'과 정렬
         ...DIRECT_PRODUCT_DESCRIPTION_LABELS,
         saveSuccessToast: '상품 설명이 저장되었습니다',
-        placeholderExisting: '저장된 상품 상세설명을 수정하세요.',
-        placeholderFallback: '상품 상세설명을 작성하세요.',
+        placeholderExisting: '저장된 상품 상세설명을 수정하시기 바랍니다.',
+        placeholderFallback: '상품 상세설명을 작성하시기 바랍니다.',
       }}
       /* 상품 사실·전문 참고자료와 이용 목적을 분리한다. 근거 입력은 편집 세션에만 사용한다. */
       renderAssist={({ product, value, prefillNote, onApplyHtml }) => (

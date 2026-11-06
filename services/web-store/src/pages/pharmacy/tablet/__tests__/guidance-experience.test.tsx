@@ -1,11 +1,8 @@
-import { useState } from 'react';
 import { act, cleanup, fireEvent, render, screen, within } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { PublicScreenSetViewer, TabletKioskPage, type QrScreenSet, type TabletKioskApi, type TabletScreenResponse } from '@o4o/tablet-kiosk-core';
 import { TabletContentStepBuilder, type ScreenSet, type ScreenSetBuilderApi, type ScreenSetDetail, type ScreenBlock } from '@o4o/tablet-screen-set-editor';
 import { createScreenSetSession } from '../screenSetSession';
-import { StoreSignageScheduleForm } from '../../StoreSignageScheduleForm';
-import type { StorePlaylist } from '../../../../api/storePlaylist';
 
 vi.mock('@o4o/content-editor', () => ({
   ContentRenderer: ({ html }: { html: string }) => <div>{html}</div>,
@@ -20,7 +17,7 @@ const products = [
 ];
 const sections = [
   { blockType: 'corner_description', sortOrder: 10, data: { title: '손님에게 보이는 제목', body: '짧은 코너 안내' } },
-  { blockType: 'content_list', sortOrder: 20, data: { items: [{ itemId: 'guide', title: '사용 순서', summary: '차례대로 확인하세요', hasDetail: true, detail: { html: '자세한 사용 순서' } }] } },
+  { blockType: 'content_list', sortOrder: 20, data: { items: [{ itemId: 'guide', title: '사용 순서', summary: '차례대로 확인하시기 바랍니다', hasDetail: true, detail: { html: '자세한 사용 순서' } }] } },
   { blockType: 'product_list', sortOrder: 30, data: { selectionMode: 'selected', products } },
   { blockType: 'idle_media', sortOrder: 40, data: { items: [{ url: 'https://youtu.be/example' }] } },
 ];
@@ -239,21 +236,6 @@ describe('안내 제작', () => {
     expect(api.create).toHaveBeenCalledOnce(); expect(cancel).not.toHaveBeenCalled();
     await act(async () => finish()); expect(saved).toHaveBeenCalledOnce();
   });
-});
-
-it('사이니지의 기본 일정과 상세 설정은 같은 상태를 보존한다', () => {
-  const save = vi.fn();
-  function Schedule() {
-    const [name, setName] = useState(''), [playlist, setPlaylist] = useState(''), [priority, setPriority] = useState(0);
-    return <StoreSignageScheduleForm editing={false} playlists={[{ id: 'playlist', name: '안내 모음', publishStatus: 'published' } as StorePlaylist]} schName={name} schPlaylistId={playlist} schPriority={priority} schDays={[0, 1, 2, 3, 4, 5, 6]} schStartTime="00:00" schEndTime="23:59" schValidFrom="" schValidUntil="" schIsActive={true} schSaving={false} saveError={null} setSchName={setName} setSchPlaylistId={setPlaylist} setSchPriority={setPriority} setSchStartTime={vi.fn()} setSchEndTime={vi.fn()} setSchValidFrom={vi.fn()} setSchValidUntil={vi.fn()} setSchIsActive={vi.fn()} toggleSchDay={vi.fn()} handleSaveSchedule={() => save({ name, playlist, priority })} resetScheduleForm={vi.fn()} />;
-  }
-  const { container } = render(<Schedule />);
-  fireEvent.change(screen.getByRole('combobox'), { target: { value: 'playlist' } });
-  expect((screen.getByLabelText('스케줄명') as HTMLInputElement).value).toBe('안내 모음 재생');
-  const details = container.querySelector('details')!; details.open = true;
-  fireEvent.change(screen.getByLabelText('우선순위'), { target: { value: '7' } }); details.open = false;
-  fireEvent.click(screen.getByRole('button', { name: '저장' }));
-  expect(save).toHaveBeenCalledWith({ name: '안내 모음 재생', playlist: 'playlist', priority: 7 });
 });
 
 it('saves and reopens the existing idle list with retained file identity and the selected order', async () => {

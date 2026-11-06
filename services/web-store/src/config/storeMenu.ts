@@ -41,9 +41,8 @@ export const UNIFIED_STORE_CONFIG: StoreDashboardConfig = {
     ]},
     { label: '디지털 사이니지', items: [
       { key: 'signage-playlist',  label: '재생목록', subPath: '/marketing/signage/playlist' },
-      { key: 'signage-videos',    label: '동영상함',       subPath: '/marketing/signage/videos' },
-      { key: 'signage-schedules', label: '스케줄',       subPath: '/marketing/signage/schedules' },
-      { key: 'signage-player',    label: 'TV 재생',      subPath: '/marketing/signage/player' },
+      { key: 'signage-videos',    label: '동영상',            subPath: '/marketing/signage/videos' },
+      { key: 'signage-player',    label: '디스플레이 재생',      subPath: '/marketing/signage/player' },
     ]},
     { label: '분석', items: [
       { key: 'analytics-marketing', label: '마케팅 분석', subPath: '/analytics/marketing' },
@@ -62,7 +61,7 @@ export const UNIFIED_STORE_CONFIG: StoreDashboardConfig = {
  * Neture 약국 매장 메뉴 — WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1 (DESIGN §6)
  *
  * 약국은 매장 HUB 단계(취급 신청 → 승인 → 주문 가능) 없이 내 매장에서 바로 공급 상품을 주문한다.
- * `UNIFIED_STORE_CONFIG` 는 PharmacyHub 공통 문맥에도 쓰이므로 직접 바꾸지 않고,
+ * `UNIFIED_STORE_CONFIG` 의 공통 메뉴와 분리하여,
  * 약국(kpa-society) 문맥일 때만 `withPharmacyStoreMenu` 로 홈 바로 뒤에 붙인다.
  * subPath 는 pages/neture-pharmacy/shared.tsx 의 PHARMACY_STORE_PATHS 와 같다.
  */

@@ -100,7 +100,7 @@ function SupplyOptionsSession({ navigation }: SupplyPageProps) {
 
   const fetchList = useCallback(async () => {
     if (!proposal) return neturePharmacyApi.listSupplyOptions({ source, ...(explicitBusiness ? { business: explicitBusiness } : {}), ...(recruitment ? { recruitment } : {}), q: query || undefined, page, limit: PAGE_SIZE });
-    if (!business || !/^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/i.test(proposal)) throw new Error('연결된 공급 제안과 협업체를 확인해 주세요.');
+    if (!business || !/^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/i.test(proposal)) throw new Error('연결된 공급 제안과 협업체를 확인해 주시기 바랍니다.');
     const option = await neturePharmacyApi.getSupplyOption('proposal', proposal);
     if (option.semiFranchiseKey !== business) throw new Error('이 협업체의 공급 제안이 아닙니다.');
     return { items: [option], total: 1 };
@@ -116,7 +116,7 @@ function SupplyOptionsSession({ navigation }: SupplyPageProps) {
     const key = rowKey(o);
     const n = Number(qty[key] ?? '1');
     if (!Number.isInteger(n) || n < 1) {
-      setActionError('수량을 1 이상의 정수로 입력해 주세요.');
+      setActionError('수량을 1 이상의 정수로 입력해 주시기 바랍니다.');
       return;
     }
     addBusy.current = true; setAddingKey(key);
@@ -137,7 +137,7 @@ function SupplyOptionsSession({ navigation }: SupplyPageProps) {
   return (
     <PharmacyPage
       title="상품 주문"
-      description="가입한 협업체와 참여 승인된 모집에서 주문할 상품을 찾습니다. 공급 경로별 조건과 단가를 확인해 선택하세요."
+      description="가입한 협업체와 참여 승인된 모집에서 주문할 상품을 찾습니다. 공급 경로별 조건과 단가를 확인해 선택하시기 바랍니다."
       actions={<Link className={btn.secondary} to={pharmacyStorePath('cart')}>장바구니 보기</Link>}
     >
       <StoreCommerceNavigation />
@@ -178,7 +178,7 @@ function SupplyOptionsSession({ navigation }: SupplyPageProps) {
       </form>
 
       {message && <Notice>{message} <Link className="underline" to={pharmacyStorePath('cart')}>장바구니로 이동</Link></Notice>}
-      {actionError && <Notice tone="error">{actionError} 수량과 조건을 확인한 뒤 다시 담아 주세요.</Notice>}
+      {actionError && <Notice tone="error">{actionError} 수량과 조건을 확인한 뒤 다시 담아 주시기 바랍니다.</Notice>}
       {recruitment && <p className="mb-3 text-sm text-slate-600">선택한 모집의 주문 가능 상품입니다. 검색 초기화로 다른 상품을 찾을 수 있습니다.</p>}
       {error && <Notice tone="error">{error} <button className={btn.secondary} onClick={load}>상품 다시 확인</button></Notice>}
 
@@ -195,7 +195,7 @@ function SupplyOptionsSession({ navigation }: SupplyPageProps) {
       )}
       {!loading && !error && items.length > 0 && (
         <>
-          <p className="text-xs text-gray-500 md:hidden">표를 좌우로 밀어 공급조건과 담기 버튼을 확인하세요.</p>
+          <p className="text-xs text-gray-500 md:hidden">표를 좌우로 밀어 공급조건과 담기 버튼을 확인하시기 바랍니다.</p>
           <div className="overflow-x-auto rounded-lg border border-gray-200 bg-white">
             <table className="min-w-[800px] w-full text-sm">
               <thead>

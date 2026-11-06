@@ -10,9 +10,10 @@ export default function NoStorePage() {
   const { reload } = useUnifiedStore();
   return <main className="center-card"><section className="card" data-testid="no-store">
     <h1>연결된 매장이 없습니다</h1>
-    <p>약국경영자로 가입해 승인을 받으면 내 매장이 자동으로 연결됩니다. 가입 검토 중이라면 My Home에서 상태를 확인하세요.</p>
+    <p>이 계정으로 접근할 수 있는 매장(조직)이 없습니다. 약국 경영자 회원 등록이 승인되면 내 매장이 자동으로 연결됩니다. 별도 매장 신청은 필요하지 않습니다.</p>
+    <p className="muted">직원 초대 수락·승인 상태는 My Home에서도 확인할 수 있습니다. 최종 승인 후 매장을 이용할 수 있습니다.</p>
     <div className="actions">
-      <a className="button-link" href={`${PLATFORM_ORIGIN}/signup`}>가입 정보 확인</a>
+      <Link className="button-link" to={WORKSPACE_PATHS.pharmacyEnrollment}>회원 등록·매장 연결 안내</Link>
       <Link className="link-button secondary-link" to={WORKSPACE_PATHS.enrollment}>매장 시작하기(약국 외 업종)</Link>
       <Link className="link-button secondary-link" to={WORKSPACE_PATHS.invitations}>받은 초대 확인</Link>
       <a className="link-button secondary-link" href={PLATFORM_ORIGIN}>Neture 홈에서 서비스 보기</a>

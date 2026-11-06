@@ -19,11 +19,11 @@ export class FundingWorkspaceService {
     return { from: trial.status, to: next, at: new Date().toISOString(), reason, auto: false, actorUserId: actor };
   }
   async review(id: string, actor: string, approve: boolean, reason?: string) {
-    if (!approve && (!reason?.trim() || reason.trim().length > 1000)) throw new FundingError(400, 'REVIEW_REASON_REQUIRED', '반려 사유를 1~1,000자로 입력해 주세요.');
+    if (!approve && (!reason?.trim() || reason.trim().length > 1000)) throw new FundingError(400, 'REVIEW_REASON_REQUIRED', '반려 사유를 1~1,000자로 입력해 주시기 바랍니다.');
     return await this.ds.transaction(async m => {
       const trial = await this.locked(m, id);
       if (trial.status !== TrialStatus.SUBMITTED || fundingReview(trial).forumPending) throw new FundingError(409, 'REVIEW_CONFLICT', '이미 처리됐거나 심사 대기 상태가 아닙니다.');
-      if (approve && !await isFundingCreator(this.ds, trial, trial.supplierId)) throw new FundingError(409, 'CREATOR_NOT_ACTIVE', '개설자의 공급자 자격을 먼저 확인해 주세요.');
+      if (approve && !await isFundingCreator(this.ds, trial, trial.supplierId)) throw new FundingError(409, 'CREATOR_NOT_ACTIVE', '개설자의 공급자 자격을 먼저 확인해 주시기 바랍니다.');
       trial.statusHistory = [...fundingHistory(trial), this.event(trial, approve ? 'funding_approved' : `funding_rejected:${reason!.trim()}`, actor, approve ? trial.status : TrialStatus.DRAFT)];
       if (!approve) trial.status = TrialStatus.DRAFT;
       return m.getRepository(MarketTrial).save(trial);
@@ -34,7 +34,7 @@ export class FundingWorkspaceService {
     return this.ds.transaction(async m => {
       const trial = await this.locked(m, id);
       if (!fundingWasApproved(trial) || trial.status === TrialStatus.CLOSED) throw new FundingError(409, 'FUNDING_NOT_APPROVED', '승인된 진행 중 펀딩만 포럼을 개설할 수 있습니다.');
-      if (!await isFundingCreator(this.ds, trial, trial.supplierId)) throw new FundingError(409, 'CREATOR_NOT_ACTIVE', '개설자의 공급자 자격을 먼저 확인해 주세요.');
+      if (!await isFundingCreator(this.ds, trial, trial.supplierId)) throw new FundingError(409, 'CREATOR_NOT_ACTIVE', '개설자의 공급자 자격을 먼저 확인해 주시기 바랍니다.');
       const code = fundingForumCode(id), slug = fundingForumSlug(id);
       let [forum] = await m.query(`SELECT id, slug FROM forum_category_requests WHERE slug = $1 AND service_code = $2 AND status = 'completed' LIMIT 1`, [slug, code]);
       const existed = !!forum;
@@ -76,7 +76,7 @@ export class FundingWorkspaceService {
       const now = Date.now();
       if (trial.status !== TrialStatus.RECRUITING || now < new Date(trial.fundingStartAt).getTime() || now >= new Date(trial.fundingEndAt).getTime()) throw new FundingError(409, 'FUNDING_NOT_RECRUITING', '모집 기간 중인 펀딩만 참여할 수 있습니다.');
       if (trial.maxParticipants && trial.currentParticipants >= trial.maxParticipants) throw new FundingError(409, 'FUNDING_FULL', '모집 인원이 마감되었습니다.');
-      if (!['cash', 'product'].includes(rewardType) || !trial.rewardOptions.includes(rewardType)) throw new FundingError(400, 'INVALID_REWARD', '허용된 참여 조건을 선택해 주세요.');
+      if (!['cash', 'product'].includes(rewardType) || !trial.rewardOptions.includes(rewardType)) throw new FundingError(400, 'INVALID_REWARD', '허용된 참여 조건을 선택해 주시기 바랍니다.');
       const participants = m.getRepository(MarketTrialParticipant);
       if (await participants.findOne({ where: { marketTrialId: id, participantId: actor } })) throw new FundingError(409, 'ALREADY_PARTICIPANT', '이미 참여한 펀딩입니다.');
       const policies = await recordEnrollmentPolicies(m, actor, 'funding', policyReferences);

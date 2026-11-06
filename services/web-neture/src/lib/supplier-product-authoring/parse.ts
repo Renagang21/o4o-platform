@@ -134,7 +134,7 @@ export function parseSupplierProductCandidateDraft(text: string): ParseSupplierP
     parsed = extracted ? tryParse(extracted) : undefined;
   }
   if (parsed === undefined) {
-    return { ok: false, code: 'INVALID_JSON', error: 'JSON 으로 읽을 수 없습니다. ChatGPT 에 "JSON 객체 1개만 출력"을 다시 요청해 주세요.' };
+    return { ok: false, code: 'INVALID_JSON', error: 'JSON 으로 읽을 수 없습니다. ChatGPT 에 "JSON 객체 1개만 출력"을 다시 요청해 주시기 바랍니다.' };
   }
   if (!isPlainObject(parsed)) {
     return { ok: false, code: 'NOT_OBJECT', error: 'JSON 객체 1개가 아닙니다(배열·문자열 불가).' };
@@ -212,7 +212,7 @@ export function parseSupplierProductCandidateDraft(text: string): ParseSupplierP
     },
   };
 
-  if (!draft.name) warnings.push('name: 제품명이 없습니다. 화면에서 직접 입력해 주세요.');
+  if (!draft.name) warnings.push('name: 제품명이 없습니다. 화면에서 직접 입력해 주시기 바랍니다.');
 
   return { ok: true, draft, warnings };
 }

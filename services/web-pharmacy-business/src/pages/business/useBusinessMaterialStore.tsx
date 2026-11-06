@@ -46,7 +46,7 @@ export function useBusinessMaterialStore(enabled: boolean, businessKey: string, 
       <select aria-label={label} className="mt-2 block w-full rounded-lg border bg-white p-3" value={organizationId ?? ''} onChange={e => {
         const value = e.target.value;
         setParams(previous => { const next = new URLSearchParams(previous); if (value) next.set('store', value); else next.delete('store'); return next; });
-      }}><option value="">약국을 선택해 주세요</option>{stores.map(s => <option key={s.organizationId} value={s.organizationId}>{s.organizationName}</option>)}</select>
+      }}><option value="">약국을 선택해 주시기 바랍니다</option>{stores.map(s => <option key={s.organizationId} value={s.organizationId}>{s.organizationName}</option>)}</select>
     </label>;
   return { organizationId, selection };
 }

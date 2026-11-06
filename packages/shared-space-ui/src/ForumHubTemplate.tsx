@@ -308,9 +308,9 @@ function DefaultWritePrompt({
   writePrompt: NonNullable<ForumHubConfig['writePrompt']>;
   isAuthenticated: boolean;
 }) {
-  const authTitle = writePrompt.authTitle ?? '포럼에서 소통해 보세요';
-  const authDesc = writePrompt.authDesc ?? '관심 있는 포럼을 선택하고 글을 작성해 보세요';
-  const unauthTitle = writePrompt.unauthTitle ?? '포럼에 참여해 보세요';
+  const authTitle = writePrompt.authTitle ?? '포럼에서 소통해 보시기 바랍니다';
+  const authDesc = writePrompt.authDesc ?? '관심 있는 포럼을 선택하고 글을 작성해 보시기 바랍니다';
+  const unauthTitle = writePrompt.unauthTitle ?? '포럼에 참여해 보시기 바랍니다';
   const unauthDesc = writePrompt.unauthDesc ?? '로그인 후 포럼 글을 작성하고 토론에 참여할 수 있습니다';
 
   return (

@@ -355,7 +355,7 @@ async function assertRequesterNotSuspended(m: EntityManager, userId: string): Pr
   if (rows?.[0]?.status === 'suspended') {
     throw new BranchLifecycleError(
       'REQUESTER_SUSPENDED',
-      '신청자의 분회 서비스 이용이 정지된 상태라 승인할 수 없습니다. 거절하거나 정지를 먼저 해소하세요.',
+      '신청자의 분회 서비스 이용이 정지된 상태라 승인할 수 없습니다. 거절하거나 정지를 먼저 해소하시기 바랍니다.',
       409,
     );
   }

@@ -50,7 +50,7 @@ const STATUS_CONFIG: Record<ForumDeleteRequestStatus, { label: string; color: st
 };
 
 const DEFAULT_TITLE = '포럼 삭제 요청 관리';
-const DEFAULT_DESCRIPTION = '포럼 소유자의 삭제 요청을 검토하고 승인하거나 반려하세요';
+const DEFAULT_DESCRIPTION = '포럼 소유자의 삭제 요청을 검토하고 승인하거나 반려하시기 바랍니다';
 const DEFAULT_GUIDE_PAGE_KEY = 'forum.request.management';
 
 const GUIDE_FALLBACK = {
@@ -300,6 +300,7 @@ export function OperatorForumDeleteRequestsConsolePage({
         description={guideDesc ?? GUIDE_FALLBACK.description}
         steps={guideSteps ?? GUIDE_FALLBACK.steps}
         compact
+        collapsible
       />
 
       {/* Status Tabs (segmented canonical) */}
@@ -428,7 +429,7 @@ export function OperatorForumDeleteRequestsConsolePage({
                 <textarea
                   value={reviewComment}
                   onChange={(e) => setReviewComment(e.target.value)}
-                  placeholder="승인 또는 반려 사유를 입력하세요 (선택)"
+                  placeholder="승인 또는 반려 사유를 입력하시기 바랍니다 (선택)"
                   rows={3}
                   className="w-full px-4 py-3 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-slate-300 focus:border-slate-400 resize-none"
                 />

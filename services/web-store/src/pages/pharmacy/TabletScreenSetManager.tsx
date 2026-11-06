@@ -193,7 +193,7 @@ function ScreenSetManagerSession({ onToast: notify, tablets, previewApi, storeSl
       const session = sessions.begin();
       savedHeader.current = null; setSavedSet(null);
       setBuilder({ detail, current: () => session() && isCurrent() });
-    } catch { if (current() && isCurrent()) onToast({ type: 'error', message: '화면 상세를 불러오지 못했습니다. 다시 수정 버튼을 눌러 주세요.' }); }
+    } catch { if (current() && isCurrent()) onToast({ type: 'error', message: '화면 상세를 불러오지 못했습니다. 다시 수정 버튼을 눌러 주시기 바랍니다.' }); }
     finally { if (current() && isCurrent()) setOpeningId(null); }
   }, [edits, sessions, isCurrent, onToast]);
 
@@ -238,7 +238,7 @@ function ScreenSetManagerSession({ onToast: notify, tablets, previewApi, storeSl
       await reload();
     } catch (e: any) {
       const msg = (e?.code === 'SCREEN_SET_IN_USE' || e?.code === 'ARCHIVE_BLOCKED_CONNECTED')
-        ? '이 콘텐츠는 현재 코너에 연결되어 있어 제거할 수 없습니다. 먼저 코너 연결을 해제해 주세요.'
+        ? '이 콘텐츠는 현재 코너에 연결되어 있어 제거할 수 없습니다. 먼저 코너 연결을 해제해 주시기 바랍니다.'
         : (e?.message || '리스트에서 제거하지 못했습니다.');
       onToast({ type: 'error', message: msg });
     } finally { mutation.current = false; if (isCurrent()) setBusy(false); }
@@ -266,7 +266,7 @@ function ScreenSetManagerSession({ onToast: notify, tablets, previewApi, storeSl
     return (
       <>
         {builder.detail && <p role="note" className="rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">
-          현재 사용 위치: {(usageBySet[builder.detail.id] ?? []).join(', ') || '없음'}. 저장하면 이 안내를 사용하는 화면과 공개 중인 기존 QR에도 변경 내용이 반영됩니다. 실제 기기 표시는 기기에서 확인하세요.
+          현재 사용 위치: {(usageBySet[builder.detail.id] ?? []).join(', ') || '없음'}. 저장하면 이 안내를 사용하는 화면과 공개 중인 기존 QR에도 변경 내용이 반영됩니다. 실제 기기 표시는 기기에서 확인하시기 바랍니다.
         </p>}
         <TabletContentStepBuilder
           initialDetail={builder.detail}
@@ -318,10 +318,10 @@ function ScreenSetManagerSession({ onToast: notify, tablets, previewApi, storeSl
       </div>
 
       <div className="p-4 space-y-4">
-        <p className="text-sm text-slate-600">안내를 만들거나 수정한 뒤 사용할 위치에 적용하세요. 같은 안내를 여러 위치에서 사용할 수 있습니다.</p>
+        <p className="text-sm text-slate-600">안내를 만들거나 수정한 뒤 사용할 위치에 적용하시기 바랍니다. 같은 안내를 여러 위치에서 사용할 수 있습니다.</p>
 
         {openingId && <p role="status">화면 상세 불러오는 중… <button type="button" onClick={() => { edits.cancel(); setOpeningId(null); }}>불러오기 취소</button></p>}
-        {listError ? <div role="alert">{savedSet && <p>“{savedSet.name}” 내용은 저장되었습니다. 목록을 다시 불러온 뒤 적용할 위치를 선택하세요.</p>}{listError}<button type="button" onClick={() => void reload()} className="min-h-11 underline ml-2">다시 시도</button></div> : <TabletContentLibraryList
+        {listError ? <div role="alert">{savedSet && <p>“{savedSet.name}” 내용은 저장되었습니다. 목록을 다시 불러온 뒤 적용할 위치를 선택하시기 바랍니다.</p>}{listError}<button type="button" onClick={() => void reload()} className="min-h-11 underline ml-2">다시 시도</button></div> : <TabletContentLibraryList
           isCurrent={isCurrent}
           sets={sets}
           loading={loading}

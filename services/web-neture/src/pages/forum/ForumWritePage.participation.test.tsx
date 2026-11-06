@@ -105,7 +105,7 @@ it("늦게 도착한 이전 편집 조회는 현재 편집 글을 덮어쓰지 �
 it("지정한 게시판이 없으면 다른 게시판으로 자동 제출하지 않는다", async () => {
   mount("?forum=missing");
   await waitFor(() => expect(m.categories).toHaveBeenCalled());
-  fireEvent.change(screen.getByPlaceholderText("제목을 입력하세요"), {
+  fireEvent.change(screen.getByPlaceholderText("제목을 입력하시기 바랍니다"), {
     target: { value: "새 글" },
   });
   fireEvent.change(screen.getByLabelText("본문"), {

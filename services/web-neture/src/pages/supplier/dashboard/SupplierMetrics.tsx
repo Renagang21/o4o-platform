@@ -43,7 +43,7 @@ export function SupplierMetrics({
 
         {aiOpen && metricsFailed && (
           <p role="alert" className="px-6 pb-6 text-sm text-red-600">
-            지표를 불러오지 못했습니다. 새로고침 후 다시 확인해 주세요.
+            지표를 불러오지 못했습니다. 새로고침 후 다시 확인해 주시기 바랍니다.
           </p>
         )}
         {aiOpen && !metricsFailed && (

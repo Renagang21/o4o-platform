@@ -70,7 +70,7 @@ export function ActionButton({
 
 /** 반려 · 정지 · 종료 · 취소처럼 사유가 의미 있는 동작은 사유를 받는다. null = 사용자가 취소. */
 export function askReason(actionLabel: string): string | null {
-  const v = window.prompt(`${actionLabel} 사유를 입력하세요 (선택)`, '');
+  const v = window.prompt(`${actionLabel} 사유를 입력하시기 바랍니다 (선택)`, '');
   return v === null ? null : v.trim();
 }
 

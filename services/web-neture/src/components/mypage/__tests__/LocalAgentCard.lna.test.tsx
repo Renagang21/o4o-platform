@@ -39,8 +39,8 @@ import LocalAgentCard from '../LocalAgentCard';
 
 /** §5 가 정한 세 문장 + §8 이 허용한 중립 문장. 문구는 여기서만 정의한다. */
 const MESSAGE = {
-  A_NOT_RUNNING: 'PC 연결 프로그램이 실행되고 있지 않습니다.',
-  B_PERMISSION: '브라우저에서 이 PC 연결 권한을 허용해 주세요.',
+  A_NOT_RUNNING: '이 브라우저에서 PC 프로그램의 응답을 받지 못했습니다.',
+  B_PERMISSION: '브라우저에서 이 PC 연결 권한을 허용해 주시기 바랍니다.',
   C_GENERIC: '이 PC의 연결 프로그램에 연결할 수 없습니다.',
   NEUTRAL: 'PC 연결 프로그램이 실행 중이 아니거나 브라우저 연결 권한이 필요합니다.',
 };
@@ -96,9 +96,9 @@ describe('§12 LNA 안내 UX', () => {
     );
 
     render(<LocalAgentCard />);
-    await userEvent.click(await screen.findByRole('button', { name: '이미 설치했어요 · 연결 확인' }));
+    await userEvent.click(await screen.findByRole('button', { name: '설치된 프로그램 연결 확인' }));
 
-    expect(await screen.findByText('이 PC 연결됨')).toBeTruthy();
+    expect(await screen.findByText('이 PC가 현재 계정에 연결됐습니다.')).toBeTruthy();
     expect(screen.getByRole('button', { name: '연결 상태 확인' })).toBeTruthy();
   });
 
@@ -149,10 +149,10 @@ describe('§12 LNA 안내 UX', () => {
       ),
     );
 
-    await userEvent.click(screen.getByRole('button', { name: '이미 설치했어요 · 연결 확인' }));
+    await userEvent.click(screen.getByRole('button', { name: '설치된 프로그램 연결 확인' }));
 
     // 버튼 한 번으로 재관측 + 연결까지 끝난다 (§7).
-    expect(await screen.findByText('이 PC 연결됨')).toBeTruthy();
+    expect(await screen.findByText('이 PC가 현재 계정에 연결됐습니다.')).toBeTruthy();
   });
 
   it('5. 원인을 알 수 없는 localhost 실패 → 중립 안내로 두고 확정하지 않는다', async () => {
@@ -175,7 +175,7 @@ describe('§12 LNA 안내 UX', () => {
     expect(await screen.findByText(new RegExp(MESSAGE.C_GENERIC))).toBeTruthy();
   });
 
-  it('6. 이미 연결된 PC 는 그대로 연결됨으로 보인다 (기존 상태 회귀 0)', async () => {
+  it('6. local connected is not proof of the current web account; verification remains explicit', async () => {
     setPermission('granted');
     fetchMock.mockImplementation(() =>
       Promise.resolve(jsonResponse({ ...HEALTH_BODY, connected: true })),
@@ -183,10 +183,11 @@ describe('§12 LNA 안내 UX', () => {
 
     render(<LocalAgentCard />);
 
-    expect(await screen.findByText('이 PC 연결됨')).toBeTruthy();
-    // 이미 연결된 상태에서 승인권을 새로 발급하지 않는다.
+    expect(await screen.findByText(/PC 프로그램이 응답했습니다/)).toBeTruthy();
+    expect(screen.queryByText('이 PC가 현재 계정에 연결됐습니다.')).toBeNull();
+    // No automatic pairing or cross-account trust on a read-only health check.
     expect(apiPost).not.toHaveBeenCalled();
-    expect(screen.queryByRole('button', { name: '이미 설치했어요 · 연결 확인' })).toBeNull();
+    expect(screen.getByRole('button', { name: '설치된 프로그램 연결 확인' })).toBeTruthy();
   });
 
   it('실패해도 1회용 nonce 를 재사용하지 않는다 (replay 여지 0)', async () => {
@@ -200,11 +201,11 @@ describe('§12 LNA 안내 UX', () => {
     );
 
     render(<LocalAgentCard />);
-    await userEvent.click(await screen.findByRole('button', { name: '이미 설치했어요 · 연결 확인' }));
+    await userEvent.click(await screen.findByRole('button', { name: '설치된 프로그램 연결 확인' }));
 
     expect(await screen.findByText(/연결 승인 시간이 지났습니다/)).toBeTruthy();
     // 실패한 nonce 로 다시 누를 수 있는 버튼을 남기지 않는다. 남은 경로는 재관측뿐이다.
-    expect(screen.getAllByRole('button', { name: '이미 설치했어요 · 연결 확인' })).toHaveLength(1);
+    expect(screen.getAllByRole('button', { name: '설치된 프로그램 연결 확인' })).toHaveLength(1);
   });
 });
 
@@ -220,8 +221,8 @@ describe('보안 경계 — 이 카드가 하지 않는 일', () => {
     );
 
     render(<LocalAgentCard />);
-    await userEvent.click(await screen.findByRole('button', { name: '이미 설치했어요 · 연결 확인' }));
-    await screen.findByText('이 PC 연결됨');
+    await userEvent.click(await screen.findByRole('button', { name: '설치된 프로그램 연결 확인' }));
+    await screen.findByText('이 PC가 현재 계정에 연결됐습니다.');
 
     for (const [url, init] of fetchMock.mock.calls as Array<[string, RequestInit]>) {
       expect(String(url).startsWith('http://127.0.0.1:47821/') || String(url) === '/downloads/pc-connection/release.json').toBe(true);
@@ -274,9 +275,9 @@ it('after explicit installer download, matching runtime connects once without an
  render(<LocalAgentCard/>);
  await waitFor(()=>expect((screen.getByRole('button',{name:'설치 파일 받기'}) as HTMLButtonElement).disabled).toBe(false));
  await userEvent.click(screen.getByRole('button',{name:'설치 파일 받기'}));
- await screen.findByText('이제 받은 파일을 열어 주세요.');
+ await screen.findByText('이제 받은 파일을 열어 주시기 바랍니다.');
  expect(apiPost).not.toHaveBeenCalled();ready=true;
- await screen.findByText('이 PC 연결됨',{}, {timeout:6000});
+ await screen.findByText('이 PC가 현재 계정에 연결됐습니다.',{}, {timeout:6000});
  expect(apiPost).toHaveBeenCalledOnce();expect(pairs).toBe(1);expect(click.mock.instances[0].download).toBe('O4O-PC-Setup.cmd');
  expect(screen.queryByRole('button',{name:'자동 연결 중지'})).toBeNull();
  click.mockRestore();

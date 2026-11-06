@@ -29,7 +29,7 @@ export default function StoreRecruitmentApplicationsPage() {
       setRows(res?.data ?? []);
     } catch {
       // 실패 시 기존 rows 를 지우지 않는다 — 재조회 실패라면 직전 목록을 그대로 유지한다.
-      setLoadError('신청·승인 현황을 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.');
+      setLoadError('신청·승인 현황을 불러오지 못했습니다. 잠시 후 다시 시도해 주시기 바랍니다.');
     }
     setLoading(false);
   }, []);
@@ -46,7 +46,7 @@ export default function StoreRecruitmentApplicationsPage() {
         await coreApiClient.post(`/neture/seller-recruitment/applications/${applicationId}/cancel`);
         await load();
       } catch {
-        window.alert('신청 취소에 실패했습니다. 잠시 후 다시 시도해 주세요.');
+        window.alert('신청 취소에 실패했습니다. 잠시 후 다시 시도해 주시기 바랍니다.');
       }
       setCancellingId(null);
     },
@@ -58,7 +58,7 @@ export default function StoreRecruitmentApplicationsPage() {
     return (
       <div style={ERROR_BOX}>
         <p style={ERROR_TITLE}>신청·승인 현황을 불러오지 못했습니다.</p>
-        <p style={ERROR_DESC}>잠시 후 다시 시도해 주세요.</p>
+        <p style={ERROR_DESC}>잠시 후 다시 시도해 주시기 바랍니다.</p>
         <button type="button" onClick={() => void load()} style={RETRY_BTN}>다시 시도</button>
       </div>
     );

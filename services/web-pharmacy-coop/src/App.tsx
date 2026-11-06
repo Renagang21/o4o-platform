@@ -444,7 +444,7 @@ function Directory({ compact = false }: { compact?: boolean }) {
             <h1>나에게 맞는 협동조합 찾기</h1>
           )}
           <p>
-            가입 자격과 서비스는 조합별로 확인하세요. 여러 조합에 참여할 수
+            가입 자격과 서비스는 조합별로 확인하시기 바랍니다. 여러 조합에 참여할 수
             있습니다.
           </p>
         </div>
@@ -659,7 +659,7 @@ function CooperativeHome() {
                 ? membershipLabels[access.status]
                 : session.userId
                   ? "아직 가입하지 않은 조합입니다."
-                  : "로그인 후 가입 상태를 확인하세요."}
+                  : "로그인 후 가입 상태를 확인하시기 바랍니다."}
             </p>
             <SiteLink
               className="text-link"
@@ -989,7 +989,7 @@ function FederationManagement() {
         ) : (
           <Empty
             title="이 업무를 이용할 수 없습니다."
-            text="업무 메뉴와 운영 권한을 확인해 주세요."
+            text="업무 메뉴와 운영 권한을 확인해 주시기 바랍니다."
           />
         )}
       </WorkLayout>
@@ -1185,7 +1185,7 @@ function CooperativeManagement({
         ) : (
           <Empty
             title="이 업무를 이용할 수 없습니다."
-            text="업무 메뉴와 운영 권한을 확인해 주세요."
+            text="업무 메뉴와 운영 권한을 확인해 주시기 바랍니다."
           />
         )}
       </WorkLayout>
@@ -1222,7 +1222,7 @@ function NotFound() {
   return (
     <section className="section narrow">
       <h1>페이지를 찾을 수 없습니다.</h1>
-      <p>등록된 조합 주소와 메뉴를 확인해 주세요.</p>
+      <p>등록된 조합 주소와 메뉴를 확인해 주시기 바랍니다.</p>
       <SiteLink className="button" to="/cooperatives">
         협동조합 목록으로
       </SiteLink>
@@ -1233,7 +1233,7 @@ function NotFound() {
 function CooperativeContactPage({ local = false }: { local?: boolean }) {
   const { businessClient } = useContext(Context);
   const { cooperativeSlug } = useParams();
-  if (!businessClient) return <p>문의 연결을 확인해 주세요.</p>;
+  if (!businessClient) return <p>문의 연결을 확인해 주시기 바랍니다.</p>;
   const endpoint = local
     ? `/operator-inbox/cooperative/${encodeURIComponent(cooperativeSlug ?? "")}`
     : "/operator-inbox/service/pharmcoop";
@@ -1254,7 +1254,7 @@ function CooperativeInboxPage({ local = false }: { local?: boolean }) {
   const { businessClient, session, cooperatives } = useContext(Context);
   const { cooperativeSlug } = useParams();
   if (!businessClient || !session.userId)
-    return <p>로그인 후 담당 운영 권한을 확인해 주세요.</p>;
+    return <p>로그인 후 담당 운영 권한을 확인해 주시기 바랍니다.</p>;
   const coop = local
     ? cooperatives.find((c) => c.slug === cooperativeSlug)
     : null;
@@ -1281,6 +1281,6 @@ function CooperativeNotificationPage() {
   return session.userId && businessClient && !preview ? (
     <CooperativeNotifications key={session.userId} client={businessClient} />
   ) : (
-    <p>로그인 후 문의 알림을 확인해 주세요.</p>
+    <p>로그인 후 문의 알림을 확인해 주시기 바랍니다.</p>
   );
 }

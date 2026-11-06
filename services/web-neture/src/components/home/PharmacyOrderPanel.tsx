@@ -11,7 +11,7 @@ import { loadWorkingData, workDataRequest, type WorkDataSnapshot, type WorkDataC
 
 const uid = () => crypto.randomUUID();
 const initial = (): PharmacyBundle => ({ format: PHARMACY_FORMAT, records: [{ kind: 'sheet', data: { id: uid(), title: '주문 준비', lines: [], status: 'draft' } }] });
-const errorText = (e: unknown) => e instanceof Error ? e.message : '자료를 확인해 주세요.';
+const errorText = (e: unknown) => e instanceof Error ? e.message : '자료를 확인해 주시기 바랍니다.';
 const download = (value: unknown, filename: string) => {
   const url = URL.createObjectURL(new Blob([JSON.stringify(value)], { type: 'application/json' }));
   const a = document.createElement('a'); a.href = url; a.download = filename; a.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
@@ -55,7 +55,7 @@ export default function PharmacyOrderPanel({ disabled, resuming, draft = '', onA
         if(!reset && historyLoaded && historyPages[kind]===null)continue;
         const page=await workDataRequest<WorkDataSnapshot>('read',workScope,{kind,limit:100,after:reset?null:historyPages[kind],deviceId:storage.deviceId,location:storage.location});
         if(!alive.current || generation!==dataGeneration.current)return;
-        if(page.location!==storage.location || page.deviceId!==storage.deviceId || page.consent.owner!==storage.consent.owner || page.consent.epoch!==storage.consent.epoch)throw Error('자료 연결이 바뀌었어요. 다시 불러와 주세요.');
+        if(page.location!==storage.location || page.deviceId!==storage.deviceId || page.consent.owner!==storage.consent.owner || page.consent.epoch!==storage.consent.epoch)throw Error('자료 연결이 바뀌었습니다. 다시 불러와 주시기 바랍니다.');
         records.push(...page.records);Object.assign(versions,page.versions);next[kind]=page.next;
       }
       if(!alive.current || generation!==dataGeneration.current)return;
@@ -69,11 +69,11 @@ export default function PharmacyOrderPanel({ disabled, resuming, draft = '', onA
     if(!workScope || (edited.length && !discardEdits))return;
     dataGeneration.current++;setHistoryLoaded(false);setHistoryPages({});
     setBusy(true);setError('');
-    try { const loaded=await loadWorkingData(workScope, count=>{if(!alive.current)throw Error('중단');setNotice(`${count.toLocaleString()}개 자료를 불러왔어요…`);});if(!alive.current)return;
+    try { const loaded=await loadWorkingData(workScope, count=>{if(!alive.current)throw Error('중단');setNotice(`${count.toLocaleString()}개 자료를 불러왔습니다…`);});if(!alive.current)return;
       setStorage(loaded);setConsent(loaded.consent);
       if(discardEdits){setEdited([]);setSaveFailed(false);}
       setBundle({format:PHARMACY_FORMAT,records:loaded.records.some(r=>r.kind==='sheet')?loaded.records:[...loaded.records,...initial().records]});
-      setNotice(loaded.location==='server'?'서버 자료를 불러왔어요. PC가 꺼져 있어도 이용할 수 있어요.':'PC 자료를 불러왔어요. 수정 내용은 PC에 저장해요.');
+      setNotice(loaded.location==='server'?'서버 자료를 불러왔습니다. PC가 꺼져 있어도 이용할 수 있습니다.':'PC 자료를 불러왔습니다. 수정 내용은 PC에 저장합니다.');
     }catch(e){if(alive.current)setError(errorText(e));}
     finally{if(alive.current)setBusy(false);}
   }
@@ -94,9 +94,9 @@ export default function PharmacyOrderPanel({ disabled, resuming, draft = '', onA
       current={...current,revision:result.revision??current.revision,versions};
       setEdited(old=>old.filter(entry=>!pending.includes(entry)));
       }
-      setNotice('저장했어요.');return true;
+      setNotice('저장했습니다.');return true;
 
-    }catch(e){if(alive.current){setSaveFailed(true);setError(errorText(e)+( /CONFLICT|충돌|revision/i.test(errorText(e))?' 자료가 바뀌었어요. 수정 내용을 내보내거나 취소한 뒤 최신 자료를 불러와 주세요.':' 다시 저장할 수 있어요.')+' 입력한 내용은 유지했어요.');}return false;}
+    }catch(e){if(alive.current){setSaveFailed(true);setError(errorText(e)+( /CONFLICT|충돌|revision/i.test(errorText(e))?' 자료가 바뀌었습니다. 수정 내용을 내보내거나 취소한 뒤 최신 자료를 불러와 주시기 바랍니다.':' 다시 저장할 수 있습니다.')+' 입력한 내용은 유지했습니다.');}return false;}
     finally{saving.current=false;if(alive.current)setPersisting(false);}
   },[workScope,storage,edited]);
   async function importToPc() {
@@ -108,17 +108,17 @@ export default function PharmacyOrderPanel({ disabled, resuming, draft = '', onA
       const parts=pharmacyTransferParts(bundle);
       for(const [index,part] of parts.entries()){
         current=await workDataRequest<{revision:number;deviceId:string;owner:string}>('save',workScope,{mode:'restore',records:part.records,expectedRevision:current.revision,deviceId:current.deviceId,expectedOwner:current.owner});
-        saved+=part.records.length;if(!alive.current)return;setNotice(`${index+1}/${parts.length} 묶음을 PC에 반영했어요…`);
+        saved+=part.records.length;if(!alive.current)return;setNotice(`${index+1}/${parts.length} 묶음을 PC에 반영했습니다…`);
       }
       const permission=await workDataRequest<WorkDataConsent>('status',workScope);
-      if(!alive.current)return;if(permission.owner!==current.owner)throw Error('업무 범위가 바뀌었어요. 자료를 다시 확인해 주세요.');setEdited([]);setStorage({location:'pc',deviceId:current.deviceId,revision:current.revision,consent:permission,records:bundle.records,next:null,counts:{}});
-      setNotice('PC에 저장했어요.');
-    }catch(error){if(alive.current)setError((saved?`${saved}건을 PC에 반영했어요. 나머지 자료를 확인해 주세요. `:'')+errorText(error)+' 현재 화면과 파일은 유지돼요.');}
+      if(!alive.current)return;if(permission.owner!==current.owner)throw Error('업무 범위가 바뀌었습니다. 자료를 다시 확인해 주시기 바랍니다.');setEdited([]);setStorage({location:'pc',deviceId:current.deviceId,revision:current.revision,consent:permission,records:bundle.records,next:null,counts:{}});
+      setNotice('PC에 저장했습니다.');
+    }catch(error){if(alive.current)setError((saved?`${saved}건을 PC에 반영했습니다. 나머지 자료를 확인해 주시기 바랍니다. `:'')+errorText(error)+' 현재 화면과 파일은 유지됩니다.');}
     finally{if(alive.current)setBusy(false);}
   }
   const changeConsent=useCallback(async(enabled:boolean, fromPc=false)=>{
     if(!workScope || saving.current)return;
-    if(enabled && disabled){setQueuedTransfer(fromPc?'pc':'empty');setNotice('현재 작업 단계가 끝나면 서버로 전환해요. 진행 중인 작업은 유지해요.');return;}
+    if(enabled && disabled){setQueuedTransfer(fromPc?'pc':'empty');setNotice('현재 작업 단계가 끝나면 서버로 전환합니다. 진행 중인 작업은 유지합니다.');return;}
     setBusy(true);setError('');
     try {
       // Finish current edits before changing the storage authority. Never silently drop a draft.
@@ -136,8 +136,8 @@ export default function PharmacyOrderPanel({ disabled, resuming, draft = '', onA
       if(next.storageMode==='server'){
         const loaded=await loadWorkingData(workScope);if(!alive.current)return;
         setStorage(loaded);setBundle({format:PHARMACY_FORMAT,records:loaded.records.some(r=>r.kind==='sheet')?loaded.records:[...loaded.records,...bundle.records.filter(r=>r.kind==='sheet')]});
-        setNotice('이제 서버에 저장해요. 모바일이나 다른 PC에서도 이어서 이용할 수 있어요.');
-      }else setNotice(enabled?'서버로 옮기고 있어요. 자료가 있는 PC를 켜 두세요.':'서버 이용을 중단하고 서버 업무 자료를 삭제했어요. PC 저장 방식으로 되돌리지는 않아요.');
+        setNotice('이제 서버에 저장합니다. 모바일이나 다른 PC에서도 이어서 이용할 수 있습니다.');
+      }else setNotice(enabled?'서버로 옮기고 있습니다. 자료가 있는 PC를 켜 두시기 바랍니다.':'서버 이용을 중단하고 서버 업무 자료를 삭제했습니다. PC 저장 방식으로 되돌리지는 않습니다.');
     }catch(error){if(alive.current)setError(errorText(error));}
     finally{if(alive.current)setBusy(false);}
   },[workScope,disabled,edited,persist,storage,bundle,consent?.sourceDeviceId]);
@@ -157,7 +157,7 @@ export default function PharmacyOrderPanel({ disabled, resuming, draft = '', onA
         if(next.storageMode==='server'){
           const loaded=await loadWorkingData(workScope);if(!active)return;
           dataGeneration.current++;setConsent(next);setStorage(loaded);setBundle({format:PHARMACY_FORMAT,records:loaded.records.some(r=>r.kind==='sheet')?loaded.records:[...loaded.records,...initial().records]});
-          setNotice('서버로 옮겼어요. 이제 PC가 꺼져 있어도 이어서 이용할 수 있어요.');setError('');
+          setNotice('서버로 옮겼습니다. 이제 PC가 꺼져 있어도 이어서 이용할 수 있습니다.');setError('');
         }else {setConsent(next);if(next.storageMode==='stopped'){setStorage(null);setBundle(initial());}}
       }catch(error){if(active)setError(errorText(error));}finally{checking=false;}
     };
@@ -178,7 +178,7 @@ export default function PharmacyOrderPanel({ disabled, resuming, draft = '', onA
           return merged.records.some(r=>r.kind==='sheet')?merged:{...merged,records:[...merged.records,...old.records.filter(r=>r.kind==='sheet')]};
         });
       }
-    }).catch(()=>{if(active && generation===dataGeneration.current)setError('보관 위치를 확인하지 못했어요. 자료 불러오기로 다시 확인해 주세요. 입력한 내용은 유지돼요.');});
+    }).catch(()=>{if(active && generation===dataGeneration.current)setError('보관 위치를 확인하지 못했습니다. 자료 불러오기로 다시 확인해 주시기 바랍니다. 입력한 내용은 유지됩니다.');});
     return()=>{active=false;};
   },[workScope]);
   const lastPrepared = useRef({ text: '', base: '' });
@@ -223,7 +223,7 @@ export default function PharmacyOrderPanel({ disabled, resuming, draft = '', onA
     const next = validatePharmacyBundle({ format: PHARMACY_FORMAT, records },{batch:false});
     setBundle(next); setEdited(old => [...old.filter(r => r.kind !== entry.kind || r.data.id !== entry.data.id), entry]);
     setSaveFailed(false);
-    setNotice(storage?'수정 내용을 저장하고 있어요.':'현재 화면에 반영했어요. PC·서버 자료를 연결하거나 파일로 보관해 주세요.');
+    setNotice(storage?'수정 내용을 저장하고 있습니다.':'현재 화면에 반영했습니다. PC·서버 자료를 연결하거나 파일로 보관해 주시기 바랍니다.');
   }
   function attempt(action: () => void) { setError(''); setNotice(''); try { action(); } catch (e) { setError(errorText(e)); } }
   function updateSheet(next: OrderSheet) { save({ kind: 'sheet', data: next }); }
@@ -236,7 +236,7 @@ export default function PharmacyOrderPanel({ disabled, resuming, draft = '', onA
   const [editingLine, setEditingLine] = useState('');
   function addLine() {
     if (!sheet) return;
-    if (editingLine && !sheet.lines.some(l => l.id === editingLine)) throw Error('편집하던 행이 삭제됐습니다. 입력을 확인하고 새 행으로 추가하세요.');
+    if (editingLine && !sheet.lines.some(l => l.id === editingLine)) throw Error('편집하던 행이 삭제됐습니다. 입력을 확인하고 새 행으로 추가하시기 바랍니다.');
     const line: OrderLine = { id: editingLine || uid(), product_name: name.trim(), pack_label: packLabel.trim(), pack_count: count === '' ? null : Number(count), ...(supplierId ? { supplier_id: supplierId } : {}), ...(productId ? { product_id: productId } : {}), ...(packId ? { pack_id: packId } : {}) };
     updateSheet({ id: sheet.id, title: sheet.title, status: 'draft', lines: editingLine ? sheet.lines.map(l => l.id === editingLine ? line : l) : [...sheet.lines, line] });
     setName(''); setProductId(''); setPackId(''); setPackLabel(''); setCount(''); setEditingLine('');
@@ -247,13 +247,13 @@ export default function PharmacyOrderPanel({ disabled, resuming, draft = '', onA
     if (editingLine === lineId) { setEditingLine(''); setName(''); setProductId(''); setPackId(''); setPackLabel(''); setCount(''); }
   }
   function prepare(supplier: string, mode: 'prepare'|'availability') {
-    if (!sheet || resuming) throw Error('진행 중인 질문에 먼저 답하거나 업무를 마친 뒤 새 주문 요청을 준비하세요.');
+    if (!sheet || resuming) throw Error('진행 중인 질문에 먼저 답하거나 업무를 마친 뒤 새 주문 요청을 준비하시기 바랍니다.');
     const request = orderPreparationRequest(bundle, sheet.id, supplier, mode);
     const base = draft === lastPrepared.current.text ? lastPrepared.current.base : draft.trim();
     const text = base ? `${base}\n${request}` : request;
-    if (text.length > HOME_CHAT_MAX_MESSAGE_LENGTH) throw Error('기존 입력을 유지했습니다. 입력창 내용을 먼저 정리한 뒤 주문 요청을 준비하세요.');
+    if (text.length > HOME_CHAT_MAX_MESSAGE_LENGTH) throw Error('기존 입력을 유지했습니다. 입력창 내용을 먼저 정리한 뒤 주문 요청을 준비하시기 바랍니다.');
     lastPrepared.current = { text, base }; onApply(text);
-    setNotice('입력창에만 반영했습니다. 요청 내용을 확인하고 실행하세요.');
+    setNotice('입력창에만 반영했습니다. 요청 내용을 확인하고 실행하시기 바랍니다.');
   }
   return <div className="mt-3 w-full max-w-xl space-y-3 text-left text-sm text-slate-700">
       {workScope && <section aria-label="업무 자료 보관" className="space-y-2 rounded border border-slate-200 bg-white p-3">
@@ -263,61 +263,61 @@ export default function PharmacyOrderPanel({ disabled, resuming, draft = '', onA
           {saveFailed && <button type="button" disabled={blocked || persisting} onClick={()=>void load(true)} className="rounded border border-red-600 px-3 py-2 text-red-700">수정 취소하고 최신 자료 불러오기</button>}
           <button type="button" disabled={blocked || persisting || !storage || !edited.length} onClick={()=>void persist()} className="rounded bg-blue-700 px-3 py-2 text-white">자료 저장</button>
         </div>
-        <p>{storage?`보관 위치: ${storage.location==='server'?'서버':'이 PC'}`:'PC 자료는 기본적으로 PC에 보관해요.'}</p>
+        <p>{storage?`보관 위치: ${storage.location==='server'?'서버':'이 PC'}`:'PC 자료는 기본적으로 PC에 보관합니다.'}</p>
         {storage?.sync && <p className="text-xs">동기화 대기 {storage.sync.pending}건 · 충돌 {storage.sync.conflicts}건{storage.sync.lastSyncedAt?` · 마지막 확인 ${new Date(storage.sync.lastSyncedAt).toLocaleString()}`:''}</p>}
-        {storage?.sync?.conflicts ? <p role="alert">PC 수정과 서버 수정이 달라 자동 반영을 멈췄어요. 양쪽 내용은 보존돼요. 사용할 내용을 확인하고 수정해 주세요.</p>:null}
+        {storage?.sync?.conflicts ? <p role="alert">PC 수정과 서버 수정이 달라 자동 반영을 멈췄습니다. 양쪽 내용은 보존됩니다. 사용할 내용을 확인하고 수정해 주시기 바랍니다.</p>:null}
         {storage?.updatedAt && <p className="text-xs">자료 수정 시각: {new Date(storage.updatedAt).toLocaleString()}</p>}
         {!consent?.enabled && consent?.storageMode!=='stopped' && <div className="flex flex-wrap gap-2">
           <button type="button" disabled={busy || persisting || queuedTransfer!==null} onClick={()=>void changeConsent(true,true)} className="rounded bg-blue-700 px-3 py-2 text-white">동의하고 PC 자료를 서버로 옮기기</button>
           <button type="button" disabled={busy || persisting || queuedTransfer!==null || !!storage || edited.length>0 || bundle.records.some(r=>r.kind!=='sheet' || r.data.lines.length>0)} onClick={()=>void changeConsent(true)} className="rounded border border-blue-700 px-3 py-2 text-blue-700">동의하고 서버에서 시작</button>
         </div>}
-        {queuedTransfer && <p role="status">현재 작업 단계가 끝나면 서버로 전환해요. <button type="button" onClick={()=>setQueuedTransfer(null)} className="underline">전환 예약 취소</button></p>}
+        {queuedTransfer && <p role="status">현재 작업 단계가 끝나면 서버로 전환합니다. <button type="button" onClick={()=>setQueuedTransfer(null)} className="underline">전환 예약 취소</button></p>}
         {consent?.storageMode==='transferring' && <div role="status" className="rounded bg-blue-50 p-3">
           <progress aria-label="서버 전환 진행" className="w-full" />
-          <p>{consent.transferError?'자료가 달라 이전을 멈췄어요. 기존 자료는 유지돼요.':'서버로 자료를 옮기고 있어요. 완료 후 여기서 이어갈 수 있어요.'}</p>
-          {consent.transferredRecords!==undefined && <p>{consent.transferredRecords.toLocaleString()}건을 서버에 보관했어요.</p>}
-          {consent.sourceOnline===false && <p>자료가 있는 PC를 켜고 연결 프로그램을 실행해 주세요. 연결되면 계속 진행해요.</p>}
-          {consent.transferError && <p role="alert">서버 자료와 PC 자료의 연결을 확인해야 해요. 같은 요청의 자동 반복은 멈췄어요. <button type="button" disabled={disabled || busy} onClick={()=>void changeConsent(true,true)} className="underline">확인 후 다시 시도</button></p>}
+          <p>{consent.transferError?'자료가 달라 이전을 멈췄습니다. 기존 자료는 유지됩니다.':'서버로 자료를 옮기고 있습니다. 완료 후 여기서 이어갈 수 있습니다.'}</p>
+          {consent.transferredRecords!==undefined && <p>{consent.transferredRecords.toLocaleString()}건을 서버에 보관했습니다.</p>}
+          {consent.sourceOnline===false && <p>자료가 있는 PC를 켜고 연결 프로그램을 실행해 주시기 바랍니다. 연결되면 계속 진행합니다.</p>}
+          {consent.transferError && <p role="alert">서버 자료와 PC 자료의 연결을 확인해야 합니다. 같은 요청의 자동 반복은 멈췄습니다. <button type="button" disabled={disabled || busy} onClick={()=>void changeConsent(true,true)} className="underline">확인 후 다시 시도</button></p>}
           {!consent.sourceDeviceId && <button type="button" disabled={disabled || busy} onClick={()=>void changeConsent(true,true)} className="rounded bg-blue-700 px-3 py-2 text-white">자료가 있는 PC 연결하고 계속</button>}
           <button type="button" disabled={disabled || busy} onClick={()=>void changeConsent(false)} className="mt-2 underline">전환 중단·서버 자료 삭제</button>
         </div>}
-        {consent?.storageMode==='server' && consent.transferError && <p role="alert">PC에서 받은 새 자료의 연결을 확인해야 해요. 기존 서버 자료는 계속 이용할 수 있어요. <button type="button" disabled={disabled || busy || persisting} onClick={()=>void changeConsent(true,true)} className="underline">확인 후 다시 시도</button></p>}
+        {consent?.storageMode==='server' && consent.transferError && <p role="alert">PC에서 받은 새 자료의 연결을 확인해야 합니다. 기존 서버 자료는 계속 이용할 수 있습니다. <button type="button" disabled={disabled || busy || persisting} onClick={()=>void changeConsent(true,true)} className="underline">확인 후 다시 시도</button></p>}
         {consent?.storageMode==='server' && <button type="button" disabled={disabled || busy || persisting || edited.length>0} onClick={()=>void changeConsent(false)} className="rounded border px-3 py-2">서버 이용 중단·서버 자료 삭제</button>}
         {consent?.storageMode==='server' && !consent.sourceDeviceId && <button type="button" disabled={disabled || busy || persisting} onClick={()=>void changeConsent(true,true)} className="rounded border border-blue-700 px-3 py-2 text-blue-700">프로그램 자료를 수집할 PC 연결</button>}
-        {consent?.storageMode==='stopped' && <p role="status">서버 이용을 중단했어요. PC 저장 방식으로 돌아가지는 않아요. <button type="button" disabled={disabled || busy} onClick={()=>void changeConsent(true)} className="underline">동의하고 서버에서 새로 시작</button></p>}
-        <p className="text-xs">서버를 선택하면 이후 업무 자료는 서버를 기준으로 저장해요. PC 저장 방식으로 되돌리지 않아요. 약국 프로그램 화면 작업은 연결된 PC가 수행해요. 로그인 정보·환자 자료는 보내지 않아요.</p>
-        {busy && <p role="status">자료를 확인하고 있어요…</p>}{persisting && <p role="status">수정 내용을 저장하고 있어요…</p>}
+        {consent?.storageMode==='stopped' && <p role="status">서버 이용을 중단했습니다. PC 저장 방식으로 돌아가지는 않습니다. <button type="button" disabled={disabled || busy} onClick={()=>void changeConsent(true)} className="underline">동의하고 서버에서 새로 시작</button></p>}
+        <p className="text-xs">서버를 선택하면 이후 업무 자료는 서버를 기준으로 저장합니다. PC 저장 방식으로 되돌리지 않습니다. 약국 프로그램 화면 작업은 연결된 PC가 수행합니다. 로그인 정보·환자 자료는 보내지 않습니다.</p>
+        {busy && <p role="status">자료를 확인하고 있습니다…</p>}{persisting && <p role="status">수정 내용을 저장하고 있습니다…</p>}
       </section>}
       {notice && <p role="status">{notice}</p>}{error && <p role="alert">{error}</p>}
     <details className="mt-3 w-full max-w-xl rounded-xl border border-slate-200 bg-white p-4 text-left text-sm text-slate-700">
     <summary className="cursor-pointer font-semibold">약국 주문 준비</summary>
     <div className="mt-3 space-y-3">
       <p>{onPcSetup ? <button type="button" disabled={blocked} onClick={onPcSetup} className="underline">PC 설치·연결 준비</button> : <a href="/mypage" target="_blank" rel="noopener noreferrer" className="underline">이 PC 연결·프로그램 업데이트 (새 탭)</a>}</p>
-      <p>원하는 업무부터 요청하세요. 작업에 필요한 자료는 진행하면서 모으고, 처음 만나는 화면은 필요한 부분만 도움을 요청해요. 자료나 매뉴얼을 미리 등록하지 않아도 시작할 수 있어요.</p>
-      <p className="text-xs">연결한 자료의 수정은 자동 저장해요. 저장 실패 안내가 있으면 다시 시도해 주세요. 연결 전 작업은 파일로 보관할 수 있어요. 로그인·최종 주문·결제는 직접 진행합니다.</p>
+      <p>원하는 업무부터 요청하시기 바랍니다. 작업에 필요한 자료는 진행하면서 모으고, 처음 만나는 화면은 필요한 부분만 도움을 요청합니다. 자료나 매뉴얼을 미리 등록하지 않아도 시작할 수 있습니다.</p>
+      <p className="text-xs">연결한 자료의 수정은 자동 저장합니다. 저장 실패 안내가 있으면 다시 시도해 주시기 바랍니다. 연결 전 작업은 파일로 보관할 수 있습니다. 로그인·최종 주문·결제는 직접 진행합니다.</p>
       {workScope && <label className="flex items-start gap-2 text-xs"><input type="checkbox" checked={sharing} disabled={blocked} onChange={async e=>{const enabled=e.target.checked;setBusy(true);try{const next=await workDataRequest<{enabled:boolean}>('method-sharing',workScope,{enabled});if(alive.current)setSharing(next.enabled);}catch(error){if(alive.current)setError(errorText(error));}finally{if(alive.current)setBusy(false);}}} />검증된 동작 순서를 다른 사용자의 추천에 활용하도록 허용 (문장·거래 값·화면 글 제외)</label>}
       {!serverManaged && <label className="block">PC 자료함 JSON 가져오기
         <input type="file" accept=".json,application/json" disabled={blocked} onChange={async e => {
           const file = e.currentTarget.files?.[0]; e.currentTarget.value = ''; if (!file) return;
           setError(''); setBusy(true);
           try {
-            if (file.size > PHARMACY_ARCHIVE_BYTES) throw Error('자료 파일은 64MB 이내로 준비하세요.');
+            if (file.size > PHARMACY_ARCHIVE_BYTES) throw Error('자료 파일은 64MB 이내로 준비하시기 바랍니다.');
             const parsed = parsePharmacyFile(await file.text()); if (!alive.current) return;
-            if ((!storage && bundle.records.some(r => r.kind !== 'sheet' || r.data.lines.length)) || edited.length) throw Error('현재 자료를 먼저 내보내고 새로고침한 뒤 가져오세요. 기존 작업을 덮어쓰지 않습니다.');
+            if ((!storage && bundle.records.some(r => r.kind !== 'sheet' || r.data.lines.length)) || edited.length) throw Error('현재 자료를 먼저 내보내고 새로고침한 뒤 가져오시기 바랍니다. 기존 작업을 덮어쓰지 않습니다.');
             dataGeneration.current++;setStorage(null);setHistoryLoaded(false);setHistoryPages({});
             setBundle(parsed.records.some(r => r.kind === 'sheet') ? parsed : { ...parsed, records: [...parsed.records, ...initial().records] });
-            setSelected(''); setNotice('파일을 미리 보고 있어요. PC에 보관을 눌러야 저장돼요. 프로그램 출처와 상품·포장 연결을 확인하세요.');
+            setSelected(''); setNotice('파일을 미리 보고 있습니다. PC에 보관을 눌러야 저장됩니다. 프로그램 출처와 상품·포장 연결을 확인하시기 바랍니다.');
           } catch (e) { if (alive.current) setError(errorText(e)); }
           finally { if (alive.current) setBusy(false); }
         }} className="mt-1 block w-full" />
       </label>}
       {workScope && !serverManaged && <button type="button" disabled={blocked || !!storage} onClick={()=>void importToPc()} className="rounded bg-blue-700 px-3 py-2 text-white">현재 자료를 PC에 보관</button>}
-      <p className="text-xs">화면에 불러온 상품·거래처·포장·주문 시트와 조회한 이력만 파일에 담아요. 구매·사용량·판매·거래장 원본은 연결된 PC·서버에 보관돼요.</p>
+      <p className="text-xs">화면에 불러온 상품·거래처·포장·주문 시트와 조회한 이력만 파일에 담습니다. 구매·사용량·판매·거래장 원본은 연결된 PC·서버에 보관됩니다.</p>
       <div className="flex flex-wrap gap-2">
         <button type="button" disabled={blocked} onClick={() => attempt(() => download(pharmacyExportFile(bundle), 'o4o-pharmacy-work.private.json'))} className="rounded border px-2 py-1">화면 자료 내보내기</button>
         <button type="button" disabled={blocked || !edited.length} onClick={() => attempt(() => download({ format: PHARMACY_FORMAT, records: edited }, 'o4o-pharmacy-user-edits.private.json'))} className="rounded border px-2 py-1">수정 내용 내보내기</button>
       </div>
-      <p className="text-xs">내보낸 파일에는 약국 업무 자료가 포함됩니다. 본인의 PC·계정에서만 사용하세요. 서버를 선택한 업무는 파일을 가져와 PC 저장 방식으로 되돌리지 않습니다.</p>
+      <p className="text-xs">내보낸 파일에는 약국 업무 자료가 포함됩니다. 본인의 PC·계정에서만 사용하시기 바랍니다. 서버를 선택한 업무는 파일을 가져와 PC 저장 방식으로 되돌리지 않습니다.</p>
       <fieldset disabled={blocked} className="space-y-2 rounded border p-3">
         <legend>거래처 추가</legend>
         <label className="block">거래처명<input aria-label="새 거래처명" value={supplierName} maxLength={200} onChange={e => setSupplierName(e.target.value)} className="block w-full rounded border p-2" /></label>
@@ -385,13 +385,13 @@ export default function PharmacyOrderPanel({ disabled, resuming, draft = '', onA
           <button type="button" disabled={blocked || sheet.status !== 'prepared'} onClick={() => attempt(() => updateSheet({ ...sheet, status: 'handed_over' }))} className="rounded border px-2 py-1">직접 주문하도록 인계</button>
         </div>
         {sheet.status === 'handed_over' && <div><label className="block">접수 확인 거래처<select value={nextReceiptSupplier} disabled={blocked} onChange={e => { setReceiptSupplier(e.target.value); setReceipt(''); }} className="block w-full rounded border p-2">{pendingSuppliers.map(id => <option key={id} value={id}>{suppliers.find(s => s.data.id === id)?.data.name}</option>)}</select></label><label className="block">직접 확인한 외부 접수번호<input value={receipt} maxLength={200} disabled={blocked} onChange={e => setReceipt(e.target.value)} className="block w-full rounded border p-2" /><button type="button" disabled={blocked || !receipt.trim()} onClick={() => attempt(() => {
-            if (!nextReceiptSupplier) throw Error('접수 확인 거래처를 선택하세요.');
+            if (!nextReceiptSupplier) throw Error('접수 확인 거래처를 선택하시기 바랍니다.');
             const nextReceipts = [...receipts, { supplier_id: nextReceiptSupplier, reference: receipt.trim(), confirmed_at: new Date().toISOString() }];
             updateSheet({ id: sheet.id, title: sheet.title, lines: sheet.lines, status: nextReceipts.length === groupOrderLines(sheet).length ? 'receipt_recorded' : 'handed_over', receipts: nextReceipts });
             setReceipt(''); setReceiptSupplier('');
           })} className="mt-2 rounded border px-2 py-1">외부 주문 접수 직접 확인</button></label></div>}
       </>}
-      {(storage || bundle.records.some(r => r.kind === 'stock' || r.kind === 'availability')) && <details onToggle={event=>{if(event.currentTarget.open && !historyLoaded)void loadHistory();}}><summary>수량·품절 확인 이력</summary>{storage && <div className="my-2 flex gap-2"><button type="button" disabled={historyLoading} onClick={()=>void loadHistory(true)} className="rounded border px-2 py-1">이력 다시 조회</button>{historyLoaded && Object.values(historyPages).some(Boolean) && <button type="button" disabled={historyLoading} onClick={()=>void loadHistory()} className="rounded border px-2 py-1">이력 더 보기</button>}{historyLoading && <span role="status">확인 이력을 불러오고 있어요…</span>}</div>}<ul className="mt-2 space-y-2">{bundle.records.filter(r => r.kind === 'stock' || r.kind === 'availability').map(r => <li key={`${r.kind}:${r.data.id}`} className="break-words">
+      {(storage || bundle.records.some(r => r.kind === 'stock' || r.kind === 'availability')) && <details onToggle={event=>{if(event.currentTarget.open && !historyLoaded)void loadHistory();}}><summary>수량·품절 확인 이력</summary>{storage && <div className="my-2 flex gap-2"><button type="button" disabled={historyLoading} onClick={()=>void loadHistory(true)} className="rounded border px-2 py-1">이력 다시 조회</button>{historyLoaded && Object.values(historyPages).some(Boolean) && <button type="button" disabled={historyLoading} onClick={()=>void loadHistory()} className="rounded border px-2 py-1">이력 더 보기</button>}{historyLoading && <span role="status">확인 이력을 불러오고 있습니다…</span>}</div>}<ul className="mt-2 space-y-2">{bundle.records.filter(r => r.kind === 'stock' || r.kind === 'availability').map(r => <li key={`${r.kind}:${r.data.id}`} className="break-words">
         {r.kind === 'stock' ? `${products.find(p => p.data.id === r.data.product_id)?.data.name}: ${{confirmed:'실물 확인',program:'프로그램 재고',estimated:'추정 재고',unknown:'미확인'}[r.data.confidence]} / ${r.data.quantity ?? '미확인'}${r.data.unit ?? ''} / ${r.data.observed_at}` : r.kind === 'availability' ? `${products.find(p => p.data.id === r.data.product_id)?.data.name}: ${{available:'주문 가능',out_of_stock:'품절',unconfirmed:'확인 불가'}[r.data.state]} / ${suppliers.find(v => v.data.id === r.data.supplier_id)?.data.name} / ${r.data.observed_at}` : ''}
       </li>)}</ul></details>}
 

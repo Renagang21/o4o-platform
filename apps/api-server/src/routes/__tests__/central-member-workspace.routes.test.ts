@@ -104,3 +104,13 @@ it('keeps operator verification Google-authenticated, versioned and no-store for
  expect(result.status).toBe(200);expect(result.headers['cache-control']).toBe('private, no-store');
  expect(requestVerification).toHaveBeenCalledWith(actor,target,input.version);
 });
+
+it('qualification-only detail uses authenticated Google and its own read-only grant contract',async()=>{
+ const review=`/qualifications/review/${target}`;
+ expect((await request(app).get(review)).status).toBe(401);
+ expect((await request(app).get(review).set('x-user',actor).set('x-method','password')).status).toBe(403);
+ expect(detail).not.toHaveBeenCalled();
+ const result=await request(app).get(review).set('x-user',actor).set('x-method','google');
+ expect(result.status).toBe(200);expect(result.headers['cache-control']).toContain('no-store');
+ expect(detail).toHaveBeenCalledWith(actor,target,true);
+});
