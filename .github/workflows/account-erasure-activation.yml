@@ -1,0 +1,26 @@
+name: Account erasure operations
+run-name: Account erasure ${{ inputs.action || 'maintenance' }} ${{ inputs.sha || github.sha }}
+on:
+  workflow_dispatch:
+    inputs:
+      sha:
+        description: '검증한 main HEAD 40자 SHA'
+        required: true
+      action:
+        type: choice
+        options: [audit, prepare-storage, activate, disable, maintenance]
+        default: audit
+permissions:
+  contents: read
+  actions: read
+  id-token: write
+concurrency:
+  group: account-erasure-production
+  cancel-in-progress: false
+jobs:
+  operate:
+    if: github.ref == 'refs/heads/main' && vars.DEPLOY_FREEZE == 'false' && github.actor == github.repository_owner && github.triggering_actor == github.repository_owner
+    uses: ./.github/workflows/deploy-api.yml
+    with:
+      erasure_operation: ${{ inputs.action }}
+      erasure_sha: ${{ inputs.sha }}

@@ -4,7 +4,7 @@ import { mayEraseSupplierProfileFile, ownedSupplierIds } from '../../modules/net
 import type { Request, Response } from 'express';
 import { Storage } from '@google-cloud/storage';
 import { AppDataSource } from '../../database/connection.js';
-import { AccountErasureError, AccountErasureService, type PersonalStorage } from './account-erasure.service.js';
+import { AccountErasureError, AccountErasureService, erasureOptionsFromEnv, type PersonalStorage } from './account-erasure.service.js';
 
 const gcs = new Storage();
 async function assertFileOwnership(bucket:string,path:string,ownerId:string,metadata:Record<string,unknown>,db:Pick<EntityManager,'query'>=AppDataSource){
@@ -61,14 +61,7 @@ export const accountErasureStorage: PersonalStorage = {
   },
 };
 export function erasureService(): AccountErasureService {
-  const years = Number(process.env.ACCOUNT_ERASURE_SYSTEM_YEARS);
-  return new AccountErasureService(AppDataSource, {
-    enabled: process.env.ACCOUNT_ERASURE_MODE === 'apply',
-    inventoryReviewed:process.env.ACCOUNT_ERASURE_FILE_INVENTORY_REVIEW==='confirmed',
-    systemYears: years === 1 || years === 2 ? years : undefined,
-    systemBasis: process.env.ACCOUNT_ERASURE_SYSTEM_POLICY_BASIS,
-    personalBuckets: [process.env.GCS_MEDIA_LIBRARY_BUCKET || 'o4o-media-library', process.env.GCS_PRIVATE_DOCUMENT_BUCKET || 'o4o-private-documents'], storage: accountErasureStorage,
-  });
+  return new AccountErasureService(AppDataSource,{...erasureOptionsFromEnv(),storage:accountErasureStorage});
 }
 export async function respondErasureCapabilities(_req:Request,res:Response):Promise<void> {
   try { res.json({success:true,data:await erasureService().capabilities()}); }
