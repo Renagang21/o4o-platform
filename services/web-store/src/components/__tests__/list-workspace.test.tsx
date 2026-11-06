@@ -67,6 +67,7 @@ function SelectionProbe() {
       <button onClick={() => selection.setMany(["1", "2"], true)}>select</button>
       <button onClick={() => selection.retain(["2"])}>retain</button>
       <button onClick={() => setScope("b")}>scope</button>
+      <button onClick={() => setScope("a")}>back</button>
     </>
   );
 }
@@ -78,6 +79,9 @@ it("drops selection on scope change in the same render and retains only visible 
   fireEvent.click(screen.getByText("retain"));
   expect(count()).toBe("1");
   fireEvent.click(screen.getByText("scope"));
+  expect(count()).toBe("0");
+  // Returning to the earlier scope (e.g. page 2 → page 1) must not resurrect its old selection.
+  fireEvent.click(screen.getByText("back"));
   expect(count()).toBe("0");
 });
 

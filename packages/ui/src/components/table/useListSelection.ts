@@ -4,8 +4,9 @@
  * WO-O4O-STANDARD-LIST-WORKSPACE-CONTRACT-V1
  *
  * scopeKey 는 선택이 유효한 범위다(매장 · 계정 · 권한 · 검색어 · 필터 · 탭 · 페이지).
- * scopeKey 가 바뀐 렌더부터 선택은 비어 있다. effect 로 지우지 않으므로
- * 오래된 선택이 한 프레임도 화면이나 ActionBar 에 남지 않는다.
+ * scopeKey 가 바뀐 렌더부터 선택은 비어 있고, 저장된 선택도 그 렌더에서 버린다.
+ * effect 로 지우지 않으므로 오래된 선택이 한 프레임도 화면이나 ActionBar 에 남지 않으며,
+ * 이전 범위로 돌아와도 예전 선택이 되살아나지 않는다.
  */
 
 import { useCallback, useMemo, useState } from 'react';
@@ -34,6 +35,9 @@ export interface UseListSelectionReturn {
 
 export function useListSelection(scopeKey: string): UseListSelectionReturn {
   const [state, setState] = useState<SelectionState>({ scope: scopeKey, keys: EMPTY_SELECTION });
+  // Discard the stored selection as soon as the scope changes (render-time state adjustment), so
+  // returning to an earlier scope (e.g. page 2 → page 1) never resurrects its old selection.
+  if (state.scope !== scopeKey) setState({ scope: scopeKey, keys: EMPTY_SELECTION });
   const keys = state.scope === scopeKey ? state.keys : EMPTY_SELECTION;
 
   const update = useCallback(
