@@ -140,6 +140,60 @@ it("preserves unsaved work during successful background delegation checks and re
 });
 
 it.each([
+  ["a 503 outage", denied("CENTRAL_ACCESS_UNAVAILABLE", 503)],
+  ["a rate limit", denied("TOO_MANY_REQUESTS", 429)],
+  ["a network failure", new Error("Network Error")],
+])("keeps unsaved work through %s and clears the notice once the check recovers", async (_label, failure) => {
+  const granted = { data: { data: { roles: ["supplier:operator"], menuKeys: ["supplier.members"] } } };
+  mock.get.mockResolvedValueOnce(granted);
+  view("/operations/supplier/members");
+  fireEvent.change(await screen.findByLabelText("작성 중"), { target: { value: "작성 중인 사유" } });
+  mock.get.mockRejectedValueOnce(failure);
+  fireEvent(window, new Event("focus"));
+  expect(await screen.findByText(/현재 화면을 유지합니다/)).toHaveAttribute("role", "status");
+  expect(screen.queryByRole("alert")).toBeNull();
+  expect(screen.getByLabelText("작성 중")).toHaveValue("작성 중인 사유");
+  mock.get.mockResolvedValueOnce(granted);
+  fireEvent(window, new Event("focus"));
+  await waitFor(() => expect(screen.queryByText(/현재 화면을 유지합니다/)).toBeNull());
+  expect(screen.getByLabelText("작성 중")).toHaveValue("작성 중인 사유");
+});
+it("an explicit refusal during an outage still closes the screen", async () => {
+  mock.get.mockResolvedValueOnce({ data: { data: { roles: ["supplier:operator"], menuKeys: ["supplier.members"] } } });
+  view("/operations/supplier/members");
+  await screen.findByLabelText("작성 중");
+  mock.get.mockRejectedValueOnce(denied("CENTRAL_ACCESS_UNAVAILABLE", 503));
+  fireEvent(window, new Event("focus"));
+  await screen.findByText(/현재 화면을 유지합니다/);
+  mock.get.mockRejectedValueOnce(denied("CENTRAL_DELEGATION_REQUIRED"));
+  fireEvent(window, new Event("focus"));
+  expect(await screen.findByRole("alert")).toHaveTextContent("유효한 업무 위임");
+  expect(screen.queryByLabelText("작성 중")).toBeNull();
+});
+it("an outage cannot carry one account's verification over to another", async () => {
+  mock.get.mockResolvedValueOnce({ data: { data: { roles: ["supplier:operator"], menuKeys: ["supplier.members"] } } });
+  const page = view("/operations/supplier/members");
+  await screen.findByLabelText("작성 중");
+  const original = mock.user;
+  mock.user = { id: "synthetic-other-user", roles: ["supplier:operator"] };
+  mock.get.mockRejectedValue(denied("CENTRAL_ACCESS_UNAVAILABLE", 503));
+  try {
+    page.rerender(
+      <MemoryRouter initialEntries={["/operations/supplier/members"]}>
+        <Routes>
+          <Route path="/operations/:serviceKey/:area" element={<CentralOperationsPage />} />
+        </Routes>
+      </MemoryRouter>,
+    );
+    expect(await screen.findByRole("alert")).toHaveTextContent("확인하지 못했습니다");
+    expect(screen.queryByLabelText("작성 중")).toBeNull();
+  } finally {
+    mock.user = original;
+    mock.get.mockReset();
+  }
+});
+
+it.each([
   [
     "/operations/supplier/members/synthetic-member",
     "supplier:operator",

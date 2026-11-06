@@ -34,6 +34,8 @@ export default function CentralOperationsPage() {
   } | null>(null);
   const roles = grant?.userId === String(user?.id) ? grant.roles : null;
   const sequence = useRef(0);
+  const verifiedUser = useRef<string | null>(null);
+  const [checkFailed, setCheckFailed] = useState(false);
   const [error, setError] = useState("");
   const load = useCallback(async () => {
     const seq = ++sequence.current;
@@ -42,13 +44,24 @@ export default function CentralOperationsPage() {
       const response = await authClient.api.get("/operator/central-access");
       if (!Array.isArray(response.data?.data?.roles) || !Array.isArray(response.data?.data?.menuKeys))
         throw new Error("INVALID_RESPONSE");
-      if (seq === sequence.current)
+      if (seq === sequence.current) {
+        verifiedUser.current = identityId;
+        setCheckFailed(false);
         setGrant({ userId: identityId, roles: response.data.data.roles, menuKeys: response.data.data.menuKeys });
+      }
     } catch (failure) {
       if (seq === sequence.current) {
+        const { status, data } = (failure as { response?: { status?: number; data?: { code?: string } } }).response ?? {};
+        // Only an explicit refusal ends access. An outage must not discard unsaved work on a verified
+        // screen: nothing new opens because every domain API keeps its own guard.
+        if (status !== 401 && status !== 403 && verifiedUser.current === identityId) {
+          setCheckFailed(true);
+          return;
+        }
+        verifiedUser.current = null;
+        setCheckFailed(false);
         setGrant(null);
-        const code = (failure as { response?: { data?: { code?: string } } }).response?.data?.code;
-        setError((code && CENTRAL_ACCESS_DENIAL[code]) || CENTRAL_ACCESS_UNVERIFIED);
+        setError((data?.code && CENTRAL_ACCESS_DENIAL[data.code]) || CENTRAL_ACCESS_UNVERIFIED);
       }
     }
   }, [identityId]);
@@ -121,6 +134,7 @@ export default function CentralOperationsPage() {
         <button onClick={logout}>로그아웃</button>
       </header>}
     >
+      {checkFailed && <p role="status" className="mb-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">업무 위임 상태를 확인하지 못해 현재 화면을 유지합니다. 자동으로 다시 확인합니다.</p>}
       {!serviceKey && <CentralOperationOverview key={user.id} roleKey={[...roles, ...menuKeys].sort((left,right)=>left.localeCompare(right)).join('|')} />}
       {!serviceKey && <CentralOperationNotifications key={`panel:${user.id}`} variant="panel" scopeKey={[...roles, ...menuKeys].sort((left,right)=>left.localeCompare(right)).join('|')} />}
       {serviceKey && area && <nav aria-label="현재 위치" className="mb-5 flex flex-wrap items-center gap-2 border-b pb-4 text-sm text-slate-500">
