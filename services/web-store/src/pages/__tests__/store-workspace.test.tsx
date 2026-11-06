@@ -24,7 +24,7 @@ import {
 vi.mock('../../api/consultationWorkspace', () => ({ fetchConsultationLayout: vi.fn(async () => ({ organizationId: 'fixture-store', name: 'Fixture', operatingType: 'large' })) }));
 vi.mock('../pharmacy/StoreHandledProductsPage', () => ({ default: ({ navigation }: { navigation?: React.ReactNode }) => <><h1>상품 목록</h1>{navigation}</> }));
 vi.mock('../neture-pharmacy/SupplyOptionsPage', () => ({default:({navigation}:{navigation?:React.ReactNode})=><><h1>상품 주문</h1>{navigation}</>}));
-vi.mock('../pharmacy/StoreLibraryContentsPage', () => ({ default: ({ navigation, quickLinks }: { navigation?: React.ReactNode; quickLinks?: React.ReactNode }) => <><h1>저장한 안내 목록</h1>{quickLinks}{navigation}</> }));
+vi.mock('../pharmacy/StoreLibraryContentsPage', () => ({ default: ({ navigation, quickLinks, productLink, moreNavigation }: { navigation?: React.ReactNode; quickLinks?: React.ReactNode; productLink?: React.ReactNode; moreNavigation?: React.ReactNode }) => <><h1>저장한 안내 목록</h1>{quickLinks}{productLink}{navigation}{moreNavigation}</> }));
 vi.mock('../pharmacy/StoreExecutionPage', () => ({ default: ({ navigation }: { navigation?: React.ReactNode }) => <><h1>실행 현황</h1>{navigation}</> }));
 
 vi.mock("../../contexts/AuthContext", () => ({

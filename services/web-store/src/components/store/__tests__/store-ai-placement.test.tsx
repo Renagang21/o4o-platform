@@ -11,6 +11,7 @@ import { useState } from "react";
 import { MemoryRouter } from "react-router-dom";
 import { StoreAiPlacementProvider, StoreAiSlot } from "../StoreAiPlacement";
 import { StoreAiAssistant } from "../StoreAiAssistant";
+import { StoreTaskPageShell } from "../StoreTaskPageShell";
 const ask = vi.hoisted(() => vi.fn());
 vi.mock("../../../contexts/AuthContext", () => ({
   useAuth: () => ({ user: { id: "owner" }, isAuthenticated: true }),
@@ -50,6 +51,22 @@ function Fixture() {
     </StoreAiPlacementProvider>
   );
 }
+it('list-first pages keep AI optional and preserve an unsent draft while collapsed', () => {
+  render(<MemoryRouter><StoreAiPlacementProvider>
+    <StoreTaskPageShell listFirst labels={{ pageTitle: '매장 콘텐츠' }}>
+      <p>저장한 콘텐츠 목록</p>
+    </StoreTaskPageShell>
+    <StoreAiAssistant area="studio" basePath="/store" items={[]} />
+  </StoreAiPlacementProvider></MemoryRouter>);
+  const summary = screen.getByText('AI 도움 요청');
+  expect(summary.closest('details')?.open).toBe(false);
+  fireEvent.click(summary);
+  fireEvent.change(screen.getByRole('textbox'), { target: { value: '보관한 질문' } });
+  fireEvent.click(summary);
+  fireEvent.click(summary);
+  expect((screen.getByRole('textbox') as HTMLTextAreaElement).value).toBe('보관한 질문');
+  expect(ask).not.toHaveBeenCalled();
+});
 it("keeps one input and unsent draft when its surface moves into and out of an editor", () => {
   render(
     <MemoryRouter>
