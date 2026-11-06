@@ -290,21 +290,23 @@ export function OperatorMembersConsolePage({
   // ─── Batch Actions ──────────────────────────────────────────
 
   const selectedPendingIds = useMemo(
-    () => [...selectedIds].filter((id) => users.find((u) => u.id === id)?.status === 'pending'),
+    () => [...selectedIds].filter((id) => users.some((u) => u.id === id && !u.operatorReadOnly && u.status === 'pending')),
     [selectedIds, users],
   );
 
   const selectedApprovableIds = useMemo(
     () =>
       [...selectedIds].filter((id) => {
-        const s = users.find((u) => u.id === id)?.status;
+        const user = users.find((u) => u.id === id);
+        if (user?.operatorReadOnly) return false;
+        const s = user?.status;
         return s === 'pending' || s === 'rejected';
       }),
     [selectedIds, users],
   );
 
   const selectedUsers = useMemo(
-    () => users.filter((u) => selectedIds.has(u.id)),
+    () => users.filter((u) => selectedIds.has(u.id) && !u.operatorReadOnly),
     [users, selectedIds],
   );
 
@@ -356,7 +358,8 @@ export function OperatorMembersConsolePage({
   // ─── Bulk Action Bar ────────────────────────────────────────
 
   const extraBulkActionItems = (extraBulkActions ?? []).map((action: MembersBulkActionConfig) => {
-    const targetIds = action.getTargetIds(selectedUsers);
+    const allowedIds = new Set(selectedUsers.map(user => user.id));
+    const targetIds = action.getTargetIds(selectedUsers).filter(id => allowedIds.has(id));
     const count = targetIds.length;
     const label = typeof action.label === 'function' ? action.label(count) : action.label;
     return {
@@ -414,6 +417,7 @@ export function OperatorMembersConsolePage({
     header: roleColumnHeader,
     width: '120px',
     render: (_v, user) => {
+      if (user.operatorReadOnly) return <span>전체 관리자 — 처리 대상 아님</span>;
       const role = getPrimaryRole(user);
       const display = roleDisplayMap?.[role] ?? role;
       return <RoleBadge role={display} />;
@@ -485,6 +489,7 @@ export function OperatorMembersConsolePage({
     align: 'center',
     onCellClick: () => {}, // prevent row click from triggering drawer
     render: (_v, user) => {
+      if (user.operatorReadOnly) return null;
       if (actionLoading === user.id) {
         return <Loader2 className="w-4 h-4 animate-spin text-slate-400" />;
       }
@@ -535,7 +540,7 @@ export function OperatorMembersConsolePage({
   // ─── Drawer: status-aware footer actions ────────────────────
 
   const drawerActions = (() => {
-    if (!selectedUser) return [];
+    if (!selectedUser || selectedUser.operatorReadOnly) return [];
     const u = selectedUser;
     const isLoading = writing || actionLoading === u.id;
     const actions: Array<{
@@ -686,13 +691,13 @@ export function OperatorMembersConsolePage({
           </div>
         )}
 
-        {/* ActionBar — 선택 시 표시. 일괄 처리 endpoint 가 있는 서비스에서만 노출 */}
-        {canBulk && (
+        {/* Selection always supports detail; batch changes require a real endpoint. */}
+        {(
         <div className="mb-3">
           <ActionBar
             selectedCount={selectedIds.size}
-            onClearSelection={() => setSelectedIds(new Set())}
-            actions={bulkActions}
+            onClearSelection={() => {if(!state.current.writing){setSelectedIds(new Set());setSelectedUser(null);}}}
+            actions={[{key:'detail',label:'선택 회원 상세',disabled:writing||loading||selectedIds.size!==1,onClick:()=>{const user=users.find(row=>selectedIds.has(row.id));if(user)setSelectedUser(user);}},...(canBulk?bulkActions:extraBulkActionItems)]}
           />
         </div>
         )}
@@ -728,9 +733,7 @@ export function OperatorMembersConsolePage({
           }
           onRowClick={(user) => { if (!state.current.writing && !editUser && !deleteTarget && !loading && !error) { setActionError(''); setSelectedUser(user); } }}
           tableId={tableId ?? `${serviceKey}-operator-members`}
-          {...(canBulk
-            ? { selectable: true, selectedKeys: selectedIds, onSelectionChange: (ids: Set<string>) => { if (!state.current.writing && !loading && !error) setSelectedIds(ids); } }
-            : {})}
+          selectable selectedKeys={selectedIds} onSelectionChange={(ids:Set<string>)=>{if(!state.current.writing&&!loading&&!error){setSelectedIds(ids);if(selectedUser&&!ids.has(selectedUser.id))setSelectedUser(null);}}}
           {...(serverSort
             ? { manualSort: true, sortBy, sortOrder, onSort: handleSort }
             : {})}
@@ -809,6 +812,7 @@ export function OperatorMembersConsolePage({
                 <div>
                   <p style={{ fontWeight: 600, fontSize: 15, color: '#1e293b', marginBottom: 2 }}>
                     {getUserName(selectedUser)}
+                    {selectedUser.operatorReadOnly && <p>전체 관리자 — 처리 대상 아님</p>}
                   </p>
                   <p style={{ fontSize: 13, color: '#64748b' }}>{selectedUser.email}</p>
                 </div>

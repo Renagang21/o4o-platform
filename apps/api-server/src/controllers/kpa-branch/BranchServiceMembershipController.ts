@@ -1,3 +1,4 @@
+import { protectedMemberSql } from '../../services/operations/protected-member-target.js';
 /**
  * BranchServiceMembershipController — 분회 서비스 가입 승인 콘솔 (Extension Layer)
  *
@@ -76,7 +77,7 @@ export class BranchServiceMembershipController {
         params,
       );
       const rows = await AppDataSource.query(
-        `SELECT sm.id, sm.user_id, sm.status, sm.role, sm.rejection_reason,
+        `SELECT ${protectedMemberSql("u.id")} AS "operatorReadOnly", sm.id, sm.user_id, sm.status, sm.role, sm.rejection_reason,
                 sm.approved_at, sm.created_at, sm.updated_at,
                 u.email, u.name, u.phone
            FROM service_memberships sm
@@ -94,6 +95,7 @@ export class BranchServiceMembershipController {
           items: rows.map((r: any) => ({
             id: r.id,
             userId: r.user_id,
+            operatorReadOnly: r.operatorReadOnly === true,
             email: r.email,
             name: r.name,
             phone: r.phone,

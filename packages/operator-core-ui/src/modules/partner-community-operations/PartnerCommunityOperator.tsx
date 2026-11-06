@@ -1,3 +1,5 @@
+import {DataTable} from '@o4o/operator-ux-core';
+import {ActionBar} from '@o4o/ui';
 import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
 import {
@@ -82,6 +84,10 @@ export default function PartnerCommunityOperator({
     };
   }, [communityApi]);
   const canOpen = (area: string) => (!allowedTabs || allowedTabs.includes(area)) && (!data?.availableAreas || data.availableAreas.includes(area));
+  const [selectedMembers,setSelectedMembers]=useState<Set<string>>(new Set());
+  useEffect(()=>setSelectedMembers(new Set()),[user.id,tab,data,busy]);
+  const selectedMember=selectedMembers.size===1?data?.members.find(member=>selectedMembers.has(member.id)):undefined;
+  const canChangeMember=selectedMember&&!selectedMember.operatorReadOnly&&selectedMember.id!==user.id&&['active','suspended'].includes(selectedMember.status);
   const visibleTab = canOpen(tab) ? tab : (data?.availableAreas ?? ['reports','posts','members','boards','events']).find(canOpen);
   const ask = (label: string, work: (reason: string) => Promise<unknown>) => {
     setAction({ label, work });
@@ -319,45 +325,15 @@ export default function PartnerCommunityOperator({
       {data && visibleTab === "members" && (
         <section className="panel">
           <h2>커뮤니티 회원</h2>
-          {data.members.map((m) => (
-            <article
-              className="community-list-item"
-              key={m.id}
-              data-member-id={m.id}
-            >
-              <strong>{m.name}</strong>
-              <p>
-                {m.status === "active"
-                  ? "활동 중"
-                  : m.status === "suspended"
-                    ? "이용 정지"
-                    : m.status}
-              </p>
-              {m.id !== user.id &&
-                ["active", "suspended"].includes(m.status) && (
-                  <button
-                    className="button quiet"
-                    disabled={busy}
-                    onClick={() =>
-                      ask(
-                        m.status === "active"
-                          ? "회원 이용 정지"
-                          : "회원 이용 정지 해제",
-                        (note) =>
-                          communityApi.member(m.id, {
-                            status:
-                              m.status === "active" ? "suspended" : "active",
-                            reason: note,
-                            expectedVersion: m.version,
-                          }),
-                      )
-                    }
-                  >
-                    {m.status === "active" ? "이용 정지" : "정지 해제"}
-                  </button>
-                )}
-            </article>
-          ))}
+          <ActionBar selectedCount={selectedMembers.size} onClearSelection={()=>setSelectedMembers(new Set())} actions={canChangeMember&&selectedMember?[{
+            key:'status',label:selectedMember.status==='active'?'이용 정지':'정지 해제',disabled:busy,
+            onClick:()=>ask(selectedMember.status==='active'?'회원 이용 정지':'회원 이용 정지 해제',note=>communityApi.member(selectedMember.id,{status:selectedMember.status==='active'?'suspended':'active',reason:note,expectedVersion:selectedMember.version})),
+          }]:[]} />
+          <DataTable tableId="partner-community-members" data={data.members} rowKey="id" selectable selectedKeys={selectedMembers} onSelectionChange={keys=>{if(!busy)setSelectedMembers(keys);}} columns={[
+            {key:'name',header:'회원',stickyOnMobile:true},
+            {key:'status',header:'상태',render:value=>value==='active'?'활동 중':value==='suspended'?'이용 정지':value},
+            {key:'operatorReadOnly',header:'업무 대상',render:(_v,member)=>member.operatorReadOnly?'전체 관리자 — 처리 대상 아님':'회원'},
+          ]} />
         </section>
       )}
       {data && visibleTab === "boards" && (

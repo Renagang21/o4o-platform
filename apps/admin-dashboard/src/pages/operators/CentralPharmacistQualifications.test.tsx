@@ -17,10 +17,15 @@ const row = {
   reason: null,
   version: "2026-10-28T00:00:00.123456",
 };
+const fullDetail = {
+ member:{userId:row.userId,name:row.name,nickname:'합성 회원',email:'synthetic@example.test',phone:'01012345678',accountStatus:'active',emailVerified:true,version:row.version,joinedAt:'2026-11-01',hasPassword:false},
+ qualification:{...row,approvedAt:null,reviewedBy:null},registration:null,legacyLicense:null,pharmacies:[],history:[],
+ permissions:{edit:false,qualifications:true,pharmacies:false},
+};
 beforeEach(() => {
   mock.get
     .mockReset()
-    .mockResolvedValue({ data: { data: { items: [row], hasNext: false } } });
+    .mockImplementation(async (path:string) => ({data:{data:path.endsWith("/target")?fullDetail:{items:[row],hasNext:false}}}));
   mock.post
     .mockReset()
     .mockResolvedValue({ data: { data: { status: "approved" } } });
@@ -29,7 +34,7 @@ afterEach(cleanup);
 it("requires evidence confirmation and a reason before sending a versioned approval", async () => {
   render(<CentralPharmacistQualifications actorId="reviewer" />);
   fireEvent.click(await screen.findByRole("button", { name: "승인 검토" }));
-  const save = screen.getByRole("button", { name: "검토 결과 저장" });
+  const save = await screen.findByRole("button", { name: "검토 결과 저장" });
   expect(save).toBeDisabled();
   fireEvent.change(screen.getByLabelText("신청자에게 안내할 확인·반려 사유"), {
     target: { value: "면허 근거를 별도로 확인함" },
@@ -69,7 +74,7 @@ it("shows status tabs and reveals the standard action bar only after a member is
   const checkboxes = screen.getAllByRole('checkbox');
   fireEvent.click(checkboxes[checkboxes.length - 1]);
   fireEvent.click(screen.getByRole('button', { name: '선택 회원 승인 검토' }));
-  expect(screen.getByRole('button', { name: '검토 결과 저장' })).toBeDisabled();
+  expect(await screen.findByRole('button', { name: '검토 결과 저장' })).toBeDisabled();
   expect(mock.post).not.toHaveBeenCalled();
 });
 it("searches common members and clears selection when changing status", async () => {
@@ -85,6 +90,7 @@ it("clears stale data on a rejected review and requires a fresh read", async () 
   mock.post.mockRejectedValueOnce(new Error("changed"));
   render(<CentralPharmacistQualifications actorId="reviewer" />);
   fireEvent.click(await screen.findByRole("button", { name: "반려" }));
+  await screen.findByRole("button", { name: "검토 결과 저장" });
   fireEvent.change(screen.getByLabelText("신청자에게 안내할 확인·반려 사유"), {
     target: { value: "근거 확인 필요" },
   });
@@ -96,4 +102,27 @@ it("clears stale data on a rejected review and requires a fresh read", async () 
     reason: "근거 확인 필요",
     version: row.version,
   });
+});
+
+it("keeps platform Admin visible without review actions", async () => {
+ mock.get.mockResolvedValue({data:{data:{items:[{...row,operatorReadOnly:true}],hasNext:false}}});
+ render(<CentralPharmacistQualifications actorId="reviewer" />);
+ expect(await screen.findByText('전체 관리자 — 처리 대상 아님')).toBeVisible();
+ expect(screen.queryByRole('button',{name:'승인 검토'})).toBeNull();
+ expect(screen.queryByRole('button',{name:'반려',exact:true})).toBeNull();
+ expect(mock.post).not.toHaveBeenCalled();
+});
+it("shows whole-member fields in an explicit drawer before approving", async () => {
+ render(<CentralPharmacistQualifications actorId="reviewer" />);
+ fireEvent.click(await screen.findByRole('button',{name:'승인 검토'}));
+ expect(await screen.findByDisplayValue('synthetic@example.test')).toBeVisible();
+ expect(screen.getByDisplayValue('01012345678')).toBeVisible();
+ expect(screen.getByRole('button',{name:'검토 결과 저장'})).toBeDisabled();
+});
+it("cannot approve when full detail fails", async () => {
+ mock.get.mockImplementation(async (path:string)=>{if(path.endsWith('/target'))throw new Error('fixture');return {data:{data:{items:[row],hasNext:false}}};});
+ render(<CentralPharmacistQualifications actorId="reviewer" />);
+ fireEvent.click(await screen.findByRole('button',{name:'승인 검토'}));
+ await screen.findAllByText(/회원 전체 정보를 불러오지 못했습니다/);
+ expect(screen.queryByRole('button',{name:'검토 결과 저장'})).toBeNull();expect(mock.post).not.toHaveBeenCalled();
 });

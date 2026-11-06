@@ -431,6 +431,8 @@ describe("Partner public entry, login, opt-in and community", () => {
     vi.mocked(communityApi.member).mockResolvedValue({});
     mount("/operator");
     fireEvent.click(await screen.findByRole("button", { name: "회원 관리" }));
+    await screen.findByText("대상 회원");
+    fireEvent.click(screen.getAllByRole("checkbox").at(-1)!);
     fireEvent.click(await screen.findByRole("button", { name: "이용 정지" }));
     expect(communityApi.member).not.toHaveBeenCalled();
     fireEvent.change(screen.getByLabelText("처리 사유"), {

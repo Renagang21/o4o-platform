@@ -22,6 +22,7 @@ function unwrap<T>(res: { data: { success: boolean; data: T } }): T {
 export type ServiceMemberStatus = 'pending' | 'active' | 'rejected';
 
 export interface ServiceMemberRow {
+  operatorReadOnly?: boolean;
   id: string;
   userId: string;
   email: string | null;

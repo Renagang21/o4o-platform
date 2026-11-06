@@ -74,6 +74,10 @@ pharmacistQualificationsRouter.post('/members/:userId/restore-access',handle(req
   return new MemberLifecycleService(AppDataSource).restoreAccess(req.user!.id,z.string().uuid().parse(req.params.userId),{reason:input.reason!,version:input.version!});
 }));
 const memberId = (req: AuthRequest) => z.string().uuid().parse(req.params.userId);
+pharmacistQualificationsRouter.get('/review/:userId',handle(req=>{
+  google(req);
+  return new CentralMemberWorkspaceService(AppDataSource).detail(req.user!.id,memberId(req),true);
+}));
 pharmacistQualificationsRouter.get('/members', handle(req => {
   google(req);
   const query = z.object({

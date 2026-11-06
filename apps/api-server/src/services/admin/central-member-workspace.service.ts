@@ -1,3 +1,4 @@
+import { assertOperatorMemberTarget, protectedMemberSql } from '../operations/protected-member-target.js';
 import {correctIdentity,type MemberCorrection} from './member-profile-corrections.js';
 import {correctRegistration,readRegistrationView,MEMBER_REGISTRATION_LEGACY_ACCESS_SQL,MEMBER_REGISTRATION_TYPE_SQL,MEMBER_REGISTRATION_STATE_SQL,MEMBER_LOGIN_METHODS_SQL} from './member-registration-data.js';
 import { buildBusinessInfoUpdateStatement } from '../../utils/business-info-write.js';
@@ -11,7 +12,7 @@ import { resolveNetureMainMembershipStatus } from '../../modules/neture/services
 type Db = Pick<EntityManager, 'query'>;
 export type MemberTask = 'all' | 'pending' | 'inactive' | 'qualifications' | 'pharmacies' | 'corrections';
 const version = `to_char(u."updatedAt",'YYYY-MM-DD"T"HH24:MI:SS.US')`;
-const identity = `u.id AS "userId",u.name,u.nickname,u.email,u.phone,u.status AS "accountStatus",
+const identity = `${protectedMemberSql("u.id")} AS "operatorReadOnly",u.id AS "userId",u.name,u.nickname,u.email,u.phone,u.status AS "accountStatus",
  u."isActive" AS "accountActive",(SELECT sm.status FROM service_memberships sm WHERE sm.user_id=u.id AND sm.service_key='neture') AS "membershipStatus",
  u."isEmailVerified" AS "emailVerified",EXISTS(SELECT 1 FROM user_password_credentials pc WHERE pc.user_id=u.id) AS "hasPassword",u."createdAt" AS "joinedAt",${version} AS version,
  ${MEMBER_REGISTRATION_TYPE_SQL} AS "registrationType",${MEMBER_REGISTRATION_STATE_SQL} AS "registrationState",${MEMBER_REGISTRATION_LEGACY_ACCESS_SQL} AS "registrationLegacyMainAccess",${MEMBER_LOGIN_METHODS_SQL} AS "loginMethods"`;
@@ -19,17 +20,17 @@ const pharmacyExists = (status: string) => `EXISTS(SELECT 1 FROM neture_pharmacy
 const privateValue = (value: unknown) => ({ toPostgres: () => value, toJSON: () => '[redacted]' });
 
 /** Member delegates review signup fields and evidence; dedicated domain/admin commands retain their own grants. */
-export async function memberWorkspaceAccess(db: Db, actor: string, lock = false) {
+export async function memberWorkspaceAccess(db: Db, actor: string, lock = false, qualificationReview = false) {
   const roles = await centralOperationRoles(db, actor, lock);
   const keys = await centralOperationMenuKeys(db, actor, roles);
-  if (!keys.includes('neture.members')) throw new OperationError(403, 'MEMBER_DIRECTORY_REQUIRED', '공통 회원 조회 업무 위임이 필요합니다.');
+  if (!(qualificationReview ? keys.includes('neture.qualifications') : keys.includes('neture.members'))) throw new OperationError(403, 'MEMBER_DIRECTORY_REQUIRED', '공통 회원 조회 업무 위임이 필요합니다.');
   return {
     qualifications: keys.includes('neture.qualifications'),
     pharmacies: keys.includes('neture.pharmacies'),
     applications: keys.includes('neture.applications'),
-    edit: true,
-    manageAccount: roles.includes('platform:super_admin'),
-    erase: roles.includes('platform:super_admin'),
+    edit: !qualificationReview,
+    manageAccount: !qualificationReview && roles.includes('platform:super_admin'),
+    erase: !qualificationReview && roles.includes('platform:super_admin'),
   };
 }
 
@@ -56,7 +57,7 @@ export class CentralMemberWorkspaceService {
       COUNT(*) FILTER(WHERE ${permissions.qualifications ? conditions.qualifications : 'false'})::int AS qualifications,
       COUNT(*) FILTER(WHERE ${permissions.pharmacies ? conditions.pharmacies : 'false'})::int AS pharmacies,
       COUNT(*) FILTER(WHERE ${conditions.corrections})::int AS corrections ${from}`, [query]);
-    const items = await this.db.query(`SELECT u.id AS "userId",u.name,u.nickname,u.email,u.status AS "accountStatus",
+    const items = await this.db.query(`SELECT ${protectedMemberSql("u.id")} AS "operatorReadOnly",u.id AS "userId",u.name,u.nickname,u.email,u.status AS "accountStatus",
       ${MEMBER_REGISTRATION_TYPE_SQL} AS "registrationType",${MEMBER_REGISTRATION_STATE_SQL} AS "registrationState",${MEMBER_REGISTRATION_LEGACY_ACCESS_SQL} AS "registrationLegacyMainAccess",${MEMBER_LOGIN_METHODS_SQL} AS "loginMethods",
       u."isActive" AS "accountActive",u."isEmailVerified" AS "emailVerified",
       (SELECT sm.status FROM service_memberships sm WHERE sm.user_id=u.id AND sm.service_key='neture') AS "membershipStatus",
@@ -67,8 +68,8 @@ export class CentralMemberWorkspaceService {
     return { items: items.slice(0, 20).map(row=>({...row,serviceStatus:resolveNetureMainMembershipStatus({account_status:row.accountStatus,account_active:row.accountActive,email_verified:row.emailVerified,membership_status:row.membershipStatus,registration_state:row.registrationState,legacy_main_access:row.registrationLegacyMainAccess})})), hasNext: items.length > 20, counts, permissions };
   }
 
-  async detail(actor: string, target: string) {
-    const permissions = await memberWorkspaceAccess(this.db, actor);
+  async detail(actor: string, target: string, qualificationReview = false) {
+    const permissions = await memberWorkspaceAccess(this.db, actor, false, qualificationReview);
     const [member] = await this.db.query(`SELECT ${identity} FROM users u WHERE u.id=$1`, [target]);
     if (!member) throw new OperationError(404, 'MEMBER_NOT_FOUND', '회원을 찾을 수 없습니다.');
     member.serviceStatus=resolveNetureMainMembershipStatus({account_status:member.accountStatus,account_active:member.accountActive,email_verified:member.emailVerified,membership_status:member.membershipStatus,registration_state:member.registrationState,legacy_main_access:member.registrationLegacyMainAccess});
@@ -119,8 +120,7 @@ export class CentralMemberWorkspaceService {
     return await this.db.transaction(async manager => {
       const access=await memberWorkspaceAccess(manager, actor, true);
       if (!access.edit) throw new OperationError(403, 'MEMBER_ADMIN_REQUIRED', '회원 정보 정정 업무 위임이 필요합니다.');
-      const [protectedTarget]=await manager.query(`SELECT 1 FROM role_assignments WHERE user_id=$1 AND role='platform:super_admin' AND is_active=true LIMIT 1`,[target]);
-      if(protectedTarget&&!access.manageAccount)throw new OperationError(403,'ADMIN_ACCOUNT_PROTECTED','전체 관리자 정보는 전체 관리자가 정정해야 합니다.');
+      if (!access.manageAccount) await assertOperatorMemberTarget(manager,target);
       const [before] = await manager.query(`SELECT ${identity} FROM users u WHERE u.id=$1 FOR UPDATE`, [target]);
       if (!before) throw new OperationError(404, 'MEMBER_NOT_FOUND', '회원을 찾을 수 없습니다.');
       if (before.version !== input.version) throw new OperationError(409, 'MEMBER_CHANGED', '회원 정보가 변경되었습니다. 다시 조회한 뒤 정정해 주시기 바랍니다.');
@@ -165,6 +165,7 @@ export class CentralMemberWorkspaceService {
     return this.db.transaction(async manager=>{
       const access=await memberWorkspaceAccess(manager,actor,true);
       if (!access.edit || !access.applications) throw new OperationError(403,'BUSINESS_REVIEW_REQUIRED','기존 가입 사업자 정보 정정 권한이 필요합니다.');
+      if (!access.manageAccount) await assertOperatorMemberTarget(manager,target);
       const [before]=await manager.query(`SELECT ${identity},u."businessInfo" AS business FROM users u WHERE u.id=$1 AND EXISTS(SELECT 1 FROM service_memberships WHERE user_id=$1 AND service_key='neture') FOR UPDATE`,[target]);
       if (!before) throw new OperationError(404,'BUSINESS_NOT_FOUND','기존 Neture 가입 자료를 찾을 수 없습니다.');
       if (before.version!==input.version) throw new OperationError(409,'MEMBER_CHANGED','회원 정보가 변경되었습니다. 다시 조회해 주시기 바랍니다.');
@@ -185,6 +186,7 @@ export class CentralMemberWorkspaceService {
     return this.db.transaction(async manager=>{
       const access=await memberWorkspaceAccess(manager,actor,true);
       if (!access.edit || !access.pharmacies) throw new OperationError(403,'PHARMACY_REVIEW_REQUIRED','약국 정보 정정 업무 위임이 필요합니다.');
+      if (!access.manageAccount) await assertOperatorMemberTarget(manager,target);
       const [before]=await manager.query(`SELECT n.organization_id AS "organizationId",n.pharmacy_name AS name,n.business_number AS "businessNumber",n.pharmacist_license_number AS "licenseNumber",n.status,o.address,o.phone,o.metadata,md5(to_jsonb(n)::text||to_jsonb(o)::text) AS version
         FROM neture_pharmacy_memberships n JOIN organizations o ON o.id=n.organization_id WHERE n.id=$1 AND n.applicant_user_id=$2 FOR UPDATE OF n,o`,[id,target]);
       if (!before) throw new OperationError(404,'PHARMACY_NOT_FOUND','해당 회원의 약국 신청을 찾을 수 없습니다.');

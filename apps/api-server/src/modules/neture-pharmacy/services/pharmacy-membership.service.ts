@@ -1,3 +1,4 @@
+import { assertOperatorMemberTarget, protectedMemberSql } from '../../../services/operations/protected-member-target.js';
 /**
  * 내 매장(약국) 신청 · 승인 원장 (약국 1 = 원장 1 행 = 조직 1 = 내 매장 1)
  *
@@ -88,7 +89,7 @@ export class PharmacyMembershipService {
     const where = `($1::text IS NULL OR npm.status = $1)
       AND ($2::text IS NULL OR npm.pharmacy_name ILIKE $2 OR npm.business_number LIKE $2)`;
     const items = await this.dataSource.query(
-      `SELECT ${SELECT_COLUMNS}, o.name AS organization_name, o.address AS organization_address, ${BUSINESS_PROFILE_SQL} AS business_profile
+      `SELECT ${SELECT_COLUMNS}, ${protectedMemberSql("npm.applicant_user_id")} AS "operatorReadOnly", o.name AS organization_name, o.address AS organization_address, ${BUSINESS_PROFILE_SQL} AS business_profile
          FROM neture_pharmacy_memberships npm
          JOIN organizations o ON o.id = npm.organization_id
         WHERE ${where}
@@ -116,6 +117,7 @@ export class PharmacyMembershipService {
         [membershipId],
       );
       if (!current) throw new NeturePharmacyError(404, 'MEMBERSHIP_NOT_FOUND', '가입 신청을 찾을 수 없습니다.');
+      await assertOperatorMemberTarget(m, current.applicant_user_id);
       const next = nextMembershipStatus(current.status, action);
       if (!next) {
         throw new NeturePharmacyError(409, 'INVALID_TRANSITION', `현재 상태(${current.status})에서 처리할 수 없습니다.`);

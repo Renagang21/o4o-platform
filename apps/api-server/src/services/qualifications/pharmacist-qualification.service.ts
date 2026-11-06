@@ -1,3 +1,4 @@
+import { assertOperatorMemberTarget, protectedMemberSql } from '../operations/protected-member-target.js';
 import { notifyQualification } from './pharmacist-qualification-notifications.js';
 import { centralOperationMenuKeys } from '../admin/central-operation-menu-grants.js';
 import type { DataSource, EntityManager } from "typeorm";
@@ -184,7 +185,7 @@ export class PharmacistQualificationService {
     const selection = directory ? columns.replace('p.license_number AS "licenseNumber"','NULL::text AS "licenseNumber"').replace('p.qualification_reason AS reason','NULL::text AS reason').replace('p.verified_at AS "approvedAt"','NULL::timestamp AS "approvedAt"') : columns;
     const rows = await this.db.query(
       `SELECT ${selection.replace('p.user_id AS "userId"', 'u.id AS "userId"').replace('p.qualification_status AS status', "COALESCE(p.qualification_status,'unrequested') AS status")},
-       COALESCE(NULLIF(u.name,''),'회원') AS name,u.email,u.status AS "accountStatus"
+       COALESCE(NULLIF(u.name,''),'회원') AS name,u.email,u.status AS "accountStatus",${protectedMemberSql("u.id")} AS "operatorReadOnly"
        FROM users u LEFT JOIN kpa_pharmacist_profiles p ON p.user_id=u.id
        WHERE ${matches} AND ($2='all' OR COALESCE(p.qualification_status,'unrequested')=$2)
        ORDER BY p.updated_at DESC NULLS LAST,u.id LIMIT 21 OFFSET $3`,
@@ -211,6 +212,7 @@ export class PharmacistQualificationService {
       );
     return this.db.transaction(async (m) => {
       await reviewer(m, actor, true);
+      await assertOperatorMemberTarget(m, target);
       if (input.action === "approve") await account(m, target);
       else if (
         !(
