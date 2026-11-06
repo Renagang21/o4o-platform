@@ -1,5 +1,9 @@
 # HANDOFF
 
+> 저장소: `Renagang21/o4o-platform` · 코드 기준: `main` `39aae45647` · 작성: 2026-11-06 (KST)
+> 다음 실행자: LOCAL (운영 DB read-only 확인 항목이 있다. 코드 · 문서 항목은 CLOUD 도 가능)
+> 이전 인계(2026-10-07 기준 commerce 상태표 · 로컬 검증 재현 절차) 전문: `git show 39aae45647:HANDOFF.md`
+
 ## PR #339 작업공간 — 소유 세션 확인 후 정리
 
 PR #339의 main 통합·운영 배포는 완료됐지만 작업 PC와 소유 세션은 확인되지 않았다. 이 사실만으로 다른 세션의 작업공간을 삭제하지 않는다.
@@ -9,53 +13,49 @@ PR #339의 main 통합·운영 배포는 완료됐지만 작업 PC와 소유 세
 3. 조건을 모두 충족한 원래 소유 세션만 자기 worktree와 branch를 정리한다. 불명확하면 보존하고 정확한 차단 사유를 보고한다. 원격 branch도 소유권·후속 사용 여부 확인 없이 삭제하지 않는다.
 4. 소유 세션의 실제 정리 완료 확인 후에만 이 안내를 제거한다. 이 문서 변경은 기존 작업공간을 정리했다는 증거가 아니다.
 
-> 마지막 작업: 2026-10-07 (KST) · PR #308 · #332 · #336 · #328 **main 통합 · 운영 배포 완료 · 테스트 결제 활성화** — **운영 업무 흐름 미검증**(계정 필요)
+2026-11-06 조회: PR #339 MERGED · 원격 branch 없음. 포맷한 PC의 `git worktree list` 에는 해당 worktree 가 없다. 다른 PC 존재 여부와 소유 세션은 여전히 미확인이라 위 안내를 유지한다.
 
 ## 요약
 
-**WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1** — 상품 선택 → 주문 → 테스트 결제 → 공급자 처리의 주요 흐름은 구현 · 로컬 브라우저 검증까지 끝났다. 세미프랜차이즈 콘텐츠 자료함 · pharmacy-hub 기능 이전 · QR 착지 이전 준비 · Codex 리뷰 3건 반영까지 끝났다. **WO 전체 완료가 아니다** — 다른 트랙 담당 미완료(커뮤니티 게시판 · KPA 매장 provisioning 제거 · PH 인프라 삭제)가 남아 있다. 진행 정본은 WO TODO, 설계 · 인계 계약 · 미완료 범위는 [`DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1`](docs/design/DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1.md) §13 · §14 · §15 · §16.
+개발 PC 포맷 후 작업 환경을 다시 구성했고, 2026-10-07 기준으로 멈춰 있던 이 문서를 현행화했다. 코드 변경은 없다.
 
-## 상태 구분 (혼동 금지)
+## 완료된 것
 
-| 항목 | 상태 |
-|---|---|
-| 코드 구현 | main 통합 완료(#308 · #332 운영 전환 호환 · #336 배포 전 접근 정렬 · #328 결제 모드 주입) · 다른 트랙 담당 미완료 3건(DESIGN §15-2) |
-| 테스트 결제 흐름 | 격리 PostgreSQL 통합 17건 + 로컬 브라우저 20항목 PASS ([CHECK](docs/checks/CHECK-NETURE-PHARMACY-STORE-COMMERCE-LOCAL-BROWSER-V1.md)) |
-| 실제 PG 연동 | 대기(D1) |
-| 운영 배포 | **완료** — Promote run `37548237819`(SHA `0e283ba10`) success: migration 1 · API · 웹 8. 웹 8(admin · neture · kpa-society · pharmacy-hub · lecture · store · kpa-branch · hospital-pharmacy) 각 traffic 100% · revision 라벨 `0e283ba10`. API 는 이후 PR #325 Delivery 자동 배포로 `5e97815c7`(`0e283ba10` 후손) · revision `o4o-core-api-03840-mos` traffic 100% · health alive. 공개 화면 · 로그인 전 화면 · 기본 진입 13곳 실브라우저 렌더 정상(2026-10-07 확인) |
-| 결제 모드 | **테스트 결제 활성** — 운영 API revision `o4o-core-api-03840-mos` env `NETURE_PHARMACY_PAYMENT_MODE=test`(variable 설정 23:53Z 이후 #325 자동 배포로 반영). 추가 API 재배포 불필요. 실제 PG 는 계속 차단(D1) |
-| 운영 업무 흐름 검증 | **미검증** — 배포 성공과 별개. Google 인증 약국 · 공급자 테스트 계정 · `pharmacy` 담당 운영자 필요(CHECK §9-5 · [`CHECK-NETURE-PHARMACY-CUTOVER-COMPAT-V1`](docs/checks/CHECK-NETURE-PHARMACY-CUTOVER-COMPAT-V1.md) §5-4) |
-| 인덱스 2단계(부분 UNIQUE · 이벤트 재신청 409 해제) | 미착수 — 운영 안정화 후 별도 migration WO(DESIGN §17-1) |
-| 테스트 데이터 초기화 | 범위만 확정(DESIGN §12) — 운영 DB write 사용자 승인 필요 |
-| pharmacyhub.co.kr QR link 4행(비활성 E2E) | 테스트 데이터 초기화 대상으로 결정(DESIGN §12 · §16-3 A) — 삭제 미실행 · 초기화 승인 때 함께 |
-| PH 공급자 opt-in | Neture 에 재구현 안 함 — 신규 시작 410 · 단독 키 중지 409(기본 공급 노출 방지) · 기존 주문 처리 유지(DESIGN §16-5) |
-| PH 안내 · 소식 | 안내 → 기존 `/guide/*`(문구는 배포 후 운영자 편집) · 소식 → 홈 공지 · PH 안내 문구 관리 화면 제거(§16-6) |
-| 인쇄 QR 경로 보존 리다이렉트 | 구현안 · 검증 방법 · 4경로 새 화면 대조(차단 격차 없음, 301 전 조건 4건 — DESIGN §16-7) — 적용은 웹 서비스 정비 트랙 · 사용자 승인 |
-| 최신 HEAD 코드 리뷰 | Codex 미완료(unknown error 2회, 미완료로 기록 · 반복 요청 안 함) · 직접 리뷰 완료 · 사본 출처 라벨 수정(CHECK §8) |
-| pharmacy-hub 서버 · 도메인 · 인증서 | 보존 — 운영 검증 후 웹 서비스 정비 트랙이 삭제(DESIGN §16-4) |
+- 기준 checkout 재구성 · `pnpm install --frozen-lockfile` 성공 · `pnpm run check:runtime` PASS.
+- 이전 인계의 PR #308 · #332 · #336 · #328 · #325 는 모두 MERGED (2026-11-06 조회).
+- `services/web-pharmacy-hub` 는 저장소에 없다. 코드상 제거 근거는 `f58add7aa7`(2026-10-17) · `36e92381a5`(2026-10-20)이다. GCP 자원 삭제 여부는 미확인이다.
 
-## 담당 경계
+## 진행 중인 것
 
-- 인증 · 가입 트랙으로 인계: 가입 원장 · 신청/승인 · role 발급 · 승인 orchestration — `pharmacy-membership.service.ts` · `pharmacy-store-provisioner.ts` · 해당 라우트 · 화면 · KPA 매장 provisioning 제거 — [`WO-NETURE-PHARMACY-MEMBERSHIP-AUTH-TRACK-HANDOFF-V1`](docs/work-orders/WO-NETURE-PHARMACY-MEMBERSHIP-AUTH-TRACK-HANDOFF-V1.md).
-- 공통 커뮤니티 · Forum 트랙: 세미프랜차이즈 커뮤니티 게시판 — [`WO-O4O-SEMI-FRANCHISE-COMMUNITY-BOARD-V1`](docs/work-orders/WO-O4O-SEMI-FRANCHISE-COMMUNITY-BOARD-V1.md)(DRAFT).
-- 웹 서비스 정비 트랙: pharmacy-hub 인프라 삭제(조건 DESIGN §16-4).
-- Store/Commerce 유지: 조직 · 매장 연결 계약 `pharmacy-store-link.ts` · 매장 판정 · 세미프랜차이즈 이후 전부.
-- K-Cosmetics: 퇴역 결정 — 보존 전제 철회, 제거 범위는 퇴역 작업(DESIGN §14).
+- 열린 PR 0건 (2026-11-06 조회).
+- 이 문서 현행화 외에 진행 중인 worktree 없음. `wo/handoff-refresh-20261106` 은 PR 미생성이며 main 통합은 통합 담당 몫이다.
 
-## 다음에 할 일
+## 이전 인계에서 바뀐 전제
 
-1. 선행 준비 — 사용자가 Google 인증 약국 · 공급자 테스트 계정 준비 + `pharmacy` 세미프랜차이즈 담당 운영자 지정(가입 · 세미프랜차이즈 승인 검증에 필요하므로 검증보다 먼저).
-2. 운영 업무 흐름 검증(1 완료 후) — 기본 가입 → 승인 → pharmacy 세미프랜차이즈 가입 → pharmacy.neture.co.kr 접근(직접 로그인 · handoff) → 내 매장 · 계약 승낙 · 사이니지 → 주문 → 테스트 결제 → 공급자 처리 · 콘텐츠 · QR(CHECK §9-5).
-3. 그 뒤: 새 호스트 안내 문구 편집(§16-6) → PH 인프라 삭제 인계(§16-7 301 전 조건 포함). PH 은퇴 시 `pharmacy-hub` 키 단순 제거 금지(§16-5).
-4. 별도 승인 · 별도 WO: 테스트 데이터 초기화(DESIGN §12, QR 4행 포함, dry-run 동반) · 매장 경영자 계약 게시 · 인덱스 2단계 · LB/도메인 변경 · 실제 PG(D1) · 세미프랜차이즈 커뮤니티 게시판.
+- 2026-10-20 사용자 결정으로 `pharmacy` · `drugstore` · `pharmcoop` · `carepharm` 이 동급 독립 사업이 됐다 — [`WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1`](docs/work-orders/WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1.md)(OPEN).
+- 그래서 이전 인계의 "세미프랜차이즈 담당 운영자 지정 → 가입 · 승인 · 주문 운영 검증" 순서는 그대로 수행할 수 없다. 재검증이 필요하면 현행 사업 구조 기준으로 다시 정한다. 그 후 재검증이 이뤄졌는지는 이번에 확인하지 않았다.
+- commerce 잔여 작업의 정본은 [`WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1`](docs/work-orders/WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1.md) TODO 다 (미완료 5건: 3-4 · 6-2 · 6-2d · 6-4 · 6-5). 이 문서에 복제하지 않는다.
 
-## 로컬 검증 재현
+## 다음에 할 일 (우선순위 순)
 
-- docker `postgres:15` 격리 DB → `apps/api-server` 에서 `npx tsx src/migrate.ts`(DB_* env).
-- API: `NODE_ENV=development pnpm run build:api` 후 `node dist/main.js` (tsup 번들은 빌드 시 NODE_ENV 를 고정 — production 번들은 로컬 DB 에 SSL 을 요구한다). `apps/api-server/.env`(미추적)에 로컬 DB · 임의 JWT secret · `NETURE_PHARMACY_PAYMENT_MODE=test`.
-- 화면: `VITE_API_BASE_URL=http://localhost:3002` 로 web-store(4210) · web-neture(3000) dev. 로그인은 `/auth/email/login` 토큰을 `o4o_accessToken` · `o4o_refreshToken` 에 넣어 대체.
-- 통합 테스트: `NETURE_PHARMACY_IT_DATABASE_URL=<격리 DB>` + `npx jest src/modules/neture-pharmacy`. 운영 DB 금지.
+1. PR 없는 원격 branch 2개의 main 반영 여부 대조 (삭제 금지 · 대조만).
+   - `wo/readonly-db-rule` — 운영 DB read-only 계정 규칙 문서.
+   - `wo/member-signup-approval-action` — PR #956 과 내용이 겹치는지 확인.
+2. 미완료 지시서의 체크박스와 실제 상태 대조. 체크박스는 기록 시점 값이다. 운영 DB 관련 항목은 LOCAL read-only 로 확인하고 write 는 사용자 승인을 받는다.
+   - `TODO-O4O-ACCOUNT-ERASURE-ACTIVATION-V1` — PR #936 MERGED, 운영 활성화 여부 미확인.
+   - `TODO-O4O-MEMBER-PROFILE-EDIT-V1` — 병합 · 새 nullable 열의 운영 적용 여부 미확인.
+   - `WO-O4O-ADMIN-OPERATOR-INVITE-FIRST-V1` — PR #925 MERGED, 운영 migration 적용 여부 미확인.
+   - `TODO-O4O-OPERATOR-PROTECTED-MEMBER-DEPLOY-FIX-V1` — 병합 · 재배포 여부 미확인.
+   - `WO-O4O-SCHEDULED-JEST-FULL-SHARD-RECOVERY-V1` — 병합 · 전체 3분할 실행 여부 미확인.
+3. 포맷 전 PC 의 worktree 9개(다른 드라이브에 보존, 원본 `.git` 연결 끊김)에 push 안 된 변경이 있는지 대조. 사용자는 이 자료를 정비 전 자료로 본다. 대조 전에는 지우지 않는다.
+4. 새 개발 후보(사용자 선택): `WO-O4O-COMMUNITY-INDUSTRY-NEWS-V2` · `WO-O4O-COMMUNITY-FORUM-AI-PHASE1-V1`(둘 다 DRAFT) · `WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1` · `TODO-O4O-PLAYLIST-AUTHORING-REQUIRED-20261105` 잔여.
+
+## 이 PC 의 미해결 환경
+
+- 로컬 전용 파일 없음: `docs/local/TEST-ACCOUNTS.local.md`(브라우저 검증 전 사용자 원본 필요) · `apps/api-server/.env`(`.env.example` 로 새로 작성).
+- 미설치: PostgreSQL 15 · gcloud · Cloud SQL Proxy · Docker. 운영 DB read-only 확인(위 2번)에는 gcloud 와 proxy 가 필요하다.
+- Claude 앱의 worktree 위치가 저장소 안(`.claude/worktrees`)이다. §4-1(a) 에 맞게 사용자가 Settings 에서 바꿔야 한다.
 
 ## 주의
 
-- 다른 PC 의 worktree 는 이 PC 에서 정리하지 않는다. main 반영은 PR merge 하나뿐. 저장소 Public — 실명 · 자격증명 기록 금지.
+- 다른 PC 의 worktree 는 이 PC 에서 정리하지 않는다. main 반영은 PR merge 하나뿐이다. 저장소 Public — 실명 · 자격증명 기록 금지.
