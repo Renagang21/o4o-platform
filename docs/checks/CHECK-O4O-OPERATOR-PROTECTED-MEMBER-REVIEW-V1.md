@@ -56,3 +56,9 @@ CANONICAL-INDEX·ROLE-WORKSPACE V2·CURRENT-ADMIN-ROLE-POLICY의 현재 규칙�
 ## 보호·미실행
 
 기준 checkout과 다른 세션의 7개 worktree·branch·로컬 파일을 수정하거나 정리하지 않았다. 새 작업 branch/worktree를 보존한다. 실계정·운영 서버 반영은 하지 않았으므로 배포된 사이트가 변경됐다고 보고하지 않는다. PR CI·Codex 리뷰·병합·배포는 통합 담당의 별도 단계다. 운영 승인은 이번 합성 브라우저·격리 DB 검증으로 대체하지 않는다.
+
+## PR #950 리뷰 보완
+
+자격 전용 검토 상세의 `readDocuments`는 실제 `neture.members` 위임에서 별도로 파생한다. 회원 조회 권한 없이 자격 검토만 위임받은 경우 첨부 존재는 표시하지만 문서 버튼을 비활성화해 403으로 검토가 닫히는 경로를 제거한다. 서류 API의 회원 조회·문서 소유 경계는 확대하지 않았다. false/true grant의 서버 계약과 화면 회귀를 추가했다.
+
+리뷰 보완 로컬 검증: 중앙 회원·자격 UI 24건, 관련 서버 19건, PC/mobile Chromium 6건, API/admin type-check PASS.

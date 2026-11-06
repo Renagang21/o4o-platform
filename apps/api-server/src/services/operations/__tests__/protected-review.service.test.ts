@@ -1,3 +1,5 @@
+import {memberWorkspaceAccess} from '../../admin/central-member-workspace.service.js';
+import {centralOperationMenuKeys} from '../../admin/central-operation-menu-grants.js';
 import type {DataSource} from 'typeorm';
 jest.mock('../../admin/central-operation-access.js',()=>({centralOperationRoles:jest.fn(async()=>['neture:operator'])}));
 jest.mock('../../admin/central-operation-menu-grants.js',()=>({centralOperationMenuKeys:jest.fn(async()=>['neture.qualifications'])}));
@@ -27,4 +29,10 @@ it.each(['review','request_changes','approve','reject','request_approve'])('coop
   expect(access).toHaveBeenCalledWith(expect.anything(),'local-admin','coop');
   expect(query.mock.calls.every(([sql])=>sql.startsWith('SELECT'))).toBe(true);
  }finally{lock.mockRestore();access.mockRestore();}
+});
+
+it.each([false,true])('qualification detail preserves a separate document-read grant (%s)',async members=>{
+ jest.mocked(centralOperationMenuKeys).mockResolvedValueOnce(['neture.qualifications',...(members?['neture.members']:[])]);
+ const access=await memberWorkspaceAccess({query:jest.fn()} as any,'reviewer',false,true);
+ expect(access).toMatchObject({readDocuments:members,edit:false,manageAccount:false,erase:false});
 });

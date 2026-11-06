@@ -126,3 +126,18 @@ it("cannot approve when full detail fails", async () => {
  await screen.findAllByText(/회원 전체 정보를 불러오지 못했습니다/);
  expect(screen.queryByRole('button',{name:'검토 결과 저장'})).toBeNull();expect(mock.post).not.toHaveBeenCalled();
 });
+
+it.each([false,true])('respects the separate document-read grant without closing qualification review (%s)',async readDocuments=>{
+ const detail={...fullDetail,registration:{type:'pharmacy_owner',state:'pending',fields:{licenseNumber:'synthetic',businessRegistrationDocumentId:'synthetic-document'}},permissions:{...fullDetail.permissions,readDocuments}};
+ mock.get.mockImplementation(async(path:string)=>({data:{data:path.endsWith('/target')?detail:{items:[row],hasNext:false}}}));
+ render(<CentralPharmacistQualifications actorId="reviewer" />);
+ fireEvent.click(await screen.findByRole('button',{name:'승인 검토'}));
+ const documentButton=await screen.findByRole('button',{name:'사업자등록증 보기'});
+ expect(documentButton).toHaveProperty('disabled',!readDocuments);
+ if(!readDocuments){
+  fireEvent.click(documentButton);
+  expect(screen.getByRole('button',{name:'검토 결과 저장'})).toBeVisible();
+  expect(mock.get.mock.calls.some(([path])=>String(path).includes('/document/'))).toBe(false);
+  expect(screen.getByText('사업자 서류 조회 권한이 없어 첨부 여부만 표시합니다.')).toBeVisible();
+ }
+});

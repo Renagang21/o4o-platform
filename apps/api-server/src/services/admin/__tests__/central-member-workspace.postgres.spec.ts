@@ -186,7 +186,7 @@ integration('central member workbench PostgreSQL authority, projection and corre
     await expect(service.detail(reader,target)).rejects.toMatchObject({code:'MEMBER_DIRECTORY_REQUIRED'});
     const detail=await service.detail(reader,target,true);
     expect(detail.member.userId).toBe(target);expect(detail.qualification).not.toBeNull();
-    expect(detail.permissions).toMatchObject({edit:false,manageAccount:false,erase:false,pharmacies:false});
+    expect(detail.permissions).toMatchObject({readDocuments:false,edit:false,manageAccount:false,erase:false,pharmacies:false});
     expect(detail.pharmacies).toEqual([]);
   });
 

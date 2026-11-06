@@ -2,12 +2,12 @@ import {test,expect,type Page} from '@playwright/test';
 const id='22222222-2222-4222-8222-222222222222';
 const adminId='33333333-3333-4333-8333-333333333333';
 const version='2026-11-06T00:00:00.123456';
-async function fixture(page:Page) {
+async function fixture(page:Page, readDocuments?:boolean) {
  const writes:unknown[]=[];
  let approved=false;
  const user={id:'synthetic-reviewer',email:'operator@example.test',name:'합성 운영자',roles:['neture:operator','lecture:operator'],status:'active',isActive:true,isEmailVerified:true,authMethod:'google'};
  const applicant={userId:id,name:'합성 신청자',email:'member@example.test',accountStatus:'active',licenseNumber:'SYNTHETIC',status:'pending',reason:null,version};
- const full={member:{userId:id,name:'합성 신청자',nickname:'합성 닉네임',email:'member@example.test',phone:'01012345678',accountStatus:'active',emailVerified:true,joinedAt:'2026-11-01',version,hasPassword:false},qualification:{...applicant,approvedAt:null,reviewedBy:null},registration:null,legacyLicense:null,pharmacies:[],history:[],permissions:{edit:false,qualifications:true,pharmacies:false}};
+ const full={member:{userId:id,name:'합성 신청자',nickname:'합성 닉네임',email:'member@example.test',phone:'01012345678',accountStatus:'active',emailVerified:true,joinedAt:'2026-11-01',version,hasPassword:false},qualification:{...applicant,approvedAt:null,reviewedBy:null},registration:readDocuments===undefined?null:{type:'pharmacy_owner',state:'pending',fields:{licenseNumber:'SYNTHETIC',businessRegistrationDocumentId:'synthetic-document'}},legacyLicense:null,pharmacies:[],history:[],permissions:{edit:false,qualifications:true,pharmacies:false,readDocuments:readDocuments===true}};
  await page.route(url=>url.pathname.startsWith('/api/'),async route=>{
   const path=new URL(route.request().url()).pathname;
   const json=(data:unknown)=>route.fulfill({json:{success:true,data}});
@@ -46,6 +46,16 @@ for(const width of [1440,390]) test.describe(`protected review ${width}`,()=>{
   expect(writes).toHaveLength(1);
   await expect(page.getByText('합성 신청자',{exact:true})).toHaveCount(0);
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+ });
+ test('qualification-only reviewer keeps the review open with document access disabled',async({page})=>{
+  const writes=await fixture(page,false);
+  await page.goto('/operations/neture/qualifications');
+  await page.getByRole('row').filter({hasText:'합성 신청자'}).getByRole('checkbox').check();
+  await page.getByRole('button',{name:'선택 회원 승인 검토'}).click();
+  await expect(page.getByRole('button',{name:'사업자등록증 보기'})).toBeDisabled();
+  await expect(page.getByText('사업자 서류 조회 권한이 없어 첨부 여부만 표시합니다.')).toBeVisible();
+  await expect(page.getByRole('button',{name:'검토 결과 저장'})).toBeVisible();
+  expect(writes).toEqual([]);
  });
  test('service Admin targets remain readable with no approval or changes',async({page})=>{
   const writes=await fixture(page);
