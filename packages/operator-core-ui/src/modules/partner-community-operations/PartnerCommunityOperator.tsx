@@ -331,7 +331,7 @@ export default function PartnerCommunityOperator({
           }]:[]} />
           <DataTable tableId="partner-community-members" data={data.members} rowKey="id" selectable selectedKeys={selectedMembers} onSelectionChange={keys=>{if(!busy)setSelectedMembers(keys);}} columns={[
             {key:'name',header:'회원',stickyOnMobile:true},
-            {key:'status',header:'상태',render:value=>value==='active'?'활동 중':value==='suspended'?'이용 정지':value},
+            {key:'status',header:'상태',render:value=>({active:'활동 중',suspended:'이용 정지'} as Record<string,string>)[String(value)]??value},
             {key:'operatorReadOnly',header:'업무 대상',render:(_v,member)=>member.operatorReadOnly?'전체 관리자 — 처리 대상 아님':'회원'},
           ]} />
         </section>

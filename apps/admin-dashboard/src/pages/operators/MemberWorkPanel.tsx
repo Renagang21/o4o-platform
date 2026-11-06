@@ -44,7 +44,7 @@ export default function MemberWorkPanel({
     : 'terminate';
   return (
     <div className="space-y-4">
-      {readOnly && <p role="status">전체 관리자 — 처리 대상 아님</p>}
+      {readOnly && <output className="block">전체 관리자 — 처리 대상 아님</output>}
       {adminMode &&
         mode === 'delete' &&
         permissions.erase &&

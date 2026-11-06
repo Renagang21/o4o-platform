@@ -117,9 +117,9 @@ export default function CentralPharmacistQualifications({
   const selectedRow = selectedRows.length === 1 ? selectedRows[0] : undefined;
   const actions = (row: Qualification) => row.operatorReadOnly ? <span>전체 관리자 — 처리 대상 아님</span> : (
     <div className="flex flex-wrap gap-2">
-      {row.status !== "approved" && row.licenseNumber && <button type="button" disabled={busy || !canApprove(row)} onClick={() => choose(row, "approve")}>승인 검토</button>}
-      {row.version && ["pending", "unrequested"].includes(row.status) && <button type="button" disabled={busy} onClick={() => choose(row, "reject")}>반려</button>}
-      {row.status === "approved" && <button type="button" disabled={busy} onClick={() => choose(row, "revoke")}>승인 취소</button>}
+      {row.status !== "approved" && row.licenseNumber && <button type="button" disabled={busy || !canApprove(row)} onClick={() => void choose(row, "approve")}>승인 검토</button>}
+      {row.version && ["pending", "unrequested"].includes(row.status) && <button type="button" disabled={busy} onClick={() => void choose(row, "reject")}>반려</button>}
+      {row.status === "approved" && <button type="button" disabled={busy} onClick={() => void choose(row, "revoke")}>승인 취소</button>}
       {!row.version && <span className="text-slate-500">본인 자격 신청 필요</span>}
     </div>
   );
@@ -191,9 +191,9 @@ export default function CentralPharmacistQualifications({
       {error && <p role="alert">{error}</p>}
       {notice && <output className="block rounded border border-green-200 bg-green-50 p-3">{notice}</output>}
       {!directory && !selectedRow?.operatorReadOnly && selectedKeys.size > 0 && <ActionBar selectedCount={selectedKeys.size} onClearSelection={() => { setSelectedKeys(new Set()); closeReview(); }} actions={[
-        { key: "approve", label: "선택 회원 승인 검토", disabled: busy || !selectedRow || !canApprove(selectedRow), onClick: () => { if (selectedRow) choose(selectedRow, "approve"); } },
-        { key: "reject", label: "선택 회원 반려 검토", disabled: busy || !selectedRow?.version || !["pending", "unrequested"].includes(selectedRow.status), onClick: () => { if (selectedRow) choose(selectedRow, "reject"); } },
-        { key: "revoke", label: "선택 회원 승인 취소", disabled: busy || selectedRow?.status !== "approved", onClick: () => { if (selectedRow) choose(selectedRow, "revoke"); } },
+        { key: "approve", label: "선택 회원 승인 검토", disabled: busy || !selectedRow || !canApprove(selectedRow), onClick: () => { if (selectedRow) void choose(selectedRow, "approve"); } },
+        { key: "reject", label: "선택 회원 반려 검토", disabled: busy || !selectedRow?.version || !["pending", "unrequested"].includes(selectedRow.status), onClick: () => { if (selectedRow) void choose(selectedRow, "reject"); } },
+        { key: "revoke", label: "선택 회원 승인 취소", disabled: busy || selectedRow?.status !== "approved", onClick: () => { if (selectedRow) void choose(selectedRow, "revoke"); } },
       ]} />}
       {directory && selectedKeys.size > 0 && <ActionBar selectedCount={selectedKeys.size} onClearSelection={() => { setSelectedKeys(new Set()); closeReview(); }} actions={[{key:'review',label:'선택 회원 상세',disabled:!selectedRow,onClick:()=>{if(selectedRow)setDetail(selectedRow);}}]} />}
       {selectedKeys.size > 1 && <p className="text-sm text-slate-600">면허 근거와 사유를 회원별로 확인하도록 검토할 회원 한 명을 선택해 주시기 바랍니다.</p>}

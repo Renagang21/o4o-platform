@@ -197,6 +197,11 @@ function RoleModal({ userId, existingRoles, isAdmin, serviceKey, apiAdapter, the
 
 // ─── Main Component ──────────────────────────────────────────
 
+function memberActionAuthority(user:UserDetailData|null,isAdmin:boolean,canManageMembers:boolean) {
+  if(user?.operatorReadOnly)return {isAdmin:false,canManageMembers:false};
+  return {isAdmin,canManageMembers};
+}
+
 export default function UserDetailPage({
   apiAdapter,
   config,
@@ -216,8 +221,7 @@ export default function UserDetailPage({
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [showRoleModal, setShowRoleModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
-  const isAdmin = adminAuthority && !user?.operatorReadOnly;
-  const canManageMembers = memberAuthority && !user?.operatorReadOnly;
+  const {isAdmin,canManageMembers}=memberActionAuthority(user,adminAuthority,memberAuthority);
 
   const fetchDetail = useCallback(async () => {
     if (!id) return;
@@ -464,7 +468,7 @@ export default function UserDetailPage({
             </tbody>
           </table>
 
-          {user.operatorReadOnly && <p role="status">전체 관리자 — 처리 대상 아님</p>}
+          {user.operatorReadOnly && <output className="block">전체 관리자 — 처리 대상 아님</output>}
           {/* Actions */}
           <div className="flex items-center gap-2 mt-4 pt-4 border-t border-slate-100">
             {!user.operatorReadOnly && lifecycleStatus === 'pending' && (

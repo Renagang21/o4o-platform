@@ -17,7 +17,12 @@ export class PartnerCommunityService {
   constructor(private db: DataSource) {}
   private async menu(m: EntityManager,user: string,...areas: string[]) {
     try { await assertCentralOperationMenu(m,user,'partner-support',areas.map(area=>`partner-support.${area}`)); }
-    catch(error) { if(error instanceof OperationError) fail(error.status,error.code); throw error; }
+    catch(error) {
+        if(error instanceof OperationError) {
+          fail(error.status,error.code);
+        }
+        throw error;
+      }
   }
   boards() {
     return this.db.query(
@@ -387,7 +392,12 @@ export class PartnerCommunityService {
       await this.identity(m, user, true, true);
       await this.menu(m,user,'members');
       try { await assertOperatorMemberTarget(m, id); }
-      catch(error) { if(error instanceof OperationError) fail(error.status,error.code); throw error; }
+      catch(error) {
+        if(error instanceof OperationError) {
+          fail(error.status,error.code);
+        }
+        throw error;
+      }
 
       if (id === user) fail(403, "COMMUNITY_SELF_ACTION");
       if (!target) fail(404, "COMMUNITY_NOT_FOUND");

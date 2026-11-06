@@ -66,3 +66,9 @@ CANONICAL-INDEX·ROLE-WORKSPACE V2·CURRENT-ADMIN-ROLE-POLICY의 현재 규칙�
 두 번째 리뷰 보완: PostgreSQL이 허용하는 하이픈 없는/중괄호 UUID를 요청에서 거부한다. URL·가입 ID·batch 각 항목은 정형 UUID로 검증한 뒤에만 보호 검사와 핸들러로 전달한다. 검증할 수 없는 ID를 건너뛰지 않으며, 혼합 batch와 기존 등록 반려 경로의 우회 요청을 회귀에 추가했다.
 
 UUID 보완 검증: 관련 API 5 suites / 116 tests 및 API type-check PASS.
+
+## Sonar 품질 보완
+
+GitHub check annotations로 Sonar의 12개 지적을 확인했다. 조회 상태 표시를 native output으로 바꾸고, async UI 검토 호출을 명시적으로 처리하며, 중첩 조건/역할별 동작 계산과 예외 분기를 분명히 했다. 제한된 50명 batch의 읽기 전용 보호 조회는 모든 ID를 검증한 뒤 Promise.all로 완료하며 어떤 대상도 쓰기 전에 검사한다. 품질 기준·제외 설정·권한 정책은 완화하지 않는다.
+
+Sonar 보완 로컬 검증: 중앙 화면 24건, 공통 상세 22건, 파트너 20건, 관련 서버 33건, PC/mobile Chromium 6건 및 API/admin 타입·공통 UI 빌드 PASS.
