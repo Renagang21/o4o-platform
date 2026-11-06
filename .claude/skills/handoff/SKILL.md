@@ -1,4 +1,5 @@
 ---
+name: handoff
 description: 작업 종료 - 인수인계 메모 작성 후 작업 branch 커밋·push 및 통합 담당 인계
 ---
 작업공간을 옮기기 전에 인수인계 메모를 남겨줘. 문제가 생기면 멈추고 보고해.
@@ -24,6 +25,7 @@ description: 작업 종료 - 인수인계 메모 작성 후 작업 branch 커밋
      PR 은 `gh pr view <번호> --json state`, 원격 branch 존재는 `git ls-remote --heads --exit-code origin <branch>`
      (merge 후 정리로 삭제됐을 수 있다).
    - 다음에 바로 이어서 할 일 (우선순위 순서로)
+   - 다음 실행자: CLOUD(클라우드 세션 · 코드) / LOCAL(데스크톱 로컬 · 운영 DB) — 운영 DB 확인이 필요한 일은 LOCAL 로 넘기고, 실행할 read-only SQL · 판정 기준이 담긴 지시서 경로를 적는다(DOCUMENT-LIFECYCLE §10-6).
    - 주의할 점, 미해결 문제, 내린 결정과 그 이유
 3. CLAUDE.md에는 진행 상황을 쓰지 마. "세션 시작 시 HANDOFF.md를 먼저 읽을 것" 안내가 있는지만 확인하고, 없으면 추가해.
 4. git status 로 변경 사항을 보여줘. 그 다음

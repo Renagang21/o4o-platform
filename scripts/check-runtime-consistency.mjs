@@ -52,10 +52,12 @@ function* nodePins(text) {
     yield { version, job };
   }
 }
-const { volta } = JSON.parse(read('package.json'));
+const { volta, packageManager } = JSON.parse(read('package.json'));
 assert.match(volta.node, /^22\.\d+\.\d+$/, 'The supported runtime must remain Node 22');
 assert.equal(process.versions.node, volta.node, `Run this check with Node ${volta.node}`);
 assert.equal(read('.nvmrc').trim(), volta.node, '.nvmrc must match volta.node');
+// pnpm/action-setup v4+ fails when its `version` input differs from packageManager, so keep them identical (no hash suffix).
+assert.equal(packageManager, `pnpm@${volta.pnpm}`, 'packageManager must equal pnpm@volta.pnpm');
 assert.match(read('.npmrc'), /^verify-store-integrity=true$/m, 'Keep store integrity verification enabled');
 const setup = read('.github/actions/setup-build-env/action.yml');
 assert.equal(inputDefault(setup, 'pnpm-version'), volta.pnpm, 'The CI pnpm default must match volta.pnpm');
