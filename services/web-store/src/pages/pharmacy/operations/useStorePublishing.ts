@@ -8,7 +8,7 @@ const cycle: AssetPublishStatus[] = ['draft', 'published', 'hidden'];
 interface Retry { ids: string[]; status: AssetPublishStatus }
 
 /** Service-local controller; the existing policy gates, panel and transport remain unchanged. */
-export function useStorePublishing() {
+export function useStorePublishing(targetId?: string) {
   const { key, organizationId, isCurrent } = useStoreOperationScope();
   const read = useLatestStoreRequest(key);
   const rows = useRef<StoreAssetItem[]>([]), reading = useRef(true), writing = useRef(false);
@@ -25,17 +25,28 @@ export function useStorePublishing() {
     reading.current = true; rows.current = [];
     setLoading(true); setItems([]); setTotal(0); setError(null); setActionError(null); setNotice(null); setRetry(null);
     try {
-      const result = await storeAssetControlApi.list({ page: 1, limit: 200 });
-      if (!result.success || !result.data || result.data.items.some(item => item.organizationId !== organizationId))
-        throw new Error('Unconfirmed publishing list');
-      if (!current() || !isCurrent()) return;
-      rows.current = result.data.items; setItems(result.data.items); setTotal(result.data.total);
+      // A selected snapshot may be beyond the first page. Never show another snapshot as its target.
+      // The existing server clamps this endpoint to 50; use its actual page size for termination.
+      const limit = 50;
+      for (let page = 1; page <= 20; page++) {
+        const result = await storeAssetControlApi.list({ page, limit });
+        if (!current() || !isCurrent()) return;
+        if (!result.success || !result.data || result.data.items.some(item => item.organizationId !== organizationId))
+          throw new Error('Unconfirmed publishing list');
+        const matches = targetId ? result.data.items.filter(item => item.id === targetId) : result.data.items;
+        if (!targetId || matches.length) {
+          rows.current = matches; setItems(matches); setTotal(targetId ? matches.length : result.data.total);
+          return;
+        }
+        if (page * limit >= result.data.total || result.data.items.length === 0) break;
+      }
+      setError('조회 범위에서 선택한 사본을 찾지 못했습니다. 콘텐츠 목록으로 돌아가 대상을 다시 확인하시기 바랍니다.');
     } catch {
       if (current() && isCurrent()) setError('게시 상태를 불러오지 못했습니다. 다시 시도해 주시기 바랍니다.');
     } finally {
       if (current() && isCurrent()) { reading.current = false; setLoading(false); }
     }
-  }, [organizationId, isCurrent, read]);
+  }, [organizationId, isCurrent, read, targetId]);
   useEffect(() => { void reload(); }, [reload]);
 
   const changeStatus = useCallback(async (ids: string[], status: AssetPublishStatus) => {

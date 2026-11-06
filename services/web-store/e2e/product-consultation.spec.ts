@@ -5,7 +5,7 @@ test('product consultation source → ChatGPT prompt/result → linked save → 
  const errors: string[] = []; const unexpectedWrites: string[] = [];
  let saved: Record<string, any> | null = null, creates = 0, updates = 0, failReadback = true;
  page.on('pageerror', e => errors.push(e.message));
- await page.addInitScript(() => localStorage.setItem('o4o_accessToken', 'synthetic-browser-token'));
+ await page.addInitScript(() => { if (window.top === window) localStorage.setItem('o4o_accessToken', 'synthetic-browser-token'); });
  await page.route(url => url.pathname.startsWith('/api/'), async route => {
   const request = route.request(), path = new URL(request.url()).pathname;
   const json = (data: unknown) => route.fulfill({ json: { success: true, data } });
@@ -57,12 +57,16 @@ test('product consultation source → ChatGPT prompt/result → linked save → 
  await page.getByLabel('전문 참고자료의 출처와 내용을 검수했습니다').check();
  await page.getByRole('button', { name: 'ChatGPT로 작업', exact: false }).click();
  // Real prompt builder is rendered; no external AI account or network call is used.
- await expect(page.getByText('결과는 영어로 작성하세요.', { exact: false })).toBeVisible();
- await page.getByPlaceholder('LLM 이 만들어 준 HTML 을 여기에 붙여 넣고 아래 버튼을 누르세요.').fill('<h2>상담자료</h2><p onclick="alert(1)">확인할 사용자 ChatGPT 결과</p><script>window.untrustedResult=true</script>');
+ await page.getByText('전달할 작업 안내 확인·직접 복사', { exact: true }).click();
+ await expect(page.getByRole('textbox', { name: '전달할 작업 안내', exact: true })).toHaveValue(/결과는 영어로 작성하시기 바랍니다\./);
+ await page.getByPlaceholder('LLM 이 만들어 준 HTML 을 여기에 붙여 넣고 아래 버튼을 누르시기 바랍니다.').fill('<h2>상담자료</h2><p onclick="alert(1)">확인할 사용자 ChatGPT 결과</p><script>window.untrustedResult=true</script>');
+ await expect(page.getByRole('button', { name: '편집기에 넣기', exact: true })).toBeDisabled();
+ await page.getByRole('button', { name: '결과 미리보기', exact: true }).click();
+ await page.getByRole('checkbox', { name: '결과와 사실·이용 범위를 확인했습니다', exact: true }).check();
  await page.getByRole('button', { name: '편집기에 넣기', exact: true }).click();
  await page.getByRole('button', { name: '닫기', exact: true }).last().click();
  await page.getByRole('button', { name: '내 자료함 콘텐츠로 저장', exact: true }).click();
- await expect(page.getByText('저장하지 못했습니다. 입력 내용을 유지한 채 다시 시도해 주세요.', { exact: false })).toBeVisible();
+ await expect(page.getByText('저장하지 못했습니다. 입력 내용을 유지한 채 다시 시도해 주시기 바랍니다.', { exact: false })).toBeVisible();
  expect(creates).toBe(1);
  await page.getByRole('button', { name: '내 자료함 콘텐츠로 저장', exact: true }).click();
  await expect(page).toHaveURL(new RegExp(`/store/content/direct/${id}$`));
@@ -97,7 +101,7 @@ test('product consultation source → ChatGPT prompt/result → linked save → 
  expect(creates).toBe(1); expect(updates).toBe(2); expect(errors).toEqual([]);
  await page.getByRole('button', { name: '수정', exact: true }).click();
  await page.getByRole('button', { name: 'HTML', exact: true }).click();
- await page.getByPlaceholder('HTML 코드를 직접 입력하거나 외부 HTML을 붙여넣으세요...').fill("<p style='color:red'>HTML 직접 입력 결과</p>");
+ await page.getByPlaceholder('HTML 코드를 직접 입력하거나 외부 HTML을 붙여넣으시기 바랍니다...').fill("<p style='color:red'>HTML 직접 입력 결과</p>");
  await page.getByRole('button', { name: '저장', exact: true }).click();
  await expect(page.getByRole('button', { name: '수정', exact: true })).toBeVisible();
  expect(saved!.contentJson.html).toBe('<p style="color:red">HTML 직접 입력 결과</p>');

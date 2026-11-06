@@ -706,7 +706,24 @@ describe('Static regression guards', () => {
     expect(kpa).not.toContain('forumRouter');
     expect(kpa).not.toContain('homeRouter');
     expect(kpa).not.toContain("router.use('/forum'");
-    expect(read('routes/neture/controllers/neture.controller.ts')).toContain("router.get('/home/forum', optionalAuth, requireCommunityAccess('o4o-general'),");
+    expect(read('routes/neture/controllers/neture.controller.ts')).toContain("router.get('/home/forum', requireAuth, requireCommunityAccess('o4o-general'),");
+  });
+
+  it('로그인 필수 community guard 앞에는 optionalAuth 를 두지 않는다', () => {
+    // optionalAuth 는 비활성 · 세션 철회 · 약관 미동의 계정을 비로그인으로 바꿔 requireAuth 게이트를 건너뛴다.
+    const offenders: string[] = [];
+    const walk = (dir: string) => {
+      for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+        const full = path.join(dir, entry.name);
+        if (entry.isDirectory()) { if (entry.name !== '__tests__') walk(full); continue; }
+        if (!entry.name.endsWith('.ts') || /\.(test|spec)\.ts$/.test(entry.name)) continue;
+        fs.readFileSync(full, 'utf8').split('\n').forEach((line, i) => {
+          if (/\boptionalAuth\b(?: as any)?\s*,\s*requireCommunityAccess\(/.test(line)) offenders.push(`${path.relative(SRC, full)}:${i + 1}`);
+        });
+      }
+    };
+    walk(SRC);
+    expect(offenders).toEqual([]);
   });
 
   it('서비스 forum mount 는 forumContextMiddleware 계약을 유지한다', () => {

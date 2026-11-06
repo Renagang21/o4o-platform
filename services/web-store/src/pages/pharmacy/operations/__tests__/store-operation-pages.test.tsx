@@ -29,6 +29,33 @@ beforeEach(() => {
   api.update.mockImplementation(async (id: string, status: string) => ({ success: true, data: { snapshotId: id, publishStatus: status } }));
 });
 afterEach(cleanup);
+it('selected publishing finds a later-page snapshot and preserves the exact library return', async () => {
+  api.list.mockResolvedValueOnce({ success: true, data: { items: [item('other')], total: 51 } })
+    .mockResolvedValueOnce({ success: true, data: { items: [item('target')], total: 51 } });
+  render(<MemoryRouter initialEntries={[{ pathname: '/store/content', search: '?snapshotId=target', state: {
+    libraryScope: 'A:kpa-society', libraryReturn: '/store/workspace/studio?librarySource=community&libraryPage=2',
+  } }]}><StoreAssetsPage /></MemoryRouter>);
+  await screen.findByText('A Fixture target');
+  expect(screen.queryByText('A Fixture other')).toBeNull();
+  expect(api.list).toHaveBeenNthCalledWith(2, { page: 2, limit: 50 });
+  expect(screen.getByRole('link', { name: '콘텐츠 목록으로 돌아가기' }).getAttribute('href')).toBe('/store/workspace/studio?librarySource=community&libraryPage=2');
+  fireEvent.click(within(screen.getByText('A Fixture target').closest('tr')!).getByRole('button', { name: '초안' }));
+  await waitFor(() => expect(api.update).toHaveBeenCalledWith('target', 'published'));
+});
+it('missing selected publishing never falls back to another snapshot', async () => {
+  render(<MemoryRouter initialEntries={['/store/content?snapshotId=missing']}><StoreAssetsPage /></MemoryRouter>);
+  await screen.findByRole('alert');
+  expect(screen.queryByText('A Fixture one')).toBeNull();
+  expect(api.update).not.toHaveBeenCalled();
+});
+it('selected publishing stops scanning at the explicit bound without asserting a target is absent', async () => {
+  api.list.mockResolvedValue({ success: true, data: { items: [item('other')], total: 10000 } });
+  render(<MemoryRouter initialEntries={['/store/content?snapshotId=missing']}><StoreAssetsPage /></MemoryRouter>);
+  await screen.findByRole('alert');
+  expect(screen.getByRole('alert').textContent).toContain('조회 범위');
+  expect(api.list).toHaveBeenCalledTimes(20);
+  expect(api.update).not.toHaveBeenCalled();
+});
 it('home starts work before overview finishes and loads recent activity only when opened', async () => {
   let resolve!: (value: unknown) => void;
   api.analytics.mockReturnValueOnce(new Promise(r => { resolve = r; }));

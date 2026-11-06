@@ -1,6 +1,6 @@
 # O4O Canonical Document Index
 
-> **역할**: AI 도구와 무관한 **정본(canonical) 문서 지도**. [`CLAUDE.md`](../CLAUDE.md) 와 [`AGENTS.md`](../AGENTS.md) 는 규칙을 복사하지 않고 이 색인과 각 정본을 가리킨다.
+> **역할**: AI 도구와 무관한 **정본(canonical) 문서 지도**. [`AGENTS.md`](../AGENTS.md) 는 공통 실행 규칙의 정본이고 [`CLAUDE.md`](../CLAUDE.md) 는 그것을 `@AGENTS.md` 로 가져와 Claude 전용 내용만 더한다(2026-11-06). 두 진입점 모두 규칙을 복사하지 않고 이 색인과 각 정본을 가리킨다.
 > **부분 갱신**: 2026-10-29 — AI 비용·사용자 ChatGPT 하위 기술 운영 정책 등재([WO](work-orders/WO-O4O-AI-COST-AND-USER-CHATGPT-POLICY-ALIGNMENT-V1.md)).
 > **작성일**: 2026-09-12 · **최종 갱신**: 2026-11-06 (Operator 회원 업무의 전체 관리자 조회 전용 보호) · 2026-10-28 (통합 운영 책임 V2·수동 약사 자격·중앙 위임 구현 관계 — `WO-O4O-UNIFIED-MEMBERSHIP-ADMIN-REFACTOR-V1`) · 2026-10-12 (My Home 최소 모아보기·AI 별도 개발·운영 결과 정합 — `WO-O4O-MY-HOME-IMPLEMENTATION-V1`) · 2026-10-11 (My Home 정본 등재 — `WO-O4O-MY-HOME-DOCUMENT-ALIGNMENT-V1`) · 2026-10-11 (PharmacyHub 완전 폐기 정책 · 종전 법적 게시 범위 정합 — `WO-O4O-PHARMACYHUB-CANONICAL-RETIREMENT-POLICY-V1`) · 2026-10-10 (§1 대표 홈 운영 반영·회원 초기화면 구현 상태 정합 — `WO-O4O-PHARMACY-MEMBER-HOME-V1`) · 2026-10-07 (§9 잔여 판정 대기 3건 최종 판정 — RETAIL-STABLE · E-COMMERCE-ORDER-CONTRACT SUPERSEDED · COSMETICS-DOMAIN-RULES SUPERSEDED → 새 K-COSMETICS-RETIREMENT-RESIDUE-CONTRACT-V1(§5 ACTIVE), 판정 대기 0건 — `WO-O4O-CANONICAL-INDEX-S9-REMAINING-3-FINAL-DISPOSITION-V1`) · 2026-10-06 (§9 판정 6건 반영 — `WO-O4O-CANONICAL-INDEX-S9-POLICY-DECISION-ALIGNMENT-V1`) · 2026-10-05 (§1 DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1 등재 · STORE-ACCESS 약국 예외 표기) · 2026-10-04 (정본 최종 정합 — 본문 전수 검증 · 정합 후 20건 ACTIVE 등재 · §9 는 결정이 필요한 문서만 남김 · `WO-O4O-CANONICAL-DOC-FINAL-ALIGNMENT-V1`) · **출처**: 구 `CLAUDE.md` v8 "상세 규칙 문서 목록" + 본문 링크의 합집합
 
@@ -19,7 +19,7 @@
   | `판정 대기` | 현행 사업 경계와 충돌 후보이거나 일부 절이 stale — **기능 복구·확장 금지**, 판정은 별도 WO |
 
 - 행 추가·제거·상태 변경은 별도 WO 로 한다 (`CLAUDE.md` §16-4 준용). 깨진 링크 교정만 인라인 허용.
-- 우선순위(충돌 시)는 아래 절 번호 순이 아니라 `CLAUDE.md` / `AGENTS.md` 의 Source of Truth 절이 정한다. 요지: **1절(사업·정책) > 2절(구조 계약) > 나머지 도메인 정본 > 기록물**.
+- 우선순위(충돌 시)는 아래 절 번호 순이 아니라 `AGENTS.md` §2 Source of Truth(`CLAUDE.md` 가 import)가 정한다. 요지: **1절(사업·정책) > 2절(구조 계약) > 나머지 도메인 정본 > 기록물**.
 - **역할별 업무공간 리팩터링**(2026-09-15 ~ 2026-09-17)은 8단계 전부 완료되어 `ROLE_WORKSPACE_REFACTOR = CLOSED` 다 ([CHECK](checks/CHECK-O4O-FINAL-ROLE-WORKSPACE-ARCHITECTURE-CENSUS-AND-CLOSURE-V1.md)). 상위 기준은 1절 [O4O-ROLE-WORKSPACE-ARCHITECTURE-V1](baseline/O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md) 이며 이후 변경은 동 문서 §9 규칙을 따르는 명시적 WO 로만 한다. 아래 행에 `UPDATE_REQUIRED` 잔여는 없다.
 
 ---

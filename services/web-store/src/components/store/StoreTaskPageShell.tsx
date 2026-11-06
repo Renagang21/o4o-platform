@@ -3,14 +3,16 @@ import {
   type StorePageShellProps,
 } from "@o4o/store-ui-core";
 import { LoadError } from "@o4o/ui";
+import { StoreAiSlot } from "./StoreAiPlacement";
 
 /** Store-local composition; other shared PageShell consumers keep their existing layout. */
 export function StoreTaskPageShell({
   children,
   headerActions,
   state,
+  listFirst = false,
   ...props
-}: StorePageShellProps) {
+}: StorePageShellProps & { listFirst?: boolean }) {
   const body = !state ? (
     children
   ) : state.loading ? (
@@ -29,7 +31,12 @@ export function StoreTaskPageShell({
   );
   return (
     <CorePageShell {...props} headerActions={headerActions}>
+      {!listFirst && <StoreAiSlot label={props.labels.pageTitle} />}
       {body}
+      {listFirst && <details className="mt-5 rounded-lg border border-slate-200 bg-white px-3">
+        <summary className="min-h-11 cursor-pointer content-center text-sm text-teal-800">AI 도움 요청</summary>
+        <StoreAiSlot label={props.labels.pageTitle} />
+      </details>}
     </CorePageShell>
   );
 }
