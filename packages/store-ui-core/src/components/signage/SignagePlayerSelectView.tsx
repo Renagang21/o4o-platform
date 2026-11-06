@@ -88,7 +88,7 @@ export function SignagePlayerSelectView({
       setPlaylists(data.filter((p) => p.publishStatus === 'published' && p.isActive !== false));
     } catch {
       if (current !== generation.current) return;
-      setError('플레이리스트를 불러오지 못했습니다.');
+      setError('재생목록을 불러오지 못했습니다.');
       setPlaylists([]);
     } finally {
       if (current === generation.current) setLoading(false);
@@ -124,7 +124,7 @@ export function SignagePlayerSelectView({
     },
     {
       key: 'itemCount',
-      title: '항목 수',
+      title: '동영상 수',
       dataIndex: 'itemCount',
       align: 'center' as const,
       render: (v) => <span className="text-slate-600">{v}</span>,
@@ -157,6 +157,7 @@ export function SignagePlayerSelectView({
       align: 'right' as const,
       render: (_v, pl) => (
         <button
+          type="button"
           onClick={(e) => {
             e.stopPropagation();
             handlePlay(pl.id);
@@ -164,7 +165,7 @@ export function SignagePlayerSelectView({
           className={playButtonClassName}
         >
           <Play className="w-3.5 h-3.5" />
-          재생
+          재생 시작
         </button>
       ),
     },
@@ -189,7 +190,7 @@ export function SignagePlayerSelectView({
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
         <input
           type="text"
-          placeholder="플레이리스트 검색..."
+          placeholder="재생목록 검색..."
           value={keyword}
           onChange={(e) => { setKeyword(e.target.value); clearSelection(); }}
           className={searchInputClassName}
@@ -206,7 +207,7 @@ export function SignagePlayerSelectView({
       )}
 
       <ActionBar selectedCount={selectedKeys.length} onClearSelection={clearSelection}
-        actions={[{ key: 'play', label: '선택한 재생목록 열기', disabled: selectedKeys.length !== 1 || loading || !!error,
+        actions={[{ key: 'play', label: '선택한 재생목록 재생 시작', disabled: selectedKeys.length !== 1 || loading || !!error,
           onClick: () => { if (selectedKeys.length === 1 && filtered.some(item => item.id === selectedKeys[0])) handlePlay(selectedKeys[0]); } }]} />
       {/* Table */}
       {!error && <DataTable<SignageSelectPlaylist>
@@ -215,7 +216,7 @@ export function SignagePlayerSelectView({
         dataSource={filtered}
         rowKey="id"
         loading={loading}
-        emptyText="게시된 플레이리스트가 없습니다."
+        emptyText="게시된 재생목록이 없습니다."
       />}
     </div>
   );

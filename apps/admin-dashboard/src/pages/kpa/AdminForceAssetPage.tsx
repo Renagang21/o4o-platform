@@ -661,6 +661,9 @@ export default function AdminForceAssetPage() {
       <PageHeader
         title="Force Asset 관리"
         subtitle="특정 매장에 Asset을 강제 배포하고 관리합니다."
+        actions={[
+          { id: 'create', label: '강제 배포 생성', icon: <Plus className="h-4 w-4" />, onClick: () => setCreateOpen(true), variant: 'primary' },
+        ]}
       />
 
       {/* Filters */}
@@ -681,10 +684,6 @@ export default function AdminForceAssetPage() {
 
         <Button variant="outline" size="icon" onClick={() => refetch()} title="새로고침">
           <RefreshCw className="h-4 w-4" />
-        </Button>
-        <Button onClick={() => setCreateOpen(true)}>
-          <Plus className="h-4 w-4 mr-2" />
-          강제 배포 생성
         </Button>
       </div>
 

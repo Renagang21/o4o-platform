@@ -24,7 +24,7 @@
 ```
 탐색 (/hub/signage)
   → 내 매장에 추가 (assetSnapshotApi.copy)
-  → 동영상 보관함 (/store/marketing/signage/videos)
+  → 동영상 (/store/marketing/signage/videos)
   → 재생목록 구성·게시 (/store/marketing/signage/playlist)
   → 디스플레이 재생 화면 열기 (/store/marketing/signage/display)
   → 목록 선택·사용자 시작 (/store/marketing/signage/play/:playlistId)

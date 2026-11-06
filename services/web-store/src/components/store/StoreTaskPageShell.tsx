@@ -3,7 +3,6 @@ import {
   type StorePageShellProps,
 } from "@o4o/store-ui-core";
 import { LoadError } from "@o4o/ui";
-import { StoreAiSlot } from "./StoreAiPlacement";
 
 /** Store-local composition; other shared PageShell consumers keep their existing layout. */
 export function StoreTaskPageShell({
@@ -29,16 +28,7 @@ export function StoreTaskPageShell({
     <div style={state.listStyle}>{children}</div>
   );
   return (
-    <CorePageShell {...props}>
-      <StoreAiSlot label={props.labels.pageTitle} />
-      {headerActions && (
-        <div
-          className="mb-3 flex flex-wrap items-center gap-2"
-          aria-label="빠른 작업"
-        >
-          {headerActions}
-        </div>
-      )}
+    <CorePageShell {...props} headerActions={headerActions}>
       {body}
     </CorePageShell>
   );

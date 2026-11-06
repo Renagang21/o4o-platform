@@ -687,13 +687,6 @@ function ServiceAdministratorsPage() {
         />
       </div>
 
-      <div className="mb-4 space-y-3 rounded border bg-white p-4 text-sm">
-        <h2 className="font-semibold">업무 운영자 지정</h2>
-        <Link to="/admin/operations-operators" className="inline-flex rounded bg-blue-700 px-3 py-2 text-white">업무 운영자 지정</Link>
-        <p>관리자 사이트의 일상업무 담당자는 업무 운영자 지정에서 관리합니다. 이 목록은 각 서비스 Admin을 관리하며, 서비스 Admin 지정만으로 업무 운영 권한을 부여하지 않습니다.</p>
-      </div>
-      <details className="mb-4 rounded border bg-white p-4" onToggle={e => setShowLegacy(e.currentTarget.open)}><summary className="cursor-pointer font-medium">기존·기타 권한 정리</summary>{showLegacy && <UsersListClean />}</details>
-      <BusinessOperatorAssignments />
 
       {/* WO-O4O-ADMIN-OPERATORS-ROWACTION-EDIT-RESTORE-V1: ActionBar (선택 시 노출) */}
       {selectedIds.size > 0 && (
@@ -769,6 +762,15 @@ function ServiceAdministratorsPage() {
         columnVisibility
       />
 
+      <div className="mt-6">
+        <div className="mb-4 space-y-3 rounded border bg-white p-4 text-sm">
+          <h2 className="font-semibold">업무 운영자 지정</h2>
+          <Link to="/admin/operations-operators" className="inline-flex rounded bg-blue-700 px-3 py-2 text-white">업무 운영자 지정</Link>
+          <p>관리자 사이트의 일상업무 담당자는 업무 운영자 지정에서 관리합니다. 이 목록은 각 서비스 Admin을 관리하며, 서비스 Admin 지정만으로 업무 운영 권한을 부여하지 않습니다.</p>
+        </div>
+        <details className="mb-4 rounded border bg-white p-4" onToggle={e => setShowLegacy(e.currentTarget.open)}><summary className="cursor-pointer font-medium">기존·기타 권한 정리</summary>{showLegacy && <UsersListClean />}</details>
+        <BusinessOperatorAssignments />
+      </div>
       </>
 
 

@@ -308,6 +308,18 @@ export default function ProductMastersPage() {
 
   return (
     <div>
+      {/* 신규 등록은 상단 오른쪽 — 정본 O4O-STANDARD-LIST-WORKSPACE-CONTRACT-V1 (WO-O4O-ADMIN-PRODUCT-MASTER-MANUAL-REGISTRATION-UI-V1) */}
+      {canWrite && (
+        <div className="flex justify-end mb-3">
+          <button
+            type="button"
+            onClick={() => navigate('/admin/o4o-product-db/masters/new')}
+            className="flex items-center gap-1 bg-admin-blue text-white px-3 py-2 rounded text-sm"
+          >
+            <Plus className="w-4 h-4" /> 새 상품 등록
+          </button>
+        </div>
+      )}
       {/* Toolbar */}
       <div className="flex flex-wrap gap-3 mb-4 items-center">
         <form onSubmit={submitSearch} className="flex gap-2">
@@ -355,14 +367,6 @@ export default function ProductMastersPage() {
 
         <div className="ml-auto flex items-center gap-3">
           <span className="text-sm text-gray-500">총 {total.toLocaleString()}건</span>
-          {/* WO-O4O-ADMIN-PRODUCT-MASTER-MANUAL-REGISTRATION-UI-V1 */}
-          {canWrite && <button
-            type="button"
-            onClick={() => navigate('/admin/o4o-product-db/masters/new')}
-            className="flex items-center gap-1 bg-admin-blue text-white px-3 py-2 rounded text-sm"
-          >
-            <Plus className="w-4 h-4" /> 새 상품 등록
-          </button>}
         </div>
       </div>
 

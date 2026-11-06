@@ -355,6 +355,7 @@ function LibraryPage() {
           '특정 매장에 직접 보내는 기능은 없습니다. 매장용 상품 설명서·태블릿·사이니지는 콘텐츠 메뉴의 각 화면에서 등록합니다.',
         ]}
         compact
+        collapsible
       />
 
       {requestSourceError && <p role="alert">{requestSourceError}</p>}

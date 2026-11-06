@@ -300,6 +300,7 @@ export function OperatorForumDeleteRequestsConsolePage({
         description={guideDesc ?? GUIDE_FALLBACK.description}
         steps={guideSteps ?? GUIDE_FALLBACK.steps}
         compact
+        collapsible
       />
 
       {/* Status Tabs (segmented canonical) */}

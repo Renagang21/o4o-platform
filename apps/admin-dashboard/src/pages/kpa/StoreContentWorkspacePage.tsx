@@ -295,17 +295,19 @@ export default function StoreContentWorkspacePage() {
       />
 
       {/* 안내 배너 */}
-      <div className="mb-5 flex items-start gap-3 rounded-lg border border-blue-200 bg-blue-50 p-4">
-        <AlertCircle size={18} className="mt-0.5 flex-shrink-0 text-blue-600" />
-        <div className="text-sm text-blue-800">
-          <p className="font-medium">작업 공간 안내</p>
-          <p className="mt-0.5 text-blue-700">
+      <details className="mb-5 rounded-lg border border-blue-200 bg-blue-50 p-3 text-sm text-blue-800">
+        <summary className="cursor-pointer font-medium">
+          <AlertCircle size={16} className="mr-1 inline text-blue-600" />
+          작업 공간 안내
+        </summary>
+        <div>
+          <p className="mt-2 text-blue-700">
             여기에 표시된 자산은 매장이 보유한 실행 자산입니다.
             자산을 선택하여 QR·POP 등 결과물을 만들고, 매장에서 활용하시기 바랍니다.
             커뮤니티 원본은 복제되지 않으며 참조(reference) 방식으로 연결됩니다.
           </p>
         </div>
-      </div>
+      </details>
 
       {/* usageType 필터 */}
       <div className="mb-4 flex items-center gap-2">

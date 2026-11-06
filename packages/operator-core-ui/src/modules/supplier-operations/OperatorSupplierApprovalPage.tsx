@@ -215,7 +215,10 @@ export default function OperatorSupplierApprovalPage() {
         </p>
       </div>
 
-      <SupplierReviewQueue disabled={busy || reviewBusy} onBusyChange={onReviewBusy} />
+      <details className="rounded-lg border border-slate-200 bg-white p-3">
+        <summary className="min-h-11 cursor-pointer content-center text-sm font-medium text-slate-700">보완 요청 대기 목록</summary>
+        <div className="mt-2"><SupplierReviewQueue disabled={busy || reviewBusy} onBusyChange={onReviewBusy} /></div>
+      </details>
 
       {actionMessage && (
         <div

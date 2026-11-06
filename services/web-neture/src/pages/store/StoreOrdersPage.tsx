@@ -318,6 +318,7 @@ export default function StoreOrdersPage() {
           '재주문 버튼으로 동일한 상품을 장바구니에 추가합니다.',
         ]}
         compact
+        collapsible
       />
 
       {/* Message */}

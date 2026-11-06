@@ -286,7 +286,7 @@ export function createStorePlaylistController(
         }
         const organizationId = await resolveStoreAccess(dataSource, userId, userRoles, storeOwnerServiceKey, readPreferredStoreOrganizationId(req));
         if (!organizationId) {
-          res.json({ success: true, data: [] });
+          res.status(403).json({ success: false, error: { code: 'STORE_ACCESS_REQUIRED', message: '승인된 매장 이용 자격을 확인해 주세요.' } });
           return;
         }
 

@@ -576,6 +576,16 @@ export default function TabletContentLibraryList({
 
   return (
     <div className="space-y-3" ref={listTopRef}>
+      {/* 신규 등록은 상단 오른쪽 — 정본 O4O-STANDARD-LIST-WORKSPACE-CONTRACT-V1 */}
+      <div className="flex justify-end">
+        <button
+          type="button"
+          onClick={onCreate}
+          className="inline-flex items-center gap-1.5 px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-semibold hover:bg-indigo-700 shrink-0"
+        >
+          <Plus className="w-4 h-4" /> 태블릿 화면 만들기
+        </button>
+      </div>
       {savedRow && (
         <section aria-label="저장한 안내 다음 작업" className="rounded-xl border border-teal-200 bg-teal-50 p-4 space-y-2">
           <p role="status" className="text-sm font-semibold text-teal-900">“{savedRow.name}” 내용을 저장했습니다.</p>
@@ -596,7 +606,7 @@ export default function TabletContentLibraryList({
           </span>
         </div>
       )}
-      {/* ── 도구막대: 검색 + 필터(상태/템플릿/코너) + 만들기 ── */}
+      {/* ── 도구막대: 검색 + 필터(상태/템플릿/코너) ── */}
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="flex flex-1 flex-wrap items-center gap-2 min-w-0">
           <input
@@ -635,12 +645,6 @@ export default function TabletContentLibraryList({
             ))}
           </div>
         </div>
-        <button
-          onClick={onCreate}
-          className="inline-flex items-center gap-1.5 px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-semibold hover:bg-indigo-700 shrink-0"
-        >
-          <Plus className="w-4 h-4" /> 태블릿 화면 만들기
-        </button>
       </div>
 
       {/* ── 일괄 작업(선택 시) ── */}

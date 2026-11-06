@@ -126,6 +126,7 @@
 | [GLOBAL-HEADER-STANDARD-V1](architecture/ui/GLOBAL-HEADER-STANDARD-V1.md) | 글로벌 헤더 표준 · My Home 공통 직접 진입(2026-10-12 정책 확정·운영 배포 및 본 작업 후 확인 완료, 실제 인증 검증 사용자 제외) | ACTIVE |
 | [O4O-TABLE-STANDARD-BASELINE-V1](baseline/O4O-TABLE-STANDARD-BASELINE-V1.md) | 테이블 지향 표준 | ASPIRATIONAL |
 | [O4O-STANDARD-LIST-PHASE1-BASELINE-V1](baseline/O4O-STANDARD-LIST-PHASE1-BASELINE-V1.md) | 리스트 6 유형 분류 · URL 규약 — 리스트 정비 시 유형 분류 선행 | ACTIVE |
+| [O4O-STANDARD-LIST-WORKSPACE-CONTRACT-V1](architecture/O4O-STANDARD-LIST-WORKSPACE-CONTRACT-V1.md) | 목록 업무 화면 계약 — 목록 우선 · 상단 오른쪽 신규 버튼 · 선택/ActionBar · 상태, 신규 도입 · 기존 전환 기준, 예외 | ACTIVE |
 | [O4O-SHARED-SPACE-FRAME-PRINCIPLE-V1](architecture/ui-ux/O4O-SHARED-SPACE-FRAME-PRINCIPLE-V1.md) | 공유 공간(홈 등) 프레임 구조 원칙 — `packages/shared-space-ui` | ACTIVE |
 | [O4O-SHARED-SPACE-STANDARD-BLOCKS-V1](architecture/ui-ux/O4O-SHARED-SPACE-STANDARD-BLOCKS-V1.md) | 공유 공간 표준 블록 | ACTIVE |
 | [O4O-TEMPLATE-PRESETS](design/O4O-TEMPLATE-PRESETS.md) | 서비스 Template Preset — 값의 기준은 registry(`packages/shared-space-ui/src/templates.ts`) | ACTIVE |

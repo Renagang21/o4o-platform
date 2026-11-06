@@ -211,6 +211,7 @@ export default function BrandManagementPage() {
           '삭제는 상품 연결이 없는 브랜드만 가능합니다',
         ]}
         compact
+        collapsible
       />
 
       {/* Search */}
