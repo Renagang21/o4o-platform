@@ -1,0 +1,29 @@
+name: Member Sonar941 read-only diagnostic
+on:
+  push:
+    branches: [wo/member-sonar-diagnostic-20261104]
+permissions:
+  contents: read
+jobs:
+  read-public-report:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Read public Sonar issue metadata without credentials
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json,urllib.request,urllib.error
+          endpoints={
+            'issues':'https://sonarcloud.io/api/issues/search?componentKeys=Renagang21_o4o-platform&pullRequest=941&types=VULNERABILITY&ps=100',
+            'gate':'https://sonarcloud.io/api/qualitygates/project_status?projectKey=Renagang21_o4o-platform&pullRequest=941',
+          }
+          for name,url in endpoints.items():
+            try:
+              with urllib.request.urlopen(url,timeout=30) as response:
+                data=json.load(response)
+                if name=='issues':
+                  print(json.dumps({'report':name,'total':data.get('total'),'issues':[{k:i.get(k) for k in ['key','rule','severity','component','line','type','status','impacts']} for i in data.get('issues',[])]}))
+                else:print(json.dumps({'report':name,'projectStatus':data.get('projectStatus')}))
+            except urllib.error.HTTPError as e:print(json.dumps({'report':name,'httpStatus':e.code}))
+          PY
