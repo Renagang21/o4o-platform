@@ -1,6 +1,6 @@
 # ADR-0002: O4O Product Description Authenticated Access
 
-- **상태**: Accepted
+- **상태**: Accepted — 적용 범위를 상품 고정 URL·기본 QR 로 명확화 ([ADR-0004](ADR-0004-store-qr-description-anonymous-access.md), 2026-11-06)
 - **날짜**: 2026-07-12
 - **관련**: WO `WO-O4O-PRODUCT-DESCRIPTION-AUTH-ACCESS-BASELINE-AMENDMENT-V1` · baseline `docs/baseline/O4O-PRODUCT-RESOURCE-ARCHITECTURE-BASELINE-V3-AMENDMENT.md` · 정책 SSOT `docs/guides/products/O4O-STORE-PRODUCT-DESCRIPTION-POLICY-V1.md` · 조사 `docs/investigations/IR-O4O-STORE-PRODUCT-DESCRIPTION-POLICY-CODE-AND-DOC-AUDIT-V1.md` · `docs/checks/CHECK-O4O-STORE-PRODUCT-DESCRIPTION-POLICY-CODE-AND-DOC-AUDIT-V1.md`
 
