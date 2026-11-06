@@ -1,3 +1,4 @@
+import { protectedMemberSql } from '../../services/operations/protected-member-target.js';
 import { ASSIGNABLE_OPERATOR_ROLES } from '../../config/operator-role-catalog.js';
 import { OperationError } from '../../services/operations/operation-audit.js';
 /**
@@ -315,7 +316,7 @@ export class MembershipConsoleController {
 
       // Fetch users (users 테이블: camelCase columns — SnakeNamingStrategy 비활성)
       const users = await AppDataSource.query(
-        `SELECT u.id, u.email, u."firstName", u."lastName", u.name, u.nickname, u.phone,
+        `SELECT ${protectedMemberSql("u.id")} AS "operatorReadOnly", u.id, u.email, u."firstName", u."lastName", u.name, u.nickname, u.phone,
                 u.status, u."isActive", u."createdAt", u."updatedAt",
                 u."businessInfo"->>'businessName' AS company
          FROM users u
@@ -414,6 +415,7 @@ export class MembershipConsoleController {
           status: effectiveStatus,
           isActive: u.isActive,
           roles: roleMap[u.id] || [],
+          operatorReadOnly: u.operatorReadOnly === true,
           memberships,
           createdAt: u.createdAt,
           updatedAt: u.updatedAt,
@@ -462,7 +464,7 @@ export class MembershipConsoleController {
 
       // Fetch user (users 테이블: camelCase columns)
       const userRows = await AppDataSource.query(
-        `SELECT id, email, "firstName", "lastName", name, nickname, phone,
+        `SELECT ${protectedMemberSql("users.id")} AS "operatorReadOnly", id, email, "firstName", "lastName", name, nickname, phone,
                 status, "isActive", "createdAt", "updatedAt",
                 "businessInfo",
                 "businessInfo"->>'businessName' AS company
@@ -520,6 +522,7 @@ export class MembershipConsoleController {
           status: u.status,
           isActive: u.isActive,
           businessInfo: u.businessInfo || null,
+          operatorReadOnly: u.operatorReadOnly === true,
           createdAt: u.createdAt,
           updatedAt: u.updatedAt,
         },

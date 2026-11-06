@@ -156,7 +156,7 @@ export default function MemberProfileForm({
             });
           }}
           onOpenDocument={
-            values.businessRegistrationDocumentId
+            detail.permissions.readDocuments !== false && values.businessRegistrationDocumentId
               ? () => {
                   void documentWork(async () => {
                     const response = await authClient.api.get(
@@ -174,6 +174,7 @@ export default function MemberProfileForm({
               : undefined
           }
         />
+        {values.businessRegistrationDocumentId && detail.permissions.readDocuments === false && <p>사업자 서류 조회 권한이 없어 첨부 여부만 표시합니다.</p>}
         {documentError && <output role="alert">{documentError}</output>}
         {editing && (
           <>

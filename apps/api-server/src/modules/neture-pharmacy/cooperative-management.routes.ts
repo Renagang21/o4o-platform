@@ -1,3 +1,4 @@
+import { OperationError } from '../../services/operations/operation-audit.js';
 import { centralOperationRequest } from '../../middleware/central-operation-menu.middleware.js';
 import { ServiceOperatorInvitationError } from '../../services/admin/service-operator-invitation.service.js';
 import { invitationFailure } from '../../services/admin/operator-invitation-error.js';
@@ -44,6 +45,7 @@ export function cooperativeManagementRoutes(db: DataSource) {
       try {
         res.json({ success: true, data: await fn(req) });
       } catch (error) {
+        if (error instanceof OperationError) { res.status(error.status).json({success:false,code:error.code,error:error.message}); return; }
         if (error instanceof ServiceOperatorInvitationError) { invitationFailure(res,error); return; }
         if (error instanceof NeturePharmacyError || error instanceof PolicyAcceptanceError)
           res

@@ -43,6 +43,7 @@ export interface BusinessInfoData {
 }
 
 export interface UserDetailData {
+  operatorReadOnly?: boolean;
   id: string;
   email: string;
   firstName?: string;

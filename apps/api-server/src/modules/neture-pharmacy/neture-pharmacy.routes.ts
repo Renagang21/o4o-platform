@@ -1,3 +1,4 @@
+import { OperationError } from '../../services/operations/operation-audit.js';
 import { ConsultationGuidanceService } from './services/consultation-guidance.js';
 import { createConsultationGuidanceSelector } from './services/consultation-guidance.extension.js';
 import { ConsultationSupportService } from './services/consultation-support.js';
@@ -93,7 +94,8 @@ function handle(fn: Handler): RequestHandler {
         res.status(err.httpStatus).json({ success: false, error: err.message, code: err.code });
         return;
       }
-      if (err instanceof NetureMainMembershipRequiredError) {
+      if (err instanceof OperationError) { res.status(err.status).json({success:false,code:err.code,error:err.message}); return; }
+        if (err instanceof NetureMainMembershipRequiredError) {
         res.status(err.httpStatus).json({
           success: false,
           error: err.message,

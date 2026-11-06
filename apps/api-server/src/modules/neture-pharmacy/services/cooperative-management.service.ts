@@ -1,3 +1,4 @@
+import { assertOperatorMemberTarget, protectedMemberSql } from '../../../services/operations/protected-member-target.js';
 import { assertCentralOperationMenu } from '../../../services/admin/central-operation-menu-grants.js';
 import { OperationError } from '../../../services/operations/operation-audit.js';
 import { recordOperatorRevocation } from '../../../services/admin/operator-invitation-retention.js';
@@ -501,7 +502,7 @@ export class CooperativeManagementService {
   async members(actor: string, coop: string) {
     await this.requireLocal(this.db, actor, coop);
     return this.db.query(
-      `SELECT m.id,m.user_id AS "userId",m.status,u.name,u.email,m.created_at AS "createdAt"
+      `SELECT m.id,m.user_id AS "userId",m.status,u.name,u.email,${protectedMemberSql("u.id")} AS "operatorReadOnly",m.created_at AS "createdAt"
       FROM cooperative_memberships m JOIN users u ON u.id=m.user_id WHERE m.cooperative_id=$1 ORDER BY m.created_at DESC,m.id`,
       [coop],
     );
@@ -527,6 +528,7 @@ export class CooperativeManagementService {
           "COOPERATIVE_MEMBER_NOT_FOUND",
           "조합원을 찾을 수 없습니다.",
         );
+      await assertOperatorMemberTarget(m, member.user_id);
       const request = action.startsWith("request_");
       const requestedAction = request ? action.slice(8) : action;
       const transition = MEMBER_TRANSITIONS[requestedAction];

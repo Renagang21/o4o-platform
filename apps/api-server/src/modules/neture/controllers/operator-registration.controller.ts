@@ -1,3 +1,4 @@
+import { operatorMemberTarget } from '../../../middleware/operator-member-target.middleware.js';
 import { requireNetureScope } from '../../../middleware/neture-scope.middleware.js';
 /**
  * OperatorRegistrationController
@@ -68,6 +69,7 @@ export function createOperatorRegistrationController(dataSource: DataSource, act
     '/registrations/:userId/approve',
     requireAuth,
     requireOperatorOrAdmin,
+    operatorMemberTarget,
     async (req: AuthenticatedRequest, res: Response) => {
       try {
         const { userId } = req.params;
@@ -122,6 +124,7 @@ export function createOperatorRegistrationController(dataSource: DataSource, act
     '/registrations/:userId/reject',
     requireAuth,
     requireOperatorOrAdmin,
+    operatorMemberTarget,
     async (req: AuthenticatedRequest, res: Response) => {
       try {
         const { userId } = req.params;
@@ -205,6 +208,7 @@ export function createOperatorRegistrationController(dataSource: DataSource, act
     '/registrations/batch',
     requireAuth,
     requireOperatorOrAdmin,
+    operatorMemberTarget,
     async (req: AuthenticatedRequest, res: Response) => {
       try {
         const { ids, action, reason } = req.body;

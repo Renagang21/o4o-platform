@@ -30,6 +30,7 @@ export type SemiFranchiseContentAction = 'publish' | 'archive' | 'reject';
 export type SemiFranchiseContentStatus = 'draft' | 'pending' | 'rejected' | 'published' | 'archived';
 
 export interface PharmacyMembership {
+  operatorReadOnly?: boolean;
   id: string;
   organization_id: string;
   status: string;

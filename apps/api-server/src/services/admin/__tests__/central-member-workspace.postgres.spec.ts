@@ -172,4 +172,22 @@ integration('central member workbench PostgreSQL authority, projection and corre
     }
   });
 
+
+  it('blocks legacy business and pharmacy correction of Admin targets for delegated operators',async()=>{
+    await db.query(`UPDATE central_operation_menu_grants SET menu_keys=ARRAY['neture.members','neture.pharmacies','neture.applications'] WHERE assignment_id IN (SELECT id FROM role_assignments WHERE user_id=$1)`,[reader]);
+    await expect(service.correctLegacyBusiness(reader,admin,{fields:{},reason:'합성 검토',version:'stale'})).rejects.toMatchObject({code:'ADMIN_ACCOUNT_PROTECTED'});
+    await expect(service.correctPharmacy(reader,admin,randomUUID(),{fields:{businessNumber:'1234567890'},reason:'합성 검토',version:'stale',evidenceConfirmed:true})).rejects.toMatchObject({code:'ADMIN_ACCOUNT_PROTECTED'});
+  });
+  it('labels Admin targets without granting write or unrelated domain authority to a qualification reviewer',async()=>{
+    const list=await service.list(admin,'all',1,'');
+    expect(list.items.find(row=>row.userId===admin).operatorReadOnly).toBe(true);
+    expect(list.items.find(row=>row.userId===target).operatorReadOnly).toBe(false);
+    await db.query(`UPDATE central_operation_menu_grants SET menu_keys=ARRAY['neture.qualifications'] WHERE assignment_id IN (SELECT id FROM role_assignments WHERE user_id=$1)`,[reader]);
+    await expect(service.detail(reader,target)).rejects.toMatchObject({code:'MEMBER_DIRECTORY_REQUIRED'});
+    const detail=await service.detail(reader,target,true);
+    expect(detail.member.userId).toBe(target);expect(detail.qualification).not.toBeNull();
+    expect(detail.permissions).toMatchObject({readDocuments:false,edit:false,manageAccount:false,erase:false,pharmacies:false});
+    expect(detail.pharmacies).toEqual([]);
+  });
+
 });
