@@ -15,7 +15,8 @@
 ## 세션 시작 규칙
 - 세션 시작 시 HANDOFF.md가 있으면 먼저 읽을 것
 - 진행 상황은 CLAUDE.md가 아니라 HANDOFF.md에 기록할 것
-- 시작 · 종료 절차는 `/start` · `/handoff` 커맨드(`.claude/commands/`)를 따른다.
+- 시작 · 종료 절차는 `/start` · `/handoff` 스킬(`.claude/skills/`)을 따른다.
+- 그 밖의 스킬: `/wo-new`(지시서 작성 · 인계) · `/db-readonly`(로컬 전용 운영 DB 조회) · `/verify`(변경 범위 검증) · `/integrate`(통합 담당 지정 시만) · `/worktree-cleanup`(merge 후 정리). 스킬은 규칙을 복사하지 않고 `AGENTS.md` · 정본 절을 가리킨다.
 - SessionStart 훅(`.claude/hooks/session-start.mjs`)이 `origin/main` 을 fetch 하고, **clean 한 기준 main checkout 에서만** `pull --ff-only` 한다. 작업 branch · worktree 에서는 ahead/behind 만 보고하며 merge/rebase 하지 않는다. 이 세션 유형(`실행 위치`)의 최근 미완료 지시서도 알려 준다.
 
 ## 세션 유형 — 클라우드 · 데스크톱 로컬

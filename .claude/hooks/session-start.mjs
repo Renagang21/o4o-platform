@@ -38,9 +38,10 @@ function pendingWorkOrders() {
     const body = tryGit(['show', `origin/main:${file}`]);
     if (!body.ok) continue;
     const head = body.out.split('\n').slice(0, 20).join('\n');
-    const where = /실행 위치\s*:\s*([A-Z|() 가-힣]+)/.exec(head)?.[1] ?? '';
-    const status = /상태\s*:\s*([A-Z_]+)/.exec(head)?.[1] ?? '';
-    if (where && want.test(where) && !/^(DONE|COMPLETED|CANCELLED)$/.test(status)) result.push(`${file} (${status || '상태 미기재'})`);
+    // 헤더 형식: `> **실행 위치**: LOCAL` · `> **상태**: ACTIVE` (DOCUMENT-LIFECYCLE §6 · §10-6). 굵게 표기 유무 모두 허용.
+    const where = /실행 위치\**\s*:\s*\**\s*(CLOUD|LOCAL|BOTH)/.exec(head)?.[1] ?? '';
+    const status = /상태\**\s*:\s*\**\s*([A-Z_]+)/.exec(head)?.[1] ?? '';
+    if (where && want.test(where) && !/^(COMPLETED|SUPERSEDED|ARCHIVED|OBSOLETE|DONE)$/.test(status)) result.push(`${file} (${status || '상태 미기재'})`);
     if (result.length >= 8) break;
   }
   return result;
