@@ -11,6 +11,13 @@ import {centralOperationAreas} from './central-operation-navigation';
 import {renderCentralOperation} from './central-operation-renderers';
 import CentralOperationLayout from './CentralOperationLayout';
 import { CENTRAL_OPERATION_SERVICES as SERVICES, centralMenuGroup, centralGroups } from './central-operation-groups';
+/** Each denial needs a different action, so the reason from the server decides the guidance. */
+const CENTRAL_ACCESS_DENIAL: Record<string, string> = {
+  GOOGLE_SESSION_REQUIRED: "업무 운영은 Google 로그인으로만 이용할 수 있습니다. Google 계정으로 다시 로그인해 주시기 바랍니다.",
+  CENTRAL_DELEGATION_REQUIRED: "유효한 업무 위임이 없습니다. 전체 관리자의 업무 운영자 초대를 본인이 수락하면 이용할 수 있습니다.",
+  CENTRAL_MENU_NOT_DELEGATED: "업무 운영자로 지정되어 있지만 담당 업무 메뉴가 없습니다. 전체 관리자에게 담당 업무 지정을 요청해 주시기 바랍니다.",
+};
+const CENTRAL_ACCESS_UNVERIFIED = "업무 위임 상태를 확인하지 못했습니다. 잠시 후 다시 확인해 주시기 바랍니다.";
 /** Independent entry: never expose the platform-admin layout to service Operators. */
 export default function CentralOperationsPage() {
   const { isAuthenticated, isLoading, user, logout } = useAuth();
@@ -37,12 +44,11 @@ export default function CentralOperationsPage() {
         throw new Error("INVALID_RESPONSE");
       if (seq === sequence.current)
         setGrant({ userId: identityId, roles: response.data.data.roles, menuKeys: response.data.data.menuKeys });
-    } catch {
+    } catch (failure) {
       if (seq === sequence.current) {
         setGrant(null);
-        setError(
-          "Google 로그인과 전체 관리자의 업무 운영자 지정이 필요합니다.",
-        );
+        const code = (failure as { response?: { data?: { code?: string } } }).response?.data?.code;
+        setError((code && CENTRAL_ACCESS_DENIAL[code]) || CENTRAL_ACCESS_UNVERIFIED);
       }
     }
   }, [identityId]);

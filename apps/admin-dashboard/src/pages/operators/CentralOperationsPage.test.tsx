@@ -75,13 +75,32 @@ function view(path = "/operations") {
     </MemoryRouter>,
   );
 }
+const denied = (code: string, status = 403) =>
+  Object.assign(new Error(code), { response: { status, data: { success: false, code } } });
 it("service roles alone do not show operating screens when server delegation is denied", async () => {
-  mock.get.mockRejectedValueOnce(new Error("denied"));
+  mock.get.mockRejectedValueOnce(denied("CENTRAL_DELEGATION_REQUIRED"));
   view("/operations/supplier/members");
   expect(await screen.findByRole("alert")).toHaveTextContent(
-    "업무 운영자 지정",
+    "초대를 본인이 수락",
   );
   expect(screen.queryByText("members:supplier")).toBeNull();
+});
+it.each([
+  ["GOOGLE_SESSION_REQUIRED", 403, "Google 계정으로 다시 로그인"],
+  ["CENTRAL_MENU_NOT_DELEGATED", 403, "담당 업무 지정을 요청"],
+  ["CENTRAL_ACCESS_UNAVAILABLE", 503, "확인하지 못했습니다"],
+])("guides the action for the %s denial and keeps screens closed", async (code, status, guidance) => {
+  mock.get.mockRejectedValueOnce(denied(code, status));
+  view("/operations/supplier/members");
+  const alert = await screen.findByRole("alert");
+  expect(alert).toHaveTextContent(guidance);
+  expect(alert).not.toHaveTextContent("초대를 본인이 수락");
+  expect(screen.queryByText("members:supplier")).toBeNull();
+});
+it("does not blame delegation when the check fails without a server reason", async () => {
+  mock.get.mockRejectedValueOnce(new Error("Network Error"));
+  view("/operations/supplier/members");
+  expect(await screen.findByRole("alert")).toHaveTextContent("확인하지 못했습니다");
 });
 it("shows only current delegated services and never the platform-admin entry", async () => {
   mock.get.mockResolvedValueOnce({
@@ -112,10 +131,10 @@ it("preserves unsaved work during successful background delegation checks and re
   fireEvent(window, new Event("focus"));
   await waitFor(() => expect(mock.get).toHaveBeenCalledTimes(2));
   expect(screen.getByLabelText("작성 중")).toHaveValue("작성 중인 사유");
-  mock.get.mockRejectedValueOnce(new Error("revoked"));
+  mock.get.mockRejectedValueOnce(denied("CENTRAL_DELEGATION_REQUIRED"));
   fireEvent(window, new Event("focus"));
   expect(await screen.findByRole("alert")).toHaveTextContent(
-    "업무 운영자 지정",
+    "유효한 업무 위임",
   );
   expect(screen.queryByLabelText("작성 중")).toBeNull();
 });
