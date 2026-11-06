@@ -64,6 +64,7 @@ TypeScript · Vite 는 workspace 별로 여러 버전이 공존합니다(예: we
 **기준값은 루트 `package.json`의 `volta` 필드입니다** (`node 22.23.4` · `pnpm 10.25.0`).
 CI(`.github/actions/setup-build-env`)도 동일 버전을 사용하므로, 로컬을 이 값에 맞추면
 "로컬은 되는데 CI 는 실패" 를 줄일 수 있습니다. Volta 사용 시 저장소 디렉터리에서 자동 적용됩니다.
+루트 `package.json` 의 `packageManager`(`pnpm@10.25.0`, 2026-11-06)도 같은 값으로 고정되어 있어, Corepack 이나 pnpm 의 버전 자동 전환을 쓰는 환경(Claude Code 클라우드 세션 포함)은 다른 pnpm 이 설치돼 있어도 10.25.0 으로 설치합니다. 두 값은 `pnpm run check:runtime` 이 일치를 검사합니다.
 
 Node 22 계열을 유지하며 개발·CI·서버 Docker는 보안 릴리스 **22.23.4**,
 npm은 해당 릴리스의 **10.9.9**, pnpm은 **10.25.0**을 기준으로 합니다.
