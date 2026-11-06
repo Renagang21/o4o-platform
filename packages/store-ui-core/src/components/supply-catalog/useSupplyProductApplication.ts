@@ -129,7 +129,7 @@ export function useSupplyProductApplication<T extends SupplyApplicationItem>(
         toast.error(
           opts?.allAlreadyAdded
             ? `선택한 상품이 이미 모두 ${storeNoun}에 추가되어 있습니다.`
-            : '추가할 상품을 선택해주세요.',
+            : '추가할 상품을 선택해 주시기 바랍니다.',
         );
         return { successCount: 0, failCount: 0 };
       }
@@ -167,7 +167,7 @@ export function useSupplyProductApplication<T extends SupplyApplicationItem>(
       } else if (duplicateCount > 0 && failCount === 0) {
         toast.error(`선택한 상품이 이미 모두 ${storeNoun}에 추가되어 있습니다.`);
       } else {
-        toast.error('상품 추가에 실패했습니다. 다시 시도해주세요.');
+        toast.error('상품 추가에 실패했습니다. 다시 시도해 주시기 바랍니다.');
       }
 
       setBulkAdding(false);

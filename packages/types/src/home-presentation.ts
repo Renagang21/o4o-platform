@@ -105,63 +105,63 @@ export const HOME_SURFACE_INFO: Record<
 const COPY: Record<HomeSurface, [string, string, string, string]> = {
   neture: [
     "필요한 서비스와 업무를 한곳에서",
-    "O4O AI에 질문하고, 참여 중인 서비스와 내 업무를 이어가세요.",
-    "약국의 새로운 연결을 만나세요",
-    "협력사업과 서비스 소식을 확인하고 나에게 필요한 참여 기회를 살펴보세요.",
+    "O4O AI에 질문하고, 참여 중인 서비스와 내 업무를 이어가시기 바랍니다.",
+    "약국의 새로운 연결을 만나시기 바랍니다",
+    "협력사업과 서비스 소식을 확인하고 나에게 필요한 참여 기회를 살펴보시기 바랍니다.",
   ],
   supplier: [
     "제품과 콘텐츠를 매장과 연결합니다",
     "상품 등록부터 매장 연결과 운영까지 공급자 업무를 한곳에서 관리합니다.",
     "좋은 제품에는 좋은 소개가 필요합니다",
-    "제품 정보와 콘텐츠를 준비하고, 매장에 전달할 가치를 명확하게 소개하세요.",
+    "제품 정보와 콘텐츠를 준비하고, 매장에 전달할 가치를 명확하게 소개하시기 바랍니다.",
   ],
   funding: [
     "제품의 가능성을 유통 참여로 연결합니다",
     "새로운 제품과 유통 기회를 함께 검토하고 참여합니다.",
-    "사업의 조건을 먼저 살펴보세요",
-    "진행 중인 사업의 소개와 참여 조건을 확인하고 내 매장에 맞는 기회를 찾아보세요.",
+    "사업의 조건을 먼저 살펴보시기 바랍니다",
+    "진행 중인 사업의 소개와 참여 조건을 확인하고 내 매장에 맞는 기회를 찾아보시기 바랍니다.",
   ],
   community: [
     "현장의 경험과 정보를 함께 나눕니다",
     "O4O 서비스 참여자들이 실무 정보와 경험을 공유하는 공간입니다.",
     "함께 나누면 더 가까워집니다",
-    "참여 중인 커뮤니티의 소식과 자료를 확인하고 현장의 이야기를 나눠보세요.",
+    "참여 중인 커뮤니티의 소식과 자료를 확인하고 현장의 이야기를 나눠보시기 바랍니다.",
   ],
   carepharm: [
     "만성질환 관리, 약국이 함께합니다",
     "참여 약국들이 현장의 경험과 자료를 나누고 협업하는 공간입니다.",
     "함께 나누는 약국 경영 자료",
-    "회원 자료와 협업체 소식을 확인하고 내 약국에서 활용하세요.",
+    "회원 자료와 협업체 소식을 확인하고 내 약국에서 활용하시기 바랍니다.",
   ],
   pharmacy: [
     "약국의 일상에 든든한 연결",
-    "약국 경영지원과 협력사업, 회원 소식을 한곳에서 확인하세요.",
+    "약국 경영지원과 협력사업, 회원 소식을 한곳에서 확인하시기 바랍니다.",
     "우리 약국에 맞는 협력사업",
-    "사업 소개와 참여 조건을 확인하고 약국의 새로운 활동을 준비하세요.",
+    "사업 소개와 참여 조건을 확인하고 약국의 새로운 활동을 준비하시기 바랍니다.",
   ],
   lecture: [
     "새로운 배움이 시작되는 곳",
-    "관심 있는 강의를 만나고, 나의 학습을 이어가세요.",
+    "관심 있는 강의를 만나고, 나의 학습을 이어가시기 바랍니다.",
     "나의 속도로 이어가는 학습",
-    "공개 강의를 살펴보고 수강 중인 학습과 자료를 확인하세요.",
+    "공개 강의를 살펴보고 수강 중인 학습과 자료를 확인하시기 바랍니다.",
   ],
   pharmcoop: [
     "조합의 힘을 모아, 약국의 내일을 함께.",
     "각 협동조합의 자율성을 지키며 더 나은 약국 경영과 협력의 기반을 만들어갑니다.",
     "함께하는 협동조합",
-    "소속 조합의 소식과 참여 안내를 확인하세요.",
+    "소속 조합의 소식과 참여 안내를 확인하시기 바랍니다.",
   ],
   cooperative: [
     "조합의 소식과 필요한 자료를 한곳에서.",
     "회원 활동은 조합에서, 약국 경영 업무는 내 매장에서 이어갑니다.",
     "우리 조합의 참여 안내",
-    "가입 자격과 조합의 소식을 확인하세요.",
+    "가입 자격과 조합의 소식을 확인하시기 바랍니다.",
   ],
   branch: [
     "가까운 소식, 함께하는 분회",
-    "우리 분회의 공지와 행사, 회원 자료를 한곳에서 확인하세요.",
+    "우리 분회의 공지와 행사, 회원 자료를 한곳에서 확인하시기 바랍니다.",
     "놓치지 말아야 할 회원 소식",
-    "행사 일정과 공지를 확인하고 지역 회원의 활동을 함께 이어가세요.",
+    "행사 일정과 공지를 확인하고 지역 회원의 활동을 함께 이어가시기 바랍니다.",
   ],
 };
 export function initialHomePresentation(
@@ -234,7 +234,7 @@ export function parseHomePresentation(value: unknown): HomePresentation {
     throw new Error("Hero와 홍보는 각각 최대 3개입니다.");
   const parse = (item: HomeMessage): HomeMessage => {
     if (!item || typeof item !== "object" || typeof item.enabled !== "boolean")
-      throw new Error("노출 설정을 확인해 주세요.");
+      throw new Error("노출 설정을 확인해 주시기 바랍니다.");
     for (const [field, limit] of Object.entries({
       id: 80,
       title: 120,
@@ -251,7 +251,7 @@ export function parseHomePresentation(value: unknown): HomePresentation {
         typeof item[field as keyof HomeMessage] !== "string" ||
         String(item[field as keyof HomeMessage]).length > limit
       )
-        throw new Error(`${field} 입력 길이를 확인해 주세요.`);
+        throw new Error(`${field} 입력 길이를 확인해 주시기 바랍니다.`);
     }
     if (
       !item.id ||
@@ -259,7 +259,7 @@ export function parseHomePresentation(value: unknown): HomePresentation {
       !["service", "advertisement"].includes(item.kind)
     )
       throw new Error(
-        "제목과 콘텐츠 종류를 확인해 주세요.",
+        "제목과 콘텐츠 종류를 확인해 주시기 바랍니다.",
       );
     if (
       !safeHomeUrl(item.linkUrl) ||
@@ -267,7 +267,7 @@ export function parseHomePresentation(value: unknown): HomePresentation {
       (item.linkUrl && !item.linkText.trim())
     )
       throw new Error(
-        "연결 주소와 버튼 문구를 확인해 주세요. 주소는 / 경로 또는 HTTPS만 가능합니다.",
+        "연결 주소와 버튼 문구를 확인해 주시기 바랍니다. 주소는 / 경로 또는 HTTPS만 가능합니다.",
       );
     if (item.kind === "advertisement" && !item.sponsor.trim())
       throw new Error("광고에는 광고주 표시가 필요합니다.");
@@ -279,7 +279,7 @@ export function parseHomePresentation(value: unknown): HomePresentation {
         item.endsAt &&
         Date.parse(item.startsAt) >= Date.parse(item.endsAt))
     )
-      throw new Error("게시 시작·종료 시간을 확인해 주세요.");
+      throw new Error("게시 시작·종료 시간을 확인해 주시기 바랍니다.");
     return {
       id: item.id,
       title: item.title.trim(),

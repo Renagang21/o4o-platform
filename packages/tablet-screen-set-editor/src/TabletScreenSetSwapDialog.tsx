@@ -41,7 +41,7 @@ export interface TabletScreenSetSwapDialogLabels {
 
 export const DEFAULT_SWAP_DIALOG_LABELS: TabletScreenSetSwapDialogLabels = {
   title: '화면 바꾸기',
-  subtitle: '이 코너에서 사용할 화면을 고르세요.',
+  subtitle: '이 코너에서 사용할 화면을 고르시기 바랍니다.',
   searchPlaceholder: '화면 이름 검색',
   inUse: '지금 사용 중',
   apply: '이 화면으로 바꾸기',

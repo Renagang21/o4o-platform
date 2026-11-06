@@ -135,11 +135,11 @@ function AssistantSession({
       await navigator.clipboard.writeText(turns[turns.length - 1].answer);
       if (mounted.current)
         setCopyStatus(
-          "답변을 복사했습니다. 사용할 편집기에 붙여넣어 확인하세요.",
+          "답변을 복사했습니다. 사용할 편집기에 붙여넣어 확인하시기 바랍니다.",
         );
     } catch {
       if (mounted.current)
-        setCopyStatus("복사하지 못했습니다. 답변을 선택해 복사해 주세요.");
+        setCopyStatus("복사하지 못했습니다. 답변을 선택해 복사해 주시기 바랍니다.");
     }
   };
 
@@ -199,7 +199,7 @@ function AssistantSession({
           className={`${inDialog ? "mt-2 max-h-[40vh]" : "absolute right-0 top-full z-40 mt-2 max-h-[65vh] w-full sm:max-w-lg"} overflow-y-auto rounded-xl border border-slate-200 bg-white p-4 shadow-lg`}
         >
           <p className="mb-3 text-xs text-slate-500">
-            {placement?.action ? "영상 등록 요청은 목록 저장까지 진행합니다. 기기 재생 적용은 별도로 확인하세요." : "직접 입력한 내용과 최근 대화만 전달합니다. 저장·게시·기기 적용은 기존 작업에서 확인하세요."}
+            {placement?.action ? "영상 등록 요청은 목록 저장까지 진행합니다. 기기 재생 적용은 별도로 확인하시기 바랍니다." : "직접 입력한 내용과 최근 대화만 전달합니다. 저장·게시·기기 적용은 기존 작업에서 확인하시기 바랍니다."}
           </p>
           {turns.length > 0 && (
             <div

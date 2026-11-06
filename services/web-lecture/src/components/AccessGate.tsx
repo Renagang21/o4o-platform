@@ -61,7 +61,7 @@ export default function AccessGate({ area }: { area: AccessArea }) {
       <p className="muted">{status
         ? '강의 서비스 이용이 아직 승인되지 않았거나 이용할 수 없는 상태입니다.'
         : '다른 O4O 서비스 회원 자격은 강의 서비스로 이어지지 않습니다.'}</p>
-      <p className="muted">공개 강의는 회원이 아니어도 볼 수 있습니다. 이용 신청은 문의하기로 남겨 주세요.</p>
+      <p className="muted">공개 강의는 회원이 아니어도 볼 수 있습니다. 이용 신청은 문의하기로 남겨 주시기 바랍니다.</p>
       <div className="actions">
         <Link className="button-link" to="/courses">공개 강의 둘러보기</Link>
         <a className="secondary-link" href={INQUIRY_URL}>이용 문의하기</a>

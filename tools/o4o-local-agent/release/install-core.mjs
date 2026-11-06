@@ -266,7 +266,7 @@ function activateRelease(pointer, launcher, manifest, dataHome, slot) {
     dataHome,
   });
   const start = Buffer.from(
-    `@echo off\r\nchcp 65001 >nul\r\nsetlocal DisableDelayedExpansion\r\nset "O4O_AGENT_HOME=${dataHome}"\r\n"${path.join(slot, "runtime", "node.exe")}" "${path.join(slot, "launch.mjs")}"\r\nif errorlevel 1 pause\r\n`,
+    `@echo off\r\nchcp 65001 >nul\r\nsetlocal DisableDelayedExpansion\r\nset "O4O_AGENT_HOME=${dataHome}"\r\nset "O4O_RUN_NODE=${path.join(slot, "runtime", "node.exe")}"\r\nset "O4O_RUN_ENTRY=${path.join(slot, "launch.mjs")}"\r\nset "O4O_RUN_CWD=${slot}"\r\n"%SystemRoot%\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -NoLogo -NoProfile -WindowStyle Hidden -Command "$p=[Diagnostics.ProcessStartInfo]::new(); $p.FileName=$env:O4O_RUN_NODE; $p.Arguments=([char]34 + $env:O4O_RUN_ENTRY + [char]34); $p.WorkingDirectory=$env:O4O_RUN_CWD; $p.UseShellExecute=$false; $p.CreateNoWindow=$true; [void][Diagnostics.Process]::Start($p)"\r\nif errorlevel 1 pause\r\n`,
   );
   try {
     atomic(pointer, next);

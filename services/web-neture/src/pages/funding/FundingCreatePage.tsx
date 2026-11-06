@@ -55,15 +55,15 @@ type FundingFormValues = {
 
 function validateFundingForm({ title, oneLiner, videoUrl, fundingStartAt, fundingEndAt, trialPeriodDays }: FundingFormValues) {
   const errors: Record<string, string> = {};
-  if (!title.trim()) errors.title = '제목을 입력해주세요.';
-  if (!oneLiner.trim() || oneLiner.trim().length < 10) errors.oneLiner = '한 줄 제안을 10자 이상 입력해주세요.';
+  if (!title.trim()) errors.title = '제목을 입력해 주시기 바랍니다.';
+  if (!oneLiner.trim() || oneLiner.trim().length < 10) errors.oneLiner = '한 줄 제안을 10자 이상 입력해 주시기 바랍니다.';
   if (videoUrl.trim()) {
     try { new URL(videoUrl.trim()); } catch {
       errors.videoUrl = '영상 URL 형식이 올바르지 않습니다.';
     }
   }
   if (!fundingStartAt || !fundingEndAt || new Date(fundingEndAt) <= new Date(fundingStartAt)) errors.funding = '모집 종료일은 시작일 이후여야 합니다.';
-  if (!trialPeriodDays || Number(trialPeriodDays) <= 0) errors.trialPeriodDays = '진행 기간(일)을 입력해주세요.';
+  if (!trialPeriodDays || Number(trialPeriodDays) <= 0) errors.trialPeriodDays = '진행 기간(일)을 입력해 주시기 바랍니다.';
 
   return errors;
 }
@@ -181,7 +181,7 @@ export default function FundingCreatePage({
 
     if (Object.keys(errors).length > 0) {
       setFieldErrors(errors);
-      setError('입력 항목을 확인해주세요.');
+      setError('입력 항목을 확인해 주시기 바랍니다.');
       window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
@@ -219,7 +219,7 @@ export default function FundingCreatePage({
       <h1 className="text-2xl font-bold text-gray-900 mb-2">
         {mode === 'edit' ? '유통참여형 펀딩 수정' : '유통참여형 펀딩 등록'}
       </h1>
-      <p className="text-sm text-gray-500 mb-6">매장 참여를 설득하는 제안서를 작성하세요.</p>
+      <p className="text-sm text-gray-500 mb-6">매장 참여를 설득하는 제안서를 작성하시기 바랍니다.</p>
 
 
 
@@ -227,7 +227,7 @@ export default function FundingCreatePage({
       <div className="mb-6 p-4 bg-violet-50 border border-violet-200 rounded-lg text-sm text-violet-900 space-y-1.5">
         <p className="font-semibold">유통참여형 펀딩은 투자형 펀딩이 아닙니다.</p>
         <ul className="list-disc list-inside space-y-1 text-violet-800 text-[13px]">
-          <li>개발비 전체를 모으는 것이 목적이 아니라 <b>제품 보상을 통한 초기 매장 랜딩</b>이 목적입니다. 목표 금액보다 <b>몇 개 매장에 들어갈지(목표 매장 수)</b>를 먼저 설계하세요.</li>
+          <li>개발비 전체를 모으는 것이 목적이 아니라 <b>제품 보상을 통한 초기 매장 랜딩</b>이 목적입니다. 목표 금액보다 <b>몇 개 매장에 들어갈지(목표 매장 수)</b>를 먼저 설계하시기 바랍니다.</li>
           <li>참여금(송금)은 <b>펀딩 운영자가 수령</b>하며, 송금 완료자 명단을 제품 개발자에게 공유합니다. 온라인 결제는 제공하지 않습니다.</li>
           <li>제품 개발자는 <b>포럼 운영 주체</b>로서 참여자 검토·소통·미송금자 처리를 담당합니다.</li>
           <li>제출한 제안은 <b>펀딩 운영자 승인 후에만 공개·모집</b>됩니다 (투자형 오해·송금 흐름·보상 방식 선택·제품 보상 조건·포럼 운영 방식 확인). 반려 시 안내에 따라 보완 후 다시 제출할 수 있습니다.</li>
@@ -292,7 +292,7 @@ export default function FundingCreatePage({
               id="funding-videoUrl"
               value={videoUrl}
               onChange={(e) => setVideoUrl(e.target.value)}
-              placeholder="영상 URL을 입력하세요 (YouTube, Vimeo 또는 기타 URL 가능)"
+              placeholder="영상 URL을 입력하시기 바랍니다 (YouTube, Vimeo 또는 기타 URL 가능)"
               className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${fieldBorder(fieldErrors.videoUrl)}`}
             />
             <FieldError error={fieldErrors.videoUrl} /><p className="text-xs text-gray-400 mt-1">제품 사용이나 매장 판매 모습을 보여주면 참여율이 높아집니다</p>
@@ -303,7 +303,7 @@ export default function FundingCreatePage({
         <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
           <div>
             <h2 className="text-base font-semibold text-gray-900">왜 이걸 해야 하는가</h2>
-            <p className="text-xs text-gray-500 mt-0.5">제품 설명이 아니라, 매장에서 왜 이 제품을 취급해야 하는지를 중심으로 작성하세요</p>
+            <p className="text-xs text-gray-500 mt-0.5">제품 설명이 아니라, 매장에서 왜 이 제품을 취급해야 하는지를 중심으로 작성하시기 바랍니다</p>
           </div>
 
           <div>
@@ -323,7 +323,7 @@ export default function FundingCreatePage({
         <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
           <div>
             <h2 className="text-base font-semibold text-gray-900">매장 활용 방법</h2>
-            <p className="text-xs text-gray-500 mt-0.5">매장에서 이 상품을 어떻게 판매할지 구체적으로 작성해주세요</p>
+            <p className="text-xs text-gray-500 mt-0.5">매장에서 이 상품을 어떻게 판매할지 구체적으로 작성해 주시기 바랍니다</p>
           </div>
 
           {/* WO-O4O-NETURE-DISTRIBUTION-FUNDING-SUPPLIER-DESIGN-FIELDS-V1: 설계 체크리스트 */}
@@ -356,7 +356,7 @@ export default function FundingCreatePage({
               onChange={(c) => setSalesScenarioContent(c.html)}
               preset="compact"
               minHeight="280px"
-              placeholder="판매 시나리오를 작성하세요..."
+              placeholder="판매 시나리오를 작성하시기 바랍니다..."
             /></div>
           </div>
         </div>
@@ -365,7 +365,7 @@ export default function FundingCreatePage({
         <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-5">
           <div>
             <h2 className="text-base font-semibold text-gray-900">참여 조건 및 혜택</h2>
-            <p className="text-xs text-gray-500 mt-0.5">매장이 참여하기 위해 필요한 조건과, 참여 시 얻는 혜택을 명확히 작성하세요</p>
+            <p className="text-xs text-gray-500 mt-0.5">매장이 참여하기 위해 필요한 조건과, 참여 시 얻는 혜택을 명확히 작성하시기 바랍니다</p>
           </div>
 
           {/* 결과 약속 */}
@@ -399,7 +399,7 @@ export default function FundingCreatePage({
               placeholder="예: 시험 참여 매장에 정식 제품 1박스 제공"
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             />
-            <p className="text-xs text-gray-400 mt-1">제품 보상(제품 제공)을 중심으로 작성하세요. 보상 제품명·예상 수량·보상 기준 단가·배송 예정 시점을 함께 적으면 좋습니다. 현금 보상은 투자형으로 오해될 수 있으니 신중히 선택하세요.</p>
+            <p className="text-xs text-gray-400 mt-1">제품 보상(제품 제공)을 중심으로 작성하시기 바랍니다. 보상 제품명·예상 수량·보상 기준 단가·배송 예정 시점을 함께 적으면 좋습니다. 현금 보상은 투자형으로 오해될 수 있으니 신중히 선택하시기 바랍니다.</p>
           </div>
 
           {/* 펀딩 구조 — WO-MARKET-TRIAL-CROWDFUNDING-CORE-ALIGNMENT-V1 */}
@@ -439,7 +439,7 @@ export default function FundingCreatePage({
                   placeholder="예: 2000"
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
-                <p className="text-xs text-gray-400 mt-1">1인당 권장 참여금액(보상 기준 금액). 온라인 결제 금액이 아니라 펀딩 운영자가 오프라인으로 안내하는 기준이며, 매장이 부담 없이 참여할 수준으로 설정하세요.</p>
+                <p className="text-xs text-gray-400 mt-1">1인당 권장 참여금액(보상 기준 금액). 온라인 결제 금액이 아니라 펀딩 운영자가 오프라인으로 안내하는 기준이며, 매장이 부담 없이 참여할 수준으로 설정하시기 바랍니다.</p>
               </div>
             </div>
 

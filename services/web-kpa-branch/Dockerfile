@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1
 # KPA Branch Web — Cloud Run 호환 정적 파일 서빙
 #
 # WO-O4O-PHARMACIST-BRANCH-SERVICE-FOUNDATION-DESIGN-AND-IMPLEMENTATION-V1
@@ -12,14 +13,16 @@
 #    반드시 함께 추가해야 한다. 누락 시 Docker 빌드가 실패한다.
 
 # Build stage
-FROM node:20-alpine AS builder
+FROM node:22.23.4-alpine AS builder
 
 WORKDIR /app
 
-RUN npm install -g pnpm
+RUN --mount=type=secret,id=proxy_ca \
+    if [ -f /run/secrets/proxy_ca ]; then export NODE_EXTRA_CA_CERTS=/run/secrets/proxy_ca; fi; \
+    npm install -g --ignore-scripts pnpm@10.25.0
 
 # Copy workspace configuration
-COPY pnpm-workspace.yaml ./
+COPY pnpm-workspace.yaml pnpm-lock.yaml ./
 COPY package.json ./
 COPY tsconfig.base.json ./
 COPY tsconfig.packages.json ./
@@ -27,11 +30,13 @@ COPY tsconfig.packages.json ./
 # Copy workspace package manifests needed for this service
 #   auth-react → { auth-utils, auth-client } → types
 #   shared-space-ui → { ui → types, content-editor }
+#   operator-ux-core → { ui, types } (표준 회원 목록·ActionBar)
 COPY packages/types/package.json ./packages/types/
 COPY packages/auth-utils/package.json ./packages/auth-utils/
 COPY packages/auth-client/package.json ./packages/auth-client/
 COPY packages/auth-react/package.json ./packages/auth-react/
 COPY packages/ui/package.json ./packages/ui/
+COPY packages/operator-ux-core/package.json ./packages/operator-ux-core/
 COPY packages/content-editor/package.json ./packages/content-editor/
 COPY packages/shared-space-ui/package.json ./packages/shared-space-ui/
 
@@ -39,7 +44,10 @@ COPY packages/shared-space-ui/package.json ./packages/shared-space-ui/
 COPY services/web-kpa-branch/package.json ./services/web-kpa-branch/
 
 # WO-O4O-DOCKER-PNPM-IGNORE-SCRIPTS-FIX-V1: --ignore-scripts 로 prepare 자동 빌드 skip
-RUN pnpm install --filter kpa-branch-web... --ignore-scripts
+RUN --mount=type=secret,id=proxy_ca \
+    if [ -f /run/secrets/proxy_ca ]; then export NODE_EXTRA_CA_CERTS=/run/secrets/proxy_ca; fi; \
+    pnpm install --filter kpa-branch-web... --fail-if-no-match \
+      --frozen-lockfile --ignore-scripts --verify-store-integrity=true
 
 # Copy workspace package source
 COPY packages/types/ ./packages/types/
@@ -47,6 +55,7 @@ COPY packages/auth-utils/ ./packages/auth-utils/
 COPY packages/auth-client/ ./packages/auth-client/
 COPY packages/auth-react/ ./packages/auth-react/
 COPY packages/ui/ ./packages/ui/
+COPY packages/operator-ux-core/ ./packages/operator-ux-core/
 COPY packages/content-editor/ ./packages/content-editor/
 COPY packages/shared-space-ui/ ./packages/shared-space-ui/
 
@@ -66,14 +75,16 @@ WORKDIR /app/services/web-kpa-branch
 ARG VITE_API_BASE_URL
 ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
 
-RUN npx vite build
+RUN pnpm exec vite build
 
 # Runner stage
-FROM node:20-alpine AS runner
+FROM node:22.23.4-alpine AS runner
 
 WORKDIR /app
 
-RUN npm install -g serve
+RUN --mount=type=secret,id=proxy_ca \
+    if [ -f /run/secrets/proxy_ca ]; then export NODE_EXTRA_CA_CERTS=/run/secrets/proxy_ca; fi; \
+    npm install -g --ignore-scripts serve@14.2.4
 
 COPY --from=builder /app/services/web-kpa-branch/dist ./dist
 
@@ -87,4 +98,5 @@ RUN cp -r ./dist ./dist-public-base && mv ./dist-public-base ./dist/kpa
 
 EXPOSE 8080
 
+USER node
 CMD ["serve", "-s", "dist", "-l", "8080"]

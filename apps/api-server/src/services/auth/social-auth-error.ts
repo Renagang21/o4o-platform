@@ -6,5 +6,5 @@ export class SocialAuthError extends Error {
   }
 }
 export const invalidSocialFlow = () => new SocialAuthError(
-  'SOCIAL_FLOW_INVALID', '인증 요청이 만료되었거나 사용할 수 없습니다. 다시 시작해 주세요.', 401,
+  'SOCIAL_FLOW_INVALID', '인증 요청이 만료되었거나 사용할 수 없습니다. 다시 시작해 주시기 바랍니다.', 401,
 );

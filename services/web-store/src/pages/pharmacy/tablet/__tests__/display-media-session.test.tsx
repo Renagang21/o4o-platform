@@ -62,7 +62,7 @@ it("read failure cannot become an empty product save and offers retry", async ()
     (screen.getByTestId("quick-editor-save") as HTMLButtonElement).disabled,
   ).toBe(true);
   expect(
-    screen.queryByText("선택된 상품이 없습니다. 오른쪽에서 추가하세요."),
+    screen.queryByText("선택된 상품이 없습니다. 오른쪽에서 추가하시기 바랍니다."),
   ).toBeNull();
   fireEvent.click(screen.getByText("다시 시도"));
   await screen.findByText("Product Two");

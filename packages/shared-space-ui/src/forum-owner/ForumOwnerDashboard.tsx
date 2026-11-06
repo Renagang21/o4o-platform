@@ -284,7 +284,7 @@ export function ForumOwnerDashboard({
             <div className="bg-white rounded-xl border border-slate-200 p-8 text-center">
               <Inbox className="w-12 h-12 text-slate-300 mx-auto" />
               <h3 className="mt-3 text-lg font-medium text-slate-700">아직 신청한 포럼이 없습니다</h3>
-              <p className="mt-1 text-sm text-slate-500">원하는 주제의 포럼을 신청해보세요</p>
+              <p className="mt-1 text-sm text-slate-500">원하는 주제의 포럼을 신청해보시기 바랍니다</p>
               {links.requestFormHref && (
                 <Link
                   to={links.requestFormHref}
@@ -553,7 +553,7 @@ export function ForumOwnerDashboard({
               <textarea
                 value={deleteReason}
                 onChange={(e) => setDeleteReason(e.target.value)}
-                placeholder="삭제를 요청하는 이유를 입력해주세요"
+                placeholder="삭제를 요청하는 이유를 입력해 주시기 바랍니다"
                 rows={3}
                 className="w-full px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-red-400 focus:border-transparent text-sm resize-none"
               />

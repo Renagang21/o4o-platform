@@ -18,7 +18,9 @@ beforeEach(()=>{
 });
 afterEach(cleanup);
 it('uses the shared registration flow and refreshes the actual saved catalog',async()=>{
-  render(<MemoryRouter><Page/></MemoryRouter>);await screen.findByRole('heading',{name:'AI 동영상 등록'});
+  render(<MemoryRouter><Page/></MemoryRouter>);await screen.findByRole('heading',{name:'동영상 등록'});
+  fireEvent.click(screen.getByRole('button',{name:'외부 영상 연결'}));
+  screen.getByText('AI로 제목·설명 작성 보조(선택)').closest('details')!.open=true;
   fireEvent.change(screen.getByLabelText('개별 영상 주소'),{target:{value:'https://youtu.be/abcdefghijk'}});
   fireEvent.change(screen.getByPlaceholderText('이 영상을 매장 안내 영상으로 등록해 줘'),{target:{value:'이 영상 등록해 줘'}});
   fireEvent.click(screen.getByRole('button',{name:'AI로 등록'}));
@@ -33,7 +35,7 @@ it('hands off through existing authentication to an explicit selected-store impo
 });
 it('keeps the shared catalog visible to visitors without a false registration control',async()=>{
   state.user=null;render(<MemoryRouter><Page/></MemoryRouter>);await screen.findByText('공유 영상');
-  expect(screen.queryByRole('heading',{name:'AI 동영상 등록'})).toBeNull();expect(state.post).not.toHaveBeenCalled();
+  expect(screen.queryByRole('heading',{name:'동영상 등록'})).toBeNull();expect(state.post).not.toHaveBeenCalled();
 });
 it('keeps completed history quiet and refreshes once for a new completion without resetting the draft',async()=>{
   let completed=false;
@@ -48,6 +50,9 @@ it('keeps completed history quiet and refreshes once for a new completion withou
   const catalogCalls=()=>state.get.mock.calls.filter(call=>call[0]==='/communities/community/signage').length;
   const requestCalls=()=>state.get.mock.calls.filter(call=>call[0]==='/youtube/uploads').length;
   render(<MemoryRouter><Page/></MemoryRouter>);
+  await screen.findByRole('heading',{name:'동영상 등록'});
+  fireEvent.click(screen.getByText('YouTube 요청 조회·재시도'));
+  screen.getByText('AI로 제목·설명 작성 보조(선택)').closest('details')!.open=true;
   await screen.findByText('지난 영상');await screen.findByText('순서 대기');
   const draft=screen.getByPlaceholderText('이 영상을 매장 안내 영상으로 등록해 줘');
   fireEvent.change(draft,{target:{value:'등록할 안내문'}});

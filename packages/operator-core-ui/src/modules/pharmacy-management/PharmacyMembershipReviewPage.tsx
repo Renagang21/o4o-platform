@@ -1,3 +1,5 @@
+import {DataTable} from '@o4o/operator-ux-core';
+import {ActionBar} from '@o4o/ui';
 import { getPharmacyManagementClient } from './api';
 /**
  * PharmacyMembershipReviewPage — 내 매장(약국) 신청 심사 (/operator/pharmacy-memberships)
@@ -17,15 +19,11 @@ import {
   type PharmacyMembership,
 } from './api';
 import {
-  ActionButton,
-  EmptyRow,
   Message,
   PageHeader,
   StatusBadge,
   StatusFilter,
   INPUT,
-  TD,
-  TH,
   askReason,
 } from './PharmacyCommerceUi';
 
@@ -48,12 +46,15 @@ export default function PharmacyMembershipReviewPage() {
   const [page, setPage] = useState(1);
   const [items, setItems] = useState<PharmacyMembership[]>([]);
   const [total, setTotal] = useState(0);
+  const [selectedIds,setSelectedIds]=useState<Set<string>>(new Set());
+  const selected=selectedIds.size===1?items.find(item=>selectedIds.has(item.id)):undefined;
   const [loading, setLoading] = useState(true);
   const [busyId, setBusyId] = useState<string | null>(null);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
+    setSelectedIds(new Set());
     try {
       const data = await neturePharmacyOperatorApi.listMemberships({ status, q: query, page, limit: LIMIT });
       setItems(data?.items ?? []);
@@ -77,7 +78,7 @@ export default function PharmacyMembershipReviewPage() {
       const r = askReason(label);
       if (r === null) return;
       reason = r || undefined;
-    } else if (!window.confirm(`${m.pharmacy_name} — ${label} 처리할까요?`)) {
+    } else if (!window.confirm(`${m.pharmacy_name} — ${label} 처리하시겠습니까?`)) {
       return;
     }
     setBusyId(m.id);
@@ -107,7 +108,7 @@ export default function PharmacyMembershipReviewPage() {
     <div className="space-y-4 p-6">
       <PageHeader
         title="내 매장(약국) 신청 심사"
-        description="신청 원장의 사업자등록번호 · 약사 면허번호를 확인해 처리합니다. 약사 자격과 사업자 정보를 검토하고 오프라인으로 약국 여부를 확인해 주세요. 증빙 파일은 선택 사항이며 미제출만으로 승인을 제한하지 않습니다. 신청자의 메인 이메일 확인이 필요합니다. 이 승인은 Neture 가입 · 세미프랜차이즈 가입을 바꾸지 않습니다."
+        description="신청 원장의 사업자등록번호 · 약사 면허번호를 확인해 처리합니다. 약사 자격과 사업자 정보를 검토하고 오프라인으로 약국 여부를 확인해 주시기 바랍니다. 증빙 파일은 선택 사항이며 미제출만으로 승인을 제한하지 않습니다. 신청자의 메인 이메일 확인이 필요합니다. 이 승인은 Neture 가입 · 세미프랜차이즈 가입을 바꾸지 않습니다."
       />
 
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -137,60 +138,22 @@ export default function PharmacyMembershipReviewPage() {
       <Message message={message} />
 
       <div className="overflow-x-auto rounded-lg border border-gray-200 bg-white">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className={TH}>약국</th>
-              <th className={TH}>사업자등록번호</th>
-              <th className={TH}>약사 면허번호</th>
-              <th className={TH}>신청일</th>
-              <th className={TH}>상태</th>
-              <th className={TH}>사유</th>
-              <th className={TH}>처리</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-100">
-            {loading ? (
-              <EmptyRow colSpan={7} text="불러오는 중..." />
-            ) : items.length === 0 ? (
-              <EmptyRow colSpan={7} text="해당하는 신청이 없습니다." />
-            ) : (
-              items.map((m) => (
-                <tr key={m.id}>
-                  <td className={TD}>
-                    <div className="font-medium text-gray-900">{m.pharmacy_name}</div>
-                    {m.organization_address && <div className="text-xs text-gray-500">{m.organization_address}</div>}
-                  </td>
-                  <td className={TD}>{m.business_number}</td>
-                  <td className={TD}>{m.pharmacist_license_number}
-                    {m.business_profile?.businessRegistrationDocumentId && <button type="button" className="block text-blue-700" onClick={() => void download(m.business_profile!.businessRegistrationDocumentId)}>사업자등록증 확인</button>}
-                    <span className="block text-xs">{m.business_profile?.representativeName} · {m.organization_address}</span>
-                    <span className="block text-xs">담당자: {[m.business_profile?.contactName, m.business_profile?.managerPhone, m.business_profile?.contactEmail].filter(Boolean).join(' / ') || '미입력'}</span>
-                    <span className="block text-xs">세금계산서: {m.business_profile?.taxInvoiceEmail || '미입력'}</span>
-                  </td>
-                  <td className={TD}>{formatDateTime(m.applied_at)}</td>
-                  <td className={TD}>
-                    <StatusBadge status={m.status} />
-                  </td>
-                  <td className={TD}>{m.reason || '-'}</td>
-                  <td className={TD}>
-                    <div className="flex flex-wrap gap-1">
-                      {(MEMBERSHIP_ACTIONS_BY_STATUS[m.status] ?? []).map((a) => (
-                        <ActionButton
-                          key={a.action}
-                          label={a.label}
-                          action={a.action}
-                          disabled={busyId === m.id}
-                          onClick={() => decide(m, a.action, a.label)}
-                        />
-                      ))}
-                    </div>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+        <ActionBar selectedCount={selectedIds.size} onClearSelection={()=>setSelectedIds(new Set())} actions={selected&&!selected.operatorReadOnly?(MEMBERSHIP_ACTIONS_BY_STATUS[selected.status]??[]).map(action=>({key:action.action,label:action.label,disabled:!!busyId||loading,onClick:()=>void decide(selected,action.action,action.label)})):[]} />
+        <DataTable<PharmacyMembership> tableId="pharmacy-membership-review" data={items} rowKey="id" loading={loading}
+          selectable selectedKeys={selectedIds} onSelectionChange={keys=>{if(!busyId)setSelectedIds(keys);}} columns={[
+            {key:'pharmacy_name',header:'약국',stickyOnMobile:true,render:(_v,m)=><div>{m.pharmacy_name}<p>{m.organization_address}</p></div>},
+            {key:'business_number',header:'사업자등록번호'},
+            {key:'pharmacist_license_number',header:'약사 면허번호·제출 정보',render:(_v,m)=><div>{m.pharmacist_license_number}
+              {m.business_profile?.businessRegistrationDocumentId&&<button type="button" onClick={()=>void download(m.business_profile!.businessRegistrationDocumentId)}>사업자등록증 확인</button>}
+              <p>{m.business_profile?.representativeName} · {m.organization_address}</p>
+              <p>담당자: {[m.business_profile?.contactName,m.business_profile?.managerPhone,m.business_profile?.contactEmail].filter(Boolean).join(' / ')||'미입력'}</p>
+              <p>세금계산서: {m.business_profile?.taxInvoiceEmail||'미입력'}</p>
+            </div>},
+            {key:'applied_at',header:'신청일',render:value=>formatDateTime(value)},
+            {key:'status',header:'상태',render:value=><StatusBadge status={value} />},
+            {key:'reason',header:'사유'},
+            {key:'operatorReadOnly',header:'업무 대상',render:(_v,m)=>m.operatorReadOnly?'전체 관리자 — 처리 대상 아님':'약국'},
+          ]} />
       </div>
 
       {totalPages > 1 && (

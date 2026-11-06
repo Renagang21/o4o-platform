@@ -138,7 +138,7 @@ export function ForumRequestForm({
   backTo,
   backLabel = '포럼으로 돌아가기',
   title = '새 포럼 신청',
-  description = '원하시는 포럼이 없나요? 새 포럼을 신청해주세요.',
+  description = '원하시는 포럼이 없습니까? 새 포럼을 신청해 주시기 바랍니다.',
   successMessage = '관리자 검토 후 결과를 알려드리겠습니다.',
   submitLabel = '신청하기',
   showForumType = false,
@@ -182,12 +182,12 @@ export function ForumRequestForm({
 
   const validateForm = (): boolean => {
     const next: FormErrors = {};
-    if (!formData.name.trim()) next.name = '포럼 이름을 입력해주세요';
+    if (!formData.name.trim()) next.name = '포럼 이름을 입력해 주시기 바랍니다';
     else if (formData.name.length < 2) next.name = '포럼 이름은 2자 이상이어야 합니다';
     else if (formData.name.length > 50) next.name = '포럼 이름은 50자 이하여야 합니다';
-    if (!formData.description.trim()) next.description = '포럼 설명을 입력해주세요';
+    if (!formData.description.trim()) next.description = '포럼 설명을 입력해 주시기 바랍니다';
     else if (formData.description.length < 10) next.description = '포럼 설명은 10자 이상이어야 합니다';
-    if (selectedTags.length === 0) next.tags = '태그를 1개 이상 입력해주세요.';
+    if (selectedTags.length === 0) next.tags = '태그를 1개 이상 입력해 주시기 바랍니다.';
     setErrors(next);
     return Object.keys(next).length === 0;
   };
@@ -214,7 +214,7 @@ export function ForumRequestForm({
       setIsSuccess(true);
       if (onSuccess) onSuccess();
     } catch {
-      setSubmitError('신청 중 오류가 발생했습니다. 다시 시도해주세요.');
+      setSubmitError('신청 중 오류가 발생했습니다. 다시 시도해 주시기 바랍니다.');
       setIsSubmitting(false);
     }
   };
@@ -288,7 +288,7 @@ export function ForumRequestForm({
               id="forum-req-desc"
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              placeholder="이 포럼에서 어떤 주제를 다루나요?"
+              placeholder="이 포럼에서 어떤 주제를 다룹니까?"
               rows={4}
               className={`w-full px-4 py-3 rounded-lg border ${
                 errors.description ? 'border-red-300 focus:ring-red-500' : `border-slate-200 ${t.inputRing}`
@@ -308,7 +308,7 @@ export function ForumRequestForm({
               태그 <span className="text-red-500">*</span>
             </label>
             <p className="text-xs text-slate-500 mb-3">
-              포럼을 찾고 분류하는 데 사용할 태그를 1개 이상 입력하세요. Enter 또는 쉼표로 추가합니다. (최대 5개)
+              포럼을 찾고 분류하는 데 사용할 태그를 1개 이상 입력하시기 바랍니다. Enter 또는 쉼표로 추가합니다. (최대 5개)
             </p>
             <div
               className={`flex flex-wrap gap-2 items-center px-3 py-2 rounded-lg border ${
@@ -360,7 +360,7 @@ export function ForumRequestForm({
               id="forum-req-reason"
               value={formData.reason}
               onChange={(e) => setFormData({ ...formData, reason: e.target.value })}
-              placeholder="이 포럼이 필요한 이유를 설명해주세요 (선택사항)"
+              placeholder="이 포럼이 필요한 이유를 설명해 주시기 바랍니다 (선택사항)"
               rows={3}
               className={`w-full px-4 py-3 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 ${t.inputRing} focus:border-transparent resize-none`}
             />

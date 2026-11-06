@@ -36,7 +36,7 @@ export function BusinessFeatureSummary({
           (op) => op.membershipStatus === "active",
         ) && (
         <p className="text-gray-500">
-          가입 승인·자료 운영을 맡을 담당 운영자를 지정해 주세요.
+          가입 승인·자료 운영을 맡을 담당 운영자를 지정해 주시기 바랍니다.
         </p>
       )}
     </div>

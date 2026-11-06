@@ -141,7 +141,7 @@ export default function SupplierOrdersPage() {
             해당 서비스가 이곳에 자동으로 표시됩니다.
           </p>
           <p style={styles.emptyStateHint}>
-            판매자 신청 현황은 "신청 관리" 메뉴에서 확인하세요
+            판매자 신청 현황은 "신청 관리" 메뉴에서 확인하시기 바랍니다
           </p>
         </div>
       ) : (

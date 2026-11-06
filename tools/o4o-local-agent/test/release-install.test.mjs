@@ -102,12 +102,48 @@ test('Windows packaged runtime starts and health proves its release and data rea
  delete options.preflight;
  const result=await installPackage({source,...options});const slot=installedSlot(options.home);
  const system=process.env.SystemRoot;
+ const stopFixtureRuntime = async runtime => {
+  // Only the executable inside this test's random package is eligible. Exercise
+  // normal Ctrl+C shutdown rather than assuming the short-lived CMD owns a tree.
+  assert.ok(path.resolve(runtime).startsWith(path.resolve(root)+path.sep));
+  execFileSync(path.join(system,'System32','WindowsPowerShell','v1.0','powershell.exe'),['-NoProfile','-Command',`
+$ErrorActionPreference='Stop'
+Add-Type @'
+using System;
+using System.Runtime.InteropServices;
+public static class FixtureConsole {
+ [DllImport("kernel32.dll")] public static extern bool FreeConsole();
+ [DllImport("kernel32.dll")] public static extern bool AttachConsole(uint id);
+ [DllImport("kernel32.dll")] public static extern bool SetConsoleCtrlHandler(IntPtr handler, bool add);
+ [DllImport("kernel32.dll")] public static extern bool GenerateConsoleCtrlEvent(uint type, uint group);
+}
+'@
+$workers=@(Get-CimInstance Win32_Process | Where-Object { $_.ExecutablePath -eq $env:O4O_TEST_RUNTIME -and $_.CommandLine -match '--worker' })
+if ($workers.Count -ne 1) { throw 'FIXTURE_WORKER_NOT_UNIQUE' }
+$worker=[Diagnostics.Process]::GetProcessById([int]$workers[0].ProcessId)
+[void][FixtureConsole]::FreeConsole()
+if (-not [FixtureConsole]::AttachConsole([uint32]$worker.Id)) { throw 'FIXTURE_CONSOLE_UNAVAILABLE' }
+try {
+ [void][FixtureConsole]::SetConsoleCtrlHandler([IntPtr]::Zero,$true)
+ if (-not [FixtureConsole]::GenerateConsoleCtrlEvent(0,0)) { throw 'FIXTURE_STOP_NOT_SENT' }
+ if (-not $worker.WaitForExit(10000)) { throw 'FIXTURE_STOP_NOT_CONFIRMED' }
+} finally {
+ [void][FixtureConsole]::FreeConsole()
+ [void][FixtureConsole]::SetConsoleCtrlHandler([IntPtr]::Zero,$false)
+}
+`],{env:{...process.env,O4O_TEST_RUNTIME:runtime},stdio:'pipe',timeout:20000});
+  for(let n=0;n<30;n++) {
+   if(!await runningAgent()) return;
+   await new Promise(resolve=>setTimeout(resolve,100));
+  }
+  assert.fail('fixture runtime did not stop normally');
+ };
  execFileSync(path.join(system,'System32','cmd.exe'),['/d','/s','/c',`""${path.join(source,'Install.cmd')}""`],{
-   env:{...process.env,PATH:path.join(system,'System32'),O4O_PC_INSTALL_HOME:options.home,O4O_AGENT_HOME:options.dataHome,APPDATA:path.join(root,'roaming')},
+   env:{...process.env,GITHUB_ACTIONS:'true',PATH:path.join(system,'System32'),O4O_PC_INSTALL_HOME:options.home,O4O_AGENT_HOME:options.dataHome,APPDATA:path.join(root,'roaming')},
    windowsVerbatimArguments:true,stdio:['ignore','pipe','pipe'],timeout:60000,
  });
  assert.ok(fs.existsSync(path.join(root,'roaming','Microsoft','Windows','Start Menu','Programs','O4O PC 연결.cmd')));
- const child=spawn(path.join(system,'System32','cmd.exe'),['/d','/s','/c',`""${path.join(options.home,'Start.cmd')}""`],{cwd:slot,env:{...process.env,PATH:path.join(system,'System32')},windowsVerbatimArguments:true,stdio:'ignore'});
+ const child=spawn(path.join(system,'System32','cmd.exe'),['/d','/s','/c',`""${path.join(options.home,'Start.cmd')}""`],{cwd:slot,env:{...process.env,GITHUB_ACTIONS:'true',PATH:path.join(system,'System32')},windowsVerbatimArguments:true,stdio:'ignore'});
  try{
   let health;for(let n=0;n<40;n++){
    try{const response=await fetch('http://127.0.0.1:47821/health',{headers:{Origin:'https://neture.co.kr'},signal:AbortSignal.timeout(500)});if(response.ok){health=await response.json();break;}}catch{}
@@ -115,10 +151,11 @@ test('Windows packaged runtime starts and health proves its release and data rea
   }
   assert.ok(health,'installed runtime must serve health');assert.equal(health.releaseId,result.releaseId);assert.equal(health.agentVersion,'0.6.0');assert.equal(health.localData.ready,true);assert.equal(health.localData.schemaVersion,10);
   assert.equal(health.connected,false);assert.equal('credentials'in health,false);
- }finally{const exited=new Promise(resolve=>child.once('exit',resolve));execFileSync(path.join(system,'System32','taskkill.exe'),['/pid',String(child.pid),'/T','/F'],{stdio:'ignore'});await exited;}
+  assert.equal(child.exitCode,0,'CMD bootstrap must finish while the GUI/runtime remain usable');
+ }finally{await stopFixtureRuntime(path.join(slot,'runtime','node.exe'));}
  const freshHome=options.home+'-fresh',freshData=options.dataHome+'-fresh';
  execFileSync(path.join(system,'System32','cmd.exe'),['/d','/s','/c',`""${path.join(source,'Install.cmd')}""`],{
-   env:{...process.env,PATH:path.join(system,'System32'),O4O_PC_INSTALL_HOME:freshHome,O4O_AGENT_HOME:freshData,APPDATA:path.join(root,'roaming-fresh')},
+   env:{...process.env,GITHUB_ACTIONS:'true',PATH:path.join(system,'System32'),O4O_PC_INSTALL_HOME:freshHome,O4O_AGENT_HOME:freshData,APPDATA:path.join(root,'roaming-fresh')},
    windowsVerbatimArguments:true,input:'Y\r\n',stdio:['pipe','pipe','pipe'],timeout:60000,
  });
  assert.ok(fs.existsSync(path.join(freshData,'local.db')));assert.equal(verifyPackage(installedSlot(freshHome)).releaseId,result.releaseId);
@@ -127,7 +164,7 @@ test('Windows packaged runtime starts and health proves its release and data rea
  const freshSlot=installedSlot(freshHome),runtime=path.join(freshSlot,'runtime','node.exe');
  try {
   const installOutput=execFileSync(path.join(source,'runtime','node.exe'),[path.join(source,'install.mjs'),'--window'],{
-   env:{...process.env,PATH:path.join(system,'System32'),O4O_PC_INSTALL_HOME:freshHome,O4O_AGENT_HOME:freshData,APPDATA:path.join(root,'roaming-fresh')},stdio:'pipe',timeout:60000,
+   env:{...process.env,GITHUB_ACTIONS:'true',PATH:path.join(system,'System32'),O4O_PC_INSTALL_HOME:freshHome,O4O_AGENT_HOME:freshData,APPDATA:path.join(root,'roaming-fresh')},stdio:'pipe',timeout:60000,
   });
   assert.match(installOutput.toString('utf8'),/설치와 프로그램 실행을 확인했습니다/);
   let health;
@@ -137,7 +174,7 @@ test('Windows packaged runtime starts and health proves its release and data rea
   }
   assert.equal(health?.releaseId,result.releaseId);assert.equal(health?.localData?.ready,true);
  } finally {
-  execFileSync(path.join(system,'System32','WindowsPowerShell','v1.0','powershell.exe'),['-NoProfile','-Command',"Get-CimInstance Win32_Process | Where-Object { $_.ExecutablePath -eq $env:O4O_TEST_RUNTIME } | ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }"],{env:{...process.env,O4O_TEST_RUNTIME:runtime},stdio:'pipe'});
+  await stopFixtureRuntime(runtime);
  }
 
  // A child which spawns but immediately fails must never be reported ready.
@@ -145,7 +182,7 @@ test('Windows packaged runtime starts and health proves its release and data rea
  const broken=assembleRelease({sourceSha,files:brokenFiles,runtime:fs.readFileSync(process.execPath),runtimeLicense:Buffer.from('fixture license')});
  const brokenSource=writePackage(broken,'startup failure');
  assert.throws(()=>execFileSync(path.join(brokenSource,'runtime','node.exe'),[path.join(brokenSource,'install.mjs'),'--window'],{
-   env:{...process.env,PATH:path.join(system,'System32'),O4O_PC_INSTALL_HOME:freshHome,O4O_AGENT_HOME:freshData,APPDATA:path.join(root,'roaming-fresh')},stdio:'pipe',timeout:60000,
+   env:{...process.env,GITHUB_ACTIONS:'true',PATH:path.join(system,'System32'),O4O_PC_INSTALL_HOME:freshHome,O4O_AGENT_HOME:freshData,APPDATA:path.join(root,'roaming-fresh')},stdio:'pipe',timeout:60000,
  }),error=>{
    assert.equal(error.status,1);assert.doesNotMatch(error.stdout.toString('utf8'),/설치와 프로그램 실행을 확인했습니다/);
    assert.match(error.stderr.toString('utf8'),/설치는 끝났지만 실행하지 못했습니다/);return true;
@@ -207,7 +244,7 @@ test('Windows offline installer handles Korean paths and rejects corrupt/truncat
  fs.writeFileSync(launcher,result.setup);
  const system=process.env.SystemRoot;
  const run=()=>execFileSync(path.join(system,'System32','cmd.exe'),['/d','/s','/c',`""${launcher}""`],{
-  env:{...process.env,O4O_SETUP_TEST_MARKER:marker,PATH:path.join(system,'System32')},windowsVerbatimArguments:true,input:'\r\n',timeout:60000,
+  env:{...process.env,GITHUB_ACTIONS:'true',O4O_SETUP_TEST_MARKER:marker,PATH:path.join(system,'System32')},windowsVerbatimArguments:true,input:'\r\n',timeout:60000,
  });
  run();assert.equal(fs.readFileSync(marker,'utf8'),'started');fs.unlinkSync(marker);
  const corrupt=Buffer.from(result.setup);const offset=Number(corrupt.readBigInt64LE(corrupt.length-8));corrupt[offset+40]^=1;fs.writeFileSync(launcher,corrupt);

@@ -39,7 +39,7 @@ export function ForeignVisitorSalesSupportPaymentSuccessPage() {
     const serviceKey = params.get('serviceKey');
 
     if (!paymentId || !paymentKey || !orderId || !serviceKey) {
-      setErrorMsg('결제 정보가 올바르지 않습니다. 다시 시도해 주세요.');
+      setErrorMsg('결제 정보가 올바르지 않습니다. 다시 시도해 주시기 바랍니다.');
       setState('error');
       return;
     }

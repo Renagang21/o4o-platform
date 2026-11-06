@@ -195,7 +195,7 @@ export default function SupplierProductLibraryPage() {
         <div className="flex flex-col items-center py-16 text-slate-500">
           <AlertTriangle size={48} className="mb-4 text-red-400" />
           <p className="text-sm font-medium text-slate-700">상품을 검색하지 못했습니다</p>
-          <p className="text-xs mt-1 text-slate-400">일시적인 오류일 수 있습니다. 잠시 후 다시 시도해 주세요.</p>
+          <p className="text-xs mt-1 text-slate-400">일시적인 오류일 수 있습니다. 잠시 후 다시 시도해 주시기 바랍니다.</p>
           <button
             type="button"
             onClick={() => doSearch(page)}
@@ -208,7 +208,7 @@ export default function SupplierProductLibraryPage() {
         <div className="flex flex-col items-center py-16 text-slate-400">
           <Package size={48} className="mb-4 opacity-50" />
           <p className="text-sm">검색 결과가 없습니다</p>
-          <p className="text-xs mt-1">다른 키워드로 검색해보세요</p>
+          <p className="text-xs mt-1">다른 키워드로 검색해보시기 바랍니다</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

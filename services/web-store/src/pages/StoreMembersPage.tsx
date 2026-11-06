@@ -57,7 +57,7 @@ export default function StoreMembersPage() {
     setNotice(null);
     try {
       await storeMembershipApi.invite(email.trim(), effectiveServiceKey ?? 'kpa');
-      setNotice('초대했습니다. 상대가 수락한 뒤 최종 승인해 주세요.');
+      setNotice('초대했습니다. 상대가 수락한 뒤 최종 승인해 주시기 바랍니다.');
       setEmail('');
       await load();
     } catch (e) {

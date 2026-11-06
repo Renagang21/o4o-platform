@@ -42,7 +42,7 @@ export function createProductCorrectionController(db: DataSource): Router {
         return;
       }
       if (error instanceof ZodError) {
-        res.status(400).json({ success: false, code: 'INVALID_INPUT', error: '입력값을 확인해 주세요.' });
+        res.status(400).json({ success: false, code: 'INVALID_INPUT', error: '입력값을 확인해 주시기 바랍니다.' });
         return;
       }
       if (error instanceof CorrectionError) {

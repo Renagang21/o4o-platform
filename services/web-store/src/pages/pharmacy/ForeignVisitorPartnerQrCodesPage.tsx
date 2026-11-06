@@ -138,7 +138,7 @@ export function ForeignVisitorPartnerQrCodesPage() {
           <div className="flex flex-col items-center gap-2 py-16 px-6 text-center">
             <QrCode className="w-7 h-7 text-slate-300" />
             <p className="text-sm font-medium text-slate-600">아직 발급된 QR이 없습니다.</p>
-            <p className="text-xs text-slate-400">이 파트너에게 연결할 제휴마케팅 QR을 발급해 보세요.</p>
+            <p className="text-xs text-slate-400">이 파트너에게 연결할 제휴마케팅 QR을 발급해 보시기 바랍니다.</p>
           </div>
         )}
         {listState === 'ready' && qrCodes.length > 0 && (
@@ -230,7 +230,7 @@ function QrFormModal({ partnerId, initial, onClose, onSaved, onEntitlementDenied
   const [saving, setSaving] = useState(false);
 
   const save = async () => {
-    if (!qrCodeName.trim()) { toast.error('QR 이름을 입력해 주세요.'); return; }
+    if (!qrCodeName.trim()) { toast.error('QR 이름을 입력해 주시기 바랍니다.'); return; }
     setSaving(true);
     const payload: QrWritePayload = {
       qrCodeName: qrCodeName.trim(),

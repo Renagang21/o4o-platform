@@ -42,7 +42,7 @@ export default function ForumManagementPage() {
       serviceKey="neture"
       client={client}
       title="포럼 신청 관리"
-      description="포럼 생성 요청을 검토하고 승인/거절/보완요청하세요"
+      description="포럼 생성 요청을 검토하고 승인/거절/보완요청하시기 바랍니다"
       headerIcon={<FileCheck className="w-7 h-7 text-emerald-600" />}
       tableId="neture-forum-requests"
     />

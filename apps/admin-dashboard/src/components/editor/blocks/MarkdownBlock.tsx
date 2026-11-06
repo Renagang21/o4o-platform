@@ -502,8 +502,8 @@ const MarkdownBlock: React.FC<MarkdownBlockProps> = ({
           <div className="flex items-center justify-center p-12 text-gray-400">
             <div className="text-center">
               <FileText className="h-12 w-12 mx-auto mb-3 opacity-50" />
-              <p className="text-sm">마크다운 파일을 불러와주세요</p>
-              <p className="text-xs mt-1">상단의 "파일 불러오기" 버튼을 클릭하세요</p>
+              <p className="text-sm">마크다운 파일을 불러와주시기 바랍니다</p>
+              <p className="text-xs mt-1">상단의 "파일 불러오기" 버튼을 클릭하시기 바랍니다</p>
             </div>
           </div>
         )}

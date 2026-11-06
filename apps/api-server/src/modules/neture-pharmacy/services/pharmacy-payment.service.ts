@@ -174,18 +174,18 @@ export class PharmacyPaymentService {
         return { alreadyPaid: true, orderIds, testPayment: payment.metadata?.testPayment === true };
       }
       if (payment.status !== 'CREATED') {
-        throw new NeturePharmacyError(409, 'INVALID_PAYMENT_STATE', '다시 결제를 준비해 주세요.');
+        throw new NeturePharmacyError(409, 'INVALID_PAYMENT_STATE', '다시 결제를 준비해 주시기 바랍니다.');
       }
       assertPayable(mode);
       if (payment.metadata?.mode !== mode) {
-        throw new NeturePharmacyError(409, 'PAYMENT_MODE_CHANGED', '다시 결제를 준비해 주세요.');
+        throw new NeturePharmacyError(409, 'PAYMENT_MODE_CHANGED', '다시 결제를 준비해 주시기 바랍니다.');
       }
 
       const { targets, amount } = this.payable(orders);
       const currentIds = targets.map((o) => o.id).sort(byId);
       // 금액 · 대상 주문이 준비 시점과 같아야 한다(그 사이 취소 · 변경되면 다시 준비).
       if (Math.round(Number(payment.amount)) !== amount || JSON.stringify(currentIds) !== JSON.stringify(orderIds)) {
-        throw new NeturePharmacyError(409, 'AMOUNT_MISMATCH', '주문 금액이 결제 준비 시점과 다릅니다. 다시 결제를 준비해 주세요.');
+        throw new NeturePharmacyError(409, 'AMOUNT_MISMATCH', '주문 금액이 결제 준비 시점과 다릅니다. 다시 결제를 준비해 주시기 바랍니다.');
       }
 
       // test 모드 승인 — PG 호출 없음.
@@ -205,7 +205,7 @@ export class PharmacyPaymentService {
         [orderIds, paymentId],
       ));
       if (paid.length !== orderIds.length) {
-        throw new NeturePharmacyError(409, 'ORDER_STATE_CHANGED', '주문 상태가 바뀌었습니다. 다시 결제를 준비해 주세요.');
+        throw new NeturePharmacyError(409, 'ORDER_STATE_CHANGED', '주문 상태가 바뀌었습니다. 다시 결제를 준비해 주시기 바랍니다.');
       }
       return { alreadyPaid: false, orderIds, testPayment: true };
     });

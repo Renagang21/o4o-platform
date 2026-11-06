@@ -47,7 +47,7 @@ function operationId(value: unknown): string | undefined {
     throw new OperationError(
       400,
       "INVALID_OPERATION_ID",
-      "처리 요청 ID를 확인해 주세요.",
+      "처리 요청 ID를 확인해 주시기 바랍니다.",
     );
   return value;
 }
@@ -61,7 +61,7 @@ function revokeReason(reason: unknown) {
     throw new OperationError(
       400,
       "INVALID_REASON",
-      "폐기 사유는 2,000자 이내로 입력해 주세요.",
+      "폐기 사유는 2,000자 이내로 입력해 주시기 바랍니다.",
     );
   return reason.trim();
 }
@@ -72,7 +72,7 @@ function renewMonths(value: unknown) {
     throw new OperationError(
       400,
       "INVALID_MONTHS",
-      "갱신 기간은 1~1,200개월 정수로 입력해 주세요.",
+      "갱신 기간은 1~1,200개월 정수로 입력해 주시기 바랍니다.",
     );
   return months as number;
 }
@@ -84,18 +84,18 @@ function updatePatch(input: unknown) {
     if (Object.prototype.hasOwnProperty.call(source, key))
       patch[key] = source[key];
   if (patch.isValid !== undefined && typeof patch.isValid !== "boolean")
-    throw new OperationError(400, "INVALID_FIELD", "유효 상태를 확인해 주세요.");
+    throw new OperationError(400, "INVALID_FIELD", "유효 상태를 확인해 주시기 바랍니다.");
   if (patch.expiresAt !== undefined && patch.expiresAt !== null) {
     const date = new Date(patch.expiresAt as string);
     if (!Number.isFinite(date.getTime()))
-      throw new OperationError(400, "INVALID_FIELD", "만료일을 확인해 주세요.");
+      throw new OperationError(400, "INVALID_FIELD", "만료일을 확인해 주시기 바랍니다.");
     patch.expiresAt = date;
   }
   for (const key of ["certificateUrl", "badgeUrl"] as const)
     if (patch[key] !== undefined && patch[key] !== null && typeof patch[key] !== "string")
-      throw new OperationError(400, "INVALID_FIELD", "주소 값을 확인해 주세요.");
+      throw new OperationError(400, "INVALID_FIELD", "주소 값을 확인해 주시기 바랍니다.");
   if (patch.metadata !== undefined && patch.metadata !== null && (typeof patch.metadata !== "object" || Array.isArray(patch.metadata)))
-    throw new OperationError(400, "INVALID_FIELD", "부가 정보를 확인해 주세요.");
+    throw new OperationError(400, "INVALID_FIELD", "부가 정보를 확인해 주시기 바랍니다.");
   return patch;
 }
 
@@ -147,7 +147,7 @@ export async function changeLectureCertificate(
     throw new OperationError(
       403,
       "ACTOR_REQUIRED",
-      "운영자 인증을 확인해 주세요.",
+      "운영자 인증을 확인해 주시기 바랍니다.",
     );
   const key = operationId(input.operationId);
   const reason = action === "revoke" ? revokeReason(input.reason ?? "") : null;
@@ -263,7 +263,7 @@ export async function listCertificateOperations(
 ) {
   const n = page === undefined ? 1 : Number(page);
   if (!Number.isSafeInteger(n) || n < 1 || n > 10000)
-    throw new OperationError(400, "INVALID_PAGE", "이력 페이지를 확인해 주세요.");
+    throw new OperationError(400, "INVALID_PAGE", "이력 페이지를 확인해 주시기 바랍니다.");
   const rows = await db.query(
     `SELECT id, user_id AS "actorId", created_at AS at,
        replace(action_key, 'lecture.certificate_', '') AS action,

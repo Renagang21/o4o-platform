@@ -115,7 +115,7 @@ export class DrugFileSession {
     const handle = this.handle;
     if (!handle) return;
     if ((await this.deps.requestPermission(handle)) === 'granted') await this.read(true);
-    else this.set({ status: 'needs-permission', error: '원내 약품 파일 읽기가 허용되지 않았습니다. 다시 눌러 허용해 주세요.' });
+    else this.set({ status: 'needs-permission', error: '원내 약품 파일 읽기가 허용되지 않았습니다. 다시 눌러 허용해 주시기 바랍니다.' });
   }
 
   /** 파일이 바뀌었으면 다시 읽고 현재 행을 돌려준다(조회 직전). */

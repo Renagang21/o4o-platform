@@ -63,7 +63,7 @@ export function requireNetureMainMembership(dataSource: DataSource, options: Net
       logger.error('[NetureMainMembership] status lookup failed', { error: (err as Error)?.message });
       res.status(503).json({
         success: false,
-        error: 'Neture 가입 상태를 확인하지 못했습니다. 잠시 후 다시 시도해 주세요.',
+        error: 'Neture 가입 상태를 확인하지 못했습니다. 잠시 후 다시 시도해 주시기 바랍니다.',
         code: 'NETURE_MEMBERSHIP_CHECK_FAILED',
       });
       return;

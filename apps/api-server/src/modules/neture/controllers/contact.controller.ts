@@ -56,7 +56,7 @@ export function createContactController(dataSource: DataSource): Router {
       if (!name || !email || !subject || !message) {
         return res.status(400).json({
           success: false,
-          error: { code: 'MISSING_REQUIRED_FIELDS', message: '필수 항목을 입력해 주세요.' },
+          error: { code: 'MISSING_REQUIRED_FIELDS', message: '필수 항목을 입력해 주시기 바랍니다.' },
         });
       }
 
@@ -64,7 +64,7 @@ export function createContactController(dataSource: DataSource): Router {
       if (!emailRegex.test(email)) {
         return res.status(400).json({
           success: false,
-          error: { code: 'INVALID_EMAIL', message: '올바른 이메일 주소를 입력해 주세요.' },
+          error: { code: 'INVALID_EMAIL', message: '올바른 이메일 주소를 입력해 주시기 바랍니다.' },
         });
       }
 

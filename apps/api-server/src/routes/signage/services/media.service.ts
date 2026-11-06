@@ -80,7 +80,7 @@ export class SignageMediaService {
 
     // Tags validation
     if (!dto.tags || dto.tags.length === 0) {
-      throw Object.assign(new Error('태그를 최소 1개 이상 입력해주세요'), {
+      throw Object.assign(new Error('태그를 최소 1개 이상 입력해 주시기 바랍니다'), {
         code: 'TAGS_REQUIRED',
         statusCode: 400,
       });

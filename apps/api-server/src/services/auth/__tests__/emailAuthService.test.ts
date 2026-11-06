@@ -305,6 +305,18 @@ describe('EmailAuthService', () => {
     expect(h.store.users[0].nickname).toBe('합성닉네임');
   });
 
+  it('trusted verification mail confirms a corrected social-only address without creating password credentials',async()=>{
+    const h=makeHarness();
+    const user=h.addUser({email:'corrected-social@example.com',isEmailVerified:false});
+    await h.service.resendVerification(user.email,META);expect(h.mails).toHaveLength(0);
+    expect(await h.service.sendVerificationMail(user,'neture')).toBe(true);
+    const token=h.lastLinkToken('/verify-email');expect(token).not.toBe('');
+    await h.service.verifyEmail(token);
+    expect(h.store.users.find(row=>row.id===user.id)?.isEmailVerified).toBe(true);
+    expect(await h.passwords.hasPassword(user.id)).toBe(false);
+    await expectCode(h.service.verifyEmail(token),'INVALID_OR_EXPIRED_TOKEN');
+  });
+
   describe('token lifecycle hardening', () => {
     it('changing a password invalidates every preexisting reset link', async () => {
       const h = makeHarness();
@@ -370,6 +382,7 @@ describe('EmailAuthService', () => {
 
       expect(h.store.users).toHaveLength(1);
       const u = h.store.users[0];
+      expect(u.businessInfo).toMatchObject({o4oMembershipRegistrationV1:{type:null,state:'pending',fields:{}}});
       expect(u.email).toBe('new.user@example.com');
       expect(u.phone).toBe('01012345678');
       expect(u.isEmailVerified).toBe(false);

@@ -43,7 +43,7 @@ export default function PharmacyCartPage() {
     if (mutation.current || loading) return;
     const n = Number(qty[item.id]);
     if (!Number.isInteger(n) || n < 1) {
-      setError('수량을 1 이상의 정수로 입력해 주세요.');
+      setError('수량을 1 이상의 정수로 입력해 주시기 바랍니다.');
       return;
     }
     if (n === item.quantity) return;
@@ -115,7 +115,7 @@ export default function PharmacyCartPage() {
         <section className="mb-6 rounded-lg border border-emerald-200 bg-white p-4" data-testid="checkout-result">
           <h2 className="mb-2 text-lg font-semibold text-gray-900">주문 확정 결과</h2>
           {result.createdOrders.length > 0
-            ? <p className="mb-3 text-sm text-gray-700">주문 {result.createdOrders.length}건이 만들어졌습니다. 결제 그룹별로 결제해 주세요.</p>
+            ? <p className="mb-3 text-sm text-gray-700">주문 {result.createdOrders.length}건이 만들어졌습니다. 결제 그룹별로 결제해 주시기 바랍니다.</p>
             : <p className="mb-3 text-sm text-gray-700">만들어진 주문이 없습니다.</p>}
           {result.paymentGroups.map((g, idx) => (
             <div key={g.paymentGroupId} className="mb-2 flex flex-wrap items-center justify-between gap-2 rounded border border-gray-100 bg-gray-50 px-3 py-2 text-sm">
@@ -207,7 +207,7 @@ export default function PharmacyCartPage() {
               {checkingOut ? '주문 확정 중...' : '주문 확정'}
             </button>
           </div>
-          {unappliedQuantity && <p className="mt-2 text-right text-sm text-amber-700">수량 변경을 적용한 후 주문을 확정해 주세요.</p>}
+          {unappliedQuantity && <p className="mt-2 text-right text-sm text-amber-700">수량 변경을 적용한 후 주문을 확정해 주시기 바랍니다.</p>}
         </>
       )}
     </PharmacyPage>

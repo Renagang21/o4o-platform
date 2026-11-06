@@ -64,7 +64,7 @@ const FeatureCardBlock: React.FC<FeatureCardBlockProps> = ({
 }) => {
   const icon = attributes.icon || 'star';
   const title = attributes.title || '기능 제목';
-  const description = attributes.description || '기능 설명을 입력하세요';
+  const description = attributes.description || '기능 설명을 입력하시기 바랍니다';
   const link = attributes.link || '';
   const backgroundColor = attributes.backgroundColor || '#ffffff';
   const borderColor = attributes.borderColor || '#e5e7eb';
@@ -166,7 +166,7 @@ const FeatureCardBlock: React.FC<FeatureCardBlockProps> = ({
             <Textarea
               value={description}
               onChange={(e) => handleAttributeChange('description', e.target.value)}
-              placeholder="기능 설명을 입력하세요"
+              placeholder="기능 설명을 입력하시기 바랍니다"
               rows={3}
             />
           </div>

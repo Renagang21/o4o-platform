@@ -51,10 +51,10 @@ export default function OperatorInvitationsPanel({
       await authClient.api.post(
         `/admin/service-operator-invitations/${id}/${action}`,
       );
-      setNotice(action === 'resend' ? '메일 재발송을 요청했습니다. 수신함·스팸함을 확인하세요. 이전 링크는 사용할 수 없습니다.' : '초대를 취소했습니다.');
+      setNotice(action === 'resend' ? '메일 재발송을 요청했습니다. 수신함·스팸함을 확인하시기 바랍니다. 이전 링크는 사용할 수 없습니다.' : '초대를 취소했습니다.');
       await load();
     } catch (e: any) {
-      setError(e?.response?.data?.error || '요청에 실패했습니다. 재발송은 이전 발송 1분 후 가능합니다. 실제 처리 상태를 다시 조회하세요.');
+      setError(e?.response?.data?.error || '요청에 실패했습니다. 재발송은 이전 발송 1분 후 가능합니다. 실제 처리 상태를 다시 조회하시기 바랍니다.');
     } finally {
       setBusy(false);
     }
@@ -99,12 +99,12 @@ export default function OperatorInvitationsPanel({
                 timeZone: 'Asia/Seoul',
               })}
             </span>
-            {row.status === 'pending' && row.scope_type === 'platform' && /(?:[:_])operator$/.test(row.role) && <span>이전 Operator 초대는 취소하고 해당 서비스 Admin이 다시 초대하세요.</span>}
+            {row.status === 'pending' && row.scope_type === 'platform' && /(?:[:_])operator$/.test(row.role) && <span>이전 Operator 초대는 취소하고 해당 서비스 Admin이 다시 초대하시기 바랍니다.</span>}
             {row.status === 'pending' && !row.expired && (
               <>
                 <button
                   disabled={busy || row.scope_type === 'platform' && /(?:[:_])operator$/.test(row.role)}
-                  title={row.scope_type === 'platform' && /(?:[:_])operator$/.test(row.role) ? '이전 중앙 Operator 초대는 취소하고 해당 서비스 Admin이 다시 초대하세요.' : undefined}
+                  title={row.scope_type === 'platform' && /(?:[:_])operator$/.test(row.role) ? '이전 중앙 Operator 초대는 취소하고 해당 서비스 Admin이 다시 초대하시기 바랍니다.' : undefined}
                   onClick={() => void manage(row.id, 'resend')}
                 >
                   재발송

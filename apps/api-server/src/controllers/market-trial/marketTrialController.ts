@@ -245,7 +245,7 @@ export class MarketTrialController {
       const { id } = req.params;
       const existing = await MarketTrialController.trialRepo.findOne({ where: { id } });
       if (!existing || !await isFundingCreator(MarketTrialController.dataSource!, existing, userId)) return res.status(403).json({ success: false, message: '자기 펀딩만 수정할 수 있습니다.' });
-      if (!validFundingFields({ ...existing, ...req.body })) return res.status(400).json({ success: false, message: '모집 기간·수량·금액 입력을 확인해 주세요.' });
+      if (!validFundingFields({ ...existing, ...req.body })) return res.status(400).json({ success: false, message: '모집 기간·수량·금액 입력을 확인해 주시기 바랍니다.' });
       const trial = await MarketTrialController.trialService.updateTrial(id, userId, fundingUpdatePayload(req.body));
 
       res.json({ success: true, data: toTrialDTO(trial) });

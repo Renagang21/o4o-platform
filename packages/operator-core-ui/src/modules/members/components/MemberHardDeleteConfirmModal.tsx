@@ -128,7 +128,7 @@ export function MemberHardDeleteConfirmModal({
 
           <div className="space-y-1.5">
             <label htmlFor="member-hard-delete-confirm" className="text-xs text-slate-600">
-              계속하려면 <span className="font-semibold text-red-600">{keyword}</span> 를 입력하세요.
+              계속하려면 <span className="font-semibold text-red-600">{keyword}</span> 를 입력하시기 바랍니다.
             </label>
             <input
               id="member-hard-delete-confirm"

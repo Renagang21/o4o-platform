@@ -1,6 +1,9 @@
-FROM node:22.18.0-alpine AS builder
+# syntax=docker/dockerfile:1
+FROM node:22.23.4-alpine AS builder
 WORKDIR /app
-RUN npm install -g --ignore-scripts pnpm@10.25.0
+RUN --mount=type=secret,id=proxy_ca \
+    if [ -f /run/secrets/proxy_ca ]; then export NODE_EXTRA_CA_CERTS=/run/secrets/proxy_ca; fi; \
+    npm install -g --ignore-scripts pnpm@10.25.0
 COPY pnpm-workspace.yaml pnpm-lock.yaml package.json tsconfig.base.json tsconfig.packages.json ./
 COPY packages/types/package.json ./packages/types/
 COPY packages/auth-utils/package.json ./packages/auth-utils/
@@ -15,7 +18,9 @@ COPY packages/operator-core-ui/package.json ./packages/operator-core-ui/
 COPY packages/operator-ux-core/package.json ./packages/operator-ux-core/
 COPY packages/error-handling/package.json ./packages/error-handling/
 COPY services/web-lecture/package.json ./services/web-lecture/
-RUN pnpm install --filter lecture-web... --fail-if-no-match --frozen-lockfile --ignore-scripts
+RUN --mount=type=secret,id=proxy_ca \
+    if [ -f /run/secrets/proxy_ca ]; then export NODE_EXTRA_CA_CERTS=/run/secrets/proxy_ca; fi; \
+    pnpm install --filter lecture-web... --fail-if-no-match --frozen-lockfile --ignore-scripts
 COPY packages/types/ ./packages/types/
 COPY packages/auth-utils/ ./packages/auth-utils/
 COPY packages/auth-client/ ./packages/auth-client/
@@ -42,9 +47,11 @@ ENV VITE_SERVICE_URL=$VITE_SERVICE_URL
 WORKDIR /app/services/web-lecture
 RUN pnpm exec vite build
 
-FROM node:22.18.0-alpine AS runner
+FROM node:22.23.4-alpine AS runner
 WORKDIR /app
-RUN npm install -g --ignore-scripts serve@14.2.4
+RUN --mount=type=secret,id=proxy_ca \
+    if [ -f /run/secrets/proxy_ca ]; then export NODE_EXTRA_CA_CERTS=/run/secrets/proxy_ca; fi; \
+    npm install -g --ignore-scripts serve@14.2.4
 COPY --from=builder /app/services/web-lecture/dist ./dist
 USER node
 ENV PORT=8080

@@ -21,21 +21,21 @@ export function toAiAdminError(error: unknown): AiAdminError {
   const serverMessage = res?.data?.error || res?.data?.message;
 
   if (status === 401) {
-    return { status, message: '로그인이 필요합니다. 다시 로그인한 뒤 시도해 주세요.' };
+    return { status, message: '로그인이 필요합니다. 다시 로그인한 뒤 시도해 주시기 바랍니다.' };
   }
   if (status === 403) {
     return { status, message: '이 화면을 볼 권한이 없습니다. 관리자 권한이 필요합니다.' };
   }
   if (status === 404) {
-    return { status, message: '요청한 API를 찾을 수 없습니다. 배포 상태를 확인해 주세요.' };
+    return { status, message: '요청한 API를 찾을 수 없습니다. 배포 상태를 확인해 주시기 바랍니다.' };
   }
   if (status && status >= 500) {
-    return { status, message: serverMessage || '서버에서 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.' };
+    return { status, message: serverMessage || '서버에서 오류가 발생했습니다. 잠시 후 다시 시도해 주시기 바랍니다.' };
   }
   if (status) {
     return { status, message: serverMessage || '요청을 처리하지 못했습니다.' };
   }
-  return { status: null, message: '서버에 연결하지 못했습니다. 네트워크 상태를 확인해 주세요.' };
+  return { status: null, message: '서버에 연결하지 못했습니다. 네트워크 상태를 확인해 주시기 바랍니다.' };
 }
 
 /** 조회 실패 화면. 빈 상태와 명확히 구분된다. */

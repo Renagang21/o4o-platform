@@ -20,7 +20,7 @@ export interface HandoffEntryPageProps {
   networkErrorMessage?: string;
 }
 
-export function HandoffEntryPage({ apiBaseUrl, basename = '', errorMessages, resolveFailure, showSpinner = true, missingTokenMessage = '이동 정보가 없습니다. 다시 시도해 주세요.', networkErrorMessage = '네트워크 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.' }: Readonly<HandoffEntryPageProps>) {
+export function HandoffEntryPage({ apiBaseUrl, basename = '', errorMessages, resolveFailure, showSpinner = true, missingTokenMessage = '이동 정보가 없습니다. 다시 시도해 주시기 바랍니다.', networkErrorMessage = '네트워크 오류가 발생했습니다. 잠시 후 다시 시도해 주시기 바랍니다.' }: Readonly<HandoffEntryPageProps>) {
   const exchange = useHandoffExchange({ apiBaseUrl, basename, missingTokenMessage, networkErrorMessage });
   const status = exchange.status;
   const failure = exchange.status === 'error' ? resolveFailure?.(exchange.data) : null;

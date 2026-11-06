@@ -16,7 +16,7 @@ const denied = () =>
   new NeturePharmacyError(
     403,
     "COOPERATION_MEMBERSHIP_REQUIRED",
-    "이 공간의 현재 가입 승인과 이용 권한을 확인해 주세요.",
+    "이 공간의 현재 가입 승인과 이용 권한을 확인해 주시기 바랍니다.",
   );
 export async function requireMember(
   exec: Executor,

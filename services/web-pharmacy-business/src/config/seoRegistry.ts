@@ -22,7 +22,7 @@ import { BUSINESS_SITE } from './businessSite';
  * 표시 이름 = O4O 약국, 대표 주소 = pharmacy.neture.co.kr (index.html 정적 title · description 과 같은 값).
  */
 export const PHARMACY_HOME_TITLE = BUSINESS_SITE.key === 'carepharm' ? 'CarePharm — 만성질환관리 약국 협업체' : `${PHARMACY_DISPLAY_NAME} — 약국의 정보와 업무를 하나로 연결합니다`;
-export const PHARMACY_HOME_DESCRIPTION = BUSINESS_SITE.key === 'carepharm' ? '만성질환 관리 자료와 현장 경험을 함께 나누고 내 약국에서 활용합니다.' : '제품 정보와 콘텐츠를 활용하고, 매장 운영과 고객 서비스를 더 편리하게 시작하세요.';
+export const PHARMACY_HOME_DESCRIPTION = BUSINESS_SITE.key === 'carepharm' ? '만성질환 관리 자료와 현장 경험을 함께 나누고 내 약국에서 활용합니다.' : '제품 정보와 콘텐츠를 활용하고, 매장 운영과 고객 서비스를 더 편리하게 시작하시기 바랍니다.';
 
 export const KPA_SEO_DEFAULTS: PageSeoConfig = {
   title: PHARMACY_HOME_TITLE,

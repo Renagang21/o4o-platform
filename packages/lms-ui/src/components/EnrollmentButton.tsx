@@ -76,7 +76,7 @@ export function EnrollmentButton({
         <button type="button" disabled style={{ ...baseButton, background: '#ef4444', cursor: 'not-allowed' }}>
           {labels?.rejected ?? '수강 거절됨'}
         </button>
-        <p style={noteStyle}>강사에게 문의하세요.</p>
+        <p style={noteStyle}>강사에게 문의하시기 바랍니다.</p>
       </div>
     );
   }

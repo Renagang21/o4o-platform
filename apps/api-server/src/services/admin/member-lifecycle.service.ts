@@ -5,7 +5,6 @@ import { StoreOwnerTerminationService } from "../store-owner-termination.service
 import { createHash } from "node:crypto";
 import type { DataSource, EntityManager } from "typeorm";
 import { memberWorkspaceAccess } from "./central-member-workspace.service.js";
-import { MembershipApprovalService } from "../approval/MembershipApprovalService.js";
 import {
   OperationError,
   operationReason,
@@ -69,114 +68,39 @@ async function releaseOwnerMarkers(
 export class MemberLifecycleService {
   constructor(private readonly db: DataSource) {}
 
-  async stopAccess(
-    actor: string,
-    target: string,
-    input: { reason: string; version: string },
-  ) {
-    return this.changeAccess(actor, target, input, false);
+  /** Member termination is reversible service state only. Staff belongs to the employer. */
+  async stopAccess(actor:string,target:string,input:{reason:string;version:string;terminate?:boolean}) {
+    return this.setMemberState(actor,target,input,'withdrawn');
   }
-
-  async terminateAccess(
-    actor: string,
-    target: string,
-    input: { reason: string; version: string },
-  ) {
-    return this.changeAccess(actor, target, input, true);
+  async terminateAccess(actor:string,target:string,input:{reason:string;version:string}) {
+    return this.setMemberState(actor,target,input,'withdrawn');
   }
-
-  private async changeAccess(
-    actor: string,
-    target: string,
-    input: { reason: string; version: string },
-    terminate: boolean,
-  ) {
-    const reason = operationReason(input.reason);
-    try {
-      return await this.db.transaction(async (m) => {
-        await lockMembers(m, [actor, target]);
-        await memberWorkspaceAccess(m, actor, true);
-        if (actor === target)
-          throw new OperationError(
-            409,
-            "SELF_STOP_FORBIDDEN",
-            "본인 이용은 이 화면에서 정지할 수 없습니다.",
-          );
-        await protectAccount(m, target);
-        const [user] = await m.query(
-          `SELECT id,to_char("updatedAt",'YYYY-MM-DD"T"HH24:MI:SS.US') AS version FROM users WHERE id=$1 FOR UPDATE`,
-          [target],
-        );
-        if (!user)
-          throw new OperationError(
-            404,
-            "MEMBER_NOT_FOUND",
-            "회원을 찾을 수 없습니다.",
-          );
-        if (user.version !== input.version)
-          throw new OperationError(
-            409,
-            "MEMBER_CHANGED",
-            "회원 정보가 변경되었습니다. 다시 조회해 주세요.",
-          );
-        const state = await getNetureMainMembershipStatus(m, target);
-        if (
-          (!terminate && state !== "active") ||
-          (terminate && !["active", "suspended"].includes(state))
-        )
-          throw new OperationError(
-            409,
-            "MEMBER_SERVICE_STATE_CHANGED",
-            "현재 서비스 이용 상태를 다시 확인해 주세요.",
-          );
-        // Scoped main suspension also covers verified-email users without an explicit membership row.
-        const approvals = new MembershipApprovalService();
-        await approvals.suspendMembership({
-          userId: target,
-          suspendedBy: actor,
-          isPlatformAdmin: false,
-          serviceKeys: ["neture"],
-          manager: m,
-        });
-        if (terminate) {
-          await approvals.withdrawMembership({
-            userId: target,
-            withdrawnBy: actor,
-            isPlatformAdmin: false,
-            serviceKeys: ["neture"],
-            manager: m,
-          });
-          await m.query(
-            `UPDATE organization_members om SET left_at=now(),updated_at=now()
-            FROM organizations o WHERE o.id=om.organization_id AND o.type IN ('store','pharmacy','supplier','semi_franchise')
-            AND om.user_id=$1 AND om.left_at IS NULL AND om.role IN ('staff','accepted','invited','admin','manager')`,
-            [target],
-          );
-          for (const role of ["kpa:store_member", "cafe24-b2b:store_member"])
-            await roleAssignmentService.removeRole(target, role, m);
-        }
-        await m.query(
-          'UPDATE users SET "updatedAt"=clock_timestamp() WHERE id=$1',
-          [target],
-        );
-        await recordOperation(
-          m,
-          "neture",
-          actor,
-          terminate ? "member.access_terminated" : "member.access_stopped",
-          { subjectKey: key(target), reasonKey: key(reason) },
-        );
-        return {
-          saved: true,
-          accessStopped: true,
-          serviceStatus: terminate ? "withdrawn" : "suspended",
-          employmentReleased: terminate,
-          businessDataDeleted: false,
-        };
-      });
-    } finally {
-      invalidateRoles(target);
-    }
+  async restoreAccess(actor:string,target:string,input:{reason:string;version:string}) {
+    return this.setMemberState(actor,target,input,'active');
+  }
+  private async setMemberState(actor:string,target:string,input:{reason:string;version:string},next:'active'|'withdrawn') {
+    const reason=operationReason(input.reason);
+    const result=await this.db.transaction(async m=>{
+      await lockMembers(m,[actor,target]);
+      await memberWorkspaceAccess(m,actor,true);
+      if(actor===target)throw new OperationError(409,'SELF_STOP_FORBIDDEN','본인 회원 상태는 다른 운영자가 처리해야 합니다.');
+      await protectAccount(m,target);
+      const [user]=await m.query(`SELECT id,status,"isActive",to_char("updatedAt",'YYYY-MM-DD"T"HH24:MI:SS.US') AS version FROM users WHERE id=$1 FOR UPDATE`,[target]);
+      if(!user)throw new OperationError(404,'MEMBER_NOT_FOUND','회원을 찾을 수 없습니다.');
+      if(user.version!==input.version)throw new OperationError(409,'MEMBER_CHANGED','회원 정보가 변경되었습니다. 다시 조회해 주시기 바랍니다.');
+      if(!user.isActive||!['active','approved'].includes(user.status))throw new OperationError(409,'ACCOUNT_ADMIN_REQUIRED','공통 계정 이용 상태는 Admin에서 확인해야 합니다.');
+      const state=await getNetureMainMembershipStatus(m,target);
+      if(next==='active'&&!['suspended','withdrawn'].includes(state))throw new OperationError(409,'MEMBER_SERVICE_STATE_CHANGED','해지된 회원만 복구할 수 있습니다.');
+      if(next==='withdrawn'&&!['active','suspended','withdrawn'].includes(state))throw new OperationError(409,'MEMBER_SERVICE_STATE_CHANGED','현재 회원 상태를 다시 확인해 주시기 바랍니다.');
+      await m.query(`INSERT INTO service_memberships(user_id,service_key,status,role) VALUES($1,'neture',$2,'customer')
+        ON CONFLICT(user_id,service_key) DO UPDATE SET status=$2,updated_at=now()`,[target,next]);
+      await m.query('UPDATE users SET "updatedAt"=clock_timestamp() WHERE id=$1',[target]);
+      await recordOperation(m,'neture',actor,next==='active'?'member.access_restored':'member.access_terminated',
+        {subjectKey:key(target),reasonKey:key(reason),previousStatus:state,nextStatus:next});
+      return {saved:true,serviceStatus:next,employmentReleased:false,businessDataDeleted:false};
+    });
+    invalidateRoles(target);
+    return result;
   }
 
   async closurePlan(actor: string, target: string, organizationId: string) {
@@ -196,7 +120,7 @@ export class MemberLifecycleService {
         throw new OperationError(
           409,
           "PHARMACY_OWNER_CHANGED",
-          "현재 약국 경영자를 다시 확인해 주세요.",
+          "현재 약국 경영자를 다시 확인해 주시기 바랍니다.",
         );
       const items = await closureInventory(m, organizationId);
       return {
@@ -260,7 +184,7 @@ export class MemberLifecycleService {
             throw new OperationError(
               409,
               "PHARMACY_OWNER_CHANGED",
-              "현재 약국 경영자를 다시 확인해 주세요.",
+              "현재 약국 경영자를 다시 확인해 주시기 바랍니다.",
             );
           const [organization] = await m.query(
             'SELECT id,"isActive" FROM organizations WHERE id=$1 FOR UPDATE',
@@ -396,7 +320,7 @@ export class MemberLifecycleService {
           throw new OperationError(
             409,
             "NEXT_OWNER_REQUIRED",
-            "가입된 새 경영자의 이메일을 확인해 주세요.",
+            "가입된 새 경영자의 이메일을 확인해 주시기 바랍니다.",
           );
         nextId = next.id;
         await lockMembers(m, [actor, target, next.id]);
@@ -436,7 +360,7 @@ export class MemberLifecycleService {
             throw new OperationError(
               409,
               "PHARMACY_OWNER_CHANGED",
-              "현재 승인된 약국과 경영자 소속을 다시 확인해 주세요.",
+              "현재 승인된 약국과 경영자 소속을 다시 확인해 주시기 바랍니다.",
             );
           const pending = await m.query(
             `SELECT 1 FROM store_owner_termination_cases WHERE organization_id=$1 AND status<>'cancelled' LIMIT 1`,
@@ -456,7 +380,7 @@ export class MemberLifecycleService {
             throw new OperationError(
               409,
               "OTHER_EMPLOYER_EXISTS",
-              "새 경영자의 기존 사업체 소속을 먼저 정리해 주세요.",
+              "새 경영자의 기존 사업체 소속을 먼저 정리해 주시기 바랍니다.",
             );
           const [qualification] = await m.query(
             `SELECT license_number FROM kpa_pharmacist_profiles WHERE user_id=$1 AND qualification_status='approved' AND license_verified=true AND verified_at IS NOT NULL AND verified_by IS NOT NULL AND NULLIF(BTRIM(license_number),'') IS NOT NULL FOR SHARE`,

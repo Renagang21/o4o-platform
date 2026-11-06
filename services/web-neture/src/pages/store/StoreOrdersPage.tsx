@@ -363,7 +363,7 @@ export default function StoreOrdersPage() {
         <div style={styles.empty}>
           <Package size={48} color="#cbd5e1" />
           <h3 style={styles.emptyTitle}>주문 내역을 불러오지 못했습니다</h3>
-          <p style={styles.emptyText}>잠시 후 다시 시도해 주세요.</p>
+          <p style={styles.emptyText}>잠시 후 다시 시도해 주시기 바랍니다.</p>
           <button onClick={fetchOrders} style={styles.retryBtn}>다시 시도</button>
         </div>
       )}
@@ -373,7 +373,7 @@ export default function StoreOrdersPage() {
         <div style={styles.empty}>
           <Package size={48} color="#cbd5e1" />
           <h3 style={styles.emptyTitle}>주문 내역이 없습니다</h3>
-          <p style={styles.emptyText}>상품을 둘러보고 첫 주문을 시작해보세요.</p>
+          <p style={styles.emptyText}>상품을 둘러보고 첫 주문을 시작해보시기 바랍니다.</p>
           <Link to="/content" style={styles.browseBtn}>상품 둘러보기</Link>
         </div>
       )}

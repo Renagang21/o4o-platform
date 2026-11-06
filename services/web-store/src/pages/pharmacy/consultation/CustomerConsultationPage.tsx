@@ -65,12 +65,12 @@ export default function CustomerConsultationPage() {
       ), {
       recognition: screen?.runtime?.recognition, synthesis: screen?.runtime?.synthesis,
       recognize: async (audioBase64, spokenLanguage) => {
-        if (!credential || !screen) throw new Error('상담 화면을 다시 연결해 주세요.');
+        if (!credential || !screen) throw new Error('상담 화면을 다시 연결해 주시기 바랍니다.');
         return customerRequest<{ text: string; language: string }>('speech/recognize', { ...credential, epoch: screen.epoch, audioBase64,
           language: autoLanguage && screen.runtime?.detectLanguage ? 'auto' : spokenLanguage });
       },
       synthesize: async () => {
-        if (!credential || !screen) throw new Error('상담 화면을 다시 연결해 주세요.');
+        if (!credential || !screen) throw new Error('상담 화면을 다시 연결해 주시기 바랍니다.');
         return customerRequest<{ audioBase64: string; mimeType: string }>('speech/synthesize', { ...credential, epoch: screen.epoch });
       },
       onLanguage: value => { if (screen?.languages.some(item => item.key === value)) setLanguage(value); },
@@ -268,7 +268,7 @@ export default function CustomerConsultationPage() {
     } catch (e) {
       if (alive.current && generation.current === version && submission.current === request && draftEpoch.current === current.epoch) {
         if ([401, 403].includes((e as { status?: number }).status ?? 0)) revokeDevice();
-        setError((e as Error).message || "답변을 전달하지 못했습니다. 다시 시도해 주세요.");
+        setError((e as Error).message || "답변을 전달하지 못했습니다. 다시 시도해 주시기 바랍니다.");
       }
     } finally {
       if (submission.current === request) {
@@ -303,7 +303,7 @@ export default function CustomerConsultationPage() {
       {!credential ? (
         <section className="space-y-4 rounded-xl border bg-white p-6">
           <h2 className="text-xl font-semibold">고객 화면 연결</h2>
-          <p>직원 상담 화면에 표시된 연결 코드를 입력해 주세요.</p>
+          <p>직원 상담 화면에 표시된 연결 코드를 입력해 주시기 바랍니다.</p>
           <form
             className="flex flex-wrap gap-3"
             onSubmit={(e) => {
@@ -449,7 +449,7 @@ export default function CustomerConsultationPage() {
       )}
       {speech.message && <p role="status">{speech.message}</p>}
       {notice && <p role="status">{notice}</p>}
-      {credential && storageWarning && <p role="status">이 브라우저에서는 연결이 저장되지 않습니다. 다음에 다시 연결해 주세요.</p>}
+      {credential && storageWarning && <p role="status">이 브라우저에서는 연결이 저장되지 않습니다. 다음에 다시 연결해 주시기 바랍니다.</p>}
       {credential && (
         <details className="border-t pt-4">
           <summary className="min-h-12 cursor-pointer">
@@ -460,7 +460,7 @@ export default function CustomerConsultationPage() {
           </button>
           <p className="text-sm">
             연결 자체를 폐기하려면 직원 화면에서 ‘고객 기기 연결 해제’를
-            사용하세요.
+            사용하시기 바랍니다.
           </p>
         </details>
       )}

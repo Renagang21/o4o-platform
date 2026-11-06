@@ -87,13 +87,13 @@ function App() {
 
     switch (error) {
       case 'token_refresh_failed':
-        toast.error('세션이 만료되었습니다. 다시 로그인해 주세요.');
+        toast.error('세션이 만료되었습니다. 다시 로그인해 주시기 바랍니다.');
         break;
       case 'insufficient_permissions':
         toast.error('관리자 권한이 필요합니다.');
         break;
       case 'account_locked':
-        toast.error('계정이 잠겨있습니다. 관리자에게 문의하세요.');
+        toast.error('계정이 잠겨있습니다. 관리자에게 문의하시기 바랍니다.');
         break;
       default:
         toast.error('인증 오류가 발생했습니다.');

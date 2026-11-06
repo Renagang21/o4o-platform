@@ -30,6 +30,9 @@ export default function PcProgramUpdate({
     [downloaded, setDownloaded] = useState(false),
     [waiting, setWaiting] = useState(false),
     [notice, setNotice] = useState("");
+  const [manifestState, setManifestState] = useState<
+    "loading" | "ready" | "failed"
+  >("loading");
   const [downloadProgress, setDownloadProgress] = useState(0);
   const [elapsed, setElapsed] = useState(0);
   const [connectionStage, setConnectionStage] = useState<
@@ -56,7 +59,7 @@ export default function PcProgramUpdate({
     manifestRequest.current?.abort();
     const controller = new AbortController();
     manifestRequest.current = controller;
-    setRelease(null);
+    setManifestState("loading");
     setError("");
     try {
       const response = await fetch(PC_RELEASE_BASE + "release.json", {
@@ -66,10 +69,17 @@ export default function PcProgramUpdate({
       });
       if (!response.ok) throw new Error("PC_RELEASE_UNAVAILABLE");
       const next = validatePcRelease(await response.json());
-      if (active.current && !controller.signal.aborted) setRelease(next);
+      if (active.current && !controller.signal.aborted) {
+        setRelease(next);
+        setManifestState("ready");
+      }
     } catch {
-      if (active.current && !controller.signal.aborted)
-        setError("PC 설치 자료를 확인하지 못했습니다. 다시 확인해 주세요.");
+      if (active.current && !controller.signal.aborted) {
+        setManifestState("failed");
+        setError(
+          "PC 설치 자료를 확인하지 못했습니다. 다시 확인해 주시기 바랍니다.",
+        );
+      }
     }
   }, []);
   useEffect(() => {
@@ -97,7 +107,7 @@ export default function PcProgramUpdate({
       () => {
         controller.abort();
         setNotice(
-          "10분 동안 연결을 확인하지 못해 자동 확인을 멈췄어요. 받은 파일과 브라우저 권한을 확인한 뒤 연결 확인을 눌러 주세요.",
+          "10분 동안 연결을 확인하지 못해 자동 확인을 멈췄습니다. 받은 파일과 브라우저 권한을 확인한 뒤 연결 확인을 눌러 주시기 바랍니다.",
         );
         setWaiting(false);
       },
@@ -108,7 +118,7 @@ export default function PcProgramUpdate({
       if (controller.signal.aborted || !active.current) return;
       if (Date.now() >= deadline) {
         setNotice(
-          "아직 실행을 확인하지 못했어요. 받은 파일을 열고 연결 확인을 눌러 주세요.",
+          "아직 실행을 확인하지 못했습니다. 받은 파일을 열고 연결 확인을 눌러 주시기 바랍니다.",
         );
         setWaiting(false);
         return;
@@ -117,21 +127,21 @@ export default function PcProgramUpdate({
         const state = pcReleaseStatus(publishedRelease, probe.health);
         if (state === "data_error") {
           setError(
-            "데이터를 확인하지 못했어요. 기존 데이터를 지우지 말고 문의해 주세요.",
+            "데이터를 확인하지 못했습니다. 기존 데이터를 지우지 말고 문의해 주시기 바랍니다.",
           );
           setWaiting(false);
           return;
         }
         if (state === "current") {
           setConnectionStage("connecting");
-          setNotice("프로그램을 확인했어요. 이 계정에 연결하고 있어요.");
+          setNotice("프로그램을 확인했습니다. 이 계정에 연결하고 있습니다.");
           const connected = await connect(probe.health, controller.signal);
           if (controller.signal.aborted || !active.current) return;
           setConnectionStage(connected ? "connected" : "ready");
           setNotice(
             connected
-              ? "설치와 PC 연결을 확인했어요."
-              : "아래 연결 안내를 확인해 주세요.",
+              ? "설치와 PC 연결을 확인했습니다."
+              : "아래 연결 안내를 확인해 주시기 바랍니다.",
           );
           setWaiting(false);
           return;
@@ -146,17 +156,19 @@ export default function PcProgramUpdate({
       );
       setNotice(
         !probe.ok && probe.reason === "PERMISSION_REQUIRED"
-          ? "브라우저에서 PC 연결 허용을 눌러 주세요."
+          ? "브라우저에서 PC 연결 허용을 눌러 주시기 바랍니다."
           : probe.ok
-            ? "이전 프로그램이 실행 중이에요. 종료한 뒤 받은 설치 파일을 열어 주세요."
-            : "PC 프로그램 실행을 기다리고 있어요.",
+            ? "이전 프로그램이 실행 중입니다. 종료한 뒤 받은 설치 파일을 열어 주시기 바랍니다."
+            : "PC 프로그램 실행을 기다리고 있습니다.",
       );
       timer = setTimeout(check, 2000);
     }
     function check() {
       void observe().catch(() => {
         if (controller.signal.aborted || !active.current) return;
-        setError("자동 연결을 확인하지 못했어요. 연결 확인을 눌러 주세요.");
+        setError(
+          "자동 연결을 확인하지 못했습니다. 연결 확인을 눌러 주시기 바랍니다.",
+        );
         setWaiting(false);
       });
     }
@@ -203,7 +215,7 @@ export default function PcProgramUpdate({
       setDownloaded(true);
       onInstallStarted?.();
       if (release.setup && onConnectReady) {
-        setNotice("PC 프로그램 실행을 기다리고 있어요.");
+        setNotice("PC 프로그램 실행을 기다리고 있습니다.");
         waitStarted.current = Date.now();
         setElapsed(0);
         setWaiting(true);
@@ -220,10 +232,19 @@ export default function PcProgramUpdate({
       if (active.current) setBusy(false);
     }
   }
+  // Manual verification must update the same completion steps as automatic setup.
+  const shownStage =
+    status === "current" && health?.connected
+      ? "connected"
+      : connectionStage === "connecting"
+        ? "connecting"
+        : status === "current"
+          ? "ready"
+          : connectionStage;
   const downloadButton = (
     <button
       type="button"
-      disabled={!release || disabled || busy}
+      disabled={!release || manifestState !== "ready" || disabled || busy}
       onClick={() => void download()}
       className={
         downloaded
@@ -239,13 +260,13 @@ export default function PcProgramUpdate({
       {busy
         ? "설치 파일 받는 중…"
         : downloaded
-          ? "파일을 못 받았나요? 다시 받기"
+          ? "파일을 못 받았습니까? 다시 받기"
           : "설치 파일 받기"}
     </button>
   );
   const installation = (
     <div className="space-y-3 rounded-xl bg-blue-50 p-4">
-      {status === "update" && <p>프로그램 업데이트가 필요해요.</p>}
+      {status === "update" && <p>프로그램 업데이트가 필요합니다.</p>}
       {!downloaded && downloadButton}
       {busy && (
         <div className="space-y-1">
@@ -262,34 +283,39 @@ export default function PcProgramUpdate({
           />
         </div>
       )}
-      {downloaded && release?.setup && connectionStage === "waiting" ? (
+      {downloaded && release?.setup && shownStage === "waiting" ? (
         <div role="status" className="space-y-2">
-          <p className="font-semibold">이제 받은 파일을 열어 주세요.</p>
+          <p className="font-semibold">
+            이제 받은 파일을 열어 주시기 바랍니다.
+          </p>
           <p>
             브라우저 오른쪽 위 다운로드(↓)에서 <strong>O4O-PC-Setup.cmd</strong>
-            를 여세요. 목록이 안 보이면 <strong>Ctrl+J</strong>를 누르세요.
+            를 여시기 바랍니다. 목록이 안 보이면 <strong>Ctrl+J</strong>를
+            누르시기 바랍니다.
           </p>
           <p className="font-medium text-blue-900">
-            저장 후 받은 파일을 열어야 설치가 시작돼요.
+            저장 후 받은 파일을 열어야 설치가 시작됩니다.
           </p>
-          <p>압축 해제·설치·프로그램 실행은 자동으로 진행돼요.</p>
+          <p>압축 해제·설치·프로그램 실행은 자동으로 진행됩니다.</p>
         </div>
-      ) : connectionStage !== "waiting" ? (
-        <p>PC 프로그램 실행을 확인했어요.</p>
+      ) : shownStage !== "waiting" ? (
+        <p>PC 프로그램 실행을 확인했습니다.</p>
       ) : (
         <p>
           {release?.setup ? (
             <>
-              받은 파일을 한 번만 열면 설치돼요.
-              {onConnectReady && " 실행되면 이 계정에 자동으로 연결해요."}
+              받은 파일을 한 번만 열면 설치됩니다.
+              {onConnectReady && " 실행되면 이 계정에 자동으로 연결합니다."}
             </>
           ) : (
-            "설치 파일을 준비해요."
+            "설치 파일을 준비합니다."
           )}
         </p>
       )}
       {release && !release.setup && (
-        <p>이전 설치 파일입니다. 압축을 풀고 Install.cmd를 열어 주세요.</p>
+        <p>
+          이전 설치 파일입니다. 압축을 풀고 Install.cmd를 열어 주시기 바랍니다.
+        </p>
       )}
       {downloaded && downloadButton}
     </div>
@@ -302,7 +328,11 @@ export default function PcProgramUpdate({
       {status === "current" ? (
         <>
           <output className="block text-emerald-700">
-            최신 프로그램입니다.
+            {manifestState === "loading"
+              ? "게시된 설치 버전을 다시 확인하고 있습니다."
+              : manifestState === "failed"
+                ? "프로그램 응답은 확인했지만 최신 버전은 다시 확인이 필요합니다."
+                : "최신 프로그램입니다."}
           </output>
           <details>
             <summary className="cursor-pointer text-gray-500">
@@ -316,12 +346,14 @@ export default function PcProgramUpdate({
       )}
       {status === "data_error" && (
         <p role="alert">
-          데이터 확인이 필요합니다. 기존 데이터를 지우지 말고 문의해 주세요.
+          데이터 확인이 필요합니다. 기존 데이터를 지우지 말고 문의해 주시기
+          바랍니다.
         </p>
       )}
       {downloaded && release?.setup && onConnectReady && (
         <div
           className="space-y-3 rounded-xl border border-blue-100 p-4"
+          role="group"
           aria-label="PC 연결 진행 단계"
         >
           <ol className="space-y-2">
@@ -329,13 +361,13 @@ export default function PcProgramUpdate({
               { label: "설치 파일 받기", done: true, current: false },
               {
                 label: "받은 파일 열기 · 설치",
-                done: connectionStage !== "waiting",
-                current: waiting && connectionStage === "waiting",
+                done: shownStage !== "waiting",
+                current: waiting && shownStage === "waiting",
               },
               {
                 label: "이 계정에 PC 연결",
-                done: connectionStage === "connected",
-                current: waiting && connectionStage === "connecting",
+                done: shownStage === "connected",
+                current: waiting && shownStage === "connecting",
               },
             ].map((step, index) => (
               <li
@@ -368,23 +400,23 @@ export default function PcProgramUpdate({
                 연결 확인 경과 {Math.floor(elapsed / 60)}분 {elapsed % 60}초 ·
                 최대 10분 자동 확인
               </p>
-              {connectionStage === "waiting" && (
+              {shownStage === "waiting" && (
                 <p className="text-xs text-gray-600">
-                  설치 진행률은 이 화면에서 확인할 수 없어요. 파일을 열었다면
-                  설치 창을 확인해 주세요.
+                  설치 진행률은 이 화면에서 확인할 수 없습니다. 파일을 열었다면
+                  설치 창을 확인해 주시기 바랍니다.
                 </p>
               )}
-              {connectionStage === "connecting" && elapsed >= 60 && (
+              {shownStage === "connecting" && elapsed >= 60 && (
                 <p
                   role="status"
                   className="rounded-lg bg-amber-50 p-3 text-amber-900"
                 >
-                  프로그램은 실행 중이지만 계정 연결 응답이 늦어지고 있어요.
-                  브라우저의 PC 연결 권한을 확인해 주세요. 자동 연결을 중지한 뒤
-                  다시 확인할 수도 있어요.
+                  프로그램은 실행 중이지만 계정 연결 응답이 늦어지고 있습니다.
+                  브라우저의 PC 연결 권한을 확인해 주시기 바랍니다. 자동 연결을
+                  중지한 뒤 다시 확인할 수도 있습니다.
                 </p>
               )}
-              {connectionStage === "waiting" &&
+              {shownStage === "waiting" &&
                 (elapsed >= 60 || waitingReason !== "unknown") && (
                   <div
                     role="status"
@@ -392,20 +424,20 @@ export default function PcProgramUpdate({
                   >
                     <p className="font-semibold">
                       {waitingReason === "permission"
-                        ? "브라우저의 PC 연결 권한을 확인해 주세요."
+                        ? "브라우저의 PC 연결 권한을 확인해 주시기 바랍니다."
                         : waitingReason === "update"
-                          ? "이전 프로그램을 종료해 주세요."
-                          : "아직 프로그램 응답이 없어요. 기다리기만 해서는 설치되지 않아요."}
+                          ? "이전 프로그램을 종료해 주시기 바랍니다."
+                          : "아직 프로그램 응답이 없습니다. 기다리기만 해서는 설치되지 않습니다."}
                     </p>
                     <p>
                       다운로드(↓)에서 O4O-PC-Setup.cmd를 열고, 보안 확인과 설치
-                      확인 창을 확인해 주세요.
+                      확인 창을 확인해 주시기 바랍니다.
                     </p>
                     {elapsed >= 180 && (
                       <p>
-                        3분 이상 응답이 없어요. 설치 창에 오류가 있는지 확인해
-                        주세요. 설치 창이 끝났다면 시작 메뉴의 O4O PC 연결을
-                        실행해 주세요.
+                        3분 이상 응답이 없습니다. 설치 창에 오류가 있는지 확인해
+                        주시기 바랍니다. 설치 창이 끝났다면 시작 메뉴의 O4O PC
+                        연결을 실행해 주시기 바랍니다.
                       </p>
                     )}
                   </div>
@@ -422,7 +454,7 @@ export default function PcProgramUpdate({
               aria-hidden
             />
           )}
-          {notice}
+          {shownStage === "connected" ? "설치와 현재 계정의 PC 연결을 확인했습니다." : notice}
         </p>
       )}
       {!waiting && (
@@ -444,7 +476,7 @@ export default function PcProgramUpdate({
             ? "연결 확인 중…"
             : health?.connected
               ? "연결 상태 확인"
-              : "이미 설치했어요 · 연결 확인"}
+              : "설치된 프로그램 연결 확인"}
         </button>
       )}
       {waiting && (
@@ -452,7 +484,7 @@ export default function PcProgramUpdate({
           type="button"
           onClick={() => {
             stopWaiting();
-            setNotice("자동 연결을 중지했어요.");
+            setNotice("자동 연결을 중지했습니다.");
           }}
           className="text-gray-500 underline"
         >
@@ -475,11 +507,11 @@ export default function PcProgramUpdate({
         <summary className="cursor-pointer">도움말</summary>
         <p className="mt-2">
           Windows 10/11용입니다. 업데이트할 때는 열린 PC 연결 프로그램을 먼저
-          종료해 주세요. 기존 데이터는 유지됩니다.
+          종료해 주시기 바랍니다. 기존 데이터는 유지됩니다.
         </p>
         <p>
-          브라우저는 받은 파일을 대신 실행할 수 없어요. 파일 열기와 보안 확인은
-          직접 눌러 주세요.
+          브라우저는 받은 파일을 대신 실행할 수 없습니다. 파일 열기와 보안
+          확인은 직접 눌러 주시기 바랍니다.
         </p>
         {release && <p>버전 {release.version}</p>}
       </details>

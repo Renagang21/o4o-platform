@@ -70,7 +70,7 @@ const DEFAULT_STATUS_FILTER_OPTIONS: { value: StatusFilter; label: string }[] = 
 ];
 
 const DEFAULT_TITLE = '포럼 신청 관리';
-const DEFAULT_DESCRIPTION = '포럼 생성 요청을 검토하고 승인/거절/보완요청하세요';
+const DEFAULT_DESCRIPTION = '포럼 생성 요청을 검토하고 승인/거절/보완요청하시기 바랍니다';
 const DEFAULT_SEARCH_PLACEHOLDER = '포럼명 또는 신청자 검색...';
 
 function formatDate(dateString: string): string {
@@ -160,7 +160,7 @@ export function OperatorForumRequestsConsolePage({
 
     // 보완 요청은 의견 필수 (canonical 정책)
     if (action === 'revision' && !reviewComment.trim()) {
-      toast.error('보완 요청 시 의견을 입력해주세요.');
+      toast.error('보완 요청 시 의견을 입력해 주시기 바랍니다.');
       return;
     }
 
@@ -470,7 +470,7 @@ export function OperatorForumRequestsConsolePage({
                 <textarea
                   value={reviewComment}
                   onChange={(e) => setReviewComment(e.target.value)}
-                  placeholder="승인/거절/보완 사유를 입력하세요 (보완 요청 시 필수)"
+                  placeholder="승인/거절/보완 사유를 입력하시기 바랍니다 (보완 요청 시 필수)"
                   rows={3}
                   className="w-full px-4 py-3 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-slate-300 focus:border-slate-400 resize-none"
                 />

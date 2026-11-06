@@ -41,7 +41,7 @@ export class KakaoIdentityService {
       return parseKakaoIdentity(me.data);
     } catch {
       // Axios errors include request bodies/headers. Never log or expose them.
-      throw new SocialAuthError('KAKAO_AUTH_INVALID', '카카오 인증에 실패했습니다. 다시 시도해 주세요.', 401);
+      throw new SocialAuthError('KAKAO_AUTH_INVALID', '카카오 인증에 실패했습니다. 다시 시도해 주시기 바랍니다.', 401);
     }
   }
 }

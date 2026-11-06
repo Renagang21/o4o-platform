@@ -1,9 +1,9 @@
 # syntax=docker/dockerfile:1
-FROM node:22.18.0-alpine AS builder
+FROM node:22.23.4-alpine AS builder
 WORKDIR /app
 RUN --mount=type=secret,id=proxy_ca \
     if [ -f /run/secrets/proxy_ca ]; then export NODE_EXTRA_CA_CERTS=/run/secrets/proxy_ca; fi; \
-    npm install -g pnpm@10.25.0 --ignore-scripts
+    npm install -g --ignore-scripts pnpm@10.25.0
 COPY pnpm-workspace.yaml pnpm-lock.yaml package.json tsconfig.base.json tsconfig.packages.json ./
 COPY packages/types/package.json ./packages/types/
 COPY packages/auth-utils/package.json ./packages/auth-utils/

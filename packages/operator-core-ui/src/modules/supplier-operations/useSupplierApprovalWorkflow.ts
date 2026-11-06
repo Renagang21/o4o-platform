@@ -53,7 +53,7 @@ export function useSupplierApprovalWorkflow(suppliers: AdminSupplier[], selected
     try {
       await operation();
     } catch {
-      if (mounted.current) setActionMessage({ type: 'error', text: '요청을 완료하지 못했습니다. 입력과 대상을 유지했습니다. 다시 시도해 주세요.' });
+      if (mounted.current) setActionMessage({ type: 'error', text: '요청을 완료하지 못했습니다. 입력과 대상을 유지했습니다. 다시 시도해 주시기 바랍니다.' });
     } finally {
       writing.current = false;
       if (mounted.current) {
@@ -103,7 +103,7 @@ export function useSupplierApprovalWorkflow(suppliers: AdminSupplier[], selected
       const result = await operatorSupplierApi.updateBasicInfo(target.id, values);
       if (!mounted.current) return;
       if (!result.success) {
-        setActionMessage({ type: 'error', text: '정보 저장에 실패했습니다. 잠시 후 다시 시도해 주세요.' });
+        setActionMessage({ type: 'error', text: '정보 저장에 실패했습니다. 잠시 후 다시 시도해 주시기 바랍니다.' });
         return;
       }
       setActionMessage({ type: 'success', text: `${target.name || '공급자'} 기본 정보를 저장했습니다.` });
@@ -144,12 +144,12 @@ export function useSupplierApprovalWorkflow(suppliers: AdminSupplier[], selected
       }
       const messages: Record<string, string> = {
         INVALID_STATUS: '이미 처리된 공급자입니다. 목록을 새로고침합니다.',
-        BUSINESS_REGISTRATION_REQUIRED: '사업자등록증 사본과 등록증의 필수 기재 정보를 확인해 주세요.',
-        APPLICANT_NETURE_MEMBERSHIP_NOT_ACTIVE: '신청자의 메인 이메일 확인과 계정 상태를 확인해 주세요.',
+        BUSINESS_REGISTRATION_REQUIRED: '사업자등록증 사본과 등록증의 필수 기재 정보를 확인해 주시기 바랍니다.',
+        APPLICANT_NETURE_MEMBERSHIP_NOT_ACTIVE: '신청자의 메인 이메일 확인과 계정 상태를 확인해 주시기 바랍니다.',
         SUPPLIER_NOT_FOUND: '공급자를 찾을 수 없습니다.',
       };
       if (result.code === 'INVALID_STATUS') { setDrawer(null); refetch(); }
-      setActionMessage({ type: 'error', text: messages[result.code ?? ''] ?? '승인에 실패했습니다. 잠시 후 다시 시도해 주세요.' });
+      setActionMessage({ type: 'error', text: messages[result.code ?? ''] ?? '승인에 실패했습니다. 잠시 후 다시 시도해 주시기 바랍니다.' });
     });
   };
   const handleRejectConfirm = () => {
@@ -166,7 +166,7 @@ export function useSupplierApprovalWorkflow(suppliers: AdminSupplier[], selected
         const ok = await operatorSupplierApi.rejectSupplier(ids[0], reason);
         if (!mounted.current) return;
         if (!ok) {
-          setActionMessage({ type: 'error', text: '거절 처리에 실패했습니다. 다시 시도해 주세요.' });
+          setActionMessage({ type: 'error', text: '거절 처리에 실패했습니다. 다시 시도해 주시기 바랍니다.' });
           return;
         }
         setActionMessage({ type: 'success', text: `${name || '공급자'} 거절 처리 완료` });
@@ -186,7 +186,7 @@ export function useSupplierApprovalWorkflow(suppliers: AdminSupplier[], selected
       window.open(url, '_blank', 'noopener,noreferrer');
       setTimeout(() => URL.revokeObjectURL(url), 30_000);
     } catch {
-      if (mounted.current) setActionMessage({ type: 'error', text: '서류를 내려받지 못했습니다. 다시 시도해 주세요.' });
+      if (mounted.current) setActionMessage({ type: 'error', text: '서류를 내려받지 못했습니다. 다시 시도해 주시기 바랍니다.' });
     }
   };
   const closeBatchResult = () => {

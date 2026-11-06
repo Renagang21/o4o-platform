@@ -263,7 +263,7 @@ function DetailDrawer({ trialId, onClose, onChoiceSaved }: DetailDrawerProps) {
                 }}
               >
                 <div style={{ fontWeight: 600, color: '#92400E', marginBottom: '12px', fontSize: '0.9375rem' }}>
-                  보상 방식을 선택해 주세요
+                  보상 방식을 선택해 주시기 바랍니다
                 </div>
                 <div style={{ display: 'flex', gap: '12px' }}>
                   <button
@@ -455,7 +455,7 @@ export function MyParticipationsPage() {
         description={guideDesc ?? '유통참여형 펀딩의 처리 현황과 선택 가능한 옵션을 확인합니다.'}
         steps={guideSteps ?? [
           '상단 KPI에서 전체 참여 수와 처리 대기 건수를 확인합니다.',
-          '\'선택 대기\' 상태인 항목은 제품 수령 또는 금액 환급을 선택해 주세요.',
+          '\'선택 대기\' 상태인 항목은 제품 수령 또는 금액 환급을 선택해 주시기 바랍니다.',
           '펀딩 처리 완료 건은 이미 처리가 끝난 상태입니다.',
         ]}
         compact

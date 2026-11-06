@@ -348,7 +348,7 @@ export function createSellerController(dataSource: DataSource): Router {
     return res.status(410).json({
       success: false,
       code: 'NETURE_B2B_LEGACY_SELLER_ORDER_RETIRED',
-      message: 'B2B 주문은 장바구니 결제를 통해 진행해 주세요.',
+      message: 'B2B 주문은 장바구니 결제를 통해 진행해 주시기 바랍니다.',
       canonicalAction: 'store_cart_checkout_b2b',
       canonicalRoute: '/api/v1/store/cart/neture/checkout-confirm-b2b',
     });

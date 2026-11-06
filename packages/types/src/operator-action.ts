@@ -69,7 +69,7 @@ export const OPERATOR_ACTION_CONFIGS: Record<OperatorActionType, OperatorActionC
     confirmText: '거절',
     confirmVariant: 'danger',
     requireReason: true,
-    reasonPlaceholder: '거절 사유를 입력해주세요',
+    reasonPlaceholder: '거절 사유를 입력해 주시기 바랍니다',
   },
   [OperatorActionType.SUSPEND]: {
     title: '정지 확인',
@@ -77,7 +77,7 @@ export const OPERATOR_ACTION_CONFIGS: Record<OperatorActionType, OperatorActionC
     confirmText: '정지',
     confirmVariant: 'danger',
     requireReason: true,
-    reasonPlaceholder: '정지 사유를 입력해주세요',
+    reasonPlaceholder: '정지 사유를 입력해 주시기 바랍니다',
   },
   [OperatorActionType.ACTIVATE]: {
     title: '활성화 확인',

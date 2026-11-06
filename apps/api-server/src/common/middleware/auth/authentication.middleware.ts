@@ -206,7 +206,7 @@ export const requireAuth = async (
     }
 
     if (isRetiredServiceValue(payload.serviceKey)) {
-      return res.status(401).json({ success: false, code: 'SERVICE_SESSION_REVOKED', error: '세션이 종료되었습니다. 현재 서비스에서 다시 로그인해 주세요.' });
+      return res.status(401).json({ success: false, code: 'SERVICE_SESSION_REVOKED', error: '세션이 종료되었습니다. 현재 서비스에서 다시 로그인해 주시기 바랍니다.' });
     }
 
     // WO-O4O-AUTH-SERVICE-TOKEN-BOUNDARY-HARDENING-V1:
@@ -247,7 +247,7 @@ export const requireAuth = async (
     }
 
     if (!(await isBrowserSessionLive(user.id, payload, user.refreshTokenFamily))) {
-      return res.status(401).json({ success: false, error: '세션이 종료되었습니다. 다시 로그인해 주세요.', code: 'SESSION_REVOKED' });
+      return res.status(401).json({ success: false, error: '세션이 종료되었습니다. 다시 로그인해 주시기 바랍니다.', code: 'SESSION_REVOKED' });
     }
 
     // WO-O4O-RESTRICTED-LOGIN-FOR-PENDING-REJECTED-V1: 중앙 default-deny

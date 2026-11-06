@@ -30,6 +30,8 @@ export interface GlobalHeaderNavItem {
 }
 
 export interface GlobalHeaderBrand {
+  /** Approved O4O service mark; existing callers may retain their own icon. */
+  logoSrc?: string;
   /** 서비스 로고 아이콘 (ReactNode: emoji, SVG, lucide icon 등) */
   icon: React.ReactNode;
   /** 서비스명 */
@@ -204,11 +206,13 @@ export function GlobalHeader({
             <div
               className="w-10 h-10 rounded-xl flex items-center justify-center text-xl shadow-sm"
               style={{
-                background: `linear-gradient(135deg, ${primaryColor}cc, ${primaryColor})`,
-                boxShadow: `0 4px 12px ${primaryColor}40`,
+                background: brand.logoSrc ? 'transparent' : `linear-gradient(135deg, ${primaryColor}cc, ${primaryColor})`,
+                boxShadow: brand.logoSrc ? 'none' : `0 4px 12px ${primaryColor}40`,
               }}
             >
-              {typeof brand.icon === 'string' ? (
+              {brand.logoSrc ? (
+                <img src={brand.logoSrc} alt="" aria-hidden="true" className="h-10 w-10 object-contain" />
+              ) : typeof brand.icon === 'string' ? (
                 <span>{brand.icon}</span>
               ) : (
                 brand.icon

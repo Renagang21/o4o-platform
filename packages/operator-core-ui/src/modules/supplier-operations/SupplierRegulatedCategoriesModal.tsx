@@ -57,7 +57,7 @@ export default function SupplierRegulatedCategoriesModal({ supplierId, supplierN
         setRows(data);
         setNotes(Object.fromEntries(data.map((r) => [r.category, r.reviewNote || ''])));
       }
-    } catch { if(current()) {setLoadError(true);setError('품목군을 불러오지 못했습니다. 다시 조회해 주세요.');} }
+    } catch { if(current()) {setLoadError(true);setError('품목군을 불러오지 못했습니다. 다시 조회해 주시기 바랍니다.');} }
     finally {if(current()) setLoading(false);}
   };
 

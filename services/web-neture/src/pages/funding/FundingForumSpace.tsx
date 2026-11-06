@@ -40,7 +40,7 @@ export function FundingForumLayout() {
     catch (e: any) {
       if (!current()) return;
       if (e.response?.data?.code === 'PENDING_REQUEST') setRequested(true);
-      else setError(e.response?.data?.error || '신청하지 못했습니다. 다시 시도해 주세요.');
+      else setError(e.response?.data?.error || '신청하지 못했습니다. 다시 시도해 주시기 바랍니다.');
     } finally { if (current()) setBusy(false); }
   };
   const currentAccess = loadedScope === scope ? access : null;

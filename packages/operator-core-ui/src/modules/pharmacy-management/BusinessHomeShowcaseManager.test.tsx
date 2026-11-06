@@ -11,7 +11,7 @@ it('does not load before the management section is opened',()=>{
   const {get}=client();render(<BusinessHomeShowcaseManager businessKey="carepharm" />);expect(get).not.toHaveBeenCalled();
 });
 it('preserves edited input and explains a conflicting save without retrying automatically',async()=>{
-  const put=vi.fn().mockRejectedValue({response:{data:{error:'목록을 다시 조회해 주세요.'}}});client(put);
+  const put=vi.fn().mockRejectedValue({response:{data:{error:'목록을 다시 조회해 주시기 바랍니다.'}}});client(put);
   render(<BusinessHomeShowcaseManager businessKey="carepharm" />);fireEvent.click(screen.getByRole('button',{name:'메인 진열 관리 · 처리 이력'}));
   const input=await screen.findByRole('spinbutton');fireEvent.change(input,{target:{value:'5'}});
   fireEvent.click(screen.getByRole('checkbox'));fireEvent.click(screen.getByRole('button',{name:'Reviewed product 진열 저장'}));

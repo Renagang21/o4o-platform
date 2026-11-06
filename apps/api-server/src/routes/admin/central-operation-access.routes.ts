@@ -49,7 +49,7 @@ centralOperationAccessRouter.get("/overview", async (req: AuthRequest, res) => {
   try {
     res.json({ success: true, data: await centralOperationOverview(AppDataSource, req.user!.id, res.locals.centralOperationRoles, res.locals.centralOperationMenus) });
   } catch {
-    res.status(503).json({ success: false, code: 'CENTRAL_OVERVIEW_UNAVAILABLE', error: '운영 알림을 불러오지 못했습니다. 다시 조회해 주세요.' });
+    res.status(503).json({ success: false, code: 'CENTRAL_OVERVIEW_UNAVAILABLE', error: '운영 알림을 불러오지 못했습니다. 다시 조회해 주시기 바랍니다.' });
   }
 });
 centralOperationAccessRouter.get('/notifications', async (req: AuthRequest, res) => {

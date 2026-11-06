@@ -56,7 +56,7 @@ export default function CentralSupplierReview({
     } catch {
       if (seq === epoch.current.value)
         setError(
-          "공급자 목록을 불러오지 못했습니다. 권한과 최신 상태를 확인해 주세요.",
+          "공급자 목록을 불러오지 못했습니다. 권한과 최신 상태를 확인해 주시기 바랍니다.",
         );
     } finally {
       if (seq === epoch.current.value) setLoading(false);
@@ -79,7 +79,7 @@ export default function CentralSupplierReview({
     if (!row || selected.size !== 1 || lock.current) return;
     const reason =
       action === "reject"
-        ? window.prompt("반려 사유를 입력해 주세요.")
+        ? window.prompt("반려 사유를 입력해 주시기 바랍니다.")
         : undefined;
     if (action === "reject" && !reason?.trim()) return;
     if (
@@ -102,7 +102,7 @@ export default function CentralSupplierReview({
     } catch {
       if (seq === epoch.current.value)
         setNotice(
-          "처리하지 못했습니다. 최신 상태와 승인 조건을 다시 확인해 주세요.",
+          "처리하지 못했습니다. 최신 상태와 승인 조건을 다시 확인해 주시기 바랍니다.",
         );
     } finally {
       if (seq === epoch.current.value) {

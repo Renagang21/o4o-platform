@@ -35,8 +35,8 @@ const categories: ForumCategoriesClient = {
   directDeactivate: (id, data) => post(`${base}/categories/${idPath(id)}/deactivate`, data),
   activate: id => post(`${base}/categories/${idPath(id)}/activate`),
   // Hard delete remains exclusively in the existing Admin API below.
-  getDeleteCheck: async () => { throw new Error('Admin의 삭제된 포럼 관리에서 확인해 주세요.'); },
-  hardDelete: async () => { throw new Error('Admin의 삭제된 포럼 관리에서 처리해 주세요.'); },
+  getDeleteCheck: async () => { throw new Error('Admin의 삭제된 포럼 관리에서 확인해 주시기 바랍니다.'); },
+  hardDelete: async () => { throw new Error('Admin의 삭제된 포럼 관리에서 처리해 주시기 바랍니다.'); },
 };
 const deleted: DeletedForumAdminClient = {
   getDeletedForums: () => get(`${admin}/forums/deleted`),

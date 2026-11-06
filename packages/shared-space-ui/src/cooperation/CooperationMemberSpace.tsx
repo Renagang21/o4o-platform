@@ -24,11 +24,11 @@ interface LoadIssue { message: string; retryable: boolean; login?: boolean; unav
 function loadIssue(error: unknown, stage: string): LoadIssue {
   const response = (error as { response?: { status?: number; data?: { code?: string; error?: { code?: string } } } })?.response;
   const code = response?.data?.code ?? response?.data?.error?.code;
-  if (code === 'BUSINESS_NOT_FOUND') return { message: '이 약국 협업체의 회원 서비스가 아직 개설되지 않았거나 현재 운영 중이 아닙니다. 참여 안내와 문의를 이용해 주세요.', retryable: false, unavailable: true };
-  if (code === 'COMMUNITY_NOT_FOUND') return { message: '이 협업체의 회원 공간이 아직 개설되지 않았거나 현재 이용할 수 없습니다. 운영 안내를 확인해 주세요.', retryable: false, unavailable: true };
-  if (response?.status === 401) return { message: '로그인 상태를 확인하지 못했습니다. 다시 로그인해 주세요.', retryable: false, login: true };
-  if (response?.status === 403) return { message: `${stage}에 접근할 수 없습니다. 참여 상태를 확인하거나 문의해 주세요.`, retryable: false };
-  return { message: `${stage} 조회 중 문제가 발생했습니다. 잠시 후 다시 시도해 주세요.`, retryable: true };
+  if (code === 'BUSINESS_NOT_FOUND') return { message: '이 약국 협업체의 회원 서비스가 아직 개설되지 않았거나 현재 운영 중이 아닙니다. 참여 안내와 문의를 이용해 주시기 바랍니다.', retryable: false, unavailable: true };
+  if (code === 'COMMUNITY_NOT_FOUND') return { message: '이 협업체의 회원 공간이 아직 개설되지 않았거나 현재 이용할 수 없습니다. 운영 안내를 확인해 주시기 바랍니다.', retryable: false, unavailable: true };
+  if (response?.status === 401) return { message: '로그인 상태를 확인하지 못했습니다. 다시 로그인해 주시기 바랍니다.', retryable: false, login: true };
+  if (response?.status === 403) return { message: `${stage}에 접근할 수 없습니다. 참여 상태를 확인하거나 문의해 주시기 바랍니다.`, retryable: false };
+  return { message: `${stage} 조회 중 문제가 발생했습니다. 잠시 후 다시 시도해 주시기 바랍니다.`, retryable: true };
 }
 const statusName: Record<string, string> = { active: '참여 중', pending: '승인 대기', suspended: '이용 정지', rejected: '신청 반려', terminated: '탈퇴' };
 export type CooperationView = 'home' | 'participation' | 'materials' | 'tools';
@@ -83,12 +83,12 @@ function MemberSpace({ model, client, accountId, view, onLogin, onEnterStore, ma
     if (moving.current) return;
     moving.current = true; setBusy(true); setEntryError('');
     try { const href = await onEnterStore(path); if (mounted.current) window.location.assign(href); }
-    catch { if (mounted.current) setEntryError('내 매장으로 이동하지 못했습니다. 약국 소속과 승인 상태를 확인해 주세요.'); }
+    catch { if (mounted.current) setEntryError('내 매장으로 이동하지 못했습니다. 약국 소속과 승인 상태를 확인해 주시기 바랍니다.'); }
     finally { if (mounted.current) { moving.current = false; setBusy(false); } }
   };
   const heading = view === 'home' ? <h2 className={accountId ? 'sr-only' : 'text-xl font-semibold'}>회원 이용</h2> : <h1 className="text-3xl font-semibold">{view === 'materials' ? '자료실' : view === 'tools' ? '내 매장 업무' : '참여 안내'}</h1>;
   const storeSearch = organizationId ? `?store=${encodeURIComponent(organizationId)}` : '';
-  if (!accountId) return <section className="mx-auto max-w-6xl p-6">{heading}<p className="my-5">로그인 후 서비스 참여 신청과 이용 상태를 확인하세요.</p><button className="rounded-lg bg-teal-800 px-5 py-3 text-white" onClick={onLogin}>로그인하기</button></section>;
+  if (!accountId) return <section className="mx-auto max-w-6xl p-6">{heading}<p className="my-5">로그인 후 서비스 참여 신청과 이용 상태를 확인하시기 바랍니다.</p><button className="rounded-lg bg-teal-800 px-5 py-3 text-white" onClick={onLogin}>로그인하기</button></section>;
   return <section className="mx-auto max-w-6xl space-y-6 p-4 sm:p-8">
     {heading}
     <CooperationMemberNavigation items={[
@@ -108,8 +108,8 @@ function MemberSpace({ model, client, accountId, view, onLogin, onEnterStore, ma
     {entryError && <p role="alert">{entryError}</p>}
     {!state && !issue && <p role="status">회원 이용 상태를 확인하고 있습니다…</p>}
     {state && <>
-      {!state.access.canManage && (state.stores.length ? <label className="block">이용할 약국<select aria-label="이용할 약국" className="mt-2 block rounded border p-3" value={organizationId ?? ''} onChange={event => setParams(previous => { const next = new URLSearchParams(previous); if (event.target.value) next.set('store', event.target.value); else next.delete('store'); return next; })}><option value="">약국을 선택해 주세요</option>{state.stores.map(store => <option key={store.organizationId} value={store.organizationId}>{store.organizationName}</option>)}</select></label> : <a href="https://store.neture.co.kr/start-pharmacy">약국 개설 · 소속 확인</a>)}
-      {view === 'participation' ? (organizationId || state.access.canManage ? <Participation key={`${model.key}:${organizationId}:${version}`} model={model} business={state.business} access={state.access} client={scopedClient} onChanged={() => setVersion(n => n + 1)} /> : <p>가입 상태를 확인할 약국을 선택해 주세요.</p>) : state.access.canManage ? <div className="space-y-4 rounded-xl border p-6"><p>담당 서비스 운영자입니다. 회원 업무는 승인된 약국을 기준으로 이용합니다.</p><Link className="block underline" to="/operator/semi-franchises?tab=contents">사업 자료 등록 · 관리</Link><Link to={model.communityPath}>회원 게시글 관리</Link></div> : organizationId ? <SelectedMemberResources onAccess={setMemberAccess} materialsGuide={materialsGuide} homeNews={homeNews} accountId={accountId} key={`${model.key}:${organizationId}:${version}`} model={model} organizationId={organizationId} client={scopedClient} view={view} storeSearch={storeSearch} busy={busy} onEnterStore={enterStore} resolveStoreEntry={onEnterStore} /> : <p>회원 업무를 이용할 약국을 선택해 주세요.</p>}
+      {!state.access.canManage && (state.stores.length ? <label className="block">이용할 약국<select aria-label="이용할 약국" className="mt-2 block rounded border p-3" value={organizationId ?? ''} onChange={event => setParams(previous => { const next = new URLSearchParams(previous); if (event.target.value) next.set('store', event.target.value); else next.delete('store'); return next; })}><option value="">약국을 선택해 주시기 바랍니다</option>{state.stores.map(store => <option key={store.organizationId} value={store.organizationId}>{store.organizationName}</option>)}</select></label> : <a href="https://store.neture.co.kr/start-pharmacy">약국 개설 · 소속 확인</a>)}
+      {view === 'participation' ? (organizationId || state.access.canManage ? <Participation key={`${model.key}:${organizationId}:${version}`} model={model} business={state.business} access={state.access} client={scopedClient} onChanged={() => setVersion(n => n + 1)} /> : <p>가입 상태를 확인할 약국을 선택해 주시기 바랍니다.</p>) : state.access.canManage ? <div className="space-y-4 rounded-xl border p-6"><p>담당 서비스 운영자입니다. 회원 업무는 승인된 약국을 기준으로 이용합니다.</p><Link className="block underline" to="/operator/semi-franchises?tab=contents">사업 자료 등록 · 관리</Link><Link to={model.communityPath}>회원 게시글 관리</Link></div> : organizationId ? <SelectedMemberResources onAccess={setMemberAccess} materialsGuide={materialsGuide} homeNews={homeNews} accountId={accountId} key={`${model.key}:${organizationId}:${version}`} model={model} organizationId={organizationId} client={scopedClient} view={view} storeSearch={storeSearch} busy={busy} onEnterStore={enterStore} resolveStoreEntry={onEnterStore} /> : <p>회원 업무를 이용할 약국을 선택해 주시기 바랍니다.</p>}
 
       {view === 'home' && state.access.canManage && <BusinessHomeShowcase client={client} businessKey={model.key} accountId={accountId} operator />}
       {state.access.canManage && <Link to="/operator/semi-franchises" className="block underline">참여 약국 · 공급 승인 · 콘텐츠 운영</Link>}
@@ -150,7 +150,7 @@ function SelectedMemberResources({ onAccess, model, organizationId, client, view
       </section>
       <section className="rounded-xl border border-slate-200 bg-white p-5">
         <h2 className="text-lg font-semibold">회원 지원</h2>
-        <p className="my-3 text-sm text-slate-600">회원 게시판에서 경험을 나누고 사업 자료를 내 약국에서 활용하세요.</p>
+        <p className="my-3 text-sm text-slate-600">회원 게시판에서 경험을 나누고 사업 자료를 내 약국에서 활용하시기 바랍니다.</p>
         <Link className="block py-3 underline" to={model.communityPath + storeSearch}>회원 게시글 보기</Link>
         <Link className="block py-3 underline" to={'/materials' + storeSearch}>자료실 보기</Link>
         <Link className="block py-3 underline" to={'/tools' + storeSearch}>내 매장 업무 안내</Link>
@@ -179,7 +179,7 @@ function Participation({ model, business, access, client, onChanged }: { model: 
     if (access.canManage) { setLoading(false); return; }
     let alive = true;
     client.get(`${BASE}/semi-franchises`).then(r => { if (alive) setMembership((r.data.data as Membership[]).find(b => b.key === model.key) ?? null); })
-      .catch(() => { if (alive) setError('가입 상태를 확인하지 못했습니다. 약국 개설·소속과 승인 상태를 확인해 주세요.'); })
+      .catch(() => { if (alive) setError('가입 상태를 확인하지 못했습니다. 약국 개설·소속과 승인 상태를 확인해 주시기 바랍니다.'); })
       .finally(() => { if (alive) setLoading(false); });
     return () => { alive = false; };
   }, [client, model.key, access.canManage]);
@@ -191,10 +191,10 @@ function Participation({ model, business, access, client, onChanged }: { model: 
     catch (e: any) {
       const code = e.response?.data?.code ?? e.response?.data?.error?.code;
       if (['POLICY_VERSION_MISMATCH', 'ENROLLMENT_POLICY_REQUIRED', 'POLICY_UNAVAILABLE'].includes(code)) {
-        agreement.reload(); setError('서비스 약관이 변경되었거나 준비 중입니다. 입력 내용은 유지됩니다. 약관을 다시 확인해 주세요.');
+        agreement.reload(); setError('서비스 약관이 변경되었거나 준비 중입니다. 입력 내용은 유지됩니다. 약관을 다시 확인해 주시기 바랍니다.');
       } else {
         if (code === 'CONDITIONS_CHANGED') { setAccepted(false); setStaleConditions(true); }
-        setError('신청을 처리하지 못했습니다. 참여 조건과 현재 상태를 다시 확인해 주세요.');
+        setError('신청을 처리하지 못했습니다. 참여 조건과 현재 상태를 다시 확인해 주시기 바랍니다.');
       }
     }
     finally { setBusy(false); }
@@ -254,7 +254,7 @@ function Materials({ model, client, guide }: { model: CooperationModel; client: 
     {!state.items.length && <p>{q || tag ? '검색 조건에 맞는 자료가 없습니다.' : '등록된 자료가 없습니다.'}</p>}
     {state.items.map(c => <details key={c.id} className="min-w-0 rounded-lg border p-4"><summary className="cursor-pointer break-words font-semibold">{c.title}</summary>{c.revision && <p className="my-3 text-sm">{c.category || '미분류'} · 개정 {c.revision}</p>}{safeEducationUrl(c.educationUrl) && <a href={safeEducationUrl(c.educationUrl)} target="_blank" rel="noopener noreferrer" className="my-3 inline-flex min-h-11 items-center underline">관련 교육 열기 ↗</a>}{c.summary && <p className="my-3 break-words">{c.summary}</p>}{Array.isArray(c.tags) && <div className="my-3 flex flex-wrap gap-2">{[...new Set(c.tags.filter(value => typeof value === 'string' && value.trim()))].map(value => <button key={value} className="min-h-11 rounded-full border px-3 text-sm" onClick={() => filter({ tag: value })}>{value}</button>)}</div>}{c.body && <ContentRenderer html={c.body} />}<CooperationMaterialAttachments attachments={c.attachments} /></details>)}
     {state.total > 20 && <nav aria-label="자료 목록 페이지"><button className="min-h-11" disabled={page === 1} onClick={() => filter({ page: String(page - 1) })}>이전</button><span className="px-4">{page}</span><button className="min-h-11" disabled={page * 20 >= state.total} onClick={() => filter({ page: String(page + 1) })}>다음</button></nav>}
-    <p>자료를 가져와 편집·활용하려면 내 약국의 사업 자료를 이용하세요.</p>
+    <p>자료를 가져와 편집·활용하려면 내 약국의 사업 자료를 이용하시기 바랍니다.</p>
     <Link className="inline-flex min-h-11 items-center rounded-lg bg-teal-800 px-4 py-2 text-white" to={`/tools${params.get('store') ? `?store=${encodeURIComponent(params.get('store')!)}` : ''}`}>내 매장 업무 · 이용 안내</Link>
   </>}</div>;
 }

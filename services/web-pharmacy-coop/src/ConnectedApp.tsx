@@ -119,7 +119,7 @@ export function ConnectedApp() {
   if (auth.pendingPolicyAcceptances.length)
     return (
       <main className="container">
-        <p>O4O 계정에서 이용약관 동의를 완료해 주세요.</p>
+        <p>O4O 계정에서 이용약관 동의를 완료해 주시기 바랍니다.</p>
         <a href="https://neture.co.kr">O4O 계정으로 이동</a>
       </main>
     );
@@ -173,7 +173,7 @@ export function ConnectedApp() {
         ) : undefined
       }
       loginContent={
-        <LoginCard brand="O4O 협동조합" title="협동조합 로그인">
+        <LoginCard logoSrc={`${import.meta.env.BASE_URL}brand/pharmacy-coop/logo-mark.svg`} brand="O4O 협동조합" title="협동조합 로그인">
           {auth.user ? (
             <>
               <p>로그인했습니다.</p>

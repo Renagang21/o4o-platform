@@ -116,7 +116,7 @@ export function resolveServiceAdminRole(role: unknown, serviceKey: unknown): Ope
     throw new OperatorRoleContractError('ROLE_NOT_ASSIGNABLE', '제거된 kpa-society 서비스에는 새 관리자를 지정할 수 없습니다.');
   }
   if (!ASSIGNABLE_SERVICE_ADMIN_ROLES.includes(resolved.role)) {
-    throw new OperatorRoleContractError('ROLE_NOT_ASSIGNABLE', '전체관리자는 서비스 Admin만 지정합니다. Operator는 해당 서비스 Admin이 지정하세요.');
+    throw new OperatorRoleContractError('ROLE_NOT_ASSIGNABLE', '전체관리자는 서비스 Admin만 지정합니다. Operator는 해당 서비스 Admin이 지정하시기 바랍니다.');
   }
   return resolved;
 }

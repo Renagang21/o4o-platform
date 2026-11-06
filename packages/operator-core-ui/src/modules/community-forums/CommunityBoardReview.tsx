@@ -43,7 +43,7 @@ function BoardReviewPanel({ communityKey, api }: { communityKey: string; api: Ax
       if (mounted.current && version === requestVersion.current) setRows(data);
     } catch {
       if (mounted.current && version === requestVersion.current) {
-        setLoadError('게시판 개설 신청 목록을 불러오지 못했습니다. 다시 시도해 주세요.');
+        setLoadError('게시판 개설 신청 목록을 불러오지 못했습니다. 다시 시도해 주시기 바랍니다.');
       }
     } finally {
       if (mounted.current && version === requestVersion.current) setLoading(false);
@@ -74,7 +74,7 @@ function BoardReviewPanel({ communityKey, api }: { communityKey: string; api: Ax
       setNotice(`‘${row.name}’ 게시판 개설 신청을 ${action === 'approve' ? '승인' : '반려'}했습니다.`);
       void load();
     } catch {
-      if (mounted.current) setActionError('개설 신청을 처리하지 못했습니다. 권한과 신청 상태를 확인한 뒤 다시 시도해 주세요.');
+      if (mounted.current) setActionError('개설 신청을 처리하지 못했습니다. 권한과 신청 상태를 확인한 뒤 다시 시도해 주시기 바랍니다.');
     } finally {
       submitting.current = false;
       if (mounted.current) setProcessing(null);
@@ -90,7 +90,7 @@ function BoardReviewPanel({ communityKey, api }: { communityKey: string; api: Ax
 
   return <section className="my-4 rounded-lg border border-slate-200 bg-white p-4 sm:p-6" aria-label="게시판 개설 신청 심사" aria-busy={disabled}>
     <h2 className="font-semibold text-slate-900">게시판 개설 신청 심사</h2>
-    <p className="mt-1 text-sm text-slate-500">신청 내용을 확인하고 게시판 개설 여부를 결정해 주세요.</p>
+    <p className="mt-1 text-sm text-slate-500">신청 내용을 확인하고 게시판 개설 여부를 결정해 주시기 바랍니다.</p>
     {notice && <p role="status" className="mt-3 text-sm text-green-700">{notice}</p>}
     {actionError && <p role="alert" className="mt-3 text-sm text-red-700">{actionError}</p>}
     {loadError && <div className="mt-3">

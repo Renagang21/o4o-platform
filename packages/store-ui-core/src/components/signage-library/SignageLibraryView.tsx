@@ -379,7 +379,7 @@ export function SignageLibraryView<T extends SignageLibraryItem>({
               가져온 자료는 {ownerLabel}의 독립 사본으로 저장됩니다. 같은 자료를 다시 가져오면 새로운 사본이
               생성됩니다. 추가한 콘텐츠는{' '}
               {renderLink({ to: guide.href, className: ac.link, children: guide.linkLabel })}
-              에서 플레이리스트 구성과 스케줄 적용을 할 수 있습니다.
+              에서 재생목록을 구성하고 각 디스플레이에서 선택해 재생할 수 있습니다.
             </>
           )}
         </span>

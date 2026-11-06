@@ -1,3 +1,4 @@
+import { operatorMemberTarget } from '../../middleware/operator-member-target.middleware.js';
 /**
  * Operator Membership Console Routes — Extension Layer
  * WO-O4O-MEMBERSHIP-CONSOLE-V1
@@ -60,21 +61,21 @@ router.get('/stats', controller.getStats);
 router.get('/:userId', controller.getMemberDetail);
 
 // Member update (password change) / status change / delete
-router.put('/:userId', controller.updateMember);
-router.patch('/:userId/status', controller.updateMemberStatus);
-router.post('/:userId/reactivate', controller.reactivateMember);
+router.put('/:userId', operatorMemberTarget, controller.updateMember);
+router.patch('/:userId/status', operatorMemberTarget, controller.updateMemberStatus);
+router.post('/:userId/reactivate', operatorMemberTarget, controller.reactivateMember);
 router.get('/:userId/delete-risk', controller.getDeleteRisk);
-router.delete('/:userId', controller.deleteMember);
+router.delete('/:userId', operatorMemberTarget, controller.deleteMember);
 
 // Role assignment/removal
-router.post('/:userId/roles', controller.assignMemberRole);
-router.delete('/:userId/roles/:role', controller.removeMemberRole);
+router.post('/:userId/roles', operatorMemberTarget, controller.assignMemberRole);
+router.delete('/:userId/roles/:role', operatorMemberTarget, controller.removeMemberRole);
 
 // Membership approval/rejection
-router.patch('/:membershipId/approve', controller.approveMembership);
-router.patch('/:membershipId/reject', controller.rejectMembership);
+router.patch('/:membershipId/approve', operatorMemberTarget, controller.approveMembership);
+router.patch('/:membershipId/reject', operatorMemberTarget, controller.rejectMembership);
 
 // V3 Batch — WO-O4O-TABLE-STANDARD-V3-EXPANSION
-router.post('/batch-status', controller.batchUpdateStatus);
+router.post('/batch-status', operatorMemberTarget, controller.batchUpdateStatus);
 
 export default router;

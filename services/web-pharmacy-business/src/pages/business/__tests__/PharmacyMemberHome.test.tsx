@@ -136,7 +136,7 @@ describe('약국 회원 초기화면', () => {
     expect(screen.queryByText('등록된 공지가 없습니다.')).toBeNull();
     mocks.get.mockImplementation((path: string, config: unknown) => path.endsWith('/forum/posts') ? Promise.resolve({ data: { data: [] } }) : original(path, config));
     fireEvent.click(screen.getAllByRole('button', { name: '다시 시도' })[0]);
-    expect(await screen.findByText('회원 게시판에서 이야기를 나눠 주세요 →')).toBeTruthy();
+    expect(await screen.findByText('회원 게시판에서 이야기를 나눠 주시기 바랍니다 →')).toBeTruthy();
     expect(screen.queryByRole('heading', { name: '회원 약국들의 이야기' })).toBeNull();
     expect(screen.queryByRole('heading', { name: '중요 공지' })).toBeNull();
     expect(screen.queryAllByRole('alert')).toHaveLength(0);
@@ -144,7 +144,7 @@ describe('약국 회원 초기화면', () => {
   it('내 매장 이동 실패를 안내하고 다시 실행할 수 있게 한다', async () => {
     mocks.handoff.mockRejectedValue(new Error('No organization')); render(<BusinessStoreShortcut compact />);
     fireEvent.click(screen.getByRole('button', { name: '내 매장' }));
-    expect(await screen.findByRole('alert')).toHaveProperty('textContent', '내 매장으로 이동하지 못했습니다. 매장 소속과 승인 상태를 확인해 주세요.');
+    expect(await screen.findByRole('alert')).toHaveProperty('textContent', '내 매장으로 이동하지 못했습니다. 매장 소속과 승인 상태를 확인해 주시기 바랍니다.');
     await waitFor(() => expect(screen.getByRole('button', { name: '내 매장' })).toHaveProperty('disabled', false));
     expect(mocks.handoff).toHaveBeenCalledWith({ get: mocks.get }, { workspace: 'store', origin: 'https://store.neture.co.kr', returnPath: '/store' });
   });
@@ -190,7 +190,7 @@ it('preserves a handoff failure when the user starts navigation immediately afte
     return <BusinessStoreShortcut />;
   }
   render(<ClickAtCommit />);
-  expect(await screen.findByRole('alert')).toHaveProperty('textContent', '내 매장으로 이동하지 못했습니다. 매장 소속과 승인 상태를 확인해 주세요.');
+  expect(await screen.findByRole('alert')).toHaveProperty('textContent', '내 매장으로 이동하지 못했습니다. 매장 소속과 승인 상태를 확인해 주시기 바랍니다.');
   expect(mocks.handoff).toHaveBeenCalledTimes(1);
 });
 
@@ -222,6 +222,6 @@ it('최근 혼합 페이지가 공지로만 채워져도 전체 게시판에 첫
     return original(path, config);
   });
   render(tree('/'));
-  expect((await screen.findByRole('link', { name: '회원 게시판에서 이야기를 나눠 주세요 →' })).getAttribute('href')).toBe('/community/write');
+  expect((await screen.findByRole('link', { name: '회원 게시판에서 이야기를 나눠 주시기 바랍니다 →' })).getAttribute('href')).toBe('/community/write');
   expect(screen.queryByText(/첫 약국 이야기/)).toBeNull();
 });

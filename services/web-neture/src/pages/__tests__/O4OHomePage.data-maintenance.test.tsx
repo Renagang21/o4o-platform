@@ -11,18 +11,18 @@ vi.mock('../../lib/footerLegal',()=>({loadFooterLegal:vi.fn(async()=>null)}));
 vi.mock('../../lib/ai/unified-request',async original=>({...await original<typeof import('../../lib/ai/unified-request')>(),sendUnifiedRequest:mocks.send}));
 import O4OHomePage from '../O4OHomePage';
 const page=()=> <MemoryRouter><O4OHomePage /></MemoryRouter>;
-const work={kind:'work',work:{goal:{goalId:'goal',status:'waiting_for_user',siteId:'synthetic-site',displayName:'합성 대상'},progress:'needs_user',takeover:null,neededInput:'포장 수량을 확인해 주세요',stepCount:0,aiPlanCount:0,path:null,history:[],message:'확인 필요',errorCode:null,target:null,runId:'g_synthetic',resumable:true}};
+const work={kind:'work',work:{goal:{goalId:'goal',status:'waiting_for_user',siteId:'synthetic-site',displayName:'합성 대상'},progress:'needs_user',takeover:null,neededInput:'포장 수량을 확인해 주시기 바랍니다',stepCount:0,aiPlanCount:0,path:null,history:[],message:'확인 필요',errorCode:null,target:null,runId:'g_synthetic',resumable:true}};
 beforeEach(()=>{vi.clearAllMocks();mocks.auth.user={id:'synthetic-user',name:'Synthetic',email:'synthetic@example.invalid',roles:[]};mocks.auth.isAuthenticated=true;mocks.send.mockResolvedValue(work);});
 afterEach(cleanup);
 function prepare(){
- fireEvent.change(screen.getByTestId('home-composer-input'),{target:{value:'합성 상품은 500정 2포장으로 수정해 주세요'}});
+ fireEvent.change(screen.getByTestId('home-composer-input'),{target:{value:'합성 상품은 500정 2포장으로 수정해 주시기 바랍니다'}});
 }
 it('starts from ordinary conversation without a separate data maintenance menu or form',()=>{
  render(page());
  expect(screen.queryByRole('button',{name:'데이터 정비',exact:true})).toBeNull();
  expect(screen.queryByRole('region',{name:'업무 데이터 정비'})).toBeNull();
  prepare();expect(mocks.send).not.toHaveBeenCalled();
- expect(screen.getByTestId('home-composer-input')).toHaveProperty('value','합성 상품은 500정 2포장으로 수정해 주세요');
+ expect(screen.getByTestId('home-composer-input')).toHaveProperty('value','합성 상품은 500정 2포장으로 수정해 주시기 바랍니다');
 });
 it('reuses the waiting run, original target, scope and attachments, including after a transport error',async()=>{
  render(page());fireEvent.change(screen.getByTestId('home-composer-input'),{target:{value:'상품 준비'}});fireEvent.click(screen.getByTestId('home-composer-submit'));

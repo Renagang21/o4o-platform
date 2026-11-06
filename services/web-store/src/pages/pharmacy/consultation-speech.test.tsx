@@ -35,10 +35,10 @@ beforeEach(() => {
   synthesis.getVoices.mockReturnValue(['ko-KR', 'en-US', 'ja-JP'].map(lang => ({ lang })));
   state.get.mockImplementation(async () => ({ success: true, data: { organizationId: state.org,
     supportAllowed: true,
-    languages: [{ key: 'en', label: 'English' }, { key: 'ja', label: 'Japanese' }], phrases: [{ key: 'welcome', text: '안녕하세요.' }],
+    languages: [{ key: 'en', label: 'English' }, { key: 'ja', label: 'Japanese' }], phrases: [{ key: 'welcome', text: '안녕하십니까.' }],
     modes: [{ key: 'counter-pharmacist', label: '매대 약사 상담', entitled: true, allowed: true, professional: true },
       { key: 'floor-staff', label: '매장 직원 응대', entitled: true, allowed: true, professional: false }] } }));
-  state.post.mockImplementation(async (_path, body) => ({ success: true, data: { organizationId: state.org, ...body, source: body.text ?? '안녕하세요.', translation: 'Translated words' } }));
+  state.post.mockImplementation(async (_path, body) => ({ success: true, data: { organizationId: state.org, ...body, source: body.text ?? '안녕하십니까.', translation: 'Translated words' } }));
 });
 afterEach(() => { cleanup(); vi.restoreAllMocks(); vi.unstubAllGlobals(); });
 
@@ -62,7 +62,7 @@ it('finishes a guidance voice request beside its microphone button and waits for
   fireEvent.click(guidance().getByRole('button', { name: '말로 안내 요청' }));
   await guidance().findByRole('button', { name: '요청 말하기 마치기' });
   const recognition = latest();
-  await act(async () => recognition.result('상품 위치를 알려주세요'));
+  await act(async () => recognition.result('상품 위치를 알려주시기 바랍니다'));
   expect(recognition.abort).not.toHaveBeenCalled();
   expect((guidance().getByRole('button', { name: '안내 찾기' }) as HTMLButtonElement).disabled).toBe(true);
   fireEvent.click(guidance().getByRole('button', { name: '요청 말하기 마치기' }));
@@ -70,7 +70,7 @@ it('finishes a guidance voice request beside its microphone button and waits for
   expect(state.post).not.toHaveBeenCalled();
   await act(async () => recognition.onend?.());
   expect((guidance().getByRole('button', { name: '안내 찾기' }) as HTMLButtonElement).disabled).toBe(false);
-  expect((guidance().getByRole('textbox') as HTMLInputElement).value).toBe('상품 위치를 알려주세요');
+  expect((guidance().getByRole('textbox') as HTMLInputElement).value).toBe('상품 위치를 알려주시기 바랍니다');
   expect(document.activeElement).not.toBe(guidance().getByRole('textbox'));
 });
 it('keeps nonprofessional outgoing phrases fixed and records the customer in the selected language', async () => {

@@ -60,7 +60,7 @@ export default function OperatorInboxEntryPage() {
       alive = false;
     };
   }, [accountId, kind, scopeKey, scope]);
-  if (!user) return <p>로그인 후 문의 알림을 다시 열어 주세요.</p>;
+  if (!user) return <p>로그인 후 문의 알림을 다시 열어 주시기 바랍니다.</p>;
   if (state?.scope !== scope)
     return <p role="status">현재 담당 운영 권한을 확인하고 있습니다…</p>;
   return (
@@ -69,7 +69,7 @@ export default function OperatorInboxEntryPage() {
       {state.error ? (
         <p role="alert">
           문의함을 열 권한이 없거나 연결 정보를 확인하지 못했습니다. 해당
-          서비스에서 운영 권한을 확인해 주세요.
+          서비스에서 운영 권한을 확인해 주시기 바랍니다.
         </p>
       ) : (
         <>

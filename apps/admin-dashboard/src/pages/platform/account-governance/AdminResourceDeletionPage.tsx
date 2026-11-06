@@ -75,7 +75,7 @@ export default function AdminResourceDeletionPage() {
     } catch {
       if (seq === epoch.current.value)
         setError(
-          "목록을 조회하지 못했습니다. 현재 관리자 권한을 확인해 주세요.",
+          "목록을 조회하지 못했습니다. 현재 관리자 권한을 확인해 주시기 바랍니다.",
         );
     } finally {
       if (seq === epoch.current.value) setLoading(false);
@@ -113,7 +113,7 @@ export default function AdminResourceDeletionPage() {
       if (seq === epoch.current.value) setPlan(response.data.data);
     } catch {
       if (seq === epoch.current.value)
-        setError("삭제 범위를 확인하지 못했습니다. 다시 조회해 주세요.");
+        setError("삭제 범위를 확인하지 못했습니다. 다시 조회해 주시기 바랍니다.");
     } finally {
       if (seq === epoch.current.value) {
         lock.current = false;
@@ -150,7 +150,7 @@ export default function AdminResourceDeletionPage() {
     } catch {
       if (seq === epoch.current.value)
         setNotice(
-          "삭제를 완료하지 못했습니다. 상태·권한·연결 자료가 바뀌었을 수 있습니다. 새 범위를 조회한 뒤 재시도해 주세요.",
+          "삭제를 완료하지 못했습니다. 상태·권한·연결 자료가 바뀌었을 수 있습니다. 새 범위를 조회한 뒤 재시도해 주시기 바랍니다.",
         );
     } finally {
       if (seq === epoch.current.value) {

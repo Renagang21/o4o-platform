@@ -66,7 +66,11 @@ function matchesStatus(
   status: SignageStatusFilter,
 ): boolean {
   if (status === "all") return true;
-  if (video.source === "direct") return false;
+  if (video.source === "direct") {
+    if (status === "published") return video._media?.status === "active";
+    if (status === "draft") return video._media?.status === "draft";
+    return false;
+  }
   if (status === "forced")
     return !!video._snapshot && isForcedActive(video._snapshot);
   return video.publishStatus === status;
@@ -91,6 +95,11 @@ function compareVideos(
   }
   return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
 }
+/** Tags belong to the store copy, regardless of its import origin. */
+export function signageVideoTags(video: UnifiedVideoItem): string[] {
+  const tags = video._media?.tags ?? video._snapshot?.contentJson?.tags;
+  return Array.isArray(tags) ? tags.filter((tag): tag is string => typeof tag === 'string') : [];
+}
 export function filterSignageVideos(
   videos: UnifiedVideoItem[],
   filter: {
@@ -99,12 +108,13 @@ export function filterSignageVideos(
     keyword: string;
   },
 ): UnifiedVideoItem[] {
-  const keyword = filter.keyword.toLowerCase();
+  const keyword = filter.keyword.trim().toLowerCase();
   return videos
     .filter((video) => matchesStatus(video, filter.status))
     .filter(
       (video) =>
-        !filter.keyword.trim() || video.title.toLowerCase().includes(keyword),
+        !keyword || video.title.toLowerCase().includes(keyword) ||
+        signageVideoTags(video).some(tag => tag.toLowerCase().includes(keyword)),
     )
     .sort((a, b) => compareVideos(a, b, filter.sort));
 }
@@ -120,4 +130,13 @@ export function summarizePlaylistDuration(
     else missingCount++;
   }
   return { totalSec, missingCount };
+}
+
+/** Import origin is separate from hosting provider; do not guess an unknown business. */
+export function signageVideoOrigin(video: UnifiedVideoItem): string {
+  if (video.source === 'direct') return '직접 등록';
+  const service = video._snapshot?.sourceService;
+  if (service === 'community') return '커뮤니티';
+  if (service === 'semi-franchise') return '가입 협업체';
+  return '제공 자료';
 }

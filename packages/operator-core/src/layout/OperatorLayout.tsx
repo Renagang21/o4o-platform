@@ -50,7 +50,7 @@ export function OperatorLayout({
             {config?.pageTitle || '운영자 대시보드'}
           </h1>
           <p className="text-slate-500 mt-1">
-            {config?.pageSubtitle || '운영 현황을 한눈에 확인하세요'}
+            {config?.pageSubtitle || '운영 현황을 한눈에 확인하시기 바랍니다'}
           </p>
         </div>
         <button

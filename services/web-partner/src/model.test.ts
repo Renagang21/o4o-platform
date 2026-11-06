@@ -93,14 +93,14 @@ describe("콘텐츠와 홍보 링크", () => {
   });
   it("입력 사실을 유지하며 영상과 메시지 형식을 구분한다", () => {
     expect(
-      contentDraft("테스트 제품", "사용 전 흔들어 주세요.", "틱톡"),
+      contentDraft("테스트 제품", "사용 전 흔들어 주시기 바랍니다.", "틱톡"),
     ).toContain("장면 2");
     const message = contentDraft(
       "테스트 제품",
-      "사용 전 흔들어 주세요.",
+      "사용 전 흔들어 주시기 바랍니다.",
       "카카오톡",
     );
-    expect(message).toContain("사용 전 흔들어 주세요.");
+    expect(message).toContain("사용 전 흔들어 주시기 바랍니다.");
     expect(message).toContain("공유 문구");
     expect(message).not.toContain("장면 2");
     expect(() => contentDraft("", "정보", "라인")).toThrow();

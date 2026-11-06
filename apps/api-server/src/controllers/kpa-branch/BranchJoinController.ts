@@ -39,19 +39,19 @@ const SERVICE_KEY = SERVICE_KEYS.KPA_BRANCH;
 
 /** 이미 가입 이력이 있는 경우의 응답 (409) */
 const DUPLICATE_RESPONSE: Record<string, { code: string; message: string }> = {
-  active: { code: 'ALREADY_MEMBER', message: '이미 분회 서비스 회원입니다. 로그인해 주세요.' },
+  active: { code: 'ALREADY_MEMBER', message: '이미 분회 서비스 회원입니다. 로그인해 주시기 바랍니다.' },
   pending: { code: 'ALREADY_PENDING', message: '이미 가입 신청이 접수되어 승인 대기 중입니다.' },
   rejected: {
     code: 'ALREADY_REJECTED',
-    message: '이전 가입 신청이 반려되었습니다. 분회 서비스 운영자에게 재검토를 요청해 주세요.',
+    message: '이전 가입 신청이 반려되었습니다. 분회 서비스 운영자에게 재검토를 요청해 주시기 바랍니다.',
   },
   suspended: {
     code: 'REACTIVATION_REQUIRED',
-    message: '이용이 정지된 계정입니다. 분회 서비스 운영자에게 재활성화를 요청해 주세요.',
+    message: '이용이 정지된 계정입니다. 분회 서비스 운영자에게 재활성화를 요청해 주시기 바랍니다.',
   },
   withdrawn: {
     code: 'REACTIVATION_REQUIRED',
-    message: '탈퇴 처리된 계정입니다. 분회 서비스 운영자에게 재활성화를 요청해 주세요.',
+    message: '탈퇴 처리된 계정입니다. 분회 서비스 운영자에게 재활성화를 요청해 주시기 바랍니다.',
   },
 };
 export class BranchJoinController {
@@ -72,7 +72,7 @@ export class BranchJoinController {
     if (!userId) {
       return res.status(401).json({
         success: false,
-        error: '가입 신청 전에 Google 계정으로 로그인해 주세요.',
+        error: '가입 신청 전에 Google 계정으로 로그인해 주시기 바랍니다.',
         code: 'AUTH_REQUIRED',
       });
     }

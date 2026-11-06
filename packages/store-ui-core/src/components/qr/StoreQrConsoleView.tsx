@@ -223,9 +223,9 @@ export function StoreQrConsoleView({ api, theme, labels, findTemplate }: StoreQr
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.title.trim()) { toast.error('제목을 입력해주세요'); return; }
+    if (!form.title.trim()) { toast.error('제목을 입력해 주시기 바랍니다'); return; }
     const slug = form.slug.trim() || generateSlug(form.title);
-    if (!slug) { toast.error('슬러그를 입력해주세요'); return; }
+    if (!slug) { toast.error('슬러그를 입력해 주시기 바랍니다'); return; }
 
     setCreating(true);
     try {
@@ -425,7 +425,7 @@ export function StoreQrConsoleView({ api, theme, labels, findTemplate }: StoreQr
                   type="text"
                   value={form.title}
                   onChange={(e) => handleTitleChange(e.target.value)}
-                  placeholder="QR 코드 이름을 입력하세요"
+                  placeholder="QR 코드 이름을 입력하시기 바랍니다"
                   maxLength={300}
                   required
                   style={inputStyle}

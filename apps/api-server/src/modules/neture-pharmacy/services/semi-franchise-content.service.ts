@@ -40,7 +40,7 @@ export type SnapshotCopier = (input: {
 function cleanContent(input: ContentInput, requireTitle: boolean) {
   const title = typeof input.title === 'string' ? input.title.trim() : '';
   if (requireTitle && (!title || title.length > 300)) {
-    throw new NeturePharmacyError(400, 'INVALID_TITLE', '제목을 입력해 주세요(300자 이하).');
+    throw new NeturePharmacyError(400, 'INVALID_TITLE', '제목을 입력해 주시기 바랍니다(300자 이하).');
   }
   const arr = (v: unknown) => (Array.isArray(v) ? v : undefined);
   const text = (v: unknown) => (typeof v === 'string' ? v : v === null ? null : undefined);
@@ -108,9 +108,9 @@ export class SemiFranchiseContentService {
   async operatorUpdate(sf: SemiFranchiseRow, userId: string, id: string, input: ContentInput) {
     const c = cleanContent(input, false);
     if (input.expectedRevision !== undefined && (!Number.isInteger(input.expectedRevision) || input.expectedRevision < 1))
-      throw new NeturePharmacyError(400, 'INVALID_REVISION', '자료 개정 번호를 확인해 주세요.');
+      throw new NeturePharmacyError(400, 'INVALID_REVISION', '자료 개정 번호를 확인해 주시기 바랍니다.');
     if (input.title !== undefined && !c.title) {
-      throw new NeturePharmacyError(400, 'INVALID_TITLE', '제목을 입력해 주세요(300자 이하).');
+      throw new NeturePharmacyError(400, 'INVALID_TITLE', '제목을 입력해 주시기 바랍니다(300자 이하).');
     }
     const rows = rowsOf(await this.dataSource.query(
       `UPDATE semi_franchise_contents SET
@@ -135,7 +135,7 @@ export class SemiFranchiseContentService {
     ));
     if (!rows[0]) {
       if (input.expectedRevision !== undefined && (await this.dataSource.query("SELECT id FROM semi_franchise_contents WHERE id=$1 AND semi_franchise_id=$2 AND status IN ('draft','pending','published')", [id,sf.id])).length)
-        throw new NeturePharmacyError(409, 'CONTENT_CHANGED', '다른 자료 개정이 반영됐습니다. 입력 내용을 보관하고 다시 조회해 주세요.');
+        throw new NeturePharmacyError(409, 'CONTENT_CHANGED', '다른 자료 개정이 반영됐습니다. 입력 내용을 보관하고 다시 조회해 주시기 바랍니다.');
       throw new NeturePharmacyError(404, 'CONTENT_NOT_FOUND', '수정할 수 있는 콘텐츠가 없습니다.');
     }
     return rows[0];
@@ -146,13 +146,13 @@ export class SemiFranchiseContentService {
     const to = action === 'publish' ? 'published' : action === 'reject' ? 'rejected' : 'archived';
     const from = action === 'publish' ? ['draft', 'pending', 'archived'] : action === 'reject' ? ['pending'] : ['draft', 'published'];
     if (action === 'reject' && (typeof reason !== 'string' || !reason.trim()))
-      throw new NeturePharmacyError(400, 'REASON_REQUIRED', '반려 사유를 입력해 주세요.');
+      throw new NeturePharmacyError(400, 'REASON_REQUIRED', '반려 사유를 입력해 주시기 바랍니다.');
     return this.dataSource.transaction(async manager => {
       const [current] = await manager.query(`SELECT c.title, c.status, c.revision, c.created_by, c.source_supplier_id,
         ns.organization_id FROM semi_franchise_contents c LEFT JOIN neture_suppliers ns ON ns.id=c.source_supplier_id
         WHERE c.id=$1 AND c.semi_franchise_id=$2 FOR UPDATE OF c`, [id, sf.id]);
       if (!current) throw new NeturePharmacyError(409, 'INVALID_TRANSITION', '처리할 수 없는 상태입니다.');
-      if (expectedRevision !== undefined && current.revision !== expectedRevision) throw new NeturePharmacyError(409, 'CONTENT_CHANGED', '다른 자료 개정이 반영됐습니다. 다시 검토해 주세요.');
+      if (expectedRevision !== undefined && current.revision !== expectedRevision) throw new NeturePharmacyError(409, 'CONTENT_CHANGED', '다른 자료 개정이 반영됐습니다. 다시 검토해 주시기 바랍니다.');
       if (!from.includes(current.status) || (action === 'publish' && current.status === 'archived' && current.source_supplier_id))
         throw new NeturePharmacyError(409, 'INVALID_TRANSITION', '처리할 수 없는 상태입니다.');
       if (action === 'publish' && current.source_supplier_id) {

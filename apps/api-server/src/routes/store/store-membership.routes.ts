@@ -93,7 +93,7 @@ export function createStoreMembershipRoutes(dataSource: DataSource, requireAuth:
       if (!(ENROLLABLE_SERVICE_KEYS as readonly string[]).includes(serviceKey)) {
         res.status(400).json({
           success: false,
-          error: '매장을 열 서비스를 선택해 주세요.',
+          error: '매장을 열 서비스를 선택해 주시기 바랍니다.',
           code: 'SERVICE_NOT_ENROLLABLE',
         });
         return;
@@ -150,7 +150,7 @@ export function createStoreMembershipRoutes(dataSource: DataSource, requireAuth:
     asyncHandler(async (req: Request, res: Response) => {
       const email = typeof req.body?.email === 'string' ? req.body.email : '';
       if (!email.trim()) {
-        res.status(400).json({ success: false, error: '초대할 주소를 입력해 주세요.', code: 'EMAIL_REQUIRED' });
+        res.status(400).json({ success: false, error: '초대할 주소를 입력해 주시기 바랍니다.', code: 'EMAIL_REQUIRED' });
         return;
       }
       try {

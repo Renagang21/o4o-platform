@@ -22,7 +22,7 @@ const endpoint = '/communities/community/improvements';
 const classes = 'rounded border border-slate-300 bg-white px-3 py-2 disabled:opacity-50';
 function message(error: unknown) {
   const response = (error as { response?: { data?: { error?: unknown } } })?.response?.data;
-  return typeof response?.error === 'string' ? response.error : '요청을 처리하지 못했습니다. 입력 내용은 유지됩니다. 다시 시도해 주세요.';
+  return typeof response?.error === 'string' ? response.error : '요청을 처리하지 못했습니다. 입력 내용은 유지됩니다. 다시 시도해 주시기 바랍니다.';
 }
 /** Two consumers only: community member surface and the existing central community.forums workspace. */
 export default function ImprovementForum(props: Props) {
@@ -91,8 +91,8 @@ function ForumSession({ client, actorKey, detailId, management = false, onSelect
   const permittedManager = item?.canManage ?? snapshot?.canManage ?? false;
   const canManage = management && permittedManager;
   return <section aria-label="O4O 업데이트·개선 요청" className="min-w-0 space-y-4 rounded-xl border bg-white p-4 sm:p-6">
-    <header className="flex flex-wrap items-start justify-between gap-3"><div><h1 className="text-xl font-bold">O4O 업데이트·개선 요청</h1><p className="mt-1 text-sm text-slate-600">업데이트 소식을 확인하고 오류·불편과 개선 의견을 남겨 주세요.</p></div><button className={classes} disabled={loading || busy} onClick={() => void load()}>다시 조회</button></header>
-    <p className="rounded bg-amber-50 p-3 text-sm">모든 글과 답변은 공개됩니다. 비밀번호·연락처·환자 정보는 입력하지 마세요. 민감한 내용은 <a className="underline" href="https://community.neture.co.kr/contact">비공개 문의</a>를 이용해 주세요.</p>
+    <header className="flex flex-wrap items-start justify-between gap-3"><div><h1 className="text-xl font-bold">O4O 업데이트·개선 요청</h1><p className="mt-1 text-sm text-slate-600">업데이트 소식을 확인하고 오류·불편과 개선 의견을 남겨 주시기 바랍니다.</p></div><button className={classes} disabled={loading || busy} onClick={() => void load()}>다시 조회</button></header>
+    <p className="rounded bg-amber-50 p-3 text-sm">모든 글과 답변은 공개됩니다. 비밀번호·연락처·환자 정보는 입력하지 마시기 바랍니다. 민감한 내용은 <a className="underline" href="https://community.neture.co.kr/contact">비공개 문의</a>를 이용해 주시기 바랍니다.</p>
     {!management && permittedManager && <a className="inline-block underline" href={`https://admin.neture.co.kr/operations/community/forums?tab=improvements${detailId ? `&improvement=${encodeURIComponent(detailId)}` : ''}`}>통합 운영에서 공식 답변·업데이트 관리 →</a>}
     {error && <p role="alert" className="rounded bg-red-50 p-3 text-red-800">{error}{item || snapshot ? ' 이전 내용은 최신이 아닐 수 있습니다.' : ''}</p>}
     {notice && <p role="status" className="text-blue-800">{notice}</p>}
@@ -102,7 +102,7 @@ function ForumSession({ client, actorKey, detailId, management = false, onSelect
       <div><p className="text-sm text-slate-600">{kinds[item.kind]} · {improvementStates[item.state]} · {new Date(item.createdAt).toLocaleDateString('ko-KR', { timeZone: 'Asia/Seoul' })}</p><h2 className="mt-2 break-words text-xl font-semibold">{item.title}</h2></div>
       <p className="whitespace-pre-wrap break-words">{item.body}</p>
       {item.mine && (item.kind !== 'update' || canManage) && <button className={classes} disabled={busy} onClick={() => { setEditing(!editing); setEditVersion(item.version); setTitle(item.title); setBody(item.body); }}>내 글 수정{editing ? ' 접기' : ''}</button>}
-      {editConflict && <div role="alert" className="rounded bg-amber-50 p-3"><p>수정 중 다른 변경이 도착했습니다. 초안을 보관한 뒤 최신 글을 확인해 주세요.</p><button className={classes} disabled={loading || busy} onClick={() => { setTitle(item.title); setBody(item.body); setEditVersion(item.version); setError(''); }}>최신 글로 다시 편집</button></div>}
+      {editConflict && <div role="alert" className="rounded bg-amber-50 p-3"><p>수정 중 다른 변경이 도착했습니다. 초안을 보관한 뒤 최신 글을 확인해 주시기 바랍니다.</p><button className={classes} disabled={loading || busy} onClick={() => { setTitle(item.title); setBody(item.body); setEditVersion(item.version); setError(''); }}>최신 글로 다시 편집</button></div>}
       {editing && <form className="space-y-3 rounded border p-3" onSubmit={e => { e.preventDefault(); void write(() => client.patch(`${endpoint}/${item.id}`, { title, body, version: editVersion }), () => { setEditing(false); setEditVersion(null); setNotice('글을 수정했습니다.'); void load(); }); }}>
         <label className="block">수정 제목<input className={`${classes} block w-full`} required maxLength={200} value={title} disabled={busy} onChange={e => setTitle(e.target.value)} /></label>
         <label className="block">수정 내용<textarea className={`${classes} block w-full`} required minLength={5} maxLength={10000} rows={6} value={body} disabled={busy} onChange={e => setBody(e.target.value)} /></label>
@@ -110,7 +110,7 @@ function ForumSession({ client, actorKey, detailId, management = false, onSelect
         <button className={classes} disabled={busy || loading || !!error || !!editConflict || !title.trim() || body.trim().length < 5}>수정 저장</button>
       </form>}
       <ol aria-label="답변 이력" className="space-y-3">{item.replies.map((r, i) => <li key={i} className={`rounded border p-3 ${r.official ? 'border-blue-200 bg-blue-50' : 'bg-slate-50'}`}><p className="text-sm font-semibold">{r.official ? 'O4O 운영팀 공식 답변' : r.requester ? '요청자 추가 정보' : '회원 의견'} · {new Date(r.at).toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' })}{r.state ? ` · ${improvementStates[r.state]}` : ''}</p><p className="mt-2 whitespace-pre-wrap break-words">{r.text}</p>{r.updateId && <a className="mt-2 inline-block underline" href={`https://community.neture.co.kr/improvements/${r.updateId}`}>관련 업데이트 안내 보기 →</a>}</li>)}</ol>
-      {replyConflict && <div role="alert" className="rounded bg-amber-50 p-3"><p>새 답변이나 상태 변경이 있습니다. 작성한 답변은 유지됩니다. 최신 내용을 확인해 주세요.</p><button className={classes} disabled={loading || busy} onClick={() => { setReplyVersion(item.version); setState(item.state === 'received' ? 'reviewing' : item.state); setError(''); }}>최신 상태로 답변 계속</button></div>}
+      {replyConflict && <div role="alert" className="rounded bg-amber-50 p-3"><p>새 답변이나 상태 변경이 있습니다. 작성한 답변은 유지됩니다. 최신 내용을 확인해 주시기 바랍니다.</p><button className={classes} disabled={loading || busy} onClick={() => { setReplyVersion(item.version); setState(item.state === 'received' ? 'reviewing' : item.state); setError(''); }}>최신 상태로 답변 계속</button></div>}
       {item.kind !== 'update' && !!actorKey && <form className="space-y-3 border-t pt-4" onSubmit={event => {
         event.preventDefault();
         void write(() => client.post(`${endpoint}/${item.id}/replies`, { body: reply, version: replyVersion ?? item.version, official: canManage, ...(canManage ? { state, ...(updateUrl.trim() ? { updateUrl: updateUrl.trim() } : {}) } : {}) }), () => { replyDirty.current = false; setReplyVersion(null); setReply(''); setUpdateUrl(''); setNotice('답변을 저장했습니다.'); void load(); });
@@ -124,7 +124,7 @@ function ForumSession({ client, actorKey, detailId, management = false, onSelect
       </form>}
     </article>}
     {!detailId && snapshot && <>
-      {!snapshot.ready && <div className="space-y-3"><p>공식 포럼을 준비 중입니다.</p>{canManage && <><p className="text-sm">현재 로그인한 계정이 대표 소유자가 됩니다. 지정된 담당 계정인지 확인한 뒤 개설하세요.</p><button className={classes} disabled={busy || !!error} onClick={() => void write(() => client.post(`${endpoint}/setup`), () => { setNotice('공식 포럼을 개설했습니다.'); void load(); })}>현재 계정으로 공식 포럼 개설</button></>}</div>}
+      {!snapshot.ready && <div className="space-y-3"><p>공식 포럼을 준비 중입니다.</p>{canManage && <><p className="text-sm">현재 로그인한 계정이 대표 소유자가 됩니다. 지정된 담당 계정인지 확인한 뒤 개설하시기 바랍니다.</p><button className={classes} disabled={busy || !!error} onClick={() => void write(() => client.post(`${endpoint}/setup`), () => { setNotice('공식 포럼을 개설했습니다.'); void load(); })}>현재 계정으로 공식 포럼 개설</button></>}</div>}
       {snapshot.ready && <>
         <div className="flex flex-wrap items-center gap-3"><label>분류 <select className={classes} value={kind} disabled={busy} onChange={e => { setKind(e.target.value); setPage(1); }}><option value="">전체</option>{Object.entries(kinds).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label>{management && <label className="flex items-center gap-2"><input type="checkbox" checked={pending} disabled={busy} onChange={e => { setPending(e.target.checked); setPage(1); }} />운영팀 처리 대기만</label>}
           {actorKey && <button className={classes} disabled={busy} onClick={() => setWriting(v => !v)}>{writing ? '작성 접기' : '글 작성'}</button>}
@@ -135,7 +135,7 @@ function ForumSession({ client, actorKey, detailId, management = false, onSelect
           <label className="block">글 구분 <select className={classes} disabled={busy} value={writeKind} onChange={e => setWriteKind(e.target.value as Kind)}>{Object.entries(kinds).filter(([k]) => canManage || k !== 'update').map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label>
           <label className="block">제목<input className={`${classes} mt-1 block w-full`} maxLength={200} required disabled={busy} value={title} onChange={e => setTitle(e.target.value)} /></label>
           <label className="block">내용<textarea className={`${classes} mt-1 block w-full`} rows={6} minLength={5} maxLength={10000} required disabled={busy} value={body} onChange={e => setBody(e.target.value)} /></label>
-          <p className="text-sm text-slate-600">문제 화면·발생 순서·기대한 동작을 적어 주세요. 개선 제안은 사용 목적을 함께 알려 주세요.</p>
+          <p className="text-sm text-slate-600">문제 화면·발생 순서·기대한 동작을 적어 주시기 바랍니다. 개선 제안은 사용 목적을 함께 알려 주시기 바랍니다.</p>
           <button className={classes} disabled={busy || loading || !!error || !title.trim() || body.trim().length < 5}>{busy ? '등록 중…' : '공개 글 등록'}</button>
         </form>}
         <ul className="divide-y">{snapshot.items.map(row => <li key={row.id} className="py-3"><button className="w-full text-left" onClick={() => onSelect(row.id)}><span className="text-sm text-slate-600">{kinds[row.kind]} · {improvementStates[row.state]} · {new Date(row.createdAt).toLocaleDateString('ko-KR', { timeZone: 'Asia/Seoul' })}</span><strong className="mt-1 block break-words">{row.title}</strong></button></li>)}</ul>

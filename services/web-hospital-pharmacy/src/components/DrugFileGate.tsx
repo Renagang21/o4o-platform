@@ -31,7 +31,7 @@ export default function DrugFileGate({ children }: { children: ReactNode }) {
         <div className="notice">
           {SUPPORTED_BROWSER_NOTICE}
           <br />
-          지금 브라우저에서는 원내 약품 파일을 연결할 수 없습니다. Chrome 또는 Edge 로 이 주소를 열어 주세요.
+          지금 브라우저에서는 원내 약품 파일을 연결할 수 없습니다. Chrome 또는 Edge 로 이 주소를 열어 주시기 바랍니다.
         </div>
       </div>
     );
@@ -43,7 +43,7 @@ export default function DrugFileGate({ children }: { children: ReactNode }) {
         <h1>{BRAND.name}</h1>
         <p className="muted">
           원내 약품 파일{fileName ? <> <b>{fileName}</b></> : null} 이 연결돼 있습니다. 이 파일을 다시 읽으려면 권한이 필요합니다.
-          아래 버튼을 누르고 권한 창에서 허용해 주세요. 권한 창에 &ldquo;방문할 때마다 허용&rdquo; 이 보이면 그것을 고르면 다음부터는 묻지 않습니다.
+          아래 버튼을 누르고 권한 창에서 허용해 주시기 바랍니다. 권한 창에 &ldquo;방문할 때마다 허용&rdquo; 이 보이면 그것을 고르면 다음부터는 묻지 않습니다.
         </p>
         <div className="row">
           <button className="btn" onClick={() => void allowAccess()}>원내 약품 파일 읽기 허용</button>
@@ -92,7 +92,7 @@ export default function DrugFileGate({ children }: { children: ReactNode }) {
       <p className="muted">{SUPPORTED_BROWSER_NOTICE}</p>
       <div className="panel">
         <p style={{ marginTop: 0, lineHeight: 1.6 }}>
-          원내 약품 파일을 연결해 주세요.
+          원내 약품 파일을 연결해 주시기 바랍니다.
           <br />
           원내 약품 목록 Excel(.xlsx · .xls) 또는 CSV 파일 하나를 직접 고르면 됩니다. 파일 이름은 상관없습니다.
         </p>

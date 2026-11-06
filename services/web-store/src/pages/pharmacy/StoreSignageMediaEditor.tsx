@@ -140,11 +140,11 @@ export function StoreSignageMediaEditor({
                   className="w-full px-3 py-2 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
                   placeholder="https://www.youtube.com/watch?v=..."
                 />
-                {storedVideo && <p className="text-sm text-slate-600">O4O 보관 영상입니다. 다른 영상으로 바꾸려면 라이브러리에서 새로 선택해 등록하세요.</p>}
+                {storedVideo && <p className="text-sm text-slate-600">O4O 보관 영상입니다. 다른 영상으로 바꾸려면 라이브러리에서 새로 선택해 등록하시기 바랍니다.</p>}
                 <p className="mt-1 text-[11px] text-slate-400">
                   {target.kind === 'direct'
-                    ? '등록 영상을 수정합니다. 재생목록에 가져온 매장 사본은 자동 갱신되지 않으므로, 사용 중인 안내의 사본을 확인해 수정하세요.'
-                    : '이 매장 사본을 수정합니다. 이 사본을 사용하는 재생목록에도 반영되며 실제 기기에서는 화면을 다시 열어 확인하세요.'}
+                    ? '등록 영상을 수정합니다. 재생목록에 가져온 매장 사본은 자동 갱신되지 않으므로, 사용 중인 안내의 사본을 확인해 수정하시기 바랍니다.'
+                    : '이 매장 사본을 수정합니다. 이 사본을 사용하는 재생목록에도 반영되며 실제 기기에서는 화면을 다시 열어 확인하시기 바랍니다.'}
                 </p>
               </div>
 
@@ -152,7 +152,7 @@ export function StoreSignageMediaEditor({
                 <p className="text-xs text-slate-500">미리보기는 입력한 영상만 확인하며 저장하거나 매장 화면에 적용하지 않습니다.</p>
                 <button type="button" disabled={editSaving || !previewUrl} onClick={() => previewUrl && setPreview({ target: targetKey, url: previewUrl })}
                   className="min-h-11 px-3 border rounded text-sm disabled:opacity-50">입력한 영상 미리보기</button>
-                {!previewUrl && <p className="text-xs text-amber-700">올바른 YouTube 또는 Vimeo 영상 URL을 입력해 주세요.</p>}
+                {!previewUrl && <p className="text-xs text-amber-700">올바른 YouTube 또는 Vimeo 영상 URL을 입력해 주시기 바랍니다.</p>}
                 {preview && preview.target === targetKey && preview.url === previewUrl && <div>
                   <div className="aspect-video w-full"><VideoPlayback url={storedVideo ? draft.sourceUrl : hostedVideo(draft.sourceUrl)?.url ?? draft.sourceUrl} kind={storedVideo ? 'video' : hostedVideo(draft.sourceUrl)?.provider ?? 'video'} title="입력한 동영상 미리보기" /></div>
                   <button type="button" onClick={() => setPreview(null)} className="min-h-11 underline text-sm">영상 미리보기 닫기</button>

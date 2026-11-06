@@ -44,7 +44,7 @@ function renderComposed(props: {
         initialTitle={props.initialTitle}
         initialContentHtml={props.initialContentHtml}
         titleLabel="제목"
-        titlePlaceholder="제목을 입력하세요"
+        titlePlaceholder="제목을 입력하시기 바랍니다"
         contentLabel="내용"
         submitLabel={props.mode === 'edit' ? '수정하기' : '등록'}
         submittingLabel="등록 중..."
@@ -62,7 +62,7 @@ describe('ForumWritePageShell + ForumWriteForm', () => {
     const onSubmit = vi.fn();
     renderComposed({ mode: 'create', onSubmit });
 
-    fireEvent.change(screen.getByPlaceholderText('제목을 입력하세요'), { target: { value: '  새 글  ' } });
+    fireEvent.change(screen.getByPlaceholderText('제목을 입력하시기 바랍니다'), { target: { value: '  새 글  ' } });
     fireEvent.change(screen.getByLabelText('content-editor'), { target: { value: '<p>본문</p>' } });
     fireEvent.click(screen.getByRole('button', { name: '등록' }));
 
@@ -79,7 +79,7 @@ describe('ForumWritePageShell + ForumWriteForm', () => {
       initialContentHtml: '<p>기존 본문</p>',
     });
 
-    expect((screen.getByPlaceholderText('제목을 입력하세요') as HTMLInputElement).value).toBe('기존 제목');
+    expect((screen.getByPlaceholderText('제목을 입력하시기 바랍니다') as HTMLInputElement).value).toBe('기존 제목');
     expect((screen.getByLabelText('content-editor') as HTMLTextAreaElement).value).toBe('<p>기존 본문</p>');
 
     fireEvent.click(screen.getByRole('button', { name: '수정하기' }));
@@ -103,7 +103,7 @@ describe('ForumWritePageShell + ForumWriteForm', () => {
     const onInvalid = vi.fn();
     renderComposed({ mode: 'create', onSubmit, onInvalid });
 
-    fireEvent.change(screen.getByPlaceholderText('제목을 입력하세요'), { target: { value: '제목만' } });
+    fireEvent.change(screen.getByPlaceholderText('제목을 입력하시기 바랍니다'), { target: { value: '제목만' } });
     fireEvent.click(screen.getByRole('button', { name: '등록' }));
 
     await waitFor(() => expect(onInvalid).toHaveBeenCalledWith('content'));
@@ -115,7 +115,7 @@ describe('ForumWritePageShell + ForumWriteForm', () => {
     const onSubmit = vi.fn(() => new Promise<void>((resolve) => { release = resolve; }));
     renderComposed({ mode: 'create', onSubmit });
 
-    fireEvent.change(screen.getByPlaceholderText('제목을 입력하세요'), { target: { value: '제목' } });
+    fireEvent.change(screen.getByPlaceholderText('제목을 입력하시기 바랍니다'), { target: { value: '제목' } });
     fireEvent.change(screen.getByLabelText('content-editor'), { target: { value: '<p>본문</p>' } });
     fireEvent.click(screen.getByRole('button', { name: '등록' }));
 

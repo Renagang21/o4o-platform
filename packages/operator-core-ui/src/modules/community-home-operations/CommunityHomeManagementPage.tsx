@@ -22,7 +22,7 @@ const blank = (kind: EditorialKind): Partial<HomeItem> => ({
 });
 const errorText = (error: unknown) =>
   (error as { response?: { data?: { error?: string } } }).response?.data
-    ?.error || "저장하지 못했습니다. 다시 시도해 주세요.";
+    ?.error || "저장하지 못했습니다. 다시 시도해 주시기 바랍니다.";
 function ManagementPagination({
   page,
   hasNext,
@@ -123,7 +123,7 @@ export default function CommunityHomeManagementPage({
     } catch {
       if (listScope.current === scope)
         setError(
-          "수집은 끝났지만 등록 목록을 갱신하지 못했습니다. 뉴스 탭을 다시 열어 주세요.",
+          "수집은 끝났지만 등록 목록을 갱신하지 못했습니다. 뉴스 탭을 다시 열어 주시기 바랍니다.",
         );
     }
   };
@@ -286,7 +286,7 @@ export default function CommunityHomeManagementPage({
               newsReviewId: reviewId,
             });
             setMessage(
-              "AI 정리를 초안에 채웠습니다. 확인 후 저장·게시 상태를 선택해 주세요.",
+              "AI 정리를 초안에 채웠습니다. 확인 후 저장·게시 상태를 선택해 주시기 바랍니다.",
             );
           }}
         />

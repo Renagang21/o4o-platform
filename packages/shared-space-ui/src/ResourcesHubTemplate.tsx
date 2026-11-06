@@ -854,7 +854,7 @@ export function ResourcesHubTemplate({ config }: { config: ResourcesHubConfig })
         <Search size={16} color="#9CA3AF" style={{ flexShrink: 0 }} />
         <input
           type="text"
-          placeholder={config.searchPlaceholder ?? '자료를 검색하세요'}
+          placeholder={config.searchPlaceholder ?? '자료를 검색하시기 바랍니다'}
           value={searchInput}
           onChange={e => handleSearchChange(e.target.value)}
           onKeyDown={handleSearchKeyDown}

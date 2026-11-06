@@ -15,7 +15,7 @@ export async function getEnrollmentPolicies(q: Pick<EntityManager, 'query'>, ser
   const docs = await Promise.all(['terms', 'privacy'].map(type => readCurrentPolicyDocument(q, serviceKey, type as 'terms' | 'privacy')));
   const marked = docs.filter((doc): doc is CurrentPolicyDocument => !!doc && isEnrollmentPolicySlug(doc.service_key, doc.document_type, doc.slug));
   if ((marked.length || isBusinessPolicyScope(serviceKey)) && (marked.length !== 2 || Number(marked[0].version) < (isBusinessPolicyScope(serviceKey) ? 1 : 2) || marked[0].version !== marked[1].version)) {
-    throw new PolicyAcceptanceError('POLICY_UNAVAILABLE', '서비스 약관과 개인정보 안내를 함께 준비하고 있습니다. 잠시 후 다시 확인해 주세요.', 503);
+    throw new PolicyAcceptanceError('POLICY_UNAVAILABLE', '서비스 약관과 개인정보 안내를 함께 준비하고 있습니다. 잠시 후 다시 확인해 주시기 바랍니다.', 503);
   }
   return marked;
 }
@@ -28,7 +28,7 @@ export async function recordEnrollmentPolicies(m: Pick<EntityManager, 'query'>, 
   const docs = await getEnrollmentPolicies(m, serviceKey);
   const refs = references ?? [];
   if (!Array.isArray(refs) || refs.length !== docs.length || docs.some(doc => refs.filter(ref => ref?.documentType === doc.document_type).length !== 1)) {
-    throw new PolicyAcceptanceError('ENROLLMENT_POLICY_REQUIRED', '해당 서비스의 현재 약관과 개인정보 안내를 확인해 주세요.', 409);
+    throw new PolicyAcceptanceError('ENROLLMENT_POLICY_REQUIRED', '해당 서비스의 현재 약관과 개인정보 안내를 확인해 주시기 바랍니다.', 409);
   }
   const evidence: PolicyEvidence[] = [];
   for (const doc of docs) {

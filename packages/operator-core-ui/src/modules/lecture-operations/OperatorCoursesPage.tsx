@@ -57,7 +57,7 @@ export default function OperatorCoursesPage() {
           </>}
           {(c.status === 'draft' || c.status === 'rejected') && <button type="button" className="btn" disabled={busy !== null || loading || !!error} onClick={() => void act(c.id, '게시', () => operatorApi.publish(c.id))}>강제 게시</button>}
           {c.status === 'published' && <button type="button" className="btn" disabled={busy !== null || loading || !!error} onClick={() => void act(c.id, '게시 중단', () => operatorApi.unpublish(c.id))}>게시 중단</button>}
-          {c.status !== 'archived' && <button type="button" className="btn btn-ghost" disabled={busy !== null || loading || !!error} onClick={() => { if (window.confirm('보관 처리할까요?')) void act(c.id, '보관', () => operatorApi.archive(c.id)); }}>보관</button>}
+          {c.status !== 'archived' && <button type="button" className="btn btn-ghost" disabled={busy !== null || loading || !!error} onClick={() => { if (window.confirm('보관 처리하시겠습니까?')) void act(c.id, '보관', () => operatorApi.archive(c.id)); }}>보관</button>}
         </div>
       </li>)}
     </ul>

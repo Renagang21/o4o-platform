@@ -47,7 +47,7 @@ export function ProductDescriptionAssist({ context, onApplyHtml, value, onChange
         <label htmlFor={`${id}-reference-source`}>전문 자료 출처·확인일</label>
         <input style={inputStyle} id={`${id}-reference-source`} maxLength={1000} value={referenceSource} onChange={e => { change({ referenceSource: e.target.value, reviewed: false }); }} placeholder="전문 문헌·지침 이름 또는 URL, 확인일" />
         <label><input type="checkbox" disabled={!reference.trim() || !referenceSource.trim()} checked={reviewed} onChange={e => change({ reviewed: e.target.checked })} /> 전문 참고자료의 출처와 내용을 검수했습니다</label>
-        <p>환자·고객 개인정보는 입력하지 마세요. {value ? '근거·목적·언어는 본문과 함께 저장합니다. 결과는 편집기에서 검토한 뒤 저장하세요.' : '근거는 이번 AI 작업에 사용하며 결과는 편집기에서 검토한 뒤 저장합니다.'}</p>
+        <p>환자·고객 개인정보는 입력하지 마시기 바랍니다. {value ? '근거·목적·언어는 본문과 함께 저장합니다. 결과는 편집기에서 검토한 뒤 저장하시기 바랍니다.' : '근거는 이번 AI 작업에 사용하며 결과는 편집기에서 검토한 뒤 저장합니다.'}</p>
       </div>
     </details>
     <LlmAssistPanel label={STORE_LLM_ASSIST_LABEL} contextLabel={PRODUCT_DESCRIPTION_PURPOSE_LABELS[purpose]}

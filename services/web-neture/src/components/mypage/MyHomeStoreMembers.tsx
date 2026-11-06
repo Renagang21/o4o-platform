@@ -10,7 +10,7 @@ type Member = { userId: string; email: string; name: string | null; role: string
 const statusLabel = { invited: '수락 대기', accepted: '경영자 승인 대기', active: '이용 중' };
 const failure = (e: unknown) => {
   const value = e as { response?: { data?: { error?: unknown } } };
-  return typeof value.response?.data?.error === 'string' ? value.response.data.error : '요청을 처리하지 못했습니다. 다시 시도해 주세요.';
+  return typeof value.response?.data?.error === 'string' ? value.response.data.error : '요청을 처리하지 못했습니다. 다시 시도해 주시기 바랍니다.';
 };
 
 /** Individual My Home manages invitations; store authority is rechecked by the server. */

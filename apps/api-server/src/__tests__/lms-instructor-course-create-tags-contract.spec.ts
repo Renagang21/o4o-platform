@@ -30,7 +30,7 @@ const lectureApi = read('services/web-lecture/src/api/lecture.ts') + read('packa
 describe('LMS 강의 생성 태그 계약 (§10/§15 → Lecture Phase 2)', () => {
   it('backend 생성 경로가 태그를 필수로 유지한다', () => {
     expect(courseService).toContain('const sanitizedTags = sanitizeCourseTags(data.tags);');
-    expect(courseService).toContain('태그를 1개 이상 입력해주세요');
+    expect(courseService).toContain('태그를 1개 이상 입력해 주시기 바랍니다');
   });
 
   it('Lecture 강사 강의 화면이 태그를 입력받고 1개 이상을 화면에서 먼저 강제한다', () => {

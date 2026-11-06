@@ -41,7 +41,7 @@ describe('O4O 약국 표시 브랜드', () => {
     expect(PHARMACY_HERO.title).toEqual(['약국의 정보와 업무를', '하나로 연결합니다']);
     expect(PHARMACY_HERO.description).toEqual([
       '제품 정보와 콘텐츠를 활용하고,',
-      '매장 운영과 고객 서비스를 더 편리하게 시작하세요.',
+      '매장 운영과 고객 서비스를 더 편리하게 시작하시기 바랍니다.',
     ]);
   });
 
@@ -88,8 +88,8 @@ describe('공개 footer · /about 메타 — legacy "약사회" 브랜드 없음
 });
 
 describe('brand asset 자리', () => {
-  it('사용자 제작 asset 투입 전 — 자리만 있고 참조 플래그는 false', () => {
-    expect(PHARMACY_BRAND_ASSETS_READY).toBe(false);
+  it('승인된 O4O 서비스 asset이 연결돼 있다', () => {
+    expect(PHARMACY_BRAND_ASSETS_READY).toBe(true);
     expect(Object.values(PHARMACY_BRAND_ASSET_SLOTS).every((p) => p.startsWith('/brand/'))).toBe(true);
   });
 });

@@ -180,7 +180,7 @@ export default function HomepageCmsPage() {
         <div className="text-center py-16 bg-red-50 rounded-xl border border-red-200">
           <AlertTriangle className="w-12 h-12 text-red-400 mx-auto mb-4" />
           <p className="text-red-700 font-medium mb-1">홈페이지 콘텐츠를 불러오지 못했습니다.</p>
-          <p className="text-sm text-red-500 mb-4">잠시 후 다시 시도해 주세요.</p>
+          <p className="text-sm text-red-500 mb-4">잠시 후 다시 시도해 주시기 바랍니다.</p>
           <button
             onClick={() => loadItems()}
             className="px-4 py-2 text-sm font-medium bg-white border border-red-300 text-red-700 rounded-lg hover:bg-red-100"

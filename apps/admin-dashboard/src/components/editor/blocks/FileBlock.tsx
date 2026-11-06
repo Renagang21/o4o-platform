@@ -212,7 +212,7 @@ const FileBlock: React.FC<FileBlockProps> = ({
           <File className="w-16 h-16 text-gray-400 mx-auto mb-4" />
           <h3 className="text-lg font-medium text-gray-900 mb-2">파일 추가</h3>
           <p className="text-sm text-gray-500 mb-4">
-            미디어 라이브러리에서 파일을 선택하세요
+            미디어 라이브러리에서 파일을 선택하시기 바랍니다
           </p>
           <button
             onClick={() => setShowFileSelector(true)}

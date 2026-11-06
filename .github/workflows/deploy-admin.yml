@@ -145,7 +145,7 @@ jobs:
         sparse-checkout: scripts/ci
     - uses: actions/setup-node@v7
       with:
-        node-version: '22.18.0'
+        node-version: '22.23.4'
     - name: Require green CI for target SHA
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -239,7 +239,7 @@ jobs:
     - name: Setup build environment
       uses: ./.github/actions/setup-build-env
       with:
-        node-version: '22.18.0'
+        node-version: '22.23.4'
         # Admin deploy does not need every workspace package. Build the exact transitive
         # workspace dependency closure below instead of the repository-wide build:packages chain.
         build-packages: 'false'

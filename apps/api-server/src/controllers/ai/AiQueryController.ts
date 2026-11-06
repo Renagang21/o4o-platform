@@ -50,14 +50,14 @@ export class AiQueryController {
       if (!question || typeof question !== 'string' || question.trim().length === 0) {
         return res.status(400).json({
           success: false,
-          error: '질문을 입력해주세요.'
+          error: '질문을 입력해 주시기 바랍니다.'
         });
       }
 
       if (question.length > 2000) {
         return res.status(400).json({
           success: false,
-          error: '질문은 2000자 이내로 입력해주세요.'
+          error: '질문은 2000자 이내로 입력해 주시기 바랍니다.'
         });
       }
 

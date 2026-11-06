@@ -55,7 +55,7 @@ export function useOperatorQueue<T>(scope: string, fetch: () => Promise<{ data: 
     toast.success(success);
     const refreshed = await load();
     if (!current()) return false;
-    if (!refreshed) setRefreshNotice(`${success} 목록 갱신에 실패했습니다. 다시 처리하지 말고 다시 조회해 주세요.`);
+    if (!refreshed) setRefreshNotice(`${success} 목록 갱신에 실패했습니다. 다시 처리하지 말고 다시 조회해 주시기 바랍니다.`);
     lifecycle.submitting = false; setBusy(null);
     return true;
   }

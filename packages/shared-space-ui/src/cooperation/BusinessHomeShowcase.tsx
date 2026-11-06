@@ -33,7 +33,7 @@ function Showcase({ client, businessKey, accountId, organizationId, cooperative,
       if (destination.origin !== 'https://store.neture.co.kr' || destination.pathname !== '/handoff') throw new Error('Invalid Store destination');
       if (mounted.current && generation.current.version === current) window.location.assign(href);
     }
-    catch { if (mounted.current && generation.current.version === current) setEntryError('내 약국으로 이동하지 못했습니다. 약국 소속과 승인 상태를 확인한 뒤 다시 시도해 주세요.'); }
+    catch { if (mounted.current && generation.current.version === current) setEntryError('내 약국으로 이동하지 못했습니다. 약국 소속과 승인 상태를 확인한 뒤 다시 시도해 주시기 바랍니다.'); }
     finally { if (mounted.current && generation.current.version === current) { pending.current = false; setMoving(false); } }
   };
   useEffect(() => {
@@ -59,7 +59,7 @@ function Showcase({ client, businessKey, accountId, organizationId, cooperative,
       if (data.businessKey !== businessKey || !Array.isArray(data.items) || data.items.some((i: Item) =>
         !i || typeof i.id !== 'string' || typeof i.title !== 'string' || !['product','content'].includes(i.kind))) throw new Error();
       if (alive) setItems(data.items.filter((i: Item) => !i.hidden && (!only || i.kind === only)));
-    }).catch(() => { if (alive) setError('진열 자료를 조회하지 못했습니다. 이 협업체의 가입·운영 자격을 확인해 주세요.'); });
+    }).catch(() => { if (alive) setError('진열 자료를 조회하지 못했습니다. 이 협업체의 가입·운영 자격을 확인해 주시기 바랍니다.'); });
     return () => { alive = false; };
   }, [client, businessKey, accountId, cooperative, operator, selected, retry, only]);
   return <section className="rounded-xl border p-5 space-y-4" aria-label="협업체 제품·콘텐츠">
@@ -70,7 +70,7 @@ function Showcase({ client, businessKey, accountId, organizationId, cooperative,
         <option value="">약국 선택</option>{stores?.map(s => <option key={s.organizationId} value={s.organizationId}>{s.organizationName}</option>)}
       </select></label>}
       {error ? <div><p role="alert">{error}</p><button type="button" onClick={() => setRetry(n => n + 1)}>진열 다시 조회</button></div> :
-        !cooperative && !operator && !selected ? <p>{stores === null && !organizationId && !externalSelection ? '소속 약국을 확인하고 있습니다…' : '이용할 약국을 선택해 주세요.'}</p> :
+        !cooperative && !operator && !selected ? <p>{stores === null && !organizationId && !externalSelection ? '소속 약국을 확인하고 있습니다…' : '이용할 약국을 선택해 주시기 바랍니다.'}</p> :
         items === null ? <output>진열 자료를 불러오고 있습니다…</output> : !items.length ? <p>현재 진열된 제품·콘텐츠가 없습니다.</p> :
           <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{items.map(item => <li key={item.id} className="min-w-0 rounded-lg border p-4 break-words">
             <p className="text-sm text-slate-500">{item.kind === 'product' ? '승인 제품' : '협업체 콘텐츠'}</p>

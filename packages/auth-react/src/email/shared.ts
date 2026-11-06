@@ -41,14 +41,14 @@ export function readEmailAuthError(error: unknown, fallback: string): EmailAuthE
   const data = e?.response?.data;
   const status = e?.response?.status;
   if (status === 429) {
-    return { message: '요청이 너무 많습니다. 잠시 후 다시 시도해 주세요.', code: data?.code, status };
+    return { message: '요청이 너무 많습니다. 잠시 후 다시 시도해 주시기 바랍니다.', code: data?.code, status };
   }
   if (data && typeof data === 'object') {
     const message = typeof data.error === 'string' && data.error ? data.error : fallback;
     return { message, code: typeof data.code === 'string' ? data.code : undefined, details: data.details, status };
   }
   if (error instanceof TypeError || e?.code === 'ERR_NETWORK') {
-    return { message: '서버에 연결할 수 없습니다. 잠시 후 다시 시도해 주세요.' };
+    return { message: '서버에 연결할 수 없습니다. 잠시 후 다시 시도해 주시기 바랍니다.' };
   }
   return { message: fallback };
 }

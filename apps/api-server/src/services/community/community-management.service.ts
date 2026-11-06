@@ -1,3 +1,4 @@
+import { protectedMemberSql } from '../operations/protected-member-target.js';
 import { assertCentralOperationMenu } from '../admin/central-operation-menu-grants.js';
 import { OperationError } from '../operations/operation-audit.js';
 import { createHash } from 'node:crypto';
@@ -56,6 +57,8 @@ async function memberDeletionTarget(db: Exec, actor: string, id: string): Promis
   const blockers: string[] = [];
   const [member] = await db.query(`SELECT * FROM service_memberships WHERE user_id=$1 AND service_key='community'`, [id]);
   if (!member) fail(404, 'MEMBER_NOT_FOUND', '커뮤니티 회원을 찾을 수 없습니다.');
+  const [protectedTarget]=await db.query(`SELECT ${protectedMemberSql('$1::uuid')} AS protected`,[id]);
+  if(protectedTarget?.protected) blockers.push('전체 관리자 — 처리 대상 아님');
 
   if (!['suspended','withdrawn','rejected'].includes(member.status)) blockers.push('회원 이용을 먼저 정지하거나 탈퇴 처리해 주세요.');
   if (actor === id) blockers.push('자신의 서비스 데이터를 삭제할 수 없습니다.');

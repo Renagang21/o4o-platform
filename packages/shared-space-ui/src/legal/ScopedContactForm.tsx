@@ -31,7 +31,7 @@ export function ScopedContactForm({
             return { id: typeof id === "string" ? id : undefined };
           } catch {
             throw new Error(
-              "문의를 접수하지 못했습니다. 입력 내용을 확인하고 다시 시도해 주세요.",
+              "문의를 접수하지 못했습니다. 입력 내용을 확인하고 다시 시도해 주시기 바랍니다.",
             );
           }
         }}

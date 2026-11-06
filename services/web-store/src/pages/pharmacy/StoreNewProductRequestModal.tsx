@@ -65,7 +65,7 @@ function ProductRequestForm({ onClose, onSubmitted, editRequest, onAddExisting, 
             <p style={styles.subtitle}>
               {isEdit
                 ? '관리자 보완 요청 내용을 반영해 요청을 수정한 뒤 다시 제출합니다.'
-                : 'O4O 표준 상품 DB에 없는 상품의 등록을 요청합니다. 먼저 기존 상품이 있는지 검색하세요.'}
+                : 'O4O 표준 상품 DB에 없는 상품의 등록을 요청합니다. 먼저 기존 상품이 있는지 검색하시기 바랍니다.'}
             </p>
           </div>
           <button onClick={onClose} style={styles.closeBtn} aria-label="닫기"><X size={18} /></button>
@@ -75,7 +75,7 @@ function ProductRequestForm({ onClose, onSubmitted, editRequest, onAddExisting, 
           {state.actionError}
           {state.existingFound && onAddExisting && <button type="button" className="ml-2 underline" onClick={() => { onClose(); onAddExisting(); }}>기존 상품 추가로 이동</button>}
         </div>}
-        {busy && <p role="status">처리 중입니다. 결과를 확인할 때까지 기다려 주세요.</p>}
+        {busy && <p role="status">처리 중입니다. 결과를 확인할 때까지 기다려 주시기 바랍니다.</p>}
         <fieldset disabled={busy} style={{ border: 0, padding: 0, margin: 0, minWidth: 0 }}>
         {step === 'search' ? (
           <>
@@ -109,7 +109,7 @@ function ProductRequestForm({ onClose, onSubmitted, editRequest, onAddExisting, 
               ) : state.searchError ? (
                 <div role="alert" style={styles.empty}>{state.searchError} <button type="button" onClick={() => void runSearch()}>다시 검색</button></div>
               ) : searchResults.length === 0 ? (
-                <div style={styles.empty}>검색 결과가 없습니다. 아래에서 신규 등록을 요청하세요.</div>
+                <div style={styles.empty}>검색 결과가 없습니다. 아래에서 신규 등록을 요청하시기 바랍니다.</div>
               ) : (
                 <div style={styles.resultList}>
                   {searchResults.map((p) => {
@@ -140,7 +140,7 @@ function ProductRequestForm({ onClose, onSubmitted, editRequest, onAddExisting, 
             </div>
 
             <div style={styles.searchFooter}>
-              <span style={styles.footerNote}>찾는 상품이 없나요?</span>
+              <span style={styles.footerNote}>찾는 상품이 없습니까?</span>
               <button onClick={goToForm} style={styles.primaryBtn}>
                 <Plus size={14} /> 신규 등록 요청 작성
               </button>

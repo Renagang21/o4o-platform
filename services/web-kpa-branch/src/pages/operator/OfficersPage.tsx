@@ -160,7 +160,7 @@ export default function OfficersPage({ slug }: { slug: string }) {
     try {
       // 종료일을 비우면 서버가 오늘로 마감한다
       await updateOfficer(slug, o.id, { status: 'ended' });
-      setMessage(`${o.name} ${o.position} 임기를 종료했습니다. 재임하실 경우 새로 등록해 주세요.`);
+      setMessage(`${o.name} ${o.position} 임기를 종료했습니다. 재임하실 경우 새로 등록해 주시기 바랍니다.`);
       await reload();
     } catch (e) {
       setActionError(describe(e));

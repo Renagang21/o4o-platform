@@ -179,11 +179,11 @@ export function useSupplierProductImport(onApplyDraft?: (draft: ImportDraft) => 
   const handleParse = useCallback(() => {
     // WO-...PASSTHROUGH: 상위 유형(의약품/비의약품) 선택 전에는 분석 제한. 세부 유형 없이도 분석 가능.
     if (!topChoice) {
-      setError('먼저 제품 유형(의약품/비의약품)을 선택해 주세요.');
+      setError('먼저 제품 유형(의약품/비의약품)을 선택해 주시기 바랍니다.');
       return;
     }
     if (!html.trim()) {
-      setError('관리자 상품 수정 페이지 HTML을 붙여넣거나 파일을 불러와 주세요.');
+      setError('관리자 상품 수정 페이지 HTML을 붙여넣거나 파일을 불러와 주시기 바랍니다.');
       return;
     }
     if (html.length > 5 * 1024 * 1024) {
@@ -192,7 +192,7 @@ export function useSupplierProductImport(onApplyDraft?: (draft: ImportDraft) => 
     }
     if (!looksLikeFirstmallAdmin(html)) {
       setError(
-        'Firstmall 관리자 상품 수정 페이지 HTML로 보이지 않습니다. 관리자에서 상품 수정 화면의 전체 HTML(Ctrl+U)을 복사해 주세요.',
+        'Firstmall 관리자 상품 수정 페이지 HTML로 보이지 않습니다. 관리자에서 상품 수정 화면의 전체 HTML(Ctrl+U)을 복사해 주시기 바랍니다.',
       );
       return;
     }

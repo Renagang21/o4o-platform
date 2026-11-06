@@ -35,19 +35,19 @@ export async function sendHospitalRequest(input: { text: string }): Promise<Hosp
       body: { text: input.text },
     });
   } catch {
-    throw new AiRequestError('네트워크 오류가 발생했습니다. 다시 시도해 주세요.', 'NETWORK_ERROR');
+    throw new AiRequestError('네트워크 오류가 발생했습니다. 다시 시도해 주시기 바랍니다.', 'NETWORK_ERROR');
   }
   const { ok, status, body } = result;
   if (!ok || !body?.success) {
     throw new AiRequestError(
-      body?.error || '응답을 생성하지 못했습니다. 다시 시도해 주세요.',
+      body?.error || '응답을 생성하지 못했습니다. 다시 시도해 주시기 바랍니다.',
       body?.code || 'AI_ERROR',
       status,
     );
   }
   const data = body.data;
   if (!data || typeof data.kind !== 'string') {
-    throw new AiRequestError('응답을 생성하지 못했습니다. 다시 시도해 주세요.', 'AI_ERROR');
+    throw new AiRequestError('응답을 생성하지 못했습니다. 다시 시도해 주시기 바랍니다.', 'AI_ERROR');
   }
   return { kind: data.kind, message: data.message, plan: data.plan };
 }
@@ -64,12 +64,12 @@ export async function requestFileStructure(
       body: { profile, targetSchema },
     });
   } catch {
-    throw new AiRequestError('네트워크 오류가 발생했습니다. 다시 시도해 주세요.', 'NETWORK_ERROR');
+    throw new AiRequestError('네트워크 오류가 발생했습니다. 다시 시도해 주시기 바랍니다.', 'NETWORK_ERROR');
   }
   const { ok, status, body } = result;
   if (!ok || !body?.success || !body.data?.inference) {
     throw new AiRequestError(
-      body?.error || '파일 구조를 이해하지 못했습니다. 다시 시도해 주세요.',
+      body?.error || '파일 구조를 이해하지 못했습니다. 다시 시도해 주시기 바랍니다.',
       body?.code || 'FILE_UNDERSTANDING_FAILED',
       status,
     );

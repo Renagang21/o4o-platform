@@ -36,7 +36,7 @@ beforeEach(() => {
   agreements.mockResolvedValue([]);
 });
 it("an active pharmacy and owner relation are insufficient without personal qualification; revocation takes effect immediately", async () => {
-  const db = { query: jest.fn() } as any;
+  const db = { query: jest.fn().mockResolvedValue([]) } as any;
   expect(await isStoreOwner(db, "owner", "kpa", "store-a")).toMatchObject({
     isOwner: true,
     organizationId: "store-a",

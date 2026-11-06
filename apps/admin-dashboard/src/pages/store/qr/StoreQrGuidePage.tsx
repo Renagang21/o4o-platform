@@ -71,7 +71,7 @@ export default function StoreQrGuidePage() {
       <div style={s.card}>
         <h2 style={s.sectionTitle}>서비스별 매장 QR 화면</h2>
         <p style={s.body}>
-          매장 경영자 계정으로 로그인한 뒤 아래 화면에서 QR을 생성하세요.
+          매장 경영자 계정으로 로그인한 뒤 아래 화면에서 QR을 생성하시기 바랍니다.
         </p>
         <div style={s.linkList}>
           {STORE_QR_ENTRIES.map((e) => (

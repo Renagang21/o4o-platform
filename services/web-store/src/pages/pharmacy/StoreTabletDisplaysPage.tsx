@@ -261,7 +261,7 @@ function TabletDisplaySession({ isCurrent }: Readonly<{ isCurrent: () => boolean
     setSettingsLoading(true); setSettingsLoadError(null);
     fetchTabletDisplaySettings()
       .then(value => { if (!cancelled) setSettings(value); })
-      .catch(() => { if (!cancelled) setSettingsLoadError('화면 설정을 불러오지 못했습니다. 다시 시도해 주세요.'); })
+      .catch(() => { if (!cancelled) setSettingsLoadError('화면 설정을 불러오지 못했습니다. 다시 시도해 주시기 바랍니다.'); })
       .finally(() => { if (!cancelled) setSettingsLoading(false); });
     return () => { cancelled = true; invalidateSettingsRequest(); };
   }, [organizationId, settingsRetry, invalidateSettingsRequest]);
@@ -313,15 +313,15 @@ function TabletDisplaySession({ isCurrent }: Readonly<{ isCurrent: () => boolean
   // WO-O4O-KPA-TABLET-TOUCH-FIRST-TABLET-CONNECT-FLOW-V1: 실행 액션(신규 API/pairing 없음 — 기존 URL 재사용).
   //   화면 열기 = 공개 viewer 새 탭. 팝업 차단/ slug 부재 시 안내.
   const handleOpenTabletScreen = (tabletId: string) => {
-    if (!storeSlug) { setToast({ type: 'error', message: '태블릿 실행 주소를 만들 수 없습니다. 매장 기본 정보를 먼저 확인해 주세요.' }); return; }
+    if (!storeSlug) { setToast({ type: 'error', message: '태블릿 실행 주소를 만들 수 없습니다. 매장 기본 정보를 먼저 확인해 주시기 바랍니다.' }); return; }
     const w = window.open(publicTabletUrl(tabletId), '_blank', 'noopener,noreferrer');
-    if (!w) setToast({ type: 'error', message: '팝업이 차단되어 화면을 열지 못했습니다. 주소를 복사해 태블릿에서 직접 열어 주세요.' });
+    if (!w) setToast({ type: 'error', message: '팝업이 차단되어 화면을 열지 못했습니다. 주소를 복사해 태블릿에서 직접 열어 주시기 바랍니다.' });
   };
   const handleCopyTabletUrl = (tabletId: string) => {
-    if (!storeSlug) { setToast({ type: 'error', message: '태블릿 실행 주소를 만들 수 없습니다. 매장 기본 정보를 먼저 확인해 주세요.' }); return; }
+    if (!storeSlug) { setToast({ type: 'error', message: '태블릿 실행 주소를 만들 수 없습니다. 매장 기본 정보를 먼저 확인해 주시기 바랍니다.' }); return; }
     navigator.clipboard?.writeText(publicTabletUrl(tabletId))
       .then(() => setToast({ type: 'success', message: '태블릿 실행 주소가 복사되었습니다.' }))
-      .catch(() => setToast({ type: 'error', message: '주소를 복사하지 못했습니다. 직접 열어 다시 시도해 주세요.' }));
+      .catch(() => setToast({ type: 'error', message: '주소를 복사하지 못했습니다. 직접 열어 다시 시도해 주시기 바랍니다.' }));
   };
 
   // WO-O4O-KPA-TABLET-OPERATOR-COMMON-IDLE-VIDEO-SELECTION-V1: 서비스 공통 대기 영상(태블릿별 1개 선택)
@@ -446,7 +446,7 @@ function TabletDisplaySession({ isCurrent }: Readonly<{ isCurrent: () => boolean
       previewTabletIdRef.current = requestedTablet;
       setPreviewSettings(saved); setPreviewView('tablet'); setPreviewSlug(slug); setPreviewOpen(true);
     } catch {
-      if (current() && isCurrent()) setToast({ type: 'error', message: '저장된 고객 화면을 불러오지 못했습니다. 다시 시도해 주세요.' });
+      if (current() && isCurrent()) setToast({ type: 'error', message: '저장된 고객 화면을 불러오지 못했습니다. 다시 시도해 주시기 바랍니다.' });
     } finally { if (current() && isCurrent()) setPreviewLoading(false); }
   }, [selectedTabletId, previewRequests, isCurrent]);
 
@@ -733,7 +733,7 @@ function TabletDisplaySession({ isCurrent }: Readonly<{ isCurrent: () => boolean
     <div className="space-y-6">
       <StoreWorkflowNavigation subject="태블릿" />
       <StoreOperationReturn entry={operationEntry} />
-      {hasStoreOperationEntry(location.state) && !operationEntry && <p role="status" className="text-sm text-amber-800">매장 또는 업무가 변경되었습니다. 현재 매장의 위치를 다시 선택해 주세요.</p>}
+      {hasStoreOperationEntry(location.state) && !operationEntry && <p role="status" className="text-sm text-amber-800">매장 또는 업무가 변경되었습니다. 현재 매장의 위치를 다시 선택해 주시기 바랍니다.</p>}
       {operationEntry && !loadingTablets && !tabletListError && !tablets.some(tablet => tablet.id === operationEntry.id) && <p role="alert" className="text-sm text-amber-800">선택한 위치를 현재 목록에서 확인하지 못했습니다. <button type="button" className="min-h-11 underline" onClick={() => void loadTablets()}>위치 다시 확인</button></p>}
       {previewLoading && <p role="status">고객 화면 불러오는 중… <button type="button" onClick={handleClosePreview} className="min-h-11 underline">미리보기 불러오기 취소</button></p>}
       {/* Header */}
@@ -818,7 +818,7 @@ function TabletDisplaySession({ isCurrent }: Readonly<{ isCurrent: () => boolean
               <ol className="list-decimal pl-5 space-y-2 text-sm text-slate-700 leading-relaxed">
                 <li>크롬 브라우저에서 매장 태블릿 주소를 열어 사용합니다.</li>
                 <li>홈 화면에 바로가기로 추가하면 주소 입력 없이 실행할 수 있습니다.</li>
-                <li>화면 자동 꺼짐(절전) 시간을 매장 상황에 맞게 확인하세요.</li>
+                <li>화면 자동 꺼짐(절전) 시간을 매장 상황에 맞게 확인하시기 바랍니다.</li>
                 <li>위치 카드의 [태블릿 연결]로 실제 태블릿을 연결하면, 위치 이동·콘텐츠 변경·상품 수정이 태블릿에 자동(10~30초)으로 반영됩니다. 새로고침이 필요 없습니다.</li>
                 <li>연결된 태블릿 화면의 [직원 메뉴]에서 매장 직원이 로그인 후 위치 변경·콘텐츠 변경·상품 빠른 수정을 할 수 있습니다.</li>
                 <li>‘고객 화면 미리보기’로 실제 태블릿 화면을 미리 확인할 수 있습니다.</li>
@@ -941,7 +941,7 @@ function TabletDisplaySession({ isCurrent }: Readonly<{ isCurrent: () => boolean
             addTablet: '위치 추가',
             hint: '카드 하나가 매장 안의 위치(예: A-01, 카운터)입니다. 위치마다 지금 나오는 콘텐츠를 바꿀 수 있고, 실제 태블릿은 [태블릿 연결]로 위치에 붙이거나 다른 위치로 옮길 수 있습니다.',
             emptyTitle: '아직 등록된 위치가 없습니다',
-            emptyHint: '위치를 추가한 뒤 콘텐츠를 적용하고, 실제 태블릿을 연결하세요.',
+            emptyHint: '위치를 추가한 뒤 콘텐츠를 적용하고, 실제 태블릿을 연결하시기 바랍니다.',
           }}
           cardFooterSlot={(t) => {
             const list = devicesByLocation[t.id] ?? [];
@@ -1072,7 +1072,7 @@ function TabletDisplaySession({ isCurrent }: Readonly<{ isCurrent: () => boolean
 
                     {storeSlug ? (
                       <>
-                        <p className="text-xs text-slate-500">이 코너 화면을 태블릿에서 실행할 수 있습니다. 태블릿 크롬에서 ‘화면 열기’로 열거나, 주소를 복사해 북마크하세요.</p>
+                        <p className="text-xs text-slate-500">이 코너 화면을 태블릿에서 실행할 수 있습니다. 태블릿 크롬에서 ‘화면 열기’로 열거나, 주소를 복사해 북마크하시기 바랍니다.</p>
                         <div className="flex gap-2 flex-wrap">
                           <button
                             onClick={() => handleOpenTabletScreen(selectedTablet.id)}
@@ -1096,7 +1096,7 @@ function TabletDisplaySession({ isCurrent }: Readonly<{ isCurrent: () => boolean
                         </div>
                         {!selectedTablet.currentScreenSetId && (
                           <div className="text-[11px] text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
-                            연결할 화면 세트가 아직 없습니다. 아래에서 화면 세트를 만들어 적용해 주세요.
+                            연결할 화면 세트가 아직 없습니다. 아래에서 화면 세트를 만들어 적용해 주시기 바랍니다.
                           </div>
                         )}
                         <div>
@@ -1112,7 +1112,7 @@ function TabletDisplaySession({ isCurrent }: Readonly<{ isCurrent: () => boolean
                       </>
                     ) : (
                       <div className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
-                        태블릿 실행 주소를 만들 수 없습니다. 매장 기본 정보(공개 주소)를 먼저 확인해 주세요.
+                        태블릿 실행 주소를 만들 수 없습니다. 매장 기본 정보(공개 주소)를 먼저 확인해 주시기 바랍니다.
                       </div>
                     )}
                   </div>
@@ -1224,7 +1224,7 @@ function TabletDisplaySession({ isCurrent }: Readonly<{ isCurrent: () => boolean
                   </div>
                   {(ocSelection.status === 'expired' || ocSelection.status === 'unavailable') && (
                     <div className="text-amber-600 mt-1">
-                      선택한 서비스 공통 영상의 방영 기간이 종료되었습니다. 현재 태블릿에는 사용 가능한 공통 영상이 자동 노출됩니다. 코너에 맞는 다른 공통 영상을 선택해 주세요.
+                      선택한 서비스 공통 영상의 방영 기간이 종료되었습니다. 현재 태블릿에는 사용 가능한 공통 영상이 자동 노출됩니다. 코너에 맞는 다른 공통 영상을 선택해 주시기 바랍니다.
                     </div>
                   )}
                 </div>
@@ -1278,7 +1278,7 @@ function TabletDisplaySession({ isCurrent }: Readonly<{ isCurrent: () => boolean
                     어느 쪽이 쓰이는지 화면에서 알 수 없어 "저장했는데 안 나온다" 가 반복됐다.
                     설정 위치와 우선순위를 명시한다. 데이터·저장 동작은 바꾸지 않는다. */}
                 <div className="mb-3 rounded-lg border border-sky-100 bg-sky-50 px-3 py-2 text-[11px] leading-relaxed text-sky-900">
-                  <span className="font-semibold">어떤 목록이 재생되나요?</span>{' '}
+                  <span className="font-semibold">어떤 목록이 재생됩니까?</span>{' '}
                   이 코너에 적용된 화면 세트의 <span className="font-medium">대기 화면</span> 설정이 우선합니다.
                   세트가 <span className="font-medium">직접 선택한 미디어</span>를 쓰도록 설정돼 있으면 아래 목록 대신 그 미디어가 재생되고,
                   <span className="font-medium">매장 대기 목록 사용</span>으로 돼 있으면 아래 목록이 재생됩니다.
@@ -1428,7 +1428,7 @@ function TabletDisplaySession({ isCurrent }: Readonly<{ isCurrent: () => boolean
                       {poolTab === 'supplier' ? (
                         <>
                           <p>태블릿에 진열할 취급 중인 O4O 제품이 없습니다.</p>
-                          <p className="mt-1">취급 중인 O4O 제품을 먼저 등록한 뒤 태블릿에 배치해 주세요.</p>
+                          <p className="mt-1">취급 중인 O4O 제품을 먼저 등록한 뒤 태블릿에 배치해 주시기 바랍니다.</p>
                           <button
                             type="button"
                             onClick={() => navigate(`${base}/my-products`)}
@@ -1443,7 +1443,7 @@ function TabletDisplaySession({ isCurrent }: Readonly<{ isCurrent: () => boolean
                               local pool 빈 상태 문구를 실제 데이터 축(store_local_products = '매장 자체 상품')과
                               복원된 메뉴 라벨에 맞춰 정정. 이동 대상 route 무변경. */}
                           <p>태블릿에 진열할 매장 자체 상품이 없습니다.</p>
-                          <p className="mt-1">매장 자체 상품을 먼저 등록한 뒤 태블릿에 배치해 주세요.</p>
+                          <p className="mt-1">매장 자체 상품을 먼저 등록한 뒤 태블릿에 배치해 주시기 바랍니다.</p>
                           <button
                             type="button"
                             onClick={() => navigate(`${base}/commerce/local-products`)}
@@ -1519,7 +1519,7 @@ function TabletDisplaySession({ isCurrent }: Readonly<{ isCurrent: () => boolean
                 <div className="max-h-[400px] overflow-y-auto">
                   {displays.length === 0 ? (
                     <div className="py-8 text-center text-sm text-slate-400">
-                      이 태블릿에 진열된 제품이 없습니다. 왼쪽에서 제품을 선택해 추가하세요.
+                      이 태블릿에 진열된 제품이 없습니다. 왼쪽에서 제품을 선택해 추가하시기 바랍니다.
                     </div>
                   ) : (
                     <div className="divide-y">
@@ -1595,7 +1595,7 @@ function TabletDisplaySession({ isCurrent }: Readonly<{ isCurrent: () => boolean
                               ) : candidates.length === 0 ? (
                                 <span className="text-xs text-slate-400">
                                   연결된 설명 콘텐츠가 없습니다. 태블릿 상세 화면에는 기본 상품 설명이 표시됩니다.
-                                  상품별 설명을 따로 보여주려면 먼저 상품 설명 콘텐츠를 만들고 이 제품에 연결하세요.
+                                  상품별 설명을 따로 보여주려면 먼저 상품 설명 콘텐츠를 만들고 이 제품에 연결하시기 바랍니다.
                                 </span>
                               ) : (
                                 <>

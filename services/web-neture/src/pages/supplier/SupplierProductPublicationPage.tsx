@@ -21,11 +21,11 @@ export default function SupplierProductPublicationPage() {
       {!c.loading && !c.loadError && <>
         <label className="block text-sm font-medium">제품 선택
           <select className={INPUT} value={c.offerId} onChange={e => c.select(e.target.value)} disabled={c.saving}>
-            <option value="">제품을 선택하세요</option>
+            <option value="">제품을 선택하시기 바랍니다</option>
             {c.products.map(p => <option key={p.id} value={p.id}>{p.name || p.masterName} · {p.approvalStatus === 'APPROVED' ? '등록 승인' : '등록 검토 필요'}</option>)}
           </select>
         </label>
-        {c.offerId && !product && <p role="alert" className="text-amber-800">요청한 제품을 찾을 수 없습니다. 내 제품을 다시 선택해 주세요.</p>}
+        {c.offerId && !product && <p role="alert" className="text-amber-800">요청한 제품을 찾을 수 없습니다. 내 제품을 다시 선택해 주시기 바랍니다.</p>}
         {product && <>
           <div className="rounded-lg border bg-slate-50 p-4 text-sm">
             <strong>{product.name || product.masterName}</strong>
@@ -52,7 +52,7 @@ export default function SupplierProductPublicationPage() {
                 <label className="mt-3 block">KPA 서비스 공급가 (선택 — 비우면 기존 서비스 가격 또는 기본가 유지)
                   <input type="number" min="1" step="1" className={INPUT} value={form.prices['kpa-society'] ?? ''} onChange={e => setForm(f => ({ ...f, prices: { ...f.prices, 'kpa-society': e.target.value } }))} />
                 </label>
-                <p className="mt-1 text-xs text-slate-500">게시를 중단해도 서비스 가격은 보존합니다. 가격 해제는 상품 상세의 서비스별 가격 설정을 이용하세요.</p>
+                <p className="mt-1 text-xs text-slate-500">게시를 중단해도 서비스 가격은 보존합니다. 가격 해제는 상품 상세의 서비스별 가격 설정을 이용하시기 바랍니다.</p>
               </div>
               <details className="rounded border p-3 text-sm"><summary className="cursor-pointer font-medium">기존 전체 공급 설정</summary>
                 <label className="mt-3 flex gap-3"><input type="checkbox" checked={form.isPublic} onChange={e => setForm(f => ({ ...f, isPublic: e.target.checked }))} /><span>전체 공급 카탈로그 공개 (의약품 제외)</span></label>

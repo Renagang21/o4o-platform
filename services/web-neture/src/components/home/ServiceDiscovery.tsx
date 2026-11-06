@@ -50,7 +50,7 @@ export default function ServiceDiscovery({ data, personalized = false }: { data?
   return <>
   {membershipGroups.length > 0 && <section aria-labelledby="all-services-title" className="mt-12 w-full max-w-5xl">
     <h2 id="all-services-title" className="text-xl font-semibold text-slate-900">{hasPersonalData ? '다른 서비스 알아보기' : '전체 서비스'}</h2>
-    <p className="text-sm text-slate-500">{hasPersonalData ? '아직 가입·신청하지 않은 서비스입니다. 서비스 소개를 살펴보고 참여할 수 있습니다.' : '공개 콘텐츠를 둘러보고 필요한 서비스를 찾아보세요. 가입·로그인이 필요한 기능은 각 서비스에서 안내합니다.'}</p>
+    <p className="text-sm text-slate-500">{hasPersonalData ? '아직 가입·신청하지 않은 서비스입니다. 서비스 소개를 살펴보고 참여할 수 있습니다.' : '공개 콘텐츠를 둘러보고 필요한 서비스를 찾아보시기 바랍니다. 가입·로그인이 필요한 기능은 각 서비스에서 안내합니다.'}</p>
     {hasPersonalData ? <nav aria-label="가입하지 않은 서비스" className="mt-6">{renderCards(membershipGroups.flatMap(group => group.services))}</nav> : renderGroups(membershipGroups)}
   </section>}
   {publicGroups.length > 0 && <section aria-labelledby="public-tools-title" className="mt-12 w-full max-w-5xl">

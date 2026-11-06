@@ -28,7 +28,7 @@ const RETIRED = {
   success: false,
   code: 'STORE_SALE_PAYMENT_DEPRECATED',
   message:
-    '매장 소비자 결제는 O4O에서 제공하지 않습니다. 현장 결제는 매장의 POS, 온라인 판매는 외부 판매채널을 이용해 주세요.',
+    '매장 소비자 결제는 O4O에서 제공하지 않습니다. 현장 결제는 매장의 POS, 온라인 판매는 외부 판매채널을 이용해 주시기 바랍니다.',
 } as const;
 
 export function createKpaPaymentController(

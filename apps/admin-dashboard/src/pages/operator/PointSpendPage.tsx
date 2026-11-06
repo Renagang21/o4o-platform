@@ -198,11 +198,11 @@ export default function PointSpendPage() {
       if (code === 'INSUFFICIENT_BALANCE') {
         toast.error('잔액이 부족합니다.');
       } else if (code === 'INVALID_DESCRIPTION') {
-        toast.error('차감 사유(description)를 입력해 주세요.');
+        toast.error('차감 사유(description)를 입력해 주시기 바랍니다.');
       } else if (code === 'INVALID_AMOUNT') {
         toast.error('차감 금액은 1 이상의 정수여야 합니다.');
       } else if (code === 'INVALID_USER_ID') {
-        toast.error('대상 사용자 ID를 확인해 주세요.');
+        toast.error('대상 사용자 ID를 확인해 주시기 바랍니다.');
       } else if (code === 'INVALID_PAYOUT_TYPE') {
         toast.error('보상 유형(payoutType) 값이 올바르지 않습니다.');
       } else {
@@ -262,7 +262,7 @@ export default function PointSpendPage() {
       if (code === 'INVALID_AMOUNT') {
         toast.error('지급 금액은 1 이상의 정수여야 합니다.');
       } else if (code === 'INVALID_USER_ID') {
-        toast.error('대상 사용자 ID를 확인해 주세요.');
+        toast.error('대상 사용자 ID를 확인해 주시기 바랍니다.');
       } else {
         toast.error(body?.error || '지급 처리 중 오류가 발생했습니다.');
       }
@@ -428,7 +428,7 @@ export default function PointSpendPage() {
             <p className="font-medium">정책 안내</p>
             <p className="mt-0.5">
               포인트 차감은 <strong>보상 지급 완료 처리</strong>를 의미합니다. 실제 보상(현금/상품권 등)
-              지급 후 본 화면에서 차감을 수행하세요.
+              지급 후 본 화면에서 차감을 수행하시기 바랍니다.
             </p>
           </div>
         </div>
@@ -483,7 +483,7 @@ export default function PointSpendPage() {
               className="w-full rounded border border-gray-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
               disabled={spendMutation.isPending}
             >
-              <option value="">보상 유형을 선택하세요</option>
+              <option value="">보상 유형을 선택하시기 바랍니다</option>
               {PAYOUT_TYPES.map((p) => (
                 <option key={p.value} value={p.value}>
                   {p.label}
@@ -568,11 +568,11 @@ export default function PointSpendPage() {
         </form>
 
         {submittedLookupUserId === '' ? (
-          <p className="text-sm text-gray-400">사용자 ID를 입력하고 조회 버튼을 눌러주세요.</p>
+          <p className="text-sm text-gray-400">사용자 ID를 입력하고 조회 버튼을 눌러주시기 바랍니다.</p>
         ) : historyQuery.isError ? (
           <div className="rounded border border-red-200 bg-red-50 p-4 text-sm text-red-700">
             {(historyQuery.error as any)?.response?.data?.error
-              || '거래 이력을 불러오지 못했습니다. (UUID 형식이 올바른지 확인해 주세요.)'}
+              || '거래 이력을 불러오지 못했습니다. (UUID 형식이 올바른지 확인해 주시기 바랍니다.)'}
           </div>
         ) : historyQuery.isLoading ? (
           <p className="text-sm text-gray-500">불러오는 중...</p>

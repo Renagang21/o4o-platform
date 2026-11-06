@@ -54,7 +54,7 @@ export function createPublicContactInquiryController(dataSource: DataSource): Ro
     try {
       return res.json({ success: true, data: await loadPublicContactSettings(dataSource, serviceKey) });
     } catch {
-      return res.status(503).json({ success: false, error: { code: 'CONTACT_SETTINGS_UNAVAILABLE', message: '문의 설정을 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.' } });
+      return res.status(503).json({ success: false, error: { code: 'CONTACT_SETTINGS_UNAVAILABLE', message: '문의 설정을 불러오지 못했습니다. 잠시 후 다시 시도해 주시기 바랍니다.' } });
     }
   });
 
@@ -88,7 +88,7 @@ export function createPublicContactInquiryController(dataSource: DataSource): Ro
     }
 
     if ([name,email,phone,organizationName,subject,message,sourcePath].some(value => typeof value === 'string' && value.includes('\0'))) {
-      return res.status(400).json({success:false,error:{code:'INVALID_INPUT',message:'입력 내용을 확인해 주세요.'}});
+      return res.status(400).json({success:false,error:{code:'INVALID_INPUT',message:'입력 내용을 확인해 주시기 바랍니다.'}});
     }
     // ── validation ──
     const cleanName = typeof name === 'string' ? name.trim() : '';
@@ -99,13 +99,13 @@ export function createPublicContactInquiryController(dataSource: DataSource): Ro
     if (!cleanName || !cleanEmail || !cleanSubject || !cleanMessage) {
       return res.status(400).json({
         success: false,
-        error: { code: 'MISSING_REQUIRED_FIELDS', message: '필수 항목을 입력해 주세요.' },
+        error: { code: 'MISSING_REQUIRED_FIELDS', message: '필수 항목을 입력해 주시기 바랍니다.' },
       });
     }
     if (!EMAIL_RE.test(cleanEmail)) {
       return res.status(400).json({
         success: false,
-        error: { code: 'INVALID_EMAIL', message: '올바른 이메일 주소를 입력해 주세요.' },
+        error: { code: 'INVALID_EMAIL', message: '올바른 이메일 주소를 입력해 주시기 바랍니다.' },
       });
     }
     if (privacyConsent !== true) {
@@ -115,7 +115,7 @@ export function createPublicContactInquiryController(dataSource: DataSource): Ro
       });
     }
     if (cleanName.length > 100 || cleanEmail.length > 255 || (typeof phone === 'string' && phone.length > 50) || (typeof organizationName === 'string' && organizationName.length > 200)) {
-      return res.status(400).json({ success: false, error: { code: 'FIELD_TOO_LONG', message: '입력 길이를 확인해 주세요.' } });
+      return res.status(400).json({ success: false, error: { code: 'FIELD_TOO_LONG', message: '입력 길이를 확인해 주시기 바랍니다.' } });
     }
     if (cleanSubject.length > 300) {
       return res.status(400).json({
@@ -126,7 +126,7 @@ export function createPublicContactInquiryController(dataSource: DataSource): Ro
     if (cleanMessage.length < 10) {
       return res.status(400).json({
         success: false,
-        error: { code: 'MESSAGE_TOO_SHORT', message: '문의 내용을 10자 이상 입력해 주세요.' },
+        error: { code: 'MESSAGE_TOO_SHORT', message: '문의 내용을 10자 이상 입력해 주시기 바랍니다.' },
       });
     }
     if (cleanMessage.length > 5000) {
@@ -138,12 +138,12 @@ export function createPublicContactInquiryController(dataSource: DataSource): Ro
     let publicSettings: Awaited<ReturnType<typeof loadPublicContactSettings>>;
     try { publicSettings = await loadPublicContactSettings(dataSource, serviceKey); }
     catch {
-      return res.status(503).json({ success: false, error: { code: 'CONTACT_SETTINGS_UNAVAILABLE', message: '문의 설정을 확인하지 못했습니다. 잠시 후 다시 시도해 주세요.' } });
+      return res.status(503).json({ success: false, error: { code: 'CONTACT_SETTINGS_UNAVAILABLE', message: '문의 설정을 확인하지 못했습니다. 잠시 후 다시 시도해 주시기 바랍니다.' } });
     }
     const type = publicSettings.inquiryTypesConfigured ? inquiryType
       : (VALID_INQUIRY_TYPES as readonly string[]).includes(inquiryType) ? inquiryType : 'other';
     if (!publicSettings.inquiryTypes.some(option => option.value === type)) {
-      return res.status(400).json({ success: false, error: { code: 'INQUIRY_TYPE_DISABLED', message: '현재 접수할 수 없는 문의 유형입니다. 문의 화면을 새로 열어 확인해 주세요.' } });
+      return res.status(400).json({ success: false, error: { code: 'INQUIRY_TYPE_DISABLED', message: '현재 접수할 수 없는 문의 유형입니다. 문의 화면을 새로 열어 확인해 주시기 바랍니다.' } });
     }
 
     try {

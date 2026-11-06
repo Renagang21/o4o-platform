@@ -175,10 +175,10 @@ export function GoogleContinue<TUser = unknown>({
       setMessage('이용약관과 개인정보 처리방침에 동의해야 계정을 만들 수 있습니다.');
       return;
     }
-    if (!name.trim() || name.trim().length > 100) { setMessage('이름을 100자 이내로 입력해 주세요.'); return; }
-    if (!nickname.trim()) { setMessage('닉네임을 입력해 주세요.'); return; }
+    if (!name.trim() || name.trim().length > 100) { setMessage('이름을 100자 이내로 입력해 주시기 바랍니다.'); return; }
+    if (!nickname.trim()) { setMessage('닉네임을 입력해 주시기 바랍니다.'); return; }
     const phoneDigits = phone.replace(/\D/g, '');
-    if (!/^01\d{8,9}$/.test(phoneDigits)) { setMessage('개인 휴대전화 번호를 입력해 주세요.'); return; }
+    if (!/^01\d{8,9}$/.test(phoneDigits)) { setMessage('개인 휴대전화 번호를 입력해 주시기 바랍니다.'); return; }
     const idToken = stage.idToken;
     setMessage(null);
     setStage({ kind: 'busy' });
@@ -213,7 +213,7 @@ export function GoogleContinue<TUser = unknown>({
       {stage.kind === 'consent' && (
         <div style={box} data-testid="google-continue-consent">
           <p style={{ fontSize: 14, color: '#111827', margin: 0 }}>
-            처음 오셨네요. 계정을 만들려면 아래 항목에 동의해 주세요.
+            처음 오셨네요. 계정을 만들려면 아래 항목에 동의해 주시기 바랍니다.
           </p>
           <label style={styles.field}>닉네임 (필수)<input style={styles.input} type="text" maxLength={50} value={nickname} onChange={(e) => setNickname(e.target.value)} /></label>
           <label style={styles.field}>이름 (필수)<input style={styles.input} type="text" autoComplete="name" maxLength={100} value={name} onChange={(e) => setName(e.target.value)} /></label>

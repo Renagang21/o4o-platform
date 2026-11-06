@@ -32,11 +32,11 @@ export interface CommunityWorkspace {
 
 function membershipMessage(status: string | null, authenticated: boolean): string {
   const messages: Record<string, string> = {
-    suspended: '커뮤니티 서비스 이용이 정지되었습니다. 운영자에게 문의해 주세요.',
-    withdrawn: '커뮤니티 서비스에서 탈퇴한 상태입니다. 운영자에게 문의해 주세요.',
+    suspended: '커뮤니티 서비스 이용이 정지되었습니다. 운영자에게 문의해 주시기 바랍니다.',
+    withdrawn: '커뮤니티 서비스에서 탈퇴한 상태입니다. 운영자에게 문의해 주시기 바랍니다.',
   };
   return messages[status ?? ''] ?? (authenticated
-    ? '커뮤니티 이용 자격을 확인할 수 없습니다. 계정 상태를 확인하거나 운영자에게 문의해 주세요.'
+    ? '커뮤니티 이용 자격을 확인할 수 없습니다. 계정 상태를 확인하거나 운영자에게 문의해 주시기 바랍니다.'
     : '공통 계정으로 로그인하면 커뮤니티에 참여할 수 있습니다.');
 }
 
@@ -88,7 +88,7 @@ function Workspace({ view }: { view: WorkspaceView }) {
   }, [workspace, communityKey, isAuthenticated, basePath, location.pathname, location.search, location.hash, moveRetry, nativeAccess]);
   if (workspace?.kind === 'semi-franchise' && !nativeAccess) return <section className="mx-auto max-w-6xl p-6">
     {error ? <><p role="alert">{error}</p><button type="button" onClick={() => setMoveRetry(n => n + 1)}>다시 이동</button></> : <output aria-live="polite">사업 서비스의 참여자 공간으로 이동합니다…</output>}
-    {!workspace.businessKey && <><p>사업 정보를 확인할 수 없습니다. 잠시 후 다시 시도해 주세요.</p><button type="button" onClick={() => setVersion(n => n + 1)}>사업 정보 다시 확인</button></>}
+    {!workspace.businessKey && <><p>사업 정보를 확인할 수 없습니다. 잠시 후 다시 시도해 주시기 바랍니다.</p><button type="button" onClick={() => setVersion(n => n + 1)}>사업 정보 다시 확인</button></>}
   </section>;
 
   const createBoard = async () => {
@@ -107,7 +107,7 @@ function Workspace({ view }: { view: WorkspaceView }) {
     {workspace && (!nativeBusiness || nativeAccess) && !workspace.allowed && <section className="my-6 rounded-lg border bg-white p-6">
       <h1 className="text-2xl font-semibold">{workspace.name}</h1>
       {!nativeBusiness && <Link to={`/communities/${encodeURIComponent(communityKey)}/public`} className="mt-3 inline-block text-sm text-blue-700">공개 게시글 보기 →</Link>}
-      <p className="my-4">{nativeBusiness ? '이 사업의 참여 자격을 확인할 수 없습니다. 해당 사업 운영자에게 문의해 주세요.' : membershipMessage(workspace.membershipStatus, isAuthenticated)}</p>
+      <p className="my-4">{nativeBusiness ? '이 사업의 참여 자격을 확인할 수 없습니다. 해당 사업 운영자에게 문의해 주시기 바랍니다.' : membershipMessage(workspace.membershipStatus, isAuthenticated)}</p>
       {!isAuthenticated && <Link to={`/login?returnUrl=${encodeURIComponent(basePath)}`}>로그인</Link>}
       {workspace.reason === 'ACCOUNT_NOT_ACTIVE' && <Link to="/mypage">내 계정 확인</Link>}
     </section>}

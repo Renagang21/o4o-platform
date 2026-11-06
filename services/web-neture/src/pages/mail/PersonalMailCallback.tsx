@@ -18,7 +18,7 @@ export default function PersonalMailCallback() {
       code = params.current.get("code");
     if (!state || !code) {
       setError(
-        "메일 연결을 완료하지 못했습니다. 메일 관리 화면에서 다시 연결해 주세요.",
+        "메일 연결을 완료하지 못했습니다. 메일 관리 화면에서 다시 연결해 주시기 바랍니다.",
       );
       return;
     }
@@ -36,7 +36,7 @@ export default function PersonalMailCallback() {
         <p role="status">메일 연결을 확인하고 있습니다…</p>
       ) : (
         <p>
-          O4O 로그인 상태를 확인한 뒤 메일 관리 화면에서 다시 연결해 주세요.
+          O4O 로그인 상태를 확인한 뒤 메일 관리 화면에서 다시 연결해 주시기 바랍니다.
         </p>
       )}
       <button

@@ -188,7 +188,7 @@ export class BranchEducationCreditService {
     if (required <= 0) {
       throw new BranchEducationCreditError(
         'CREDIT_VALUE_INVALID',
-        '의무평점은 0보다 커야 합니다. 이수 의무가 없으면 개별 면제로 처리해 주세요.',
+        '의무평점은 0보다 커야 합니다. 이수 의무가 없으면 개별 면제로 처리해 주시기 바랍니다.',
         422,
       );
     }
@@ -282,7 +282,7 @@ export class BranchEducationCreditService {
     if (exemptionType === null && required <= 0) {
       throw new BranchEducationCreditError(
         'CREDIT_VALUE_INVALID',
-        '면제를 해제하려면 의무평점을 함께 입력해 주세요.',
+        '면제를 해제하려면 의무평점을 함께 입력해 주시기 바랍니다.',
         422,
       );
     }

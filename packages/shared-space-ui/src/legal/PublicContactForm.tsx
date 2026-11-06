@@ -93,10 +93,10 @@ export function PublicContactForm({
 
   function validate(): string | null {
     if (!form.name.trim() || !form.email.trim() || !form.subject.trim() || !form.message.trim()) {
-      return '필수 항목을 입력해 주세요.';
+      return '필수 항목을 입력해 주시기 바랍니다.';
     }
-    if (!EMAIL_RE.test(form.email.trim())) return '올바른 이메일 주소를 입력해 주세요.';
-    if (form.message.trim().length < 10) return '문의 내용을 10자 이상 입력해 주세요.';
+    if (!EMAIL_RE.test(form.email.trim())) return '올바른 이메일 주소를 입력해 주시기 바랍니다.';
+    if (form.message.trim().length < 10) return '문의 내용을 10자 이상 입력해 주시기 바랍니다.';
     if (!form.privacyConsent) return '개인정보 수집·이용 동의가 필요합니다.';
     return null;
   }
@@ -126,7 +126,7 @@ export function PublicContactForm({
       setReceiptId(receipt ? receipt.id : undefined);
       setSubmitted(true);
     } catch (err: any) {
-      setError(err?.message || '문의 접수 중 문제가 발생했습니다. 잠시 후 다시 시도해 주세요.');
+      setError(err?.message || '문의 접수 중 문제가 발생했습니다. 잠시 후 다시 시도해 주시기 바랍니다.');
     } finally {
       submittingRef.current = false;
       setSubmitting(false);

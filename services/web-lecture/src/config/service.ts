@@ -24,6 +24,6 @@ export function isPublicLecturePath(path: string): boolean {
 /** study.neture.co.kr 공개 홈 Hero — WO-O4O-CROSS-SERVICE-PUBLIC-DESIGN-AND-BRAND-REFRESH-V1 확정 문구 */
 export const STUDY_HERO = {
   title: ['필요한 지식을', '실무와 연결합니다'],
-  description: ['O4O 서비스와 현장 업무에 필요한', '강의와 학습 콘텐츠를 만나보세요.'],
+  description: ['O4O 서비스와 현장 업무에 필요한', '강의와 학습 콘텐츠를 만나보시기 바랍니다.'],
   accent: '#5b4acb',
 } as const;

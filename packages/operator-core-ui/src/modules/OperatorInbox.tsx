@@ -180,7 +180,7 @@ export function OperatorInbox({
     } catch {
       if (state.alive && seq === state.detail)
         setDetailError(
-          "문의 상세를 불러오지 못했습니다. 목록에서 다시 선택해 주세요.",
+          "문의 상세를 불러오지 못했습니다. 목록에서 다시 선택해 주시기 바랍니다.",
         );
     } finally {
       if (state.alive && seq === state.detail) setDetailLoading(false);
@@ -223,20 +223,20 @@ export function OperatorInbox({
       } catch {
         if (state.alive)
           setDetailError(
-            "처리 이력을 조회하지 못했습니다. 저장된 내용은 유지됩니다. 문의를 다시 열어 주세요.",
+            "처리 이력을 조회하지 못했습니다. 저장된 내용은 유지됩니다. 문의를 다시 열어 주시기 바랍니다.",
           );
       }
       setNotice(
         (await load())
           ? "문의 처리 내용을 저장했습니다."
-          : "저장은 완료됐지만 목록을 갱신하지 못했습니다. 다시 저장하지 말고 목록을 새로고침해 주세요.",
+          : "저장은 완료됐지만 목록을 갱신하지 못했습니다. 다시 저장하지 말고 목록을 새로고침해 주시기 바랍니다.",
       );
     } catch (e) {
       if (state.alive)
         setDetailError(
           (e as { response?: { status?: number } })?.response?.status === 409
-            ? "다른 운영자가 수정했거나 권한이 변경됐습니다. 입력은 유지됩니다. 현재 문의를 다시 열어 확인해 주세요."
-            : "저장하지 못했습니다. 입력은 유지됩니다. 다시 시도해 주세요.",
+            ? "다른 운영자가 수정했거나 권한이 변경됐습니다. 입력은 유지됩니다. 현재 문의를 다시 열어 확인해 주시기 바랍니다."
+            : "저장하지 못했습니다. 입력은 유지됩니다. 다시 시도해 주시기 바랍니다.",
         );
     } finally {
       state.writing = false;
@@ -269,13 +269,13 @@ export function OperatorInbox({
           ? result.status === "sent"
             ? "답변 발송을 완료했습니다."
             : result.status === "failed"
-              ? "답변 발송에 실패했습니다. 이력을 확인하고 새 답변으로 다시 작성해 주세요."
+              ? "답변 발송에 실패했습니다. 이력을 확인하고 새 답변으로 다시 작성해 주시기 바랍니다."
               : "발송 결과를 확인 중입니다. 같은 답변을 다시 발송하지 않습니다."
           : result.status === "sent"
             ? `담당자 알림을 확인했습니다. 새 전달 ${result.created}건 (기존 전달 중복 없음).`
             : result.status === "off"
               ? "이 문의창구의 앱 알림은 설정에서 비활성화되어 있습니다."
-              : "현재 수신할 담당자가 없습니다. 담당자 지정 후 다시 확인해 주세요.",
+              : "현재 수신할 담당자가 없습니다. 담당자 지정 후 다시 확인해 주시기 바랍니다.",
       );
       if (kind === "reply" && result.status === "sent") {
         setReply("");
@@ -290,18 +290,18 @@ export function OperatorInbox({
         if (kind === "reply") setStatus(fresh.data.data.status);
         if (!(await load()))
           setDetailError(
-            "처리는 완료됐지만 목록 조회에 실패했습니다. 다시 실행하지 말고 새로고침해 주세요.",
+            "처리는 완료됐지만 목록 조회에 실패했습니다. 다시 실행하지 말고 새로고침해 주시기 바랍니다.",
           );
       } catch {
         if (state.alive)
           setDetailError(
-            "처리는 접수됐지만 상세 조회에 실패했습니다. 다시 실행하지 말고 문의를 다시 열어 이력을 확인해 주세요.",
+            "처리는 접수됐지만 상세 조회에 실패했습니다. 다시 실행하지 말고 문의를 다시 열어 이력을 확인해 주시기 바랍니다.",
           );
       }
     } catch {
       if (state.alive)
         setDetailError(
-          "처리 결과를 확인하지 못했습니다. 입력은 유지됩니다. 답변 재시도는 같은 요청 번호를 사용합니다. 권한과 이력을 확인해 주세요.",
+          "처리 결과를 확인하지 못했습니다. 입력은 유지됩니다. 답변 재시도는 같은 요청 번호를 사용합니다. 권한과 이력을 확인해 주시기 바랍니다.",
         );
     } finally {
       state.writing = false;
@@ -482,7 +482,7 @@ export function OperatorInbox({
           )}
           <p>
             아래 상태·메모 저장은 내부 처리입니다. 문의자에게 보낼 답변은 별도로
-            작성해 발송하세요.
+            작성해 발송하시기 바랍니다.
           </p>
           {client.post && (
             <section aria-label="문의 답변과 알림 복구">

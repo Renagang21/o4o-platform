@@ -18,21 +18,21 @@ const input = () => screen.getByLabelText('지금 하고 싶은 일 또는 이�
 function open() { fireEvent.click(screen.getByRole('button', { name: /내 매장 AI/ })); }
 function send(value: string) { fireEvent.change(input(), { target: { value } }); fireEvent.click(screen.getByRole('button', { name: '보내기' })); }
 afterEach(cleanup);
-beforeEach(() => { vi.clearAllMocks(); m.store = 'A'; m.account = 'owner'; m.service = 'kpa-society'; m.ask.mockResolvedValue({ success: true, answer: '어떤 제품을 안내할까요?', remainingQueries: 4 }); });
+beforeEach(() => { vi.clearAllMocks(); m.store = 'A'; m.account = 'owner'; m.service = 'kpa-society'; m.ask.mockResolvedValue({ success: true, answer: '어떤 제품을 안내하시겠습니까?', remainingQueries: 4 }); });
 
 it('opens without a paid call and submits only the entered question and bounded conversation', async () => {
   render(app()); open(); expect(m.ask).not.toHaveBeenCalled();
   send('고객에게 제품을 설명하고 싶어요');
-  await screen.findByText('어떤 제품을 안내할까요?');
+  await screen.findByText('어떤 제품을 안내하시겠습니까?');
   expect(m.ask).toHaveBeenCalledTimes(1);
   const request = m.ask.mock.calls[0][0];
-  expect(request).toMatchObject({ question: '고객에게 제품을 설명하고 싶어요', serviceId: 'kpa-society', task: 'question', contextData: { pageTitle: '내 매장 · 매장 컨텐츠', serviceInfo: { previousTurns: [] } } });
+  expect(request).toMatchObject({ question: '고객에게 제품을 설명하고 싶어요', serviceId: 'kpa-society', task: 'question', contextData: { pageTitle: '내 매장 · 매장 콘텐츠', serviceInfo: { previousTurns: [] } } });
   expect(request.storeId).toBeUndefined();
   expect(request.contextData.product).toBeUndefined();
 });
 
 it('keeps one conversation and unsent input across work areas, then carries the reply to the next question', async () => {
-  render(app()); open(); send('안내를 만들고 싶어요'); await screen.findByText('어떤 제품을 안내할까요?');
+  render(app()); open(); send('안내를 만들고 싶어요'); await screen.findByText('어떤 제품을 안내하시겠습니까?');
   fireEvent.change(input(), { target: { value: '고객 안내 제품 A' } });
   fireEvent.click(screen.getByText('운영으로 이동'));
   expect((input() as HTMLTextAreaElement).value).toBe('고객 안내 제품 A');
@@ -59,9 +59,9 @@ it('locks duplicate sends, keeps later typing and ignores a late reply after a s
 });
 
 it.each(['account', 'service'] as const)('separates the displayed conversation when %s changes', async field => {
-  const view = render(app()); open(); send('원래 입력'); await screen.findByText('어떤 제품을 안내할까요?');
+  const view = render(app()); open(); send('원래 입력'); await screen.findByText('어떤 제품을 안내하시겠습니까?');
   m[field] = field === 'account' ? 'staff' : 'neture'; view.rerender(app()); open();
-  expect(screen.queryByText('어떤 제품을 안내할까요?')).toBeNull();
+  expect(screen.queryByText('어떤 제품을 안내하시겠습니까?')).toBeNull();
 });
 
 it('keeps failed input, reports quota limits and retries only on an explicit request', async () => {
@@ -69,7 +69,7 @@ it('keeps failed input, reports quota limits and retries only on an explicit req
   render(app()); open(); send('실패 입력');
   await screen.findByRole('alert'); expect((input() as HTMLTextAreaElement).value).toBe('실패 입력');
   expect(m.ask).toHaveBeenCalledTimes(1);
-  fireEvent.click(screen.getByRole('button', { name: '다시 요청' })); await screen.findByText('어떤 제품을 안내할까요?');
+  fireEvent.click(screen.getByRole('button', { name: '다시 요청' })); await screen.findByText('어떤 제품을 안내하시겠습니까?');
   expect(m.ask).toHaveBeenCalledTimes(2);
 });
 
@@ -83,17 +83,17 @@ it('shows returned text safely and exposes only permission-filtered existing lin
 });
 
 it('allows service-free owners to use the existing general query and clears only UI state for a new task', async () => {
-  m.service = null; render(app()); open(); send('설명'); await screen.findByText('어떤 제품을 안내할까요?');
+  m.service = null; render(app()); open(); send('설명'); await screen.findByText('어떤 제품을 안내하시겠습니까?');
   expect(m.ask.mock.calls[0][0].serviceId).toBe('neture');
   fireEvent.click(screen.getByRole('button', { name: '새 작업' }));
-  expect(screen.queryByText('어떤 제품을 안내할까요?')).toBeNull();
+  expect(screen.queryByText('어떤 제품을 안내하시겠습니까?')).toBeNull();
   expect(m.ask).toHaveBeenCalledTimes(1);
 });
 
 it('uses the explicit service workspace before the common store service context', async () => {
   m.service = 'neture';
   render(<MemoryRouter><StoreAiAssistant area="commerce" basePath="/work/kpa-society/store" items={[]} /></MemoryRouter>);
-  open(); send('거래 조건 설명'); await screen.findByText('어떤 제품을 안내할까요?');
+  open(); send('거래 조건 설명'); await screen.findByText('어떤 제품을 안내하시겠습니까?');
   expect(m.ask.mock.calls[0][0].serviceId).toBe('kpa-society');
 });
 it('uses Enter to send while preserving Korean composition and Shift+Enter', async () => {
@@ -103,7 +103,7 @@ it('uses Enter to send while preserving Korean composition and Shift+Enter', asy
  fireEvent.keyDown(input(), {key:'Enter',shiftKey:true});
  expect(m.ask).not.toHaveBeenCalled();
  fireEvent.keyDown(input(), {key:'Enter'});
- await screen.findByText('어떤 제품을 안내할까요?');
+ await screen.findByText('어떤 제품을 안내하시겠습니까?');
  expect(m.ask).toHaveBeenCalledTimes(1);
 });
 

@@ -121,7 +121,7 @@ it("does not offer a fallback type when all configured types are disabled", asyn
   });
   render(<PublicServiceContact serviceKey="supplier" client={api} />);
   await screen.findByText(
-    "현재 선택할 수 있는 문의 유형이 없습니다. 잠시 후 다시 확인해 주세요.",
+    "현재 선택할 수 있는 문의 유형이 없습니다. 잠시 후 다시 확인해 주시기 바랍니다.",
   );
   expect(screen.queryByRole("button", { name: "문의 보내기" })).toBeNull();
 });

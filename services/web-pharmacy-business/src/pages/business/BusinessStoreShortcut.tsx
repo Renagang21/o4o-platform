@@ -66,7 +66,7 @@ export default function BusinessStoreShortcut({
     } catch {
       if (request !== generation.current) return;
       setError(
-        "내 매장으로 이동하지 못했습니다. 매장 소속과 승인 상태를 확인해 주세요.",
+        "내 매장으로 이동하지 못했습니다. 매장 소속과 승인 상태를 확인해 주시기 바랍니다.",
       );
       pending.current = false;
       setBusy(false);

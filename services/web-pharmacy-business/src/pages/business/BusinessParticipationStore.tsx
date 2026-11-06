@@ -39,8 +39,8 @@ export function BusinessParticipationStore({ children }: Readonly<{
         const next = new URLSearchParams(params);
         if (value) next.set('store', value); else next.delete('store');
         void navigate({ pathname: location.pathname, search: next.toString(), hash: location.hash });
-      }}><option value="">약국을 선택해 주세요</option>{stores.map(store => <option key={store.organizationId} value={store.organizationId}>{store.organizationName}</option>)}</select>
+      }}><option value="">약국을 선택해 주시기 바랍니다</option>{stores.map(store => <option key={store.organizationId} value={store.organizationId}>{store.organizationName}</option>)}</select>
     </label>
-    {selected ? children(selected, busy => setPendingStore(busy ? selected : null)) : <p role="status">가입 상태를 확인할 약국을 선택해 주세요.</p>}
+    {selected ? children(selected, busy => setPendingStore(busy ? selected : null)) : <p role="status">가입 상태를 확인할 약국을 선택해 주시기 바랍니다.</p>}
   </>;
 }

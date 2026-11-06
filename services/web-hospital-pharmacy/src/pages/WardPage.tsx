@@ -15,9 +15,9 @@ import { useLocalDrugs } from '../contexts/LocalDrugContext';
 // 화면-국소 질의 파싱: 조사(josa)·불용어를 떼어 2자 이상 needle 만 남긴다.
 // 도메인 규칙(제품/함량/원내/동일성분)은 @o4o/hospital-pharmacy-core 가 소유하고, 여기서는 표시용 needle 만 만든다.
 const STOPWORDS = new Set([
-  '우리', '원내', '병원', '약국', '있어', '있나', '있나요', '있는지', '없어', '없나요',
+  '우리', '원내', '병원', '약국', '있어', '있나', '있습니까', '있는지', '없어', '없습니까',
   '같은', '동일', '성분', '대체', '대체약', '조사', '조사해', '조사해줘', '알려', '알려줘',
-  '확인', '보유', '재고', '해줘', '해주세요', '뭐', '무엇', '어떤',
+  '확인', '보유', '재고', '해줘', '해 주시기 바랍니다', '뭐', '무엇', '어떤',
 ]);
 function extractLocalNeedles(text: string): string[] {
   const out = new Set<string>();
@@ -90,7 +90,7 @@ export default function WardPage() {
       }
       setAnswer(text_answer);
     } catch (err) {
-      setError(err instanceof Error ? err.message : '응답을 생성하지 못했습니다. 다시 시도해 주세요.');
+      setError(err instanceof Error ? err.message : '응답을 생성하지 못했습니다. 다시 시도해 주시기 바랍니다.');
     } finally {
       setPending(false);
     }

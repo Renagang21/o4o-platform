@@ -236,7 +236,7 @@ function SnapshotSelectorDialog({
       <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle>Snapshot 선택</DialogTitle>
-          <DialogDescription>강제 배포할 Asset Snapshot을 선택하세요.</DialogDescription>
+          <DialogDescription>강제 배포할 Asset Snapshot을 선택하시기 바랍니다.</DialogDescription>
         </DialogHeader>
         <div className="flex gap-2 mb-3">
           <div className="relative flex-1">
@@ -373,7 +373,7 @@ function CreateForceAssetDialog({
               <Label>대상 매장 (Organization)</Label>
               <Select value={organizationId} onValueChange={setOrganizationId}>
                 <SelectTrigger>
-                  <SelectValue placeholder="매장을 선택하세요" />
+                  <SelectValue placeholder="매장을 선택하시기 바랍니다" />
                 </SelectTrigger>
                 <SelectContent>
                   {orgs.map((o) => (

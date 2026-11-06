@@ -83,7 +83,7 @@ function FundingOperatorWorkspace({ id }: { id: string }) {
       )}
 
       {refreshRequired && <div role="status" className="mb-4 rounded border border-amber-300 bg-amber-50 p-4 text-sm">
-        {savedBeforeRefresh ? '처리는 완료됐지만 최신 운영 현황을 확인하지 못했습니다. 다시 저장하지 말고 운영 현황을 새로고침해 주세요.' : '최신 운영 현황을 확인하지 못했습니다. 추가 처리 전에 운영 현황을 새로고침해 주세요.'}
+        {savedBeforeRefresh ? '처리는 완료됐지만 최신 운영 현황을 확인하지 못했습니다. 다시 저장하지 말고 운영 현황을 새로고침해 주시기 바랍니다.' : '최신 운영 현황을 확인하지 못했습니다. 추가 처리 전에 운영 현황을 새로고침해 주시기 바랍니다.'}
       </div>}
       {kpiError && <div role="alert" className="mb-4 rounded border border-amber-300 p-4 text-sm">
         운영 지표: {kpiError} <button disabled={offlineBusy || pending || refreshing} onClick={() => void refresh()} className="underline">운영 지표 다시 조회</button>
@@ -213,7 +213,7 @@ function FundingOperatorWorkspace({ id }: { id: string }) {
           </div>
           {allFulfilled && trial.status !== 'fulfilled' && trial.status !== 'closed' && (
             <p className="mt-2 text-xs text-green-600">
-              모든 참여자 이행이 완료되었습니다. 유통참여형 펀딩 상태 전환을 검토해주세요.
+              모든 참여자 이행이 완료되었습니다. 유통참여형 펀딩 상태 전환을 검토해 주시기 바랍니다.
             </p>
           )}
         </div>
@@ -266,12 +266,12 @@ function FundingOperatorWorkspace({ id }: { id: string }) {
               value={rejectReason}
               disabled={offlineBusy || pending}
               onChange={(e) => setRejectReason(e.target.value)}
-              placeholder="반려 사유를 입력해주세요."
+              placeholder="반려 사유를 입력해 주시기 바랍니다."
               rows={3}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 mb-1"
             />
             {/* WO-O4O-NETURE-DISTRIBUTION-FUNDING-OPERATOR-PREAPPROVAL-CHECKLIST-V1 */}
-            <p className="text-xs text-gray-500 mb-4">투자형 오해·송금 흐름·보상 조건·포럼 운영 기준 중 보완이 필요한 부분을 구체적으로 작성해 주세요.</p>
+            <p className="text-xs text-gray-500 mb-4">투자형 오해·송금 흐름·보상 조건·포럼 운영 기준 중 보완이 필요한 부분을 구체적으로 작성해 주시기 바랍니다.</p>
             <div className="flex gap-2 justify-end">
               <button
                 onClick={() => setShowRejectModal(false)}

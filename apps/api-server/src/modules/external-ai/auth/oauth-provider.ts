@@ -167,7 +167,7 @@ async function loadGrantConnection(
   } catch (error) {
     if (error instanceof InvalidTokenError)
       throw new InvalidGrantError(
-        "O4O 연결이 해제되었거나 만료되었습니다. 다시 연결해 주세요.",
+        "O4O 연결이 해제되었거나 만료되었습니다. 다시 연결해 주시기 바랍니다.",
       );
     throw error;
   }
@@ -278,7 +278,7 @@ export class ExternalAiOAuthProvider implements OAuthServerProvider {
           counts.recent >= registrationLimits.newClientsPerHour
         )
           throw new TooManyRequestsError(
-            "연결 등록 한도에 도달했습니다. 나중에 다시 시도해 주세요.",
+            "연결 등록 한도에 도달했습니다. 나중에 다시 시도해 주시기 바랍니다.",
           );
         await db.query(
           "INSERT INTO external_ai_clients(id,metadata,secret_cipher) VALUES($1,$2,$3)",
@@ -341,7 +341,7 @@ export class ExternalAiOAuthProvider implements OAuthServerProvider {
         counts.client >= authorizationLimits.pendingPerClient
       )
         throw new TooManyRequestsError(
-          "연결 요청 한도에 도달했습니다. 나중에 다시 시도해 주세요.",
+          "연결 요청 한도에 도달했습니다. 나중에 다시 시도해 주시기 바랍니다.",
         );
       await db.query(
         `INSERT INTO external_ai_credentials(hash,kind,client_id,data,expires_at)
@@ -410,7 +410,7 @@ export class ExternalAiOAuthProvider implements OAuthServerProvider {
         chosen.some((scope) => scope.startsWith("o4o:mail:")) &&
         !workspaces.some((id) => id.startsWith("mail:"))
       )
-        throw new InvalidScopeError("허용할 개인 메일 계정을 선택해 주세요.");
+        throw new InvalidScopeError("허용할 개인 메일 계정을 선택해 주시기 바랍니다.");
       if (chosen.some((scope) => !pending.data.scopes.includes(scope)))
         throw new InvalidScopeError("요청 범위를 넘는 기능입니다.");
       if (
@@ -418,7 +418,7 @@ export class ExternalAiOAuthProvider implements OAuthServerProvider {
         workspaces.length > 50 ||
         new Set(workspaces).size !== workspaces.length
       )
-        throw new InvalidScopeError("작업공간을 선택해 주세요.");
+        throw new InvalidScopeError("작업공간을 선택해 주시기 바랍니다.");
       await this.authorizeWorkspaces(
         userId,
         workspaces,
@@ -597,7 +597,7 @@ export class ExternalAiOAuthProvider implements OAuthServerProvider {
         (requestedScopes.length !== connection.scopes.length ||
           requestedScopes.some((s) => !connection.scopes.includes(s)))
       )
-        throw new InvalidScopeError("기능 변경은 다시 연결해 주세요.");
+        throw new InvalidScopeError("기능 변경은 다시 연결해 주시기 바랍니다.");
       await manager.query(
         "UPDATE external_ai_credentials SET consumed_at=now() WHERE hash=$1",
         [row.hash],

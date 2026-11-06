@@ -174,7 +174,7 @@ export class EmailAuthRecovery {
 
   async getPasswordStatus(
     userId: string,
-  ): Promise<{ hasPassword: boolean; canManage: boolean }> {
+  ): Promise<{ hasPassword: boolean; canManage: boolean; temporaryExpiresAt?: string | null }> {
     const forbidden =
       (await demoAccountService.isDemoAccount(
         userId,
@@ -183,6 +183,7 @@ export class EmailAuthRecovery {
     return {
       hasPassword: await this.context.passwords.hasPassword(userId),
       canManage: !forbidden,
+      ...(this.context.passwords.temporaryStatus ? {temporaryExpiresAt:await this.context.passwords.temporaryStatus(userId,this.context.dataSource())} : {}),
     };
   }
 

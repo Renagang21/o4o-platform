@@ -10,7 +10,7 @@ export interface PdfOptions {
 }
 
 // WO §9: 1차 상담 안내 기본 문구(직접 편집은 2차)
-export const DEFAULT_CONSULT_TEXT = '궁금한 점은 약사에게 문의하세요.';
+export const DEFAULT_CONSULT_TEXT = '궁금한 점은 약사에게 문의하시기 바랍니다.';
 
 // WO-O4O-KPA-CONTENT-PDF-PRINT-DENSITY-STYLES-V1:
 //   화면(QR/태블릿)용 스타일이 그대로 인쇄되면 글자·줄간격·여백이 커서 페이지 수가 과도하다.

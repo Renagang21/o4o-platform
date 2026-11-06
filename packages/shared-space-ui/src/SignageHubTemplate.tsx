@@ -535,7 +535,7 @@ function EmptyView({ hasFilters, emptyMessage, emptyFilteredMessage }: {
       </p>
       <p style={st.emptyDesc}>
         {hasFilters
-          ? '검색어를 변경하거나 필터를 초기화해 보세요.'
+          ? '검색어를 변경하거나 필터를 초기화해 보시기 바랍니다.'
           : '콘텐츠가 등록되면 이곳에 표시됩니다.'}
       </p>
     </div>

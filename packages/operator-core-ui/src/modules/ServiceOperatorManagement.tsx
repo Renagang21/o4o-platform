@@ -132,7 +132,7 @@ function OperatorManagementPanel({
           if (locked.current) return;
           const q = query.trim();
           if (q.length === 1) {
-            setError("검색어를 두 글자 이상 입력해 주세요.");
+            setError("검색어를 두 글자 이상 입력해 주시기 바랍니다.");
             return;
           }
           setSearch(q);
@@ -169,7 +169,7 @@ function OperatorManagementPanel({
           <>
             <h3 className="font-semibold">현재 Operator</h3>
             {data.truncated && (
-              <p>검색 결과가 많습니다. 이름·이메일로 범위를 좁혀 주세요.</p>
+              <p>검색 결과가 많습니다. 이름·이메일로 범위를 좁혀 주시기 바랍니다.</p>
             )}
             {!data.operators.length && <p>지정된 Operator가 없습니다.</p>}
             <ul className="space-y-2">
@@ -200,7 +200,7 @@ function OperatorManagementPanel({
               <>
                 <h3 className="font-semibold">활성 서비스 회원 검색 결과</h3>
                 <p className="text-sm text-gray-600">
-                  최대 30명을 표시합니다. 이름이나 이메일로 범위를 좁혀 주세요.
+                  최대 30명을 표시합니다. 이름이나 이메일로 범위를 좁혀 주시기 바랍니다.
                 </p>
                 {!data.candidates.length && (
                   <p>일치하는 활성 회원이 없습니다.</p>

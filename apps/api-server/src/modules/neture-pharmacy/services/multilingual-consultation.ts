@@ -30,11 +30,11 @@ function consultationText(mode: typeof CONSULTATION_MODES[number], input: Record
     let text: string;
     if (mode.key === 'floor-staff' && input.direction === 'to-customer') {
       const phrase = CONSULTATION_STAFF_PHRASES.find(item => item.key === input.phrase);
-      if (!phrase || input.text !== undefined) throw new NeturePharmacyError(400, 'STAFF_PHRASE_REQUIRED', '직원 응대는 안내 문구를 선택해 주세요.');
+      if (!phrase || input.text !== undefined) throw new NeturePharmacyError(400, 'STAFF_PHRASE_REQUIRED', '직원 응대는 안내 문구를 선택해 주시기 바랍니다.');
       text = phrase.text;
     } else {
       if (typeof input.text !== 'string' || !input.text.trim() || input.text.length > 1000) {
-        throw new NeturePharmacyError(400, 'INVALID_CONSULTATION_INPUT', '번역할 문장을 1,000자 이내로 입력해 주세요.');
+        throw new NeturePharmacyError(400, 'INVALID_CONSULTATION_INPUT', '번역할 문장을 1,000자 이내로 입력해 주시기 바랍니다.');
       }
       text = input.text.trim();
     }
@@ -70,24 +70,24 @@ export class MultilingualConsultationService {
   private async authorize(userId: string, organizationId: string, mode: typeof CONSULTATION_MODES[number]) {
     try {
       const access = await resolveStoreAccessLevel(this.db, userId, 'kpa', organizationId);
-      if (access.level === 'none' || access.organizationId !== organizationId) throw new NeturePharmacyError(403, 'STORE_ACCESS_REQUIRED', '이 약국의 이용 권한을 확인해 주세요.');
+      if (access.level === 'none' || access.organizationId !== organizationId) throw new NeturePharmacyError(403, 'STORE_ACCESS_REQUIRED', '이 약국의 이용 권한을 확인해 주시기 바랍니다.');
       if (access.level === 'owner' && !await roleAssignmentService.hasAnyRole(userId, ['platform:super_admin']) &&
-        await getNetureMainMembershipStatus(this.db, userId) !== 'active') throw new NeturePharmacyError(403, 'NETURE_MEMBERSHIP_REQUIRED', '회원 이용 상태를 확인해 주세요.');
+        await getNetureMainMembershipStatus(this.db, userId) !== 'active') throw new NeturePharmacyError(403, 'NETURE_MEMBERSHIP_REQUIRED', '회원 이용 상태를 확인해 주시기 바랍니다.');
       const pharmacies = await this.db.query(`SELECT status FROM neture_pharmacy_memberships WHERE organization_id=$1`, [organizationId]);
-      if (pharmacies.length !== 1 || pharmacies[0].status !== 'active') throw new NeturePharmacyError(403, 'PHARMACY_ACCESS_REQUIRED', '내 매장 승인을 확인해 주세요.');
+      if (pharmacies.length !== 1 || pharmacies[0].status !== 'active') throw new NeturePharmacyError(403, 'PHARMACY_ACCESS_REQUIRED', '내 매장 승인을 확인해 주시기 바랍니다.');
       await this.features.require(userId, organizationId, mode.feature);
       if (mode.professional && !await this.deps.professional(userId, organizationId)) {
         throw new NeturePharmacyError(403, 'PHARMACIST_CONFIRMATION_REQUIRED', '본인의 약사 자격 검증과 이 약국의 상담 업무 허가가 필요합니다.');
       }
     } catch (error) {
       if (error instanceof NeturePharmacyError) throw error;
-      throw new NeturePharmacyError(503, 'FEATURE_ACCESS_UNAVAILABLE', '상담 이용 자격을 확인하지 못했습니다. 다시 시도해 주세요.');
+      throw new NeturePharmacyError(503, 'FEATURE_ACCESS_UNAVAILABLE', '상담 이용 자격을 확인하지 못했습니다. 다시 시도해 주시기 바랍니다.');
     }
   }
 
   async requireMode(userId: string, organizationId: string, key: string) {
     const mode = CONSULTATION_MODES.find(item => item.key === key);
-    if (!mode) throw new NeturePharmacyError(400, 'INVALID_CONSULTATION_INPUT', '상담 방식을 확인해 주세요.');
+    if (!mode) throw new NeturePharmacyError(400, 'INVALID_CONSULTATION_INPUT', '상담 방식을 확인해 주시기 바랍니다.');
     await this.authorize(userId, organizationId, mode);
   }
 
@@ -95,7 +95,7 @@ export class MultilingualConsultationService {
     const mode = CONSULTATION_MODES.find(item => item.key === input.mode);
     if (!mode || !CONSULTATION_SCREEN_LANGUAGES.some(language => language.key === input.language) ||
       typeof input.direction !== 'string' || !['to-customer', 'to-staff'].includes(input.direction)) {
-      throw new NeturePharmacyError(400, 'INVALID_CONSULTATION_INPUT', '상담 방식과 언어를 확인해 주세요.');
+      throw new NeturePharmacyError(400, 'INVALID_CONSULTATION_INPUT', '상담 방식과 언어를 확인해 주시기 바랍니다.');
     }
     const text = consultationText(mode, input);
     await this.authorize(userId, organizationId, mode);
@@ -112,10 +112,10 @@ export class MultilingualConsultationService {
     // A removed invitation, expired feature or revoked professional confirmation cannot yield a late result.
     await this.authorize(userId, organizationId, mode);
     if (!output || typeof output.translation !== 'string' || !output.translation.trim() || output.translation.length > 4000) {
-      throw new NeturePharmacyError(503, 'CONSULTATION_TRANSLATION_UNAVAILABLE', '번역 결과를 확인하지 못했습니다. 다시 시도해 주세요.');
+      throw new NeturePharmacyError(503, 'CONSULTATION_TRANSLATION_UNAVAILABLE', '번역 결과를 확인하지 못했습니다. 다시 시도해 주시기 바랍니다.');
     }
     if (auto && !CONSULTATION_SCREEN_LANGUAGES.some(item => item.key === output.detectedLanguage))
-      throw new NeturePharmacyError(422, 'CONSULTATION_LANGUAGE_UNCERTAIN', '입력 언어를 확인하지 못했습니다. 고객 언어를 직접 선택해 주세요.');
+      throw new NeturePharmacyError(422, 'CONSULTATION_LANGUAGE_UNCERTAIN', '입력 언어를 확인하지 못했습니다. 고객 언어를 직접 선택해 주시기 바랍니다.');
     return { organizationId, mode: mode.key, direction: input.direction, language, source: text, translation: output.translation,
       ...(auto && output.detectedLanguage ? { detectedLanguage: output.detectedLanguage, initialStationLanguage: input.stationLanguage } : {}) };
   }

@@ -251,7 +251,7 @@ export function ForumPage({ boardSlug, title: customTitle, description: customDe
         searchValue={searchInput}
         onSearchChange={setSearchInput}
         onSearchSubmit={handleSearchSubmit}
-        searchPlaceholder="검색어를 입력하세요"
+        searchPlaceholder="검색어를 입력하시기 바랍니다"
         accentColor={PRIMARY}
         filterSlot={
           <>

@@ -28,7 +28,7 @@ export function useContentImport(organizationId: string) {
           const last = Math.max(1, Math.ceil(result.data.total / 12));
           if (page > last) { latest.cancel(); setPageValue(last); return; }
           setItems(result.data.items); setTotal(result.data.total);
-        } catch { if (active() && current()) setError('콘텐츠 목록을 불러오지 못했습니다. 다시 시도해 주세요.'); }
+        } catch { if (active() && current()) setError('콘텐츠 목록을 불러오지 못했습니다. 다시 시도해 주시기 바랍니다.'); }
         finally { if (active() && current()) setLoading(false); }
       })();
     }, 300);

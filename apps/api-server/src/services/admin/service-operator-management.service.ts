@@ -104,7 +104,7 @@ export class ServiceOperatorManagementService {
         throw new OperationError(
           409,
           "BUSINESS_OPERATOR_SCOPE_UNAVAILABLE",
-          "활성 협력사업에서 지정하세요. 개별 조합은 조합 운영 화면에서 지정합니다.",
+          "활성 협력사업에서 지정하시기 바랍니다. 개별 조합은 조합 운영 화면에서 지정합니다.",
         );
     }
   }
@@ -161,10 +161,10 @@ export class ServiceOperatorManagementService {
   }
   async validateInvitationGrant(m: EntityManager, actor: string, key: string, target?: string) {
     const scope=delegationScope(key);
-    if (CENTRAL_OPERATION_ROLES.includes(scope.operatorRole)) throw new OperationError(403,'CENTRAL_ADMIN_REQUIRED','직영 운영자 지정·회수는 통합 관리자에서 처리하세요.');
+    if (CENTRAL_OPERATION_ROLES.includes(scope.operatorRole)) throw new OperationError(403,'CENTRAL_ADMIN_REQUIRED','직영 운영자 지정·회수는 통합 관리자에서 처리하시기 바랍니다.');
     await this.authorize(m,actor,scope);
     if (!target) return;
-    if (actor===target) throw new OperationError(409,'SELF_OPERATOR_CHANGE_FORBIDDEN','자기 역할은 다른 Admin에게 요청하세요.');
+    if (actor===target) throw new OperationError(409,'SELF_OPERATOR_CHANGE_FORBIDDEN','자기 역할은 다른 Admin에게 요청하시기 바랍니다.');
     await lockOperatorAssignments(m,target);
     await demoAccountService.assertNotDemoAccount(target,m);
 
@@ -194,19 +194,19 @@ export class ServiceOperatorManagementService {
           throw new OperationError(
             409,
             "OPERATOR_ROLE_SCHEDULE_REVIEW_REQUIRED",
-            "유효기간이 설정된 역할입니다. 전체 관리자에게 기간 검토를 요청하세요.",
+            "유효기간이 설정된 역할입니다. 전체 관리자에게 기간 검토를 요청하시기 바랍니다.",
           );
         }
     if (prior?.is_active) throw new OperationError(409,'OPERATOR_ALREADY_ACTIVE','이미 활성 운영자입니다.');
   }
   async change(actor: string, key: string, userId: string, assign: boolean) {
     const scope = delegationScope(key);
-    if (CENTRAL_OPERATION_ROLES.includes(scope.operatorRole)) throw new OperationError(403,'CENTRAL_ADMIN_REQUIRED','직영 운영자 지정·회수는 통합 관리자에서 처리하세요.');
+    if (CENTRAL_OPERATION_ROLES.includes(scope.operatorRole)) throw new OperationError(403,'CENTRAL_ADMIN_REQUIRED','직영 운영자 지정·회수는 통합 관리자에서 처리하시기 바랍니다.');
     if (!uuid.test(userId))
       throw new OperationError(
         400,
         "INVALID_USER_ID",
-        "대상 사용자를 선택해 주세요.",
+        "대상 사용자를 선택해 주시기 바랍니다.",
       );
     userId = userId.toLowerCase();
     if (assign) {
@@ -221,12 +221,12 @@ export class ServiceOperatorManagementService {
         throw new OperationError(
           409,
           "SELF_OPERATOR_CHANGE_FORBIDDEN",
-          "자기 역할은 다른 Admin에게 요청하세요.",
+          "자기 역할은 다른 Admin에게 요청하시기 바랍니다.",
         );
       // Same lock as every canonical operator writer; includes preflight and audit ownership.
       await lockOperatorAssignments(m, userId);
       const [central] = await m.query(`SELECT 1 FROM role_assignments WHERE user_id=$1 AND role=$2 AND scope_type=$3 AND is_active=true LIMIT 1`,[userId,scope.operatorRole,CENTRAL_DELEGATION_SCOPE]);
-      if (central) throw new OperationError(403,'CENTRAL_OPERATOR_MANAGEMENT_REQUIRED','중앙 위임은 통합 관리자에서 회수해 주세요.');
+      if (central) throw new OperationError(403,'CENTRAL_OPERATOR_MANAGEMENT_REQUIRED','중앙 위임은 통합 관리자에서 회수해 주시기 바랍니다.');
       await demoAccountService.assertNotDemoAccount(userId, m);
       let changed = false;
 

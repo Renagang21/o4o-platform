@@ -36,7 +36,7 @@ function BranchRequestSection() {
     setNotice(null);
     setSubmitError(null);
     if (!name.trim()) {
-      setSubmitError('분회 이름을 입력하세요.');
+      setSubmitError('분회 이름을 입력하시기 바랍니다.');
       return;
     }
     const problem = slugProblem(slug);
@@ -218,7 +218,7 @@ export default function MyBranchPage() {
             )}
           </p>
         ) : (
-          <p className="text-gray-500">등록된 분회 소속이 없습니다. 분회 운영자에게 전입 등록을 요청하세요.</p>
+          <p className="text-gray-500">등록된 분회 소속이 없습니다. 분회 운영자에게 전입 등록을 요청하시기 바랍니다.</p>
         )}
       </section>
 

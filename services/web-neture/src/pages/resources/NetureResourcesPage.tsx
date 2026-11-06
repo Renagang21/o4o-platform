@@ -55,7 +55,7 @@ function useNetureResourcesConfig(): ResourcesHubConfig {
 
     heroTitle: '자료실',
     heroDesc: '공급자·매장을 위한 공유 자료 모음입니다.',
-    searchPlaceholder: '자료를 검색하세요',
+    searchPlaceholder: '자료를 검색하시기 바랍니다',
 
     pageLimit: 12,
 

@@ -278,7 +278,7 @@ export function ExternalSalesPanel({
             <div className="text-center py-10 text-slate-400">
               <ExternalLink className="w-8 h-8 mx-auto mb-2 text-slate-300" />
               <p className="text-sm">아직 이 채널에 연동한 상품이 없습니다.</p>
-              <p className="text-xs mt-1">"상품 추가"로 매장 진열 상품을 선택하세요.</p>
+              <p className="text-xs mt-1">"상품 추가"로 매장 진열 상품을 선택하시기 바랍니다.</p>
             </div>
           ) : (
             <ul className="divide-y divide-slate-100">

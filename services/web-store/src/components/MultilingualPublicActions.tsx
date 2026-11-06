@@ -77,7 +77,7 @@ function PublicActionsSession({ groupId, publishable, disabled: disabledProp = f
   const openPopup = (action: PublicAction): { ok: boolean; popup: Window | null } => {
     if (action !== 'open' && action !== 'tablet') return { ok: true, popup: null };
     const popup = window.open('about:blank', '_blank');
-    if (!popup) { setError('새 창이 차단되었습니다. 팝업을 허용하거나 URL 복사를 사용해 주세요.'); return { ok: false, popup: null }; }
+    if (!popup) { setError('새 창이 차단되었습니다. 팝업을 허용하거나 URL 복사를 사용해 주시기 바랍니다.'); return { ok: false, popup: null }; }
     popup.opener = null;
     openTab.current = popup;
     return { ok: true, popup };
@@ -86,7 +86,7 @@ function PublicActionsSession({ groupId, publishable, disabled: disabledProp = f
     if (lock.current || disabled || !isCurrent()) return;
     if (action === 'qr' && qr) { setQr(null); return; }
     const release = acquireLock ? acquireLock() : () => {};
-    if (!release) { setError('편집 내용을 저장하는 중입니다. 저장이 끝난 뒤 다시 시도해 주세요.'); return; }
+    if (!release) { setError('편집 내용을 저장하는 중입니다. 저장이 끝난 뒤 다시 시도해 주시기 바랍니다.'); return; }
     // Never leave a stale store's tab open.
     const { ok, popup } = openPopup(action);
     if (!ok) { release(); return; }
@@ -101,7 +101,7 @@ function PublicActionsSession({ groupId, publishable, disabled: disabledProp = f
       if (!['http:', 'https:'].includes(link.protocol)) throw new Error('Invalid link');
       if (onPublished && (await onPublished()) === false) {
         popup?.close(); openTab.current = null;
-        if (owned()) setError('편집 내용이 저장되는 중이라 고객용 링크·QR 전달을 중단했습니다. 발행 상태를 확인한 뒤 다시 시도해 주세요.');
+        if (owned()) setError('편집 내용이 저장되는 중이라 고객용 링크·QR 전달을 중단했습니다. 발행 상태를 확인한 뒤 다시 시도해 주시기 바랍니다.');
         return;
       }
       if (!owned()) { popup?.close(); return; }
@@ -109,7 +109,7 @@ function PublicActionsSession({ groupId, publishable, disabled: disabledProp = f
     } catch {
       popup?.close();
       if (owned()) {
-        const message = '고객용 링크·QR 작업을 완료하지 못했습니다. 다시 시도해 주세요. 저장된 콘텐츠는 공개되었을 수 있습니다.';
+        const message = '고객용 링크·QR 작업을 완료하지 못했습니다. 다시 시도해 주시기 바랍니다. 저장된 콘텐츠는 공개되었을 수 있습니다.';
         setError(message); toast.error(message);
       }
     } finally {

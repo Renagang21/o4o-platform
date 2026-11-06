@@ -283,7 +283,7 @@ export default function O4OHomePage() {
     } catch (err) {
       if (gen !== aiGenRef.current) return;
       setAnswer(null);
-      setError(err instanceof UnifiedRequestError || err instanceof Error ? err.message : '응답을 생성하지 못했습니다. 다시 시도해 주세요.');
+      setError(err instanceof UnifiedRequestError || err instanceof Error ? err.message : '응답을 생성하지 못했습니다. 다시 시도해 주시기 바랍니다.');
       // 서버 guard 가 Neture 가입 승인 전이라고 답하면 상태를 다시 읽어 입력창 자리를 안내로 바꾼다.
       if (err instanceof UnifiedRequestError && err.code === 'NETURE_MEMBERSHIP_REQUIRED') entry.reload();
     } finally {
@@ -313,8 +313,8 @@ export default function O4OHomePage() {
         >
           <div className="flex items-start justify-between gap-3">
             <p className="m-0 leading-relaxed">
-              하고 싶은 일을 한 문장으로 적어 주세요. O4O 가 할 수 있는 데까지 진행하고,
-              더 필요한 정보가 있으면 <span className="font-medium text-slate-800">짧게 물어봅니다</span> — 질문은 정상 진행이에요.
+              하고 싶은 일을 한 문장으로 적어 주시기 바랍니다. O4O 가 할 수 있는 데까지 진행하고,
+              더 필요한 정보가 있으면 <span className="font-medium text-slate-800">짧게 물어봅니다</span> — 질문은 정상 진행입니다.
             </p>
             <button
               type="button"
@@ -368,8 +368,8 @@ export default function O4OHomePage() {
             disabled={pending}
             busy={pending}
             onPaste={handlePaste}
-            aria-label="무엇을 도와드릴까요?"
-            placeholder="무엇을 도와드릴까요?"
+            aria-label="어떤 도움이 필요합니까?"
+            placeholder="어떤 도움이 필요합니까?"
             data-testid="home-composer-input"
             submitLabel="요청 실행"
             submitDisabled={!trimmed || blocked}
@@ -446,8 +446,8 @@ export default function O4OHomePage() {
       </form>
 
       {canUseHomeWorkspace && !resumeAnchor && waitingTasks.length>0 && <section className="mt-3 w-full max-w-xl rounded border p-3 text-left text-sm">
-        <p>도움이 필요한 이전 업무가 있어요.</p>
-        {waitingTasks.map(task=><button key={task.taskId} type="button" disabled={blocked} onClick={()=>{setResumeAnchor({runId:task.runId,targetId:task.targetId});setQuestion('이전 업무 이어하기');setAnswer('필요한 도움이나 진행한 내용을 입력해 주세요. 원래 PC가 연결되면 같은 업무를 이어갑니다.');}} className="mr-2 mt-2 rounded border px-3 py-2">{new Date(task.updatedAt).toLocaleString()} 업무 이어하기</button>)}
+        <p>도움이 필요한 이전 업무가 있습니다.</p>
+        {waitingTasks.map(task=><button key={task.taskId} type="button" disabled={blocked} onClick={()=>{setResumeAnchor({runId:task.runId,targetId:task.targetId});setQuestion('이전 업무 이어하기');setAnswer('필요한 도움이나 진행한 내용을 입력해 주시기 바랍니다. 원래 PC가 연결되면 같은 업무를 이어갑니다.');}} className="mr-2 mt-2 rounded border px-3 py-2">{new Date(task.updatedAt).toLocaleString()} 업무 이어하기</button>)}
       </section>}
       {canUseHomeWorkspace && <div className="mt-3 w-full max-w-xl text-left">
         <button type="button" disabled={blocked} onClick={() => setPcSetup({ context: setupContext, request: null })} className="rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 disabled:opacity-50">PC 연결 준비</button>
@@ -457,7 +457,7 @@ export default function O4OHomePage() {
         onContinue={() => { const request = activePcSetup.request; if (request) void submit(trimmed, trimmed === request.text ? request.routeHint : undefined); }} />}
       {canUseHomeWorkspace && <PharmacyOrderPanel workScope={workScope} key={JSON.stringify([user?.id, workScope])} disabled={blocked || isResolvingStore} resuming={!!resumeAnchor} draft={input} onApply={text => { setInput(text); setConfirm(null); }} onPcSetup={() => setPcSetup({ context: setupContext, request: null })} />}
       {canUseHomeWorkspace && <ManualLibraryPanel key={user?.id} library={manuals} disabled={blocked} />}
-      {manualSearchEmpty && !pending && <p role="status" className="mt-2 max-w-xl text-xs text-slate-600">선택한 매뉴얼에서 관련 내용을 찾지 못해 이번 요청에는 매뉴얼을 보내지 않았습니다. 프로그램 이름·메뉴·업무를 구체적으로 적어 주세요.</p>}
+      {manualSearchEmpty && !pending && <p role="status" className="mt-2 max-w-xl text-xs text-slate-600">선택한 매뉴얼에서 관련 내용을 찾지 못해 이번 요청에는 매뉴얼을 보내지 않았습니다. 프로그램 이름·메뉴·업무를 구체적으로 적어 주시기 바랍니다.</p>}
       {!pending && manuals.ready && manualReferencesUsed.length > 0 && <div className="w-full max-w-xl"><ManualReferences references={manualReferencesUsed} library={manuals} disabled={blocked} /></div>}
 
 
@@ -505,7 +505,7 @@ export default function O4OHomePage() {
           {pending && (
             <p className="m-0 flex items-center gap-2 text-sm text-slate-400" data-testid="home-composer-pending">
               <Loader2 className="h-3.5 w-3.5 animate-spin" />
-              처리 중... (화면에서 작업이 필요하면 열려 있는 화면을 그대로 두세요)
+              처리 중... (화면에서 작업이 필요하면 열려 있는 화면을 그대로 두시기 바랍니다)
             </p>
           )}
           {/* 서버가 "작업인지 모호" 로 되물은 경우 — 실행하지 않았다. [진행] 은 같은 문장을 다시 보낸다(§5-2). */}
@@ -542,8 +542,8 @@ export default function O4OHomePage() {
               {workResult.progress === 'needs_user' && !workResult.resumable && !requiresPcSetup(workResult) && (
                 <p className="m-0 mt-2 text-sm text-slate-700">
                   {workResult.target?.targetType === 'windows_app'
-                    ? '프로그램의 현재 화면에서 직접 이어서 진행하세요.'
-                    : 'Chrome 의 현재 화면에서 직접 이어서 진행하세요.'}{' '}
+                    ? '프로그램의 현재 화면에서 직접 이어서 진행하시기 바랍니다.'
+                    : 'Chrome 의 현재 화면에서 직접 이어서 진행하시기 바랍니다.'}{' '}
                   필요하면 다음 문장으로 다시 요청할 수 있습니다.
                 </p>
               )}
@@ -579,7 +579,7 @@ export default function O4OHomePage() {
                 <>
                   <p className="m-0">{openedSite.displayName} 사이트를 열었습니다.</p>
                   <p className="m-0 mt-1 text-slate-500">
-                    로그인이 필요한 경우 사이트에서 직접 로그인해 주세요. 이미 로그인되어 있으면 바로 눌러 주세요.
+                    로그인이 필요한 경우 사이트에서 직접 로그인해 주시기 바랍니다. 이미 로그인되어 있으면 바로 눌러 주시기 바랍니다.
                   </p>
                   <button
                     type="button"
@@ -676,7 +676,7 @@ export default function O4OHomePage() {
         <ServiceHomeHero surface="neture" client={homePresentationApi} heading="h1" />
         <section aria-labelledby="home-ai-title" className="mt-6 flex w-full flex-col items-center text-center">
           <h2 id="home-ai-title" className="m-0 text-lg font-semibold text-slate-900">O4O 업무 도우미</h2>
-          <p className="mt-2 mb-0 text-sm text-slate-500">{canUseHomeWorkspace ? '무엇을 도와드릴까요?' : '질문하거나 필요한 업무를 요청할 수 있습니다.'}</p>
+          <p className="mt-2 mb-0 text-sm text-slate-500">{canUseHomeWorkspace ? '어떤 도움이 필요합니까?' : '질문하거나 필요한 업무를 요청할 수 있습니다.'}</p>
           {canUseHomeWorkspace && netureGateStatus ? (
             <NetureMembershipNotice status={netureGateStatus} />
           ) : (
@@ -685,7 +685,7 @@ export default function O4OHomePage() {
               {hasPendingTerms ? null : composerArea}
             </>
           )}
-          {hasPendingTerms && <p className="mt-6 text-sm text-slate-600">서비스를 둘러볼 수 있습니다. 업무를 시작하려면 <Link to="/mypage" className="font-medium text-blue-700 underline">약관 동의하기</Link>를 선택해 주세요.</p>}
+          {hasPendingTerms && <p className="mt-6 text-sm text-slate-600">서비스를 둘러볼 수 있습니다. 업무를 시작하려면 <Link to="/mypage" className="font-medium text-blue-700 underline">약관 동의하기</Link>를 선택해 주시기 바랍니다.</p>}
         </section>
 
         {canUseHomeWorkspace ? (

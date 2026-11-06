@@ -54,7 +54,7 @@ export function RichTextEditor({
   value = '',
   onChange,
   onSave,
-  placeholder = '내용을 입력하세요...',
+  placeholder = '내용을 입력하시기 바랍니다...',
   editable = true,
   autoSaveInterval = 0,
   minHeight = '400px',
@@ -500,7 +500,7 @@ export function RichTextEditor({
               color: '#1e293b',
               background: '#f8fafc',
             }}
-            placeholder="HTML 코드를 직접 입력하거나 외부 HTML을 붙여넣으세요..."
+            placeholder="HTML 코드를 직접 입력하거나 외부 HTML을 붙여넣으시기 바랍니다..."
             spellCheck={false}
           />
           <p style={{ marginTop: 6, fontSize: 11, color: '#9ca3af', margin: '4px 0 0' }}>

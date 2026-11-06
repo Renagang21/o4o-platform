@@ -59,7 +59,7 @@ export default function AdminErasureHistoryPage() {
     } catch {
       if (generation === epoch.current.value)
         setError(
-          "삭제 내역을 조회하지 못했습니다. 현재 전체 관리자 권한을 확인한 뒤 다시 조회해 주세요.",
+          "삭제 내역을 조회하지 못했습니다. 현재 전체 관리자 권한을 확인한 뒤 다시 조회해 주시기 바랍니다.",
         );
     } finally {
       if (generation === epoch.current.value) setLoading(false);

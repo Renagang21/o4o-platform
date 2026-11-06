@@ -47,7 +47,7 @@ export function useVerificationEmailResend(
       );
       if (request !== generation.current.value) return;
       if (result.mailSent === false)
-        setError("확인 메일을 보내지 못했습니다. 잠시 후 다시 시도해 주세요.");
+        setError("확인 메일을 보내지 못했습니다. 잠시 후 다시 시도해 주시기 바랍니다.");
       else
         setMessage(
           result.mailSent === true

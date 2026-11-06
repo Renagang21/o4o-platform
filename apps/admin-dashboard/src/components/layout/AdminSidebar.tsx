@@ -130,9 +130,7 @@ const AdminSidebar: FC<AdminSidebarProps> = ({ isOpen, onClose }) => {
         <div className="flex h-8 items-center justify-between px-2 bg-[#1d2327]">
           {!isCollapsed && (
             <Link to="/" className="flex items-center gap-1 text-[13px] hover:text-modern-primary transition-colors">
-              <div className="w-5 h-5 bg-modern-primary rounded-sm flex items-center justify-center">
-                <span className="text-white text-xs font-bold">O</span>
-              </div>
+              <img src={`${import.meta.env.BASE_URL}brand/admin/logo-mark.svg`} alt="" aria-hidden="true" className="h-5 w-5" />
               <span>O4O Admin</span>
             </Link>
           )}

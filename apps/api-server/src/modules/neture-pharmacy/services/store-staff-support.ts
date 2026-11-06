@@ -10,7 +10,7 @@ export class StoreStaffSupportService {
   constructor(private readonly db: Executor) {}
   async product(org: string, kind: unknown, id: unknown) {
     if (!['local','listing'].includes(String(kind)) || typeof id !== 'string' || !/^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/i.test(id))
-      throw new NeturePharmacyError(400,'INVALID_PRODUCT','상품을 확인해 주세요.');
+      throw new NeturePharmacyError(400,'INVALID_PRODUCT','상품을 확인해 주시기 바랍니다.');
     const [product] = await this.db.query(`WITH products AS (
       SELECT id,'local'::text AS kind,name FROM store_local_products WHERE organization_id=$1 AND is_active=true
       UNION ALL SELECT l.id,'listing'::text AS kind,m.name FROM organization_product_listings l JOIN product_masters m ON m.id=l.master_id AND m.status='ACTIVE' WHERE l.organization_id=$1 AND l.is_active=true
@@ -55,7 +55,7 @@ export class StoreStaffSupportService {
       throw new NeturePharmacyError(
         400,
         "INVALID_LOCATION",
-        "상품과 진열 위치를 확인해 주세요(100자 이하).",
+        "상품과 진열 위치를 확인해 주시기 바랍니다(100자 이하).",
       );
     }
     const table =
@@ -95,7 +95,7 @@ export class StoreStaffSupportService {
       throw new NeturePharmacyError(
         400,
         "INVALID_DEMAND_REASON",
-        "기록할 항목을 선택해 주세요.",
+        "기록할 항목을 선택해 주시기 바랍니다.",
       );
     // One atomic row update: concurrent staff clicks cannot overwrite each other's counts.
     await this.db.query(
@@ -113,7 +113,7 @@ export class StoreStaffSupportService {
       throw new NeturePharmacyError(
         400,
         "INVALID_MONTH",
-        "조회 월을 확인해 주세요.",
+        "조회 월을 확인해 주시기 바랍니다.",
       );
     return await this.db.query(
       `SELECT o.id,o.name, o.metadata#>ARRAY['staffSupport','demandCounts',$1] AS counts

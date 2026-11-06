@@ -17,9 +17,9 @@ import type { O4OHelpSectionProps, O4OHelpUsageItem, O4OHelpServiceItem } from '
 // ─── Defaults ────────────────────────────────────────────────────────────────
 
 const DEFAULT_USAGE_ITEMS: O4OHelpUsageItem[] = [
-  { title: '매장 등록', description: '약국·매장을 플랫폼에 등록하고 운영을 시작하세요', href: '#' },
-  { title: '상품 등록', description: '취급 상품을 등록하고 파트너에게 공급하세요', href: '#' },
-  { title: '콘텐츠 활용', description: '매장용 디지털 콘텐츠를 검색하고 활용하세요', href: '#' },
+  { title: '매장 등록', description: '약국·매장을 플랫폼에 등록하고 운영을 시작하시기 바랍니다', href: '#' },
+  { title: '상품 등록', description: '취급 상품을 등록하고 파트너에게 공급하시기 바랍니다', href: '#' },
+  { title: '콘텐츠 활용', description: '매장용 디지털 콘텐츠를 검색하고 활용하시기 바랍니다', href: '#' },
 ];
 
 /** 전체 서비스 목록. currentServiceKey와 일치하는 항목은 렌더링에서 제외된다. */

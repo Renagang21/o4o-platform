@@ -67,14 +67,14 @@ export function ForeignVisitorAffiliatePublicLandingPage() {
             )}
 
             <p className="mt-6 text-xs text-slate-400">
-              자세한 안내는 매장 직원에게 문의해 주세요.<br />Please ask our staff for assistance.
+              자세한 안내는 매장 직원에게 문의해 주시기 바랍니다.<br />Please ask our staff for assistance.
             </p>
           </div>
         )}
       </main>
 
       <footer className="px-5 py-6 text-center text-[11px] text-slate-400">
-        문의는 매장에 직접 문의해 주세요 · KPA-Society
+        문의는 매장에 직접 문의해 주시기 바랍니다 · KPA-Society
       </footer>
     </div>
   );

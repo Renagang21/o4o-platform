@@ -112,7 +112,7 @@ export function ContactInquiryAdminPage({ serviceKey, api, inquiryTypeLabels = {
         data={result?.items ?? []}
         rowKey={(i) => i.id}
         loading={loading}
-        emptyMessage={listError ? '목록을 다시 불러와 주세요.' : '접수된 문의가 없습니다.'}
+        emptyMessage={listError ? '목록을 다시 불러와 주시기 바랍니다.' : '접수된 문의가 없습니다.'}
         onRowClick={(i) => openDetail(i.id)}
       />
 

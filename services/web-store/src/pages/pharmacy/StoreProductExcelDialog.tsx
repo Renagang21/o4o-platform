@@ -34,7 +34,7 @@ function ExcelSession({ onClose, onRegistered, organizationId }: Readonly<Props 
         const guess = guessProductFileColumns(result.columns);
         setBarcodeColumn(guess.barcode); setNameColumn(guess.name);
       }
-    } catch { if (current() && isCurrent()) { setData(null); setError('파일을 처리하지 못했습니다. 첫 시트·열 이름·최대 5,000행/10MB를 확인하세요.'); } }
+    } catch { if (current() && isCurrent()) { setData(null); setError('파일을 처리하지 못했습니다. 첫 시트·열 이름·최대 5,000행/10MB를 확인하시기 바랍니다.'); } }
     finally { lock.current = false; if (current() && isCurrent()) setBusy(false); }
   };
   const resetRows = () => { requests.cancel(); setData(previous => previous ? { ...previous, rows: [] } : null); setSelected({}); setOutcomes({}); setPage(0); };
@@ -62,7 +62,7 @@ function ExcelSession({ onClose, onRegistered, organizationId }: Readonly<Props 
     onClose={() => { if (!lock.current) onClose(); }} preventBackdropClose={busy}>
     <div className="max-h-[90vh] w-full max-w-5xl overflow-auto rounded-lg bg-white p-4 text-slate-900">
       <div className="flex items-start justify-between gap-2"><h2 className="text-lg font-semibold">엑셀 상품 등록·AI 자료 준비</h2><button type="button" className={button} disabled={busy} onClick={onClose}>닫기</button></div>
-      <p className="my-2 text-sm">첫 시트의 바코드·상품명 열만 사용합니다. POS 코드·가격·주문·재고는 저장하지 않습니다. 이름으로 찾은 후보는 직접 확인해 선택하세요.</p>
+      <p className="my-2 text-sm">첫 시트의 바코드·상품명 열만 사용합니다. POS 코드·가격·주문·재고는 저장하지 않습니다. 이름으로 찾은 후보는 직접 확인해 선택하시기 바랍니다.</p>
       <p className="my-2 rounded border border-teal-200 bg-teal-50 p-3 text-sm">상담자료는 O4O 관리자가 공통 상품 DB에서 검토·승인하고 갱신합니다. 승인된 자료를 상담에 활용하며 정기 점검·갱신 일정은 관리자 운영 절차에 따라 안내됩니다. 상품·언어별 준비 상태에 따라 제공 시점은 다를 수 있습니다. 엑셀 등록만으로 자료가 자동 생성되지는 않습니다.</p>
       <StoreAiReadinessNotice organizationId={organizationId} language={language} />
       <fieldset disabled={busy} className="min-w-0 space-y-3">
@@ -90,7 +90,7 @@ function ExcelSession({ onClose, onRegistered, organizationId }: Readonly<Props 
           <p className="text-xs">등록 후 내 매장 제품의 ‘안내 작성’에서 AI 상담자료를 확인합니다. 미확보 자료는 사용자 ChatGPT에서 근거를 준비하고 전체관리자가 검토·승인합니다. 공개 근거가 없으면 작성하지 않습니다. 공통 QR 설명서는 별도 관리자 제작입니다.</p>
         </>}
       </fieldset>
-      {busy && <output className="block">처리 중입니다. 상품 등록 중에는 창을 닫거나 매장을 변경하지 마세요.</output>}
+      {busy && <output className="block">처리 중입니다. 상품 등록 중에는 창을 닫거나 매장을 변경하지 마시기 바랍니다.</output>}
     </div>
   </StoreProductDialog>;
 }

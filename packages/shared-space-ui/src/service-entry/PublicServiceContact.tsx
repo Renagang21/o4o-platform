@@ -31,7 +31,7 @@ export function PublicServiceContact({
           : isPublicServiceKey(serviceKey)
             ? PUBLIC_SERVICE_ENTRIES[serviceKey].name
             : null;
-  if (!name) return <p role="alert">문의할 서비스를 확인해 주세요.</p>;
+  if (!name) return <p role="alert">문의할 서비스를 확인해 주시기 바랍니다.</p>;
   return (
     <section style={{ maxWidth: 800, margin: "0 auto", padding: "32px 16px" }}>
       <h1 style={{ fontSize: 28, fontWeight: 700, marginBottom: 16 }}>
@@ -129,7 +129,7 @@ function ConfiguredContactForm({
   if (!types.length)
     return (
       <p role="status">
-        현재 선택할 수 있는 문의 유형이 없습니다. 잠시 후 다시 확인해 주세요.
+        현재 선택할 수 있는 문의 유형이 없습니다. 잠시 후 다시 확인해 주시기 바랍니다.
       </p>
     );
   return (
@@ -153,7 +153,7 @@ function ConfiguredContactForm({
           };
           throw Error(
             e.response?.data?.error?.message ||
-              "문의를 접수하지 못했습니다. 잠시 후 다시 시도해 주세요.",
+              "문의를 접수하지 못했습니다. 잠시 후 다시 시도해 주시기 바랍니다.",
           );
         }
       }}

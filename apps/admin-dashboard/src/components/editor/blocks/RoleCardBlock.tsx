@@ -56,7 +56,7 @@ const RoleCardBlock: React.FC<RoleCardBlockProps> = ({
   const imageUrl = attributes.imageUrl || '';
   const name = attributes.name || '이름';
   const role = attributes.role || '직책';
-  const description = attributes.description || '담당 업무 또는 소개를 입력하세요';
+  const description = attributes.description || '담당 업무 또는 소개를 입력하시기 바랍니다';
   const email = attributes.email || '';
   const linkedin = attributes.linkedin || '';
   const twitter = attributes.twitter || '';
@@ -121,7 +121,7 @@ const RoleCardBlock: React.FC<RoleCardBlockProps> = ({
             <Textarea
               value={description}
               onChange={(e) => handleAttributeChange('description', e.target.value)}
-              placeholder="담당 업무 또는 소개를 입력하세요"
+              placeholder="담당 업무 또는 소개를 입력하시기 바랍니다"
               rows={3}
             />
           </div>

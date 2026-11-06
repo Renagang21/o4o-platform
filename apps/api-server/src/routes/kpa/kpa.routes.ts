@@ -882,7 +882,7 @@ export function createKpaRoutes(dataSource: DataSource): Router {
       };
       const sanitizedTags = sanitizeContentTags(tags);
       if (sanitizedTags.length === 0) {
-        res.status(400).json({ success: false, error: { code: 'VALIDATION_ERROR', message: '태그를 1개 이상 입력해주세요' } });
+        res.status(400).json({ success: false, error: { code: 'VALIDATION_ERROR', message: '태그를 1개 이상 입력해 주시기 바랍니다' } });
         return;
       }
 
@@ -1060,7 +1060,7 @@ export function createKpaRoutes(dataSource: DataSource): Router {
         };
         const sanitized = sanitizeTags(tags);
         if (sanitized.length === 0) {
-          res.status(400).json({ success: false, error: { code: 'VALIDATION_ERROR', message: '태그를 1개 이상 입력해주세요' } });
+          res.status(400).json({ success: false, error: { code: 'VALIDATION_ERROR', message: '태그를 1개 이상 입력해 주시기 바랍니다' } });
           return;
         }
         sets.push(`tags = $${idx++}`); params.push(JSON.stringify(sanitized));

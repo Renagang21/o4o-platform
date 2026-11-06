@@ -16,7 +16,7 @@ export function BusinessInboxPage() {
   const { businessKey = BUSINESS_SITE.key } = useParams();
   const { user } = useAuth();
   if (!user) {
-    return <p>로그인 후 담당 운영 권한을 확인해 주세요.</p>;
+    return <p>로그인 후 담당 운영 권한을 확인해 주시기 바랍니다.</p>;
   }
   return (
     <OperatorInbox

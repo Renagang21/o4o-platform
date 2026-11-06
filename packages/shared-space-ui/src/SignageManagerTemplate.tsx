@@ -277,7 +277,7 @@ function VideoTable({ config }: { config: SignageManagerConfig }) {
       <EmptyState
         icon={VideoIcon}
         message="등록된 동영상이 없습니다"
-        sub={config.onAddVideo ? '동영상 등록 버튼을 눌러 첫 번째 동영상을 추가하세요.' : undefined}
+        sub={config.onAddVideo ? '동영상 등록 버튼을 눌러 첫 번째 동영상을 추가하시기 바랍니다.' : undefined}
       />
     );
   }
@@ -411,7 +411,7 @@ function PlaylistTable({ config }: { config: SignageManagerConfig }) {
       <EmptyState
         icon={PlaylistIcon}
         message="등록된 플레이리스트가 없습니다"
-        sub={config.onAddPlaylist ? '플레이리스트 등록 버튼을 눌러 첫 번째 플레이리스트를 추가하세요.' : undefined}
+        sub={config.onAddPlaylist ? '플레이리스트 등록 버튼을 눌러 첫 번째 플레이리스트를 추가하시기 바랍니다.' : undefined}
       />
     );
   }

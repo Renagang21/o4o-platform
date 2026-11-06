@@ -15,12 +15,12 @@ export class CommunityPublicReadError extends Error {
 
 export function parsePublicReadInput(input: { mode?: unknown; postIds?: unknown }) {
   if (typeof input.mode !== 'string' || !['private', 'board', 'selected'].includes(input.mode)) {
-    throw new CommunityPublicReadError(400, 'INVALID_PUBLIC_READ_MODE', '공개 범위를 선택해 주세요.');
+    throw new CommunityPublicReadError(400, 'INVALID_PUBLIC_READ_MODE', '공개 범위를 선택해 주시기 바랍니다.');
   }
   const mode = input.mode as PublicReadMode;
   const ids = input.postIds ?? [];
   if (!Array.isArray(ids) || ids.length > 100 || ids.some(id => typeof id !== 'string' || !UUID.test(id))) {
-    throw new CommunityPublicReadError(400, 'INVALID_PUBLIC_POST_IDS', '유효한 게시글을 최대 100개 선택해 주세요.');
+    throw new CommunityPublicReadError(400, 'INVALID_PUBLIC_POST_IDS', '유효한 게시글을 최대 100개 선택해 주시기 바랍니다.');
   }
   if (mode !== 'selected' && ids.length) {
     throw new CommunityPublicReadError(400, 'INVALID_PUBLIC_POST_IDS', '선택 공개에서만 게시글을 지정할 수 있습니다.');
@@ -114,7 +114,7 @@ export async function listCommunityPublicReadSettings(exec: Exec, key: string, u
 
 /** Call inside a transaction. Scope and row locks precede any metadata change. */
 export async function setCommunityPublicRead(exec: Exec, key: string, user: CommunityAccessUser, boardId: string, input: { mode?: unknown; postIds?: unknown }) {
-  if (!UUID.test(boardId)) throw new CommunityPublicReadError(400, 'INVALID_BOARD_ID', '유효한 게시판을 선택해 주세요.');
+  if (!UUID.test(boardId)) throw new CommunityPublicReadError(400, 'INVALID_BOARD_ID', '유효한 게시판을 선택해 주시기 바랍니다.');
   const selection = parsePublicReadInput(input);
   const value = await workspace(exec, key, user, true);
   const [board] = await exec.query(`SELECT id, forum_type AS "forumType", metadata->'${PUBLIC_READ_KEY}' AS "publicRead" FROM forum_category_requests
@@ -142,7 +142,7 @@ export async function setCommunityPublicRead(exec: Exec, key: string, user: Comm
   // Existing production JWT signing material; no new credential or insecure fallback.
   const signingKey = process.env.JWT_SECRET;
   if (selection.mode !== 'private' && !signingKey?.trim()) {
-    throw new CommunityPublicReadError(503, 'PUBLIC_READ_UNAVAILABLE', '공개 설정을 저장할 수 없습니다. 잠시 후 다시 시도해 주세요.');
+    throw new CommunityPublicReadError(503, 'PUBLIC_READ_UNAVAILABLE', '공개 설정을 저장할 수 없습니다. 잠시 후 다시 시도해 주시기 바랍니다.');
   }
   const setting = signingKey?.trim() ? signPublicReadDesignation(value.communityKey, boardId, designation, signingKey) : designation;
   await exec.query(`UPDATE forum_category_requests SET metadata =

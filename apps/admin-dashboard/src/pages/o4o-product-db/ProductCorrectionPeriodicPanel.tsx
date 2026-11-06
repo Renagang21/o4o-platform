@@ -174,7 +174,7 @@ export default function ProductCorrectionPeriodicPanel({ canWrite }: { canWrite:
     } catch {
       if (active.current)
         setError(
-          '작업은 저장됐지만 최신 현황을 불러오지 못했습니다. 같은 작업을 다시 만들지 말고 현황을 새로고침하세요.',
+          '작업은 저장됐지만 최신 현황을 불러오지 못했습니다. 같은 작업을 다시 만들지 말고 현황을 새로고침하시기 바랍니다.',
         );
     }
   };
@@ -255,12 +255,12 @@ export default function ProductCorrectionPeriodicPanel({ canWrite }: { canWrite:
               {dashboard.worker && <p className="text-sm">
                 최근 실행: {dashboard.worker.source === 'job' ? '독립 정기 작업' : 'API 서버'} ·
                 최근 성공 {date(dashboard.worker.lastSucceededAt)} · 최근 실패 {date(dashboard.worker.lastFailedAt)}
-                {dashboard.worker.lastErrorCode && ' · 작업 실패: 다음 실행 또는 실행 오류를 확인하세요.'}
+                {dashboard.worker.lastErrorCode && ' · 작업 실패: 다음 실행 또는 실행 오류를 확인하시기 바랍니다.'}
               </p>}
               <p>
                 마지막 서버/독립 작업 점검: {date(dashboard.lastTickAt)} (한국시간). 기본 서버 실행은 약 1분
                 간격이며 휴면 중 정시 실행을 보장하지 않습니다. 독립 정기 호출의 활성화 여부는
-                운영 설정을 확인하세요.
+                운영 설정을 확인하시기 바랍니다.
               </p>
             </div>
           )}
@@ -268,7 +268,7 @@ export default function ProductCorrectionPeriodicPanel({ canWrite }: { canWrite:
             <h5 className="font-semibold">설명서 갱신 검토</h5>
             <p className="text-sm">
               상품 반영 후 관련 유형·언어의 설명서를 확인합니다. 이용 목적은 기존 작업의
-              제안값이므로 실제 용도에 맞게 선택하세요. 검토 종료는 게시·반영 완료를 뜻하지
+              제안값이므로 실제 용도에 맞게 선택하시기 바랍니다. 검토 종료는 게시·반영 완료를 뜻하지
               않습니다.
             </p>
             <select
@@ -333,7 +333,7 @@ export default function ProductCorrectionPeriodicPanel({ canWrite }: { canWrite:
                 {!renewal.record.purposes.length && (
                   <p className="text-sm">
                     이용 목적이 아직 지정되지 않았습니다. 실제 용도를 선택한 뒤 검토 기록을
-                    저장하세요.
+                    저장하시기 바랍니다.
                   </p>
                 )}
                 {renewal.record.sourceChanges?.map((change) => (
@@ -677,7 +677,7 @@ export default function ProductCorrectionPeriodicPanel({ canWrite }: { canWrite:
                         await afterSaved(
                           result
                             ? '후보 점검 처리 결과를 저장했습니다.'
-                            : '다른 처리 요청이 진행 중이거나 점검할 항목이 없습니다. 실행 상태를 확인하세요.',
+                            : '다른 처리 요청이 진행 중이거나 점검할 항목이 없습니다. 실행 상태를 확인하시기 바랍니다.',
                           () => openJob(job.id, pages.page),
                         );
                       })
@@ -736,7 +736,7 @@ export default function ProductCorrectionPeriodicPanel({ canWrite }: { canWrite:
                   </button>
                 </div>
                 <p className="text-sm">
-                  중지·취소해도 저장된 결과는 유지됩니다. 상태 충돌 시 실행 상태를 새로고침하세요.
+                  중지·취소해도 저장된 결과는 유지됩니다. 상태 충돌 시 실행 상태를 새로고침하시기 바랍니다.
                 </p>
                 {controls.map((c, index) => (
                   <p key={index} className="text-sm">

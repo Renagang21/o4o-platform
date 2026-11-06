@@ -5,7 +5,7 @@ export class OperationError extends Error {
 }
 export function operationReason(value: unknown) {
   if (typeof value !== 'string' || !value.trim() || [...value.trim()].length > 2000 || value.includes('\0'))
-    throw new OperationError(400, 'REASON_REQUIRED', '처리 사유를 1~2,000자로 입력해 주세요.');
+    throw new OperationError(400, 'REASON_REQUIRED', '처리 사유를 1~2,000자로 입력해 주시기 바랍니다.');
   return value.trim();
 }
 /** Call only within the mutation transaction. Free text is redacted from query error serialization. */

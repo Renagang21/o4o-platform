@@ -18,15 +18,33 @@ export function setupDownload(manifest, archive) {
 setlocal DisableDelayedExpansion
 chcp 65001 >nul
 set "O4O_SETUP_FILE=%~f0"
-"%SystemRoot%\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -NoLogo -NoProfile -Command "$f=[IO.File]::OpenRead($env:O4O_SETUP_FILE); $r=[IO.BinaryReader]::new($f); if($f.Length -lt 16){throw 'Invalid installer'}; $f.Position=$f.Length-16; $footer=$r.ReadBytes(16); if([Text.Encoding]::ASCII.GetString($footer,0,8) -ne 'O4OPKG1!'){throw 'Invalid installer'}; $n=[BitConverter]::ToInt64($footer,8); if($n -le 0 -or $n -gt 16384 -or $n -gt $f.Length-16){throw 'Invalid installer'}; $f.Position=0; $text=[Text.Encoding]::UTF8.GetString($r.ReadBytes([int]$n)); $r.Dispose(); & ([scriptblock]::Create($text.Substring($text.LastIndexOf('# O4O_SETUP_SCRIPT')+18)))"
+"%SystemRoot%\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -NoLogo -NoProfile -STA -WindowStyle Hidden -Command "$f=[IO.File]::OpenRead($env:O4O_SETUP_FILE); $r=[IO.BinaryReader]::new($f); if($f.Length -lt 16){throw 'Invalid installer'}; $f.Position=$f.Length-16; $footer=$r.ReadBytes(16); if([Text.Encoding]::ASCII.GetString($footer,0,8) -ne 'O4OPKG1!'){throw 'Invalid installer'}; $n=[BitConverter]::ToInt64($footer,8); if($n -le 0 -or $n -gt 16384 -or $n -gt $f.Length-16){throw 'Invalid installer'}; $f.Position=0; $text=[Text.Encoding]::UTF8.GetString($r.ReadBytes([int]$n)); $r.Dispose(); & ([scriptblock]::Create($text.Substring($text.LastIndexOf('# O4O_SETUP_SCRIPT')+18)))"
 set "O4O_SETUP_EXIT=%ERRORLEVEL%"
-if not "%O4O_SETUP_EXIT%"=="0" pause
+rem Installation result is shown in the setup window, not the console.
 exit /b %O4O_SETUP_EXIT%
 # O4O_SETUP_SCRIPT
 $ErrorActionPreference = 'Stop'
 [Console]::OutputEncoding = [Text.UTF8Encoding]::new()
 $expectedHash = '${manifest.sha256}'
 $expectedBytes = ${manifest.bytes}
+Add-Type -AssemblyName PresentationFramework
+$window = New-Object Windows.Window
+$window.Title = 'O4O PC 연결 설치'
+$window.Width = 500; $window.Height = 270; $window.WindowStartupLocation = 'CenterScreen'; $window.ResizeMode = 'NoResize'
+$panel = New-Object Windows.Controls.StackPanel; $panel.Margin = '24'
+$title = New-Object Windows.Controls.TextBlock; $title.Text = 'O4O PC 연결을 준비합니다.'; $title.FontSize = 20; $title.Margin = '0,0,0,16'
+$step = New-Object Windows.Controls.TextBlock; $step.TextWrapping = 'Wrap'; $step.Margin = '0,0,0,12'
+$bar = New-Object Windows.Controls.ProgressBar; $bar.Height = 20; $bar.Maximum = 4
+$close = New-Object Windows.Controls.Button; $close.Content = '완료'; $close.Margin = '0,20,0,0'; $close.IsEnabled = $false
+$panel.Children.Add($title) > $null; $panel.Children.Add($step) > $null; $panel.Children.Add($bar) > $null; $panel.Children.Add($close) > $null
+$window.Content = $panel; $close.Add_Click({$window.Close()})
+$window.Add_Closing({ if (-not $close.IsEnabled) { $_.Cancel = $true } })
+$window.Show()
+function Update-SetupUi([int]$number, [string]$text) {
+  $bar.Value = $number; $step.Text = $text
+  $window.Dispatcher.Invoke([Action]{}, [Windows.Threading.DispatcherPriority]::Background)
+}
+$setupExit = 0
 function Copy-EmbeddedPackage([string]$target) {
   $source = [IO.File]::OpenRead($env:O4O_SETUP_FILE)
   $outputStream = $null
@@ -66,20 +84,38 @@ $temporary = Join-Path ([IO.Path]::GetTempPath()) ('o4o-setup-' + [Guid]::NewGui
 try {
   if (-not [Environment]::Is64BitOperatingSystem -or -not [Environment]::Is64BitProcess -or $env:PROCESSOR_ARCHITECTURE -ne 'AMD64') { throw 'WINDOWS_X64_REQUIRED' }
   [void][IO.Directory]::CreateDirectory($temporary)
-  Write-Host 'O4O PC 연결을 설치합니다. 이 창에서 진행 단계를 확인해 주세요.'
+  Update-SetupUi 0 '설치 파일을 준비하고 있습니다.'
   $archive = Join-Path $temporary 'package.zip'
   $package = Join-Path $temporary 'package'
-  Write-Host '[1/4] 받은 설치 파일을 확인합니다.'
+  Update-SetupUi 1 '1 / 4 · 받은 설치 파일을 확인합니다.'
   Copy-EmbeddedPackage $archive
-  Write-Host '[2/4] 설치 파일을 검증하고 압축을 풉니다.'
+  Update-SetupUi 2 '2 / 4 · 파일 무결성을 검증하고 압축을 풉니다.'
   Expand-VerifiedPackage $archive $package
-  & (Join-Path $package 'runtime/node.exe') (Join-Path $package 'install.mjs') --window
-  if ($LASTEXITCODE -ne 0) { throw 'INSTALL_NOT_COMPLETED' }
-  Write-Host '설치가 끝났습니다. O4O 화면에서 연결 상태를 확인해 주세요.'
+  Update-SetupUi 3 '3 / 4 · 프로그램 설치와 실행 응답을 확인합니다.'
+  $bar.IsIndeterminate = $true
+  $info = New-Object Diagnostics.ProcessStartInfo
+  $info.FileName = Join-Path $package 'runtime/node.exe'
+  $entry = Join-Path $package 'install.mjs'
+  $info.Arguments = ([char]34 + $entry + [char]34 + ' --window')
+  $info.UseShellExecute = $false; $info.CreateNoWindow = $true
+  $info.RedirectStandardOutput = $true; $info.RedirectStandardError = $true
+  $process = [Diagnostics.Process]::Start($info)
+  $stdout = $process.StandardOutput.ReadToEndAsync(); $stderr = $process.StandardError.ReadToEndAsync()
+  while (-not $process.HasExited) {
+    $window.Dispatcher.Invoke([Action]{}, [Windows.Threading.DispatcherPriority]::Background)
+    [Threading.Thread]::Sleep(100)
+  }
+  $process.WaitForExit()
+  if ($process.ExitCode -ne 0) { throw 'INSTALL_NOT_COMPLETED' }
+  $bar.IsIndeterminate = $false
+  $title.Text = '설치가 완료됐습니다.'
+  Update-SetupUi 4 '4 / 4 · 프로그램 실행을 확인했습니다. O4O 화면에서 현재 계정과의 연결을 확인합니다.'
 } catch {
   if ($env:GITHUB_ACTIONS -eq 'true') { Write-Host ('O4O_SETUP_ERROR: ' + $_.Exception.Message) }
-  Write-Host '설치를 마치지 못했습니다. 열린 PC 연결 프로그램을 종료한 뒤 다시 설치해 주세요. 파일이 손상됐다면 O4O에서 다시 받아 주세요.'
-  exit 1
+  $bar.IsIndeterminate = $false
+  $title.Text = '설치를 완료하지 못했습니다.'
+  Update-SetupUi 0 '기존 데이터는 보존됩니다. PC 연결 프로그램을 정상 종료한 뒤 다시 시도하거나 설치 파일을 다시 받으시기 바랍니다.'
+  $setupExit = 1
 } finally {
   # Windows can briefly retain the exited runtime image (for example during scanning).
   # Retry only our own random extraction directory; never terminate processes.
@@ -88,11 +124,19 @@ try {
       if ([IO.Directory]::Exists($temporary)) { [IO.Directory]::Delete($temporary, $true) }
       break
     } catch {
-      if ($attempt -eq 24) { Write-Host '임시 설치 파일 정리를 마치지 못했습니다. 설치 결과는 위 안내를 확인해 주세요.' }
+      if ($attempt -eq 24) { Write-Host '임시 설치 파일 정리를 마치지 못했습니다. 설치 결과는 위 안내를 확인해 주시기 바랍니다.' }
       else { [Threading.Thread]::Sleep(200) }
     }
   }
 }
+$close.IsEnabled = $true
+if ($setupExit -ne 0) { $close.Content = '닫기' }
+if ($env:GITHUB_ACTIONS -eq 'true') { $window.Close() }
+while ($window.IsVisible) {
+  $window.Dispatcher.Invoke([Action]{}, [Windows.Threading.DispatcherPriority]::Background)
+  [Threading.Thread]::Sleep(100)
+}
+exit $setupExit
 `.replace(/\n/g, "\r\n"),
     "utf8",
   );

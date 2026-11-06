@@ -47,4 +47,4 @@ export function decideHospitalSurfacePlan(
 
 /** question plan 일 때 되묻는 표준 문구(§6 — QUESTION 은 실패가 아니라 정상 진행). */
 export const HOSPITAL_QUESTION_ANSWER =
-  '어떤 약품에 대해, 무엇을 도와드릴까요? 예) "타이레놀정의 효능을 조사해줘" · "이 약과 같은 성분의 원내약 있어?"';
+  '어떤 약품에 대해, 어떤 도움이 필요합니까? 예) "타이레놀정의 효능을 조사해줘" · "이 약과 같은 성분의 원내약 있어?"';

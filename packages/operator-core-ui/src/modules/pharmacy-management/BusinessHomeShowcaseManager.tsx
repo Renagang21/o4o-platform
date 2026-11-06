@@ -31,7 +31,7 @@ function Manager({ businessKey }: Readonly<{ businessKey: string }>) {
       if (current) setState(data);
     }).catch(() => { if (current) setError('진열 목록을 조회하지 못했습니다.'); });
     api.get(`${base}/showcase-history`).then(r => { if (current) setHistory(r.data.data); })
-      .catch(() => { if (current) setHistoryError('처리 이력을 조회하지 못했습니다. 다시 조회해 주세요.'); });
+      .catch(() => { if (current) setHistoryError('처리 이력을 조회하지 못했습니다. 다시 조회해 주시기 바랍니다.'); });
     return () => { current = false; };
   }, [api, base, businessKey, open, retry]);
   async function save(row: Row, hidden: boolean, position: number) {
@@ -44,7 +44,7 @@ function Manager({ businessKey }: Readonly<{ businessKey: string }>) {
     } catch (e) {
       if (!alive.current) return;
       const response = e as { response?: { data?: { error?: string } } };
-      setError(response.response?.data?.error ?? '저장하지 못했습니다. 입력을 보존했습니다. 다시 시도해 주세요.');
+      setError(response.response?.data?.error ?? '저장하지 못했습니다. 입력을 보존했습니다. 다시 시도해 주시기 바랍니다.');
     } finally { gate.current = false; if (alive.current) setBusy(false); }
   }
   return <section className="rounded-lg border p-4 space-y-3" aria-label="메인 진열 관리">

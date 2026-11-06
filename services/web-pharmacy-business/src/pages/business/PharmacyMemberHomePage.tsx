@@ -72,26 +72,26 @@ export default function PharmacyMemberHomePage() {
     <div className="cooperation-member-intro"><BusinessHomeFeature key={`${scope}:hero`} businessKey={business.key} mode="hero" fallback={<header className="member-home-heading border-b border-slate-200 pb-5">
       <p className="text-xs font-semibold tracking-wide text-blue-700">{businessName} · 협력약국 공간</p>
       <h1 id="member-home-title" className="mt-2 text-2xl font-bold tracking-tight text-slate-950 sm:text-3xl">약국에 필요한 소식과 자료</h1>
-      <p className="mt-2 text-sm leading-6 text-slate-600">본부가 전하는 소식부터 제품 정보, 회원 약국의 이야기까지 확인하세요.</p>
+      <p className="mt-2 text-sm leading-6 text-slate-600">본부가 전하는 소식부터 제품 정보, 회원 약국의 이야기까지 확인하시기 바랍니다.</p>
     </header>} /></div>
     <CooperationMemberHomeLayout summary={<>
       <section className="rounded-xl border border-slate-200 bg-white p-5">
         <h2 className="text-lg font-semibold">내 참여 상태</h2>
-        <p className="mt-3 text-sm text-slate-600">{access?.canManage ? '담당 사업 운영자' : access?.allowed ? '참여 승인 · 이용 가능' : '참여 신청·승인 상태를 확인해 주세요.'}</p>
+        <p className="mt-3 text-sm text-slate-600">{access?.canManage ? '담당 사업 운영자' : access?.allowed ? '참여 승인 · 이용 가능' : '참여 신청·승인 상태를 확인해 주시기 바랍니다.'}</p>
         <p className="mt-2 text-sm text-slate-600">가입·자료 이용 자격은 약국별로 확인합니다.</p>
         {materialStore.selection}
         <Link className="mt-4 inline-flex min-h-11 items-center text-sm font-semibold text-blue-700" to={membershipPath}>가입·승인 상태 확인</Link>
       </section>
       <section className="rounded-xl border border-slate-200 bg-white p-5">
         <h2 className="text-lg font-semibold">회원 지원</h2>
-        <p className="mt-3 text-sm text-slate-600">참여 조건이나 자료 활용이 궁금하면 담당 본부에 문의하세요.</p>
+        <p className="mt-3 text-sm text-slate-600">참여 조건이나 자료 활용이 궁금하면 담당 본부에 문의하시기 바랍니다.</p>
         <Link className="mt-4 inline-flex min-h-11 items-center text-sm font-semibold text-blue-700" to="/contact">문의하기</Link>
         <Link className="mt-2 block py-3 text-sm text-blue-700" to={businessPath(business.key, 'tools')}>내 약국 업무 안내</Link>
       </section>
     </>}>
     {!access?.allowed ? <section className="rounded-xl border bg-white p-6">
       <h2 className="text-lg font-semibold">참여 신청 · 이용 안내</h2>
-      <p className="my-3 text-sm leading-6 text-slate-600">사업 소식과 운영 자료는 참여 승인 후 이용할 수 있습니다. 신청 조건과 현재 상태를 확인해 주세요.</p>
+      <p className="my-3 text-sm leading-6 text-slate-600">사업 소식과 운영 자료는 참여 승인 후 이용할 수 있습니다. 신청 조건과 현재 상태를 확인해 주시기 바랍니다.</p>
       <Link className="font-medium text-blue-700" to={membershipPath}>참여 신청 · 상태 확인 →</Link>
     </section> : <>
       {!access.canManage && user && <CooperationMemberWorkflows client={authClient.api} accountId={user.id} kind="business" scopeKey={business.key} organizationId={materialStore.organizationId} />}
@@ -102,7 +102,7 @@ export default function PharmacyMemberHomePage() {
       </section>
       <section aria-labelledby="materials-title" className="space-y-4">
         <SectionHeading id="materials-title" icon={<BookOpen size={20} aria-hidden="true" />} title="약국 운영 자료" to={selectedMaterialsPath} linkLabel="전체 자료" />
-        <p className="text-sm leading-6 text-slate-600">본부가 제공하는 콘텐츠를 살펴보고, 사용할 자료는 내 매장에서 사본으로 가져오세요.</p>
+        <p className="text-sm leading-6 text-slate-600">본부가 제공하는 콘텐츠를 살펴보고, 사용할 자료는 내 매장에서 사본으로 가져오시기 바랍니다.</p>
         {access.canManage && <p className="text-sm text-slate-600">자료의 작성·검토·게시는 {canManageHere ? <Link to={`/operator/semi-franchises?key=${encodeURIComponent(business.key)}&tab=contents`} className="text-blue-700">사업 자료 관리 →</Link> : '해당 사업의 담당 운영 화면'}에서 진행합니다.</p>}
       </section>
       <div id="business-products" className="scroll-mt-28">
@@ -114,12 +114,12 @@ export default function PharmacyMemberHomePage() {
           <DataState state={currentPosts} retry={() => setRetryPosts(n => n + 1)} empty={false} emptyText="">
             <PostRows posts={conversations} base={forumPath} />
           </DataState>
-          <div className="rounded-lg bg-slate-50 p-4"><p className="text-sm leading-6 text-slate-600">궁금한 점을 묻고, 다른 약국에 도움이 될 경험을 나눠 주세요.</p>
+          <div className="rounded-lg bg-slate-50 p-4"><p className="text-sm leading-6 text-slate-600">궁금한 점을 묻고, 다른 약국에 도움이 될 경험을 나눠 주시기 바랍니다.</p>
             <Link to={`${forumPath}/write`} className="mt-4 inline-flex min-h-11 items-center gap-2 rounded-lg bg-blue-700 px-4 py-2 text-sm font-medium text-white">이야기 나누기 <ArrowUpRight size={16} aria-hidden="true" /></Link>
           </div>
         </div>
       </section>}
-      {!showConversations && business.communityKey && <Link to={`${forumPath}/write`} className="inline-flex min-h-11 items-center text-sm font-medium text-blue-700">회원 게시판에서 이야기를 나눠 주세요 →</Link>}
+      {!showConversations && business.communityKey && <Link to={`${forumPath}/write`} className="inline-flex min-h-11 items-center text-sm font-medium text-blue-700">회원 게시판에서 이야기를 나눠 주시기 바랍니다 →</Link>}
     </>}
     </CooperationMemberHomeLayout>
     <nav aria-label="회원 지원" className="flex flex-wrap items-center gap-x-6 gap-y-3 border-t border-slate-200 pt-5 text-sm text-slate-600">

@@ -201,7 +201,7 @@ export const DEFAULT_TABLET_LABELS: StoreTabletDisplaysLabels = {
   pageTitle: '태블릿 진열 관리',
   subtitle: '태블릿에 표시할 상품을 구성합니다. 공급 상품과 자체 상품을 혼합할 수 있습니다.',
   emptyTabletsTitle: '등록된 태블릿이 없습니다',
-  emptyTabletsHint: '매장에 태블릿을 먼저 등록해 주세요.',
+  emptyTabletsHint: '매장에 태블릿을 먼저 등록해 주시기 바랍니다.',
   idleDescription:
     '매장이 일정 시간 사용되지 않을 때 태블릿이 자동으로 보여줄 이미지/영상 목록입니다. 고객이 화면을 터치하면 즉시 상품 안내 화면으로 돌아갑니다.',
 };

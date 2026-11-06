@@ -386,7 +386,7 @@ export default function OperatorSupplierApprovalPage() {
               disabled={busy}
               value={rejectReason}
               onChange={(e) => setRejectReason(e.target.value)}
-              placeholder="거절 사유를 입력하세요 (선택)"
+              placeholder="거절 사유를 입력하시기 바랍니다 (선택)"
               className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 mb-4"
               rows={3}
             />

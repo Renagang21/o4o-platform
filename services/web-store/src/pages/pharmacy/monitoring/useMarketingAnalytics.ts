@@ -32,7 +32,7 @@ export function useMarketingAnalytics(organizationId: string) {
       if (!current() || !ownerRef.current()) throw new Error('Inactive request');
       return reply;
     } catch {
-      if (current() && ownerRef.current()) setError('홍보 분석을 불러오지 못했습니다. 다시 시도해 주세요.');
+      if (current() && ownerRef.current()) setError('홍보 분석을 불러오지 못했습니다. 다시 시도해 주시기 바랍니다.');
       throw new Error('Marketing analytics unavailable');
     } finally {
       if (current() && ownerRef.current()) setLoading(false);

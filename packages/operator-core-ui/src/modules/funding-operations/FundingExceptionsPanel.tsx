@@ -55,7 +55,7 @@ export default function FundingExceptionsPanel() {
       }
     } catch {
       if (active()) {
-        setError("예외 현황을 조회하지 못했습니다. 다시 조회해 주세요.");
+        setError("예외 현황을 조회하지 못했습니다. 다시 조회해 주시기 바랍니다.");
         setItems([]);
         setHasMore(false);
       }
@@ -72,7 +72,7 @@ export default function FundingExceptionsPanel() {
       <p className="text-sm text-slate-600">
         현재 오프라인 기록을 기준으로 한 확인 목록입니다. 입금 대기는 연체
         판정이 아니며, 실제 송금·환불을 실행하지 않습니다. 기록을 수정한 뒤 다시
-        조회해 해소 여부를 확인하세요.
+        조회해 해소 여부를 확인하시기 바랍니다.
       </p>
       <div className="flex flex-wrap gap-3">
         <label className="text-sm">

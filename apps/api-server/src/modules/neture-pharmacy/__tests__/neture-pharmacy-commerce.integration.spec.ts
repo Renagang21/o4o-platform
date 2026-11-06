@@ -20,7 +20,7 @@ import { resolveCommunityWorkspace, listCommunityWorkspaces, createCommunityBoar
  */
 import { DataSource } from 'typeorm';
 import { randomUUID } from 'crypto';
-import { PharmacyMembershipService, type PharmacyStoreProvisioner } from '../services/pharmacy-membership.service.js';
+import { PharmacyMembershipService, type PharmacyStoreProvisioner } from '../../../__tests__/fixtures/legacy-pharmacy-application.js';
 import { SemiFranchiseService } from '../services/semi-franchise.service.js';
 import { getSupplyOption, listSupplyOptions } from '../services/supply-access.js';
 import { SupplyProposalService } from '../services/supply-proposal.service.js';

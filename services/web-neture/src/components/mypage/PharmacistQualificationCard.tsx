@@ -33,7 +33,7 @@ export default function PharmacistQualificationCard() {
       .catch(() => {
         if (alive)
           setError(
-            "약사 자격 상태를 불러오지 못했습니다. 설정 화면을 다시 열어 주세요.",
+            "약사 자격 상태를 불러오지 못했습니다. 설정 화면을 다시 열어 주시기 바랍니다.",
           );
       });
     return () => {
@@ -54,7 +54,7 @@ export default function PharmacistQualificationCard() {
       setConfirmed(false);
     } catch {
       setError(
-        "자격 신청을 처리하지 못했습니다. 계정 상태와 면허번호를 확인해 주세요.",
+        "자격 신청을 처리하지 못했습니다. 계정 상태와 면허번호를 확인해 주시기 바랍니다.",
       );
     } finally {
       lock.current = false;
@@ -66,7 +66,7 @@ export default function PharmacistQualificationCard() {
       <h2 className="text-lg font-semibold">약사 자격</h2>
       <p>
         일반 회원은 약사 자격 없이 이용할 수 있습니다. 약사 전용 기능과 약국
-        경영 업무에 필요한 자격만 별도로 신청하세요.
+        경영 업무에 필요한 자격만 별도로 신청하시기 바랍니다.
       </p>
       {value && (
         <p role="status">현재 상태: {labels[value.status] ?? "확인 필요"}</p>

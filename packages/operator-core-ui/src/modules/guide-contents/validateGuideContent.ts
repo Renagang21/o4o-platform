@@ -39,20 +39,20 @@ export function validateGuideContent(payload: GuideContentPayload): GuideValidat
   // title: required, non-empty, length limit
   const trimmedTitle = title.trim();
   if (!trimmedTitle) {
-    return { valid: false, error: '제목을 입력해 주세요.' };
+    return { valid: false, error: '제목을 입력해 주시기 바랍니다.' };
   }
   if (trimmedTitle.length > MAX_TITLE_LENGTH) {
-    return { valid: false, error: `제목은 ${MAX_TITLE_LENGTH}자 이하로 입력해 주세요.` };
+    return { valid: false, error: `제목은 ${MAX_TITLE_LENGTH}자 이하로 입력해 주시기 바랍니다.` };
   }
 
   // description: optional, length limit
   if (description.trim().length > MAX_DESCRIPTION_LENGTH) {
-    return { valid: false, error: `설명은 ${MAX_DESCRIPTION_LENGTH}자 이하로 입력해 주세요.` };
+    return { valid: false, error: `설명은 ${MAX_DESCRIPTION_LENGTH}자 이하로 입력해 주시기 바랍니다.` };
   }
 
   // steps: required, min 1
   if (!Array.isArray(steps) || steps.length === 0) {
-    return { valid: false, error: '단계 안내를 1개 이상 입력해 주세요.' };
+    return { valid: false, error: '단계 안내를 1개 이상 입력해 주시기 바랍니다.' };
   }
 
   // steps: max count

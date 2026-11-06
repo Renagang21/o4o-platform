@@ -118,7 +118,7 @@ export function createContentTemplateRoutes(dataSource: DataSource): Router {
       if (!name || typeof name !== 'string' || !name.trim()) {
         res.status(400).json({
           success: false,
-          error: { code: 'VALIDATION_ERROR', message: '템플릿 이름을 입력해주세요.' },
+          error: { code: 'VALIDATION_ERROR', message: '템플릿 이름을 입력해 주시기 바랍니다.' },
         });
         return;
       }

@@ -138,7 +138,7 @@ function AuthoringSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>)
           if (current() && isCurrent()) hydrate(full);
         } else if (current() && isCurrent()) setTitle(productName ? `${productName} 다국어 안내` : '');
       } catch {
-        if (current() && isCurrent()) setError('콘텐츠를 불러오지 못했습니다. 다시 시도해 주세요.');
+        if (current() && isCurrent()) setError('콘텐츠를 불러오지 못했습니다. 다시 시도해 주시기 바랍니다.');
       } finally { if (current() && isCurrent()) setIsLoading(false); }
     })();
     return reads.cancel;
@@ -187,7 +187,7 @@ function AuthoringSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>)
 
   const handleSaveGroup = async () => {
     if (!validTarget || lock.current || !isCurrent()) return;
-    if (!title.trim()) { setSaveError('콘텐츠 제목을 입력하세요.'); return; }
+    if (!title.trim()) { setSaveError('콘텐츠 제목을 입력하시기 바랍니다.'); return; }
     const current = writes.begin();
     lock.current = true; setIsSavingGroup(true); setSaveError(null);
     try {
@@ -199,14 +199,14 @@ function AuthoringSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>)
       if (group) { setGroup(saved); setTitle(saved.title); setDefaultLocale(saved.defaultLocale); }
       else hydrate(saved);
       toast.success(isNew ? '다국어 콘텐츠가 생성되었습니다 (초안)' : '기본 정보가 저장되었습니다');
-    } catch { if (current() && isCurrent()) setSaveError('기본 정보 저장 결과를 확인하지 못했습니다. 입력을 유지했습니다. 다시 시도해 주세요.'); }
+    } catch { if (current() && isCurrent()) setSaveError('기본 정보 저장 결과를 확인하지 못했습니다. 입력을 유지했습니다. 다시 시도해 주시기 바랍니다.'); }
     finally { lock.current = false; if (current() && isCurrent()) setIsSavingGroup(false); }
   };
 
   const persistPage = async (publish: boolean, statusOnly = false) => {
     // Non-HTML pages keep their original body: block upserts, but allow status-only changes (e.g. unpublish).
     if (!group || lock.current || (unsupported && !statusOnly) || !isCurrent()) return;
-    if (!statusOnly && !activeDraft.title.trim()) { setSaveError('이 언어의 제목을 입력하세요.'); return; }
+    if (!statusOnly && !activeDraft.title.trim()) { setSaveError('이 언어의 제목을 입력하시기 바랍니다.'); return; }
     const locale = activeLocale;
     const current = writes.begin();
     lock.current = true; setIsSavingPage(true); setSaveError(null);
@@ -224,7 +224,7 @@ function AuthoringSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>)
         ? { ...prev[locale], status: saved.pages.find(p => p.locale === locale)?.status ?? 'draft' }
         : draftFromPage(saved.pages.find(p => p.locale === locale)) }));
       toast.success(`${STORE_MLC_LOCALE_LABELS[locale]} 페이지가 ${statusOnly ? '초안으로 변경' : publish ? '발행' : '저장'}되었습니다`);
-    } catch { if (current() && isCurrent()) setSaveError('언어별 저장 결과를 확인하지 못했습니다. 선택한 언어와 입력을 유지했습니다. 다시 시도해 주세요.'); }
+    } catch { if (current() && isCurrent()) setSaveError('언어별 저장 결과를 확인하지 못했습니다. 선택한 언어와 입력을 유지했습니다. 다시 시도해 주시기 바랍니다.'); }
     finally { lock.current = false; if (current() && isCurrent()) setIsSavingPage(false); }
   };
 
@@ -334,7 +334,7 @@ function AuthoringSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>)
             published={group.pages.some(p => p.status === 'published')} /></>}
       </div>
 
-      {dirty && <p className="text-sm text-amber-800">미저장 변경이 있습니다. 기본 정보와 언어별 본문을 저장한 뒤 고객용 링크·QR을 사용해 주세요.</p>}
+      {dirty && <p className="text-sm text-amber-800">미저장 변경이 있습니다. 기본 정보와 언어별 본문을 저장한 뒤 고객용 링크·QR을 사용해 주시기 바랍니다.</p>}
       {!group && (
         <div className="flex items-start gap-3 p-4 border rounded-xl text-sm bg-amber-50/70 border-amber-200 text-amber-800">
           <Globe className="w-4 h-4 shrink-0 mt-0.5 opacity-70" />
@@ -471,18 +471,18 @@ function AuthoringSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>)
                     }}
                   onApplyHtml={(html) => setActiveDraft({ html })}
                 />}
-              {unsupported && <p role="status" className="text-sm text-amber-800">이 언어는 HTML 편집을 지원하지 않는 형식입니다. 원본 형식을 유지하며 발행 내용 보기에서 확인해 주세요.</p>}
+              {unsupported && <p role="status" className="text-sm text-amber-800">이 언어는 HTML 편집을 지원하지 않는 형식입니다. 원본 형식을 유지하며 발행 내용 보기에서 확인해 주시기 바랍니다.</p>}
               <RichTextEditor showInternalAi={false}
                 key={`${group.id}:${activeLocale}`}
                 value={activeDraft.html}
                 onChange={(c) => setActiveDraft({ html: c.html })}
-                placeholder={`${STORE_MLC_LOCALE_LABELS[activeLocale]} 본문을 작성하세요`}
+                placeholder={`${STORE_MLC_LOCALE_LABELS[activeLocale]} 본문을 작성하시기 바랍니다`}
                 minHeight="360px"
                 editable={!busy && !unsupported}
               />
             </div>
             <p className="text-xs text-slate-400">
-              언어별 내용은 동일할 필요가 없습니다. 각 언어 독립 안내 페이지로 작성하세요. 스캔 시 하나의 QR 에서 언어 탭으로 표시됩니다.
+              언어별 내용은 동일할 필요가 없습니다. 각 언어 독립 안내 페이지로 작성하시기 바랍니다. 스캔 시 하나의 QR 에서 언어 탭으로 표시됩니다.
             </p>
           </div>
         </div>

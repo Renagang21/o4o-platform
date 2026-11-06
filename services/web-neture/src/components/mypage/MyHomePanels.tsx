@@ -34,12 +34,12 @@ function ResourcePolicyNotice({ pending, reload }: { pending: PendingPolicyAccep
       return { success: true };
     } catch {
       if (alive.current) reload();
-      return { success: false, error: "약관 상태를 다시 확인해 주세요." };
+      return { success: false, error: "약관 상태를 다시 확인해 주시기 바랍니다." };
     }
   };
   return <div>
     <PolicyAcceptanceGate inline pending={pending} loadPolicy={loadPolicy} onAccept={accept} onLogout={logout}
-      serviceName="이용하려는 서비스" leadText="이 항목을 조회하려면 해당 서비스의 약관을 확인해 주세요. 다른 항목은 계속 이용할 수 있습니다.">
+      serviceName="이용하려는 서비스" leadText="이 항목을 조회하려면 해당 서비스의 약관을 확인해 주시기 바랍니다. 다른 항목은 계속 이용할 수 있습니다.">
       {null}
     </PolicyAcceptanceGate>
   </div>;
@@ -488,7 +488,7 @@ export function MyHomeActivity({
       {communities.length === 0 ? (
         <p className={BOX}>
           현재 참여할 수 있는 커뮤니티가 없습니다. 참여 서비스에서 이용 상태를
-          확인해 주세요.
+          확인해 주시기 바랍니다.
         </p>
       ) : (
         (compact ? communities.slice(0, 3) : communities).map((c) => (
@@ -554,9 +554,9 @@ function StoreBusinessRecords({ accountId, organizationId, compact, canEnterComm
   const visible = items?.slice(compact ? 0 : (page - 1) * 10, compact ? 3 : page * 10);
   return <section className={BOX} aria-label="내 매장 협력사업 참여 현황">
     <h2 className="text-lg font-semibold">약국 협력사업 참여 현황</h2>
-    <p className="mt-2 text-sm text-slate-600">선택한 약국이 참여한 협력사업입니다. 가입자 공간에서 소식을 확인하고 상품·자료는 내 매장에서 이용합니다. 매장이 여러 곳이면 이동 후 매장을 다시 선택해 주세요.</p>
+    <p className="mt-2 text-sm text-slate-600">선택한 약국이 참여한 협력사업입니다. 가입자 공간에서 소식을 확인하고 상품·자료는 내 매장에서 이용합니다. 매장이 여러 곳이면 이동 후 매장을 다시 선택해 주시기 바랍니다.</p>
     {!result.data ? <ResourceNotice error={result.error} reload={result.reload} /> : !items ?
-      <p className="mt-3 text-sm text-amber-800">선택한 매장의 사업 참여 정보를 조회할 수 없습니다. 내 매장에서 이용 권한을 확인해 주세요.</p> :
+      <p className="mt-3 text-sm text-amber-800">선택한 매장의 사업 참여 정보를 조회할 수 없습니다. 내 매장에서 이용 권한을 확인해 주시기 바랍니다.</p> :
       items.length === 0 ? <p className="mt-3 text-sm text-slate-500">운영 중인 약국 협력사업에 표시할 참여 기록이 없습니다.</p> : <>
         <ul className="mt-3 divide-y divide-slate-100">{visible!.map(item => <li key={item.key} className="py-3 text-sm"><div className="flex flex-wrap justify-between gap-2"><span className="break-words font-medium">{item.name}</span><span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-600">{item.status}</span></div>{item.active && <MyHomeBusinessEntry key={`${item.key}:${item.hasCommunity}`} businessKey={item.key} organizationId={organizationId} hasCommunity={item.hasCommunity && canEnterCommunity} />}{item.active && item.communityKey && canEnterCommunity && <BusinessNews key={`${accountId}:${organizationId}:${item.key}:${item.communityKey}`} accountId={accountId} organizationId={organizationId} businessKey={item.key} communityKey={item.communityKey} />}</li>)}</ul>
         {compact ? <p className="mt-2 text-xs text-slate-500">참여 기록 {items.length}건 중 최대 3건을 표시합니다.</p> : <RecordPages page={page} total={items.length} limit={10} label="협력사업 참여" onChange={setPage} />}
@@ -776,7 +776,7 @@ function StoreManagement({
         <h2 className="text-lg font-semibold">경영 현황</h2>
         <p className="mt-2 text-sm text-slate-600">
           현재 조회할 수 있는 매장 통계가 없습니다. 승인된 내 매장이 있으면 참여
-          서비스에서 매장 관리를 이용해 주세요.
+          서비스에서 매장 관리를 이용해 주시기 바랍니다.
         </p>
         <Link
           className="mt-3 inline-block text-blue-700 underline"

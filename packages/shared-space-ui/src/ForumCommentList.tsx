@@ -91,7 +91,7 @@ function CommentRow({
       await onEditComment(comment.id, draft.trim());
       setEditing(false);
     } catch (e) {
-      setError(e instanceof Error ? e.message : '댓글을 저장하지 못했습니다. 다시 시도해 주세요.');
+      setError(e instanceof Error ? e.message : '댓글을 저장하지 못했습니다. 다시 시도해 주시기 바랍니다.');
     } finally {
       processing.current = false;
       setSaving(false);
@@ -102,7 +102,7 @@ function CommentRow({
     if (processing.current || !onDeleteComment) return;
     processing.current = true; setRemoving(true); setError('');
     try { await onDeleteComment(comment.id); }
-    catch (e) { setError(e instanceof Error ? e.message : '댓글을 삭제하지 못했습니다. 다시 시도해 주세요.'); }
+    catch (e) { setError(e instanceof Error ? e.message : '댓글을 삭제하지 못했습니다. 다시 시도해 주시기 바랍니다.'); }
     finally { processing.current = false; setRemoving(false); }
   };
 

@@ -22,11 +22,11 @@ export function DemoLoginButtons<TUser>({ loginWithEmail, onSuccess, onFailure }
       const result = await loginWithEmail(account.email, account.password);
       if (result.success && result.user) onSuccess(result.user);
       else {
-        setError(result.error || '테스트 계정으로 로그인하지 못했습니다. 잠시 후 다시 시도해 주세요.');
+        setError(result.error || '테스트 계정으로 로그인하지 못했습니다. 잠시 후 다시 시도해 주시기 바랍니다.');
         onFailure?.(result);
       }
     } catch {
-      setError('테스트 계정으로 로그인하지 못했습니다. 잠시 후 다시 시도해 주세요.');
+      setError('테스트 계정으로 로그인하지 못했습니다. 잠시 후 다시 시도해 주시기 바랍니다.');
     } finally {
       lock.current = false;
       setBusy(null);

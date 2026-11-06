@@ -64,13 +64,13 @@ describe('common service member workflow', () => {
     mount(client, { rejectReason: { required: true } });
     fireEvent.click(await screen.findByText('검증 회원'));
     fireEvent.change(screen.getByLabelText('반려 사유'), {
-      target: { value: '보완해주세요' },
+      target: { value: '보완해 주시기 바랍니다' },
     });
     fireEvent.click(screen.getByRole('button', { name: '반려' }));
     await screen.findByText('반려 장애');
     expect(
       (screen.getByLabelText('반려 사유') as HTMLTextAreaElement).value,
-    ).toBe('보완해주세요');
+    ).toBe('보완해 주시기 바랍니다');
     fireEvent.click(screen.getByRole('button', { name: '반려' }));
     await screen.findByRole('status');
     expect(client.updateStatus).toHaveBeenCalledTimes(2);
@@ -243,7 +243,7 @@ describe('common service member workflow', () => {
     expect(client.updateStatus).toHaveBeenCalledTimes(1);
     expect(screen.getByRole('status').textContent).toContain('처리 완료');
   });
-  it('keeps approval-only mode free of editing, deletion and bulk controls', async () => {
+  it('supports single detail selection in approval-only mode without editing, deletion or batch changes', async () => {
     const client = api();
     mount(client, {
       consoleMode: 'approval',
@@ -252,8 +252,9 @@ describe('common service member workflow', () => {
       canDeleteMembership: true,
     });
     await screen.findByText('검증 회원');
-    expect(screen.queryByRole('checkbox')).toBeNull();
-    fireEvent.click(screen.getByText('검증 회원'));
+    expect(screen.getAllByRole('checkbox').length).toBeGreaterThan(1);
+    fireEvent.click(screen.getAllByRole('checkbox').at(-1)!);
+    fireEvent.click(screen.getByRole('button',{name:'선택 회원 상세'}));
     expect(screen.queryByRole('button', { name: '비활성화' })).toBeNull();
     expect(screen.queryByRole('button', { name: '수정' })).toBeNull();
   });

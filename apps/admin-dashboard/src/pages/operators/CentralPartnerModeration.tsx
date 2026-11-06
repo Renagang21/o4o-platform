@@ -36,7 +36,7 @@ export default function CentralPartnerModeration({
     try {
       await work();
     } catch {
-      setError("처리하지 못했습니다. 최신 상태를 다시 확인해 주세요.");
+      setError("처리하지 못했습니다. 최신 상태를 다시 확인해 주시기 바랍니다.");
     } finally {
       lock.current = false;
       setBusy(false);

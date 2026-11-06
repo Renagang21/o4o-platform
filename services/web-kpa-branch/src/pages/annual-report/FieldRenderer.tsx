@@ -104,7 +104,7 @@ function renderControl(
           disabled={locked}
           onChange={(e) => set(coerce(e.target.value, options))}
         >
-          <option value="">선택하세요</option>
+          <option value="">선택하시기 바랍니다</option>
           {options.map((o) => (
             <option key={String(o.value)} value={String(o.value)}>
               {o.label}
@@ -168,7 +168,7 @@ function renderControl(
       // 업로드 파이프라인 연결은 후속 분리 (WO §11). 필드는 표시하되 입력은 막는다.
       return (
         <div className="rounded border border-dashed border-gray-300 px-3 py-2 text-sm text-gray-500">
-          파일 첨부는 준비 중입니다. 분회 사무국으로 제출해 주세요.
+          파일 첨부는 준비 중입니다. 분회 사무국으로 제출해 주시기 바랍니다.
         </div>
       );
 

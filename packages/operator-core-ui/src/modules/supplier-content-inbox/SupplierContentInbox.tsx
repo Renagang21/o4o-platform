@@ -349,7 +349,7 @@ export function SupplierContentInbox({
                 </details>
               )}
               <p className="text-xs text-slate-400">
-                게시하면 이 서비스의 콘텐츠로 노출됩니다. 수정이 필요하면 보류한 뒤 콘텐츠 관리 화면에서 편집하세요.
+                게시하면 이 서비스의 콘텐츠로 노출됩니다. 수정이 필요하면 보류한 뒤 콘텐츠 관리 화면에서 편집하시기 바랍니다.
               </p>
             </div>
           )}

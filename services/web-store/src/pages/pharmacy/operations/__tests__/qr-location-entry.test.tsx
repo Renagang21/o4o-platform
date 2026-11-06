@@ -47,7 +47,7 @@ it('a pending old-store list cannot reopen its target after switching stores', a
   api.list.mockReturnValueOnce(new Promise(done => { resolve = done; }));
   const h = render(view()); await waitFor(() => expect(api.list).toHaveBeenCalledOnce());
   api.store = 'B'; h.rerender(view());
-  await screen.findByText('매장 또는 업무가 변경되었습니다. 현재 매장의 QR을 다시 선택해 주세요.');
+  await screen.findByText('매장 또는 업무가 변경되었습니다. 현재 매장의 QR을 다시 선택해 주시기 바랍니다.');
   await act(async () => resolve(feed()));
   expect(api.placements).not.toHaveBeenCalled();
   expect(screen.queryByRole('link', { name: '위치별 현황으로 돌아가기' })).toBeNull();

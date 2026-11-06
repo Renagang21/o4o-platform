@@ -47,7 +47,7 @@ it('does not refresh after a write finishes following unmount', async () => {
   await act(async()=>finish({skipped:false}));expect(api.list).toHaveBeenCalledTimes(1);
 });
 it('renders a structured server conflict as failure text rather than crashing the result dialog',async()=>{
- api.markRead.mockRejectedValueOnce({response:{data:{error:{code:'CONTACT_CHANGED',message:'최신 문의를 확인하세요.'}}}});
+ api.markRead.mockRejectedValueOnce({response:{data:{error:{code:'CONTACT_CHANGED',message:'최신 문의를 확인하시기 바랍니다.'}}}});
  render(<Page/>);await select();fireEvent.click(screen.getByRole('button',{name:'선택 문의 확인',exact:true}));
- fireEvent.click(await screen.findByRole('button',{name:'실패 항목 1건 보기'}));expect(screen.getByText(/최신 문의를 확인하세요/)).toBeTruthy();
+ fireEvent.click(await screen.findByRole('button',{name:'실패 항목 1건 보기'}));expect(screen.getByText(/최신 문의를 확인하시기 바랍니다/)).toBeTruthy();
 });

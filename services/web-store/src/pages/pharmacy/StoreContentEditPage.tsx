@@ -203,7 +203,7 @@ export default function StoreContentEditPage() {
           <RichTextEditor showInternalAi={false}
             value={editorInitialHtml}
             onChange={(c) => setEditorContent(c)}
-            placeholder="본문 내용을 입력하세요"
+            placeholder="본문 내용을 입력하시기 바랍니다"
             minHeight="420px"
             preset="full"
           />

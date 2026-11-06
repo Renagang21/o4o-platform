@@ -63,7 +63,7 @@ export function useTabletDevices(
     } catch {
       if (isCurrent())
         setLoadError(
-          "연결된 태블릿을 불러오지 못했습니다. 다시 시도해 주세요.",
+          "연결된 태블릿을 불러오지 못했습니다. 다시 시도해 주시기 바랍니다.",
         );
     } finally {
       if (isCurrent()) setLoading(false);
@@ -121,7 +121,7 @@ export function useTabletDevices(
       if (isCurrent())
         notifyRef.current({
           type: "error",
-          message: "연결 코드를 발급하지 못했습니다. 다시 시도해 주세요.",
+          message: "연결 코드를 발급하지 못했습니다. 다시 시도해 주시기 바랍니다.",
         });
     } finally {
       pairingLocks.current.delete(organizationId);
@@ -160,7 +160,7 @@ export function useTabletDevices(
       if (isCurrent())
         notifyRef.current({
           type: "error",
-          message: "태블릿 작업을 완료하지 못했습니다. 다시 시도해 주세요.",
+          message: "태블릿 작업을 완료하지 못했습니다. 다시 시도해 주시기 바랍니다.",
         });
     } finally {
       locks.delete(device.id);

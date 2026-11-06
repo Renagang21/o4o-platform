@@ -1,3 +1,4 @@
+import { operatorMemberTarget } from '../../middleware/operator-member-target.middleware.js';
 import { presentationHandlers } from '../home-presentation/home-presentation.routes.js';
 /**
  * KPA Branch Routes
@@ -608,11 +609,13 @@ export function createKpaBranchRoutes(): Router {
   router.patch(
     '/admin/service-members/:membershipId/approve',
     ...adminGuards,
+    operatorMemberTarget,
     wrap(BranchServiceMembershipController.approve),
   );
   router.patch(
     '/admin/service-members/:membershipId/reject',
     ...adminGuards,
+    operatorMemberTarget,
     wrap(BranchServiceMembershipController.reject),
   );
 

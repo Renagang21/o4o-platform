@@ -308,7 +308,7 @@ function ImprovementRequestModal({
           <textarea
             value={memo}
             onChange={(e) => setMemo(e.target.value)}
-            placeholder="추가로 전달할 내용이 있다면 작성해주세요..."
+            placeholder="추가로 전달할 내용이 있다면 작성해 주시기 바랍니다..."
             className={`w-full px-3 py-2 border border-slate-200 rounded-lg text-sm resize-none focus:outline-none focus:ring-2 ${theme.modal.focusRing} focus:border-transparent`}
             rows={3}
           />

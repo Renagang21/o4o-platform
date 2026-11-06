@@ -276,7 +276,7 @@ export function createAdminServiceLegalController(dataSource: DataSource, requir
               || (effectiveDate !== undefined && toTime(effectiveDate) !== toTime(doc.effective_date))
               || slugChanged;
             if (immutableTouched || (acceptedBusinessPolicy && title !== undefined && normalizeStr(title) !== doc.title)) {
-              throw new ServicePolicyLifecycleError('PUBLISHED_POLICY_IMMUTABLE', '게시 중인 문서의 본문·버전·시행일·표식은 수정할 수 없습니다. 새 버전을 등록해 게시하세요.', 409);
+              throw new ServicePolicyLifecycleError('PUBLISHED_POLICY_IMMUTABLE', '게시 중인 문서의 본문·버전·시행일·표식은 수정할 수 없습니다. 새 버전을 등록해 게시하시기 바랍니다.', 409);
             }
           }
           // The account marker belongs to a newly created row, including after unpublish/restore.
@@ -349,7 +349,7 @@ export function createAdminServiceLegalController(dataSource: DataSource, requir
 
           if (action === 'publish') {
             if ([doc.title, doc.content].some(value => typeof value !== 'string' || value.trim().length === 0)) {
-              throw new ServicePolicyLifecycleError('POLICY_DISPLAY_FIELDS_REQUIRED', '게시할 정책 문서의 제목과 본문을 입력해 주세요.', 400);
+              throw new ServicePolicyLifecycleError('POLICY_DISPLAY_FIELDS_REQUIRED', '게시할 정책 문서의 제목과 본문을 입력해 주시기 바랍니다.', 400);
             }
             if (doc.service_key === 'neture' && ['terms', 'privacy'].includes(doc.document_type) && doc.slug === (doc.document_type === 'terms' ? COMMON_ACCOUNT_TERMS_SLUG : 'neture-account-privacy')
               && (doc.version < 2 || !doc.effective_date)) {
@@ -361,14 +361,14 @@ export function createAdminServiceLegalController(dataSource: DataSource, requir
             if (doc.service_key === 'neture' && doc.document_type === 'terms' && doc.slug === COMMON_ACCOUNT_TERMS_SLUG) {
               const privacy = await readCurrentPolicyDocument(manager, 'neture', 'privacy', true);
               if (!privacy || privacy.slug !== 'neture-account-privacy' || Number(privacy.version) !== doc.version || !privacy.title?.trim() || !privacy.content?.trim()) {
-                throw new ServicePolicyLifecycleError('COMMON_ACCOUNT_POLICY_PAIR_REQUIRED', '같은 버전의 공통 개인정보 처리방침을 먼저 준비해 주세요.', 409);
+                throw new ServicePolicyLifecycleError('COMMON_ACCOUNT_POLICY_PAIR_REQUIRED', '같은 버전의 공통 개인정보 처리방침을 먼저 준비해 주시기 바랍니다.', 409);
               }
             }
             if (doc.service_key === 'neture' && doc.document_type === 'privacy') {
               const terms = await readCurrentPolicyDocument(manager, 'neture', 'terms', true);
               if (terms?.slug === COMMON_ACCOUNT_TERMS_SLUG && Number(terms.version) >= 2
                 && (doc.slug !== 'neture-account-privacy' || doc.version !== Number(terms.version))) {
-                throw new ServicePolicyLifecycleError('COMMON_ACCOUNT_POLICY_PAIR_REQUIRED', '공통 약관이 적용 중입니다. 같은 버전의 개인정보 처리방침을 유지해 주세요.', 409);
+                throw new ServicePolicyLifecycleError('COMMON_ACCOUNT_POLICY_PAIR_REQUIRED', '공통 약관이 적용 중입니다. 같은 버전의 개인정보 처리방침을 유지해 주시기 바랍니다.', 409);
               }
             }
             // 같은 유형의 기존 published 문서 → draft
@@ -392,7 +392,7 @@ export function createAdminServiceLegalController(dataSource: DataSource, requir
             if (doc.service_key === 'neture' && doc.document_type === 'privacy' && doc.slug === 'neture-account-privacy' && doc.status === 'published') {
               const terms = await readCurrentPolicyDocument(manager, 'neture', 'terms', true);
               if (terms?.slug === COMMON_ACCOUNT_TERMS_SLUG && Number(terms.version) >= 2) {
-                throw new ServicePolicyLifecycleError('COMMON_ACCOUNT_POLICY_PAIR_REQUIRED', '공통 약관이 적용 중입니다. 정책 전환 순서를 먼저 확인해 주세요.', 409);
+                throw new ServicePolicyLifecycleError('COMMON_ACCOUNT_POLICY_PAIR_REQUIRED', '공통 약관이 적용 중입니다. 정책 전환 순서를 먼저 확인해 주시기 바랍니다.', 409);
               }
             }
             doc.status = 'draft';

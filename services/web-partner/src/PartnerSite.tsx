@@ -219,7 +219,7 @@ export default function PartnerSite() {
   return (
     <>
       <GlobalHeader
-        brand={{ name: "O4O Partner", icon: "p.", href: "/" }}
+        brand={{ name: "O4O Partner", icon: "p.", logoSrc: `${import.meta.env.BASE_URL}brand/partner/logo-mark.svg`, href: "/" }}
         publicNav={PARTNER_PUBLIC_NAV}
         contextualNav={membership.operator ? PARTNER_OPERATOR_NAV : []}
         user={
@@ -393,7 +393,7 @@ export default function PartnerSite() {
               <h1>
                 함께 만들고,
                 <br />
-                경험을 나누세요.
+                경험을 나누시기 바랍니다.
               </h1>
               <p>
                 콘텐츠 제작 팁과 채널 활동 경험, 궁금한 점을 파트너들과 나누는
@@ -409,7 +409,7 @@ export default function PartnerSite() {
                 {!user ? (
                   <>
                     <p>
-                      O4O 계정으로 로그인한 뒤 커뮤니티에 별도로 가입하세요.
+                      O4O 계정으로 로그인한 뒤 커뮤니티에 별도로 가입하시기 바랍니다.
                       작업공간 초대와 커뮤니티 가입은 각각 관리됩니다.
                     </p>
                     <Link
@@ -437,7 +437,7 @@ export default function PartnerSite() {
                     {membership.status === "suspended"
                       ? "이용 정지"
                       : membership.status}
-                    . 운영자에게 이용 상태를 확인해 주세요.
+                    . 운영자에게 이용 상태를 확인해 주시기 바랍니다.
                   </p>
                 ) : (
                   <form
@@ -452,7 +452,7 @@ export default function PartnerSite() {
                   >
                     <p>
                       서로를 존중하고, 타인의 개인정보·무단 복제 콘텐츠·스팸을
-                      게시하지 마세요. 게시글과 댓글은 커뮤니티 회원에게
+                      게시하지 마시기 바랍니다. 게시글과 댓글은 커뮤니티 회원에게
                       표시됩니다.
                     </p>
                     {policies.map((p) => (
@@ -727,7 +727,7 @@ function CommunityContent({
                     className="text-button danger"
                     disabled={busy}
                     onClick={() => {
-                      if (confirm("이 글을 삭제할까요?"))
+                      if (confirm("이 글을 삭제하시겠습니까?"))
                         action(async () => {
                           await communityApi.remove(post.id, post.revision);
                           nav(`/community/boards/${post.board_id}`);
@@ -790,7 +790,7 @@ function CommunityContent({
                       className="text-button danger"
                       disabled={busy}
                       onClick={() => {
-                        if (confirm("이 댓글을 삭제할까요?"))
+                        if (confirm("이 댓글을 삭제하시겠습니까?"))
                           action(async () => {
                             await communityApi.removeComment(c.id, c.revision);
                             await reload();
@@ -919,7 +919,7 @@ function CommunityContent({
         })}
       <div className="panel">
         {!items.length && (
-          <p>아직 게시글이 없습니다. 첫 이야기를 남겨보세요.</p>
+          <p>아직 게시글이 없습니다. 첫 이야기를 남겨보시기 바랍니다.</p>
         )}
         {items.map((p) => (
           <article className="community-list-item" key={p.id}>

@@ -66,7 +66,7 @@ export default function SemiFranchiseContentFormPage({ businessKey, returnPath }
 
       {archived ? (
         <div className="rounded-lg border border-gray-200 bg-white p-8 text-center text-sm text-gray-500">
-          보관되거나 반려된 콘텐츠는 수정할 수 없습니다. 공급자 요청 자료는 원본을 보완한 뒤 새로 요청하고, 운영자 작성 자료는 목록에서 다시 게시한 뒤 수정하세요.
+          보관되거나 반려된 콘텐츠는 수정할 수 없습니다. 공급자 요청 자료는 원본을 보완한 뒤 새로 요청하고, 운영자 작성 자료는 목록에서 다시 게시한 뒤 수정하시기 바랍니다.
         </div>
       ) : (
         <form onSubmit={submit} aria-busy={saving} className="rounded-lg border border-gray-200 bg-white p-5">
@@ -80,7 +80,7 @@ export default function SemiFranchiseContentFormPage({ businessKey, returnPath }
                 const tags = form.tags.split(',').map(tag => tag.trim()).filter(Boolean);
                 if (!tags.includes(outline.tag) && tags.length < 20) set('tags', [...tags, outline.tag].join(', '));
               }}>{outline.name} 양식</button>)}</div>}
-              <p>권장 태그를 선택하거나 아래 태그 입력란에 주제를 직접 입력하세요.</p>
+              <p>권장 태그를 선택하거나 아래 태그 입력란에 주제를 직접 입력하시기 바랍니다.</p>
               <div className="flex flex-wrap gap-2">{materialGuide.tags.map(tag => <button type="button" key={tag} className="min-h-11 rounded border bg-white px-3 py-2" onClick={() => {
                 const tags = form.tags.split(',').map(value => value.trim()).filter(Boolean);
                 if (!tags.includes(tag) && tags.length < 20) set('tags', [...tags, tag].join(', '));
@@ -117,7 +117,7 @@ export default function SemiFranchiseContentFormPage({ businessKey, returnPath }
                   value={form.body}
                   onChange={(c) => set('body', c.html)}
                   editable={!saving}
-                  placeholder="약국에 전달할 내용을 입력하세요..."
+                  placeholder="약국에 전달할 내용을 입력하시기 바랍니다..."
                   preset="compact"
                   minHeight="300px"
                 />
@@ -139,8 +139,8 @@ export default function SemiFranchiseContentFormPage({ businessKey, returnPath }
                 checked={form.tags.split(',').map(tag => tag.trim()).includes('staff-quick-guide')}
                 disabled={!form.tags.split(',').map(tag => tag.trim()).includes('staff-quick-guide') && form.tags.split(',').filter(tag => tag.trim()).length >= 20}
                 onChange={event => { const tags = form.tags.split(',').map(tag => tag.trim()).filter(tag => tag && tag !== 'staff-quick-guide'); set('tags', [...tags, ...(event.target.checked ? ['staff-quick-guide'] : [])].join(', ')); }} />직원 숙지 자료로 사용</label>
-              <p className="mb-2 text-xs text-gray-500">게시하면 가입 약국의 직원 현장 지원 ‘짧게 익히기’에 표시합니다. 핵심 안내를 짧게 작성해 주세요.</p>
-              {form.tags.split(',').filter(tag => tag.trim()).length >= 20 && <p className="text-xs text-gray-500">태그가 20개이면 기존 태그 하나를 지운 뒤 선택해 주세요.</p>}
+              <p className="mb-2 text-xs text-gray-500">게시하면 가입 약국의 직원 현장 지원 ‘짧게 익히기’에 표시합니다. 핵심 안내를 짧게 작성해 주시기 바랍니다.</p>
+              {form.tags.split(',').filter(tag => tag.trim()).length >= 20 && <p className="text-xs text-gray-500">태그가 20개이면 기존 태그 하나를 지운 뒤 선택해 주시기 바랍니다.</p>}
               <label className="mb-1 block text-sm font-medium text-gray-700">태그</label>
               <input
                 className={INPUT}

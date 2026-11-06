@@ -90,7 +90,7 @@ export function resolveOperatorTargetServiceKey(
       error: new OperatorRegistrationContractError(
         400,
         'MULTI_SERVICE_NOT_ALLOWED',
-        '한 번의 등록에서는 대상 서비스를 하나만 선택할 수 있습니다. 서비스별로 나누어 등록하세요.',
+        '한 번의 등록에서는 대상 서비스를 하나만 선택할 수 있습니다. 서비스별로 나누어 등록하시기 바랍니다.',
       ),
     };
   }
@@ -358,7 +358,7 @@ export class AdminUserController {
       }
       res.status(400).json({
         success: false, code: 'OPERATOR_INVITATION_REQUIRED',
-        error: '운영자 지정은 서비스 운영자 초대 메일의 확인·수락 절차를 이용하세요. 이메일로 기존 계정을 찾아 즉시 권한을 부여하지 않습니다.',
+        error: '운영자 지정은 서비스 운영자 초대 메일의 확인·수락 절차를 이용하시기 바랍니다. 이메일로 기존 계정을 찾아 즉시 권한을 부여하지 않습니다.',
       });
     } catch (error) {
       if (error instanceof OperatorRoleContractError) {

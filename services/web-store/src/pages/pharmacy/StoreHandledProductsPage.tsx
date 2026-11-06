@@ -343,29 +343,36 @@ function HandledProductsSession({ workspace, navigation }: ProductPageProps) {
         }
         icon={<Boxes size={20} style={{ color: colors.primary }} />}
         title={workspace ? '상품·거래' : STORE_PRODUCT_NAME}
-        description="상품을 찾고 선택해 상세정보·안내 작업을 시작하세요."
+        description="상품을 검색하거나 선택하면 상세정보·안내 작업을 시작할 수 있습니다."
       />
 
       <StoreAiSlot />
       <StoreCommerceNavigation />
       <nav aria-label="상품 빠른 작업" className="relative mb-3 flex flex-wrap items-center gap-2">
-          <button type="button" onClick={() => setShowExcel(true)} style={styles.primaryBtn}>엑셀 상품 등록·AI 자료 준비</button>
+          <details name="store-product-actions" className="relative rounded-lg border border-blue-600 bg-white text-sm">
+            <summary className="min-h-11 cursor-pointer rounded-lg bg-blue-600 px-4 py-3 font-semibold text-white">제품 등록</summary>
+            <div className="absolute left-0 z-30 mt-1 flex w-[min(21rem,calc(100vw-3rem))] flex-col gap-2 rounded-xl border bg-white p-3 shadow-lg">
+          <button type="button" onClick={() => setShowExcel(true)} style={styles.refreshBtn}>엑셀 상품 등록·AI 자료 준비</button>
           {/* WO-O4O-STORE-HANDLED-PRODUCTS-PRODUCTMASTER-LIST-LINK-V1:
               O4O 표준 상품 DB(ProductMaster)를 검색·선택하여 내 매장 제품으로 등록. */}
-          <button onClick={() => setShowAddO4oModal(true)} style={styles.primaryBtn}>
+          <button type="button" onClick={() => setShowAddO4oModal(true)} style={styles.refreshBtn}>
             <Boxes size={14} />
             O4O 제품에서 찾아 등록
           </button>
           {/* WO-O4O-KPA-STORE-NEW-PRODUCT-REQUEST-AND-ADMIN-APPROVAL-V1 (P1):
               O4O DB 에 없는 신규 상품의 등록 요청(제출·상태). 기존 상품은 위 '표준 상품에서 추가'로. */}
-          <button onClick={openLocalCreate} disabled={localSaving} style={styles.primaryBtn}>
+          <button type="button" onClick={openLocalCreate} disabled={localSaving} style={styles.refreshBtn}>
             <PlusCircle size={14} /> 직접 등록하기
           </button>
-          <details className="rounded-lg border border-slate-200 bg-white text-sm">
+            </div>
+          </details>
+          <button type="button" onClick={() => navigate(`${base}/product-settings`)} style={styles.refreshBtn}>제품 진열 설정</button>
+          <button type="button" onClick={reload} style={styles.refreshBtn}><RefreshCw size={14} />새로고침</button>
+          <details name="store-product-actions" className="relative rounded-lg border border-slate-200 bg-white text-sm">
             <summary className="min-h-11 cursor-pointer content-center px-3">더보기</summary>
             <div className="absolute left-0 z-30 mt-1 w-[min(21rem,calc(100vw-3rem))] max-h-[60vh] overflow-y-auto rounded-xl border bg-white p-3 shadow-lg">
             <div className="flex flex-wrap gap-2">
-          <button onClick={() => navigate(`${base}/product-settings`)} style={styles.refreshBtn}>제품 진열 설정</button>
+
           <button onClick={openNewRequest} style={styles.requestBtn}>
             <PlusCircle size={14} />
             O4O DB 등록 요청
@@ -375,10 +382,7 @@ function HandledProductsSession({ workspace, navigation }: ProductPageProps) {
             내 등록 요청
           </button>
 
-          <button onClick={reload} style={styles.refreshBtn}>
-            <RefreshCw size={14} />
-            새로고침
-          </button>
+
             </div>
             {navigation}
             </div>

@@ -115,7 +115,7 @@ describe('store purchase actions use current server state', () => {
     expect(checkout.disabled).toBe(true);
     fireEvent.click(checkout);
     expect(api.checkout).not.toHaveBeenCalled();
-    expect(screen.getByText('수량 변경을 적용한 후 주문을 확정해 주세요.')).toBeTruthy();
+    expect(screen.getByText('수량 변경을 적용한 후 주문을 확정해 주시기 바랍니다.')).toBeTruthy();
   });
 
   it('shows delivery and tracking separately from the checkout payment status', async () => {

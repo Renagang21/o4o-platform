@@ -208,7 +208,7 @@ describe('Candidate creation existing workflow', () => {
     mount('create', '?barcode=FIXTURE');
     await waitFor(() =>
       expect(mocks.toast.error).toHaveBeenCalledWith(
-        '바코드 조회에 실패했습니다. 잠시 후 다시 시도해 주세요.',
+        '바코드 조회에 실패했습니다. 잠시 후 다시 시도해 주시기 바랍니다.',
       ),
     );
     expect(screen.queryByRole('button', { name: /기존 제품에 공급 연결/ })).toBeNull();
@@ -218,14 +218,14 @@ describe('Candidate creation existing workflow', () => {
     mocks.product.getCategories.mockRejectedValueOnce(new Error('unavailable'));
     mount('create');
     fireEvent.click(screen.getByRole('button', { name: '다음', exact: true }));
-    expect(screen.getByText('상품명을 입력해주세요.')).toBeTruthy();
+    expect(screen.getByText('상품명을 입력해 주시기 바랍니다.')).toBeTruthy();
     fireEvent.click(await screen.findByRole('button', { name: '다시 시도' }));
     await screen.findByRole('option', { name: '일반 카테고리' });
     expect(mocks.product.getCategories).toHaveBeenCalledTimes(2);
   });
   it('sends a Candidate-only payload without price or publication fields', async () => {
     await createStep3();
-    fireEvent.change(screen.getByLabelText('소비자에게 보이는 간이 설명을 입력하세요...'), {
+    fireEvent.change(screen.getByLabelText('소비자에게 보이는 간이 설명을 입력하시기 바랍니다...'), {
       target: { value: '검증 설명' },
     });
     fireEvent.click(screen.getByRole('button', { name: '제품 정보 검토 요청', exact: true }));
@@ -322,7 +322,7 @@ describe('Candidate creation existing workflow', () => {
     expect(sessionStorage.getItem('neture-import-draft')).toBeNull();
     fireEvent.click(screen.getByRole('button', { name: '다음', exact: true }));
     expect(screen.queryByLabelText('검증 공급가')).toBeNull();
-    expect(screen.getByLabelText('소비자에게 보이는 간이 설명을 입력하세요...')).toBeTruthy();
+    expect(screen.getByLabelText('소비자에게 보이는 간이 설명을 입력하시기 바랍니다...')).toBeTruthy();
   });
 });
 
@@ -361,11 +361,11 @@ describe('Import existing workflow', () => {
 
   it('requires a product type and rejects unrelated HTML', async () => {
     mount('import');
-    fireEvent.change(screen.getByPlaceholderText('관리자 상품 수정 페이지의 HTML을 붙여넣으세요'), {
+    fireEvent.change(screen.getByPlaceholderText('관리자 상품 수정 페이지의 HTML을 붙여넣으시기 바랍니다'), {
       target: { value: '<p>기타 HTML</p>' },
     });
     fireEvent.click(screen.getByRole('button', { name: '관리자 상품 데이터 분석' }));
-    expect(screen.getByText('먼저 제품 유형(의약품/비의약품)을 선택해 주세요.')).toBeTruthy();
+    expect(screen.getByText('먼저 제품 유형(의약품/비의약품)을 선택해 주시기 바랍니다.')).toBeTruthy();
     expect(mocks.supplier.copyImages).not.toHaveBeenCalled();
   });
   it('parses locally and preserves the incoming precise type in the draft handoff', async () => {
@@ -422,7 +422,7 @@ describe('Import existing workflow', () => {
     expect(
       (
         screen.getByPlaceholderText(
-          '관리자 상품 수정 페이지의 HTML을 붙여넣으세요',
+          '관리자 상품 수정 페이지의 HTML을 붙여넣으시기 바랍니다',
         ) as HTMLTextAreaElement
       ).value,
     ).toBe('');

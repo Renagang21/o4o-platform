@@ -67,7 +67,7 @@ it('funding notices use the explicit project pin adapter and closed projects exp
   await act(async () => {}); expect(pin).toHaveBeenCalledWith('post-a', true); expect(mocks.pin).not.toHaveBeenCalled();
   view.unmount();
   render(<MemoryRouter initialEntries={[`${basePath}/post/notice`]}><Routes><Route path={`${basePath}/post/:slug`} element={<ForumPostPage basePath={basePath} canModerate readOnly pinPost={pin} />} /></Routes></MemoryRouter>);
-  await screen.findByText('참여자 안내'); expect(screen.queryByRole('button', { name: '공지로 고정' })).toBeNull(); expect(screen.queryByPlaceholderText('댓글을 입력하세요...')).toBeNull();
+  await screen.findByText('참여자 안내'); expect(screen.queryByRole('button', { name: '공지로 고정' })).toBeNull(); expect(screen.queryByPlaceholderText('댓글을 입력하시기 바랍니다...')).toBeNull();
 });
 
 it.each(['neture:admin', 'platform:super_admin'])('uses explicit funding moderation instead of client role %s for another author', async role => {

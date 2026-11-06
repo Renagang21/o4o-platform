@@ -132,6 +132,10 @@ import { CompleteMemberErasureFences1793684890120 } from '../migrations/17936848
 import { SeparateMemberResourceOwnership1793691490120 } from '../migrations/1793691490120-SeparateMemberResourceOwnership.js';
 import { FenceClosedPharmacyWriters1793698990120 } from '../migrations/1793698990120-FenceClosedPharmacyWriters.js';
 
+import { AddTemporaryPasswordExpiry1793750400000 } from '../migrations/1793750400000-AddTemporaryPasswordExpiry.js';
+
+import { AddStorePlaylistTags1793857542325 } from '../migrations/1793857542325-AddStorePlaylistTags.js';
+
 export const INCREMENTAL_MIGRATIONS: readonly MigrationClass[] = [
   CreateStoreOwnerTerminationCases1789701000000,
   AlterHandoffTokensTargetWorkspace1789974015939,
@@ -190,6 +194,8 @@ export const INCREMENTAL_MIGRATIONS: readonly MigrationClass[] = [
   CompleteMemberErasureFences1793684890120,
   SeparateMemberResourceOwnership1793691490120,
   FenceClosedPharmacyWriters1793698990120,
+  AddTemporaryPasswordExpiry1793750400000,
+  AddStorePlaylistTags1793857542325,
 ];
 
 export function incrementalMigrationNames(): string[] {

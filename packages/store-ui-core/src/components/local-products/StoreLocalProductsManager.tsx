@@ -187,7 +187,7 @@ export function StoreLocalProductsManager<
     labels?.description ??
     'O4O 주문과 무관하게 매장에서 자체적으로 취급·진열하는 상품입니다. 결제/주문 시스템과 연결되지 않습니다.';
   const emptyTitle = labels?.emptyTitle ?? '등록된 매장 취급 상품이 없습니다';
-  const emptyDescription = labels?.emptyDescription ?? '매장에서 자체적으로 취급하는 상품을 등록해 보세요.';
+  const emptyDescription = labels?.emptyDescription ?? '매장에서 자체적으로 취급하는 상품을 등록해 보시기 바랍니다.';
 
   // undefined = 기존 `/store/*` 기본 동작 · null = 숨김 · 함수 = 교체
   const onTabletDisplays =
@@ -569,7 +569,7 @@ export function StoreLocalProductsManager<
           </h3>
           <p className="text-slate-500 mb-6">
             {debouncedSearch
-              ? '다른 검색어로 시도해 보세요.'
+              ? '다른 검색어로 시도해 보시기 바랍니다.'
               : emptyDescription}
           </p>
           {!debouncedSearch && (
@@ -767,7 +767,7 @@ function ProductFormModal({
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="상품명을 입력하세요"
+              placeholder="상품명을 입력하시기 바랍니다"
               className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
               required
             />

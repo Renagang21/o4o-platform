@@ -14,11 +14,11 @@ export function PartnerAccountCard({
   heading?: "h1" | "h2";
 }) {
   return (
-    <LoginCard
+    <LoginCard logoSrc={`${import.meta.env.BASE_URL}brand/partner/logo-mark.svg`}
       brand="O4O Partner"
       title="O4O 계정 로그인"
       heading={heading}
-      description="로그인 후 파트너 커뮤니티와 공동공간을 이용하세요."
+      description="로그인 후 파트너 커뮤니티와 공동공간을 이용하시기 바랍니다."
     >
       <a
         className="o4o-login-primary-link"
@@ -29,7 +29,7 @@ export function PartnerAccountCard({
         Google·카카오로 로그인 ↗
       </a>
       <p className="o4o-login-description">
-        새 창에서 로그인하고 파트너 화면이 열리면 아래에서 로그인 상태를 확인해 주세요.
+        새 창에서 로그인하고 파트너 화면이 열리면 아래에서 로그인 상태를 확인해 주시기 바랍니다.
       </p>
       <button
         type="button"

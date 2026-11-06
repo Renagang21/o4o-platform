@@ -96,8 +96,8 @@ export default function CategoryManagementPage() {
 
   const handleSave = async () => {
     if (!form.name.trim()) {
-      setDialogError('카테고리 이름을 입력하세요');
-      toast.error('카테고리 이름을 입력하세요');
+      setDialogError('카테고리 이름을 입력하시기 바랍니다');
+      toast.error('카테고리 이름을 입력하시기 바랍니다');
       return;
     }
     setDialogError(null);
@@ -209,7 +209,7 @@ export default function CategoryManagementPage() {
             {visibleRows.length === 0 && (
               <tr>
                 <td colSpan={4} className="px-6 py-12 text-center text-slate-400">
-                  카테고리가 없습니다. 위의 버튼을 눌러 추가하세요.
+                  카테고리가 없습니다. 위의 버튼을 눌러 추가하시기 바랍니다.
                 </td>
               </tr>
             )}

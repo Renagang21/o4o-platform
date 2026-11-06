@@ -98,7 +98,7 @@ function LibraryResources() {
     const result = await remove(rows);
     if (!result) return;
     setSelected(prev => new Set([...prev].filter(id => !result.removed.has(id))));
-    if (result.failed) toast.error(`${result.removed.size}개 삭제, ${result.failed}개 실패했습니다. 실패한 자료를 다시 시도해 주세요.`);
+    if (result.failed) toast.error(`${result.removed.size}개 삭제, ${result.failed}개 실패했습니다. 실패한 자료를 다시 시도해 주시기 바랍니다.`);
     else toast.success(`${result.removed.size}개 삭제되었습니다`);
   };
   const handleDelete = async (row: UnifiedResourceRow) => {
@@ -291,7 +291,7 @@ function LibraryResources() {
         dataSource={visibleItems}
         rowKey="id"
         loading={loading}
-        emptyText={errors.length ? "조회에 실패한 자료가 있습니다. 다시 시도해 주세요." : "보관된 자료가 없습니다. 커뮤니티 자료실 또는 공급자 라이브러리에서 자료를 가져와 매장에 보관할 수 있습니다."}
+        emptyText={errors.length ? "조회에 실패한 자료가 있습니다. 다시 시도해 주시기 바랍니다." : "보관된 자료가 없습니다. 커뮤니티 자료실 또는 공급자 라이브러리에서 자료를 가져와 매장에 보관할 수 있습니다."}
         onRow={(row) => ({
           onClick: () => setDetailId(row.id),
           style: { cursor: 'pointer' },

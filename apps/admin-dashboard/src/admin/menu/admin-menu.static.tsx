@@ -252,6 +252,7 @@ export const adminMenuStatic: MenuItem[] = [
     label: '콘텐츠·자료',
     icon: <FileText className="w-5 h-5" />,
     children: [
+      { id: 'content-required-signage', label: '전체 매장 필수 영상', icon: <FileText className="w-4 h-4" />, path: '/operator/signage/required' },
       {id:'content-resource-deletion',label:'포럼·강의 최종 삭제',icon:<ClipboardList className="w-4 h-4"/>,path:'/admin/platform/resource-deletion'},
       {
         id: 'content-overview',

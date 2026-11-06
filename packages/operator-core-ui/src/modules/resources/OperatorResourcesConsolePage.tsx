@@ -230,7 +230,7 @@ export function OperatorResourcesConsolePage({
     const scope = scopeRef.current;
     if (!scope.mounted || scope.writing || scope !== renderedScope) return;
     if (loading || error || renderedList !== scope.list) {
-      setActionError('목록을 다시 확인한 뒤 처리해 주세요.'); return;
+      setActionError('목록을 다시 확인한 뒤 처리해 주시기 바랍니다.'); return;
     }
     scope.writing = true; setWriting(true); setActionError(null); setNotice(null);
     try { await operation(); }
@@ -615,7 +615,7 @@ export function OperatorResourcesConsolePage({
 
       {notice && <p role="status" className="mb-3 text-emerald-700">{notice}</p>}
       {actionError && <p role="alert" className="mb-3 text-red-700">{actionError}</p>}
-      {refreshFailed && <p role="alert" className="mb-3 text-amber-700">처리는 완료했지만 최신 목록을 확인하지 못했습니다. 목록만 다시 조회해 주세요.</p>}
+      {refreshFailed && <p role="alert" className="mb-3 text-amber-700">처리는 완료했지만 최신 목록을 확인하지 못했습니다. 목록만 다시 조회해 주시기 바랍니다.</p>}
       {/* 정책 안내 */}
       <div style={policyBannerStyle}>{policyBanner ?? defaultPolicyBanner(nouns)}</div>
 

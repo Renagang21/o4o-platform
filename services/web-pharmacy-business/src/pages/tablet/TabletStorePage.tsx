@@ -257,7 +257,7 @@ function TabletStaffPanel({ device, heartbeatInfo, onClose, onChanged, onDisconn
       setMode('home');
       onChanged();
     } catch (e: any) {
-      setError(e?.code === 'SCREEN_SET_NOT_ACTIVE' ? '활성(active) 콘텐츠만 표시할 수 있습니다. PC 에서 콘텐츠를 활성화하세요.' : (e?.message || '콘텐츠를 변경하지 못했습니다.'));
+      setError(e?.code === 'SCREEN_SET_NOT_ACTIVE' ? '활성(active) 콘텐츠만 표시할 수 있습니다. PC 에서 콘텐츠를 활성화하시기 바랍니다.' : (e?.message || '콘텐츠를 변경하지 못했습니다.'));
     } finally {
       setBusy(false);
     }
@@ -283,7 +283,7 @@ function TabletStaffPanel({ device, heartbeatInfo, onClose, onChanged, onDisconn
         </div>
         {forbidden && (
           <div role="alert" style={{ color: '#b91c1c' }} data-testid="staff-forbidden">
-            이 매장의 직원 권한이 없는 계정입니다. 매장 구성원(owner/manager) 계정으로 로그인하세요.
+            이 매장의 직원 권한이 없는 계정입니다. 매장 구성원(owner/manager) 계정으로 로그인하시기 바랍니다.
           </div>
         )}
         {error && <div role="alert" style={{ color: '#b91c1c' }}>{error}</div>}
@@ -314,13 +314,13 @@ function TabletStaffPanel({ device, heartbeatInfo, onClose, onChanged, onDisconn
                 <button type="button" style={panelPrimary} onClick={() => setMode('products')} disabled={!currentSetId} data-testid="staff-edit-products">상품 수정</button>
                 <button type="button" style={panelBtn} onClick={onClose}>소비자 화면으로 돌아가기</button>
               </div>
-              {!currentSetId && <span style={{ color: '#6b7280', fontSize: 14 }}>표시 중인 콘텐츠가 없어 상품 수정을 할 수 없습니다. 먼저 콘텐츠를 선택하세요.</span>}
+              {!currentSetId && <span style={{ color: '#6b7280', fontSize: 14 }}>표시 중인 콘텐츠가 없어 상품 수정을 할 수 없습니다. 먼저 콘텐츠를 선택하시기 바랍니다.</span>}
             </div>
           </>
         )}
         {snap && mode === 'location' && (
           <>
-            <strong>위치 변경 — 이 태블릿을 어느 위치로 옮기나요?</strong>
+            <strong>위치 변경 — 이 태블릿을 어느 위치로 옮깁니까?</strong>
             <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 8 }} data-testid="staff-location-list">
               {snap.locations.map((l) => (
                 <li key={l.id}>
@@ -344,7 +344,7 @@ function TabletStaffPanel({ device, heartbeatInfo, onClose, onChanged, onDisconn
           <>
             <strong>콘텐츠 변경 — 이 위치({snap.location?.location || snap.location?.name})에서 보여줄 콘텐츠</strong>
             <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 8 }} data-testid="staff-content-list">
-              {(contents ?? []).length === 0 && <li style={{ color: '#6b7280' }}>이 위치에 연결된 콘텐츠가 없습니다. PC 「내 매장 › 태블릿」에서 콘텐츠를 연결하세요.</li>}
+              {(contents ?? []).length === 0 && <li style={{ color: '#6b7280' }}>이 위치에 연결된 콘텐츠가 없습니다. PC 「내 매장 › 태블릿」에서 콘텐츠를 연결하시기 바랍니다.</li>}
               {(contents ?? []).map((c) => (
                 <li key={c.id}>
                   <button
@@ -382,7 +382,7 @@ function TabletStaffPanel({ device, heartbeatInfo, onClose, onChanged, onDisconn
             <button
               type="button"
               style={{ ...panelBtn, fontSize: 13, padding: '6px 10px', color: '#6b7280' }}
-              onClick={() => { if (window.confirm('이 브라우저의 태블릿 연결을 해제할까요? 다시 쓰려면 PC 에서 새 연결 코드를 발급해야 합니다.')) onDisconnected(); }}
+              onClick={() => { if (window.confirm('이 브라우저의 태블릿 연결을 해제하시겠습니까? 다시 쓰려면 PC 에서 새 연결 코드를 발급해야 합니다.')) onDisconnected(); }}
             >
               이 브라우저 연결 해제
             </button>

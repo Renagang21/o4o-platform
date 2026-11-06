@@ -57,15 +57,15 @@ export interface LlmAssistPanelProps {
   defaultOpen?: boolean;
 }
 
-const HTML_FIX_PROMPT_HEAD = `아래 HTML 이 편집기에서 깨져 보입니다. 구조만 고쳐서 다시 주세요.
+const HTML_FIX_PROMPT_HEAD = `아래 HTML 이 편집기에서 깨져 보입니다. 구조만 고쳐서 다시 주시기 바랍니다.
 
 조건:
-- 내용(문장·의미)은 바꾸지 말고 태그 구조만 바로잡아 주세요.
-- 열고 닫는 태그를 맞추고, 중첩이 잘못된 부분을 정리해 주세요.
+- 내용(문장·의미)은 바꾸지 말고 태그 구조만 바로잡아 주시기 바랍니다.
+- 열고 닫는 태그를 맞추고, 중첩이 잘못된 부분을 정리해 주시기 바랍니다.
 - 사용할 태그: p, h2, h3, strong, em, ul, ol, li, br, a, table, img 정도.
-- 꾸미기는 태그 안 style 속성(인라인 CSS)으로만 해 주세요.
-- script, 외부 CSS 파일, 외부 폰트, 외부 스크립트는 넣지 마세요(자동 제거됩니다).
-- 설명 없이 HTML 만 주세요.
+- 꾸미기는 태그 안 style 속성(인라인 CSS)으로만 해 주시기 바랍니다.
+- script, 외부 CSS 파일, 외부 폰트, 외부 스크립트는 넣지 마시기 바랍니다(자동 제거됩니다).
+- 설명 없이 HTML 만 주시기 바랍니다.
 
 [HTML]
 `;
@@ -177,7 +177,7 @@ function LlmAssistSession({
     const ok = await copyText(text);
     if (!alive.current || attempt !== copyAttempt.current) return;
     if (!ok) {
-      notify('복사하지 못했습니다. 아래 내용을 직접 선택해 복사해 주세요.', 'error');
+      notify('복사하지 못했습니다. 아래 내용을 직접 선택해 복사해 주시기 바랍니다.', 'error');
       return;
     }
     setCopied(kind);
@@ -190,9 +190,9 @@ function LlmAssistSession({
       onApplyHtml(previewHtml);
       setPrevious({ html: currentHtml ?? '', applied: previewHtml });
       clearResult();
-      notify('편집기에 넣었습니다. 내용을 확인한 뒤 저장해 주세요.', 'success');
+      notify('편집기에 넣었습니다. 내용을 확인한 뒤 저장해 주시기 바랍니다.', 'success');
     } catch {
-      notify('편집기에 넣지 못했습니다. 결과를 유지했으니 다시 확인해 주세요.', 'error');
+      notify('편집기에 넣지 못했습니다. 결과를 유지했으니 다시 확인해 주시기 바랍니다.', 'error');
     }
   };
 
@@ -200,7 +200,7 @@ function LlmAssistSession({
     const cleaned = sanitizeRichHtml(pasted.trim().replace(/^```(?:html)?\s*\n([\s\S]*?)\n```$/i, '$1'));
     if (isBlankHtml(cleaned)) {
       setPreviewHtml(null);
-      notify('미리 볼 본문이 없습니다. 결과 HTML을 확인해 주세요.', 'error');
+      notify('미리 볼 본문이 없습니다. 결과 HTML을 확인해 주시기 바랍니다.', 'error');
       return;
     }
     setPreviewHtml(cleaned);
@@ -211,7 +211,7 @@ function LlmAssistSession({
     if (disabled || !previous || !onApplyHtml || currentHtml !== previous.applied) return;
     try {
       onApplyHtml(previous.html); setPrevious(null);
-      notify('적용 전 본문으로 돌렸습니다. 저장은 별도로 진행하세요.', 'success');
+      notify('적용 전 본문으로 돌렸습니다. 저장은 별도로 진행하시기 바랍니다.', 'success');
     } catch {
       notify('이전 본문을 복원하지 못했습니다.', 'error');
     }
@@ -273,7 +273,7 @@ function LlmAssistSession({
                     setSelectedMaterials(ids => event.target.checked ? [...ids, material.id] : ids.filter(id => id !== material.id)); setCopied(null);
                   }} />{material.title}
                 </label>)}
-                <p style={{ fontSize: 12 }}>선택한 자료만 요청문에 포함합니다. 개인정보·거래정보·내부 자료의 외부 전달 가능 여부를 확인하세요.</p>
+                <p style={{ fontSize: 12 }}>선택한 자료만 요청문에 포함합니다. 개인정보·거래정보·내부 자료의 외부 전달 가능 여부를 확인하시기 바랍니다.</p>
               </fieldset>}
 
               {/* 1-a) 추가 요청 (guideText 가 함수일 때만) */}
@@ -329,12 +329,12 @@ function LlmAssistSession({
                     value={pasted}
                     onChange={(e) => { setPasted(e.target.value); setPreviewHtml(null); setReviewed(false); }}
                     rows={6}
-                    placeholder="LLM 이 만들어 준 HTML 을 여기에 붙여 넣고 아래 버튼을 누르세요."
+                    placeholder="LLM 이 만들어 준 HTML 을 여기에 붙여 넣고 아래 버튼을 누르시기 바랍니다."
                     style={{ width: '100%', padding: '10px 12px', border: '1px solid #d1d5db', borderRadius: '8px', fontSize: '12px', fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace', resize: 'vertical', boxSizing: 'border-box' }}
                   />
                   {previewHtml !== null && <div style={{ marginTop: 12 }}>
                     <iframe title="결과 미리보기" sandbox="" referrerPolicy="no-referrer" srcDoc={`<!doctype html><html><head><meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; img-src data:; form-action 'none'; base-uri 'none'"><style>body{font:14px sans-serif;overflow-wrap:anywhere}img,table{max-width:100%}</style></head><body>${previewHtml}</body></html>`} style={{ width: '100%', height: 220, border: '1px solid #d1d5db', borderRadius: 8, boxSizing: 'border-box' }} />
-                    <p style={{ fontSize: 12 }}>안전한 미리보기에서는 외부 이미지·영상이 표시되지 않을 수 있습니다. 실제 편집기에서도 확인하세요.</p>
+                    <p style={{ fontSize: 12 }}>안전한 미리보기에서는 외부 이미지·영상이 표시되지 않을 수 있습니다. 실제 편집기에서도 확인하시기 바랍니다.</p>
                     <label style={{ display: 'flex', gap: 8, fontSize: 13 }}><input type="checkbox" checked={reviewed} onChange={event => setReviewed(event.target.checked)} />결과와 사실·이용 범위를 확인했습니다</label>
                   </div>}
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '8px' }}>
@@ -356,14 +356,14 @@ function LlmAssistSession({
                 </div>
               ) : (
                 <div style={{ fontSize: '11px', color: '#4b5563', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '10px 12px', lineHeight: 1.7 }}>
-                  결과 HTML 은 편집기의 <b>HTML 탭</b>에 붙여 넣으세요. 저장 시 script·외부 CSS·외부 스크립트는 안전을 위해 자동으로 제거되고,
+                  결과 HTML 은 편집기의 <b>HTML 탭</b>에 붙여 넣으시기 바랍니다. 저장 시 script·외부 CSS·외부 스크립트는 안전을 위해 자동으로 제거되고,
                   영상은 YouTube·Vimeo 만 표시됩니다.
                 </div>
               )}
 
               <div style={{ fontSize: '11px', color: '#92400e', background: '#fffbeb', border: '1px solid #fde68a', borderRadius: '8px', padding: '10px 12px', lineHeight: 1.7 }}>
-                <b>확인해 주세요.</b> LLM 이 쓴 내용은 사실과 다를 수 있습니다. 게시 전에 담당자가 직접 확인해 주세요.
-                상품 사실과 전문 참고정보는 각각의 근거와 대조하고, 판단 지원 내용은 담당자가 검토해 주세요.
+                <b>확인해 주시기 바랍니다.</b> LLM 이 쓴 내용은 사실과 다를 수 있습니다. 게시 전에 담당자가 직접 확인해 주시기 바랍니다.
+                상품 사실과 전문 참고정보는 각각의 근거와 대조하고, 판단 지원 내용은 담당자가 검토해 주시기 바랍니다.
               </div>
 
             </div>

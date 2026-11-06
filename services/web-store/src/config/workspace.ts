@@ -38,7 +38,7 @@ export const WORKSPACE_PATHS = {
   invitations: '/invitations',
   /** 매장 시작하기(사업자 가입) — 매장이 없는 사용자가 쓰므로 StoreGate 밖이다. */
   enrollment: '/start-store',
-  /** 내 매장(약국) 신청 — 약국은 `/start-store` 자가 가입 대상이 아니다(DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1 §3-1 · §5). StoreGate 밖. */
+  /** 과거 별도 약국 신청 URL. 신규 신청 기능은 폐기하며 회원 등록 상태로 안내한다. */
   pharmacyEnrollment: '/start-pharmacy',
 } as const;
 
@@ -51,6 +51,6 @@ export interface RootNavItem {
 
 export const ROOT_NAV_ITEMS: readonly RootNavItem[] = [
   { key: 'my-store', label: '내 매장', to: WORKSPACE_PATHS.myStore, end: false },
-  { key: 'my-services', label: '이용 사업', to: WORKSPACE_PATHS.myServices, end: true },
+  { key: 'my-services', label: '이용 사업/가입 관리', to: WORKSPACE_PATHS.myServices, end: true },
   { key: 'settings', label: '설정', to: WORKSPACE_PATHS.settings, end: false },
 ] as const;

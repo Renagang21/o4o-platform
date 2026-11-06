@@ -25,7 +25,7 @@ GitHub 약관 및 적용 법률에 따라 인정되는 권리는 제한하지 �
 | Database | PostgreSQL (GCP Cloud SQL) |
 | Infra | GCP Cloud Run + Artifact Registry |
 | CI/CD | GitHub Actions (`.github/workflows/`) |
-| Node | 22.18.0 (`volta` 고정) |
+| Node | 22.23.4 (`volta` 고정) |
 | Package Manager | pnpm 10.25.0 (`volta` 고정) |
 
 ## 워크스페이스 구조
@@ -70,7 +70,7 @@ API 서버가 실제로 읽는 환경파일은 **`apps/api-server/.env`** 입니
 
 ```bash
 # 개발 서버
-pnpm run dev              # web + admin 동시 실행
+pnpm run dev              # 관리자 대시보드 (= dev:admin)
 pnpm run dev:api          # API 서버
 
 # 빌드

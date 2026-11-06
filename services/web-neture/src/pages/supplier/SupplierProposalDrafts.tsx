@@ -152,7 +152,7 @@ export default function SupplierProposalDrafts({
       Number(terms.unitPrice) <= 0
     ) {
       setMessage(
-        "제품 · 협업체 · 공급 가격과 배송비·최소금액 조건을 확인해 주세요.",
+        "제품 · 협업체 · 공급 가격과 배송비·최소금액 조건을 확인해 주시기 바랍니다.",
       );
       return;
     }
@@ -177,8 +177,8 @@ export default function SupplierProposalDrafts({
     setSelected([]);
     setMessage(
       additions.length
-        ? `${additions.length}개 협업체의 초안을 만들었습니다. 각 조건을 확인한 후 승인 요청하세요.`
-        : "선택한 협업체의 초안이 이미 있습니다. 기존 초안을 확인하세요.",
+        ? `${additions.length}개 협업체의 초안을 만들었습니다. 각 조건을 확인한 후 승인 요청하시기 바랍니다.`
+        : "선택한 협업체의 초안이 이미 있습니다. 기존 초안을 확인하시기 바랍니다.",
     );
   };
 
@@ -209,7 +209,7 @@ export default function SupplierProposalDrafts({
       )
     ) {
       setMessage(
-        "각 초안의 제품 · 활성 협업체 · 공급 가격과 배송비·최소금액 조건을 확인해 주세요.",
+        "각 초안의 제품 · 활성 협업체 · 공급 가격과 배송비·최소금액 조건을 확인해 주시기 바랍니다.",
       );
       return;
     }
@@ -263,7 +263,7 @@ export default function SupplierProposalDrafts({
         await onSubmitted();
       } catch {
         setMessage(
-          "접수 처리는 끝났지만 목록 갱신에 실패했습니다. 페이지를 다시 열어 상태를 확인하세요.",
+          "접수 처리는 끝났지만 목록 갱신에 실패했습니다. 페이지를 다시 열어 상태를 확인하시기 바랍니다.",
         );
       }
     } finally {
@@ -281,7 +281,7 @@ export default function SupplierProposalDrafts({
         같은 조건으로 여러 협업체에 요청
       </h2>
       <p className="text-sm text-gray-600">
-        공통 입력으로 협업체별 초안을 만든 뒤 각각 확인·수정하세요.
+        공통 입력으로 협업체별 초안을 만든 뒤 각각 확인·수정하시기 바랍니다.
         요청·승인·변경·종료는 협업체별로 독립 처리되며, 다른 협업체로 자동
         반영되지 않습니다.
       </p>
@@ -292,12 +292,12 @@ export default function SupplierProposalDrafts({
         {storageScope && !storageError
           ? "초안은 마지막 사용 후 24시간 이내에 이 탭에서 복원됩니다."
           : "초안은 현재 화면에서만 유지됩니다."}{" "}
-        공용 기기에서는 작업 후 초안을 지우고 로그아웃하세요.
+        공용 기기에서는 작업 후 초안을 지우고 로그아웃하시기 바랍니다.
       </p>
       {(!storageScope || storageError) && (
         <p role="alert" className="text-sm text-amber-800">
           초안을 이 탭에 보관할 수 없습니다. 화면을 떠나기 전에 작성 내용을
-          확인하세요.
+          확인하시기 바랍니다.
         </p>
       )}
       {hasWork && (
@@ -308,7 +308,7 @@ export default function SupplierProposalDrafts({
           onClick={() => {
             if (
               window.confirm(
-                "작성 중인 초안을 모두 지울까요? 응답을 확인하지 못한 요청도 이미 접수됐을 수 있으니 목록에서 확인하세요. 초안을 지워도 접수한 제안은 종료되지 않습니다.",
+                "작성 중인 초안을 모두 지우시겠습니까? 응답을 확인하지 못한 요청도 이미 접수됐을 수 있으니 목록에서 확인하시기 바랍니다. 초안을 지워도 접수한 제안은 종료되지 않습니다.",
               )
             ) {
               setTerms({ ...EMPTY });
@@ -397,7 +397,7 @@ export default function SupplierProposalDrafts({
                   minOrderAmount: String(p.termsSnapshot?.minOrderAmount ?? 0),
                 });
                 setMessage(
-                  "제품 · 단가 · 고정 배송조건 · 메모를 가져왔습니다. 기존 방식의 제안은 배송비를 새로 입력하세요. 대상 약국은 복사하지 않습니다. 기존 초안은 변경하지 않습니다.",
+                  "제품 · 단가 · 고정 배송조건 · 메모를 가져왔습니다. 기존 방식의 제안은 배송비를 새로 입력하시기 바랍니다. 대상 약국은 복사하지 않습니다. 기존 초안은 변경하지 않습니다.",
                 );
               }
             }}
@@ -567,7 +567,7 @@ export default function SupplierProposalDrafts({
               {d.error && (
                 <p role="alert" className="text-sm text-red-600">
                   {d.error} 통신 오류라도 접수됐을 수 있습니다. 내용을 바꾸지
-                  말고 같은 요청으로 접수 결과를 확인하세요.
+                  말고 같은 요청으로 접수 결과를 확인하시기 바랍니다.
                 </p>
               )}
               {d.status === "error" && (
@@ -577,7 +577,7 @@ export default function SupplierProposalDrafts({
                   onClick={() => {
                     if (
                       window.confirm(
-                        "접수 목록을 확인했나요? 이미 접수됐다면 먼저 기존 제안을 종료하세요. 확인한 내용을 새 초안으로 바꾸겠습니까?",
+                        "접수 목록을 확인했습니까? 이미 접수됐다면 먼저 기존 제안을 종료하시기 바랍니다. 확인한 내용을 새 초안으로 바꾸겠습니까?",
                       )
                     ) {
                       setDrafts((prev) =>
@@ -653,7 +653,7 @@ export default function SupplierProposalDrafts({
           )}
           <p className="text-xs text-gray-500">
             완료된 요청과 오류가 난 요청은 묶음 요청에서 제외합니다. 오류가 난
-            건은 같은 내용으로 접수 확인 후 새 조건의 초안을 만드세요.
+            건은 같은 내용으로 접수 확인 후 새 조건의 초안을 만드시기 바랍니다.
           </p>
         </div>
       )}

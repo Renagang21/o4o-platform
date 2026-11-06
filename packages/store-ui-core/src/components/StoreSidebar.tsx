@@ -45,7 +45,6 @@ import {
   Users,
   Tv,
   ListVideo,
-  Calendar,
   Play,
   ChevronDown,
   ChevronRight,
@@ -104,7 +103,6 @@ const SECTION_ICONS: Record<string, typeof LayoutDashboard> = {
   'signage-display': Tv,
   'signage-playlist': ListVideo,
   'signage-videos': Monitor,
-  'signage-schedules': Calendar,
   'signage-player': Play,
   settings: Settings,
 };

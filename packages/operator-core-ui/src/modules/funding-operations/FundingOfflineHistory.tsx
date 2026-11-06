@@ -80,7 +80,7 @@ export default function FundingOfflineHistory({
       }
     } catch {
       if (current === generation.current)
-        setError("이전 이력을 조회하지 못했습니다. 다시 시도해 주세요.");
+        setError("이전 이력을 조회하지 못했습니다. 다시 시도해 주시기 바랍니다.");
     } finally {
       if (current === generation.current) {
         lock.current = false;

@@ -360,7 +360,7 @@ router.post('/operator/courses/:id/reject', ipBurstLimiter, requireAuth, apiLimi
     return res.json({ success: true, data: { course: updated } });
   } catch (err: any) {
     if (err.message === 'REJECTION_REASON_REQUIRED') {
-      return res.status(400).json({ success: false, error: '반려 사유를 입력해주세요.', code: 'REJECTION_REASON_REQUIRED' });
+      return res.status(400).json({ success: false, error: '반려 사유를 입력해 주시기 바랍니다.', code: 'REJECTION_REASON_REQUIRED' });
     }
     if (err.message?.startsWith('INVALID_STATUS_TRANSITION')) {
       return res.status(400).json({ success: false, error: '검토 대기(PENDING_REVIEW) 상태의 강의만 반려할 수 있습니다.', code: 'INVALID_STATUS_TRANSITION' });

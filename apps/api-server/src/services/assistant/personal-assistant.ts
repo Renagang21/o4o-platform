@@ -254,7 +254,7 @@ function declaredCompletionReply(task: AssistantTaskRow, runId: string): WorkExe
         aiPlanCount: 0,
         path: null,
         history: [],
-        message: '완료로 기록했습니다. 필요하면 새 요청으로 이어서 말씀해 주세요.',
+        message: '완료로 기록했습니다. 필요하면 새 요청으로 이어서 말씀해 주시기 바랍니다.',
         errorCode: null,
         target: null,
         workflow: null,

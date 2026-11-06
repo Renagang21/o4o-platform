@@ -43,6 +43,7 @@ import { resolveNetureNotificationTarget } from '../lib/notificationRouting';
  */
 export const NETURE_HEADER_BRAND = {
   icon: '🌿',
+  logoSrc: `/brand/${CURRENT_HOST_PROFILE === 'main' ? 'neture' : CURRENT_HOST_PROFILE}/logo-mark.svg`,
   name: 'Neture',
   subtitle: 'O4O 통합 업무 공간',
   primaryColor: '#059669',

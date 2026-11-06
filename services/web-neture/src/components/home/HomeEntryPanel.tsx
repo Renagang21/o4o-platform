@@ -148,7 +148,7 @@ export default function HomeEntryPanel({ user, data, loading, error, onReload, n
       window.location.assign(targetUrl);
     } catch (err) {
       if (generation !== handoffGeneration.current) return;
-      setMoveError(err instanceof ServiceEntryError ? err.message : '서비스로 이동하지 못했습니다. 잠시 후 다시 시도해 주세요.');
+      setMoveError(err instanceof ServiceEntryError ? err.message : '서비스로 이동하지 못했습니다. 잠시 후 다시 시도해 주시기 바랍니다.');
       setBusyId(null);
     }
   };
@@ -209,7 +209,7 @@ export default function HomeEntryPanel({ user, data, loading, error, onReload, n
         || (isCooperation(item) ? '사업자와 가입 약국이 공지·소식·사업 자료를 함께 나누는 공동공간입니다.' : item.id === 'svc:neture-supplier' ? '제품을 등록하고 참여 매장에 공급합니다.' : '가입한 서비스에서 활동을 이어갑니다.');
     return <section aria-labelledby="joined-services-title" className="mt-10 w-full max-w-3xl text-left">
       <h2 id="joined-services-title" className="text-xl font-semibold text-slate-900">일상 서비스</h2>
-      <p className="mt-2 text-sm text-slate-500">이용 중인 서비스로 바로 이동하세요. 개인 활동과 계정은 상단 My Home에서 확인할 수 있습니다.</p>
+      <p className="mt-2 text-sm text-slate-500">이용 중인 서비스로 바로 이동하시기 바랍니다. 개인 활동과 계정은 상단 My Home에서 확인할 수 있습니다.</p>
       {moveError && <p role="alert" className="mt-3 text-sm text-red-700">{moveError}</p>}
       {dailyGroups.length > 0 ? dailyGroups.map(group => <section key={group.title} aria-label={group.title} className="mt-5">
         <h3 className="mb-3 text-base font-semibold text-slate-800">{group.title}</h3>
@@ -220,7 +220,7 @@ export default function HomeEntryPanel({ user, data, loading, error, onReload, n
             <p className="mb-0 mt-3 text-sm text-slate-600">{descriptionOf(item)}</p>
           </li>)}
         </ul>
-      </section>) : <p className="mt-4 text-sm text-slate-600">현재 이용 중인 서비스가 없습니다. 아래에서 서비스를 알아보세요.</p>}
+      </section>) : <p className="mt-4 text-sm text-slate-600">현재 이용 중인 서비스가 없습니다. 아래에서 서비스를 알아보시기 바랍니다.</p>}
       {model.statusItems.length > 0 && <div className="mt-5 rounded-xl border border-amber-200 bg-amber-50 p-4">
         <h3 className="text-sm font-semibold">가입·이용 상태</h3>
         <ul className="mt-2 list-none space-y-2 p-0 text-sm">{model.statusItems.map(item => <li key={item.id}>
@@ -242,20 +242,20 @@ export default function HomeEntryPanel({ user, data, loading, error, onReload, n
     return <section className="rounded-2xl border border-slate-200 bg-white p-5" aria-label={storeOrganizationId ? '선택 매장 업무 바로가기' : '내 업무 바로가기'}>
       <h2 className="text-lg font-semibold">{storeOrganizationId ? '내 매장 업무' : '내 업무 바로가기'}</h2>
       {storeOrganizationId && <p className="mt-2 text-sm text-slate-600">선택한 매장의 협력 사업과 운영 업무는 내 매장 업무 공간에서 이어갈 수 있습니다.</p>}
-      {storeOrganizationId && homeEntryStoreOrganizationIds(data).length > 1 &&<p className="mt-2 text-sm text-slate-600">매장이 여러 곳이면 이동한 매장 관리 화면에서 매장을 다시 선택해 주세요.</p>}
+      {storeOrganizationId && homeEntryStoreOrganizationIds(data).length > 1 &&<p className="mt-2 text-sm text-slate-600">매장이 여러 곳이면 이동한 매장 관리 화면에서 매장을 다시 선택해 주시기 바랍니다.</p>}
       {moveError && <p role="alert" className="mt-3 text-sm text-red-700">{moveError}</p>}
       {groups.length > 0 ? <div className="mt-4 grid gap-4 sm:grid-cols-2">
         {groups.map(group => <div key={group.id}>
           <h3 className="text-sm font-medium text-slate-600">{group.title}</h3>
           <div className="mt-2 flex flex-wrap gap-2">{(compactWorkspace ? group.items.slice(0, 1) : group.items).map(item => <EntryButton key={item.id} item={item} busyId={busyId} onHandoff={handleHandoff} />)}</div>
         </div>)}
-      </div> : <p className="mt-3 text-sm text-slate-500">현재 바로 이동할 수 있는 업무가 없습니다. 참여 서비스에서 이용 상태를 확인해 주세요.</p>}
+      </div> : <p className="mt-3 text-sm text-slate-500">현재 바로 이동할 수 있는 업무가 없습니다. 참여 서비스에서 이용 상태를 확인해 주시기 바랍니다.</p>}
       {!storeOrganizationId && !compactWorkspace && model.statusItems.length > 0 && <ul className="mt-4 space-y-2 text-sm" aria-label="가입·이용 상태">
         {model.statusItems.map(item => <li key={item.id} className="flex flex-wrap gap-2"><span>{item.serviceName}</span><span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-600">{item.statusLabel}</span></li>)}
       </ul>}
       {compactWorkspace && (groups.reduce((total, group) => total + group.items.length, 0) > groups.length || model.statusItems.length > 0) && <p className="mt-3 text-xs text-slate-500">
         {groups.reduce((count, group) => count + group.items.length, 0) > groups.length && "추가 업무는 참여 서비스에서 확인할 수 있습니다. "}
-        {model.statusItems.length > 0 && `가입·이용 상태 ${model.statusItems.length}건을 참여 서비스에서 확인하세요.`}
+        {model.statusItems.length > 0 && `가입·이용 상태 ${model.statusItems.length}건을 참여 서비스에서 확인하시기 바랍니다.`}
       </p>}
       <Link to="/mypage/services" className="mt-4 inline-block text-sm text-blue-700 underline">참여 서비스와 이용 상태 보기 →</Link>
     </section>;

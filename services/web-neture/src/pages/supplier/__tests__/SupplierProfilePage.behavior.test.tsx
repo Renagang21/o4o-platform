@@ -219,7 +219,7 @@ describe('SupplierProfilePage existing section ownership', () => {
       expect(select.value).toBe('');
       expect(Array.from(select.options, (option) => option.value)).toEqual(['', 'individual', 'corporation']);
       fireEvent.click(screen.getByRole('button', { name: '저장', exact: true }));
-      await screen.findByText('세금계산서 발행을 위한 개인 / 법인 구분을 선택해 주세요.');
+      await screen.findByText('세금계산서 발행을 위한 개인 / 법인 구분을 선택해 주시기 바랍니다.');
       expect(api.profile.updateProfile).not.toHaveBeenCalled();
       fireEvent.change(select, { target: { value: 'corporation' } });
       fireEvent.click(screen.getByRole('button', { name: '저장', exact: true }));
@@ -251,7 +251,7 @@ describe('SupplierProfilePage existing section ownership', () => {
     await loaded();
     fireEvent.change(screen.getByLabelText('상호명'), { target: { value: '   ' } });
     fireEvent.click(screen.getByRole('button', { name: '저장', exact: true }));
-    await screen.findByText('상호명을 1~255자로 입력해 주세요.');
+    await screen.findByText('상호명을 1~255자로 입력해 주시기 바랍니다.');
     expect(api.profile.updateProfile).not.toHaveBeenCalled();
   });
   it('edits contact and shipping values through their visible field labels', async () => {

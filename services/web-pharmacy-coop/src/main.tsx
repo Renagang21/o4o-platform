@@ -21,7 +21,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
             <HandoffEntryPage
               errorMessages={{
                 HANDOFF_TOKEN_INVALID:
-                  "이동 링크가 만료되었습니다. 출발 화면에서 다시 이동해 주세요.",
+                  "이동 링크가 만료되었습니다. 출발 화면에서 다시 이동해 주시기 바랍니다.",
               }}
               apiBaseUrl={(
                 import.meta.env.VITE_API_BASE_URL || "https://api.neture.co.kr"

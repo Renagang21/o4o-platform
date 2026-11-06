@@ -45,7 +45,7 @@ const NotInstalledState: FC<NotInstalledStateProps> = ({ appName }) => (
       {appName} 앱이 설치되지 않았습니다
     </h2>
     <p className="text-gray-600 text-center max-w-md mb-6">
-      현재 제공되지 않는 기능입니다. 사용 가능한 관리자 메뉴를 확인하세요.
+      현재 제공되지 않는 기능입니다. 사용 가능한 관리자 메뉴를 확인하시기 바랍니다.
     </p>
     <Link
       to="/admin"
@@ -74,7 +74,7 @@ const InactiveState: FC<InactiveStateProps> = ({ appName }) => (
       {appName} 앱이 비활성화 상태입니다
     </h2>
     <p className="text-gray-600 text-center max-w-md mb-6">
-      현재 비활성 상태인 기능입니다. 사용 가능한 관리자 메뉴를 확인하세요.
+      현재 비활성 상태인 기능입니다. 사용 가능한 관리자 메뉴를 확인하시기 바랍니다.
     </p>
     <Link
       to="/admin"
@@ -113,7 +113,7 @@ export const AppGuard: FC<AppGuardProps> = ({
           앱 상태를 확인할 수 없습니다
         </h2>
         <p className="text-gray-600 text-center max-w-md">
-          잠시 후 다시 시도해 주세요.
+          잠시 후 다시 시도해 주시기 바랍니다.
         </p>
       </div>
     );

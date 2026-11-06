@@ -206,7 +206,7 @@ export function PublicScreenSetViewer({ screenSet }: { screenSet: QrScreenSet })
               ) : openProduct.short_description ? (
                 <ContentRenderer html={openProduct.short_description} variant="guide" />
               ) : (
-                <p style={{ margin: 0, color: colors.neutral500 }}>자세한 내용은 이 화면을 매장 직원에게 보여주세요.</p>
+                <p style={{ margin: 0, color: colors.neutral500 }}>자세한 내용은 이 화면을 매장 직원에게 보여주시기 바랍니다.</p>
               )}
             </div>
         </GuidanceDialog>

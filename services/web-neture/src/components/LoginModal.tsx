@@ -16,7 +16,7 @@ import { claimLoginNavigation, cancelLoginNavigation } from '../lib/loginNavigat
 
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LoginCard, O4OHomeButton, GoogleContinue, KakaoContinue, EmailLoginDisclosure, NETURE_LOGO_SRC } from '@o4o/auth-react';
+import { LoginCard, O4OHomeButton, GoogleContinue, KakaoContinue, EmailLoginDisclosure } from '@o4o/auth-react';
 import { authClient } from '../lib/apiClient';
 import { useAuth } from '../contexts';
 import type { User } from '../contexts/AuthContext';
@@ -187,7 +187,7 @@ export default function LoginModal({ isOpen, onClose, returnUrl }: LoginModalPro
     >
       <button type="button" className="o4o-login-backdrop" aria-label="로그인 창 배경 닫기" onClick={onClose} />
       <LoginCard brand={LOGIN_BRAND[CURRENT_HOST_PROFILE]} tone="green" heading="h2" title={`${LOGIN_BRAND[CURRENT_HOST_PROFILE]} 로그인`} description={LOGIN_MODAL_SUBTITLE[CURRENT_HOST_PROFILE]} onClose={onClose}
-        logoSrc={CURRENT_HOST_PROFILE === 'community' || CURRENT_HOST_PROFILE === 'carepharm' ? undefined : NETURE_LOGO_SRC}>
+        logoSrc={`/brand/${CURRENT_HOST_PROFILE === 'main' ? 'neture' : CURRENT_HOST_PROFILE}/logo-mark.svg`}>
 
               {/* WO-O4O-GOOGLE-ONLY-SIGNUP-LOGIN-V1: Google 로 계속하기 — 미등록이면 약관 동의 → 계정 생성 */}
               <div className="flex flex-col gap-3">

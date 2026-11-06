@@ -56,7 +56,7 @@ export function CommunitySavePanel({
           type="text"
           value={communityTitle}
           onChange={(e) => setCommunityTitle(e.target.value)}
-          placeholder="게시글 제목을 입력하세요"
+          placeholder="게시글 제목을 입력하시기 바랍니다"
           style={{
             width: '100%',
             padding: '8px 10px',
@@ -225,7 +225,7 @@ export function StoreSavePanel({
           type="text"
           value={storeTitle}
           onChange={(e) => setStoreTitle(e.target.value)}
-          placeholder="저장할 콘텐츠 제목을 입력하세요"
+          placeholder="저장할 콘텐츠 제목을 입력하시기 바랍니다"
           style={{
             width: '100%',
             padding: '8px 10px',
@@ -360,7 +360,7 @@ export function ProductionMaterialSavePanel({
           type="text"
           value={productionMaterialTitle}
           onChange={(e) => setProductionMaterialTitle(e.target.value)}
-          placeholder="저장할 매장 제작 자료 제목을 입력하세요"
+          placeholder="저장할 매장 제작 자료 제목을 입력하시기 바랍니다"
           style={{
             width: '100%',
             padding: '8px 10px',

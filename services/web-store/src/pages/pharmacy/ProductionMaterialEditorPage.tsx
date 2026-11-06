@@ -176,7 +176,7 @@ export default function ProductionMaterialEditorPage() {
             value={title}
             aria-label="콘텐츠 제목"
             onChange={(e) => setTitle(e.target.value)}
-            placeholder="제작 자료 제목을 입력하세요"
+            placeholder="제작 자료 제목을 입력하시기 바랍니다"
             style={styles.titleInput}
             maxLength={200}
           />
@@ -259,7 +259,7 @@ export default function ProductionMaterialEditorPage() {
         <RichTextEditor showInternalAi={false}
           value={editorInitialHtml}
           onChange={handleChange}
-          placeholder="직접 작성하거나 ChatGPT 등 외부 AI에서 만든 내용을 붙여넣으세요."
+          placeholder="직접 작성하거나 ChatGPT 등 외부 AI에서 만든 내용을 붙여넣으시기 바랍니다."
           minHeight="520px"
           preset="full"
         />

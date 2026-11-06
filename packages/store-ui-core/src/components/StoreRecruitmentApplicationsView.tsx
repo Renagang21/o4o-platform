@@ -63,7 +63,7 @@ function resolveState(a: StoreRecruitmentApplicationRow): { label: string; cls: 
     return {
       label: '반려됨',
       cls: 'bg-red-100 text-red-700',
-      note: a.reason ? `반려 사유: ${a.reason}` : '신청이 반려되었습니다. 필요한 경우 공급자 안내를 확인해 주세요.',
+      note: a.reason ? `반려 사유: ${a.reason}` : '신청이 반려되었습니다. 필요한 경우 공급자 안내를 확인해 주시기 바랍니다.',
     };
   }
   if (a.status === 'cancelled') {

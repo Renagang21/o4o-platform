@@ -41,7 +41,7 @@ it('keeps rejection template and cancel input entirely in parent flow', async ()
   const drawer = await openDrawer(); fireEvent.click(drawer.getByRole('button', { name: '거절', exact: true }));
   const modal = within(screen.getByRole('dialog', { name: '승인 거절' }));
   fireEvent.click(modal.getByRole('button', { name: /상품 이미지가 없습니다/ }));
-  expect((modal.getByRole('textbox') as HTMLTextAreaElement).value).toBe('상품 이미지가 없습니다. 이미지를 추가한 후 다시 요청해 주세요.');
+  expect((modal.getByRole('textbox') as HTMLTextAreaElement).value).toBe('상품 이미지가 없습니다. 이미지를 추가한 후 다시 요청해 주시기 바랍니다.');
   fireEvent.click(modal.getByRole('button', { name: '취소' }));
   expect(screen.queryByRole('dialog', { name: '승인 거절' })).toBeNull(); expect(screen.getByRole('dialog', { name: '상품 상세' })).toBeTruthy(); expect(api.reject).not.toHaveBeenCalled();
 });

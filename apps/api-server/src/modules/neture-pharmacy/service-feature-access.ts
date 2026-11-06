@@ -11,7 +11,7 @@ export async function checkPharmacyFeature(db: Pick<DataSource, 'query'>, res: R
     const pharmacies = await db.query(`SELECT status FROM neture_pharmacy_memberships WHERE organization_id=$1`, [organizationId]);
     if (!pharmacies.length) return true; // Other store domains retain their existing rules.
     res.setHeader('Cache-Control', 'private, no-store');
-    if (pharmacies[0].status !== 'active') throw new NeturePharmacyError(403, 'PHARMACY_ACCESS_REQUIRED', '내 매장 승인을 확인해 주세요.');
+    if (pharmacies[0].status !== 'active') throw new NeturePharmacyError(403, 'PHARMACY_ACCESS_REQUIRED', '내 매장 승인을 확인해 주시기 바랍니다.');
     const features = createPharmacyFeatureService(db);
     if (userId) await features.require(userId, organizationId, feature);
     else await features.requireStore(organizationId, feature);

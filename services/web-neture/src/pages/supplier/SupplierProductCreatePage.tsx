@@ -56,7 +56,7 @@ function CandidateRequestComplete({ registered, productType }: Readonly<{
         <p className="text-xs text-blue-700/80 mt-2">
           아직 <strong>공급 상품(Offer)으로 등록된 것은 아닙니다.</strong> 운영자가 제품 정보를
           검토해 표준 제품(ProductMaster)으로 확정하면, 제품 라이브러리에서 해당 제품을 선택해
-          내 제품 등록을 요청할 수 있습니다. 등록 승인 후 서비스 게시와 이벤트를 각각 진행하세요.
+          내 제품 등록을 요청할 수 있습니다. 등록 승인 후 서비스 게시와 이벤트를 각각 진행하시기 바랍니다.
           {productType?.rx && ' 처방의약품은 승격 후에도 약국 대상 서비스 공급으로만 연결됩니다.'}
         </p>
         {(registered.candidateId || registered.identifierValue) && (
@@ -132,7 +132,7 @@ export default function SupplierProductCreatePage() {
       onApplyDraft={(draft) => {
         formState.applySourceImport(draft);
         media.applyImportImages(draft);
-        toast.success('빈 입력란과 이미지를 보완했습니다. 기존 입력과 선택한 이미지는 유지됩니다. 확인 후 검토 요청을 제출하세요.');
+        toast.success('빈 입력란과 이미지를 보완했습니다. 기존 입력과 선택한 이미지는 유지됩니다. 확인 후 검토 요청을 제출하시기 바랍니다.');
       }}
     />;
   }
@@ -153,7 +153,7 @@ export default function SupplierProductCreatePage() {
           <button
             type="button"
             onClick={goToSourceImport}
-            title="상품 상세페이지에서 '페이지 소스 보기'를 열어 소스 전체를 복사해 붙여넣으면, 추출 가능한 항목이 등록 폼에 자동 입력됩니다. 자동으로 채워진 내용은 등록 전 반드시 확인하세요."
+            title="상품 상세페이지에서 '페이지 소스 보기'를 열어 소스 전체를 복사해 붙여넣으면, 추출 가능한 항목이 등록 폼에 자동 입력됩니다. 자동으로 채워진 내용은 등록 전 반드시 확인하시기 바랍니다."
             className="shrink-0 inline-flex items-center gap-1.5 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
           >
             ⚡ 상세페이지 소스로 자동 입력
@@ -165,7 +165,7 @@ export default function SupplierProductCreatePage() {
           variant="info"
           title={guideTitle ?? '제품 정보를 검토 요청으로 제출합니다.'}
           description={
-            '이 화면은 공급 상품을 바로 만들지 않습니다. 제출한 제품 정보는 운영자 검토 후 표준 제품으로 확정되며, 그 뒤 제품 라이브러리에서 내 제품으로 등록합니다. 가격·게시 대상·이벤트 기간은 각 후속 업무에서 정합니다. 이미 표준 제품에 있는 제품은 제품 라이브러리에서 바로 공급 연결하세요. 사진·PDF·URL 이 있으면 [ChatGPT로 작업]으로 제품정보를 정리해 입력란에 채운 뒤 확인·수정할 수 있습니다.'
+            '이 화면은 공급 상품을 바로 만들지 않습니다. 제출한 제품 정보는 운영자 검토 후 표준 제품으로 확정되며, 그 뒤 제품 라이브러리에서 내 제품으로 등록합니다. 가격·게시 대상·이벤트 기간은 각 후속 업무에서 정합니다. 이미 표준 제품에 있는 제품은 제품 라이브러리에서 바로 공급 연결하시기 바랍니다. 사진·PDF·URL 이 있으면 [ChatGPT로 작업]으로 제품정보를 정리해 입력란에 채운 뒤 확인·수정할 수 있습니다.'
           }
           steps={
             [
@@ -213,7 +213,7 @@ export default function SupplierProductCreatePage() {
         {importDraft && (
           <div className="rounded-lg bg-emerald-50 border border-emerald-200 px-4 py-3 text-sm text-emerald-800">
             상세페이지 소스에서 자동 추출한 초안입니다. 아래 입력란을 검토·수정한 뒤 검토 요청을
-            제출해 주세요. 누락·오류가 많으면 [ChatGPT로 작업]으로 보정할 수 있습니다.
+            제출해 주시기 바랍니다. 누락·오류가 많으면 [ChatGPT로 작업]으로 보정할 수 있습니다.
           </div>
         )}
 

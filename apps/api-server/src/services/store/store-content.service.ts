@@ -324,7 +324,7 @@ export async function updateDirectContent(
       title: content.title, content_json: content.content_json, tags: content.tags, updated_by: userId,
     }).where('id=:id AND organization_id=:org AND source_type=:source', { id, org: organizationId, source: 'direct' })
       .andWhere("NOT (content_json ? :contextKey)", { contextKey: 'productConsultation' }).execute();
-    if (!result.affected) return { ok: false, status: 409, code: 'CONTENT_CONFLICT', message: '자료가 변경됐습니다. 최신 내용을 다시 확인해 주세요.' };
+    if (!result.affected) return { ok: false, status: 409, code: 'CONTENT_CONFLICT', message: '자료가 변경됐습니다. 최신 내용을 다시 확인해 주시기 바랍니다.' };
     await applyProductRefPlan(manager, organizationId, id, prepared.plan);
     const saved = await currentRepo.findOneByOrFail({ id, organization_id: organizationId });
     return { ok: true, data: toDirectView(saved) };

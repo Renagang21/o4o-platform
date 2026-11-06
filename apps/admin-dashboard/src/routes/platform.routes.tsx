@@ -49,6 +49,7 @@ const StoreContentWorkspacePage = lazy(() => import('@/pages/kpa/StoreContentWor
 const HubNoticeListPage = lazy(() => import('@/pages/kpa/HubNoticeListPage'));
 
 // KPA Force Asset Console (WO-O4O-ADMIN-FORCE-ASSET-CONSOLE-V1)
+const AdminRequiredSignagePage = lazy(() => import('@/pages/kpa/AdminRequiredSignagePage'));
 const AdminForceAssetPage = lazy(() => import('@/pages/kpa/AdminForceAssetPage'));
 
 // KPA Snapshot Browser (WO-O4O-KPA-ADMIN-SNAPSHOT-BROWSE-V1)
@@ -206,6 +207,12 @@ export function PlatformRoutes() {
         <Suspense fallback={<PageLoader />}>
           <HubNoticeListPage />
         </Suspense>
+      </AdminProtectedRoute>
+    } />,
+
+    <Route key="/operator/signage/required" path="/operator/signage/required" element={
+      <AdminProtectedRoute requiredRoles={['platform:super_admin']}>
+        <Suspense fallback={<PageLoader />}><AdminRequiredSignagePage /></Suspense>
       </AdminProtectedRoute>
     } />,
 

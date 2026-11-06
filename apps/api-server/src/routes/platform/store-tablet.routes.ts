@@ -1639,7 +1639,7 @@ export function createStoreTabletRoutes(
         //   자동 연결 삭제는 하지 않는다(명시적 해제 유도).
         if (req.body.status === 'archived') {
           const cur = await dataSource.query(`SELECT count(*)::int AS c FROM store_tablets WHERE current_screen_set_id = $1 AND organization_id = $2`, [id, organizationId]);
-          if ((cur?.[0]?.c ?? 0) > 0) { res.status(409).json({ success: false, error: '이 콘텐츠를 현재 사용 중인 코너가 있어 보관할 수 없습니다. 먼저 다른 콘텐츠로 전환해 주세요.', code: 'ARCHIVE_BLOCKED_CURRENT' }); return; }
+          if ((cur?.[0]?.c ?? 0) > 0) { res.status(409).json({ success: false, error: '이 콘텐츠를 현재 사용 중인 코너가 있어 보관할 수 없습니다. 먼저 다른 콘텐츠로 전환해 주시기 바랍니다.', code: 'ARCHIVE_BLOCKED_CURRENT' }); return; }
           const links = await dataSource.query(`SELECT count(*)::int AS c FROM store_tablet_corner_contents WHERE screen_set_id = $1 AND organization_id = $2`, [id, organizationId]);
           const linkCount = links?.[0]?.c ?? 0;
           if (linkCount > 0) { res.status(409).json({ success: false, error: `이 콘텐츠가 ${linkCount}개 코너에 연결되어 있어 보관할 수 없습니다. 먼저 코너 연결을 해제해 주세요.`, code: 'ARCHIVE_BLOCKED_CONNECTED', data: { linkCount } }); return; }
@@ -1722,7 +1722,7 @@ export function createStoreTabletRoutes(
     try {
       const id = req.params.id;
       const inUse = await dataSource.query(`SELECT id FROM store_tablets WHERE current_screen_set_id = $1 AND organization_id = $2 LIMIT 1`, [id, organizationId]);
-      if (inUse?.[0]) { res.status(409).json({ success: false, error: '이 콘텐츠를 현재 사용 중인 코너가 있어 보관할 수 없습니다. 먼저 다른 콘텐츠로 전환해 주세요.', code: 'SCREEN_SET_IN_USE' }); return; }
+      if (inUse?.[0]) { res.status(409).json({ success: false, error: '이 콘텐츠를 현재 사용 중인 코너가 있어 보관할 수 없습니다. 먼저 다른 콘텐츠로 전환해 주시기 바랍니다.', code: 'SCREEN_SET_IN_USE' }); return; }
       const links = await dataSource.query(`SELECT count(*)::int AS c FROM store_tablet_corner_contents WHERE screen_set_id = $1 AND organization_id = $2`, [id, organizationId]);
       const linkCount = links?.[0]?.c ?? 0;
       if (linkCount > 0) {
@@ -2445,7 +2445,7 @@ export function createStoreTabletRoutes(
       const t = await dataSource.query(`SELECT id, current_screen_set_id AS "currentScreenSetId" FROM store_tablets WHERE id = $1 AND organization_id = $2 LIMIT 1`, [tabletId, organizationId]);
       if (!t?.[0]) { res.status(404).json({ success: false, error: 'Tablet not found', code: 'TABLET_NOT_FOUND' }); return; }
       if (t[0].currentScreenSetId === screenSetId) {
-        res.status(409).json({ success: false, error: '현재 사용 중인 콘텐츠입니다. 먼저 다른 콘텐츠로 전환하거나 적용을 해제해 주세요.', code: 'CURRENT_CONTENT_CANNOT_BE_REMOVED' });
+        res.status(409).json({ success: false, error: '현재 사용 중인 콘텐츠입니다. 먼저 다른 콘텐츠로 전환하거나 적용을 해제해 주시기 바랍니다.', code: 'CURRENT_CONTENT_CANNOT_BE_REMOVED' });
         return;
       }
       const del = await dataSource.query(

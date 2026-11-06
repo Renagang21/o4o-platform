@@ -11,7 +11,7 @@ export function participantFilters(query: Record<string, unknown>, params: unkno
     const value = query[field];
     if (value === undefined) continue;
     if (typeof value !== 'string' || !(field === 'paymentStatus' ? isPaymentStatus(value) : options[field].includes(value))) {
-      throw new FundingError(400, 'INVALID_PARTICIPANT_FILTER', '참여자 조회 조건을 확인해 주세요.');
+      throw new FundingError(400, 'INVALID_PARTICIPANT_FILTER', '참여자 조회 조건을 확인해 주시기 바랍니다.');
     }
     params.push(value);
     const column = field === 'paymentStatus' ? `COALESCE(${alias}."paymentStatus", 'unpaid')` : `${alias}."${field}"`;

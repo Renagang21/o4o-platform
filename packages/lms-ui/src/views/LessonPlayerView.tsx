@@ -343,7 +343,7 @@ export function LessonPlayerView({
   const handleSubmitAssignment = async () => {
     if (!assignment || !port.submitAssignment) return;
     if (!assignmentText.trim()) {
-      notify.error('제출 내용을 입력해 주세요.');
+      notify.error('제출 내용을 입력해 주시기 바랍니다.');
       return;
     }
     try {
@@ -541,7 +541,7 @@ export function LessonPlayerView({
                           onChange={(e) => setSingleAnswer(q.id, e.target.value)}
                           rows={3}
                           style={textareaStyle}
-                          placeholder="답변을 입력하세요"
+                          placeholder="답변을 입력하시기 바랍니다"
                         />
                       ) : (
                         (q.options ?? []).map((opt) => {
@@ -655,7 +655,7 @@ export function LessonPlayerView({
                     onChange={(e) => setAssignmentText(e.target.value)}
                     rows={8}
                     style={textareaStyle}
-                    placeholder="과제 내용을 작성하세요"
+                    placeholder="과제 내용을 작성하시기 바랍니다"
                   />
                   <div style={{ display: 'flex', gap: '8px', marginTop: '12px' }}>
                     <button

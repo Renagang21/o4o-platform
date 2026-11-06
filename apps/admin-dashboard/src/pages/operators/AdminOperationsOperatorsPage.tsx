@@ -22,7 +22,7 @@ function message(error: unknown) {
   const detail = data?.error as { message?: unknown } | undefined;
   if (typeof detail?.message === 'string') return detail.message;
   if (typeof data?.message === 'string') return data.message;
-  return '요청 결과를 확인하지 못했습니다. 입력 내용을 유지한 채 다시 확인해 주세요.';
+  return '요청 결과를 확인하지 못했습니다. 입력 내용을 유지한 채 다시 확인해 주시기 바랍니다.';
 }
 
 export default function AdminOperationsOperatorsPage() {
@@ -69,12 +69,12 @@ export default function AdminOperationsOperatorsPage() {
   }
   async function search() {
     setSearchNotice('');
-    if (query.trim().length < 2) { setError('이름이나 이메일을 두 글자 이상 입력해 주세요.'); return; }
+    if (query.trim().length < 2) { setError('이름이나 이메일을 두 글자 이상 입력해 주시기 바랍니다.'); return; }
     const seq = ++searchSequence.current; setError(''); setCandidates([]); setCandidate(null);
     try {
       const response = await authClient.api.get('/admin/operator-assignments/candidates', { params: { q: query.trim() } });
       if (!Array.isArray(response.data?.data?.candidates)) throw new Error('INVALID_RESPONSE');
-      if (seq === searchSequence.current) { setCandidates(response.data.data.candidates); if (!response.data.data.candidates.length) setSearchNotice('검색 결과가 없습니다. 공통 계정이 없다면 이메일로 초대하세요.'); }
+      if (seq === searchSequence.current) { setCandidates(response.data.data.candidates); if (!response.data.data.candidates.length) setSearchNotice('검색 결과가 없습니다. 공통 계정이 없다면 이메일로 초대하시기 바랍니다.'); }
     } catch (error_) { if (seq === searchSequence.current) setError(message(error_)); }
   }
   async function submit() {
@@ -125,13 +125,13 @@ export default function AdminOperationsOperatorsPage() {
         {searchNotice && !completed && <p role="status" className="text-sm text-slate-600">{searchNotice}</p>}
         {candidates.map(row => <label key={row.userId} className="flex items-start gap-2 rounded border p-3"><input type="radio" disabled={busy || completed} name="operations-candidate" checked={candidate?.userId === row.userId} onChange={() => { setCandidate(row); setEmail(''); }} /><span className="break-all">{row.name || '이름 없음'} · {row.email}{!row.hasGoogleLink && <span className="block text-sm text-amber-800">업무 운영 이용 전 Google 계정 연결이 필요합니다.</span>}</span></label>)}
         <label className="block">미가입자 초대 이메일<input type="email" disabled={busy || completed} className="mt-1 block w-full rounded border p-2" value={email} onChange={event => { setEmail(event.target.value); setCandidate(null); }} /></label>
-        <p className="text-sm text-slate-600">가입된 계정은 검색 후 선택하세요. 이메일 일치만으로 계정을 연결하지 않습니다. 수락하면 일상업무 전체를 기본으로 제공합니다. 담당 업무는 나중에 변경할 수 있습니다.</p>
+        <p className="text-sm text-slate-600">가입된 계정은 검색 후 선택하시기 바랍니다. 이메일 일치만으로 계정을 연결하지 않습니다. 수락하면 일상업무 전체를 기본으로 제공합니다. 담당 업무는 나중에 변경할 수 있습니다.</p>
       </div> : <p className="my-4 break-all">{target?.name} · {target?.email}</p>}
       {dialog === 'duties' ? <AdminOperationsDutySelection value={keys} onChange={setKeys} disabled={busy || completed} expanded={dialog === 'duties'} /> : dialog === 'revoke' ? <p>업무 운영자 지정을 해제합니다. 전체 관리자와 별도로 보유한 서비스·독립 사업 권한은 변경하지 않습니다.</p> : null}
-      {dialog === 'duties' && <p className="my-3 text-sm text-slate-600">담당 업무를 선택하고 저장하세요. 초대 메일을 다시 보낼 필요는 없습니다.</p>}
+      {dialog === 'duties' && <p className="my-3 text-sm text-slate-600">담당 업무를 선택하고 저장하시기 바랍니다. 초대 메일을 다시 보낼 필요는 없습니다.</p>}
       {dialog !== 'invite' && <label className="block">처리 사유<textarea className="mt-1 block w-full rounded border p-2" maxLength={2000} value={reason} disabled={busy} onChange={event => setReason(event.target.value)} /></label>}
       <div className="sticky bottom-0 z-10 mt-5 space-y-3 border-t bg-white pt-3">
-        {dialog === 'invite' && <p className="break-all text-sm text-slate-600">받는 사람: {candidate?.email || email.trim() || '위에서 사용자를 선택하거나 이메일을 입력해 주세요.'}</p>}
+        {dialog === 'invite' && <p className="break-all text-sm text-slate-600">받는 사람: {candidate?.email || email.trim() || '위에서 사용자를 선택하거나 이메일을 입력해 주시기 바랍니다.'}</p>}
         {busy && !completed && <p role="status">{dialog === 'invite' ? '초대 메일 발송을 요청하고 있습니다…' : '변경 내용을 저장하고 있습니다…'}</p>}
         {error && <p ref={feedback} role="alert" tabIndex={-1} className="text-red-700">{error}</p>}
         {completed && <p role="status" className="text-emerald-800">{notice}</p>}
