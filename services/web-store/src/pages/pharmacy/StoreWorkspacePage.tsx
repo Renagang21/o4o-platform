@@ -125,14 +125,11 @@ function WorkspaceContents({ area }: WorkspaceProps) {
     return (
       <StoreLibraryContentsPage
         workspace
-        navigation={<><StoreLibraryNavigation section="mine" />{navigation}</>}
+        navigation={<StoreLibraryNavigation section="mine" showSources={false} />}
+        moreNavigation={navigation}
+        productLink={productAllowed && <Link className={linkStyle} to={`${config.basePath}/my-products`}>상품에서 만들기</Link>}
         quickLinks={
           <>
-            {productAllowed && (
-              <Link className={linkStyle} to={`${config.basePath}/my-products`}>
-                상품에서 만들기
-              </Link>
-            )}
             <Link
               className={linkStyle}
               to={

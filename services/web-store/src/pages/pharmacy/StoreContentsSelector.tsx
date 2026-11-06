@@ -27,7 +27,7 @@ import { ContentUsageSummary } from './library/ContentUsageSummary';
 import { LibraryBusinessFilter } from './library/LibraryBusinessFilter';
 import { useStoreResource } from './hooks/useStoreResource';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { Sparkles, Trash2, Search, FileText, Info, Printer, QrCode, Image as ImageIcon } from 'lucide-react';
+import { Sparkles, Trash2, Search, FileText, Printer, QrCode, Image as ImageIcon } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
 import { Pagination } from '@o4o/operator-ux-core';
 import { DataTable, type Column, ActionBar } from '@o4o/ui';
@@ -347,13 +347,13 @@ function DocumentsSection({
       .map((r) => r.id);
     const directCount = selected.size - snapshotIds.length;
     if (snapshotIds.length === 0) {
-      toast.error('삭제 가능한 항목이 없습니다 (직접 작성 콘텐츠는 매장 제작 자료에서 삭제)');
+      toast.error('숨길 수 있는 사본이 없습니다. 직접 작성 콘텐츠는 편집 화면에서 삭제합니다.');
       return;
     }
     if (
       !confirm(
-        `선택한 ${snapshotIds.length}개 콘텐츠를 내 자료함에서 삭제하시겠습니까?${
-          directCount > 0 ? `\n(직접 작성 ${directCount}개는 매장 제작 자료에서 삭제)` : ''
+        `선택한 ${snapshotIds.length}개 사본을 내 자료함에서 숨기시겠습니까?${
+          directCount > 0 ? `\n(직접 작성·제작 자료 ${directCount}개는 변경하지 않습니다.)` : ''
         }`,
       )
     )
@@ -362,14 +362,14 @@ function DocumentsSection({
     try {
       const n = await onRemoveSnapshots(snapshotIds);
       if (!isCurrent()) return;
-      if (n < snapshotIds.length) toast.error(`${n}개 삭제, ${snapshotIds.length - n}개 실패했습니다. 목록을 확인하고 다시 시도해 주시기 바랍니다.`);
+      if (n < snapshotIds.length) toast.error(`${n}개 숨김, ${snapshotIds.length - n}개 실패했습니다. 목록을 확인하고 다시 시도해 주시기 바랍니다.`);
       if (n > 0) {
-        if (n === snapshotIds.length) toast.success(`${n}개 콘텐츠를 내 자료함에서 삭제했습니다`);
+        if (n === snapshotIds.length) toast.success(`${n}개 사본을 내 자료함에서 숨겼습니다`);
         setSelected(new Set());
         onAfterRemove?.();
       }
     } catch (e: any) {
-      if (isCurrent()) toast.error(e?.message || '삭제에 실패했습니다');
+      if (isCurrent()) toast.error(e?.message || '사본을 숨기지 못했습니다');
     } finally { mutation.current = false; if (isCurrent()) setRemoving(false); }
   }, [selected, rows, onRemoveSnapshots, onAfterRemove, isCurrent]);
 
@@ -600,37 +600,6 @@ function DocumentsSection({
 
   return (
     <section style={styles.section}>
-      {/* WO-O4O-STORE-LIBRARY-CONTENTS-DIRECT-CONTENT-REENTRY-UX-V1: guide bar */}
-      <div style={styles.infoBar}>
-        <Info size={14} style={{ color: colors.primary, flexShrink: 0 }} />
-        <span>
-          제작 후 저장한 콘텐츠는 <strong style={{ color: '#1D4ED8' }}>내 콘텐츠</strong> 표시 항목에서 다시 수정할 수 있습니다.
-        </span>
-      </div>
-
-      {/* WO-O4O-KPA-CONTENT-LIST-TAG-SEARCH-FILTER-V1: 출처 탭 (page 모드 전용) */}
-      {mode === 'page' && (
-        <><LibraryBusinessFilter value={business} onChange={value => {
-          setBusiness(value); setSource(value ? 'franchise' : 'all'); setPage(1);
-        }} />
-        <div style={styles.sourceTabBar}>
-          {SOURCE_TABS.map(({ key, label }) => {
-            const active = source === key;
-            return (
-              <button
-                key={key}
-                type="button"
-                aria-pressed={active}
-                onClick={() => changeSource(key)}
-                style={{ ...styles.sourceTab, ...(active ? styles.sourceTabActive : styles.sourceTabInactive) }}
-              >
-                {label}
-              </button>
-            );
-          })}
-        </div></>
-      )}
-
       <div style={styles.sectionHeader}>
         <span style={styles.countBadge}>{total}건</span>
         {/* WO-O4O-KPA-CONTENT-LIST-TAG-SEARCH-FILTER-V1: 적용된 태그 필터 chip */}
@@ -654,12 +623,50 @@ function DocumentsSection({
         </div>
       </div>
 
+      {mode === 'page' && <div className="mb-3 flex flex-wrap items-start gap-2">
+        <details className="w-full rounded-lg border border-slate-200 bg-white px-3">
+          <summary className="min-h-11 cursor-pointer content-center text-sm">필터 · {SOURCE_TABS.find(tab => tab.key === source)?.label}{business ? ' · 협업체 선택됨' : ''}</summary>
+        <p className="mb-2 text-xs text-slate-500">출처는 내 매장 사본의 분류입니다. 협업체를 선택하면 해당 협업체에서 가져온 사본만 표시합니다.</p>
+        <LibraryBusinessFilter value={business} onChange={value => {
+          setBusiness(value); setSource(value ? 'franchise' : 'all'); setPage(1);
+        }} />
+        <div style={styles.sourceTabBar}>
+          {SOURCE_TABS.map(({ key, label }) => {
+            const active = source === key;
+            return (
+              <button
+                key={key}
+                type="button"
+                aria-pressed={active}
+                onClick={() => changeSource(key)}
+                style={{ ...styles.sourceTab, ...(active ? styles.sourceTabActive : styles.sourceTabInactive) }}
+              >
+                {label}
+              </button>
+            );
+          })}
+        </div>
+        </details>
+        {(searchQuery || source !== 'all' || activeTag || business) && <button type="button" className="min-h-11 text-sm text-blue-700 underline" onClick={() => {
+          setSearchInput(''); setSearchQuery(''); setSource('all'); setBusiness(''); setActiveTag(null); setPage(1);
+        }}>검색·필터 초기화</button>}
+      </div>}
+      {mode === 'page' && selected.size === 0 && <p className="mb-2 text-xs text-slate-500">콘텐츠를 체크하면 편집·활용 작업을 표시합니다.</p>}
       {/* WO-O4O-KPA-STORE-LIBRARY-CONTENTS-STANDARD-TABLE-V1: custom toolbar → @o4o/ui ActionBar */}
       <div className="[&>div>div]:flex-wrap [&>div>div>span]:whitespace-nowrap [&_button]:shrink-0 [&_button]:whitespace-nowrap">
       <ActionBar
         selectedCount={selected.size}
         onClearSelection={() => setSelected(new Set())}
         actions={[
+          ...(mode === 'page' ? [{
+            key: 'edit', label: '선택 콘텐츠 편집',
+            onClick: () => { if (isCurrent() && singleSelectedRow) navigate(base + singleSelectedRow.href.slice('/store'.length), { state: returnState }); },
+            disabled: selected.size !== 1,
+          }, {
+            key: 'publish', label: '선택 사본 게시 설정',
+            onClick: () => { if (isCurrent() && singleSelectedRow?.origin === 'snapshot') navigate(`${base}/content?snapshotId=${encodeURIComponent(singleSelectedRow.id)}`, { state: returnState }); },
+            disabled: singleSelectedRow?.origin !== 'snapshot',
+          }] : []),
           {
             key: 'start',
             label: startButtonLabel ?? '제작 시작',
@@ -696,11 +703,11 @@ function DocumentsSection({
           }] : []),
           ...(showRemoveButton ? [{
             key: 'remove',
-            label: '선택 삭제',
+            label: '선택 사본 숨기기',
             icon: <Trash2 size={14} />,
             variant: 'danger' as const,
             onClick: handleRemove,
-            disabled: loading || removing || !!reimportingId || selected.size === 0,
+            disabled: loading || removing || !!reimportingId || !rows.some(row => selected.has(row.selectionKey) && row.origin === 'snapshot'),
           }] : []),
         ]}
       />
@@ -730,7 +737,7 @@ function DocumentsSection({
         dataSource={rows}
         rowKey="selectionKey"
         loading={loading}
-        emptyText={searchQuery ? '검색 결과가 없습니다' : '가져온 문서형 콘텐츠가 없습니다'}
+        emptyText={searchQuery || source !== 'all' || activeTag || business ? '검색·필터 조건에 맞는 콘텐츠가 없습니다. 조건을 초기화하거나 제공 자료에서 콘텐츠를 가져오시기 바랍니다.' : '저장한 콘텐츠가 없습니다. 새 콘텐츠를 만들거나 제공 자료에서 가져오시기 바랍니다.'}
         rowSelection={{
           selectedRowKeys: Array.from(selected),
           onChange: (keys: string[]) => setSelected(new Set(keys)),
@@ -745,6 +752,11 @@ function DocumentsSection({
       />
       </>}
 
+
+      {mode === 'page' && <details className="mt-3 rounded-lg border border-slate-200 px-3 text-xs text-slate-600">
+        <summary className="min-h-11 cursor-pointer content-center">선택·활용 안내</summary>
+        <p className="pb-3">한 개를 선택하면 편집·POP·PDF를 사용할 수 있습니다. QR은 직접 작성·제작 자료를 지원합니다. 가져온 사본은 게시 설정·숨기기를 지원합니다. 숨기기는 원본 삭제가 아닙니다. 원본 변경은 기존 매장 사본에 반영되지 않습니다. 게시 설정은 실제 기기 적용·재생 완료를 뜻하지 않습니다.</p>
+      </details>}
 
       {/* WO-O4O-KPA-STORE-LIBRARY-CONTENTS-PDF-EXPORT-OPTIONS-V1: 옵션 모달 */}
       {showPdfExport && (
@@ -798,7 +810,7 @@ const styles: Record<string, CSSProperties> = {
     color: colors.neutral500,
   },
   section: {
-    marginTop: '16px',
+    marginTop: '8px',
   },
   sectionHeader: {
     display: 'flex',
@@ -825,18 +837,6 @@ const styles: Record<string, CSSProperties> = {
     padding: '8px 12px',
     background: colors.neutral100,
     borderRadius: '6px',
-  },
-  infoBar: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '8px',
-    padding: '10px 14px',
-    background: '#EFF6FF',
-    border: `1px solid #BFDBFE`,
-    borderRadius: '8px',
-    fontSize: '13px',
-    color: '#1D4ED8',
-    marginBottom: '14px',
   },
   searchWrap: {
     position: 'relative',
