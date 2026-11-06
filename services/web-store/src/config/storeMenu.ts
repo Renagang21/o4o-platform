@@ -41,7 +41,7 @@ export const UNIFIED_STORE_CONFIG: StoreDashboardConfig = {
     ]},
     { label: '디지털 사이니지', items: [
       { key: 'signage-playlist',  label: '재생목록', subPath: '/marketing/signage/playlist' },
-      { key: 'signage-videos',    label: '동영상 보관함',       subPath: '/marketing/signage/videos' },
+      { key: 'signage-videos',    label: '동영상',            subPath: '/marketing/signage/videos' },
       { key: 'signage-player',    label: '디스플레이 재생',      subPath: '/marketing/signage/player' },
     ]},
     { label: '분석', items: [

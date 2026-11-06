@@ -154,6 +154,8 @@ export interface PharmacyOrder {
 export interface SemiFranchiseContent {
   id: string;
   title: string;
+  /** 자료에 포함된 지원 영상(서버 파생). 가입 매장 목록 조회에서 내려온다. */
+  videos?: Array<{ sourceType: 'youtube' | 'vimeo'; sourceUrl: string; embedId: string }>;
   summary: string | null;
   body: string | null;
   thumbnailUrl: string | null;
@@ -206,6 +208,9 @@ export const neturePharmacyApi = {
     return (await coreApiClient.get<Envelope<SemiFranchiseContent>>(`${P}/store/contents/${encodeURIComponent(id)}`)).data;
   },
   /** 내 매장 편집용 사본(매장 소유 독립 사본) 생성 — 원본 변경은 사본에 전파되지 않는다. */
+  async copyVideo(id: string, sourceUrl: string): Promise<{ snapshotId: string }> {
+    return (await coreApiClient.post<Envelope<{ snapshotId: string }>>(`${P}/store/contents/${encodeURIComponent(id)}/copy-video`, { sourceUrl })).data;
+  },
   async copyContent(id: string): Promise<{ snapshotId: string }> {
     return (await coreApiClient.post<Envelope<{ snapshotId: string }>>(`${P}/store/contents/${encodeURIComponent(id)}/copy`, {})).data;
   },

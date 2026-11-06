@@ -631,6 +631,16 @@ export { AddressSearch } from './components/AddressSearch';
 export type { AddressSearchProps, AddressSearchValue } from './components/AddressSearch';
 export * from './components/table/BaseTable';
 export * from './components/table/ActionBar';
+// WO-O4O-STANDARD-LIST-WORKSPACE-CONTRACT-V1
+export { ListWorkspace } from './components/table/ListWorkspace';
+export type {
+  ListWorkspaceProps,
+  ListWorkspaceCreateAction,
+  ListWorkspaceCreatePlacement,
+  ListWorkspaceError,
+} from './components/table/ListWorkspace';
+export { useListSelection } from './components/table/useListSelection';
+export type { UseListSelectionReturn } from './components/table/useListSelection';
 export * from './components/table/BulkResultModal';
 export * from './components/table/RowActionMenu';
 export * from './components/table/ConfirmActionDialog';

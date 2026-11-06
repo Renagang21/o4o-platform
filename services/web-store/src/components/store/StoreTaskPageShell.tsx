@@ -30,16 +30,8 @@ export function StoreTaskPageShell({
     <div style={state.listStyle}>{children}</div>
   );
   return (
-    <CorePageShell {...props}>
+    <CorePageShell {...props} headerActions={headerActions}>
       {!listFirst && <StoreAiSlot label={props.labels.pageTitle} />}
-      {headerActions && (
-        <div
-          className="mb-3 flex flex-wrap items-center gap-2"
-          aria-label="빠른 작업"
-        >
-          {headerActions}
-        </div>
-      )}
       {body}
       {listFirst && <details className="mt-5 rounded-lg border border-slate-200 bg-white px-3">
         <summary className="min-h-11 cursor-pointer content-center text-sm text-teal-800">AI 도움 요청</summary>

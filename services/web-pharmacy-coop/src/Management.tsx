@@ -75,40 +75,50 @@ export function MemberManagementPanel({
   return (
     <section className="section coop-management">
       <h2>조합원 관리 · {admin ? "admin" : "operator"}</h2>
-      <AiOverviewPanel scopeKey={`${userId}:${cooperative.id}`} load={async () => {
-        const response = await client.post(`${base}/${cooperative.id}/ai-overview`, {});
-        const result = response.data?.data;
-        if (response.data?.success !== true || result?.cooperativeId !== cooperative.id) throw new Error('COOPERATIVE_CONTEXT_CHANGED');
-        return result;
-      }} />
+      <details>
+        <summary>AI 현황 요약</summary>
+        <AiOverviewPanel scopeKey={`${userId}:${cooperative.id}`} load={async () => {
+          const response = await client.post(`${base}/${cooperative.id}/ai-overview`, {});
+          const result = response.data?.data;
+          if (response.data?.success !== true || result?.cooperativeId !== cooperative.id) throw new Error('COOPERATIVE_CONTEXT_CHANGED');
+          return result;
+        }} />
+      </details>
       {work.data && (
         <StatusSummary rows={work.data as Member[]} noun="조합원" />
       )}
       {admin && showSettings && (
-        <EligibilitySettings
-          key={cooperative.id}
-          client={client}
-          cooperative={cooperative}
-          onChanged={onChanged}
-        />
+        <details>
+          <summary>가입 자격·운영자 설정</summary>
+          <EligibilitySettings
+            key={cooperative.id}
+            client={client}
+            cooperative={cooperative}
+            onChanged={onChanged}
+          />
+        </details>
       )}
-      <p>
-        {admin
-          ? "최종 자격 결정은 해당 조합에만 적용됩니다. 제명은 정관에 따른 의결 결과를 기록하시기 바랍니다."
-          : "신청 검토·보완 요청과 최종 처리 요청을 기록합니다. 자격 결정은 조합 admin이 처리합니다."}
-      </p>
       <Feedback {...work} />
-      <label>
-        <span>검토·처리 사유</span>
-        <textarea
-          maxLength={2000}
-          value={reason}
-          onChange={(e) => setReason(e.target.value)}
-        />
-      </label>
       {!work.data && !work.error && <p>조합원을 불러오고 있습니다…</p>}
+      {selected && !selected.operatorReadOnly && (
+        <div>
+        <p>
+          {admin
+            ? "최종 자격 결정은 해당 조합에만 적용됩니다. 제명은 정관에 따른 의결 결과를 기록하시기 바랍니다."
+            : "신청 검토·보완 요청과 최종 처리 요청을 기록합니다. 자격 결정은 조합 admin이 처리합니다."}
+        </p>
+        <label>
+          <span>검토·처리 사유</span>
+          <textarea
+            maxLength={2000}
+            value={reason}
+            onChange={(e) => setReason(e.target.value)}
+          />
+        </label>
+        </div>
+      )}
       <ActionBar selectedCount={selectedIds.size} onClearSelection={()=>setSelectedIds(new Set())} actions={memberActions.map(action=>({
-        key:action,label:action.startsWith('request_')?`${labels[action.slice(8)]} 요청`:labels[action],disabled:work.busy||!reason.trim(),
+        key:action,label:labels[action]??`${labels[action.slice(8)]} 요청`,disabled:work.busy||!reason.trim(),
         onClick:()=>{if(selected&&!selected.operatorReadOnly)void work.send(`${base}/${cooperative.id}/members/${selected.id}/actions/${action}`,{reason});},
       }))} />
       <DataTable<Member> tableId="cooperative-member-management" data={(work.data as Member[]|null)??[]} rowKey="id"

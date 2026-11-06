@@ -372,7 +372,7 @@ export function ServiceLegalSettingsPage({ serviceKey, api, title, enabledTabs }
       {/* ── 정책 문서 탭 ── */}
       {tab === 'policies' && (
         <>
-          <div className="mb-3">
+          <div className="mb-3 flex justify-end">
             <button className={C.btnPrimary} onClick={openNewDoc}>새 문서</button>
           </div>
           <p className={C.help}>게시된 정책 문서만 공개 화면에서 조회됩니다. 정책 문서는 시행일과 버전을 함께 관리하는 것을 권장합니다.</p>

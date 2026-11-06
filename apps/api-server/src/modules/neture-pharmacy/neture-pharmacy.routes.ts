@@ -311,6 +311,10 @@ export function createNeturePharmacyRoutes(dataSource: DataSource, consultationD
     res.status(201);
     return contents.pharmacyCopy(org(req), req.user!.id, uuidParam(req, 'id'));
   }));
+  router.post('/pharmacy/store/contents/:id/copy-video', ...store, handle(async (req, res) => {
+    res.status(201);
+    return contents.pharmacyCopyVideo(org(req), req.user!.id, uuidParam(req, 'id'), req.body?.sourceUrl);
+  }));
 
   router.get('/pharmacy/recruitments', ...store, handle(async (req) => recruitments.pharmacyBrowse(org(req))));
   router.post('/pharmacy/recruitments/:id/apply', ...store, handle(async (req) =>

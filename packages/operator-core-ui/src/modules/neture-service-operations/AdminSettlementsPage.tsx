@@ -84,6 +84,7 @@ const FILTER_TABS: { label: string; value: SettlementStatus | undefined }[] = [
 export default function AdminSettlementsPage() {
  const {adminSettlementApi}=useNetureServiceOperations();
   const [settlements, setSettlements] = useState<Settlement[]>([]);
+  const [calcOpen, setCalcOpen] = useState(false);
   const [kpi, setKpi] = useState<AdminSettlementKpi>({
     calculated_count: 0, calculated_amount: 0,
     approved_count: 0, approved_amount: 0,
@@ -294,9 +295,15 @@ export default function AdminSettlementsPage() {
   return (
     <div style={styles.container}>
       {/* Header */}
-      <div style={styles.header}>
-        <h1 style={styles.title}>정산 관리</h1>
-        <p style={styles.subtitle}>정산 계산, 승인, 지급을 관리합니다.</p>
+      <div style={{ ...styles.header, display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'flex-start', gap: '12px' }}>
+        <div>
+          <h1 style={styles.title}>정산 관리</h1>
+          <p style={styles.subtitle}>정산 계산, 승인, 지급을 관리합니다.</p>
+        </div>
+        <button type="button" aria-expanded={calcOpen} onClick={() => setCalcOpen((open) => !open)} style={styles.calcButton}>
+          <Calculator size={16} />
+          {calcOpen ? '정산 계산 닫기' : '정산 계산'}
+        </button>
       </div>
 
       {/* KPI Cards */}
@@ -315,8 +322,8 @@ export default function AdminSettlementsPage() {
         </div>
       </div>
 
-      {/* Calculate Section */}
-      <div style={styles.section}>
+      {/* Calculate Section — 상단 버튼으로 연다 (정본 O4O-STANDARD-LIST-WORKSPACE-CONTRACT-V1) */}
+      {calcOpen && <div style={styles.section}>
         <h2 style={styles.sectionTitle}>정산 계산</h2>
         <div style={styles.calcRow}>
           <input
@@ -341,13 +348,13 @@ export default function AdminSettlementsPage() {
             }}
           >
             <Calculator size={16} />
-            {calculating ? '계산 중...' : '정산 계산'}
+            {calculating ? '계산 중...' : '계산 실행'}
           </button>
         </div>
         {calcMessage && (
           <p style={{ marginTop: '8px', fontSize: '13px', color: '#475569' }}>{calcMessage}</p>
         )}
-      </div>
+      </div>}
 
       {/* Filter Tabs */}
       <div style={styles.filterRow}>

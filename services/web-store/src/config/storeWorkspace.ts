@@ -33,7 +33,7 @@ export const STORE_WORKSPACE_AREAS = [
     key: "signage",
     label: "사이니지",
     subPath: "/marketing/signage/videos",
-    description: "동영상을 보관하고 각 디스플레이의 재생목록을 선택합니다.",
+    description: "동영상과 재생목록을 관리하고 각 디스플레이의 재생목록을 선택합니다.",
   },
 ] as const;
 
@@ -221,8 +221,8 @@ export function workspaceGroups(
   const groups =
     area === "signage"
       ? [
-          group("signage-library", "동영상 보관함", "외부 영상과 가져온 자료를 보관합니다.", ["signage-videos"]),
-          group("signage-playlists", "재생목록", "보관함의 영상을 선택해 추가하고 순서를 편집합니다.", ["signage-playlist"]),
+          group("signage-library", "동영상", "등록한 영상과 가져온 자료를 관리합니다.", ["signage-videos"]),
+          group("signage-playlists", "재생목록", "등록한 동영상을 선택해 추가하고 순서를 편집합니다.", ["signage-playlist"]),
           group("signage-playback", "디스플레이 재생", "각 화면에서 게시된 재생목록을 선택해 반복 재생합니다.", ["signage-player"]),
         ]
       : area === "commerce"

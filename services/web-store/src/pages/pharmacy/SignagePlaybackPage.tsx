@@ -298,7 +298,7 @@ function PlaybackSession() {
         <div className="flex items-center justify-center w-full h-full">
           <div className="text-center max-w-md">
             <AlertCircle className="w-10 h-10 text-red-400 mx-auto mb-3" />
-            <p className="text-white/60 mb-4 whitespace-pre-line">{error ?? '플레이리스트를 찾을 수 없습니다.'}</p>
+            <p className="text-white/60 mb-4 whitespace-pre-line">{error ?? '재생목록을 찾을 수 없습니다.'}</p>
             <button type="button" onClick={() => setRetry(value => value + 1)} className="mb-3 min-h-11 rounded-lg bg-white/10 px-4 text-sm text-white">다시 시도</button>
 
           </div>

@@ -6,6 +6,7 @@
 **작성일:** 2026-05-07  
 **기반 조사:** `docs/archive/investigations/IR-O4O-OPERATOR-TABLE-CANONICAL-GAP-AUDIT-V1.md`  
 **상태:** ACTIVE  
+**화면 계약:** 표 바깥의 화면 배치(제목 · 신규 버튼 · 필터 · 선택 · 페이지네이션)와 상태는 [O4O-STANDARD-LIST-WORKSPACE-CONTRACT-V1](O4O-STANDARD-LIST-WORKSPACE-CONTRACT-V1.md) 을 따른다.  
 
 ---
 

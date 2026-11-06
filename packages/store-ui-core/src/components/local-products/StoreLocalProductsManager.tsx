@@ -481,8 +481,8 @@ export function StoreLocalProductsManager<
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="min-w-0">
           <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-3">
             <ShoppingBag className="w-7 h-7 text-teal-600" />
             {title}
@@ -490,15 +490,24 @@ export function StoreLocalProductsManager<
           </h1>
           <p className="text-sm text-slate-500 mt-1">{description}</p>
         </div>
-        {onTabletDisplays && (
+        <div className="flex flex-wrap items-center gap-2">
+          {onTabletDisplays && (
+            <button
+              onClick={onTabletDisplays}
+              className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-teal-700 bg-teal-50 rounded-xl hover:bg-teal-100 transition-colors"
+            >
+              <Tablet className="w-4 h-4" />
+              태블릿 진열 관리
+            </button>
+          )}
           <button
-            onClick={onTabletDisplays}
-            className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-teal-700 bg-teal-50 rounded-xl hover:bg-teal-100 transition-colors"
+            onClick={handleCreate}
+            className="flex items-center gap-2 px-4 py-2.5 bg-teal-600 text-white text-sm font-medium rounded-xl hover:bg-teal-700 transition-colors shadow-lg shadow-teal-600/25"
           >
-            <Tablet className="w-4 h-4" />
-            태블릿 진열 관리
+            <Plus className="w-4 h-4" />
+            상품 등록
           </button>
-        )}
+        </div>
       </div>
 
       {/* Filters */}
@@ -532,13 +541,6 @@ export function StoreLocalProductsManager<
           활성 상품만
         </label>
 
-        <button
-          onClick={handleCreate}
-          className="flex items-center gap-2 px-4 py-2.5 bg-teal-600 text-white text-sm font-medium rounded-xl hover:bg-teal-700 transition-colors shadow-lg shadow-teal-600/25"
-        >
-          <Plus className="w-4 h-4" />
-          상품 등록
-        </button>
       </div>
 
       {/* Error */}

@@ -197,7 +197,9 @@ function storeChildRoutes() {
         <Route path="marketing/signage" element={<Navigate to={`${S}/marketing/signage/playlist`} replace />} />
         <Route path="marketing/signage/playlist" element={<StoreSignagePage />} />
         <Route path="marketing/signage/playlist/new" element={<StorePlaylistCreatePage />} />
+        <Route path="marketing/signage/playlist/:playlistId" element={<StoreSignagePage />} />
         <Route path="marketing/signage/videos" element={<StoreSignagePage />} />
+        <Route path="marketing/signage/videos/new" element={<StoreSignagePage />} />
         <Route path="marketing/signage/schedules" element={<Navigate to={`${S}/marketing/signage/player`} replace />} />
         <Route path="marketing/signage/player" element={<SignagePlayerSelectPage />} />
         {/* 매장 구성원 — Owner 전용 화면. 권한은 서버가 판정한다(StoreOwnerOnly 는 화면 가드일 뿐) */}

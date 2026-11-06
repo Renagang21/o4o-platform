@@ -451,6 +451,7 @@ export default function ProductCandidateReviewPage() {
           '수집 자료의 검증·보완 사유를 기록하고 해당 제품군 등록 경로를 확인합니다',
         ]}
         compact
+        collapsible
       />
 
       <section aria-label="후보 업무 구분" className="my-4 grid gap-3 sm:grid-cols-3">

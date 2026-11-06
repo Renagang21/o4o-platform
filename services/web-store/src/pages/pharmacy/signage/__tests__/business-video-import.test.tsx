@@ -1,0 +1,53 @@
+import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { afterEach, beforeEach, expect, it, vi } from 'vitest';
+const api = vi.hoisted(() => ({ listContents: vi.fn(), copyVideo: vi.fn() }));
+vi.mock('../../../../api/neturePharmacy', () => ({ neturePharmacyApi: api }));
+vi.mock('@o4o/tablet-kiosk-core', () => ({ VideoPlayback: ({ title }: { title: string }) => <div aria-label={title}>preview</div> }));
+import { BusinessVideoImport } from '../BusinessVideoImport';
+const video = { id: 'content', title: '외부 안내 영상', semiFranchiseName: '합성 협업체', videos: [{ sourceType: 'youtube', sourceUrl: 'https://www.youtube.com/watch?v=abcdefghijk', embedId: 'abcdefghijk' }] };
+const current = () => true;
+const IMPORT = '동영상에 가져오기';
+const pick = () => fireEvent.click(screen.getByRole('checkbox', { name: `${video.title} 영상 선택` }));
+beforeEach(() => { vi.resetAllMocks(); api.listContents.mockResolvedValue({ items: [video], total: 1 }); api.copyVideo.mockResolvedValue({ snapshotId: 'saved' }); });
+afterEach(cleanup);
+const props = () => ({ organizationId: 'store-a', isCurrent: current, onImported: vi.fn(), onClose: vi.fn() });
+it('selects the member video, previews and imports through the guarded material API once', async () => {
+  const p = props(); let finish!: (v: unknown) => void; api.copyVideo.mockReturnValue(new Promise(resolve => { finish = resolve; }));
+  render(<BusinessVideoImport {...p} />); await screen.findByText(video.title);
+  pick();
+  fireEvent.click(screen.getByRole('button', { name: '미리보기' })); expect(screen.getByLabelText(video.title)).toBeTruthy();
+  await waitFor(() => expect((screen.getByRole('button', { name: IMPORT }) as HTMLButtonElement).disabled).toBe(false));
+  fireEvent.click(screen.getByRole('button', { name: IMPORT }));
+  fireEvent.click(screen.getByRole('button', { name: IMPORT }));
+  expect(api.copyVideo).toHaveBeenCalledTimes(1); expect(api.copyVideo).toHaveBeenCalledWith(video.id, video.videos[0].sourceUrl);
+  await act(async () => finish({ snapshotId: 'saved' })); expect(p.onImported).toHaveBeenCalledTimes(1);
+  expect(screen.getByRole('status').textContent).toContain('가져왔습니다');
+});
+it('shows a real denial and retries without reporting an unconfirmed import as saved', async () => {
+  const p = props(); api.copyVideo.mockRejectedValueOnce(new Error('membership revoked'));
+  render(<BusinessVideoImport {...p} />); await screen.findByText(video.title); pick();
+  fireEvent.click(screen.getByRole('button', { name: IMPORT })); await screen.findByRole('alert');
+  expect(p.onImported).not.toHaveBeenCalled();
+  await waitFor(() => expect((screen.getByRole('button', { name: IMPORT }) as HTMLButtonElement).disabled).toBe(false));
+  fireEvent.click(screen.getByRole('button', { name: IMPORT })); await waitFor(() => expect(p.onImported).toHaveBeenCalledTimes(1));
+});
+it('discards a delayed catalog after scope replacement and a completed import after unmount', async () => {
+  let finishList!: (v: unknown) => void; api.listContents.mockReturnValueOnce(new Promise(resolve => { finishList = resolve; }));
+  const p = props(), ui = render(<BusinessVideoImport {...p} />);
+  api.listContents.mockResolvedValue({ items: [], total: 0 }); ui.rerender(<BusinessVideoImport {...p} organizationId="store-b" />);
+  await act(async () => finishList({ items: [video], total: 1 })); expect(screen.queryByText(video.title)).toBeNull();
+  ui.unmount(); api.listContents.mockResolvedValue({ items: [video], total: 1 }); let finishCopy!: (v: unknown) => void;
+  api.copyVideo.mockReturnValue(new Promise(resolve => { finishCopy = resolve; }));
+  const second = render(<BusinessVideoImport {...p} />); await screen.findByText(video.title); pick();
+  fireEvent.click(screen.getByRole('button', { name: IMPORT })); second.unmount();
+  await act(async () => finishCopy({ snapshotId: 'saved' })); expect(p.onImported).not.toHaveBeenCalled();
+});
+it('supports paging to materials beyond the first page and clears old selections on search', async () => {
+  api.listContents.mockResolvedValue({ items: [video], total: 21 }); render(<BusinessVideoImport {...props()} />); await screen.findByText(video.title);
+  pick(); fireEvent.click(screen.getByRole('button', { name: '다음' }));
+  await waitFor(() => expect(api.listContents).toHaveBeenLastCalledWith({ q: '', page: 2, limit: 20 }));
+  await screen.findByText(video.title);
+  expect(screen.queryByRole('button', { name: IMPORT })).toBeNull();
+  fireEvent.change(screen.getByRole('textbox'), { target: { value: '안내' } }); fireEvent.click(screen.getByRole('button', { name: '검색' }));
+  await waitFor(() => expect(api.listContents).toHaveBeenLastCalledWith({ q: '안내', page: 1, limit: 20 }));
+});

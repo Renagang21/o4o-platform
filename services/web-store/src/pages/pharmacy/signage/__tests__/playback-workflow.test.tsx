@@ -92,17 +92,17 @@ it('shows only published playlists, keeps selection actionable, and chooses in t
   </Routes></MemoryRouter>);
   await screen.findByText('게시 안내'); expect(screen.queryByText('비공개 초안')).toBeNull(); expect(screen.queryByText('중지된 안내')).toBeNull();
   fireEvent.click(screen.getAllByRole('checkbox')[1]);
-  fireEvent.click(screen.getByRole('button', { name: '선택한 재생목록 열기' }));
+  fireEvent.click(screen.getByRole('button', { name: '선택한 재생목록 재생 시작' }));
   await screen.findByText('매장 안내 A');
   expect(m.get).toHaveBeenCalledWith('/store-playlists/public/store-guide');
 });
 it('distinguishes failed playlist loading from empty results and allows retry', async () => {
   m.playlists.mockRejectedValueOnce(new Error('offline'));
   render(<MemoryRouter><SignagePlayerSelectPage selection /></MemoryRouter>);
-  await screen.findByText('플레이리스트를 불러오지 못했습니다.');
+  await screen.findByText('재생목록을 불러오지 못했습니다.');
   fireEvent.click(screen.getByRole('button', { name: '다시 시도' }));
   await waitFor(() => expect(m.playlists).toHaveBeenCalledTimes(2));
-  await waitFor(() => expect(screen.queryByText('플레이리스트를 불러오지 못했습니다.')).toBeNull());
+  await waitFor(() => expect(screen.queryByText('재생목록을 불러오지 못했습니다.')).toBeNull());
 });
 it('falls back to normal playback if the browser rejects fullscreen', async () => {
   Object.defineProperty(HTMLElement.prototype, 'requestFullscreen', { configurable: true, value: vi.fn().mockRejectedValue(new Error('denied')) });
@@ -151,7 +151,7 @@ it('redirects retired schedule playback URLs to the playlist chooser without rea
     <Route path="/store/marketing/signage/play/:playlistId" element={<SignagePlaybackPage />} />
     <Route path="/store/marketing/signage/display" element={<SignagePlayerSelectPage selection />} />
   </Routes></MemoryRouter>);
-  await screen.findByText('게시된 플레이리스트가 없습니다.');
+  await screen.findByText('게시된 재생목록이 없습니다.');
   expect(m.get).not.toHaveBeenCalled();
 });
 

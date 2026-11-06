@@ -188,7 +188,7 @@ export function useSignagePlaylists(organizationId: string) {
     });
   };
   const handleDeletePlaylist = (playlist: StorePlaylist) => {
-    if (!confirm(`"${playlist.name}" 플레이리스트를 삭제하시겠습니까?`)) return;
+    if (!confirm(`"${playlist.name}" 재생목록을 삭제하시겠습니까?`)) return;
     return runPlaylistMutation(playlist.id, async (isStoreCurrent) => {
       try {
         await deleteStorePlaylist(playlist.id);

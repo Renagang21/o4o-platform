@@ -451,6 +451,7 @@ export default function OperatorProductApprovalPage() {
           '반려 시 사유를 입력하면 공급자에게 전달됩니다',
         ]}
         compact
+        collapsible
       />
 
       {/* WO-O4O-NETURE-OPERATOR-PRODUCTS-AND-OFFERS-LOAD-ERROR-CONTRACT-V1:
