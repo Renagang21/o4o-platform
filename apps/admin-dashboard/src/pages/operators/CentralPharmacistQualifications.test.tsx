@@ -22,7 +22,7 @@ const fullDetail = {
  qualification:{...row,approvedAt:null,reviewedBy:null},registration:null,legacyLicense:null,pharmacies:[],history:[],
  permissions:{edit:false,qualifications:true,pharmacies:false},
 };
-const pendingRegistration = {type:'supplier',state:'pending',fields:{businessName:'합성 사업자'}};
+const pendingRegistration = {type:'supplier',state:'pending',requestId:'request-1',fields:{businessName:'합성 사업자'}};
 const respondWith = (detail:unknown, list:unknown=[row]) => mock.get.mockImplementation(async (path:string) => ({data:{data:path.endsWith("/target")?detail:{items:list,hasNext:false}}}));
 const fillReason = (value:string) => fireEvent.change(screen.getByLabelText("신청자에게 안내할 확인·반려 사유"), { target: { value } });
 beforeEach(() => {
@@ -79,8 +79,25 @@ it("registers the signup rejection from the same drawer", async () => {
   );
   expect(await screen.findByRole("status")).toHaveTextContent("가입 반려를 저장했습니다.");
 });
+it("decides a legacy qualification without a stored signup on the qualification API", async () => {
+  // readRegistrationView() synthesizes this pending view from the qualification ledger (no requestId).
+  respondWith({ ...fullDetail, registration: { type: "pharmacist", state: "pending", fields: { licenseNumber: "synthetic" } } });
+  render(<CentralPharmacistQualifications actorId="reviewer" canManageMembers />);
+  fireEvent.click(await screen.findByRole("button", { name: "가입승인" }));
+  const reject = await screen.findByRole("button", { name: "반려" });
+  fillReason("근거 부족");
+  fireEvent.click(reject);
+  await waitFor(() =>
+    expect(mock.post).toHaveBeenCalledWith("/qualifications/pharmacist/review/target", {
+      action: "reject",
+      reason: "근거 부족",
+      version: row.version,
+    }),
+  );
+  expect(mock.post.mock.calls.some(([path]) => String(path).includes("registration"))).toBe(false);
+});
 it("requires license evidence for a licensed signup, but not to reject it", async () => {
-  respondWith({ ...fullDetail, registration: { type: "pharmacy_owner", state: "pending", fields: {} } });
+  respondWith({ ...fullDetail, registration: { type: "pharmacy_owner", state: "pending", requestId: "request-2", fields: {} } });
   render(<CentralPharmacistQualifications actorId="reviewer" canManageMembers />);
   fireEvent.click(await screen.findByRole("button", { name: "가입승인" }));
   const approve = await screen.findByRole("button", { name: "승인" });

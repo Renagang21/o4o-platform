@@ -34,10 +34,14 @@ type Decision = "approve" | "reject" | "revoke";
  */
 function signupDecision(detail: MemberDetail, row: Qualification, canManageMembers: boolean) {
   const registration = detail.registration;
-  const viaRegistration = Boolean(canManageMembers && registration && registration.state !== "approved");
+  // The detail view synthesizes a pending registration from the legacy qualification ledger even when
+  // nothing was submitted; only a stored submission (server-issued requestId) can be decided on the
+  // member-registration API, which otherwise answers 409 REGISTRATION_REQUIRED.
+  const submitted = Boolean(registration?.requestId && registration.state !== "approved");
+  const viaRegistration = canManageMembers && submitted;
   return {
     viaRegistration,
-    registrationBlocked: Boolean(!canManageMembers && registration && registration.state !== "approved"),
+    registrationBlocked: !canManageMembers && submitted,
     canApprove: viaRegistration || Boolean(row.version && row.licenseNumber && row.status !== "approved"),
     canReject: viaRegistration
       ? registration?.state === "pending"
