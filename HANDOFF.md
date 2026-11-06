@@ -38,17 +38,16 @@ PR #339의 main 통합·운영 배포는 완료됐지만 작업 PC와 소유 세
 
 ## 다음에 할 일 (우선순위 순)
 
-1. PR 없는 원격 branch 2개의 main 반영 여부 대조 (삭제 금지 · 대조만).
-   - `wo/readonly-db-rule` — 운영 DB read-only 계정 규칙 문서.
-   - `wo/member-signup-approval-action` — PR #956 과 내용이 겹치는지 확인.
-2. 미완료 지시서의 체크박스와 실제 상태 대조. 체크박스는 기록 시점 값이다. 운영 DB 관련 항목은 LOCAL read-only 로 확인하고 write 는 사용자 승인을 받는다.
-   - `TODO-O4O-ACCOUNT-ERASURE-ACTIVATION-V1` — PR #936 MERGED, 운영 활성화 여부 미확인.
-   - `TODO-O4O-MEMBER-PROFILE-EDIT-V1` — 병합 · 새 nullable 열의 운영 적용 여부 미확인.
-   - `WO-O4O-ADMIN-OPERATOR-INVITE-FIRST-V1` — PR #925 MERGED, 운영 migration 적용 여부 미확인.
-   - `TODO-O4O-OPERATOR-PROTECTED-MEMBER-DEPLOY-FIX-V1` — 병합 · 재배포 여부 미확인.
-   - `WO-O4O-SCHEDULED-JEST-FULL-SHARD-RECOVERY-V1` — 병합 · 전체 3분할 실행 여부 미확인.
-3. 포맷 전 PC 의 worktree 9개(다른 드라이브에 보존, 원본 `.git` 연결 끊김)에 push 안 된 변경이 있는지 대조. 사용자는 이 자료를 정비 전 자료로 본다. 대조 전에는 지우지 않는다.
-4. 새 개발 후보(사용자 선택): `WO-O4O-COMMUNITY-INDUSTRY-NEWS-V2` · `WO-O4O-COMMUNITY-FORUM-AI-PHASE1-V1`(둘 다 DRAFT) · `WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1` · `TODO-O4O-PLAYLIST-AUTHORING-REQUIRED-20261105` 잔여.
+1. `wo/readonly-db-rule`(`c01aa01292`) main 통합 여부 결정 — PR 없음 · main 미반영. 운영 DB 조회를 `o4o_readonly` 계정으로 제한하는 규칙(`AGENTS.md` · `SETUP.md` · `db-readonly` 스킬)이다. 통합 전까지 main 문서는 조회에 `o4o_api_v2` 를 안내한다. 통합은 통합 담당 몫이다.
+2. 미완료 지시서의 남은 확인. 체크박스는 기록 시점 값이므로 아래 2026-11-06 조회값을 따른다. 운영 DB 확인은 LOCAL read-only 로 하고 write 는 사용자 승인을 받는다.
+   - `TODO-O4O-ACCOUNT-ERASURE-ACTIVATION-V1` — PR #936 MERGED. `account-erasure-activation.yml` 실행 0건이라 운영 활성화는 아직 안 된 것으로 본다.
+   - `TODO-O4O-MEMBER-PROFILE-EDIT-V1` — migration `1793750400000-AddTemporaryPasswordExpiry` 는 main 에 있다. 운영 적용 여부는 미확인.
+   - `WO-O4O-ADMIN-OPERATOR-INVITE-FIRST-V1` — PR #925 MERGED. 운영 migration 적용 여부는 미확인.
+   - `TODO-O4O-OPERATOR-PROTECTED-MEMBER-DEPLOY-FIX-V1` — #951 main 반영 · Promote `051b7ede63` success(`deploy-kpa-branch` 포함). 약국협업체 frontend-only 배포 · 최종 HTTP 점검은 미확인.
+   - `WO-O4O-SCHEDULED-JEST-FULL-SHARD-RECOVERY-V1` — `8eb3dab7dc` main 반영 · 최근 스케줄 실행(2026-11-05 23:03Z) success. 집계 · 메모리 기록은 미확인.
+3. 새 개발 후보(사용자 선택): `WO-O4O-COMMUNITY-INDUSTRY-NEWS-V2` · `WO-O4O-COMMUNITY-FORUM-AI-PHASE1-V1`(둘 다 DRAFT) · `WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1` · `TODO-O4O-PLAYLIST-AUTHORING-REQUIRED-20261105` 잔여.
+
+`wo/member-signup-approval-action` 은 대조 완료 — 커밋 `aea4fa8736` 이 PR #956(MERGED)에 포함돼 있어 추가 통합이 필요 없다.
 
 ## 이 PC 의 미해결 환경
 
@@ -59,3 +58,4 @@ PR #339의 main 통합·운영 배포는 완료됐지만 작업 PC와 소유 세
 ## 주의
 
 - 다른 PC 의 worktree 는 이 PC 에서 정리하지 않는다. main 반영은 PR merge 하나뿐이다. 저장소 Public — 실명 · 자격증명 기록 금지.
+- D 드라이브는 작업에 쓰지 않는다(사용자 결정 2026-11-07). 그곳의 포맷 전 worktree 는 정비 전 자료이며 참조 · 대조하지 않는다. push 되지 않은 변경 유무는 확인하지 않았다.
