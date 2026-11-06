@@ -499,14 +499,31 @@
       "WebFetch(domain:neture.co.kr)",
       "WebFetch(domain:api.neture.co.kr)",
       "WebFetch(domain:kpa-society.co.kr)",
-      "WebFetch(domain:k-cosmetics.site)",
       "WebFetch(domain:glycopharm.co.kr)",
       "WebFetch(domain:ai.google.dev)",
       "PowerShell(Get-ChildItem *)",
       "PowerShell(Get-Content *)",
       "PowerShell(Test-Path *)",
       "PowerShell(Select-String *)",
-      "PowerShell(Get-Location)"
+      "PowerShell(Get-Location)",
+      "Bash(git push -u origin wo/*)",
+      "PowerShell(git push -u origin wo/*)",
+      "Bash(git push origin wo/*)",
+      "PowerShell(git push origin wo/*)",
+      "Bash(git push -u origin claude/*)",
+      "PowerShell(git push -u origin claude/*)",
+      "Bash(git push origin claude/*)",
+      "PowerShell(git push origin claude/*)",
+      "Bash(git -C * push -u origin wo/*)",
+      "PowerShell(git -C * push -u origin wo/*)",
+      "Bash(git -C * push origin wo/*)",
+      "PowerShell(git -C * push origin wo/*)",
+      "Bash(node scripts/check-unsafe-routes.mjs)",
+      "PowerShell(node scripts/check-unsafe-routes.mjs)",
+      "Bash(node scripts/check-unsafe-routes.mjs *)",
+      "PowerShell(node scripts/check-unsafe-routes.mjs *)",
+      "Bash(npx pnpm@10.25.0 install --frozen-lockfile*)",
+      "PowerShell(npx pnpm@10.25.0 install --frozen-lockfile*)"
     ],
     "ask": [
       "Bash(gh secret *)",
@@ -544,7 +561,17 @@
       "Bash(*gcloud* secrets *)",
       "Bash(*gcloud* secrets)",
       "PowerShell(*gcloud* secrets *)",
-      "PowerShell(*gcloud* secrets)"
+      "PowerShell(*gcloud* secrets)",
+      "Bash(gh pr merge *)",
+      "PowerShell(gh pr merge *)",
+      "Bash(gh workflow run *)",
+      "PowerShell(gh workflow run *)",
+      "Bash(gcloud run deploy *)",
+      "PowerShell(gcloud run deploy *)",
+      "Bash(gcloud run services update *)",
+      "PowerShell(gcloud run services update *)",
+      "Bash(gcloud run services update-traffic *)",
+      "PowerShell(gcloud run services update-traffic *)"
     ],
     "deny": [
       "Bash(git push *--force*)",
@@ -652,7 +679,51 @@
       "Bash(pnpm publish *)",
       "PowerShell(pnpm publish *)",
       "Bash(gh pr merge *--admin*)",
-      "PowerShell(gh pr merge *--admin*)"
+      "PowerShell(gh pr merge *--admin*)",
+      "Bash(git add -A*)",
+      "PowerShell(git add -A*)",
+      "Bash(git add --all*)",
+      "PowerShell(git add --all*)",
+      "Bash(git add .)",
+      "PowerShell(git add .)",
+      "Bash(git add . *)",
+      "PowerShell(git add . *)",
+      "Bash(git commit -a*)",
+      "PowerShell(git commit -a*)",
+      "Bash(git -C * add -A*)",
+      "PowerShell(git -C * add -A*)",
+      "Bash(git -C * add --all*)",
+      "PowerShell(git -C * add --all*)",
+      "Bash(git -C * add .)",
+      "PowerShell(git -C * add .)",
+      "Bash(git -C * commit -a*)",
+      "PowerShell(git -C * commit -a*)",
+      "Bash(git push * main)",
+      "PowerShell(git push * main)",
+      "Bash(git push * main *)",
+      "PowerShell(git push * main *)",
+      "Bash(git push *:main*)",
+      "PowerShell(git push *:main*)",
+      "Bash(git -C * push * main)",
+      "PowerShell(git -C * push * main)",
+      "Bash(git -C * push * main *)",
+      "PowerShell(git -C * push * main *)",
+      "Bash(git -C * push *:main*)",
+      "PowerShell(git -C * push *:main*)"
+    ]
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/session-start.mjs\"",
+            "timeout": 60
+          }
+        ]
+      }
     ]
   }
 }
