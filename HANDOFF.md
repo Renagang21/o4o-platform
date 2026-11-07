@@ -62,7 +62,10 @@ PR #339의 main 통합·운영 배포는 완료됐지만 작업 PC와 소유 세
 - `apps/api-server/.env` 를 `.env.example` 로 만들었다. JWT · SESSION · `ENCRYPTION_KEY` 는 이 PC 전용 난수다. 운영 값은 없다. `DB_PASSWORD` 는 placeholder 라 로컬 DB 를 쓰려면 사용자가 채워야 한다.
 - Docker: Windows 쪽 Docker Desktop 은 설치하지 않았다. 지금 개발에는 필요 없다(SETUP §1 선택). self-hosted runner 용 Docker Engine 은 WSL2 Ubuntu-24.04 안에서 동작 중이다(29.9.3, `o4oci` docker 그룹). 실행기 미등록 — [`O4O-SELF-HOSTED-CI-RUNNER-V1`](docs/baseline/operations/O4O-SELF-HOSTED-CI-RUNNER-V1.md).
 - 운영 DB read-only 접속 확인(사용자 실행 2026-11-07): 프록시 경유 `psql` 로 `o4o_readonly` 로그인 성공 · `current_user = o4o_readonly` · `default_transaction_read_only = on`. 비밀번호는 `gcloud secrets versions access latest --secret=o4o-db-readonly-password` 로 `PGPASSWORD` 에 넣고 조회 후 지운다(손 입력은 인증 실패가 났다).
+- #966 이후 로컬 확인: `gcloud run deploy --help` 승인 요청 · 배포 차단 훅 로컬 무해 실행은 통과. 저장소 선언 플러그인 설치 안내는 미확인(#966 이후 main 에서 새 세션으로 확인).
 - 미완료: `docs/local/TEST-ACCOUNTS.local.md`(사용자 원본 필요).
+- 점검표 · 판단 근거: [`WO-O4O-HOME-PC-DEV-ENV-REBUILD-V1`](docs/work-orders/WO-O4O-HOME-PC-DEV-ENV-REBUILD-V1.md) 5-6.
+- 참고: 로컬 PG 서버는 `listen_addresses` 가 전체(0.0.0.0)다. 로컬 DB 로 쓰기 시작할 때 `localhost` 로 좁힌다.
 
 ## 주의
 
