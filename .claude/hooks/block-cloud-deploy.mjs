@@ -15,84 +15,12 @@
  *   그 밖의 예외는 허용(exit 0)으로 넘겨 일반 명령을 막지 않는다.
  */
 import { execFileSync } from 'node:child_process';
-import { readFileSync } from 'node:fs';
+import { baseName, commandIndex, readStdin, segments, tokenize } from './lib/shell.mjs';
 
 const DEPLOY_NAME = /deploy|delivery|promote/i;
 
 const isCloud = () =>
   process.env.CLAUDE_CODE_REMOTE === 'true' || Boolean(process.env.CLAUDE_CODE_REMOTE_SESSION_ID);
-
-function readStdin() {
-  try {
-    return readFileSync(0, 'utf8');
-  } catch {
-    return '';
-  }
-}
-
-/** 따옴표를 고려한 단순 토큰 분리 */
-function tokenize(segment) {
-  const out = [];
-  const re = /"([^"]*)"|'([^']*)'|(\S+)/g;
-  let m;
-  while ((m = re.exec(segment))) out.push(m[1] ?? m[2] ?? m[3]);
-  return out;
-}
-
-/** heredoc 본문(<<EOF … EOF)은 명령이 아니라 데이터이므로 지운다 */
-function stripHeredocs(cmd) {
-  const lines = cmd.split('\n');
-  const out = [];
-  for (let i = 0; i < lines.length; i++) {
-    out.push(lines[i]);
-    const m = lines[i].match(/<<-?\s*(['"]?)([A-Za-z_][\w-]*)\1/);
-    if (!m) continue;
-    const end = m[2];
-    while (i + 1 < lines.length && lines[i + 1].trim() !== end) i++;
-    i++; // 종료 구분자 줄
-  }
-  return out.join('\n');
-}
-
-/** 따옴표 밖의 ; & | 줄바꿈 에서만 나눈다 (커밋 메시지 같은 따옴표 안 문자열은 명령으로 보지 않는다) */
-function segments(cmd) {
-  const src = stripHeredocs(cmd);
-  const out = [];
-  let cur = '';
-  let q = null;
-  for (let i = 0; i < src.length; i++) {
-    const c = src[i];
-    if (q) {
-      if (c === q) q = null;
-      else if (c === '\\' && q === '"') cur += src[i++];
-      cur += c;
-      continue;
-    }
-    if (c === '"' || c === "'") {
-      q = c;
-      cur += c;
-      continue;
-    }
-    if (c === ';' || c === '&' || c === '|' || c === '\n') {
-      out.push(cur);
-      cur = '';
-      continue;
-    }
-    cur += c;
-  }
-  out.push(cur);
-  return out.map((s) => s.trim()).filter(Boolean);
-}
-
-/** 명령 위치의 토큰 index (VAR=값 · sudo · env 등 접두어를 건너뛴다) */
-function commandIndex(tokens) {
-  const prefixes = new Set(['sudo', 'env', 'command', 'exec', 'time', 'nohup', 'call', '&', '(', '{']);
-  let i = 0;
-  while (i < tokens.length && (prefixes.has(tokens[i]) || /^[A-Za-z_]\w*=/.test(tokens[i]))) i++;
-  return i;
-}
-
-const baseName = (t = '') => t.split(/[\\/]/).pop().replace(/\.(cmd|exe)$/i, '').toLowerCase();
 
 function repoSlug(tokens, cwd) {
   const i = tokens.findIndex((t) => t === '-R' || t === '--repo');
