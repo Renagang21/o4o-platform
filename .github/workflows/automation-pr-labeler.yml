@@ -2,7 +2,8 @@ name: PR Size Labeler
 
 on:
   pull_request:
-    types: [opened, synchronize]
+    # WO-O4O-CI-DRAFT-LIGHT-READY-GUARANTEE-V1 — 드래프트 동안은 라벨을 달지 않고, Ready 전환 때 단다.
+    types: [opened, synchronize, reopened, ready_for_review]
 
 permissions:
   pull-requests: write
@@ -10,6 +11,7 @@ permissions:
 jobs:
   size-label:
     name: Apply Size Labels
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ${{ fromJSON(vars.CI_RUNNER_LINUX == 'self-hosted' && github.event.repository.private == true && github.event.pull_request.head.repo.fork != true && '["self-hosted","Linux","X64","o4o-ci-linux"]' || '"ubuntu-latest"') }}
     steps:
       - name: Apply size labels
