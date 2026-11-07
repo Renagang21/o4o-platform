@@ -82,15 +82,17 @@ test('budget defers only draft PRs; ready and main retain the full merge/deploym
   const ci = readWorkflow('ci-pipeline.yml');
   assert.match(ci, /types: \[opened, synchronize, reopened, ready_for_review, converted_to_draft\]/);
   assert.match(ci, /defer_full:.*vars\.CI_COST_PROFILE == 'budget'.*github\.event_name == 'pull_request'.*github\.event\.pull_request\.draft/);
-  const ids = ['quality-check', 'api-tests', 'build', 'web-build', 'docs-fast-validate', 'admin-fast-validate', 'admin-fast-guards', 'pc-installer-windows', 'central-operator-integration'];
+  const ids = ['quality-check', 'api-tests', 'build', 'web-build', 'docs-fast-validate', 'admin-fast-validate', 'admin-fast-guards', 'pc-installer-windows', 'central-operator-integration', 'api-runtime-dependencies'];
   for (const id of ids) {
     const block = ci.split(`\n  ${id}:\n`)[1]?.split(/\n  [a-z][a-z0-9-]*:\n/)[0];
     assert.ok(block, id);
     assert.match(block, /if: (?:>-\n\s*)?needs\.detect\.outputs\.defer_full != 'true' &&/, id);
   }
+  // WO-O4O-CI-DRAFT-LIGHT-READY-GUARANTEE-V1 — 드래프트 gate 는 실패시키지 않고 이름을 바꿔 required check 를 채우지 않는다.
+  // Ready · main 에서의 full 보장은 draft-ready-guarantee.test.mjs 가 식 평가로 고정한다.
   const gate = ci.split('\n  ci-gate:\n')[1];
   assert.match(gate, /if: always\(\)/);
-  assert.match(gate, /if: needs\.detect\.outputs\.defer_full == 'true'\n[\s\S]*?exit 1/);
+  assert.match(gate, /name: \$\{\{ \(vars\.CI_COST_PROFILE == 'budget' && github\.event_name == 'pull_request' && github\.event\.pull_request\.draft\) && 'CI Gate \(draft · not final\)' \|\| 'CI Gate' \}\}/);
 });
 test('private CodeQL requires explicit enablement; budget automatic CodeQL is off', () => {
   const security = readWorkflow('ci-security.yml');
