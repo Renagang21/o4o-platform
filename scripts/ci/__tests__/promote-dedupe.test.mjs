@@ -68,6 +68,10 @@ test('promote.yml: 판정 job → promote(delivery 호출) 순서, guard 실패 
   assert.equal(j.promote.with.mode, 'promote');
   assert.equal(j.dedupe.permissions.actions, 'read');
   assert.equal(j.dedupe.permissions['id-token'], undefined, 'guard 에는 GCP 인증 권한이 필요 없다');
+  // 쓰기 권한은 배포 호출 job 에만 있다(workflow 단위 권한은 읽기만) — delivery 가 필요한 권한 집합은 그대로다.
+  assert.deepEqual(promote.permissions, { contents: 'read', actions: 'read' });
+  assert.deepEqual(j.promote.permissions, { contents: 'read', actions: 'read', statuses: 'write', 'id-token': 'write' });
+  assert.equal(j.dedupe.permissions.statuses, undefined);
   const ctx = (skip, result = 'success', cancelled = false) => ({ needs: { dedupe: { result, outputs: skip === undefined ? {} : { skip } } }, $status: { cancelled, success: !cancelled } });
   assert.equal(evaluateIf(j.promote.if, ctx('true')), false, 'skip=true → 배포 호출 안 함');
   assert.equal(evaluateIf(j.promote.if, ctx('false')), true);
