@@ -342,9 +342,11 @@ export const STATE_OF = {
   // target 에 아직 못 미치므로 commit status 는 이전처럼 pending 을 유지한다.
   NOT_SELECTED: 'NOT_SELECTED',
 };
-const STATE_ORDER = ['FAILED', 'BLOCKED_CI', 'BLOCKED_FREEZE', 'HELD_LEVEL_3', 'HELD_ROLLOUT_PENDING', 'HELD_DEPENDENCY', 'NOT_SELECTED', 'DEPLOYING', 'DEPLOYED', 'SUPERSEDED', 'NO_DEPLOY'];
+const STATE_ORDER = ['FAILED', 'CANCELLED', 'BLOCKED_CI', 'BLOCKED_FREEZE', 'HELD_LEVEL_3', 'HELD_ROLLOUT_PENDING', 'HELD_DEPENDENCY', 'NOT_SELECTED', 'DEPLOYING', 'DEPLOYED', 'SUPERSEDED', 'NO_DEPLOY'];
 const GH_STATE = {
   FAILED: 'failure',
+  // 배포 job 이 취소돼 시도되지 않았다(사람의 run 취소 · 시간 초과). serving 은 이전 그대로 — 실패와 구분해 'error'.
+  CANCELLED: 'error',
   BLOCKED_CI: 'failure',
   BLOCKED_FREEZE: 'pending',
   HELD_LEVEL_3: 'pending',
@@ -396,6 +398,8 @@ export function commitStatus(services, target) {
   if (moving.length > 0) parts.push(`deploy: ${moving.map((s) => s.key).join(',')}`);
   const failed = of('FAILED');
   if (failed.length > 0) parts.push(`failed: ${failed.map((s) => s.key).join(',')}`);
+  const cancelled = of('CANCELLED');
+  if (cancelled.length > 0) parts.push(`cancelled: ${cancelled.map((s) => s.key).join(',')} (re-run Delivery)`);
   const held = of('HELD_LEVEL_3', 'HELD_ROLLOUT_PENDING', 'HELD_DEPENDENCY', 'NOT_SELECTED');
   if (held.length > 0) parts.push(`held: ${held.map((s) => `${s.key}(${SHORT[s.state]})`).join(',')}`);
   const hint = held.some((s) => s.state !== 'HELD_DEPENDENCY') && !present.has('BLOCKED_FREEZE') && !present.has('BLOCKED_CI') ? ` · ${promoteCommand(target)}` : '';
@@ -782,11 +786,39 @@ async function main() {
 }
 
 /**
- * 배포 뒤 확정 (Unified Delivery report job). 판정은 다시 하지 않는다 — classify 기록 + **지금 serving SHA** 만 본다.
- *   계획된 서비스: serving == target(단일 revision 100%) → DEPLOYED · 아니면 FAILED
- *   (API 가 실패했고 API 뒤에 배치된 프런트 → HELD_DEPENDENCY: reusable job 이 skip 되어 배포 0)
+ * delivery.yml report job 의 `toJSON(needs)` → 서비스 묶음별 job 결과 + run 취소 여부.
+ *   run 이 취소되면 진행 중이던 job 은 `cancelled`, 아직 시작 전인 job 은 `skipped` 가 된다 — 그래서 **어느 하나라도
+ *   cancelled 면** 이 run 은 취소된 것으로 본다(2026-11-06 Delivery 009d8f4f: classify cancelled → 배포 job 0 → FAILED 오기록).
+ *   needs 를 못 읽으면(부재 · 형식 이상) 종전 판정 그대로다(cancelled=false).
  */
-export function finalizeStates(record, servingNow) {
+export function deliveryJobs(needsJson) {
+  let needs = null;
+  try {
+    needs = typeof needsJson === 'string' ? JSON.parse(needsJson) : needsJson;
+  } catch {
+    needs = null;
+  }
+  if (!needs || typeof needs !== 'object') return { cancelled: false, jobs: {} };
+  const result = (k) => (needs[k] && typeof needs[k] === 'object' ? needs[k].result ?? null : null);
+  const jobs = {
+    classify: result('classify'),
+    api: result('deploy-api'),
+    web_after_api: result('deploy-web-after-api'),
+    web_parallel: result('deploy-web-parallel'),
+    admin: result('deploy-admin'),
+  };
+  return { cancelled: Object.values(jobs).includes('cancelled'), jobs };
+}
+
+/**
+ * 배포 뒤 확정 (Unified Delivery report job). 판정은 다시 하지 않는다 — classify 기록 + **지금 serving SHA** 만 본다.
+ *   계획된 서비스: serving == target(단일 revision 100%) → DEPLOYED
+ *   run 이 취소됐고 target 에 못 미침 → CANCELLED (배포를 시도하지 못했거나 중단됨 · 실패로 기록하지 않는다)
+ *   (API 가 실패했고 API 뒤에 배치된 프런트 → HELD_DEPENDENCY: reusable job 이 skip 되어 배포 0)
+ *   그 밖에 target 에 못 미침 → FAILED
+ * @param {{cancelled?: boolean}} [run]  deliveryJobs 결과 (없으면 취소 아님)
+ */
+export function finalizeStates(record, servingNow, run = {}) {
   const plan = record.plan ?? {};
   const target = record.target_sha;
   const after = new Set([...(plan.web_after_api ?? []), ...(plan.admin_after_api ? ['admin'] : [])]);
@@ -796,6 +828,7 @@ export function finalizeStates(record, servingNow) {
     if (!record.execute || !planned.has(s.key)) return { key: s.key, state: STATE_OF[s.decision] ?? 'NO_DEPLOY', serving: null };
     const now = servingNow[s.key] ?? { sha: null, source: 'not read' };
     if (now.sha === target) return { key: s.key, state: 'DEPLOYED', serving: now };
+    if (run.cancelled === true) return { key: s.key, state: 'CANCELLED', serving: now };
     if (after.has(s.key) && !apiOk) return { key: s.key, state: 'HELD_DEPENDENCY', serving: now };
     return { key: s.key, state: 'FAILED', serving: now };
   });
@@ -810,7 +843,9 @@ async function reportMain(args) {
   const keys = new Set([...(plan.deploy_api ? ['api'] : []), ...(plan.web_after_api ?? []), ...(plan.web_parallel ?? []), ...(plan.admin_after_api || plan.admin_parallel ? ['admin'] : [])]);
   const servingNow = {};
   for (const t of DEPLOY_TARGETS) if (record.execute && keys.has(t.key)) servingNow[t.key] = readServingSha(t);
-  const states = finalizeStates(record, servingNow);
+  const run = deliveryJobs(process.env.DELIVERY_NEEDS);
+  if (run.cancelled) console.log(`::warning::이 Delivery run 은 취소됐다 (${JSON.stringify(run.jobs)}) — target 에 못 미친 서비스는 CANCELLED 로 기록한다`);
+  const states = finalizeStates(record, servingNow, run);
   const st = await postStatus(gh, args['status-context'], record.target_sha, states);
   const lines = [
     `### 📦 Delivery result — \`${record.target_sha}\``,
@@ -828,7 +863,7 @@ async function reportMain(args) {
   const text = lines.join('\n');
   console.log(text);
   if (process.env.GITHUB_STEP_SUMMARY) appendFileSync(process.env.GITHUB_STEP_SUMMARY, `${text}\n`);
-  if (states.some((s) => s.state === 'FAILED')) process.exitCode = 1;
+  if (states.some((s) => s.state === 'FAILED' || s.state === 'CANCELLED')) process.exitCode = 1;
 }
 
 async function fetchRunsVia(repo, token, workflowPath, sha) {
