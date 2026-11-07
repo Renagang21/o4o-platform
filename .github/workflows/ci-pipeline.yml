@@ -113,7 +113,8 @@ jobs:
   # 0-b. 드래프트용 가벼운 검사 — WO-O4O-CI-DRAFT-LIGHT-READY-GUARANTEE-V1
   #
   #   budget 모드(`CI_COST_PROFILE=budget`)의 드래프트 PR push 에서만 돈다(`defer_full`). 무거운 job 은 모두 skip 이다.
-  #   설치 없이 도는 정적 guard 만 실행한다(측정 약 2초): 위험 운영 route · TypeORM entity 등록 · console.log.
+  #   설치 없이 도는 정적 guard 만 실행한다(측정 1초 미만): 위험 운영 route · console.log.
+  #   TypeORM entity 등록 검사는 `typescript` 패키지가 필요해 여기 넣지 않는다(Code Quality Check 에 그대로 있다 · Codex #975).
   #   `.claude/` 검사(scripts/ci/check-agent-config.mjs)는 파일이 있을 때만 실행한다(#973 병합 전후 모두 동작).
   #   문서 민감정보 검사는 아래 docs-sensitive-guard 가 모든 run 에서 따로 한다.
   #   **이 job 은 full 검증을 대신하지 않는다.** Ready 전환 · Ready 이후 push · main push 는 full CI 를 탄다.
@@ -137,8 +138,6 @@ jobs:
         node-version: ${{ env.NODE_VERSION }}
     - name: Guard unsafe operational routes
       run: node scripts/check-unsafe-routes.mjs
-    - name: Guard TypeORM entity registry integrity
-      run: node scripts/check-typeorm-entities.mjs
     - name: Check for console.log statements
       run: bash scripts/ci/check-console-log.sh apps/
     - name: Check agent config (.claude/) when the checker exists

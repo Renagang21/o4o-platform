@@ -7,7 +7,7 @@
 // 이 시험은 식의 분기만 본다. 실제 GitHub 실행(그룹 취소 시점 · check run 생성)은 PR CI · 실기로 확인한다.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -155,9 +155,39 @@ test('모든 무거운 job 은 defer_full 로 막히고, 드래프트에서 도�
 
 test('draft-light 는 설치 없이 도는 정적 guard 만 실행하고 무거운 명령을 부르지 않는다', () => {
   const run = ci.jobs['draft-light'].steps.map((s) => s.run ?? '').join('\n');
-  for (const cmd of ['check-unsafe-routes.mjs', 'check-typeorm-entities.mjs', 'check-console-log.sh']) assert.match(run, new RegExp(cmd.replace('.', '\\.')));
+  for (const cmd of ['check-unsafe-routes.mjs', 'check-console-log.sh']) assert.match(run, new RegExp(cmd.replace('.', '\\.')));
   assert.doesNotMatch(run, /pnpm|npm ci|jest|vitest|tsc|build/);
   assert.ok(!ci.jobs['draft-light'].steps.some((s) => /setup-build-env/.test(s.uses ?? '')));
+});
+
+// Codex #975: 이 개발 환경의 전역 NODE_PATH 가 typescript 를 찾아 줘서 로컬 실측이 통과했지만 깨끗한 runner 에서는 실패했다.
+// 그래서 실행 결과가 아니라 **소스의 import 대상**으로 판정한다 — draft-light 가 부르는 node 스크립트는 node 내장 모듈과
+// 상대 경로만 import 해야 한다(설치 없이 실행 가능).
+test('draft-light 가 부르는 node 스크립트는 외부 패키지를 import 하지 않는다 (설치 없이 실행 가능)', () => {
+  const run = ci.jobs['draft-light'].steps.map((s) => s.run ?? '').join('\n');
+  const scripts = [...run.matchAll(/node (scripts\/[\w./-]+\.mjs)/g)].map((m) => m[1]);
+  assert.ok(scripts.length >= 1);
+  const seen = new Set();
+  const visit = (rel) => {
+    if (seen.has(rel)) return;
+    seen.add(rel);
+    const abs = path.join(root, rel);
+    if (!existsSync(abs)) return; // check-agent-config.mjs 처럼 "있을 때만" 실행하는 스크립트
+    const src = readFileSync(abs, 'utf8');
+    const specs = [
+      ...src.matchAll(/^\s*import\s[^'"]*?['"]([^'"]+)['"]/gm),
+      ...src.matchAll(/\bimport\(\s*['"]([^'"]+)['"]\s*\)/g),
+      ...src.matchAll(/\brequire\(\s*['"]([^'"]+)['"]\s*\)/g),
+    ].map((m) => m[1]);
+    for (const spec of specs) {
+      if (spec.startsWith('node:')) continue;
+      if (spec.startsWith('.')) { visit(path.relative(root, path.resolve(path.dirname(abs), spec)).split(path.sep).join('/')); continue; }
+      assert.fail(`${rel} 가 외부 패키지 '${spec}' 를 불러온다 — draft-light 에는 설치 단계가 없다`);
+    }
+  };
+  for (const s of scripts) visit(s);
+  // 반례: entity 검사는 typescript 가 필요하다 → 이 규칙이 실제로 잡는다
+  assert.match(readFileSync(path.join(root, 'scripts/check-typeorm-entities.mjs'), 'utf8'), /require\(\s*['"]typescript['"]\s*\)/);
 });
 
 test('Size Labeler: 드래프트에서는 건너뛰고 Ready 전환 때 실행한다', () => {
