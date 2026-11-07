@@ -1,6 +1,5 @@
-import { CommunityNewsCollectionPanel } from "./CommunityNewsCollectionPanel";
+import { CommunityNewsAutoRunsPanel } from "./CommunityNewsAutoRunsPanel";
 import { useEffect, useRef, useState } from "react";
-import { CommunityNewsReviewPanel } from "./CommunityNewsReviewPanel";
 import { Link } from "react-router-dom";
 import {
   type CommunityHomeOperationsApi,
@@ -266,29 +265,9 @@ export default function CommunityHomeManagementPage({
         </section>
       )}
       {kind === "news" && (
-        <CommunityNewsCollectionPanel
+        <CommunityNewsAutoRunsPanel
           api={homeApi}
-          onCollected={() => void refreshCollectedNews()}
-        />
-      )}
-      {kind === "news" && (
-        <CommunityNewsReviewPanel
-          api={homeApi}
-          onApply={(item, reviewId) => {
-            setId(item.id);
-            setForm({
-              ...item,
-              kind: "news",
-              status: "draft",
-              audience: "members",
-              isPinned: false,
-              sortOrder: 0,
-              newsReviewId: reviewId,
-            });
-            setMessage(
-              "AI 정리를 초안에 채웠습니다. 확인 후 저장·게시 상태를 선택해 주시기 바랍니다.",
-            );
-          }}
+          onFinished={() => void refreshCollectedNews()}
         />
       )}
       {!loading && kind !== "forum" && (
@@ -321,6 +300,13 @@ export default function CommunityHomeManagementPage({
                   {item.status} ·{" "}
                   {item.audience === "public" ? "공개" : "회원 전용"}
                   {item.isPinned ? ` · 상시 노출 (${item.sortOrder})` : ""}
+                  {item.autoPublished ? " · 자동 게시" : ""}
+                  {item.autoPublished &&
+                  !item.isPinned &&
+                  item.expiresAt &&
+                  new Date(item.expiresAt) <= new Date()
+                    ? " · 노출 기간 종료"
+                    : ""}
                 </span>
               </button>
             ))}
@@ -386,9 +372,10 @@ export default function CommunityHomeManagementPage({
             </label>
             {kind === "news" && (
               <p className="text-xs text-slate-500">
-                세 매체의 기사 제목·제공 요약·원문 링크를 등록합니다. 같은 주요
-                이슈는 약사공론을 우선 연결하며, AI 정리는 게시 전 초안으로
-                확인합니다.
+                세 매체의 기사 제목·제공 요약·원문 링크를 등록합니다. 자동 게시
+                항목을 숨기려면 게시 상태를 보관 · 게시 중지로, 계속 노출하려면
+                상시 노출로 저장합니다. 제목·요약·링크를 고치면 이후 약사공론
+                대표 교체가 이 항목을 덮어쓰지 않습니다.
               </p>
             )}
             <div className="flex flex-wrap gap-4">

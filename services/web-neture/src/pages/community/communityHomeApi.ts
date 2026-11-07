@@ -14,5 +14,6 @@ export type {
   CommunityHome,
   NewsReview,
   NewsCollection,
+  NewsAutoRun,
 } from "@o4o/operator-core-ui";
 export const homeApi = createCommunityHomeApi(api);
