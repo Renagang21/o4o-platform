@@ -138,7 +138,7 @@ Docker Desktop은 컨테이너 빌드를 로컬에서 재현할 때만 필요합
 ### Claude Code 플러그인 (Engineering · Design)
 
 **클라우드 세션은 claude.ai 계정에서 활성화하고, 로컬 PC 세션은 저장소 `.claude/settings.json` 선언(`engineering@knowledge-work-plugins` · `design@knowledge-work-plugins`)으로 설치한다.**
-클라우드 세션은 저장소가 선언한 플러그인을 설치하지 않고([cloud-environments](https://code.claude.com/docs/en/cloud-environments#what-carries-over-from-your-setup)), 계정 동기화는 공식 문서상 Cowork · 터미널 세션만 명시돼 데스크톱 Code 탭 로컬 세션은 보장되지 않는다([plugins/loading](https://code.claude.com/docs/en/plugins/loading)). 두 경로가 한 PC 에서 겹치면 저장소 쪽이 로드되고 계정 사본은 로드되지 않으므로 중복 · 충돌은 없다. 계정에서 켤 때는 Directory 의 UUID 사본이 아니라 `Knowledge Work` 마켓플레이스 항목을 고른다.
+클라우드 세션은 저장소가 선언한 플러그인을 설치하지 않고([cloud-environments](https://code.claude.com/docs/en/cloud-environments#what-carries-over-from-your-setup)), 계정 동기화는 공식 문서상 Cowork · 터미널 세션만 명시돼 데스크톱 Code 탭 로컬 세션은 보장되지 않는다([plugins/loading](https://code.claude.com/docs/en/plugins/loading)). 계정에서는 카탈로그의 Anthropic Directory `Engineering` · `Design` 항목을 켠다(2026-11-07 기준 `Knowledge Work` 항목은 이 안에 흡수돼 따로 보이지 않는다). 카탈로그상 이 항목의 스킬 이름은 `engineering:*` 가 아니라 `<UUID>:*` 로 표시되므로, 켠 뒤 새 세션에서 실제 이름을 확인한다. 한 PC 에서 두 경로가 겹칠 때 manifest 이름이 같으면 저장소 쪽만 로드되지만(문서의 name conflict 규칙), Directory 사본의 manifest 이름이 같은지는 확인되지 않았다 — 터미널 세션에서 스킬이 두 벌 보이면 `claude plugin disable <name>@synced` 로 계정 사본을 끈다.
 
 ---
 
