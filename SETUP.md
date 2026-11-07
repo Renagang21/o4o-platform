@@ -330,14 +330,14 @@ API 서버는 **`apps/api-server/.env`** 만 읽습니다 (루트 `.env` 아님)
 
 운영 DB에 대한 write는 CLAUDE.md §0의 승인 규칙을 그대로 따릅니다 (read-only 검증만 자유).
 
-**운영 DB 조회는 읽기 전용 계정 `o4o_readonly` 만 사용합니다.** 사용자가 명시 승인한 운영 작업이 아니면 조회에 `o4o_api_v2` 를 쓰지 않습니다.
+**운영 DB 조회는 읽기 전용 계정 `o4o_readonly` 만 사용합니다.** 통합 담당이 명시 승인한 운영 작업이 아니면 조회에 `o4o_api_v2` 를 쓰지 않습니다.
 
 **운영 DB identity** (2026-11-06 기준):
 
 | role | 성격 | 사용처 |
 |---|---|---|
 | `o4o_readonly` | **읽기 전용 login** (비밀번호 = Secret Manager `o4o-db-readonly-password`) | 운영 DB read-only 조회 · 검증 |
-| `o4o_api_v2` | **login / runtime identity** (비밀번호 = Secret Manager `o4o-db-password`) | `o4o-core-api` · migration Job `o4o-api-migrations` · 사용자가 명시 승인한 운영 작업 |
+| `o4o_api_v2` | **login / runtime identity** (비밀번호 = Secret Manager `o4o-db-password`) | `o4o-core-api` · migration Job `o4o-api-migrations` · 통합 담당이 명시 승인한 운영 작업 |
 | `o4o_api` | **NOLOGIN owner role** — 운영 스키마 객체(테이블 · 시퀀스 · enum · 함수 등)의 소유자 | 직접 접속하지 않는다. `o4o_api_v2` 가 member 이며 role 설정(`SET role=o4o_api`)으로 세션이 이 role 권한으로 동작한다 |
 
 `o4o_readonly` 의 조회 범위:
@@ -496,7 +496,7 @@ fixture는 자체 생성 DB의 소유권 marker를 확인하고 baseline·전체
 ### Git 절차
 
 **worktree · branch · main 통합 · 종료 정리는 [AGENTS.md §4-1](AGENTS.md#4-1-parallel-session--worktree-policy) 이 정본입니다** —
-독립 작업은 전용 worktree + branch 에서 하고, `main` 반영은 PR merge 로만(기술 gate 충족 후 별도 승인 없이) 합니다. `main` 직접 작업 · direct push 는 쓰지 않습니다.
+독립 작업은 전용 worktree + branch 에서 하고, 작업 세션은 push 후 PR 생성까지 하고, `main` 반영(PR merge)과 배포는 통합 담당만 합니다(역할 정의: [AGENTS.md §4](AGENTS.md#4-git--병렬-작업-안전)). `main` 직접 작업 · direct push 는 쓰지 않습니다.
 **stage · 커밋 · PC 이동 절차는
 [docs/baseline/operations/O4O-GIT-PARALLEL-WORK-SAFETY-V1.md](docs/baseline/operations/O4O-GIT-PARALLEL-WORK-SAFETY-V1.md) 가 정본입니다**(그 문서의 `main` 직접 작업 전제와 다르면 §4-1 우선) —
 path-specific stage, 다른 세션 미커밋 변경 불가침,

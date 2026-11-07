@@ -18,4 +18,4 @@ description: 운영 DB read-only 조회 (데스크톱 로컬 세션 전용) - �
    - 원문(제목 · 이메일 · 이름 · 사업자명 · URL · 응답 원문)을 옮기지 않는다. 날짜 · 상태 · 건수 · 비율로 요약한다(`DOCUMENT-LIFECYCLE` §10-4).
    - 지시서의 판정 기준대로 결론을 적고, 같은 작업 branch 의 WO 결과 절 또는 CHECK 에 기록한다.
    - `node scripts/check-doc-sensitive.mjs` 확인 → path-specific commit → push → `/handoff` 로 다음 실행자(CLOUD) 지정.
-5. write 가 필요하다고 판단되면 실행하지 않고, 대상 · 건수 · dry-run 결과 · 되돌리는 방법을 정리해 사용자 명시 승인을 요청한다. migration 은 CI/CD 자동 적용이 원칙이다(`PRODUCTION-MIGRATION-STANDARD`).
+5. write 가 필요하다고 판단되면 실행하지 않고, 대상 · 건수 · dry-run 결과 · 되돌리는 방법을 정리해 통합 담당의 명시 승인을 요청한다(`AGENTS.md` §5). migration 은 CI/CD 자동 적용이 원칙이다(`PRODUCTION-MIGRATION-STANDARD`).
