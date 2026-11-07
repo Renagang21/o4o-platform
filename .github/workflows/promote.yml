@@ -31,6 +31,10 @@ on:
         description: "'true' = 판정만 (배포 0)"
         required: false
         default: 'false'
+      force:
+        description: "'true' = 같은 SHA 가 이미 승격됐거나 진행 중이어도 실행 (롤백 뒤 재배포 등)"
+        required: false
+        default: 'false'
 
 concurrency:
   group: promote-production
@@ -43,8 +47,40 @@ permissions:
   id-token: write
 
 jobs:
+  # WO-O4O-PROMOTE-SAME-SHA-GUARD-V1 — 같은 SHA 의 Promote(dry-run 제외)가 이미 성공했거나 진행 · 대기 중이면
+  # 배포 호출을 건너뛴다(IR §9-4: 207회 중 50회가 직전과 같은 SHA). 판정은 Actions API 의 Promote run 목록만 쓴다.
+  # 실패 · 취소된 이전 run 은 재시도를 허용한다. 확인할 수 없으면 막지 않는다(`scripts/ci/promote-dedupe.mjs`).
+  # 이 job 자체가 실패 · 누락돼도(output 비어 있음) 아래 promote 는 그대로 실행된다 — 중복 방지가 승격을 막지 않는다.
+  dedupe:
+    name: Same-SHA guard
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    permissions:
+      contents: read
+      actions: read
+    outputs:
+      skip: ${{ steps.check.outputs.skip }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          sparse-checkout: scripts/ci/promote-dedupe.mjs
+          sparse-checkout-cone-mode: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22.23.4'
+      - name: Skip when the same SHA was already promoted or is in flight
+        id: check
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          PROMOTE_SHA: ${{ inputs.sha }}
+          PROMOTE_DRY_RUN: ${{ inputs.dry_run }}
+          PROMOTE_FORCE: ${{ inputs.force }}
+        run: node scripts/ci/promote-dedupe.mjs
+
   promote:
     name: Promote
+    needs: [dedupe]
+    if: ${{ !cancelled() && needs.dedupe.outputs.skip != 'true' }}
     uses: ./.github/workflows/delivery.yml
     with:
       mode: promote
