@@ -2,7 +2,7 @@
 
 > **상태**: DRAFT
 > **작성일**: 2026-11-07 · **최종 갱신**: 2026-11-07
-> **근거 WO/IR**: WO-O4O-SELF-HOSTED-CI-PREPARATION-V1 · [`IR-O4O-PRIVATE-CI-BUDGET-V1`](../../investigations/IR-O4O-PRIVATE-CI-BUDGET-V1.md)
+> **근거 WO/IR**: WO-O4O-SELF-HOSTED-CI-PREPARATION-V1 · WO-O4O-SELF-HOSTED-CI-PR969-CLOSURE-V1 · [`IR-O4O-PRIVATE-CI-BUDGET-V1`](../../investigations/IR-O4O-PRIVATE-CI-BUDGET-V1.md)
 > **범위**: 저장소를 private 로 전환한 **뒤** 일반 CI 를 집 PC 실행기로 옮기기 위한 구조 · 준비 절차 · 복귀 절차.
 > 이 문서 작성 시점의 상태는 **public 유지 / GitHub 호스팅 실행 유지 / 자체 실행기 미등록 / 저장소 변수 미설정**이다.
 > 실기(집 PC) 검증 전이므로 DRAFT 다. §8 실기 확인을 마치면 ACTIVE 로 바꾸고 `CANONICAL-INDEX` 행 추가를 별도 문서 작업으로 한다.
@@ -16,6 +16,22 @@
 - **public 저장소에서는 변수를 잘못 설정해도 자체 실행기로 가지 않는다.** fork PR 도 private 여부와 무관하게 호스팅이다.
 - 배포 · GCP 권한 job, CodeQL, Sonar 의 실행 장소와 정책은 그대로다.
 - 되돌리기는 **변수 삭제 한 번**이다.
+
+## 1-1. 준비 현황 (2026-11-07 기준)
+
+| 단계 | 상태 | 근거 · 비고 |
+|---|---|---|
+| 실행 장소 선택 구조(이 문서 §2) | 구현 · PR CI 통과 | public · 변수 없음 경로만 GitHub 에서 실행 확인 |
+| 집 PC 기본 환경 | **완료** (사용자 수동 확인) | Windows 11 Pro · i5-10400(6C/12T) · RAM 64GB · Ubuntu 24.04 / WSL2 / systemd · 전용 Linux 계정 `o4oci` · Docker(전용 계정 실행 성공) · Node.js 22.23.4 · npm 10.9.9 · pnpm 10.25.0 |
+| 기본 환경의 부팅 복구 | **완료** (사용자 수동 확인) | Windows 재부팅 후 예약 작업으로 Ubuntu 유지 → Ubuntu Running · Docker active · Node/pnpm 버전 확인. **GitHub 실행기 서비스의 재연결 확인과는 별개다**(실행기 미등록) |
+| 대표 작업 로컬 실행 | **완료** (수동 1회 측정) | 공유 패키지 빌드 1분 32초 · API 서버 빌드 35초 · 관리자 화면 빌드 15초 · API Jest 662 suite / 10,131 test 통과 · 실패 0 (skipped 82 suite / 1,257 test) · 22분 6초 · 최대 RSS 약 4.47GiB. CI 와 같은 3분할 · 동일 runner 조건이 아니며, 자체 실행기 CI 의 검증 결과가 아니다 |
+| private 전환 | 미완료 | §6 결정 후 |
+| GitHub 실행기 등록 · 연결 | 미완료 | private 전환 후(§9) |
+| 실제 자체 실행기 CI | 미완료 | label 매칭 · service container · CI Gate (§8) |
+| 실행기 서비스의 재부팅 후 재연결 | 미완료 | §7-7 · §8 |
+| 실제 CI 이후 컨테이너 · 프로세스 · 임시 파일 정리 | 미완료 | §5-1 의 동작을 실기로 확인(§8) |
+
+비밀번호 · 토큰 · 등록 토큰 · 개인 인증정보는 이 표와 어떤 기록에도 남기지 않는다.
 
 ## 2. 선택식과 변수
 
@@ -43,6 +59,8 @@ Windows 는 변수 · label · 기본값만 다르다. 자체 실행기는 아�
 3. fork 에서 온 PR 이 아님
 
 `scripts/ci/__tests__/runner-selection.test.mjs` 가 (a) 전환 대상 job 의 `runs-on` 이 이 문자열과 같은지, (b) 그 밖의 job 과 배포 · CodeQL workflow 에 자체 실행기 참조가 없는지, (c) 이 식을 GitHub expression 의미(피연산자 반환형 `&&`/`||`, 대소문자 무시 비교, 없는 속성 = null)로 평가해 변수 · 공개 여부 · fork · 이벤트 조합별 결과를 고정한다. 이 시험은 CI `Code Quality Check` 에서 blocking 으로 돈다.
+
+정적 검사(2026-11-07): actionlint 1.7.12 + shellcheck 0.11.0 으로 전체 workflow 를 검사했다. 이번 변경으로 생긴 지적은 0건이다. `origin/main` 과 결과가 같다(기존 `deploy-auto.yml` `if: false` 1건 · shellcheck info 39건). actionlint 는 식의 문법과 타입만 본다. 수제 평가기 시험과 public CI 통과를 합쳐도 private · self-hosted 분기가 GitHub 에서 실제로 실행된 것은 아니다(§8).
 
 ### 2-3. schedule 이벤트 — 판정 job
 
@@ -122,7 +140,8 @@ schedule 이벤트에는 repository payload 가 없어 2-2 식이 항상 호스�
 | `GITHUB_TOKEN` 기본 권한 | `ci-pipeline.yml` 은 top-level `permissions` 미지정 → 저장소 기본값을 따른다 | 자체 실행기 사용 전 저장소 기본값을 read-only 로 두는 것 권장(사용자 결정 · 설정 변경은 별도) |
 | CodeQL private | 현행 `CODEQL_PRIVATE_ENABLED` 미설정 = private 에서 자동 생략 | 개인 계정 private 저장소의 Code Scanning 이용 조건(GitHub Code Security) 확인 후 결정 |
 | Sonar | private 에서 PR 진단 조회 · 업로드 단계 skip(기존 코드) | SonarCloud private 프로젝트 요금 조건 확인 |
-| 자체 실행기 과금 | **현재 무료.** GitHub 공식 안내 기준 자체 실행기의 Actions 사용에는 분당 요금이 없다. 2025-12-16 공지된 self-hosted 분당 플랫폼 요금(2026-03-01 시행 예정 · $0.002/분)은 GitHub changelog 갱신으로 **연기**됐고 새 시행일은 공지되지 않았다. 전기료 · 하드웨어는 별도 | 재공지 시 `scripts/ci/actions-cost.mjs` 의 `SELF_HOSTED_USD_PER_MINUTE` 한 곳만 바꾼다. 전환 직전 billing 문서 · changelog 재확인 |
+| 자체 실행기 과금 | **현재 무료 (2026-11-07 확인).** ① GitHub Docs "Self-hosted runners": self-hosted runner 는 "free to use with GitHub Actions" 이며 머신 유지 비용은 사용자 부담. ② GitHub Docs "GitHub Actions billing": 요금 · 포함 사용량 설명은 GitHub 호스팅 실행기 기준이며 self-hosted 분당 요금 항목이 없다. 포함 compute 는 금액 기준(Free $12 · Pro $18/월)이고 Copilot code review 등 다른 제품과 같이 쓴다. ③ GitHub changelog 2025-12-16 "Update to GitHub Actions pricing": 2026-03-01 시행 예정이던 self-hosted 분당 $0.002 플랫폼 요금은 **연기**(재검토) — 같은 글에 남아 있는 원래 발표 문구는 현재 시행 요금이 아니다. 새 시행일 공지 없음. 확인 방법: ①② 는 공식 문서 원본(`github/docs` main `8cd1075179df`)으로 읽었다. docs.github.com · github.blog 는 이 작업 환경에서 직접 접속이 막혀(403) ③ 은 검색 색인의 공지 문구로 확인했다 | 재공지 시 `scripts/ci/actions-cost.mjs` 의 `SELF_HOSTED_USD_PER_MINUTE` 한 곳만 바꾼다. 전환 직전 공식 billing 문서 · changelog 를 브라우저로 재확인 |
+| 별도 비용 구분 | 위 "무료" 는 자체 실행기의 **실행 시간**에 대한 것이다 | 전기료 · 하드웨어 · 인터넷(집 PC 부담), Artifacts 저장(Packages 와 공유 · Free 500MB / Pro 1GB) · Actions cache(저장소당 10GB 포함 · 실행기 종류 무관), Sonar · Code Security · Copilot 등 별도 유료 서비스는 각각 따로 본다 |
 | Actions · Artifacts · Cache 비용 관리 | 미확인 | artifact `retention-days`(대부분 7일) 유지 · 저장 공간 사용량 확인 |
 | 예산 알림 · 실제 사용 차단 | 미확인 | 예산을 "알림만" 이 아니라 **한도 도달 시 차단(stop usage)** 으로 둘지 결정 |
 | 과거 비밀값 노출 점검 | 이번 작업에서 전체 이력 검사 **미실행** — 범위가 커서 후속 작업으로 분리 | private 전환은 노출 이력의 해결이 아니다. 별도 WO 로 secret scanning · 이력 점검 |
@@ -193,18 +212,18 @@ sudo docker run --rm hello-world
 ### 7-5. 전용 사용자 · 디렉터리
 
 ```bash
-sudo useradd --create-home --shell /bin/bash o4o-runner
+sudo useradd --create-home --shell /bin/bash o4oci
 ```
 
 ```bash
-sudo usermod -aG docker o4o-runner
+sudo usermod -aG docker o4oci
 ```
 
 ```bash
-sudo -u o4o-runner mkdir -p /home/o4o-runner/actions-runner
+sudo -u o4oci mkdir -p /home/o4oci/actions-runner
 ```
 
-- 실행기 작업 폴더 · 도구 캐시 · pnpm store 는 모두 `/home/o4o-runner` 아래(C: SSD 의 WSL 디스크)다.
+- 실행기 작업 폴더 · 도구 캐시 · pnpm store 는 모두 `/home/o4oci` 아래(C: SSD 의 WSL 디스크)다.
 - 이 사용자에는 gcloud 인증 · GitHub 개인 토큰 · 운영 DB 접속 수단을 두지 않는다.
 - docker 그룹은 사실상 root 권한이다. 이 PC 의 실행기는 **이 저장소 전용**으로만 등록한다.
 
@@ -246,18 +265,18 @@ Windows 자동 로그인은 요구하지 않는다.
 
 | 대상 | 위치 | 정리 |
 |---|---|---|
-| 실행기 진단 로그 | `/home/o4o-runner/actions-runner/_diag` | 30일 지난 파일만: `find /home/o4o-runner/actions-runner/_diag -type f -mtime +30 -delete` |
-| 도구 캐시(Node 버전들) | `/home/o4o-runner/actions-runner/_work/_tool` | 현재 workflow 가 쓰지 않는 버전 폴더만 수동 삭제 |
-| pnpm store | `sudo -u o4o-runner pnpm store path` 로 확인 | `pnpm store prune` (실행기 Idle 일 때) |
+| 실행기 진단 로그 | `/home/o4oci/actions-runner/_diag` | 30일 지난 파일만: `find /home/o4oci/actions-runner/_diag -type f -mtime +30 -delete` |
+| 도구 캐시(Node 버전들) | `/home/o4oci/actions-runner/_work/_tool` | 현재 workflow 가 쓰지 않는 버전 폴더만 수동 삭제 |
+| pnpm store | `sudo -u o4oci pnpm store path` 로 확인 | `pnpm store prune` (실행기 Idle 일 때) |
 | Jest 캐시 | `/tmp/jest_*` | 실행기 Idle 일 때 해당 패턴만 삭제 |
 | Docker | 이미지 · 정지 컨테이너 | `docker image prune -f --filter "until=168h"` · `docker container prune -f` |
 | WSL 가상 디스크 | C: 의 `ext4.vhdx` | 삭제해도 자동으로 줄지 않는다 — 공간 회수는 별도 절차(`wsl --manage <distro> --set-sparse true` 등) 확인 후 |
 
 작업 폴더 전체 · 홈 전체를 지우는 명령은 쓰지 않는다. 경보 기준 예: C: 여유 40GB 미만이면 정리.
 
-### 7-10. 대표 작업 로컬 측정 (등록 전, `o4o-runner` 로)
+### 7-10. 대표 작업 로컬 측정 (등록 전, `o4oci` 로)
 
-저장소를 `/home/o4o-runner/measure/o4o-platform` 에 clone 하고 [SETUP.md](../../../SETUP.md) 설치 절차 후:
+저장소를 `/home/o4oci/measure/o4o-platform` 에 clone 하고 [SETUP.md](../../../SETUP.md) 설치 절차 후:
 
 ```bash
 /usr/bin/time -v pnpm install --frozen-lockfile
@@ -292,7 +311,7 @@ Windows 자동 로그인은 요구하지 않는다.
 
 1. §6 결정 완료(플랜 · ruleset · Environment · 예산 차단 · CodeQL/Sonar).
 2. 저장소 private 전환 → ruleset · `production` Environment 가 유지됐는지 read-only 확인.
-3. 실행기 등록 — GitHub Settings → Actions → Runners → New self-hosted runner 에서 **화면이 주는 다운로드 · 검증 · 등록 명령**을 `o4o-runner` 로 실행한다. 등록 토큰은 화면에서만 쓰고 저장 · 공유하지 않는다. `config.sh` 에 `--labels o4o-ci-linux --unattended` 를 더하고, 서비스 설치는 `sudo ./svc.sh install o4o-runner` → `sudo ./svc.sh start`.
+3. 실행기 등록 — GitHub Settings → Actions → Runners → New self-hosted runner 에서 **화면이 주는 다운로드 · 검증 · 등록 명령**을 `o4oci` 로 실행한다. 등록 토큰은 화면에서만 쓰고 저장 · 공유하지 않는다. `config.sh` 에 `--labels o4o-ci-linux --unattended` 를 더하고, 서비스 설치는 `sudo ./svc.sh install o4oci` → `sudo ./svc.sh start`.
    (Windows 를 옮기는 경우에만: 같은 화면의 Windows 명령 + `--labels o4o-ci-windows --runasservice`.)
 4. 이 시점까지 변수는 없다 → 모든 job 은 여전히 호스팅. 실행기가 Idle 인지만 본다.
 5. `CI_RUNNER_LINUX=self-hosted` 설정 → Draft 가 아닌 시험 PR 1건으로 §8 확인.
