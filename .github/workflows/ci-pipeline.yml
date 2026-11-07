@@ -254,6 +254,7 @@ jobs:
         scripts/ci/__tests__/deploy-workflow-diff.test.mjs
         scripts/ci/__tests__/deploy-orchestrate.test.mjs
         scripts/ci/__tests__/runner-selection.test.mjs
+        scripts/ci/__tests__/promote-dedupe.test.mjs
 
     - name: Test account erasure activation controls (isolated)
       run: |
