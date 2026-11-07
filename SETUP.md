@@ -135,6 +135,11 @@ pnpm run check:runtime
 
 Docker Desktop은 컨테이너 빌드를 로컬에서 재현할 때만 필요합니다(선택).
 
+### Claude Code 플러그인 (Engineering · Design)
+
+**클라우드 세션은 claude.ai 계정에서 활성화하고, 로컬 PC 세션은 저장소 `.claude/settings.json` 선언(`engineering@knowledge-work-plugins` · `design@knowledge-work-plugins`)으로 설치한다.**
+클라우드 세션은 저장소가 선언한 플러그인을 설치하지 않고([cloud-environments](https://code.claude.com/docs/en/cloud-environments#what-carries-over-from-your-setup)), 계정 동기화는 공식 문서상 Cowork · 터미널 세션만 명시돼 데스크톱 Code 탭 로컬 세션은 보장되지 않는다([plugins/loading](https://code.claude.com/docs/en/plugins/loading)). 두 경로가 한 PC 에서 겹치면 저장소 쪽이 로드되고 계정 사본은 로드되지 않으므로 중복 · 충돌은 없다. 계정에서 켤 때는 Directory 의 UUID 사본이 아니라 `Knowledge Work` 마켓플레이스 항목을 고른다.
+
 ---
 
 ## 2. 최초 1회 설정
