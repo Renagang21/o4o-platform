@@ -58,11 +58,13 @@ function prepareStorage(revision){
    writeFileSync(process.env.ERASURE_AUDIT_REPORT,JSON.stringify({storagePrepared:true,scope:'private-document-bucket',role:'roles/storage.objectUser',activationChanged:false},null,2)+'\n');
    console.log('Private document storage prepared; activation remains unchanged');return;
 }
+// gcloud reports an absent job as "Cannot find job [name]." Any other failure, such as a permission error, must not read as absent.
+export function auditJobMissing(stderr){return /NOT_FOUND|not found|Cannot find job \[o4o-account-erasure-audit\]/i.test(stderr??'');}
 function createAudit(directory,served,payload){
  return async(expectEnabled=false,maintenance=false)=>{
    const original=command(['run','jobs','describe','o4o-api-migrations',...location,'--format=json']);
    const existing=spawnSync('gcloud',['run','jobs','describe','o4o-account-erasure-audit',...location,'--format=json'],{encoding:'utf8'});
-   if(existing.status!==0&&!/NOT_FOUND|not found/i.test(existing.stderr??''))throw new Error('JOB_OWNERSHIP_UNVERIFIED');
+   if(existing.status!==0&&!auditJobMissing(existing.stderr))throw new Error('JOB_OWNERSHIP_UNVERIFIED');
    if(existing.status===0&&JSON.parse(existing.stdout).metadata?.labels?.['o4o-purpose']!=='account-erasure-readiness')throw new Error('FOREIGN_JOB_PROTECTED');
    const spec=jobSpec(original,served(),payload,expectEnabled,maintenance),path=join(directory,'job.json');writeFileSync(path,JSON.stringify(spec),{mode:0o600});
    command(['run','jobs','replace',path,...location,'--quiet'],false);

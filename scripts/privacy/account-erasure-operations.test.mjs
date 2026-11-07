@@ -1,6 +1,13 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {activationValues,jobSpec,ERASURE_ENV_NAMES} from './account-erasure-operations.mjs';
+import {activationValues,auditJobMissing,jobSpec,ERASURE_ENV_NAMES} from './account-erasure-operations.mjs';
+test('only an absent audit job counts as missing; other gcloud failures stay unverified',()=>{
+ assert.equal(auditJobMissing('ERROR: (gcloud.run.jobs.describe) Cannot find job [o4o-account-erasure-audit].\n'),true);
+ assert.equal(auditJobMissing('ERROR: NOT_FOUND: job does not exist'),true);
+ for(const stderr of ['ERROR: (gcloud.run.jobs.describe) PERMISSION_DENIED: caller lacks run.jobs.get','ERROR: (gcloud.run.jobs.describe) Cannot find job [another-job].','',undefined]){
+  assert.equal(auditJobMissing(stderr),false);
+ }
+});
 const ready=()=>({schema:true,writerGaps:0,closureGaps:0,accounts:9,activeAdminCount:1,readOnlyDatabase:true,files:[{permissionsVerified:true,probeRemaining:0,objects:0,taggedPersonal:0,unmarked:0},{permissionsVerified:true,probeRemaining:0,objects:0,taggedPersonal:0,unmarked:0}]});
 test('activation requires actual schema, writer, ownership, account and storage readiness evidence',()=>{
  for(const patch of [{schema:false},{accounts:undefined},{accounts:null},{activeAdminCount:undefined},{schema:'true'},{writerGaps:1},{closureGaps:1},{accounts:50000},{activeAdminCount:0},{readOnlyDatabase:false},{files:[]},{files:[{permissionsVerified:false,probeRemaining:0},{permissionsVerified:true,probeRemaining:0,objects:0,taggedPersonal:0,unmarked:0}]},{files:[{permissionsVerified:true,probeRemaining:1},{permissionsVerified:true,probeRemaining:0,objects:0,taggedPersonal:0,unmarked:0}]}])assert.throws(()=>activationValues({...ready(),...patch}),/ACTIVATION_EVIDENCE_REQUIRED|SYSTEM_TWO_YEAR_REVIEW_REQUIRED/);
