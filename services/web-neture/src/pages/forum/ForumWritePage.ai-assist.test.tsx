@@ -125,6 +125,23 @@ describe('writing assistant', () => {
     await waitFor(() => expect(m.create).toHaveBeenCalledTimes(1));
     expect(m.create.mock.calls[0][0]).toMatchObject({ title: '제목 후보 이', forumId: 'second', tags: ['재고'] });
   });
+  it('undo returns to the original after repeated applies and a new suggestion', async () => {
+    mount();
+    await openSuggestions();
+    const applied = '<p>다듬은 본문입니다 &lt;b&gt;굵게&lt;/b&gt;</p>';
+    fireEvent.click(screen.getByRole('button', { name: '본문에 적용' }));
+    await waitFor(() => expect(bodyInput().value).toBe(applied));
+    fireEvent.click(screen.getByRole('button', { name: '본문에 적용' }));
+    await waitFor(() => expect(bodyInput().value).toBe(applied));
+
+    fireEvent.click(screen.getByRole('button', { name: 'AI 도움 받기' }));
+    await waitFor(() => expect(m.compose).toHaveBeenCalledTimes(2));
+    await screen.findByText('제목 후보');
+
+    fireEvent.click(screen.getByRole('button', { name: '적용 취소' }));
+    await waitFor(() => expect(bodyInput().value).toBe('<p>재고를 어떻게 관리하시나요</p>'));
+    expect(screen.queryByRole('button', { name: '적용 취소' })).toBeNull();
+  });
   it('an unchosen suggestion does not reach the post', async () => {
     mount();
     await openSuggestions();

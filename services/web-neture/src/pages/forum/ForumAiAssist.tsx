@@ -71,7 +71,8 @@ export function ForumAiAssistPanel({ title, editorHtml, forumId, tags, onApplyTi
   const unavailableMessage = statusFailed ? forumAiErrorMessage('AI_UNAVAILABLE') : forumAiErrorMessage(status?.reason ?? undefined);
 
   async function ask() {
-    setBusy(true); setMessage(''); setSuggestion(null); setPreviousHtml(null);
+    // previousHtml stays: a new suggestion must not take away the way back to the original.
+    setBusy(true); setMessage(''); setSuggestion(null);
     try {
       setSuggestion(await requestForumComposeAssist({ title: trimmedTitle, body: bodyText, ...(forumId ? { forumId } : {}) }));
       setStatus((current) => current && { ...current, remainingToday: Math.max(current.remainingToday - 1, 0) });
@@ -122,7 +123,7 @@ export function ForumAiAssistPanel({ title, editorHtml, forumId, tags, onApplyTi
           </div>
           <p className="m-0 mt-2 text-xs text-amber-800">적용하면 본문이 수정안 글자로 바뀌며 서식과 이미지는 유지되지 않습니다.</p>
           <div className="mt-2 flex flex-wrap gap-2">
-            <button type="button" className={secondaryButton} onClick={() => { setPreviousHtml(editorHtml); onApplyBody(forumTextToHtml(suggestion.body!.suggestion)); }}>본문에 적용</button>
+            <button type="button" className={secondaryButton} onClick={() => { setPreviousHtml((current) => current ?? editorHtml); onApplyBody(forumTextToHtml(suggestion.body!.suggestion)); }}>본문에 적용</button>
             {previousHtml !== null && <button type="button" className={secondaryButton} onClick={() => { onApplyBody(previousHtml); setPreviousHtml(null); }}>적용 취소</button>}
           </div>
         </div>}
