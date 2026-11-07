@@ -1,5 +1,6 @@
 import React from "react";
 import {
+  act,
   render,
   screen,
   fireEvent,
@@ -48,6 +49,12 @@ function client() {
   };
 }
 afterEach(cleanup);
+// The panel clears its selection in an effect after new rows render. Wait for that
+// effect, or a click that lands first is undone and the action buttons disappear.
+async function findMemberRow(text: string) {
+  await screen.findByText(text);
+  await act(async () => {});
+}
 it('requires the cooperative own policy pair and submits only those current references', async () => {
   const api = client();
   const policyScope = 'business:11111111-1111-4111-8111-111111111111';
@@ -81,7 +88,7 @@ describe("scoped administration work", () => {
         userId="op"
       />,
     );
-    await screen.findByText("회원");
+    await findMemberRow("회원");
     fireEvent.click(screen.getAllByRole("checkbox").at(-1)!);
     expect(screen.queryByRole("button", { name: "가입 승인" })).toBeNull();
     expect(screen.getByRole("button", { name: "보완 요청" })).toBeTruthy();
@@ -111,7 +118,7 @@ describe("scoped administration work", () => {
         userId="admin"
       />,
     );
-    await screen.findByText("회원");
+    await findMemberRow("회원");
     fireEvent.click(screen.getAllByRole("checkbox").at(-1)!);
     fireEvent.change(screen.getByLabelText("검토·처리 사유"), {
       target: { value: "승인 심사" },
@@ -172,7 +179,7 @@ it('keeps platform Admin membership visible and read-only for both cooperative r
  const api=client();const original=api.get.getMockImplementation()!;
  api.get.mockImplementation(async(path:string)=>path.endsWith('/members')?{data:{data:[{...member,operatorReadOnly:true}]}}:original(path));
  render(<MemberManagementPanel client={api} cooperative={coop} admin userId="local-admin" />);
- await screen.findByText('전체 관리자 — 처리 대상 아님');
+ await findMemberRow('전체 관리자 — 처리 대상 아님');
  fireEvent.click(screen.getAllByRole('checkbox').at(-1)!);
  expect(screen.queryByRole('button',{name:'가입 승인',exact:true})).toBeNull();
  expect(screen.queryByRole('button',{name:'보완 요청',exact:true})).toBeNull();expect(api.post).not.toHaveBeenCalled();
