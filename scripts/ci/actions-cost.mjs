@@ -107,6 +107,9 @@ export async function audit({ get, repo, from, to, sampleSize = 10 }) {
   return { repo, from, to, totalRuns: runs.size, incompleteRunsExcluded: pending,
     method: 'Stratified sample; standard private rates for GitHub-hosted jobs; self-hosted machine time reported separately at SELF_HOSTED_USD_PER_MINUTE (electricity excluded); unchanged runtime assumed despite public/private hardware differences; compute only; no billing account access',
     selfHostedUsdPerMinute: SELF_HOSTED_USD_PER_MINUTE,
+    // Sample-based estimate, not measured totals or an invoice. Included compute usage is shared with other
+    // products on the account (e.g. Copilot code review), so it is never subtracted here.
+    estimateBasis: 'stratified-sample', includedComputeUsageApplied: false,
     grossEstimatedUsd: rows.reduce((sum, r) => sum + r.estimatedUsd, 0),
     estimatedHostedMinutes: rows.reduce((sum, r) => sum + r.estimatedMinutes, 0),
     estimatedSelfHostedMinutes: rows.reduce((sum, r) => sum + r.estimatedSelfHostedMinutes, 0), rows };
