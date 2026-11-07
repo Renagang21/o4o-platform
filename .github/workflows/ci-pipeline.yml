@@ -254,6 +254,12 @@ jobs:
         scripts/ci/__tests__/deploy-workflow-diff.test.mjs
         scripts/ci/__tests__/deploy-orchestrate.test.mjs
         scripts/ci/__tests__/runner-selection.test.mjs
+        scripts/ci/__tests__/check-agent-config.test.mjs
+
+    # WO-O4O-DOCS-FAST-AGENT-CONFIG-V1 — `.claude/` 경량 검사(settings JSON · 훅 node --check · 훅 단위 테스트).
+    # `.claude/` 가 코드와 섞여 full 경로로 오는 경우에도 같은 검사를 돌린다(1초 미만 · 의존성 0).
+    - name: Check agent config (.claude/)
+      run: node scripts/ci/check-agent-config.mjs
 
     - name: Test account erasure activation controls (isolated)
       run: |
@@ -658,6 +664,10 @@ jobs:
   # 문서 Markdown **추가·수정만** 있는 push 에서 실행된다(판정: detect).
   # 실측 기준선: docs-only commit 63c36e11e 에서도 CI 14분 09초 + CodeQL 7분 32초가 돌았다.
   #
+  # WO-O4O-DOCS-FAST-AGENT-CONFIG-V1 — 같은 조건(추가 · 수정만)으로 문서 · 에이전트 설정 경로도 여기로 온다:
+  #   root `*.md` · `.claude/**` · `.agents/**` · `.github/pull_request_template.md`(정확한 파일 1개).
+  #   삭제 · 이동과 `.github/` 의 다른 파일은 지금처럼 full 이다. `.claude/` 는 아래 `Check agent config` 가 검사한다.
+  #
   # 무엇을 **줄이지 않았는지** 명시한다:
   #   - 변경 문서를 **실제로 읽는** api-server test 는 전부 선별해 그대로 돌린다
   #     (`--mode=docs-specs`. 전수 조사 §9 결과: 기록물 보존 guard · 정본 존재 단언 ·
@@ -694,6 +704,11 @@ jobs:
     # docs 축 판정 자체의 회귀(Case D1~D10)를 여기서도 막는다.
     - name: Run tests (CI affected-scope detector node:test)
       run: node --test scripts/ci/__tests__/detect-affected.test.mjs
+
+    # `.claude/` 를 바꾼 push 가 이 경로로 올 수 있다 — settings JSON · 훅 node --check · 훅 단위 테스트.
+    # `.claude/` 를 바꾸지 않은 경우에도 돌린다(1초 미만). 실패는 blocking 이고 CI Gate 로 전파된다.
+    - name: Check agent config (.claude/)
+      run: node scripts/ci/check-agent-config.mjs
 
     - name: Select docs consumer tests
       id: select

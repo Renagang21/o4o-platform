@@ -61,6 +61,14 @@
  *       (docs 안의 데이터는 2026-10-03 `apps/api-server/src/scripts/data/` 로 분리됐지만 규칙은 유지한다)
  *     - 경로에 `data/` 세그먼트가 없음 (같은 이유의 보수적 여유)
  *   나머지는 전부 기존 경로다. 애매하면 full CI 한 번을 선택한다.
+ *
+ *   WO-O4O-DOCS-FAST-AGENT-CONFIG-V1 (2026-11-07) — 같은 빠른 경로에 **문서 · 에이전트 설정** 경로를 더한다
+ *   (`isDocsFastExtra`): root `*.md` · `.claude/**` · `.agents/**` · `.github/pull_request_template.md`.
+ *   어느 CI 검사도 이 파일을 읽지 않는다(전수 확인 — IR-O4O-PRIVATE-CI-BUDGET-V1 §7). 조건은 docs 와 같다:
+ *     - 추가 · 수정만. 삭제 · 이동은 global(full) 그대로다.
+ *     - `.github/` 의 다른 파일(workflow · action · 그 밖의 템플릿)은 계속 global 이다 — 예외는 정확한 파일 1개.
+ *     - `.claude/` 는 docs fast job 과 Code Quality Check 에서 `scripts/ci/check-agent-config.mjs`
+ *       (settings JSON 파싱 · 훅 `node --check` · 훅 단위 테스트)가 검사한다.
  */
 
 import { spawnSync } from 'node:child_process';
@@ -121,6 +129,22 @@ const GLOBAL_PREFIXES = [
 const NEUTRAL_PREFIXES = ['docs/'];
 
 /**
+ * WO-O4O-DOCS-FAST-AGENT-CONFIG-V1 — docs fast path 에 함께 태우는 **문서 · 에이전트 설정** 경로.
+ * 추가 · 수정일 때만 중립이고, 삭제 · 이동은 global 이다(docs/** 와 같은 규칙).
+ *   - root 최상위 `*.md` (README · AGENTS · CLAUDE · SETUP · HANDOFF …) — 하위 디렉터리의 md 는 해당하지 않는다
+ *   - `.claude/**` · `.agents/**` — 에이전트 세션 설정 · 훅 · 스킬. 이미지 · 빌드 컨텍스트 밖
+ *   - `.github/pull_request_template.md` — `.github/` 를 global 로 두는 이유(정적 spec 이 workflow 원문을 읽음)가
+ *     닿지 않는 **정확한 파일 1개**. 다른 `.github/**` 는 계속 global 이다.
+ */
+const DOCS_FAST_EXTRA_EXACT = new Set(['.github/pull_request_template.md']);
+const DOCS_FAST_EXTRA_PREFIXES = ['.claude/', '.agents/'];
+const DOCS_FAST_EXTRA_ROOT_MARKDOWN = /^[^/]+\.md$/i;
+
+export function isDocsFastExtra(file) {
+  return DOCS_FAST_EXTRA_EXACT.has(file) || hasPrefix(file, DOCS_FAST_EXTRA_PREFIXES) || DOCS_FAST_EXTRA_ROOT_MARKDOWN.test(file);
+}
+
+/**
  * WO-O4O-CICD-PRODUCTION-STATE-RECONCILIATION-AND-LEVEL3-RULE-PRECISION-V1 §12 · §13 — **배포 축 전용** NON_RUNTIME_GLOBAL.
  * workspace 매핑이 없는 root 경로 중 어떤 이미지 · 빌드 컨텍스트 · runtime 에도 닿지 않는 것만 (census 근거: Dockerfile 은
  * 서비스 · package 디렉터리만 COPY, API 이미지는 dist bundle 만). 이 목록 밖의 매핑 없는 경로는 종전대로 전 서비스 fallback(UNKNOWN).
@@ -136,6 +160,9 @@ const NON_RUNTIME_GLOBAL_EXACT = new Set([
 ]);
 const NON_RUNTIME_GLOBAL_PREFIXES = [
   '.claude/',
+  // WO-O4O-DOCS-FAST-AGENT-CONFIG-V1 — `.claude/` 와 같은 에이전트 설정(스킬 문서). 어떤 Dockerfile 도 COPY 하지 않는다.
+  // 없으면 스킬 문서 수정만으로 "매핑 불가" → API · 전 Web 서비스 fallback 배포가 된다.
+  '.agents/',
   '.playwright-mcp/',
   '.idx/',
   // 배포 · 소스 은퇴한 앱 디렉터리 — workspace 에서 빠져 매핑이 없지만 어떤 Dockerfile 도 COPY 하지 않는다.
@@ -323,6 +350,15 @@ export function classifyDocs(changedFiles) {
   let fast = true;
 
   for (const { status, path: file } of changedFiles) {
+    if (isDocsFastExtra(file)) {
+      // docs_only 는 "변경 전체가 docs/** 안" 그대로 둔다. fast 여부만 docs 와 같은 규칙으로 본다.
+      docsOnly = false;
+      if (status !== 'A' && status !== 'M') {
+        fast = false;
+        reasons.push(`문서 · 에이전트 설정 ${status}(삭제/이동) — docs fast 아님: ${file}`);
+      }
+      continue;
+    }
     if (!hasPrefix(file, NEUTRAL_PREFIXES)) {
       docsOnly = false;
       fast = false;
@@ -345,7 +381,8 @@ export function classifyDocs(changedFiles) {
     }
   }
 
-  return { docs_only: docsOnly, docs_fast_eligible: docsOnly && fast, reasons };
+  // fast 는 docs/** 밖의 경로를 만나면 이미 false 다. 남은 경우는 docs Markdown · 문서 · 에이전트 설정의 추가 · 수정뿐이다.
+  return { docs_only: docsOnly, docs_fast_eligible: fast, reasons };
 }
 
 /**
@@ -433,6 +470,14 @@ export function classify(changedFiles, graph, opts = {}) {
   let nonAdminCode = false;
 
   for (const { status, path: file } of changedFiles) {
+    // `.github/pull_request_template.md` 가 아래 `.github/` global 에 먼저 걸리지 않도록 앞에서 본다.
+    if (isDocsFastExtra(file)) {
+      if (status === 'A' || status === 'M') continue;
+      global = true;
+      result.reasons.push(`문서 · 에이전트 설정 삭제/이동(${status}) — 중립 아님: ${file}`);
+      continue;
+    }
+
     if (GLOBAL_EXACT.has(file) || hasPrefix(file, GLOBAL_PREFIXES)) {
       global = true;
       result.reasons.push(`global: ${file}`);
@@ -1055,6 +1100,13 @@ export function selectDocsConsumerSpecs(changedFiles, root = REPO_ROOT) {
 
   const needles = new Set();
   for (const { path: file } of changedFiles) {
+    if (isDocsFastExtra(file)) {
+      // root md 는 파일명 자체(`CLAUDE.md`), `.claude/<area>` · `.agents/<area>` 는 그 영역까지 넓게 찾는다.
+      const seg = file.split('/');
+      if (seg.length >= 3) needles.add(`${seg[0]}/${seg[1]}`);
+      needles.add(file);
+      continue;
+    }
     if (!hasPrefix(file, NEUTRAL_PREFIXES)) continue;
     const seg = file.split('/');
     if (seg.length >= 2) needles.add(`${seg[0]}/${seg[1]}`);
