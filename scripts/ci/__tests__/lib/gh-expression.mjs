@@ -38,18 +38,18 @@ export function evaluate(expr, ctx = {}) {
   let i = 0;
   const peek = () => tokens[i];
   const next = () => tokens[i++];
-  const expect = (t) => { const got = next(); if (got !== t) throw new Error(`expected ${t}, got ${got} in ${src}`); };
+  const consume = (t) => { const got = next(); if (got !== t) throw new Error(`expected ${t}, got ${got} in ${src}`); };
   const status = ctx.$status ?? {};
   const args = () => {
-    expect('(');
+    consume('(');
     const out = [];
     if (peek() !== ')') { out.push(or()); while (peek() === ',') { next(); out.push(or()); } }
-    expect(')');
+    consume(')');
     return out;
   };
   const primary = () => {
     const t = next();
-    if (t === '(') { const v = or(); expect(')'); return v; }
+    if (t === '(') { const v = or(); consume(')'); return v; }
     if (t === '!') return !truthy(primary());
     if (t.startsWith("'")) return t.slice(1, -1).replace(/''/g, "'");
     if (/^\d/.test(t)) return Number(t);
