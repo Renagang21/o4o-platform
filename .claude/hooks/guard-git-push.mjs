@@ -7,7 +7,7 @@
  * 끝의 `:*` 는 접두어 일치 문법과 겹쳐 의도대로 매칭되지 않는다(2026-11-07 실측). `--delete` · `-d` · force ·
  * main push 는 settings.json deny 가 그대로 막는다.
  *
- * 거부: git [-C <path>] [-c <k=v>] push … :<ref>   (`:` 단독 = matching push 는 삭제가 아니므로 통과)
+ * 거부: git [-C <path>] [-c <k=v>] push … :<ref> | +:<ref>   (`:` · `+:` 단독 = matching push 는 삭제가 아니므로 통과)
  * 예외는 허용(exit 0)으로 넘겨 일반 명령을 막지 않는다.
  */
 import { baseName, commandIndex, readStdin, segments, tokenize } from './lib/shell.mjs';
@@ -23,7 +23,12 @@ function deletesRemoteRef(segment) {
     i++;
   }
   if (tokens[i] !== 'push') return null;
-  const ref = tokens.slice(i + 1).find((t) => !t.startsWith('-') && t.startsWith(':') && t.length > 1);
+  // `:<ref>` 와 강제 표기 `+:<ref>` 모두 원격 삭제다. `:` · `+:` 단독(matching push)은 제외.
+  const ref = tokens.slice(i + 1).find((t) => {
+    if (t.startsWith('-')) return false;
+    const r = t.replace(/^\+/, '');
+    return r.startsWith(':') && r.length > 1;
+  });
   return ref ?? null;
 }
 
