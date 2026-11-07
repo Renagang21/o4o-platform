@@ -13,6 +13,7 @@ function mockController() {
   };
 }
 jest.mock('../controllers/forum/ForumPostController.js', () => ({ ForumPostController: mockController() }));
+jest.mock('../controllers/forum/ForumAiAssistController.js', () => ({ ForumAiAssistController: mockController() }));
 jest.mock('../controllers/forum/ForumDirectoryController.js', () => ({ ForumDirectoryController: mockController() }));
 jest.mock('../controllers/forum/ForumCommentController.js', () => ({ ForumCommentController: mockController() }));
 jest.mock('../controllers/forum/ForumModerationController.js', () => ({ ForumModerationController: mockController() }));

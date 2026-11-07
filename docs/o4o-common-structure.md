@@ -36,6 +36,26 @@ O4O 플랫폼은 여러 독립 서비스(KPA-Society, Neture 등)로 구성되�
 | 권한 처리 | 읽기/쓰기/관리자 분기 구조 | 서비스별 멤버십/역할 기준 |
 | API 계약 | `/api/v1/{service}/forum/*` 경로 구조 | serviceKey 기반 데이터 격리 |
 
+#### Forum AI 보조 계약 (1단계 — 2026-11-07, `WO-O4O-COMMUNITY-FORUM-AI-PHASE1-V1`)
+
+작성 화면의 선택 기능이다. **현재 열린 범위는 커뮤니티 원장(`communityKey = community`) 컨텍스트뿐**이고, 그 밖의 forum mount 는 경로를 건너뛰어 종전 동작 그대로다. 다른 서비스로 넓히려면 별도 판정이 필요하다.
+
+| 경로 (`/api/v1/communities/community/forum` 아래) | 역할 | AI |
+|---|---|---|
+| `GET /ai/status` | AI 사용 가능 여부 · 사유 · 오늘 남은 횟수 (실패도 "사용 불가"로 응답) | 호출 없음 |
+| `POST /ai/compose-assist` | 제목 후보 3개 · 본문 수정안 · 태그 후보 · 게시판 추천 | 요청 시 1회 |
+| `GET /posts/similar?title=` | 제목 키워드 기반 비슷한 글 최대 5개 | 호출 없음 |
+| `POST /ai/similar-search` | "더 찾기" — AI 키워드로 같은 필터 재검색 (quota · 사용 원장을 쓰므로 POST) | 요청 시 1회 |
+
+- **제안만 한다.** 서버는 응답만 돌려주고 저장 · 게시 · 숨김을 하지 않는다. 적용은 작성자가 항목별로 고르고, 게시는 기존 저장 버튼뿐이다.
+- **권한:** `authenticate` + 기존 커뮤니티 컨텍스트 해석 + `checkClosedForumAccess` 재사용. 새 권한 개념 없음. 게시판 목록은 서버가 route 컨텍스트로 계산하며 쓰기 목록은 읽기 목록에서 개선 게시판을 뺀 것이다. 공개 비로그인 경로에는 없다.
+- **출력 검증:** 게시판 ID 가 서버가 준 쓰기 가능 목록 밖이면 답변 전체를 버린다(`AI_OUTPUT_INVALID`). 입력 `forumId` 도 그 목록 밖이면 403 `FORUM_NOT_WRITABLE`. 제목 3개 · 태그 5개 이하 · HTML 금지 · 본문 길이 증가 제한.
+- **입력 상한:** 제목 160자 · 본문 4,000자. 초과는 자르지 않고 400 `INPUT_TOO_LONG`.
+- **비용:** 편집 모델(`resolveEditingModel`) · 단일 시도 · 출력 토큰 상한 · `ai_query_policy.ai_enabled` · 기존 quota(`SERVICE_QUERY` / `community`).
+- **사용자별 일일 횟수:** `ai_query_policy.free_daily_limit`(코드 상한 30). 새 테이블 없이 `ai_usage_reservations` 의 당일 건수로 센다. 같은 `community` 서비스의 다른 AI 사용(뉴스 편집 초안)도 함께 세어진다. 건수 확인과 예약은 별도 트랜잭션이라, 사용자별 동시 1건 제한은 인스턴스 안에서만 보장되고 인스턴스 간 초과 가능성이 남는다.
+- **금지:** 의약 질문 답변 생성(다듬기 · 분류만). 사용자 입력은 자료이며 명령이 아니다.
+- **AI 없이도 동작:** AI 꺼짐 · 한도 초과 · 장애여도 글쓰기와 키워드 비슷한 글은 그대로 동작한다.
+
 ### `/lms`
 
 | 항목 | 공통 구조 | 서비스별 내용 |
