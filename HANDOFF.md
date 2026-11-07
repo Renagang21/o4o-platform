@@ -1,6 +1,6 @@
 # HANDOFF
 
-> 저장소: `Renagang21/o4o-platform` · 코드 기준: `main` `39aae45647` · 작성: 2026-11-06 (KST)
+> 저장소: `Renagang21/o4o-platform` · 작업 branch: `wo/coop-member-test-race` · 코드 기준: `363ff25eb2` · 작성: 2026-11-07 (KST)
 > 다음 실행자: LOCAL (운영 DB read-only 확인 항목이 있다. 코드 · 문서 항목은 CLOUD 도 가능)
 > 이전 인계(2026-10-07 기준 commerce 상태표 · 로컬 검증 재현 절차) 전문: `git show 39aae45647:HANDOFF.md`
 
@@ -27,8 +27,7 @@ PR #339의 main 통합·운영 배포는 완료됐지만 작업 PC와 소유 세
 
 ## 진행 중인 것
 
-- 열린 PR 0건 (2026-11-06 조회).
-- 이 문서 현행화 외에 진행 중인 worktree 없음.
+- `wo/coop-member-test-race`(worktree `o4o-wt/coop-member-test-race`) — PR 미생성. `services/web-pharmacy-coop/src/Management.test.tsx` 의 간헐 실패를 고쳤다. 조합원 패널이 행 표시 뒤 effect 로 선택을 초기화하는데, 그 effect 전에 클릭이 먼저 들어가면 선택이 풀려 작업 버튼이 사라졌다. 임시 테스트로 이 순서를 강제해 재현했고, 테스트에서 effect 처리를 기다리게 했다. 제품 코드는 그대로다. 수정 전 코드도 부하 15회 전부 통과해 드문 실패이므로, 반복 통과는 수정 효과의 근거가 아니다. main 통합은 통합 담당 몫이다.
 
 ## 이전 인계에서 바뀐 전제
 
@@ -38,22 +37,24 @@ PR #339의 main 통합·운영 배포는 완료됐지만 작업 PC와 소유 세
 
 ## 다음에 할 일 (우선순위 순)
 
-1. 운영 DB 조회 계정 확인 — PR #961 로 조회 계정을 `o4o_readonly` 로 제한했다. 운영 DB 에 이 role 과 secret `o4o-db-readonly-password` 가 실제로 있는지는 미확인이다. 없으면 규칙상 조회가 막히므로 다음 운영 DB 조회 전에 확인한다.
-2. 미완료 지시서의 남은 확인. 체크박스는 기록 시점 값이므로 아래 2026-11-06 조회값을 따른다. 운영 DB 확인은 LOCAL read-only 로 하고 write 는 사용자 승인을 받는다.
-   - `TODO-O4O-ACCOUNT-ERASURE-ACTIVATION-V1` — PR #936 MERGED. `account-erasure-activation.yml` 실행 0건이라 운영 활성화는 아직 안 된 것으로 본다.
-   - `TODO-O4O-MEMBER-PROFILE-EDIT-V1` — migration `1793750400000-AddTemporaryPasswordExpiry` 는 main 에 있다. 운영 적용 여부는 미확인.
-   - `WO-O4O-ADMIN-OPERATOR-INVITE-FIRST-V1` — PR #925 MERGED. 운영 migration 적용 여부는 미확인.
-   - `TODO-O4O-OPERATOR-PROTECTED-MEMBER-DEPLOY-FIX-V1` — #951 main 반영 · Promote `051b7ede63` success(`deploy-kpa-branch` 포함). 약국협업체 frontend-only 배포 · 최종 HTTP 점검은 미확인.
-   - `WO-O4O-SCHEDULED-JEST-FULL-SHARD-RECOVERY-V1` — `8eb3dab7dc` main 반영 · 최근 스케줄 실행(2026-11-05 23:03Z) success. 집계 · 메모리 기록은 미확인.
-3. 불안정 테스트 조사 — `services/web-pharmacy-coop/src/Management.test.tsx` 의 "operator sends a review request ..." 가 87행에서 "보완 요청" 버튼을 못 찾아 PR #961 CI 1회차에서 실패했고, 코드 변경 없는 재실행에서 통과했다. 원인은 미조사다.
-4. 새 개발 후보(사용자 선택): `WO-O4O-COMMUNITY-INDUSTRY-NEWS-V2` · `WO-O4O-COMMUNITY-FORUM-AI-PHASE1-V1`(둘 다 DRAFT) · `WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1` · `TODO-O4O-PLAYLIST-AUTHORING-REQUIRED-20261105` 잔여.
+1. 계정 완전삭제 운영 활성화 여부 결정(사용자 승인 필요) — `TODO-O4O-ACCOUNT-ERASURE-ACTIVATION-V1`. PR #936 MERGED 지만 운영 API 에 `ACCOUNT_ERASURE_*` 설정 4개가 모두 없어 OFF 다(2026-11-07 조회). `account-erasure-activation.yml` 실행 0건. 활성화는 운영 영향이 있어 임의로 실행하지 않는다.
+2. 새 개발 후보(사용자 선택): `WO-O4O-COMMUNITY-INDUSTRY-NEWS-V2` · `WO-O4O-COMMUNITY-FORUM-AI-PHASE1-V1`(둘 다 DRAFT) · `WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1` · `TODO-O4O-PLAYLIST-AUTHORING-REQUIRED-20261105` 잔여.
 
-대조 완료: `wo/readonly-db-rule` 은 PR #961 로 main 반영(`ed8bc1367c`), `wo/member-signup-approval-action` 은 커밋 `aea4fa8736` 이 PR #956(MERGED)에 포함돼 있어 추가 통합이 필요 없다.
+## 확인 결과 (2026-11-07 조회)
+
+체크박스는 기록 시점 값이라 지시서에 비어 있어도 아래가 현재 상태다.
+
+- 운영 API 서빙 SHA 는 `5106df8666` 이다. 사용자 계정 수동 Promote 로 배포됐고 이 세션이 실행한 것은 아니다.
+- `o4o_readonly` · secret `o4o-db-readonly-password` 는 존재한다. `psql` 미설치로 실제 접속과 조회 권한은 미확인.
+- `TODO-O4O-MEMBER-PROFILE-EDIT-V1` · `WO-O4O-ADMIN-OPERATOR-INVITE-FIRST-V1` — 해당 migration 커밋 이후의 `o4o-api-migrations` Job 이 모두 성공했다(최근 2026-11-06 23:38Z). DB 를 직접 조회한 값은 아니다.
+- `TODO-O4O-OPERATOR-PROTECTED-MEMBER-DEPLOY-FIX-V1` — `cooperative-web` 서빙 SHA `dd83d30d29`(#950 포함). `drugstore.neture.co.kr` · `kpa.neture.co.kr` 공개 진입 HTTP 200. 화면 동작 검증은 아니다.
+- `WO-O4O-SCHEDULED-JEST-FULL-SHARD-RECOVERY-V1` — 2026-11-06 22:33Z 스케줄 실행에서 3분할과 집계가 모두 success. 메모리 기록 값은 미확인.
+- 대조 완료: `wo/readonly-db-rule` 은 PR #961 로 main 반영(`ed8bc1367c`), `wo/member-signup-approval-action` 은 커밋 `aea4fa8736` 이 PR #956(MERGED)에 포함돼 있어 추가 통합이 필요 없다.
 
 ## 이 PC 의 미해결 환경
 
 - 로컬 전용 파일 없음: `docs/local/TEST-ACCOUNTS.local.md`(브라우저 검증 전 사용자 원본 필요) · `apps/api-server/.env`(`.env.example` 로 새로 작성).
-- 미설치: PostgreSQL 15 · gcloud · Cloud SQL Proxy · Docker. 운영 DB read-only 확인(위 2번)에는 gcloud 와 proxy 가 필요하다.
+- gcloud · Cloud SQL Proxy 는 설치 · 로그인 완료. 미설치: PostgreSQL 15(`psql` 포함) · Docker. 운영 DB 를 직접 조회하려면 `psql` 이 필요하다.
 - Claude 앱의 worktree 위치가 저장소 안(`.claude/worktrees`)이다. §4-1(a) 에 맞게 사용자가 Settings 에서 바꿔야 한다.
 
 ## 주의
