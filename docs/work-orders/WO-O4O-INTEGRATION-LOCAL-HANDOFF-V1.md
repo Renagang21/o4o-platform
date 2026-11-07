@@ -3,7 +3,7 @@
 > **상태**: ACTIVE
 > **작성일**: 2026-11-07 · **최종 갱신**: 2026-11-07
 > **실행 위치**: LOCAL
-> **인계**: `claude/elegant-albattani-5x2elv` · `9347dae1f4` · 다음 실행자 LOCAL(통합 담당)
+> **인계**: PR #985 로 main 반영 · 다음 실행자 LOCAL(통합 담당) — 결과는 최신 `origin/main` 에서 새 branch(`wo/integration-local-handoff-result` 등)로 기록한다
 > **근거**: 통합 담당 지시(2026-11-07 — "클라우드 통합 세션이 못 하는 일은 정리해서 로컬 에이전트에게 넘긴다") · [`IR-O4O-UNMERGED-BRANCH-AND-PR-DISPOSITION-V1`](../investigations/IR-O4O-UNMERGED-BRANCH-AND-PR-DISPOSITION-V1.md) §6 (#984) · PR #968 통합 확인 코멘트
 
 ## 1. 배경
@@ -57,7 +57,7 @@
   - `failed` 가 나오면 lease 가 거절한 것이다(그사이 tip 이 바뀜). 재시도하지 말고 이름만 기록한다.
 - [ ] [LOCAL] 확인: `git ls-remote --heads origin` 의 branch 수를 센다. 기대값은 `main` + 그 시점 열린 PR branch + KEEP 2 + (선택을 빼고 실행했다면) 선택 3.
 - [ ] [LOCAL] 임시 파일 `$env:TEMP\cleanup-branches.ps1` 을 지운다.
-- [ ] [LOCAL] 아래 6절 결과 칸을 채워 이 WO 를 갱신하고, 작업 branch 에 commit · push 한다.
+- [ ] [LOCAL] 아래 6절 결과 칸을 채워 이 WO 를 갱신한다. 최신 `origin/main` 에서 새 worktree · branch 를 만들어 commit · push 하고 PR 을 연다(#985 는 이미 병합된 PR 이라 그 branch 에 쌓지 않는다 — `AGENTS.md` §4-1(e)).
 
 ### B. #968 운영 반영 (대기 — #968 병합 후에만)
 
