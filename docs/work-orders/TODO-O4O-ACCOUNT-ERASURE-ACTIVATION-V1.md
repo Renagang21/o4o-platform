@@ -9,16 +9,16 @@
 
 - [x] 최신 main·worktree·기존 변경과 실행 환경 확인
 - [x] 실행 모드·파일 확인·시스템 연수·정책 근거의 네 가지 gate 및 배포 시 설정 소실 가능성 확인
-- [ ] 실제 운영 schema/fence·최소 로그·계정 규모·파일 producer와 소유/공유 참조를 집계로 조사
-- [ ] 현행 정책의 기본 1년 및 법정 2년 요건을 대조하고 기간·근거 기록
-- [ ] API runtime identity로 저장소 list/get/조건부 delete 권한 확인. 전용 probe object만 생성·정리하고 잔여0 검증
+- [x] 실제 운영 schema/fence·최소 로그·계정 규모·파일 producer와 소유/공유 참조를 집계로 조사
+- [x] 현행 정책의 기본 1년 및 법정 2년 요건을 대조하고 기간·근거 기록 (계정 9개 · 기본 1년 적용)
+- [x] API runtime identity로 저장소 list/get/조건부 delete 권한 확인. 전용 probe object만 생성·정리하고 잔여0 검증
 - [x] 미표식/공유/타인 파일은 review로 보호하며 임의 소유 추정·전역 backfill 금지
 - [x] 기존 환경값 전달 helper로 네 설정을 다음 배포에도 보존
 - [x] schema·파일 권한·정책·현재 main/CI·승인된 실행 계정을 검증하는 audit/activate 절차 구현
 - [x] 실패 시 새 설정을 노출하지 않거나 이전 revision으로 복구, 실제 처리 결과만 보고
-- [ ] 로컬 회귀·기존 공통 helper·민감정보 검사·CI·Codex·PR main 병합
-- [ ] 운영 audit → 검토 결과 문서화 → 실제 활성화 → readiness enabled 및 공개 health/권한 차단 확인
-- [ ] 합성 probe 잔여0·운영 준비·미해결 개별 review 항목 구분, 문서 정합 및 작업공간 보존/정리 판정
+- [x] 로컬 회귀·기존 공통 helper·민감정보 검사·CI·Codex·PR main 병합 (PR #936 · #963)
+- [x] 운영 audit → 검토 결과 문서화 → 실제 활성화 → readiness enabled 및 공개 health 확인 (2026-11-07, 공개 권한 차단은 별도 경로 미확인)
+- [x] 합성 probe 잔여0·운영 준비·미해결 개별 review 항목 구분. 실제 계정 삭제 동작은 미검증이다. 결과는 CHECK 의 실제 운영 결과 절에 있다
 
 ## 실행 경계
 

@@ -1,6 +1,6 @@
 # HANDOFF
 
-> 저장소: `Renagang21/o4o-platform` · 작업 branch: `wo/coop-member-test-race` · 코드 기준: `363ff25eb2` · 작성: 2026-11-07 (KST)
+> 저장소: `Renagang21/o4o-platform` · 코드 기준: `main` `8e95d16027` · 작성: 2026-11-07 (KST)
 > 다음 실행자: LOCAL (운영 DB read-only 확인 항목이 있다. 코드 · 문서 항목은 CLOUD 도 가능)
 > 이전 인계(2026-10-07 기준 commerce 상태표 · 로컬 검증 재현 절차) 전문: `git show 39aae45647:HANDOFF.md`
 
@@ -27,7 +27,7 @@ PR #339의 main 통합·운영 배포는 완료됐지만 작업 PC와 소유 세
 
 ## 진행 중인 것
 
-- `wo/coop-member-test-race`(worktree `o4o-wt/coop-member-test-race`) — PR 미생성. `services/web-pharmacy-coop/src/Management.test.tsx` 의 간헐 실패를 고쳤다. 조합원 패널이 행 표시 뒤 effect 로 선택을 초기화하는데, 그 effect 전에 클릭이 먼저 들어가면 선택이 풀려 작업 버튼이 사라졌다. 임시 테스트로 이 순서를 강제해 재현했고, 테스트에서 effect 처리를 기다리게 했다. 제품 코드는 그대로다. 수정 전 코드도 부하 15회 전부 통과해 드문 실패이므로, 반복 통과는 수정 효과의 근거가 아니다. main 통합은 통합 담당 몫이다.
+- `wo/community-industry-news-v2` — 개발 중, PR 미생성. 다음에 할 일 1번 참조.
 
 ## 이전 인계에서 바뀐 전제
 
@@ -37,14 +37,16 @@ PR #339의 main 통합·운영 배포는 완료됐지만 작업 PC와 소유 세
 
 ## 다음에 할 일 (우선순위 순)
 
-1. 계정 완전삭제 운영 활성화 여부 결정(사용자 승인 필요) — `TODO-O4O-ACCOUNT-ERASURE-ACTIVATION-V1`. PR #936 MERGED 지만 운영 API 에 `ACCOUNT_ERASURE_*` 설정 4개가 모두 없어 OFF 다(2026-11-07 조회). `account-erasure-activation.yml` 실행 0건. 활성화는 운영 영향이 있어 임의로 실행하지 않는다.
-2. 새 개발 후보(사용자 선택): `WO-O4O-COMMUNITY-INDUSTRY-NEWS-V2` · `WO-O4O-COMMUNITY-FORUM-AI-PHASE1-V1`(둘 다 DRAFT) · `WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1` · `TODO-O4O-PLAYLIST-AUTHORING-REQUIRED-20261105` 잔여.
+1. `WO-O4O-COMMUNITY-INDUSTRY-NEWS-V2` — `wo/community-industry-news-v2` 에서 개발 중. migration 이 있어 병합 전에 사용자 승인이 필요하다.
+2. 테스트 계정으로 계정 완전삭제와 포럼 AI 를 실제 화면에서 확인한다. 둘 다 운영에 켜져 있으나 실제 동작은 미검증이다.
+3. 남은 개발 후보: `WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1` · `TODO-O4O-PLAYLIST-AUTHORING-REQUIRED-20261105` 잔여.
 
 ## 확인 결과 (2026-11-07 조회)
 
 체크박스는 기록 시점 값이라 지시서에 비어 있어도 아래가 현재 상태다.
 
-- 운영 API 서빙 SHA 는 `5106df8666` 이다. 사용자 계정 수동 Promote 로 배포됐고 이 세션이 실행한 것은 아니다.
+- 운영 API · Neture 웹 서빙 SHA 는 `8e95d16027` 이다(PR #965 포럼 AI 포함, Delivery 자동 배포).
+- 계정 완전삭제는 운영에서 켜져 있다(사용자 승인 2026-11-07). 결과와 미검증 항목은 [`CHECK-O4O-ACCOUNT-ERASURE-ACTIVATION-V1`](docs/checks/CHECK-O4O-ACCOUNT-ERASURE-ACTIVATION-V1.md). 이 절차를 다시 돌리려면 `github-actions` 에 `roles/logging.viewer` 를 임시 부여하고 회수해야 한다.
 - `o4o_readonly` · secret `o4o-db-readonly-password` 는 존재한다. `psql` 미설치로 실제 접속과 조회 권한은 미확인.
 - `TODO-O4O-MEMBER-PROFILE-EDIT-V1` · `WO-O4O-ADMIN-OPERATOR-INVITE-FIRST-V1` — 해당 migration 커밋 이후의 `o4o-api-migrations` Job 이 모두 성공했다(최근 2026-11-06 23:38Z). DB 를 직접 조회한 값은 아니다.
 - `TODO-O4O-OPERATOR-PROTECTED-MEMBER-DEPLOY-FIX-V1` — `cooperative-web` 서빙 SHA `dd83d30d29`(#950 포함). `drugstore.neture.co.kr` · `kpa.neture.co.kr` 공개 진입 HTTP 200. 화면 동작 검증은 아니다.
