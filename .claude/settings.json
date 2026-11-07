@@ -620,20 +620,14 @@
       "PowerShell(pnpm install *--no-frozen-lockfile*)",
       "Bash(pnpm install *--fix-lockfile*)",
       "PowerShell(pnpm install *--fix-lockfile*)",
-      "Bash(pnpm *migration:*)",
-      "PowerShell(pnpm *migration:*)",
       "Bash(pnpm *db:reset*)",
       "PowerShell(pnpm *db:reset*)",
       "Bash(pnpm *db:seed*)",
       "PowerShell(pnpm *db:seed*)",
       "Bash(pnpm *db:setup*)",
       "PowerShell(pnpm *db:setup*)",
-      "Bash(pnpm *seed:*)",
-      "PowerShell(pnpm *seed:*)",
       "Bash(pnpm *typeorm *)",
       "PowerShell(pnpm *typeorm *)",
-      "Bash(npm run *migration:*)",
-      "PowerShell(npm run *migration:*)",
       "Bash(npx typeorm *)",
       "PowerShell(npx typeorm *)",
       "Bash(node *migration*)",
@@ -731,7 +725,13 @@
       "Bash(gcloud app deploy *)",
       "PowerShell(gcloud app deploy *)",
       "Bash(gcloud functions deploy *)",
-      "PowerShell(gcloud functions deploy *)"
+      "PowerShell(gcloud functions deploy *)",
+      "Bash(pnpm *migration*)",
+      "PowerShell(pnpm *migration*)",
+      "Bash(pnpm *seed*)",
+      "PowerShell(pnpm *seed*)",
+      "Bash(npm run *migration*)",
+      "PowerShell(npm run *migration*)"
     ],
     "deny": [
       "Bash(git push *--force*)",
@@ -882,8 +882,6 @@
       "PowerShell(git push * HEAD *)",
       "Bash(git push *refs/heads/main*)",
       "PowerShell(git push *refs/heads/main*)",
-      "Bash(git push * :*)",
-      "PowerShell(git push * :*)",
       "Bash(git -C * push)",
       "PowerShell(git -C * push)",
       "Bash(git -C * push * HEAD)",
@@ -892,8 +890,6 @@
       "PowerShell(git -C * push * HEAD *)",
       "Bash(git -C * push *refs/heads/main*)",
       "PowerShell(git -C * push *refs/heads/main*)",
-      "Bash(git -C * push * :*)",
-      "PowerShell(git -C * push * :*)",
       "Bash(gh api *DELETE*)",
       "PowerShell(gh api *DELETE*)",
       "Bash(gh api *-X delete*)",
@@ -929,6 +925,11 @@
             "type": "command",
             "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/block-cloud-deploy.mjs\"",
             "timeout": 30
+          },
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/guard-git-push.mjs\"",
+            "timeout": 15
           }
         ]
       }

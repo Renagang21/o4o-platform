@@ -381,7 +381,9 @@ verdict: SAFE_TO_REMOVE | KEEP | UNCERTAIN
     배포가 필요하면 merge 후 자동 Delivery 를 따르거나 로컬 세션으로 넘긴다.
   - 로컬 세션: 사용자 승인 후 실행한다. 사용자가 그 세션에 배포 · merge 를 요청한 것이 승인이며,
     이후는 §4-1(e)·(f) 의 통합 담당 흐름대로 진행한다(`promote.yml` 조건은 §4-1(f) 그대로).
-- main 직접 push · force push · 원격 branch 삭제는 `.claude/settings.json` 이 모든 세션에서 deny 로 막는다.
+- main 직접 push · force push · 원격 branch 삭제는 `.claude/settings.json` deny 로 모든 세션에서 막는다.
+  콜론 refspec 삭제(`git push origin :<branch>` · `+:<branch>`)는 permission 패턴으로 표현되지 않아
+  PreToolUse 훅(`.claude/hooks/guard-git-push.mjs`)이 모든 세션에서 막는다.
   §4-1(i) 7 의 원격 branch 정리는 사용자가 GitHub 에서 한다.
 - 그 밖의 §5 위험 변경 항목(dependency · CI · Core/Frozen · contract 등)은 §5 를 그대로 따른다.
 - 로컬 세션의 운영 DB 조회는 §5 **DB·보안 경계**(`o4o_readonly` 계정 전용)를 따른다.
