@@ -27,13 +27,13 @@
 | 세션 | 판별 | 하는 일 | 하지 않는 일 |
 |---|---|---|---|
 | **클라우드 세션** (claude.ai/code) | `CLAUDE_CODE_REMOTE=true` | 코드 · 문서 · 테스트 · branch push · PR 생성(`AGENTS.md` §4-1(e)) | 운영 DB 접속 — gcloud 인증 · Cloud SQL Proxy 가 없다 |
-| **데스크톱 로컬 세션** | 그 밖 | 운영 DB read-only 조회 · 사용자가 승인한 운영 작업 · 실 PC smoke | 승인 없는 DB write · DDL · migration 수동 적용 (`AGENTS.md` §5) |
+| **데스크톱 로컬 세션** | 그 밖 | 운영 DB read-only 조회 · 통합 담당이 승인한 운영 작업(`AGENTS.md` §5) · 실 PC smoke | 승인 없는 DB write · DDL · migration 수동 적용 (`AGENTS.md` §5) |
 
 - 클라우드 세션에서 운영 DB 확인이 필요하면 멈추고, read-only SQL 과 판정 기준을 담은 지시서를 `docs/work-orders/` 에 작성해 작업 branch 로 push 한 뒤 `HANDOFF.md` 로 로컬 세션에 넘긴다. 로컬 세션은 결과를 마스킹해 같은 branch 에 기록하고 push 한다.
 - 두 세션 모두 `AGENTS.md` §4-1 의 전용 worktree · branch 규칙을 따른다.
 
 ## 명령 실행 원칙 (Claude Code 도구)
-- **항상 사용자 확인:** 운영 DB 직접 접속 · 시크릿 · IAM · 프로덕션 리소스 삭제. `.claude/settings.json` 의 ask 규칙(allow 보다 우선)이 이 범위를 강제한다.
+- **항상 사용자 확인:** 운영 DB 직접 접속 · 시크릿 · IAM · 프로덕션 리소스 삭제. `.claude/settings.json` 의 ask 규칙(allow 보다 우선)이 이 범위를 강제한다. 운영 변경(운영 DB 쓰기 · 시크릿 · 배포)의 승인자는 통합 담당이다 — 다른 개발자의 세션이면 ask 창을 승인하기 전에 통합 담당 승인을 받는다(`AGENTS.md` §5).
 - ask 대상 명령은 다른 명령과 `;` · `&&` · `|` 로 묶지 않는다 — 섞이면 한 줄 전체가 승인 대상이 되어 무엇을 승인하는지 흐려진다.
 - `gh pr view` · `gh pr checks` · `gh run view` 로 알 수 있는 정보는 `gh api` 를 쓰지 않는다.
 - `gh api` 는 GET 조회만 사용하고, `-X` · `--method` · `-f` · `-F` · `--input` 옵션은 쓰지 않는다.
