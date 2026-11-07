@@ -65,7 +65,9 @@
 
 - [ ] [LOCAL] **통합 담당 명시 승인 필요** — migration `1794013771244-CreateCommunityNewsAutomation` 이 포함된 Promote(LEVEL_3)는 운영 DB DDL 이다. 승인 뒤 [README — 배포](../../README.md#배포) · [`PRODUCTION-MIGRATION-STANDARD`](../baseline/operations/PRODUCTION-MIGRATION-STANDARD.md) 절차로 `promote.yml` 을 1회 실행한다(`gh workflow run promote.yml -f sha=<40자 main HEAD>`).
 - [ ] [LOCAL] Promote run 과 `o4o-api-migrations` Job 이 성공했는지 확인한다.
-- [ ] [LOCAL] 운영 DB read-only(`o4o_readonly`) 로 아래 SQL 을 실행한다.
+- [ ] [LOCAL] 운영 DB read-only(`o4o_readonly`) 로 아래 SQL 1) · 2) 를 실행한다. 둘 다 시스템 카탈로그만 읽어서 새 테이블 조회 권한이 없어도 된다.
+- [ ] [LOCAL] **통합 담당 명시 승인 필요(DB 권한 변경)** — 새 테이블은 `o4o_readonly` 에 기본 거부다([SETUP.md 운영 DB identity](../../SETUP.md) — "새 표는 기본 거부"). 3) 을 실행하기 전에 운영자 로컬의 분류 스크립트를 다시 실행해 두 테이블을 분류한다. 분류 전에는 3) 을 실행하지 않는다.
+- [ ] [LOCAL] 분류 뒤 3) 을 실행한다.
 
 ```sql
 -- 1) 새 테이블 2개가 생겼는가
@@ -83,7 +85,7 @@ JOIN pg_namespace n ON n.oid = c.relnamespace
 WHERE n.nspname = 'public'
   AND c.relname IN ('community_news_articles', 'community_news_engagement_daily');
 
--- 3) 첫 자동 실행 기록 수(실행 시각 이후) — 원문 대신 건수만
+-- 3) 첫 자동 실행 기록 수(실행 시각 이후) — 원문 대신 건수만. 분류(조회 권한 부여) 뒤에만 실행한다
 SELECT count(*) AS article_rows FROM public.community_news_articles;
 ```
 
@@ -94,6 +96,7 @@ SELECT count(*) AS article_rows FROM public.community_news_articles;
 | 1) 두 값 모두 `true`, 2) 두 행 모두 `fenced = true` | migration 반영 정상 |
 | 1) 이 `false` | migration 미적용 — Promote · migration Job 로그 확인 |
 | 2) 에 `false` 가 있음 | 계정 삭제 보호 누락 — 계정 삭제 기능이 이 테이블을 막지 못한다. 즉시 통합 담당에게 보고 |
+| 3) 이 `permission denied` 로 실패 | 조회 권한 미확보 — 분류 스크립트가 아직 실행되지 않았다. 장애나 자동 게시 실패가 아니다. 분류 뒤 다시 실행한다 |
 | 3) 이 0 이고 08시 · 15시(KST) 실행 시각이 지났음 | 자동 게시 실행 실패 가능 — 운영자 화면 `news-auto-runs` 또는 API 로그 확인(PR #968 위험 항목: `SERVICE_QUERY` quota) |
 
 ## 6. 결과 기록 (LOCAL 이 채운다)
