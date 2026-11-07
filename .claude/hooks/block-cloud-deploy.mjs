@@ -11,7 +11,7 @@
  *   · gh workflow run <deploy-* | delivery | promote> — 파일명 · 표시명, 숫자 ID 는 API 로 조회
  *   · gh run rerun <id> — 그 run 의 workflow 가 배포 계열이면
  *   · gh api …/dispatches — workflow dispatch API 직접 호출
- * - 숫자 ID 를 조회하지 못하면 클라우드에서는 거부한다(fail closed).
+ * - 숫자 ID 를 조회하지 못하거나, workflow run · run rerun 의 대상을 특정하지 못하면 클라우드에서는 거부한다(fail closed).
  *   그 밖의 예외는 허용(exit 0)으로 넘겨 일반 명령을 막지 않는다.
  */
 import { execFileSync } from 'node:child_process';
@@ -51,7 +51,8 @@ function ghJson(path, jq, cwd) {
 
 /** gh 서브커맨드 뒤 첫 위치 인자 (값을 받는 플래그는 건너뛴다) */
 function firstPositional(tokens, start) {
-  const valueFlags = new Set(['-R', '--repo', '-r', '--ref', '-f', '--raw-field', '-F', '--field', '--json']);
+  // --json 은 값 없는 플래그다(gh workflow run: STDIN 으로 입력을 읽음) — 다음 토큰을 소비하지 않는다.
+  const valueFlags = new Set(['-R', '--repo', '-r', '--ref', '-f', '--raw-field', '-F', '--field']);
   for (let i = start; i < tokens.length; i++) {
     const t = tokens[i];
     if (t.startsWith('-')) {
@@ -113,7 +114,8 @@ function check(segment, cwd) {
   // gh workflow run <target>
   if (sub[0] === 'workflow' && sub[1] === 'run') {
     const target = firstPositional(sub, 2);
-    if (!target) return null; // 대화형 선택 — 클라우드에서는 실행 불가
+    // 대상을 특정하지 못하면 거부한다(fail closed). 대화형 선택은 클라우드에서 어차피 실행되지 않는다.
+    if (!target) return 'gh workflow run 의 대상 workflow 를 특정할 수 없음';
     if (/^\d+$/.test(target)) {
       const slug = repoSlug(args, cwd);
       try {
@@ -129,7 +131,8 @@ function check(segment, cwd) {
   // gh run rerun <run-id>
   if (sub[0] === 'run' && sub[1] === 'rerun') {
     const id = firstPositional(sub, 2);
-    if (!id || !/^\d+$/.test(id)) return null;
+    if (!id) return 'gh run rerun 의 대상 run 을 특정할 수 없음'; // 대화형 선택 — fail closed
+    if (!/^\d+$/.test(id)) return null;
     const slug = repoSlug(args, cwd);
     try {
       const info = ghJson(`repos/${slug}/actions/runs/${id}`, '"\\(.path) \\(.name)"', cwd);
