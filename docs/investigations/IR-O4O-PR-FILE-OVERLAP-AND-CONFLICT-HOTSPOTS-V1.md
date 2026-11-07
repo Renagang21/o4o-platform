@@ -15,7 +15,7 @@
 3. 충돌 기록이 남은 충돌은 **서비스(웹) 154건 · core(API 플랫폼) 100건**에 집중된다. 공통 패키지는 17건, extension은 0건이다. 공통 UI를 바꾸면 **서비스마다 있는 shell · route 파일이 연쇄로 수정**되는 것이 실제 충돌 경로다.
 4. **오래 열린 PR일수록 충돌이 많다.** 충돌률은 2시간 이내 병합 PR 5.2%(29/557), 2~8시간 16%(15/92), 8~24시간 22%(15/67), 24시간 초과 36%(8/22)다. 하루 병합은 중앙값 13건, 최대 57건이다.
 5. 현재 배포 구조: **main 에 병합하면 CI가 끝난 뒤 Delivery가 자동 배포한다.** LEVEL 2(일반 runtime)는 운영까지 반영된다. LEVEL 3(migration · 인증 · 권한 · 결제 · 배포 설정)는 자동 배포가 차단되고 Promote 1회로 반영된다. 30일 기준 Delivery 624회(3,743분), Promote 207회(4,412분)였다.
-6. "병합은 자주, 운영 반영은 묶어서"를 하려면 **Delivery의 트리거를 바꿔 하루 2회 release train으로 운영하는 방식**을 권장한다. 대신 WIF 조건과 CI gate의 target 선택을 함께 바꿔야 한다. 그러면 배포 계열 Actions 사용량은 월 약 8,150분에서 약 1,200~2,200분으로 줄어든다(추정). main push CI(월 23,822분)는 그대로 남는다.
+6. "병합은 자주, 운영 반영은 묶어서"를 하려면 **Delivery의 트리거를 바꿔 하루 2회 release train으로 운영하는 방식**을 권장한다. 대신 WIF 조건과 train 시점의 CI 대기 방식을 함께 바꿔야 한다. 그러면 배포 계열 Actions 사용량은 월 약 8,150분에서 약 1,200~3,700분으로 줄어든다(추정 · 큰 값은 train 마다 HEAD CI 를 최대로 기다린 경우). main push CI(월 23,822분)는 그대로 남는다.
 
 ---
 
@@ -213,7 +213,7 @@ Promote(workflow_dispatch · 통합 담당) → delivery.yml 을 mode=promote �
 | 바꿀 것 | 내용 | 위험 · 승인 |
 |---|---|---|
 | ① `delivery.yml` 트리거 | `workflow_run`(main CI 마다)을 빼고 `schedule`(예: KST 12:40 · 18:40 — 정시를 피한다)과 `workflow_dispatch`(통합 담당의 수동 release)를 둔다. 판정 로직은 이미 "서빙 SHA → target 누적 diff" 라서 묶음 배포를 그대로 처리한다 | CI · 배포 인프라 변경(§5) — 통합 담당 승인 · WO |
-| ② target 선택 | 지금 target 은 "CI 를 끝낸 그 commit"이다. 앞으로는 **"main 에서 CI 가 green 인 가장 최근 SHA"** 를 고른다. `deploy-orchestrate.mjs` 에 선택 함수를 추가한다. CI 진행 중인 HEAD 는 건너뛴다 | 중간 — 판정 스크립트 테스트 필수 |
+| ② target · CI 대기 | 현행 SHA 일치 조건(target == main HEAD == workflow `github.sha`, `deploy-orchestrate.mjs` 판정)과 reusable deploy workflow 가 `github.sha` 로 빌드 · CI gate · 이미지 태그를 정하는 구조는 **그대로 둔다**. train run 은 **main HEAD 를 target 으로 잡고 HEAD 의 CI 완료를 기다린다**(classify 의 CI 조회 대기를 0 → 수십 분으로). HEAD CI 가 실패하면 그 train 은 배포하지 않고 다음 train(또는 수동 release)이 처리한다. 대기 중 main 이 움직이면 지금처럼 `SUPERSEDED` 다. "CI green 인 이전 SHA"를 고르는 방식은 reusable workflow 4개에 target SHA 를 명시 전달 · 검증하도록 바꿔야 해서 범위가 커지므로 채택하지 않는다 | 중간 — 판정 스크립트 테스트 필수. 대기 시간만큼 classify job 분이 늘어난다(train 당 수십 분 · 하루 2회) |
 | ③ WIF provider 조건 | README 기준 provider 조건에 "허용 workflow · **소유자 dispatch**"가 있다. `schedule` 이벤트의 actor 가 이 조건을 통과하는지 확인해야 하고, 통과하지 않으면 조건을 바꿔야 한다 | **IAM/WIF 변경 — 통합 담당 승인 필수.** 미확인(이번 조사는 GCP 조회 없음) |
 | ④ LEVEL 3 묶음 | Promote 를 "LEVEL 3 병합마다"가 아니라 **release train 시점에 1회**로 바꾼다. 같은 train 의 LEVEL 2 도 함께 나간다(현행 promote 동작 그대로). migration 이 여러 개면 manifest 순서대로 한 번에 실행된다 | **migration 묶음은 운영 DB DDL 을 한 번에 여러 개 적용**한다. migration 이 있는 train 은 통합 담당이 개별 확인한다(§5) |
 | ⑤ hotfix 경로 | 장애 수정은 지금의 `promote.yml` 을 `services` 를 지정해 즉시 실행한다(코드 변경 없음) | 낮음 |
@@ -227,12 +227,12 @@ Promote(workflow_dispatch · 통합 담당) → delivery.yml 을 mode=promote �
 
 | 항목 | 현재 | 권장안 A (하루 2회 train) | 근거 |
 |---|---:|---:|---|
-| Delivery | 3,743 (624 run · 평균 6분) | 약 600~900 (60 run · 묶음이라 회당 10~15분) | 배포 build 는 서비스당 train 1회로 줄어든다 |
+| Delivery | 3,743 (624 run · 평균 6분) | 약 600~2,400 (60 run · 묶음이라 회당 10~15분 + HEAD CI 대기 0~25분) | 배포 build 는 서비스당 train 1회로 줄어든다. train 시각을 병합이 드문 시간대로 두면 대기는 대부분 0 이다 |
 | Promote | 4,412 (207 run · 평균 21분) | 약 600~1,300 (train 당 0~1회 · hotfix 포함 30~60 run) | LEVEL 3 를 train 에 흡수 |
 | main push CI · CodeQL | 23,822 | 23,822 (변동 없음) | Delivery 의 CI gate 가 target SHA 의 green 을 요구하므로 유지 |
-| **배포 계열 합계** | **약 8,150** | **약 1,200~2,200** | **월 약 5,950~6,950분 감소**(표준 Linux $0.006/분 기준 약 $36~42) |
+| **배포 계열 합계** | **약 8,150** | **약 1,200~3,700** | **월 약 4,450~6,950분 감소**(표준 Linux $0.006/분 기준 약 $27~42) |
 
-- 지금은 저장소가 공개라 표준 실행기 비용이 없다. 위 금액은 비공개로 전환할 때의 의미다. 앞의 IR 은 "배포 계열 잔여 9,200분이 Pro 포함 3,000분을 넘는다"고 봤다. 권장안 A 를 적용하면 이 잔여가 **약 2,300~3,300분**이 되어 Pro 포함분 근처로 내려온다.
+- 지금은 저장소가 공개라 표준 실행기 비용이 없다. 위 금액은 비공개로 전환할 때의 의미다. 앞의 IR 은 "배포 계열 잔여 9,200분이 Pro 포함 3,000분을 넘는다"고 봤다. 권장안 A 를 적용하면 이 잔여가 **약 2,300~4,800분**이 되어 Pro 포함분 근처로 내려온다.
 - 대안 B 는 classify 만 남는다(624 run × 1~2분). 그래서 배포 build 절감만 생기고 감소폭은 약 4,500~5,500분이다.
 - Cloud Build · Artifact Registry · Cloud Run revision 생성 횟수도 비슷한 비율로 줄어든다(GCP 비용 · 미실측).
 
@@ -338,7 +338,7 @@ jobs:
 3. **구조 S~M** — 공통 패키지 barrel 정렬 · `web-neture`/`web-store` route 모듈 분리 · `register-routes` registrar 분리 · `neture-pharmacy.routes` sub-router. 각각 순수 이동 PR 로 진행한다.
 4. **구조 L** — `ServiceShell` 공통화(Shared Module Protocol · 전 서비스 smoke).
 5. **migration** — lane 규칙(즉시)과 재생성 스크립트(M). manifest 생성 파일화는 Core · 계약 변경이라 별도로 판단한다.
-6. **배포** — release train(권장안 A): WIF 조건 확인(LOCAL · 통합 담당) → `delivery.yml` 트리거 · target 선택 변경 → README · AGENTS 문서 갱신.
+6. **배포** — release train(권장안 A): WIF 조건 확인(LOCAL · 통합 담당) → `delivery.yml` 트리거 · train 의 HEAD CI 대기 변경 → README · AGENTS 문서 갱신.
 
 ## 8. 확인하지 못한 것
 
