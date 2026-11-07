@@ -26,4 +26,4 @@ description: 작업요청서(WO) 작성 - docs/work-orders/ 에 표준 헤더(�
    - 결과로 무엇을 판정하는지(어느 결과면 원인 A, 어느 결과면 B)를 함께 적는다.
    - write · DDL 이 필요하면 별도 단계로 분리하고 "사용자 명시 승인 필요"를 적는다(`AGENTS.md` §5).
 5. 저장 전 `node scripts/check-doc-sensitive.mjs` 로 민감정보를 확인한다(`AGENTS.md` §5 · Public 저장소).
-6. 인계가 필요하면 작업 branch 에 path-specific commit · push 하고 `/handoff` 로 `HANDOFF.md` 에 지시서 경로와 다음 실행자를 적는다.
+6. 인계가 필요하면 작업 branch 에 path-specific commit · push 하고 `/handoff` 로 `HANDOFF.md` 에 지시서 경로와 다음 실행자를 적는다. PR 은 `/handoff` 가 만든다 — 남은 실행(LOCAL 조회 등)이 있으면 드래프트로 둔다(`AGENTS.md` §4-1(e)).

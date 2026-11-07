@@ -15,8 +15,8 @@
 ## 세션 시작 규칙
 - 세션 시작 시 HANDOFF.md가 있으면 먼저 읽을 것
 - 진행 상황은 CLAUDE.md가 아니라 HANDOFF.md에 기록할 것
-- 시작 · 종료 절차는 `/start` · `/handoff` 스킬(`.claude/skills/`)을 따른다.
-- 그 밖의 스킬: `/wo-new`(지시서 작성 · 인계) · `/db-readonly`(로컬 전용 운영 DB 조회) · `/verify`(변경 범위 검증) · `/integrate`(통합 담당 지정 시만) · `/worktree-cleanup`(merge 후 정리). 스킬은 규칙을 복사하지 않고 `AGENTS.md` · 정본 절을 가리킨다.
+- 시작 · 종료 절차는 `/start` · `/handoff` 스킬(`.claude/skills/`)을 따른다. 작업 세션은 push 후 PR 생성까지 하고, 병합 · 배포는 통합 담당만 한다 — `AGENTS.md` §4 역할 · §4-1(e).
+- 그 밖의 스킬: `/wo-new`(지시서 작성 · 인계) · `/db-readonly`(로컬 전용 운영 DB 조회) · `/verify`(변경 범위 검증) · `/integrate`(통합 세션으로 지정된 PR 만 — `AGENTS.md` §4 역할) · `/worktree-cleanup`(merge 후 정리). 스킬은 규칙을 복사하지 않고 `AGENTS.md` · 정본 절을 가리킨다.
 - SessionStart 훅(`.claude/hooks/session-start.mjs`)이 `origin/main` 을 fetch 하고, **clean 한 기준 main checkout 에서만** `pull --ff-only` 한다. 작업 branch · worktree 에서는 ahead/behind 만 보고하며 merge/rebase 하지 않는다. 이 세션 유형(`실행 위치`)의 최근 미완료 지시서도 알려 준다.
 - PreToolUse 훅(`.claude/hooks/block-cloud-deploy.mjs`)은 **클라우드 세션에서만** 운영 배포 명령을 거부한다. 로컬은 `.claude/settings.json` 의 ask 를 따른다. 정책은 `AGENTS.md` §9.
 - PreToolUse 훅(`.claude/hooks/guard-git-push.mjs`)은 **모든 세션에서** 콜론 refspec 원격 branch 삭제를 거부한다. permission 패턴은 끝이 `:*` 이면 예전 접두어 문법으로 해석돼 의도대로 매칭되지 않으므로, 새 규칙을 `:*` 로 끝내지 않는다(`pnpm run build:*` 처럼 접두어 일치가 의도인 경우만 예외).
@@ -26,7 +26,7 @@
 
 | 세션 | 판별 | 하는 일 | 하지 않는 일 |
 |---|---|---|---|
-| **클라우드 세션** (claude.ai/code) | `CLAUDE_CODE_REMOTE=true` | 코드 · 문서 · 테스트 · branch push · (통합 담당 지정 시) PR | 운영 DB 접속 — gcloud 인증 · Cloud SQL Proxy 가 없다 |
+| **클라우드 세션** (claude.ai/code) | `CLAUDE_CODE_REMOTE=true` | 코드 · 문서 · 테스트 · branch push · PR 생성(`AGENTS.md` §4-1(e)) | 운영 DB 접속 — gcloud 인증 · Cloud SQL Proxy 가 없다 |
 | **데스크톱 로컬 세션** | 그 밖 | 운영 DB read-only 조회 · 사용자가 승인한 운영 작업 · 실 PC smoke | 승인 없는 DB write · DDL · migration 수동 적용 (`AGENTS.md` §5) |
 
 - 클라우드 세션에서 운영 DB 확인이 필요하면 멈추고, read-only SQL 과 판정 기준을 담은 지시서를 `docs/work-orders/` 에 작성해 작업 branch 로 push 한 뒤 `HANDOFF.md` 로 로컬 세션에 넘긴다. 로컬 세션은 결과를 마스킹해 같은 branch 에 기록하고 push 한다.

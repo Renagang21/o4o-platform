@@ -1,9 +1,9 @@
 ---
 name: handoff
-description: 작업 종료 - 인수인계 메모 작성 후 작업 branch 커밋·push 및 통합 담당 인계
+description: 작업 종료 - 인수인계 메모 작성 후 작업 branch 커밋·push · PR 생성(드래프트/Ready)
 ---
 작업공간을 옮기기 전에 인수인계 메모를 남겨줘. 문제가 생기면 멈추고 보고해.
-개발 담당의 종료점은 로컬 검증·commit·push 후 인계다. PR 생성부터는 사용자가 지정한 통합 담당만 수행한다(AGENTS.md §4-1(e)·§5). main 에 직접 push 하지 마.
+작업 세션의 종료점은 로컬 검증·commit·push·PR 생성이다. 병합·배포는 통합 담당만 한다(AGENTS.md §4 역할 · §4-1(e)). main 에 직접 push 하지 마.
 기준 main checkout 의 branch 는 바꾸지 않는다(AGENTS.md §4-1(b)(c)).
 
 1. 커밋할 작업공간을 정해. `git branch --show-current` 로 확인한다.
@@ -34,9 +34,11 @@ description: 작업 종료 - 인수인계 메모 작성 후 작업 branch 커밋
    - 커밋 메시지는 작업 내용에 맞게 작성해.
 5. git push -u origin <현재 branch>
    - 거부되면 멈추고 보고해. 임의로 force push 하지 마.
-   - 개발 담당은 PR을 만들지 않는다. 기존 PR이 있더라도 같은 branch에만 추가 push하고 통합 담당에게 재인계한다.
-     (다음 작업공간의 `/start` 는 PR이 없는 원격 branch의 HANDOFF.md도 읽는다.)
+   - (다음 작업공간의 `/start` 는 PR이 없는 원격 branch의 HANDOFF.md도 읽는다.)
    - 2번에서 기록한 상태 중 이번 push로 원격 branch 존재 여부가 바뀌었다면,
      다시 조회해 HANDOFF.md 를 갱신하고 같은 branch 에 한 번 더 커밋 · push 한다.
-6. 저장소 · branch · 최종 push HEAD · 검증 결과 · 미해결 사항 · HANDOFF.md 요약을 통합 담당에게 전달해.
-   기존 PR이 있으면 번호·상태를 덧붙이고, 없으면 PR 미생성·PR CI 미실행으로 명시한다.
+6. PR 을 만들거나 재사용해(AGENTS.md §4-1(e)). 먼저 `gh pr list --head <branch> --state open` 으로 열린 PR 을 확인한다(앱이 드래프트 PR 을 자동으로 만들었을 수 있다).
+   - PR 설명은 `.github/pull_request_template.md` 의 절(변경 요약 · 결정 사항 · 검증 결과 · 확인하지 못한 것 · 겹치는 PR)을 채운다.
+   - 검증이 끝나지 않았거나 다음 작업공간이 이어서 할 일이 남았으면 드래프트(`gh pr create --draft`)로 두고, 남은 일과 다음 실행자를 적는다. 검증을 마쳤으면 `gh pr ready <번호>`.
+   - merge · auto-merge 설정은 하지 않는다.
+7. 저장소 · branch · 최종 push HEAD · PR 번호와 상태(드래프트/Ready) · 검증 결과 · 미해결 사항 · HANDOFF.md 요약을 보고해.

@@ -11,5 +11,5 @@ merge 가 끝난 **자기 세션의** worktree 만 정리한다. 절차 원문�
 4. **Windows 데스크톱이면 필수**: worktree 아래 모든 깊이의 junction / symlink(특히 `node_modules`)를 나열하고 PowerShell `[System.IO.Directory]::Delete(<path>)` 로 하나씩 해제한 뒤 재스캔 0 을 확인한다. 하나라도 남으면 삭제하지 않는다(2026-09-12 `packages/` 소스 삭제 사고). 클라우드 세션(Linux)은 이 단계를 건너뛰고 그 사실을 보고에 적는다.
 5. 판정: `SAFE_TO_REMOVE` / `KEEP` / `UNCERTAIN`. 1~4 를 모두 통과한 경우만 아래를 진행한다.
 6. `git worktree remove <path>` → `git worktree prune` → 기준 checkout 에서 `git status --short` 에 삭제(` D`) 항목이 없는지 확인.
-7. branch 정리: main 에 포함된 로컬 branch 는 `git branch -d`. squash merge 로 `-d` 가 거절되면, 1번의 경로 diff 0 과 PR merged 를 확인했을 때만 `-D` 를 쓴다(`.claude/settings.json` 은 `-D` 를 막으므로 사용자에게 실행을 요청한다).
+7. branch 정리: main 에 포함된 로컬 branch 는 `git branch -d`. squash merge 로 `-d` 가 거절되면, 1번의 경로 diff 0 과 PR merged 를 확인했을 때만 `-D` 를 쓴다(`.claude/settings.json` 은 `-D` 를 막으므로 사용자에게 실행을 요청한다). 원격 branch 는 지우지 않는다 — 병합된 PR 의 head branch 는 저장소 설정이 자동 삭제하고, 나머지는 통합 담당이 정리한다(`AGENTS.md` §4-1(i) 7).
 8. 보고: `AGENTS.md` §4-1(j) 의 `WORKTREE_DISPOSITION` 블록.
