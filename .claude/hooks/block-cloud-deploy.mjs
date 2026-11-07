@@ -98,7 +98,14 @@ function check(segment, cwd) {
 
   if (word !== 'gh') return null;
   const ghAt = at;
-  const sub = tokens.slice(ghAt + 1);
+  // 서브커맨드 앞의 gh 전역 옵션(-R/--repo <값>, --repo=…, 그 밖의 -플래그)은 건너뛴다.
+  // repoSlug() 는 전역 옵션을 포함한 전체 인자에서 -R/--repo 를 읽는다.
+  const args = tokens.slice(ghAt + 1);
+  let s = 0;
+  while (s < args.length && args[s].startsWith('-')) {
+    s += args[s] === '-R' || args[s] === '--repo' ? 2 : 1;
+  }
+  const sub = args.slice(s);
 
   // gh api …/dispatches
   if (sub[0] === 'api' && sub.some((t) => /\/dispatches\b/.test(t))) return 'workflow dispatch API 호출';
@@ -108,7 +115,7 @@ function check(segment, cwd) {
     const target = firstPositional(sub, 2);
     if (!target) return null; // 대화형 선택 — 클라우드에서는 실행 불가
     if (/^\d+$/.test(target)) {
-      const slug = repoSlug(sub, cwd);
+      const slug = repoSlug(args, cwd);
       try {
         const info = ghJson(`repos/${slug}/actions/workflows/${target}`, '"\\(.path) \\(.name)"', cwd);
         return DEPLOY_NAME.test(info) ? `배포 workflow 실행 (ID ${target} → ${info})` : null;
@@ -123,7 +130,7 @@ function check(segment, cwd) {
   if (sub[0] === 'run' && sub[1] === 'rerun') {
     const id = firstPositional(sub, 2);
     if (!id || !/^\d+$/.test(id)) return null;
-    const slug = repoSlug(sub, cwd);
+    const slug = repoSlug(args, cwd);
     try {
       const info = ghJson(`repos/${slug}/actions/runs/${id}`, '"\\(.path) \\(.name)"', cwd);
       return DEPLOY_NAME.test(info) ? `배포 workflow 재실행 (run ${id} → ${info})` : null;
