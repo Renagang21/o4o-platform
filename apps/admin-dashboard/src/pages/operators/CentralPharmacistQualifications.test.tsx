@@ -166,7 +166,7 @@ it("without the member grant hides editing and keeps the qualification-only deci
   fireEvent.click(await screen.findByRole("button", { name: "가입승인" }));
   const approve = await screen.findByRole("button", { name: "승인" });
   expect(screen.queryByRole("button", { name: "정보 수정" })).toBeNull();
-  expect(screen.getByText("가입 승인은 공통 회원 관리 업무 위임이 필요합니다.")).toBeVisible();
+  expect(screen.getByText("가입 승인은 회원 가입·이용 관리 업무 위임이 필요합니다.")).toBeVisible();
   expect(screen.getByText("이 처리는 약사 자격에만 적용되며 공통 계정·가입 상태는 변경하지 않습니다.")).toBeVisible();
   expect(approve).toBeDisabled();
   fillReason("면허 근거를 별도로 확인함");

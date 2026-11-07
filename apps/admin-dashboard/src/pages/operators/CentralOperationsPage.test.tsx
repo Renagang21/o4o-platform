@@ -235,7 +235,7 @@ it("replaces the flat business menu list with the current three-level location",
   const breadcrumb=await screen.findByRole('navigation',{name:'현재 위치'});
   expect(within(breadcrumb).getByText('약국·공통 운영')).toBeTruthy();
   expect(within(breadcrumb).getByText('회원·자격')).toBeTruthy();
-  expect(within(breadcrumb).getByText('O4O 서비스 회원·이용 상태')).toHaveAttribute('aria-current','page');
+  expect(within(breadcrumb).getByText('서비스별 이용 상태')).toHaveAttribute('aria-current','page');
   expect(screen.queryByRole('navigation',{name:'서비스 운영 업무'})).toBeNull();
   expect(screen.queryByRole('link',{name:'상품 후보 검토'})).toBeNull();
   expect(screen.queryByRole('button',{name:'공급자'})).toBeNull();
