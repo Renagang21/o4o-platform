@@ -53,7 +53,7 @@
 
 ## 1. 개발 기본 규칙
 
-- 브랜치: 독립 작업은 전용 worktree · 전용 branch 가 기본(2026-10-03~). 규칙은 [`AGENTS.md` §4](AGENTS.md#4-git--병렬-작업-안전) (§4-1 worktree · §4-2 stage/commit/push).
+- 브랜치: 독립 작업은 전용 worktree · 전용 branch 가 기본(2026-10-03~). 규칙은 [`AGENTS.md` §4](AGENTS.md#4-git--병렬-작업-안전) (§4-1 worktree · §4-2 stage/commit/push · §4-3 공유 코드 허브 lane · 작업 순서).
 - App 계층: `Core → Extension → Feature → Service`. 역방향 의존 금지.
 - API 호출: `authClient.api.get()` / `.post()` 필수. 환경변수 직접 사용 · 하드코딩 URL 금지.
 - 공통 모듈 · config · sidebar · layout · capability map · core+extension contract 수정은 **모든 소비처를 먼저 식별**하고 단일 서비스 기준으로 완료 판단하지 않는다. 식별자 검색만으로 소비처 0 을 선언하지 않는다(`node scripts/quality/check-literal-consumers.mjs --source <파일>`). 절차: [`O4O-SHARED-MODULE-CHANGE-PROTOCOL-V1`](docs/baseline/O4O-SHARED-MODULE-CHANGE-PROTOCOL-V1.md).
