@@ -3,7 +3,7 @@
 > **상태**: DRAFT (조사 전용 · 코드 · workflow · 설정 변경 없음)
 > **작성일**: 2026-11-07
 > **범위**: 최근 60일(2026-09-08 ~ 2026-11-07) 병합 PR 738건 + 조사 시점 열린 PR 3건(#968 · #973 · #975)
-> **실행 위치**: CLOUD (GitHub 조회 · git 이력 재계산만. 운영 DB · GCP 조회 없음)
+> **실행 위치**: CLOUD (GitHub 조회 · git 이력 재계산만. 운영 DB · GCP 조회 없음) · §5-5 만 LOCAL(GCP WIF read-only 조회 · 2026-11-07 추가)
 > **관련**: [`IR-O4O-PRIVATE-CI-BUDGET-V1`](IR-O4O-PRIVATE-CI-BUDGET-V1.md) §8 (Actions 사용량 수치 출처) · [`AGENTS.md` §4-1](../../AGENTS.md) · [README — 배포](../../README.md#배포)
 
 ---
@@ -214,7 +214,7 @@ Promote(workflow_dispatch · 통합 담당) → delivery.yml 을 mode=promote �
 |---|---|---|
 | ① `delivery.yml` 트리거 | `workflow_run`(main CI 마다)을 빼고 `schedule`(예: KST 12:40 · 18:40 — 정시를 피한다)과 `workflow_dispatch`(통합 담당의 수동 release)를 둔다. 판정 로직은 이미 "서빙 SHA → target 누적 diff" 라서 묶음 배포를 그대로 처리한다 | CI · 배포 인프라 변경(§5) — 통합 담당 승인 · WO |
 | ② target · CI 대기 | 현행 SHA 일치 조건(target == main HEAD == workflow `github.sha`, `deploy-orchestrate.mjs` 판정)과 reusable deploy workflow 가 `github.sha` 로 빌드 · CI gate · 이미지 태그를 정하는 구조는 **그대로 둔다**. train run 은 **main HEAD 를 target 으로 잡고 HEAD 의 CI 완료를 기다린다**(classify 의 CI 조회 대기를 0 → 수십 분으로). HEAD CI 가 실패하면 그 train 은 배포하지 않고 다음 train(또는 수동 release)이 처리한다. 대기 중 main 이 움직이면 지금처럼 `SUPERSEDED` 다. "CI green 인 이전 SHA"를 고르는 방식은 reusable workflow 4개에 target SHA 를 명시 전달 · 검증하도록 바꿔야 해서 범위가 커지므로 채택하지 않는다 | 중간 — 판정 스크립트 테스트 필수. 대기 시간만큼 classify job 분이 늘어난다(train 당 수십 분 · 하루 2회) |
-| ③ WIF provider 조건 | README 기준 provider 조건에 "허용 workflow · **소유자 dispatch**"가 있다. `schedule` 이벤트의 actor 가 이 조건을 통과하는지 확인해야 하고, 통과하지 않으면 조건을 바꿔야 한다 | **IAM/WIF 변경 — 통합 담당 승인 필수.** 미확인(이번 조사는 GCP 조회 없음) |
+| ③ WIF provider 조건 | README 기준 provider 조건에 "허용 workflow · **소유자 dispatch**"가 있다. `schedule` 이벤트의 actor 가 이 조건을 통과하는지 확인해야 하고, 통과하지 않으면 조건을 바꿔야 한다 | **IAM/WIF 변경 — 통합 담당 승인 필수.** 확인 완료(2026-11-07 · LOCAL) — 현재 조건은 `schedule` 을 거부한다. 결과 · 권장 조건식은 §5-5 |
 | ④ LEVEL 3 묶음 | Promote 를 "LEVEL 3 병합마다"가 아니라 **release train 시점에 1회**로 바꾼다. 같은 train 의 LEVEL 2 도 함께 나간다(현행 promote 동작 그대로). migration 이 여러 개면 manifest 순서대로 한 번에 실행된다 | **migration 묶음은 운영 DB DDL 을 한 번에 여러 개 적용**한다. migration 이 있는 train 은 통합 담당이 개별 확인한다(§5) |
 | ⑤ hotfix 경로 | 장애 수정은 지금의 `promote.yml` 을 `services` 를 지정해 즉시 실행한다(코드 변경 없음) | 낮음 |
 | ⑥ 문서 | README 「배포」 · AGENTS §4-1(f) · `PRODUCTION-MIGRATION-STANDARD` 의 "main push → 자동 배포" 서술을 train 기준으로 고친다 | 문서 PR |
@@ -241,6 +241,59 @@ Promote(workflow_dispatch · 통합 담당) → delivery.yml 을 mode=promote �
 - **한 번 배포에 변경이 많아져** 장애 원인을 좁히기 어렵다. verified rollout(0% → 검사 → 전환 · API 자동 복귀)은 서비스 단위로 그대로 작동하지만, 롤백하면 그 train 의 해당 서비스 변경이 전부 되돌아간다.
 - 병합 후 운영 확인까지 최대 반나절 지연된다. UI 정비 결과를 운영에서 바로 확인하던 흐름이 바뀐다 → hotfix 경로(⑤)를 함께 운영한다.
 - migration 이 여러 개 묶이면 forward-only DDL 이 한 번에 적용된다. migration 이 있는 train 은 통합 담당이 개별 확인한다.
+
+### 5-5. WIF 조건 확인 결과 (2026-11-07 · LOCAL · read-only 조회)
+
+> 실행: 데스크톱 로컬 세션. `gcloud iam workload-identity-pools providers describe o4o-platform` · `gcloud iam service-accounts get-iam-policy github-actions@…` 두 개의 조회만 했다. **GCP 설정은 바꾸지 않았다.**
+
+**결론: 현재 provider 조건은 `schedule` 이벤트를 허용하지 않는다.** §5-2 ③ 의 확인 항목에 대한 답이다. 권장안 A 의 schedule train 은 조건을 바꾸기 전에는 GCP 인증 단계에서 실패한다.
+
+**(1) 현재 조건** — provider `github-actions/o4o-platform` (state `ACTIVE`, issuer `https://token.actions.githubusercontent.com`). 아래를 **모두** 만족해야 인증된다.
+
+| 조건 | 현재 값 | `schedule` 실행의 OIDC 값 | 판정 |
+|---|---|---|---|
+| `repository_id` · `repository_owner_id` · `repository` | 이 저장소 · 소유자 계정 | 동일 | 통과 |
+| `environment` | `== 'production'` | job 에 `environment: production` 을 선언하면 `production` (delivery 의 classify job 은 이미 선언) | 통과 |
+| `ref` | `refs/heads/main` 또는 `refs/tags/deploy/*` | schedule 은 기본 branch 에서 돌므로 `refs/heads/main` | 통과 |
+| **`event_name`** | `in ['workflow_run', 'workflow_dispatch']` | `schedule` | **거부** |
+| dispatch actor | `event_name != 'workflow_dispatch' \|\| actor_id == 소유자` | dispatch 가 아니므로 적용 안 됨 | 통과 |
+| `job_workflow_ref` | 7개 workflow(`delivery` · `deploy-api` · `deploy-admin` · `deploy-web-services` · `deploy-cooperative` · `gcp-wif-auth-smoke` · `pharmacyhub-qr-cutover`) `.yml@(refs/heads/main\|refs/tags/deploy/…)` | delivery 가 호출하는 재사용 workflow 는 `deploy-*.yml@refs/heads/main` | 통과(목록에 있음) |
+
+- 서비스 계정 바인딩은 이 저장소 principalSet(`attribute.repository_id`)에 대한 `roles/iam.workloadIdentityUser` 하나다. 이벤트 종류로 거르지 않으므로 바꿀 필요가 없다.
+- 지금 `schedule` 을 쓰는 workflow(`scheduled-api-full-jest.yml` · `ci-security.yml`)는 GCP 인증을 쓰지 않아 영향이 없다.
+
+**(2) `schedule` 이 거부되는 지점** — `assertion.event_name in ['workflow_run', 'workflow_dispatch']` 한 곳이다. 나머지 조건은 delivery 의 schedule run(및 그 run 이 호출하는 `deploy-api` · `deploy-web-services` · `deploy-admin`)에서 모두 통과한다.
+
+**(3) 권장 변경 조건식** — 현재 조건의 `event_name` 절을 아래 두 절로 바꾼다. 나머지 절은 그대로 둔다.
+
+```text
+&& assertion.event_name in ['workflow_run', 'workflow_dispatch', 'schedule']
+&& (assertion.event_name != 'schedule'
+    || (assertion.ref == 'refs/heads/main'
+        && assertion.workflow_ref == 'Renagang21/o4o-platform/.github/workflows/delivery.yml@refs/heads/main'))
+```
+
+- `schedule` 은 **최상위 workflow 가 main 의 `delivery.yml` 인 경우에만** 허용한다. 다른 배포 workflow 에 schedule 경로가 생기지 않는다.
+- `job_workflow_ref` 가 아니라 `workflow_ref` 로 좁힌다. delivery 는 `deploy-api` · `deploy-web-services` · `deploy-admin` 를 재사용 호출(`uses: ./.github/workflows/deploy-*.yml`)하고, 이 job 들의 토큰에는 `job_workflow_ref = deploy-*.yml@…` · `workflow_ref = delivery.yml@…` 가 실린다. `job_workflow_ref == delivery.yml` 로 좁히면 실제 배포 job 이 거부된다.
+- `actor_id` 는 schedule 조건에 넣지 않는다. schedule run 의 actor 는 cron 을 마지막으로 고친 사람이라 사람 확인 수단이 되지 못한다. 대신 실행 ref(main)와 최상위 workflow 로 좁힌다.
+- `workflow_dispatch`(통합 담당의 수동 release)는 현재 조건(소유자 `actor_id`) 그대로 통과한다.
+- 적용 전에 현재 조건 원문을 백업하고, 적용 직후 `gcp-wif-auth-smoke.yml`(수동 · 소유자)로 기존 경로가 깨지지 않았는지 확인한다.
+
+**(4) 저장소 쪽에서 함께 바꿀 것** — 배포 주기 PR(§5-2 ①②)에 포함한다.
+
+- `delivery.yml`: `on:` 에 `schedule` 추가 · `workflow_run` 제거. 이벤트에 묶인 로직도 같이 바꿔야 한다 — 현재 enforce 모드는 `$EVENT = workflow_run` 일 때만 켜지므로(그 밖은 dry-run), 그대로 두면 schedule run 은 **dry-run 으로만 돈다**. `concurrency.group`(`event_name == 'workflow_run'` 이면 `delivery-production`)과 classify job 의 `if:`(`workflow_run.event == 'push'`), `run-name`(`workflow_run.head_sha || inputs.target_sha`)도 schedule 기준으로 고친다.
+- `scripts/ci/__tests__/deploy-workflow-gates.test.mjs`: 위 트리거 · enforce · concurrency 를 `workflow_run` 으로 고정한 assertion 들을 schedule 기준으로 바꾼다. `deploy-auto.yml` 의 "workflow_run trigger 0 · 자동 경로는 delivery.yml 하나" 검사도 함께 확인한다.
+- `.github/SECRETS_SETUP.md` 「GCP 인증」 의 provider 조건 서술에 `schedule`(delivery · main 한정)을 추가한다.
+- README 「배포」 · `AGENTS.md` §4-1(f) 의 "main CI 완료 → 자동 배포" 서술(§5-2 ⑥).
+
+**(5) `assertRestrictedWif` 주의점** — `scripts/deployment/pharmacy-hub-administrative-purge-job.mjs`
+
+- apply 모드에서 provider 조건을 읽어 **정확히 일치**하는지 검사한다. 비교 대상은 `pharmacyhub-qr-cutover.yml@refs/heads/main` · 특정 `workflow_sha` 하나만 허용하는 임시 제한 조건(`restrictedWifCondition(sha)`)이다. 즉 이 작업은 실행 동안 provider 를 그 제한 조건으로 **일시 교체**하는 절차를 전제로 한다.
+- 평상시 조건을 바꿔도 이 스크립트는 깨지지 않는다. 평상시 조건은 원래부터 제한 조건과 다르다.
+- 대신 두 가지를 지킨다. ① 제한 조건이 걸려 있는 동안에는 schedule train 을 포함한 모든 배포가 인증에 실패한다 — cutover 창과 train 시각이 겹치지 않게 한다. ② cutover 후 평상시 조건으로 되돌릴 때 **schedule 절이 들어간 새 조건**으로 되돌린다. 변경 전에 떠 둔 옛 백업으로 되돌리면 schedule 허용이 사라진다.
+- 조건 변경 작업과 cutover apply 를 같은 시간대에 하지 않는다(공유 자원 직렬화 — `AGENTS.md` §4-1(g)).
+
+**(6) 변경 시점** — **private 전환 때, 배포 주기 PR(§5-2 ① `delivery.yml` 트리거 변경)과 같은 날** 바꾼다. 순서: 조건 변경(통합 담당 승인 · LOCAL) → `gcp-wif-auth-smoke` 확인 → 배포 주기 PR 병합 → 첫 schedule train 결과 확인. 조건만 먼저 바꾸면 쓰이지 않는 허용 경로가 열린 채 남고, PR 만 먼저 병합하면 schedule train 이 인증에서 실패한다. provider 조건 변경은 IAM/WIF 운영 변경이라 **통합 담당 승인이 필요하다**(`AGENTS.md` §5 · §9).
 
 ---
 
@@ -338,15 +391,17 @@ jobs:
 3. **구조 S~M** — 공통 패키지 barrel 정렬 · `web-neture`/`web-store` route 모듈 분리 · `register-routes` registrar 분리 · `neture-pharmacy.routes` sub-router. 각각 순수 이동 PR 로 진행한다.
 4. **구조 L** — `ServiceShell` 공통화(Shared Module Protocol · 전 서비스 smoke).
 5. **migration** — lane 규칙(즉시)과 재생성 스크립트(M). manifest 생성 파일화는 Core · 계약 변경이라 별도로 판단한다.
-6. **배포** — release train(권장안 A): WIF 조건 확인(LOCAL · 통합 담당) → `delivery.yml` 트리거 · train 의 HEAD CI 대기 변경 → README · AGENTS 문서 갱신.
+6. **배포** — release train(권장안 A): WIF 조건 확인(완료 · §5-5) → private 전환 날 WIF 조건 변경(통합 담당 승인 · LOCAL)과 `delivery.yml` 트리거 · train 의 HEAD CI 대기 변경 PR 을 함께 진행 → README · AGENTS 문서 갱신.
 
 ## 8. 확인하지 못한 것
 
 - rebase 로 해결한 충돌 수(§1 한계). 실제 충돌 수는 이 보고보다 많다.
-- WIF provider 의 `schedule` 이벤트 허용 여부(GCP IAM 조회 필요 · LOCAL).
+- ~~WIF provider 의 `schedule` 이벤트 허용 여부~~ → 2026-11-07 LOCAL 조회로 확인(§5-5 · 허용하지 않음). 권장 조건식이 실제 schedule run 에서 통과하는지는 조건을 바꾼 뒤 첫 train 으로만 확인할 수 있다.
 - 이 저장소에서 merge queue 를 쓸 수 있는지(계정 유형 · 요금제).
 - §5-3 의 train 회당 시간은 추정이다. 적용 후 `actions-cost.mjs` 로 2주 실측해야 한다.
 
 ## 9. 문서 정합
 
 문서 정합: 발견 0건 / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 6건(§7 — 신규 작업 제안이며 기준 문서 drift 는 아님)
+
+§5-5 추가(2026-11-07): 발견 1건 — `.github/SECRETS_SETUP.md` 의 허용 workflow 목록(5개)이 실제 provider 조건(7개)과 달랐다. 같은 PR 에서 실제 조건에 맞게 고쳤다.
