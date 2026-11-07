@@ -47,7 +47,34 @@ runtime capabilities와 운영 audit는 같은 schema 준비 SQL을 사용한다
 
 ## 실제 운영 결과
 
-대기. 운영 audit 집계·probe 잔여0·현재 설정·활성화 enabled·정확한 serving·공개 권한 차단·최소 기록 maintenance·후속 설정 보존 결과를 분리해 기록한다.
+2026-11-07 사용자 승인으로 활성화했다. 사용자는 현재 운영 데이터가 전부 테스트 데이터이며 삭제되어도 된다고 확인했다.
+
+**실행 전에 고친 것과 준비한 것**
+
+- PR #963: gcloud 의 `Cannot find job [name].` 문구를 Job 없음으로 인식하지 못해 첫 audit 가 `JOB_OWNERSHIP_UNVERIFIED` 로 멈추던 문제를 고쳤다.
+- 비공개 문서 bucket 이 없어 audit 가 404 로 멈췄다. `prepare-storage` 는 `github-actions` 권한 부족으로 bucket 생성에서 실패했다. 사용자가 소유자 계정으로 같은 내용을 직접 실행했다: 비공개 · 균일 접근 · 서울 리전 bucket 생성, runtime 계정에 그 bucket 의 `roles/storage.objectUser` 부여.
+- audit 결과를 Cloud Logging 에서 읽는 단계가 `github-actions` 권한 부족으로 실패했다. 사용자가 `roles/logging.viewer` 를 임시 부여했고, 활성화 뒤 회수했다(회수 출력 확인).
+
+**결과**
+
+| 항목 | 결과 |
+|---|---|
+| audit (run 42326530776, `0531e7c489`) | schema true · writer/closure 공백 0 · 계정 9 · 활성 관리자 1 · read-only DB |
+| 저장소 | 2개 bucket 권한 확인 · probe 잔여 0. 파일은 미디어 bucket 2,861개(전부 미표식) · 문서 bucket 0개 |
+| activate (run 42326702297) | 성공. 설정 4개 적용, enabled true, 계정 5만 미만이라 기본 1년(`O4O_PRIVACY_V1_SECTION6_1Y`) |
+| 후속 설정 보존 | 이후 일반 배포(`8e95d16027`, revision `o4o-core-api-04401-pip`) 뒤에도 설정 4개 유지 |
+| 공개 health | HTTP 200 |
+
+**미검증**
+
+- 실제 계정 삭제 요청과 처리. 이번에는 준비 상태까지만 검증했다.
+- 공개 경로의 권한 차단. 절차 내부 검증은 통과했으나 별도로 확인한 경로는 없다.
+- `maintenance` 실행과 최소 기록 정리.
+
+**운영 참고**
+
+- 미표식 파일 2,861개는 소유를 추정해 지우지 않는다. 관련 계정은 review 로 남아 completed 로 표시되지 않을 수 있다.
+- `audit` · `activate` · `disable` · `maintenance` 는 결과를 Cloud Logging 에서 읽으므로 `github-actions` 에 `roles/logging.viewer` 가 필요하다. 상시 부여하지 않았으므로 실행할 때마다 임시 부여와 회수가 필요하다.
 
 문서 정합: 기존 회원 관리의 배포 성공과 이번 완전삭제 활성화를 구분한다. 사용자 삭제 테스트 금지라는 해석을 되살리지 않는다. 기간·법정 분류·타인/사업체 소유 보호를 변경하지 않는다.
 
