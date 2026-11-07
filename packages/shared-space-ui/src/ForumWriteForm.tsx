@@ -16,7 +16,7 @@
  * (단 form body 자체는 create/edit 공용이므로 KPA edit 등 parent 가 initial* + onSubmit 로 재사용 가능.)
  */
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { CSSProperties, ReactNode } from 'react';
 import { RichTextEditor } from '@o4o/content-editor';
 import type { ContentEditorProps } from '@o4o/content-editor';
@@ -35,6 +35,13 @@ export interface ForumWriteFormPayload {
   editorHtml: string;
   /** showPostType=true 일 때만 포함 */
   type?: ForumWritePostType;
+}
+
+/** seq 가 바뀔 때마다 지정한 값만 폼에 반영한다. 사용자가 항목별로 고른 제안 적용 등에 쓴다. */
+export interface ForumWriteFormDraftPatch {
+  seq: number;
+  title?: string;
+  editorHtml?: string;
 }
 
 export type ForumWriteFormTheme = 'blue' | 'emerald' | 'pink' | 'primary';
@@ -74,6 +81,12 @@ export interface ForumWriteFormProps {
    * WO-O4O-FORUM-WRITE-NETURE-FORM-COMMONIZATION-V1
    */
   renderContentMeta?: (state: { html: string; textLength: number }) => ReactNode;
+  /** 제목 입력 바로 아래 슬롯 (예: 비슷한 글 안내). 미지정 시 미노출. WO-O4O-COMMUNITY-FORUM-AI-PHASE1-V1 */
+  renderAfterTitle?: ReactNode;
+  /** 폼이 소유한 제목·본문이 바뀔 때 알린다. 미지정 시 기존과 동일. WO-O4O-COMMUNITY-FORUM-AI-PHASE1-V1 */
+  onDraftChange?: (draft: { title: string; editorHtml: string }) => void;
+  /** 부모가 제목·본문을 명시적으로 바꿀 때 쓴다. 미지정 시 기존과 동일. WO-O4O-COMMUNITY-FORUM-AI-PHASE1-V1 */
+  draftPatch?: ForumWriteFormDraftPatch;
 
   onSubmit: (payload: ForumWriteFormPayload) => Promise<void> | void;
   onCancel?: () => void;
@@ -121,6 +134,9 @@ export function ForumWriteForm({
   editorProps,
   renderExtra,
   renderContentMeta,
+  renderAfterTitle,
+  onDraftChange,
+  draftPatch,
   onSubmit,
   onCancel,
   onInvalid,
@@ -131,6 +147,20 @@ export function ForumWriteForm({
   const [submitting, setSubmitting] = useState(false);
 
   const accent = submitColor ?? THEME_COLORS[theme];
+
+  const notifyDraft = useRef(onDraftChange);
+  notifyDraft.current = onDraftChange;
+  useEffect(() => {
+    notifyDraft.current?.({ title, editorHtml });
+  }, [title, editorHtml]);
+
+  const appliedPatch = useRef(draftPatch?.seq);
+  useEffect(() => {
+    if (!draftPatch || draftPatch.seq === appliedPatch.current) return;
+    appliedPatch.current = draftPatch.seq;
+    if (draftPatch.title !== undefined) setTitle(draftPatch.title);
+    if (draftPatch.editorHtml !== undefined) setEditorHtml(draftPatch.editorHtml);
+  }, [draftPatch]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -184,6 +214,7 @@ export function ForumWriteForm({
           maxLength={titleMaxLength}
           disabled={submitting}
         />
+        {renderAfterTitle}
       </div>
 
       <div style={styles.field}>

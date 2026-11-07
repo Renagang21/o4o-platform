@@ -1,10 +1,12 @@
 import { Router, type RequestHandler } from 'express';
 import { ForumPostController } from '../../controllers/forum/ForumPostController.js';
+import { ForumAiAssistController } from '../../controllers/forum/ForumAiAssistController.js';
 import { ForumDirectoryController } from '../../controllers/forum/ForumDirectoryController.js';
 import { ForumCommentController } from '../../controllers/forum/ForumCommentController.js';
 import { ForumModerationController } from '../../controllers/forum/ForumModerationController.js';
 import { ForumMembershipController } from '../../controllers/forum/ForumMembershipController.js';
 import { authenticate, optionalAuth } from '../../middleware/auth.middleware.js';
+import { apiLimiter } from '../../middleware/rateLimiter.js';
 import {
   forumContextMiddleware,
   type ForumContext,
@@ -102,6 +104,7 @@ export function createServiceForumRouter(options: ServiceForumRouterOptions): Ro
 
   const router: Router = Router({ mergeParams: true });
   const postController = new ForumPostController();
+  const aiAssistController = new ForumAiAssistController();
   const forumDirectoryController = new ForumDirectoryController();
   const commentController = new ForumCommentController();
   const moderationController = new ForumModerationController();
@@ -123,8 +126,21 @@ export function createServiceForumRouter(options: ServiceForumRouterOptions): Ro
   router.get('/health', moderationController.health.bind(moderationController));
   router.get('/stats', optionalAuth, moderationController.getStats.bind(moderationController));
 
-  // Posts (tags/popular 는 /posts/:id 보다 먼저 등록)
+  // WO-O4O-COMMUNITY-FORUM-AI-PHASE1-V1: 작성자 전용 보조. 커뮤니티 원장 컨텍스트에서만 열린다.
+  // 다른 mount 는 이 경로를 건너뛰어(next('route')) 종전 동작 그대로다. 서버 컨텍스트로만 판정한다.
+  const communityAuthorOnly: RequestHandler = (req, _res, next) => {
+    if ((req as any).forumContext?.communityKey === 'community') next();
+    else next('route');
+  };
+  const assistRead: RequestHandler[] = [communityAuthorOnly, authenticate as any, ...communityGuards, apiLimiter];
+  const assistWrite: RequestHandler[] = [communityAuthorOnly, ...write, apiLimiter];
+  router.get('/ai/status', ...assistRead, aiAssistController.status.bind(aiAssistController));
+  router.post('/ai/compose-assist', ...assistWrite, aiAssistController.composeAssist.bind(aiAssistController));
+  router.post('/ai/similar-search', ...assistWrite, aiAssistController.similarWithAi.bind(aiAssistController));
+
+  // Posts (tags/popular · similar 는 /posts/:id 보다 먼저 등록)
   router.get('/posts', ...read, postController.listPosts.bind(postController));
+  router.get('/posts/similar', ...assistRead, aiAssistController.similar.bind(aiAssistController));
   router.get('/posts/tags/popular', ...read, postController.getPopularTags.bind(postController));
   router.get('/posts/:id', ...read, postController.getPost.bind(postController));
   router.post('/posts', ...write, postController.createPost.bind(postController));

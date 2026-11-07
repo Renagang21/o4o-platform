@@ -27,11 +27,12 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { htmlToBlocks } from '@o4o/forum-core/utils';
 // WO-O4O-FORUM-WRITE-NETURE-FORM-COMMONIZATION-V1: create 공통 폼 적용
 // WO-O4O-FORUM-WRITE-EDIT-FORM-COMMONIZATION-V1: edit 도 동일 공통 폼으로 통합 (inline form 제거)
-import { ForumWriteForm, type ForumWriteFormPayload, type ForumWriteFormPostTypeOption } from '@o4o/shared-space-ui';
+import { ForumWriteForm, type ForumWriteFormDraftPatch, type ForumWriteFormPayload, type ForumWriteFormPostTypeOption } from '@o4o/shared-space-ui';
 import { blocksToHtml } from '@o4o/forum-core/utils';
 import { libraryDocumentText } from '../supplier/libraryDocumentText';
 import { supplierApi } from '../../lib/api';
 import { CarePharmPostGuide } from '../carepharm/CarePharmPostGuide';
+import { ForumAiAssistPanel, ForumSimilarPosts } from './ForumAiAssist';
 import { useAuth, useLoginModal } from '../../contexts';
 import {
   createForumPost,
@@ -62,6 +63,8 @@ interface ForumWritePageProps {
   allowAnnouncement?: boolean;
   /** Set only inside the already-authorized native CarePharm member workspace. */
   writingContext?: 'carepharm';
+  /** Community forum AI phase 1: the writing assistant and similar-post hints on the create screen. */
+  aiAssist?: boolean;
 }
 
 function forumWriteHeading(isEditMode: boolean, communityLabel: string | undefined) {
@@ -83,6 +86,7 @@ function ForumWriter({
   postSegment = 'post',
   allowAnnouncement = false,
   writingContext,
+  aiAssist = false,
 }: ForumWritePageProps = {}) {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -111,6 +115,7 @@ function ForumWriter({
       .then((res) => {
         if (!alive) return;
         const items: any[] = Array.isArray(res?.data) ? res.data : [];
+        setAvailableForums(items);
         // `?forum=<slug>` 가 있으면 그 포럼을 우선 확정한다 (홈 소식 섹션 · 포럼 목록 필터에서 진입).
         if (libraryId) {
           setAvailableForums(items); setForumId(''); setTargetForum(null); return;
@@ -156,6 +161,12 @@ function ForumWriter({
   const [error, setError] = useState<string | null>(null);
   const [editSlug, setEditSlug] = useState<string | null>(null);
   const [editStatus, setEditStatus] = useState<string | null>(null);
+
+  // WO-O4O-COMMUNITY-FORUM-AI-PHASE1-V1: the form owns the draft; suggestions reach it only by the author's choice.
+  const assistEnabled = aiAssist && !isEditMode && !libraryId;
+  const [draft, setDraft] = useState({ title: '', editorHtml: '' });
+  const [draftPatch, setDraftPatch] = useState<ForumWriteFormDraftPatch | undefined>();
+  const [assistTags, setAssistTags] = useState<string[]>([]);
 
   // WO-NETURE-EXTERNAL-CONTACT-V1: Contact settings
   const [contactSettings, setContactSettings] = useState<UserContactSettings | null>(null);
@@ -301,7 +312,7 @@ function ForumWriter({
         content: blocks,
         forumId,
         categorySlug: categorySlug,
-        ...(selectedClassification ? { tags: [selectedClassification] } : {}),
+        ...(selectedClassification || assistTags.length ? { tags: [...new Set([...(selectedClassification ? [selectedClassification] : []), ...assistTags])] } : {}),
         showContactOnPost: hasContactInfo ? showContactOnPost : false,
       });
       if (!current()) return;
@@ -423,6 +434,11 @@ function ForumWriter({
           onCancel={handleCancel}
           onSubmit={isEditMode ? handleUpdateSubmit : handleCreateSubmit}
           onInvalid={() => setError(`제목과 내용을 모두 입력해 주시기 바랍니다. (내용은 최소 ${MIN_CONTENT_LENGTH}자 이상)`)}
+          {...(assistEnabled ? {
+            onDraftChange: setDraft,
+            draftPatch,
+            renderAfterTitle: <ForumSimilarPosts title={draft.title} basePath={(backPath || '/forum').replace(/\/$/, '')} postSegment={postSegment} />,
+          } : {})}
           renderContentMeta={({ textLength }) => (
             <div style={styles.charCount}>
               {textLength}자
@@ -435,6 +451,20 @@ function ForumWriter({
           )}
           renderExtra={
             <>
+            {assistEnabled && <ForumAiAssistPanel
+              title={draft.title}
+              editorHtml={draft.editorHtml}
+              forumId={forumId}
+              tags={assistTags}
+              onApplyTitle={(next) => setDraftPatch((prev) => ({ seq: (prev?.seq ?? 0) + 1, title: next }))}
+              onApplyBody={(html) => setDraftPatch((prev) => ({ seq: (prev?.seq ?? 0) + 1, editorHtml: html }))}
+              onToggleTag={(tag) => setAssistTags((prev) => prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag])}
+              onApplyBoard={(board) => {
+                const listed = availableForums.find((forum) => String(forum.id) === board.id);
+                setForumId(board.id);
+                setTargetForum({ id: board.id, slug: listed?.slug ?? '', name: listed?.name ?? board.name, tags: Array.isArray(listed?.tags) ? listed.tags : [] });
+              }}
+            />}
             {writingContext === 'carepharm' && <CarePharmPostGuide />}
             {!isEditMode && forumTags.length > 0 && (
               <div style={styles.classificationBox}>
