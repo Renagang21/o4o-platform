@@ -1,7 +1,8 @@
 import logger from "../utils/logger.js";
 import { runCommunityNewsAutomation } from "../services/community/community-news-automation.service.js";
+import { newsWindow } from "../services/community/community-news-auto-policy.js";
 
-/** Existing in-process scheduler: first eligible boot/tick after 08:00 KST, daily DB reservation. */
+/** Existing in-process scheduler: first boot/tick inside the 08:00 or 15:00 KST window; the DB reservation prevents repeats. */
 export class CommunityNewsJob {
   private timer: NodeJS.Timeout | null = null;
   private running = false;
@@ -17,13 +18,13 @@ export class CommunityNewsJob {
     this.timer = null;
   }
   async runOnce(now = new Date()) {
-    if (this.running || (now.getUTCHours() + 9) % 24 < 8) return;
+    if (this.running || !newsWindow(now)) return;
     this.running = true;
     try {
-      logger.info("[COMMUNITY_NEWS_JOB]", await this.task());
+      logger.info("[COMMUNITY_NEWS_JOB]", await this.task(now));
     } catch {
       logger.warn(
-        "[COMMUNITY_NEWS_JOB] draft preparation unavailable; operator review remains available",
+        "[COMMUNITY_NEWS_JOB] unavailable; the next tick re-checks the window reservation",
       );
     } finally {
       this.running = false;

@@ -5,7 +5,9 @@ const collect = jest.fn(),
 jest.mock("../../database/connection", () => ({ AppDataSource: {query: jest.fn(async () => [])} }));
 jest.mock("../../middleware/rateLimiter", () => ({
   apiLimiter: (_req: any, _res: any, next: any) => next(),
+  newsBeaconLimiter: (_req: any, _res: any, next: any) => next(),
 }));
+jest.mock("../../services/community/community-news-auto.service", () => ({}));
 jest.mock("../../services/community/community-news-collection.service", () => ({
   collectNews: (...a: unknown[]) => collect(...a),
   getNewsCollection: (...a: unknown[]) => read(...a),
