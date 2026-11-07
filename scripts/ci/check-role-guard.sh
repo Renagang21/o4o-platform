@@ -11,13 +11,16 @@ ROOT="${1:-.}"
 cd "$ROOT" || exit 2
 shopt -s nullglob
 TARGETS=(services/web-*/src/)
-if [ ${#TARGETS[@]} -eq 0 ]; then
+if [[ ${#TARGETS[@]} -eq 0 ]]; then
   echo "GUARD-005~007: services/web-*/src 없음 — 검사 대상 0"
   exit 0
 fi
 
 FAIL=0
-scan() { grep -rn --include="*.ts" --include="*.tsx" "$1" "${TARGETS[@]}"; }
+scan() {
+  local pattern="$1"
+  grep -rn --include="*.ts" --include="*.tsx" "$pattern" "${TARGETS[@]}"
+}
 
 echo "::group::GUARD-005 — user.role direct comparison"
 if scan 'user\.role\s*[!=]=\s*'; then
@@ -47,5 +50,5 @@ if scan '<RoleGuard>'; then
 fi
 echo "::endgroup::"
 
-if [ "$FAIL" -ne 0 ]; then exit 1; fi
+if [[ "$FAIL" -ne 0 ]]; then exit 1; fi
 echo "Guard Policy Check (GUARD-005 · 006 · 007): ALL PASSED — Ref: docs/platform-core/ROLE_GUARD_TEST_BASELINE_V1.md"
