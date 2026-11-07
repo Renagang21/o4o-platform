@@ -160,8 +160,10 @@ const NON_RUNTIME_GLOBAL_EXACT = new Set([
 ]);
 const NON_RUNTIME_GLOBAL_PREFIXES = [
   '.claude/',
-  // WO-O4O-DOCS-FAST-AGENT-CONFIG-V1 — `.claude/` 와 같은 에이전트 설정(스킬 문서). 어떤 Dockerfile 도 COPY 하지 않는다.
-  // 없으면 스킬 문서 수정만으로 "매핑 불가" → API · 전 Web 서비스 fallback 배포가 된다.
+  // WO-O4O-DOCS-FAST-AGENT-CONFIG-V1 — `.claude/` 와 같은 에이전트 설정. 어떤 Dockerfile 도 COPY 하지 않는다.
+  // Delivery(deploy-risk.mjs)는 `*.md` 를 미리 걸러 내므로 스킬 Markdown 은 이미 배포 0 이었다. 이 항목은
+  // `.agents/` 의 비 Markdown 파일과, classifyApiDeploy 를 직접 쓰는 경로(deploy-api.yml detect)가
+  // "매핑 불가" → API · 전 Web 서비스 fallback 으로 가지 않게 한다.
   '.agents/',
   '.playwright-mcp/',
   '.idx/',

@@ -694,7 +694,7 @@ test('Case DA10. docs consumer 선별이 root md · 에이전트 설정을 읽�
   assert.ok(Array.isArray(selectDocsConsumerSpecs(parseFileList('M\t.agents/skills/o4o-work-order/SKILL.md'))));
 });
 
-test('Case DA11. 배포 축 — .agents/ 는 .claude/ 처럼 non-runtime 이다 (스킬 문서 수정이 전 서비스 배포가 되지 않는다)', () => {
+test('Case DA11. 배포 축 — .agents/ 는 .claude/ 처럼 non-runtime 이다 (비 Markdown · classifyApiDeploy 직접 호출도 배포 0)', () => {
   for (const f of ['.agents/skills/o4o-work-order/SKILL.md', '.agents/x.json']) {
     assert.equal(isNonRuntimeGlobal(f), true, f);
     const files = parseFileList(`M\t${f}`);
