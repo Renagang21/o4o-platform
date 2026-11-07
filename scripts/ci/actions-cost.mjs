@@ -5,6 +5,10 @@ import { fileURLToPath } from 'node:url';
 // USD per minute, verified 2026-10-30. Public ubuntu-latest maps to standard private Linux.
 // https://docs.github.com/en/billing/reference/actions-runner-pricing
 export const RATES = { linux: 0.006, windows: 0.010, macos: 0.062 };
+// Self-hosted runner minutes carry no GitHub charge today: the $0.002/min platform charge announced for
+// 2026-03-01 was postponed (GitHub changelog 2025-12-16 entry). Re-check before relying on it; change only here.
+// Electricity and hardware are not modelled.
+export const SELF_HOSTED_USD_PER_MINUTE = 0;
 
 export function daysBetween(from, to) {
   for (const value of [from, to]) {
@@ -32,19 +36,27 @@ export async function pages(get, endpoint, key) {
   }
 }
 
+/**
+ * minutes/usd = GitHub-hosted billable minutes (per-job round-up) and their charge.
+ * selfHostedMinutes = machine time on self-hosted runners (unrounded, 2 decimals), charged at
+ * SELF_HOSTED_USD_PER_MINUTE and kept separate so mixed periods are not reported as hosted usage.
+ */
 export function priceJob(job) {
-  if (job.conclusion === 'skipped') return { minutes: 0, usd: 0 };
+  if (job.conclusion === 'skipped') return { minutes: 0, usd: 0, selfHostedMinutes: 0 };
   if (job.status !== 'completed' || !job.started_at || !job.completed_at) throw new Error('Incomplete job; audit completed runs only');
   const elapsed = Date.parse(job.completed_at) - Date.parse(job.started_at);
   if (!Number.isFinite(elapsed) || elapsed < 0) throw new Error('Invalid job timestamps');
-  const minutes = Math.ceil(elapsed / 60000);
   const labels = job.labels || [];
-  if (labels.includes('self-hosted')) throw new Error('Self-hosted cost requires a separate model');
+  if (labels.some(l => String(l).toLowerCase() === 'self-hosted')) {
+    const selfHostedMinutes = Math.round(elapsed / 600) / 100;
+    return { minutes: 0, usd: selfHostedMinutes * SELF_HOSTED_USD_PER_MINUTE, selfHostedMinutes };
+  }
+  const minutes = Math.ceil(elapsed / 60000);
   // Reject custom/larger runner labels instead of silently charging them at a standard rate.
   const label = labels.find(l => /^(ubuntu|windows|macos)-(latest|\d+(\.\d+)?)(-arm64)?$/.test(l));
   if (!label || label.endsWith('-arm64')) throw new Error('Unsupported runner rate; explicit pricing required');
   const os = label.startsWith('ubuntu') ? 'linux' : label.startsWith('windows') ? 'windows' : 'macos';
-  return { minutes, usd: minutes * RATES[os] };
+  return { minutes, usd: minutes * RATES[os], selfHostedMinutes: 0 };
 }
 
 /** Stratify by workflow, event and conclusion, then spread samples across time. */
@@ -78,22 +90,29 @@ export async function audit({ get, repo, from, to, sampleSize = 10 }) {
   for (const rs of strata.values()) {
     rs.sort((a, b) => a.created_at.localeCompare(b.created_at) || a.id - b.id);
     const n = Math.min(sampleSize, rs.length);
-    let minutes = 0, usd = 0, jobs = 0;
+    let minutes = 0, usd = 0, selfHosted = 0, jobs = 0;
     for (let i = 0; i < n; i++) {
       const r = rs[Math.floor((i + 0.5) * rs.length / n)];
       // filter=all includes previous attempts; each job ID must be charged only once.
       const all = await pages(get, `${prefix}/runs/${r.id}/jobs?filter=all`, 'jobs');
       for (const j of new Map(all.map(j => [j.id, j])).values()) {
-        const cost = priceJob(j); minutes += cost.minutes; usd += cost.usd; jobs++;
+        const cost = priceJob(j); minutes += cost.minutes; usd += cost.usd; selfHosted += cost.selfHostedMinutes; jobs++;
       }
     }
     rows.push({ workflow: rs[0].path, event: rs[0].event, conclusion: rs[0].conclusion,
       runs: rs.length, sampledRuns: n, sampledJobs: jobs,
-      estimatedMinutes: minutes / n * rs.length, estimatedUsd: usd / n * rs.length });
+      estimatedMinutes: minutes / n * rs.length, estimatedUsd: usd / n * rs.length,
+      estimatedSelfHostedMinutes: selfHosted / n * rs.length });
   }
   return { repo, from, to, totalRuns: runs.size, incompleteRunsExcluded: pending,
-    method: 'Stratified sample; standard private rates; unchanged runtime assumed despite public/private hardware differences; compute only; no billing account access',
-    grossEstimatedUsd: rows.reduce((sum, r) => sum + r.estimatedUsd, 0), rows };
+    method: 'Stratified sample; standard private rates for GitHub-hosted jobs; self-hosted machine time reported separately at SELF_HOSTED_USD_PER_MINUTE (electricity excluded); unchanged runtime assumed despite public/private hardware differences; compute only; no billing account access',
+    selfHostedUsdPerMinute: SELF_HOSTED_USD_PER_MINUTE,
+    // Sample-based estimate, not measured totals or an invoice. Included compute usage is shared with other
+    // products on the account (e.g. Copilot code review), so it is never subtracted here.
+    estimateBasis: 'stratified-sample', includedComputeUsageApplied: false,
+    grossEstimatedUsd: rows.reduce((sum, r) => sum + r.estimatedUsd, 0),
+    estimatedHostedMinutes: rows.reduce((sum, r) => sum + r.estimatedMinutes, 0),
+    estimatedSelfHostedMinutes: rows.reduce((sum, r) => sum + r.estimatedSelfHostedMinutes, 0), rows };
 }
 
 export async function githubGet(endpoint) {

@@ -56,6 +56,13 @@ main/develop push·수동 전체 검사·정기 API Jest·기존 배포 게이�
 - 공개 Sonar PR 진단 조회·업로드는 budget 모드 또는 비공개에서 생략한다. **외부 Sonar App 자체를 해제하거나 구독을 취소하지 않는다.**
 - AI 리뷰는 빌드·테스트·권한/격리 검증의 통과 증거를 대신하지 않는다.
 
+### 자체 실행기(집 PC) 전환 준비
+
+일반 CI job 의 `runs-on` 은 저장소 변수 `CI_RUNNER_LINUX` / `CI_RUNNER_WINDOWS` = `self-hosted` 로 자체 실행기를 고를 수 있다.
+**변수가 없거나 저장소가 public 이거나 fork PR 이면 항상 GitHub 호스팅**이다. 배포 · GCP · CodeQL job 은 대상이 아니다.
+되돌리기는 변수 삭제. 대상 job · 안전 조건 · 집 PC 준비 · 적용/복귀 순서는
+[`O4O-SELF-HOSTED-CI-RUNNER-V1`](../../docs/baseline/operations/O4O-SELF-HOSTED-CI-RUNNER-V1.md).
+
 읽기 전용 비용 재계산(`GITHUB_TOKEN` 또는 `GH_TOKEN`, 최대 31일):
 
 ```sh
