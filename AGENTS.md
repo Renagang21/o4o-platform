@@ -360,3 +360,30 @@ verdict: SAFE_TO_REMOVE | KEEP | UNCERTAIN
 - 대체 문서를 특정할 수 없거나 판단이 애매하면 상태를 임의 변경하지 않고 보고만 한다.
 - 발견 사항·인라인 조치·후속 문서 작업을 `문서 정합` 항목에 보고한다. 형식:
   `문서 정합: 발견 N건 / SUPERSEDED 표기 N건 / 링크 수정 N건 / 별도 WO 제안 N건` (없으면 `해당 없음`).
+
+## 9. 자율 진행 원칙
+
+> 도입: 2026-11-07 사용자 지시. 클라우드 세션의 승인 요청은 사용자가 PC 앞에 있을 때만 처리할 수 있으므로,
+> 질문 · 승인 대기로 작업이 멈추는 일을 줄인다.
+
+- **세션 판별:** 환경 변수 `CLAUDE_CODE_REMOTE=true` 또는 `CLAUDE_CODE_REMOTE_SESSION_ID` 가 있으면 클라우드 세션,
+  둘 다 없으면 로컬 세션이다(클라우드 세션에는 둘 다 설정된다).
+- **클라우드 세션은 판단이 필요한 부분을 합리적으로 결정하고 진행한다.** 결정 내용과 이유는 PR 설명의
+  **「결정 사항」** 칸에 기록한다. PR 을 만들지 않는 개발 담당(§4-1(e))은 인계 보고에 같은 항목을 남긴다.
+  질문은 아래 승인 필수 작업이거나, 어느 쪽으로 결정해도 되돌리기 어려운 경우로 한정한다.
+- **승인 필수 작업 — 클라우드 · 로컬 모두 실행 전에 멈추고 사용자 승인을 받는다:**
+  - 운영 DB 쓰기 · 스키마 변경 · DB 권한 변경
+  - 운영 환경 변수 · 시크릿 변경
+  - main 직접 push · force push · 원격 branch 삭제
+  - 파일 · 데이터의 영구 삭제
+- **운영 배포** (`deploy-*` · `delivery` · `promote` workflow 실행, `gcloud run deploy` 등 gcloud 배포 명령):
+  - 클라우드 세션: 실행하지 않는다. PreToolUse 훅(`.claude/hooks/block-cloud-deploy.mjs`)이 거부한다.
+    배포가 필요하면 merge 후 자동 Delivery 를 따르거나 로컬 세션으로 넘긴다.
+  - 로컬 세션: 사용자 승인 후 실행한다. 사용자가 그 세션에 배포 · merge 를 요청한 것이 승인이며,
+    이후는 §4-1(e)·(f) 의 통합 담당 흐름대로 진행한다(`promote.yml` 조건은 §4-1(f) 그대로).
+- main 직접 push · force push · 원격 branch 삭제는 `.claude/settings.json` deny 로 모든 세션에서 막는다.
+  콜론 refspec 삭제(`git push origin :<branch>` · `+:<branch>`)는 permission 패턴으로 표현되지 않아
+  PreToolUse 훅(`.claude/hooks/guard-git-push.mjs`)이 모든 세션에서 막는다.
+  §4-1(i) 7 의 원격 branch 정리는 사용자가 GitHub 에서 한다.
+- 그 밖의 §5 위험 변경 항목(dependency · CI · Core/Frozen · contract 등)은 §5 를 그대로 따른다.
+- 로컬 세션의 운영 DB 조회는 §5 **DB·보안 경계**(`o4o_readonly` 계정 전용)를 따른다.
