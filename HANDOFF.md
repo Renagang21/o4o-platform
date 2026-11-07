@@ -47,7 +47,7 @@ PR #339의 main 통합·운영 배포는 완료됐지만 작업 PC와 소유 세
 
 - 운영 API · Neture 웹 서빙 SHA 는 `8e95d16027` 이다(PR #965 포럼 AI 포함, Delivery 자동 배포).
 - 계정 완전삭제는 운영에서 켜져 있다(사용자 승인 2026-11-07). 결과와 미검증 항목은 [`CHECK-O4O-ACCOUNT-ERASURE-ACTIVATION-V1`](docs/checks/CHECK-O4O-ACCOUNT-ERASURE-ACTIVATION-V1.md). 이 절차를 다시 돌리려면 `github-actions` 에 `roles/logging.viewer` 를 임시 부여하고 회수해야 한다.
-- `o4o_readonly` · secret `o4o-db-readonly-password` 는 존재한다. `psql` 미설치로 실제 접속과 조회 권한은 미확인.
+- `o4o_readonly` · secret `o4o-db-readonly-password` 는 존재한다. `psql` 은 설치했지만 실제 접속과 조회 권한은 미확인이다.
 - `TODO-O4O-MEMBER-PROFILE-EDIT-V1` · `WO-O4O-ADMIN-OPERATOR-INVITE-FIRST-V1` — 해당 migration 커밋 이후의 `o4o-api-migrations` Job 이 모두 성공했다(최근 2026-11-06 23:38Z). DB 를 직접 조회한 값은 아니다.
 - `TODO-O4O-OPERATOR-PROTECTED-MEMBER-DEPLOY-FIX-V1` — `cooperative-web` 서빙 SHA `dd83d30d29`(#950 포함). `drugstore.neture.co.kr` · `kpa.neture.co.kr` 공개 진입 HTTP 200. 화면 동작 검증은 아니다.
 - `WO-O4O-SCHEDULED-JEST-FULL-SHARD-RECOVERY-V1` — 2026-11-06 22:33Z 스케줄 실행에서 3분할과 집계가 모두 success. 메모리 기록 값은 미확인.
@@ -55,9 +55,13 @@ PR #339의 main 통합·운영 배포는 완료됐지만 작업 PC와 소유 세
 
 ## 이 PC 의 미해결 환경
 
-- 로컬 전용 파일 없음: `docs/local/TEST-ACCOUNTS.local.md`(브라우저 검증 전 사용자 원본 필요) · `apps/api-server/.env`(`.env.example` 로 새로 작성).
-- gcloud · Cloud SQL Proxy 는 설치 · 로그인 완료. 미설치: PostgreSQL 15(`psql` 포함) · Docker. 운영 DB 를 직접 조회하려면 `psql` 이 필요하다.
-- Claude 앱의 worktree 위치가 저장소 안(`.claude/worktrees`)이다. §4-1(a) 에 맞게 사용자가 Settings 에서 바꿔야 한다.
+2026-11-07 집 PC 정비 후 상태:
+
+- 완료: git · gh 로그인 · git user · Node 22.23.4 · pnpm 10.25.0 · gcloud(프로젝트 `netureyoutube`, ADC 있음) · Cloud SQL Proxy v2.14.3. Claude 앱 worktree 위치는 `o4o-wt` 로 바뀌어 있다.
+- PostgreSQL 15.19(winget `PostgreSQL.PostgreSQL.15`): `psql` 을 사용자 PATH 에 추가했다. 함께 설치된 서버 서비스 `postgresql-x64-15` 는 **수동 시작 · 중지** 상태로 바꿨다. §3-1 로컬 개발 DB 로 쓸 때만 `Start-Service postgresql-x64-15`(관리자)로 켠다.
+- `apps/api-server/.env` 를 `.env.example` 로 만들었다. JWT · SESSION · `ENCRYPTION_KEY` 는 이 PC 전용 난수다. 운영 값은 없다. `DB_PASSWORD` 는 placeholder 라 로컬 DB 를 쓰려면 사용자가 채워야 한다.
+- Docker: Windows 쪽 Docker Desktop 은 설치하지 않았다. 지금 개발에는 필요 없다(SETUP §1 선택). self-hosted runner 용 Docker Engine 은 WSL2 Ubuntu-24.04 안에서 동작 중이다(29.9.3, `o4oci` docker 그룹). 실행기 미등록 — [`O4O-SELF-HOSTED-CI-RUNNER-V1`](docs/baseline/operations/O4O-SELF-HOSTED-CI-RUNNER-V1.md).
+- 미완료: `docs/local/TEST-ACCOUNTS.local.md`(사용자 원본 필요) · 프록시 + `o4o_readonly` 의 실제 `psql` 접속 확인(시크릿 조회가 필요해 사용자 확인 후 실행).
 
 ## 주의
 
