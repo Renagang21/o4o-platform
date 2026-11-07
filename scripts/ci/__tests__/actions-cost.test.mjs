@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { audit, daysBetween, pages, priceJob } from '../actions-cost.mjs';
+import { SELF_HOSTED_USD_PER_MINUTE, audit, daysBetween, pages, priceJob } from '../actions-cost.mjs';
 
 test('dates are inclusive, validated and bounded', () => {
   assert.deepEqual(daysBetween('2026-09-30', '2026-10-01'), ['2026-09-30', '2026-10-01']);
@@ -12,13 +12,34 @@ test('dates are inclusive, validated and bounded', () => {
 const job = (over = {}) => ({ id: 1, status: 'completed', conclusion: 'success', labels: ['ubuntu-latest'],
   started_at: '2026-10-01T00:00:00Z', completed_at: '2026-10-01T00:01:01Z', ...over });
 test('job-level rounding, OS rate, skipped jobs and unsupported runners', () => {
-  assert.deepEqual(priceJob(job()), { minutes: 2, usd: 0.012 });
+  assert.deepEqual(priceJob(job()), { minutes: 2, usd: 0.012, selfHostedMinutes: 0 });
   assert.equal(priceJob(job({ labels: ['windows-latest'] })).usd, 0.02);
   assert.equal(priceJob(job({ labels: ['macos-latest'] })).usd, 0.124);
-  assert.equal(priceJob({ conclusion: 'skipped' }).usd, 0);
-  for (const labels of [['self-hosted', 'linux'], ['custom-32core'], ['ubuntu-24.04-arm64']]) assert.throws(() => priceJob(job({ labels })));
+  assert.deepEqual(priceJob({ conclusion: 'skipped' }), { minutes: 0, usd: 0, selfHostedMinutes: 0 });
+  for (const labels of [['custom-32core'], ['ubuntu-24.04-arm64'], ['o4o-ci-linux']]) assert.throws(() => priceJob(job({ labels })));
   assert.throws(() => priceJob(job({ status: 'in_progress' })));
   assert.throws(() => priceJob(job({ completed_at: 'invalid' })));
+});
+test('self-hosted jobs report unrounded machine time separately and never count as hosted minutes', () => {
+  for (const labels of [['self-hosted', 'Linux', 'X64', 'o4o-ci-linux'], ['Self-Hosted', 'Windows', 'X64', 'o4o-ci-windows']]) {
+    assert.deepEqual(priceJob(job({ labels })), { minutes: 0, usd: 0, selfHostedMinutes: 1.02 });
+  }
+  assert.equal(SELF_HOSTED_USD_PER_MINUTE, 0);
+  assert.throws(() => priceJob(job({ labels: ['self-hosted'], status: 'in_progress' })));
+  assert.throws(() => priceJob(job({ labels: ['self-hosted'], completed_at: 'invalid' })));
+});
+test('mixed hosted and self-hosted runs keep both totals without failing the audit', async () => {
+  const runs = [{ id: 1, path: 'ci.yml', created_at: '2026-10-01T00:01:00Z', event: 'push', conclusion: 'success', status: 'completed' }];
+  const result = await audit({ repo: 'owner/repo', from: '2026-10-01', to: '2026-10-01', get: async endpoint => {
+    if (endpoint.includes('/jobs?')) return { total_count: 3, jobs: [job(), job({ id: 2, labels: ['self-hosted', 'Linux', 'X64', 'o4o-ci-linux'] }), job({ id: 3, conclusion: 'skipped' })] };
+    if (endpoint.includes('per_page=1') && !endpoint.includes('per_page=100')) return { total_count: 1 };
+    return { total_count: 1, workflow_runs: runs };
+  } });
+  assert.equal(result.estimatedHostedMinutes, 2);
+  assert.equal(result.estimatedSelfHostedMinutes, 1.02);
+  assert.equal(result.grossEstimatedUsd, 0.012);
+  assert.equal(result.selfHostedUsdPerMinute, 0);
+  assert.equal(result.rows[0].sampledJobs, 3);
 });
 test('pagination reads past 100 and rejects incomplete responses', async () => {
   const first = Array.from({ length: 100 }, (_, id) => ({ id }));

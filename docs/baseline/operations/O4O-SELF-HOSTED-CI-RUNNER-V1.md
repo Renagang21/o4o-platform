@@ -122,7 +122,7 @@ schedule 이벤트에는 repository payload 가 없어 2-2 식이 항상 호스�
 | `GITHUB_TOKEN` 기본 권한 | `ci-pipeline.yml` 은 top-level `permissions` 미지정 → 저장소 기본값을 따른다 | 자체 실행기 사용 전 저장소 기본값을 read-only 로 두는 것 권장(사용자 결정 · 설정 변경은 별도) |
 | CodeQL private | 현행 `CODEQL_PRIVATE_ENABLED` 미설정 = private 에서 자동 생략 | 개인 계정 private 저장소의 Code Scanning 이용 조건(GitHub Code Security) 확인 후 결정 |
 | Sonar | private 에서 PR 진단 조회 · 업로드 단계 skip(기존 코드) | SonarCloud private 프로젝트 요금 조건 확인 |
-| 자체 실행기 과금 | GitHub 가 2025-12 에 self-hosted 분당 플랫폼 요금을 공지했다가 연기했다는 보도가 있으나 공식 현행 상태 **미확인** | 전환 직전 GitHub billing 문서 · changelog 확인 |
+| 자체 실행기 과금 | **현재 무료.** GitHub 공식 안내 기준 자체 실행기의 Actions 사용에는 분당 요금이 없다. 2025-12-16 공지된 self-hosted 분당 플랫폼 요금(2026-03-01 시행 예정 · $0.002/분)은 GitHub changelog 갱신으로 **연기**됐고 새 시행일은 공지되지 않았다. 전기료 · 하드웨어는 별도 | 재공지 시 `scripts/ci/actions-cost.mjs` 의 `SELF_HOSTED_USD_PER_MINUTE` 한 곳만 바꾼다. 전환 직전 billing 문서 · changelog 재확인 |
 | Actions · Artifacts · Cache 비용 관리 | 미확인 | artifact `retention-days`(대부분 7일) 유지 · 저장 공간 사용량 확인 |
 | 예산 알림 · 실제 사용 차단 | 미확인 | 예산을 "알림만" 이 아니라 **한도 도달 시 차단(stop usage)** 으로 둘지 결정 |
 | 과거 비밀값 노출 점검 | 이번 작업에서 전체 이력 검사 **미실행** — 범위가 커서 후속 작업으로 분리 | private 전환은 노출 이력의 해결이 아니다. 별도 WO 로 secret scanning · 이력 점검 |
@@ -274,7 +274,7 @@ Windows 자동 로그인은 요구하지 않는다.
 - 실행기는 OS 별 1개로 시작한다(동시 1 job). CI Pipeline 1회의 job(최대 약 12개)이 순서대로 돈다.
 - PR 1건과 main push 1건이 겹칠 때의 전체 대기 시간을 Actions 화면 job 의 생성 → 시작 시각으로 기록한다.
 - 동시 실행(실행기 2개 이상)은 이 측정 후 판단한다. `55432` 고정 포트처럼 같은 PC 에서 겹치면 안 되는 job 이 있다(§3).
-- `scripts/ci/actions-cost.mjs` 는 self-hosted label 을 만나면 "unsupported runner" 로 멈춘다(의도된 fail-closed). 혼합 기간 비용 집계에는 후속 수정이 필요하다.
+- 비용 집계: `node scripts/ci/actions-cost.mjs --repo Renagang21/o4o-platform --from <YYYY-MM-DD> --to <YYYY-MM-DD>`. self-hosted label job 은 중단하지 않고 `estimatedSelfHostedMinutes`(올림 없는 실제 실행 시간)로 따로 모으고, GitHub 실행기 job 은 기존대로 `estimatedHostedMinutes` · `grossEstimatedUsd`(job 별 분 단위 올림 · 표준 요금)로 계산한다. 자체 실행기 요금은 `SELF_HOSTED_USD_PER_MINUTE`(현재 0) 이며 전기료는 포함하지 않는다. 대기열 시간은 집계하지 않는다.
 
 ## 8. 실기 확인 항목 (이 문서를 ACTIVE 로 바꾸기 전)
 
