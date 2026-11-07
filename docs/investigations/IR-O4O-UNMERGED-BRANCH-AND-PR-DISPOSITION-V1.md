@@ -154,6 +154,8 @@
   - 기본 실행은 **미리보기**다. 실제 삭제는 `-Execute` 를 줄 때만 한다.
   - 실행 직전 `gh pr list` 로 열린 PR 을 다시 조회한다. 그사이 PR 이 열린 branch 는 건너뛴다. `gh` 가 없거나 조회에 실패하면 중단한다.
   - `git ls-remote` 로 각 branch 의 현재 tip 을 이 조사의 SHA 와 비교한다. 다르면(조사 뒤 새 push) 건너뛰고 재조사 대상으로 표시한다.
+  - 삭제 요청 자체에도 그 SHA 를 lease 로 건다(`--force-with-lease=refs/heads/<branch>:<SHA>`). 조회와 삭제 사이에 새 push 가 들어오면 서버가 삭제를 거절하고, 그 branch 는 `failed` 로 보고된다. 실패한 branch 는 tip 을 다시 조사한 뒤 처리한다.
+  - 이 스크립트는 통합 담당이 로컬 PowerShell 에서 직접 실행한다. Claude Code 세션에서는 원격 branch 삭제 명령이 권한 규칙과 `guard-git-push` 훅으로 거부된다.
   - 같은 이름의 tag 와 헷갈리지 않도록 `refs/heads/<branch>` 전체 이름으로 삭제한다.
 - 복구: PR 이 있던 branch 의 커밋은 GitHub 의 `refs/pull/<번호>/head` 에 남는다. PR 이 없던 branch 는 아래 표의 SHA 로 다시 만들 수 있다(`git push origin <sha>:refs/heads/<branch>`, 객체가 남아 있는 동안).
 - 스크립트 본문은 일부러 ASCII 로만 썼다. Windows PowerShell 5.1 은 BOM 없는 UTF-8 `.ps1` 을 시스템 코드페이지로 읽어 한글이 깨지기 때문이다.
@@ -294,8 +296,9 @@ if (-not $Execute) { Write-Host 'Preview only. Re-run with -Execute to delete.';
 
 $Failed = New-Object System.Collections.Generic.List[string]
 foreach ($t in $ToDelete) {
-    git push origin --delete ('refs/heads/' + $t.B)
-    if ($LASTEXITCODE -ne 0) { $Failed.Add($t.B) }
+    # Lease on the verified SHA: the server rejects the delete if the tip moved after ls-remote.
+    git push origin ('--force-with-lease=refs/heads/' + $t.B + ':' + $t.Sha) --delete ('refs/heads/' + $t.B)
+    if ($LASTEXITCODE -ne 0) { $Failed.Add("$($t.B) | delete rejected (tip moved or push error) - re-check") }
 }
 Write-Host ("Done: deleted {0}  failed {1}" -f ($ToDelete.Count - $Failed.Count), $Failed.Count)
 foreach ($f in $Failed) { Write-Host "  failed: $f" }
