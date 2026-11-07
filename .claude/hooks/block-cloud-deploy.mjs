@@ -11,6 +11,7 @@
  *   · gh workflow run <deploy-* | delivery | promote> — 파일명 · 표시명, 숫자 ID 는 API 로 조회
  *   · gh run rerun <id> — 그 run 의 workflow 가 배포 계열이면
  *   · gh api …/dispatches — workflow dispatch API 직접 호출
+ *   · gh api …/actions/runs/<id>/rerun(-failed-jobs) · …/actions/jobs/<id>/rerun — 배포 run · job 재실행
  * - 숫자 ID 를 조회하지 못하거나, workflow run · run rerun 의 대상을 특정하지 못하면 클라우드에서는 거부한다(fail closed).
  *   그 밖의 예외는 허용(exit 0)으로 넘겨 일반 명령을 막지 않는다.
  */
@@ -108,8 +109,27 @@ function check(segment, cwd) {
   }
   const sub = args.slice(s);
 
-  // gh api …/dispatches
-  if (sub[0] === 'api' && sub.some((t) => /\/dispatches\b/.test(t))) return 'workflow dispatch API 호출';
+  if (sub[0] === 'api') {
+    // gh api …/dispatches
+    if (sub.some((t) => /\/dispatches\b/.test(t))) return 'workflow dispatch API 호출';
+    // gh api …/actions/runs/<id>/rerun(-failed-jobs) · …/actions/jobs/<id>/rerun — gh run rerun 과 같은 재실행 경로
+    for (const t of sub) {
+      const run = t.match(/actions\/runs\/(\d+)\/(rerun|rerun-failed-jobs)\b/);
+      const job = t.match(/actions\/jobs\/(\d+)\/rerun\b/);
+      if (!run && !job) continue;
+      const fromPath = t.match(/repos\/([^/{}]+\/[^/{}]+)\/actions\//);
+      const slug = fromPath ? fromPath[1] : repoSlug(args, cwd);
+      const [kind, id] = run ? ['runs', run[1]] : ['jobs', job[1]];
+      const jq = run ? '"\\(.path) \\(.name)"' : '.workflow_name';
+      try {
+        const info = ghJson(`repos/${slug}/actions/${kind}/${id}`, jq, cwd);
+        return DEPLOY_NAME.test(info) ? `API 로 배포 workflow 재실행 (${kind} ${id} → ${info})` : null;
+      } catch {
+        return `${kind} ${id} 를 조회하지 못해 배포 여부를 확인할 수 없음`;
+      }
+    }
+    return null;
+  }
 
   // gh workflow run <target>
   if (sub[0] === 'workflow' && sub[1] === 'run') {

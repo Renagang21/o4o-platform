@@ -50,10 +50,9 @@ export function segments(cmd) {
       cur += c;
       continue;
     }
-    // 줄 연속(백슬래시 + 줄바꿈)은 명령이 이어지는 것이므로 공백으로 합친다.
+    // 줄 연속(백슬래시 + 줄바꿈)은 bash 처럼 공백 없이 제거한다 — `:\<LF>branch` 는 `:branch` 한 인자다.
     if (c === '\\' && (src[i + 1] === '\n' || (src[i + 1] === '\r' && src[i + 2] === '\n'))) {
       i += src[i + 1] === '\r' ? 2 : 1;
-      cur += ' ';
       continue;
     }
     if (c === '"' || c === "'") {
