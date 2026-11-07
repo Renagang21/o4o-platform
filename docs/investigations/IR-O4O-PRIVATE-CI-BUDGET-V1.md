@@ -1,7 +1,7 @@
 # O4O 비공개 전환 월 예산 조사 및 1차 절감 준비
 
 > **상태**: DRAFT
-> **작성일**: 2026-10-30 · **최종 갱신**: 2026-10-30
+> **작성일**: 2026-10-30 · **최종 갱신**: 2026-11-07
 > **범위**: 향후 비공개 운영의 비용 절감. 월 100,000원은 희망 수준이며 필수 상한이 아니다. 비공개 전환은 별도 후속 작업이다. 현재 공개 여부·요금제·계정 예산은 변경하지 않는다.
 
 ## 1. 실제 조회 및 추정의 구분
@@ -101,3 +101,57 @@ main 병합 전까지 개발 담당이 검증·CI 지적 보완을 수행하며,
 
 - https://github.com/actions/cache
 - https://docs.github.com/en/actions/reference/workflows-and-actions/dependency-caching
+
+## 7. 절감 후보 — 문서 · 에이전트 설정 전용 변경의 full CI (2026-11-07 조사 · 미구현)
+
+> 조사만 했다. 판정 규칙(`scripts/ci/detect-affected.mjs`)은 바꾸지 않았다. 검사 범위를 바꾸는 변경이라 별도 WO 로 구현한다.
+
+### 7-1. 현재 판정 (코드 기준)
+
+문서 빠른 경로(`docs_fast_eligible`)는 **변경 전체가 `docs/**` 의 Markdown 추가 · 수정**일 때만 참이다. 아래 경로가 하나라도 섞이면 full CI 를 탄다.
+
+| 경로 | CI 축 판정 | 배포 축 판정 | 이 파일을 읽는 CI 검사 |
+|---|---|---|---|
+| `docs/**.md` (추가 · 수정) | 중립 → 빠른 경로 | 중립 | `docs-fast-validate` 가 그 문서를 읽는 test 만 선별 |
+| `docs/**` 삭제 · 이동 · 비 Markdown | global → full | — | 기록물 존재를 단언하는 정적 spec (의도된 동작 · 유지) |
+| 루트 `*.md` (`AGENTS.md` · `CLAUDE.md` · `README.md` · `SETUP.md` · `HANDOFF.md`) | `workspace 매핑 불가` → global → full | NON_RUNTIME → 배포 무영향 | 없음 — test 안의 등장은 판정기 시험의 입력 문자열 · 주석뿐 |
+| `.claude/**` (settings · hooks · skills) | `workspace 매핑 불가` → global → full | NON_RUNTIME → 배포 무영향 | 없음 — ESLint 는 `ts/tsx` 만 검사하고(`eslint.config.js`), 훅 테스트 · `settings.json` 검증은 CI 에 등록돼 있지 않다 |
+| `.agents/**` | `workspace 매핑 불가` → global → full | 매핑 없음 | 없음 |
+| `.github/pull_request_template.md` | `.github/` 접두어 → global → full | `.github/` 중립 | 없음 — `.github/` 를 global 로 두는 이유(정적 spec 이 workflow 원문을 읽음)가 이 파일에는 해당하지 않는다 |
+
+실측 사례:
+- `4ed77ee634`(#966): `.claude/` · `AGENTS.md` · `CLAUDE.md` · `SETUP.md` · PR 템플릿 · 문서를 바꿨다. 판정기 재실행 결과 `global_or_unknown=true` → full CI 였고, Delivery 는 전 서비스 `NO_DEPLOY` 였다.
+- 열린 PR #971: `.agents/` · `.claude/` · PR 템플릿 · 루트 md 4개 · `docs/` 를 바꾼다. 같은 이유로 full CI 대상이다.
+
+### 7-2. 빈도와 규모 (표본 · 추정)
+
+- 2026-10-08 이후 main first-parent 커밋 554건을 분류했다.
+  - 이미 빠른 경로: 136건
+  - **위 후보 경로로만 이뤄졌는데 full CI 를 탄 커밋: 17건**
+  - 그 밖: 401건
+- 같은 변경의 PR push 실행은 세지 않았다(미측정).
+- job 시간(job 별 분 단위 올림 합계, 표본 각 2건):
+  - full CI: `4ed77ee634` 11 job · 47분, `f96b70338a` 11 job · 49분
+  - 빠른 경로: `435d0d10be` · `743b01ed28` 각 4 job · 5분
+- main 만 보면 회당 약 42~44 job-분 차이다. 30일 17건이면 약 700 job-분 규모다.
+  - 표본 2건 기준의 추정이며 청구액이 아니다.
+  - PR 실행분은 별도로 더 생긴다.
+
+### 7-3. 후보안 (안전 조건 포함)
+
+1. **루트 `*.md` · `.agents/**` · `.github/pull_request_template.md` 를 빠른 경로 대상에 포함**
+   - 추가 · 수정에 한한다. 삭제 · 이동은 지금처럼 global 로 둔다.
+   - `docs-fast-validate` 의 소비 test 선별(`--mode=docs-specs`)이 이 경로도 보도록 넓힌다. 지금은 읽는 test 가 0이지만, 생기면 자동으로 선별되게 하기 위해서다.
+2. **`.claude/**` 는 빠른 경로 + 전용 경량 검사**
+   - 지금 full CI 는 이 경로를 실제로 검증하지 않는다. 그래서 빠른 경로로 옮겨도 잃는 검증은 없다.
+   - 대신 `settings.json` JSON 파싱과 훅 `.mjs` 구문 검사(`node --check`)를 빠른 경로에 더하는 것을 함께 검토한다. 훅 테스트가 저장소에 들어오면 그것도 등록한다.
+3. **Delivery Classify 는 유지(후보에서 제외)**
+   - main CI 가 끝날 때마다 GCP 인증과 서빙 SHA 조회를 1회 한다. 2026-11-07 기준 최근 40회 중 39 success · 1 cancelled 였다.
+   - 문서 전용이어도 commit status 기록과 서빙 상태 대조를 맡으므로, 절감폭(회당 약 1분)에 비해 변경 위험이 크다.
+
+구현 시 지킬 것:
+- `CI Gate` 이름 · needs · 실패 전파는 바꾸지 않는다. 빠른 경로 job 도 지금처럼 CI Gate 에 묶는다.
+- main push 의 검증 취소나 테스트 삭제는 하지 않는다. 판정을 할 수 없는 경우는 지금처럼 full CI 로 떨어진다.
+- `scripts/ci/__tests__/detect-affected.test.mjs` 에 경로별 회귀 사례를 추가한다. 루트 md · `.claude/` · `.agents/` · PR 템플릿의 추가 · 수정 · 삭제 · 이동과 코드 혼합을 다룬다.
+- `.github/` 의 다른 파일(workflow · action · 그 밖의 템플릿)은 계속 global 로 둔다. 예외는 정확한 파일명 1개만 둔다.
+
