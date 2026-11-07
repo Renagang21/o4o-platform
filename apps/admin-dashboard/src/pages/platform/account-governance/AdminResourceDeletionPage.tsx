@@ -4,6 +4,7 @@ import { authClient } from "@o4o/auth-client";
 import { DataTable, type ListColumnDef } from "@o4o/operator-ux-core";
 import { ActionBar } from "@o4o/ui";
 type Kind = "community" | "lecture";
+const TITLES: Record<Kind, string> = { community: "커뮤니티 게시판 최종 삭제", lecture: "강좌 최종 삭제" };
 type Row = { id: string; name?: string; title?: string; status: string };
 type Plan = {
   digest?: string;
@@ -13,13 +14,13 @@ type Plan = {
   enrollments?: number;
 };
 /** Reuses the domain deletion procedures. No account deletion or duplicated content editor. */
-export default function AdminResourceDeletionPage() {
+export default function AdminResourceDeletionPage({ fixedKind }: Readonly<{ fixedKind?: Kind }> = {}) {
   const { user } = useAuth();
   const actorKey = [
     user?.id,
     ...(Array.isArray(user?.roles) ? user.roles : []),
   ].join(":");
-  const [kind, setKind] = useState<Kind>("community"),
+  const [kind, setKind] = useState<Kind>(fixedKind ?? "community"),
     [page, setPage] = useState(1),
     [hasNext, setHasNext] = useState(false);
   const [rows, setRows] = useState<Row[]>([]),
@@ -170,13 +171,13 @@ export default function AdminResourceDeletionPage() {
   ];
   return (
     <section className="space-y-4 min-w-0">
-      <h1 className="text-xl font-bold">포럼·강의 최종 삭제</h1>
+      <h1 className="text-xl font-bold">{fixedKind ? TITLES[fixedKind] : "포럼·강의 최종 삭제"}</h1>
       <p>
         운영 중지·종료된 대상만 표시합니다. 선택한 포럼의 게시글·댓글·가입 자료
         또는 강의의 수업·학습 자료를 삭제합니다. 공통 계정과 다른 대상의 자료,
         공용 미디어 원본은 유지합니다.
       </p>
-      <nav aria-label="삭제 대상">
+      {!fixedKind && <nav aria-label="삭제 대상">
         <button type="button"
           disabled={busy}
           aria-pressed={kind === "community"}
@@ -197,7 +198,7 @@ export default function AdminResourceDeletionPage() {
         >
           강의
         </button>
-      </nav>
+      </nav>}
       <button type="button" disabled={busy || loading} onClick={() => void load()}>
         새로고침
       </button>

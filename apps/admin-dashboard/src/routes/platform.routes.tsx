@@ -73,6 +73,10 @@ export function PlatformRoutes() {
       <Route path="users" element={<PlatformUsersPage />} />
       <Route path="suppliers" element={<CentralSupplierReview adminMode />} />
       <Route path="stores" element={<AdminStoresPage />} />
+      <Route path="member-erasure" element={<PlatformUsersPage initialTask="inactive" />} />
+      <Route path="board-deletion" element={<AdminResourceDeletionPage fixedKind="community" />} />
+      <Route path="course-deletion" element={<AdminResourceDeletionPage fixedKind="lecture" />} />
+      {/* 예전 통합 화면 북마크: 두 대상을 탭으로 보여 준다. */}
       <Route path="resource-deletion" element={<AdminResourceDeletionPage />} />
       <Route path="erasure-operations" element={<AdminErasureHistoryPage />} />
       {/* Removed administration tools: old bookmarks return to the platform home. */}
