@@ -124,10 +124,10 @@ export const adminMenuStatic: MenuItem[] = [
   //   공급자·파트너·약국협업체처럼 일부 이용자만 쓰는 서비스의 참여 해지는 이 대기 목록에 들어오지 않는다.
   // ============================================
   { id: 'final-deletion', label: '최종 삭제 처리', icon: <ClipboardList className="w-5 h-5" />, children: [
-    { id: 'final-deletion-members', label: '회원 계정·개인자료 삭제', icon: <Layers className="w-4 h-4" />, path: '/admin/platform/member-erasure' },
-    { id: 'final-deletion-forums', label: '포럼 최종 삭제·복구', icon: <ClipboardList className="w-4 h-4" />, path: '/operations/neture/forum-deleted' },
-    { id: 'final-deletion-community-boards', label: '커뮤니티 게시판 최종 삭제', icon: <ClipboardList className="w-4 h-4" />, path: '/admin/platform/board-deletion' },
-    { id: 'final-deletion-courses', label: '강좌 최종 삭제', icon: <ClipboardList className="w-4 h-4" />, path: '/admin/platform/course-deletion' },
+    { id: 'final-deletion-members', label: '회원 계정 삭제', icon: <Layers className="w-4 h-4" />, path: '/admin/platform/member-erasure' },
+    { id: 'final-deletion-forums', label: '포럼 삭제·복구', icon: <ClipboardList className="w-4 h-4" />, path: '/operations/neture/forum-deleted' },
+    { id: 'final-deletion-community-boards', label: '커뮤니티 게시판', icon: <ClipboardList className="w-4 h-4" />, path: '/admin/platform/board-deletion' },
+    { id: 'final-deletion-courses', label: '강좌 삭제', icon: <ClipboardList className="w-4 h-4" />, path: '/admin/platform/course-deletion' },
     { id: 'platform-erasure-history', label: '삭제 처리 내역', icon: <ClipboardList className="w-4 h-4" />, path: '/admin/platform/erasure-operations' },
   ] },
   { id: 'member-business-management', label: '회원·사업체', icon: <Layers className="w-5 h-5" />, children: [

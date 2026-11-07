@@ -173,9 +173,11 @@ export default function AdminResourceDeletionPage({ fixedKind }: Readonly<{ fixe
     <section className="space-y-4 min-w-0">
       <h1 className="text-xl font-bold">{fixedKind ? TITLES[fixedKind] : "포럼·강의 최종 삭제"}</h1>
       <p>
-        운영 중지·종료된 대상만 표시합니다. 선택한 포럼의 게시글·댓글·가입 자료
-        또는 강의의 수업·학습 자료를 삭제합니다. 공통 계정과 다른 대상의 자료,
-        공용 미디어 원본은 유지합니다.
+        {fixedKind === "lecture"
+          ? "운영에서 보관 처리된 강좌만 표시합니다. 선택한 강좌의 수업·학습 자료를 삭제합니다. 공통 계정과 다른 대상의 자료, 공용 미디어 원본은 유지합니다."
+          : fixedKind === "community"
+            ? "운영에서 종료(보관) 처리된 커뮤니티 게시판만 표시합니다. 선택한 게시판의 게시글·댓글·가입 자료를 삭제합니다. 공통 계정과 다른 대상의 자료, 공용 미디어 원본은 유지합니다."
+            : "운영 중지·종료된 대상만 표시합니다. 선택한 포럼의 게시글·댓글·가입 자료 또는 강의의 수업·학습 자료를 삭제합니다. 공통 계정과 다른 대상의 자료, 공용 미디어 원본은 유지합니다."}
       </p>
       {!fixedKind && <nav aria-label="삭제 대상">
         <button type="button"
