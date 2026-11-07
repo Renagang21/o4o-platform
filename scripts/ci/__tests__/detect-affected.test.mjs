@@ -705,10 +705,14 @@ test('Case DA11. 배포 축 — .agents/ 는 .claude/ 처럼 non-runtime 이다 
   assert.equal(classifyApiDeploy(parseFileList('D\t.agents/skills/x/SKILL.md'), graph).api_deploy_affected, false);
 });
 
-test('Case DA12. ci-pipeline.yml — docs fast job 과 Code Quality Check 가 .claude/ 검사를 돌린다', () => {
+test('Case DA12. ci-pipeline.yml — docs fast · Code Quality · admin fast 가 모두 .claude/ 검사를 돌린다 (어느 경로로도 우회 불가)', () => {
   const yml = workflowYaml('ci-pipeline.yml');
   const jobBlock = (id) => yml.split(`\n  ${id}:\n`)[1]?.split(/\n {2}[a-z][a-z0-9-]*:\n/)[0] ?? '';
-  for (const id of ['docs-fast-validate', 'quality-check']) {
+  // Codex P2(#973): `.claude/` + Admin 소스 혼합은 admin fast 경로로 간다 — 그 경로에서도 검사가 돌아야 우회가 없다.
+  const mixed = verdictOf(['M\t.claude/settings.json', 'M\tapps/admin-dashboard/src/main.tsx']);
+  assert.equal(mixed.admin_only, true, '.claude + Admin 소스 = admin fast 경로');
+  assert.equal(mixed.docs_fast_eligible, false);
+  for (const id of ['docs-fast-validate', 'quality-check', 'admin-fast-guards']) {
     const block = jobBlock(id);
     assert.ok(block, id);
     assert.match(block, /node scripts\/ci\/check-agent-config\.mjs/, `${id} 가 .claude/ 검사를 실행해야 한다`);

@@ -45,7 +45,7 @@ export function checkAgentConfig(root) {
   const lines = [];
   let ok = true;
 
-  const files = walk(claudeDir).sort();
+  const files = walk(claudeDir).sort((a, b) => a.localeCompare(b));
   const jsonFiles = files.filter((f) => f.endsWith('.json'));
   const hooksDir = path.join(claudeDir, 'hooks') + path.sep;
   const hookScripts = files.filter((f) => f.startsWith(hooksDir) && SCRIPT_FILE.test(f));
@@ -85,7 +85,8 @@ export function checkAgentConfig(root) {
       lines.push(`ok   node --test   ${hookTests.length} files — ${tail.join(' · ')}`);
     } else {
       ok = false;
-      lines.push(`FAIL node --test   ${hookTests.length} files — ${tail.join(' · ') || r.error?.message || `exit ${r.status}`}`);
+      const detail = tail.join(' · ') || r.error?.message || 'exit ' + r.status;
+      lines.push(`FAIL node --test   ${hookTests.length} files — ${detail}`);
     }
   }
 

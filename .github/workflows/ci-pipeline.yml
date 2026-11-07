@@ -855,6 +855,11 @@ jobs:
         strict-lockfile: 'true'
         build-packages: 'false'
 
+    # WO-O4O-DOCS-FAST-AGENT-CONFIG-V1 — `.claude/` 가 Admin 소스와 섞여 이 경로로 와도 같은 검사를 받는다
+    # (Code Quality Check · Docs Fast 와 같은 단계 · 설치 없이 1초 미만).
+    - name: Check agent config (.claude/)
+      run: node scripts/ci/check-agent-config.mjs
+
     - name: Select api-server static guard specs
       id: select
       env:

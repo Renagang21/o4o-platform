@@ -342,6 +342,23 @@ export function workspaceDirOf(graph, filePath) {
  * @param {{status: string, path: string}[]} changedFiles
  * @returns {{docs_only: boolean, docs_fast_eligible: boolean, reasons: string[]}}
  */
+/**
+ * 파일 1건이 docs fast 를 막는 이유. 막지 않으면 null.
+ * `docs/**` 밖이면서 문서 · 에이전트 설정도 아닌 경로는 `outside` 로 따로 알린다(reason 없이 docs_only 만 끈다).
+ */
+function docsFastBlocker(status, file) {
+  const changed = status === 'A' || status === 'M';
+  if (isDocsFastExtra(file)) {
+    return changed ? null : `문서 · 에이전트 설정 ${status}(삭제/이동) — docs fast 아님: ${file}`;
+  }
+  if (!hasPrefix(file, NEUTRAL_PREFIXES)) return 'outside';
+  if (!changed) return `문서 ${status}(삭제/이동) — docs fast 아님: ${file}`;
+  if (!DOCS_FAST_EXTENSIONS.some((ext) => file.toLowerCase().endsWith(ext))) return `Markdown 이 아닌 문서 경로 자산 — docs fast 아님: ${file}`;
+  const dataSeg = file.split('/').find((seg) => DOCS_DATA_SEGMENTS.has(seg));
+  if (dataSeg) return `데이터 성격 경로(${dataSeg}/) — docs fast 아님: ${file}`;
+  return null;
+}
+
 export function classifyDocs(changedFiles) {
   if (!Array.isArray(changedFiles) || changedFiles.length === 0) {
     return { docs_only: false, docs_fast_eligible: false, reasons: ['변경 파일 0건 — docs fast 대상 아님'] };
@@ -352,38 +369,16 @@ export function classifyDocs(changedFiles) {
   let fast = true;
 
   for (const { status, path: file } of changedFiles) {
-    if (isDocsFastExtra(file)) {
-      // docs_only 는 "변경 전체가 docs/** 안" 그대로 둔다. fast 여부만 docs 와 같은 규칙으로 본다.
-      docsOnly = false;
-      if (status !== 'A' && status !== 'M') {
-        fast = false;
-        reasons.push(`문서 · 에이전트 설정 ${status}(삭제/이동) — docs fast 아님: ${file}`);
-      }
-      continue;
-    }
-    if (!hasPrefix(file, NEUTRAL_PREFIXES)) {
-      docsOnly = false;
-      fast = false;
-      continue;
-    }
-    if (status !== 'A' && status !== 'M') {
-      fast = false;
-      reasons.push(`문서 ${status}(삭제/이동) — docs fast 아님: ${file}`);
-      continue;
-    }
-    if (!DOCS_FAST_EXTENSIONS.some((ext) => file.toLowerCase().endsWith(ext))) {
-      fast = false;
-      reasons.push(`Markdown 이 아닌 문서 경로 자산 — docs fast 아님: ${file}`);
-      continue;
-    }
-    if (file.split('/').some((seg) => DOCS_DATA_SEGMENTS.has(seg))) {
-      fast = false;
-      reasons.push(`데이터 성격 경로(${file.split('/').find((seg) => DOCS_DATA_SEGMENTS.has(seg))}/) — docs fast 아님: ${file}`);
-      continue;
-    }
+    // docs_only 는 "변경 전체가 docs/** 안" 그대로 둔다. 문서 · 에이전트 설정은 fast 여부만 docs 와 같은 규칙으로 본다.
+    if (!hasPrefix(file, NEUTRAL_PREFIXES)) docsOnly = false;
+    const blocker = docsFastBlocker(status, file);
+    if (blocker === null) continue;
+    fast = false;
+    if (blocker !== 'outside') reasons.push(blocker);
   }
 
-  // fast 는 docs/** 밖의 경로를 만나면 이미 false 다. 남은 경우는 docs Markdown · 문서 · 에이전트 설정의 추가 · 수정뿐이다.
+  // fast 는 docs/** 밖의 경로(문서 · 에이전트 설정 제외)를 만나면 이미 false 다.
+  // 남은 경우는 docs Markdown · 문서 · 에이전트 설정의 추가 · 수정뿐이다.
   return { docs_only: docsOnly, docs_fast_eligible: fast, reasons };
 }
 
