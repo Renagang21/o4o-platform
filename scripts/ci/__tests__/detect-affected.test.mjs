@@ -48,6 +48,8 @@ import {
   classifyApiDeploy,
   classifyDocs,
   isApiNonDeployPath,
+  isDocsFastExtra,
+  isNonRuntimeGlobal,
   lockfileDeployImpact,
   parseFileList,
   parsePnpmLock,
@@ -536,6 +538,186 @@ test('변경 문서를 raw text 로 읽는 api-server test 가 선별된다 (nes
 
   // 문서가 아닌 변경에는 docs consumer 선별이 관여하지 않는다
   assert.deepEqual(selectDocsConsumerSpecs(parseFileList('M\tapps/api-server/src/foo.ts')), []);
+});
+
+// ---------------------------------------------------------------------------
+// Case DA1~DA12 — 문서 · 에이전트 설정 경로의 docs fast path
+//   WO-O4O-DOCS-FAST-AGENT-CONFIG-V1 (IR-O4O-PRIVATE-CI-BUDGET-V1 §7 후보안 1 · 2)
+//   추가 · 수정은 fast, 삭제 · 이동은 global, `.github/` 의 다른 파일은 계속 global.
+// ---------------------------------------------------------------------------
+
+const ROOT_MD = ['AGENTS.md', 'CLAUDE.md', 'README.md', 'SETUP.md', 'HANDOFF.md', 'CHANGELOG.md'];
+const AGENT_CONFIG = [
+  '.claude/settings.json',
+  '.claude/hooks/block-cloud-deploy.mjs',
+  '.claude/hooks/lib/shell.mjs',
+  '.claude/skills/handoff/SKILL.md',
+  '.agents/skills/o4o-work-order/SKILL.md',
+  '.github/pull_request_template.md',
+];
+const assertFast = (lines, msg) => {
+  const v = verdictOf(lines);
+  assert.equal(v.docs_fast_eligible, true, `${msg}: fast 여야 한다 — ${v.reasons.join(' | ')}`);
+  assert.equal(v.global_or_unknown, false, `${msg}: global 이 아니어야 한다`);
+  assert.equal(v.admin_affected, false, `${msg}: code 축을 깨우지 않는다`);
+  assert.equal(v.api_affected, false, `${msg}: code 축을 깨우지 않는다`);
+  assert.equal(v.fallback, false, msg);
+  return v;
+};
+const assertFull = (lines, msg) => {
+  const v = verdictOf(lines);
+  assert.equal(v.docs_fast_eligible, false, `${msg}: fast 가 아니어야 한다`);
+  assert.equal(v.global_or_unknown, true, `${msg}: global(full) 이어야 한다`);
+  assert.equal(v.api_affected, true, `${msg}: full CI 는 API 축을 연다`);
+  return v;
+};
+
+test('Case DA1. root 최상위 Markdown 추가 · 수정 → docs fast (docs_only 는 docs/** 의미 그대로 false)', () => {
+  for (const f of ROOT_MD) {
+    for (const st of ['M', 'A']) {
+      const v = assertFast([`${st}\t${f}`], `${st} ${f}`);
+      assert.equal(v.docs_only, false, `${f}: docs_only 는 "전부 docs/** 안" 의미를 유지한다`);
+    }
+  }
+});
+
+test('Case DA2. .claude · .agents · PR 템플릿 추가 · 수정 → docs fast', () => {
+  for (const f of AGENT_CONFIG) {
+    assertFast([`M\t${f}`], `M ${f}`);
+    assertFast([`A\t${f}`], `A ${f}`);
+  }
+});
+
+test('Case DA3. #971 형태(에이전트 설정 + root md + docs Markdown) 묶음 → docs fast', () => {
+  assertFast([
+    'M\t.agents/skills/o4o-work-order/SKILL.md',
+    'M\t.claude/settings.json',
+    'M\t.claude/skills/handoff/SKILL.md',
+    'M\t.github/pull_request_template.md',
+    'M\tAGENTS.md',
+    'M\tCLAUDE.md',
+    'M\tREADME.md',
+    'M\tSETUP.md',
+    'M\tdocs/baseline/operations/O4O-GIT-PARALLEL-WORK-SAFETY-V1.md',
+  ], '#971 형태');
+});
+
+test('Case DA4. 삭제 · 이동은 지금처럼 full 이다 (경로마다)', () => {
+  for (const f of [...ROOT_MD, ...AGENT_CONFIG]) {
+    assertFull([`D\t${f}`], `D ${f}`);
+  }
+  // rename 은 old · new 두 줄로 들어온다(readChangedFiles)
+  assertFull(['R\tAGENTS.md', 'R\tdocs/AGENTS.md'], 'root md → docs 이동');
+  assertFull(['R\t.claude/skills/a/SKILL.md', 'R\t.claude/skills/b/SKILL.md'], '.claude 안 이동');
+  assertFull(['R\t.github/pull_request_template.md', 'R\t.github/PULL_REQUEST_TEMPLATE.md'], 'PR 템플릿 이름 변경');
+  // 다른 fast 대상과 섞여도 삭제 하나면 full 이다
+  assertFull(['M\tCLAUDE.md', 'M\tdocs/checks/X.md', 'D\t.agents/skills/x/SKILL.md'], '혼합 + 삭제');
+});
+
+test('Case DA5. .github/ 의 다른 파일은 계속 global 이다 (예외는 정확한 파일 1개)', () => {
+  for (const f of [
+    '.github/workflows/ci-pipeline.yml',
+    '.github/actions/setup-build-env/action.yml',
+    '.github/labeler.yml',
+    '.github/README.md',
+    '.github/ISSUE_TEMPLATE/bug.md',
+    '.github/PULL_REQUEST_TEMPLATE/feature.md',
+    '.github/pull_request_template.md.bak',
+  ]) {
+    assert.equal(isDocsFastExtra(f), false, f);
+    assertFull([`M\t${f}`], f);
+    assertFull(['M\t.github/pull_request_template.md', `M\t${f}`], `PR 템플릿 + ${f}`);
+  }
+});
+
+test('Case DA6. 하위 디렉터리의 Markdown · root 의 비 Markdown 은 대상이 아니다', () => {
+  for (const f of ['scripts/README.md', 'tools/o4o-local-agent/README.md', 'e2e/README.md', 'HANDOFF.txt', 'AGENTS.md.orig', 'claude/settings.json', '.claudex/a.json']) {
+    assert.equal(isDocsFastExtra(f), false, f);
+    assertFull([`M\t${f}`], f);
+  }
+  // workspace 안 README 는 그 workspace 의 code 축이다(fast 아님)
+  const v = verdictOf(['M\tapps/api-server/README.md']);
+  assert.equal(v.docs_fast_eligible, false);
+  assert.equal(v.api_affected, true);
+});
+
+test('Case DA7. 문서 · 에이전트 설정 + 코드 혼합 → fast 아님, 기존 경로', () => {
+  const api = verdictOf(['M\tCLAUDE.md', 'M\t.claude/settings.json', 'M\tapps/api-server/src/foo.ts']);
+  assert.equal(api.docs_fast_eligible, false);
+  assert.equal(api.api_affected, true);
+  assert.equal(api.global_or_unknown, false, '에이전트 설정 자체는 global 을 만들지 않는다');
+
+  const admin = verdictOf(['M\tAGENTS.md', 'M\tapps/admin-dashboard/src/main.tsx']);
+  assert.equal(admin.docs_fast_eligible, false);
+  assert.equal(admin.admin_only, true, 'admin fast path 는 그대로 동작한다');
+
+  assertFull(['M\tAGENTS.md', 'M\tscripts/ci/detect-affected.mjs'], 'root md + scripts');
+  assertFull(['M\t.claude/settings.json', 'M\tpackage.json'], '.claude + root manifest');
+});
+
+test('Case DA8. classifyDocs 단독 — fast 규칙이 classify 와 같다', () => {
+  assert.equal(docsOf(['M\tCLAUDE.md', 'M\tdocs/checks/X.md']).docs_fast_eligible, true);
+  assert.equal(docsOf(['M\tCLAUDE.md', 'M\tdocs/checks/X.md']).docs_only, false);
+  assert.equal(docsOf(['D\tCLAUDE.md']).docs_fast_eligible, false);
+  assert.equal(docsOf(['M\t.github/workflows/x.yml']).docs_fast_eligible, false);
+  // 기존 docs 규칙은 그대로다
+  assert.equal(docsOf(['M\tdocs/checks/data/anything.md']).docs_fast_eligible, false);
+  assert.equal(docsOf(['M\tdocs/checks/X.md']).docs_only, true);
+});
+
+test('Case DA9. multi-commit push — 앞 commit 이 코드면 에이전트 설정 변경이 있어도 fast 아님', () => {
+  const { dir, write, base } = makeRepo();
+  try {
+    write('apps/api-server/src/foo.ts', 'export const x = 2;\n');
+    git(dir, ['add', '-A']);
+    git(dir, ['commit', '-q', '-m', 'code']);
+    write('CLAUDE.md', 'doc\n');
+    write('.claude/settings.json', '{}\n');
+    git(dir, ['add', '-A']);
+    git(dir, ['commit', '-q', '-m', 'agent config']);
+    const head = git(dir, ['rev-parse', 'HEAD']).stdout.trim();
+    const read = readChangedFiles(base, head, dir);
+    assert.equal(read.ok, true);
+    const v = classify(read.files, graph);
+    assert.equal(v.docs_fast_eligible, false);
+    assert.equal(v.api_affected, true);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('Case DA10. docs consumer 선별이 root md · 에이전트 설정을 읽는 test 도 찾는다', () => {
+  // `cross-session-safe-commit-guard.spec.ts` 는 'CLAUDE.md' 문자열을 쓴다 — false positive 는 허용, 누락은 금지
+  const picked = selectDocsConsumerSpecs(parseFileList('M\tCLAUDE.md'));
+  assert.ok(picked.includes('src/__tests__/cross-session-safe-commit-guard.spec.ts'), picked.join(' '));
+  // 읽는 test 가 없는 경로는 빈 선별이다(정상 — 선별 0건)
+  assert.ok(Array.isArray(selectDocsConsumerSpecs(parseFileList('M\t.agents/skills/o4o-work-order/SKILL.md'))));
+});
+
+test('Case DA11. 배포 축 — .agents/ 는 .claude/ 처럼 non-runtime 이다 (비 Markdown · classifyApiDeploy 직접 호출도 배포 0)', () => {
+  for (const f of ['.agents/skills/o4o-work-order/SKILL.md', '.agents/x.json']) {
+    assert.equal(isNonRuntimeGlobal(f), true, f);
+    const files = parseFileList(`M\t${f}`);
+    assert.equal(classifyApiDeploy(files, graph).api_deploy_affected, false, `${f} → API 배포 0`);
+    assert.deepEqual(Object.entries(classifyWebDeploy(files, graph).services).filter(([, on]) => on).map(([k]) => k), [], `${f} → Web 배포 0`);
+  }
+  // 삭제여도 이미지 밖 경로는 배포 무영향이다(배포 축 규칙은 상태와 무관 — 기존 .claude/ 와 동일)
+  assert.equal(classifyApiDeploy(parseFileList('D\t.agents/skills/x/SKILL.md'), graph).api_deploy_affected, false);
+});
+
+test('Case DA12. ci-pipeline.yml — docs fast · Code Quality · admin fast 가 모두 .claude/ 검사를 돌린다 (어느 경로로도 우회 불가)', () => {
+  const yml = workflowYaml('ci-pipeline.yml');
+  const jobBlock = (id) => yml.split(`\n  ${id}:\n`)[1]?.split(/\n {2}[a-z][a-z0-9-]*:\n/)[0] ?? '';
+  // Codex P2(#973): `.claude/` + Admin 소스 혼합은 admin fast 경로로 간다 — 그 경로에서도 검사가 돌아야 우회가 없다.
+  const mixed = verdictOf(['M\t.claude/settings.json', 'M\tapps/admin-dashboard/src/main.tsx']);
+  assert.equal(mixed.admin_only, true, '.claude + Admin 소스 = admin fast 경로');
+  assert.equal(mixed.docs_fast_eligible, false);
+  for (const id of ['docs-fast-validate', 'quality-check', 'admin-fast-guards']) {
+    const block = jobBlock(id);
+    assert.ok(block, id);
+    assert.match(block, /node scripts\/ci\/check-agent-config\.mjs/, `${id} 가 .claude/ 검사를 실행해야 한다`);
+  }
+  assert.match(jobBlock('quality-check'), /scripts\/ci\/__tests__\/check-agent-config\.test\.mjs/, '검사 스크립트 자체의 회귀 시험도 blocking');
 });
 
 // ---------------------------------------------------------------------------
