@@ -14,7 +14,7 @@
 2. **B 그룹 26개 판정**: 전부 반영 13 · 대체됨 11 · **일부 반영 2**(`wo/pharmacyhub-residual-integration`, `wo/four-service-full-retirement-v1`). 단순 미반영으로 남은 작업은 없다. main 에 들어가지 않은 커밋은 모두 의도적으로 폐기됐거나 후속 PR 로 대체됐다.
 3. **삭제 대상 86개**: C 그룹 62개(병합된 PR 의 head branch) + B 그룹 중 전부 반영·대체됨 24개. 여기에 PR 없이 이미 main 에 전부 포함된 branch 3개를 선택 항목으로 덧붙였다. 열린 PR 의 branch 는 하나도 없다(대조 0건).
 4. **KEEP 2개**: `wo/pharmacyhub-residual-integration`(#610), `wo/four-service-full-retirement-v1`(#615). 남은 일부 작업을 이어 갈지 결정할 때까지 보존한다.
-5. **보안 주의**: `work/store-description-qr-audit-v1` 에는 production 조회 원문 JSON 7개(`tmp/store-description-qr-audit/*.json`, 2,196줄)가 들어 있다. 이 저장소는 Public 이다. #608 은 바로 이 이유로 그 파일들을 main 회수 대상에서 뺐다. branch 를 삭제해도 커밋은 SHA 로 한동안 접근할 수 있다. 완전 제거가 필요하면 GitHub 지원 요청(캐시 · 연결되지 않은 객체 정리)을 따로 검토해야 한다.
+5. **보안 확인 (2026-11-07)**: `work/store-description-qr-audit-v1` 에는 조회 결과 JSON 7개(`tmp/store-description-qr-audit/*.json`, 2,196줄)가 있다. ① 현재 main 에 없고, main 이력 18,372커밋 어디에도 들어간 적이 없다(경로 · blob SHA · 파일명으로 대조). 이 커밋을 가진 원격 branch 는 이 branch 하나뿐이다. ② 항목은 상품 200건의 내부 ID(UUID) · 상품명 · 분류 · 건수 집계 · 판정 문장 · 소스 경로 · 코드 식별자 · 공개 서비스 도메인 URL · SELECT 문 1개다. 이메일 · 전화번호 · 주소 · 이름 · 계정 식별자 · 비밀번호 · 토큰 · key 는 패턴 검사와 키 이름 확인에서 0건이었다(전화번호 패턴 2건은 UUID 안 숫자열의 오탐). ③ **소유자 확인 사항**: 이 JSON 은 운영 실데이터가 아니라 테스트용 자료다(통합 담당 확인, 2026-11-07). 따라서 이 branch 는 다른 branch 와 같은 **일반 삭제 대상**으로 둔다. 판정은 패턴 · 키 기준이라 패턴에 맞지 않는 형태의 값까지 완전히 배제하지는 못한다.
 
 ## 1. 방법
 
@@ -69,7 +69,7 @@
 | `docs/google-only-auth-cleanup-check` `d88f687a86` | 없음 | 전부 반영 | #608 회수. ENROLLMENT CHECK 는 branch 초안 대신 main `9aac89b74f` 판을 유지한다고 커밋에 명시 | 삭제 |
 | `docs/enrollment-closeout` `51903a1254` | 없음 | 전부 반영 | #608 에서 3-way 적용. 51/51줄 일치 | 삭제 |
 | `work/cross-service-my-store-runtime-contract-commonization-v1` `26c7e0eb18` | #207 병합 후 추가 push | 대체됨 | 같은 작업이 [#211](https://github.com/Renagang21/o4o-platform/pull/211)(merged, "KCos·GP 태블릿 client 계약 중복 제거")로 반영됨. 대상 `services/web-glycopharm` · `web-k-cosmetics` 는 main 에서 제거됨 | 삭제 |
-| `work/store-description-qr-audit-v1` `9aa2a48f82` | 없음 | 전부 반영 | #608 이 CHECK 를 회수했고, production 조회 원문 `tmp/*.json` 7개는 Public 저장소라 의도적으로 제외. **이 branch 에 production 원문이 남아 있으므로 삭제를 우선 처리** (§0-5) | 삭제 (우선) |
+| `work/store-description-qr-audit-v1` `9aa2a48f82` | 없음 | 전부 반영 | #608 이 CHECK 를 회수했고, `tmp/*.json` 조회 결과 7개는 Public 저장소라 의도적으로 제외. JSON 에 개인정보 · 비밀값 없음, 소유자 확인상 테스트용 자료(§0-5) | 삭제 |
 
 ## 5. C 그룹 — PR 이 병합됐는데 원격에 남은 branch (62)
 
@@ -308,7 +308,7 @@ git fetch origin --prune
 |---|---|---|
 | `wo/pharmacyhub-residual-integration` 재개 여부 | LOCAL → 통합 담당 | 운영 DB read-only 로 PH(`pharmacy-hub`) 서비스 키 · slug 를 가진 조직 · 모집 · 초대 · tablet device 행이 남아 있는지 확인한다. 남아 있으면 최신 main 기준 재현 기반 WO 를 만들고, 없으면 branch 를 삭제한다 |
 | GlycoPharm `glycocare` scope 잔재 정리 | CLOUD | §3 #615 ①. 공용 타입(`packages/types`)을 포함하므로 shared module protocol 에 따라 소비처를 식별한 뒤 정리한다. 착수하면 `wo/four-service-full-retirement-v1` 삭제 |
-| `work/store-description-qr-audit-v1` | 통합 담당 | production 원문 노출 branch. 우선 삭제하고, 필요하면 GitHub 지원 요청으로 객체 완전 제거를 검토 |
+| `work/store-description-qr-audit-v1` | 통합 담당 | 보안 확인 완료(§0-5): main 유입 이력 없음 · 개인정보 · 비밀값 없음 · 소유자 확인상 테스트용 자료. 별도 조치 없이 §6 스크립트의 일반 삭제 대상으로 처리 |
 
 ## 8. 검증 · 한계
 
