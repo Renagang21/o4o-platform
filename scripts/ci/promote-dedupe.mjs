@@ -69,14 +69,42 @@ export function covers(prev, cur) {
   return cur.every((s) => prev.includes(s));
 }
 
-/**
- * @returns {Promise<{skip: boolean, reason: string, runUrl?: string}>}
- */
-export async function checkDuplicate({ repo, sha, runId, services, dryRun, force, token, apiUrl = 'https://api.github.com', fetchImpl = globalThis.fetch }) {
+/** 판정 전에 막지 않는 이유가 이미 있으면 그 결과, 없으면 null */
+function precheck({ repo, sha, dryRun, force, token, fetchImpl }) {
   if (String(force).toLowerCase() === 'true') return { skip: false, reason: "force='true' — 같은 SHA 여도 실행" };
   if (String(dryRun).toLowerCase() === 'true') return { skip: false, reason: 'dry-run 은 판정만 하므로 막지 않는다' };
   if (!/^[0-9a-f]{40}$/.test(String(sha ?? ''))) return { skip: false, reason: 'SHA 형식이 40자 hex 가 아님 — 판정은 delivery 가 거절한다' };
   if (!repo || !token || typeof fetchImpl !== 'function') return { skip: false, reason: '저장소 · token 없음 — 확인 불가' };
+  return null;
+}
+
+/** commit status 의 target_url 이 그 run(id 경계 · `/attempts/N` 허용)을 가리키는가 */
+function pointsToRun(targetUrl, runId) {
+  const url = String(targetUrl ?? '');
+  const marker = `/actions/runs/${runId}`;
+  return url.endsWith(marker) || url.includes(`${marker}/`);
+}
+
+/**
+ * 성공한 run 중 모든 서비스를 target 에 올리고 끝난 첫 run.
+ * 목록은 최신순이다 — 그 run 의 URL 로 남은 첫 status 가 마지막 값이다(classify 의 DEPLOYING → report 의 최종값).
+ * success 는 SUPERSEDED(PROMOTE_REFUSED_NOT_HEAD = 배포 0)에도 나온다 — overall 이 DEPLOYED · NO_DEPLOY 일 때만 완료.
+ */
+function findCompleted(done, statuses) {
+  for (const x of done) {
+    const last = statuses.find((st) => st?.context === STATUS_CONTEXT && pointsToRun(st?.target_url, x.run.id));
+    const overall = String(last?.description ?? '').split(' ')[0];
+    if (last?.state === 'success' && COMPLETE.has(overall)) return { run: x.run, overall };
+  }
+  return null;
+}
+
+/**
+ * @returns {Promise<{skip: boolean, reason: string, runUrl?: string}>}
+ */
+export async function checkDuplicate({ repo, sha, runId, services, dryRun, force, token, apiUrl = 'https://api.github.com', fetchImpl = globalThis.fetch }) {
+  const early = precheck({ repo, sha, dryRun, force, token, fetchImpl });
+  if (early) return early;
   const self = Number(runId);
   const want = parseServices(services);
   const base = apiUrl.replace(/\/$/, '');
@@ -107,15 +135,8 @@ export async function checkDuplicate({ repo, sha, runId, services, dryRun, force
     if (done.length === 0) return { skip: false, reason: same.length ? `이전 Promote ${same.length}건 중 성공한 run 없음 — 실행` : '같은 SHA 의 이전 Promote 없음' };
     const statuses = await get(`commits/${sha}/statuses?per_page=100`);
     if (!Array.isArray(statuses)) return { skip: false, reason: 'commit status 응답 형식 이상 — 확인 불가' };
-    for (const x of done) {
-      // 목록은 최신순이다 — 그 run 의 URL 로 남은 첫 status 가 마지막 값이다(classify 의 DEPLOYING → report 의 최종값)
-      const last = statuses.find((st) => st?.context === STATUS_CONTEXT && new RegExp(`/actions/runs/${x.run.id}(/|$)`).test(String(st?.target_url ?? '')));
-      const overall = String(last?.description ?? '').split(' ')[0];
-      // success 는 SUPERSEDED(PROMOTE_REFUSED_NOT_HEAD = 배포 0)에도 나온다 — overall 이 DEPLOYED · NO_DEPLOY 일 때만 완료
-      if (last?.state === 'success' && COMPLETE.has(overall)) {
-        return { skip: true, reason: `같은 SHA 의 Promote 가 이미 모든 서비스를 target 에 올림 (run ${x.run.id} · production=${overall})`, runUrl: x.run.html_url };
-      }
-    }
+    const hit = findCompleted(done, statuses);
+    if (hit) return { skip: true, reason: `같은 SHA 의 Promote 가 이미 모든 서비스를 target 에 올림 (run ${hit.run.id} · production=${hit.overall})`, runUrl: hit.run.html_url };
     return { skip: false, reason: `성공한 이전 Promote ${done.length}건 모두 일부만 승격 · 보류 · 기록 없음 — 실행` };
   } catch (error) {
     return { skip: false, reason: `Promote run 조회 실패(${error?.message ?? error?.name ?? 'Error'}) — 확인 불가` };
