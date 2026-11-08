@@ -19,21 +19,25 @@
 
 ## 테스트 계정 찾기 — 브라우저·운영 검증 전
 
-실제 테스트 계정의 기준 파일은 **`docs/local/TEST-ACCOUNTS.local.md`** 하나입니다 (사용자 결정 2026-10-16).
-리팩터링 이전 테스트 계정은 모두 폐기됐습니다. 운영자·관리자·회원 로그인 검증 전에 이 파일을 먼저 확인합니다.
-서비스에서 같은 운영자 아이디를 사용하더라도 현재 서비스 역할·가입 상태는 로그인 후 별도로 확인합니다.
-로그인·역할 확인 결과는 그 파일의 확인 상태·확인 기록 표에만 남깁니다.
+테스트 계정의 기준 파일은 **[`docs/TEST-ACCOUNTS.md`](docs/TEST-ACCOUNTS.md)** 하나입니다 (통합 담당 결정 2026-11-08).
+저장소에 추적되므로 **새 clone·worktree·클라우드 세션·Codex Cloud 에 그대로 들어옵니다.** 별도 파일 전달이 필요 없습니다.
 
-이 파일은 `.gitignore`의 `docs/local/*.local.md` 규칙으로 제외되므로 **새 clone·worktree·Codex Cloud에 자동으로 들어오지 않습니다.**
-현재 checkout에 없으면 같은 작업환경의 기준 checkout에 있는 동일 경로를 확인합니다. 거기에도 없으면 파일이 없다는 사실과
-필요한 경로를 알리고, 사용자의 로컬 원본을 승인된 비공개 파일 전달 또는 환경 Secret 연결로 제공받습니다.
-스크린샷에 경로가 보이는 것만으로 클라우드에서 파일 내용을 읽을 수 있는 것은 아닙니다.
-파일로 연결한 경우 파일 존재와 `git check-ignore -v docs/local/TEST-ACCOUNTS.local.md`를 확인합니다.
+- **사용자 테스트는 로그인 화면의 「테스트 로그인」 버튼으로 합니다.** 매장 경영자 · 공급자 · 매장 직원 세 버튼이 있고,
+  계정은 공개 Demo 계정입니다(정책 [`O4O-CANONICAL-DEMO-ACCOUNTS-V1`](docs/baseline/O4O-CANONICAL-DEMO-ACCOUNTS-V1.md) · 값의 코드 정본 `packages/auth-utils/src/demoAccounts.ts`).
+- Google·카카오 로그인은 테스트 계정 대상이 아닙니다. 외부 계정 로그인 화면은 사용자에게 넘겨 사용자가 직접 로그인합니다.
+- 운영자·관리자 계정은 Demo 에 없습니다. 그 화면 검증은 작업 지시에 계정 확보 방법이 있을 때만 합니다.
+- 서비스별 현재 역할·가입 상태는 로그인 후 별도로 확인합니다. 화면이 열린 것과 역할 검증 통과는 구분해 보고합니다.
 
-계정·비밀번호를 공개 문서·커밋·로그에 복사하지 않습니다. 예전 seed 계정, 이전 계정 파일의 사본, 공개 Demo 계정으로 임의 대체하거나
-비밀번호를 추측하지 않습니다. 상태 변경 검증은 테스트 대상과 원상 복구 방법을 확인한 뒤 수행합니다.
+계정·비밀번호를 문서·커밋·로그에 복사하지 않습니다(Demo 값의 정본은 코드 하나). 예전 seed 계정, 이전 계정 파일의 사본으로 임의 대체하거나
+비밀번호를 추측하지 않습니다. 버튼 로그인이 실패하면 다른 계정으로 대체하지 않고 실패로 보고합니다. 상태 변경 검증은 테스트 대상과 원상 복구 방법을 확인한 뒤 수행합니다.
 
-### 기준 파일 변경 (2026-10-16)
+### 기준 파일 변경 (2026-11-08)
+
+2026-10-16 에 정한 로컬 전용 `docs/local/TEST-ACCOUNTS.local.md` 는 더 이상 기준 파일이 아니다. 클라우드 세션이 읽을 수 없어
+통합 담당이 기준을 저장소 추적 파일 `docs/TEST-ACCOUNTS.md` 로 바꾸고, 사용자 테스트는 로그인 화면의 테스트 로그인 버튼으로 하도록 정했다.
+로컬 사본이 남아 있으면 계정 출처로 쓰지 않는다. `.gitignore` 의 `docs/local/*.local.md` 행은 로컬 사본이 실수로 추적되지 않도록 유지한다.
+
+### 기준 파일 변경 (2026-10-16 · 기록)
 
 2026-10-11에 정한 `docs/local/TEST-ACCOUNT.txt`는 더 이상 기준 파일이 아니다. 사용자 지시로 기준을
 `docs/local/TEST-ACCOUNTS.local.md`로 바꿨다. `TEST-ACCOUNT.txt`가 남아 있는 checkout에서는 그 파일을 계정 출처로 쓰지 않는다.
@@ -286,7 +290,7 @@ Admin 개발 서버의 기준 포트는 **3001**입니다. `apps/admin-dashboard
 **로그인 · AI 호출 (실제 기능 smoke 에만 필요)**
 
 - 화면 기동 자체에는 Google OAuth 도 AI key 도 필요 없습니다.
-- 현행 로그인은 이메일·비밀번호, Google, 카카오를 지원합니다. 일반 계정 검증에는 위의 로컬 전용 `TEST-ACCOUNTS.local.md`를 사용하며, 아래는 Google 개발용 설정 예시입니다.
+- 현행 로그인은 이메일·비밀번호, Google, 카카오를 지원합니다. 일반 계정 검증에는 위의 `docs/TEST-ACCOUNTS.md`(로그인 화면 테스트 로그인 버튼)를 사용하며, 아래는 Google 개발용 설정 예시입니다.
 - Google 로그인 smoke는 GIS popup → ID token → API의 `aud` 검증 흐름을 확인합니다. 로컬 Google 로그인 smoke에는
   Authorized JavaScript origin 에 `http://localhost:3000` 이 등록된 **개발용 OAuth Client ID** 하나가 필요합니다.
   `apps/api-server/.env` 에 아래 한 줄만 넣습니다. web-neture 에는 Google 설정이 없습니다(Client ID 는 API 의 `/auth/google/config` 가 내려줍니다).
