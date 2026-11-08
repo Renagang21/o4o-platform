@@ -46,6 +46,8 @@ export interface HomeItem {
   reason?: string;
   newsReviewId?: string;
   newsRecommendation?: { recommended: boolean; reason: string };
+  autoPublished?: boolean;
+  expiresAt?: string | null;
 }
 export interface HomePreview {
   pinned: HomeItem[];
@@ -82,8 +84,51 @@ export interface NewsCollection {
   state: "pending" | "done" | "partial" | "failed";
   sources: { id: string; added: number; status: string }[];
 }
+export interface NewsAutoRun {
+  id: string;
+  day: string;
+  window: "morning" | "afternoon";
+  state: "running" | "done" | "partial" | "no_articles" | "ai_disabled" | "failed";
+  trigger: "schedule" | "manual";
+  sources: {
+    id: string;
+    status: string;
+    fetched: number;
+    added: number;
+    duplicates: number;
+    outOfWindow: number;
+  }[];
+  ai: "pending" | "done" | "skipped" | "disabled" | "failed";
+  candidates: number;
+  clusters: number;
+  published: number;
+  swapped: number;
+  suppressed: number;
+  startedAt: string;
+  finishedAt: string | null;
+}
+export interface NewsEngagementItem {
+  contentId: string;
+  position: number;
+}
 export function createCommunityHomeApi(api: CommunityHomeClient) {
   return {
+    autoRuns: async () =>
+      (await api.get("/communities/community/management/news-auto-runs")).data
+        .data as NewsAutoRun[],
+    runAutoNews: async () =>
+      (
+        await api.post(
+          "/communities/community/management/news-auto-runs",
+          {},
+          { timeout: 180000 },
+        )
+      ).data.data as NewsAutoRun,
+    /** Anonymous aggregate only; a lost beacon must never disturb the page. */
+    newsEngagement: (
+      event: "impression" | "click",
+      items: NewsEngagementItem[],
+    ) => api.post("/communities/community/news-engagement", { event, items }),
     collection: async () =>
       (await api.get("/communities/community/management/news-collection")).data
         .data as NewsCollection | null,

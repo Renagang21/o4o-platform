@@ -119,3 +119,34 @@ it("operators cannot see sale or closure controls and own-account actions stay h
   expect(screen.queryByRole("region")).toBeNull();
   expect(screen.queryByText("이용 정지")).toBeNull();
 });
+it.each(["pending", "rejected"])(
+  "does not open the termination form for a %s member even when the panel asks for it",
+  (serviceStatus) => {
+    render(
+      <MemberLifecycleActions
+        initialAction="terminate"
+        detail={{ ...detail, member: { ...detail.member, serviceStatus } } as MemberDetail}
+        actorId="operator"
+        busy={false}
+        perform={async () => {}}
+      />,
+    );
+    expect(screen.queryByText("회원 해지 실행")).toBeNull();
+    expect(screen.queryByRole("button", { name: "회원 해지" })).toBeNull();
+    expect(screen.getByText(/가입 대기 · 반려 회원은 이용 해지 대상이 아닙니다/)).toBeTruthy();
+    expect(api.post).not.toHaveBeenCalled();
+  },
+);
+it("still opens the termination form for an active member", () => {
+  render(
+    <MemberLifecycleActions
+      initialAction="terminate"
+      detail={detail}
+      actorId="operator"
+      busy={false}
+      perform={async () => {}}
+    />,
+  );
+  expect(screen.getByText("회원 이용을 해지합니다. 이후 이용 복구가 가능합니다.")).toBeTruthy();
+  expect(screen.queryByText(/이용 해지 대상이 아닙니다/)).toBeNull();
+});

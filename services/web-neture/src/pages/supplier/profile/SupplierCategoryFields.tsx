@@ -20,10 +20,10 @@ export default function SupplierCategoryFields({
     <>
       {/* Section A-4: 공급 예정 품목군 (WO-O4O-SUPPLIER-REGULATED-CATEGORY-DOCUMENTS-V1) */}
       <div className="bg-white border border-gray-200 rounded-xl p-6 mb-4">
-        <h2 className="flex items-center gap-2 text-base font-semibold text-gray-800 mb-2">
+        <h3 className="flex items-center gap-2 text-base font-semibold text-gray-800 mb-2">
           <FileText className="w-5 h-5 text-gray-500" />
           공급 예정 품목군
-        </h2>
+        </h3>
         {/* WO-O4O-NETURE-SUPPLIER-PROFILE-CATEGORY-SELECTION-ONLY-AND-PRODUCT-LIGHTWEIGHT-GATE-V1:
             선택-only — 번호/PDF/검토요청은 프로필 단계에서 제거. 규제 적합성은 상품 등록·운영자 확인 단계. */}
         <p className="text-xs text-gray-500 mb-5">

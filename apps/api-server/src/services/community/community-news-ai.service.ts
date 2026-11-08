@@ -11,6 +11,11 @@ import {
   createCommunityNewsExtension,
   type NewsCandidate,
 } from "./community-news-policy.js";
+import {
+  NEWS_AUTO_LIMITS,
+  createCommunityNewsClusterExtension,
+  type NewsClusterInput,
+} from "./community-news-auto-policy.js";
 import logger from "../../utils/logger.js";
 
 async function generate(
@@ -70,4 +75,84 @@ export function generateScheduledNewsSuggestions(
   input: readonly NewsCandidate[],
 ) {
   return generate(input, undefined);
+}
+
+/** V2: one provider attempt per reserved window; the server decides publication from the validated output. */
+async function generateClusters(
+  input: readonly NewsClusterInput[],
+  actor: string | undefined,
+) {
+  const policy = await AppDataSource.getRepository(AiQueryPolicy).findOneBy({
+    id: 1,
+  });
+  if (!policy?.aiEnabled) throw new Error("AI_DISABLED");
+  const apiKey = await resolveAiApiKey(AppDataSource, "gemini");
+  if (!apiKey) throw new Error("AI_NOT_CONFIGURED");
+  const model = await resolveEditingModel();
+  const run = await runAiExtension(
+    {
+      extension: createCommunityNewsClusterExtension(input),
+      input: undefined,
+      context: {
+        requestId: randomUUID(),
+        serviceId: "community",
+        featureId: "industry-news-clusters",
+        actorId: actor ?? "community-news-scheduler",
+        audience: "staff",
+      },
+      materials: [],
+      funding: { payer: "platform" },
+    },
+    createAccountedExtensionRuntime(AppDataSource, {
+      request: {
+        provider: "gemini",
+        responseMode: "json",
+        config: {
+          apiKey,
+          model,
+          temperature: 0.1,
+          maxTokens: NEWS_AUTO_LIMITS.maxOutputTokens,
+        },
+        timeoutMs: NEWS_AUTO_LIMITS.timeoutMs,
+        retry: { maxAttempts: 1 },
+        meta: {
+          service: "community",
+          callerName: "community.industry-news-clusters",
+        },
+      },
+      accounting: {
+        scope: "SERVICE_QUERY",
+        serviceKey: "community",
+        userId: actor,
+      },
+    }),
+    {
+      authorize: async () => {
+        if (actor)
+          await requireCommunityManager(
+            AppDataSource,
+            actor,
+            false,
+            "editorial",
+          );
+        else await requireNewsAutomationEnabled(AppDataSource);
+        return true;
+      },
+      record: async (event) => {
+        logger.info("[COMMUNITY_NEWS_AI]", event);
+      },
+    },
+  );
+  return run.output;
+}
+export function generateNewsClusters(
+  input: readonly NewsClusterInput[],
+  actor: string,
+) {
+  return generateClusters(input, actor);
+}
+export function generateScheduledNewsClusters(
+  input: readonly NewsClusterInput[],
+) {
+  return generateClusters(input, undefined);
 }

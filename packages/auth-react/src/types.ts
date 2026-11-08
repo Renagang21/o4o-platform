@@ -62,8 +62,10 @@ export interface GoogleSignupConsents {
   terms: boolean;
   privacy: boolean;
   marketing?: boolean;
-  phone: string;
-  name: string;
+  /** 선택(WO-O4O-AUTH-ONBOARDING-UX-CLEANUP-V1 T2). */
+  phone?: string;
+  /** 선택(WO-O4O-AUTH-ONBOARDING-UX-CLEANUP-V1 T2). */
+  name?: string;
   nickname?: string;
 }
 

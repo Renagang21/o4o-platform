@@ -18,7 +18,8 @@ GitHub Actions 의 GCP 인증은 **장기 SA key 없이** GitHub OIDC → WIF �
 - provider: `projects/117791934476/locations/global/workloadIdentityPools/github-actions/providers/o4o-platform` (식별자 · 비밀 아님 → workflow 상수)
 - provider 조건: `repository_id` · `repository_owner_id` 일치 · `environment == production` · `ref` = `refs/heads/main` 또는 `refs/tags/deploy/*` ·
   `event_name` ∈ {`workflow_run`, `workflow_dispatch`} · `workflow_dispatch` 는 소유자 `actor_id` 만 ·
-  `job_workflow_ref` ∈ {`delivery` · `deploy-api` · `deploy-admin` · `deploy-web-services` · `gcp-wif-auth-smoke`}.yml @ main · deploy/*
+  `job_workflow_ref` ∈ {`delivery` · `deploy-api` · `deploy-admin` · `deploy-web-services` · `deploy-cooperative` · `gcp-wif-auth-smoke` · `pharmacyhub-qr-cutover`}.yml @ main · deploy/*
+  (2026-11-07 provider 조회 기준 7개. `schedule` 이벤트는 허용하지 않는다 — 조회 결과 · 변경안은 [`IR-O4O-PR-FILE-OVERLAP-AND-CONFLICT-HOTSPOTS-V1` §5-5](../docs/investigations/IR-O4O-PR-FILE-OVERLAP-AND-CONFLICT-HOTSPOTS-V1.md))
 - SA 에 부여한 것은 그 repository principalSet 의 `roles/iam.workloadIdentityUser` 하나 (SA 의 프로젝트 역할은 무변경).
 - 인증 확인: `gcp-wif-auth-smoke.yml` (수동 · 소유자 · read-only). 계약: `scripts/ci/__tests__/deploy-workflow-gates.test.mjs`.
 - 다른 workflow 에서 GCP 인증이 필요해지면 provider 조건의 허용 workflow 목록을 먼저 바꿔야 한다(소유자 · GCP 측 변경).

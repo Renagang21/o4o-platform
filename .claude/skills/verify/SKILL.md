@@ -18,6 +18,6 @@ description: 변경 범위 검증 - 바뀐 경로에 맞는 타입 검사 · 테
    | entity · migration · SQL | `node scripts/check-forbidden-tables.mjs` · ESM 규칙(`CLAUDE.md` §2) 확인 |
    | 공통 모듈 · config · sidebar | `node scripts/quality/check-literal-consumers.mjs --source <파일>` (소비처 전수 — `AGENTS.md` §3) |
    | `docs/**` · 루트 md | `node scripts/check-doc-sensitive.mjs` |
-   | UI | 빌드 성공만으로 종결하지 않는다 — PC · 모바일 화면 확인(테스트 계정은 `docs/local/TEST-ACCOUNTS.local.md`) |
+   | UI | 빌드 성공만으로 종결하지 않는다 — PC · 모바일 화면 확인(테스트 계정은 `docs/TEST-ACCOUNTS.md` — 로그인 화면 테스트 로그인 버튼) |
 
 4. 보고: 명령 · 통과/실패 건수 · 실패 원인을 그대로 적는다. 현재 변경과 무관한 실패는 고치지 않고 base(`origin/main`)에서도 실패하는지 확인해 보고한다. 건너뛴 검증은 이유와 함께 적는다.

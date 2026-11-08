@@ -4,8 +4,9 @@ import type { SignupTermsDocument } from '@o4o/auth-client';
  * <EmailSignupForm /> — 이메일 회원가입 + <EmailSentNotice /> 확인 메일 안내
  * WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1
  *
- * 입력: 이메일(=로그인 아이디) · 이름 · 휴대전화 · 비밀번호 · 비밀번호 확인 · 필수 약관.
+ * 입력: 이메일(=로그인 아이디) · 이름(선택) · 휴대전화(선택) · 비밀번호 · 비밀번호 확인 · 필수 약관.
  * 휴대전화는 아이디 찾기에만 쓴다(본인 인증이 아니다).
+ * WO-O4O-AUTH-ONBOARDING-UX-CLEANUP-V1 T2: 이름 · 휴대전화는 선택이다 — 가입 유형 입력 단계가 필수로 받는다.
  * 가입은 계정만 만든다 — 서비스 가입 · 조직 · 역할을 주지 않고 세션도 열지 않는다(메일 확인 후 로그인).
  * 이미 쓰는 이메일은 서버가 안내 문구를 준다(새 계정 · 자동 병합 없음).
  */
@@ -52,15 +53,15 @@ export function EmailSignupForm({ api, links, className }: EmailSignupFormProps)
 
   const phoneDigits = signupPhoneDigits(phone);
   const emailOk = isLoginEmailShapeValid(email);
-  const phoneOk = PHONE_SHAPE.test(phoneDigits);
+  // 선택 항목: 비어 있으면 통과, 값이 있으면 형식만 확인한다.
+  const phoneOk = phone.trim().length === 0 || PHONE_SHAPE.test(phoneDigits);
   const policyOk = checkPasswordPolicy(password).length === 0;
   const confirmOk = confirm.length > 0 && confirm === password;
-  const ready = !!policy && emailOk && name.trim().length > 0 && nickname.trim().length > 0 && phoneOk && policyOk && confirmOk && terms && privacy && !submitting;
+  const ready = !!policy && emailOk && nickname.trim().length > 0 && phoneOk && policyOk && confirmOk && terms && privacy && !submitting;
   const missing = [
     !nickname.trim() && '닉네임 입력',
     !emailOk && '올바른 이메일 입력',
-    !name.trim() && '이름 입력',
-    !phoneOk && '국내 휴대전화 번호 입력',
+    !phoneOk && '휴대전화 번호 형식 확인',
     !policyOk && '비밀번호 조건 충족',
     !confirmOk && '비밀번호 확인 일치',
     !policy && '이용약관 불러오기',
@@ -90,9 +91,9 @@ export function EmailSignupForm({ api, links, className }: EmailSignupFormProps)
     try {
       const res = await api.signupWithEmail({
         email: email.trim(),
-        name: name.trim(),
+        ...(name.trim() ? { name: name.trim() } : {}),
         nickname: nickname.trim(),
-        phone: phoneDigits,
+        ...(phoneDigits ? { phone: phoneDigits } : {}),
         password,
         consents: { terms, privacy, marketing, ...signupPolicyReferences(policy!) },
       });
@@ -138,7 +139,7 @@ export function EmailSignupForm({ api, links, className }: EmailSignupFormProps)
         {email.length > 0 && !emailOk && <p style={styles.hintBad}>올바른 이메일 주소를 입력해 주시기 바랍니다.</p>}
       </div>
       <div style={styles.field}>
-        <label htmlFor="o4o-signup-name" style={styles.label}>이름</label>
+        <label htmlFor="o4o-signup-name" style={styles.label}>이름 (선택)</label>
         <input
           id="o4o-signup-name"
           name="name"
@@ -151,7 +152,7 @@ export function EmailSignupForm({ api, links, className }: EmailSignupFormProps)
         />
       </div>
       <div style={styles.field}>
-        <label htmlFor="o4o-signup-phone" style={styles.label}>휴대전화</label>
+        <label htmlFor="o4o-signup-phone" style={styles.label}>휴대전화 (선택)</label>
         <input
           id="o4o-signup-phone"
           name="phone"

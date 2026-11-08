@@ -928,7 +928,7 @@ describe('EmailAuthService', () => {
     it.each([
       [{ consents: { terms: true, privacy: false } }, 'CONSENT_REQUIRED'],
       [{ email: 'bad' }, 'INVALID_EMAIL'],
-      [{ name: '  ' }, 'INVALID_NAME'],
+      [{ name: 'x'.repeat(51) }, 'INVALID_NAME'],
       [{ phone: '02-123-4567' }, 'INVALID_PHONE'],
       [{ password: 'abcdefgh1' }, 'PASSWORD_POLICY_VIOLATION'],
       [{ password: 'abc!1' }, 'PASSWORD_POLICY_VIOLATION'],
@@ -941,6 +941,18 @@ describe('EmailAuthService', () => {
       expect(h.store.users).toHaveLength(0);
       expect(h.store.creds.size).toBe(0);
     });
+
+    // WO-O4O-AUTH-ONBOARDING-UX-CLEANUP-V1 T2: 이름 · 휴대전화는 가입 선택 항목이다.
+    it.each([[{ name: '', phone: '' }], [{ name: '  ', phone: '  ' }], [{ name: undefined, phone: undefined }]])(
+      '이름 · 휴대전화 없이도 가입된다 — 빈 값은 저장하지 않는다 (%j)',
+      async (over) => {
+        const h = makeHarness();
+        await h.service.signup(signupInput(over as never));
+        expect(h.store.users).toHaveLength(1);
+        expect(h.store.users[0].name ?? null).toBeNull();
+        expect(h.store.users[0].phone ?? null).toBeNull();
+      },
+    );
 
     it('정책 위반은 위반 항목을 details 로 돌려준다(대소문자 요구 없음)', async () => {
       const h = makeHarness();

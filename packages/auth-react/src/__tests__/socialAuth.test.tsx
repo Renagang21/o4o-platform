@@ -14,7 +14,7 @@ it('hides unconfigured Kakao and rejects no normal login method',async()=>{
 it('Kakao callback signup requires explicit consent, then shows email verification without logging in',async()=>{
  callback={token:'state',code:'code',kind:'kakao-login',cancelled:false};const success=vi.fn();const signup=vi.fn(async()=>({success:false,nextStep:'verify-email' as const,mailSent:true}));
  render(<KakaoContinue client={{getSignupTerms:async()=>TERMS,getKakaoAuthConfig:async()=>({enabled:true}),startKakaoLogin:vi.fn()}} loginWithKakao={async()=>({success:false,nextStep:'signup',signupTicket:'ticket',email:'synthetic@fixture.invalid'})} signupWithKakao={signup} onSuccess={success} privacyHref="/old-service-privacy" />);
- await screen.findByRole('link',{name:'내용 보기 · 버전 1'});expect(screen.getByTestId('kakao-continue').querySelector('a[href="https://neture.co.kr/privacy"]')?.getAttribute('target')).toBe('_blank');await screen.findByLabelText('이메일');fireEvent.change(screen.getByLabelText('닉네임'), { target: { value: 'Fixture nickname' } });fireEvent.change(screen.getByLabelText('이름'),{target:{value:'Synthetic'}});fireEvent.change(screen.getByLabelText('개인 휴대전화'),{target:{value:'01000000000'}});
+ await screen.findByRole('link',{name:'내용 보기 · 버전 1'});expect(screen.getByTestId('kakao-continue').querySelector('a[href="https://neture.co.kr/privacy"]')?.getAttribute('target')).toBe('_blank');await screen.findByLabelText('이메일');fireEvent.change(screen.getByLabelText('닉네임'), { target: { value: 'Fixture nickname' } });fireEvent.change(screen.getByLabelText('이름 (선택)'),{target:{value:'Synthetic'}});fireEvent.change(screen.getByLabelText('개인 휴대전화 (선택)'),{target:{value:'01000000000'}});
  fireEvent.click(screen.getByLabelText(/이용약관/));fireEvent.click(screen.getByLabelText(/개인정보 처리방침/));fireEvent.submit(screen.getByRole('button',{name:'동의하고 계정 만들기'}).closest('form')!);
  await screen.findByText(/확인 메일을 보냈습니다/);expect(signup).toHaveBeenCalledWith('ticket',expect.objectContaining({consents:{terms:true,privacy:true,marketing:false,termsPolicy:{policyDocumentId:TERMS.policyDocumentId,version:TERMS.version}}}));expect(success).not.toHaveBeenCalled();
 });
@@ -57,10 +57,50 @@ it('Kakao requires fresh privacy acknowledgement after a policy version mismatch
   const signup=vi.fn(async()=>({success:false,code:'POLICY_VERSION_MISMATCH',error:'Changed'}));
   render(<KakaoContinue client={{getSignupTerms:load,getKakaoAuthConfig:async()=>({enabled:true}),startKakaoLogin:vi.fn()}} loginWithKakao={async()=>({success:false,nextStep:'signup',signupTicket:'ticket',email:'synthetic@fixture.invalid'})} signupWithKakao={signup} onSuccess={vi.fn()} />);
   await screen.findByRole('link',{name:'내용 보기 · 버전 1'});
-  fireEvent.change(screen.getByLabelText('닉네임'), { target: { value: 'Fixture nickname' } });fireEvent.change(screen.getByLabelText('이름'),{target:{value:'Fixture'}});fireEvent.change(screen.getByLabelText('개인 휴대전화'),{target:{value:'01012345678'}});
+  fireEvent.change(screen.getByLabelText('닉네임'), { target: { value: 'Fixture nickname' } });fireEvent.change(screen.getByLabelText('이름 (선택)'),{target:{value:'Fixture'}});fireEvent.change(screen.getByLabelText('개인 휴대전화 (선택)'),{target:{value:'01012345678'}});
   fireEvent.click(screen.getAllByRole('checkbox')[0]);fireEvent.click(screen.getAllByRole('checkbox')[1]);
   fireEvent.submit(screen.getByRole('button',{name:'동의하고 계정 만들기'}).closest('form')!);
   await screen.findByRole('link',{name:'내용 보기 · 버전 2'});
   expect((screen.getAllByRole('checkbox')[1] as HTMLInputElement).checked).toBe(false);
   fireEvent.click(screen.getAllByRole('checkbox')[0]);expect((screen.getByRole('button',{name:'동의하고 계정 만들기'}) as HTMLButtonElement).disabled).toBe(true);expect(signup).toHaveBeenCalledTimes(1);
+});
+
+// WO-O4O-AUTH-ONBOARDING-UX-CLEANUP-V1 T1 · T2
+function renderKakaoSignup(signup: ReturnType<typeof vi.fn>) {
+  callback={token:'state',kind:'kakao-login'};
+  render(<KakaoContinue client={{getSignupTerms:async()=>TERMS,getKakaoAuthConfig:async()=>({enabled:true}),startKakaoLogin:vi.fn()}} loginWithKakao={async()=>({success:false,nextStep:'signup',signupTicket:'ticket',email:'synthetic@fixture.invalid'})} signupWithKakao={signup as any} onSuccess={vi.fn()} />);
+}
+async function submitKakaoSignup() {
+  await screen.findByRole('link',{name:'내용 보기 · 버전 1'});
+  fireEvent.change(screen.getByLabelText('닉네임'), { target: { value: 'Fixture nickname' } });
+  fireEvent.click(screen.getAllByRole('checkbox')[0]);fireEvent.click(screen.getAllByRole('checkbox')[1]);
+  fireEvent.submit(screen.getByRole('button',{name:'동의하고 계정 만들기'}).closest('form')!);
+}
+
+it('Kakao signup submits without name and phone — both optional and omitted when empty', async () => {
+  const signup=vi.fn(async()=>({success:false,nextStep:'verify-email' as const,mailSent:true}));
+  renderKakaoSignup(signup);
+  await submitKakaoSignup();
+  await screen.findByText(/확인 메일을 보냈습니다/);
+  const input=(signup.mock.calls[0] as unknown as [string, Record<string, unknown>])[1];
+  expect(input).not.toHaveProperty('name');expect(input).not.toHaveProperty('phone');
+});
+
+it('Kakao signup EMAIL_IN_USE shows link guidance directly above the submit button and keeps the form', async () => {
+  const signup=vi.fn(async()=>({success:false,code:'EMAIL_IN_USE',status:409,error:'이미 사용 중인 이메일입니다.'}));
+  renderKakaoSignup(signup);
+  await submitKakaoSignup();
+  const alert=await screen.findByTestId('kakao-signup-error');
+  expect(alert.textContent).toContain('계정 설정에서 카카오를 연결');
+  expect(alert.nextElementSibling?.textContent).toBe('동의하고 계정 만들기');
+  expect(screen.getByRole('button',{name:'동의하고 계정 만들기'})).toBeTruthy();
+});
+
+it('Kakao signup with an expired ticket closes the form and offers to start again', async () => {
+  const signup=vi.fn(async()=>({success:false,code:'SOCIAL_FLOW_INVALID',status:401,error:'인증을 다시 시작해 주시기 바랍니다.'}));
+  renderKakaoSignup(signup);
+  await submitKakaoSignup();
+  await screen.findByRole('button',{name:'카카오로 계속하기'});
+  expect(screen.queryByRole('button',{name:'동의하고 계정 만들기'})).toBeNull();
+  expect(screen.getByRole('alert').textContent).toContain('카카오로 다시 시작');
 });

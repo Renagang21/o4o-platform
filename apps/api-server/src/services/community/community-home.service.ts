@@ -1,5 +1,5 @@
 import { newsSource } from "./community-news-policy.js";
-import { recommendationFor } from "./community-news-review.service.js";
+import { newsDay, recommendationFor } from "./community-news-review.service.js";
 import { COMMUNITY_HOME_PIN_SQL } from "./community-home-pins.js";
 import type { EntityManager } from "typeorm";
 import type { CommunityAccessUser } from "../../utils/community-access.resolver.js";
@@ -22,7 +22,7 @@ const TYPES: Record<HomeKind, string> = {
 };
 const UUID = /^[a-f\d]{8}(-[a-f\d]{4}){3}-[a-f\d]{12}$/i;
 const SCOPE = `"serviceKey"='community' AND "organizationId" IS NULL AND metadata->>'section'='${EDITORIAL_SECTION}'`;
-const COLUMNS = `id,title,summary,"linkUrl","isPinned","sortOrder","createdAt","updatedAt",status,metadata->>'kind' AS kind,metadata->>'audience' AS audience,metadata->'newsRecommendation' AS "newsRecommendation"`;
+const COLUMNS = `id,title,summary,"linkUrl","isPinned","sortOrder","createdAt","updatedAt",status,metadata->>'kind' AS kind,metadata->>'audience' AS audience,metadata->'newsRecommendation' AS "newsRecommendation",metadata->'autoNews' IS NOT NULL AS "autoPublished"`;
 function fail(status: number, code: string, message: string): never {
   throw new CommunityManagementError(status, code, message);
 }
@@ -118,7 +118,8 @@ async function access(db: Exec, user: CommunityAccessUser | null) {
     fail(404, "COMMUNITY_NOT_FOUND", "커뮤니티를 찾을 수 없습니다.");
   return w;
 }
-const eligible = `status='published' AND ("expiresAt" IS NULL OR "expiresAt">NOW())`;
+/** An operator's news pin outlives the automatic expiry; unpinning returns the item to it. */
+const eligible = `status='published' AND ("expiresAt" IS NULL OR "expiresAt">NOW() OR ("isPinned"=true AND metadata->>'kind'='news'))`;
 const visibility = `($1::boolean OR metadata->>'audience'='public')`;
 export async function listEditorial(
   db: Exec,
@@ -210,7 +211,7 @@ export async function managedHomeItems(
 ) {
   await requireCommunityManager(db, actor, false, 'editorial');
   const rows = await db.query(
-    `SELECT ${COLUMNS},body FROM cms_contents WHERE ${SCOPE} AND metadata->>'kind'=$1
+    `SELECT ${COLUMNS},body,"expiresAt" FROM cms_contents WHERE ${SCOPE} AND metadata->>'kind'=$1
       ORDER BY "isPinned" DESC,"sortOrder","createdAt" DESC,id LIMIT 21 OFFSET $2`,
     [kind, (page - 1) * 20],
   );
@@ -229,10 +230,12 @@ export async function saveEditorial(
     "SELECT pg_advisory_xact_lock(hashtext('community-editorial'))",
   );
   let newsRecommendation: unknown;
+  let autoNews: Record<string, unknown> | undefined;
+  const signals: string[] = [];
   if (id) {
     homeUuid(id);
     const [existing] = await db.query(
-      `SELECT id,"linkUrl",metadata,metadata->>'kind' AS kind FROM cms_contents WHERE ${SCOPE} AND id=$1 FOR UPDATE`,
+      `SELECT id,title,summary,"linkUrl",status,"isPinned",metadata,metadata->>'kind' AS kind FROM cms_contents WHERE ${SCOPE} AND id=$1 FOR UPDATE`,
       [id],
     );
     if (existing?.kind !== item.kind)
@@ -243,6 +246,23 @@ export async function saveEditorial(
       );
     if (item.kind === "news" && existing.linkUrl === item.linkUrl)
       newsRecommendation = existing.metadata?.newsRecommendation;
+    if (item.kind === "news" && existing.metadata?.autoNews) {
+      const wasLive = existing.status === "published",
+        isLive = item.status === "published";
+      if (wasLive !== isLive) signals.push(isLive ? "unhide" : "hide");
+      if (existing.isPinned !== item.isPinned)
+        signals.push(item.isPinned ? "pin" : "unpin");
+      autoNews = {
+        ...existing.metadata.autoNews,
+        // A later run must not overwrite what the operator wrote.
+        operatorEdited:
+          existing.metadata.autoNews.operatorEdited === true ||
+          existing.title !== item.title ||
+          (existing.summary ?? "") !== item.summary ||
+          existing.linkUrl !== item.linkUrl,
+        ...(signals.length ? { lastSignal: signals[signals.length - 1] } : {}),
+      };
+    }
   }
   if (item.kind === "news" && input.newsReviewId !== undefined) {
     if (!id)
@@ -275,6 +295,7 @@ export async function saveEditorial(
     kind: item.kind,
     audience: item.audience,
     ...(newsRecommendation ? { newsRecommendation } : {}),
+    ...(autoNews ? { autoNews } : {}),
   });
   const params = [
     item.title,
@@ -308,7 +329,75 @@ export async function saveEditorial(
     status: item.status,
     isPinned: item.isPinned,
   });
+  // Strong signals for the later weight learning (WO V2 §3). No learning happens yet.
+  for (const signal of signals)
+    await homeAudit(db, actor, "community:news_operator_signal", {
+      id: saved.id,
+      signal,
+      articleId: autoNews?.articleId,
+      clusterKey: autoNews?.clusterKey,
+    });
   return saved;
+}
+const ENGAGEMENT_MAX_ITEMS = 12;
+/** Anonymous aggregate only: the user decides visibility here and is never stored. */
+export async function recordNewsEngagement(
+  db: Exec,
+  user: CommunityAccessUser | null,
+  input: Record<string, unknown>,
+  now = new Date(),
+) {
+  const { event, items } = input;
+  const invalid = () =>
+    fail(400, "INVALID_NEWS_ENGAGEMENT", "기록 형식을 확인해 주세요.");
+  if (
+    (event !== "impression" && event !== "click") ||
+    !Array.isArray(items) ||
+    !items.length ||
+    items.length > ENGAGEMENT_MAX_ITEMS ||
+    (event === "click" && items.length !== 1)
+  )
+    return invalid();
+  const positions = new Map<string, number>();
+  for (const entry of items) {
+    const contentId = (entry as { contentId?: unknown })?.contentId;
+    const position = (entry as { position?: unknown })?.position;
+    if (
+      typeof contentId !== "string" ||
+      !UUID.test(contentId) ||
+      !Number.isInteger(position) ||
+      Number(position) < 1 ||
+      Number(position) > ENGAGEMENT_MAX_ITEMS ||
+      positions.has(contentId.toLowerCase())
+    )
+      return invalid();
+    positions.set(contentId.toLowerCase(), Number(position));
+  }
+  const w = await access(db, user);
+  const rows: { id: string; articleId: string | null }[] = await db.query(
+    `SELECT id,metadata->'autoNews'->>'articleId' AS "articleId" FROM cms_contents
+     WHERE ${SCOPE} AND ${eligible} AND ${visibility} AND metadata->>'kind'='news' AND metadata->'autoNews' IS NOT NULL AND id=ANY($2::uuid[])`,
+    [w.allowed, [...positions.keys()]],
+  );
+  const valid = rows.filter((row) => row.articleId && UUID.test(row.articleId));
+  if (!valid.length)
+    fail(404, "NEWS_ITEM_NOT_FOUND", "기록할 수 있는 자동 게시 소식이 없습니다.");
+  const click = event === "click";
+  await db.query(
+    `INSERT INTO community_news_engagement_daily(article_id,day,"position",impressions,clicks)
+     SELECT v.article_id,$1::date,v.pos,$4::int,$5::int FROM unnest($2::uuid[],$3::smallint[]) AS v(article_id,pos)
+     ON CONFLICT (article_id,day,"position") DO UPDATE SET
+       impressions=community_news_engagement_daily.impressions+EXCLUDED.impressions,
+       clicks=community_news_engagement_daily.clicks+EXCLUDED.clicks`,
+    [
+      newsDay(now),
+      valid.map((row) => row.articleId),
+      valid.map((row) => positions.get(row.id.toLowerCase())),
+      click ? 0 : 1,
+      click ? 1 : 0,
+    ],
+  );
+  return { recorded: valid.length };
 }
 export async function managedHomeForum(
   db: Exec,
