@@ -49,12 +49,17 @@ export function parseServices(raw) {
 export function parseTitle(title, sha) {
   const t = String(title ?? '');
   if (!t.startsWith(`Promote ${sha}`)) return null;
-  let rest = t.slice(`Promote ${sha}`.length);
-  const dryRun = /\(dry-run\)\s*$/.test(rest);
-  if (dryRun) rest = rest.replace(/\s*\(dry-run\)\s*$/, '');
-  const m = /^\s*·\s*services=(.*)$/.exec(rest);
-  if (!m && rest.trim() !== '') return null;
-  return { dryRun, services: m ? parseServices(m[1]) : [] };
+  // 정규식 대신 문자열 연산 — 제목은 사람이 넣은 입력을 담는다(backtracking 없는 선형 처리 · Sonar S8786)
+  let rest = t.slice(`Promote ${sha}`.length).trim();
+  const DRY = '(dry-run)';
+  const dryRun = rest.endsWith(DRY);
+  if (dryRun) rest = rest.slice(0, -DRY.length).trim();
+  if (rest === '') return { dryRun, services: [] };
+  const PREFIX = '·';
+  if (!rest.startsWith(PREFIX)) return null;
+  rest = rest.slice(PREFIX.length).trim();
+  if (!rest.startsWith('services=')) return null;
+  return { dryRun, services: parseServices(rest.slice('services='.length)) };
 }
 
 /** 이전 범위(prev)가 이번 요청(cur)을 모두 덮는가. 빈 목록 = 승격 가능한 전부. */
