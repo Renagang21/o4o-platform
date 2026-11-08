@@ -25,6 +25,7 @@ function fakeApi(over = {}) {
     [`compare/${P}...${C}`]: { files: [{ filename: 'apps/api-server/src/a.ts' }] },
     [`commits/${C}/pulls`]: [{ number: 7, merged_at: 'x', base: { ref: 'main' }, merge_commit_sha: C, head: { sha: H, repo: { full_name: REPO } } }],
     [`commits/${H}`]: { commit: { tree: { sha: T } } },
+    [`compare/${P}...${H}`]: { status: 'ahead', ahead_by: 3, behind_by: 0 },
     'runs': { workflow_runs: [{ id: 11, head_sha: H, event: 'pull_request', path: '.github/workflows/ci-pipeline.yml', conclusion: 'success', created_at: '2026-11-07T00:00:00Z', repository: { full_name: REPO }, head_repository: { full_name: REPO }, html_url: 'u' }] },
     'jobs/11': { jobs: [{ name: 'Detect affected scope', conclusion: 'success' }, { name: 'CI Gate', conclusion: 'success' }] },
     ...over,
@@ -49,6 +50,19 @@ test('같은 tree + head 의 pull_request CI 에서 "CI Gate" success → verifi
 
 test('tree(C) ≠ tree(PR head) 이면 full (PR branch 가 병합 직전 main 을 포함하지 않음)', async () => {
   assert.equal((await decide({ [`commits/${H}`]: { commit: { tree: { sha: 'x'.repeat(40) } } } })).verified, false);
+});
+
+test('병합 직전 main 이 PR head 의 조상이 아니면 tree 가 같아도 full — CI 가 검사한 병합 결과가 다를 수 있다 (Codex #981)', async () => {
+  // 시나리오: H 는 옛 main 기반 · CI 는 H + B(그 시점 main 의 변경) 를 검사 · 이후 B 가 revert 되고 H 가 병합 → tree(C) == tree(H)
+  for (const [label, cmp] of Object.entries({
+    'H 가 P 보다 뒤처짐(diverged)': { status: 'diverged', ahead_by: 3, behind_by: 2 },
+    'H 가 P 의 조상(behind)': { status: 'behind', ahead_by: 0, behind_by: 1 },
+    'behind_by 없음': { status: 'ahead' },
+    'status 없음': { behind_by: 0 },
+  })) assert.equal((await decide({ [`compare/${P}...${H}`]: cmp })).verified, false, label);
+  assert.equal((await decide({ [`compare/${P}...${H}`]: 'ERR' })).verified, false, 'compare 실패');
+  // identical(H == P 내용 · 빈 PR) 도 조상 관계로 인정
+  assert.equal((await decide({ [`compare/${P}...${H}`]: { status: 'identical', ahead_by: 0, behind_by: 0 } })).verified, true);
 });
 
 test('CI 인프라(.github/** · scripts/**) 변경은 tree 가 같아도 full', async () => {

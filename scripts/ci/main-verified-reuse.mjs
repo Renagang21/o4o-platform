@@ -8,11 +8,15 @@
  *   1. C 와 첫 부모 사이 변경 파일(compare API) — `.github/**` · `scripts/**` (CI 인프라)가 있으면 full
  *   2. C 를 merge commit 으로 가진 병합 PR 정확히 1개(commits/{C}/pulls · merged · base=main · merge_commit_sha=C · 같은 저장소)
  *   3. **tree(C) == tree(PR head H)** — git 이 계산한 tree SHA(commits API). 같으면 H 의 내용 = C 의 내용이다.
+ *   3-b. **병합 직전 main(C 의 첫 부모 P)이 H 의 조상**이다 — compare API `P...H` 의 behind_by == 0.
  *   4. H 에 대해 `ci-pipeline.yml` 의 `pull_request` run 이 성공했고, 그 run 의 job 중 **이름이 정확히 `CI Gate`** 인 job 이
  *      success 다(Actions jobs API). 드래프트 run 의 gate(`CI Gate (draft · not final)`)는 이름이 달라 해당하지 않는다.
  *
- * PR CI 는 H 와 그 시점 main 의 병합 결과를 검사한다. tree(C)==tree(H) 이면 H 가 이미 병합 직전 main 을 포함하므로
- * 그 병합 결과도 H 와 같은 내용이다 — 검사한 내용과 C 가 같다.
+ * PR CI 는 H 가 아니라 H 와 **그 시점 main(B_t)** 의 임시 병합 결과를 검사한다(Codex #981).
+ *   tree(C)==tree(H) 만으로는 부족하다 — B_t 에 있던 변경이 나중에 main 에서 revert 되면 C 의 tree 는 H 와 같지만,
+ *   CI 가 검사한 것은 H+그 변경이다. 그래서 P 가 H 의 조상인지 확인한다(3-b): main 은 이력 재작성이 금지돼
+ *   (ruleset non-fast-forward 금지) B_t 는 P 의 조상이고, 따라서 H 의 조상이다 → H 와 B_t 의 병합 = H 그대로
+ *   = 검사한 내용이 H = C 의 내용이다. run 의 base SHA 는 완료된 run 의 API 응답에 남지 않아 이 방식으로 증명한다.
  *
  * 하나라도 확인할 수 없으면 verified=false(full CI)다. 항상 exit 0.
  * 기본 비활성 — 저장소 변수 `CI_MAIN_REUSE=true` 일 때만 판정한다(통합 담당 결정).
@@ -64,6 +68,12 @@ export async function decideReuse({ repo, sha, enabled, token, apiUrl = 'https:/
     const headCommit = await get(`commits/${head}`);
     const headTree = headCommit?.commit?.tree?.sha;
     if (headTree !== tree) return { verified: false, reason: `tree(C) ≠ tree(PR #${pr.number} head) — PR branch 가 병합 직전 main 을 포함하지 않았다 — full` };
+
+    // 3-b. P(병합 직전 main)가 H 의 조상 — CI 가 검사한 임시 병합 결과가 H 그대로임을 보장한다
+    const ancestry = await get(`compare/${parent}...${head}`);
+    if (ancestry?.behind_by !== 0 || !['ahead', 'identical'].includes(ancestry?.status)) {
+      return { verified: false, reason: `병합 직전 main 이 PR #${pr.number} head 의 조상이 아님(status=${ancestry?.status ?? '?'} · behind_by=${ancestry?.behind_by ?? '?'}) — PR CI 가 다른 병합 결과를 검사했을 수 있다 — full` };
+    }
 
     const runs = await get(`actions/workflows/ci-pipeline.yml/runs?head_sha=${head}&event=pull_request&status=completed&per_page=20`);
     const candidates = (runs?.workflow_runs ?? []).filter((r) =>
