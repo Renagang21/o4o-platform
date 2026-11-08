@@ -82,7 +82,7 @@ for (const viewport of [
       ).toBeVisible();
       await directory.getByText("펀딩", { exact: true }).click();
       await expect(
-        directory.getByRole("link", { name: "펀딩 서비스 회원" }),
+        directory.getByRole("link", { name: "펀딩 가입·이용 상태" }),
       ).toBeVisible();
       await expect(
         page.getByRole("link", { name: "전체 관리자", exact: true }),
