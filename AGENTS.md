@@ -399,9 +399,9 @@ verdict: SAFE_TO_REMOVE | KEEP | UNCERTAIN
   콘솔 오류뿐 아니라 **toast·API 응답과 실제 동작**을 확인한다.
 - route / menu / layout 변경은 desktop·mobile을 각각 확인한다.
   신규 route는 메뉴 진입·직접 URL과 기존 route 회귀를 확인한다.
-- 테스트 계정 SSOT는 `docs/local/TEST-ACCOUNTS.local.md`다(로컬 전용 · 2026-10-16 변경, 이전 `TEST-ACCOUNT.txt`는 계정 출처로 쓰지 않는다).
-  파일 위치·새 clone/클라우드에서 누락되는 이유·확보 절차는 [SETUP.md의 테스트 계정 찾기](SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)를 따른다.
-  현재 checkout에 없으면 기준 checkout의 동일 경로도 확인한 후 누락을 보고한다. 과거 seed/Demo 계정으로 대체하지 않는다.
+- 테스트 계정 SSOT는 [`docs/TEST-ACCOUNTS.md`](docs/TEST-ACCOUNTS.md)다(저장소 추적 · 2026-11-08 변경 — 클라우드 · 로컬 세션 공용).
+  **사용자 테스트는 로그인 화면의 「테스트 로그인」 버튼**(매장 경영자 · 공급자 · 매장 직원)으로 한다. 규칙은 그 파일과 [SETUP.md의 테스트 계정 찾기](SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)를 따른다.
+  이전 기준 `docs/local/TEST-ACCOUNTS.local.md` · `TEST-ACCOUNT.txt`는 계정 출처로 쓰지 않는다. Google · 카카오 로그인은 사용자가 직접 한다.
   운영 계정 사용과 자격증명의 코드·문서·커밋 복사를 금지한다.
 - 중간·완료 보고는 **한국어**로 작성하고 파일명·route·API·command·commit SHA 등 기술 식별자는 원문 유지한다.
 - 긴 diff 대신 변경 / 검증 / 미해결 / Git 상태 중심으로 보고한다.
