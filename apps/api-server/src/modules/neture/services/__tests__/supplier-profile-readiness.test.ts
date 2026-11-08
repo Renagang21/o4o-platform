@@ -1,4 +1,4 @@
-import { contactPhoneWrite, missingProfileFieldsOf, missingSettlementFieldsOf } from '../supplier-profile-readiness.js';
+import { contactPhoneWrite, missingProfileFieldsOf, missingSettlementFieldsOf, supplierIdentityOf } from '../supplier-profile-readiness.js';
 
 describe('supplier profile readiness (WO-O4O-AUTH-ONBOARDING-UX-CLEANUP-V1)', () => {
   it('lists missing profile fields in a stable order', () => {
@@ -19,5 +19,13 @@ describe('supplier profile readiness (WO-O4O-AUTH-ONBOARDING-UX-CLEANUP-V1)', ()
     expect(contactPhoneWrite('02-123-4567')).toEqual({ supplier: '021234567', organization: '021234567' });
     expect(contactPhoneWrite('')).toEqual({ supplier: '', organization: null });
     expect(contactPhoneWrite(null)).toEqual({ supplier: '', organization: null });
+  });
+  it('reads representative/type/item from the organization first and falls back to the old columns (T9)', () => {
+    const columns = { representativeName: 'column-rep', businessType: 'column-type', businessItem: 'column-item' };
+    expect(supplierIdentityOf(columns, { representativeName: 'org-rep', businessType: 'org-type', businessCategory: 'org-item' }))
+      .toEqual({ representativeName: 'org-rep', businessType: 'org-type', businessItem: 'org-item' });
+    expect(supplierIdentityOf(columns, null)).toEqual({ representativeName: 'column-rep', businessType: 'column-type', businessItem: 'column-item' });
+    expect(supplierIdentityOf(columns, { representativeName: '  ', businessType: null })).toEqual({ representativeName: 'column-rep', businessType: 'column-type', businessItem: 'column-item' });
+    expect(supplierIdentityOf({}, {})).toEqual({ representativeName: null, businessType: null, businessItem: null });
   });
 });

@@ -17,6 +17,43 @@ export interface SupplierReadinessSource {
   taxInvoiceEmail?: string | null;
 }
 
+/**
+ * 대표자명 · 업태 · 종목의 정본은 Organization(`organizations.metadata.businessProfile`)이다.
+ *
+ * WO-O4O-AUTH-ONBOARDING-UX-CLEANUP-V1 T9 (= WO-O4O-SUPPLIER-IDENTITY-...-CANONICALIZATION-V1 §L 실행):
+ *   expand 단계 — 정본 값이 있으면 정본을, 없으면 옛 위치(`neture_suppliers` 컬럼)를 읽는다.
+ *   쓰기는 정본과 옛 컬럼 양쪽에 한다. 옛 컬럼 삭제(contract)는 별도 WO 다.
+ *   org 키 이름은 약국 분기와 같다: representativeName · businessType · businessCategory.
+ */
+export interface SupplierIdentityColumns {
+  representativeName?: string | null;
+  businessType?: string | null;
+  businessItem?: string | null;
+}
+
+export interface SupplierIdentity {
+  representativeName: string | null;
+  businessType: string | null;
+  businessItem: string | null;
+}
+
+function pick(canonical: unknown, legacy: string | null | undefined): string | null {
+  if (typeof canonical === 'string' && canonical.trim()) return canonical;
+  return legacy?.trim() ? legacy : null;
+}
+
+export function supplierIdentityOf(
+  supplier: SupplierIdentityColumns,
+  orgBusinessProfile?: Record<string, unknown> | null,
+): SupplierIdentity {
+  const p = orgBusinessProfile ?? {};
+  return {
+    representativeName: pick(p.representativeName, supplier.representativeName),
+    businessType: pick(p.businessType, supplier.businessType),
+    businessItem: pick(p.businessCategory, supplier.businessItem),
+  };
+}
+
 const EMAIL_SHAPE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 /** 승인 후 보완 안내(정보성) — 승인 게이트가 아니다. */

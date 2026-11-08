@@ -3,7 +3,7 @@ import { isSelectableBusinessEntityType } from '@o4o/types';
 import { AppDataSource } from '../../../database/connection.js';
 import { NetureSupplier, SupplierStatus, ContactVisibility } from '../entities/index.js';
 import logger from '../../../utils/logger.js';
-import { contactPhoneWrite, missingProfileFieldsOf, missingSettlementFieldsOf } from './supplier-profile-readiness.js';
+import { contactPhoneWrite, missingProfileFieldsOf, missingSettlementFieldsOf, supplierIdentityOf } from './supplier-profile-readiness.js';
 
 export class SupplierProfileEntityTypeInvalidError extends Error {
   constructor() {
@@ -91,13 +91,15 @@ export class NetureSupplierBusinessService {
         businessStartDate?: string | null;
         managerEmail?: string | null;
       };
+      // T9: 대표자명 · 업태 · 종목 — Organization 정본 우선, 없으면 옛 컬럼
+      const identity = supplierIdentityOf(supplier, orgBusinessProfile);
 
       // WO-O4O-POSTAL-CODE-ADDRESS-V1
       const addrDetail = org?.address_detail;
 
       // WO-O4O-NETURE-SUPPLIER-APPROVAL-AND-PROFILE-COMPLETION-SEPARATION-V1:
       // 프로필 완성 상태(정보성) — 승인 여부(status)와 분리. 프론트는 이 값을 그대로 사용.
-      const missingProfileFields = this.getMissingProfileFields(supplier);
+      const missingProfileFields = this.getMissingProfileFields(supplier, orgBusinessProfile);
 
       return {
         id: supplier.id,
@@ -113,15 +115,16 @@ export class NetureSupplierBusinessService {
         businessNumber: org?.business_number ?? null,
         // WO-O4O-SUPPLIER-IDENTITY-...-CANONICALIZATION-V1 §D:
         //   representativeName · businessType 의 **최종 SSOT 는 Organization** 이다.
-        //   이번 WO 는 migration 0 이므로 현재 위치(neture_suppliers)에서 읽고, 이관은 §L 판정 대상이다.
-        representativeName: supplier.representativeName || null,
+        //   WO-O4O-AUTH-ONBOARDING-UX-CLEANUP-V1 T9: §L 실행 — 정본 우선, 옛 컬럼은 fallback.
+        representativeName: identity.representativeName,
         businessZipCode: addrDetail?.zipCode ?? null,
         businessAddress: org?.address ?? null,
         businessAddressDetail: addrDetail?.detailAddress ?? null,
         managerName: supplier.managerName || null,
         managerPhone: supplier.managerPhone || null,
         managerEmail: org?.metadata?.businessProfile?.managerEmail || null,
-        businessType: supplier.businessType || null,
+        businessType: identity.businessType,
+        businessItem: identity.businessItem,
         // WO-O4O-SUPPLIER-IDENTITY-...-CANONICALIZATION-V1 §D:
         //   이전에는 users.businessInfo 에서 읽었으나 **그 키는 한 번도 저장된 적이 없다**(IR §5 —
         //   write 가 `if (supplier.userId)` 뒤에서 조용히 skip 됐다).
@@ -285,6 +288,10 @@ export class NetureSupplierBusinessService {
       //   (metadata = 조직 확장 필드 jsonb · DDL 0 · 엔티티 변경 0).
       const businessProfileWriteNeeded =
         data.businessEntityType !== undefined || data.businessStartDate !== undefined || data.managerEmail !== undefined;
+      // T9: 대표자명 · 업태 · 종목은 정본(Organization)과 옛 컬럼 양쪽에 쓴다(expand).
+      //   조직이 없는 공급자는 옛 컬럼에만 쓴다 — 기존에도 허용된 입력이라 거부하지 않는다.
+      const identityWriteNeeded =
+        data.representativeName !== undefined || data.businessType !== undefined || data.businessItem !== undefined;
 
       // §9 silent success 금지:
       //   조직이 연결돼 있지 않으면 canonical 저장 위치 자체가 없다. 조용히 버리지 않고 거부한다.
@@ -302,7 +309,8 @@ export class NetureSupplierBusinessService {
         data.businessZipCode !== undefined ||
         data.businessAddressDetail !== undefined ||
         data.contactPhone !== undefined ||
-        businessProfileWriteNeeded;
+        businessProfileWriteNeeded ||
+        identityWriteNeeded;
       // WO-O4O-SUPPLIER-IDENTITY-RELATIONSHIP-AND-BUSINESS-PROFILE-CANONICALIZATION-V1 §F:
       //   하나의 사용자 action 이 **두 canonical resource**(organizations · neture_suppliers)를
       //   바꿔야 하므로 단일 트랜잭션으로 묶는다. 이전엔 순차 write 였어
@@ -334,11 +342,14 @@ export class NetureSupplierBusinessService {
               phone: contactPhone ? contactPhone.organization : undefined,
               address_detail: addressDetail,
               // §D: 사업자등록증 기재사항 — Organization 확장 필드에 저장(migration 0)
-              business_profile: businessProfileWriteNeeded
+              business_profile: businessProfileWriteNeeded || identityWriteNeeded
                 ? {
                     managerEmail: data.managerEmail !== undefined ? (data.managerEmail.trim() || null) : undefined,
                     businessEntityType: data.businessEntityType !== undefined ? (data.businessEntityType || null) : undefined,
                     businessStartDate: data.businessStartDate !== undefined ? (data.businessStartDate || null) : undefined,
+                    representativeName: data.representativeName !== undefined ? (data.representativeName || null) : undefined,
+                    businessType: data.businessType !== undefined ? (data.businessType || null) : undefined,
+                    businessCategory: data.businessItem !== undefined ? (data.businessItem || null) : undefined,
                   }
                 : undefined,
             },
@@ -361,21 +372,23 @@ export class NetureSupplierBusinessService {
         businessStartDate?: string | null;
         managerEmail?: string | null;
       };
+      const identity = supplierIdentityOf(supplier, savedBusinessProfile);
+      const missingProfileFields = this.getMissingProfileFields(supplier, savedBusinessProfile);
 
       return {
         id: supplier.id,
         // Business profile — org SSOT
         name: org?.name ?? '',
         businessNumber: org?.business_number ?? null,
-        representativeName: supplier.representativeName || null,
+        representativeName: identity.representativeName,
         businessZipCode: org?.address_detail?.zipCode ?? null,
         businessAddress: org?.address ?? null,
         businessAddressDetail: org?.address_detail?.detailAddress ?? null,
         managerName: supplier.managerName || null,
         managerPhone: supplier.managerPhone || null,
         managerEmail: org?.metadata?.businessProfile?.managerEmail || null,
-        businessType: supplier.businessType || null,
-        businessItem: supplier.businessItem || null,
+        businessType: identity.businessType,
+        businessItem: identity.businessItem,
         // WO-O4O-SUPPLIER-IDENTITY-...-CANONICALIZATION-V1 §D:
         //   Organization 이 canonical 소유자 — 전용 컬럼 신설 전까지 metadata.businessProfile.
         businessEntityType: savedBusinessProfile.businessEntityType ?? null,
@@ -383,8 +396,8 @@ export class NetureSupplierBusinessService {
         taxInvoiceEmail: supplier.taxInvoiceEmail || null,
         ...this.getContactAndOrderProfile(supplier),
         // WO-O4O-AUTH-ONBOARDING-UX-CLEANUP-V1 T4: 저장 직후 화면의 미입력 체크리스트를 서버 판정으로 갱신한다(추가 필드).
-        profileComplete: this.getMissingProfileFields(supplier).length === 0,
-        missingProfileFields: this.getMissingProfileFields(supplier),
+        profileComplete: missingProfileFields.length === 0,
+        missingProfileFields,
       };
     } catch (error) {
       logger.error('[NetureSupplierService] Error updating supplier profile:', error);
@@ -536,18 +549,20 @@ export class NetureSupplierBusinessService {
     address: string | null;
     phone: string | null;
     managerEmail: string | null;
+    /** T9: Organization 정본의 대표자명 · 업태 · 종목(`metadata.businessProfile`) */
+    businessProfile: Record<string, unknown> | null;
   }>> {
-    const map = new Map<string, { name: string; business_number: string | null; address: string | null; phone: string | null; managerEmail: string | null }>();
+    const map = new Map<string, { name: string; business_number: string | null; address: string | null; phone: string | null; managerEmail: string | null; businessProfile: Record<string, unknown> | null }>();
     if (organizationIds.length === 0) return map;
 
     try {
-      const rows: Array<{ id: string; name: string; business_number: string | null; address: string | null; phone: string | null; managerEmail: string | null }> =
+      const rows: Array<{ id: string; name: string; business_number: string | null; address: string | null; phone: string | null; managerEmail: string | null; businessProfile: Record<string, unknown> | null }> =
         await AppDataSource.query(
-          `SELECT id, name, business_number, address, phone, metadata->'businessProfile'->>'managerEmail' AS "managerEmail" FROM organizations WHERE id = ANY($1)`,
+          `SELECT id, name, business_number, address, phone, metadata->'businessProfile'->>'managerEmail' AS "managerEmail", metadata->'businessProfile' AS "businessProfile" FROM organizations WHERE id = ANY($1)`,
           [organizationIds],
         );
       for (const row of rows) {
-        map.set(row.id, { name: row.name, business_number: row.business_number, address: row.address, phone: row.phone, managerEmail: row.managerEmail || null });
+        map.set(row.id, { name: row.name, business_number: row.business_number, address: row.address, phone: row.phone, managerEmail: row.managerEmail || null, businessProfile: row.businessProfile ?? null });
       }
     } catch (error) {
       logger.warn('[NetureSupplierService] Org batch read failed:', error);
@@ -555,8 +570,10 @@ export class NetureSupplierBusinessService {
     return map;
   }
 
-  getMissingProfileFields(supplier: NetureSupplier): string[] {
-    return missingProfileFieldsOf(supplier);
+  /** T9: 대표자명은 Organization 정본 우선(`orgBusinessProfile`), 없으면 옛 컬럼으로 판정한다. */
+  getMissingProfileFields(supplier: NetureSupplier, orgBusinessProfile?: Record<string, unknown> | null): string[] {
+    const { representativeName } = supplierIdentityOf(supplier, orgBusinessProfile);
+    return missingProfileFieldsOf({ ...supplier, representativeName });
   }
 
 
