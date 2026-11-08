@@ -1,12 +1,11 @@
-import { createHash } from 'node:crypto';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
-import { profiles, apps } from '../generate-service-icons.mjs';
+import { profiles, apps, appProfiles, mark, BASE_KEY, icon } from '../generate-service-icons.mjs';
 
 const root = new URL('../../../', import.meta.url);
 const read = file => readFile(new URL(file, root));
-const groups = Object.entries(apps).flatMap(([app,key]) => (key === 'neture' ? ['neture','supplier','funding','community','carepharm'] : key === 'pharmacy' ? ['pharmacy','carepharm','drugstore'] : [key]).map(profile=>({app,profile})));
+const groups = Object.keys(apps).flatMap(app => appProfiles(app).map(profile => ({app, profile})));
 
 test('every linked service has self-contained vector, ICO and correctly sized raster assets', async () => {
   for (const {app,profile} of groups) {
@@ -21,20 +20,29 @@ test('every linked service has self-contained vector, ICO and correctly sized ra
       const png=await read(dir+file);assert.equal(png.readUInt32BE(16),size);assert.equal(png.readUInt32BE(20),size);
     }
     const manifest=JSON.parse(await read(dir+'manifest.webmanifest'));
+    assert.equal(manifest.theme_color, profiles[profile][2]);
     for(const icon of manifest.icons) await read(dir+icon.src);
     assert.ok((await read(dir+'logo-horizontal.svg')).toString().includes(profiles[profile][0]));
   }
 });
 
-test('all service glyphs are distinct, preserve the O4O outline and share the original palette', async () => {
-  const master=(await read('packages/auth-react/src/assets/o4o-logo.svg')).toString();
-  const outline=master.match(/<path fill="#fff" d="([^"]+)"/)[1];
-  const distinct=new Set();
-  for(const [key]of Object.entries(profiles)) {
+test('committed assets match the generator output', async () => {
+  for (const {app,profile} of groups) {
+    assert.equal((await read(`${app}/public/brand/${profile}/favicon.svg`)).toString(), icon(profile), `${profile}: run node scripts/brand/generate-service-icons.mjs`);
+  }
+});
+
+test('every service keeps the same R mark; sub-domains add a distinct glyph and badge colour', async () => {
+  const glyphs=new Set(), colours=new Set();
+  for(const [key,[,glyph,colour]] of Object.entries(profiles)) {
     const {app}=groups.find(x=>x.profile===key);
     const svg=(await read(`${app}/public/brand/${key}/favicon.svg`)).toString();
-    assert.ok(svg.includes(outline));assert.ok(svg.includes('#0073aa')&&svg.includes('#005177'));
-    assert.ok(!distinct.has(profiles[key][1]),key);distinct.add(profiles[key][1]);
+    assert.ok(svg.includes(mark.r) && svg.includes(mark.leaf), `${key}: R mark`);
+    assert.match(colour, /^#[0-9a-f]{6}$/);
+    if (key === BASE_KEY) { assert.ok(!svg.includes('stroke-width="2.2"'), 'representative mark has no badge'); continue; }
+    assert.ok(svg.includes(`fill="${colour}"`), `${key}: badge colour`);
+    assert.ok(!glyphs.has(glyph),key);glyphs.add(glyph);
+    assert.ok(!colours.has(colour),key);colours.add(colour);
   }
 });
 
@@ -47,7 +55,8 @@ test('every application links a real SVG icon and retains the appropriate base p
   }
 });
 
-test('representative home retains its original N favicon files', async()=>{
-  assert.equal(createHash('sha256').update(await read('services/web-neture/public/favicon.svg')).digest('hex'),'36e07f77ea3806cef163a4d492b8381a250f7bc4df042b8a574971e09a5a3bcb');
-  assert.equal(createHash('sha256').update(await read('services/web-neture/public/favicon.png')).digest('hex'),'cae1ec54f4eecb8b1e6212be93e07aa1ae269abd58900c4a6474482582fcaa43');
+test('representative neture.co.kr home uses the badge-free R mark', async()=>{
+  assert.equal((await read('services/web-neture/public/favicon.svg')).toString(), icon(BASE_KEY));
+  const png=await read('services/web-neture/public/favicon.png');
+  assert.equal(png.readUInt32BE(16),192);assert.equal(png.readUInt32BE(20),192);
 });

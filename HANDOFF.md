@@ -30,6 +30,7 @@
 4. **[LOCAL]** WO §5-B — #968 병합 후에만: 통합 담당 승인 → `promote.yml`(LEVEL_3) → read-only SQL 로 테이블 · 트리거 · 첫 실행 확인.
 5. KEEP 2 branch 재판정(IR §7) — 별도 WO.
 6. **[통합 담당 → 사용자]** #986 병합 · 배포 후 아래 「#986 배포 후 화면 확인」을 사용자가 운영 화면에서 확인한다. 문제가 나오면 새 branch 로 수정 PR 을 연다(병합된 #986 branch 는 재사용하지 않는다).
+7. **[LOCAL · 2026-11-13 이후]** 계정 이용약관 · 개인정보 처리방침 · 서비스별 안내 v2 게시(공고 2026-10-12 → 시행 2026-11-13) — [`WO-O4O-ACCOUNT-POLICY-V2-PUBLICATION-V1`](docs/work-orders/WO-O4O-ACCOUNT-POLICY-V2-PUBLICATION-V1.md). §5-1 read-only 조회 · §5-2 본문 준비는 13일 전에 해도 된다. 게시(§5-3)는 통합 담당 승인 후. (2026-11-08 클라우드 세션 · branch `claude/intelligent-cray-o2p4u3`)
 
 ## #986 배포 후 화면 확인 (사용자 · 2026-11-08 결정)
 
