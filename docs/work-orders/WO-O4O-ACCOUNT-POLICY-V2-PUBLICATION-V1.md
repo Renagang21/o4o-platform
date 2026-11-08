@@ -103,6 +103,8 @@ ORDER BY 1, 2, 3;
 
 ### 5-3. 게시 — 2026-11-13 이후 · **통합 담당 명시 승인 필요**(운영 데이터 변경 · `AGENTS.md` §5)
 
+- [ ] [CLOUD · 선행 필수] **새 문서 등록 화면에서 slug(표식)를 지정할 수 있게 한다.** 현재 공통 화면 `packages/operator-core-ui/src/modules/service-legal/ServiceLegalSettingsPage.tsx` 의 `openNewDoc()` 는 slug 없이 폼을 열고 입력란도 없다. `admin-service-legal.controller.ts` 는 slug 를 자동으로 만들지 않고, 표식 slug 는 **새 문서 등록 때만** 지정할 수 있다(`ENROLLMENT_POLICY_MARKER_IMMUTABLE`). 그대로 게시하면 표식 없는 문서가 되어 계정 재동의 · 서비스 신청 정책 선택에 포함되지 않고, 나중에 slug 를 붙일 수도 없다. 별도 PR 로 화면을 고쳐 배포한 뒤에 아래 게시를 한다
+- [ ] [LOCAL] **중지 조건:** 위 선행 작업이 배포되지 않았거나, 새 문서 폼에서 아래 표의 slug 를 입력할 수 없으면 게시하지 않고 보고한다
 - [ ] [LOCAL] 통합 담당 승인을 받는다. 승인 범위: 아래 표의 문서 게시만
 - [ ] [LOCAL] 관리자 화면에서 게시. 화면 위치(코드 기준 · 실제 메뉴는 확인):
   - `neture`: `neture.co.kr/admin/settings/legal-terms`
@@ -123,7 +125,8 @@ ORDER BY 1, 2, 3;
 
 - [ ] [LOCAL] Q1 재실행 — 새 행 `published` · `content_md5` = §5-2 md5 · v1 행 보존
 - [ ] [LOCAL] 브라우저(PC · 모바일): `neture.co.kr/terms` · `/privacy`, `supplier.neture.co.kr/terms` · `/privacy`, `community.` · `funding.` · `study.` 호스트 — v2 가 보이고 KPA Society · K-Cosmetics · PharmacyHub 나열이 없는지
-- [ ] [LOCAL] 「테스트 로그인」(매장 경영자 · 공급자 — `docs/TEST-ACCOUNTS.md`)으로 로그인해 재동의 화면이 뜨고, 동의 후 정상 진입하는지
+- [ ] [LOCAL] Demo 버튼(매장 경영자 · 공급자 — `docs/TEST-ACCOUNTS.md`)으로는 **정상 진입만** 확인한다. Demo 계정은 재동의 강제 대상이 아니라서(`policy-acceptance.service.ts` `getEnforcedPendingForUser` 의 Demo 예외 — 로그인 응답 · `/auth/me` 도 이 결과를 쓴다) 재동의 화면이 뜨지 않는 것이 정상이다
+- [ ] [LOCAL] 일반 회원의 재동의(화면이 뜨고, 동의 후 정상 진입)는 Demo 가 아닌 경로로 확인한다 — 격리 환경의 일반 사용자 통합 테스트, 또는 통합 담당이 승인한 비-Demo 테스트 계정. 확인 경로가 없으면 「미확인」으로 기록하고 Demo 결과로 대신하지 않는다
 - [ ] [LOCAL] 회원가입 화면의 약관 보기가 v2 를 보여 주는지
 - [ ] [LOCAL] 결과를 §6 에 기록 · 이 문서 상태를 `COMPLETED` 로 바꾸고 push
 
