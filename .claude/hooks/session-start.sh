@@ -4,7 +4,7 @@
 # - lockfile 기준 설치(pnpm install --frozen-lockfile)만 한다. lockfile 을 바꾸지 않는다.
 # - 실패해도 세션을 막지 않는다: 오류는 출력만 하고 항상 exit 0.
 # - 동기화 요약은 session-start.mjs 가 맡는다. 이 파일은 설치만 한다.
-if [ "${CLAUDE_CODE_REMOTE:-}" != "true" ]; then
+if [[ "${CLAUDE_CODE_REMOTE:-}" != "true" ]]; then
   exit 0
 fi
 
@@ -14,7 +14,7 @@ corepack enable >/dev/null 2>&1 || true
 pm_version="$(node -p "(require('./package.json').packageManager||'').split('@')[1]||''" 2>/dev/null)"
 if command -v pnpm >/dev/null 2>&1; then
   PNPM=(pnpm)
-elif [ -n "$pm_version" ]; then
+elif [[ -n "$pm_version" ]]; then
   PNPM=(npx --yes "pnpm@${pm_version}")
 else
   echo "[deps] pnpm 을 찾지 못함 — 설치 건너뜀"; exit 0
