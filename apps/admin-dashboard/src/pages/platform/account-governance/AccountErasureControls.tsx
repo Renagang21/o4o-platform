@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { api } from '@/api/base';
 
 import type { UserErasureResult as AccountErasureResult } from '@/types/user';
-const LABELS: Record<AccountErasureResult['state'], string> = {
+export const ERASURE_STATE_LABELS: Record<AccountErasureResult['state'], string> = {
   pending: '삭제 중', processing: '삭제 중', review_required: '삭제 미완료 — 확인 필요',
   retry_required: '삭제 실패 — 재시도 가능', completed: '계정·개인자료 삭제 완료',
 };
@@ -27,7 +27,7 @@ const ERRORS: Record<string, string> = {
   USER_NOT_FOUND: '이미 삭제됐거나 존재하지 않는 회원입니다. 목록을 새로 조회해 주시기 바랍니다.',
   SERVICE_STOP_REQUIRED: '서비스 이용 상태를 다시 확인해 주시기 바랍니다. 최신 계정 삭제 API에서는 사전 정지가 필요하지 않습니다.',
 };
-function deletionMessage(code?: string) {
+export function deletionMessage(code?: string) {
   return code && ERRORS[code] ? ERRORS[code] : '삭제를 완료하지 못했습니다. 다시 시도해 주시기 바랍니다.';
 }
 
@@ -60,7 +60,7 @@ export default function AccountErasureControls({ accountId, userId, onCompleted,
           : await api.post(`/admin/users/erasure-operations/${result!.operationId}/retry`);
       if (captured !== epoch.current.generation) return;
       const data = response.data?.data as AccountErasureResult | undefined;
-      if (!data || typeof data.erased !== 'boolean' || !Object.prototype.hasOwnProperty.call(LABELS,data.state) || (data.state === 'completed') !== data.erased) throw new Error('INVALID_RESPONSE');
+      if (!data || typeof data.erased !== 'boolean' || !Object.prototype.hasOwnProperty.call(ERASURE_STATE_LABELS,data.state) || (data.state === 'completed') !== data.erased) throw new Error('INVALID_RESPONSE');
       setResult(data);onResult?.(data);
       completed = data.state === 'completed' && data.erased === true;
     } catch (e) {
@@ -74,7 +74,7 @@ export default function AccountErasureControls({ accountId, userId, onCompleted,
   };
   return <div className="space-y-2 text-sm">
     {result ? <>
-      <p role="status">{LABELS[result.state]}{result.state !== 'completed' ? ' · 삭제 미완료' : ''}</p>
+      <p role="status">{ERASURE_STATE_LABELS[result.state]}{result.state !== 'completed' ? ' · 삭제 미완료' : ''}</p>
       {(result.reviewCodes?.length ?? 0) > 0 && <ul className="list-disc pl-5">{result.reviewCodes?.map(code => <li key={code}>{deletionMessage(code)} <span className="text-xs text-slate-500">({code})</span></li>)}</ul>}
       {result.errorCode && <p role="alert">{deletionMessage(result.errorCode)} ({result.errorCode})</p>}
       {typeof result.remainingFileTasks === "number" && <p>남은 파일: {result.remainingFileTasks}건</p>}

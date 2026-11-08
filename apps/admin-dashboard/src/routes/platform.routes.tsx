@@ -70,10 +70,16 @@ export function PlatformRoutes() {
     <Route key="/admin/platform" path="/admin/platform" element={<PlatformSectionLayout />}>
       <Route index element={<PlatformAdminLandingPage />} />
       <Route path="accounts" element={<PlatformAccountsPage />} />
-      <Route path="users" element={<PlatformUsersPage />} />
+      {/* 같은 화면 컴포넌트를 prop 만 바꿔 쓰는 경로는 key 로 다시 마운트한다. 초기 상태(목록 · 선택 · 삭제 대상)가
+          이전 경로의 것으로 남지 않게 한다(#986 Codex P1). */}
+      <Route path="users" element={<PlatformUsersPage key="users" />} />
       <Route path="suppliers" element={<CentralSupplierReview adminMode />} />
       <Route path="stores" element={<AdminStoresPage />} />
-      <Route path="resource-deletion" element={<AdminResourceDeletionPage />} />
+      <Route path="member-erasure" element={<PlatformUsersPage key="member-erasure" initialTask="inactive" />} />
+      <Route path="board-deletion" element={<AdminResourceDeletionPage key="board-deletion" fixedKind="community" />} />
+      <Route path="course-deletion" element={<AdminResourceDeletionPage key="course-deletion" fixedKind="lecture" />} />
+      {/* 예전 통합 화면 북마크: 두 대상을 탭으로 보여 준다. */}
+      <Route path="resource-deletion" element={<AdminResourceDeletionPage key="resource-deletion" />} />
       <Route path="erasure-operations" element={<AdminErasureHistoryPage />} />
       {/* Removed administration tools: old bookmarks return to the platform home. */}
       {['services', 'roles', 'service-audience'].map(path =>
