@@ -74,9 +74,10 @@ run("community home PostgreSQL visibility and persistence", () => {
     db = new DataSource({
       type: "postgres",
       host: "127.0.0.1",
-      port: 55439,
-      username: "postgres",
-      database: "postgres",
+      port: Number(process.env.O4O_COMMUNITY_HOME_PG_PORT ?? 55439),
+      username: process.env.O4O_COMMUNITY_HOME_PG_USER ?? "postgres",
+      password: process.env.O4O_COMMUNITY_HOME_PG_PASSWORD,
+      database: process.env.O4O_COMMUNITY_HOME_PG_DATABASE ?? "postgres",
       extra: { options: `-c search_path=${schema}` },
     });
     await db.initialize();

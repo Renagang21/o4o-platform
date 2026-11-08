@@ -186,6 +186,7 @@ export { CooperationOperatorWorkflows } from './modules/CooperationOperatorWorkf
 export { default as CommunityHomeManagementPage } from './modules/community-home-operations/CommunityHomeManagementPage';
 export { CommunityNewsCollectionPanel } from './modules/community-home-operations/CommunityNewsCollectionPanel';
 export { CommunityNewsReviewPanel } from './modules/community-home-operations/CommunityNewsReviewPanel';
+export { CommunityNewsAutoRunsPanel } from './modules/community-home-operations/CommunityNewsAutoRunsPanel';
 export * from './modules/community-home-operations/communityHomeApi';
 export { default as CommunityManagementWorkspace } from './modules/community-home-operations/CommunityManagementWorkspace';
 export { default as PartnerCommunityOperator } from './modules/partner-community-operations/PartnerCommunityOperator';

@@ -136,6 +136,9 @@ import { AddTemporaryPasswordExpiry1793750400000 } from '../migrations/179375040
 
 import { AddStorePlaylistTags1793857542325 } from '../migrations/1793857542325-AddStorePlaylistTags.js';
 
+// WO-O4O-COMMUNITY-INDUSTRY-NEWS-V2 §4 (community_news_articles · community_news_engagement_daily)
+import { CreateCommunityNewsAutomation1794013771244 } from '../migrations/1794013771244-CreateCommunityNewsAutomation.js';
+
 export const INCREMENTAL_MIGRATIONS: readonly MigrationClass[] = [
   CreateStoreOwnerTerminationCases1789701000000,
   AlterHandoffTokensTargetWorkspace1789974015939,
@@ -196,6 +199,7 @@ export const INCREMENTAL_MIGRATIONS: readonly MigrationClass[] = [
   FenceClosedPharmacyWriters1793698990120,
   AddTemporaryPasswordExpiry1793750400000,
   AddStorePlaylistTags1793857542325,
+  CreateCommunityNewsAutomation1794013771244,
 ];
 
 export function incrementalMigrationNames(): string[] {
