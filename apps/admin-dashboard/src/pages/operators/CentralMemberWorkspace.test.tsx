@@ -377,3 +377,20 @@ it('retains the focused member form after a validation error rather than reporti
   await screen.findByText('사업자등록번호를 확인해 주시기 바랍니다.');
   expect(screen.getByLabelText('사업자등록번호')).toHaveValue('123');
 });
+it('shows a failed action inside the open member panel, not behind it', async () => {
+  api.patch.mockRejectedValueOnce({
+    response: { status: 409, data: { error: '다른 운영자가 변경했습니다.' } },
+  });
+  mount();
+  await select();
+  fireEvent.click(screen.getByRole('button', { name: '회원 정보 수정' }));
+  fireEvent.change(screen.getByLabelText('수정 사유'), {
+    target: { value: '합성 수정' },
+  });
+  fireEvent.click(screen.getByRole('button', { name: '회원 정보 저장' }));
+  const panel = screen.getByRole('complementary', { name: '선택 회원 작업' });
+  await waitFor(() =>
+    expect(within(panel).getByRole('alert').textContent).toContain('다른 운영자가 변경했습니다.'),
+  );
+  expect(screen.getAllByRole('alert')).toHaveLength(1);
+});

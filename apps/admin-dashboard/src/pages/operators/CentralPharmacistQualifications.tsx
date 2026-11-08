@@ -297,7 +297,7 @@ export default function CentralPharmacistQualifications({
             {selected.row.name}{selected.row.licenseNumber ? ` · 면허번호 ${selected.row.licenseNumber}` : ""}
           </h3>
           {canManageMembers && selected.action === "signup" && <button type="button" disabled={busy} onClick={() => { setNotice(""); setError(""); setEditing(true); }}>정보 수정</button>}
-          {route.registrationBlocked && <p>가입 승인은 공통 회원 관리 업무 위임이 필요합니다.</p>}
+          {route.registrationBlocked && <p>가입 승인은 회원 가입·이용 관리 업무 위임이 필요합니다.</p>}
           {selected.action === "signup" && !route.viaRegistration && (route.canApprove || route.canReject) && <p>이 처리는 약사 자격에만 적용되며 공통 계정·가입 상태는 변경하지 않습니다.</p>}
           {selected.action === "signup" && !route.canApprove && !route.canReject
             ? <>

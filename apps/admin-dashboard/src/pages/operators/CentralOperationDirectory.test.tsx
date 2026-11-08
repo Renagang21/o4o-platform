@@ -10,7 +10,7 @@ it('gives common operations the full width, groups its menus, and places supplie
   expect(common.className).toContain('md:col-span-2');
   const group = screen.getByText('회원·자격').closest('details')!;
   expect(group.open).toBe(false); fireEvent.click(group.querySelector('summary')!);
-  expect(screen.getByRole('link', {name:'공통 회원 관리'}).getAttribute('href')).toBe('/operations/neture/members');
+  expect(screen.getByRole('link', {name:'회원 가입·이용 관리'}).getAttribute('href')).toBe('/operations/neture/members');
   const supplier = screen.getByRole('heading', {name:'공급자'}).closest('details')!;
   expect(supplier.open).toBe(false);
   expect(common.compareDocumentPosition(supplier) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();

@@ -19,11 +19,18 @@ const item = (
   minimumRole: CentralOperationMenu['minimumRole'] = 'operator',
 ): CentralOperationMenu => ({ key: `${service}.${area}`, service, area, label, group, minimumRole, sourcePaths });
 
-/** Each entry is a real existing work surface, including its detail/tab workflows. */
+/**
+ * Each entry is a real existing work surface, including its detail/tab workflows.
+ * WO-O4O-ADMIN-OPERATOR-MENU-REALIGNMENT-V1 (2026-11-07): labels say what the screen does.
+ * Lecture · community · funding are offered to every neture member, so their `members` areas handle
+ * sign-up and usage status (active / suspended / withdrawn) only — account erasure stays with the
+ * platform admin. Lecture learner access is gated by this membership, so the area is kept.
+ * Keys are unchanged so stored menu grants keep working.
+ */
 export const CENTRAL_OPERATION_MENUS: readonly CentralOperationMenu[] = [
-  item('neture', 'members', '공통 회원 관리', 'members', []),
-  item('neture', 'service-members', 'O4O 서비스 회원·이용 상태', 'members', ['/operator/users','/operator/members']),
-  item('neture', 'membership-cleanup', '서비스 가입 관계 정리', 'members', ['/admin/members'], 'admin'),
+  item('neture', 'members', '회원 가입·이용 관리', 'members', []),
+  item('neture', 'service-members', '서비스별 이용 상태', 'members', ['/operator/users','/operator/members']),
+  item('neture', 'membership-cleanup', '가입 관계 정리', 'members', ['/admin/members'], 'admin'),
   item('neture', 'qualifications', '약사 자격 검토', 'members', []),
   item('neture', 'applications', '기존 서비스 가입 검토', 'members', ['/operator/applications']),
   item('neture', 'pharmacies', '약국·매장 신청 심사', 'members', ['/operator/pharmacy-memberships']),
@@ -31,7 +38,7 @@ export const CENTRAL_OPERATION_MENUS: readonly CentralOperationMenu[] = [
   item('neture', 'legacy-contact', '기존 문의 관리', 'service', ['/operator/contact-messages']),
   item('neture', 'forums', '포럼 개설 신청', 'service', ['/operator/community']),
   item('neture', 'forum-delete', '포럼 삭제 요청', 'service', ['/operator/forum-delete', '/operator/forum-delete-requests']),
-  item('neture', 'forum-deleted', '삭제된 포럼 관리', 'service', ['/admin/forum-deleted'], 'admin'),
+  item('neture', 'forum-deleted', '포럼 최종 삭제·복구', 'service', ['/admin/forum-deleted'], 'admin'),
   item('neture', 'forum-analytics', '포럼 분석', 'service', ['/operator/forum-analytics']),
   item('neture', 'guides', '안내 문구 관리', 'service', ['/operator/guide-contents']),
   item('neture', 'home', '홈·공지·광고 운영', 'service', ['/operator/home-presentation/neture']),
@@ -60,13 +67,13 @@ export const CENTRAL_OPERATION_MENUS: readonly CentralOperationMenu[] = [
   item('supplier', 'contact-settings', '문의 설정', 'settings', ['/operator/service-contact/supplier/settings'], 'admin'),
   item('supplier', 'home', '홈·공지·광고 운영', 'service', ['/operator/home-presentation/supplier']),
   item('supplier', 'legal', '법정정보·약관', 'settings', ['/operator/legal/supplier'], 'admin'),
-  item('funding', 'members', '펀딩 서비스 회원', 'members', ['/operator/service-members/funding']),
+  item('funding', 'members', '펀딩 가입·이용 상태', 'members', ['/operator/service-members/funding']),
   item('funding', 'funding', '펀딩 개설·참여·이행 운영', 'business', ['/operator/market-trial']),
   item('funding', 'inbox', '문의 접수·처리 / 운영 업무함', 'service', ['/operator/inbox/funding', '/operator/service-contact/funding']),
   item('funding', 'contact-settings', '문의 설정', 'settings', ['/operator/service-contact/funding/settings'], 'admin'),
   item('funding', 'home', '홈·공지·광고 운영', 'service', ['/operator/home-presentation/funding']),
   item('funding', 'legal', '법정정보·약관', 'settings', ['/operator/legal/funding'], 'admin'),
-  item('lecture', 'members', '강의 서비스 회원', 'members', ['/operator/members']),
+  item('lecture', 'members', '강의 가입·이용 상태', 'members', ['/operator/members']),
   item('lecture', 'instructors', '강사 신청 검토', 'members', ['/operator/instructors']),
   item('lecture', 'courses', '강의 개설·자료·게시 운영', 'service', ['/operator', '/operator/courses']),
   item('lecture', 'certificates', '수료증 발급·갱신·복구', 'service', ['/operator/certificates']),
@@ -75,10 +82,10 @@ export const CENTRAL_OPERATION_MENUS: readonly CentralOperationMenu[] = [
   item('lecture', 'contact-settings', '문의 설정', 'settings', ['/operator/service-contact/lecture/settings'], 'admin'),
   item('lecture', 'legal', '법정정보·약관', 'settings', [], 'admin'),
   item('lecture', 'home', '홈·공지 운영', 'service', ['/operator/home-presentation']),
-  item('community', 'members', '커뮤니티 회원', 'members', ['/operator/service-members/community']),
+  item('community', 'members', '커뮤니티 가입·이용 상태', 'members', ['/operator/service-members/community']),
   item('community', 'inbox', '문의 접수·처리 / 운영 업무함', 'service', ['/operator/inbox/community', '/operator/service-contact/community']),
   item('community', 'boards', '게시판·게시글·회원 운영', 'service', ['/operator/communities/boards']),
-  item('community', 'forums', '포럼 개설·공개 설정', 'service', ['/operator/communities']),
+  item('community', 'forums', '게시판 개설·공개', 'service', ['/operator/communities']),
   item('community', 'editorial', '첫 화면·콘텐츠·자료', 'service', ['/operator/communities/home']),
   item('community', 'contact-settings', '문의 설정', 'settings', ['/operator/service-contact/community/settings'], 'admin'),
   item('community', 'home', '홈·공지·광고 운영', 'service', ['/operator/home-presentation/community']),
