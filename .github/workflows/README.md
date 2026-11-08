@@ -7,8 +7,7 @@
 
 | 워크플로 | 트리거 | 역할 |
 |---|---|---|
-| `ci-pipeline.yml` | main push · PR | type-check · lint(ratchet) · test · build · **affected Web production build(vite)**. **대부분 blocking** |
-| `ci-guard-policy.yml` | PR (`services/web-*/src/**`) | RoleGuard 정적 분석 (GUARD-005~007) |
+| `ci-pipeline.yml` | main push · PR | type-check · lint(ratchet) · test · build · **affected Web production build(vite)**. **대부분 blocking**. Detect job 이 문서 민감정보 guard 와 RoleGuard 정적 분석(GUARD-005~007, `scripts/ci/check-role-guard.sh` — 종전 `ci-guard-policy.yml`)을 모든 run 에서 실행 |
 | `ci-appstore-guard.yml` | manifest·lifecycle 변경 | App Store 일관성 가드 |
 | `ci-security.yml` | main push · PR · 주간 | CodeQL 보안 분석 |
 | `e2e-auth-runtime.yml` | 수동 · auth 관련 경로 변경 | 4개 서비스 auth 런타임 E2E |

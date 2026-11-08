@@ -33,10 +33,9 @@ const SWITCHABLE = {
   'ci-pipeline.yml': {
     detect: LINUX_EXPR, 'draft-light': LINUX_EXPR, 'quality-check': LINUX_EXPR, 'api-tests': LINUX_EXPR, build: LINUX_EXPR,
     'web-build': LINUX_EXPR, 'docs-fast-validate': LINUX_EXPR, 'admin-fast-validate': LINUX_EXPR,
-    'admin-fast-guards': LINUX_EXPR, 'docs-sensitive-guard': LINUX_EXPR, 'pc-installer-windows': WINDOWS_EXPR,
+    'admin-fast-guards': LINUX_EXPR, 'pc-installer-windows': WINDOWS_EXPR,
     'central-operator-integration': LINUX_EXPR, 'api-runtime-dependencies': LINUX_EXPR, 'ci-gate': LINUX_EXPR,
   },
-  'ci-guard-policy.yml': { 'guard-check': LINUX_EXPR },
   'ci-appstore-guard.yml': { 'appstore-guard': LINUX_EXPR },
   'automation-pr-labeler.yml': { 'size-label': LINUX_EXPR },
   'scheduled-api-full-jest.yml': { runner: 'ubuntu-latest', plan: SCHEDULED_EXPR, 'full-jest': SCHEDULED_EXPR, aggregate: SCHEDULED_EXPR },

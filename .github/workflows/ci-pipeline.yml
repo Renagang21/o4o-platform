@@ -70,7 +70,7 @@ jobs:
   #   되돌리기 = 변수 삭제. 배포 · GCP 권한 job(deploy-* · delivery · promote)과 CodeQL 은 이 식을 쓰지 않는다.
   detect:
     name: Detect affected scope
-    # 드래프트 run 에서 PR 의 현재 draft 상태를 읽는다(pr-live-draft.mjs). 그 밖에는 git 만 쓴다.
+    # 드래프트 run 에서 PR 의 현재 draft 상태를 읽는다(pr-live-draft.mjs). 그 밖에는 git · node 내장 모듈 · grep 만 쓴다.
     permissions:
       contents: read
       pull-requests: read
@@ -101,6 +101,24 @@ jobs:
         HEAD_SHA: ${{ github.event.inputs.head_sha || (github.event_name == 'pull_request' && github.event.pull_request.head.sha) || github.sha }}
       run: node scripts/ci/detect-affected.mjs
 
+    # WO-O4O-CI-SHORT-JOB-CONSOLIDATION-V1 (IR-O4O-PRIVATE-CI-BUDGET-V1 §8-4) — 1분 미만 별도 job 두 개를 이 job 의 step 으로 옮겼다.
+    #   종전: `docs-sensitive-guard` job(실행 약 15초 · 1분 청구) + `ci-guard-policy.yml` workflow(약 27초 · 1분 청구).
+    #   둘 다 설치 없이 node 내장 모듈 · git · grep 만 쓰고, 이 job 은 이미 full checkout(fetch-depth 0)이다.
+    #   affected scope · 드래프트 여부와 무관하게 **모든 run 에서** 돈다(종전 RoleGuard 는 services/web-*/src 변경 PR 만이었다).
+    #   실패하면 detect 가 실패 → 뒤 job 은 skip → CI Gate(`if: always()`)가 failure 로 막는다.
+    #   단계 이름 `Docs sensitive info guard` 는 DOCUMENT-LIFECYCLE-AND-ARCHIVE-RULES-V1 §10-4 가 가리키는 이름이라 유지한다.
+    #   Docs 민감정보 guard 의 목적(WO-O4O-DOCS-SECURITY-SEPARATION-AND-INTAKE-RULES-V1): 공개 저장소의 docs 에서
+    #   개인 메일 · 휴대전화 · 공인 IP 를 막는다. 규칙 본문은 scripts/check-doc-sensitive.mjs 상단 주석.
+    - uses: actions/setup-node@v7
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+
+    - name: Docs sensitive info guard
+      run: node scripts/check-doc-sensitive.mjs
+
+    - name: Guard Static Analysis (RoleGuard GUARD-005~007)
+      run: bash scripts/ci/check-role-guard.sh
+
     # WO-O4O-CI-DRAFT-LIGHT-READY-GUARANTEE-V1 — 드래프트 run 에서만. 확인할 수 없으면 superseded=false(가벼운 검사 실행).
     - name: Check whether this draft PR is already Ready
       id: live
@@ -116,7 +134,7 @@ jobs:
   #   설치 없이 도는 정적 guard 만 실행한다(측정 1초 미만): 위험 운영 route · console.log.
   #   TypeORM entity 등록 검사는 `typescript` 패키지가 필요해 여기 넣지 않는다(Code Quality Check 에 그대로 있다 · Codex #975).
   #   `.claude/` 검사(scripts/ci/check-agent-config.mjs)는 파일이 있을 때만 실행한다(#973 병합 전후 모두 동작).
-  #   문서 민감정보 검사는 아래 docs-sensitive-guard 가 모든 run 에서 따로 한다.
+  #   문서 민감정보 검사 · RoleGuard 는 위 detect job 의 step 으로 모든 run 에서 따로 한다(WO-O4O-CI-SHORT-JOB-CONSOLIDATION-V1).
   #   **이 job 은 full 검증을 대신하지 않는다.** Ready 전환 · Ready 이후 push · main push 는 full CI 를 탄다.
   draft-light:
     name: Draft light checks
@@ -315,6 +333,7 @@ jobs:
         scripts/ci/__tests__/runner-selection.test.mjs
         scripts/ci/__tests__/draft-ready-guarantee.test.mjs
         scripts/ci/__tests__/check-agent-config.test.mjs
+        scripts/ci/__tests__/short-job-consolidation.test.mjs
 
     # WO-O4O-DOCS-FAST-AGENT-CONFIG-V1 — `.claude/` 경량 검사(settings JSON · 훅 node --check · 훅 단위 테스트).
     # `.claude/` 가 코드와 섞여 full 경로로 오는 경우에도 같은 검사를 돌린다(1초 미만 · 의존성 0).
@@ -944,28 +963,6 @@ jobs:
           cd apps/api-server && npx jest --maxWorkers=1 $SPECS
         fi
 
-  # Docs 민감정보 guard — WO-O4O-DOCS-SECURITY-SEPARATION-AND-INTAKE-RULES-V1
-  #
-  #   저장소가 Public 이므로 docs 의 개인 메일 · 휴대전화 · 공인 IP 를 막는다. 규칙 본문은
-  #   scripts/check-doc-sensitive.mjs 상단 주석. affected scope 와 무관하게 **항상** 실행한다 —
-  #   docs fast · admin fast · full 어느 경로로 가도 같은 검사를 받는다. 의존성 설치 없이 node 내장 모듈과 git 만 쓴다.
-  docs-sensitive-guard:
-    name: Docs sensitive info guard
-    runs-on: ${{ fromJSON(vars.CI_RUNNER_LINUX == 'self-hosted' && github.event.repository.private == true && github.event.pull_request.head.repo.fork != true && '["self-hosted","Linux","X64","o4o-ci-linux"]' || '"ubuntu-latest"') }}
-    timeout-minutes: 5
-    steps:
-    - uses: actions/checkout@v6
-      with:
-        sparse-checkout: |
-          /docs/
-          /scripts/check-doc-sensitive.mjs
-        sparse-checkout-cone-mode: false
-    - uses: actions/setup-node@v7
-      with:
-        node-version: ${{ env.NODE_VERSION }}
-    - name: Guard docs sensitive info
-      run: node scripts/check-doc-sensitive.mjs
-
   # 최종 CI Gate — WO-O4O-CI-CANONICAL-FINAL-GATE-AND-REQUIRED-CHECK-READINESS-V1
   #
   #   위 job 들은 affected scope 에 따라 서로 배타적으로 skip 되고, matrix job 은 표시 이름이 바뀐다.
@@ -1102,7 +1099,7 @@ jobs:
   ci-gate:
     name: ${{ (vars.CI_COST_PROFILE == 'budget' && github.event_name == 'pull_request' && github.event.pull_request.draft) && 'CI Gate (draft · not final)' || 'CI Gate' }}
     runs-on: ${{ fromJSON(vars.CI_RUNNER_LINUX == 'self-hosted' && github.event.repository.private == true && github.event.pull_request.head.repo.fork != true && '["self-hosted","Linux","X64","o4o-ci-linux"]' || '"ubuntu-latest"') }}
-    needs: [detect, draft-light, quality-check, api-tests, build, web-build, docs-fast-validate, admin-fast-validate, admin-fast-guards, docs-sensitive-guard, pc-installer-windows, central-operator-integration, api-runtime-dependencies]
+    needs: [detect, draft-light, quality-check, api-tests, build, web-build, docs-fast-validate, admin-fast-validate, admin-fast-guards, pc-installer-windows, central-operator-integration, api-runtime-dependencies]
     if: always()
     timeout-minutes: 5
     steps:

@@ -29,7 +29,6 @@
 ├── deploy-web-services.yml   # 서비스별 웹 5종 배포 (변경 감지 후 선별 배포)
 ├── ci-pipeline.yml           # type-check · lint(ratchet) · test · build 검증 (대부분 blocking)
 ├── ci-appstore-guard.yml     # App Store 패키지 가드
-├── ci-guard-policy.yml       # 정책 가드
 ├── ci-security.yml           # 보안 검사
 ├── e2e-auth-runtime.yml      # 인증 런타임 E2E
 ├── automation-pr-labeler.yml # PR 라벨 자동화
