@@ -761,8 +761,13 @@ test('CI Gate 는 고정 이름 · always() · 모든 CI job 을 needs 로 묶�
   const jobIds = [...jobsBlock.matchAll(/^ {2}([a-z][a-z0-9-]*):\n/gm)].map((m) => m[1]);
   assert.ok(jobIds.includes('ci-gate'), 'ci-gate job 이 있어야 한다');
   const gate = jobsBlock.slice(jobsBlock.indexOf('\n  ci-gate:\n'));
-  assert.match(gate, /\n {4}name: CI Gate\n/, 'job 이름은 정확히 "CI Gate" 여야 한다');
-  assert.doesNotMatch(gate, /matrix|\$\{\{[^}]*\}\}\s*\n\s*runs-on/, 'gate 는 matrix 가 아니어야 한다');
+  // WO-O4O-CI-DRAFT-LIGHT-READY-GUARANTEE-V1 — 이름은 식이지만 **budget 드래프트 PR 이 아닌 모든 문맥에서 정확히 "CI Gate"** 다.
+  // 드래프트에서만 다른 이름이 되어 required check 를 채우지 않는다(draft-ready-guarantee.test.mjs 가 분기 전체를 고정).
+  const nameLine = gate.match(/\n {4}name: ([^\n]+)\n/)?.[1] ?? '';
+  const DRAFT_EXPR = "vars.CI_COST_PROFILE == 'budget' && github.event_name == 'pull_request' && github.event.pull_request.draft";
+  assert.equal(nameLine, `\${{ (${DRAFT_EXPR}) && 'CI Gate (draft · not final)' || 'CI Gate' }}`, 'gate 이름 식은 이 형태로 고정한다');
+  assert.ok(nameLine.endsWith("|| 'CI Gate' }}"), '드래프트가 아닌 경우의 이름은 정확히 "CI Gate"');
+  assert.doesNotMatch(gate, /\n {4}strategy:|matrix\./, 'gate 는 matrix 가 아니어야 한다');
   assert.match(gate, /\n {4}if: always\(\)\n/, '취소 시 skipped(=통과) 가 되지 않도록 always() 여야 한다');
   const needs = gate.match(/\n {4}needs: \[([^\]]+)\]/);
   assert.ok(needs, 'ci-gate needs 목록이 없다');
