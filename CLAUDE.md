@@ -33,6 +33,17 @@
 - 클라우드 세션에서 운영 DB 확인이 필요하면 멈추고, read-only SQL 과 판정 기준을 담은 지시서를 `docs/work-orders/` 에 작성해 작업 branch 로 push 한 뒤 `HANDOFF.md` 로 로컬 세션에 넘긴다. 로컬 세션은 결과를 마스킹해 같은 branch 에 기록하고 push 한다.
 - 두 세션 모두 `AGENTS.md` §4-1 의 전용 worktree · branch 규칙을 따른다.
 
+### 클라우드 세션 규칙 (환경 `o4o-dev`)
+
+- **의존성:** SessionStart 훅(`.claude/hooks/session-start.sh`)이 클라우드에서만 `pnpm install --frozen-lockfile` 을 실행한다. 실패해도 세션은 열리며 마지막 출력을 보여 준다 — 그때는 같은 명령을 직접 다시 실행한다. 환경 setup script 에는 의존성 설치를 넣지 않는다(캐시돼 lockfile 변경을 놓친다).
+- **시작 동기화:** 작업 전에는 `git fetch origin` 후 working tree 상태와 `origin/main` 대비 ahead/behind 만 확인한다. 시작했다는 이유로 merge · rebase 하지 않는다(`AGENTS.md` §4-1(d)).
+  - 최신 main 이 실제로 필요하면(충돌 · 통합 준비 · 의존 변경) 충돌 여부와 통합 필요성을 먼저 확인한 뒤, clean 상태에서 자기 branch 에만 반영한다.
+  - 아직 push 하지 않은 branch 는 `git pull --rebase origin main`, 이미 push 한 branch 는 `git merge origin/main` 을 쓴다(원격 이력 재작성 금지 · §4-1(e) · §4-2). dirty 상태에서는 pull 하지 않는다.
+- **branch · PR:** 세션에 지정된 `claude/*` branch 에서 작업하고 결과는 PR 로 낸다. main 직접 push · PR 병합 · auto-merge 는 하지 않는다.
+- **통합 담당 몫:** 원격 branch 삭제 · 배포 · CI · 배포 인프라 변경(`AGENTS.md` §5) PR 의 병합은 통합 담당이 직접 한다. 클라우드 세션은 PR 까지만 한다.
+- **테스트 계정:** [`docs/TEST-ACCOUNTS.md`](docs/TEST-ACCOUNTS.md) 를 쓴다. 환경 변수에 계정 값을 두지 않는다.
+- **시크릿:** 코드 · 문서 · 커밋 · PR · 대화에 남기지 않는다. 환경 설정 화면의 환경 변수에도 넣지 않는다(편집 권한자와 에이전트가 읽을 수 있다).
+
 ## 명령 실행 원칙 (Claude Code 도구)
 - **항상 사용자 확인:** 운영 DB 직접 접속 · 시크릿 · IAM · 프로덕션 리소스 삭제. `.claude/settings.json` 의 ask 규칙(allow 보다 우선)이 이 범위를 강제한다. 운영 변경(운영 DB 쓰기 · 시크릿 · 배포)의 승인자는 통합 담당이다 — 다른 개발자의 세션이면 ask 창을 승인하기 전에 통합 담당 승인을 받는다(`AGENTS.md` §5).
 - ask 대상 명령은 다른 명령과 `;` · `&&` · `|` 로 묶지 않는다 — 섞이면 한 줄 전체가 승인 대상이 되어 무엇을 승인하는지 흐려진다.
