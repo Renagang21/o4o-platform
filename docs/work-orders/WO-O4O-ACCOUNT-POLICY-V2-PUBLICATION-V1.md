@@ -1,9 +1,9 @@
 # Neture 계정 이용약관·개인정보 처리방침 · 서비스별 안내 v2 게시
 
 > **상태**: ACTIVE
-> **작성일**: 2026-11-08 · **최종 갱신**: 2026-11-08
+> **작성일**: 2026-11-08 · **최종 갱신**: 2026-11-08 (LOCAL §5-1 · §5-2 완료)
 > **실행 위치**: LOCAL
-> **인계**: claude/intelligent-cray-o2p4u3 · push 전 · 다음 실행자 LOCAL (VS Code 로컬 세션)
+> **인계**: claude/intelligent-cray-o2p4u3 · §5-1 · §5-2 완료(2026-11-08) · 다음 실행자 LOCAL — 2026-11-13 이후 §5-3(통합 담당 승인 · §6-3 입력값)
 > **근거**: 사용자 확인(2026-11-08) — 공개 `/terms` · `/privacy` 가 리팩터링 전 서비스(KPA Society · K-Cosmetics · PharmacyHub)를 적용 대상으로 나열. 이미 공고된 개정안(공고일 2026-10-12 · 시행 예정일 2026-11-13)을 시행일에 게시해 해소하기로 함
 
 ## 1. 배경
@@ -65,7 +65,7 @@
 
 ### 5-1. 사전 확인 — 운영 DB read-only (2026-11-13 전에 해도 됨)
 
-- [ ] [LOCAL] `/db-readonly` 로 아래 SQL 실행 · 결과를 마스킹 없이 적어도 되는 값(서비스 · 종류 · version · 상태 · 날짜 · 건수 · hash)만 §6 에 기록
+- [x] [LOCAL] `/db-readonly` 로 아래 SQL 실행 · 결과를 마스킹 없이 적어도 되는 값(서비스 · 종류 · version · 상태 · 날짜 · 건수 · hash)만 §6 에 기록
 
 ```sql
 -- Q1. 서비스별 정책 문서 현황 (본문·제목 원문은 고르지 않는다)
@@ -95,11 +95,11 @@ ORDER BY 1, 2, 3;
 
 ### 5-2. 게시 본문 준비 (2026-11-13 전에 해도 됨)
 
-- [ ] [LOCAL] 최신 `origin/main` 에서 위 원본 파일 3개를 읽어, 공고 페이지와 같은 규칙(§3 첫 행)으로 게시 본문 8개를 만든다:
+- [x] [LOCAL] 최신 `origin/main` 에서 위 원본 파일 3개를 읽어, 공고 페이지와 같은 규칙(§3 첫 행)으로 게시 본문 8개를 만든다:
   - `neture` terms(계정 이용약관) · `neture` privacy(계정 개인정보 처리방침)
   - `supplier` · `community` · `funding` · `lecture` · `kpa-society` 각각: 「공통 적용 원칙」 + 「<서비스> 이용약관」(terms) / 「공통 적용 원칙」 + 「<서비스> 개인정보 안내」(privacy) — 서비스당 2개, 모두 10개
-- [ ] [LOCAL] `neture.co.kr/policies/account-update` 화면 본문과 대조해 글자가 같은지 확인. 본문 파일은 커밋하지 않는다(저장소 원본이 정본)
-- [ ] [LOCAL] 각 본문의 md5 를 기록(§6) — 게시 후 Q1 `content_md5` 와 대조한다
+- [x] [LOCAL] `neture.co.kr/policies/account-update` 화면 본문과 대조해 글자가 같은지 확인. 본문 파일은 커밋하지 않는다(저장소 원본이 정본)
+- [x] [LOCAL] 각 본문의 md5 를 기록(§6) — 게시 후 Q1 `content_md5` 와 대조한다
 
 ### 5-3. 게시 — 2026-11-13 이후 · **통합 담당 명시 승인 필요**(운영 데이터 변경 · `AGENTS.md` §5)
 
@@ -111,10 +111,10 @@ ORDER BY 1, 2, 3;
 
   | service_key | document_type | slug | version | 시행일 | 제목 |
   |---|---|---|---|---|---|
-  | neture | terms | `neture-account-terms` | 기존 최대 +1 | 2026-11-13 | Neture 계정 이용약관 |
-  | neture | privacy | 기존 v1 slug 확인 후 동일 규칙 | 기존 최대 +1 | 2026-11-13 | Neture 계정 개인정보 처리방침 |
-  | supplier · community · funding · lecture · kpa-society | terms | `<service_key>-service-terms` | 기존 최대 +1 | 2026-11-13 | <서비스명> 서비스 이용약관 |
-  | 같음 | privacy | `<service_key>-service-privacy` | 기존 최대 +1 | 2026-11-13 | <서비스명> 서비스 개인정보 안내 |
+  | neture | terms | `neture-account-terms` | 2 (privacy 게시 후 · §6-3) | 2026-11-13 | Neture 계정 이용약관 |
+  | neture | privacy | `neture-account-privacy` (§6-3) | 2 | 2026-11-13 | Neture 계정 개인정보 처리방침 |
+  | supplier · community · funding · lecture · kpa-society | terms | `<service_key>-service-terms` | 2 (§6-3) | 2026-11-13 | <서비스명> 서비스 이용약관 |
+  | 같음 | privacy | `<service_key>-service-privacy` | 2 (§6-3) | 2026-11-13 | <서비스명> 서비스 개인정보 안내 |
 
   - 변경 사유(`change_reason`): `2026-10-12 공고 개정안 시행 (공고: /policies/account-update)`
 - [ ] [LOCAL] 게시 중 오류 · 화면이 예상과 다르면 남은 게시를 멈추고 게시한 것 / 남은 것을 보고
@@ -133,11 +133,62 @@ ORDER BY 1, 2, 3;
 
 | 단계 | 일시 | 결과 |
 |---|---|---|
-| 5-1 Q1 | | |
-| 5-1 Q2 | | |
-| 5-2 본문 md5 | | |
-| 5-3 게시(통합 담당 승인) | | |
+| 5-1 Q1 | 2026-11-08 | 아래 6-1. 판정: `neture` **B(초안 미등록)** · `kpa-society` **B** · `supplier` · `community` · `funding` · `lecture` **B — 문서 0건(첫 게시)** |
+| 5-1 Q2 | 2026-11-08 | 아래 6-1. v1 동의 기록 합계 14건(neture terms 6 · privacy 3, kpa-society terms 2, k-cosmetics terms 3) |
+| 5-2 본문 md5 | 2026-11-08 | 아래 6-2. 본문 12개 생성(`origin/main` 1084f51486) · 공고 화면과 대조 3/3 일치 · 퇴역 서비스명 0건 |
+| 5-3 게시(통합 담당 승인) | | 미실행 — 2026-11-13 이후. **6-3 의 수정된 입력값으로 게시** |
 | 5-4 확인 | | |
+
+### 6-1. 운영 DB 조회 결과 (`o4o_readonly` · read-only 트랜잭션 · 2026-11-08)
+
+Q1 — 대상 8개 serviceKey 중 행이 있는 것은 3개뿐(6행). `supplier` · `community` · `funding` · `lecture` · `pharmacy-hub` 는 0행.
+
+| service_key | document_type | version | status | slug | effective | published | length | content_md5 |
+|---|---|---|---|---|---|---|---|---|
+| neture | privacy | 1 | published | `privacy` | 2026-09-17 | 2026-09-17 | 8803 | `e2bad96f4ddc91daf7e6652e9a0b44d7` |
+| neture | terms | 1 | published | `terms` | 2026-09-17 | 2026-09-18 | 10320 | `81592168d0f613f23f194145fd65f0a8` |
+| kpa-society | privacy | 1 | published | `privacy` | 2026-09-17 | 2026-09-17 | 8803 | (neture privacy 와 같음) |
+| kpa-society | terms | 1 | published | `terms` | 2026-09-17 | 2026-09-18 | 10320 | (neture terms 와 같음) |
+| k-cosmetics | privacy | 1 | published | `privacy` | 2026-09-17 | 2026-09-17 | 8803 | (neture privacy 와 같음) |
+| k-cosmetics | terms | 1 | published | `terms` | 2026-09-17 | 2026-09-18 | 10320 | (neture terms 와 같음) |
+
+Q2 — 동의 건수: neture terms v1 6 · neture privacy v1 3 · kpa-society terms v1 2 · k-cosmetics terms v1 3. 그 밖의 조합은 0.
+
+### 6-2. 게시 본문 md5 (UTF-8 · LF · 앞뒤 공백 없음)
+
+생성 규칙: 공고 페이지 `body()` 와 같은 변환(`> ` 줄 · `# ` 줄 제거, `**굵게**` · `[링크](url)` 를 글자만 남김, trim).
+서비스별 문서 = 변환된 서비스 안내 본문에서 「## 공통 적용 원칙」 절 + 빈 줄 1개 + 「## <서비스> 서비스 이용약관 / 개인정보 안내」 절(각 절 trim).
+공고 화면 대조: `neture.co.kr/policies/account-update` 의 세 본문 `innerText` 와 변환 본문을 공백 · 표 기호(`|` · 구분선) · 제목 표지(`##`)를 뺀 글자로 비교 — 3/3 일치(2744 · 4471 · 3424자).
+
+| 문서 | service_key / type | 글자 수 | md5 |
+|---|---|---|---|
+| 계정 이용약관 | neture / terms | 3651 | `3f90b3d7363e89f98bcb12d8f78dede5` |
+| 계정 개인정보 처리방침 | neture / privacy | 6005 | `9ae4fd667774ad612ac1240a884bd010` |
+| 공급자 | supplier / terms | 1475 | `e5df9a4facc2bc6cd326dfedc8831b18` |
+| 공급자 | supplier / privacy | 1239 | `b98cb6c6f0933dd7263a85d8fafab6e9` |
+| 약국·약사회 | kpa-society / terms | 1433 | `310e27acb94dd4d879f726b14b594bf1` |
+| 약국·약사회 | kpa-society / privacy | 1406 | `22fe4cb9e2bead9a14786808d2279505` |
+| 커뮤니티 | community / terms | 1357 | `43c6e357b237b88763ac0a0398b9434a` |
+| 커뮤니티 | community / privacy | 1264 | `a2c182667e1c880919e42f69d0f67f06` |
+| 펀딩 | funding / terms | 1311 | `1506fa657347a866dd516e9e9162553b` |
+| 펀딩 | funding / privacy | 1242 | `a5c5168a323d05c9f509d6bb3869c473` |
+| 강의 | lecture / terms | 1343 | `2a5698f2845dc09e763d49f853d3b9dc` |
+| 강의 | lecture / privacy | 1296 | `9052323942b069eaf7f5237fcb1c74cb` |
+
+- 본문 파일은 커밋하지 않았다. 게시 당일 같은 규칙으로 다시 만들어 md5 가 위 표와 같은지 확인한 뒤 붙여 넣는다.
+- 관리자 API 는 `content` 를 trim 하지 않고 그대로 저장한다(`admin-service-legal.controller.ts` POST). 붙여 넣을 때 끝 줄바꿈이 더해지면 md5 가 달라지므로 게시 전 상세 화면 · Q1 로 확인한다.
+
+### 6-3. §5-3 입력값 정정 — 코드의 게시 검사 기준 (2026-11-08 확인)
+
+§5-3 표를 그대로 따르면 아래 두 곳에서 게시가 거부되거나 잘못된 문서가 적용된다. 게시 때는 이 절을 따른다.
+
+1. **Neture 개인정보 처리방침 slug 는 `neture-account-privacy` 여야 한다.** §5-3 표의 "기존 v1 slug 확인 후 동일 규칙"을 따르면 v1 slug `privacy` 가 되는데,
+   그러면 계정 약관 게시가 `COMMON_ACCOUNT_POLICY_PAIR_REQUIRED` 로 거부된다. 계정 약관 slug 는 `neture-account-terms`(`COMMON_ACCOUNT_TERMS_SLUG`) 그대로.
+2. **게시 순서: Neture 는 개인정보 처리방침(v2) 먼저, 그다음 이용약관(v2).** 약관 게시 때 같은 version 의 `neture-account-privacy` 가 이미 published 여야 한다. 둘 다 version 2 · 시행일 필수.
+3. **서비스별 문서 version 은 모두 2 로 한다.** slug `<service_key>-service-<type>` 문서는 version ≥2 · 시행일이 있어야 게시된다(`ENROLLMENT_POLICY_NOT_READY`).
+   `supplier` · `community` · `funding` · `lecture` 는 기존 문서가 없어 "기존 최대 +1" 이 1 이 되므로 거부된다. `kpa-society` 는 +1 = 2 로 같다.
+4. **서비스별 terms · privacy 는 같은 version 으로 연달아 게시한다.** 한쪽만 published 인 동안 그 서비스의 신청 화면은 `POLICY_UNAVAILABLE`(503) 이 된다(`getEnrollmentPolicies`).
+5. 관리자 API 의 serviceKey 허용 목록(`SUPPORTED_LEGAL_SERVICE_KEYS`)에 다섯 서비스가 모두 있다. 화면 위치 확인은 §5-3 그대로 게시 당일에 한다.
 
 ## 7. 검증 계획
 
