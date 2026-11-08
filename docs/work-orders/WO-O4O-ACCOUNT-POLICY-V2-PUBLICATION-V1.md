@@ -3,7 +3,7 @@
 > **상태**: ACTIVE
 > **작성일**: 2026-11-08 · **최종 갱신**: 2026-11-08 (LOCAL §5-1 · §5-2 완료)
 > **실행 위치**: LOCAL
-> **인계**: claude/intelligent-cray-o2p4u3 · §5-1 · §5-2 완료(2026-11-08) · §5-3 · §5-4 는 사용자 수작업(2026-11-13 이후 · §6-3) · kpa-society 게시는 편집 화면 부재로 보류
+> **인계**: claude/intelligent-cray-o2p4u3 · §5-1 · §5-2 완료(2026-11-08) · §5-3 · §5-4 는 사용자 수작업(2026-11-13 이후 · §6-3) · kpa-society 는 게시 대상 아님(삭제한 서비스 · 2026-11-08 사용자)
 > **근거**: 사용자 확인(2026-11-08) — 공개 `/terms` · `/privacy` 가 리팩터링 전 서비스(KPA Society · K-Cosmetics · PharmacyHub)를 적용 대상으로 나열. 이미 공고된 개정안(공고일 2026-10-12 · 시행 예정일 2026-11-13)을 시행일에 게시해 해소하기로 함
 
 ## 1. 배경
@@ -58,7 +58,7 @@
 
 - 약관 본문 수정 · 새 조항 추가(필요하면 별도 개정 + 새 공고).
 - 퇴역 서비스 v1 문서의 게시 해제 · 보관.
-- `kpa-branch`(분회) 전용 약관 신설. 서비스별 안내의 "약국·약사회"는 `kpa-society` 에 게시한다(설계 문서 「내부 게시·적용 대조」). 분회에 별도 게시가 필요해 보이면 하지 말고 보고한다.
+- `kpa-branch`(분회) 전용 약관 신설. 서비스별 안내의 "약국·약사회"는 게시하지 않는다 — `kpa-society` 는 삭제한 서비스다(2026-11-08 사용자 확인 · §6-3 6). 원래 설계는 `kpa-society` 게시였다(설계 문서 「내부 게시·적용 대조」). 분회에 별도 게시가 필요해 보이면 하지 말고 보고한다.
 - 코드 변경. 게시 중 코드 문제가 보이면 멈추고 CLOUD 로 넘긴다.
 
 ## 5. TODO
@@ -97,7 +97,7 @@ ORDER BY 1, 2, 3;
 
 - [x] [LOCAL] 최신 `origin/main` 에서 위 원본 파일 3개를 읽어, 공고 페이지와 같은 규칙(§3 첫 행)으로 게시 본문 8개를 만든다:
   - `neture` terms(계정 이용약관) · `neture` privacy(계정 개인정보 처리방침)
-  - `supplier` · `community` · `funding` · `lecture` · `kpa-society` 각각: 「공통 적용 원칙」 + 「<서비스> 이용약관」(terms) / 「공통 적용 원칙」 + 「<서비스> 개인정보 안내」(privacy) — 서비스당 2개, 모두 10개
+  - `supplier` · `community` · `funding` · `lecture` 각각(`kpa-society` 는 2026-11-08 사용자 확인으로 제외): 「공통 적용 원칙」 + 「<서비스> 이용약관」(terms) / 「공통 적용 원칙」 + 「<서비스> 개인정보 안내」(privacy) — 서비스당 2개, 모두 10개
 - [x] [LOCAL] `neture.co.kr/policies/account-update` 화면 본문과 대조해 글자가 같은지 확인. 본문 파일은 커밋하지 않는다(저장소 원본이 정본)
 - [x] [LOCAL] 각 본문의 md5 를 기록(§6) — 게시 후 Q1 `content_md5` 와 대조한다
 
@@ -107,13 +107,13 @@ ORDER BY 1, 2, 3;
 - [ ] [LOCAL] 관리자 화면에서 게시. 화면 위치(코드 기준 · 실제 메뉴는 확인):
   - `neture`: `neture.co.kr/admin/settings/legal-terms`
   - `supplier` · `funding` · `community`: 각 호스트의 `/operator/legal/<serviceKey>` (`services/web-neture/src/App.tsx`)
-  - `lecture` · `kpa-society`: 해당 서비스 운영자 화면의 법정정보·약관 설정. 위치를 못 찾으면 게시하지 말고 보고
+  - `lecture`: `admin.neture.co.kr/operations/lecture/legal` (§6-3 6). `kpa-society` 는 게시하지 않는다
 
   | service_key | document_type | slug | version | 시행일 | 제목 |
   |---|---|---|---|---|---|
   | neture | terms | `neture-account-terms` | 2 (privacy 게시 후 · §6-3) | 2026-11-13 | Neture 계정 이용약관 |
   | neture | privacy | `neture-account-privacy` (§6-3) | 2 | 2026-11-13 | Neture 계정 개인정보 처리방침 |
-  | supplier · community · funding · lecture · kpa-society | terms | `<service_key>-service-terms` | 2 (§6-3) | 2026-11-13 | <서비스명> 서비스 이용약관 |
+  | supplier · community · funding · lecture | terms | `<service_key>-service-terms` | 2 (§6-3) | 2026-11-13 | <서비스명> 서비스 이용약관 |
   | 같음 | privacy | `<service_key>-service-privacy` | 2 (§6-3) | 2026-11-13 | <서비스명> 서비스 개인정보 안내 |
 
   - 변경 사유(`change_reason`): `2026-10-12 공고 개정안 시행 (공고: /policies/account-update)`
@@ -136,7 +136,7 @@ ORDER BY 1, 2, 3;
 | 5-1 Q1 | 2026-11-08 | 아래 6-1. 판정: `neture` **B(초안 미등록)** · `kpa-society` **B** · `supplier` · `community` · `funding` · `lecture` **B — 문서 0건(첫 게시)** |
 | 5-1 Q2 | 2026-11-08 | 아래 6-1. v1 동의 기록 합계 14건(neture terms 6 · privacy 3, kpa-society terms 2, k-cosmetics terms 3) |
 | 5-2 본문 md5 | 2026-11-08 | 아래 6-2. 본문 12개 생성(`origin/main` 1084f51486) · 공고 화면과 대조 3/3 일치 · 퇴역 서비스명 0건 |
-| 5-3 게시(통합 담당 승인) | | 미실행 — 2026-11-13 이후 사용자 수작업. **6-3 입력값으로 게시 · kpa-society 2건 보류(편집 화면 없음)** |
+| 5-3 게시(통합 담당 승인) | | 미실행 — 2026-11-13 이후 사용자 수작업. **6-3 입력값으로 게시 · kpa-society 게시 안 함(삭제한 서비스)** |
 | 5-4 확인 | | |
 
 ### 6-1. 운영 DB 조회 결과 (`o4o_readonly` · read-only 트랜잭션 · 2026-11-08)
@@ -166,8 +166,8 @@ Q2 — 동의 건수: neture terms v1 6 · neture privacy v1 3 · kpa-society te
 | 계정 개인정보 처리방침 | neture / privacy | 6005 | `9ae4fd667774ad612ac1240a884bd010` |
 | 공급자 | supplier / terms | 1475 | `e5df9a4facc2bc6cd326dfedc8831b18` |
 | 공급자 | supplier / privacy | 1239 | `b98cb6c6f0933dd7263a85d8fafab6e9` |
-| 약국·약사회 | kpa-society / terms | 1433 | `310e27acb94dd4d879f726b14b594bf1` |
-| 약국·약사회 | kpa-society / privacy | 1406 | `22fe4cb9e2bead9a14786808d2279505` |
+| 약국·약사회 | kpa-society / terms | 1433 | `310e27acb94dd4d879f726b14b594bf1` (게시 안 함) |
+| 약국·약사회 | kpa-society / privacy | 1406 | `22fe4cb9e2bead9a14786808d2279505` (게시 안 함) |
 | 커뮤니티 | community / terms | 1357 | `43c6e357b237b88763ac0a0398b9434a` |
 | 커뮤니티 | community / privacy | 1264 | `a2c182667e1c880919e42f69d0f67f06` |
 | 펀딩 | funding / terms | 1311 | `1506fa657347a866dd516e9e9162553b` |
@@ -193,7 +193,9 @@ Q2 — 동의 건수: neture terms v1 6 · neture privacy v1 3 · kpa-society te
    - 공통: `admin.neture.co.kr/operations/<serviceKey>/legal`(`apps/admin-dashboard` · `CentralSharedWork.tsx`) — neture · supplier · funding · community · lecture.
    - 서비스별: neture `neture.co.kr/admin/settings/legal-terms` · supplier `neture.co.kr/operator/legal/supplier` · funding `neture.co.kr/operator/legal/funding` · community `community.neture.co.kr/operator/legal/community`.
    - lecture: `services/web-lecture` 에는 화면이 없고 위 공통 화면만 있다.
-   - **kpa-society: 편집 화면이 없다.** `CENTRAL_OPERATION_SERVICES` 에 없고 서비스 웹에도 없다. API 는 키를 받지만 화면 없이 API 를 직접 호출하는 것은 이 지시서 범위 밖이므로 **kpa-society 2건은 보류**한다(§5-3 「위치를 못 찾으면 게시하지 말고 보고」). 게시하려면 화면 추가(CLOUD WO) 또는 통합 담당이 정한 다른 방법이 필요하다.
+   - **kpa-society: 게시하지 않는다.** 삭제한 서비스다(2026-11-08 사용자 확인 · 상위 [`WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1`](WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1.md) D1). 편집 화면도 없다.
+     관리자 약관 API 가 아직 이 키를 받는 것은 정리 누락이며, [`WO-O4O-KPA-SOCIETY-POLICY-API-RESIDUE-REMOVAL-V1`](WO-O4O-KPA-SOCIETY-POLICY-API-RESIDUE-REMOVAL-V1.md)(별도 branch · PR)이 제거한다.
+     서비스별 안내 원본의 「약국·약사회」 절은 공고된 본문이라 이 지시서에서 고치지 않는다.
    - 공통 폼(`packages/operator-core-ui/.../ServiceLegalSettingsPage.tsx`)과 API 는 본문을 trim 하지 않는다.
 7. 게시는 사용자가 수작업으로 한다(2026-11-08 사용자 지시). 수작업용 본문 12개와 체크리스트는 로컬 PC 에만 두었다(커밋하지 않음).
 
