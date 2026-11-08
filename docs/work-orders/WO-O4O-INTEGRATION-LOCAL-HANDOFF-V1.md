@@ -99,6 +99,23 @@ SELECT count(*) AS article_rows FROM public.community_news_articles;
 | 3) 이 `permission denied` 로 실패 | 조회 권한 미확보 — 분류 스크립트가 아직 실행되지 않았다. 장애나 자동 게시 실패가 아니다. 분류 뒤 다시 실행한다 |
 | 3) 이 0 이고 08시 · 15시(KST) 실행 시각이 지났음 | 자동 게시 실행 실패 가능 — 운영자 화면 `news-auto-runs` 또는 API 로그 확인(PR #968 위험 항목: `SERVICE_QUERY` quota) |
 
+### C. #986 admin 운영자 메뉴 정리 — 실제 계정 화면 확인 (병합 전)
+
+#986 은 `admin.neture.co.kr` 화면 코드 24개 파일과 조사 지시서 1개를 바꾼다. 클라우드에서는 합성 API 응답으로만 화면을 확인했다. 클라우드에 `docs/local/TEST-ACCOUNTS.local.md` 가 없기 때문이다. 실제 계정 확인은 LOCAL 만 할 수 있다. 확인 항목의 정본은 [#986 설명](https://github.com/Renagang21/o4o-platform/pull/986)의 「확인하지 못한 것」이다.
+
+- [ ] [LOCAL] PR branch 를 **읽기 전용으로** 받는다. 남의 branch 를 checkout 하지 않고, 분리된 worktree 를 만든다(`AGENTS.md` §4-1(b)): `git fetch origin claude/vibrant-allen-56f5dq` → `git worktree add --detach <o4o-wt>/pr986-smoke origin/claude/vibrant-allen-56f5dq`.
+- [ ] [LOCAL] [SETUP.md](../../SETUP.md) 의 설치 · Admin 개발 서버 절(포트 3001)대로 실행한다. 계정은 `docs/local/TEST-ACCOUNTS.local.md` 의 테스트 계정만 쓴다. 운영 계정은 쓰지 않는다.
+- [ ] [LOCAL] PC(1440px) · 모바일 각각에서 확인한다.
+  - 회원 목록 → 행 선택 → 오른쪽 사이드 패널 → 상세 · 정보 수정 → 목록 갱신 · Esc 닫기
+  - admin 메뉴 「최종 삭제 처리」 그룹: 회원 계정 삭제('해지 회원' 탭 먼저) · 포럼 최종 삭제·복구 · 커뮤니티 게시판 · 강좌 삭제 · 삭제 처리 내역이 실제 목록을 보여 주는가
+  - 사이드바가 현재 그룹을 자동으로 펼치는가
+  - delegated operator(`neture:operator`) 테스트 계정으로 `/operations` 의 새 메뉴 이름 · 그룹 구성
+- [ ] [LOCAL] **삭제 · 해지 버튼은 누르지 않는다.** 화면 열기와 목록 확인까지만 한다. 테스트 계정을 실제로 해지 · 삭제해야 하면 `AGENTS.md` §5 「테스트 데이터 생성 · 정리 경계」를 먼저 충족하고 통합 담당 승인을 받는다.
+- [ ] [LOCAL] 결과(통과 · 실패 항목, 스크린샷은 계정 정보를 가린 것만)를 #986 PR 코멘트로 남긴다. 확인용 worktree 는 지운다.
+- [ ] [CLOUD] smoke 가 통과하면 #986 작업 세션이 Ready 로 바꾼다. 통합 담당이 클라우드 통합 세션을 지정하면, 그 세션이 CI · Codex 를 확인하고 병합한다.
+- [ ] [CLOUD] 병합 뒤 Delivery 가 admin 을 자동 배포했는지 확인한다(Delivery run 의 `Admin` job · `Report` job). 이 PR 에는 migration 이 없어서 Promote 는 필요 없다(병합 시점 Delivery 판정으로 다시 확인한다).
+- [ ] [LOCAL] 배포 뒤 `admin.neture.co.kr` 에서 위 화면 중 2~3개를 실제 계정으로 다시 열어 운영 반영을 확인한다.
+
 ## 6. 결과 기록 (LOCAL 이 채운다)
 
 - A. 실행 일시 · 실행자:
@@ -107,11 +124,14 @@ SELECT count(*) AS article_rows FROM public.community_news_articles;
 - A. 실행 결과 `deleted / failed`, 건너뛴 · 실패한 branch 이름:
 - A. 실행 뒤 원격 branch 수:
 - B. (대기)
+- C. #986 smoke 일시 · 계정 종류(admin / operator) · PC · 모바일 결과 · PR 코멘트 링크:
+- C. 배포 뒤 운영 확인:
 
 ## 7. 검증 계획
 
 - A 는 실행 뒤 원격 branch 수와 6절 기록으로 확인한다. 클라우드 통합 세션이 다음 확인 때 `git ls-remote` 로 대조한다.
 - B 는 위 SQL 판정표로 확인한다.
+- C 는 #986 PR 코멘트의 smoke 결과와, 병합 뒤 Delivery 의 `Admin` job 결과로 확인한다.
 
 ## 문서 정합
 
