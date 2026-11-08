@@ -18,9 +18,25 @@ export default function MemberLifecycleActions({
   busy: boolean;
   perform: (work: () => Promise<unknown>) => Promise<void>;
 }>) {
-  const [action, setAction] = useState<
+  // 서버는 이용 중(active)인 회원만 해지하고, 해지(suspended·withdrawn)된 회원만 복구한다.
+  // 가입 대기 · 반려 회원은 둘 다 아니므로 해지 · 복구 양식을 열지 않는다(가입 심사에서 처리).
+  const serviceStatus = detail.member.serviceStatus ?? "";
+  const accessAction: "restore" | "terminate" | null = [
+    "suspended",
+    "withdrawn",
+  ].includes(serviceStatus)
+    ? "restore"
+    : serviceStatus === "active"
+      ? "terminate"
+      : null;
+  const [selectedAction, setAction] = useState<
     "restore" | "terminate" | "transfer" | "close" | null
   >(initialAction);
+  const action =
+    (selectedAction === "restore" || selectedAction === "terminate") &&
+    selectedAction !== accessAction
+      ? null
+      : selectedAction;
   const [reason, setReason] = useState("");
   const [email, setEmail] = useState("");
   const [organizationId, setOrganizationId] = useState("");
@@ -79,9 +95,15 @@ export default function MemberLifecycleActions({
       aria-label="회원 이용 관리"
     >
       <h4 className="font-semibold">이용 관리</h4>
+      {accessAction === null && (
+        <p className="text-sm text-slate-600">
+          가입 대기 · 반려 회원은 이용 해지 대상이 아닙니다. 가입 승인 · 반려는
+          가입 심사에서 처리합니다.
+        </p>
+      )}
       <div className="flex flex-wrap gap-3">
-        {['suspended','withdrawn'].includes(detail.member.serviceStatus??'') ? <button type="button" disabled={busy} onClick={()=>choose('restore')}>이용 복구</button>
-          : detail.member.serviceStatus==='active' && <button type="button" disabled={busy} onClick={()=>choose('terminate')}>회원 해지</button>}
+        {accessAction === "restore" ? <button type="button" disabled={busy} onClick={()=>choose('restore')}>이용 복구</button>
+          : accessAction === "terminate" && <button type="button" disabled={busy} onClick={()=>choose('terminate')}>회원 해지</button>}
         {adminMode &&
           detail.permissions.manageAccount &&
           pharmacies.some((pharmacy) => pharmacy.status === "active") && (
