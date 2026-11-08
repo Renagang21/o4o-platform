@@ -35,8 +35,8 @@ const categories: ForumCategoriesClient = {
   directDeactivate: (id, data) => post(`${base}/categories/${idPath(id)}/deactivate`, data),
   activate: id => post(`${base}/categories/${idPath(id)}/activate`),
   // Hard delete remains exclusively in the existing Admin API below.
-  getDeleteCheck: async () => { throw new Error('Admin의 삭제된 포럼 관리에서 확인해 주시기 바랍니다.'); },
-  hardDelete: async () => { throw new Error('Admin의 삭제된 포럼 관리에서 처리해 주시기 바랍니다.'); },
+  getDeleteCheck: async () => { throw new Error('완전 삭제는 Admin의 최종 삭제 처리 > 포럼 최종 삭제·복구에서 확인해 주시기 바랍니다.'); },
+  hardDelete: async () => { throw new Error('완전 삭제는 Admin의 최종 삭제 처리 > 포럼 최종 삭제·복구에서 처리해 주시기 바랍니다.'); },
 };
 const deleted: DeletedForumAdminClient = {
   getDeletedForums: () => get(`${admin}/forums/deleted`),
@@ -55,7 +55,7 @@ export default function CentralForumOperations({ area }: { area: string }) {
   if (area === 'forums') return <OperatorForumRequestsConsolePage serviceKey="neture" client={requests} title="포럼 신청 관리" description="개설 신청의 승인·반려·보완 요청을 처리합니다." tableId="central-neture-forum-requests" />;
   if (area === 'forum-deleted') return <ForumDeletedManagementPage client={deleted} operatorDeleteHref="/operations/neture/forum-delete" />;
   if (area === 'forum-analytics') return <OperatorForumAnalyticsPage client={analytics} accent={{ iconText: 'text-blue-600', barColor: 'bg-blue-500', activeForumText: 'text-blue-600', activeForumBg: 'bg-blue-50' }} />;
-  return <section><div role="tablist" aria-label="포럼 삭제 업무">{[['requests', '삭제 요청'], ['direct', '포럼 직접 삭제']].map(([key, label]) => <button type="button" key={key} role="tab" aria-selected={tab === key} onClick={() => setTab(key)}>{label}</button>)}</div>
+  return <section><div role="tablist" aria-label="포럼 삭제 업무">{[['requests', '삭제 요청'], ['direct', '포럼 사용 중지·재개']].map(([key, label]) => <button type="button" key={key} role="tab" aria-selected={tab === key} onClick={() => setTab(key)}>{label}</button>)}</div>
     {tab === 'requests' ? <OperatorForumDeleteRequestsConsolePage serviceKey="neture" client={deletions} title="포럼 삭제 요청" tableId="central-neture-forum-delete" /> : <OperatorForumCategoriesPage client={categories} disableHardDelete tableId="central-neture-forum-categories" />}
   </section>;
 }

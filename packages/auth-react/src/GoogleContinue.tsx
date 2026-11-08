@@ -21,6 +21,16 @@ import type { SignupTermsDocument } from '@o4o/auth-client';
 import { useCallback, useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { renderGoogleButton, type GoogleAuthConfig } from '@o4o/auth-client';
 import type { AuthLoginResult, AuthServiceAccess, GoogleSignupConsents } from './types';
+import { useAlertIntoView } from './useAlertIntoView';
+
+/**
+ * WO-O4O-AUTH-ONBOARDING-UX-CLEANUP-V1 T1: 가입 실패 코드별 안내.
+ *   같은 이메일의 다른 수단 가입은 서버가 막는다(EMAIL_IN_USE) — 화면은 다음 행동(기존 계정 로그인 후 연결)만 알려 준다.
+ */
+export const GOOGLE_SIGNUP_EMAIL_IN_USE_MESSAGE =
+  '이미 가입된 이메일입니다. 기존 방법으로 로그인한 뒤 계정 설정에서 Google 을 연결해 주시기 바랍니다.';
+export const GOOGLE_SIGNUP_ALREADY_REGISTERED_MESSAGE = '이미 가입된 Google 계정입니다. Google 버튼으로 다시 로그인해 주시기 바랍니다.';
+export const GOOGLE_SIGNUP_EXPIRED_MESSAGE = 'Google 인증이 만료되었습니다. 입력한 내용은 유지됩니다. Google 버튼을 다시 눌러 주시기 바랍니다.';
 
 export interface GoogleContinueProps<TUser = unknown> {
   /** `authClient.getGoogleAuthConfig` — 공개 Client ID 조회. */
@@ -93,6 +103,7 @@ export function GoogleContinue<TUser = unknown>({
   const [nickname, setNickname] = useState('');
   const containerRef = useRef<HTMLDivElement>(null);
   const mountedRef = useRef(true);
+  const alertRef = useAlertIntoView<HTMLParagraphElement>(message);
 
   // 콜백 props 는 최신값을 ref 로만 읽는다 — 참조가 바뀌어도 effect/stage 에 영향을 주지 않는다.
   const callbacksRef = useRef({ getConfig, loginWithGoogle, signupWithGoogle, onSuccess, onError, onStart });
@@ -175,24 +186,41 @@ export function GoogleContinue<TUser = unknown>({
       setMessage('이용약관과 개인정보 처리방침에 동의해야 계정을 만들 수 있습니다.');
       return;
     }
-    if (!name.trim() || name.trim().length > 100) { setMessage('이름을 100자 이내로 입력해 주시기 바랍니다.'); return; }
+    // WO-O4O-AUTH-ONBOARDING-UX-CLEANUP-V1 T2: 이름 · 휴대전화는 선택 — 값이 있을 때만 형식을 확인한다.
+    if (name.trim().length > 100) { setMessage('이름을 100자 이내로 입력해 주시기 바랍니다.'); return; }
     if (!nickname.trim()) { setMessage('닉네임을 입력해 주시기 바랍니다.'); return; }
     const phoneDigits = phone.replace(/\D/g, '');
-    if (!/^01\d{8,9}$/.test(phoneDigits)) { setMessage('개인 휴대전화 번호를 입력해 주시기 바랍니다.'); return; }
+    if (phoneDigits && !/^01\d{8,9}$/.test(phoneDigits)) { setMessage('휴대전화 번호 형식을 확인해 주시기 바랍니다. (예: 01012345678)'); return; }
     const idToken = stage.idToken;
     setMessage(null);
     setStage({ kind: 'busy' });
-    const result = await callbacksRef.current.signupWithGoogle(idToken, { terms, privacy, marketing, nickname: nickname.trim(), name: name.trim(), phone: phoneDigits, ...signupPolicyReferences(policy!) });
+    const result = await callbacksRef.current.signupWithGoogle(idToken, {
+      terms, privacy, marketing, nickname: nickname.trim(),
+      ...(name.trim() ? { name: name.trim() } : {}),
+      ...(phoneDigits ? { phone: phoneDigits } : {}),
+      ...signupPolicyReferences(policy!),
+    });
     if (!mountedRef.current) return;
     if (result.success && result.user) {
       callbacksRef.current.onSuccess({ user: result.user, isNewUser: true });
       return;
     }
     if (result.code?.startsWith('POLICY_')) { setPolicy(null); setTerms(false); setPrivacy(false); setPolicyReload(value => value + 1); }
-    fail(result);
-    // ID token 은 짧게 유효 — 동의 화면으로 되돌려 재시도를 허용한다(EMAIL_IN_USE 등은 메시지로 안내).
+    if (result.code === 'GOOGLE_ALREADY_REGISTERED') {
+      fail({ ...result, error: GOOGLE_SIGNUP_ALREADY_REGISTERED_MESSAGE });
+      void loadConfig();
+      return;
+    }
+    if (result.code === 'GOOGLE_ID_TOKEN_INVALID' || result.status === 401) {
+      // ID token 이 만료됐다 — 같은 token 으로는 계속 실패하므로 Google 버튼부터 다시 시작한다.
+      fail({ ...result, error: GOOGLE_SIGNUP_EXPIRED_MESSAGE });
+      void loadConfig();
+      return;
+    }
+    fail(result.code === 'EMAIL_IN_USE' ? { ...result, error: GOOGLE_SIGNUP_EMAIL_IN_USE_MESSAGE } : result);
+    // 동의 화면에 머물러 입력을 고친 뒤 재시도할 수 있게 한다.
     setStage({ kind: 'consent', idToken });
-  }, [stage, terms, privacy, marketing, phone, name, nickname, policy, fail]);
+  }, [stage, terms, privacy, marketing, phone, name, nickname, policy, fail, loadConfig]);
 
   return (
     <div className={className} style={box} data-testid="google-continue">
@@ -216,8 +244,8 @@ export function GoogleContinue<TUser = unknown>({
             처음 오셨네요. 계정을 만들려면 아래 항목에 동의해 주시기 바랍니다.
           </p>
           <label style={styles.field}>닉네임 (필수)<input style={styles.input} type="text" maxLength={50} value={nickname} onChange={(e) => setNickname(e.target.value)} /></label>
-          <label style={styles.field}>이름 (필수)<input style={styles.input} type="text" autoComplete="name" maxLength={100} value={name} onChange={(e) => setName(e.target.value)} /></label>
-          <label style={styles.field}>개인 휴대전화 (필수)<input style={styles.input} type="tel" autoComplete="tel" value={phone} onChange={(e) => setPhone(e.target.value)} /></label>
+          <label style={styles.field}>이름 (선택)<input style={styles.input} type="text" autoComplete="name" maxLength={100} value={name} onChange={(e) => setName(e.target.value)} /></label>
+          <label style={styles.field}>개인 휴대전화 (선택)<input style={styles.input} type="tel" autoComplete="tel" value={phone} onChange={(e) => setPhone(e.target.value)} /></label>
           <p style={muted}>연락처를 등록합니다. 휴대전화 본인 인증을 수행하는 것은 아닙니다.</p>
           <SignupTermsAgreement load={getSignupTerms} checked={terms} onChecked={setTerms} onDocument={document => { setPolicy(document); setPrivacy(false); }} reloadKey={policyReload} />
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
@@ -228,6 +256,8 @@ export function GoogleContinue<TUser = unknown>({
             <input type="checkbox" checked={marketing} onChange={(e) => setMarketing(e.target.checked)} />
             <span>마케팅 정보 수신에 동의합니다. (선택)</span>
           </label>
+          {/* T1: 오류는 제출 버튼 바로 위에 — 스크롤되는 모달 하단에 숨지 않게 한다. */}
+          {message && <p ref={alertRef} style={errorStyle} role="alert" data-testid="google-continue-signup-error">{message}</p>}
           <button type="button" disabled={!policy || !terms || !privacy} style={primaryBtn} onClick={() => { void submitSignup(); }}>
             동의하고 계정 만들기
           </button>
@@ -236,7 +266,7 @@ export function GoogleContinue<TUser = unknown>({
           </button>
         </div>
       )}
-      {message && <p style={errorStyle} role="alert">{message}</p>}
+      {message && stage.kind !== 'consent' && <p ref={alertRef} style={errorStyle} role="alert">{message}</p>}
     </div>
   );
 }

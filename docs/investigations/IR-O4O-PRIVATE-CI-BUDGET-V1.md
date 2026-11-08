@@ -410,3 +410,62 @@ PR 에서 온 558건 중 PR CI run 과 연결된 516건의 대조 결과:
 
 §8-5 의 "감축 후 약 53,400분" 에서 1 을 더하면 **약 38,600분**(GitHub 호스팅 기준, 집 PC 이전 전)이 된다. 이때 Pro 기준 비용은 약 $214/월이다. 집 PC 로 옮길 양은 약 29,400분으로 줄고, 실행기 2대로도 피크 대기가 크게 줄어든다(재계산은 1 구현 후 실측으로 한다).
 
+## 10. 결정 반영 · 후속 조사 (2026-11-07)
+
+> 2026-11-07 사용자 결정: §9-3 C 안 **조건부 채택**(판정은 GitHub API 가 직접 주는 정보만), Promote 같은 SHA 재실행 방지 채택, `check-forbidden-tables.mjs` 실패는 원인만 조사.
+> CI · workflow PR 은 한 번에 하나씩 병합한다: #973 → #975 → #976 → #980 → #981.
+
+### 10-1. §9-3 C 안 — API 정보만으로 판정 가능 → 구현(#981, 기본 비활성)
+
+**판정 근거(모두 GitHub 가 만든 정보 · PR 코드가 쓸 수 있는 기록은 쓰지 않음):**
+
+| 확인 | API | 위조 가능성 |
+|---|---|---|
+| main 커밋 C 의 tree SHA · 첫 부모 | `commits/{C}` | 없음 — git 객체 해시 |
+| C 와 부모 사이 변경 파일 (`.github/**` · `scripts/**` 면 full) | `compare/{P}...{C}` | 없음 |
+| C 를 merge commit 으로 가진 병합 PR 정확히 1개 · 같은 저장소 · base=main | `commits/{C}/pulls` | 없음 — GitHub 병합 기록 |
+| PR head H 의 tree SHA == tree(C) | `commits/{H}` | 없음 |
+| H 의 `ci-pipeline.yml` `pull_request` run 성공 + 이름이 정확히 `CI Gate` 인 job success | `actions/workflows/…/runs` · `actions/runs/{id}/jobs` | job 결론은 Actions runner 가 보고한다. API 로 만든 check run 은 Actions job 이 아니므로 섞이지 않는다. 드래프트 gate(`CI Gate (draft · not final)`)는 이름이 달라 제외된다 |
+
+- **§9 의 "같은 base" 기준과의 차이**:
+  - PR CI 가 실제로 검사한 임시 병합 커밋(`refs/pull/N/merge`)의 SHA 는 run 메타데이터에 남지 않는다.
+  - 그래서 API 기준은 **tree(C) == tree(PR head)**, 즉 PR head 가 병합 직전 main 을 이미 포함한 경우로 좁아진다.
+  - 실측 적중률:
+    - 2026-09-30~10-29 merge commit 525건 중 **426건(81%)**
+    - 11월 squash 최근 26건 중 **8건(31%)** — 병렬 세션 PR 이 main 보다 뒤처진 채 병합되는 경우가 많다
+  - 통합 담당이 병합 직전 main 을 merge 하고 PR CI 를 다시 받으면(AGENTS §4-1(e)) 대부분 적중한다.
+- **예상 절감**:
+  - 현재 흐름(약 30%): 월 약 6,000분
+  - 병합 직전 최신화 시(80%대): 월 약 15,000분
+  - 매일 main 전체 검사 비용(약 900분)을 뺀 값이며, 켠 뒤 2주 실측으로 확정한다.
+- **안전 경계**:
+  - 기본 비활성(`CI_MAIN_REUSE`)이다.
+  - CI 인프라 변경 · 판정 불가 · API 실패는 full 이다.
+  - 매일 1회 main 전체 검사를 둔다(Delivery 는 이 run 으로 배포하지 않는다).
+
+### 10-2. Promote 같은 SHA 재실행 방지 → 구현(#980)
+
+- 같은 SHA 의 Promote(dry-run 제외)가 **이미 성공**했거나 **진행 · 대기 중**이면 배포 호출을 건너뛴다.
+- 실패 · 취소된 이전 run 은 재시도를 허용한다. `force='true'` 는 롤백 뒤 재배포 등의 예외용이다.
+- 판정할 수 없거나 판정 job 이 실패하면 **승격은 그대로 진행한다**(fail-open).
+- 판정 job 비용은 약 1분 × 월 약 200회다. 막는 재실행은 1회 평균 약 21분이다.
+
+### 10-3. `scripts/check-forbidden-tables.mjs` 가 main 에서 실패하는 원인 (조사만 · 수정 안 함)
+
+현재 main 에서 실행하면 위반 2건으로 exit 1 이다.
+
+| 위반 | 파일 · 도입 | 실제 성격 | 판정 |
+|---|---|---|---|
+| `@Entity('o4o_payments')` | `apps/api-server/src/entities/payment/PlatformPayment.entity.ts` · `73948d30ef`(2026-02-16, Retail Stable v1.0 payment core) | **PaymentCore 의 플랫폼 공통 결제 테이블**. `CHECKOUT-STABLE-DECLARATION-V2` §2-2 가 `o4o_payments."paymentKey"` UNIQUE 등을 현행 계약으로 명시하고, §2 의 Neture 약국 테스트 결제도 이 테이블을 쓴다 | **오탐** — 스크립트의 허용 목록이 `checkout_orders` · `checkout_payments` 둘뿐이고, 패턴 `(?!checkout_)(\w+)_payments` 가 PaymentCore 테이블도 잡는다. PaymentCore 도입 때 스크립트가 갱신되지 않았다 |
+| `@Entity('neture_settlement_orders')` | `apps/api-server/src/modules/neture/entities/neture-settlement-order.entity.ts` · `32273509a2`(2026-03-09, settlement service extraction) | 정산-주문 **연결 테이블**(중복 정산 방지). 주문을 만드는 독립 주문 원장이 아니다 | **이름 패턴 오탐** — `*_orders` 접미사만 보고 판정한다 |
+
+**방치된 이유:**
+- 이 스크립트는 **CI workflow · `package.json` 어디에서도 호출되지 않는다.** `O4O-STORE-RULES` §(스키마)에 "수동 실행" 으로 기록돼 있다.
+- 그래서 위반이 생겨도 막지 못했고, 이후 CHECK 문서들은 "사전 위반" 으로만 적었다(예: `CHECK-O4O-AUTOMATION-VIDEO-JOB-P0-ADMIN-WORKSPACE-V1`).
+- 2026-10 문서 census(`CHECK-O4O-DOCS-4AXIS-CLASSIFICATION-AND-PUBLIC-SECURITY-CENSUS-V1` §288)도 이미 지적했다: CI 미연결, `@Entity({ name })` 형식 미검출, B2B 파생 원장 `neture_orders` 가 금지 목록에 있음.
+
+**정리 방향(결정 필요 · 별도 WO):**
+1. `o4o_payments` 를 PaymentCore 예외로, `neture_settlement_orders` 를 연결 테이블 예외로 근거와 함께 허용 목록에 둘지 정한다. `CLAUDE.md` §4 · `CHECKOUT-STABLE-V2` 의 계약 소유자가 결정한다.
+2. `@Entity({ name: 'x' })` 형식도 검사하게 고치고, `neture_orders` 항목은 B2B 계약(`O4O-B2B-SUPPLIER-TO-STORE-ORDER-CONTRACT-V1`)과 맞춘다.
+3. 위반 0 이 된 뒤 CI 에 연결한다. 이 스크립트는 설치 없이 돈다(내장 모듈 `fs/promises` · `path` · `url` 만 쓴다). 그래서 Code Quality Check 와 드래프트 가벼운 검사에 모두 넣을 수 있다. 단 드래프트 검사에 넣으려면 import 를 `node:` 접두어로 바꿔야 한다. #975 의 시험이 `node:` 내장 · 상대 경로만 허용한다.
+

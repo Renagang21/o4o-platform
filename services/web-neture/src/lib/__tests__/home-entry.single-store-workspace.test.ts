@@ -42,6 +42,14 @@ describe('resolveSingleStoreWorkspaceUrl', () => {
     await expect(resolveSingleStoreWorkspaceUrl(user)).resolves.toBe('https://store.neture.co.kr/handoff?token=synthetic');
     expect(post).toHaveBeenCalledTimes(1);
     expect(post).toHaveBeenCalledWith('/auth/handoff', { targetWorkspace: 'store', returnPath: '/store' });
+    // WO-O4O-AUTH-ONBOARDING-UX-CLEANUP-V1 T3: 홈 전체(GET 5건)가 아니라 매장 목록 한 건만 조회한다.
+    expect(get.mock.calls.map(c => c[0])).toEqual(['/work-scope/accessible-stores']);
+  });
+
+  it('매장 목록 응답이 잘못되면 미가입처럼 숨기지 않고 throw · handoff 0', async () => {
+    get.mockResolvedValue({ data: { data: {} } });
+    await expect(resolveSingleStoreWorkspaceUrl(user)).rejects.toThrow('bad response');
+    expect(post).not.toHaveBeenCalled();
   });
 
   it.each([

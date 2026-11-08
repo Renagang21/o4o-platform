@@ -116,41 +116,44 @@ export const adminMenuStatic: MenuItem[] = [
   // PLATFORM HUB — 유일한 진짜 플랫폼 전역 집계 화면
   //   현행 12개 공식 주소의 기본 접속 상태를 확인한다. 업무 승인 집계/실행은 각 서비스 소관.
   // ============================================
-  { id: 'platform-account-governance', label: '계정 · 운영 권한', icon: <Layers className="w-5 h-5" />, children: [
-    { id: 'platform-account-overview', label: '계정·운영 권한 개요', icon: <Shield className="w-5 h-5" />, path: '/admin/platform' },
-    { id: 'member-business-management', label: '회원·사업체 관리', icon: <Layers className="w-5 h-5" />, children: [
-      { id: 'platform-members', label: '전체 회원', icon: <Layers className="w-5 h-5" />, path: '/admin/platform/users' },
-      { id: 'platform-suppliers', label: '공급자', icon: <Package className="w-5 h-5" />, path: '/admin/platform/suppliers' },
-      { id: 'platform-stores', label: '내 매장', icon: <Layers className="w-5 h-5" />, path: '/admin/platform/stores' },
-      { id: 'platform-erasure-history', label: '삭제 처리 내역', icon: <ClipboardList className="w-5 h-5" />, path: '/admin/platform/erasure-operations' },
-    ] },
-  ] },
-  { id: 'operations-operators', label: '업무 운영자 지정', icon: <Shield className="w-5 h-5" />, path: '/admin/operations-operators' },
-  { id: 'central-operations', label: '업무 운영', icon: <ClipboardList className="w-5 h-5" />, path: '/operations' },
-  { id: 'pharmacy-service-settings', label: '약국 서비스 설정', icon: <Layers className="w-5 h-5" />, path: '/admin/pharmacy-service-settings' },
-  {
-    id: 'platform-hub',
-    label: '서비스 상태',
-    icon: <Layers className="w-5 h-5" />,
-    path: '/admin/platform/hub',
-  },
-
   // ============================================
-  // CORE — 사람 · 권한 · 금융 · 설정 (Admin 거버넌스)
+  // WO-O4O-ADMIN-OPERATOR-MENU-REALIGNMENT-V1 (2026-11-07 사용자 확정)
+  //   Operator 가 이용을 해지·중지한 대상의 다음 단계(Admin 최종 삭제)를 한 그룹에 모은다.
+  //   삭제 순서는 개인정보 정책(2026-11-03 보완) 그대로다 — 해지 회원을 먼저 보여 주되
+  //   해지되지 않은 회원도 Admin 이 바로 삭제할 수 있다('전체 회원' 탭).
+  //   공급자·파트너·약국협업체처럼 일부 이용자만 쓰는 서비스의 참여 해지는 이 대기 목록에 들어오지 않는다.
+  // ============================================
+  { id: 'final-deletion', label: '최종 삭제 처리', icon: <ClipboardList className="w-5 h-5" />, children: [
+    { id: 'final-deletion-members', label: '회원 계정 삭제', icon: <Layers className="w-4 h-4" />, path: '/admin/platform/member-erasure' },
+    { id: 'final-deletion-forums', label: '포럼 삭제·복구', icon: <ClipboardList className="w-4 h-4" />, path: '/operations/neture/forum-deleted' },
+    { id: 'final-deletion-community-boards', label: '커뮤니티 게시판', icon: <ClipboardList className="w-4 h-4" />, path: '/admin/platform/board-deletion' },
+    { id: 'final-deletion-courses', label: '강좌 삭제', icon: <ClipboardList className="w-4 h-4" />, path: '/admin/platform/course-deletion' },
+    { id: 'platform-erasure-history', label: '삭제 처리 내역', icon: <ClipboardList className="w-4 h-4" />, path: '/admin/platform/erasure-operations' },
+  ] },
+  { id: 'member-business-management', label: '회원·사업체', icon: <Layers className="w-5 h-5" />, children: [
+    { id: 'platform-members', label: '전체 회원', icon: <Layers className="w-4 h-4" />, path: '/admin/platform/users' },
+    { id: 'platform-suppliers', label: '공급자', icon: <Package className="w-4 h-4" />, path: '/admin/platform/suppliers' },
+    { id: 'platform-stores', label: '내 매장', icon: <Layers className="w-4 h-4" />, path: '/admin/platform/stores' },
+  ] },
+  { id: 'operator-authority', label: '운영자·권한', icon: <Shield className="w-5 h-5" />, children: [
+    { id: 'platform-account-overview', label: '계정·운영 권한 개요', icon: <Shield className="w-4 h-4" />, path: '/admin/platform' },
+    { id: 'operations-operators', label: '업무 운영자 지정', icon: <Shield className="w-4 h-4" />, path: '/admin/operations-operators' },
+    // 서비스 담당 권한은 한 화면에서 관리한다. 과거 /users 북마크도 /operators로 통합한다.
+    { id: 'core-operators', label: '서비스 관리자·운영자', icon: <Shield className="w-4 h-4" />, path: '/operators' },
+    { id: 'admin-accounts', label: '전체 관리자 계정', icon: <Shield className="w-4 h-4" />, path: '/settings/admin-accounts' },
+  ] },
+  // ============================================
+  // CORE — 서비스 설정 · 금융 · 플랫폼 설정 (Admin 거버넌스)
   //   CLAUDE.md §11 — Admin = 구조 + 정책 + 거버넌스 + 금융
   // ============================================
   {
     id: 'core',
-    label: '관리 설정',
-    icon: <Shield className="w-5 h-5" />,
+    label: '서비스 설정',
+    icon: <Settings className="w-5 h-5" />,
     children: [
-      // 서비스 담당 권한은 한 화면에서 관리한다. 과거 /users 북마크도 /operators로 통합한다.
-      {
-        id: 'core-operators',
-        label: '서비스 관리자·운영자',
-        icon: <Shield className="w-4 h-4" />,
-        path: '/operators',
-      },
+      { id: 'pharmacy-service-settings', label: '약국 서비스 설정', icon: <Layers className="w-4 h-4" />, path: '/admin/pharmacy-service-settings' },
+      // PLATFORM HUB — 현행 공식 주소의 기본 접속 상태를 확인한다. 업무 승인 집계/실행은 각 서비스 소관.
+      { id: 'platform-hub', label: '서비스 상태', icon: <Layers className="w-4 h-4" />, path: '/admin/platform/hub' },
       // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1: '분회 서비스 가입 승인'(core-kpa-branch-service-members) 제거.
       //   서비스 회원 가입 승인은 그 서비스 운영자(kpa-branch:admin)가 분회 서비스 화면에서 한다.
       //   Admin 은 서비스 운영자만 지정한다.
@@ -240,38 +243,13 @@ export const adminMenuStatic: MenuItem[] = [
   },
 
   // ============================================
-  // CONTENT — 공통 콘텐츠 자산 · 정책
+  // CONTENT — 공통 콘텐츠 자산 · 정책 (2026-11-07 아래 '콘텐츠 게시' 그룹으로 통합)
   //   `Collections` 제거(기능 미구현 명시). 독립 `Policies` 는 1차 정비에서 제거하고
   //   미디어·콘텐츠·게시 위치 화면의 관리 도움말로 옮겼다.
   //   `Assets` → `미디어 라이브러리`(/content-resource/media-assets) 로 교체하고 `Analytics` 를 제거했다
   //   (WO-O4O-CMS-LEGACY-MEDIA-ASSET-TO-MEDIA-V2-CANONICALIZATION-FINAL-CLOSURE-V1).
   //   둘 다 cms_media 하나에 의존했고 그 테이블은 운영에 존재한 적이 없어 상시 500 이었다.
   // ============================================
-  {
-    id: 'content',
-    label: '콘텐츠·자료',
-    icon: <FileText className="w-5 h-5" />,
-    children: [
-      { id: 'content-required-signage', label: '전체 매장 필수 영상', icon: <FileText className="w-4 h-4" />, path: '/operator/signage/required' },
-      {id:'content-resource-deletion',label:'포럼·강의 최종 삭제',icon:<ClipboardList className="w-4 h-4"/>,path:'/admin/platform/resource-deletion'},
-      {
-        id: 'content-overview',
-        label: '자료 안내',
-        icon: <LayoutDashboard className="w-4 h-4" />,
-        path: '/content',
-      },
-      {
-        // WO-O4O-CMS-LEGACY-MEDIA-ASSET-TO-MEDIA-V2-CANONICALIZATION-FINAL-CLOSURE-V1:
-        //   깨진 `Assets`(/content/assets · cms_media) 진입점을 미디어 정본 화면으로 교체한다.
-        //   대상 = media_assets · /api/v1/platform/media-library*.
-        id: 'content-media-library',
-        label: '미디어 라이브러리',
-        icon: <Image className="w-4 h-4" />,
-        path: '/content-resource/media-assets',
-      },
-    ],
-  },
-
   // ============================================
   // CMS
   //   실동작 축은 `cms_contents` · `cms_content_slots` 둘이다.
@@ -285,6 +263,12 @@ export const adminMenuStatic: MenuItem[] = [
     label: '콘텐츠 게시',
     icon: <Database className="w-5 h-5" />,
     children: [
+      // '자료 안내'(/content)는 아래 항목으로 가는 링크 카드만 있어 메뉴에서 뺐다(route 는 북마크용으로 유지).
+      // '포럼·강의 최종 삭제'는 '최종 삭제 처리' 그룹의 대상별 메뉴로 나눴다.
+      { id: 'content-required-signage', label: '전체 매장 필수 영상', icon: <FileText className="w-4 h-4" />, path: '/operator/signage/required' },
+      // WO-O4O-CMS-LEGACY-MEDIA-ASSET-TO-MEDIA-V2-CANONICALIZATION-FINAL-CLOSURE-V1:
+      //   깨진 `Assets`(/content/assets · cms_media) 진입점을 미디어 정본 화면으로 교체한다.
+      { id: 'content-media-library', label: '미디어 라이브러리', icon: <Image className="w-4 h-4" />, path: '/content-resource/media-assets' },
       {
         id: 'cms-contents',
         label: '콘텐츠 관리',
@@ -307,6 +291,8 @@ export const adminMenuStatic: MenuItem[] = [
       },
     ],
   },
+  // 운영자 업무 화면(/operations)으로 이동. AdminLayout 밖이다.
+  { id: 'central-operations', label: '업무 운영', icon: <ClipboardList className="w-5 h-5" />, path: '/operations' },
 ];
 
 // WO-O4O-YAKSA-REPORTS-NONFUNCTIONAL-UI-AND-DEAD-CONTRACT-REMOVAL-V1

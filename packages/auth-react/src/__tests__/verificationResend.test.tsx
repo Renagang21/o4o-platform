@@ -128,8 +128,8 @@ it("pending-verification duplicate signup leaves the password form and offers re
   for (const [label, value] of [
     ["닉네임", "Fixture"],
     ["이메일 (로그인 아이디)", "pending@fixture.invalid"],
-    ["이름", "Fixture"],
-    ["휴대전화", "01012345678"],
+    ["이름 (선택)", "Fixture"],
+    ["휴대전화 (선택)", "01012345678"],
   ])
     fireEvent.change(screen.getByLabelText(label), { target: { value } });
   fireEvent.change(screen.getByTestId("email-signup-password"), {

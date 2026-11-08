@@ -84,8 +84,8 @@ describe('EmailLoginForm', () => {
 describe('EmailSignupForm', () => {
   function fill(overrides: Partial<Record<'email' | 'name' | 'phone' | 'pw' | 'confirm', string>> = {}) {
     fireEvent.change(screen.getByLabelText('이메일 (로그인 아이디)'), { target: { value: overrides.email ?? 'new@x.com' } });
-    fireEvent.change(screen.getByLabelText('닉네임'), { target: { value: 'Fixture nickname' } });fireEvent.change(screen.getByLabelText('이름'), { target: { value: overrides.name ?? '홍길동' } });
-    fireEvent.change(screen.getByLabelText('휴대전화'), { target: { value: overrides.phone ?? '010-1234-5678' } });
+    fireEvent.change(screen.getByLabelText('닉네임'), { target: { value: 'Fixture nickname' } });fireEvent.change(screen.getByLabelText('이름 (선택)'), { target: { value: overrides.name ?? '홍길동' } });
+    fireEvent.change(screen.getByLabelText('휴대전화 (선택)'), { target: { value: overrides.phone ?? '010-1234-5678' } });
     fireEvent.change(screen.getByTestId('email-signup-password'), { target: { value: overrides.pw ?? GOOD_PASSWORD } });
     fireEvent.change(screen.getByTestId('email-signup-confirm'), { target: { value: overrides.confirm ?? GOOD_PASSWORD } });
   }
@@ -113,7 +113,7 @@ describe('EmailSignupForm', () => {
     fill({ phone });
     screen.getAllByRole('checkbox').slice(0, 2).forEach(box => fireEvent.click(box));
     expect(submit().disabled).toBe(true);
-    expect(screen.getByRole('status').textContent).toContain('국내 휴대전화 번호 입력');
+    expect(screen.getByRole('status').textContent).toContain('휴대전화 번호 형식 확인');
     fireEvent.submit(screen.getByTestId('email-signup-form'));
     expect(signup).not.toHaveBeenCalled();
   });
@@ -323,7 +323,7 @@ it('email requires fresh privacy acknowledgement after a policy version mismatch
   const signup=vi.fn(async()=>{throw {response:{data:{code:'POLICY_VERSION_MISMATCH',error:'Changed'}}};});
   render(<EmailSignupForm api={{getSignupTerms:load,signupWithEmail:signup,resendVerificationEmail:vi.fn()}} />);
   await screen.findByRole('link',{name:'내용 보기 · 버전 1'});
-  fireEvent.change(screen.getByLabelText('이메일 (로그인 아이디)'),{target:{value:'synthetic@fixture.invalid'}});fireEvent.change(screen.getByLabelText('닉네임'), { target: { value: 'Fixture nickname' } });fireEvent.change(screen.getByLabelText('이름'),{target:{value:'Fixture'}});fireEvent.change(screen.getByLabelText('휴대전화'),{target:{value:'01012345678'}});
+  fireEvent.change(screen.getByLabelText('이메일 (로그인 아이디)'),{target:{value:'synthetic@fixture.invalid'}});fireEvent.change(screen.getByLabelText('닉네임'), { target: { value: 'Fixture nickname' } });fireEvent.change(screen.getByLabelText('이름 (선택)'),{target:{value:'Fixture'}});fireEvent.change(screen.getByLabelText('휴대전화 (선택)'),{target:{value:'01012345678'}});
   for(const id of ['email-signup-password','email-signup-confirm'])fireEvent.change(screen.getByTestId(id),{target:{value:'Synthetic123!'}});
   fireEvent.click(screen.getAllByRole('checkbox')[0]);fireEvent.click(screen.getAllByRole('checkbox')[1]);fireEvent.click(screen.getByRole('button',{name:'가입하고 확인 메일 받기'}));
   await screen.findByRole('link',{name:'내용 보기 · 버전 2'});

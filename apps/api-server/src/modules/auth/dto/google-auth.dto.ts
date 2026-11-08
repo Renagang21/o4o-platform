@@ -38,14 +38,16 @@ export class GoogleSignupConsentsDto {
   @Type(() => SignupTermsReferenceDto)
   privacyPolicy?: SignupTermsReferenceDto;
 
+  // WO-O4O-AUTH-ONBOARDING-UX-CLEANUP-V1 T2: 이름 · 휴대전화는 가입 선택 항목이다.
+  @IsOptional()
   @IsString()
-  @IsNotEmpty()
   @MaxLength(100)
-  name!: string;
+  name?: string;
 
+  @IsOptional()
   @IsString()
-  @IsNotEmpty()
-  phone!: string;
+  @MaxLength(20)
+  phone?: string;
 
   @IsBoolean()
   terms!: boolean;

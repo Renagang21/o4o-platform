@@ -39,7 +39,7 @@ export default function CentralOperationLayout({services, menus, header, childre
         {centralGroups(menus.filter(menu => menu.service === key)).map(group => {
           const groupId = `${key}:${group.key}`, opened = openGroups.includes(groupId);
           const link = (menu: CentralOperationMenu) => <Link key={menu.key} to={centralMenuHref(menu)} aria-current={centralMenuIsActive(menu,pathname) ? 'page' : undefined} onClick={() => setMobileOpen(false)} className={`block rounded px-3 py-2.5 text-sm break-words ${centralMenuIsActive(menu,pathname) ? 'bg-blue-50 font-semibold text-blue-800' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'}`}>{menu.label}</Link>;
-          if (group.menus.length === 1) return <div key={group.key}>{link(group.menus[0])}</div>;
+          // 메뉴가 하나뿐인 그룹도 머리말을 보여 서비스마다 사이드바 모양을 같게 둔다(2026-11-07).
           return <div key={group.key}>
             <button type="button" aria-expanded={opened} aria-controls={`${prefix}-${key}-${group.key}`} onClick={() => setOpenGroups(old => toggle(old,groupId))} className={`flex w-full items-center justify-between gap-2 rounded px-3 py-2.5 text-left text-sm font-medium ${activeGroup === groupId ? 'text-blue-800' : 'text-slate-700 hover:bg-slate-50'}`}><span>{group.label}</span><ChevronDown size={14} aria-hidden className={opened ? 'rotate-180' : ''}/></button>
             <div id={`${prefix}-${key}-${group.key}`} hidden={!opened} className="ml-2 border-l border-slate-100 pl-1">{group.menus.map(link)}</div>
