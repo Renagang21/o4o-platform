@@ -18,6 +18,9 @@ const SUPPLIER_PRIVATE_FIELDS = [
   "settlement_bankbook_document_id",
   "mail_order_sales_document_id",
 ] as const;
+// WO-O4O-AUTH-ONBOARDING-UX-CLEANUP-V1 T9: 대표자명의 정본이 organizations.metadata.businessProfile 로 옮겨 왔으므로
+// neture_suppliers.representative_name 과 같은 개인정보로 함께 지운다. 업태 · 종목은 개인정보가 아니라 유지한다.
+const ORG_PRIVATE_PROFILE_KEYS = "ARRAY['managerEmail','representativeName']";
 const supplierFiles = [
   "business_registration_document_id",
   "settlement_bankbook_document_id",
@@ -46,7 +49,7 @@ export function supplierErasureProjection(
   if (table.schema_name !== "public") return row;
   if (table.table_name === "organizations")
     return `(CASE WHEN EXISTS(SELECT 1 FROM neture_suppliers s WHERE s.organization_id=${alias}.id AND ${OWNER})
- THEN jsonb_set(${row},'{metadata,businessProfile}',COALESCE(${alias}.metadata->'businessProfile','{}'::jsonb)-'managerEmail') ELSE ${row} END)`;
+ THEN jsonb_set(${row},'{metadata,businessProfile}',COALESCE(${alias}.metadata->'businessProfile','{}'::jsonb)-${ORG_PRIVATE_PROFILE_KEYS}) ELSE ${row} END)`;
   if (
     table.table_name !== "neture_suppliers" ||
     !table.columns.includes("organization_id")
@@ -97,7 +100,7 @@ export async function detachSupplierAccount(
   );
   if (!table?.columns.includes("organization_id")) return;
   await db.query(
-    `UPDATE organizations o SET metadata=jsonb_set(metadata,'{businessProfile}',(metadata->'businessProfile')-'managerEmail')
+    `UPDATE organizations o SET metadata=jsonb_set(metadata,'{businessProfile}',(metadata->'businessProfile')-${ORG_PRIVATE_PROFILE_KEYS})
  WHERE jsonb_typeof(metadata->'businessProfile')='object' AND EXISTS(SELECT 1 FROM neture_suppliers s WHERE s.organization_id=o.id AND ${OWNER})`,
     [userId],
   );

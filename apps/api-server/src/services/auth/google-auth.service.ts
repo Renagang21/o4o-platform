@@ -112,7 +112,7 @@ const GOOGLE_AUTH_ERROR_MESSAGE: Record<GoogleAuthErrorCode, string> = {
   GOOGLE_EMAIL_MISSING: 'Google 계정에서 이메일을 확인할 수 없어 계정을 생성할 수 없습니다.',
   GOOGLE_EMAIL_UNVERIFIED: 'Google 에서 인증되지 않은 이메일의 계정으로는 가입할 수 없습니다. 이메일 인증을 마친 Google 계정을 사용해 주세요.',
   EMAIL_IN_USE: '이미 사용 중인 이메일입니다. 기존 계정은 자동으로 연결되지 않습니다.',
-  INVALID_PHONE: '개인 휴대전화 번호를 입력해 주세요.',
+  INVALID_PHONE: '휴대전화 번호 형식을 확인해 주세요. (예: 01012345678)',
   INVALID_NAME: '이름을 100자 이내로 입력해 주세요.',
   CONSENT_REQUIRED: '이용약관과 개인정보 처리방침에 동의해야 합니다.',
   INVALID_USER: '계정 정보를 확인할 수 없습니다.',
@@ -143,8 +143,10 @@ export interface GoogleSignupConsents {
   terms: boolean;
   privacy: boolean;
   marketing?: boolean;
-  phone: string;
-  name: string;
+  /** 선택(WO-O4O-AUTH-ONBOARDING-UX-CLEANUP-V1 T2). 비어 있으면 저장하지 않는다. */
+  phone?: string;
+  /** 선택(WO-O4O-AUTH-ONBOARDING-UX-CLEANUP-V1 T2). 비어 있으면 저장하지 않는다. */
+  name?: string;
   nickname?: string;
 }
 
@@ -296,8 +298,12 @@ export class GoogleAuthService {
       throw new GoogleAuthError('GOOGLE_EMAIL_MISSING');
     }
 
-    if (typeof input.consents.name !== 'string' || !input.consents.name.trim() || input.consents.name.trim().length > 100) throw new GoogleAuthError('INVALID_NAME');
-    if (!isPhoneShapeValid(input.consents.phone)) throw new GoogleAuthError('INVALID_PHONE');
+    // WO-O4O-AUTH-ONBOARDING-UX-CLEANUP-V1 T2: 이름 · 휴대전화는 가입 선택 항목이다(가입 유형 입력이 필수로 받는다).
+    //   값이 있을 때만 형식을 검사한다.
+    const name = typeof input.consents.name === 'string' ? input.consents.name.trim() : '';
+    if (name.length > 100) throw new GoogleAuthError('INVALID_NAME');
+    const phone = typeof input.consents.phone === 'string' ? input.consents.phone.trim() : '';
+    if (phone && !isPhoneShapeValid(phone)) throw new GoogleAuthError('INVALID_PHONE');
     const user = await this.dataSource.transaction(async (manager) => {
       const created = await this.createGoogleUser(manager, identity, input.consents);
       await recordSignupTerms(created.id, input.policyServiceKey ?? '', input.consents.termsPolicy, manager);
@@ -365,9 +371,9 @@ export class GoogleAuthService {
     const user = userRepo.create({businessInfo:initialMemberRegistration(),
       // WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1 Phase B-1: `password: null` write 제거 — 컬럼이 B-2 에서 사라진다.
       email,
-      name: consents.name.trim(),
+      name: consents.name?.trim() || null,
       nickname: consents.nickname?.trim() || undefined,
-      phone: normalizePhoneDigits(consents.phone),
+      phone: normalizePhoneDigits(consents.phone) || undefined,
       status: UserStatus.ACTIVE,
       isActive: true,
       isEmailVerified: true,

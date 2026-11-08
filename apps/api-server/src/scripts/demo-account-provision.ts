@@ -214,10 +214,13 @@ async function run(): Promise<void> {
         orgAction = 'CREATE';
         if (APPLY) {
           const created = await one(
-            `INSERT INTO organizations (name, code, type, description)
-             VALUES ($1, $2, $3, $4) RETURNING id`,
+            // WO-O4O-AUTH-ONBOARDING-UX-CLEANUP-V1 T9: 공급자 대표자명의 정본은 Organization 이다 — 새 조직에만 넣는다
+            //   (기존 행은 UPDATE 하지 않는다 · ④). 이미 있는 Demo 조직은 backfill migration 이 채운다.
+            `INSERT INTO organizations (name, code, type, description, metadata)
+             VALUES ($1, $2, $3, $4, $5::jsonb) RETURNING id`,
             [demo.newOrganization.name, demo.newOrganization.code, demo.newOrganization.type,
-             'canonical Supplier Demo (WO-O4O-CANONICAL-DEMO-ACCOUNT-FOUNDATION-AND-EXPERIENCE-LOGIN-V1)'],
+             'canonical Supplier Demo (WO-O4O-CANONICAL-DEMO-ACCOUNT-FOUNDATION-AND-EXPERIENCE-LOGIN-V1)',
+             JSON.stringify(demo.demoType === 'SUPPLIER' ? { businessProfile: { representativeName: demo.name } } : {})],
           );
           orgId = created!.id as string;
           writes += 1;

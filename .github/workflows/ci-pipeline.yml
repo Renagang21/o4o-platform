@@ -6,6 +6,12 @@ on:
   pull_request:
     branches: [ main ]
     types: [opened, synchronize, reopened, ready_for_review, converted_to_draft]
+  # WO-O4O-CI-MAIN-VERIFIED-REUSE-V1 — 매일 1회 main HEAD 전체 검사(안전망). main 검증 재사용(아래 detect)이
+  # 켜져 있어도 이 run 은 항상 full 이다(push 가 아니므로 재사용 판정을 하지 않고, base 가 없어 affected 판정도 full).
+  # Delivery 는 push 로 돈 CI 만 판정하므로 이 run 으로 배포가 시작되지 않는다(delivery.yml classify 조건).
+  # 19:37 UTC = 04:37 KST — 정기 API full Jest(18:00 UTC)와 겹치지 않는 한산한 시간.
+  schedule:
+    - cron: '37 19 * * *'
   workflow_dispatch:
     # WO-O4O-ADMIN-CI-CD-AFFECTED-SCOPE-AND-DUPLICATE-WORK-REDUCTION-V1
     # affected 판정을 **실제 GitHub Actions 에서** 재현하기 위한 입력.
@@ -70,9 +76,12 @@ jobs:
   #   되돌리기 = 변수 삭제. 배포 · GCP 권한 job(deploy-* · delivery · promote)과 CodeQL 은 이 식을 쓰지 않는다.
   detect:
     name: Detect affected scope
-    # 드래프트 run 에서 PR 의 현재 draft 상태를 읽는다(pr-live-draft.mjs). 그 밖에는 git 만 쓴다.
+    # 드래프트 run 에서 PR 의 현재 draft 상태를 읽는다(pr-live-draft.mjs).
+    # main 검증 재사용 판정(main-verified-reuse.mjs)이 commits · compare · pulls · actions runs/jobs 를 읽는다.
+    # 그 밖에는 git · node 내장 모듈 · grep 만 쓴다.
     permissions:
       contents: read
+      actions: read
       pull-requests: read
     runs-on: ${{ fromJSON(vars.CI_RUNNER_LINUX == 'self-hosted' && github.event.repository.private == true && github.event.pull_request.head.repo.fork != true && '["self-hosted","Linux","X64","o4o-ci-linux"]' || '"ubuntu-latest"') }}
     outputs:
@@ -88,6 +97,8 @@ jobs:
       web_build_dirs: ${{ steps.scope.outputs.web_build_dirs }}
       # 드래프트 run 인데 PR 이 이미 Ready 면 true — 가벼운 검사도 건너뛴다(full 은 ready_for_review run 이 한다).
       draft_superseded: ${{ steps.live.outputs.superseded }}
+      # main push 커밋이 녹색 PR CI 가 검사한 것과 같은 tree 면 true — 무거운 job 을 건너뛴다(판정은 GitHub API 정보만).
+      main_verified: ${{ steps.mainreuse.outputs.verified }}
 
     steps:
     - uses: actions/checkout@v6
@@ -101,6 +112,24 @@ jobs:
         HEAD_SHA: ${{ github.event.inputs.head_sha || (github.event_name == 'pull_request' && github.event.pull_request.head.sha) || github.sha }}
       run: node scripts/ci/detect-affected.mjs
 
+    # WO-O4O-CI-SHORT-JOB-CONSOLIDATION-V1 (IR-O4O-PRIVATE-CI-BUDGET-V1 §8-4) — 1분 미만 별도 job 두 개를 이 job 의 step 으로 옮겼다.
+    #   종전: `docs-sensitive-guard` job(실행 약 15초 · 1분 청구) + `ci-guard-policy.yml` workflow(약 27초 · 1분 청구).
+    #   둘 다 설치 없이 node 내장 모듈 · git · grep 만 쓰고, 이 job 은 이미 full checkout(fetch-depth 0)이다.
+    #   affected scope · 드래프트 여부와 무관하게 **모든 run 에서** 돈다(종전 RoleGuard 는 services/web-*/src 변경 PR 만이었다).
+    #   실패하면 detect 가 실패 → 뒤 job 은 skip → CI Gate(`if: always()`)가 failure 로 막는다.
+    #   단계 이름 `Docs sensitive info guard` 는 DOCUMENT-LIFECYCLE-AND-ARCHIVE-RULES-V1 §10-4 가 가리키는 이름이라 유지한다.
+    #   Docs 민감정보 guard 의 목적(WO-O4O-DOCS-SECURITY-SEPARATION-AND-INTAKE-RULES-V1): 공개 저장소의 docs 에서
+    #   개인 메일 · 휴대전화 · 공인 IP 를 막는다. 규칙 본문은 scripts/check-doc-sensitive.mjs 상단 주석.
+    - uses: actions/setup-node@v7
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+
+    - name: Docs sensitive info guard
+      run: node scripts/check-doc-sensitive.mjs
+
+    - name: Guard Static Analysis (RoleGuard GUARD-005~007)
+      run: bash scripts/ci/check-role-guard.sh
+
     # WO-O4O-CI-DRAFT-LIGHT-READY-GUARANTEE-V1 — 드래프트 run 에서만. 확인할 수 없으면 superseded=false(가벼운 검사 실행).
     - name: Check whether this draft PR is already Ready
       id: live
@@ -110,13 +139,25 @@ jobs:
         PR_NUMBER: ${{ github.event.pull_request.number }}
       run: node scripts/ci/pr-live-draft.mjs
 
+    # WO-O4O-CI-MAIN-VERIFIED-REUSE-V1 (IR §9-3 C · 조건부 채택) — main push 에서만 · `CI_MAIN_REUSE=true` 일 때만.
+    #   tree(C) == tree(PR head) 이고 그 head 의 pull_request CI 에서 이름이 정확히 `CI Gate` 인 job 이 success 면
+    #   verified=true. `.github/**` · `scripts/**` 변경 · 판정 불가 · API 실패는 모두 false(full).
+    #   PR 쪽 코드가 만든 기록은 쓰지 않는다 — tree SHA 는 git 이, job 결과는 Actions 가 준다.
+    - name: Reuse a green PR CI for an identical main tree
+      id: mainreuse
+      if: github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.CI_MAIN_REUSE == 'true'
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+        CI_MAIN_REUSE: ${{ vars.CI_MAIN_REUSE }}
+      run: node scripts/ci/main-verified-reuse.mjs
+
   # 0-b. 드래프트용 가벼운 검사 — WO-O4O-CI-DRAFT-LIGHT-READY-GUARANTEE-V1
   #
   #   budget 모드(`CI_COST_PROFILE=budget`)의 드래프트 PR push 에서만 돈다(`defer_full`). 무거운 job 은 모두 skip 이다.
   #   설치 없이 도는 정적 guard 만 실행한다(측정 1초 미만): 위험 운영 route · console.log.
   #   TypeORM entity 등록 검사는 `typescript` 패키지가 필요해 여기 넣지 않는다(Code Quality Check 에 그대로 있다 · Codex #975).
   #   `.claude/` 검사(scripts/ci/check-agent-config.mjs)는 파일이 있을 때만 실행한다(#973 병합 전후 모두 동작).
-  #   문서 민감정보 검사는 아래 docs-sensitive-guard 가 모든 run 에서 따로 한다.
+  #   문서 민감정보 검사 · RoleGuard 는 위 detect job 의 step 으로 모든 run 에서 따로 한다(WO-O4O-CI-SHORT-JOB-CONSOLIDATION-V1).
   #   **이 job 은 full 검증을 대신하지 않는다.** Ready 전환 · Ready 이후 push · main push 는 full CI 를 탄다.
   draft-light:
     name: Draft light checks
@@ -155,7 +196,7 @@ jobs:
     needs: [detect]
     # Admin-only 변경은 아래 admin-fast-* 두 잡이, 문서 Markdown 추가·수정만인 변경은
     # docs-fast-validate 가 대체한다. 그 외에는 전부 여기로 온다.
-    if: needs.detect.outputs.defer_full != 'true' && needs.detect.outputs.admin_only != 'true' && needs.detect.outputs.docs_fast_eligible != 'true'
+    if: needs.detect.outputs.defer_full != 'true' && needs.detect.outputs.main_verified != 'true' && needs.detect.outputs.admin_only != 'true' && needs.detect.outputs.docs_fast_eligible != 'true'
 
     steps:
     - uses: actions/checkout@v6
@@ -315,6 +356,9 @@ jobs:
         scripts/ci/__tests__/runner-selection.test.mjs
         scripts/ci/__tests__/draft-ready-guarantee.test.mjs
         scripts/ci/__tests__/check-agent-config.test.mjs
+        scripts/ci/__tests__/short-job-consolidation.test.mjs
+        scripts/ci/__tests__/promote-dedupe.test.mjs
+        scripts/ci/__tests__/main-verified-reuse.test.mjs
 
     # WO-O4O-DOCS-FAST-AGENT-CONFIG-V1 — `.claude/` 경량 검사(settings JSON · 훅 node --check · 훅 단위 테스트).
     # `.claude/` 가 코드와 섞여 full 경로로 오는 경우에도 같은 검사를 돌린다(1초 미만 · 의존성 0).
@@ -497,7 +541,7 @@ jobs:
     # Admin-only 변경에서는 전체 suite 대신 admin-fast-guards 가
     # **Admin 소스를 읽는 정적 guard spec** 만 선별해 돌린다(범위 축소가 아니라 선별).
     # docs fast 도 같은 원리다 — docs-fast-validate 가 **그 문서를 읽는 test** 만 선별한다.
-    if: needs.detect.outputs.defer_full != 'true' && needs.detect.outputs.admin_only != 'true' && needs.detect.outputs.docs_fast_eligible != 'true'
+    if: needs.detect.outputs.defer_full != 'true' && needs.detect.outputs.main_verified != 'true' && needs.detect.outputs.admin_only != 'true' && needs.detect.outputs.docs_fast_eligible != 'true'
     strategy:
       fail-fast: false
       matrix:
@@ -599,7 +643,7 @@ jobs:
     name: Build Applications
     runs-on: ${{ fromJSON(vars.CI_RUNNER_LINUX == 'self-hosted' && github.event.repository.private == true && github.event.pull_request.head.repo.fork != true && '["self-hosted","Linux","X64","o4o-ci-linux"]' || '"ubuntu-latest"') }}
     needs: [detect]
-    if: needs.detect.outputs.defer_full != 'true' && needs.detect.outputs.admin_only != 'true' && needs.detect.outputs.docs_fast_eligible != 'true'
+    if: needs.detect.outputs.defer_full != 'true' && needs.detect.outputs.main_verified != 'true' && needs.detect.outputs.admin_only != 'true' && needs.detect.outputs.docs_fast_eligible != 'true'
 
     # build matrix 대상은 배포되는 앱만 유지한다.
     # WO-O4O-MAIN-SITE-FULL-SOURCE-DELETION-V1 에서 은퇴 앱이 소스째 삭제되어
@@ -672,7 +716,7 @@ jobs:
     runs-on: ${{ fromJSON(vars.CI_RUNNER_LINUX == 'self-hosted' && github.event.repository.private == true && github.event.pull_request.head.repo.fork != true && '["self-hosted","Linux","X64","o4o-ci-linux"]' || '"ubuntu-latest"') }}
     needs: [detect]
     if: >-
-      needs.detect.outputs.defer_full != 'true' &&
+      needs.detect.outputs.defer_full != 'true' && needs.detect.outputs.main_verified != 'true' &&
       needs.detect.outputs.admin_only != 'true' && needs.detect.outputs.docs_fast_eligible != 'true' &&
       needs.detect.outputs.web_build_dirs != '' && needs.detect.outputs.web_build_dirs != '[]'
     timeout-minutes: 30
@@ -743,7 +787,7 @@ jobs:
     name: Docs Fast — docs consumer tests
     runs-on: ${{ fromJSON(vars.CI_RUNNER_LINUX == 'self-hosted' && github.event.repository.private == true && github.event.pull_request.head.repo.fork != true && '["self-hosted","Linux","X64","o4o-ci-linux"]' || '"ubuntu-latest"') }}
     needs: [detect]
-    if: needs.detect.outputs.defer_full != 'true' && needs.detect.outputs.docs_fast_eligible == 'true'
+    if: needs.detect.outputs.defer_full != 'true' && needs.detect.outputs.main_verified != 'true' && needs.detect.outputs.docs_fast_eligible == 'true'
 
     steps:
     - uses: actions/checkout@v6
@@ -826,7 +870,7 @@ jobs:
     name: Admin Fast — validate & build
     runs-on: ${{ fromJSON(vars.CI_RUNNER_LINUX == 'self-hosted' && github.event.repository.private == true && github.event.pull_request.head.repo.fork != true && '["self-hosted","Linux","X64","o4o-ci-linux"]' || '"ubuntu-latest"') }}
     needs: [detect]
-    if: needs.detect.outputs.defer_full != 'true' && needs.detect.outputs.admin_only == 'true'
+    if: needs.detect.outputs.defer_full != 'true' && needs.detect.outputs.main_verified != 'true' && needs.detect.outputs.admin_only == 'true'
 
     steps:
     - uses: actions/checkout@v6
@@ -901,7 +945,7 @@ jobs:
     name: Admin Fast — repo static guards
     runs-on: ${{ fromJSON(vars.CI_RUNNER_LINUX == 'self-hosted' && github.event.repository.private == true && github.event.pull_request.head.repo.fork != true && '["self-hosted","Linux","X64","o4o-ci-linux"]' || '"ubuntu-latest"') }}
     needs: [detect]
-    if: needs.detect.outputs.defer_full != 'true' && needs.detect.outputs.admin_only == 'true'
+    if: needs.detect.outputs.defer_full != 'true' && needs.detect.outputs.main_verified != 'true' && needs.detect.outputs.admin_only == 'true'
 
     steps:
     - uses: actions/checkout@v6
@@ -944,28 +988,6 @@ jobs:
           cd apps/api-server && npx jest --maxWorkers=1 $SPECS
         fi
 
-  # Docs 민감정보 guard — WO-O4O-DOCS-SECURITY-SEPARATION-AND-INTAKE-RULES-V1
-  #
-  #   저장소가 Public 이므로 docs 의 개인 메일 · 휴대전화 · 공인 IP 를 막는다. 규칙 본문은
-  #   scripts/check-doc-sensitive.mjs 상단 주석. affected scope 와 무관하게 **항상** 실행한다 —
-  #   docs fast · admin fast · full 어느 경로로 가도 같은 검사를 받는다. 의존성 설치 없이 node 내장 모듈과 git 만 쓴다.
-  docs-sensitive-guard:
-    name: Docs sensitive info guard
-    runs-on: ${{ fromJSON(vars.CI_RUNNER_LINUX == 'self-hosted' && github.event.repository.private == true && github.event.pull_request.head.repo.fork != true && '["self-hosted","Linux","X64","o4o-ci-linux"]' || '"ubuntu-latest"') }}
-    timeout-minutes: 5
-    steps:
-    - uses: actions/checkout@v6
-      with:
-        sparse-checkout: |
-          /docs/
-          /scripts/check-doc-sensitive.mjs
-        sparse-checkout-cone-mode: false
-    - uses: actions/setup-node@v7
-      with:
-        node-version: ${{ env.NODE_VERSION }}
-    - name: Guard docs sensitive info
-      run: node scripts/check-doc-sensitive.mjs
-
   # 최종 CI Gate — WO-O4O-CI-CANONICAL-FINAL-GATE-AND-REQUIRED-CHECK-READINESS-V1
   #
   #   위 job 들은 affected scope 에 따라 서로 배타적으로 skip 되고, matrix job 은 표시 이름이 바뀐다.
@@ -982,7 +1004,7 @@ jobs:
       contents: read
     runs-on: ${{ fromJSON(vars.CI_RUNNER_WINDOWS == 'self-hosted' && github.event.repository.private == true && github.event.pull_request.head.repo.fork != true && '["self-hosted","Windows","X64","o4o-ci-windows"]' || '"windows-latest"') }}
     needs: [detect]
-    if: needs.detect.outputs.defer_full != 'true' && needs.detect.outputs.docs_fast_eligible != 'true' && needs.detect.outputs.admin_only != 'true'
+    if: needs.detect.outputs.defer_full != 'true' && needs.detect.outputs.main_verified != 'true' && needs.detect.outputs.docs_fast_eligible != 'true' && needs.detect.outputs.admin_only != 'true'
     timeout-minutes: 10
     steps:
     - uses: actions/checkout@v6
@@ -1013,7 +1035,7 @@ jobs:
     name: Central operator PostgreSQL integration
     runs-on: ${{ fromJSON(vars.CI_RUNNER_LINUX == 'self-hosted' && github.event.repository.private == true && github.event.pull_request.head.repo.fork != true && '["self-hosted","Linux","X64","o4o-ci-linux"]' || '"ubuntu-latest"') }}
     needs: [detect]
-    if: needs.detect.outputs.defer_full != 'true' && (needs.detect.outputs.api_affected == 'true' || needs.detect.outputs.global_or_unknown == 'true')
+    if: needs.detect.outputs.defer_full != 'true' && needs.detect.outputs.main_verified != 'true' && (needs.detect.outputs.api_affected == 'true' || needs.detect.outputs.global_or_unknown == 'true')
     timeout-minutes: 25
     services:
       postgres:
@@ -1070,7 +1092,7 @@ jobs:
       contents: read
     runs-on: ${{ fromJSON(vars.CI_RUNNER_LINUX == 'self-hosted' && github.event.repository.private == true && github.event.pull_request.head.repo.fork != true && '["self-hosted","Linux","X64","o4o-ci-linux"]' || '"ubuntu-latest"') }}
     needs: [detect]
-    if: needs.detect.outputs.defer_full != 'true' && (needs.detect.outputs.api_affected == 'true' || needs.detect.outputs.global_or_unknown == 'true')
+    if: needs.detect.outputs.defer_full != 'true' && needs.detect.outputs.main_verified != 'true' && (needs.detect.outputs.api_affected == 'true' || needs.detect.outputs.global_or_unknown == 'true')
     timeout-minutes: 10
     steps:
     - uses: actions/checkout@v6
@@ -1102,7 +1124,7 @@ jobs:
   ci-gate:
     name: ${{ (vars.CI_COST_PROFILE == 'budget' && github.event_name == 'pull_request' && github.event.pull_request.draft) && 'CI Gate (draft · not final)' || 'CI Gate' }}
     runs-on: ${{ fromJSON(vars.CI_RUNNER_LINUX == 'self-hosted' && github.event.repository.private == true && github.event.pull_request.head.repo.fork != true && '["self-hosted","Linux","X64","o4o-ci-linux"]' || '"ubuntu-latest"') }}
-    needs: [detect, draft-light, quality-check, api-tests, build, web-build, docs-fast-validate, admin-fast-validate, admin-fast-guards, docs-sensitive-guard, pc-installer-windows, central-operator-integration, api-runtime-dependencies]
+    needs: [detect, draft-light, quality-check, api-tests, build, web-build, docs-fast-validate, admin-fast-validate, admin-fast-guards, pc-installer-windows, central-operator-integration, api-runtime-dependencies]
     if: always()
     timeout-minutes: 5
     steps:
@@ -1123,5 +1145,8 @@ jobs:
       run: |
         echo "::notice::드래프트 PR — 가벼운 검사만 했다. 필수 검사 'CI Gate' 는 Ready for review 전환 시 full CI 로 실행된다."
         echo "draft_superseded=${{ needs.detect.outputs.draft_superseded }} (true 면 이미 Ready — full 은 ready_for_review run 이 한다)"
+    - name: Main verified reuse notice
+      if: needs.detect.outputs.main_verified == 'true'
+      run: echo "::notice::main 검증 재사용 — 이 커밋과 같은 tree 를 녹색 PR CI 가 이미 검사했다(Detect 의 판정 요약 참조). 무거운 job 은 건너뛰었다."
     - name: CI Gate PASS
       run: echo "모든 upstream CI job 이 success 또는 skipped"

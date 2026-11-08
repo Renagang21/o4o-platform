@@ -11,9 +11,7 @@ export default function SupplierMailOrderFields({
   const fieldId = useId();
   const {
     onboarding,
-    onboardingSaving,
-    onboardingSaved,
-    onboardingError,
+    scopeStatus,
     mailOrderReportFile,
     setMailOrderReportFile,
     uploadingDocument,
@@ -25,14 +23,20 @@ export default function SupplierMailOrderFields({
     handleUploadDocument,
     handleDownloadDocument,
   } = controller;
+  // WO-O4O-AUTH-ONBOARDING-UX-CLEANUP-V1 T4: 이 섹션은 통신판매업 필드만 저장하고 자기 결과만 보인다.
+  const {
+    saving: onboardingSaving,
+    saved: onboardingSaved,
+    error: onboardingError,
+  } = scopeStatus('mailOrder');
   return (
     <>
       {/* Section A-3: 통신판매업 신고 정보 (WO-O4O-SUPPLIER-MAIL-ORDER-REPORTING-FIELDS-V1) */}
       <div className="bg-white border border-gray-200 rounded-xl p-6 mb-4">
-        <h2 className="flex items-center gap-2 text-base font-semibold text-gray-800 mb-2">
+        <h3 className="flex items-center gap-2 text-base font-semibold text-gray-800 mb-2">
           <FileText className="w-5 h-5 text-gray-500" />
           통신판매업 신고 정보
-        </h2>
+        </h3>
         <p className="text-xs text-gray-500 mb-5">
           통신판매업 신고 정보가 있는 경우 선택적으로 입력할 수 있습니다. 이 정보는 운영자 확인 또는
           특정 상품 승인 검토 시 참고 정보로 사용될 수 있습니다. 취급 품목이나 판매 방식에 따라 신고
@@ -127,8 +131,8 @@ export default function SupplierMailOrderFields({
           <div className="flex items-center gap-3">
             <button
               type="button"
-              onClick={handleSaveOnboarding}
-              disabled={onboardingSaving}
+              onClick={() => handleSaveOnboarding('mailOrder')}
+              disabled={controller.onboardingSaving}
               className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary-600 text-white rounded-lg hover:bg-primary-700 text-sm font-medium disabled:opacity-50"
             >
               {onboardingSaving ? (

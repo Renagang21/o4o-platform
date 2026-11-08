@@ -146,11 +146,15 @@ test('detect 가 실패 · 취소돼 output 이 비어도 드래프트가 아니
   assert.equal(evaluateIf(gateStep('Fail when').if, c), true);
 });
 
-test('모든 무거운 job 은 defer_full 로 막히고, 드래프트에서 도는 job 은 detect · draft-light · docs guard · gate 뿐이다', () => {
+test('모든 무거운 job 은 defer_full 로 막히고, 드래프트에서 도는 job 은 detect · draft-light · gate 뿐이다', () => {
   const ctx = event({ draft: true });
   const c = withNeeds(ctx, detectOutputs(ctx));
   const running = Object.keys(ci.jobs).filter((id) => evaluateIf(ci.jobs[id].if, c));
-  assert.deepEqual(running.sort(), ['ci-gate', 'detect', 'docs-sensitive-guard', 'draft-light'].sort());
+  assert.deepEqual(running.sort(), ['ci-gate', 'detect', 'draft-light'].sort());
+  // 문서 민감정보 guard 는 별도 job 이 아니라 detect 의 조건 없는 step 이다(WO-O4O-CI-SHORT-JOB-CONSOLIDATION-V1) — 드래프트에서도 돈다.
+  const guard = ci.jobs.detect.steps.find((s) => s.name === 'Docs sensitive info guard');
+  assert.ok(guard, 'detect 에 Docs sensitive info guard step 이 있다');
+  assert.equal(guard.if, undefined);
 });
 
 test('draft-light 는 설치 없이 도는 정적 guard 만 실행하고 무거운 명령을 부르지 않는다', () => {

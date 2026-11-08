@@ -39,10 +39,10 @@ export default function SupplierBusinessInfo({
     <>
       {/* Section A: 사업자 기본정보 */}
       <div className="bg-white border border-gray-200 rounded-xl p-6 mb-4">
-        <h2 className="flex items-center gap-2 text-base font-semibold text-gray-800 mb-5">
+        <h3 className="flex items-center gap-2 text-base font-semibold text-gray-800 mb-5">
           <Building2 className="w-5 h-5 text-gray-500" />
           사업자 기본정보
-        </h2>
+        </h3>
         <div className="space-y-5">
           {/* 상호명 */}
           <div>

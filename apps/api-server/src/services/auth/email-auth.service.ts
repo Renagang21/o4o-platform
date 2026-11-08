@@ -192,13 +192,15 @@ export class EmailAuthService {
     if (!isLoginEmailShapeValid(email))
       throw new EmailAuthError('INVALID_EMAIL');
 
+    // WO-O4O-AUTH-ONBOARDING-UX-CLEANUP-V1 T2: 이름 · 휴대전화는 가입 선택 항목이다(가입 유형 입력이 필수로 받는다).
+    //   값이 있을 때만 형식을 검사한다.
     const name = (input.name ?? '').trim();
-    if (name.length === 0 || name.length > 50)
-      throw new EmailAuthError('INVALID_NAME');
+    if (name.length > 50) throw new EmailAuthError('INVALID_NAME');
 
-    if (!isPhoneShapeValid(input.phone))
+    const rawPhone = (input.phone ?? '').trim();
+    if (rawPhone && !isPhoneShapeValid(rawPhone))
       throw new EmailAuthError('INVALID_PHONE');
-    const phone = normalizePhoneDigits(input.phone);
+    const phone = normalizePhoneDigits(rawPhone);
 
     const violations = checkPasswordPolicy(input.password);
     if (violations.length > 0) {
@@ -219,9 +221,9 @@ export class EmailAuthService {
       const repo = manager.getRepository(User);
       const created = repo.create({businessInfo:initialMemberRegistration(),
         email,
-        name,
+        name: name || null,
         nickname: input.nickname?.trim() || undefined,
-        phone,
+        phone: phone || undefined,
         status: UserStatus.ACTIVE,
         isActive: true,
         isEmailVerified: false,

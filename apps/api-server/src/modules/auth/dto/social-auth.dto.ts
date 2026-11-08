@@ -33,10 +33,11 @@ export class SocialSignupDto {
   token!: string;
   @IsString() @IsNotEmpty() @MaxLength(255)
   email!: string;
-  @IsString() @IsNotEmpty() @MaxLength(100)
-  name!: string;
-  @IsString() @IsNotEmpty() @MaxLength(20)
-  phone!: string;
+  // WO-O4O-AUTH-ONBOARDING-UX-CLEANUP-V1 T2: 이름 · 휴대전화는 가입 선택 항목이다.
+  @IsOptional() @IsString() @MaxLength(100)
+  name?: string;
+  @IsOptional() @IsString() @MaxLength(20)
+  phone?: string;
   @IsDefined() @ValidateNested() @Type(()=>EmailSignupConsentsDto)
   consents!: EmailSignupConsentsDto;
   @IsOptional() @IsBoolean()

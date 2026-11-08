@@ -15,7 +15,9 @@ name: Promote
 #
 #   선택 입력: services (쉼표 — 그 서비스만) · dry_run ('true' = 판정만, 배포 0)
 
-run-name: Promote ${{ inputs.sha }}${{ inputs.dry_run == 'true' && ' (dry-run)' || '' }}
+# 서비스 범위를 run 이름에 남긴다 — Same-SHA guard 가 이전 run 의 범위를 run 목록 API 로 읽는다(입력값은 API 에 없다).
+#   `Promote <sha>[ · services=<목록>][ (dry-run)]` — 목록이 없으면 승격 가능한 전부.
+run-name: Promote ${{ inputs.sha }}${{ inputs.services != '' && ' · services=' || '' }}${{ inputs.services }}${{ inputs.dry_run == 'true' && ' (dry-run)' || '' }}
 
 on:
   workflow_dispatch:
@@ -31,20 +33,65 @@ on:
         description: "'true' = 판정만 (배포 0)"
         required: false
         default: 'false'
+      force:
+        description: "'true' = 같은 SHA 가 이미 승격됐거나 진행 중이어도 실행 (롤백 뒤 재배포 등)"
+        required: false
+        default: 'false'
 
 concurrency:
   group: promote-production
   cancel-in-progress: false
 
+# 쓰기 권한은 배포 호출 job(promote)에만 준다 — Same-SHA guard 는 읽기만 한다(SonarCloud githubactions:S8233).
 permissions:
   contents: read
   actions: read
-  statuses: write
-  id-token: write
 
 jobs:
+  # WO-O4O-PROMOTE-SAME-SHA-GUARD-V1 — 같은 SHA 의 Promote(dry-run 제외)가 이미 **모든 서비스를 target 에 올렸거나**
+  # (그 run 이 남긴 마지막 commit status `production` = DEPLOYED · NO_DEPLOY success) **먼저 시작돼 같은 범위로** 진행 · 대기 중이면
+  # 배포 호출을 건너뛴다(IR §9-4: 207회 중 50회가 직전과 같은 SHA). 판정은 Promote run 목록과 그 SHA 의 commit status 만 쓴다.
+  # 실패 · 취소 · 배포 없이 끝난(freeze 등) · 일부만 승격(보류 · 미선택)된 run 과 뒤에 만들어진 run 은 막는 근거가 아니다.
+  # 확인할 수 없으면 막지 않는다(`scripts/ci/promote-dedupe.mjs`).
+  # 이 job 자체가 실패 · 누락돼도(output 비어 있음) 아래 promote 는 그대로 실행된다 — 중복 방지가 승격을 막지 않는다.
+  dedupe:
+    name: Same-SHA guard
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    permissions:
+      contents: read
+      actions: read
+      statuses: read   # 이전 run 이 남긴 commit status `production` 으로 승격 완료를 판정한다(읽기만)
+    outputs:
+      skip: ${{ steps.check.outputs.skip }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          sparse-checkout: scripts/ci/promote-dedupe.mjs
+          sparse-checkout-cone-mode: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22.23.4'
+      - name: Skip when the same SHA was already promoted or is in flight
+        id: check
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          PROMOTE_SHA: ${{ inputs.sha }}
+          PROMOTE_SERVICES: ${{ inputs.services }}
+          PROMOTE_DRY_RUN: ${{ inputs.dry_run }}
+          PROMOTE_FORCE: ${{ inputs.force }}
+        run: node scripts/ci/promote-dedupe.mjs
+
   promote:
     name: Promote
+    needs: [dedupe]
+    if: ${{ !cancelled() && needs.dedupe.outputs.skip != 'true' }}
+    # delivery.yml(reusable)이 필요로 하는 권한 — 종전 workflow 단위 권한과 같은 집합이다.
+    permissions:
+      contents: read
+      actions: read     # ci-gate (CI run 조회)
+      statuses: write   # commit status `production`
+      id-token: write   # GCP 인증 = WIF
     uses: ./.github/workflows/delivery.yml
     with:
       mode: promote

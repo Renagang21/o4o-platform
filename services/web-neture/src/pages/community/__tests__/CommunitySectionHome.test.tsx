@@ -14,6 +14,9 @@ const api = vi.hoisted(() => ({
   save: vi.fn(),
   forum: vi.fn(),
   pinForum: vi.fn(),
+  autoRuns: vi.fn().mockResolvedValue([]),
+  runAutoNews: vi.fn(),
+  newsEngagement: vi.fn().mockResolvedValue({}),
   review: vi.fn().mockResolvedValue(null),
   collection: vi.fn().mockResolvedValue(null),
   collect: vi.fn(),
@@ -218,10 +221,10 @@ describe("community section home", () => {
       expect(api.pinForum).toHaveBeenCalledWith("old-post", true),
     );
   });
-  it("refreshes collected news without discarding an in-progress editorial draft", async () => {
+  it("refreshes auto-published news without discarding an in-progress editorial draft", async () => {
     api.manage.mockResolvedValue({ items: [], hasNext: false });
     let finish!: (value: any) => void;
-    api.collect.mockImplementationOnce(
+    api.runAutoNews.mockImplementationOnce(
       () =>
         new Promise((resolve) => {
           finish = resolve;
@@ -233,22 +236,122 @@ describe("community section home", () => {
     );
     await waitFor(() =>
       expect(
-        screen.getByText("오늘의 기사 수집").hasAttribute("disabled"),
+        screen.getByText("이번 시간대 수동 실행").hasAttribute("disabled"),
       ).toBe(false),
     );
-    fireEvent.click(screen.getByText("오늘의 기사 수집"));
+    expect(screen.queryByText("오늘의 기사 수집")).toBeNull();
+    expect(screen.queryByText("오늘의 초안 정리")).toBeNull();
+    fireEvent.click(screen.getByText("이번 시간대 수동 실행"));
     fireEvent.change(screen.getByLabelText("제목"), {
       target: { value: "편집 중인 제목" },
     });
-    finish({
-      day: "2026-10-23",
-      state: "done",
-      sources: [{ id: "kpanews", added: 2, status: "ok" }],
-    });
-    await screen.findByText("약사공론: 신규 2개");
+    api.autoRuns.mockResolvedValueOnce([
+      {
+        id: "run",
+        day: "2026-11-07",
+        window: "morning",
+        state: "partial",
+        trigger: "manual",
+        ai: "done",
+        candidates: 120,
+        clusters: 30,
+        published: 8,
+        swapped: 0,
+        suppressed: 1,
+        startedAt: "2026-11-06T23:00:00Z",
+        finishedAt: "2026-11-06T23:01:00Z",
+        sources: [
+          { id: "kpanews", status: "ok", fetched: 50, added: 40, duplicates: 1, outOfWindow: 9 },
+          { id: "dailypharm", status: "ROBOTS_BLOCKED", fetched: 0, added: 0, duplicates: 0, outOfWindow: 0 },
+        ],
+      },
+    ]);
+    finish({ id: "run" });
+    // Standard list: check the run, then open its detail from the ActionBar.
+    const row = (await screen.findByText("2026-11-07 오전 · 수동")).closest("tr")!;
+    expect(within(row).getByText("일부 매체 실패")).toBeTruthy();
+    fireEvent.click(within(row).getByRole("checkbox"));
+    fireEvent.click(screen.getByRole("button", { name: /상세 보기/ }));
+    await screen.findByText(/약사공론: 수신 50건/);
+    expect(screen.getByText("데일리팜: 수집 실패 (ROBOTS_BLOCKED)")).toBeTruthy();
     await waitFor(() => expect(api.manage).toHaveBeenCalledTimes(3));
     expect((screen.getByLabelText("제목") as HTMLInputElement).value).toBe(
       "편집 중인 제목",
     );
+  });
+  it("marks auto-published news in the operator list and keeps it editable", async () => {
+    api.manage.mockImplementation(async (kind: string) => ({
+      items:
+        kind === "news"
+          ? [
+              {
+                ...item("auto", "자동 기사"),
+                kind: "news",
+                autoPublished: true,
+                expiresAt: "2020-01-01T00:00:00Z",
+              },
+            ]
+          : [],
+      hasNext: false,
+      page: 1,
+    }));
+    mount(<Management />);
+    fireEvent.click(
+      screen.getByRole("button", { name: "약업계 주요 소식", exact: true }),
+    );
+    expect(
+      (await screen.findByText(/자동 게시 · 노출 기간 종료/)).textContent,
+    ).toContain("자동 게시");
+  });
+  it("reports news impressions and clicks only for auto-published items, by home position", async () => {
+    const data = fixture();
+    data.news = {
+      pinned: [
+        {
+          ...item("news-manual"),
+          isPinned: true,
+          linkUrl: "https://www.kpanews.co.kr/news/articleView.html?idxno=1",
+        },
+      ],
+      recent: [
+        {
+          ...item("news-auto-a"),
+          autoPublished: true,
+          linkUrl: "https://www.kpanews.co.kr/news/articleView.html?idxno=2",
+        },
+        {
+          ...item("news-auto-b"),
+          autoPublished: true,
+          linkUrl: "https://www.medipana.com/news/articleView.html?idxno=3",
+        },
+      ],
+    };
+    api.home.mockResolvedValue(data);
+    mount(<Home />);
+    const link = await screen.findByText("news-auto-b ↗");
+    await waitFor(() =>
+      expect(api.newsEngagement).toHaveBeenCalledWith("impression", [
+        { contentId: "news-auto-a", position: 2 },
+        { contentId: "news-auto-b", position: 3 },
+      ]),
+    );
+    expect(api.newsEngagement).toHaveBeenCalledTimes(1);
+    fireEvent.click(link);
+    await waitFor(() =>
+      expect(api.newsEngagement).toHaveBeenLastCalledWith("click", [
+        { contentId: "news-auto-b", position: 3 },
+      ]),
+    );
+    fireEvent.click(screen.getByText("news-manual ↗"));
+    expect(api.newsEngagement).toHaveBeenCalledTimes(2);
+  });
+  it("keeps the home working when a beacon fails and sends none without auto items", async () => {
+    api.newsEngagement.mockRejectedValue(Error("offline"));
+    api.home.mockResolvedValue(fixture());
+    mount(<Home />);
+    await screen.findByText("news-pin ↗");
+    expect(api.newsEngagement).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByText("news-pin ↗"));
+    expect(api.newsEngagement).not.toHaveBeenCalled();
   });
 });

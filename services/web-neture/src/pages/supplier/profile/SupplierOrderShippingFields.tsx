@@ -35,10 +35,10 @@ export default function SupplierOrderShippingFields({
     <>
       {/* Section D: B2B 주문 조건 — WO-NETURE-B2B-SUPPLIER-ORDER-CONDITION-V1 */}
       <div className="bg-white border border-gray-200 rounded-xl p-6 mb-4">
-        <h2 className="flex items-center gap-2 text-base font-semibold text-gray-800 mb-2">
+        <h3 className="flex items-center gap-2 text-base font-semibold text-gray-800 mb-2">
           <ShoppingCart className="w-5 h-5 text-gray-500" />
           B2B 주문 조건
-        </h2>
+        </h3>
         <p className="text-xs text-gray-500 mb-5">
           매장 주문자가 장바구니/제품 리스트에서 확인할 수 있는 주문 조건입니다. 비워두면 “조건
           없음”으로 표시됩니다.
@@ -114,10 +114,10 @@ export default function SupplierOrderShippingFields({
 
       {/* Section E: 배송 정책 — WO-O4O-NETURE-SUPPLIER-SHIPPING-SETTING-FOUNDATION-V1 */}
       <div className="bg-white border border-gray-200 rounded-xl p-6 mb-4">
-        <h2 className="flex items-center gap-2 text-base font-semibold text-gray-800 mb-2">
+        <h3 className="flex items-center gap-2 text-base font-semibold text-gray-800 mb-2">
           <ShoppingCart className="w-5 h-5 text-gray-500" />
           배송 정책
-        </h2>
+        </h3>
         <p className="text-xs text-gray-500 mb-2">
           공급자별 기본 배송비, 무료배송 기준, 출고 안내, 반품/교환 안내를 설정합니다.
           장바구니·주문에서 공급자별 상품금액(같은 공급자의 일반·이벤트 상품 합산) 기준으로 배송비가

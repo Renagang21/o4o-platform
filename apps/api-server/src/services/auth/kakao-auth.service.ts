@@ -17,7 +17,7 @@ import { kakaoIdentityService, type KakaoIdentityService, type VerifiedKakaoIden
 import { socialFlowService, type SocialFlowService } from './social-flow.service.js';
 import { SocialAuthError } from './social-auth-error.js';
 
-export interface KakaoSignupInput { email: string; name: string; nickname?: string; phone: string; consents: { terms: boolean; privacy: boolean; marketing?: boolean; termsPolicy?: SignupTermsReference; privacyPolicy?: SignupTermsReference } }
+export interface KakaoSignupInput { email: string; name?: string; nickname?: string; phone?: string; consents: { terms: boolean; privacy: boolean; marketing?: boolean; termsPolicy?: SignupTermsReference; privacyPolicy?: SignupTermsReference } }
 const uniqueViolation = (error: unknown): boolean => {
   const e = error as { code?: string; driverError?: { code?: string } };
   return (e?.code ?? e?.driverError?.code) === '23505';
@@ -44,8 +44,10 @@ export class KakaoAuthService {
   async signup(token: string, binding: string, origin: string, input: KakaoSignupInput) {
     const email=normalizeLoginEmail(input.email);
     if (!isLoginEmailShapeValid(email)) throw new SocialAuthError('INVALID_EMAIL','이메일 주소를 확인해 주시기 바랍니다.');
-    if (!input.name?.trim() || input.name.trim().length>100) throw new SocialAuthError('INVALID_NAME','이름을 100자 이내로 입력해 주시기 바랍니다.');
-    if (!isPhoneShapeValid(input.phone)) throw new SocialAuthError('INVALID_PHONE','개인 휴대전화 번호를 입력해 주시기 바랍니다.');
+    // WO-O4O-AUTH-ONBOARDING-UX-CLEANUP-V1 T2: 이름 · 휴대전화는 가입 선택 항목이다(가입 유형 입력이 필수로 받는다).
+    const name=(input.name??'').trim();const phone=(input.phone??'').trim();
+    if (name.length>100) throw new SocialAuthError('INVALID_NAME','이름을 100자 이내로 입력해 주시기 바랍니다.');
+    if (phone && !isPhoneShapeValid(phone)) throw new SocialAuthError('INVALID_PHONE','휴대전화 번호 형식을 확인해 주시기 바랍니다. (예: 01012345678)');
     if (!input.consents?.terms || !input.consents?.privacy) throw new SocialAuthError('CONSENT_REQUIRED','이용약관과 개인정보 처리방침에 동의해 주시기 바랍니다.');
     let serviceKey='';
     try {
@@ -57,7 +59,7 @@ export class KakaoAuthService {
         const duplicate: unknown[] = await manager.query('SELECT 1 FROM users WHERE lower(email)=$1 LIMIT 1',[email]);
         if (duplicate.length) throw new SocialAuthError('EMAIL_IN_USE','이미 사용 중인 이메일입니다. 기존 계정으로 로그인한 뒤 명시적으로 연결해 주시기 바랍니다.',409);
         const now=new Date();const repo=manager.getRepository(User);
-        const created=repo.create({businessInfo:initialMemberRegistration(),email,name:input.name.trim(),nickname:input.nickname?.trim() || undefined,phone:normalizePhoneDigits(input.phone),
+        const created=repo.create({businessInfo:initialMemberRegistration(),email,name:name||null,nickname:input.nickname?.trim() || undefined,phone:normalizePhoneDigits(phone)||undefined,
           status:UserStatus.ACTIVE,isActive:true,isEmailVerified:identity.emailVerified===true&&normalizeLoginEmail(identity.email??'')===email,
           tosAcceptedAt:now,privacyAcceptedAt:now,marketingAccepted:input.consents.marketing===true});
         await repo.save(created);

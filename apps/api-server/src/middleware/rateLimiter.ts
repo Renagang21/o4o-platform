@@ -182,6 +182,16 @@ export const findLoginIdLimiter = findLoginIdLimiters.ip;
 /** 아이디 찾기 — 입력값 기준 (이름·전화 조합당 1시간 5회) */
 export const findLoginIdInputLimiter = findLoginIdLimiters.input;
 
+// WO-O4O-COMMUNITY-INDUSTRY-NEWS-V2 — 커뮤니티 홈 뉴스 노출·클릭 beacon. 인증 앞단 · IP 단위.
+export const newsBeaconLimiter = rateLimit({
+  windowMs: 1 * 60 * 1000,
+  max: 30,
+  message: { success: false, error: '요청이 너무 많습니다.', code: 'RATE_LIMITED' },
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req: Request) => getTrustedClientIp(req),
+});
+
 // 파일 업로드 레이트 리밋
 export const uploadLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1시간

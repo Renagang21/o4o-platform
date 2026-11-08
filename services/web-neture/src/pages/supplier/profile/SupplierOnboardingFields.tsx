@@ -1,19 +1,23 @@
-import { useId } from 'react';
+import { useEffect, useId, useState } from 'react';
 import { Mail, Save, Loader2, CheckCircle, FileText, Upload, Download } from 'lucide-react';
 import { inputClass, fileInputClass } from './profilePresentation';
 import type { useSupplierOnboarding } from './useSupplierOnboarding';
 
 export default function SupplierOnboardingFields({
   controller,
+  manager,
+  businessName,
 }: {
   controller: ReturnType<typeof useSupplierOnboarding>;
+  /** 담당자 정보 묶음의 현재 입력 — "담당자와 같음" 이 복사한다(WO-O4O-AUTH-ONBOARDING-UX-CLEANUP-V1 T4). */
+  manager?: { name: string; email: string };
+  /** 상호명 — 예금주가 비었을 때 "상호명으로 채우기" 가 쓴다. 자동 저장하지 않는다. */
+  businessName?: string;
 }) {
   const fieldId = useId();
   const {
     onboarding,
-    onboardingSaving,
-    onboardingSaved,
-    onboardingError,
+    scopeStatus,
     businessRegistrationFile,
     setBusinessRegistrationFile,
     bankbookFile,
@@ -37,15 +41,28 @@ export default function SupplierOnboardingFields({
     handleUploadDocument,
     handleDownloadDocument,
   } = controller;
+  const {
+    saving: onboardingSaving,
+    saved: onboardingSaved,
+    error: onboardingError,
+  } = scopeStatus('settlement');
+  const [sameAsManager, setSameAsManager] = useState(false);
+  // 체크된 동안은 담당자 입력을 따라간다. 체크를 풀면 마지막 값이 남고 직접 고칠 수 있다.
+  useEffect(() => {
+    if (!sameAsManager || !manager) return;
+    setSettlementContactName(manager.name);
+    setSettlementContactEmail(manager.email);
+  }, [sameAsManager, manager?.name, manager?.email, setSettlementContactName, setSettlementContactEmail]);
+  const holderFill = businessName?.trim();
   return (
     <>
       {/* Section A-2: 공급자 온보딩 서류/정산 정보 */}
       <div className="bg-white border border-gray-200 rounded-xl p-6 mb-4">
-        <h2 className="flex items-center gap-2 text-base font-semibold text-gray-800 mb-2">
+        <h3 className="flex items-center gap-2 text-base font-semibold text-gray-800 mb-2">
           <FileText className="w-5 h-5 text-gray-500" />
           공급자 서류 및 정산 정보
-        </h2>
-        <p className="text-xs text-gray-500 mb-5">증빙 파일은 선택 사항이며 미제출로 신청·승인이 제한되지 않습니다. 담당자·세금계산서 정보도 나중에 보완할 수 있습니다. 실제 정산에 필요한 계좌 정보는 정산 전에 확인해 주시기 바랍니다.</p>
+        </h3>
+        <p className="text-xs text-gray-500 mb-5"><span className="text-red-500">*</span> 표시(세금계산서 이메일 · 은행명 · 계좌번호 · 예금주)는 실제 정산에 필요합니다. 승인과는 별개이며 나중에 보완할 수 있습니다. 증빙 파일은 선택입니다.</p>
 
         {/* WO-O4O-NETURE-SUPPLIER-PROFILE-AUX-LOAD-ERROR-CONTRACT-V1:
             조회 실패를 "미입력" 으로 오인시키지 않는다. 입력값은 비우지 않고 안내만 덧붙인다. */}
@@ -72,7 +89,7 @@ export default function SupplierOnboardingFields({
               className="flex items-center gap-1.5 text-sm font-medium text-gray-700 mb-1.5"
             >
               <Mail className="w-3.5 h-3.5 text-gray-400" />
-              세금계산서 이메일 (선택)
+              세금계산서 이메일 <span className="text-red-500">*</span>
             </label>
             <input
               id={`${fieldId}-field-0`}
@@ -134,12 +151,31 @@ export default function SupplierOnboardingFields({
                 type="text"
                 value={settlementAccountHolder}
                 onChange={(e) => setSettlementAccountHolder(e.target.value)}
-                placeholder="예: 주식회사 O4O"
+                placeholder={holderFill ? `예: ${holderFill}` : '예: 주식회사 O4O'}
                 className={inputClass}
               />
+              {holderFill && !settlementAccountHolder.trim() && (
+                <button
+                  type="button"
+                  onClick={() => setSettlementAccountHolder(holderFill)}
+                  className="mt-1 text-xs font-medium text-primary-700 hover:text-primary-800"
+                >
+                  상호명으로 채우기
+                </button>
+              )}
             </div>
           </div>
 
+          {manager && (
+            <label className="flex items-center gap-2 text-sm text-gray-700">
+              <input
+                type="checkbox"
+                checked={sameAsManager}
+                onChange={(e) => setSameAsManager(e.target.checked)}
+              />
+              정산 담당자가 담당자와 같음
+            </label>
+          )}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label
@@ -154,6 +190,7 @@ export default function SupplierOnboardingFields({
                 value={settlementContactName}
                 onChange={(e) => setSettlementContactName(e.target.value)}
                 placeholder="선택"
+                readOnly={sameAsManager}
                 className={inputClass}
               />
             </div>
@@ -170,6 +207,7 @@ export default function SupplierOnboardingFields({
                 value={settlementContactEmail}
                 onChange={(e) => setSettlementContactEmail(e.target.value)}
                 placeholder="settlement@company.com"
+                readOnly={sameAsManager}
                 className={inputClass}
               />
             </div>
@@ -258,8 +296,8 @@ export default function SupplierOnboardingFields({
           <div className="flex items-center gap-3">
             <button
               type="button"
-              onClick={handleSaveOnboarding}
-              disabled={onboardingSaving}
+              onClick={() => handleSaveOnboarding('settlement')}
+              disabled={controller.onboardingSaving}
               className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary-600 text-white rounded-lg hover:bg-primary-700 text-sm font-medium disabled:opacity-50"
             >
               {onboardingSaving ? (
