@@ -3,6 +3,7 @@ import { Repository } from 'typeorm';
 import { AppDataSource } from '../../../database/connection.js';
 import { NetureSupplier, SupplierStatus, ContactVisibility } from '../entities/index.js';
 import { NetureSupplierBusinessService } from './supplier-business.service.js';
+import { supplierIdentityOf } from './supplier-profile-readiness.js';
 import logger from '../../../utils/logger.js';
 import { listOwnedSupplierIds } from '../middleware/supplier-context.resolver.js';
 
@@ -213,14 +214,15 @@ export class NetureSupplierDirectoryService {
       return suppliers.map((s) => {
         const org = s.organizationId ? orgMap.get(s.organizationId) : null;
         const userInfo = s.userId ? userStatusMap.get(s.userId) : null;
-        const missing = this.businessService.getMissingProfileFields(s);
+        const missing = this.businessService.getMissingProfileFields(s, org?.businessProfile);
         return {
           id: s.id, name: org?.name ?? '', slug: s.slug, status: s.status,
           contactEmail: s.contactEmail || '',
           userId: s.userId,
           identityStatus: userInfo?.status || null,
           userEmail: userInfo?.email || null,
-          representativeName: s.representativeName || null,
+          // T9: Organization 정본 우선, 없으면 옛 컬럼
+          representativeName: supplierIdentityOf(s, org?.businessProfile).representativeName,
           businessNumber: org?.business_number ?? null,
           taxInvoiceEmail: s.taxInvoiceEmail || null,
           businessRegistrationDocumentId: s.businessRegistrationDocumentId || null,

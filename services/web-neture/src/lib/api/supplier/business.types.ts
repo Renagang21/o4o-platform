@@ -87,6 +87,8 @@ export interface SupplierOnboarding {
   businessRegistrationDocument: SupplierOnboardingDocument | null;
   settlementBankbookDocument: SupplierOnboardingDocument | null;
   mailOrderSalesDocument: SupplierOnboardingDocument | null;
+  /** 정산 필수 미입력(서버 판정). WO-O4O-AUTH-ONBOARDING-UX-CLEANUP-V1 T4 — 이전 서버 응답에는 없다. */
+  missingSettlementFields?: string[];
 }
 
 // WO-NETURE-B2B-SUPPLIER-ORDER-CONDITION-V1

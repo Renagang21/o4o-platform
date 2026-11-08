@@ -59,7 +59,7 @@ export const STATUS: Record<EmailAuthErrorCode, number> = {
 export const MESSAGE: Record<EmailAuthErrorCode, string> = {
   CONSENT_REQUIRED: '이용약관과 개인정보 처리방침에 동의해야 합니다.',
   INVALID_EMAIL: '올바른 이메일 주소를 입력해 주세요.',
-  INVALID_NAME: '이름을 입력해 주세요.',
+  INVALID_NAME: '이름을 50자 이내로 입력해 주세요.',
   INVALID_PHONE: '휴대전화 번호를 확인해 주세요. (예: 01012345678)',
   PASSWORD_POLICY_VIOLATION: '비밀번호 규칙을 확인해 주세요.',
   EMAIL_IN_USE:
@@ -110,9 +110,11 @@ export interface EmailSignupInput extends EmailAuthRequestMeta {
   policyServiceKey?: string;
   email: string;
   password: string;
-  name: string;
+  /** 선택(WO-O4O-AUTH-ONBOARDING-UX-CLEANUP-V1 T2). */
+  name?: string;
   nickname?: string;
-  phone: string;
+  /** 선택(WO-O4O-AUTH-ONBOARDING-UX-CLEANUP-V1 T2). */
+  phone?: string;
   consents: {
     terms: boolean;
     privacy: boolean;

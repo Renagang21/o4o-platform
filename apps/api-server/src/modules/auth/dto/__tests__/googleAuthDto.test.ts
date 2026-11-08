@@ -26,6 +26,8 @@ describe('Google auth DTO — 입력 계약', () => {
   it('signup: consents.terms/privacy 필수 · marketing 선택 · 그 외 필드 거절', async () => {
     expect(await run(GoogleSignupRequestDto, { idToken: 't', consents: { termsPolicy: { policyDocumentId: '11111111-1111-4111-8111-111111111111', version: 1 }, terms: true, privacy: true, name: '테스트회원', phone: '01012345678' } })).toHaveLength(0);
     expect(await run(GoogleSignupRequestDto, { idToken: 't', consents: { termsPolicy: { policyDocumentId: '11111111-1111-4111-8111-111111111111', version: 1 }, terms: true, privacy: true, marketing: false, name: '테스트회원', phone: '01012345678' } })).toHaveLength(0);
+    // WO-O4O-AUTH-ONBOARDING-UX-CLEANUP-V1 T2: 이름 · 휴대전화는 선택이다.
+    expect(await run(GoogleSignupRequestDto, { idToken: 't', consents: { termsPolicy: { policyDocumentId: '11111111-1111-4111-8111-111111111111', version: 1 }, terms: true, privacy: true } })).toHaveLength(0);
     expect((await run(GoogleSignupRequestDto, { idToken: 't', consents: { terms: true } })).length).toBeGreaterThan(0);
     expect((await run(GoogleSignupRequestDto, { idToken: 't' })).length).toBeGreaterThan(0);
     for (const field of ['name', 'phone', 'email', 'sub', 'role', 'serviceKey', 'password']) {
