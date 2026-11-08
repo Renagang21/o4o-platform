@@ -267,8 +267,12 @@ describe("community section home", () => {
       },
     ]);
     finish({ id: "run" });
+    // Standard list: check the run, then open its detail from the ActionBar.
+    const row = (await screen.findByText("2026-11-07 오전 · 수동")).closest("tr")!;
+    expect(within(row).getByText("일부 매체 실패")).toBeTruthy();
+    fireEvent.click(within(row).getByRole("checkbox"));
+    fireEvent.click(screen.getByRole("button", { name: /상세 보기/ }));
     await screen.findByText(/약사공론: 수신 50건/);
-    expect(screen.getByText(/2026-11-07 오전 · 일부 매체 실패 · 수동/)).toBeTruthy();
     expect(screen.getByText("데일리팜: 수집 실패 (ROBOTS_BLOCKED)")).toBeTruthy();
     await waitFor(() => expect(api.manage).toHaveBeenCalledTimes(3));
     expect((screen.getByLabelText("제목") as HTMLInputElement).value).toBe(
