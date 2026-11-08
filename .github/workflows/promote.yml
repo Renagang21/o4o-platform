@@ -48,10 +48,11 @@ permissions:
   actions: read
 
 jobs:
-  # WO-O4O-PROMOTE-SAME-SHA-GUARD-V1 — 같은 SHA · 같은 서비스 범위의 Promote(dry-run 제외)가 이미 **승격을 마쳤거나**
-  # (그 run 의 delivery `Report` job success) **먼저 시작돼** 진행 · 대기 중이면 배포 호출을 건너뛴다(IR §9-4: 207회 중 50회가
-  # 직전과 같은 SHA). 판정은 Actions API 의 Promote run 목록 · job 결과만 쓴다. 실패 · 취소 · 배포 없이 끝난(freeze 등) run 과
-  # 뒤에 만들어진 run 은 막는 근거가 아니다. 확인할 수 없으면 막지 않는다(`scripts/ci/promote-dedupe.mjs`).
+  # WO-O4O-PROMOTE-SAME-SHA-GUARD-V1 — 같은 SHA 의 Promote(dry-run 제외)가 이미 **모든 서비스를 target 에 올렸거나**
+  # (그 run 이 남긴 마지막 commit status `production` = DEPLOYED · NO_DEPLOY success) **먼저 시작돼 같은 범위로** 진행 · 대기 중이면
+  # 배포 호출을 건너뛴다(IR §9-4: 207회 중 50회가 직전과 같은 SHA). 판정은 Promote run 목록과 그 SHA 의 commit status 만 쓴다.
+  # 실패 · 취소 · 배포 없이 끝난(freeze 등) · 일부만 승격(보류 · 미선택)된 run 과 뒤에 만들어진 run 은 막는 근거가 아니다.
+  # 확인할 수 없으면 막지 않는다(`scripts/ci/promote-dedupe.mjs`).
   # 이 job 자체가 실패 · 누락돼도(output 비어 있음) 아래 promote 는 그대로 실행된다 — 중복 방지가 승격을 막지 않는다.
   dedupe:
     name: Same-SHA guard
@@ -60,6 +61,7 @@ jobs:
     permissions:
       contents: read
       actions: read
+      statuses: read   # 이전 run 이 남긴 commit status `production` 으로 승격 완료를 판정한다(읽기만)
     outputs:
       skip: ${{ steps.check.outputs.skip }}
     steps:
