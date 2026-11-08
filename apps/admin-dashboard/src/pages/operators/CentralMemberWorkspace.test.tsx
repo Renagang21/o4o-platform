@@ -9,7 +9,7 @@ import {
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import CentralMemberWorkspace from './CentralMemberWorkspace';
 import type { MemberDetail } from './member-workspace-model';
-const api = vi.hoisted(() => ({ get: vi.fn(), post: vi.fn(), patch: vi.fn() }));
+const api = vi.hoisted(() => ({ get: vi.fn(), post: vi.fn(), patch: vi.fn(), delete: vi.fn() }));
 vi.mock('@o4o/auth-client', () => ({ authClient: { api } }));
 const base = '/qualifications/pharmacist/members';
 const permissions = {
@@ -393,4 +393,60 @@ it('shows a failed action inside the open member panel, not behind it', async ()
     expect(within(panel).getByRole('alert').textContent).toContain('다른 운영자가 변경했습니다.'),
   );
   expect(screen.getAllByRole('alert')).toHaveLength(1);
+});
+
+function mountAdmin() {
+  const listed = api.get.getMockImplementation()!;
+  api.get.mockImplementation(async (path: string, ...rest: unknown[]) => {
+    const response = await listed(path, ...rest);
+    if (path === base) response.data.data.permissions = { ...permissions, erase: true, manageAccount: true };
+    return response;
+  });
+  render(<CentralMemberWorkspace actorId="admin" adminMode />);
+}
+async function selectFirstRow() {
+  await screen.findByRole('button', { name: '회원 합성 회원 member-a@example.test' });
+  fireEvent.click(screen.getAllByRole('checkbox')[1]);
+}
+it('admin 「계정 삭제」 asks once and deletes the selected account directly', async () => {
+  const confirm = vi.spyOn(globalThis, 'confirm').mockReturnValue(true);
+  api.delete.mockResolvedValueOnce({ data: { data: { operationId: 'op', state: 'completed', erased: true } } });
+  mountAdmin();
+  await selectFirstRow();
+  expect(screen.queryByRole('button', { name: '계정·개인자료 삭제 확인' })).toBeNull();
+  fireEvent.click(screen.getByRole('button', { name: '계정 삭제' }));
+  expect(confirm).toHaveBeenCalledTimes(1);
+  await waitFor(() => expect(api.delete).toHaveBeenCalledWith('/admin/users/member-a', { timeout: 90_000 }));
+  await screen.findByText('계정을 삭제했습니다.');
+  expect(screen.queryByRole('complementary', { name: '선택 회원 작업' })).toBeNull();
+  confirm.mockRestore();
+});
+it('admin 「계정 삭제」 does nothing when the confirmation is cancelled', async () => {
+  const confirm = vi.spyOn(globalThis, 'confirm').mockReturnValue(false);
+  mountAdmin();
+  await selectFirstRow();
+  fireEvent.click(screen.getByRole('button', { name: '계정 삭제' }));
+  expect(api.delete).not.toHaveBeenCalled();
+  confirm.mockRestore();
+});
+it('admin 「계정 삭제」 shows the server refusal reason', async () => {
+  const confirm = vi.spyOn(globalThis, 'confirm').mockReturnValue(true);
+  api.delete.mockRejectedValueOnce({ response: { status: 409, data: { code: 'ACCOUNT_ERASURE_ROLLOUT_REQUIRED' } } });
+  mountAdmin();
+  await selectFirstRow();
+  fireEvent.click(screen.getByRole('button', { name: '계정 삭제' }));
+  const alert = await screen.findByRole('alert');
+  expect(alert.textContent).toContain('현재 계정 삭제 기능이 비활성화돼 있습니다');
+  expect(alert.textContent).toContain('ACCOUNT_ERASURE_ROLLOUT_REQUIRED');
+  confirm.mockRestore();
+});
+it('admin 「계정 삭제」 reports an unfinished deletion instead of success', async () => {
+  const confirm = vi.spyOn(globalThis, 'confirm').mockReturnValue(true);
+  api.delete.mockResolvedValueOnce({ data: { data: { operationId: 'op', state: 'retry_required', erased: false, errorCode: 'PERSONAL_FILE_INVENTORY_REVIEW_REQUIRED' } } });
+  mountAdmin();
+  await selectFirstRow();
+  fireEvent.click(screen.getByRole('button', { name: '계정 삭제' }));
+  await screen.findByText(/삭제 실패 — 재시도 가능 — 삭제가 아직 끝나지 않았습니다/);
+  expect(screen.queryByText('계정을 삭제했습니다.')).toBeNull();
+  confirm.mockRestore();
 });

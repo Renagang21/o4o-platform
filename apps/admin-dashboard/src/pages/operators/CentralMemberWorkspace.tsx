@@ -5,6 +5,9 @@ import { createPortal } from 'react-dom';
 import { authClient } from '@o4o/auth-client';
 import { DataTable, type ListColumnDef } from '@o4o/operator-ux-core';
 import MemberWorkPanel from './MemberWorkPanel';
+import { api } from '@/api/base';
+import { ERASURE_STATE_LABELS, deletionMessage } from '@/pages/platform/account-governance/AccountErasureControls';
+import type { UserErasureResult } from '@/types/user';
 import { memberError, type MemberDetail, type MemberPermissions, type MemberRow, type MemberTask, type MemberWorkMode } from './member-workspace-model';
 
 const base = '/qualifications/pharmacist/members';
@@ -106,6 +109,36 @@ export default function CentralMemberWorkspace({ actorId, initialQuery = '', ini
       await refresh();
     }
   };
+  // Admin 「계정 삭제」: 확인 창 하나로 바로 삭제한다(2026-11-08 통합 담당 요청). 서버의 erased 값만 완료로 본다.
+  const eraseAccount = async (row: MemberRow) => {
+    if (lock.current) return;
+    if (!globalThis.confirm(`${row.name || '선택한 회원'} 계정을 삭제하시겠습니까?\n\n계정과 개인 자료 · 첨부파일이 삭제되며 되돌릴 수 없습니다. 사업체 · 약국 · 공급자 거래 자료는 유지됩니다.`)) return;
+    const context = actorEpoch.current.value;
+    lock.current = true; setBusy(true); setError(''); setNotice('');
+    let message = '', failure = '';
+    try {
+      const response = await api.delete(`/admin/users/${encodeURIComponent(row.userId)}`, { timeout: 90_000 });
+      const data = response.data?.data as UserErasureResult | undefined;
+      if (!data || typeof data.erased !== 'boolean' || !Object.prototype.hasOwnProperty.call(ERASURE_STATE_LABELS, data.state)) throw new Error('INVALID_RESPONSE');
+      message = data.erased ? '계정을 삭제했습니다.'
+        : `${ERASURE_STATE_LABELS[data.state]} — 삭제가 아직 끝나지 않았습니다. 「삭제 처리 내역」에서 상태를 확인하거나 재시도해 주시기 바랍니다.${data.errorCode ? ` ${deletionMessage(data.errorCode)} (${data.errorCode})` : ''}`;
+    } catch (error_) {
+      const e = error_ as { code?: string; response?: { data?: { code?: string } } };
+      const code = e.response?.data?.code;
+      failure = e.code === 'ECONNABORTED'
+        ? '서버 응답이 없습니다. 삭제가 진행 중일 수 있으니 「삭제 처리 내역」에서 상태를 확인해 주시기 바랍니다.'
+        : `${deletionMessage(code)}${code ? ` (${code})` : ''}`;
+    } finally {
+      if (context === actorEpoch.current.value) {
+        ++detailSequence.current; setSelectedId(null); setDetail(null); setSelectedIds(new Set());
+        await load();
+        if (context === actorEpoch.current.value) {
+          if (failure) setError(failure); else setNotice(message);
+          lock.current = false; setBusy(false);
+        }
+      }
+    }
+  };
   const reviewRows=selectedIds.size>1?rows.filter(row=>selectedIds.has(row.userId)):rows;
   const selectedIndex = reviewRows.findIndex(row => row.userId === selectedId);
   const nextMember = reviewRows[selectedIndex + 1];
@@ -131,8 +164,8 @@ export default function CentralMemberWorkspace({ actorId, initialQuery = '', ini
     {/* 패널이 열려 있으면 결과 · 오류는 패널 안에 보인다. 패널은 body 위 레이어라 여기 문구가 가려진다. */}
     {!selectedId && error && <p role="alert">{error}</p>}{!selectedId && notice && <output>{notice}</output>}
     <div className="[&>div>div]:flex-wrap"><ActionBar selectedCount={selectedIds.size} onClearSelection={()=>{if(busy)return;++detailSequence.current;setSelectedIds(new Set());setSelectedId(null);setDetail(null);setReading(false);}} actions={([
-      ['detail','회원 상세보기'],['edit','회원 정보 수정'],['reject','가입 반려'],['delete',adminMode?'계정·개인자료 삭제 확인':'회원 해지·복구'],['pharmacy','약국·사업자 정보'],
-    ] as const).map(([key,label])=>({key,label,visible:!protectedSelection||key==='detail',variant:workActionVariant(key,workMode),tooltip:key==='delete'&&deleteForbidden?'전체 관리자 권한이 필요합니다.':undefined,disabled:busy||loading||(key!=='detail'&&selectedIds.size!==1)||(key==='edit'&&!permissions.edit)||(key==='reject'&&!permissions.edit)||(key==='delete'&&deleteForbidden),onClick:()=>{const first=rows.find(row=>selectedIds.has(row.userId));if(first)void openMember(first.userId,key);}}))}/></div>
+      ['detail','회원 상세보기'],['edit','회원 정보 수정'],['reject','가입 반려'],['delete',adminMode?'계정 삭제':'회원 해지·복구'],['pharmacy','약국·사업자 정보'],
+    ] as const).map(([key,label])=>({key,label,visible:!protectedSelection||key==='detail',variant:workActionVariant(key,workMode),tooltip:key==='delete'&&deleteForbidden?'전체 관리자 권한이 필요합니다.':undefined,disabled:busy||loading||(key!=='detail'&&selectedIds.size!==1)||(key==='edit'&&!permissions.edit)||(key==='reject'&&!permissions.edit)||(key==='delete'&&deleteForbidden),onClick:()=>{const first=rows.find(row=>selectedIds.has(row.userId));if(!first)return;if(adminMode&&key==='delete'){void eraseAccount(first);return;}void openMember(first.userId,key);}}))}/></div>
     {selectedIds.size>1 && <p className="text-sm text-slate-600">선택 회원은 순서대로 상세 검토할 수 있습니다. 수정·거부·삭제는 한 명씩 확인 후 진행합니다.</p>}
     {selectedId && createPortal(<aside ref={panel} tabIndex={-1} aria-label="선택 회원 작업" className="fixed inset-y-0 right-0 z-50 flex w-full max-w-full flex-col border-l border-slate-200 bg-white shadow-2xl outline-none sm:w-[560px] lg:w-[640px]">
       <header className="flex flex-wrap items-center gap-x-2 gap-y-1 border-b border-slate-200 bg-blue-50 px-3 py-3 text-sm sm:flex-nowrap sm:px-4"><h3 className="min-w-0 flex-1 truncate text-base font-semibold">{workMode==='edit'?'회원 정보 수정':workMode==='detail'?'회원 정보 보기':workMode==='pharmacy'?'약국·사업자 정보':'선택 회원 작업'}</h3><div className="order-last flex w-full justify-end gap-2 sm:order-none sm:w-auto"><button type="button" className="shrink-0 whitespace-nowrap px-1" disabled={busy || reading || !nextMember} onClick={() => { if (nextMember) void openMember(nextMember.userId); }}>다음 회원 검토</button><button type="button" className="shrink-0 whitespace-nowrap px-1" disabled={busy} onClick={closePanel}>선택 해제</button></div><button type="button" aria-label="회원 작업 패널 닫기" disabled={busy} className="shrink-0 rounded px-2 text-xl leading-none text-slate-500 hover:bg-slate-100" onClick={closePanel}>×</button></header>
