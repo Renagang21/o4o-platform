@@ -54,12 +54,14 @@
 - [ ] [CLOUD] 약관 · 동의 · 가입 약관 표면에서 `kpa-society` 제거(§3 판단대로). 프런트가 이 API 를 `kpa-society` 로 호출하는 곳이 남아 있으면 같은 PR 에서 함께 정리하거나 PR 에 적는다
 - [ ] [CLOUD] 테스트: `kpa-society` 로 관리자 약관 API · 공개 legal · 가입 약관 · 서비스 신청 약관 호출 시 거부, 다른 서비스(neture · supplier · community · funding · lecture) 회귀 없음, 약국 결제 검사 회귀 없음
 - [ ] [CLOUD] `/verify` · PR(「결정 사항」에 §3 두 번째 행 결정 기록)
-- [ ] [LOCAL] 배포 후: `neture.co.kr` 회원가입 · 약관 동의 화면, `/terms` · `/privacy` 정상 · 약국 결제 진입 정상(Demo 매장 경영자)
+- [ ] [CLOUD] 가입 약관 · 재동의 게이트는 격리 DB 의 **일반 사용자** 테스트로 확인한다(통합 테스트). Demo 계정은 재동의 강제에서 빠지므로(`getEnforcedPendingForUser` 의 Demo 예외) 이 검증에 쓰지 않는다
+- [ ] [LOCAL] 배포 후 Demo(매장 경영자): `/terms` · `/privacy` 정상 · 약국 결제 진입 정상. 가입 화면은 열리는지까지만 보고 가입을 진행하지 않는다([Demo 정본 §19](../baseline/O4O-CANONICAL-DEMO-ACCOUNTS-V1.md))
 
 ## 6. 검증 계획
 
 - 단위 · 통합 테스트로 `kpa-society` 거부와 다른 서비스 회귀 없음을 확인한다.
-- 배포 후 Demo 로그인(매장 경영자 · 공급자)으로 재동의 · 가입 약관 · 결제 진입을 본다.
+- 가입 약관 · 재동의는 격리 환경의 일반 사용자 테스트로 확인한다. Demo 계정은 재동의 강제 대상이 아니고(`policy-acceptance.service.ts` `getEnforcedPendingForUser` 의 Demo 예외), Demo 로 가입 경로를 검증하지 않는다([Demo 정본 §19](../baseline/O4O-CANONICAL-DEMO-ACCOUNTS-V1.md)). Demo 로 통과해도 약관 처리 회귀가 없다는 근거가 되지 않는다.
+- 배포 후 Demo 로그인(매장 경영자)으로는 허용된 화면만 본다 — `/terms` · `/privacy` · 약국 결제 진입.
 
 ## 문서 정합
 
