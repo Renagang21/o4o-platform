@@ -1,5 +1,6 @@
 {
   "permissions": {
+    "defaultMode": "acceptEdits",
     "allow": [
       "Bash(git status *)",
       "PowerShell(git status *)",
@@ -905,7 +906,17 @@
       "Bash(gh pr merge * -d)",
       "PowerShell(gh pr merge * -d)",
       "Bash(gh pr merge * -d *)",
-      "PowerShell(gh pr merge * -d *)"
+      "PowerShell(gh pr merge * -d *)",
+      "Bash(git push origin main*)",
+      "Bash(ssh *)",
+      "PowerShell(ssh *)",
+      "Bash(pm2 *)",
+      "PowerShell(pm2 *)",
+      "Bash(npx pm2 *)",
+      "Bash(pnpm *deploy*)",
+      "PowerShell(pnpm *deploy*)",
+      "Bash(npm run *deploy*)",
+      "PowerShell(npm run *deploy*)"
     ]
   },
   "hooks": {
@@ -917,6 +928,11 @@
             "type": "command",
             "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/session-start.mjs\"",
             "timeout": 60
+          },
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/session-start.sh\"",
+            "timeout": 600
           }
         ]
       }
