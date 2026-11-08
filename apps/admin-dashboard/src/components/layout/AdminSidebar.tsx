@@ -44,7 +44,13 @@ const AdminSidebar: FC<AdminSidebarProps> = ({ isOpen, onClose }) => {
       if (item.children) visit(item.children, [...parents, item.id])
     })
     visit(menuItems, [])
-    if (open.length) setExpandedItems((prev: any[]) => [...new Set([...prev, ...open])])
+    // useAdminMenu() 는 렌더마다 새 배열을 돌려준다. 이미 펼쳐져 있으면 같은 상태를 돌려줘
+    // 재렌더 루프를 막는다(#986 Codex P1).
+    if (open.length) {
+      setExpandedItems((prev: any[]) =>
+        open.every(id => prev.includes(id)) ? prev : [...new Set([...prev, ...open])],
+      )
+    }
   }, [location.pathname, menuItems])
 
   const handleMenuItemClick = (item: MenuItem) => {
