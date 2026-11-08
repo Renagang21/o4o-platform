@@ -814,6 +814,7 @@ export function deliveryJobs(needsJson) {
  * 배포 뒤 확정 (Unified Delivery report job). 판정은 다시 하지 않는다 — classify 기록 + **지금 serving SHA** 만 본다.
  *   계획된 서비스: serving == target(단일 revision 100%) → DEPLOYED
  *   run 이 취소됐고 target 에 못 미침 → CANCELLED (배포를 시도하지 못했거나 중단됨 · 실패로 기록하지 않는다)
+ *     단 그 서비스의 job 이 failure 면 FAILED, API 가 failure 라 배포하지 않은 API 뒤 프런트는 HELD_DEPENDENCY
  *   (API 가 실패했고 API 뒤에 배치된 프런트 → HELD_DEPENDENCY: reusable job 이 skip 되어 배포 0)
  *   그 밖에 target 에 못 미침 → FAILED
  * @param {{cancelled?: boolean}} [run]  deliveryJobs 결과 (없으면 취소 아님)
@@ -824,11 +825,22 @@ export function finalizeStates(record, servingNow, run = {}) {
   const after = new Set([...(plan.web_after_api ?? []), ...(plan.admin_after_api ? ['admin'] : [])]);
   const planned = new Set([...(plan.deploy_api ? ['api'] : []), ...after, ...(plan.web_parallel ?? []), ...(plan.admin_parallel ? ['admin'] : [])]);
   const apiOk = !plan.deploy_api || servingNow.api?.sha === target;
+  // 서비스 → 그 서비스를 배포하는 delivery.yml job (deliveryJobs 의 jobs 키)
+  const jobOf = (key) =>
+    key === 'api' ? 'api' : key === 'admin' ? 'admin' : (plan.web_after_api ?? []).includes(key) ? 'web_after_api' : 'web_parallel';
   return record.services.map((s) => {
     if (!record.execute || !planned.has(s.key)) return { key: s.key, state: STATE_OF[s.decision] ?? 'NO_DEPLOY', serving: null };
     const now = servingNow[s.key] ?? { sha: null, source: 'not read' };
     if (now.sha === target) return { key: s.key, state: 'DEPLOYED', serving: now };
-    if (run.cancelled === true) return { key: s.key, state: 'CANCELLED', serving: now };
+    if (run.cancelled === true) {
+      // 취소는 그 서비스의 job 이 실패하지 않았을 때만이다. 이미 실패한 job(예: API 실패 뒤 병렬 프런트가 취소된 run)은
+      // FAILED 그대로 두고, API 실패로 배포하지 않은 API 뒤 프런트는 HELD_DEPENDENCY 그대로 둔다 — 실패를 취소로 가리지 않는다.
+      const jobs = run.jobs ?? {};
+      const own = jobs[jobOf(s.key)];
+      if (own === 'failure') return { key: s.key, state: 'FAILED', serving: now };
+      if (after.has(s.key) && !apiOk && jobs.api === 'failure') return { key: s.key, state: 'HELD_DEPENDENCY', serving: now };
+      return { key: s.key, state: 'CANCELLED', serving: now };
+    }
     if (after.has(s.key) && !apiOk) return { key: s.key, state: 'HELD_DEPENDENCY', serving: now };
     return { key: s.key, state: 'FAILED', serving: now };
   });

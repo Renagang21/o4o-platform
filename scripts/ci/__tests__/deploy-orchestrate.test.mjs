@@ -536,6 +536,47 @@ describe('U5. 상태 표현 · commit status · report (§10 · §26 · §27)', 
     // FAILED 가 섞이면 FAILED 가 우선한다 (실패를 취소로 가리지 않는다)
     assert.equal(commitStatus([{ key: 'api', state: 'FAILED' }, { key: 'neture', state: 'CANCELLED' }], TARGET).overall, 'FAILED');
   });
+  it('report: 취소된 run 이어도 이미 실패한 job 의 서비스는 FAILED 로 남는다 (API 실패 뒤 병렬 프런트 취소)', () => {
+    const record = {
+      target_sha: TARGET,
+      execute: true,
+      plan: { deploy_api: true, web_after_api: ['neture'], web_parallel: ['store'], admin_after_api: false, admin_parallel: true },
+      services: [
+        { key: 'api', decision: 'AUTO_DEPLOY' },
+        { key: 'neture', decision: 'AUTO_DEPLOY' },
+        { key: 'store', decision: 'AUTO_DEPLOY' },
+        { key: 'admin', decision: 'AUTO_DEPLOY' },
+      ],
+    };
+    // API 배포가 실패한 뒤 진행 중이던 병렬 프런트가 취소됐다 → run 은 취소로 읽히지만 API 실패를 가리지 않는다
+    const run = deliveryJobs({
+      classify: { result: 'success' },
+      'deploy-api': { result: 'failure' },
+      'deploy-web-after-api': { result: 'skipped' },
+      'deploy-web-parallel': { result: 'cancelled' },
+      'deploy-admin': { result: 'failure' },
+    });
+    assert.equal(run.cancelled, true);
+    const states = finalizeStates(record, { api: { sha: BASE }, neture: { sha: BASE }, store: { sha: BASE }, admin: { sha: BASE } }, run);
+    assert.deepEqual(states.map((s) => s.state), ['FAILED', 'HELD_DEPENDENCY', 'CANCELLED', 'FAILED']);
+    const status = commitStatus(states, TARGET);
+    assert.equal(status.overall, 'FAILED');
+    assert.equal(status.state, 'failure');
+  });
+  it('report: API 자체가 취소된 run 이면 API 뒤 프런트도 CANCELLED (의존 대기가 아니라 취소)', () => {
+    const record = {
+      target_sha: TARGET,
+      execute: true,
+      plan: { deploy_api: true, web_after_api: ['neture'], web_parallel: [], admin_after_api: false, admin_parallel: false },
+      services: [
+        { key: 'api', decision: 'AUTO_DEPLOY' },
+        { key: 'neture', decision: 'AUTO_DEPLOY' },
+      ],
+    };
+    const run = deliveryJobs({ classify: { result: 'success' }, 'deploy-api': { result: 'cancelled' }, 'deploy-web-after-api': { result: 'skipped' } });
+    const states = finalizeStates(record, { api: { sha: BASE }, neture: { sha: BASE } }, run);
+    assert.deepEqual(states.map((s) => s.state), ['CANCELLED', 'CANCELLED']);
+  });
   it('report: 취소가 없으면 종전 판정 그대로 · needs 를 못 읽으면 취소 아님', () => {
     const record = {
       target_sha: TARGET,
