@@ -29,6 +29,7 @@
 | **클라우드 세션** (claude.ai/code) | `CLAUDE_CODE_REMOTE=true` | 코드 · 문서 · 테스트 · branch push · PR 생성(`AGENTS.md` §4-1(e)) | 운영 DB 접속 — gcloud 인증 · Cloud SQL Proxy 가 없다 |
 | **데스크톱 로컬 세션** | 그 밖 | 운영 DB read-only 조회 · 통합 담당이 승인한 운영 작업(`AGENTS.md` §5) · 실 PC smoke | 승인 없는 DB write · DDL · migration 수동 적용 (`AGENTS.md` §5) |
 
+- 작업 위치 분담(개발은 클라우드, 병합 · 배포 · 로컬 작업은 VS Code 로컬)은 `AGENTS.md` §4 「작업 위치 분담」을 따른다.
 - 클라우드 세션에서 운영 DB 확인이 필요하면 멈추고, read-only SQL 과 판정 기준을 담은 지시서를 `docs/work-orders/` 에 작성해 작업 branch 로 push 한 뒤 `HANDOFF.md` 로 로컬 세션에 넘긴다. 로컬 세션은 결과를 마스킹해 같은 branch 에 기록하고 push 한다.
 - 두 세션 모두 `AGENTS.md` §4-1 의 전용 worktree · branch 규칙을 따른다.
 
