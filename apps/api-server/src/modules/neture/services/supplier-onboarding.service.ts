@@ -5,6 +5,7 @@ import type { DataSource, Repository } from 'typeorm';
 import { KycDocument } from '../../../entities/KycDocument.js';
 import { NetureSupplier } from '../entities/index.js';
 import logger from '../../../utils/logger.js';
+import { missingSettlementFieldsOf } from './supplier-profile-readiness.js';
 
 export type SupplierOnboardingDocumentType = 'business_registration' | 'bank_statement' | 'mail_order_report';
 
@@ -109,13 +110,16 @@ export class SupplierOnboardingService {
       : undefined;
 
     // reported 선택 시 신고번호 필수 (그 외 상태는 신고번호 없이 저장 가능)
+    // WO-O4O-AUTH-ONBOARDING-UX-CLEANUP-V1 T4: 통신판매업 값을 보낸 저장에서만 검사한다.
+    //   정산만 저장하는 요청이 저장돼 있던 통신판매업 상태 때문에 막히지 않게 한다(통신판매업 저장은 기존과 동일하게 검사).
+    const mailOrderTouched = mailOrderSalesStatus !== undefined || mailOrderSalesRegistrationNumber !== undefined;
     const effectiveStatus = mailOrderSalesStatus !== undefined
       ? mailOrderSalesStatus
       : (supplier.mailOrderSalesStatus as MailOrderSalesStatus | null);
     const effectiveRegistrationNumber = mailOrderSalesRegistrationNumber !== undefined
       ? mailOrderSalesRegistrationNumber
       : supplier.mailOrderSalesRegistrationNumber;
-    if (effectiveStatus === 'reported' && !effectiveRegistrationNumber) {
+    if (mailOrderTouched && effectiveStatus === 'reported' && !effectiveRegistrationNumber) {
       return { success: false as const, error: 'MAIL_ORDER_REGISTRATION_NUMBER_REQUIRED' };
     }
 
@@ -230,6 +234,8 @@ export class SupplierOnboardingService {
       businessRegistrationDocument: businessRegistrationDocument ? this.mapDocument(businessRegistrationDocument) : null,
       settlementBankbookDocument: settlementBankbookDocument ? this.mapDocument(settlementBankbookDocument) : null,
       mailOrderSalesDocument: mailOrderSalesDocument ? this.mapDocument(mailOrderSalesDocument) : null,
+      // WO-O4O-AUTH-ONBOARDING-UX-CLEANUP-V1 T4: 정산 필수 미입력(추가 필드) — 화면 체크리스트가 그대로 쓴다.
+      missingSettlementFields: missingSettlementFieldsOf(supplier),
     };
   }
 

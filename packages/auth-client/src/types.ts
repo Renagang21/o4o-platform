@@ -100,8 +100,10 @@ export interface GoogleSignupConsents {
   terms: boolean;
   privacy: boolean;
   marketing?: boolean;
-  phone: string;
-  name: string;
+  /** 선택(WO-O4O-AUTH-ONBOARDING-UX-CLEANUP-V1 T2). */
+  phone?: string;
+  /** 선택(WO-O4O-AUTH-ONBOARDING-UX-CLEANUP-V1 T2). */
+  name?: string;
   nickname?: string;
 }
 
@@ -124,9 +126,11 @@ export interface GoogleAuthResponse extends AuthResponse {
 export interface EmailSignupRequest {
   email: string;
   password: string;
-  name: string;
+  /** 선택(WO-O4O-AUTH-ONBOARDING-UX-CLEANUP-V1 T2). */
+  name?: string;
   nickname?: string;
-  phone: string;
+  /** 선택(WO-O4O-AUTH-ONBOARDING-UX-CLEANUP-V1 T2). */
+  phone?: string;
   consents: Omit<GoogleSignupConsents, 'phone' | 'name' | 'nickname'>;
 }
 
@@ -150,7 +154,7 @@ export interface SocialProof { token: string; idToken?: string; code?: string }
 export interface SocialGrant { token: string; nonce?: string; authorizationUrl?: string; provider?: SocialProvider }
 export interface SignupTermsReference { policyDocumentId: string; version: number }
 export interface SignupTermsDocument extends SignupTermsReference { title: string; termsHref: string; privacyHref?: string; privacyPolicy?: SignupTermsReference & { title: string } }
-export interface KakaoSignupRequest { email: string; name: string; nickname?: string; phone: string; consents: { terms: boolean; privacy: boolean; marketing?: boolean; termsPolicy: SignupTermsReference; privacyPolicy?: SignupTermsReference } }
+export interface KakaoSignupRequest { email: string; name?: string; nickname?: string; phone?: string; consents: { terms: boolean; privacy: boolean; marketing?: boolean; termsPolicy: SignupTermsReference; privacyPolicy?: SignupTermsReference } }
 export interface KakaoAuthResponse extends GoogleAuthResponse {
   nextStep?: 'signup' | 'verify-email'; signupTicket?: string; email?: string; maskedEmail?: string; mailSent?: boolean;
 }

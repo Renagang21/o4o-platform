@@ -153,6 +153,38 @@ describe('supplier business profile behavior', () => {
     expect(result?.managerPhone).toBe('01000000000');
   });
 
+  it('reads representative/type/item from the organization profile before the old supplier columns (T9)', async () => {
+    Object.assign(supplier, { businessType: 'column-type', businessItem: 'column-item' });
+    (AppDataSource.query as jest.Mock).mockResolvedValue([{ ...org, metadata: { businessProfile: { representativeName: 'org-rep', businessType: 'org-type' } } }]);
+    const result = await service.getSupplierProfile('fixture-supplier');
+    expect(result).toMatchObject({ representativeName: 'org-rep', businessType: 'org-type', businessItem: 'column-item' });
+  });
+
+  it('judges the missing representative from the organization profile when the old column is empty (T9)', async () => {
+    supplier.representativeName = null;
+    (AppDataSource.query as jest.Mock).mockResolvedValue([{ ...org, metadata: { businessProfile: { representativeName: 'org-rep' } } }]);
+    expect((await service.getSupplierProfile('fixture-supplier'))?.missingProfileFields).toEqual(['managerName', 'managerPhone']);
+    (AppDataSource.query as jest.Mock).mockResolvedValue([{ ...org, metadata: {} }]);
+    expect((await service.getSupplierProfile('fixture-supplier'))?.missingProfileFields).toEqual(['representativeName', 'managerName', 'managerPhone']);
+  });
+
+  it('writes representative/type/item to both the organization profile and the old columns in one transaction (T9)', async () => {
+    await service.updateSupplierProfile('fixture-supplier', { representativeName: 'new-rep', businessType: 'new-type', businessItem: '' });
+    const update = txQuery.mock.calls.find(([sql]) => sql.startsWith('UPDATE organizations'));
+    expect(update).toBeDefined();
+    const meta = update![1].filter((v: unknown) => typeof v === 'string' && v.startsWith('{')).map((v: string) => JSON.parse(v));
+    expect(meta).toContainEqual({ otherService: { retained: true }, businessProfile: { businessEntityType: 'fixture-type', businessStartDate: '2000-01-01', retained: true, representativeName: 'new-rep', businessType: 'new-type', businessCategory: null } });
+    expect(save).toHaveBeenCalledWith(expect.objectContaining({ representativeName: 'new-rep', businessType: 'new-type', businessItem: null }));
+    expect(AppDataSource.transaction).toHaveBeenCalledTimes(1);
+  });
+
+  it('keeps writing representative to the old column only when no organization is linked (T9)', async () => {
+    supplier.organizationId = null;
+    await service.updateSupplierProfile('fixture-supplier', { representativeName: 'new-rep' });
+    expect(txQuery.mock.calls.find(([sql]) => sql.startsWith('UPDATE organizations'))).toBeUndefined();
+    expect(save).toHaveBeenCalledWith(expect.objectContaining({ representativeName: 'new-rep' }));
+  });
+
   it.each(['read', 'update'] as const)('%s keeps the contact and order condition response fields after sharing their projection', async (mode) => {
     Object.assign(supplier, {
       contactEmail: 'fixture-email', contactPhone: 'fixture-phone', contactWebsite: 'fixture-site', contactKakao: 'fixture-channel',

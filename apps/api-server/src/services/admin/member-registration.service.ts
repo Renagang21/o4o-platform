@@ -540,8 +540,13 @@ export class MemberRegistrationService {
         'BUSINESS_OWNER_CHANGED',
         '현재 사업체 소유자를 다시 확인해 주시기 바랍니다.',
       );
+    // WO-O4O-AUTH-ONBOARDING-UX-CLEANUP-V1 T9: 공급자도 대표자명 · 업태 · 종목을 Organization 정본에 쓴다
+    //   (약국 분기와 같은 키). neture_suppliers 옛 컬럼 쓰기는 expand 단계 동안 호출자가 유지한다.
     const metadata = supplier
       ? {
+          representativeName: f.representativeName ?? null,
+          businessType: f.businessType ?? null,
+          businessCategory: f.businessItem ?? null,
           businessEntityType: f.businessEntityType ?? null,
           businessStartDate: f.businessStartDate ?? null,
           managerEmail: f.managerEmail || null,
