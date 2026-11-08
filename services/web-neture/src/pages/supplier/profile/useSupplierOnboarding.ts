@@ -1,6 +1,12 @@
 import { useState, useCallback } from 'react';
 import { supplierOnboardingApi, type SupplierOnboarding } from '../../../lib/api';
 
+/** 온보딩 화면의 저장 범위 (WO-O4O-AUTH-ONBOARDING-UX-CLEANUP-V1 T4). */
+export type SupplierOnboardingScope = 'settlement' | 'mailOrder';
+type DocumentType = 'business_registration' | 'bank_statement' | 'mail_order_report';
+const documentScope = (type: DocumentType): SupplierOnboardingScope =>
+  type === 'mail_order_report' ? 'mailOrder' : 'settlement';
+
 export function useSupplierOnboarding() {
   const [onboarding, setOnboarding] = useState<SupplierOnboarding | null>(null);
   const [onboardingSaving, setOnboardingSaving] = useState(false);
@@ -13,6 +19,7 @@ export function useSupplierOnboarding() {
     'business_registration' | 'bank_statement' | 'mail_order_report' | null
   >(null);
   const [onboardingLoadError, setOnboardingLoadError] = useState(false);
+  const [onboardingScope, setOnboardingScope] = useState<SupplierOnboardingScope | null>(null);
   const [taxInvoiceEmail, setTaxInvoiceEmail] = useState('');
   const [settlementBankName, setSettlementBankName] = useState('');
   const [settlementAccountNumber, setSettlementAccountNumber] = useState('');
@@ -22,26 +29,14 @@ export function useSupplierOnboarding() {
   const [mailOrderSalesStatus, setMailOrderSalesStatus] = useState('');
   const [mailOrderSalesRegistrationNumber, setMailOrderSalesRegistrationNumber] = useState('');
 
-  const initializeOnboarding = useCallback(
-    (onboardingData: SupplierOnboarding, profileTaxInvoiceEmail?: string | null) => {
-      setOnboarding(onboardingData);
-      setTaxInvoiceEmail(onboardingData.taxInvoiceEmail || profileTaxInvoiceEmail || '');
-      setSettlementBankName(onboardingData.settlementBankName || '');
-      setSettlementAccountNumber(onboardingData.settlementAccountNumber || '');
-      setSettlementAccountHolder(onboardingData.settlementAccountHolder || '');
-      setSettlementContactName(onboardingData.settlementContactName || '');
-      setSettlementContactEmail(onboardingData.settlementContactEmail || '');
-      setMailOrderSalesStatus(onboardingData.mailOrderSalesStatus || '');
-      setMailOrderSalesRegistrationNumber(onboardingData.mailOrderSalesRegistrationNumber || '');
-    },
-    [],
-  );
-
-  const refreshOnboarding = async () => {
-    try {
-      const data = await supplierOnboardingApi.getOnboarding();
+  /**
+   * WO-O4O-AUTH-ONBOARDING-UX-CLEANUP-V1 T5: 초기화와 재조회가 같은 필드 대입을 두 번 적던 것을 하나로 모은다.
+   *   profileTaxInvoiceEmail 은 초기 조회에서만 넘긴다 — onboarding 값이 비었을 때의 기존 대체값(동작 불변).
+   */
+  const applyOnboarding = useCallback(
+    (data: SupplierOnboarding, profileTaxInvoiceEmail?: string | null) => {
       setOnboarding(data);
-      setTaxInvoiceEmail(data.taxInvoiceEmail || '');
+      setTaxInvoiceEmail(data.taxInvoiceEmail || profileTaxInvoiceEmail || '');
       setSettlementBankName(data.settlementBankName || '');
       setSettlementAccountNumber(data.settlementAccountNumber || '');
       setSettlementAccountHolder(data.settlementAccountHolder || '');
@@ -49,26 +44,44 @@ export function useSupplierOnboarding() {
       setSettlementContactEmail(data.settlementContactEmail || '');
       setMailOrderSalesStatus(data.mailOrderSalesStatus || '');
       setMailOrderSalesRegistrationNumber(data.mailOrderSalesRegistrationNumber || '');
+    },
+    [],
+  );
+  const initializeOnboarding = applyOnboarding;
+
+  const refreshOnboarding = async () => {
+    try {
+      applyOnboarding(await supplierOnboardingApi.getOnboarding());
       setOnboardingLoadError(false);
     } catch {
       setOnboardingLoadError(true);
     }
   };
 
-  const handleSaveOnboarding = async () => {
+  /**
+   * WO-O4O-AUTH-ONBOARDING-UX-CLEANUP-V1 T4: 정산 저장과 통신판매업 저장은 자기 필드만 보낸다.
+   *   이전에는 두 버튼이 8개 필드를 모두 보내서, 통신판매업 신고번호 누락이 정산 저장까지 막았다.
+   *   scope 를 생략하면 둘 다 보낸다(기존 호출 호환).
+   */
+  const handleSaveOnboarding = async (scope?: SupplierOnboardingScope) => {
+    const target = typeof scope === 'string' ? scope : null;
+    setOnboardingScope(target);
     setOnboardingSaving(true);
     setOnboardingSaved(false);
     setOnboardingError(null);
 
-    const result = await supplierOnboardingApi.updateOnboarding({
+    const settlement = {
       taxInvoiceEmail,
       settlementBankName,
       settlementAccountNumber,
       settlementAccountHolder,
       settlementContactName,
       settlementContactEmail,
-      mailOrderSalesStatus,
-      mailOrderSalesRegistrationNumber,
+    };
+    const mailOrder = { mailOrderSalesStatus, mailOrderSalesRegistrationNumber };
+    const result = await supplierOnboardingApi.updateOnboarding({
+      ...(target === null || target === 'settlement' ? settlement : {}),
+      ...(target === null || target === 'mailOrder' ? mailOrder : {}),
     });
 
     setOnboardingSaving(false);
@@ -81,6 +94,16 @@ export function useSupplierOnboarding() {
     }
   };
 
+  /** 각 섹션이 자기 저장 · 업로드의 진행과 결과만 보이게 한다. */
+  const scopeStatus = (scope: SupplierOnboardingScope) => {
+    const own = onboardingScope === null || onboardingScope === scope;
+    return {
+      saving: onboardingSaving && own,
+      saved: onboardingSaved && own,
+      error: own ? onboardingError : null,
+    };
+  };
+
   const handleUploadDocument = async (
     documentType: 'business_registration' | 'bank_statement' | 'mail_order_report',
   ) => {
@@ -90,6 +113,7 @@ export function useSupplierOnboarding() {
         : documentType === 'mail_order_report'
           ? mailOrderReportFile
           : bankbookFile;
+    setOnboardingScope(documentScope(documentType));
     if (!file) {
       setOnboardingError('PDF 파일을 선택해 주시기 바랍니다.');
       return;
@@ -118,6 +142,7 @@ export function useSupplierOnboarding() {
     documentType: 'business_registration' | 'bank_statement' | 'mail_order_report',
   ) => {
     const blob = await supplierOnboardingApi.downloadDocument(documentType);
+    setOnboardingScope(documentScope(documentType));
     if (!blob) {
       setOnboardingError('문서를 열 수 없습니다.');
       return;
@@ -165,6 +190,7 @@ export function useSupplierOnboarding() {
     initializeOnboarding,
     refreshOnboarding,
     handleSaveOnboarding,
+    scopeStatus,
     handleUploadDocument,
     handleDownloadDocument,
   };

@@ -181,6 +181,7 @@ forum · lms · signage 는 **플랫폼 공통 구조**. KPA 가 reference imple
 
 - SSOT: [`docs/TEST-ACCOUNTS.md`](docs/TEST-ACCOUNTS.md) (저장소 추적 · 2026-11-08 기준 변경, 이전 `docs/local/TEST-ACCOUNTS.local.md` · `TEST-ACCOUNT.txt` 미사용). 브라우저 검증 전 반드시 참조. 클라우드 세션도 이 파일을 쓴다.
 - 사용자 테스트는 **로그인 화면의 「테스트 로그인」 버튼**(매장 경영자 · 공급자 · 매장 직원 — 공개 Demo 계정)으로 한다. Google · 카카오 로그인 화면은 사용자에게 넘겨 사용자가 직접 로그인한다.
+  사용자 화면은 **배포 후** 이 버튼으로 검증한다(2026-11-08) — 절차 · 예외는 [`AGENTS.md` §6](AGENTS.md#6-검증--완료-보고) · [`SETUP.md` 배포 후 Demo 검증](SETUP.md#배포-후-demo-검증).
 - 실제 운영 계정 사용 금지. **자격증명 하드코딩 금지** — seed · 테스트 코드 · CI 어디에도 박지 않는다. 발견 시 즉시 제거.
 
 ## 16. 문서 Drift 발견 시 정비

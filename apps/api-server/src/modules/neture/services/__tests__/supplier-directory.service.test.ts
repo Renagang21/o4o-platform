@@ -42,6 +42,17 @@ describe('supplier directory contracts', () => {
     expect(compatibilityListQuery).toBe(applySupplierListQuery);
   });
 
+  it('operator list reads the representative from the organization profile first and passes it to readiness (T9)', async () => {
+    supplier.representativeName = 'column-rep';
+    const profile = { representativeName: 'org-rep' };
+    (business.getOrgDataBatch as jest.Mock).mockResolvedValue(new Map([['fixture-org', { name: 'Fixture organization', business_number: 'fixture-number', managerEmail: null, businessProfile: profile }]]));
+    const [row] = await service.getAllSuppliers();
+    expect(row.representativeName).toBe('org-rep');
+    expect(business.getMissingProfileFields).toHaveBeenCalledWith(supplier, profile);
+    (business.getOrgDataBatch as jest.Mock).mockResolvedValue(new Map());
+    expect((await service.getAllSuppliers())[0].representativeName).toBe('column-rep');
+  });
+
   it('anonymous detail hides all contact values while retaining public hints and zero order amounts', async () => {
     const result = await service.getSupplierBySlug('fixture');
     expect(result).toMatchObject({ name: 'Fixture organization', contact: { email: null, phone: null, website: null, kakao: null }, contactHints: { email: 'available', phone: 'approved_buyers_only', website: 'private', kakao: 'approved_buyers_only' }, orderCondition: { minOrderAmount: 0, minOrderSurcharge: 20, note: null }, products: [{ id: 'fixture-offer', name: 'Fixture product', category: 'Fixture brand' }] });
