@@ -2,7 +2,10 @@
  * WO-O4O-CICD-DEPLOY-FREEZE-CUTOVER-V1 — 자동 배포 결정 · 실행 순서 (node:test · 네트워크 0 · GitHub 주입)
  */
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
 import { describe, it } from 'node:test';
+import { fileURLToPath } from 'node:url';
 
 import {
   FRONTENDS,
@@ -16,6 +19,7 @@ import {
   decideOne,
   decidePromote,
   executeDecisions,
+  deliveryJobs,
   finalizeStates,
   githubClient,
   isFrozen,
@@ -25,6 +29,8 @@ import {
 } from '../deploy-orchestrate.mjs';
 import { DEPLOY_TARGETS, LEVEL_1, LEVEL_2, LEVEL_3, assessRisk } from '../deploy-risk.mjs';
 import { buildWorkspaceGraph } from '../detect-affected.mjs';
+
+const REPO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..', '..');
 
 const SHA = 'c'.repeat(40);
 const ok = { frozen: false, ciGreen: true, headIsTarget: true };
@@ -485,6 +491,116 @@ describe('U5. 상태 표현 · commit status · report (§10 · §26 · §27)', 
     assert.deepEqual(good.map((s) => s.state), ['DEPLOYED', 'DEPLOYED', 'DEPLOYED', 'NO_DEPLOY']);
     const apiFail = finalizeStates(record, { api: { sha: BASE }, neture: { sha: BASE }, store: { sha: TARGET } });
     assert.deepEqual(apiFail.map((s) => s.state), ['FAILED', 'HELD_DEPENDENCY', 'DEPLOYED', 'NO_DEPLOY']);
+  });
+  it('report: run 이 취소되면 target 에 못 미친 서비스는 FAILED 가 아니라 CANCELLED (2026-11-06 009d8f4f 재현)', () => {
+    const record = {
+      target_sha: TARGET,
+      execute: true,
+      plan: { deploy_api: false, web_after_api: [], web_parallel: ['store'], admin_after_api: false, admin_parallel: false },
+      services: [
+        { key: 'api', decision: 'NO_DEPLOY' },
+        { key: 'store', decision: 'AUTO_DEPLOY' },
+      ],
+    };
+    // 실제 기록: classify 의 모든 step 은 success 였지만 run 취소로 job 이 cancelled · 배포 job 은 skipped
+    const needs = JSON.stringify({
+      classify: { result: 'cancelled', outputs: { execute: 'true' } },
+      'deploy-api': { result: 'skipped', outputs: {} },
+      'deploy-web-after-api': { result: 'skipped', outputs: {} },
+      'deploy-web-parallel': { result: 'skipped', outputs: {} },
+      'deploy-admin': { result: 'skipped', outputs: {} },
+    });
+    const run = deliveryJobs(needs);
+    assert.equal(run.cancelled, true);
+    const states = finalizeStates(record, { store: { sha: BASE } }, run);
+    assert.deepEqual(states.map((s) => s.state), ['NO_DEPLOY', 'CANCELLED']);
+    const status = commitStatus(states, TARGET);
+    assert.equal(status.overall, 'CANCELLED');
+    assert.equal(status.state, 'error');
+    assert.match(status.description, /cancelled: store/);
+    assert.doesNotMatch(status.description, /FAILED|promote/);
+  });
+  it('report: 취소된 run 이어도 이미 target 을 서빙하는 서비스는 DEPLOYED (API 끝난 뒤 취소)', () => {
+    const record = {
+      target_sha: TARGET,
+      execute: true,
+      plan: { deploy_api: true, web_after_api: ['neture'], web_parallel: [], admin_after_api: false, admin_parallel: false },
+      services: [
+        { key: 'api', decision: 'AUTO_DEPLOY' },
+        { key: 'neture', decision: 'AUTO_DEPLOY' },
+      ],
+    };
+    const run = deliveryJobs({ classify: { result: 'success' }, 'deploy-api': { result: 'success' }, 'deploy-web-after-api': { result: 'cancelled' } });
+    const states = finalizeStates(record, { api: { sha: TARGET }, neture: { sha: BASE } }, run);
+    assert.deepEqual(states.map((s) => s.state), ['DEPLOYED', 'CANCELLED']);
+    // FAILED 가 섞이면 FAILED 가 우선한다 (실패를 취소로 가리지 않는다)
+    assert.equal(commitStatus([{ key: 'api', state: 'FAILED' }, { key: 'neture', state: 'CANCELLED' }], TARGET).overall, 'FAILED');
+  });
+  it('report: 취소된 run 이어도 이미 실패한 job 의 서비스는 FAILED 로 남는다 (API 실패 뒤 병렬 프런트 취소)', () => {
+    const record = {
+      target_sha: TARGET,
+      execute: true,
+      plan: { deploy_api: true, web_after_api: ['neture'], web_parallel: ['store'], admin_after_api: false, admin_parallel: true },
+      services: [
+        { key: 'api', decision: 'AUTO_DEPLOY' },
+        { key: 'neture', decision: 'AUTO_DEPLOY' },
+        { key: 'store', decision: 'AUTO_DEPLOY' },
+        { key: 'admin', decision: 'AUTO_DEPLOY' },
+      ],
+    };
+    // API 배포가 실패한 뒤 진행 중이던 병렬 프런트가 취소됐다 → run 은 취소로 읽히지만 API 실패를 가리지 않는다
+    const run = deliveryJobs({
+      classify: { result: 'success' },
+      'deploy-api': { result: 'failure' },
+      'deploy-web-after-api': { result: 'skipped' },
+      'deploy-web-parallel': { result: 'cancelled' },
+      'deploy-admin': { result: 'failure' },
+    });
+    assert.equal(run.cancelled, true);
+    const states = finalizeStates(record, { api: { sha: BASE }, neture: { sha: BASE }, store: { sha: BASE }, admin: { sha: BASE } }, run);
+    assert.deepEqual(states.map((s) => s.state), ['FAILED', 'HELD_DEPENDENCY', 'CANCELLED', 'FAILED']);
+    const status = commitStatus(states, TARGET);
+    assert.equal(status.overall, 'FAILED');
+    assert.equal(status.state, 'failure');
+  });
+  it('report: API 자체가 취소된 run 이면 API 뒤 프런트도 CANCELLED (의존 대기가 아니라 취소)', () => {
+    const record = {
+      target_sha: TARGET,
+      execute: true,
+      plan: { deploy_api: true, web_after_api: ['neture'], web_parallel: [], admin_after_api: false, admin_parallel: false },
+      services: [
+        { key: 'api', decision: 'AUTO_DEPLOY' },
+        { key: 'neture', decision: 'AUTO_DEPLOY' },
+      ],
+    };
+    const run = deliveryJobs({ classify: { result: 'success' }, 'deploy-api': { result: 'cancelled' }, 'deploy-web-after-api': { result: 'skipped' } });
+    const states = finalizeStates(record, { api: { sha: BASE }, neture: { sha: BASE } }, run);
+    assert.deepEqual(states.map((s) => s.state), ['CANCELLED', 'CANCELLED']);
+  });
+  it('report: 취소가 없으면 종전 판정 그대로 · needs 를 못 읽으면 취소 아님', () => {
+    const record = {
+      target_sha: TARGET,
+      execute: true,
+      plan: { deploy_api: true, web_after_api: ['neture'], web_parallel: [], admin_after_api: false, admin_parallel: false },
+      services: [
+        { key: 'api', decision: 'AUTO_DEPLOY' },
+        { key: 'neture', decision: 'AUTO_DEPLOY' },
+      ],
+    };
+    const failed = deliveryJobs({ classify: { result: 'success' }, 'deploy-api': { result: 'failure' }, 'deploy-web-after-api': { result: 'skipped' } });
+    assert.equal(failed.cancelled, false);
+    assert.deepEqual(finalizeStates(record, { api: { sha: BASE }, neture: { sha: BASE } }, failed).map((s) => s.state), ['FAILED', 'HELD_DEPENDENCY']);
+    for (const bad of [undefined, '', 'not json', 'null', '[]']) {
+      assert.equal(deliveryJobs(bad).cancelled, false, String(bad));
+    }
+    assert.deepEqual(finalizeStates(record, { api: { sha: BASE }, neture: { sha: BASE } }).map((s) => s.state), ['FAILED', 'HELD_DEPENDENCY']);
+  });
+  it('delivery.yml report step 이 needs 를 DELIVERY_NEEDS 로 넘긴다', () => {
+    const wf = readFileSync(path.join(REPO, '.github/workflows/delivery.yml'), 'utf8');
+    const report = wf.slice(wf.indexOf('\n  report:'));
+    assert.match(report, /if: always\(\) && needs\.classify\.outputs\.execute == 'true'/);
+    assert.match(report, /DELIVERY_NEEDS: \$\{\{ toJSON\(needs\) \}\}/);
+    assert.match(report, /deploy-orchestrate\.mjs report/);
   });
   it('배선 검증 계획: api 포함 → 프런트는 after-api · 미포함 → 병렬 · 항상 dry_call', () => {
     assert.deepEqual(wiringPlan(['api', 'neture', 'admin']), {

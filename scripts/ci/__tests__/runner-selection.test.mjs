@@ -13,6 +13,7 @@ import { createRequire } from 'node:module';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { evaluate, template } from './lib/gh-expression.mjs';
 
 const require = createRequire(import.meta.url);
 const yaml = require('js-yaml');
@@ -30,7 +31,7 @@ const SCHEDULED_EXPR = `\${{ fromJSON(needs.runner.outputs.linux || '"ubuntu-lat
 // 전환 지원 job — 여기 없는 job 은 고정 GitHub 호스팅이다.
 const SWITCHABLE = {
   'ci-pipeline.yml': {
-    detect: LINUX_EXPR, 'quality-check': LINUX_EXPR, 'api-tests': LINUX_EXPR, build: LINUX_EXPR,
+    detect: LINUX_EXPR, 'draft-light': LINUX_EXPR, 'quality-check': LINUX_EXPR, 'api-tests': LINUX_EXPR, build: LINUX_EXPR,
     'web-build': LINUX_EXPR, 'docs-fast-validate': LINUX_EXPR, 'admin-fast-validate': LINUX_EXPR,
     'admin-fast-guards': LINUX_EXPR, 'docs-sensitive-guard': LINUX_EXPR, 'pc-installer-windows': WINDOWS_EXPR,
     'central-operator-integration': LINUX_EXPR, 'api-runtime-dependencies': LINUX_EXPR, 'ci-gate': LINUX_EXPR,
@@ -41,46 +42,7 @@ const SWITCHABLE = {
   'scheduled-api-full-jest.yml': { runner: 'ubuntu-latest', plan: SCHEDULED_EXPR, 'full-jest': SCHEDULED_EXPR, aggregate: SCHEDULED_EXPR },
 };
 
-// ---------------------------------------------------------------------------
-// GitHub Actions expression 의 부분집합 평가기 (선택식에 쓰는 문법만).
-// 의미: && / || 는 피연산자를 그대로 반환, == 는 문자열 대소문자 무시 · 타입이 다르면 숫자 변환,
-// 없는 속성은 null, falsy = false · 0 · '' · null · NaN.
-// ---------------------------------------------------------------------------
-function evaluate(expr, ctx) {
-  const src = expr.replace(/^\$\{\{\s*/, '').replace(/\s*\}\}$/, '');
-  const tokens = [...src.matchAll(/\s*('(?:[^']|'')*'|==|!=|&&|\|\||[()!]|[A-Za-z_][\w.-]*)/gy)].map((m) => m[1]);
-  assert.equal(tokens.join('').replace(/\s/g, ''), src.replace(/\s/g, ''), 'unsupported syntax');
-  let i = 0;
-  const peek = () => tokens[i];
-  const next = () => tokens[i++];
-  const truthy = (v) => !(v === false || v === 0 || v === '' || v === null || v === undefined || Number.isNaN(v));
-  const num = (v) => (v === null || v === undefined ? 0 : typeof v === 'boolean' ? Number(v) : typeof v === 'string' ? (v.trim() === '' ? 0 : Number(v)) : NaN);
-  const eq = (a, b) => {
-    a ??= null; b ??= null;
-    if (typeof a === typeof b) return typeof a === 'string' ? a.toLowerCase() === b.toLowerCase() : a === b;
-    return num(a) === num(b);
-  };
-  const primary = () => {
-    const t = next();
-    if (t === '(') { const v = or(); assert.equal(next(), ')'); return v; }
-    if (t === '!') return !truthy(primary());
-    if (t.startsWith("'")) return t.slice(1, -1).replace(/''/g, "'");
-    if (t === 'true' || t === 'false') return t === 'true';
-    if (t === 'null') return null;
-    if (t === 'fromJSON') { assert.equal(next(), '('); const v = or(); assert.equal(next(), ')'); return JSON.parse(v); }
-    return t.split('.').reduce((o, k) => (o == null ? null : o[k] ?? null), ctx);
-  };
-  const cmp = () => {
-    let v = primary();
-    while (peek() === '==' || peek() === '!=') { const op = next(); const r = primary(); v = op === '==' ? eq(v, r) : !eq(v, r); }
-    return v;
-  };
-  const and = () => { let v = cmp(); while (peek() === '&&') { next(); const r = cmp(); v = truthy(v) ? r : v; } return v; };
-  const or = () => { let v = and(); while (peek() === '||') { next(); const r = and(); v = truthy(v) ? v : r; } return v; };
-  const out = or();
-  assert.equal(i, tokens.length, 'trailing tokens');
-  return out;
-}
+// GitHub Actions expression 평가기는 공용 helper 를 쓴다(lib/gh-expression.mjs).
 
 const ctx = ({ linux, windows, isPrivate, event = 'push', fork } = {}) => ({
   vars: { ...(linux !== undefined && { CI_RUNNER_LINUX: linux }), ...(windows !== undefined && { CI_RUNNER_WINDOWS: windows }) },
@@ -168,7 +130,10 @@ test('배포 · GCP · CodeQL · 그 밖의 workflow 는 자체 실행기를 참
 test('CI Gate 이름 · always() · needs 는 그대로다', () => {
   const wf = load('ci-pipeline.yml');
   const gate = wf.jobs['ci-gate'];
-  assert.equal(gate.name, 'CI Gate');
+  // 드래프트가 아닌 문맥(main push · budget 꺼짐)에서 이름은 정확히 "CI Gate" 다(분기 전체는 draft-ready-guarantee.test.mjs).
+  for (const c of [{ github: { event_name: 'push', event: {} }, vars: { CI_COST_PROFILE: 'budget' } }, { github: { event_name: 'pull_request', event: { pull_request: { draft: true } } }, vars: {} }]) {
+    assert.equal(template(gate.name, c), 'CI Gate');
+  }
   assert.equal(gate.if, 'always()');
   assert.deepEqual([...gate.needs].sort(), Object.keys(wf.jobs).filter((id) => id !== 'ci-gate').sort());
 });

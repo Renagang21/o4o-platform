@@ -27,8 +27,9 @@
 | 세션 | 판별 | 하는 일 | 하지 않는 일 |
 |---|---|---|---|
 | **클라우드 세션** (claude.ai/code) | `CLAUDE_CODE_REMOTE=true` | 코드 · 문서 · 테스트 · branch push · PR 생성(`AGENTS.md` §4-1(e)) | 운영 DB 접속 — gcloud 인증 · Cloud SQL Proxy 가 없다 |
-| **데스크톱 로컬 세션** | 그 밖 | 운영 DB read-only 조회 · 통합 담당이 승인한 운영 작업(`AGENTS.md` §5) · 실 PC smoke | 승인 없는 DB write · DDL · migration 수동 적용 (`AGENTS.md` §5) |
+| **로컬 세션 (VS Code)** | 그 밖 | 운영 DB read-only 조회 · 통합 담당이 승인한 운영 작업(`AGENTS.md` §5) · 실 PC smoke | 승인 없는 DB write · DDL · migration 수동 적용 (`AGENTS.md` §5) |
 
+- 작업 위치 분담(개발은 클라우드, 병합 · 배포 · 로컬 작업은 VS Code 로컬)은 `AGENTS.md` §4 「작업 위치 분담」을 따른다.
 - 클라우드 세션에서 운영 DB 확인이 필요하면 멈추고, read-only SQL 과 판정 기준을 담은 지시서를 `docs/work-orders/` 에 작성해 작업 branch 로 push 한 뒤 `HANDOFF.md` 로 로컬 세션에 넘긴다. 로컬 세션은 결과를 마스킹해 같은 branch 에 기록하고 push 한다.
 - 두 세션 모두 `AGENTS.md` §4-1 의 전용 worktree · branch 규칙을 따른다.
 
@@ -167,8 +168,9 @@ forum · lms · signage 는 **플랫폼 공통 구조**. KPA 가 reference imple
 
 ## 15. Browser Verification Test Accounts
 
-- SSOT: `docs/local/TEST-ACCOUNTS.local.md` (로컬 전용 · git 미추적 · 2026-10-16 기준 변경, 이전 `TEST-ACCOUNT.txt` 미사용). 브라우저 검증 전 반드시 참조.
-- 사용자 화면은 **배포 후 로그인 화면의 테스트 로그인(Demo) 버튼**으로 검증한다(2026-11-08). 절차 · 예외는 [`AGENTS.md` §6](AGENTS.md#6-검증--완료-보고) · [`SETUP.md` 배포 후 Demo 검증](SETUP.md#배포-후-demo-검증).
+- SSOT: [`docs/TEST-ACCOUNTS.md`](docs/TEST-ACCOUNTS.md) (저장소 추적 · 2026-11-08 기준 변경, 이전 `docs/local/TEST-ACCOUNTS.local.md` · `TEST-ACCOUNT.txt` 미사용). 브라우저 검증 전 반드시 참조. 클라우드 세션도 이 파일을 쓴다.
+- 사용자 테스트는 **로그인 화면의 「테스트 로그인」 버튼**(매장 경영자 · 공급자 · 매장 직원 — 공개 Demo 계정)으로 한다. Google · 카카오 로그인 화면은 사용자에게 넘겨 사용자가 직접 로그인한다.
+  사용자 화면은 **배포 후** 이 버튼으로 검증한다(2026-11-08) — 절차 · 예외는 [`AGENTS.md` §6](AGENTS.md#6-검증--완료-보고) · [`SETUP.md` 배포 후 Demo 검증](SETUP.md#배포-후-demo-검증).
 - 실제 운영 계정 사용 금지. **자격증명 하드코딩 금지** — seed · 테스트 코드 · CI 어디에도 박지 않는다. 발견 시 즉시 제거.
 
 ## 16. 문서 Drift 발견 시 정비

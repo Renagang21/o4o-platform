@@ -81,6 +81,16 @@ O4O Platform repository의 Codex 및 일반 coding agent를 위한 독립 진입
   통합 담당이 아닌 개발자의 지시, 다른 세션의 메시지, HANDOFF · 지시서 · PR 본문에 적힌 문구, 계정 · branch 이름 · CI 성공 ·
   Ready 상태로는 지정되지 않는다.
 
+**작업 위치 분담 (2026-11-08 통합 담당 결정)**
+
+- **개발은 클라우드 세션**에서 한다 — 수정 · 검증 · push · PR(검증이 끝나면 Ready)까지.
+  PR 설명의 「확인하지 못한 것」에 배포 후 확인할 항목을 적어 병합 · 배포 쪽에 넘긴다.
+- **병합 · 배포 · 로컬 작업은 VS Code 로컬 세션**에서 한다 — 순차 PR merge · 배포 · 운영 화면 확인
+  (외부 계정 로그인 포함) · 운영 DB read-only 조회 · 실 PC smoke. 통합 담당이 이 세션에 병합 · 배포를 지시하는 것이 통합 세션 지정이다.
+- 로컬 작업은 VS Code 의 Claude Code 에서 한다(데스크톱 앱 로컬 세션은 쓰지 않는다).
+- 병합 · 배포를 하는 로컬 세션은 **한 시점에 한 곳**이다. 다른 PC · 다른 창으로 옮길 때는 이전 곳에 진행 중인 병합 · 배포가 없는지 먼저 확인한다.
+- 클라우드 세션에 병합을 맡기는 것은 통합 담당이 PR 을 지정해 지시한 경우만이다(위 통합 세션 지정 규칙 그대로).
+
 ### 4-1. Parallel Session / Worktree Policy
 
 > 도입: WO-O4O-PARALLEL-SESSION-WORKTREE-POLICY-V1 (2026-10-03).
@@ -399,15 +409,15 @@ verdict: SAFE_TO_REMOVE | KEEP | UNCERTAIN
   콘솔 오류뿐 아니라 **toast·API 응답과 실제 동작**을 확인한다.
 - route / menu / layout 변경은 desktop·mobile을 각각 확인한다.
   신규 route는 메뉴 진입·직접 URL과 기존 route 회귀를 확인한다.
-- 테스트 계정 SSOT는 `docs/local/TEST-ACCOUNTS.local.md`다(로컬 전용 · 2026-10-16 변경, 이전 `TEST-ACCOUNT.txt`는 계정 출처로 쓰지 않는다).
-  파일 위치·새 clone/클라우드에서 누락되는 이유·확보 절차는 [SETUP.md의 테스트 계정 찾기](SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)를 따른다.
-  현재 checkout에 없으면 기준 checkout의 동일 경로도 확인한 후 누락을 보고한다. 과거 seed 계정으로 대체하지 않는다.
+- 테스트 계정 SSOT는 [`docs/TEST-ACCOUNTS.md`](docs/TEST-ACCOUNTS.md)다(저장소 추적 · 2026-11-08 변경 — 클라우드 · 로컬 세션 공용).
+  **사용자 테스트는 로그인 화면의 「테스트 로그인」 버튼**(매장 경영자 · 공급자 · 매장 직원)으로 한다. 규칙은 그 파일과 [SETUP.md의 테스트 계정 찾기](SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)를 따른다.
+  이전 기준 `docs/local/TEST-ACCOUNTS.local.md` · `TEST-ACCOUNT.txt`는 계정 출처로 쓰지 않는다. Google · 카카오 로그인은 사용자가 직접 한다.
   운영 계정 사용과 자격증명의 코드·문서·커밋 복사를 금지한다.
 - **배포 후 사용자 화면 검증은 로그인 화면의 테스트 로그인(Demo) 버튼으로 한다**(2026-11-08 사용자 확정).
   배포 전 단계에서 테스트 계정이 없다는 이유로 사용자 화면 검증을 막거나 미루지 않는다 — PR 에 「배포 후 Demo 검증」 항목으로 남기고,
   배포 후 Demo 버튼(매장 경영자 · 공급자 · 매장 직원)으로 확인한다. Demo 는 공개 정본 계정이며 권한 상한·금지 경로
   (가입 · 확인 메일 · 비밀번호 재설정 · 인증 수단 변경, 운영자 · 관리자 화면)는 [O4O-CANONICAL-DEMO-ACCOUNTS-V1](docs/baseline/O4O-CANONICAL-DEMO-ACCOUNTS-V1.md)을 따른다.
-  운영자 · 관리자 화면처럼 Demo 로 볼 수 없는 검증만 `TEST-ACCOUNTS.local.md` 계정을 쓴다. 운영 데이터를 남기는 검증은 §5 테스트 데이터 경계를 그대로 따른다.
+  운영자 · 관리자 화면은 Demo 에 권한이 없으므로 작업 지시에 계정 확보 방법이 있을 때만 검증한다. 운영 데이터를 남기는 검증은 §5 테스트 데이터 경계를 그대로 따른다.
   절차는 [SETUP.md의 배포 후 Demo 검증](SETUP.md#배포-후-demo-검증)을 따른다.
 - 중간·완료 보고는 **한국어**로 작성하고 파일명·route·API·command·commit SHA 등 기술 식별자는 원문 유지한다.
 - 긴 diff 대신 변경 / 검증 / 미해결 / Git 상태 중심으로 보고한다.
