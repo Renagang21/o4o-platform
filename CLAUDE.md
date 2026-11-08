@@ -168,6 +168,7 @@ forum · lms · signage 는 **플랫폼 공통 구조**. KPA 가 reference imple
 ## 15. Browser Verification Test Accounts
 
 - SSOT: `docs/local/TEST-ACCOUNTS.local.md` (로컬 전용 · git 미추적 · 2026-10-16 기준 변경, 이전 `TEST-ACCOUNT.txt` 미사용). 브라우저 검증 전 반드시 참조.
+- 사용자 화면은 **배포 후 로그인 화면의 테스트 로그인(Demo) 버튼**으로 검증한다(2026-11-08). 절차 · 예외는 [`AGENTS.md` §6](AGENTS.md#6-검증--완료-보고) · [`SETUP.md` 배포 후 Demo 검증](SETUP.md#배포-후-demo-검증).
 - 실제 운영 계정 사용 금지. **자격증명 하드코딩 금지** — seed · 테스트 코드 · CI 어디에도 박지 않는다. 발견 시 즉시 제거.
 
 ## 16. 문서 Drift 발견 시 정비

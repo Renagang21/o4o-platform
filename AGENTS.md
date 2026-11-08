@@ -401,8 +401,14 @@ verdict: SAFE_TO_REMOVE | KEEP | UNCERTAIN
   신규 route는 메뉴 진입·직접 URL과 기존 route 회귀를 확인한다.
 - 테스트 계정 SSOT는 `docs/local/TEST-ACCOUNTS.local.md`다(로컬 전용 · 2026-10-16 변경, 이전 `TEST-ACCOUNT.txt`는 계정 출처로 쓰지 않는다).
   파일 위치·새 clone/클라우드에서 누락되는 이유·확보 절차는 [SETUP.md의 테스트 계정 찾기](SETUP.md#테스트-계정-찾기--브라우저운영-검증-전)를 따른다.
-  현재 checkout에 없으면 기준 checkout의 동일 경로도 확인한 후 누락을 보고한다. 과거 seed/Demo 계정으로 대체하지 않는다.
+  현재 checkout에 없으면 기준 checkout의 동일 경로도 확인한 후 누락을 보고한다. 과거 seed 계정으로 대체하지 않는다.
   운영 계정 사용과 자격증명의 코드·문서·커밋 복사를 금지한다.
+- **배포 후 사용자 화면 검증은 로그인 화면의 테스트 로그인(Demo) 버튼으로 한다**(2026-11-08 사용자 확정).
+  배포 전 단계에서 테스트 계정이 없다는 이유로 사용자 화면 검증을 막거나 미루지 않는다 — PR 에 「배포 후 Demo 검증」 항목으로 남기고,
+  배포 후 Demo 버튼(매장 경영자 · 공급자 · 매장 직원)으로 확인한다. Demo 는 공개 정본 계정이며 권한 상한·금지 경로
+  (가입 · 확인 메일 · 비밀번호 재설정 · 인증 수단 변경, 운영자 · 관리자 화면)는 [O4O-CANONICAL-DEMO-ACCOUNTS-V1](docs/baseline/O4O-CANONICAL-DEMO-ACCOUNTS-V1.md)을 따른다.
+  운영자 · 관리자 화면처럼 Demo 로 볼 수 없는 검증만 `TEST-ACCOUNTS.local.md` 계정을 쓴다. 운영 데이터를 남기는 검증은 §5 테스트 데이터 경계를 그대로 따른다.
+  절차는 [SETUP.md의 배포 후 Demo 검증](SETUP.md#배포-후-demo-검증)을 따른다.
 - 중간·완료 보고는 **한국어**로 작성하고 파일명·route·API·command·commit SHA 등 기술 식별자는 원문 유지한다.
 - 긴 diff 대신 변경 / 검증 / 미해결 / Git 상태 중심으로 보고한다.
 - **조사 전용·무수정 요청은 CHECK/IR 생성이나 commit/push를 완료 조건으로 요구하지 않는다.**
