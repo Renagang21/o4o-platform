@@ -1,7 +1,7 @@
 # WO-O4O-INTEGRATION-LOCAL-HANDOFF-V1 — 클라우드 통합 세션이 못 하는 일의 LOCAL 인계
 
 > **상태**: ACTIVE
-> **작성일**: 2026-11-07 · **최종 갱신**: 2026-11-07
+> **작성일**: 2026-11-07 · **최종 갱신**: 2026-11-08 (§5-A 완료 · §6 기록)
 > **실행 위치**: LOCAL
 > **인계**: PR #985 로 main 반영 · 다음 실행자 LOCAL(통합 담당) — 결과는 최신 `origin/main` 에서 새 branch(`wo/integration-local-handoff-result` 등)로 기록한다
 > **근거**: 통합 담당 지시(2026-11-07 — "클라우드 통합 세션이 못 하는 일은 정리해서 로컬 에이전트에게 넘긴다") · [`IR-O4O-UNMERGED-BRANCH-AND-PR-DISPOSITION-V1`](../investigations/IR-O4O-UNMERGED-BRANCH-AND-PR-DISPOSITION-V1.md) §6 (#984) · PR #968 통합 확인 코멘트
@@ -46,18 +46,18 @@
 
 ### A. 원격 branch 정리 (지금 실행)
 
-- [ ] [LOCAL] 기준 checkout 에서 `git fetch origin --prune`, `gh auth status` 로그인 확인.
-- [ ] [LOCAL] IR §6 의 PowerShell 블록 전체를 `$env:TEMP\cleanup-branches.ps1` 로 저장한다.
-- [ ] [LOCAL] 미리보기: 저장소 checkout 에서 `& "$env:TEMP\cleanup-branches.ps1"`(선택 포함 시 `-IncludeOptional`).
+- [x] [LOCAL] 기준 checkout 에서 `git fetch origin --prune`, `gh auth status` 로그인 확인.
+- [x] [LOCAL] IR §6 의 PowerShell 블록 전체를 `$env:TEMP\cleanup-branches.ps1` 로 저장한다.
+- [x] [LOCAL] 미리보기: 저장소 checkout 에서 `& "$env:TEMP\cleanup-branches.ps1"`(선택 포함 시 `-IncludeOptional`).
   - 기대값: `To delete: 86  Skipped: 0`(선택 포함 시 89).
   - `has an open PR` 로 건너뛴 branch 가 있으면 그 PR 이 새로 열린 것이다. 삭제하지 말고 그대로 둔다.
   - `tip changed ... re-check needed` 가 있으면 조사 뒤 새 push 가 있었던 branch 다. 이 WO 의 결과 칸에 이름을 적고 실행에서 빠진 채로 둔다.
-- [ ] [LOCAL] 미리보기 결과를 확인한 뒤 실행: `& "$env:TEMP\cleanup-branches.ps1" -Execute`(선택 포함 시 `-IncludeOptional` 도 같이).
+- [x] [LOCAL] 미리보기 결과를 확인한 뒤 실행: `& "$env:TEMP\cleanup-branches.ps1" -Execute`(선택 포함 시 `-IncludeOptional` 도 같이).
   - 실행 정책에 막히면 `powershell -ExecutionPolicy Bypass -File "$env:TEMP\cleanup-branches.ps1" -Execute`.
   - `failed` 가 나오면 lease 가 거절한 것이다(그사이 tip 이 바뀜). 재시도하지 말고 이름만 기록한다.
-- [ ] [LOCAL] 확인: `git ls-remote --heads origin` 의 branch 수를 센다. 기대값은 `main` + 그 시점 열린 PR branch + KEEP 2 + (선택을 빼고 실행했다면) 선택 3.
-- [ ] [LOCAL] 임시 파일 `$env:TEMP\cleanup-branches.ps1` 을 지운다.
-- [ ] [LOCAL] 아래 6절 결과 칸을 채워 이 WO 를 갱신한다. 최신 `origin/main` 에서 새 worktree · branch 를 만들어 commit · push 하고 PR 을 연다(#985 는 이미 병합된 PR 이라 그 branch 에 쌓지 않는다 — `AGENTS.md` §4-1(e)).
+- [x] [LOCAL] 확인: `git ls-remote --heads origin` 의 branch 수를 센다. 기대값은 `main` + 그 시점 열린 PR branch + KEEP 2 + (선택을 빼고 실행했다면) 선택 3.
+- [ ] [LOCAL] 임시 파일 `$env:TEMP\cleanup-branches.ps1` 을 지운다. (실행 PC 의 사본 정리는 6절 참고)
+- [x] [LOCAL] 아래 6절 결과 칸을 채워 이 WO 를 갱신한다. 최신 `origin/main` 에서 새 worktree · branch 를 만들어 commit · push 하고 PR 을 연다(#985 는 이미 병합된 PR 이라 그 branch 에 쌓지 않는다 — `AGENTS.md` §4-1(e)).
 
 ### B. #968 운영 반영 (대기 — #968 병합 후에만)
 
@@ -101,11 +101,19 @@ SELECT count(*) AS article_rows FROM public.community_news_articles;
 
 ## 6. 결과 기록 (LOCAL 이 채운다)
 
-- A. 실행 일시 · 실행자:
-- A. 미리보기 `To delete / Skipped`:
-- A. `-IncludeOptional` 사용 여부:
-- A. 실행 결과 `deleted / failed`, 건너뛴 · 실패한 branch 이름:
-- A. 실행 뒤 원격 branch 수:
+- A. 실행 일시 · 실행자: 2026-11-08 · 통합 담당이 로컬 PowerShell 에서 직접 실행. 미리보기와 기록은 LOCAL Claude Code 세션이 했다. 이 세션은 원격 branch 삭제가 막혀 있다.
+- A. 미리보기 `To delete / Skipped`: `89 / 0`(선택 포함). 세션 PC 와 실행 PC 에서 각각 돌렸고 결과가 같았다. 새로 열린 PR 과 tip 변경은 없었다.
+- A. `-IncludeOptional` 사용 여부: 사용. 선택 3개(`wo/store-daily-workflow-upgrade` · `wo/store-signage-workspace` · `wo/store-video-single-list`)를 포함했다.
+- A. 실행 결과 `deleted / failed`, 건너뛴 · 실패한 branch 이름: `Done: deleted 89  failed 0`. 건너뛴 branch 와 실패한 branch 는 없다.
+- A. 실행 뒤 원격 branch 수: 11 (2026-11-08 `git ls-remote --heads origin`)
+  - `main` 1
+  - 열린 PR branch 6: #968 `wo/community-industry-news-v2` · #976 `wo/ci-short-job-consolidation` · #980 `wo/promote-same-sha-guard` · #981 `wo/main-verified-reuse` · #987 `claude/relaxed-newton-7y8pln` · #992 `claude/vibrant-allen-56f5dq`
+  - KEEP 2: `wo/pharmacyhub-residual-integration` · `wo/four-service-full-retirement-v1`
+  - IR 조사 범위 밖 2. 이번에 손대지 않았고, 통합 담당이 판단한다.
+    - `wo/delivery-cancelled-report`: PR 없음. tip `82a07afc63`(2026-11-07 14:42Z)으로 IR 조사 뒤에 push 됐다.
+    - `claude/elegant-albattani-5x2elv`: #988 이 병합되지 않고 CLOSED 됐다. 같은 branch 의 #985 는 MERGED 다. tip `fa02b4f0e7`.
+  - #975 는 그사이 MERGED 됐다(2026-11-08). head branch 는 자동 삭제됐다.
+- A. 임시 스크립트: 세션 PC 에서는 저장소 밖 두 곳(세션 scratchpad · `C:\Users\sohae\cleanup-branches.ps1`)에 사본이 생겼다. 실행 PC 에도 `C:\Users\sohae\cleanup-branches.ps1` 이 있다. 저장소 안에는 파일이 생기지 않았다. 정리 상태는 PR 에 적는다.
 - B. (대기)
 
 ## 7. 검증 계획
