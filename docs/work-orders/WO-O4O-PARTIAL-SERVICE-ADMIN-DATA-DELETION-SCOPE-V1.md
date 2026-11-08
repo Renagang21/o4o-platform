@@ -1,9 +1,9 @@
 # 일부 이용자 서비스(공급자 · 파트너 · 약국협업체) admin 의 「서비스 데이터만 삭제」 범위 조사
 
 > **상태**: ACTIVE
-> **작성일**: 2026-11-07 · **최종 갱신**: 2026-11-08 (§8 CLOUD 조사 결과)
+> **작성일**: 2026-11-07 · **최종 갱신**: 2026-11-08 (§8 CLOUD 조사 결과 · D1~D5 확정)
 > **실행 위치**: BOTH
-> **인계**: claude/vibrant-allen-56f5dq · 다음 실행자 **사용자 결정(§8-6)** → LOCAL (§7 운영 건수 확인) → CLOUD (구현 WO)
+> **인계**: claude/vibrant-allen-56f5dq · 다음 실행자 LOCAL (§7 운영 건수 확인) · 통합 담당 (공급자 구현 WO §6 승인)
 > **근거**: 2026-11-07 사용자 확정(아래 §2) · admin.neture.co.kr 운영자 메뉴 정리 PR(같은 branch) · [`WO-O4O-SERVICE-MEMBERSHIP-TERMINATION-GLOBAL-IDENTITY-DECOUPLING-V1`](WO-O4O-SERVICE-MEMBERSHIP-TERMINATION-GLOBAL-IDENTITY-DECOUPLING-V1.md) · [`WO-O4O-TWO-STAGE-ACCOUNT-ERASURE-CORE-V1`](WO-O4O-TWO-STAGE-ACCOUNT-ERASURE-CORE-V1.md) · [`O4O-PRIVACY-DATA-RETENTION-POLICY-V1`](../baseline/O4O-PRIVACY-DATA-RETENTION-POLICY-V1.md)
 
 이 문서는 **조사 지시서**다. 삭제 기능 구현 · 운영 데이터 변경은 범위 밖이며, 조사 결과로 범위를 확정한 뒤 별도 구현 WO 를 연다.
@@ -60,9 +60,9 @@
 - [x] [CLOUD] §3-1 · §3-2 서비스별 데이터 목록과 삭제 · 보존 분류표 작성 (코드 · entity · migration 기준) — §8-1~§8-3 (2026-11-08)
 - [x] [CLOUD] §3-3 기존 삭제 경로가 지우는 범위와 빠진 범위 대조 — §8-4
 - [x] [CLOUD] §3-4 · §3-5 · §3-6 제안 작성 — §8-5
-- [ ] [사용자] §8-6 결정 D1~D5
+- [x] [사용자] §8-6 결정 D1~D5 — 2026-11-08 모두 제안대로 확정
 - [ ] [LOCAL] §7 read-only 조회로 서비스별 대상 규모 확인(건수만, 마스킹)
-- [ ] [CLOUD] 결과로 구현 WO 작성(서비스별 1 PR · core 먼저)
+- [ ] [CLOUD] 결과로 구현 WO 작성(서비스별 1 PR · core 먼저) — 공급자: [`WO-O4O-SUPPLIER-SERVICE-DATA-DELETION-V1`](WO-O4O-SUPPLIER-SERVICE-DATA-DELETION-V1.md)(2026-11-08 작성, 통합 담당 승인 대기). 파트너 · 약국협업체는 공급자 구현 후
 
 ## 7. 검증 계획 — LOCAL read-only 조회
 
@@ -168,7 +168,7 @@ SELECT status, COUNT(*) AS n FROM cooperative_memberships GROUP BY status ORDER 
 - **UI(§3-6):** 공급자 · 파트너는 admin.neture.co.kr 중앙 운영 `/operations/{service}/members` 의 admin 등급 작업으로 둔다. 약국협업체는 사업 운영자가 일하는 각 사업 화면(web-pharmacy-business · web-pharmacy-coop · carepharm)에 둔다 — 사업 운영자 지정 구조(`semi_franchise_operators`)가 그쪽에 있다.
 - **구현 순서(AGENTS.md §4-3 R2):** 공통 실행 틀 + 서비스별 handler 를 서비스당 1 PR. 순서 제안: 공급자 → 파트너 → 약국협업체. migration 이 필요하면(삭제 이력 테이블 등) migration lane 규칙과 통합 담당 승인을 따른다.
 
-### 8-6. 사용자 결정 필요
+### 8-6. 사용자 결정 — **2026-11-08 확정: D1~D5 모두 제안대로**
 
 - **D1** 선행 조건: 「참여 해지 + 진행 주문 · 미정산 0」일 때만 서비스 데이터 삭제 허용 — 제안: 예
 - **D2** 파트너 게시글 · 댓글: 익명화(본문 비움, 스레드 유지) vs 행 완전삭제 — 제안: 익명화
