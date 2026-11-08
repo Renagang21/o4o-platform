@@ -136,14 +136,10 @@ export class HandoffExchangeController extends BaseController {
         );
       }
 
-      // 3. Load fresh roles from role_assignments
-      const roles = await roleAssignmentService.getRoleNames(user.id);
-
-      // 4. Project verified main access while preserving independent service approvals.
-      const memberships = await readUserMembershipsWithMainAccess(user.id);
-
       // §8-2: 대상 종류 판정 — WORKSPACE(store) 면 organization 축으로 재검증하고 origin 을 고정한다.
       //   토큰은 이미 원자적으로 소비됐으므로(단일 사용) 여기서 거부되면 재사용될 수 없다.
+      //   WO-O4O-AUTH-ONBOARDING-UX-CLEANUP-V1 T3: origin 판정은 DB 조회가 없으므로 아래 읽기 조회보다 먼저 한다
+      //   (거부 결과 · 응답은 종전과 같다).
       if (payload.targetWorkspace !== undefined) {
         if (!isStoreWorkspaceExchangeOrigin(req.get('origin'))) {
           logger.warn(
@@ -161,7 +157,19 @@ export class HandoffExchangeController extends BaseController {
             'HANDOFF_TOKEN_INVALID',
           );
         }
-        const stores = await resolveAccessibleStores(AppDataSource, user.id);
+      }
+
+      // 3~4. 역할(role_assignments) · 멤버십(main 접근 투영) · (WORKSPACE 면) 접근 가능 매장 — 서로 의존하지 않는 읽기라 병렬로 조회한다.
+      const [roles, memberships, workspaceStores] = await Promise.all([
+        roleAssignmentService.getRoleNames(user.id),
+        readUserMembershipsWithMainAccess(user.id),
+        payload.targetWorkspace !== undefined
+          ? resolveAccessibleStores(AppDataSource, user.id)
+          : Promise.resolve(null),
+      ]);
+
+      if (payload.targetWorkspace !== undefined) {
+        const stores = workspaceStores ?? [];
         if (
           stores.length === 0 &&
           (await getNetureMainMembershipStatus(AppDataSource, user.id)) !==

@@ -1,6 +1,7 @@
 # 커뮤니티 약업계 주요 소식
 
 > 상태: COMPLETED · 작성일: 2026-10-21 · 최종 확인: 2026-10-23 · 범위: community 전용 뉴스·운영 AI 초안
+> 후속: [WO-O4O-COMMUNITY-INDUSTRY-NEWS-V2](WO-O4O-COMMUNITY-INDUSTRY-NEWS-V2.md) — 전체 기사 AI 선별 · 자동 게시. 정기 실행과 운영 화면은 V2 로 옮겨졌고, 아래는 V1 당시 기록이다.
 
 ## 사용자 확정
 

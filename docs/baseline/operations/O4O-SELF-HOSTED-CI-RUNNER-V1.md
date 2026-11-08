@@ -79,13 +79,12 @@ schedule 이벤트에는 repository payload 가 없어 2-2 식이 항상 호스�
 | | Code Quality Check | Linux 일반 | 지원 | Sonar 단계는 기존대로 private 에서 skip |
 | | API Server Jest (1~3/3) | Linux 일반 | 지원 | 실행기 1대면 3 shard 가 순차 → wall-clock 증가 |
 | | Build Applications · Web production build | Linux 일반 | 지원 | |
-| | Docs Fast · Admin Fast ×2 · Docs sensitive guard | Linux 일반 | 지원 | |
+| | Docs Fast · Admin Fast ×2 (문서 민감정보 guard · RoleGuard 는 Detect 의 step) | Linux 일반 | 지원 | |
 | | Central operator PostgreSQL integration | Linux 일반 | 지원 | service container — 실행기에 Docker 필요. host port `55432` 고정이라 같은 PC 동시 실행 불가(순차 전제) |
 | | API production dependency smoke | Linux 일반 | 지원 | `$RUNNER_TEMP` 만 사용 |
 | | PC installer Windows | Windows 전용 | 지원(기본 보류 권장) | §5-3 |
 | | **CI Gate** | 관리(결과 집계) | 지원 | 이름 · `if: always()` · needs 불변 |
 | `scheduled-api-full-jest.yml` | plan · 3 shard · aggregate | Linux 일반 | 지원 | 판정 job(§2-3)은 호스팅 고정 |
-| `ci-guard-policy.yml` | Guard Static Analysis | Linux 일반 | 지원 | |
 | `ci-appstore-guard.yml` | AppStore Consistency Guard | Linux 일반 | 지원 | |
 | `automation-pr-labeler.yml` | Apply Size Labels | 관리 | 지원 | `actions/github-script` 는 runner 내장 Node 로 동작 · `GITHUB_TOKEN` 만 사용 |
 | `automation-repo-setup.yml` | Create Missing Labels | 관리 | 보류 | `.github/labeler.yml` 변경 시만 · 실행 빈도가 낮아 효과 없음 |

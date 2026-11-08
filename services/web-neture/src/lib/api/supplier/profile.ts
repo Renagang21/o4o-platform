@@ -75,7 +75,7 @@ export const supplierProfileApi = {
     shippingStandard?: string | null;
     shippingIsland?: string | null;
     shippingMountain?: string | null;
-  }): Promise<{ success: boolean; error?: string }> {
+  }): Promise<{ success: boolean; error?: string; data?: Partial<SupplierProfile> }> {
     try {
       const response = await api.patch('/neture/supplier/profile', data);
       return response.data;

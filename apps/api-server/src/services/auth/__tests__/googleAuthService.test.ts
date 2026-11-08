@@ -190,11 +190,30 @@ describe('GoogleAuthService — Google-only Signup/Login', () => {
     semiFranchiseResolver = jest.fn(async (_userId: string, key: string) => decideSemiFranchiseAccess(key, semiFranchiseRows));
   });
 
-  it.each(['', '   ', 'x'.repeat(101)])('signup rejects a missing or oversized name before creating an account', async (name) => {
+  it('signup rejects an oversized name before creating an account', async () => {
     build({ 'tok-a': { sub: SUB_A, email: 'new@example.test', emailVerified: true } });
-    await expect(svc.signup({ idToken: 'tok-a', consents: { ...CONSENTS, name }, ...META })).rejects.toMatchObject({ code: 'INVALID_NAME' });
+    await expect(svc.signup({ idToken: 'tok-a', consents: { ...CONSENTS, name: 'x'.repeat(101) }, ...META })).rejects.toMatchObject({ code: 'INVALID_NAME' });
     expect(store.users).toHaveLength(0);
     expect(store.linked).toHaveLength(0);
+  });
+
+  it('signup rejects a malformed phone when one is given', async () => {
+    build({ 'tok-a': { sub: SUB_A, email: 'new@example.test', emailVerified: true } });
+    await expect(svc.signup({ idToken: 'tok-a', consents: { ...CONSENTS, phone: '02-123-4567' }, ...META })).rejects.toMatchObject({ code: 'INVALID_PHONE' });
+    expect(store.users).toHaveLength(0);
+  });
+
+  // WO-O4O-AUTH-ONBOARDING-UX-CLEANUP-V1 T2: 이름 · 휴대전화는 가입 선택 항목이다.
+  it.each([
+    [{ name: '', phone: '' }],
+    [{ name: '   ', phone: '   ' }],
+    [{ name: undefined, phone: undefined }],
+  ])('signup without name and phone creates the account with them unset (%j)', async (over) => {
+    build({ 'tok-a': { sub: SUB_A, email: 'new@example.test', emailVerified: true } });
+    await svc.signup({ idToken: 'tok-a', consents: { ...CONSENTS, ...over }, ...META });
+    expect(store.users).toHaveLength(1);
+    expect(store.users[0].name ?? null).toBeNull();
+    expect(store.users[0].phone ?? null).toBeNull();
   });
 
   // ── signup ────────────────────────────────────────────────────────────────

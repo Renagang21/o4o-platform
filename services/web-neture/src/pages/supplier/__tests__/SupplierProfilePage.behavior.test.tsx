@@ -171,7 +171,7 @@ describe('SupplierProfilePage existing section ownership', () => {
     expect(api.profile.getProfile).toHaveBeenCalledTimes(1);
     expect(api.onboarding.getOnboarding).toHaveBeenCalledTimes(1);
   });
-  it('saves business/contact/shipping through profile while excluding tax and account fields', async () => {
+  it('saves only the business group fields from the business save button', async () => {
     render(<SupplierProfilePage />);
     await loaded();
     fireEvent.change(screen.getByPlaceholderText('홍길동'), {
@@ -181,16 +181,14 @@ describe('SupplierProfilePage existing section ownership', () => {
     fireEvent.change(screen.getByLabelText(/^세금계산서 이메일/), {
       target: { value: 'fixture-tax@example.invalid' },
     });
-    fireEvent.click(screen.getByRole('button', { name: '저장', exact: true }));
+    fireEvent.change(screen.getByLabelText('기본 배송비 (원)'), { target: { value: '4500' } });
+    fireEvent.click(screen.getByRole('button', { name: '사업자 정보 저장' }));
     await waitFor(() => expect(api.profile.updateProfile).toHaveBeenCalledTimes(1));
     const payload = api.profile.updateProfile.mock.lastCall?.[0];
     expect(payload).toEqual(
       expect.objectContaining({
         representativeName: '수정 대표',
         businessAddress: '검증 주소',
-        baseShippingFee: 3000,
-        freeShippingThreshold: null,
-        contactEmailVisibility: 'public',
       }),
     );
     for (const key of [
@@ -198,6 +196,10 @@ describe('SupplierProfilePage existing section ownership', () => {
       'settlementBankName',
       'settlementAccountNumber',
       'mailOrderSalesStatus',
+      // 다른 묶음의 저장하지 않은 편집은 보내지 않는다
+      'baseShippingFee',
+      'contactEmailVisibility',
+      'managerName',
     ])
       expect(payload).not.toHaveProperty(key);
     expect(api.onboarding.updateOnboarding).not.toHaveBeenCalled();
@@ -206,8 +208,9 @@ describe('SupplierProfilePage existing section ownership', () => {
     api.profile.getProfile.mockResolvedValue({ ...profile, businessEntityType: '' });
     render(<SupplierProfilePage />); await loaded();
     fireEvent.change(screen.getByLabelText('담당자 이메일'), { target: { value: 'person@example.invalid' } });
-    fireEvent.click(screen.getByRole('button', { name: '저장', exact: true }));
-    await waitFor(() => expect(api.profile.updateProfile).toHaveBeenCalledWith(expect.objectContaining({ managerEmail: 'person@example.invalid', businessEntityType: undefined })));
+    fireEvent.click(screen.getByRole('button', { name: '연락처 저장' }));
+    await waitFor(() => expect(api.profile.updateProfile).toHaveBeenCalledWith(expect.objectContaining({ managerEmail: 'person@example.invalid' })));
+    expect(api.profile.updateProfile.mock.lastCall?.[0]).not.toHaveProperty('businessEntityType');
   });
   it.each(['simple_taxpayer', 'general_taxpayer', 'tax_exempt', 'non_profit', 'other'])(
     'requires an explicit individual/corporation choice for %s without guessing', async (legacy) => {
@@ -218,11 +221,11 @@ describe('SupplierProfilePage existing section ownership', () => {
       expect(select.required).toBe(false);
       expect(select.value).toBe('');
       expect(Array.from(select.options, (option) => option.value)).toEqual(['', 'individual', 'corporation']);
-      fireEvent.click(screen.getByRole('button', { name: '저장', exact: true }));
+      fireEvent.click(screen.getByRole('button', { name: '사업자 정보 저장' }));
       await screen.findByText('세금계산서 발행을 위한 개인 / 법인 구분을 선택해 주시기 바랍니다.');
       expect(api.profile.updateProfile).not.toHaveBeenCalled();
       fireEvent.change(select, { target: { value: 'corporation' } });
-      fireEvent.click(screen.getByRole('button', { name: '저장', exact: true }));
+      fireEvent.click(screen.getByRole('button', { name: '사업자 정보 저장' }));
       await waitFor(() => expect(api.profile.updateProfile).toHaveBeenCalledWith(
         expect.objectContaining({ businessEntityType: 'corporation' }),
       ));
@@ -235,7 +238,7 @@ describe('SupplierProfilePage existing section ownership', () => {
     expect(input.disabled).toBe(false);
     expect(input.value).toBe(profile.name);
     fireEvent.change(input, { target: { value: '  변경 공급자  ' } });
-    fireEvent.click(screen.getByRole('button', { name: '저장', exact: true }));
+    fireEvent.click(screen.getByRole('button', { name: '사업자 정보 저장' }));
     await waitFor(() => expect(api.profile.updateProfile).toHaveBeenCalledWith(
       expect.objectContaining({ name: '변경 공급자' }),
     ));
@@ -250,7 +253,7 @@ describe('SupplierProfilePage existing section ownership', () => {
     render(<SupplierProfilePage />);
     await loaded();
     fireEvent.change(screen.getByLabelText('상호명'), { target: { value: '   ' } });
-    fireEvent.click(screen.getByRole('button', { name: '저장', exact: true }));
+    fireEvent.click(screen.getByRole('button', { name: '사업자 정보 저장' }));
     await screen.findByText('상호명을 1~255자로 입력해 주시기 바랍니다.');
     expect(api.profile.updateProfile).not.toHaveBeenCalled();
   });
@@ -266,17 +269,25 @@ describe('SupplierProfilePage existing section ownership', () => {
     fireEvent.change(screen.getByLabelText('기본 배송비 (원)'), {
       target: { value: '4500' },
     });
-    fireEvent.click(screen.getByRole('button', { name: '저장', exact: true }));
+    fireEvent.click(screen.getByRole('button', { name: '연락처 저장' }));
     await waitFor(() => expect(api.profile.updateProfile).toHaveBeenCalledTimes(1));
     expect(api.profile.updateProfile.mock.lastCall?.[0]).toEqual(
       expect.objectContaining({
         managerName: '검증 담당자 변경',
         contactEmail: 'updated@example.invalid',
-        baseShippingFee: 4500,
+        contactEmailVisibility: 'public',
       }),
     );
+    expect(api.profile.updateProfile.mock.lastCall?.[0]).not.toHaveProperty('baseShippingFee');
+    await screen.findByText('담당자 · 공개 연락처가 저장되었습니다.');
+    fireEvent.click(screen.getByRole('button', { name: '주문 · 배송 조건 저장' }));
+    await waitFor(() => expect(api.profile.updateProfile).toHaveBeenCalledTimes(2));
+    expect(api.profile.updateProfile.mock.lastCall?.[0]).toEqual(
+      expect.objectContaining({ baseShippingFee: 4500, freeShippingThreshold: null, minOrderAmount: 10000 }),
+    );
+    expect(api.profile.updateProfile.mock.lastCall?.[0]).not.toHaveProperty('managerName');
   });
-  it('keeps onboarding tax/account/mail-order fields under its own save button', async () => {
+  it('keeps onboarding tax/account fields under the settlement save without mail-order fields', async () => {
     render(<SupplierProfilePage />);
     await loaded();
     fireEvent.change(screen.getByPlaceholderText('tax@company.com'), {
@@ -288,9 +299,10 @@ describe('SupplierProfilePage existing section ownership', () => {
       expect.objectContaining({
         taxInvoiceEmail: 'fixture-tax@example.invalid',
         settlementBankName: '검증 은행',
-        mailOrderSalesStatus: 'not_applicable',
       }),
     );
+    expect(api.onboarding.updateOnboarding.mock.lastCall?.[0]).not.toHaveProperty('mailOrderSalesStatus');
+    expect(api.onboarding.updateOnboarding.mock.lastCall?.[0]).not.toHaveProperty('mailOrderSalesRegistrationNumber');
     expect(api.profile.updateProfile).not.toHaveBeenCalled();
   });
   it('shows profile save failures without claiming a saved state', async () => {
@@ -300,7 +312,7 @@ describe('SupplierProfilePage existing section ownership', () => {
     });
     render(<SupplierProfilePage />);
     await loaded();
-    fireEvent.click(screen.getByRole('button', { name: '저장', exact: true }));
+    fireEvent.click(screen.getByRole('button', { name: '사업자 정보 저장' }));
     await screen.findByText('FIXTURE_PROFILE_FAILED');
     expect(screen.queryByRole('button', { name: '저장됨' })).toBeNull();
   });
@@ -410,5 +422,75 @@ describe('supplier profile save notice lifetime', () => {
       hook.unmount();
       expect(vi.getTimerCount()).toBe(0);
     } finally { vi.useRealTimers(); }
+  });
+});
+
+// WO-O4O-AUTH-ONBOARDING-UX-CLEANUP-V1 T4: 묶음 · 체크리스트 · 정산 보조 입력
+describe('supplier profile grouped layout', () => {
+  it('shows the four groups in order', async () => {
+    render(<SupplierProfilePage />);
+    await loaded();
+    const groups = screen.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
+    expect(groups).toEqual(
+      expect.arrayContaining(['1사업자 정보', '2담당자 · 공개 연락처', '3정산', '4판매 조건']),
+    );
+  });
+  it('lists missing required items from the server responses with links to their groups', async () => {
+    api.profile.getProfile.mockResolvedValue({ ...profile, missingProfileFields: ['managerPhone'] });
+    api.onboarding.getOnboarding.mockResolvedValue({ ...onboarding, missingSettlementFields: ['taxInvoiceEmail'] });
+    render(<SupplierProfilePage />);
+    await loaded();
+    const list = within(screen.getByRole('region', { name: /아직 입력하지 않은 필수 항목 2개/ }));
+    expect(list.getByRole('link', { name: /담당자 전화번호/ }).getAttribute('href')).toBe('#supplier-group-contact');
+    expect(list.getByRole('link', { name: /세금계산서 이메일/ }).getAttribute('href')).toBe('#supplier-group-settlement');
+  });
+  it('updates the checklist from the profile save response', async () => {
+    api.profile.getProfile.mockResolvedValue({ ...profile, missingProfileFields: ['managerPhone'] });
+    api.onboarding.getOnboarding.mockResolvedValue({ ...onboarding, missingSettlementFields: [] });
+    api.profile.updateProfile.mockResolvedValue({ success: true, data: { missingProfileFields: [] } });
+    render(<SupplierProfilePage />);
+    await loaded();
+    fireEvent.click(screen.getByRole('button', { name: '연락처 저장' }));
+    await screen.findByText('필수 항목을 모두 입력했습니다.');
+  });
+  it('saves mail-order fields separately and keeps its error out of the settlement section', async () => {
+    api.onboarding.updateOnboarding.mockResolvedValue({ success: false, error: 'MAIL_ORDER_REGISTRATION_NUMBER_REQUIRED' });
+    render(<SupplierProfilePage />);
+    await loaded();
+    fireEvent.click(screen.getByRole('button', { name: '통신판매업 정보 저장' }));
+    await waitFor(() => expect(api.onboarding.updateOnboarding).toHaveBeenCalledTimes(1));
+    expect(Object.keys(api.onboarding.updateOnboarding.mock.lastCall?.[0]).sort()).toEqual([
+      'mailOrderSalesRegistrationNumber',
+      'mailOrderSalesStatus',
+    ]);
+    await card('통신판매업 신고 정보').findByText('MAIL_ORDER_REGISTRATION_NUMBER_REQUIRED');
+    expect(card('공급자 서류 및 정산 정보').queryByText('MAIL_ORDER_REGISTRATION_NUMBER_REQUIRED')).toBeNull();
+  });
+  it('copies the manager into the settlement contact while "same as manager" is checked', async () => {
+    api.profile.getProfile.mockResolvedValue({ ...profile, managerEmail: 'manager@example.invalid' });
+    render(<SupplierProfilePage />);
+    await loaded();
+    fireEvent.click(screen.getByLabelText('정산 담당자가 담당자와 같음'));
+    expect((screen.getByLabelText('정산 담당자명') as HTMLInputElement).value).toBe('검증 담당자');
+    expect((screen.getByLabelText('정산 담당자 이메일') as HTMLInputElement).value).toBe('manager@example.invalid');
+    fireEvent.click(screen.getByRole('button', { name: '정산 정보 저장' }));
+    await waitFor(() => expect(api.onboarding.updateOnboarding).toHaveBeenCalledWith(
+      expect.objectContaining({ settlementContactName: '검증 담당자', settlementContactEmail: 'manager@example.invalid' }),
+    ));
+  });
+  it('fills the account holder from the business name only when asked', async () => {
+    api.onboarding.getOnboarding.mockResolvedValue({ ...onboarding, settlementAccountHolder: '' });
+    render(<SupplierProfilePage />);
+    await loaded();
+    const holder = screen.getByLabelText(/^예금주/) as HTMLInputElement;
+    expect(holder.value).toBe('');
+    fireEvent.click(screen.getByRole('button', { name: '상호명으로 채우기' }));
+    expect(holder.value).toBe('검증 공급자');
+  });
+  it('marks the invoice email as required for settlement', async () => {
+    render(<SupplierProfilePage />);
+    await loaded();
+    expect(screen.getByLabelText(/^세금계산서 이메일/).closest('div')?.textContent).toContain('*');
+    expect(screen.queryByText('세금계산서 이메일 (선택)')).toBeNull();
   });
 });

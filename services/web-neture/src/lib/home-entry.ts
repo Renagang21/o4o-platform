@@ -480,11 +480,17 @@ export async function openServiceEntry(serviceKey: string, returnPath?: string):
 
 /**
  * WO-O4O-DEMO-LOGIN-ENTRY-AND-EXPERIENCE-UX-V1 — 로그인 직후 Store Workspace 로 바로 가는 URL.
- * 홈 매장 카드와 **같은 계산**(`buildHomeEntryModel` 의 store 항목)과 **같은 handoff**(`resolveServiceEntryUrl`)다 —
+ * 홈 매장 카드와 **같은 계산**(`buildHomeEntryModel` 의 store 항목)과 **같은 handoff**(`resolveHomeEntryUrl`)다 —
  * 새 경로 · 우회 없음. 매장이 정확히 하나일 때만 이동한다(복수 매장 자동 선택 금지 원칙 유지).
  */
 export async function resolveSingleStoreWorkspaceUrl(user: User): Promise<string> {
-  const data = await fetchHomeEntryData();
+  // WO-O4O-AUTH-ONBOARDING-UX-CLEANUP-V1 T3: 매장 항목의 출처는 `workspaceStores`(GET /work-scope/accessible-stores) 하나다.
+  //   홈 전체 조회(GET 5건) 대신 그 한 건만 읽고, 나머지 출처는 빈 값으로 둔 채 **같은 모델 계산**을 쓴다 —
+  //   매장 항목(handoff · workspace)은 다른 출처의 영향을 받지 않는다(관리 링크는 internal · public 이라 아래 filter 가 뺀다).
+  const res = await api.get('/work-scope/accessible-stores');
+  const workspaceStores = res.data?.data?.stores;
+  if (!Array.isArray(workspaceStores)) throw new Error('bad response');
+  const data: HomeEntryData = { services: [], stores: [], workspaceStores, branches: [], serviceStates: NONE_SERVICE_STATES, operatorServices: [], communities: [] };
   const items = (buildHomeEntryModel(user, data).groups.find((g) => g.id === 'store')?.items ?? [])
     .filter((item) => item.action.kind === 'handoff' || item.action.kind === 'workspace');
   const only = items.length === 1 ? items[0].action : null;

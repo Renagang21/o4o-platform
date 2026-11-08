@@ -1,6 +1,7 @@
 import axios from "axios";
 import { parse, type HTMLElement } from "node-html-parser";
 import { setTimeout as pause } from "node:timers/promises";
+import { parseStringPromise } from "xml2js";
 import { NEWS_SOURCES, newsKey, newsSource } from "./community-news-policy.js";
 
 export type NewsSourceId = (typeof NEWS_SOURCES)[number]["id"];
@@ -155,13 +156,17 @@ export function robotsPolicy(content: string, path = "/") {
   };
 }
 
-async function read(url: string, maxBytes: number) {
+async function read(
+  url: string,
+  maxBytes: number,
+  accept = "text/html,text/plain;q=0.9",
+) {
   const response = await axios.get<string>(url, {
     timeout: 15000,
     maxRedirects: 0,
     maxContentLength: maxBytes,
     responseType: "text",
-    headers: { "User-Agent": USER_AGENT, Accept: "text/html,text/plain;q=0.9" },
+    headers: { "User-Agent": USER_AGENT, Accept: accept },
   });
   if (typeof response.data !== "string")
     throw new Error("SOURCE_INVALID_RESPONSE");
@@ -177,4 +182,114 @@ export async function collectSource(
   if (!robots.allowed) throw new Error("ROBOTS_BLOCKED");
   if (robots.delayMs) await pause(robots.delayMs);
   return parseNewsPage(sourceId, await read(page, 2000000));
+}
+
+/** Verified feed addresses (2026-11-07). A publisher moving its feed fails closed as unavailable. */
+export const FEED_URLS: Record<NewsSourceId, string> = {
+  kpanews: "https://www.kpanews.co.kr/rss/allArticle.xml",
+  dailypharm: "https://www.dailypharm.com/rss/news.xml",
+  medipana: "https://www.medipana.com/rss/allArticle.xml",
+};
+const MAX_FEED_BYTES = 5000000;
+const MAX_FEED_ITEMS = 200;
+export interface FeedArticle {
+  url: string;
+  title: string;
+  lead: string;
+  section: string | null;
+  publishedAt: Date;
+}
+/** Bare `YYYY-MM-DD HH:mm:ss` from these publishers is KST, never UTC. RFC 822 carries its own zone. */
+export function parseFeedDate(raw: unknown): Date | null {
+  if (typeof raw !== "string") return null;
+  const value = raw.trim();
+  const bare = /^(\d{4}-\d{2}-\d{2}) (\d{2}:\d{2}:\d{2})$/.exec(value);
+  let parsed: Date | null = null;
+  if (bare) parsed = new Date(`${bare[1]}T${bare[2]}+09:00`);
+  else if (
+    /^[A-Za-z]{3}, \d{1,2} [A-Za-z]{3} \d{4} \d{2}:\d{2}(:\d{2})? ([+-]\d{4}|GMT|UTC|KST)$/.test(
+      value,
+    )
+  )
+    parsed = new Date(value.replace(/KST$/, "+0900"));
+  return parsed && !Number.isNaN(parsed.getTime()) ? parsed : null;
+}
+/** Canonical address keeping only the article identifier, so tracking variations cannot create a new article. */
+function feedArticleUrl(sourceId: NewsSourceId, raw: unknown) {
+  if (typeof raw !== "string") return null;
+  const key = articleLink(sourceId, raw.trim().replace(/^http:\/\//i, "https://"));
+  if (!key) return null;
+  const url = new URL(key);
+  url.search =
+    sourceId === "dailypharm" ? "" : `?idxno=${url.searchParams.get("idxno")}`;
+  return url.href.length <= 500 ? url.href : null;
+}
+/** xml2js yields a string, or an object with `_` when the element also has attributes. */
+function feedText(value: unknown): string {
+  const first = Array.isArray(value) ? value[0] : value;
+  if (typeof first === "string") return first;
+  const inner = (first as { _?: unknown } | undefined)?._;
+  return typeof inner === "string" ? inner : "";
+}
+/** Descriptions may carry escaped markup; only the visible text is kept. */
+function feedPlain(value: unknown, max: number) {
+  return parse(feedText(value))
+    .textContent.replace(/\s+/g, " ")
+    .trim()
+    .slice(0, max);
+}
+/**
+ * Feed XML is untrusted. Document type declarations are refused outright, so no external or custom
+ * entity can be defined; the input size is capped by read() and the item count here.
+ */
+export async function parseNewsFeed(
+  sourceId: NewsSourceId,
+  xml: string,
+): Promise<FeedArticle[]> {
+  if (/<!DOCTYPE|<!ENTITY/i.test(xml)) throw new Error("SOURCE_INVALID_RESPONSE");
+  let document: any;
+  try {
+    document = await parseStringPromise(xml, { strict: true, explicitArray: true });
+  } catch {
+    throw new Error("SOURCE_INVALID_RESPONSE");
+  }
+  const entries: any[] = document?.rss?.channel?.[0]?.item ?? [];
+  const seen = new Set<string>(),
+    items: FeedArticle[] = [];
+  for (const entry of entries.slice(0, MAX_FEED_ITEMS)) {
+    const url = feedArticleUrl(sourceId, feedText(entry.link));
+    const title = feedPlain(entry.title, 160);
+    const publishedAt = parseFeedDate(feedText(entry.pubDate));
+    if (!url || !title || !publishedAt || seen.has(url)) continue;
+    seen.add(url);
+    items.push({
+      url,
+      title,
+      lead: feedPlain(entry.description, 240),
+      section: feedPlain(entry.category, 100) || null,
+      publishedAt,
+    });
+  }
+  if (!items.length) throw new Error("SOURCE_LAYOUT_CHANGED");
+  return items;
+}
+/** robots and the feed only: title, lead, section and time. Article pages are never requested. */
+export async function collectFeed(
+  sourceId: NewsSourceId,
+): Promise<FeedArticle[]> {
+  const feed = new URL(FEED_URLS[sourceId]);
+  const robots = robotsPolicy(
+    await read(new URL("/robots.txt", feed).href, 100000),
+    feed.pathname,
+  );
+  if (!robots.allowed) throw new Error("ROBOTS_BLOCKED");
+  if (robots.delayMs) await pause(robots.delayMs);
+  return parseNewsFeed(
+    sourceId,
+    await read(
+      feed.href,
+      MAX_FEED_BYTES,
+      "application/rss+xml,application/xml;q=0.9,text/xml;q=0.8",
+    ),
+  );
 }

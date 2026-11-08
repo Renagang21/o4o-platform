@@ -86,3 +86,44 @@ it('stores an unselected reviewed-signup marker only on the newly created Kakao 
     ),
   ).toBe(false);
 });
+
+// WO-O4O-AUTH-ONBOARDING-UX-CLEANUP-V1 T2: 이름 · 휴대전화는 가입 선택 항목이다.
+function kakaoHarness() {
+  const userCreate = jest.fn((v: any) => ({ ...v, id: randomUUID() }));
+  const manager = {
+    query: jest.fn(async () => []),
+    getRepository: (entity: unknown) => ({
+      create: entity === User ? userCreate : jest.fn((v: any) => v),
+      save: jest.fn(async (v: any) => v),
+    }),
+  };
+  const db = { getRepository: manager.getRepository, transaction: async (work: any) => work(manager) };
+  const flows = {
+    consume: jest.fn(async () => ({ service_key: 'neture', payload: { providerId: 'synthetic-provider', emailVerified: false } })),
+  };
+  const service = new KakaoAuthService(db as any, { exchangeCode: jest.fn() } as any, flows as any);
+  return { service, userCreate, flows };
+}
+
+it.each([[{}], [{ name: '', phone: '' }], [{ name: '  ', phone: '  ' }]])(
+  'Kakao signup without name and phone stores them unset (%j)',
+  async (over) => {
+    const h = kakaoHarness();
+    await h.service.signup('synthetic-flow', 'synthetic-binding', 'https://neture.co.kr', {
+      email: 'signup@fixture.invalid', nickname: 'Synthetic nick', consents: { terms: true, privacy: true }, ...over,
+    } as any);
+    const created = h.userCreate.mock.calls[0][0];
+    expect(created.name ?? null).toBeNull();
+    expect(created.phone ?? null).toBeNull();
+  },
+);
+
+it('Kakao signup rejects a malformed phone when one is given, before consuming the flow', async () => {
+  const h = kakaoHarness();
+  await expect(
+    h.service.signup('synthetic-flow', 'synthetic-binding', 'https://neture.co.kr', {
+      email: 'signup@fixture.invalid', phone: '02-123-4567', consents: { terms: true, privacy: true },
+    } as any),
+  ).rejects.toMatchObject({ code: 'INVALID_PHONE' });
+  expect(h.flows.consume).not.toHaveBeenCalled();
+});

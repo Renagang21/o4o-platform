@@ -40,11 +40,11 @@ export function useSupplierProfile() {
       setRegulatedCategories(null);
       setCategoriesLoadError(true);
     }
-    if (data) {
-      initializeProfile(data);
-      setTaxInvoiceEmail(data.taxInvoiceEmail || '');
-    }
+    if (data) initializeProfile(data);
+    // WO-O4O-AUTH-ONBOARDING-UX-CLEANUP-V1 T5: 세금계산서 이메일은 한 컬럼(neture_suppliers.tax_invoice_email)을
+    //   두 응답이 함께 돌려준다. 입력값은 한 번만 정한다 — onboarding 값 우선, 비었거나 조회 실패면 profile 값(기존 동작).
     if (onboardingData) initializeOnboarding(onboardingData, data?.taxInvoiceEmail);
+    else if (data) setTaxInvoiceEmail(data.taxInvoiceEmail || '');
     setLoading(false);
   }, [
     initializeProfile,
