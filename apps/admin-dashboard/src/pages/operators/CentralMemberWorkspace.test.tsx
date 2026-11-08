@@ -450,3 +450,12 @@ it('admin 「계정 삭제」 reports an unfinished deletion instead of success'
   expect(screen.queryByText('계정을 삭제했습니다.')).toBeNull();
   confirm.mockRestore();
 });
+it('admin 「이용·약국 관리」 still opens the panel with the access and pharmacy actions', async () => {
+  mountAdmin();
+  await selectFirstRow();
+  fireEvent.click(screen.getByRole('button', { name: '이용·약국 관리' }));
+  const panel = await screen.findByRole('complementary', { name: '선택 회원 작업' });
+  await waitFor(() => expect(within(panel).getByRole('region', { name: '회원 이용 관리' })).toBeTruthy());
+  expect(within(panel).queryByRole('button', { name: '계정·개인자료 완전삭제' })).toBeNull();
+  expect(api.delete).not.toHaveBeenCalled();
+});

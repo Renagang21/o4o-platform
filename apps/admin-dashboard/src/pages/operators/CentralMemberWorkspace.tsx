@@ -154,8 +154,7 @@ export default function CentralMemberWorkspace({ actorId, initialQuery = '', ini
   ];
   let panelContent = <button type="button" disabled={busy} onClick={() => { if (selectedId) void openMember(selectedId); }}>선택 회원 다시 조회</button>;
   if (reading) { panelContent = <output>회원 제출 정보를 확인하는 중…</output>; }
-  else if (detail) { panelContent = <MemberWorkPanel onErasureResult={result=>{if(result.erased){return;}
-    setRows(previous=>previous.map(row=>row.userId===detail.member.userId?{...row,accountActive:false}:row));setDetail(previous=>previous?{...previous,member:{...previous.member,accountActive:false}}:previous);setSelectedIds(new Set());}} onAccessLost={clearPrivate} adminMode={adminMode} key={`${detail.member.userId}:${detail.member.version}:${workMode}`} onModeChange={setWorkMode} mode={workMode} detail={detail} actorId={actorId} busy={busy} perform={perform} onBusyChange={value=>{lock.current=value;setBusy(value);}} />; }
+  else if (detail) { panelContent = <MemberWorkPanel onAccessLost={clearPrivate} adminMode={adminMode} key={`${detail.member.userId}:${detail.member.version}:${workMode}`} onModeChange={setWorkMode} mode={workMode} detail={detail} actorId={actorId} busy={busy} perform={perform} onBusyChange={value=>{lock.current=value;setBusy(value);}} />; }
   const deleteForbidden=adminMode?!permissions.erase:!permissions.edit;
   return <section className="space-y-4 min-w-0" aria-label="회원 업무">
     <h2 className="text-xl font-bold">{adminMode?'전체 회원':'회원 가입·이용 관리'}</h2>
@@ -164,8 +163,16 @@ export default function CentralMemberWorkspace({ actorId, initialQuery = '', ini
     {/* 패널이 열려 있으면 결과 · 오류는 패널 안에 보인다. 패널은 body 위 레이어라 여기 문구가 가려진다. */}
     {!selectedId && error && <p role="alert">{error}</p>}{!selectedId && notice && <output>{notice}</output>}
     <div className="[&>div>div]:flex-wrap"><ActionBar selectedCount={selectedIds.size} onClearSelection={()=>{if(busy)return;++detailSequence.current;setSelectedIds(new Set());setSelectedId(null);setDetail(null);setReading(false);}} actions={([
-      ['detail','회원 상세보기'],['edit','회원 정보 수정'],['reject','가입 반려'],['delete',adminMode?'계정 삭제':'회원 해지·복구'],['pharmacy','약국·사업자 정보'],
-    ] as const).map(([key,label])=>({key,label,visible:!protectedSelection||key==='detail',variant:workActionVariant(key,workMode),tooltip:key==='delete'&&deleteForbidden?'전체 관리자 권한이 필요합니다.':undefined,disabled:busy||loading||(key!=='detail'&&selectedIds.size!==1)||(key==='edit'&&!permissions.edit)||(key==='reject'&&!permissions.edit)||(key==='delete'&&deleteForbidden),onClick:()=>{const first=rows.find(row=>selectedIds.has(row.userId));if(!first)return;if(adminMode&&key==='delete'){void eraseAccount(first);return;}void openMember(first.userId,key);}}))}/></div>
+      ['detail','회원 상세보기'],['edit','회원 정보 수정'],['reject','가입 반려'],
+      // Admin: 「계정 삭제」는 바로 삭제하고, 이용 복구 · 약국 매도 이전 · 완전폐업은 「이용·약국 관리」 패널에서 한다(#990 Codex P1).
+      ...(adminMode?[['manage','이용·약국 관리'] as const]:[]),
+      ['delete',adminMode?'계정 삭제':'회원 해지·복구'],['pharmacy','약국·사업자 정보'],
+    ] as ReadonlyArray<readonly [MemberWorkMode|'manage',string]>).map(([key,label])=>{
+      const mode:MemberWorkMode=key==='manage'?'delete':key;
+      let variant=workActionVariant(mode,workMode);
+      if(key==='manage')variant=workMode==='delete'?'primary':'default';
+      return {key,label,visible:!protectedSelection||key==='detail',variant,tooltip:key==='delete'&&deleteForbidden?'전체 관리자 권한이 필요합니다.':undefined,disabled:busy||loading||(key!=='detail'&&selectedIds.size!==1)||(key==='edit'&&!permissions.edit)||(key==='reject'&&!permissions.edit)||(key==='manage'&&!permissions.edit)||(key==='delete'&&deleteForbidden),onClick:()=>{const first=rows.find(row=>selectedIds.has(row.userId));if(!first)return;if(adminMode&&key==='delete'){void eraseAccount(first);return;}void openMember(first.userId,mode);}};
+    })}/></div>
     {selectedIds.size>1 && <p className="text-sm text-slate-600">선택 회원은 순서대로 상세 검토할 수 있습니다. 수정·거부·삭제는 한 명씩 확인 후 진행합니다.</p>}
     {selectedId && createPortal(<aside ref={panel} tabIndex={-1} aria-label="선택 회원 작업" className="fixed inset-y-0 right-0 z-50 flex w-full max-w-full flex-col border-l border-slate-200 bg-white shadow-2xl outline-none sm:w-[560px] lg:w-[640px]">
       <header className="flex flex-wrap items-center gap-x-2 gap-y-1 border-b border-slate-200 bg-blue-50 px-3 py-3 text-sm sm:flex-nowrap sm:px-4"><h3 className="min-w-0 flex-1 truncate text-base font-semibold">{workMode==='edit'?'회원 정보 수정':workMode==='detail'?'회원 정보 보기':workMode==='pharmacy'?'약국·사업자 정보':'선택 회원 작업'}</h3><div className="order-last flex w-full justify-end gap-2 sm:order-none sm:w-auto"><button type="button" className="shrink-0 whitespace-nowrap px-1" disabled={busy || reading || !nextMember} onClick={() => { if (nextMember) void openMember(nextMember.userId); }}>다음 회원 검토</button><button type="button" className="shrink-0 whitespace-nowrap px-1" disabled={busy} onClick={closePanel}>선택 해제</button></div><button type="button" aria-label="회원 작업 패널 닫기" disabled={busy} className="shrink-0 rounded px-2 text-xl leading-none text-slate-500 hover:bg-slate-100" onClick={closePanel}>×</button></header>
