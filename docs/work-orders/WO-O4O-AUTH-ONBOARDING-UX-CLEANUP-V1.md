@@ -3,7 +3,7 @@
 > **상태**: ACTIVE
 > **작성일**: 2026-11-08 · **최종 갱신**: 2026-11-08
 > **실행 위치**: CLOUD (브라우저 smoke 만 LOCAL)
-> **인계**: `claude/relaxed-newton-7y8pln` · push 후 PR #987 · 다음 실행자 CLOUD (구현) → LOCAL (브라우저 smoke)
+> **인계**: `claude/relaxed-newton-7y8pln` · PR #987 · 다음 실행자 통합 담당(병합 · 배포) → 배포 후 Demo 검증(T7) → LOCAL(T9 운영 backfill · 승인 필요)
 > **근거**: 2026-11-07~08 사용자 확정(대화) · [`WO-O4O-PRIVACY-IDENTITY-TARGET-MODEL-DECISION-CLOSURE-V1`](WO-O4O-PRIVACY-IDENTITY-TARGET-MODEL-DECISION-CLOSURE-V1.md) D1 · [`TODO-O4O-UNIFIED-MEMBER-REGISTRATION-V1`](TODO-O4O-UNIFIED-MEMBER-REGISTRATION-V1.md) · [`WO-O4O-NETURE-SUPPLIER-ONBOARDING-BUSINESS-PROFILE-SYNC-AND-SIMPLIFICATION-V1`](WO-O4O-NETURE-SUPPLIER-ONBOARDING-BUSINESS-PROFILE-SYNC-AND-SIMPLIFICATION-V1.md)
 
 ## 1. 배경 (현재 코드 대조)
@@ -92,34 +92,34 @@
 ## 5. TODO
 
 - [x] T0 [CLOUD] Neture 로그인 모달 "O4O 메인으로" 제거 — `services/web-neture/src/components/LoginModal.tsx` (U1)
-- [ ] T1 [CLOUD] 소셜 가입 오류 안내 — `KakaoContinue.tsx` · `GoogleContinue.tsx`
-  - [ ] 오류 문구를 제출 버튼 위로 옮기고, 오류가 나면 그 위치로 스크롤
-  - [ ] 만료 · 무효 티켓(`SOCIAL_FLOW_INVALID`)이면 폼을 닫고 다시 시작
-  - [ ] `EMAIL_IN_USE` · `SOCIAL_IDENTITY_CONFLICT` 면 기존 계정 로그인 후 연결 안내
-  - [ ] 테스트 보강
-- [ ] T2 [CLOUD] 가입 이름 · 휴대전화 선택화(U3)
-  - [ ] 화면: Google · 카카오 · 이메일 가입 폼 라벨을 "(선택)"으로 바꾸고 필수 검사 제거
-  - [ ] 서버: Google · 카카오 · 이메일 signup 서비스와 DTO 를 "값이 있으면 형식만 검사"로 변경
-  - [ ] 가입 유형 입력의 필수(이름 · 닉네임 · 휴대전화)는 유지됨을 확인
-  - [ ] 테스트 보강
-- [ ] T3 [CLOUD] Demo 로그인 경로 단축
-  - [ ] Demo 매장 이동에서 불필요한 홈 데이터 조회 제거
-  - [ ] 모달 뒤 홈 화면의 중복 조회 억제(가능한 범위)
-  - [ ] `handoff-exchange` 역할 · 멤버십 조회 병렬화
-  - [ ] 테스트
-- [ ] T4 [CLOUD] 공급자 사업자 정보 화면 1단계
-  - [ ] 섹션을 4개 묶음(사업자 정보 · 담당자와 공개 연락처 · 정산 · 판매 조건)으로 재구성
-  - [ ] 묶음별 저장
-  - [ ] 정산 저장과 통신판매업 저장의 전송 필드 분리
-  - [ ] 세금계산서 이메일 필수 표기를 서버 기준에 맞춤
-  - [ ] 상단에 서버 기준 미입력 필수 항목 체크리스트
-  - [ ] 정산 담당자 "담당자와 같음", 예금주 기본값(상호)
-  - [ ] 테스트
-- [ ] T5 [CLOUD] 공급자 정보 코드 정리(DB 불변, U6)
-  - [ ] 같은 값을 쓰는 중복 경로 확인
-  - [ ] 읽기 · 쓰기 helper 한 곳으로 모으기
-  - [ ] 테스트
-- [ ] T6 [CLOUD] 문서 정합 — 조사 중 발견한 기준 문서 drift 보고 · 허용 범위 인라인 처리
+- [x] T1 [CLOUD] 소셜 가입 오류 안내 — `KakaoContinue.tsx` · `GoogleContinue.tsx`
+  - [x] 오류 문구를 제출 버튼 위로 옮기고, 오류가 나면 그 위치로 스크롤
+  - [x] 만료 · 무효 티켓(`SOCIAL_FLOW_INVALID`)이면 폼을 닫고 다시 시작
+  - [x] `EMAIL_IN_USE` · `SOCIAL_IDENTITY_CONFLICT` 면 기존 계정 로그인 후 연결 안내
+  - [x] 테스트 보강
+- [x] T2 [CLOUD] 가입 이름 · 휴대전화 선택화(U3)
+  - [x] 화면: Google · 카카오 · 이메일 가입 폼 라벨을 "(선택)"으로 바꾸고 필수 검사 제거
+  - [x] 서버: Google · 카카오 · 이메일 signup 서비스와 DTO 를 "값이 있으면 형식만 검사"로 변경
+  - [x] 가입 유형 입력의 필수(이름 · 닉네임 · 휴대전화)는 유지됨을 확인
+  - [x] 테스트 보강
+- [x] T3 [CLOUD] Demo 로그인 경로 단축
+  - [x] Demo 매장 이동에서 불필요한 홈 데이터 조회 제거
+  - [x] 모달 뒤 홈 화면의 중복 조회 억제(가능한 범위)
+  - [x] `handoff-exchange` 역할 · 멤버십 조회 병렬화
+  - [x] 테스트
+- [x] T4 [CLOUD] 공급자 사업자 정보 화면 1단계
+  - [x] 섹션을 4개 묶음(사업자 정보 · 담당자와 공개 연락처 · 정산 · 판매 조건)으로 재구성
+  - [x] 묶음별 저장
+  - [x] 정산 저장과 통신판매업 저장의 전송 필드 분리
+  - [x] 세금계산서 이메일 필수 표기를 서버 기준에 맞춤
+  - [x] 상단에 서버 기준 미입력 필수 항목 체크리스트
+  - [x] 정산 담당자 "담당자와 같음", 예금주 기본값(상호)
+  - [x] 테스트
+- [x] T5 [CLOUD] 공급자 정보 코드 정리(DB 불변, U6)
+  - [x] 같은 값을 쓰는 중복 경로 확인
+  - [x] 읽기 · 쓰기 helper 한 곳으로 모으기
+  - [x] 테스트
+- [x] T6 [CLOUD] 문서 정합 — 조사 중 발견한 기준 문서 drift 보고 · 허용 범위 인라인 처리
   - [x] 배포 후 Demo 검증 절차 기록(U9) — `AGENTS.md` §6 · `SETUP.md` 「배포 후 Demo 검증」 · `CLAUDE.md` §15
 - [ ] T7 [배포 후 · Demo] 브라우저 검증 (U9 — 배포 후 로그인 화면 Demo 버튼, PC · mobile)
   - [ ] 매장 경영자 Demo: 로그인 → 매장 화면 도착까지 체감 시간 (T3)
@@ -128,10 +128,19 @@
   - [ ] [본인 실제 계정 · Demo 불가] 카카오 · Google 가입 오류 안내(T1), 이름 · 휴대전화 없이 가입 → 가입 유형 입력 필수 확인(T2)
 - [ ] T8 [승인 대기] API `min-instances=1` (U5)
 - [ ] T9 [CLOUD 구현 · 운영 반영은 통합 담당 승인] 공급자 정보 정본 일원화 (U8)
-  - [ ] 설계: 항목별 정본 위치 확정 (organization-core 동결 범위 확인)
-  - [ ] 코드: 읽기 · 쓰기를 정본 한 곳으로
-  - [ ] migration: 기존 데이터 이관 (migration lane · 격리 DB fingerprint)
-  - [ ] 테스트
+  - [x] 설계: 9월 정본 결정(`WO-O4O-SUPPLIER-IDENTITY-RELATIONSHIP-AND-BUSINESS-PROFILE-CANONICALIZATION-V1` §0 정책 4 · 5 · 6)을 따른다. 남아 있던 §L(대표자 · 업태 · 종목의 Organization 이관)을 실행한다.
+    - 정본 = `organizations.metadata.businessProfile` 의 `representativeName` · `businessType` · `businessCategory`(약국 분기와 같은 키). jsonb 값 쓰기라 컬럼 · 엔티티 변경 0 — `O4O-CORE-FREEZE-V1` §3.2 해당 없음.
+    - 이번에 옮기지 않는 것: 담당자 이메일(정책 5 는 NetureSupplier 지만 컬럼이 없어 추가 결정 필요) · 통신판매업(정책 4 는 Organization 이지만 T4 화면 분리 직후라 다음 단계). 공개 전화와 사업장 전화는 다른 개념이라 합치지 않는다.
+  - [x] 코드(expand): 읽기는 정본 우선 · 없으면 옛 컬럼(`supplierIdentityOf`), 쓰기는 정본 + 옛 컬럼 양쪽 — profile GET/PATCH · 미입력 판정 · 운영자 공급자 목록/검색 · 가입 승인/수정(`member-registration.service.ts` supplier 분기) · 계정 삭제 시 정본의 대표자명도 제거 · Demo 생성(새 조직 INSERT 에만)
+    - 함께 고친 버그: 공급자 승인 때 대표자 · 업태를 org metadata 에 쓰지 않아 운영자 회원 상세에서 빈칸으로 보였다.
+  - [x] backfill: migration 이 아니라 CLI(`apps/api-server/src/scripts/supplier-business-identity-backfill.ts`). 데이터만 바꾸는 migration 은 schema fingerprint 가 같아 migration contract C22(중복 fingerprint 금지)가 거부하고, CLAUDE.md §8-1 도 backfill 은 CLI 우선이다. 그래서 migration lane(#968) 과도 겹치지 않는다.
+  - [x] 테스트: 단위(정본 우선 · fallback · 양쪽 쓰기 · 조직 없는 공급자 · 목록) + 일회용 로컬 PostgreSQL 16 에서 backfill SQL 7건(trim · 정본 보존 · 빈 정본 채움 · 비객체/다중 공급자/빈 값 제외 · 재실행 0건)
+  - [ ] [LOCAL · 통합 담당 승인 필요] 운영 backfill — 아래 절차. 9월 WO 정책 12 · 14 의 운영 공급자 3건도 대상에 들어간다(값 복사만 하고 소유자 연결은 건드리지 않음 — 승인 때 함께 확인).
+    1. dry-run(조회만, `o4o_readonly` 로 가능): `npx tsx src/scripts/supplier-business-identity-backfill.ts` → `TARGET_ORGANIZATIONS` · `SKIPPED` 건수 기록(원문 출력 없음)
+    2. 판정: `SKIPPED` 의 multi-supplier orgs · non-object businessProfile 이 0 이 아니면 그 조직은 수동 확인 대상으로 보고만 한다(이번 backfill 은 건너뜀).
+    3. [write · 통합 담당 명시 승인 후] `SUPPLIER_IDENTITY_BACKFILL_CONFIRM=YES npx tsx src/scripts/supplier-business-identity-backfill.ts --apply` → `UPDATED_ORGANIZATIONS` 가 1 의 `TARGET_ORGANIZATIONS` 와 같고 `RESIDUE = 0` 인지 확인. 다시 dry-run 해서 대상 0.
+    - 순서: 이 PR 의 코드가 배포된 뒤에 실행한다. 배포 전·후 어느 쪽이든 화면 값은 같다(fallback).
+  - [ ] [별도 WO] contract: `neture_suppliers.representative_name · business_type · business_item` 쓰기 중단 → 컬럼 삭제(DDL · 승인 필요). backfill 완료 확인 후.
 
 ## 6. 검증 계획
 
@@ -139,8 +148,10 @@
 - web-neture: `npx vitest run --config services/web-neture/vitest.config.mjs`, `tsc --noEmit`
 - store 웹(handoff 수신): 해당 서비스 vitest
 - `/verify` 스킬로 변경 범위 검증
-- 브라우저 smoke 는 클라우드에 테스트 계정이 없어서 T7 로 LOCAL 에 넘긴다
+- 브라우저 확인은 T7 — 배포 후 로그인 화면 Demo 버튼(U9)
 
 ## 7. 문서 정합
 
-- (진행하며 기록)
+- 발견: `AGENTS.md` §6 「과거 seed/Demo 계정으로 대체하지 않는다」가 U9(배포 후 Demo 검증)와 충돌 → 사용자 지시로 문장 수정(`AGENTS.md` §6 · `SETUP.md` · `CLAUDE.md` §15).
+- 발견(보고만): 6월 `WO-O4O-NETURE-SUPPLIER-ONBOARDING-BUSINESS-PROFILE-SYNC-AND-SIMPLIFICATION-V1` D1(「`neture_suppliers` 를 정본으로」)은 9월 정책 4 · 5 로 대체됐지만 표기가 없다. 기록물(work-orders)이라 인라인 대상이 아니다.
+- 발견(보고만): `PRODUCTION-MIGRATION-STANDARD` 는 데이터만 바꾸는 작업의 경로(CLI)를 적고 있지 않다 — C22 가 data-only migration 을 거부한다는 사실이 문서에 없다. 별도 문서 작업 제안.
