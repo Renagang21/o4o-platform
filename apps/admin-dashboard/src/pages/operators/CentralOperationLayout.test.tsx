@@ -11,7 +11,7 @@ it('assigns every menu once without changing any destinations, including all 32 
  const all=CENTRAL_OPERATION_MENUS.flatMap(menu=>centralGroups([menu]).flatMap(g=>g.menus));
  expect(all.map(m=>m.key).sort()).toEqual(CENTRAL_OPERATION_MENUS.map(m=>m.key).sort());
  const groups=centralGroups(CENTRAL_OPERATION_MENUS.filter(m=>m.service==='neture'));
- expect(groups.map(g=>[g.label,g.menus.length])).toEqual([['회원·자격',6],['문의·알림',2],['상품',7],['매장·거래',3],['콘텐츠·포럼',8],['운영·설정',6]]);
+ expect(groups.map(g=>[g.label,g.menus.length])).toEqual([['회원·자격',6],['업무함·문의·알림',4],['상품',7],['매장·거래',3],['콘텐츠·홈',7],['운영·설정',4],['최종 삭제(관리자)',1]]);
  expect(groups.flatMap(g=>g.menus).map(centralMenuHref)).toContain('/operations/neture/candidates');
 });
 it('starts collapsed, opens the destination on navigation and keeps manual collapse through equivalent refreshes',()=>{
@@ -24,7 +24,7 @@ it('starts collapsed, opens the destination on navigation and keeps manual colla
 });
 it('opens the matching business and group for a direct detail URL',()=>{
  view('/operations/neture/service-members/fixture');expect(screen.getByRole('button',{name:'약국·공통 운영'}).getAttribute('aria-expanded')).toBe('true');
- expect(screen.getByRole('button',{name:'회원·자격'}).getAttribute('aria-expanded')).toBe('true');expect(screen.getByRole('link',{name:'O4O 서비스 회원·이용 상태'}).getAttribute('aria-current')).toBe('page');
+ expect(screen.getByRole('button',{name:'회원·자격'}).getAttribute('aria-expanded')).toBe('true');expect(screen.getByRole('link',{name:'서비스별 이용 상태'}).getAttribute('aria-current')).toBe('page');
 });
 it('uses the same permitted tree in a mobile dialog and closes on selection with focus returned',()=>{
  view('/operations/neture/candidates');fireEvent.click(screen.getByRole('button',{name:/업무 메뉴/}));const dialog=screen.getByRole('dialog',{name:'업무 운영 메뉴'});

@@ -1,73 +1,60 @@
 # HANDOFF
 
-> 저장소: `Renagang21/o4o-platform` · 코드 기준: `main` `8e95d16027` · 작성: 2026-11-07 (KST)
-> 다음 실행자: LOCAL (운영 DB read-only 확인 항목이 있다. 코드 · 문서 항목은 CLOUD 도 가능)
-> 이전 인계(2026-10-07 기준 commerce 상태표 · 로컬 검증 재현 절차) 전문: `git show 39aae45647:HANDOFF.md`
+> 저장소: `Renagang21/o4o-platform` · 작업 branch: `claude/elegant-albattani-5x2elv` · 코드 기준: `main` `03f1381036` · 작성: 2026-11-07 14:34Z (클라우드 통합 세션)
+> 다음 실행자: **LOCAL(통합 담당)** — [`WO-O4O-INTEGRATION-LOCAL-HANDOFF-V1`](docs/work-orders/WO-O4O-INTEGRATION-LOCAL-HANDOFF-V1.md)
+> 이전 인계 전문: `git show 03f1381036:HANDOFF.md`
 
-## PR #339 작업공간 — 소유 세션 확인 후 정리
+## 운영 원칙 (통합 담당 지시 2026-11-07)
 
-PR #339의 main 통합·운영 배포는 완료됐지만 작업 PC와 소유 세션은 확인되지 않았다. 이 사실만으로 다른 세션의 작업공간을 삭제하지 않는다.
+클라우드 통합 세션이 못 하는 일(원격 branch 삭제 · 운영 배포 · migration Promote · 운영 DB 조회)은 **정리해서 LOCAL 에 넘긴다.** 형식은 `docs/work-orders/` 의 WO(실행 순서 · read-only SQL · 판정 기준 포함) + 이 파일의 "다음 실행자" 칸이다. 이번 인계가 첫 사례다.
 
-1. 다른 세션은 `git worktree list`로 해당 branch/worktree의 존재만 확인하고 `KEEP` 또는 `UNCERTAIN`으로 보고한다. branch만 남아 있어도 임의로 삭제하지 않는다.
-2. 원래 소유 세션이 자기 작업공간임을 확인한 경우에만 [AGENTS.md §4-1(i)](AGENTS.md#4-1-parallel-session--worktree-policy)의 main 포함·clean·남은 작업 및 다른 세션 사용 여부를 확인한다. Windows는 junction 해제·재스캔까지 통과해야 한다.
-3. 조건을 모두 충족한 원래 소유 세션만 자기 worktree와 branch를 정리한다. 불명확하면 보존하고 정확한 차단 사유를 보고한다. 원격 branch도 소유권·후속 사용 여부 확인 없이 삭제하지 않는다.
-4. 소유 세션의 실제 정리 완료 확인 후에만 이 안내를 제거한다. 이 문서 변경은 기존 작업공간을 정리했다는 증거가 아니다.
+## 완료된 것 (2026-11-07 클라우드 통합 세션)
 
-2026-11-06 조회: PR #339 MERGED · 원격 branch 없음. 포맷한 PC의 `git worktree list` 에는 해당 worktree 가 없다. 다른 PC 존재 여부와 소유 세션은 여전히 미확인이라 위 안내를 유지한다.
+- 병합: #972 · #974(#972 에서 빠진 IR §8) · #978 · #977 · #979 · #983 · #982 · #973(문서 · 에이전트 설정 빠른 경로) · #984(branch 처분 조사 — 삭제 스크립트에 SHA lease 를 이 세션이 보완 `7e48c6d5`).
+- post-merge CI: #972 · #974 · #977 · #978 · #979 success. #982 의 main run 은 직후 #973 push 에 밀려 cancelled(실패 아님). #983 · #973 · #984 는 마지막 확인 때 진행 중이었다.
 
-## 요약
+## 진행 중 · 대기 (2026-11-07 14:33Z 조회)
 
-개발 PC 포맷 후 작업 환경을 다시 구성했고, 2026-10-07 기준으로 멈춰 있던 이 문서를 현행화했다. 코드 변경은 없다.
-
-## 완료된 것
-
-- 기준 checkout 재구성 · `pnpm install --frozen-lockfile` 성공 · `pnpm run check:runtime` PASS.
-- 이전 인계의 PR #308 · #332 · #336 · #328 · #325 는 모두 MERGED (2026-11-06 조회).
-- `services/web-pharmacy-hub` 는 저장소에 없다. 코드상 제거 근거는 `f58add7aa7`(2026-10-17) · `36e92381a5`(2026-10-20)이다. GCP 자원 삭제 여부는 미확인이다.
-
-## 진행 중인 것
-
-- `wo/community-industry-news-v2` — 개발 중, PR 미생성. 다음에 할 일 1번 참조.
-
-## 이전 인계에서 바뀐 전제
-
-- 2026-10-20 사용자 결정으로 `pharmacy` · `drugstore` · `pharmcoop` · `carepharm` 이 동급 독립 사업이 됐다 — [`WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1`](docs/work-orders/WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1.md)(OPEN).
-- 그래서 이전 인계의 "세미프랜차이즈 담당 운영자 지정 → 가입 · 승인 · 주문 운영 검증" 순서는 그대로 수행할 수 없다. 재검증이 필요하면 현행 사업 구조 기준으로 다시 정한다. 그 후 재검증이 이뤄졌는지는 이번에 확인하지 않았다.
-- commerce 잔여 작업의 정본은 [`WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1`](docs/work-orders/WO-NETURE-PHARMACY-STORE-COMMERCE-REFACTOR-V1.md) TODO 다 (미완료 5건: 3-4 · 6-2 · 6-2d · 6-4 · 6-5). 이 문서에 복제하지 않는다.
+| PR | branch(원격) | 상태 | 다음 |
+|---|---|---|---|
+| #968 커뮤니티 뉴스 자동 게시 | `wo/community-industry-news-v2` 있음 | OPEN · **보류** — HEAD `0db752c` | 작업 세션 수정 필요: 새 테이블 2개의 `account_erasure_write_fence` 트리거 누락(CI 실패), Codex P1(표준 리스트) · P2(URL 정규화), Sonar. base 가 오래돼 `git merge origin/main` 필요. [통합 코멘트](https://github.com/Renagang21/o4o-platform/pull/968#issuecomment-6707486063) |
+| #975 드래프트 경량 검사 | `wo/draft-light-ready-guarantee` 있음 | OPEN · Ready | CI PR 순서 다음 차례. 클라우드 통합 세션 지정 필요 |
+| #976 · #980 · #981 | 각 branch 있음 | OPEN · 드래프트 | #975 → #976 → #980 → #981 순서. 앞 PR 병합 후 작업 세션이 최신 main 에 맞추고 Ready |
+| #986 admin.neture.co.kr 운영자 메뉴 정리 | `claude/vibrant-allen-56f5dq` 있음 | OPEN · Ready · CI 통과(2026-11-07) | 통합 담당 병합 · 배포 → **배포 후 사용자가 실제 화면 확인**(아래 「#986 배포 후 화면 확인」). 병합 전 LOCAL smoke 는 하지 않는다(2026-11-08 사용자 결정) |
 
 ## 다음에 할 일 (우선순위 순)
 
-1. `WO-O4O-COMMUNITY-INDUSTRY-NEWS-V2` — `wo/community-industry-news-v2` 에서 개발 중. migration 이 있어 병합 전에 사용자 승인이 필요하다.
-2. 테스트 계정으로 계정 완전삭제와 포럼 AI 를 실제 화면에서 확인한다. 둘 다 운영에 켜져 있으나 실제 동작은 미검증이다.
-3. 남은 개발 후보: `WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1` · `TODO-O4O-PLAYLIST-AUTHORING-REQUIRED-20261105` 잔여.
+1. ~~**[LOCAL]** WO §5-A — 원격 branch 정리~~ **완료(2026-11-08)** — 선택 포함 89개 삭제 · 실패 0. 결과는 WO §6.
+2. **[CLOUD]** #975 부터 CI PR 순차 통합(통합 세션 지정 필요).
+3. **[CLOUD]** #968 수정(작업 세션) → 클라우드 통합 세션이 CI · 리뷰 확인 후 병합.
+4. **[LOCAL]** WO §5-B — #968 병합 후에만: 통합 담당 승인 → `promote.yml`(LEVEL_3) → read-only SQL 로 테이블 · 트리거 · 첫 실행 확인.
+5. KEEP 2 branch 재판정(IR §7) — 별도 WO.
+6. **[통합 담당 → 사용자]** #986 병합 · 배포 후 아래 「#986 배포 후 화면 확인」을 사용자가 운영 화면에서 확인한다. 문제가 나오면 새 branch 로 수정 PR 을 연다(병합된 #986 branch 는 재사용하지 않는다).
 
-## 확인 결과 (2026-11-07 조회)
+## #986 배포 후 화면 확인 (사용자 · 2026-11-08 결정)
 
-체크박스는 기록 시점 값이라 지시서에 비어 있어도 아래가 현재 상태다.
+병합 전에는 합성 API 응답으로 PC(1440px) · iPhone 13 화면만 점검했다(PR 설명 「검증 결과」). 실제 계정 · 실제 데이터 확인은 **배포가 끝난 뒤 사용자가** admin.neture.co.kr 에서 한다. 운영 데이터를 바꾸는 동작(해지 · 삭제 · 저장)은 테스트용 데이터에서만 하고, 실제 회원 데이터로 삭제를 실행하지 않는다(AGENTS.md §5 테스트 데이터 경계).
 
-- 운영 API · Neture 웹 서빙 SHA 는 `8e95d16027` 이다(PR #965 포럼 AI 포함, Delivery 자동 배포).
-- 계정 완전삭제는 운영에서 켜져 있다(사용자 승인 2026-11-07). 결과와 미검증 항목은 [`CHECK-O4O-ACCOUNT-ERASURE-ACTIVATION-V1`](docs/checks/CHECK-O4O-ACCOUNT-ERASURE-ACTIVATION-V1.md). 이 절차를 다시 돌리려면 `github-actions` 에 `roles/logging.viewer` 를 임시 부여하고 회수해야 한다.
-- `o4o_readonly` · secret `o4o-db-readonly-password` 는 존재하며, 2026-11-07 이 PC 에서 실제 로그인과 읽기 전용 세션을 확인했다(아래 절). 표별 조회 범위는 확인하지 않았다.
-- `TODO-O4O-MEMBER-PROFILE-EDIT-V1` · `WO-O4O-ADMIN-OPERATOR-INVITE-FIRST-V1` — 해당 migration 커밋 이후의 `o4o-api-migrations` Job 이 모두 성공했다(최근 2026-11-06 23:38Z). DB 를 직접 조회한 값은 아니다.
-- `TODO-O4O-OPERATOR-PROTECTED-MEMBER-DEPLOY-FIX-V1` — `cooperative-web` 서빙 SHA `dd83d30d29`(#950 포함). `drugstore.neture.co.kr` · `kpa.neture.co.kr` 공개 진입 HTTP 200. 화면 동작 검증은 아니다.
-- `WO-O4O-SCHEDULED-JEST-FULL-SHARD-RECOVERY-V1` — 2026-11-06 22:33Z 스케줄 실행에서 3분할과 집계가 모두 success. 메모리 기록 값은 미확인.
-- 대조 완료: `wo/readonly-db-rule` 은 PR #961 로 main 반영(`ed8bc1367c`), `wo/member-signup-approval-action` 은 커밋 `aea4fa8736` 이 PR #956(MERGED)에 포함돼 있어 추가 통합이 필요 없다.
+- [ ] admin 사이드바 맨 위 「최종 삭제 처리」 그룹: 회원 계정 삭제 · 포럼 삭제·복구 · 커뮤니티 게시판 · 강좌 삭제 · 삭제 처리 내역 — 각각 진입 · 직접 URL 진입 · 현재 그룹 자동 펼침
+- [ ] 회원 계정 삭제: '해지 회원' 탭이 먼저 열리고 안내 문구가 보이는지
+- [ ] 회원 목록에서 행 선택 → 오른쪽 사이드 패널 열림 · 「다음 회원 검토」 · Esc / × 닫기 · 패널을 연 채 다른 행 선택 (PC · 모바일)
+- [ ] 강좌 삭제 · 커뮤니티 게시판 화면에 보관 처리된 대상만 나오는지
+- [ ] `/operations` 업무 운영 사이드바: 새 그룹(업무함·문의·알림 · 서비스 운영 · 콘텐츠·홈 · 최종 삭제(관리자)) 과 바뀐 메뉴 이름. 위임 운영자 계정(neture:operator 등)에서도 확인
+- [ ] 포럼 삭제 요청 화면의 「포럼 사용 중지·재개」 탭
 
-## 이 PC 의 미해결 환경
+## 주의 · 결정
 
-2026-11-07 집 PC 정비 후 상태:
-
-- 완료: git · gh 로그인 · git user · Node 22.23.4 · pnpm 10.25.0 · gcloud(프로젝트 `netureyoutube`, ADC 있음) · Cloud SQL Proxy v2.14.3. Claude 앱 worktree 위치는 `o4o-wt` 로 바뀌어 있다.
-- PostgreSQL 15.19(winget `PostgreSQL.PostgreSQL.15`): `psql` 을 사용자 PATH 에 추가했다. 함께 설치된 서버 서비스 `postgresql-x64-15` 는 **수동 시작 · 중지** 상태로 바꿨다. §3-1 로컬 개발 DB 로 쓸 때만 `Start-Service postgresql-x64-15`(관리자)로 켠다.
-- `apps/api-server/.env` 를 `.env.example` 로 만들었다. JWT · SESSION · `ENCRYPTION_KEY` 는 이 PC 전용 난수다. 운영 값은 없다. `DB_PASSWORD` 는 placeholder 라 로컬 DB 를 쓰려면 사용자가 채워야 한다.
-- Docker: Windows 쪽 Docker Desktop 은 설치하지 않았다. 지금 개발에는 필요 없다(SETUP §1 선택). self-hosted runner 용 Docker Engine 은 WSL2 Ubuntu-24.04 안에서 동작 중이다(29.9.3, `o4oci` docker 그룹). 실행기 미등록 — [`O4O-SELF-HOSTED-CI-RUNNER-V1`](docs/baseline/operations/O4O-SELF-HOSTED-CI-RUNNER-V1.md).
-- 운영 DB read-only 접속 확인(사용자 실행 2026-11-07): 프록시 경유 `psql` 로 `o4o_readonly` 로그인 성공 · `current_user = o4o_readonly` · `default_transaction_read_only = on`. 비밀번호는 `gcloud secrets versions access latest --secret=o4o-db-readonly-password` 로 `PGPASSWORD` 에 넣고 조회 후 지운다(손 입력은 인증 실패가 났다).
-- #966 이후 로컬 확인: `gcloud run deploy --help` 승인 요청 · 배포 차단 훅 로컬 무해 실행은 통과. 저장소 선언 플러그인 설치 안내는 미확인(#966 이후 main 에서 새 세션으로 확인).
-- 미완료: `docs/local/TEST-ACCOUNTS.local.md`(사용자 원본 필요).
-- 점검표 · 판단 근거: [`WO-O4O-HOME-PC-DEV-ENV-REBUILD-V1`](docs/work-orders/WO-O4O-HOME-PC-DEV-ENV-REBUILD-V1.md) 5-6.
-- 참고: 로컬 PG 서버는 `listen_addresses` 가 전체(0.0.0.0)다. 로컬 DB 로 쓰기 시작할 때 `localhost` 로 좁힌다.
-
-## 주의
-
+- 클라우드 세션은 원격 branch 삭제 명령을 실행할 수 없다(settings deny + `guard-git-push` 훅). 로컬 시험용 bare 저장소에서도 같은 문자열이 막힌다 — #984 lease 삭제는 실행 시험을 하지 못했다. 미리보기부터 확인한다.
+- 스크립트 파일은 저장소 밖(`$env:TEMP`)에 저장한다(untracked 파일 방지).
 - 다른 PC 의 worktree 는 이 PC 에서 정리하지 않는다. main 반영은 PR merge 하나뿐이다. 저장소 Public — 실명 · 자격증명 기록 금지.
-- D 드라이브는 작업에 쓰지 않는다(사용자 결정 2026-11-07). 그곳의 포맷 전 worktree 는 정비 전 자료이며 참조 · 대조하지 않는다. push 되지 않은 변경 유무는 확인하지 않았다.
+
+## PR #339 작업공간 — 소유 세션 확인 후 정리 (유지)
+
+PR #339 의 main 통합 · 운영 배포는 완료됐지만 작업 PC 와 소유 세션이 확인되지 않았다. 원래 소유 세션이 [AGENTS.md §4-1(i)](AGENTS.md#4-1-parallel-session--worktree-policy) 조건을 확인한 경우에만 자기 worktree · branch 를 정리한다. 불명확하면 보존한다. 2026-11-06 조회: PR #339 MERGED · 원격 branch 없음 · 포맷한 PC 에는 해당 worktree 없음. 실제 정리 확인 전까지 이 안내를 유지한다.
+
+## 집 PC 환경 (2026-11-07, 유지)
+
+- 완료: git · gh · Node 22.23.4 · pnpm 10.25.0 · gcloud(ADC) · Cloud SQL Proxy v2.14.3 · `psql`(PostgreSQL 15.19, 서버 서비스는 수동 시작). worktree 위치 `o4o-wt`.
+- 운영 DB read-only 접속 확인됨: 프록시 경유 `o4o_readonly` · `default_transaction_read_only = on`. 비밀번호는 `gcloud secrets versions access latest --secret=o4o-db-readonly-password` 로 `PGPASSWORD` 에 넣고 조회 후 지운다.
+- 미완료: `docs/local/TEST-ACCOUNTS.local.md`(사용자 원본 필요). 로컬 PG `listen_addresses` 는 로컬 DB 로 쓸 때 `localhost` 로 좁힌다.
+- 세부: [`WO-O4O-HOME-PC-DEV-ENV-REBUILD-V1`](docs/work-orders/WO-O4O-HOME-PC-DEV-ENV-REBUILD-V1.md) 5-6. D 드라이브는 작업에 쓰지 않는다.
