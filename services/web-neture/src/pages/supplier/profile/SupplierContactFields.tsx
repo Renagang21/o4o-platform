@@ -37,10 +37,10 @@ export default function SupplierContactFields({
     <>
       {/* Section B: 담당자 정보 */}
       <div className="bg-white border border-gray-200 rounded-xl p-6 mb-4">
-        <h2 className="flex items-center gap-2 text-base font-semibold text-gray-800 mb-5">
+        <h3 className="flex items-center gap-2 text-base font-semibold text-gray-800 mb-5">
           <User className="w-5 h-5 text-gray-500" />
           담당자 정보
-        </h2>
+        </h3>
         <div className="space-y-5">
           {/* 담당자명 */}
           <div>
@@ -88,10 +88,10 @@ export default function SupplierContactFields({
 
       {/* Section C: 외부 공개 연락처 */}
       <div className="bg-white border border-gray-200 rounded-xl p-6 mb-4">
-        <h2 className="flex items-center gap-2 text-base font-semibold text-gray-800 mb-5">
+        <h3 className="flex items-center gap-2 text-base font-semibold text-gray-800 mb-5">
           <Globe className="w-5 h-5 text-gray-500" />
           외부 공개 연락처
-        </h2>
+        </h3>
         <p className="text-xs text-gray-400 mb-5">
           판매자가 공급자 프로필에서 문의할 때 사용되는 연락처입니다. 각 항목의 공개 범위를 설정할
           수 있습니다.

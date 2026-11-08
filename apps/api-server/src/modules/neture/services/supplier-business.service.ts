@@ -3,6 +3,7 @@ import { isSelectableBusinessEntityType } from '@o4o/types';
 import { AppDataSource } from '../../../database/connection.js';
 import { NetureSupplier, SupplierStatus, ContactVisibility } from '../entities/index.js';
 import logger from '../../../utils/logger.js';
+import { contactPhoneWrite, missingProfileFieldsOf, missingSettlementFieldsOf } from './supplier-profile-readiness.js';
 
 export class SupplierProfileEntityTypeInvalidError extends Error {
   constructor() {
@@ -217,9 +218,13 @@ export class NetureSupplierBusinessService {
         throw new SupplierProfileEmailInvalidError();
       }
 
+      // WO-O4O-AUTH-ONBOARDING-UX-CLEANUP-V1 T5: 같은 공개 전화 입력을 supplier · organization 두 곳에 쓴다 —
+      //   정규화는 한 번(contactPhoneWrite)만 하고 아래 organization write 가 같은 값을 쓴다.
+      const contactPhone = data.contactPhone !== undefined ? contactPhoneWrite(data.contactPhone) : undefined;
+
       // Existing contact fields
       if (data.contactEmail !== undefined) supplier.contactEmail = data.contactEmail || '';
-      if (data.contactPhone !== undefined) supplier.contactPhone = data.contactPhone ? data.contactPhone.replace(/\D/g, '') : '';
+      if (contactPhone) supplier.contactPhone = contactPhone.supplier;
       if (data.contactWebsite !== undefined) supplier.contactWebsite = data.contactWebsite || '';
       if (data.contactKakao !== undefined) supplier.contactKakao = data.contactKakao || '';
       if (data.contactEmailVisibility !== undefined) supplier.contactEmailVisibility = data.contactEmailVisibility;
@@ -326,7 +331,7 @@ export class NetureSupplierBusinessService {
               name: data.name?.trim(),
               business_number: data.businessNumber !== undefined ? (data.businessNumber || null) : undefined,
               address: data.businessAddress !== undefined ? (data.businessAddress || null) : undefined,
-              phone: data.contactPhone !== undefined ? (data.contactPhone ? data.contactPhone.replace(/\D/g, '') : null) : undefined,
+              phone: contactPhone ? contactPhone.organization : undefined,
               address_detail: addressDetail,
               // §D: 사업자등록증 기재사항 — Organization 확장 필드에 저장(migration 0)
               business_profile: businessProfileWriteNeeded
@@ -377,6 +382,9 @@ export class NetureSupplierBusinessService {
         businessStartDate: savedBusinessProfile.businessStartDate ?? null,
         taxInvoiceEmail: supplier.taxInvoiceEmail || null,
         ...this.getContactAndOrderProfile(supplier),
+        // WO-O4O-AUTH-ONBOARDING-UX-CLEANUP-V1 T4: 저장 직후 화면의 미입력 체크리스트를 서버 판정으로 갱신한다(추가 필드).
+        profileComplete: this.getMissingProfileFields(supplier).length === 0,
+        missingProfileFields: this.getMissingProfileFields(supplier),
       };
     } catch (error) {
       logger.error('[NetureSupplierService] Error updating supplier profile:', error);
@@ -548,11 +556,7 @@ export class NetureSupplierBusinessService {
   }
 
   getMissingProfileFields(supplier: NetureSupplier): string[] {
-    const missing: string[] = [];
-    if (!supplier.representativeName?.trim()) missing.push('representativeName');
-    if (!supplier.managerName?.trim()) missing.push('managerName');
-    if (!supplier.managerPhone?.trim()) missing.push('managerPhone');
-    return missing;
+    return missingProfileFieldsOf(supplier);
   }
 
 
@@ -567,16 +571,6 @@ export class NetureSupplierBusinessService {
 
   /** 실제 정산에 필요한 계좌·세금계산서 이메일. 증빙 파일은 선택. */
   getMissingSettlementFields(supplier: NetureSupplier): string[] {
-    const missing: string[] = [];
-    if (!supplier.settlementBankName?.trim()) missing.push('settlementBankName');
-    if (!supplier.settlementAccountNumber?.trim()) missing.push('settlementAccountNumber');
-    if (!supplier.settlementAccountHolder?.trim()) missing.push('settlementAccountHolder');
-    // Bank statement uploads are optional; settlement account details remain separate.
-    if (!supplier.taxInvoiceEmail?.trim()) {
-      missing.push('taxInvoiceEmail');
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(supplier.taxInvoiceEmail)) {
-      missing.push('validTaxInvoiceEmail');
-    }
-    return missing;
+    return missingSettlementFieldsOf(supplier);
   }
 }
