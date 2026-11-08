@@ -303,10 +303,25 @@ async function applyClusters(
     ),
   ];
   const urls = [...new Set([...everyone.values()].map((a) => a.url))];
+  // Operators may save a link with tracking parameters or a fragment. Find candidates by the bare
+  // address, keep only those with the same canonical key, and lock just those rows.
+  const keys = new Set(urls.map(linkKey));
+  const bareUrls = [
+    ...new Set(urls.flatMap(hostVariants).map((u) => u.split(/[?#]/)[0])),
+  ];
+  const linkedIds = (
+    (await db.query(
+      `SELECT id,"linkUrl" FROM cms_contents
+       WHERE ${NEWS} AND split_part(split_part("linkUrl",'#',1),'?',1)=ANY($1::text[])`,
+      [bareUrls],
+    )) as { id: string; linkUrl: string | null }[]
+  )
+    .filter((r) => keys.has(linkKey(r.linkUrl)))
+    .map((r) => r.id);
   const rows: ContentRow[] = await db.query(
-    `SELECT id,status,"linkUrl","isPinned",("expiresAt" IS NULL OR "expiresAt">$3::timestamptz) AS "notExpired",metadata FROM cms_contents
-     WHERE ${NEWS} AND (id=ANY($1::uuid[]) OR "linkUrl"=ANY($2::text[])) FOR UPDATE`,
-    [contentIds, urls.flatMap(hostVariants), now],
+    `SELECT id,status,"linkUrl","isPinned",("expiresAt" IS NULL OR "expiresAt">$2::timestamptz) AS "notExpired",metadata FROM cms_contents
+     WHERE ${NEWS} AND id=ANY($1::uuid[]) FOR UPDATE`,
+    [[...new Set([...contentIds, ...linkedIds])], now],
   );
   const byId = new Map(rows.map((r) => [r.id, r]));
   const byUrl = new Map<string, ContentRow[]>();

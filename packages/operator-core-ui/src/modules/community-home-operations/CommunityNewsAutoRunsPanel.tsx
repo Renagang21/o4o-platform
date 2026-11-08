@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState } from "react";
+import { ActionBar, BaseDetailDrawer } from "@o4o/ui";
+import { DataTable, type ListColumnDef } from "@o4o/operator-ux-core";
 import {
   type CommunityHomeOperationsApi,
   type NewsAutoRun,
@@ -20,6 +22,16 @@ const STATE_NAMES: Record<NewsAutoRun["state"], string> = {
 const errorText = (error: unknown) =>
   (error as { response?: { data?: { error?: string } } }).response?.data
     ?.error ?? "결과를 확인하지 못했습니다. 다시 확인해 주시기 바랍니다.";
+const runLabel = (run: NewsAutoRun) =>
+  `${run.day} ${WINDOW_NAMES[run.window]}${run.trigger === "manual" ? " · 수동" : ""}`;
+
+const COLUMNS: ListColumnDef<NewsAutoRun>[] = [
+  { key: "run", header: "실행", sticky: true, render: (_v, run) => runLabel(run) },
+  { key: "state", header: "상태", render: (_v, run) => STATE_NAMES[run.state] },
+  { key: "candidates", header: "후보", width: "80px" },
+  { key: "published", header: "게시", width: "80px" },
+  { key: "suppressed", header: "숨김 유지", width: "96px" },
+];
 
 /** Viewing reads stored results only; the feed fetch and AI call run once per day and window. */
 export function CommunityNewsAutoRunsPanel({
@@ -28,7 +40,9 @@ export function CommunityNewsAutoRunsPanel({
 }: Readonly<{ onFinished: () => void; api: CommunityHomeOperationsApi }>) {
   const [runs, setRuns] = useState<NewsAutoRun[]>([]),
     [busy, setBusy] = useState(true),
-    [error, setError] = useState("");
+    [error, setError] = useState(""),
+    [selected, setSelected] = useState<Set<string>>(new Set()),
+    [detail, setDetail] = useState<NewsAutoRun | null>(null);
   const mounted = useRef(false);
   useEffect(() => {
     mounted.current = true;
@@ -52,6 +66,9 @@ export function CommunityNewsAutoRunsPanel({
   const load = async (run: boolean) => {
     setBusy(true);
     setError("");
+    // A reload may drop or change records; never keep a stale selection or detail.
+    setSelected(new Set());
+    setDetail(null);
     try {
       if (run) await homeApi.runAutoNews();
       const value = await homeApi.autoRuns();
@@ -64,6 +81,9 @@ export function CommunityNewsAutoRunsPanel({
       if (mounted.current) setBusy(false);
     }
   };
+  // Records are read-only; the only follow-up is inspecting one run, so it needs a single selection.
+  const single =
+    selected.size === 1 ? runs.find((r) => selected.has(r.id)) : undefined;
   return (
     <section
       aria-label="뉴스 자동 게시"
@@ -103,23 +123,54 @@ export function CommunityNewsAutoRunsPanel({
           {error}
         </p>
       )}
-      {!busy && !error && !runs.length && (
-        <p className="text-sm">아직 실행 기록이 없습니다.</p>
+      {!busy && !error && (
+        <ActionBar
+          selectedCount={selected.size}
+          onClearSelection={() => setSelected(new Set())}
+          actions={[
+            {
+              key: "detail",
+              label: "상세 보기",
+              onClick: () => {
+                if (single) setDetail(single);
+              },
+              variant: "primary",
+              disabled: !single,
+            },
+          ]}
+        />
       )}
-      <ul className="divide-y">
-        {runs.map((run) => (
-          <li key={run.id} className="py-3 text-sm">
-            <p className="font-medium">
-              {run.day} {WINDOW_NAMES[run.window]} · {STATE_NAMES[run.state]}
-              {run.trigger === "manual" ? " · 수동" : ""}
+      <DataTable<NewsAutoRun>
+        columns={COLUMNS}
+        data={runs}
+        rowKey="id"
+        loading={busy}
+        emptyMessage="아직 실행 기록이 없습니다."
+        selectable
+        selectedKeys={selected}
+        onSelectionChange={(keys) => {
+          if (!busy) setSelected(keys);
+        }}
+        onRowClick={(run) => {
+          if (!busy) setDetail(run);
+        }}
+      />
+      <BaseDetailDrawer
+        open={!!detail}
+        onClose={() => setDetail(null)}
+        title={detail ? runLabel(detail) : ""}
+        width={480}
+      >
+        {detail && (
+          <div className="space-y-3 text-sm">
+            <p className="font-medium">{STATE_NAMES[detail.state]}</p>
+            <p className="text-slate-600">
+              후보 {detail.candidates}건 · 이슈 {detail.clusters}개 · 게시{" "}
+              {detail.published}건 · 약사공론 대표 교체 {detail.swapped}건 ·
+              운영자 숨김 유지 {detail.suppressed}건
             </p>
-            <p className="mt-1 text-slate-600">
-              후보 {run.candidates}건 · 이슈 {run.clusters}개 · 게시{" "}
-              {run.published}건 · 약사공론 대표 교체 {run.swapped}건 · 운영자
-              숨김 유지 {run.suppressed}건
-            </p>
-            <ul className="mt-1 text-slate-600">
-              {run.sources.map((source) => (
+            <ul className="space-y-1 text-slate-600">
+              {detail.sources.map((source) => (
                 <li key={source.id}>
                   {SOURCE_NAMES[source.id] ?? source.id}:{" "}
                   {source.status === "ok"
@@ -128,9 +179,9 @@ export function CommunityNewsAutoRunsPanel({
                 </li>
               ))}
             </ul>
-          </li>
-        ))}
-      </ul>
+          </div>
+        )}
+      </BaseDetailDrawer>
     </section>
   );
 }

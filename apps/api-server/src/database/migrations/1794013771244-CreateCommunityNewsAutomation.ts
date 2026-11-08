@@ -37,6 +37,11 @@ export class CreateCommunityNewsAutomation1794013771244 implements MigrationInte
       PRIMARY KEY (article_id, day, "position")
     )`);
     await queryRunner.query(`CREATE INDEX idx_community_news_engagement_day ON community_news_engagement_daily (day)`);
+    // Every table carries the account-erasure write fence (ERASURE_WRITER_GAPS_SQL).
+    for (const table of ['community_news_articles', 'community_news_engagement_daily']) {
+      await queryRunner.query(`CREATE TRIGGER account_erasure_write_fence BEFORE INSERT OR UPDATE ON ${table}
+        FOR EACH ROW EXECUTE FUNCTION public.account_erasure_write_fence()`);
+    }
   }
   async down(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`DROP TABLE community_news_engagement_daily`);

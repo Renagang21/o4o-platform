@@ -98,6 +98,7 @@ const pick =
 
 run("community news automation on isolated PostgreSQL", () => {
   let db: DataSource;
+  let createdFence = false;
   const schema = "community_news_" + randomUUID().replaceAll("-", "");
   beforeAll(async () => {
     process.env.JWT_SECRET = "isolated-community-news-test-signing-material";
@@ -132,6 +133,15 @@ run("community news automation on isolated PostgreSQL", () => {
           .replaceAll("public.uuid_generate_v4()", "gen_random_uuid()"),
       );
     }
+    // The migration attaches the account-erasure fence; a bare test cluster has no fence function.
+    const [{ missing }] = await db.query(
+      "SELECT to_regproc('public.account_erasure_write_fence') IS NULL AS missing",
+    );
+    createdFence = missing;
+    if (createdFence)
+      await db.query(
+        "CREATE FUNCTION public.account_erasure_write_fence() RETURNS trigger LANGUAGE plpgsql AS 'BEGIN RETURN NEW; END'",
+      );
     const runner = db.createQueryRunner();
     await new CreateCommunityNewsAutomation1794013771244().up(runner);
     await runner.release();
@@ -151,6 +161,8 @@ run("community news automation on isolated PostgreSQL", () => {
   afterAll(async () => {
     if (db?.isInitialized) {
       await db.query(`DROP SCHEMA ${schema} CASCADE`);
+      if (createdFence)
+        await db.query("DROP FUNCTION public.account_erasure_write_fence()");
       await db.destroy();
     }
   });
@@ -615,8 +627,9 @@ run("community news automation on isolated PostgreSQL", () => {
       "published",
       base,
     );
-    await insert(draft.url, "draft", base);
-    await insert(archived.url, "archived", base);
+    // Operators may save the address with tracking parameters or a fragment; it is still the same article.
+    await insert(`${draft.url}?utm_source=newsletter#top`, "draft", base);
+    await insert(`${archived.url}&utm_medium=mail&fbclid=x#comments`, "archived", base);
     const result = await runScheduledNewsWindow(db, {
       now,
       loader: loaderOf({

@@ -356,7 +356,7 @@ export const EXPECTED_SCHEMA_STATES: readonly ExpectedSchemaState[] = [
 
   { appliedThrough: 'AddStorePlaylistTags1793857542325', fingerprint: '0856ce6b4cf245e66f8c69e7e55ed949ad31a049dcacfe8a6732cfa159d43cac', fingerprintLineCount: 7556 },
 
-  { appliedThrough: 'CreateCommunityNewsAutomation1794013771244', fingerprint: '7d9473e6d0274e67fac38390c9b82a8018d345d7604ba99d3b0be0656d9c49ec', fingerprintLineCount: 7592 },
+  { appliedThrough: 'CreateCommunityNewsAutomation1794013771244', fingerprint: '1489bb64d223656c63cdf99e06f45f25a732276d976f58eeaaff84113da37bee', fingerprintLineCount: 7594 },
 ] as const;
 
 /** Expected state after `prefixLength` incremental migrations; undefined when not registered. */
