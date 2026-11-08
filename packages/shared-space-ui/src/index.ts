@@ -110,6 +110,7 @@ export { ForumWriteForm } from './ForumWriteForm';
 export type {
   ForumWriteFormProps,
   ForumWriteFormPayload,
+  ForumWriteFormDraftPatch,
   ForumWriteFormTheme,
   ForumWritePostType,
   ForumWriteFormPostTypeOption,

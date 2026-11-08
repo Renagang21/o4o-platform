@@ -1,6 +1,6 @@
 # 커뮤니티 포럼 AI 1단계 — 글쓰기 도우미 · 비슷한 글 안내
 
-> 상태: DRAFT · 작성일: 2026-11-06 · 범위: `community.neture.co.kr` 커뮤니티 포럼(작성 화면)
+> 상태: 구현 완료 · 통합 담당 인계 대기(미병합 · 미배포) · 작성일: 2026-11-06 · 구현일: 2026-11-07 · 범위: `community.neture.co.kr` 커뮤니티 포럼(작성 화면)
 
 ## 1. 사용자 확정 (2026-11-06)
 
@@ -48,9 +48,33 @@
 
 ## 6. TODO
 
-- [ ] 커뮤니티 forum 작성 화면 · 게시판 쓰기 가능 목록 · 읽기 권한 판정 함수 위치 확정.
-- [ ] `compose-assist` 출력 계약 · 서버 검증(게시판 ID 화이트리스트 · 길이 · 형식) · 비용 상한.
-- [ ] `similar` 키워드 검색 · 권한 필터 · 결과 상한 · AI 키워드 재검색(요청 시).
-- [ ] 웹: AI 도움 패널(항목별 적용) · 비슷한 글 목록 · AI 비활성/한도 안내 · PC/모바일.
-- [ ] 테스트: 권한(폐쇄 게시판 · 미가입 · 타 커뮤니티 글 비노출) · 게시판 ID 위조 거부 · 비용 상한 · AI mock.
-- [ ] 정본 반영: forum 공통 구조 문서에 AI 보조 계약 추가.
+- [x] 커뮤니티 forum 작성 화면 · 게시판 쓰기 가능 목록 · 읽기 권한 판정 함수 위치 확정. (`ForumWritePage` · `ForumAiAssistController` · `checkClosedForumAccess`)
+- [x] `compose-assist` 출력 계약 · 서버 검증(게시판 ID 화이트리스트 · 길이 · 형식) · 비용 상한.
+- [x] `similar` 키워드 검색 · 권한 필터 · 결과 상한 · AI 키워드 재검색(요청 시).
+- [x] 웹: AI 도움 패널(항목별 적용) · 비슷한 글 목록 · AI 비활성/한도 안내 · PC/모바일. (PC/모바일은 로컬 fixture 로만 확인 — 아래 7절)
+- [x] 테스트: 권한(폐쇄 게시판 · 미가입 · 타 커뮤니티 글 비노출) · 게시판 ID 위조 거부 · 비용 상한 · AI mock. (DB · 모델 mock — 아래 7절)
+- [x] 정본 반영: forum 공통 구조 문서에 AI 보조 계약 추가. (`docs/o4o-common-structure.md`)
+
+## 7. 구현 기록 (2026-11-07)
+
+**API contract 추가** (`/api/v1/communities/community/forum` 아래, 다른 forum mount 는 건너뜀): `GET /ai/status` · `POST /ai/compose-assist` · `GET /posts/similar` · `POST /ai/similar-search`. 계약은 `docs/o4o-common-structure.md`.
+
+**4절 · 3절과 다르게 정한 것**
+
+| 사안 | WO | 구현 | 이유 |
+|---|---|---|---|
+| AI 키워드 재검색 경로 | `GET .../posts/similar` 안에서 | 별도 `POST /ai/similar-search` | quota · 사용 원장을 쓰므로 GET 상태 변경 금지(AGENTS.md §5) 준수 |
+| 결과 부족 시 AI | 자동 또는 "더 찾기" | "더 찾기" 버튼만. 부족하면 버튼을 보여 준다 | 제목 입력 중 자동 호출은 일일 횟수를 소모한다 |
+| 상태 확인 | 언급 없음 | `GET /ai/status` 추가 | 버튼 비활성 안내를 누르기 전에 보여 주기 위함 |
+| 적용 범위 | `community.neture.co.kr` | `communityKey = community` 만. 사업 회원 공간(`business:*`) · 펀딩 · Neture mount 제외 | WO 범위 유지 |
+| 입력 상한 초과 | 상한만 명시 | 자르지 않고 400 | 잘린 본문의 수정안을 적용하면 글이 사라진다 |
+
+**공유 모듈 변경 (additive)**: `ForumWriteForm` 에 선택 prop `renderAfterTitle` · `onDraftChange` · `draftPatch` 추가(소비처 web-neture · web-pharmacy-business · web-pharmacy-coop 은 미지정 시 동작 동일). `AiQuotaService.checkQuota` 에 선택 `serviceKey` 인자 추가.
+
+**확인하지 못한 것**
+
+- 로컬 PostgreSQL 이 없어 실제 DB 실행 검증은 하지 않았다. TypeORM 이 만든 SQL 문자열과 바인딩만 확인했다.
+- 실제 모델 호출은 하지 않았다(mock).
+- 브라우저 확인은 API 를 stub 한 로컬 fixture 로만 했다. 실제 로그인 · 실제 API 연동은 미확인.
+
+**남은 한계**: 일일 횟수 초과 방지는 건수 확인과 예약이 별도 트랜잭션이라 인스턴스 간 동시 요청에서 소폭 초과할 수 있다. 일일 횟수는 같은 `community` 서비스의 다른 AI 사용(뉴스 편집 초안)과 합산된다.

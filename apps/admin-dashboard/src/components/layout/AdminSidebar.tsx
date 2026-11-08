@@ -1,5 +1,5 @@
 import { type FC } from 'react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom'
 import {
   X,
@@ -35,6 +35,23 @@ const AdminSidebar: FC<AdminSidebarProps> = ({ isOpen, onClose }) => {
 
   const isParentActive = (children: MenuItem[] | undefined) => 
     children?.some((child: any) => child.path && isActive(child.path)) || false
+
+  // 현재 화면이 속한 그룹은 펼친다(2026-11-07). 사용자가 접은 다른 그룹은 그대로 둔다.
+  useEffect(() => {
+    const open: string[] = []
+    const visit = (items: MenuItem[], parents: string[]) => items.forEach(item => {
+      if (item.path && item.path === location.pathname) open.push(...parents)
+      if (item.children) visit(item.children, [...parents, item.id])
+    })
+    visit(menuItems, [])
+    // useAdminMenu() 는 렌더마다 새 배열을 돌려준다. 이미 펼쳐져 있으면 같은 상태를 돌려줘
+    // 재렌더 루프를 막는다(#986 Codex P1).
+    if (open.length) {
+      setExpandedItems((prev: any[]) =>
+        open.every(id => prev.includes(id)) ? prev : [...new Set([...prev, ...open])],
+      )
+    }
+  }, [location.pathname, menuItems])
 
   const handleMenuItemClick = (item: MenuItem) => {
     if (item.id === 'collapse') {

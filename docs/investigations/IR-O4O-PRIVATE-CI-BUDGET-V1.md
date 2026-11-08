@@ -1,7 +1,7 @@
 # O4O 비공개 전환 월 예산 조사 및 1차 절감 준비
 
 > **상태**: DRAFT
-> **작성일**: 2026-10-30 · **최종 갱신**: 2026-10-30
+> **작성일**: 2026-10-30 · **최종 갱신**: 2026-11-07
 > **범위**: 향후 비공개 운영의 비용 절감. 월 100,000원은 희망 수준이며 필수 상한이 아니다. 비공개 전환은 별도 후속 작업이다. 현재 공개 여부·요금제·계정 예산은 변경하지 않는다.
 
 ## 1. 실제 조회 및 추정의 구분
@@ -101,3 +101,371 @@ main 병합 전까지 개발 담당이 검증·CI 지적 보완을 수행하며,
 
 - https://github.com/actions/cache
 - https://docs.github.com/en/actions/reference/workflows-and-actions/dependency-caching
+
+## 7. 절감 후보 — 문서 · 에이전트 설정 전용 변경의 full CI (2026-11-07 조사 · 미구현)
+
+> 조사만 했다. 판정 규칙(`scripts/ci/detect-affected.mjs`)은 바꾸지 않았다. 검사 범위를 바꾸는 변경이라 별도 WO 로 구현한다.
+
+### 7-1. 현재 판정 (코드 기준)
+
+문서 빠른 경로(`docs_fast_eligible`)는 **변경 전체가 `docs/**` 의 Markdown 추가 · 수정**일 때만 참이다. 아래 경로가 하나라도 섞이면 full CI 를 탄다.
+
+| 경로 | CI 축 판정 | 배포 축 판정 | 이 파일을 읽는 CI 검사 |
+|---|---|---|---|
+| `docs/**.md` (추가 · 수정) | 중립 → 빠른 경로 | 중립 | `docs-fast-validate` 가 그 문서를 읽는 test 만 선별 |
+| `docs/**` 삭제 · 이동 · 비 Markdown | global → full | — | 기록물 존재를 단언하는 정적 spec (의도된 동작 · 유지) |
+| 루트 `*.md` (`AGENTS.md` · `CLAUDE.md` · `README.md` · `SETUP.md` · `HANDOFF.md`) | `workspace 매핑 불가` → global → full | NON_RUNTIME → 배포 무영향 | 없음 — test 안의 등장은 판정기 시험의 입력 문자열 · 주석뿐 |
+| `.claude/**` (settings · hooks · skills) | `workspace 매핑 불가` → global → full | NON_RUNTIME → 배포 무영향 | 없음 — ESLint 는 `ts/tsx` 만 검사하고(`eslint.config.js`), 훅 테스트 · `settings.json` 검증은 CI 에 등록돼 있지 않다 |
+| `.agents/**` | `workspace 매핑 불가` → global → full | 매핑 없음 | 없음 |
+| `.github/pull_request_template.md` | `.github/` 접두어 → global → full | `.github/` 중립 | 없음 — `.github/` 를 global 로 두는 이유(정적 spec 이 workflow 원문을 읽음)가 이 파일에는 해당하지 않는다 |
+
+실측 사례:
+- `4ed77ee634`(#966): `.claude/` · `AGENTS.md` · `CLAUDE.md` · `SETUP.md` · PR 템플릿 · 문서를 바꿨다. 판정기 재실행 결과 `global_or_unknown=true` → full CI 였고, Delivery 는 전 서비스 `NO_DEPLOY` 였다.
+- 열린 PR #971: `.agents/` · `.claude/` · PR 템플릿 · 루트 md 4개 · `docs/` 를 바꾼다. 같은 이유로 full CI 대상이다.
+
+### 7-2. 빈도와 규모 (표본 · 추정)
+
+- 2026-10-08 이후 main first-parent 커밋 554건을 분류했다.
+  - 이미 빠른 경로: 136건
+  - **위 후보 경로로만 이뤄졌는데 full CI 를 탄 커밋: 17건**
+  - 그 밖: 401건
+- 같은 변경의 PR push 실행은 세지 않았다(미측정).
+- job 시간(job 별 분 단위 올림 합계, 표본 각 2건):
+  - full CI: `4ed77ee634` 11 job · 47분, `f96b70338a` 11 job · 49분
+  - 빠른 경로: `435d0d10be` · `743b01ed28` 각 4 job · 5분
+- main 만 보면 회당 약 42~44 job-분 차이다. 30일 17건이면 약 700 job-분 규모다.
+  - 표본 2건 기준의 추정이며 청구액이 아니다.
+  - PR 실행분은 별도로 더 생긴다.
+
+### 7-3. 후보안 (안전 조건 포함)
+
+1. **루트 `*.md` · `.agents/**` · `.github/pull_request_template.md` 를 빠른 경로 대상에 포함**
+   - 추가 · 수정에 한한다. 삭제 · 이동은 지금처럼 global 로 둔다.
+   - `docs-fast-validate` 의 소비 test 선별(`--mode=docs-specs`)이 이 경로도 보도록 넓힌다. 지금은 읽는 test 가 0이지만, 생기면 자동으로 선별되게 하기 위해서다.
+2. **`.claude/**` 는 빠른 경로 + 전용 경량 검사**
+   - 지금 full CI 는 이 경로를 실제로 검증하지 않는다. 그래서 빠른 경로로 옮겨도 잃는 검증은 없다.
+   - 대신 `settings.json` JSON 파싱과 훅 `.mjs` 구문 검사(`node --check`)를 빠른 경로에 더하는 것을 함께 검토한다. 훅 테스트가 저장소에 들어오면 그것도 등록한다.
+3. **Delivery Classify 는 유지(후보에서 제외)**
+   - main CI 가 끝날 때마다 GCP 인증과 서빙 SHA 조회를 1회 한다. 2026-11-07 기준 최근 40회 중 39 success · 1 cancelled 였다.
+   - 문서 전용이어도 commit status 기록과 서빙 상태 대조를 맡으므로, 절감폭(회당 약 1분)에 비해 변경 위험이 크다.
+
+구현 시 지킬 것:
+- `CI Gate` 이름 · needs · 실패 전파는 바꾸지 않는다. 빠른 경로 job 도 지금처럼 CI Gate 에 묶는다.
+- main push 의 검증 취소나 테스트 삭제는 하지 않는다. 판정을 할 수 없는 경우는 지금처럼 full CI 로 떨어진다.
+- `scripts/ci/__tests__/detect-affected.test.mjs` 에 경로별 회귀 사례를 추가한다. 루트 md · `.claude/` · `.agents/` · PR 템플릿의 추가 · 수정 · 삭제 · 이동과 코드 혼합을 다룬다.
+- `.github/` 의 다른 파일(workflow · action · 그 밖의 템플릿)은 계속 global 로 둔다. 예외는 정확한 파일명 1개만 둔다.
+
+> 후보안 1 · 2 는 2026-11-07 채택돼 #973 으로 구현 중이다.
+
+## 8. 실행량 감축 우선 — Draft 1순위 · 트리거별 분해 · 짧은 job 통합 · 집 PC 재계산 (2026-11-07 조사 · 미구현)
+
+> 조사와 제안만 한다. workflow · 스크립트 · 저장소 변수는 바꾸지 않았다. 구현은 아래 8-7 순서로 별도 PR 에서 한다.
+
+### 8-0. 이번 절의 전제 (2026-11-07 사용자 결정)
+
+1. 요금제는 **GitHub Pro** 로 간다. 포함 compute 는 $18/월이며 표준 Linux 기준 3,000분이다.
+2. 집 PC 이전보다 **실행량 감축을 먼저** 한다.
+3. 앞으로 클라우드 세션의 PR 은 **모두 드래프트로 자동 생성**된다. 그래서 Draft 비용 절약 모드(`CI_COST_PROFILE=budget`)를 감축 1순위로 올린다.
+4. 드래프트 push 에서는 가벼운 검사만 한다. **Ready 전환과 main 대상 최종 커밋에서는 full CI 가 반드시 돈다.**
+
+### 8-1. 방법 · 수치의 성격
+
+- 대상 기간은 §1 과 같은 2026-09-30~10-29 UTC 이다. 생성된 run **9,414건 전체**를 날짜별로 조회했고, 하루 1,000건 이상이면 시간별로 나눠 조회했다.
+- 표본은 workflow · 트리거 · branch 종류 · 결과의 **71개 층**에서 층마다 최대 10건, 기간에 고르게 뽑았다(총 **429 run**).
+  - job 별 시작 · 종료 시각으로 실제 시간을 구했다.
+  - 청구 기준 시간은 job 별 분 단위 올림으로 환산했다.
+  - 재실행 attempt 는 포함했고 job id 중복은 제거했다.
+- **월 청구 기준 추정 92,470분**(실제 실행시간 73,277분)이다.
+  - §1 의 88,774분과 약 4% 차이다. 층 구분에 branch 종류를 더한 데 따른 표본 차이다.
+  - 이 절의 수치는 서로 비교할 수 있도록 모두 이 92,470분 기준이다.
+- 모두 public 실행시간 기준의 **표본 추정이며 청구액이 아니다.**
+  - private 표준 실행기(2 vCPU / 8GB)는 public(4 vCPU / 16GB)보다 느릴 수 있다(미실측).
+  - 금액은 표준 Linux $0.006/분으로 환산했다.
+- 재현용 조회 스크립트는 저장소에 넣지 않았다(조사 전용). 같은 방법은 `scripts/ci/actions-cost.mjs` 의 층화 표본과 같다.
+
+### 8-2. 실행량이 어디서 나오는가 — 트리거 × branch 종류
+
+| 트리거 | branch | run | 월 분(청구 추정) | 비중 | 주요 workflow |
+|---|---|---:|---:|---:|---|
+| `pull_request` | `wo/*` | 6,846 | 58,119 | **62.9%** | CI Pipeline 1,942 · CodeQL 1,942 · Size Labeler 1,946 · Guard Policy 1,013 |
+| `push` | `main` | 1,344 | 23,822 | **25.8%** | CI Pipeline 664 · CodeQL 664 |
+| `workflow_dispatch` | `main` | 437 | 5,128 | 5.5% | Promote 207 · PharmacyHub QR cutover 111 · WIF smoke 35 · 배포 수동 실행 |
+| `workflow_run` | `main` | 665 | 3,811 | 4.1% | Delivery 624 · deploy-auto(은퇴) 35 |
+| `schedule` | `main` | 34 | 560 | 0.6% | 정기 full Jest 30 · CodeQL 주간 4 |
+| `pull_request` | 그 밖(`feat/` · `docs/` · `work/` 등) | 44 | 493 | 0.5% | CI · CodeQL · Labeler |
+| `workflow_dispatch` | `wo/*` · 그 밖 | 38 | 533 | 0.6% | 수동 CI · `deploy/*` 태그 배포 |
+| `push` | `wo/*` · 그 밖 | 6 | 10 미만 | 0% | 진단용 workflow |
+| **합계** | | **9,414** | **92,470** | | |
+
+- 이 기간에 `claude/*` branch run 은 0건이다. 클라우드 세션 PR 의 자동 드래프트는 이후 정책이라 이 표에 반영되지 않았다.
+- **PR 이 실행량의 63%** 를 만든다. PR 523개 · head SHA 1,960개로, PR 하나당 평균 3.75번 push 했다.
+  - push 횟수 분포(PR 수): 1회 177 · 2회 112 · 3회 72 · 4회 40 · 5회 29 · 6~9회 58 · 10회 이상 35.
+- PR 의 CI Pipeline 은 한 SHA 에 1번 돈다(1,954 SHA 중 2번 돈 것은 1건). PR 의 cancelled run 은 738건(CI 578 · CodeQL 149 · Guard 11)이다. 새 push 가 앞 실행을 취소한 것이고, 취소 전까지의 시간은 청구된다.
+
+workflow 별 비중(청구 추정): CI Pipeline 71,501 · CodeQL 8,375 · Promote 4,412 · Delivery 3,743 · Size Labeler 1,963 · Guard Policy 1,015 · 정기 Jest 529 · 그 밖 932.
+
+### 8-3. 1순위 — Draft 비용 절약 모드 효과 추정과 구현안
+
+**효과 추정.** PR 마다 마지막 head SHA 를 "최종 커밋"으로 두고, 그 전 SHA 의 실행을 드래프트 단계 후보로 셌다.
+
+| PR workflow | 최종 SHA 실행 | 그 전 SHA 실행 |
+|---|---|---|
+| CI Pipeline | 11,779분 (521 run) | **39,274분** (1,435 run) |
+| CodeQL | 1,208분 | 3,368분 |
+| Size Labeler | 525분 | 1,438분 |
+| Guard Policy | 216분 | 799분 |
+| **PR 합계** | **13,729분** | **44,883분 (77%)** |
+
+- private 에서는 CodeQL 이 원래 자동 생략된다(§3 · `CODEQL_PRIVATE_ENABLED` 미설정). 그래서 Draft 효과는 CodeQL 을 뺀 41,515분에서 계산한다.
+- 드래프트 push 마다 가벼운 검사(아래 L1)로 약 4분이 든다고 보면(1,435 run × 4 = 5,740분):
+
+| 시나리오 | 가정 | 월 절감(추정) |
+|---|---|---:|
+| A 상한 | 최종 커밋 전까지 계속 드래프트 | **약 35,800** |
+| **B 기준** | push 가 2번 이상인 PR(346개)마다 Ready 뒤 보완 push 1번이 full | **약 27,200** |
+| C 보수 | push 가 3번 이상인 PR(234개)은 Ready 뒤 full push 1번 더 | **약 21,300** |
+
+- 과거 PR 의 드래프트 상태 이력은 쓰지 않았다(지금까지는 대부분 바로 Ready 였다). 실제 효과는 세션이 언제 Ready 로 바꾸는지에 달렸다. 활성화 후 2주간 `actions-cost.mjs` 로 실측해 시나리오를 확정한다.
+
+**구현안 (별도 PR · 저장소 변수 `CI_COST_PROFILE=budget` 설정은 통합 담당 결정).** 지금 코드에서 이미 동작하는 것과 더해야 할 것을 나눈다.
+
+| 항목 | 지금 코드 | 필요한 변경 |
+|---|---|---|
+| 드래프트 PR 의 무거운 검사 유예 | `defer_full` = budget · `pull_request` · draft 일 때만 참 → 무거운 job 11개 skip | 없음 |
+| 드래프트에서 도는 가벼운 검사 | Detect · Docs sensitive guard 만 | **L1 가벼운 검사 job** 추가(또는 8-4 의 통합 job 으로 겸함): 문서 민감정보 · RoleGuard 정적 검사 · `.claude/` 검사 · `check-forbidden-tables` · `check-unsafe-routes` · console.log 검사. 설치 없이 1분 안팎. 선택안 L2: 영향 workspace type-check(설치 포함 약 3~4분) |
+| 드래프트의 CI Gate | 실패로 표시(`Draft PR requires final validation`) — green 으로 병합 준비된 것처럼 보이지 않음 | 없음. L1 이 실패하면 메시지를 L1 실패로 구분해 보여 준다 |
+| Ready 전환 시 full | CI Pipeline `types` 에 `ready_for_review` 포함 → 같은 head SHA 로 full 실행 | 없음 |
+| Ready 후 push | `synchronize` 이고 draft=false → full | 없음 |
+| main 대상 최종 커밋 | main `push` 는 `defer_full` 대상이 아님 → 항상 full. 배포 gate 도 main CI green 을 요구 | 없음 |
+| 다시 드래프트로 | `converted_to_draft` → 유예 · CI Gate 실패 → Ready 전까지 병합 불가 | 없음 |
+| Size Labeler | `opened` · `synchronize` 마다 실행 | `if: !github.event.pull_request.draft` + `types` 에 `ready_for_review` 추가 |
+| Guard Policy | 드래프트도 실행 · `ready_for_review` 미포함 | 드래프트는 L1 에서 실행하거나 skip. **`ready_for_review` 를 `types` 에 추가**해 Ready 시 반드시 실행 |
+| CodeQL | budget 이면 자동 실행 중지 · private 이면 기본 생략 | 없음 |
+| Codex 리뷰 | 드래프트 → Ready 전환 때 실행 | 없음(드래프트 push 마다 돌지 않음) |
+| 회귀 시험 | `actions-cost.test.mjs` 가 budget · draft 계약을 고정 | Labeler · Guard 의 draft skip · `ready_for_review` 포함 시험 추가 |
+
+- 드래프트 PR 은 GitHub 에서 병합할 수 없다. 병합하려면 Ready 가 필요하고, Ready 는 full CI 를 다시 돌리며, required check `CI Gate` 가 그 결과를 요구한다. "full 없이 병합"되는 경로는 없다.
+- budget 모드는 public 기간에 켜도 동작은 같다. public 은 무료라 비용 효과는 private 전환 뒤에 생긴다.
+
+### 8-4. 1분 미만 job 통합 — 올림 손실
+
+- 실행시간 60초 미만 job 은 월 약 **17,100개**이고, 분 단위 올림으로 생기는 손실은 약 **12,000분**이다.
+- 전체 올림 손실은 19,200분(청구 추정 92,470 − 실제 73,277)이다.
+
+| job | 월 청구(추정) | 실제 | 처리안 |
+|---|---:|---:|---|
+| Docs sensitive info guard (CI) | 2,594 | 656 | **Detect job 의 step 으로 이동**. 같은 checkout 을 쓰고 약 15초가 늘어도 Detect 는 1분 미만 그대로다 |
+| Detect affected scope (CI) | 2,668 | 1,190 | 유지 — 다른 job 의 입력이다. 위 guard 들을 흡수한다 |
+| CI Gate | 2,536 | 146 | **유지** — required check 집계 job 이다(`if: always()` · 실패 전파). 합치면 gate 계약이 깨진다 |
+| CodeQL Detect | 2,614 | 1,200 | private 에서는 job 자체가 생략된다 → 0 |
+| Apply Size Labels | 1,963 | 170 | 드래프트 skip + Ready · opened 만(8-3) → 약 525. 라벨을 쓰지 않으면 폐지도 선택지다(사용자 결정) |
+| Guard Static Analysis (RoleGuard) | 1,015 | 457 | **CI Pipeline 의 Detect(또는 L1)로 흡수**. `services/web-*/src/**` 변경일 때만 실행하던 path 조건은 step 조건으로 옮긴다 |
+| Delivery Classify | 1,106 | 691 | 유지(§7-3 · 서빙 상태 기록) |
+
+- Labeler 를 CI Pipeline job 에 합치는 안은 채택하지 않는다. CI job 에 `pull-requests: write` 권한을 줘야 하기 때문이다(PR 코드를 실행하는 job 의 권한 확대).
+- 효과: Draft 적용 뒤 기준으로 Docs guard 이동 약 2,600 + Guard 흡수 약 200(최종 SHA 분, 드래프트 분은 8-3 에 포함)으로 **약 2,800분**이다.
+  - Draft 를 적용하지 않으면 Guard 흡수가 약 1,000 이 된다.
+  - Labeler 절감은 8-3 에 포함했다.
+
+### 8-5. 감축 후 남는 양과 집 PC 실행기 (2~3개 병렬 · vars 전환)
+
+**감축 순서별 잔여 (월 분, 청구 추정):**
+
+| 단계 | 잔여 | 감소 |
+|---|---:|---:|
+| 현행 (public 실행시간 기준) | 92,470 | |
+| private 에서 CodeQL 자동 생략 (이미 코드에 있음) | 84,095 | −8,375 |
+| Draft 비용 절약 모드 (시나리오 B · A~C 범위 −35,800~−21,300) | 56,935 | −27,160 |
+| 1분 미만 job 통합 (8-4) | 54,125 | −2,810 |
+| 문서 · 에이전트 설정 빠른 경로 (#973 · main 분만 실측) | 약 53,400 | 약 −700 |
+| **감축 후 합계** | **약 53,400** (A~C 범위 약 45,000~60,000) | |
+
+**감축 후 GitHub 실행기에 반드시 남는 것: 약 9,200분/월.**
+- Delivery 3,743 · Promote 4,412 · 배포 수동 실행 · 테스트 약 520 · Windows 설치 테스트 약 70 · 정기 Jest 판정 job 약 30 · 그 밖 일회성 약 400.
+- Promote 207회는 이 기간의 cutover 작업으로 많아진 값일 수 있다.
+- **이 잔여만으로 Pro 포함 3,000분을 넘는다.** 배포 계열을 집 PC 로 옮기는 것은 OIDC · production 경계 정책이라 이번 범위 밖이다.
+
+**집 PC 로 옮길 양:** 약 44,200분/월(청구 기준). 실제 실행시간은 약 37,000분이다.
+
+**2~3개 병렬 기준:**
+- 시간당 처리 능력은 실행기 2개면 120 job-분, 3개면 180 job-분이다.
+- 옮길 workflow 의 시간대별 수요(감축 전 실제 job-분/시간)는 최대 779 · p95 409 · p90 275 · 중앙값 109 였다. 한국 시간 9~16시와 20~23시가 많다.
+- 감축 후 수요를 0.6배로 잡으면, 처리 능력을 넘는 시간은 월 **2개일 때 95시간(초과 7,300 job-분이 대기열로 밀림) · 3개일 때 38시간(초과 3,700 job-분)** 이다.
+- **3개를 권장한다.** RAM 64GB 기준으로 Jest 최대 RSS 약 4.5GiB × 3 에 PostgreSQL service container 를 더해도 여유가 있다. WSL `memory` 는 32GB → 48GB 상향을 검토한다. CPU 12스레드면 job 하나에 약 4스레드다.
+
+**병렬 전 필요한 변경 (별도 PR):**
+- `Central operator PostgreSQL integration` 이 host port `55432` 를 고정으로 쓴다. 같은 PC 에서 동시에 돌면 충돌한다. job `concurrency` 로 직렬화하거나 포트를 동적으로 바꾼다.
+- 실행기는 각자 설치 폴더(작업 폴더)를 따로 쓴다. 기본 동작이다.
+
+**vars 전환 (PC 꺼짐 대비):**
+- PC 가 꺼지면 `CI_RUNNER_LINUX` 를 삭제해 GitHub 실행기로 돌린다. 자체 실행기 label 로 이미 대기 중인 job 은 옮겨가지 않으므로 취소 후 re-run 한다(§9 runbook).
+- 그동안 비용: 옮길 양 기준 하루 약 1,470분, 약 $8.8 이다. Pro 포함분은 배포 잔여가 이미 소진하므로 전부 유료다.
+- 변수 자동 전환(PC 상태 감지)은 `variables: write` 토큰이 필요하다. 권한 위험이 있어 이번에는 제안하지 않는다(수동 전환 + 알림 유지).
+
+### 8-6. 요약 — 비용 비교 (Pro · 표준 Linux $0.006/분 · 청구 추정)
+
+| 구성 | GitHub 실행기 월 분 | Pro 3,000 대비 초과 | 월 비용(Pro $4 제외) |
+|---|---:|---:|---:|
+| 현행 그대로 private | 92,470 | 89,470 | 약 $537 |
+| CodeQL 생략만 | 84,095 | 81,095 | 약 $487 |
+| **감축 완료(8-3 · 8-4 · #973)** | **약 53,400** (45,000~60,000) | 약 50,400 | **약 $302** ($252~$342) |
+| **감축 + 집 PC 3대** | **약 9,200** | 약 6,200 | **약 $37** |
+| 참고: Free 2,000 기준 감축 + 집 PC | 약 9,200 | 약 7,200 | 약 $43 (ruleset · Environment 제약 있음 — §6) |
+
+(전기료 · Artifacts · cache 저장 · 별도 유료 서비스 제외)
+
+### 8-7. 구현 순서 (각각 별도 PR)
+
+1. **Draft L1 가벼운 검사 + Labeler · Guard 드래프트 처리 + `ready_for_review` 보장**(8-3). 회귀 시험을 포함한다. 병합 후 통합 담당이 `CI_COST_PROFILE=budget` 을 설정한다.
+2. **짧은 job 통합**(8-4): Docs guard · RoleGuard 를 Detect 로 옮긴다. CI Gate 의 이름 · needs · 실패 전파는 유지한다.
+3. #973(문서 · 에이전트 설정 빠른 경로) 병합.
+4. 2주 실측(`actions-cost.mjs`)으로 8-3 시나리오와 8-5 잔여를 확정한다.
+5. private 전환 → 집 PC 실행기 3대 등록 → port 55432 직렬화 → `CI_RUNNER_LINUX=self-hosted`.
+
+## 9. main push 와 PR CI 의 중복 · 수동 실행 분석 (2026-11-07 조사 · 미구현)
+
+> 조사와 제안만 한다. ruleset · workflow · 저장소 변수는 바꾸지 않았다. 구현은 9-5 순서로 별도 PR 에서 한다.
+
+### 9-1. 방법
+
+- 기간과 수치 기준은 §8 과 같다(2026-09-30~10-29 · 청구 추정 · 청구액 아님).
+- 이 기간 main push 의 CI Pipeline run 664건을 하나씩 대조했다. 각 run 의 대상 커밋 C 가 어떤 PR 에서 왔는지 찾고, 그 PR 의 **마지막 cancelled 아닌 PR CI run** 과 비교했다.
+  - merge commit 이면 두 번째 부모가 PR head 다. squash · rebase 면 PR API 로 head 를 찾았다.
+  - PR CI 는 `pull_request` 이벤트라 **PR head 와 그 시점 main 끝을 합친 결과**를 검사한다.
+  - 그래서 "PR CI 의 base(그 run 이 시작된 시점의 main 끝 커밋)" 가 "C 의 부모(병합 직전 main)" 와 같으면, main push CI 는 PR CI 가 이미 검사한 것과 **같은 tree** 를 다시 검사한 것으로 판정했다.
+- run 의 `pull_requests` 필드는 병합된 PR 에서 대부분 비어 있다. 그래서 base 는 "run 생성 시각의 main first-parent 끝 커밋" 으로 근사했다(첫 push 가 아닌 시각 근사이므로 오차가 있을 수 있다).
+- 수동 실행은 같은 기간 `workflow_dispatch` run 475건(main 437 · `wo/*` 18 · 그 밖 20)을 workflow · 결과 · 날짜 · SHA 별로 집계했다.
+
+### 9-2. main push CI 는 PR CI 와 얼마나 겹치는가
+
+main push 의 CI Pipeline 은 월 **약 20,000분**이다(664 run · run 당 평균 30.2분). CodeQL push 3,758분은 private 에서 자동 생략되므로 따로 뺐다.
+
+| main 커밋 유형 | run | 비고 |
+|---|---:|---|
+| PR merge commit | 516 | 이 기간의 주된 경로 |
+| PR squash | 40 | 지금(11월)의 주된 경로 |
+| PR rebase · fast-forward | 12 | |
+| 직접 push (PR 없음) | 106 | 10월 초 PR 필수 전환 이전. 지금은 생기지 않는다 |
+
+PR 에서 온 558건 중 PR CI run 과 연결된 516건의 대조 결과:
+
+| 결과 | 건수 | 비중 | 의미 |
+|---|---:|---:|---|
+| **같은 tree 를 녹색 PR CI 가 이미 검사** | **447** | **87%** | main push CI 는 순수 중복이다. PR CI 와 병합 사이 중앙값 11분 |
+| PR CI 뒤 main 이 앞서감 | 69 | 13% | 1커밋 43 · 2~3커밋 17 · 4~10커밋 3 · 11커밋 이상 6 |
+| └ 그중 같은 파일이 겹침 | 7 | 1.4% | 실제로 합친 결과를 다시 볼 가치가 큰 경우 |
+| 연결 실패(run 을 못 찾음) | 42 | — | 대조에서 제외 |
+
+- 지금처럼 모두 PR 로 병합하면, 같은 구성에서 **main push run 의 약 87% 가 중복**이다. 월 약 **15,700분**이다(578 run × (30.2 − 가벼운 확인 약 3분)).
+- 13% 는 PR CI 가 보지 못한 결합 상태다. 그중 파일이 겹치는 7건은 실제 충돌 · 회귀 위험이 있다. **main push 검증을 일괄 생략하면 안 되는 이유**다. main CI green 이 곧 Delivery 의 자동 배포 조건이다.
+
+### 9-3. 줄이는 안 · 위험 · 플랜 제약
+
+| 안 | 방식 | 월 절감(추정) | 위험 | 플랜 · 권한 제약 |
+|---|---|---:|---|---|
+| **C. main 에서 tree 일치 시 가벼운 확인** (권장) | main push 의 Detect 가 다음을 확인한다: ① C 가 PR 병합 커밋이다 ② 그 PR 의 마지막 녹색 `CI Gate` run 이 검사한 merge tree 가 `C^{tree}` 와 **정확히 같다**. 그러면 무거운 job 을 skip 하고 Detect · 정적 guard · `CI Gate` 만 돌린다. 하나라도 확인할 수 없으면 full 이다 | **약 15,700** | ① tree 가 같아도 시간 · 외부 상태에 따라 결과가 다를 수 있다(flaky · 날짜 의존 · 외부 API). ② PR run 이 "검사한 tree" 를 스스로 기록하므로, 같은 저장소 PR 의 코드가 기록을 위조할 수 있다(쓰기 권한 개발자 범위 · fork PR 은 read-only token). ③ 판정 로직 버그가 skip 쪽으로 새면 결합 회귀가 배포된다 → 의심스러우면 full · 회귀 시험 · 매일 full 안전망으로 막는다 | ruleset 변경 없음. PR CI 가 tree 기록(artifact 등)을 남기고, main Detect 에 `actions: read` 가 필요하다. Free · Pro 무관 |
+| **A. 병합 직전 최신화 강제** | ruleset 의 `strict_required_status_checks_policy` 를 true 로 바꾼다. PR 이 최신 main 을 포함해야 병합된다. PR CI 가 병합될 tree 를 그대로 검사하게 된다 | 단독 0. C 와 같이 쓰면 13% 중 일부를 추가로 skip 할 수 있다(약 +1,900) | main 이 움직일 때마다 Ready PR 이 모두 다시 최신화 · full PR CI 를 돌려야 한다. 이 기간 기준 최소 69건 × 약 30분 = **약 2,100분이 추가**되고, 병렬 세션이 많을수록 연쇄 재실행이 늘어난다(미측정). 통합 순서가 직렬화돼 대기가 늘어난다 | private 저장소의 ruleset 은 **Pro 이상**에서 쓸 수 있다(Pro 결정과 맞음). ruleset 변경은 통합 담당 결정 · 설정 변경 대상이다 |
+| **B. merge queue** | 병합 대기열이 "합친 결과" 를 검사한 뒤 그 커밋을 그대로 main 에 올린다. main push CI 는 같은 커밋이므로 생략할 수 있다 | 최대 약 17,000 | 대기열 검사가 실패하면 대기가 늘어난다. `merge_group` 이벤트 대응이 필요하다(현 workflow 는 미지원) | **개인 계정 소유 저장소에서는 쓸 수 없다**(현재 이해: 조직 소유 저장소 전용이며, private 은 Enterprise Cloud 필요). 이 저장소는 개인 계정 소유라 **채택 불가**. 전환 시점에 공식 문서로 재확인 |
+| **D. main 은 항상 가벼운 확인만 + 매일 full** | main push 는 무조건 가볍게, 매일 1회 main HEAD full CI | 약 18,000 | 13% 결합 상태(파일 겹침 7건 포함)가 **검증 없이 Delivery 로 자동 배포**된다. A 를 함께 쓰지 않으면 **채택 불가** | A 와 같이 쓰면 C 와 결과가 비슷하고 PR 재실행 비용(A)이 추가된다 |
+| E. 현행 유지 | main push full | 0 | — | — |
+
+**권장: C 를 먼저 한다.**
+- ruleset 변경이나 개발 흐름 변화 없이 중복 87% 를 걷어낸다.
+- tree 가 일치하지 않는 13% 는 지금처럼 full 이다. 판정이 불확실해도 full 이다.
+- 안전망으로 매일 1회 main HEAD full CI 를 추가한다(약 30분 × 30 = 약 900분/월). 지금의 정기 full Jest 도 유지한다.
+- A 는 비용상 이득이 거의 없다(추가 재실행 ≈ 추가 절감). 결합 회귀가 실제로 문제가 될 때 별도로 판단한다.
+
+**C 구현 시 지킬 것(별도 PR):**
+- PR CI 의 Detect 가 checkout 한 merge 커밋의 tree SHA 를 남긴다(작은 artifact 또는 job summary). main Detect 는 그 PR 의 마지막 **녹색 `CI Gate` run** 의 기록만 신뢰한다.
+- 다음 경우는 모두 full 이다: 연결 PR 이 없거나 둘 이상, 기록이 없음, tree 불일치, API 실패, run 이 cancelled, 드래프트 run(`CI Gate (draft · not final)`).
+- 가벼운 확인 run 에서도 `CI Gate` 이름 · 실패 전파는 그대로 둔다. Delivery 의 "main CI green" 조건 의미가 "이 tree 는 녹색 full 검증을 받았다" 로 유지되게 한다.
+- 회귀 시험: tree 일치 → 가벼움, 불일치 · 기록 없음 · 실패 → full, 드래프트 기록 무시, main 외 이벤트에는 영향 없음.
+
+### 9-4. `workflow_dispatch` 475건(main 437) — 무엇이 실행했나
+
+- 실행 주체는 전부 `Renagang21` 이다. 세션도 사용자 token 으로 실행하므로, API 만으로는 사람과 세션을 구분할 수 없다.
+- 월 청구 추정 합계는 약 5,660분이다.
+
+| workflow | run | 월 분 | 성격 | 줄이는 안 |
+|---|---:|---:|---|---|
+| **Promote** | 207 | **4,412** | LEVEL_3(migration · auth) 배포 승인 1회. `SHA == main HEAD` 이어야 해서 main 이 움직이면 거절되고 새 SHA 로 다시 승인한다. 서로 다른 SHA 157 · **직전과 같은 SHA 재실행 50** · 직전 실행 60분 이내 99 · 실패 8 · 취소 6 | ① 같은 SHA 재실행 전에 commit status `production` 을 먼저 확인한다(운영 절차). ② 같은 시간대의 L3 변경은 마지막 HEAD 에서 한 번에 승인한다(묶음 승인). ③ Promote 의 `Web` · `Classify` job 은 1분 미만이 많다(479분 청구 · 실제 88분) → §8-4 방식 통합 후보 |
+| PharmacyHub QR cutover | 112 | 341 | 10/9~10/20 일회성 운영 전환. 실패 42 후 재시도 | 완료된 작업이라 이후 0 예상. workflow 정리 후보(별도 판단) |
+| CI Pipeline (수동) | 13 | 420 | 작업 branch 에서 수동 재실행(`pc-install-simple-button` 5회 등) | PR CI 결과를 먼저 확인한다. 드래프트 모드에서는 수동 full 이 필요할 때만 실행한다 |
+| Deploy Web Services · Deploy API · Deploy Cooperative | 39 · 20 · 25 | 386 | break-glass 수동 배포 · Cooperative 시험 배포(`apply=false` 포함) | 정상 경로는 Delivery 자동 배포다. 수동 배포는 운영 절차상 예외로 유지한다 |
+| GCP WIF auth smoke | 35 | 35 | WIF 전환 검증(10/26 하루 13회) | 변경 시에만 실행 |
+| 그 밖(e2e · delivery · deploy-auto(은퇴) · secret check · CodeQL · 기타) | 24 | 약 70 | 수동 검증 · 은퇴 workflow | deploy-auto · cd-risk-gate-shadow 는 은퇴 상태 |
+
+- **지속적으로 남는 수동 실행은 사실상 Promote 하나**다(월 약 4,400분 · GitHub 실행기에 남는 몫, §8-5).
+- Promote 를 줄이려면 L3 판정 빈도(migration · auth 변경이 섞인 main 커밋 수)와 승인 묶음이 핵심이다. L3 판정 기준 자체는 배포 안전 정책이라 이번 범위 밖이다.
+
+### 9-5. 정리 · 순서 (각각 별도 PR · 결정)
+
+| 순서 | 항목 | 월 절감(추정) | 결정 · 실행 주체 |
+|---|---|---:|---|
+| 1 | main push tree 일치 시 가벼운 확인(C) + 매일 main full 안전망 | 약 15,700 − 900 = **약 14,800** | 구현 PR(작업 세션) → 통합 담당 검토 |
+| 2 | Promote 같은 SHA 재실행 방지 · 묶음 승인 | 50회 재실행분 약 1,000 + 묶음 효과(미측정) | 운영 절차 결정(통합 담당) |
+| 3 | Promote 의 1분 미만 job 통합 | 최대 약 400 | 구현 PR(배포 workflow 변경이라 통합 담당 검토 필수) |
+| 4 | 병합 직전 최신화 강제(A) | 비용 이득 ≈ 0 | 결합 회귀가 문제 될 때 통합 담당이 판단 |
+| — | merge queue(B) | — | 개인 계정 저장소라 채택 불가(전환 시 재확인) |
+
+§8-5 의 "감축 후 약 53,400분" 에서 1 을 더하면 **약 38,600분**(GitHub 호스팅 기준, 집 PC 이전 전)이 된다. 이때 Pro 기준 비용은 약 $214/월이다. 집 PC 로 옮길 양은 약 29,400분으로 줄고, 실행기 2대로도 피크 대기가 크게 줄어든다(재계산은 1 구현 후 실측으로 한다).
+
+## 10. 결정 반영 · 후속 조사 (2026-11-07)
+
+> 2026-11-07 사용자 결정: §9-3 C 안 **조건부 채택**(판정은 GitHub API 가 직접 주는 정보만), Promote 같은 SHA 재실행 방지 채택, `check-forbidden-tables.mjs` 실패는 원인만 조사.
+> CI · workflow PR 은 한 번에 하나씩 병합한다: #973 → #975 → #976 → #980 → #981.
+
+### 10-1. §9-3 C 안 — API 정보만으로 판정 가능 → 구현(#981, 기본 비활성)
+
+**판정 근거(모두 GitHub 가 만든 정보 · PR 코드가 쓸 수 있는 기록은 쓰지 않음):**
+
+| 확인 | API | 위조 가능성 |
+|---|---|---|
+| main 커밋 C 의 tree SHA · 첫 부모 | `commits/{C}` | 없음 — git 객체 해시 |
+| C 와 부모 사이 변경 파일 (`.github/**` · `scripts/**` 면 full) | `compare/{P}...{C}` | 없음 |
+| C 를 merge commit 으로 가진 병합 PR 정확히 1개 · 같은 저장소 · base=main | `commits/{C}/pulls` | 없음 — GitHub 병합 기록 |
+| PR head H 의 tree SHA == tree(C) | `commits/{H}` | 없음 |
+| H 의 `ci-pipeline.yml` `pull_request` run 성공 + 이름이 정확히 `CI Gate` 인 job success | `actions/workflows/…/runs` · `actions/runs/{id}/jobs` | job 결론은 Actions runner 가 보고한다. API 로 만든 check run 은 Actions job 이 아니므로 섞이지 않는다. 드래프트 gate(`CI Gate (draft · not final)`)는 이름이 달라 제외된다 |
+
+- **§9 의 "같은 base" 기준과의 차이**:
+  - PR CI 가 실제로 검사한 임시 병합 커밋(`refs/pull/N/merge`)의 SHA 는 run 메타데이터에 남지 않는다.
+  - 그래서 API 기준은 **tree(C) == tree(PR head)**, 즉 PR head 가 병합 직전 main 을 이미 포함한 경우로 좁아진다.
+  - 실측 적중률:
+    - 2026-09-30~10-29 merge commit 525건 중 **426건(81%)**
+    - 11월 squash 최근 26건 중 **8건(31%)** — 병렬 세션 PR 이 main 보다 뒤처진 채 병합되는 경우가 많다
+  - 통합 담당이 병합 직전 main 을 merge 하고 PR CI 를 다시 받으면(AGENTS §4-1(e)) 대부분 적중한다.
+- **예상 절감**:
+  - 현재 흐름(약 30%): 월 약 6,000분
+  - 병합 직전 최신화 시(80%대): 월 약 15,000분
+  - 매일 main 전체 검사 비용(약 900분)을 뺀 값이며, 켠 뒤 2주 실측으로 확정한다.
+- **안전 경계**:
+  - 기본 비활성(`CI_MAIN_REUSE`)이다.
+  - CI 인프라 변경 · 판정 불가 · API 실패는 full 이다.
+  - 매일 1회 main 전체 검사를 둔다(Delivery 는 이 run 으로 배포하지 않는다).
+
+### 10-2. Promote 같은 SHA 재실행 방지 → 구현(#980)
+
+- 같은 SHA 의 Promote(dry-run 제외)가 **이미 성공**했거나 **진행 · 대기 중**이면 배포 호출을 건너뛴다.
+- 실패 · 취소된 이전 run 은 재시도를 허용한다. `force='true'` 는 롤백 뒤 재배포 등의 예외용이다.
+- 판정할 수 없거나 판정 job 이 실패하면 **승격은 그대로 진행한다**(fail-open).
+- 판정 job 비용은 약 1분 × 월 약 200회다. 막는 재실행은 1회 평균 약 21분이다.
+
+### 10-3. `scripts/check-forbidden-tables.mjs` 가 main 에서 실패하는 원인 (조사만 · 수정 안 함)
+
+현재 main 에서 실행하면 위반 2건으로 exit 1 이다.
+
+| 위반 | 파일 · 도입 | 실제 성격 | 판정 |
+|---|---|---|---|
+| `@Entity('o4o_payments')` | `apps/api-server/src/entities/payment/PlatformPayment.entity.ts` · `73948d30ef`(2026-02-16, Retail Stable v1.0 payment core) | **PaymentCore 의 플랫폼 공통 결제 테이블**. `CHECKOUT-STABLE-DECLARATION-V2` §2-2 가 `o4o_payments."paymentKey"` UNIQUE 등을 현행 계약으로 명시하고, §2 의 Neture 약국 테스트 결제도 이 테이블을 쓴다 | **오탐** — 스크립트의 허용 목록이 `checkout_orders` · `checkout_payments` 둘뿐이고, 패턴 `(?!checkout_)(\w+)_payments` 가 PaymentCore 테이블도 잡는다. PaymentCore 도입 때 스크립트가 갱신되지 않았다 |
+| `@Entity('neture_settlement_orders')` | `apps/api-server/src/modules/neture/entities/neture-settlement-order.entity.ts` · `32273509a2`(2026-03-09, settlement service extraction) | 정산-주문 **연결 테이블**(중복 정산 방지). 주문을 만드는 독립 주문 원장이 아니다 | **이름 패턴 오탐** — `*_orders` 접미사만 보고 판정한다 |
+
+**방치된 이유:**
+- 이 스크립트는 **CI workflow · `package.json` 어디에서도 호출되지 않는다.** `O4O-STORE-RULES` §(스키마)에 "수동 실행" 으로 기록돼 있다.
+- 그래서 위반이 생겨도 막지 못했고, 이후 CHECK 문서들은 "사전 위반" 으로만 적었다(예: `CHECK-O4O-AUTOMATION-VIDEO-JOB-P0-ADMIN-WORKSPACE-V1`).
+- 2026-10 문서 census(`CHECK-O4O-DOCS-4AXIS-CLASSIFICATION-AND-PUBLIC-SECURITY-CENSUS-V1` §288)도 이미 지적했다: CI 미연결, `@Entity({ name })` 형식 미검출, B2B 파생 원장 `neture_orders` 가 금지 목록에 있음.
+
+**정리 방향(결정 필요 · 별도 WO):**
+1. `o4o_payments` 를 PaymentCore 예외로, `neture_settlement_orders` 를 연결 테이블 예외로 근거와 함께 허용 목록에 둘지 정한다. `CLAUDE.md` §4 · `CHECKOUT-STABLE-V2` 의 계약 소유자가 결정한다.
+2. `@Entity({ name: 'x' })` 형식도 검사하게 고치고, `neture_orders` 항목은 B2B 계약(`O4O-B2B-SUPPLIER-TO-STORE-ORDER-CONTRACT-V1`)과 맞춘다.
+3. 위반 0 이 된 뒤 CI 에 연결한다. 이 스크립트는 설치 없이 돈다(내장 모듈 `fs/promises` · `path` · `url` 만 쓴다). 그래서 Code Quality Check 와 드래프트 가벼운 검사에 모두 넣을 수 있다. 단 드래프트 검사에 넣으려면 import 를 `node:` 접두어로 바꿔야 한다. #975 의 시험이 `node:` 내장 · 상대 경로만 허용한다.
+

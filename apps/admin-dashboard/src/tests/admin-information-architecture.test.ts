@@ -53,7 +53,12 @@ describe('메뉴 트리 — 플랫폼 관리자 사이트 canonical 구조', () 
     '/admin/platform/suppliers',
     '/admin/platform/stores',
     '/admin/platform/erasure-operations',
-    '/admin/platform/resource-deletion',
+    // WO-O4O-ADMIN-OPERATOR-MENU-REALIGNMENT-V1: 최종 삭제 처리 그룹(대상별) · 전체 관리자 계정
+    '/admin/platform/member-erasure',
+    '/operations/neture/forum-deleted',
+    '/admin/platform/board-deletion',
+    '/admin/platform/course-deletion',
+    '/settings/admin-accounts',
     '/admin/pharmacy-service-settings',
     // Core
     '/operators',
@@ -72,7 +77,7 @@ describe('메뉴 트리 — 플랫폼 관리자 사이트 canonical 구조', () 
     //   WO-O4O-CMS-LEGACY-MEDIA-ASSET-TO-MEDIA-V2-CANONICALIZATION-FINAL-CLOSURE-V1:
     //   `/content/assets` → `/content-resource/media-assets`(미디어 정본) 로 교체,
     //   `/content/analytics` 제거. 둘 다 cms_media 하나에 의존했고 운영에 그 테이블이 없다.
-    '/content',
+    //   '/content'(자료 안내 · 링크 카드뿐)는 2026-11-07 메뉴에서 제거했다(route 유지).
     '/content-resource/media-assets',
     '/operator/signage/required',
     // CMS

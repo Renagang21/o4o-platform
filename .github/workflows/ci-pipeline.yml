@@ -31,8 +31,14 @@ on:
 # 앞의 코드 full CI 를 취소**했다(실측: 619c51a4f · c5f33791a 의 CI Pipeline cancelled).
 # main/develop push 의 검증은 끝까지 보존하고, PR 은 새 revision 이 오면 이전 검사가
 # obsolete 이므로 취소를 유지한다.
+#
+# WO-O4O-CI-DRAFT-LIGHT-READY-GUARANTEE-V1 — budget 모드의 **드래프트 run 은 별도 그룹**(`-draft`)이다.
+# 드래프트로 연 직후 Ready 로 바꾸면(#974) 같은 HEAD 에 두 run 이 몇 초 차이로 시작한다. 같은 그룹이면
+# Ready run 이 드래프트 run 을 취소하고, 취소된 run 의 CI Gate(`if: always()`)가 cancelled upstream 을 보고
+# **가짜 failure** 를 남겼다. 그룹을 나누면 Ready(full) run 은 드래프트 run 을 취소하지 않는다.
+# 드래프트 push 끼리 · full run 끼리는 지금처럼 새 revision 이 앞 run 을 취소한다. budget 이 아니면 그룹은 종전과 같다.
 concurrency:
-  group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}${{ (vars.CI_COST_PROFILE == 'budget' && github.event_name == 'pull_request' && github.event.pull_request.draft) && '-draft' || '' }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 env:
@@ -53,9 +59,22 @@ jobs:
   #   global fallback 이라 아래 full CI 경로가 그대로 돈다.
   #   `fetch-depth: 0` 은 multi-commit push batch(`event.before..sha`) 를 통째로
   #   보기 위한 것이다 — `HEAD~1` 비교는 앞쪽 commit 의 변경을 놓친다.
+  #
+  # WO-O4O-SELF-HOSTED-CI-PREPARATION-V1 — 실행 장소 선택 (정본: docs/baseline/operations/O4O-SELF-HOSTED-CI-RUNNER-V1.md)
+  #   일반 CI job 의 `runs-on` 은 아래 한 가지 식이다(scripts/ci/__tests__/runner-selection.test.mjs 가 문자 그대로 고정).
+  #   자체 실행기는 세 조건이 모두 참일 때만 선택된다:
+  #     ① 저장소 변수 CI_RUNNER_LINUX(Windows job 은 CI_RUNNER_WINDOWS) == 'self-hosted'
+  #     ② github.event.repository.private == true  — public 이면 변수가 있어도 GitHub 호스팅
+  #     ③ fork 에서 온 PR 이 아님
+  #   그 밖(변수 없음 · 다른 값 · public · fork PR · payload 에 repository 가 없는 이벤트)은 전부 ubuntu-latest / windows-latest.
+  #   되돌리기 = 변수 삭제. 배포 · GCP 권한 job(deploy-* · delivery · promote)과 CodeQL 은 이 식을 쓰지 않는다.
   detect:
     name: Detect affected scope
-    runs-on: ubuntu-latest
+    # 드래프트 run 에서 PR 의 현재 draft 상태를 읽는다(pr-live-draft.mjs). 그 밖에는 git 만 쓴다.
+    permissions:
+      contents: read
+      pull-requests: read
+    runs-on: ${{ fromJSON(vars.CI_RUNNER_LINUX == 'self-hosted' && github.event.repository.private == true && github.event.pull_request.head.repo.fork != true && '["self-hosted","Linux","X64","o4o-ci-linux"]' || '"ubuntu-latest"') }}
     outputs:
       # Opt-in only. Draft CI must never count as a merge-ready full validation.
       defer_full: ${{ vars.CI_COST_PROFILE == 'budget' && github.event_name == 'pull_request' && github.event.pull_request.draft }}
@@ -67,6 +86,8 @@ jobs:
       global_or_unknown: ${{ steps.scope.outputs.global_or_unknown }}
       fallback: ${{ steps.scope.outputs.fallback }}
       web_build_dirs: ${{ steps.scope.outputs.web_build_dirs }}
+      # 드래프트 run 인데 PR 이 이미 Ready 면 true — 가벼운 검사도 건너뛴다(full 은 ready_for_review run 이 한다).
+      draft_superseded: ${{ steps.live.outputs.superseded }}
 
     steps:
     - uses: actions/checkout@v6
@@ -80,10 +101,57 @@ jobs:
         HEAD_SHA: ${{ github.event.inputs.head_sha || (github.event_name == 'pull_request' && github.event.pull_request.head.sha) || github.sha }}
       run: node scripts/ci/detect-affected.mjs
 
+    # WO-O4O-CI-DRAFT-LIGHT-READY-GUARANTEE-V1 — 드래프트 run 에서만. 확인할 수 없으면 superseded=false(가벼운 검사 실행).
+    - name: Check whether this draft PR is already Ready
+      id: live
+      if: vars.CI_COST_PROFILE == 'budget' && github.event_name == 'pull_request' && github.event.pull_request.draft
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+        PR_NUMBER: ${{ github.event.pull_request.number }}
+      run: node scripts/ci/pr-live-draft.mjs
+
+  # 0-b. 드래프트용 가벼운 검사 — WO-O4O-CI-DRAFT-LIGHT-READY-GUARANTEE-V1
+  #
+  #   budget 모드(`CI_COST_PROFILE=budget`)의 드래프트 PR push 에서만 돈다(`defer_full`). 무거운 job 은 모두 skip 이다.
+  #   설치 없이 도는 정적 guard 만 실행한다(측정 1초 미만): 위험 운영 route · console.log.
+  #   TypeORM entity 등록 검사는 `typescript` 패키지가 필요해 여기 넣지 않는다(Code Quality Check 에 그대로 있다 · Codex #975).
+  #   `.claude/` 검사(scripts/ci/check-agent-config.mjs)는 파일이 있을 때만 실행한다(#973 병합 전후 모두 동작).
+  #   문서 민감정보 검사는 아래 docs-sensitive-guard 가 모든 run 에서 따로 한다.
+  #   **이 job 은 full 검증을 대신하지 않는다.** Ready 전환 · Ready 이후 push · main push 는 full CI 를 탄다.
+  draft-light:
+    name: Draft light checks
+    runs-on: ${{ fromJSON(vars.CI_RUNNER_LINUX == 'self-hosted' && github.event.repository.private == true && github.event.pull_request.head.repo.fork != true && '["self-hosted","Linux","X64","o4o-ci-linux"]' || '"ubuntu-latest"') }}
+    needs: [detect]
+    if: needs.detect.outputs.defer_full == 'true' && needs.detect.outputs.draft_superseded != 'true'
+    permissions:
+      contents: read
+    timeout-minutes: 5
+    steps:
+    - uses: actions/checkout@v6
+      with:
+        sparse-checkout: |
+          /*
+          !/apps/api-server/src/scripts/data/
+        sparse-checkout-cone-mode: false
+    - uses: actions/setup-node@v7
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+    - name: Guard unsafe operational routes
+      run: node scripts/check-unsafe-routes.mjs
+    - name: Check for console.log statements
+      run: bash scripts/ci/check-console-log.sh apps/
+    - name: Check agent config (.claude/) when the checker exists
+      run: |
+        if [ -f scripts/ci/check-agent-config.mjs ]; then
+          node scripts/ci/check-agent-config.mjs
+        else
+          echo "scripts/ci/check-agent-config.mjs 없음 — 건너뜀"
+        fi
+
   # 1. Code Quality Checks
   quality-check:
     name: Code Quality Check
-    runs-on: ubuntu-latest
+    runs-on: ${{ fromJSON(vars.CI_RUNNER_LINUX == 'self-hosted' && github.event.repository.private == true && github.event.pull_request.head.repo.fork != true && '["self-hosted","Linux","X64","o4o-ci-linux"]' || '"ubuntu-latest"') }}
     needs: [detect]
     # Admin-only 변경은 아래 admin-fast-* 두 잡이, 문서 Markdown 추가·수정만인 변경은
     # docs-fast-validate 가 대체한다. 그 외에는 전부 여기로 온다.
@@ -244,6 +312,14 @@ jobs:
         scripts/ci/__tests__/deploy-workflow-gates.test.mjs
         scripts/ci/__tests__/deploy-workflow-diff.test.mjs
         scripts/ci/__tests__/deploy-orchestrate.test.mjs
+        scripts/ci/__tests__/runner-selection.test.mjs
+        scripts/ci/__tests__/draft-ready-guarantee.test.mjs
+        scripts/ci/__tests__/check-agent-config.test.mjs
+
+    # WO-O4O-DOCS-FAST-AGENT-CONFIG-V1 — `.claude/` 경량 검사(settings JSON · 훅 node --check · 훅 단위 테스트).
+    # `.claude/` 가 코드와 섞여 full 경로로 오는 경우에도 같은 검사를 돌린다(1초 미만 · 의존성 0).
+    - name: Check agent config (.claude/)
+      run: node scripts/ci/check-agent-config.mjs
 
     - name: Test account erasure activation controls (isolated)
       run: |
@@ -416,7 +492,7 @@ jobs:
   # 가리지 않게 한다(Phase 0 shadow false-negative 대조에 전체 실패 목록이 필요하다).
   api-tests:
     name: API Server Jest (${{ matrix.shard }}/3)
-    runs-on: ubuntu-latest
+    runs-on: ${{ fromJSON(vars.CI_RUNNER_LINUX == 'self-hosted' && github.event.repository.private == true && github.event.pull_request.head.repo.fork != true && '["self-hosted","Linux","X64","o4o-ci-linux"]' || '"ubuntu-latest"') }}
     needs: [detect]
     # Admin-only 변경에서는 전체 suite 대신 admin-fast-guards 가
     # **Admin 소스를 읽는 정적 guard spec** 만 선별해 돌린다(범위 축소가 아니라 선별).
@@ -521,7 +597,7 @@ jobs:
   # 세 잡은 모두 blocking 이며 run 결과는 셋 중 하나라도 실패하면 실패다 — 병렬화로 약해지는 게이트는 없다.
   build:
     name: Build Applications
-    runs-on: ubuntu-latest
+    runs-on: ${{ fromJSON(vars.CI_RUNNER_LINUX == 'self-hosted' && github.event.repository.private == true && github.event.pull_request.head.repo.fork != true && '["self-hosted","Linux","X64","o4o-ci-linux"]' || '"ubuntu-latest"') }}
     needs: [detect]
     if: needs.detect.outputs.defer_full != 'true' && needs.detect.outputs.admin_only != 'true' && needs.detect.outputs.docs_fast_eligible != 'true'
 
@@ -593,7 +669,7 @@ jobs:
   #   build-arg(VITE_*)는 주입하지 않는다 — vite 는 미지정 env 를 undefined 로 inline 하며 빌드 성패에 영향이 없다.
   web-build:
     name: Web production build (affected)
-    runs-on: ubuntu-latest
+    runs-on: ${{ fromJSON(vars.CI_RUNNER_LINUX == 'self-hosted' && github.event.repository.private == true && github.event.pull_request.head.repo.fork != true && '["self-hosted","Linux","X64","o4o-ci-linux"]' || '"ubuntu-latest"') }}
     needs: [detect]
     if: >-
       needs.detect.outputs.defer_full != 'true' &&
@@ -648,6 +724,10 @@ jobs:
   # 문서 Markdown **추가·수정만** 있는 push 에서 실행된다(판정: detect).
   # 실측 기준선: docs-only commit 63c36e11e 에서도 CI 14분 09초 + CodeQL 7분 32초가 돌았다.
   #
+  # WO-O4O-DOCS-FAST-AGENT-CONFIG-V1 — 같은 조건(추가 · 수정만)으로 문서 · 에이전트 설정 경로도 여기로 온다:
+  #   root `*.md` · `.claude/**` · `.agents/**` · `.github/pull_request_template.md`(정확한 파일 1개).
+  #   삭제 · 이동과 `.github/` 의 다른 파일은 지금처럼 full 이다. `.claude/` 는 아래 `Check agent config` 가 검사한다.
+  #
   # 무엇을 **줄이지 않았는지** 명시한다:
   #   - 변경 문서를 **실제로 읽는** api-server test 는 전부 선별해 그대로 돌린다
   #     (`--mode=docs-specs`. 전수 조사 §9 결과: 기록물 보존 guard · 정본 존재 단언 ·
@@ -661,7 +741,7 @@ jobs:
   #   API 전체 Jest · Admin production build.
   docs-fast-validate:
     name: Docs Fast — docs consumer tests
-    runs-on: ubuntu-latest
+    runs-on: ${{ fromJSON(vars.CI_RUNNER_LINUX == 'self-hosted' && github.event.repository.private == true && github.event.pull_request.head.repo.fork != true && '["self-hosted","Linux","X64","o4o-ci-linux"]' || '"ubuntu-latest"') }}
     needs: [detect]
     if: needs.detect.outputs.defer_full != 'true' && needs.detect.outputs.docs_fast_eligible == 'true'
 
@@ -684,6 +764,11 @@ jobs:
     # docs 축 판정 자체의 회귀(Case D1~D10)를 여기서도 막는다.
     - name: Run tests (CI affected-scope detector node:test)
       run: node --test scripts/ci/__tests__/detect-affected.test.mjs
+
+    # `.claude/` 를 바꾼 push 가 이 경로로 올 수 있다 — settings JSON · 훅 node --check · 훅 단위 테스트.
+    # `.claude/` 를 바꾸지 않은 경우에도 돌린다(1초 미만). 실패는 blocking 이고 CI Gate 로 전파된다.
+    - name: Check agent config (.claude/)
+      run: node scripts/ci/check-agent-config.mjs
 
     - name: Select docs consumer tests
       id: select
@@ -739,7 +824,7 @@ jobs:
   #   KPA · Neture · Admin closure 밖 package 테스트 / local-agent node:test.
   admin-fast-validate:
     name: Admin Fast — validate & build
-    runs-on: ubuntu-latest
+    runs-on: ${{ fromJSON(vars.CI_RUNNER_LINUX == 'self-hosted' && github.event.repository.private == true && github.event.pull_request.head.repo.fork != true && '["self-hosted","Linux","X64","o4o-ci-linux"]' || '"ubuntu-latest"') }}
     needs: [detect]
     if: needs.detect.outputs.defer_full != 'true' && needs.detect.outputs.admin_only == 'true'
 
@@ -814,7 +899,7 @@ jobs:
   # 선별이 비면(판정 실패) 전체 suite 로 되돌린다.
   admin-fast-guards:
     name: Admin Fast — repo static guards
-    runs-on: ubuntu-latest
+    runs-on: ${{ fromJSON(vars.CI_RUNNER_LINUX == 'self-hosted' && github.event.repository.private == true && github.event.pull_request.head.repo.fork != true && '["self-hosted","Linux","X64","o4o-ci-linux"]' || '"ubuntu-latest"') }}
     needs: [detect]
     if: needs.detect.outputs.defer_full != 'true' && needs.detect.outputs.admin_only == 'true'
 
@@ -829,6 +914,11 @@ jobs:
         node-version: ${{ env.NODE_VERSION }}
         strict-lockfile: 'true'
         build-packages: 'false'
+
+    # WO-O4O-DOCS-FAST-AGENT-CONFIG-V1 — `.claude/` 가 Admin 소스와 섞여 이 경로로 와도 같은 검사를 받는다
+    # (Code Quality Check · Docs Fast 와 같은 단계 · 설치 없이 1초 미만).
+    - name: Check agent config (.claude/)
+      run: node scripts/ci/check-agent-config.mjs
 
     - name: Select api-server static guard specs
       id: select
@@ -861,7 +951,7 @@ jobs:
   #   docs fast · admin fast · full 어느 경로로 가도 같은 검사를 받는다. 의존성 설치 없이 node 내장 모듈과 git 만 쓴다.
   docs-sensitive-guard:
     name: Docs sensitive info guard
-    runs-on: ubuntu-latest
+    runs-on: ${{ fromJSON(vars.CI_RUNNER_LINUX == 'self-hosted' && github.event.repository.private == true && github.event.pull_request.head.repo.fork != true && '["self-hosted","Linux","X64","o4o-ci-linux"]' || '"ubuntu-latest"') }}
     timeout-minutes: 5
     steps:
     - uses: actions/checkout@v6
@@ -890,7 +980,7 @@ jobs:
     name: PC installer Windows
     permissions:
       contents: read
-    runs-on: windows-latest
+    runs-on: ${{ fromJSON(vars.CI_RUNNER_WINDOWS == 'self-hosted' && github.event.repository.private == true && github.event.pull_request.head.repo.fork != true && '["self-hosted","Windows","X64","o4o-ci-windows"]' || '"windows-latest"') }}
     needs: [detect]
     if: needs.detect.outputs.defer_full != 'true' && needs.detect.outputs.docs_fast_eligible != 'true' && needs.detect.outputs.admin_only != 'true'
     timeout-minutes: 10
@@ -902,13 +992,26 @@ jobs:
       with:
         # Tests embed this executable; match the separately pinned PC release runtime.
         node-version: '22.18.0'
+    # WO-O4O-SELF-HOSTED-CI-PREPARATION-V1 — 자체 실행기(집 PC)에서만 도는 보호 단계.
+    # 이 테스트는 설치한 runtime 을 127.0.0.1:47821 (LOCAL_AGENT_PORT) 에 띄운다. 같은 PC 에서 실제 Local Agent 가
+    # 그 포트를 쓰고 있으면 실제 agent 를 건드리지 않고 여기서 멈춘다(종료 · 재시작 · 데이터 접근 0, AGENTS.md §4-1(h)).
+    # GitHub 호스팅 실행기에서는 skip 이라 기존 검증은 그대로다.
+    - name: Self-hosted guard — real Local Agent port must be free
+      if: runner.environment == 'self-hosted'
+      shell: pwsh
+      run: |
+        $busy = Get-NetTCPConnection -LocalPort 47821 -State Listen -ErrorAction SilentlyContinue
+        if ($busy) {
+          Write-Output '::error::127.0.0.1:47821 is already in use on this self-hosted runner (real Local Agent?). Stop it manually or set CI_RUNNER_WINDOWS back to unset.'
+          exit 1
+        }
     - name: Verify installation, data preservation and packaged runtime health
       # Readable output also preserves bounded failure annotations from this suite.
       run: node --test --test-reporter=spec tools/o4o-local-agent/test/release-install.test.mjs
 
   central-operator-integration:
     name: Central operator PostgreSQL integration
-    runs-on: ubuntu-latest
+    runs-on: ${{ fromJSON(vars.CI_RUNNER_LINUX == 'self-hosted' && github.event.repository.private == true && github.event.pull_request.head.repo.fork != true && '["self-hosted","Linux","X64","o4o-ci-linux"]' || '"ubuntu-latest"') }}
     needs: [detect]
     if: needs.detect.outputs.defer_full != 'true' && (needs.detect.outputs.api_affected == 'true' || needs.detect.outputs.global_or_unknown == 'true')
     timeout-minutes: 25
@@ -965,7 +1068,7 @@ jobs:
     name: API production dependency smoke
     permissions:
       contents: read
-    runs-on: ubuntu-latest
+    runs-on: ${{ fromJSON(vars.CI_RUNNER_LINUX == 'self-hosted' && github.event.repository.private == true && github.event.pull_request.head.repo.fork != true && '["self-hosted","Linux","X64","o4o-ci-linux"]' || '"ubuntu-latest"') }}
     needs: [detect]
     if: needs.detect.outputs.defer_full != 'true' && (needs.detect.outputs.api_affected == 'true' || needs.detect.outputs.global_or_unknown == 'true')
     timeout-minutes: 10
@@ -991,10 +1094,15 @@ jobs:
     - name: Verify dependency loading and native image processing
       run: node scripts/ci/smoke-api-runtime.mjs "$RUNNER_TEMP/api-runtime"
 
+  # WO-O4O-CI-DRAFT-LIGHT-READY-GUARANTEE-V1 — 드래프트 run 의 gate 는 **이름이 다르다**(`CI Gate (draft · not final)`).
+  #   required check 는 정확히 `CI Gate` 이므로, 드래프트 동안 필수 검사는 "대기" 로 남고 Ready 후 full run 의 `CI Gate` 만
+  #   병합을 허용한다. 그래서 드래프트 gate 를 일부러 실패시킬 필요가 없다(가짜 실패 알림 제거). 드래프트가 아닌 모든 run
+  #   (Ready · Ready 이후 push · main · dispatch · budget 아님)과 detect 가 실패해 output 이 비는 경우에도 이름은 정확히 `CI Gate` 다.
+  #   이름 판정은 detect output 이 아니라 이벤트 값으로 한다 — detect 가 취소돼도 바뀌지 않는다.
   ci-gate:
-    name: CI Gate
-    runs-on: ubuntu-latest
-    needs: [detect, quality-check, api-tests, build, web-build, docs-fast-validate, admin-fast-validate, admin-fast-guards, docs-sensitive-guard, pc-installer-windows, central-operator-integration, api-runtime-dependencies]
+    name: ${{ (vars.CI_COST_PROFILE == 'budget' && github.event_name == 'pull_request' && github.event.pull_request.draft) && 'CI Gate (draft · not final)' || 'CI Gate' }}
+    runs-on: ${{ fromJSON(vars.CI_RUNNER_LINUX == 'self-hosted' && github.event.repository.private == true && github.event.pull_request.head.repo.fork != true && '["self-hosted","Linux","X64","o4o-ci-linux"]' || '"ubuntu-latest"') }}
+    needs: [detect, draft-light, quality-check, api-tests, build, web-build, docs-fast-validate, admin-fast-validate, admin-fast-guards, docs-sensitive-guard, pc-installer-windows, central-operator-integration, api-runtime-dependencies]
     if: always()
     timeout-minutes: 5
     steps:
@@ -1003,15 +1111,17 @@ jobs:
         NEEDS: ${{ toJSON(needs) }}
       run: echo "$NEEDS"
     # 판정은 외부 도구 없이 expression 하나로 한다 — 도구 부재로 판정이 비면 통과(fail-open)가 되기 때문.
+    # 드래프트 run 은 cancelled 를 실패로 보지 않는다 — 다음 드래프트 push 가 앞 run 을 취소한 것이고, 이 gate 는 필수 검사가 아니다.
+    # 실제 failure 는 드래프트에서도 실패다. 드래프트가 아닌 run 은 종전과 같다(failure · cancelled 모두 실패).
     - name: Fail when any upstream CI job failed or was cancelled
-      if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')
+      if: contains(needs.*.result, 'failure') || (!(vars.CI_COST_PROFILE == 'budget' && github.event_name == 'pull_request' && github.event.pull_request.draft) && contains(needs.*.result, 'cancelled'))
       run: |
         echo "::error::CI Gate FAIL — failure 또는 cancelled 인 upstream job 이 있다 (위 결과 참조)"
         exit 1
-    - name: Draft PR requires final validation
-      if: needs.detect.outputs.defer_full == 'true'
+    - name: Draft PR — light checks only (required CI Gate runs when Ready)
+      if: vars.CI_COST_PROFILE == 'budget' && github.event_name == 'pull_request' && github.event.pull_request.draft
       run: |
-        echo '::error::Budget profile: draft validation deferred. Mark this PR ready for review to run all required checks.'
-        exit 1
+        echo "::notice::드래프트 PR — 가벼운 검사만 했다. 필수 검사 'CI Gate' 는 Ready for review 전환 시 full CI 로 실행된다."
+        echo "draft_superseded=${{ needs.detect.outputs.draft_superseded }} (true 면 이미 Ready — full 은 ready_for_review run 이 한다)"
     - name: CI Gate PASS
       run: echo "모든 upstream CI job 이 success 또는 skipped"

@@ -57,6 +57,36 @@ function renderComposed(props: {
   );
 }
 
+describe('ForumWriteForm optional draft props (WO-O4O-COMMUNITY-FORUM-AI-PHASE1-V1)', () => {
+  const base = { onSubmit: vi.fn(), titlePlaceholder: '제목' };
+
+  it('without them the form behaves as before: no slot, no external change', () => {
+    render(<ForumWriteForm {...base} initialTitle="그대로" />);
+    expect((screen.getByPlaceholderText('제목') as HTMLInputElement).value).toBe('그대로');
+    expect(screen.queryByTestId('after-title')).toBeNull();
+  });
+
+  it('reports draft changes and applies a patch once per seq, keeping fields it does not name', async () => {
+    const onDraftChange = vi.fn();
+    const form = (patch?: { seq: number; title?: string; editorHtml?: string }) => (
+      <ForumWriteForm {...base} onDraftChange={onDraftChange} draftPatch={patch} renderAfterTitle={<div data-testid="after-title" />} />
+    );
+    const { rerender } = render(form());
+    expect(screen.getByTestId('after-title')).toBeTruthy();
+    fireEvent.change(screen.getByPlaceholderText('제목'), { target: { value: '작성 중' } });
+    fireEvent.change(screen.getByLabelText('content-editor'), { target: { value: '<p>본문</p>' } });
+    expect(onDraftChange).toHaveBeenLastCalledWith({ title: '작성 중', editorHtml: '<p>본문</p>' });
+
+    rerender(form({ seq: 1, title: '적용한 제목' }));
+    await waitFor(() => expect((screen.getByPlaceholderText('제목') as HTMLInputElement).value).toBe('적용한 제목'));
+    expect((screen.getByLabelText('content-editor') as HTMLTextAreaElement).value).toBe('<p>본문</p>');
+
+    fireEvent.change(screen.getByPlaceholderText('제목'), { target: { value: '다시 수정' } });
+    rerender(form({ seq: 1, title: '적용한 제목' }));
+    expect((screen.getByPlaceholderText('제목') as HTMLInputElement).value).toBe('다시 수정');
+  });
+});
+
 describe('ForumWritePageShell + ForumWriteForm', () => {
   it('create: 제목/내용 입력 후 submit payload 를 그대로 전달한다', async () => {
     const onSubmit = vi.fn();

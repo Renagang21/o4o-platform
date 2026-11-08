@@ -45,8 +45,14 @@ export const menuPermissions: MenuPermission[] = [
   //   deny-by-default 전환에 따라 'dashboard' 도 명시적인 설정을 갖는다.
   //   관리자 SPA 진입 floor(App.tsx)가 이미 platform:super_admin 전용이므로
   //   노출 범위는 변하지 않고 선언만 명시화된다.
-  { menuId: 'content-resource-deletion', roles: [...PLATFORM_ADMIN_ROLES] },
-  { menuId: 'platform-account-governance', roles: [...PLATFORM_ADMIN_ROLES] },
+  // WO-O4O-ADMIN-OPERATOR-MENU-REALIGNMENT-V1: 최종 삭제 처리 · 운영자·권한 그룹
+  { menuId: 'final-deletion', roles: [...PLATFORM_ADMIN_ROLES] },
+  { menuId: 'final-deletion-members', roles: [...PLATFORM_ADMIN_ROLES] },
+  { menuId: 'final-deletion-forums', roles: [...PLATFORM_ADMIN_ROLES] },
+  { menuId: 'final-deletion-community-boards', roles: [...PLATFORM_ADMIN_ROLES] },
+  { menuId: 'final-deletion-courses', roles: [...PLATFORM_ADMIN_ROLES] },
+  { menuId: 'operator-authority', roles: [...PLATFORM_ADMIN_ROLES] },
+  { menuId: 'admin-accounts', roles: [...PLATFORM_ADMIN_ROLES] },
   { menuId: 'platform-account-overview', roles: [...PLATFORM_ADMIN_ROLES] },
   { menuId: 'member-business-management', roles: [...PLATFORM_ADMIN_ROLES] },
   { menuId: 'platform-members', roles: [...PLATFORM_ADMIN_ROLES] },
@@ -132,10 +138,6 @@ export const menuPermissions: MenuPermission[] = [
     roles: [...PLATFORM_ADMIN_ROLES]
   },
   {
-    menuId: 'content',
-    roles: [...PLATFORM_ADMIN_ROLES]
-  },
-  {
     menuId: 'cms',
     roles: [...PLATFORM_ADMIN_ROLES]
   },
@@ -178,10 +180,6 @@ export const menuPermissions: MenuPermission[] = [
     roles: [...PLATFORM_ADMIN_ROLES]
   },
   { menuId: 'content-required-signage', roles: [...PLATFORM_ADMIN_ROLES] },
-  {
-    menuId: 'content-overview',
-    roles: [...PLATFORM_ADMIN_ROLES]
-  },
   {
     // WO-O4O-CMS-LEGACY-MEDIA-ASSET-TO-MEDIA-V2-CANONICALIZATION-FINAL-CLOSURE-V1:
     //   'content-assets'(cms_media) → 'content-media-library'(media_assets 정본) 로 교체.

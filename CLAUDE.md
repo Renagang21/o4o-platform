@@ -15,22 +15,26 @@
 ## 세션 시작 규칙
 - 세션 시작 시 HANDOFF.md가 있으면 먼저 읽을 것
 - 진행 상황은 CLAUDE.md가 아니라 HANDOFF.md에 기록할 것
-- 시작 · 종료 절차는 `/start` · `/handoff` 스킬(`.claude/skills/`)을 따른다.
-- 그 밖의 스킬: `/wo-new`(지시서 작성 · 인계) · `/db-readonly`(로컬 전용 운영 DB 조회) · `/verify`(변경 범위 검증) · `/integrate`(통합 담당 지정 시만) · `/worktree-cleanup`(merge 후 정리). 스킬은 규칙을 복사하지 않고 `AGENTS.md` · 정본 절을 가리킨다.
+- 시작 · 종료 절차는 `/start` · `/handoff` 스킬(`.claude/skills/`)을 따른다. 작업 세션은 push 후 PR 생성까지 하고, 병합 · 배포는 통합 담당만 한다 — `AGENTS.md` §4 역할 · §4-1(e).
+- 그 밖의 스킬: `/wo-new`(지시서 작성 · 인계) · `/db-readonly`(로컬 전용 운영 DB 조회) · `/verify`(변경 범위 검증) · `/integrate`(통합 세션으로 지정된 PR 만 — `AGENTS.md` §4 역할) · `/worktree-cleanup`(merge 후 정리). 스킬은 규칙을 복사하지 않고 `AGENTS.md` · 정본 절을 가리킨다.
 - SessionStart 훅(`.claude/hooks/session-start.mjs`)이 `origin/main` 을 fetch 하고, **clean 한 기준 main checkout 에서만** `pull --ff-only` 한다. 작업 branch · worktree 에서는 ahead/behind 만 보고하며 merge/rebase 하지 않는다. 이 세션 유형(`실행 위치`)의 최근 미완료 지시서도 알려 준다.
+- PreToolUse 훅(`.claude/hooks/block-cloud-deploy.mjs`)은 **클라우드 세션에서만** 운영 배포 명령을 거부한다. 로컬은 `.claude/settings.json` 의 ask 를 따른다. 정책은 `AGENTS.md` §9.
+- PreToolUse 훅(`.claude/hooks/guard-git-push.mjs`)은 **모든 세션에서** 콜론 refspec 원격 branch 삭제를 거부한다. permission 패턴은 끝이 `:*` 이면 예전 접두어 문법으로 해석돼 의도대로 매칭되지 않으므로, 새 규칙을 `:*` 로 끝내지 않는다(`pnpm run build:*` 처럼 접두어 일치가 의도인 경우만 예외).
+- 플러그인: 클라우드는 claude.ai 계정 활성화, 로컬은 저장소 선언 — 이유는 `SETUP.md` §1 「Claude Code 플러그인」.
 
 ## 세션 유형 — 클라우드 · 데스크톱 로컬
 
 | 세션 | 판별 | 하는 일 | 하지 않는 일 |
 |---|---|---|---|
-| **클라우드 세션** (claude.ai/code) | `CLAUDE_CODE_REMOTE=true` | 코드 · 문서 · 테스트 · branch push · (통합 담당 지정 시) PR | 운영 DB 접속 — gcloud 인증 · Cloud SQL Proxy 가 없다 |
-| **데스크톱 로컬 세션** | 그 밖 | 운영 DB read-only 조회 · 사용자가 승인한 운영 작업 · 실 PC smoke | 승인 없는 DB write · DDL · migration 수동 적용 (`AGENTS.md` §5) |
+| **클라우드 세션** (claude.ai/code) | `CLAUDE_CODE_REMOTE=true` | 코드 · 문서 · 테스트 · branch push · PR 생성(`AGENTS.md` §4-1(e)) | 운영 DB 접속 — gcloud 인증 · Cloud SQL Proxy 가 없다 |
+| **로컬 세션 (VS Code)** | 그 밖 | 운영 DB read-only 조회 · 통합 담당이 승인한 운영 작업(`AGENTS.md` §5) · 실 PC smoke | 승인 없는 DB write · DDL · migration 수동 적용 (`AGENTS.md` §5) |
 
+- 작업 위치 분담(개발은 클라우드, 병합 · 배포 · 로컬 작업은 VS Code 로컬)은 `AGENTS.md` §4 「작업 위치 분담」을 따른다.
 - 클라우드 세션에서 운영 DB 확인이 필요하면 멈추고, read-only SQL 과 판정 기준을 담은 지시서를 `docs/work-orders/` 에 작성해 작업 branch 로 push 한 뒤 `HANDOFF.md` 로 로컬 세션에 넘긴다. 로컬 세션은 결과를 마스킹해 같은 branch 에 기록하고 push 한다.
 - 두 세션 모두 `AGENTS.md` §4-1 의 전용 worktree · branch 규칙을 따른다.
 
 ## 명령 실행 원칙 (Claude Code 도구)
-- **항상 사용자 확인:** 운영 DB 직접 접속 · 시크릿 · IAM · 프로덕션 리소스 삭제. `.claude/settings.json` 의 ask 규칙(allow 보다 우선)이 이 범위를 강제한다.
+- **항상 사용자 확인:** 운영 DB 직접 접속 · 시크릿 · IAM · 프로덕션 리소스 삭제. `.claude/settings.json` 의 ask 규칙(allow 보다 우선)이 이 범위를 강제한다. 운영 변경(운영 DB 쓰기 · 시크릿 · 배포)의 승인자는 통합 담당이다 — 다른 개발자의 세션이면 ask 창을 승인하기 전에 통합 담당 승인을 받는다(`AGENTS.md` §5).
 - ask 대상 명령은 다른 명령과 `;` · `&&` · `|` 로 묶지 않는다 — 섞이면 한 줄 전체가 승인 대상이 되어 무엇을 승인하는지 흐려진다.
 - `gh pr view` · `gh pr checks` · `gh run view` 로 알 수 있는 정보는 `gh api` 를 쓰지 않는다.
 - `gh api` 는 GET 조회만 사용하고, `-X` · `--method` · `-f` · `-F` · `--input` 옵션은 쓰지 않는다.
@@ -50,7 +54,7 @@
 
 ## 1. 개발 기본 규칙
 
-- 브랜치: 독립 작업은 전용 worktree · 전용 branch 가 기본(2026-10-03~). 규칙은 [`AGENTS.md` §4](AGENTS.md#4-git--병렬-작업-안전) (§4-1 worktree · §4-2 stage/commit/push).
+- 브랜치: 독립 작업은 전용 worktree · 전용 branch 가 기본(2026-10-03~). 규칙은 [`AGENTS.md` §4](AGENTS.md#4-git--병렬-작업-안전) (§4-1 worktree · §4-2 stage/commit/push · §4-3 공유 코드 허브 lane · 작업 순서).
 - App 계층: `Core → Extension → Feature → Service`. 역방향 의존 금지.
 - API 호출: `authClient.api.get()` / `.post()` 필수. 환경변수 직접 사용 · 하드코딩 URL 금지.
 - 공통 모듈 · config · sidebar · layout · capability map · core+extension contract 수정은 **모든 소비처를 먼저 식별**하고 단일 서비스 기준으로 완료 판단하지 않는다. 식별자 검색만으로 소비처 0 을 선언하지 않는다(`node scripts/quality/check-literal-consumers.mjs --source <파일>`). 절차: [`O4O-SHARED-MODULE-CHANGE-PROTOCOL-V1`](docs/baseline/O4O-SHARED-MODULE-CHANGE-PROTOCOL-V1.md).
@@ -164,7 +168,8 @@ forum · lms · signage 는 **플랫폼 공통 구조**. KPA 가 reference imple
 
 ## 15. Browser Verification Test Accounts
 
-- SSOT: `docs/local/TEST-ACCOUNTS.local.md` (로컬 전용 · git 미추적 · 2026-10-16 기준 변경, 이전 `TEST-ACCOUNT.txt` 미사용). 브라우저 검증 전 반드시 참조.
+- SSOT: [`docs/TEST-ACCOUNTS.md`](docs/TEST-ACCOUNTS.md) (저장소 추적 · 2026-11-08 기준 변경, 이전 `docs/local/TEST-ACCOUNTS.local.md` · `TEST-ACCOUNT.txt` 미사용). 브라우저 검증 전 반드시 참조. 클라우드 세션도 이 파일을 쓴다.
+- 사용자 테스트는 **로그인 화면의 「테스트 로그인」 버튼**(매장 경영자 · 공급자 · 매장 직원 — 공개 Demo 계정)으로 한다. Google · 카카오 로그인 화면은 사용자에게 넘겨 사용자가 직접 로그인한다.
 - 실제 운영 계정 사용 금지. **자격증명 하드코딩 금지** — seed · 테스트 코드 · CI 어디에도 박지 않는다. 발견 시 즉시 제거.
 
 ## 16. 문서 Drift 발견 시 정비

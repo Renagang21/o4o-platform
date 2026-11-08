@@ -148,6 +148,7 @@ export class AiQuotaService {
   async checkQuota(
     scope: AiPolicyScope,
     userId?: string,
+    serviceKey?: string,
   ): Promise<QuotaCheckResult> {
     try {
       return await this.evaluate(
@@ -156,6 +157,7 @@ export class AiQuotaService {
         userId,
         { requests: 0, tokens: 0, cost: 0 },
         new Date(),
+        serviceKey,
       );
     } catch {
       throw safeFailure('check');

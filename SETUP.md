@@ -19,21 +19,25 @@
 
 ## 테스트 계정 찾기 — 브라우저·운영 검증 전
 
-실제 테스트 계정의 기준 파일은 **`docs/local/TEST-ACCOUNTS.local.md`** 하나입니다 (사용자 결정 2026-10-16).
-리팩터링 이전 테스트 계정은 모두 폐기됐습니다. 운영자·관리자·회원 로그인 검증 전에 이 파일을 먼저 확인합니다.
-서비스에서 같은 운영자 아이디를 사용하더라도 현재 서비스 역할·가입 상태는 로그인 후 별도로 확인합니다.
-로그인·역할 확인 결과는 그 파일의 확인 상태·확인 기록 표에만 남깁니다.
+테스트 계정의 기준 파일은 **[`docs/TEST-ACCOUNTS.md`](docs/TEST-ACCOUNTS.md)** 하나입니다 (통합 담당 결정 2026-11-08).
+저장소에 추적되므로 **새 clone·worktree·클라우드 세션·Codex Cloud 에 그대로 들어옵니다.** 별도 파일 전달이 필요 없습니다.
 
-이 파일은 `.gitignore`의 `docs/local/*.local.md` 규칙으로 제외되므로 **새 clone·worktree·Codex Cloud에 자동으로 들어오지 않습니다.**
-현재 checkout에 없으면 같은 작업환경의 기준 checkout에 있는 동일 경로를 확인합니다. 거기에도 없으면 파일이 없다는 사실과
-필요한 경로를 알리고, 사용자의 로컬 원본을 승인된 비공개 파일 전달 또는 환경 Secret 연결로 제공받습니다.
-스크린샷에 경로가 보이는 것만으로 클라우드에서 파일 내용을 읽을 수 있는 것은 아닙니다.
-파일로 연결한 경우 파일 존재와 `git check-ignore -v docs/local/TEST-ACCOUNTS.local.md`를 확인합니다.
+- **사용자 테스트는 로그인 화면의 「테스트 로그인」 버튼으로 합니다.** 매장 경영자 · 공급자 · 매장 직원 세 버튼이 있고,
+  계정은 공개 Demo 계정입니다(정책 [`O4O-CANONICAL-DEMO-ACCOUNTS-V1`](docs/baseline/O4O-CANONICAL-DEMO-ACCOUNTS-V1.md) · 값의 코드 정본 `packages/auth-utils/src/demoAccounts.ts`).
+- Google·카카오 로그인은 테스트 계정 대상이 아닙니다. 외부 계정 로그인 화면은 사용자에게 넘겨 사용자가 직접 로그인합니다.
+- 운영자·관리자 계정은 Demo 에 없습니다. 그 화면 검증은 작업 지시에 계정 확보 방법이 있을 때만 합니다.
+- 서비스별 현재 역할·가입 상태는 로그인 후 별도로 확인합니다. 화면이 열린 것과 역할 검증 통과는 구분해 보고합니다.
 
-계정·비밀번호를 공개 문서·커밋·로그에 복사하지 않습니다. 예전 seed 계정, 이전 계정 파일의 사본, 공개 Demo 계정으로 임의 대체하거나
-비밀번호를 추측하지 않습니다. 상태 변경 검증은 테스트 대상과 원상 복구 방법을 확인한 뒤 수행합니다.
+계정·비밀번호를 문서·커밋·로그에 복사하지 않습니다(Demo 값의 정본은 코드 하나). 예전 seed 계정, 이전 계정 파일의 사본으로 임의 대체하거나
+비밀번호를 추측하지 않습니다. 버튼 로그인이 실패하면 다른 계정으로 대체하지 않고 실패로 보고합니다. 상태 변경 검증은 테스트 대상과 원상 복구 방법을 확인한 뒤 수행합니다.
 
-### 기준 파일 변경 (2026-10-16)
+### 기준 파일 변경 (2026-11-08)
+
+2026-10-16 에 정한 로컬 전용 `docs/local/TEST-ACCOUNTS.local.md` 는 더 이상 기준 파일이 아니다. 클라우드 세션이 읽을 수 없어
+통합 담당이 기준을 저장소 추적 파일 `docs/TEST-ACCOUNTS.md` 로 바꾸고, 사용자 테스트는 로그인 화면의 테스트 로그인 버튼으로 하도록 정했다.
+로컬 사본이 남아 있으면 계정 출처로 쓰지 않는다. `.gitignore` 의 `docs/local/*.local.md` 행은 로컬 사본이 실수로 추적되지 않도록 유지한다.
+
+### 기준 파일 변경 (2026-10-16 · 기록)
 
 2026-10-11에 정한 `docs/local/TEST-ACCOUNT.txt`는 더 이상 기준 파일이 아니다. 사용자 지시로 기준을
 `docs/local/TEST-ACCOUNTS.local.md`로 바꿨다. `TEST-ACCOUNT.txt`가 남아 있는 checkout에서는 그 파일을 계정 출처로 쓰지 않는다.
@@ -134,6 +138,11 @@ pnpm run check:runtime
 - 루트 `package.json`의 `*:sh` 계열 스크립트(`type-check:sh` 등)는 WSL 경유 대체 경로이며 표준이 아닙니다.
 
 Docker Desktop은 컨테이너 빌드를 로컬에서 재현할 때만 필요합니다(선택).
+
+### Claude Code 플러그인 (Engineering · Design)
+
+**클라우드 세션은 claude.ai 계정에서 활성화하고, 로컬 PC 세션은 저장소 `.claude/settings.json` 선언(`engineering@knowledge-work-plugins` · `design@knowledge-work-plugins`)으로 설치한다.**
+클라우드 세션은 저장소가 선언한 플러그인을 설치하지 않고([cloud-environments](https://code.claude.com/docs/en/cloud-environments#what-carries-over-from-your-setup)), 계정 동기화는 공식 문서상 Cowork · 터미널 세션만 명시돼 데스크톱 Code 탭 로컬 세션은 보장되지 않는다([plugins/loading](https://code.claude.com/docs/en/plugins/loading)). 계정에서는 카탈로그의 Anthropic Directory `Engineering` · `Design` 항목을 켠다(2026-11-07 기준 `Knowledge Work` 항목은 이 안에 흡수돼 따로 보이지 않는다). 카탈로그상 이 항목의 스킬 이름은 `engineering:*` 가 아니라 `<UUID>:*` 로 표시되므로, 켠 뒤 새 세션에서 실제 이름을 확인한다. 한 PC 에서 두 경로가 겹칠 때 manifest 이름이 같으면 저장소 쪽만 로드되지만(문서의 name conflict 규칙), Directory 사본의 manifest 이름이 같은지는 확인되지 않았다 — 터미널 세션에서 스킬이 두 벌 보이면 `claude plugin disable <name>@synced` 로 계정 사본을 끈다.
 
 ---
 
@@ -281,7 +290,7 @@ Admin 개발 서버의 기준 포트는 **3001**입니다. `apps/admin-dashboard
 **로그인 · AI 호출 (실제 기능 smoke 에만 필요)**
 
 - 화면 기동 자체에는 Google OAuth 도 AI key 도 필요 없습니다.
-- 현행 로그인은 이메일·비밀번호, Google, 카카오를 지원합니다. 일반 계정 검증에는 위의 로컬 전용 `TEST-ACCOUNTS.local.md`를 사용하며, 아래는 Google 개발용 설정 예시입니다.
+- 현행 로그인은 이메일·비밀번호, Google, 카카오를 지원합니다. 일반 계정 검증에는 위의 `docs/TEST-ACCOUNTS.md`(로그인 화면 테스트 로그인 버튼)를 사용하며, 아래는 Google 개발용 설정 예시입니다.
 - Google 로그인 smoke는 GIS popup → ID token → API의 `aud` 검증 흐름을 확인합니다. 로컬 Google 로그인 smoke에는
   Authorized JavaScript origin 에 `http://localhost:3000` 이 등록된 **개발용 OAuth Client ID** 하나가 필요합니다.
   `apps/api-server/.env` 에 아래 한 줄만 넣습니다. web-neture 에는 Google 설정이 없습니다(Client ID 는 API 의 `/auth/google/config` 가 내려줍니다).
@@ -325,14 +334,14 @@ API 서버는 **`apps/api-server/.env`** 만 읽습니다 (루트 `.env` 아님)
 
 운영 DB에 대한 write는 CLAUDE.md §0의 승인 규칙을 그대로 따릅니다 (read-only 검증만 자유).
 
-**운영 DB 조회는 읽기 전용 계정 `o4o_readonly` 만 사용합니다.** 사용자가 명시 승인한 운영 작업이 아니면 조회에 `o4o_api_v2` 를 쓰지 않습니다.
+**운영 DB 조회는 읽기 전용 계정 `o4o_readonly` 만 사용합니다.** 통합 담당이 명시 승인한 운영 작업이 아니면 조회에 `o4o_api_v2` 를 쓰지 않습니다.
 
 **운영 DB identity** (2026-11-06 기준):
 
 | role | 성격 | 사용처 |
 |---|---|---|
 | `o4o_readonly` | **읽기 전용 login** (비밀번호 = Secret Manager `o4o-db-readonly-password`) | 운영 DB read-only 조회 · 검증 |
-| `o4o_api_v2` | **login / runtime identity** (비밀번호 = Secret Manager `o4o-db-password`) | `o4o-core-api` · migration Job `o4o-api-migrations` · 사용자가 명시 승인한 운영 작업 |
+| `o4o_api_v2` | **login / runtime identity** (비밀번호 = Secret Manager `o4o-db-password`) | `o4o-core-api` · migration Job `o4o-api-migrations` · 통합 담당이 명시 승인한 운영 작업 |
 | `o4o_api` | **NOLOGIN owner role** — 운영 스키마 객체(테이블 · 시퀀스 · enum · 함수 등)의 소유자 | 직접 접속하지 않는다. `o4o_api_v2` 가 member 이며 role 설정(`SET role=o4o_api`)으로 세션이 이 role 권한으로 동작한다 |
 
 `o4o_readonly` 의 조회 범위:
@@ -491,7 +500,7 @@ fixture는 자체 생성 DB의 소유권 marker를 확인하고 baseline·전체
 ### Git 절차
 
 **worktree · branch · main 통합 · 종료 정리는 [AGENTS.md §4-1](AGENTS.md#4-1-parallel-session--worktree-policy) 이 정본입니다** —
-독립 작업은 전용 worktree + branch 에서 하고, `main` 반영은 PR merge 로만(기술 gate 충족 후 별도 승인 없이) 합니다. `main` 직접 작업 · direct push 는 쓰지 않습니다.
+독립 작업은 전용 worktree + branch 에서 하고, 작업 세션은 push 후 PR 생성까지 하고, `main` 반영(PR merge)과 배포는 통합 담당만 합니다(역할 정의: [AGENTS.md §4](AGENTS.md#4-git--병렬-작업-안전)). `main` 직접 작업 · direct push 는 쓰지 않습니다.
 **stage · 커밋 · PC 이동 절차는
 [docs/baseline/operations/O4O-GIT-PARALLEL-WORK-SAFETY-V1.md](docs/baseline/operations/O4O-GIT-PARALLEL-WORK-SAFETY-V1.md) 가 정본입니다**(그 문서의 `main` 직접 작업 전제와 다르면 §4-1 우선) —
 path-specific stage, 다른 세션 미커밋 변경 불가침,

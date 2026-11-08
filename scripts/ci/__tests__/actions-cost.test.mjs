@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { audit, daysBetween, pages, priceJob } from '../actions-cost.mjs';
+import { SELF_HOSTED_USD_PER_MINUTE, audit, daysBetween, pages, priceJob } from '../actions-cost.mjs';
 
 test('dates are inclusive, validated and bounded', () => {
   assert.deepEqual(daysBetween('2026-09-30', '2026-10-01'), ['2026-09-30', '2026-10-01']);
@@ -12,13 +12,39 @@ test('dates are inclusive, validated and bounded', () => {
 const job = (over = {}) => ({ id: 1, status: 'completed', conclusion: 'success', labels: ['ubuntu-latest'],
   started_at: '2026-10-01T00:00:00Z', completed_at: '2026-10-01T00:01:01Z', ...over });
 test('job-level rounding, OS rate, skipped jobs and unsupported runners', () => {
-  assert.deepEqual(priceJob(job()), { minutes: 2, usd: 0.012 });
+  assert.deepEqual(priceJob(job()), { minutes: 2, usd: 0.012, selfHostedMinutes: 0 });
   assert.equal(priceJob(job({ labels: ['windows-latest'] })).usd, 0.02);
   assert.equal(priceJob(job({ labels: ['macos-latest'] })).usd, 0.124);
-  assert.equal(priceJob({ conclusion: 'skipped' }).usd, 0);
-  for (const labels of [['self-hosted', 'linux'], ['custom-32core'], ['ubuntu-24.04-arm64']]) assert.throws(() => priceJob(job({ labels })));
+  assert.deepEqual(priceJob({ conclusion: 'skipped' }), { minutes: 0, usd: 0, selfHostedMinutes: 0 });
+  for (const labels of [['custom-32core'], ['ubuntu-24.04-arm64'], ['o4o-ci-linux']]) assert.throws(() => priceJob(job({ labels })));
   assert.throws(() => priceJob(job({ status: 'in_progress' })));
   assert.throws(() => priceJob(job({ completed_at: 'invalid' })));
+});
+test('self-hosted jobs report unrounded machine time separately and never count as hosted minutes', () => {
+  for (const labels of [['self-hosted', 'Linux', 'X64', 'o4o-ci-linux'], ['Self-Hosted', 'Windows', 'X64', 'o4o-ci-windows']]) {
+    assert.deepEqual(priceJob(job({ labels })), { minutes: 0, usd: 0, selfHostedMinutes: 1.02 });
+  }
+  assert.equal(SELF_HOSTED_USD_PER_MINUTE, 0);
+  assert.deepEqual(priceJob({ conclusion: 'skipped', labels: ['self-hosted', 'Linux'] }), { minutes: 0, usd: 0, selfHostedMinutes: 0 });
+  assert.throws(() => priceJob(job({ labels: ['self-hosted'], status: 'in_progress' })));
+  assert.throws(() => priceJob(job({ labels: ['self-hosted'], completed_at: 'invalid' })));
+});
+test('mixed hosted and self-hosted runs keep both totals without failing the audit', async () => {
+  const runs = [{ id: 1, path: 'ci.yml', created_at: '2026-10-01T00:01:00Z', event: 'push', conclusion: 'success', status: 'completed' }];
+  const result = await audit({ repo: 'owner/repo', from: '2026-10-01', to: '2026-10-01', get: async endpoint => {
+    // filter=all can list the same self-hosted job twice across attempts — it must count once.
+    const selfHosted = job({ id: 2, labels: ['self-hosted', 'Linux', 'X64', 'o4o-ci-linux'] });
+    if (endpoint.includes('/jobs?')) return { total_count: 4, jobs: [job(), selfHosted, selfHosted, job({ id: 3, conclusion: 'skipped' })] };
+    if (endpoint.includes('per_page=1') && !endpoint.includes('per_page=100')) return { total_count: 1 };
+    return { total_count: 1, workflow_runs: runs };
+  } });
+  assert.equal(result.estimatedHostedMinutes, 2);
+  assert.equal(result.estimatedSelfHostedMinutes, 1.02);
+  assert.equal(result.grossEstimatedUsd, 0.012);
+  assert.equal(result.selfHostedUsdPerMinute, 0);
+  assert.equal(result.estimateBasis, 'stratified-sample');
+  assert.equal(result.includedComputeUsageApplied, false);
+  assert.equal(result.rows[0].sampledJobs, 3);
 });
 test('pagination reads past 100 and rejects incomplete responses', async () => {
   const first = Array.from({ length: 100 }, (_, id) => ({ id }));
@@ -56,15 +82,17 @@ test('budget defers only draft PRs; ready and main retain the full merge/deploym
   const ci = readWorkflow('ci-pipeline.yml');
   assert.match(ci, /types: \[opened, synchronize, reopened, ready_for_review, converted_to_draft\]/);
   assert.match(ci, /defer_full:.*vars\.CI_COST_PROFILE == 'budget'.*github\.event_name == 'pull_request'.*github\.event\.pull_request\.draft/);
-  const ids = ['quality-check', 'api-tests', 'build', 'web-build', 'docs-fast-validate', 'admin-fast-validate', 'admin-fast-guards', 'pc-installer-windows', 'central-operator-integration'];
+  const ids = ['quality-check', 'api-tests', 'build', 'web-build', 'docs-fast-validate', 'admin-fast-validate', 'admin-fast-guards', 'pc-installer-windows', 'central-operator-integration', 'api-runtime-dependencies'];
   for (const id of ids) {
     const block = ci.split(`\n  ${id}:\n`)[1]?.split(/\n  [a-z][a-z0-9-]*:\n/)[0];
     assert.ok(block, id);
     assert.match(block, /if: (?:>-\n\s*)?needs\.detect\.outputs\.defer_full != 'true' &&/, id);
   }
+  // WO-O4O-CI-DRAFT-LIGHT-READY-GUARANTEE-V1 — 드래프트 gate 는 실패시키지 않고 이름을 바꿔 required check 를 채우지 않는다.
+  // Ready · main 에서의 full 보장은 draft-ready-guarantee.test.mjs 가 식 평가로 고정한다.
   const gate = ci.split('\n  ci-gate:\n')[1];
   assert.match(gate, /if: always\(\)/);
-  assert.match(gate, /if: needs\.detect\.outputs\.defer_full == 'true'\n[\s\S]*?exit 1/);
+  assert.match(gate, /name: \$\{\{ \(vars\.CI_COST_PROFILE == 'budget' && github\.event_name == 'pull_request' && github\.event\.pull_request\.draft\) && 'CI Gate \(draft · not final\)' \|\| 'CI Gate' \}\}/);
 });
 test('private CodeQL requires explicit enablement; budget automatic CodeQL is off', () => {
   const security = readWorkflow('ci-security.yml');

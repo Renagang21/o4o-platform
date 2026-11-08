@@ -2,7 +2,6 @@ import MemberReviewInformation from './MemberReviewInformation';
 import { useState } from 'react';
 import { authClient } from '@o4o/auth-client';
 import { MEMBER_STATUS_LABELS } from '@o4o/types';
-import AccountErasureControls from '@/pages/platform/account-governance/AccountErasureControls';
 import MemberProfileForm from './MemberProfileForm';
 import MemberLifecycleActions from './MemberLifecycleActions';
 import type { MemberDetail, MemberWorkMode } from './member-workspace-model';
@@ -14,13 +13,11 @@ export default function MemberWorkPanel({
   onBusyChange,
   mode = 'detail',
   adminMode = false,
-  onErasureResult,
   onModeChange,
   onAccessLost,
 }: Readonly<{
   onAccessLost: () => void;
   onModeChange: (mode: MemberWorkMode) => void;
-  onErasureResult?: (result: import('@/types/user').UserErasureResult) => void;
   adminMode?: boolean;
   onBusyChange: (value: boolean) => void;
   mode?: MemberWorkMode;
@@ -45,26 +42,7 @@ export default function MemberWorkPanel({
   return (
     <div className="space-y-4">
       {readOnly && <output className="block">전체 관리자 — 처리 대상 아님</output>}
-      {adminMode &&
-        mode === 'delete' &&
-        permissions.erase &&
-        actorId !== member.userId && (
-          <section
-            aria-label="계정·개인자료 완전삭제"
-            className="rounded border border-red-300 bg-white p-4"
-          >
-            <h4 className="font-semibold">계정·개인자료 완전삭제</h4>
-            <AccountErasureControls
-              onResult={onErasureResult}
-              onBusyChange={onBusyChange}
-              accountId={actorId}
-              userId={member.userId}
-              onCompleted={() => {
-                void perform(async () => undefined);
-              }}
-            />
-          </section>
-        )}
+      {/* 계정 삭제는 목록의 「계정 삭제」(확인 창 → 바로 삭제)에서만 한다(#990). 이 패널은 이용 복구 · 약국 이전 · 폐업만 다룬다. */}
       {!readOnly && mode === 'delete' && (
         <MemberLifecycleActions
           adminMode={adminMode}
