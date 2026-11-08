@@ -24,7 +24,9 @@ jest.mock("../../../utils/logger", () => ({
   default: { info: jest.fn() },
 }));
 import {
+  generateNewsClusters,
   generateNewsSuggestions,
+  generateScheduledNewsClusters,
   generateScheduledNewsSuggestions,
 } from "../community-news-ai.service";
 const input = [
@@ -66,6 +68,72 @@ it("uses existing accounting and configured model with one bounded provider atte
     scope: "SERVICE_QUERY",
     serviceKey: "community",
     userId: "actor",
+  });
+});
+describe("V2 clusters", () => {
+  const articles = [
+    {
+      source: "kpanews" as const,
+      title: "합성 제목",
+      lead: "",
+      section: null,
+      group: null,
+    },
+  ];
+  const answer = (content: string) => ({
+    content,
+    provider: "gemini",
+    model: "configured-model",
+    promptTokens: 10,
+    completionTokens: 10,
+    requestId: "fixture",
+  });
+  it("makes one bounded provider attempt with the V2 caps, through accounting", async () => {
+    account.mockResolvedValue(
+      answer(JSON.stringify({ clusters: [{ a: [0], s: 70, r: "이유" }] })),
+    );
+    await expect(generateScheduledNewsClusters(articles)).resolves.toEqual([
+      { indexes: [0], score: 70, reason: "이유" },
+    ]);
+    expect(account).toHaveBeenCalledTimes(1);
+    expect(account.mock.calls[0][1]).toMatchObject({
+      retry: { maxAttempts: 1 },
+      timeoutMs: 90000,
+      responseMode: "json",
+      config: { maxTokens: 8000, temperature: 0.1, model: "configured-model" },
+    });
+    expect(account.mock.calls[0][2]).toEqual({
+      scope: "SERVICE_QUERY",
+      serviceKey: "community",
+      userId: undefined,
+    });
+    expect(authorize).not.toHaveBeenCalled();
+  });
+  it("rejects a forged index from the model instead of publishing it", async () => {
+    account.mockResolvedValue(
+      answer(JSON.stringify({ clusters: [{ a: [7], s: 70, r: "이유" }] })),
+    );
+    await expect(generateScheduledNewsClusters(articles)).rejects.toThrow();
+    expect(account).toHaveBeenCalledTimes(1);
+  });
+  it("a manual run is accounted to the operator and stops when access is revoked or AI is off", async () => {
+    account.mockResolvedValue(answer(JSON.stringify({ clusters: [] })));
+    await generateNewsClusters(articles, "actor");
+    expect(authorize).toHaveBeenCalledWith(
+      expect.anything(),
+      "actor",
+      false,
+      "editorial",
+    );
+    expect(account.mock.calls[0][2].userId).toBe("actor");
+    account.mockClear();
+    authorize.mockRejectedValue(Error("revoked"));
+    await expect(generateNewsClusters(articles, "actor")).rejects.toThrow();
+    policy.mockResolvedValue({ aiEnabled: false });
+    await expect(generateScheduledNewsClusters(articles)).rejects.toThrow(
+      "AI_DISABLED",
+    );
+    expect(account).not.toHaveBeenCalled();
   });
 });
 it("never invokes provider when disabled or manager authorization is revoked", async () => {

@@ -1,16 +1,14 @@
 import { AppDataSource } from "../../database/connection.js";
-import { collectScheduledNews } from "./community-news-collection.service.js";
-import { reviewScheduledNews } from "./community-news-review.service.js";
-import { generateScheduledNewsSuggestions } from "./community-news-ai.service.js";
+import { runScheduledNewsWindow } from "./community-news-auto.service.js";
+import { generateScheduledNewsClusters } from "./community-news-ai.service.js";
 
-/** Daily reservations are shared by all revisions and manual actions; nothing is auto-published. */
-export async function runCommunityNewsAutomation() {
-  const collection = await collectScheduledNews(AppDataSource);
-  if (collection.state === "pending" || collection.state === "failed")
-    return { collection: collection.state, review: "not-started" };
-  const review = await reviewScheduledNews(
-    AppDataSource,
-    generateScheduledNewsSuggestions,
-  );
-  return { collection: collection.state, review: review.state };
+/** One DB reservation per KST day and window, shared by all revisions and the operator's manual run. */
+export async function runCommunityNewsAutomation(now = new Date()) {
+  const run = await runScheduledNewsWindow(AppDataSource, {
+    generate: generateScheduledNewsClusters,
+    now,
+  });
+  return run
+    ? { window: run.window, state: run.state, published: run.published }
+    : { window: null };
 }

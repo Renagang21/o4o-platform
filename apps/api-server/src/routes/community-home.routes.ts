@@ -7,11 +7,18 @@ import {
   getNewsReview,
   reviewNews,
 } from "../services/community/community-news-review.service.js";
-import { generateNewsSuggestions } from "../services/community/community-news-ai.service.js";
+import {
+  generateNewsClusters,
+  generateNewsSuggestions,
+} from "../services/community/community-news-ai.service.js";
+import {
+  listNewsAutoRuns,
+  runManualNewsWindow,
+} from "../services/community/community-news-auto.service.js";
 import { Router, type Request, type RequestHandler } from "express";
 import { AppDataSource } from "../database/connection.js";
 import { asyncHandler } from "../middleware/error-handler.js";
-import { apiLimiter } from "../middleware/rateLimiter.js";
+import { apiLimiter, newsBeaconLimiter } from "../middleware/rateLimiter.js";
 import type { AuthRequest } from "../types/auth.js";
 import type { CommunityAccessUser } from "../utils/community-access.resolver.js";
 import { CommunityManagementError } from "../services/community/community-management.service.js";
@@ -23,6 +30,7 @@ import {
   getEditorial,
   managedHomeItems,
   saveEditorial,
+  recordNewsEngagement,
   pinHomeForum,
   managedHomeForum,
 } from "../services/community/community-home.service.js";
@@ -92,6 +100,37 @@ export function createCommunityHomeRoutes(
     optionalAuth,
     handle(async (req) =>
       getEditorial(AppDataSource, await resolveUser(req), req.params.id),
+    ),
+  );
+  // Anonymous aggregate beacon: the user only decides visibility and is never stored.
+  router.post(
+    "/community/news-engagement",
+    newsBeaconLimiter,
+    optionalAuth,
+    handle(async (req) =>
+      recordNewsEngagement(
+        AppDataSource,
+        await resolveUser(req),
+        (req.body ?? {}) as Record<string, unknown>,
+      ),
+    ),
+  );
+  router.get(
+    "/community/management/news-auto-runs",
+    apiLimiter,
+    authenticate,
+    centralOperationRequest('community', () => ['community.editorial']),
+    handle((req) => listNewsAutoRuns(AppDataSource, req.user!.id)),
+  );
+  router.post(
+    "/community/management/news-auto-runs",
+    apiLimiter,
+    authenticate,
+    centralOperationRequest('community', () => ['community.editorial']),
+    handle((req) =>
+      runManualNewsWindow(AppDataSource, req.user!.id, {
+        generate: (input) => generateNewsClusters(input, req.user!.id),
+      }),
     ),
   );
   router.get(

@@ -14,16 +14,34 @@ import {
   type EditorialKind,
 } from "./communityHomeApi";
 
+/** Home order of the news section: pinned first, then recent. Only auto-published items are measured. */
+export function newsEngagementItems(preview: CommunityHome["news"]) {
+  return [...preview.pinned, ...preview.recent].flatMap((item, index) =>
+    item.autoPublished ? [{ contentId: item.id, position: index + 1 }] : [],
+  );
+}
+function reportNews(
+  event: "impression" | "click",
+  items: { contentId: string; position: number }[],
+) {
+  if (!items.length) return;
+  // Measurement only: a lost beacon never disturbs the page.
+  void Promise.resolve()
+    .then(() => homeApi.newsEngagement(event, items))
+    .catch(() => undefined);
+}
 export function PreviewItems({
   items,
   section,
   member,
   pinned = false,
+  onOpen,
 }: Readonly<{
   items: HomeItem[];
   section: EditorialKind | "forum";
   member: boolean;
   pinned?: boolean;
+  onOpen?: (item: HomeItem) => void;
 }>) {
   return (
     <ul className="divide-y divide-slate-100">
@@ -37,6 +55,7 @@ export function PreviewItems({
             )}
             <a
               href={itemHref(item, section, member)}
+              onClick={onOpen ? () => onOpen(item) : undefined}
               {...(section === "news"
                 ? { target: "_blank", rel: "noopener noreferrer" }
                 : {})}
@@ -75,6 +94,16 @@ function HomeSection({
   data: CommunityHome;
 }>) {
   const preview = data[section];
+  const onOpen =
+    section === "news"
+      ? (item: HomeItem) =>
+          reportNews(
+            "click",
+            newsEngagementItems(preview).filter(
+              (entry) => entry.contentId === item.id,
+            ),
+          )
+      : undefined;
   return (
     <section
       aria-label={SECTION_NAMES[section]}
@@ -100,6 +129,7 @@ function HomeSection({
         section={section}
         member={data.member}
         pinned
+        onOpen={onOpen}
       />
       {!!preview.recent.length && (
         <>
@@ -110,6 +140,7 @@ function HomeSection({
             items={preview.recent}
             section={section}
             member={data.member}
+            onOpen={onOpen}
           />
         </>
       )}
@@ -143,7 +174,9 @@ export default function CommunityHostHomePage() {
     homeApi
       .home()
       .then((result) => {
-        if (active) setData(result);
+        if (!active) return;
+        setData(result);
+        reportNews("impression", newsEngagementItems(result.news));
       })
       .catch(() => {
         if (active) setError(true);

@@ -30,3 +30,13 @@ it("catches failures and allows a later tick to inspect the durable reservation"
   await job.runOnce(new Date("2026-10-23T01:00:00Z"));
   expect(task).toHaveBeenCalledTimes(2);
 });
+it("passes the tick time so both KST windows reach the service, and stays idle overnight", async () => {
+  const task = jest.fn().mockResolvedValue({});
+  const job = new CommunityNewsJob(task);
+  const morning = new Date("2026-10-23T23:30:00Z");
+  const afternoon = new Date("2026-10-24T06:30:00Z");
+  await job.runOnce(morning);
+  await job.runOnce(afternoon);
+  await job.runOnce(new Date("2026-10-24T16:00:00Z"));
+  expect(task.mock.calls).toEqual([[morning], [afternoon]]);
+});
