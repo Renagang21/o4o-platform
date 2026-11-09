@@ -381,6 +381,15 @@ integration('account erasure — isolated PostgreSQL schema/real sessions', () =
     expect(await db.query('SELECT 1 FROM supplier_product_offers WHERE id=$1 AND supplier_id=$2',[offer,supplier])).toHaveLength(1);
     expect((await db.query('SELECT user_id,contact_email,manager_name,settlement_account_number,status FROM neture_suppliers WHERE id=$1',[supplier]))[0]).toEqual({user_id:null,contact_email:null,manager_name:null,settlement_account_number:null,status:'INACTIVE'});
   });
+  it('product catalog rows are business records: a subject copy in product data neither blocks erasure nor is removed',async()=>{
+    const target=await user(),master=randomUUID();
+    // Before 2026-11-09 this free-text copy produced REVIEW:public.product_masters and a multi-minute global-lock scan.
+    await db.query(`INSERT INTO product_masters(id,regulatory_name,name,manufacturer_name) VALUES($1,$2,$3,$4)`,
+      [master,`Synthetic regulatory ${target.id}`,`Synthetic product ${target.email}`,'Synthetic manufacturer']);
+    expect(await service().request(target.id)).toMatchObject({state:'completed',erased:true});
+    expect(await db.query('SELECT id FROM users WHERE id=$1',[target.id])).toHaveLength(0);
+    expect((await db.query('SELECT name FROM product_masters WHERE id=$1',[master]))[0].name).toBe(`Synthetic product ${target.email}`);
+  });
   it('supplier proof-file ownership uses canonical organization membership and rejects shared documents',async()=>{
     const target=await user(),peer=await user(),org=await organization(target.id),supplier=randomUUID(),document=randomUUID();
     await db.query("UPDATE organizations SET type='supplier' WHERE id=$1",[org]);

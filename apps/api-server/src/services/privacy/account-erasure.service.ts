@@ -45,6 +45,18 @@ const quote = (s: string) => '"' + s.replace(/"/g, '""') + '"';
 const AUTH_IDENTITY_NAMESPACES: Readonly<Record<AuthProvider,true>> = {email:true,google:true,kakao:true,naver:true,service:true};
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
+/**
+ * 상품 카탈로그(거래 · 사업 자료)는 계정 삭제 대상이 아니다 — 회원 사본 전수 검사(reviewManifest)에서 제외한다.
+ * 2026-11-09 통합 담당 결정 「거래 자료까지 삭제할 필요는 없다」.
+ * 운영 기준 이 표들(24개 · 약 2.8GB)이 검사 대상(347개 · 약 2.9GB)의 98% 였고, 행마다 jsonb 문자열 정규식 검사를
+ * 검토 3회 × 2회 반복하는 동안 전역 erasure lock 을 몇 분씩 쥐어 write fence 가 걸린 운영 쓰기까지 멈췄다.
+ * 개인 소유 표(PRIVATE_OWNERS) · 사업 자료 검토(businessErasureReviews) · 공유 파일 확인(assertPersonalFileUnshared)은 그대로다.
+ */
+const BUSINESS_CATALOG_TABLE = /^(product_|shared_product_|representative_products$)/;
+export function isBusinessCatalogTable(t: { schema_name: string; table_name: string }): boolean {
+  return t.schema_name === 'public' && BUSINESS_CATALOG_TABLE.test(t.table_name);
+}
+
 /** These are exclusively owned individual rows; business/shared/statutory rows are NOT in this list. */
 const PRIVATE_OWNERS: Readonly<Record<string, readonly string[]>> = {
   user_policy_acceptances:['user_id'],
@@ -355,6 +367,7 @@ export class AccountErasureService {
     if (soleAdmin.n) codes.push('COMMUNITY_MANAGEMENT_TRANSFER_REQUIRED');
     if (await cooperativeAdminTransferRequired(m,user.id as string)) codes.push('COOPERATIVE_MANAGEMENT_TRANSFER_REQUIRED');
     for (const t of tables) {
+      if (isBusinessCatalogTable(t)) continue;
       const table = `${quote(t.schema_name)}.${quote(t.table_name)}`;
       const owners = t.schema_name === 'public' ? PRIVATE_OWNERS[t.table_name] : undefined;
       let predicate = owners?.filter(c => t.columns.includes(c)).map(c => `r.${quote(c)}::text=$1`).join(' OR ');
