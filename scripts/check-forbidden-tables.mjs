@@ -97,7 +97,7 @@ export async function scan(root) {
       if (!content.includes('@Entity')) continue;
       files++;
       for (const t of entityTableNames(content)) {
-        if (isForbidden(t.name)) violations.push({ file: relative(root, file).split('\\').join('/'), ...t });
+        if (isForbidden(t.name)) violations.push({ file: relative(root, file).replaceAll('\\', '/'), ...t });
       }
     }
   }
@@ -131,11 +131,10 @@ async function main() {
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
-  main().then(
-    (code) => process.exit(code),
-    (error) => {
-      console.error('Script error:', error);
-      process.exit(1);
-    },
-  );
+  try {
+    process.exit(await main());
+  } catch (error) {
+    console.error('Script error:', error);
+    process.exit(1);
+  }
 }
