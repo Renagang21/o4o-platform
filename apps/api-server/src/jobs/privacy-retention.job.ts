@@ -1,6 +1,8 @@
 import { AccountErasureService, erasureOptionsFromEnv } from '../services/privacy/account-erasure.service.js';
 import { AppDataSource } from '../database/connection.js';
 import { PrivacyRetentionService } from '../services/privacy-retention.service.js';
+import { purgeRejectedRegistrations, type RejectedRegistrationStorage } from '../services/admin/rejected-registration-retention.js';
+import { Storage } from '@google-cloud/storage';
 import logger from '../utils/logger.js';
 
 /**
@@ -30,6 +32,20 @@ export function isPrivacyRetentionEnabled(env: NodeJS.ProcessEnv = process.env):
   return env.PRIVACY_RETENTION_ENABLED !== 'false';
 }
 
+/** gcs://bucket/path 파일 하나를 지운다(없으면 성공). 개인 문서 bucket 밖의 경로는 지우지 않는다. */
+function rejectedRegistrationStorage(): RejectedRegistrationStorage {
+  const bucket = process.env.GCS_PRIVATE_DOCUMENT_BUCKET || 'o4o-private-documents';
+  const prefix = `gcs://${bucket}/business-registration/`;
+  let storage: Storage | null = null;
+  return {
+    async deleteObject(fileUrl) {
+      if (!fileUrl.startsWith(prefix)) throw new Error('UNEXPECTED_DOCUMENT_LOCATION');
+      storage ??= new Storage();
+      await storage.bucket(bucket).file(fileUrl.slice(`gcs://${bucket}/`.length)).delete({ ignoreNotFound: true });
+    },
+  };
+}
+
 export class PrivacyRetentionJob {
   private intervalId: NodeJS.Timeout | null = null;
   private readonly INTERVAL_MS = 24 * 60 * 60 * 1000;
@@ -55,6 +71,13 @@ export class PrivacyRetentionJob {
         }catch{
           logger.error('[privacy-retention] account erasure minimum records unavailable');
         }
+      }
+      // 반려 후 30일 안에 다시 신청하지 않은 가입 신청서의 제출 정보 정리 — 같은 dry-run/apply 스위치를 따른다.
+      try{
+        const rejected=await purgeRejectedRegistrations(AppDataSource,startedAt,mode==='apply',rejectedRegistrationStorage());
+        logger.info('[privacy-retention] rejected registrations',{mode,...rejected});
+      }catch{
+        logger.error('[privacy-retention] rejected registrations unavailable');
       }
       const finishedAt = new Date();
       logger.info(`[privacy-retention] ${mode} done`, {
