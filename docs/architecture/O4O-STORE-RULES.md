@@ -90,6 +90,7 @@ dropshippingProductId?: string;  // Soft FK (참조만, FK 제약 없음)
 > - **런타임**: `OrderCreationGuard` · `apps/api-server/src/guards/` 는 존재하지 않는다. 주문 생성 단일 지점은 `apps/api-server/src/services/checkout.service.ts` `createOrder()` 이며, 여기서 의약품 포함 주문을 일괄 거부한다(`assertNoDrugItems`). 우회 저장을 런타임에서 막는 별도 guard 는 없다 — 규칙 준수는 코드 리뷰와 아래 스키마 검사에 의존한다.
 > - **계약**: `CreateOrderDto` 에 `orderType` 필드가 없고 `CheckoutOrder` 엔티티는 `order_type` 컬럼을 매핑하지 않는다(DB 에는 enum 컬럼 `GENERIC`/`DROPSHIPPING`/`COSMETICS`/`TOURISM`, 기본값 `GENERIC` 만 잔존). 따라서 §2.3 · §3.3 의 "OrderType 강제 · enum 추가" 절차는 현행 코드와 맞지 않는다. 서비스 구분은 `metadata.serviceKey` 로 한다([B2B 계약](../baseline/O4O-B2B-SUPPLIER-TO-STORE-ORDER-CONTRACT-V1.md)). [E-COMMERCE-ORDER-CONTRACT](../baseline/E-COMMERCE-ORDER-CONTRACT.md) 는 2026-10-07 SUPERSEDED — 주문 생성 기술 계약은 [CHECKOUT-STABLE-V2](../baseline/CHECKOUT-STABLE-DECLARATION-V2.md) §2.
 > - **스키마**: `scripts/check-forbidden-tables.mjs` 는 존재하지만 현재 CI workflow · `package.json` 어디에서도 호출되지 않는다(수동 실행). `@Entity('x_orders')` 문자열 형태만 검사한다.
+>   (2026-11-09 정합) [#1006](https://github.com/Renagang21/o4o-platform/pull/1006) 부터 CI 의 Code Quality Check · Draft light checks 에서 **blocking** 으로 실행한다. `@Entity('x')` 문자열 형식과 `@Entity({ name: 'x' })` 객체 형식을 모두 읽고, 파일 이름이 아니라 `@Entity` 포함 여부로 대상을 고른다(테스트 · `.d.ts` · `dist` 제외). 허용 목록과 근거는 스크립트의 `ALLOWED_TABLES` 가 정본이며 §2.4 표에 옮겨 적었다.
 
 ### 2.2 Guardrail 1: 런타임 차단 (Service Layer)
 
@@ -147,6 +148,18 @@ const BLOCKED_ORDER_TYPES = [
 | checkout_orders | E-commerce Core |
 | checkout_payments | E-commerce Core |
 
+> (2026-11-09 정합) 현행 허용 목록(`scripts/check-forbidden-tables.mjs` `ALLOWED_TABLES`, 통합 담당 결정 2026-11-09):
+>
+> | 테이블 | 성격 · 근거 |
+> |--------|-------------|
+> | `checkout_orders` | 주문 정본 ([CHECKOUT-STABLE-V2](../baseline/CHECKOUT-STABLE-DECLARATION-V2.md) §2) |
+> | `checkout_payments` | checkout 결제 기록 (CHECKOUT-STABLE-V2 §2) |
+> | `o4o_payments` | PaymentCore 플랫폼 공통 결제 테이블 (CHECKOUT-STABLE-V2 §2-2) |
+> | `neture_settlement_orders` | 정산-주문 연결 테이블(중복 정산 방지) — 주문 원장 아님 |
+> | `neture_orders` | 공급자 fulfillment 파생 원장 — 주문 정본 아님 ([B2B 계약](../baseline/O4O-B2B-SUPPLIER-TO-STORE-ORDER-CONTRACT-V1.md) 불변식 T1 · A2) |
+>
+> 이 밖의 `*_orders` · `*_payments` 는 CI 가 막는다. 새 허용은 계약 근거와 함께 스크립트 · 회귀 테스트를 고치는 PR 로 하고 통합 담당이 확인한다.
+
 **검사 스크립트**: `scripts/check-forbidden-tables.mjs`
 
 ### 2.5 금지 패턴 목록
@@ -156,7 +169,7 @@ const BLOCKED_ORDER_TYPES = [
 | `tourism_orders` | Tourism은 Core 위임 |
 | `cosmetics_orders` | Cosmetics는 Core 위임 |
 | `yaksa_orders` | Yaksa는 주문 기능 없음 |
-| `neture_orders` | Neture는 Read-only Hub |
+| ~~`neture_orders`~~ | ~~Neture는 Read-only Hub~~ — (2026-11-09 정합) 금지 대상 아님: 아래 주석 · §2.4 허용 목록 |
 | Service 내 `createOrder()` | 책임 침범 |
 | 서비스별 결제 API | Core 책임 |
 
