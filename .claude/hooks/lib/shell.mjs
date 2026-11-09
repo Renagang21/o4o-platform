@@ -80,3 +80,19 @@ export function commandIndex(tokens) {
 }
 
 export const baseName = (t = '') => t.split(/[\\/]/).pop().replace(/\.(cmd|exe)$/i, '').toLowerCase();
+
+/**
+ * 훅의 "ask" 가 실제 승인 창으로 이어지는 권한 모드.
+ * 2026-11-09 로컬 auto 모드에서 훅이 ask 를 반환했는데도 승인 창 없이 실행됐다(gh label delete).
+ * 그래서 이 목록 밖의 모드(auto · bypassPermissions · dontAsk · 알 수 없는 값 · permission_mode 없음)에서는
+ * ask 대신 deny 로 막는다(fail closed). 사용자는 default 모드로 바꾼 뒤 다시 실행하거나 직접 실행한다.
+ */
+export const PROMPTING_MODES = new Set(['default', 'acceptEdits', 'plan']);
+
+/** @param {unknown} permissionMode PreToolUse 입력의 permission_mode */
+export const askOrDeny = (permissionMode) => (PROMPTING_MODES.has(permissionMode) ? 'ask' : 'deny');
+
+/** deny 로 바뀐 경우 사유 끝에 붙이는 안내 */
+export const modeDenyNote = (permissionMode) =>
+  ` 현재 권한 모드(${permissionMode ?? '알 수 없음'})에서는 승인 창이 뜨지 않으므로 거부했다 — ` +
+  'default 모드로 바꾼 뒤(Shift+Tab) 다시 실행하거나 사용자가 직접 실행한다.';
