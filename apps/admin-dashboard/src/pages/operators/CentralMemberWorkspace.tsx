@@ -34,6 +34,14 @@ export default function CentralMemberWorkspace({ actorId, initialQuery = '', ini
   const listSequence = useRef(0), detailSequence = useRef(0), lock = useRef(false);
   const [selectedIds,setSelectedIds]=useState<Set<string>>(new Set());
   const [workMode,setWorkMode]=useState<MemberWorkMode>('detail');
+  // 계정 삭제는 서버에서 수십 초 걸릴 수 있다. 진행 중임을 보여 주지 않으면 버튼만 회색으로 멈춘 것처럼 보인다.
+  const [erasing,setErasing]=useState<{name:string;startedAt:number}|null>(null),[erasingSeconds,setErasingSeconds]=useState(0);
+  useEffect(()=>{
+    if(!erasing){setErasingSeconds(0);return;}
+    const tick=()=>setErasingSeconds(Math.floor((Date.now()-erasing.startedAt)/1000));
+    tick();const timer=globalThis.setInterval(tick,1000);
+    return()=>globalThis.clearInterval(timer);
+  },[erasing]);
   const actorEpoch=useRef({value:0});
   useEffect(()=>{const state=actorEpoch.current;++state.value;lock.current=false;setBusy(false);setPermissions({qualifications:false,pharmacies:false,edit:false});return()=>{++state.value;};},[actorId,adminMode]);
   const panel = useRef<HTMLElement | null>(null);
@@ -115,6 +123,7 @@ export default function CentralMemberWorkspace({ actorId, initialQuery = '', ini
     if (!globalThis.confirm(`${row.name || '선택한 회원'} 계정을 삭제하시겠습니까?\n\n계정과 개인 자료 · 첨부파일이 삭제되며 되돌릴 수 없습니다. 사업체 · 약국 · 공급자 거래 자료는 유지됩니다.`)) return;
     const context = actorEpoch.current.value;
     lock.current = true; setBusy(true); setError(''); setNotice('');
+    setErasing({ name: row.name || '선택한 회원', startedAt: Date.now() });
     let message = '', failure = '';
     try {
       const response = await api.delete(`/admin/users/${encodeURIComponent(row.userId)}`, { timeout: 90_000 });
@@ -129,6 +138,7 @@ export default function CentralMemberWorkspace({ actorId, initialQuery = '', ini
         ? '서버 응답이 없습니다. 삭제가 진행 중일 수 있으니 「삭제 처리 내역」에서 상태를 확인해 주시기 바랍니다.'
         : `${deletionMessage(code)}${code ? ` (${code})` : ''}`;
     } finally {
+      setErasing(null);
       if (context === actorEpoch.current.value) {
         ++detailSequence.current; setSelectedId(null); setDetail(null); setSelectedIds(new Set());
         await load();
@@ -161,7 +171,8 @@ export default function CentralMemberWorkspace({ actorId, initialQuery = '', ini
     <nav role="tablist" aria-label="회원 업무 대상" className="flex flex-wrap gap-2">{tasks.filter(([key]) => taskAllowed(key, permissions)).map(([key, label]) => <button type="button" role="tab" key={key} aria-selected={task === key} disabled={busy} className={`rounded border px-3 py-2 ${task === key ? 'bg-blue-700 text-white' : ''}`} onClick={() => { setTask(key); setPage(1); }}>{label} ({counts[key] ?? 0})</button>)}</nav>
     <form className="flex flex-wrap gap-2" onSubmit={event => { event.preventDefault(); setPage(1); setQuery(search.trim()); }}><input aria-label="회원 이름·이메일 검색" maxLength={100} disabled={busy} value={search} onChange={event => setSearch(event.target.value)} className="rounded border p-2" /><button type="submit" disabled={busy}>검색</button><button type="button" disabled={busy || loading} onClick={() => { ++detailSequence.current; setDetail(null); setSelectedId(null); setSelectedIds(new Set()); void load(); }}>새로고침</button></form>
     {/* 패널이 열려 있으면 결과 · 오류는 패널 안에 보인다. 패널은 body 위 레이어라 여기 문구가 가려진다. */}
-    {!selectedId && error && <p role="alert">{error}</p>}{!selectedId && notice && <output>{notice}</output>}
+    {erasing && <output aria-live="polite" className="block rounded border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">{erasing.name} 계정을 삭제하는 중입니다… {erasingSeconds}초 경과. 개인 자료와 첨부파일을 함께 지우므로 최대 90초까지 걸릴 수 있습니다. 창을 닫지 말고 기다려 주시기 바랍니다.</output>}
+    {!selectedId && error && <p role="alert" className="rounded border border-red-200 bg-red-50 p-3 text-sm text-red-800">{error}</p>}{!selectedId && notice && <output className="block rounded border border-green-200 bg-green-50 p-3 text-sm text-green-800">{notice}</output>}
     <div className="[&>div>div]:flex-wrap"><ActionBar selectedCount={selectedIds.size} onClearSelection={()=>{if(busy)return;++detailSequence.current;setSelectedIds(new Set());setSelectedId(null);setDetail(null);setReading(false);}} actions={([
       ['detail','회원 상세보기'],['edit','회원 정보 수정'],['reject','가입 반려'],
       // Admin: 「계정 삭제」는 바로 삭제하고, 이용 복구 · 약국 매도 이전 · 완전폐업은 「이용·약국 관리」 패널에서 한다(#990 Codex P1).

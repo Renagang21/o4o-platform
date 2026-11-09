@@ -421,6 +421,31 @@ it('admin 「계정 삭제」 asks once and deletes the selected account directl
   expect(screen.queryByRole('complementary', { name: '선택 회원 작업' })).toBeNull();
   confirm.mockRestore();
 });
+it('admin 「계정 삭제」 shows a progress message while the server is still deleting', async () => {
+  const confirm = vi.spyOn(globalThis, 'confirm').mockReturnValue(true);
+  let finish!: (value: unknown) => void;
+  api.delete.mockReturnValueOnce(new Promise(resolve => { finish = resolve; }));
+  mountAdmin();
+  await selectFirstRow();
+  fireEvent.click(screen.getByRole('button', { name: '계정 삭제' }));
+  expect(await screen.findByText(/계정을 삭제하는 중입니다/)).toBeTruthy();
+  expect(screen.getByText(/최대 90초/)).toBeTruthy();
+  finish({ data: { data: { operationId: 'op', state: 'completed', erased: true } } });
+  await screen.findByText('계정을 삭제했습니다.');
+  expect(screen.queryByText(/계정을 삭제하는 중입니다/)).toBeNull();
+  confirm.mockRestore();
+});
+it('admin 「계정 삭제」 explains a timed-out request instead of staying silent', async () => {
+  const confirm = vi.spyOn(globalThis, 'confirm').mockReturnValue(true);
+  api.delete.mockRejectedValueOnce({ code: 'ECONNABORTED' });
+  mountAdmin();
+  await selectFirstRow();
+  fireEvent.click(screen.getByRole('button', { name: '계정 삭제' }));
+  const alert = await screen.findByRole('alert');
+  expect(alert.textContent).toContain('서버 응답이 없습니다');
+  expect(screen.queryByText(/계정을 삭제하는 중입니다/)).toBeNull();
+  confirm.mockRestore();
+});
 it('admin 「계정 삭제」 does nothing when the confirmation is cancelled', async () => {
   const confirm = vi.spyOn(globalThis, 'confirm').mockReturnValue(false);
   mountAdmin();
