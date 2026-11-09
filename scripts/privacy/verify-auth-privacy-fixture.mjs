@@ -56,7 +56,8 @@ try{
     const child=spawn(process.execPath,['node_modules/jest/bin/jest.js','--config','apps/api-server/jest.config.cjs','--runInBand','--testTimeout=15000','--runTestsByPath',
      'apps/api-server/src/middleware/__tests__/auth-rate-limit-postgres.test.ts',
      'apps/api-server/src/services/privacy/__tests__/erasure-readiness-postgres.test.ts',
-     'apps/api-server/src/services/privacy/__tests__/account-erasure.integration.test.ts'],
+     'apps/api-server/src/services/privacy/__tests__/account-erasure.integration.test.ts',
+     'apps/api-server/src/services/admin/__tests__/rejected-registration-retention.postgres.spec.ts'],
      {cwd:root,env:{...process.env,O4O_ERASURE_TEST_PORT:'55469'},stdio:'inherit'});
     child.once('error',reject);child.once('exit',(status,signal)=>accept(signal ? 1 : status??1));
    });

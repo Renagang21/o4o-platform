@@ -244,9 +244,8 @@ it('never shows a verification-mail action for an operator-corrected social memb
 it('approves signup from the selected member with one reason and no separate qualification command', async () => {
   mount();
   await select();
-  fireEvent.click(
-    screen.getByRole('button', { name: '가입 승인', exact: true }),
-  );
+  const card = screen.getByRole('region', { name: '가입 신청 처리' });
+  fireEvent.click(within(card).getByRole('button', { name: '승인', exact: true }));
   fireEvent.change(screen.getByLabelText('처리 사유'), {
     target: { value: '가입 정보 확인' },
   });
@@ -274,6 +273,29 @@ it('rejects the signup application without changing the global account', async (
       expect.objectContaining({ reason: '사업자 정보 보완' }),
     ),
   );
+  // 처리 후 패널을 닫고, 목록 위에 결과를 보인다.
+  await screen.findByText('합성 회원 회원의 가입을 반려했습니다. 목록의 「회원 상태」가 반려로 바뀝니다.');
+  expect(screen.queryByRole('complementary', { name: '선택 회원 작업' })).toBeNull();
+});
+it('opens the reject form at the top of the panel, above the submitted information', async () => {
+  mount();
+  await select();
+  fireEvent.click(screen.getByRole('button', { name: '가입 반려', exact: true }));
+  const panel = await screen.findByRole('complementary', { name: '선택 회원 작업' });
+  const card = within(panel).getByRole('region', { name: '가입 신청 처리' });
+  const form = within(card).getByRole('form', { name: '가입 반려' });
+  const info = within(panel).getByRole('form', { name: '회원 정보 보기' });
+  expect(form.compareDocumentPosition(info) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+});
+it('shows member status right after the name and blocks reject when no signup record exists', async () => {
+  rows[0] = { ...rows[0], serviceStatus: 'rejected', registrationState: null };
+  mount();
+  const name = await screen.findByRole('button', { name: '회원 합성 회원 member-a@example.test' });
+  const headers = [...name.closest('table')!.querySelectorAll('th')].map(th => th.textContent?.trim()).filter(Boolean);
+  expect(headers.indexOf('회원 상태')).toBe(headers.indexOf('이름') + 1);
+  expect(within(name.closest('tr')!).getByText('반려')).toBeTruthy();
+  fireEvent.click(screen.getAllByRole('checkbox')[1]);
+  expect(screen.getByRole('button', { name: '가입 반려', exact: true })).toBeDisabled();
 });
 it('clears selection and private form on a status tab change', async () => {
   mount();
@@ -416,9 +438,40 @@ it('admin 「계정 삭제」 asks once and deletes the selected account directl
   expect(screen.queryByRole('button', { name: '계정·개인자료 삭제 확인' })).toBeNull();
   fireEvent.click(screen.getByRole('button', { name: '계정 삭제' }));
   expect(confirm).toHaveBeenCalledTimes(1);
-  await waitFor(() => expect(api.delete).toHaveBeenCalledWith('/admin/users/member-a', { timeout: 90_000 }));
-  await screen.findByText('계정을 삭제했습니다.');
+  await waitFor(() => expect(api.delete).toHaveBeenCalledWith('/admin/users/member-a', { timeout: 300_000 }));
+  await screen.findByText('합성 회원 계정을 삭제했습니다.');
   expect(screen.queryByRole('complementary', { name: '선택 회원 작업' })).toBeNull();
+  confirm.mockRestore();
+});
+it('admin 「계정 삭제」 shows a progress message while the server is still deleting', async () => {
+  const confirm = vi.spyOn(globalThis, 'confirm').mockReturnValue(true);
+  let finish!: (value: unknown) => void;
+  api.delete.mockReturnValueOnce(new Promise(resolve => { finish = resolve; }));
+  mountAdmin();
+  await selectFirstRow();
+  fireEvent.click(screen.getByRole('button', { name: '계정 삭제' }));
+  expect(await screen.findByText(/계정을 삭제하는 중입니다/)).toBeTruthy();
+  expect(screen.getByText(/서버에서 계속 진행됩니다/)).toBeTruthy();
+  // 화면은 잠기지 않는다: 탭 · 검색을 계속 쓸 수 있고, 삭제 중인 행은 「삭제 중」으로 보인다.
+  expect(screen.getByRole('tab', { name: /해지 회원/ })).not.toBeDisabled();
+  const row = screen.getByRole('button', { name: '회원 합성 회원 member-a@example.test' }).closest('tr')!;
+  expect(within(row).getByText('삭제 중')).toBeTruthy();
+  fireEvent.click(screen.getAllByRole('checkbox')[1]);
+  expect(screen.getByRole('button', { name: '계정 삭제' })).toBeDisabled();
+  finish({ data: { data: { operationId: 'op', state: 'completed', erased: true } } });
+  await screen.findByText('합성 회원 계정을 삭제했습니다.');
+  expect(screen.queryByText(/계정을 삭제하는 중입니다/)).toBeNull();
+  confirm.mockRestore();
+});
+it('admin 「계정 삭제」 explains a timed-out request instead of staying silent', async () => {
+  const confirm = vi.spyOn(globalThis, 'confirm').mockReturnValue(true);
+  api.delete.mockRejectedValueOnce({ code: 'ECONNABORTED' });
+  mountAdmin();
+  await selectFirstRow();
+  fireEvent.click(screen.getByRole('button', { name: '계정 삭제' }));
+  const alert = await screen.findByRole('alert');
+  expect(alert.textContent).toContain('서버 응답이 없습니다');
+  expect(screen.queryByText(/계정을 삭제하는 중입니다/)).toBeNull();
   confirm.mockRestore();
 });
 it('admin 「계정 삭제」 does nothing when the confirmation is cancelled', async () => {
