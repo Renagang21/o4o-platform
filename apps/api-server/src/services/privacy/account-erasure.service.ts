@@ -45,12 +45,27 @@ const quote = (s: string) => '"' + s.replace(/"/g, '""') + '"';
 const AUTH_IDENTITY_NAMESPACES: Readonly<Record<AuthProvider,true>> = {email:true,google:true,kakao:true,naver:true,service:true};
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
+/**
+ * 상품 카탈로그(거래 · 사업 자료)는 계정 삭제 대상이 아니다 — 회원 사본 전수 검사(reviewManifest)에서 제외한다.
+ * 2026-11-09 통합 담당 결정 「거래 자료까지 삭제할 필요는 없다」.
+ * 운영 기준 이 표들(24개 · 약 2.8GB)이 검사 대상(347개 · 약 2.9GB)의 98% 였고, 행마다 jsonb 문자열 정규식 검사를
+ * 검토 3회 × 2회 반복하는 동안 전역 erasure lock 을 몇 분씩 쥐어 write fence 가 걸린 운영 쓰기까지 멈췄다.
+ * 개인 소유 표(PRIVATE_OWNERS) · 사업 자료 검토(businessErasureReviews) · 공유 파일 확인(assertPersonalFileUnshared)은 그대로다.
+ */
+const BUSINESS_CATALOG_TABLE = /^(product_|shared_product_|representative_products$)/;
+export function isBusinessCatalogTable(t: { schema_name: string; table_name: string }): boolean {
+  return t.schema_name === 'public' && BUSINESS_CATALOG_TABLE.test(t.table_name);
+}
+
 /** These are exclusively owned individual rows; business/shared/statutory rows are NOT in this list. */
 const PRIVATE_OWNERS: Readonly<Record<string, readonly string[]>> = {
   user_policy_acceptances:['user_id'],
   personal_mail_accounts: ['user_id'], personal_mail_jobs: ['user_id'], personal_mail_oauth_flows: ['user_id'],
   external_ai_connections: ['user_id'],
   linked_accounts: ['userId'], user_password_credentials: ['user_id'],
+  // 본인 로그인 활동(login_password · login_google · link_google, IP · UA). 미분류여서 본인 행이 사본 검토(REVIEW)로 삭제를 막았다(2026-11-09 운영).
+  // 보존 정책 §13 의 로그인 기록 「30일까지」는 상한이다. 보안 최소 기록은 login_attempts 최소화로 남는다.
+  account_activities: ['userId'],
   email_verification_tokens: ['user_id'], password_reset_tokens: ['user_id'], auth_social_flows: ['user_id'],
   browser_session_revocations: ['user_id'], service_session_revocations: ['user_id'],
   handoff_tokens: ['user_id'], notifications: ['userId'],
@@ -355,6 +370,7 @@ export class AccountErasureService {
     if (soleAdmin.n) codes.push('COMMUNITY_MANAGEMENT_TRANSFER_REQUIRED');
     if (await cooperativeAdminTransferRequired(m,user.id as string)) codes.push('COOPERATIVE_MANAGEMENT_TRANSFER_REQUIRED');
     for (const t of tables) {
+      if (isBusinessCatalogTable(t)) continue;
       const table = `${quote(t.schema_name)}.${quote(t.table_name)}`;
       const owners = t.schema_name === 'public' ? PRIVATE_OWNERS[t.table_name] : undefined;
       let predicate = owners?.filter(c => t.columns.includes(c)).map(c => `r.${quote(c)}::text=$1`).join(' OR ');
