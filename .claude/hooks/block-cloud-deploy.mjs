@@ -1,10 +1,12 @@
 #!/usr/bin/env node
 /**
- * PreToolUse 훅 — 클라우드 세션에서만 운영 배포 명령을 거부한다 (AGENTS.md §9).
+ * PreToolUse 훅 — 운영 배포 명령을 클라우드 세션에서는 거부하고, 로컬 세션에서는 항상 승인을 묻는다 (AGENTS.md §9).
  *
  * - 클라우드 판별: CLAUDE_CODE_REMOTE === 'true' 또는 CLAUDE_CODE_REMOTE_SESSION_ID 존재.
- *   로컬 세션에서는 아무것도 하지 않는다 → .claude/settings.json 의 ask 규칙이 그대로 적용된다.
- * - 거부 대상
+ *   · 클라우드 → permissionDecision "deny".
+ *   · 로컬 → permissionDecision "ask". settings.json 의 ask 규칙은 auto 권한 모드에서 승인 창 없이
+ *     통과하는 것이 로컬에서 확인됐다(2026-11-09). 훅이 직접 ask 를 반환해 권한 모드와 관계없이 승인을 묻는다.
+ * - 대상
  *   · gcloud 배포: run deploy · run services update/update-traffic/replace ·
  *     run jobs deploy/update/create/execute/replace · builds submit · deploy(Cloud Deploy) ·
  *     app deploy · functions deploy
@@ -12,8 +14,8 @@
  *   · gh run rerun <id> — 그 run 의 workflow 가 배포 계열이면
  *   · gh api …/dispatches — workflow dispatch API 직접 호출
  *   · gh api …/actions/runs/<id>/rerun(-failed-jobs) · …/actions/jobs/<id>/rerun — 배포 run · job 재실행
- * - 숫자 ID 를 조회하지 못하거나, workflow run · run rerun 의 대상을 특정하지 못하면 클라우드에서는 거부한다(fail closed).
- *   그 밖의 예외는 허용(exit 0)으로 넘겨 일반 명령을 막지 않는다.
+ * - 숫자 ID 를 조회하지 못하거나, workflow run · run rerun 의 대상을 특정하지 못하면 배포로 본다(fail closed —
+ *   클라우드 거부 · 로컬 승인 요청). 그 밖의 예외는 허용(exit 0)으로 넘겨 일반 명령을 막지 않는다.
  */
 import { execFileSync } from 'node:child_process';
 import { baseName, commandIndex, readStdin, segments, tokenize } from './lib/shell.mjs';
@@ -164,8 +166,44 @@ function check(segment, cwd) {
   return null;
 }
 
+/**
+ * 명령 문자열에서 첫 번째 배포 판정 사유를 찾는다. 없으면 null.
+ * @param {string} cmd
+ * @param {string} cwd
+ */
+function findDeployReason(cmd, cwd) {
+  for (const seg of segments(cmd)) {
+    let reason = null;
+    try {
+      reason = check(seg, cwd);
+    } catch {
+      reason = null;
+    }
+    if (reason) return reason;
+  }
+  return null;
+}
+
+/**
+ * PreToolUse 응답. 클라우드는 거부, 로컬은 승인 요청.
+ * @param {string} reason
+ * @param {boolean} cloud
+ */
+function decisionFor(reason, cloud) {
+  return {
+    hookSpecificOutput: {
+      hookEventName: 'PreToolUse',
+      permissionDecision: cloud ? 'deny' : 'ask',
+      permissionDecisionReason: cloud
+        ? `클라우드 세션에서는 운영 배포를 실행하지 않는다 (AGENTS.md §9): ${reason}. ` +
+          '배포는 merge 후 자동 Delivery 를 따르거나 로컬 세션에서 승인 후 실행한다.'
+        : `운영 배포 명령 — 통합 담당의 지시가 있을 때만 승인한다 (AGENTS.md §9): ${reason}. ` +
+          '권한 모드와 관계없이 이 훅이 승인을 묻는다.',
+    },
+  };
+}
+
 function main() {
-  if (!isCloud()) return;
   let payload;
   try {
     payload = JSON.parse(readStdin() || '{}');
@@ -176,28 +214,8 @@ function main() {
   if (typeof cmd !== 'string' || !cmd) return;
   const cwd = payload.cwd || process.cwd();
 
-  for (const seg of segments(cmd)) {
-    let reason = null;
-    try {
-      reason = check(seg, cwd);
-    } catch {
-      reason = null;
-    }
-    if (reason) {
-      process.stdout.write(
-        JSON.stringify({
-          hookSpecificOutput: {
-            hookEventName: 'PreToolUse',
-            permissionDecision: 'deny',
-            permissionDecisionReason:
-              `클라우드 세션에서는 운영 배포를 실행하지 않는다 (AGENTS.md §9): ${reason}. ` +
-              '배포는 merge 후 자동 Delivery 를 따르거나 로컬 세션에서 승인 후 실행한다.',
-          },
-        }),
-      );
-      return;
-    }
-  }
+  const reason = findDeployReason(cmd, cwd);
+  if (reason) process.stdout.write(JSON.stringify(decisionFor(reason, isCloud())));
 }
 
 main();

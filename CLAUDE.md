@@ -18,7 +18,7 @@
 - 시작 · 종료 절차는 `/start` · `/handoff` 스킬(`.claude/skills/`)을 따른다. 작업 세션은 push 후 PR 생성까지 하고, 병합 · 배포는 통합 담당만 한다 — `AGENTS.md` §4 역할 · §4-1(e).
 - 그 밖의 스킬: `/wo-new`(지시서 작성 · 인계) · `/db-readonly`(로컬 전용 운영 DB 조회) · `/verify`(변경 범위 검증) · `/integrate`(통합 세션으로 지정된 PR 만 — `AGENTS.md` §4 역할) · `/worktree-cleanup`(merge 후 정리). 스킬은 규칙을 복사하지 않고 `AGENTS.md` · 정본 절을 가리킨다.
 - SessionStart 훅(`.claude/hooks/session-start.mjs`)이 `origin/main` 을 fetch 하고, **clean 한 기준 main checkout 에서만** `pull --ff-only` 한다. 작업 branch · worktree 에서는 ahead/behind 만 보고하며 merge/rebase 하지 않는다. 이 세션 유형(`실행 위치`)의 최근 미완료 지시서도 알려 준다.
-- PreToolUse 훅(`.claude/hooks/block-cloud-deploy.mjs`)은 **클라우드 세션에서만** 운영 배포 명령을 거부한다. 로컬은 `.claude/settings.json` 의 ask 를 따른다. 정책은 `AGENTS.md` §9.
+- PreToolUse 훅(`.claude/hooks/block-cloud-deploy.mjs`)은 운영 배포 명령을 **클라우드 세션에서는 거부**하고, **로컬 세션에서는 권한 모드와 관계없이 승인을 묻는다**(ask). `.claude/settings.json` 의 ask 규칙만으로는 auto 권한 모드에서 승인 창 없이 실행되는 것이 확인돼(2026-11-09) 훅이 직접 묻는다. 회귀 테스트 `.claude/hooks/block-cloud-deploy.test.mjs`. 정책은 `AGENTS.md` §9.
 - PreToolUse 훅(`.claude/hooks/guard-git-push.mjs`)은 **모든 세션에서** 콜론 refspec 원격 branch 삭제를 거부한다. permission 패턴은 끝이 `:*` 이면 예전 접두어 문법으로 해석돼 의도대로 매칭되지 않으므로, 새 규칙을 `:*` 로 끝내지 않는다(`pnpm run build:*` 처럼 접두어 일치가 의도인 경우만 예외).
 - 플러그인: 클라우드는 claude.ai 계정 활성화, 로컬은 저장소 선언 — 이유는 `SETUP.md` §1 「Claude Code 플러그인」.
 
