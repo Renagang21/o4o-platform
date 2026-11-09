@@ -8,7 +8,7 @@ import MemberWorkPanel from './MemberWorkPanel';
 import { api } from '@/api/base';
 import { ERASURE_STATE_LABELS, deletionMessage } from '@/pages/platform/account-governance/AccountErasureControls';
 import type { UserErasureResult } from '@/types/user';
-import { memberError, type MemberDetail, type MemberPermissions, type MemberRow, type MemberTask, type MemberWorkMode } from './member-workspace-model';
+import { memberError, memberStatusTone, registrationDecisionBlock, type MemberDetail, type MemberPermissions, type MemberRow, type MemberTask, type MemberWorkMode, type PerformOptions } from './member-workspace-model';
 
 const base = '/qualifications/pharmacist/members';
 const tasks: Array<[MemberTask, string]> = [['all', '전체 회원'], ['pending', '가입 대기'], ['corrections', '반려·보완'], ['inactive', '해지 회원']];
@@ -90,7 +90,7 @@ export default function CentralMemberWorkspace({ actorId, initialQuery = '', ini
     } }
     finally { if (seq === detailSequence.current) setReading(false); }
   };
-  const perform = async (work: () => Promise<unknown>) => {
+  const perform = async (work: () => Promise<unknown>, options: PerformOptions = {}) => {
     if (lock.current || !detail) return;
     const id = detail.member.userId;
     const context=actorEpoch.current.value;
@@ -100,7 +100,7 @@ export default function CentralMemberWorkspace({ actorId, initialQuery = '', ini
       const outcome=await work() as {data?:{data?:{storeInventoryPurged?:boolean;errorCode?:string}}};
       if(context!==actorEpoch.current.value)return;
       if(outcome?.data?.data?.storeInventoryPurged===false) setNotice(`폐업과 접근 해제는 적용됐습니다. 자료·파일 삭제는 미완료입니다. 확인 후 재시도해 주시기 바랍니다. (${outcome.data.data.errorCode??'PURGE_INCOMPLETE'})`);
-      else setNotice('처리 결과를 저장했습니다. 아래에서 다음 업무 또는 다음 회원을 선택해 주시기 바랍니다.');
+      else setNotice(options.done ?? '처리 결과를 저장했습니다. 아래에서 다음 업무 또는 다음 회원을 선택해 주시기 바랍니다.');
     } catch (error_) { failureMessage = memberError(error_);accessLost=[401,403].includes((error_ as {response?:{status?:number}}).response?.status??0); }
     finally {
       const refresh=async()=>{
@@ -108,7 +108,9 @@ export default function CentralMemberWorkspace({ actorId, initialQuery = '', ini
         if(failureMessage){if(accessLost){++detailSequence.current;setDetail(null);setSelectedId(null);setSelectedIds(new Set());setRows([]);setCounts({});setPermissions({qualifications:false,pharmacies:false,edit:false});}setError(failureMessage);lock.current=false;setBusy(false);return;}
         const latest=await load();
         if(context!==actorEpoch.current.value)return;
-        if(latest?.some(row=>row.userId===id))await openMember(id,'detail',true);
+        // 가입 승인·반려 · 해지·복구는 끝나면 패널을 닫는다. 결과는 목록 위 문구와 목록의 「회원 상태」로 확인한다.
+        if(options.close){++detailSequence.current;setDetail(null);setSelectedId(null);setReading(false);}
+        else if(latest?.some(row=>row.userId===id))await openMember(id,'detail',true);
         else {++detailSequence.current;setDetail(null);setSelectedId(null);setReading(false);}
         if(context!==actorEpoch.current.value)return;
         if(failureMessage)setError(failureMessage);
@@ -154,13 +156,12 @@ export default function CentralMemberWorkspace({ actorId, initialQuery = '', ini
   const nextMember = reviewRows[selectedIndex + 1];
   const protectedSelection = !adminMode && rows.some(row=>selectedIds.has(row.userId)&&row.operatorReadOnly);
   const columns: ListColumnDef<MemberRow>[] = [
-    {key:'operatorReadOnly',header:'업무 대상',render:(_value,row)=>row.operatorReadOnly?'전체 관리자 — 처리 대상 아님':'회원'},
-    {key:'name',header:'이름',stickyOnMobile:true,minWidth:120,render:(_value,row)=><button type="button" disabled={busy} aria-label={`회원 ${row.name||'미등록'} ${row.email||'이메일 미제공'}`} aria-pressed={selectedId===row.userId} className="whitespace-nowrap text-left underline" onClick={event=>{event.stopPropagation();void openMember(row.userId);}}>{row.name||'미등록'}</button>},
+    {key:'name',header:'이름',stickyOnMobile:true,minWidth:120,render:(_value,row)=><span className="flex flex-col items-start gap-0.5"><button type="button" disabled={busy} aria-label={`회원 ${row.name||'미등록'} ${row.email||'이메일 미제공'}`} aria-pressed={selectedId===row.userId} className="whitespace-nowrap text-left underline" onClick={event=>{event.stopPropagation();void openMember(row.userId);}}>{row.name||'미등록'}</button>{row.operatorReadOnly&&<span className="whitespace-nowrap text-xs text-slate-500">전체 관리자 — 처리 대상 아님</span>}</span>},
+    {key:'serviceStatus',header:'회원 상태',minWidth:100,render:value=><span className={`inline-block whitespace-nowrap rounded-full border px-2 py-0.5 text-xs font-medium ${memberStatusTone[String(value)]??'border-slate-300 bg-white text-slate-600'}`}>{MEMBER_STATUS_LABELS[String(value)]??'확인 필요'}</span>},
+    {key:'registrationType',header:'가입 유형',minWidth:110,render:value=><span className="whitespace-nowrap">{MEMBER_REGISTRATION_TYPES[value as keyof typeof MEMBER_REGISTRATION_TYPES]??'미등록'}</span>},
     {key:'nickname',header:'닉네임',minWidth:120,render:value=><span className="whitespace-nowrap">{value||'미등록'}</span>},
     {key:'email',header:'이메일',minWidth:240,render:value=><span className="whitespace-nowrap">{value||'미제공'}</span>},
     {key:'loginMethods',header:'로그인 방식',minWidth:120,render:value=><span className="whitespace-nowrap">{Array.isArray(value)&&value.length?value.map(key=>({google:'Google',kakao:'카카오',email:'이메일'})[key]??'기타').join(' · '):'미등록'}</span>},
-    {key:'registrationType',header:'가입 유형',minWidth:110,render:value=><span className="whitespace-nowrap">{MEMBER_REGISTRATION_TYPES[value as keyof typeof MEMBER_REGISTRATION_TYPES]??'미등록'}</span>},
-    {key:'serviceStatus',header:'회원 상태',minWidth:100,render:value=><span className="whitespace-nowrap">{MEMBER_STATUS_LABELS[String(value)]??'확인 필요'}</span>},
   ];
   let panelContent = <button type="button" disabled={busy} onClick={() => { if (selectedId) void openMember(selectedId); }}>선택 회원 다시 조회</button>;
   if (reading) { panelContent = <output>회원 제출 정보를 확인하는 중…</output>; }
@@ -182,7 +183,8 @@ export default function CentralMemberWorkspace({ actorId, initialQuery = '', ini
       const mode:MemberWorkMode=key==='manage'?'delete':key;
       let variant=workActionVariant(mode,workMode);
       if(key==='manage')variant=workMode==='delete'?'primary':'default';
-      return {key,label,visible:!protectedSelection||key==='detail',variant,tooltip:key==='delete'&&deleteForbidden?'전체 관리자 권한이 필요합니다.':undefined,disabled:busy||loading||(key!=='detail'&&selectedIds.size!==1)||(key==='edit'&&!permissions.edit)||(key==='reject'&&!permissions.edit)||(key==='manage'&&!permissions.edit)||(key==='delete'&&deleteForbidden),onClick:()=>{const first=rows.find(row=>selectedIds.has(row.userId));if(!first)return;if(adminMode&&key==='delete'){void eraseAccount(first);return;}void openMember(first.userId,mode);}};
+      const rejectBlock=key==='reject'&&selectedIds.size===1?registrationDecisionBlock(rows.find(row=>selectedIds.has(row.userId))):null;
+      return {key,label,visible:!protectedSelection||key==='detail',variant,tooltip:key==='delete'&&deleteForbidden?'전체 관리자 권한이 필요합니다.':rejectBlock??undefined,disabled:busy||loading||(key!=='detail'&&selectedIds.size!==1)||(key==='edit'&&!permissions.edit)||(key==='reject'&&(!permissions.edit||rejectBlock!==null))||(key==='manage'&&!permissions.edit)||(key==='delete'&&deleteForbidden),onClick:()=>{const first=rows.find(row=>selectedIds.has(row.userId));if(!first)return;if(adminMode&&key==='delete'){void eraseAccount(first);return;}void openMember(first.userId,mode);}};
     })}/></div>
     {selectedIds.size>1 && <p className="text-sm text-slate-600">선택 회원은 순서대로 상세 검토할 수 있습니다. 수정·거부·삭제는 한 명씩 확인 후 진행합니다.</p>}
     {selectedId && createPortal(<aside ref={panel} tabIndex={-1} aria-label="선택 회원 작업" className="fixed inset-y-0 right-0 z-50 flex w-full max-w-full flex-col border-l border-slate-200 bg-white shadow-2xl outline-none sm:w-[560px] lg:w-[640px]">

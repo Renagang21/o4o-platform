@@ -1,7 +1,7 @@
 import type {MemberRegistration,MemberRegistrationType} from '@o4o/types';
 export type MemberTask = 'all' | 'pending' | 'inactive' | 'qualifications' | 'pharmacies' | 'corrections';
 export interface MemberPermissions { readDocuments?: boolean; qualifications: boolean; pharmacies: boolean; applications?: boolean; edit: boolean; manageAccount?: boolean; erase?: boolean }
-export interface MemberRow { operatorReadOnly?:boolean; userId: string; name: string | null; nickname?:string|null;email: string; loginMethods?:string[];registrationType?:MemberRegistrationType|null;accountStatus: string; accountActive?:boolean; serviceStatus?: string; qualificationStatus?: string; pharmacyStatus?: string | null }
+export interface MemberRow { operatorReadOnly?:boolean; userId: string; name: string | null; nickname?:string|null;email: string; loginMethods?:string[];registrationType?:MemberRegistrationType|null;registrationState?:string|null;accountStatus: string; accountActive?:boolean; serviceStatus?: string; qualificationStatus?: string; pharmacyStatus?: string | null }
 export interface MemberProfile { operatorReadOnly?:boolean; loginMethods?:string[]; hasPassword?:boolean; userId: string; name: string | null; nickname: string | null; email: string; phone: string | null; accountStatus: string; accountActive?:boolean; serviceStatus?: string; emailVerified: boolean; joinedAt: string; version: string }
 export interface Qualification { licenseNumber: string | null; status: string; reason: string | null; approvedAt: string | null; reviewedBy: string | null; version: string }
 export interface MemberPharmacy {
@@ -33,3 +33,22 @@ export function memberError(error: unknown) {
 }
 
 export type MemberWorkMode = 'detail' | 'edit' | 'reject' | 'delete' | 'pharmacy';
+/** 처리 후 동작: close 면 패널을 닫고 목록 위에 done 문구를 보인다(가입 승인·반려 · 해지·복구). */
+export interface PerformOptions { close?: boolean; done?: string }
+export type Perform = (work: () => Promise<unknown>, options?: PerformOptions) => Promise<void>;
+/** 목록 「회원 상태」 배지 색 — MEMBER_STATUS_LABELS 의 키 기준. */
+export const memberStatusTone: Record<string, string> = {
+  pending: 'border-amber-300 bg-amber-50 text-amber-800',
+  rejected: 'border-red-300 bg-red-50 text-red-700',
+  suspended: 'border-slate-300 bg-slate-100 text-slate-600',
+  withdrawn: 'border-slate-300 bg-slate-100 text-slate-600',
+  active: 'border-green-300 bg-green-50 text-green-800',
+  approved: 'border-green-300 bg-green-50 text-green-800',
+};
+/** 목록에서 고른 회원에게 가입 승인·반려를 할 수 없는 이유. 상태를 모르면(undefined) 서버 판정에 맡긴다. */
+export function registrationDecisionBlock(row: Pick<MemberRow,'registrationState'>|undefined): string | null {
+  if (!row || row.registrationState === undefined) return null;
+  if (row.registrationState === null) return '가입 유형·제출 정보가 없습니다. 「회원 정보 수정」에서 먼저 저장해 주시기 바랍니다.';
+  if (row.registrationState === 'approved') return '이미 승인된 회원입니다. 이용 종료는 「회원 해지·복구」로 처리해 주시기 바랍니다.';
+  return null;
+}

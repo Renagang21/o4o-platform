@@ -26,6 +26,8 @@
   - **B.** GCS 호출(목록·metadata·삭제)이 느리거나 재시도를 반복했다.
   - **C.** 서버는 끝냈지만 응답 전에 90초를 넘겼다(화면은 시간 초과, 서버는 완료 또는 진행 중).
   - **D.** 그 밖의 오류. 작업 상태에 `error_code` 로 남는다.
+  - **E.** 삭제 전 검토(`reviewManifest`)가 느렸다. 이 검토는 사업 자료 참조와 다른 회원·외부 로그인 값 사본 여부를 확인하려고 여러 테이블을 정규식(`~*`)과 jsonb 경로 검색으로 훑는다(`for (const t of tables)`, `providerReview` 커서). 전역 lock 을 잡은 transaction 안에서 실행되므로, 운영 데이터 양이 많으면 90초를 넘길 수 있다. 판정: Q1 `seconds` 가 크고 Q2 파일 작업이 적거나 없으면 E 가능성이 높다.
+- 사용자 보고 보강(2026-11-09): 삭제 후 목록으로 돌아오지 않고 「해지 회원」 숫자도 줄지 않은 채 화면이 멈췄다. 화면은 응답이 오거나 90초가 지나야 목록을 새로 읽는다.
 
 ## 2. 사용자 확정
 
@@ -78,6 +80,7 @@ ORDER BY xact_age DESC NULLS LAST;
 | Q1 `processing` · `pending` 에서 멈춤 · Q3 에 advisory lock 대기(`granted=false`) 또는 오래된 transaction | A | 대기 원인 세션의 종류(상태·지속시간)를 보고. 세션 종료는 통합 담당 승인 사항 |
 | Q1 `retry_required` · `review_required` + `error_code` | D | 코드를 보고(화면 문구는 `deletionMessage` 대응) |
 | Q2 `max_attempts` 큼 · 파일 `retry_required` · 로그에 GCS 지연 | B | GCS 권한·지연을 보고 |
+| Q1 `seconds` 큼 · Q2 파일 작업 적음 · Q3 대기 없음 | E(검토 단계 테이블 검색) | 걸린 시간을 보고 → CLOUD 에서 검토 단계 성능 개선(비동기 처리 또는 검색 범위 축소) |
 | Q1 에 해당 시각 작업 없음 | 요청이 서버에 닿지 않았거나 작업 생성 전 대기 | 로그의 응답 코드로 판단(403 `GOOGLE_AUTH_REQUIRED` 등) |
 
 ## 5. 실행 기록

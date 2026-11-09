@@ -244,9 +244,8 @@ it('never shows a verification-mail action for an operator-corrected social memb
 it('approves signup from the selected member with one reason and no separate qualification command', async () => {
   mount();
   await select();
-  fireEvent.click(
-    screen.getByRole('button', { name: '가입 승인', exact: true }),
-  );
+  const card = screen.getByRole('region', { name: '가입 신청 처리' });
+  fireEvent.click(within(card).getByRole('button', { name: '승인', exact: true }));
   fireEvent.change(screen.getByLabelText('처리 사유'), {
     target: { value: '가입 정보 확인' },
   });
@@ -274,6 +273,29 @@ it('rejects the signup application without changing the global account', async (
       expect.objectContaining({ reason: '사업자 정보 보완' }),
     ),
   );
+  // 처리 후 패널을 닫고, 목록 위에 결과를 보인다.
+  await screen.findByText('합성 회원 회원의 가입을 반려했습니다. 목록의 「회원 상태」가 반려로 바뀝니다.');
+  expect(screen.queryByRole('complementary', { name: '선택 회원 작업' })).toBeNull();
+});
+it('opens the reject form at the top of the panel, above the submitted information', async () => {
+  mount();
+  await select();
+  fireEvent.click(screen.getByRole('button', { name: '가입 반려', exact: true }));
+  const panel = await screen.findByRole('complementary', { name: '선택 회원 작업' });
+  const card = within(panel).getByRole('region', { name: '가입 신청 처리' });
+  const form = within(card).getByRole('form', { name: '가입 반려' });
+  const info = within(panel).getByRole('form', { name: '회원 정보 보기' });
+  expect(form.compareDocumentPosition(info) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+});
+it('shows member status right after the name and blocks reject when no signup record exists', async () => {
+  rows[0] = { ...rows[0], serviceStatus: 'rejected', registrationState: null };
+  mount();
+  const name = await screen.findByRole('button', { name: '회원 합성 회원 member-a@example.test' });
+  const headers = [...name.closest('table')!.querySelectorAll('th')].map(th => th.textContent?.trim()).filter(Boolean);
+  expect(headers.indexOf('회원 상태')).toBe(headers.indexOf('이름') + 1);
+  expect(within(name.closest('tr')!).getByText('반려')).toBeTruthy();
+  fireEvent.click(screen.getAllByRole('checkbox')[1]);
+  expect(screen.getByRole('button', { name: '가입 반려', exact: true })).toBeDisabled();
 });
 it('clears selection and private form on a status tab change', async () => {
   mount();

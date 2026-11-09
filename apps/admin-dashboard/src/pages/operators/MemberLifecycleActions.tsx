@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { authClient } from "@o4o/auth-client";
-import type { MemberDetail } from "./member-workspace-model";
+import type { MemberDetail, Perform } from "./member-workspace-model";
 
 /** Access termination leaves business records intact. Sale changes their owner link. */
 export default function MemberLifecycleActions({
@@ -16,7 +16,7 @@ export default function MemberLifecycleActions({
   detail: MemberDetail;
   actorId: string;
   busy: boolean;
-  perform: (work: () => Promise<unknown>) => Promise<void>;
+  perform: Perform;
 }>) {
   // 서버는 이용 중(active)인 회원만 해지하고, 해지(suspended·withdrawn)된 회원만 복구한다.
   // 가입 대기 · 반려 회원은 둘 다 아니므로 해지 · 복구 양식을 열지 않는다(가입 심사에서 처리).
@@ -159,6 +159,10 @@ export default function MemberLifecycleActions({
                         transferConfirmed: true,
                       },
                     ),
+              // 해지·복구는 끝나면 패널을 닫고 목록의 「회원 상태」로 결과를 보인다.
+              action === "restore" || action === "terminate"
+                ? { close: true, done: `${detail.member.name || "선택한 회원"} 회원을 ${action === "terminate" ? "해지했습니다. 목록의 「회원 상태」가 해지로 바뀝니다." : "이용 복구했습니다."}` }
+                : undefined,
             );
           }}
         >
