@@ -390,6 +390,14 @@ integration('account erasure — isolated PostgreSQL schema/real sessions', () =
     expect(await db.query('SELECT id FROM users WHERE id=$1',[target.id])).toHaveLength(0);
     expect((await db.query('SELECT name FROM product_masters WHERE id=$1',[master]))[0].name).toBe(`Synthetic product ${target.email}`);
   });
+  it('the subject own login activity rows are removed with the account instead of blocking it for review',async()=>{
+    const target=await user(),peer=await user();
+    await db.query(`INSERT INTO account_activities("userId",action,type,"ipAddress","userAgent",success,details) VALUES($1,'login','login_google','203.0.113.7','Synthetic UA',true,'{"provider":"google"}')`,[target.id]);
+    await db.query(`INSERT INTO account_activities("userId",action,type,success,details) VALUES($1,'login','login_password',true,'{"provider":"password"}')`,[peer.id]);
+    expect(await service().request(target.id)).toMatchObject({state:'completed',erased:true});
+    expect(await db.query('SELECT 1 FROM account_activities WHERE "userId"=$1',[target.id])).toHaveLength(0);
+    expect(await db.query('SELECT 1 FROM account_activities WHERE "userId"=$1',[peer.id])).toHaveLength(1);
+  });
   it('supplier proof-file ownership uses canonical organization membership and rejects shared documents',async()=>{
     const target=await user(),peer=await user(),org=await organization(target.id),supplier=randomUUID(),document=randomUUID();
     await db.query("UPDATE organizations SET type='supplier' WHERE id=$1",[org]);

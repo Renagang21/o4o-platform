@@ -63,6 +63,9 @@ const PRIVATE_OWNERS: Readonly<Record<string, readonly string[]>> = {
   personal_mail_accounts: ['user_id'], personal_mail_jobs: ['user_id'], personal_mail_oauth_flows: ['user_id'],
   external_ai_connections: ['user_id'],
   linked_accounts: ['userId'], user_password_credentials: ['user_id'],
+  // 본인 로그인 활동(login_password · login_google · link_google, IP · UA). 미분류여서 본인 행이 사본 검토(REVIEW)로 삭제를 막았다(2026-11-09 운영).
+  // 보존 정책 §13 의 로그인 기록 「30일까지」는 상한이다. 보안 최소 기록은 login_attempts 최소화로 남는다.
+  account_activities: ['userId'],
   email_verification_tokens: ['user_id'], password_reset_tokens: ['user_id'], auth_social_flows: ['user_id'],
   browser_session_revocations: ['user_id'], service_session_revocations: ['user_id'],
   handoff_tokens: ['user_id'], notifications: ['userId'],
