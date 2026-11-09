@@ -80,6 +80,22 @@ const enabled = process.env.O4O_ERASURE_TEST_PORT === '55469';
     expect((await stored(id))[MEMBER_REGISTRATION_KEY].fields).toEqual({});
   });
 
+  it('keeps submitted fields and the document row when the storage delete fails, and retries on the next run', async () => {
+    const id = await member({ type: 'pharmacy_owner', state: 'rejected', reason: 'r', reviewedAt: daysAgo(35), fields: {} });
+    const doc = await document(id);
+    await db.query(`UPDATE users SET "businessInfo"=jsonb_set("businessInfo"::jsonb,'{${MEMBER_REGISTRATION_KEY},fields}',$2::jsonb)::json WHERE id=$1`, [id, JSON.stringify(fields(doc))]);
+    const before = await stored(id);
+    const failedRun = await purgeRejectedRegistrations(db, now, true, { deleteObject: async () => { throw new Error('transient'); } });
+    expect(failedRun).toEqual({ eligible: 1, purged: 0, documentsDeleted: 0, failed: 1 });
+    expect(await stored(id)).toEqual(before);
+    expect(await docExists(doc)).toBe(true);
+    const deleted: string[] = [];
+    const retry = await purgeRejectedRegistrations(db, now, true, { deleteObject: async url => { deleted.push(url); } });
+    expect(retry).toEqual({ eligible: 1, purged: 1, documentsDeleted: 1, failed: 0 });
+    expect(await docExists(doc)).toBe(false);
+    expect(deleted).toEqual([`gcs://fixture-private/business-registration/${id}/${doc}`]);
+  });
+
   it('dry-run only counts', async () => {
     const id = await member({ type: 'pharmacist', state: 'rejected', reason: 'r', reviewedAt: daysAgo(45), fields: fields() });
     const before = await stored(id);

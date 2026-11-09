@@ -67,6 +67,9 @@ export default function CentralMemberWorkspace({ actorId, initialQuery = '', ini
       if (seq === listSequence.current) { setError(memberError(error_)); setPermissions({ qualifications: false, pharmacies: false, edit: false }); setDetail(null); setSelectedId(null); setSelectedIds(new Set()); ++detailSequence.current; }
     } finally { if (seq === listSequence.current) setLoading(false); }
   }, [task, page, query]);
+  // 계정 삭제는 화면을 잠그지 않으므로, 끝났을 때는 그 시점의 탭 · 검색 · 페이지로 다시 조회한다(PR #1003 Codex P2).
+  const latestLoad = useRef(load);
+  latestLoad.current = load;
   useEffect(() => {
     const lists = listSequence, details = detailSequence;
     ++detailSequence.current; setDetail(null); setSelectedId(null); setSelectedIds(new Set()); setReading(false); setNotice('');
@@ -145,7 +148,7 @@ export default function CentralMemberWorkspace({ actorId, initialQuery = '', ini
     } finally {
       setErasing(previous => { const next = { ...previous }; delete next[row.userId]; return next; });
       if (context === actorEpoch.current.value) {
-        await load();
+        await latestLoad.current();
         if (context === actorEpoch.current.value) { if (failure) setError(failure); else setNotice(message); }
       }
     }

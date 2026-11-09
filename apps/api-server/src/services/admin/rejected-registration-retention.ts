@@ -7,8 +7,10 @@
  * - 정리: 제출 정보(`fields` — 면허번호 · 사업자 정보 · 사업자등록증 참조)만 비운다.
  *   상태 `rejected` · 유형 · 반려 사유 · 반려 시각은 남긴다 — 이 표식이 없어지면 가입 이전 회원(legacy)으로
  *   읽혀 승인 없이 이용 가능해지므로 지우지 않는다. 계정 자체는 지우지 않는다(계정 약관 v2 제6조 — 신청 반려 ≠ 계정 상태).
- * - 사업자등록증: 이 회원이 올린 문서이고 약국 · 공급자 사업체가 참조하지 않을 때만 `kyc_documents` 행을 지우고,
- *   commit 뒤 저장소 파일을 지운다. 파일 삭제가 실패해도 계정 완전삭제의 개인 파일 탐색(`business-registration/<userId>/`)이 나중에 찾는다.
+ * - 사업자등록증: 이 회원이 올린 문서이고 약국 · 공급자 사업체가 참조하지 않을 때만 `kyc_documents` 행을 지운다.
+ *   저장소 파일은 **commit 전에** 지운다 — 파일 삭제가 실패하면 transaction 을 되돌려 제출 정보 · 문서 행(파일 위치)을 그대로 두고,
+ *   다음 실행에서 다시 시도한다(PR #1003 Codex P2: commit 뒤에 지우면 실패 시 파일 위치가 사라져 다시 지울 수 없다).
+ *   파일을 지운 뒤 commit 이 실패해도 다음 실행이 같은 위치를 다시 지운다(없는 파일은 성공으로 본다).
  * - 실행: `jobs/privacy-retention.job.ts` 가 `PRIVACY_RETENTION_MODE` 를 따른다 — `apply` 일 때만 쓰고, 그 밖에는 건수만 센다.
  *   로그에는 건수만 남긴다.
  */
@@ -35,15 +37,15 @@ export function rejectedRegistrationCutoff(now: Date, days = REJECTED_REGISTRATI
   return new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
 }
 
-async function purgeOne(m: EntityManager, userId: string, cutoff: Date): Promise<{ purged: boolean; fileUrl: string | null }> {
+async function purgeOne(m: EntityManager, userId: string, cutoff: Date, storage?: RejectedRegistrationStorage): Promise<{ purged: boolean; documentDeleted: boolean }> {
   // 잠근 뒤 다시 판정한다: 그 사이 회원이 다시 제출했으면(pending) 건드리지 않는다.
   const [row] = await m.query(`SELECT ${REG} AS registration FROM users u WHERE u.id=$2 AND ${ELIGIBLE} FOR UPDATE`, [cutoff, userId]);
   const registration = row?.registration as MemberRegistration | undefined;
-  if (!registration) return { purged: false, fileUrl: null };
+  if (!registration) return { purged: false, documentDeleted: false };
   const documentId = registration.fields?.businessRegistrationDocumentId ?? null;
   const { fields: _fields, ...kept } = registration;
   await writeRegistration(m, userId, { ...kept, fields: {}, fieldsPurgedAt: new Date().toISOString() } as MemberRegistration & { fieldsPurgedAt: string });
-  let fileUrl: string | null = null;
+  let documentDeleted = false;
   if (documentId) {
     // 회원 본인의 사업자등록증이고, 약국 · 공급자 사업체가 쓰지 않는 경우만 지운다.
     const [doc] = await m.query(`DELETE FROM kyc_documents d
@@ -55,9 +57,15 @@ async function purgeOne(m: EntityManager, userId: string, cutoff: Date): Promise
       const rows = Array.isArray(result) && Array.isArray(result[0]) ? result[0] : result;
       return Array.isArray(rows) ? rows : [];
     });
-    fileUrl = doc?.fileUrl ?? null;
+    const fileUrl: string | null = doc?.fileUrl ?? null;
+    if (fileUrl) {
+      // commit 전에 지운다. 실패하면 throw → rollback 되어 다음 실행에서 다시 시도한다.
+      if (!storage) throw new Error('DOCUMENT_STORAGE_UNAVAILABLE');
+      await storage.deleteObject(fileUrl);
+      documentDeleted = true;
+    }
   }
-  return { purged: true, fileUrl };
+  return { purged: true, documentDeleted };
 }
 
 export async function purgeRejectedRegistrations(
@@ -73,15 +81,12 @@ export async function purgeRejectedRegistrations(
   const ids: Array<{ id: string }> = await db.query(`SELECT u.id FROM users u WHERE ${ELIGIBLE} ORDER BY u.id LIMIT ${BATCH}`, [cutoff]);
   for (const { id } of ids) {
     try {
-      const result = await db.transaction(m => purgeOne(m, id, cutoff));
+      const result = await db.transaction(m => purgeOne(m, id, cutoff, storage));
       if (!result.purged) continue;
       report.purged += 1;
-      if (result.fileUrl) {
-        report.documentsDeleted += 1;
-        await storage?.deleteObject(result.fileUrl).catch(() => { report.failed += 1; });
-      }
+      if (result.documentDeleted) report.documentsDeleted += 1;
     } catch {
-      // 계정 삭제 진행 중(쓰기 차단) 등은 다음 실행에서 다시 본다.
+      // 저장소 파일 삭제 실패 · 계정 삭제 진행 중(쓰기 차단) 등은 되돌린 뒤 다음 실행에서 다시 본다.
       report.failed += 1;
     }
   }
