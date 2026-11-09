@@ -438,8 +438,8 @@ it('admin 「계정 삭제」 asks once and deletes the selected account directl
   expect(screen.queryByRole('button', { name: '계정·개인자료 삭제 확인' })).toBeNull();
   fireEvent.click(screen.getByRole('button', { name: '계정 삭제' }));
   expect(confirm).toHaveBeenCalledTimes(1);
-  await waitFor(() => expect(api.delete).toHaveBeenCalledWith('/admin/users/member-a', { timeout: 90_000 }));
-  await screen.findByText('계정을 삭제했습니다.');
+  await waitFor(() => expect(api.delete).toHaveBeenCalledWith('/admin/users/member-a', { timeout: 300_000 }));
+  await screen.findByText('합성 회원 계정을 삭제했습니다.');
   expect(screen.queryByRole('complementary', { name: '선택 회원 작업' })).toBeNull();
   confirm.mockRestore();
 });
@@ -451,9 +451,15 @@ it('admin 「계정 삭제」 shows a progress message while the server is still
   await selectFirstRow();
   fireEvent.click(screen.getByRole('button', { name: '계정 삭제' }));
   expect(await screen.findByText(/계정을 삭제하는 중입니다/)).toBeTruthy();
-  expect(screen.getByText(/최대 90초/)).toBeTruthy();
+  expect(screen.getByText(/서버에서 계속 진행됩니다/)).toBeTruthy();
+  // 화면은 잠기지 않는다: 탭 · 검색을 계속 쓸 수 있고, 삭제 중인 행은 「삭제 중」으로 보인다.
+  expect(screen.getByRole('tab', { name: /해지 회원/ })).not.toBeDisabled();
+  const row = screen.getByRole('button', { name: '회원 합성 회원 member-a@example.test' }).closest('tr')!;
+  expect(within(row).getByText('삭제 중')).toBeTruthy();
+  fireEvent.click(screen.getAllByRole('checkbox')[1]);
+  expect(screen.getByRole('button', { name: '계정 삭제' })).toBeDisabled();
   finish({ data: { data: { operationId: 'op', state: 'completed', erased: true } } });
-  await screen.findByText('계정을 삭제했습니다.');
+  await screen.findByText('합성 회원 계정을 삭제했습니다.');
   expect(screen.queryByText(/계정을 삭제하는 중입니다/)).toBeNull();
   confirm.mockRestore();
 });

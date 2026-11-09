@@ -34,14 +34,15 @@ export default function CentralMemberWorkspace({ actorId, initialQuery = '', ini
   const listSequence = useRef(0), detailSequence = useRef(0), lock = useRef(false);
   const [selectedIds,setSelectedIds]=useState<Set<string>>(new Set());
   const [workMode,setWorkMode]=useState<MemberWorkMode>('detail');
-  // 계정 삭제는 서버에서 수십 초 걸릴 수 있다. 진행 중임을 보여 주지 않으면 버튼만 회색으로 멈춘 것처럼 보인다.
-  const [erasing,setErasing]=useState<{name:string;startedAt:number}|null>(null),[erasingSeconds,setErasingSeconds]=useState(0);
+  // 계정 삭제는 서버에서 수십 초 이상 걸릴 수 있다(삭제 전 · 후 전체 검토). 화면을 잠그지 않고 바로 목록으로 돌아가
+  // 진행 중인 삭제를 목록 위에 보이며, 끝나면 목록 · 탭 숫자를 새로 읽는다.
+  const [erasing,setErasing]=useState<Record<string,{name:string;startedAt:number}>>({}),[clock,setClock]=useState(()=>Date.now());
+  const erasingCount=Object.keys(erasing).length;
   useEffect(()=>{
-    if(!erasing){setErasingSeconds(0);return;}
-    const tick=()=>setErasingSeconds(Math.floor((Date.now()-erasing.startedAt)/1000));
-    tick();const timer=globalThis.setInterval(tick,1000);
+    if(!erasingCount)return;
+    const timer=globalThis.setInterval(()=>setClock(Date.now()),1000);
     return()=>globalThis.clearInterval(timer);
-  },[erasing]);
+  },[erasingCount]);
   const actorEpoch=useRef({value:0});
   useEffect(()=>{const state=actorEpoch.current;++state.value;lock.current=false;setBusy(false);setPermissions({qualifications:false,pharmacies:false,edit:false});return()=>{++state.value;};},[actorId,adminMode]);
   const panel = useRef<HTMLElement | null>(null);
@@ -121,33 +122,31 @@ export default function CentralMemberWorkspace({ actorId, initialQuery = '', ini
   };
   // Admin 「계정 삭제」: 확인 창 하나로 바로 삭제한다(2026-11-08 통합 담당 요청). 서버의 erased 값만 완료로 본다.
   const eraseAccount = async (row: MemberRow) => {
-    if (lock.current) return;
-    if (!globalThis.confirm(`${row.name || '선택한 회원'} 계정을 삭제하시겠습니까?\n\n계정과 개인 자료 · 첨부파일이 삭제되며 되돌릴 수 없습니다. 사업체 · 약국 · 공급자 거래 자료는 유지됩니다.`)) return;
+    if (lock.current || erasing[row.userId]) return;
+    const name = row.name || '선택한 회원';
+    if (!globalThis.confirm(`${name} 계정을 삭제하시겠습니까?\n\n계정과 개인 자료 · 첨부파일이 삭제되며 되돌릴 수 없습니다. 사업체 · 약국 · 공급자 거래 자료는 유지됩니다.`)) return;
     const context = actorEpoch.current.value;
-    lock.current = true; setBusy(true); setError(''); setNotice('');
-    setErasing({ name: row.name || '선택한 회원', startedAt: Date.now() });
+    // 화면은 잠그지 않는다: 선택만 정리하고 바로 목록으로 돌아간다.
+    ++detailSequence.current; setSelectedId(null); setDetail(null); setSelectedIds(new Set()); setError(''); setNotice('');
+    setErasing(previous => ({ ...previous, [row.userId]: { name, startedAt: Date.now() } }));
     let message = '', failure = '';
     try {
-      const response = await api.delete(`/admin/users/${encodeURIComponent(row.userId)}`, { timeout: 90_000 });
+      const response = await api.delete(`/admin/users/${encodeURIComponent(row.userId)}`, { timeout: 300_000 });
       const data = response.data?.data as UserErasureResult | undefined;
       if (!data || typeof data.erased !== 'boolean' || !Object.prototype.hasOwnProperty.call(ERASURE_STATE_LABELS, data.state)) throw new Error('INVALID_RESPONSE');
-      message = data.erased ? '계정을 삭제했습니다.'
-        : `${ERASURE_STATE_LABELS[data.state]} — 삭제가 아직 끝나지 않았습니다. 「삭제 처리 내역」에서 상태를 확인하거나 재시도해 주시기 바랍니다.${data.errorCode ? ` ${deletionMessage(data.errorCode)} (${data.errorCode})` : ''}`;
+      message = data.erased ? `${name} 계정을 삭제했습니다.`
+        : `${name} — ${ERASURE_STATE_LABELS[data.state]} — 삭제가 아직 끝나지 않았습니다. 「삭제 처리 내역」에서 상태를 확인하거나 재시도해 주시기 바랍니다.${data.errorCode ? ` ${deletionMessage(data.errorCode)} (${data.errorCode})` : ''}`;
     } catch (error_) {
       const e = error_ as { code?: string; response?: { data?: { code?: string } } };
       const code = e.response?.data?.code;
       failure = e.code === 'ECONNABORTED'
-        ? '서버 응답이 없습니다. 삭제가 진행 중일 수 있으니 「삭제 처리 내역」에서 상태를 확인해 주시기 바랍니다.'
-        : `${deletionMessage(code)}${code ? ` (${code})` : ''}`;
+        ? `${name} — 서버 응답이 없습니다. 삭제가 진행 중일 수 있으니 「삭제 처리 내역」에서 상태를 확인해 주시기 바랍니다.`
+        : `${name} — ${deletionMessage(code)}${code ? ` (${code})` : ''}`;
     } finally {
-      setErasing(null);
+      setErasing(previous => { const next = { ...previous }; delete next[row.userId]; return next; });
       if (context === actorEpoch.current.value) {
-        ++detailSequence.current; setSelectedId(null); setDetail(null); setSelectedIds(new Set());
         await load();
-        if (context === actorEpoch.current.value) {
-          if (failure) setError(failure); else setNotice(message);
-          lock.current = false; setBusy(false);
-        }
+        if (context === actorEpoch.current.value) { if (failure) setError(failure); else setNotice(message); }
       }
     }
   };
@@ -157,7 +156,7 @@ export default function CentralMemberWorkspace({ actorId, initialQuery = '', ini
   const protectedSelection = !adminMode && rows.some(row=>selectedIds.has(row.userId)&&row.operatorReadOnly);
   const columns: ListColumnDef<MemberRow>[] = [
     {key:'name',header:'이름',stickyOnMobile:true,minWidth:120,render:(_value,row)=><span className="flex flex-col items-start gap-0.5"><button type="button" disabled={busy} aria-label={`회원 ${row.name||'미등록'} ${row.email||'이메일 미제공'}`} aria-pressed={selectedId===row.userId} className="whitespace-nowrap text-left underline" onClick={event=>{event.stopPropagation();void openMember(row.userId);}}>{row.name||'미등록'}</button>{row.operatorReadOnly&&<span className="whitespace-nowrap text-xs text-slate-500">전체 관리자 — 처리 대상 아님</span>}</span>},
-    {key:'serviceStatus',header:'회원 상태',minWidth:100,render:value=><span className={`inline-block whitespace-nowrap rounded-full border px-2 py-0.5 text-xs font-medium ${memberStatusTone[String(value)]??'border-slate-300 bg-white text-slate-600'}`}>{MEMBER_STATUS_LABELS[String(value)]??'확인 필요'}</span>},
+    {key:'serviceStatus',header:'회원 상태',minWidth:100,render:(value,row)=>erasing[row.userId]?<span className="inline-block whitespace-nowrap rounded-full border border-amber-300 bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-800">삭제 중</span>:<span className={`inline-block whitespace-nowrap rounded-full border px-2 py-0.5 text-xs font-medium ${memberStatusTone[String(value)]??'border-slate-300 bg-white text-slate-600'}`}>{MEMBER_STATUS_LABELS[String(value)]??'확인 필요'}</span>},
     {key:'registrationType',header:'가입 유형',minWidth:110,render:value=><span className="whitespace-nowrap">{MEMBER_REGISTRATION_TYPES[value as keyof typeof MEMBER_REGISTRATION_TYPES]??'미등록'}</span>},
     {key:'nickname',header:'닉네임',minWidth:120,render:value=><span className="whitespace-nowrap">{value||'미등록'}</span>},
     {key:'email',header:'이메일',minWidth:240,render:value=><span className="whitespace-nowrap">{value||'미제공'}</span>},
@@ -172,7 +171,7 @@ export default function CentralMemberWorkspace({ actorId, initialQuery = '', ini
     <nav role="tablist" aria-label="회원 업무 대상" className="flex flex-wrap gap-2">{tasks.filter(([key]) => taskAllowed(key, permissions)).map(([key, label]) => <button type="button" role="tab" key={key} aria-selected={task === key} disabled={busy} className={`rounded border px-3 py-2 ${task === key ? 'bg-blue-700 text-white' : ''}`} onClick={() => { setTask(key); setPage(1); }}>{label} ({counts[key] ?? 0})</button>)}</nav>
     <form className="flex flex-wrap gap-2" onSubmit={event => { event.preventDefault(); setPage(1); setQuery(search.trim()); }}><input aria-label="회원 이름·이메일 검색" maxLength={100} disabled={busy} value={search} onChange={event => setSearch(event.target.value)} className="rounded border p-2" /><button type="submit" disabled={busy}>검색</button><button type="button" disabled={busy || loading} onClick={() => { ++detailSequence.current; setDetail(null); setSelectedId(null); setSelectedIds(new Set()); void load(); }}>새로고침</button></form>
     {/* 패널이 열려 있으면 결과 · 오류는 패널 안에 보인다. 패널은 body 위 레이어라 여기 문구가 가려진다. */}
-    {erasing && <output aria-live="polite" className="block rounded border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">{erasing.name} 계정을 삭제하는 중입니다… {erasingSeconds}초 경과. 개인 자료와 첨부파일을 함께 지우므로 최대 90초까지 걸릴 수 있습니다. 창을 닫지 말고 기다려 주시기 바랍니다.</output>}
+    {erasingCount>0 && <output aria-live="polite" className="block space-y-1 rounded border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">{Object.entries(erasing).map(([id,item])=><span key={id} className="block">{item.name} 계정을 삭제하는 중입니다… {Math.max(0,Math.floor((clock-item.startedAt)/1000))}초 경과.</span>)}<span className="block text-amber-800">삭제는 서버에서 계속 진행됩니다. 다른 업무를 계속하셔도 되며, 끝나면 목록과 탭 숫자가 바뀝니다. 이 창은 닫지 마시기 바랍니다.</span></output>}
     {!selectedId && error && <p role="alert" className="rounded border border-red-200 bg-red-50 p-3 text-sm text-red-800">{error}</p>}{!selectedId && notice && <output className="block rounded border border-green-200 bg-green-50 p-3 text-sm text-green-800">{notice}</output>}
     <div className="[&>div>div]:flex-wrap"><ActionBar selectedCount={selectedIds.size} onClearSelection={()=>{if(busy)return;++detailSequence.current;setSelectedIds(new Set());setSelectedId(null);setDetail(null);setReading(false);}} actions={([
       ['detail','회원 상세보기'],['edit','회원 정보 수정'],['reject','가입 반려'],
@@ -183,8 +182,9 @@ export default function CentralMemberWorkspace({ actorId, initialQuery = '', ini
       const mode:MemberWorkMode=key==='manage'?'delete':key;
       let variant=workActionVariant(mode,workMode);
       if(key==='manage')variant=workMode==='delete'?'primary':'default';
+      const selectedErasing=rows.some(row=>selectedIds.has(row.userId)&&erasing[row.userId]);
       const rejectBlock=key==='reject'&&selectedIds.size===1?registrationDecisionBlock(rows.find(row=>selectedIds.has(row.userId))):null;
-      return {key,label,visible:!protectedSelection||key==='detail',variant,tooltip:key==='delete'&&deleteForbidden?'전체 관리자 권한이 필요합니다.':rejectBlock??undefined,disabled:busy||loading||(key!=='detail'&&selectedIds.size!==1)||(key==='edit'&&!permissions.edit)||(key==='reject'&&(!permissions.edit||rejectBlock!==null))||(key==='manage'&&!permissions.edit)||(key==='delete'&&deleteForbidden),onClick:()=>{const first=rows.find(row=>selectedIds.has(row.userId));if(!first)return;if(adminMode&&key==='delete'){void eraseAccount(first);return;}void openMember(first.userId,mode);}};
+      return {key,label,visible:!protectedSelection||key==='detail',variant,tooltip:key==='delete'&&deleteForbidden?'전체 관리자 권한이 필요합니다.':rejectBlock??undefined,disabled:busy||loading||(key!=='detail'&&(selectedIds.size!==1||selectedErasing))||(key==='edit'&&!permissions.edit)||(key==='reject'&&(!permissions.edit||rejectBlock!==null))||(key==='manage'&&!permissions.edit)||(key==='delete'&&deleteForbidden),onClick:()=>{const first=rows.find(row=>selectedIds.has(row.userId));if(!first)return;if(adminMode&&key==='delete'){void eraseAccount(first);return;}void openMember(first.userId,mode);}};
     })}/></div>
     {selectedIds.size>1 && <p className="text-sm text-slate-600">선택 회원은 순서대로 상세 검토할 수 있습니다. 수정·거부·삭제는 한 명씩 확인 후 진행합니다.</p>}
     {selectedId && createPortal(<aside ref={panel} tabIndex={-1} aria-label="선택 회원 작업" className="fixed inset-y-0 right-0 z-50 flex w-full max-w-full flex-col border-l border-slate-200 bg-white shadow-2xl outline-none sm:w-[560px] lg:w-[640px]">
