@@ -20,6 +20,7 @@
 - SessionStart 훅(`.claude/hooks/session-start.mjs`)이 `origin/main` 을 fetch 하고, **clean 한 기준 main checkout 에서만** `pull --ff-only` 한다. 작업 branch · worktree 에서는 ahead/behind 만 보고하며 merge/rebase 하지 않는다. 이 세션 유형(`실행 위치`)의 최근 미완료 지시서도 알려 준다.
 - PreToolUse 훅(`.claude/hooks/block-cloud-deploy.mjs`)은 운영 배포 명령을 **클라우드 세션에서는 거부**하고, **로컬 세션에서는 권한 모드와 관계없이 승인을 묻는다**(ask). `.claude/settings.json` 의 ask 규칙만으로는 auto 권한 모드에서 승인 창 없이 실행되는 것이 확인돼(2026-11-09) 훅이 직접 묻는다. 회귀 테스트 `.claude/hooks/block-cloud-deploy.test.mjs`. 정책은 `AGENTS.md` §9.
 - PreToolUse 훅(`.claude/hooks/guard-git-push.mjs`)은 **모든 세션에서** 콜론 refspec 원격 branch 삭제를 거부한다. permission 패턴은 끝이 `:*` 이면 예전 접두어 문법으로 해석돼 의도대로 매칭되지 않으므로, 새 규칙을 `:*` 로 끝내지 않는다(`pnpm run build:*` 처럼 접두어 일치가 의도인 경우만 예외).
+- PreToolUse 훅(`.claude/hooks/guard-ask-commands.mjs`)은 **모든 세션에서** `gh api` 쓰기 가능 플래그 · `node`/`pnpm` 의 migration · seed 실행 · `gh … delete` 에 승인을 묻는다(ask). settings 패턴에는 제외 문법이 없어 읽기 전용 명령까지 묻던 넓은 ask 패턴을 이 훅으로 옮겼고, 예외는 훅 상단 주석의 정확한 형태(GitHub 검색 · CI 정적 검사 · 테스트 파일 실행)뿐이다. 예외를 넓힐 때는 회귀 테스트 `.claude/hooks/guard-ask-commands.test.mjs` 에 우회 사례를 함께 넣는다.
 - 플러그인: 클라우드는 claude.ai 계정 활성화, 로컬은 저장소 선언 — 이유는 `SETUP.md` §1 「Claude Code 플러그인」.
 
 ## 세션 유형 — 클라우드 · 데스크톱 로컬
@@ -48,7 +49,7 @@
 - **항상 사용자 확인:** 운영 DB 직접 접속 · 시크릿 · IAM · 프로덕션 리소스 삭제. `.claude/settings.json` 의 ask 규칙(allow 보다 우선)이 이 범위를 강제한다. 운영 변경(운영 DB 쓰기 · 시크릿 · 배포)의 승인자는 통합 담당이다 — 다른 개발자의 세션이면 ask 창을 승인하기 전에 통합 담당 승인을 받는다(`AGENTS.md` §5).
 - ask 대상 명령은 다른 명령과 `;` · `&&` · `|` 로 묶지 않는다 — 섞이면 한 줄 전체가 승인 대상이 되어 무엇을 승인하는지 흐려진다.
 - `gh pr view` · `gh pr checks` · `gh run view` 로 알 수 있는 정보는 `gh api` 를 쓰지 않는다.
-- `gh api` 는 GET 조회만 사용하고, `-X` · `--method` · `-f` · `-F` · `--input` 옵션은 쓰지 않는다.
+- `gh api` 는 GET 조회만 사용하고, `-X` · `--method` · `-f` · `-F` · `--input` 옵션은 쓰지 않는다. 예외는 GitHub 검색 `gh api -X GET search/<code|issues|commits|repositories|users> -f q='…' [--paginate]` 한 형태뿐이다(`guard-ask-commands.mjs`).
 - 결과 표시용 `echo` 는 생략한다.
 - 권한 설정은 `.claude/settings.json`(공유 · 커밋) 이 정본이다. 개인 PC 전용 허용은 `.claude/settings.local.json`(미추적) 에 둔다.
 
