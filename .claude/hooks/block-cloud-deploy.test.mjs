@@ -90,6 +90,18 @@ test('로컬 세션: 승인 창이 뜨지 않거나 알 수 없는 모드에서 
   }
 });
 
+// 2026-11-10 Codex 리뷰(#1017): 대화상자에 명령 일부만 보이면 숨은 배포까지 승인될 수 있다 — 자르지 않고 묻지 않은 채 deny.
+test('로컬 세션: 대화상자 표시 한도를 넘는 긴 명령은 묻지 않고 deny, 승인 창이 뜨는 모드는 그대로 ask', () => {
+  const long = `echo ${'x'.repeat(450)}; gcloud run deploy svc --region asia-northeast3`;
+  for (const mode of ['auto', 'bypassPermissions', null]) {
+    const d = runHook(long, { mode });
+    assert.equal(d?.permissionDecision, 'deny', String(mode));
+    assert.match(d.permissionDecisionReason, /400자를 넘어 묻지 않고 거부했다/);
+    assert.doesNotMatch(d.permissionDecisionReason, /확인 대화상자를 띄울 수 없었다/);
+  }
+  assert.equal(runHook(long, { mode: 'default' })?.permissionDecision, 'ask');
+});
+
 test('로컬 세션: PowerShell 도구 입력도 ask (& 호출 연산자 포함)', () => {
   for (const cmd of ['gcloud run deploy svc --region asia-northeast3', '& gcloud run deploy svc', '& "gcloud.cmd" builds submit']) {
     assert.equal(runHook(cmd, { tool: 'PowerShell' })?.permissionDecision, 'ask', cmd);

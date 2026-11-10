@@ -91,6 +91,8 @@ export const baseName = (t = '') => t.split(/[\\/]/).pop().replace(/\.(cmd|exe)$
 export const PROMPTING_MODES = new Set(['default', 'acceptEdits', 'plan']);
 
 export const CONFIRM_DIALOG_SECONDS = 120;
+/** 확인 대화상자에 그대로 보여 줄 수 있는 명령 길이 상한. 넘으면 자르지 않고 거부한다(일부만 보이면 승인 대상을 확인할 수 없다). */
+export const CONFIRM_DIALOG_MAX_COMMAND = 400;
 
 /**
  * 훅이 직접 띄우는 OS 확인 대화상자 — 모델이 누를 수 없는 사람 승인 경로.
@@ -145,12 +147,21 @@ export function confirmDialog(title, text, seconds = CONFIRM_DIALOG_SECONDS) {
  */
 export function approvalFor(permissionMode, { title, reason, command }) {
   if (PROMPTING_MODES.has(permissionMode)) return { decision: 'ask', note: '' };
-  const shown = String(command ?? '').replace(/\s+/g, ' ').trim().slice(0, 400);
+  const mode = permissionMode || '알 수 없음';
+  const shown = String(command ?? '').replace(/\s+/g, ' ').trim();
+  // 대화상자에 명령 전체가 보이지 않으면 사용자가 승인 대상을 확인할 수 없다 — 자르지 않고 거부한다.
+  if (shown.length > CONFIRM_DIALOG_MAX_COMMAND) {
+    return {
+      decision: 'deny',
+      note:
+        ` 권한 모드 ${mode} — 명령이 ${shown.length}자로 확인 대화상자에 모두 표시할 수 있는 ${CONFIRM_DIALOG_MAX_COMMAND}자를 넘어 묻지 않고 거부했다. ` +
+        '승인이 필요한 명령만 따로 짧게 나눠 실행하거나, default 모드로 바꾼 뒤(Shift+Tab) 다시 실행하거나, 사용자가 직접 실행한다.',
+    };
+  }
   const text =
     `Claude Code 가 승인이 필요한 명령을 실행하려 합니다.\n\n사유: ${reason}\n\n명령: ${shown}\n\n` +
     `실행을 허용하려면 '예'를 누르세요. ${CONFIRM_DIALOG_SECONDS}초 안에 응답이 없으면 거부합니다.`;
   const result = confirmDialog(title, text);
-  const mode = permissionMode || '알 수 없음';
   if (result === 'yes') return { decision: 'allow', note: ` 권한 모드 ${mode} — 사용자가 확인 대화상자에서 승인했다.` };
   const why = {
     no: '사용자가 확인 대화상자에서 거부했다',
