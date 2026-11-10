@@ -44,42 +44,50 @@ beforeEach(() => {
 });
 afterEach(cleanup);
 describe('role-specific signup', () => {
-  it('presents exactly the public signup types and only shows the selected role fields', async () => {
+  // 2단계(2026-11-10): ① 유형 카드 선택 → 「다음」 → ② 그 유형의 정보만 입력.
+  const chooseType = async (label: string) => {
+    fireEvent.click(await screen.findByRole('radio', { name: new RegExp(`^${label}`) }));
+    fireEvent.click(screen.getByRole('button', { name: '다음' }));
+  };
+  it('presents exactly the public signup types as cards and only shows the selected role fields', async () => {
     render(<MemberRegistrationForm />);
-    const type = await screen.findByLabelText('가입 유형');
-    expect(
-      [...type.querySelectorAll('option')].map((e) => e.textContent),
-    ).toEqual([
-      '선택해 주시기 바랍니다',
+    await screen.findByRole('heading', { name: '가입 유형 선택' });
+    expect(screen.getAllByRole('radio').map((e) => e.querySelector('span')?.textContent)).toEqual([
       '약사',
       '약국경영자',
       '공급자',
       '파트너',
       '기타',
     ]);
-    fireEvent.change(type, { target: { value: 'pharmacy_owner' } });
+    expect((screen.getByRole('button', { name: '다음' }) as HTMLButtonElement).disabled).toBe(true);
+    await chooseType('약국경영자');
+    expect(screen.getByRole('heading', { name: '약국경영자 정보 입력' })).toBeTruthy();
+    expect(screen.queryByLabelText('가입 유형')).toBeNull();
     expect(screen.getByLabelText('약사 면허번호')).toBeTruthy();
     expect(screen.getByLabelText('대표자명')).toBeTruthy();
-    fireEvent.change(type, { target: { value: 'supplier' } });
+    fireEvent.click(screen.getByRole('button', { name: '유형 다시 선택' }));
+    await chooseType('공급자');
     expect(screen.queryByLabelText('약사 면허번호')).toBeNull();
     expect(screen.getByLabelText('공개 문의 이메일')).toBeTruthy();
     expect(screen.getByLabelText('담당자 이메일')).toBeTruthy();
-    fireEvent.change(type, { target: { value: 'other' } });
+    fireEvent.click(screen.getByRole('button', { name: '유형 다시 선택' }));
+    await chooseType('기타');
     expect(screen.queryByLabelText('대표자명')).toBeNull();
-    expect(screen.getByLabelText('닉네임')).toBeTruthy();
+    // 닉네임은 필수, 이름 · 휴대전화는 선택이다.
+    expect((screen.getByLabelText('닉네임') as HTMLInputElement).required).toBe(true);
+    expect((screen.getByLabelText('이름 (선택)') as HTMLInputElement).required).toBe(false);
+    expect((screen.getByLabelText('휴대전화 (선택)') as HTMLInputElement).required).toBe(false);
   });
   it('submits versioned data and retains a failed draft', async () => {
     mocks.post.mockRejectedValueOnce({
       response: { status: 409, data: { error: '다시 조회해 주시기 바랍니다.' } },
     });
     render(<MemberRegistrationForm />);
-    fireEvent.change(await screen.findByLabelText('가입 유형'), {
-      target: { value: 'pharmacist' },
-    });
+    await chooseType('약사');
     fireEvent.change(screen.getByLabelText('약사 면허번호'), {
       target: { value: 'synthetic-license' },
     });
-    fireEvent.click(screen.getByRole('button', { name: '가입 정보 제출' }));
+    fireEvent.click(screen.getByRole('button', { name: '가입 신청' }));
     await screen.findByRole('alert');
     expect(
       (screen.getByLabelText('약사 면허번호') as HTMLInputElement).value,
@@ -102,7 +110,7 @@ describe('role-specific signup', () => {
     });
     render(<MemberRegistrationForm />);
     await screen.findByText('가입 검토 대기 중입니다.');
-    expect(screen.queryByRole('button', { name: '가입 정보 제출' })).toBeNull();
+    expect(screen.queryByRole('button', { name: '가입 신청' })).toBeNull();
   });
   it('lets the member submit consent when the operator prepared a pending role profile', async () => {
     mocks.get.mockResolvedValue({
@@ -116,7 +124,7 @@ describe('role-specific signup', () => {
     });
     render(<MemberRegistrationForm />);
     const submit = await screen.findByRole('button', {
-      name: '가입 정보 제출',
+      name: '가입 신청',
     });
     expect((submit as HTMLButtonElement).disabled).toBe(false);
     fireEvent.click(submit);
@@ -131,7 +139,7 @@ describe('role-specific signup', () => {
     mocks.get.mockRejectedValueOnce(new Error('offline'));
     render(<MemberRegistrationForm />);
     fireEvent.click(await screen.findByRole('button', { name: '다시 조회' }));
-    expect(await screen.findByLabelText('닉네임')).toBeTruthy();
+    expect(await screen.findByRole('heading', { name: '가입 유형 선택' })).toBeTruthy();
   });
 });
 describe('new signup completion', () => {

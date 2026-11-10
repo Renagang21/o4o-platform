@@ -295,6 +295,17 @@ it('rejects the signup application without changing the global account', async (
   await screen.findByText('합성 회원 회원의 가입을 반려했습니다. 목록의 「회원 상태」가 반려로 바뀝니다.');
   expect(screen.queryByRole('complementary', { name: '선택 회원 작업' })).toBeNull();
 });
+it('shows every service operator role instead of 미등록 for an operator without a signup record', async () => {
+  rows[1] = { ...rows[1], registrationType: null, operatorRoles: ['funding:admin', 'neture:pharmcoop_operator', 'supplier:operator'] };
+  mount();
+  const name = await screen.findByRole('button', { name: '회원 다른 합성 회원 member-b@example.test' });
+  const row = name.closest('tr')!;
+  const headers = [...name.closest('table')!.querySelectorAll('th')].map(th => th.textContent?.trim());
+  const typeCell = row.querySelectorAll('td')[headers.indexOf('가입 유형')] as HTMLElement;
+  expect(typeCell.textContent).not.toContain('미등록');
+  for (const label of ['유통참여형 펀딩 관리자', '공급자 운영자']) expect(within(typeCell).getByText(label)).toBeTruthy();
+  expect(within(typeCell).getAllByText(/(운영자|관리자)$/)).toHaveLength(3);
+});
 it('does not offer signup approval for a terminated member whose application is still pending', async () => {
   record.member.serviceStatus = 'withdrawn';
   rows[0] = { ...rows[0], serviceStatus: 'withdrawn', registrationState: 'pending' };

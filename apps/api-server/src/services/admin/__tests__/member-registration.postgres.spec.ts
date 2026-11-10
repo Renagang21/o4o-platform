@@ -243,6 +243,16 @@ const enabled = process.env.OPERATOR_INVITE_TEST_PORT === '55432';
         }
       },
     );
+    it('lets an operator submit their own signup with a nickname only, keeping stored name and phone', async () => {
+      // 2026-11-10: 다른 사람이 운영자 계정을 바꾸지 못하게 하는 보호는 본인 제출에 적용하지 않는다.
+      await db.query("INSERT INTO role_assignments(user_id,role,is_active) VALUES($1,'supplier:operator',true)", [target]);
+      await expect(registration.submit(target, { type: 'other', fields: {}, name: '', nickname: 'Operator nick', phone: '', version: await version(target) }))
+        .resolves.toMatchObject({ saved: true, state: 'pending' });
+      const [row] = await db.query('SELECT name,nickname,phone FROM users WHERE id=$1', [target]);
+      expect(row).toEqual({ name: 'Synthetic member', nickname: 'Operator nick', phone: '01012345678' });
+      await expect(registration.submit(target, { type: 'other', fields: {}, name: '', nickname: ' ', phone: '', version: await version(target) }))
+        .rejects.toMatchObject({ code: 'INVALID_MEMBER_PROFILE' });
+    });
     it('rejects before writing when an applicant forges reviewed state, privileged type or cross-type fields', async () => {
       await expect(
         submit('other', { licenseNumber: 'bad' }),

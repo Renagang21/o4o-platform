@@ -1,7 +1,8 @@
 import type {MemberRegistration,MemberRegistrationType} from '@o4o/types';
+import { getRoleMeta, getServiceMeta, parseRole } from '@/lib/rbac-catalog';
 export type MemberTask = 'all' | 'pending' | 'inactive' | 'qualifications' | 'pharmacies' | 'corrections';
 export interface MemberPermissions { readDocuments?: boolean; qualifications: boolean; pharmacies: boolean; applications?: boolean; edit: boolean; manageAccount?: boolean; erase?: boolean }
-export interface MemberRow { operatorReadOnly?:boolean; userId: string; name: string | null; nickname?:string|null;email: string; loginMethods?:string[];registrationType?:MemberRegistrationType|null;registrationState?:string|null;accountStatus: string; accountActive?:boolean; serviceStatus?: string; qualificationStatus?: string; pharmacyStatus?: string | null }
+export interface MemberRow { operatorReadOnly?:boolean; userId: string; name: string | null; nickname?:string|null;email: string; loginMethods?:string[];registrationType?:MemberRegistrationType|null;registrationState?:string|null;operatorRoles?:string[];accountStatus: string; accountActive?:boolean; serviceStatus?: string; qualificationStatus?: string; pharmacyStatus?: string | null }
 export interface MemberProfile { operatorReadOnly?:boolean; loginMethods?:string[]; hasPassword?:boolean; userId: string; name: string | null; nickname: string | null; email: string; phone: string | null; accountStatus: string; accountActive?:boolean; serviceStatus?: string; emailVerified: boolean; joinedAt: string; version: string }
 export interface Qualification { licenseNumber: string | null; status: string; reason: string | null; approvedAt: string | null; reviewedBy: string | null; version: string }
 export interface MemberPharmacy {
@@ -33,6 +34,18 @@ export function memberError(error: unknown) {
 }
 
 /** terminate · restore: 운영자 「회원 해지」 · 「이용 복구」(2026-11-10 분리). pharmacy 는 예전 링크 호환용으로 detail 과 같다. */
+/** 운영 역할 → 「공급자 운영자」 · 「유통참여형 펀딩 관리자」 · 「전체 관리자」 (서비스가 여럿이면 전부). */
+export function operatorRoleLabels(roles: readonly string[] | undefined): string[] {
+  if (!roles?.length) return [];
+  const labels = roles.map(role => {
+    if (role === 'platform:super_admin') return '전체 관리자';
+    const parsed = parseRole(role);
+    const service = getServiceMeta(parsed).label;
+    const level = /admin$/.test(parsed.roleKey) ? '관리자' : /operator$/.test(parsed.roleKey) ? '운영자' : getRoleMeta(parsed).label;
+    return `${service} ${level}`;
+  });
+  return [...new Set(labels)];
+}
 export type MemberWorkMode = 'detail' | 'edit' | 'reject' | 'delete' | 'pharmacy' | 'terminate' | 'restore';
 /** 처리 후 동작: close 면 패널을 닫고 목록 위에 done 문구를 보인다(가입 승인·반려 · 해지·복구). */
 export interface PerformOptions { close?: boolean; done?: string }

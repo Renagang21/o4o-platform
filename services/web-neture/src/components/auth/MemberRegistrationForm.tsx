@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { MemberRegistrationFields } from '@o4o/account-ui';
 import {
+  MEMBER_REGISTRATION_TYPES,
   type MemberRegistration,
   type MemberRegistrationType,
   type MemberRegistrationFields as Values,
@@ -11,6 +12,14 @@ import {
 } from '@o4o/shared-space-ui';
 import { authClient } from '../../lib/apiClient';
 import { useAuth } from '../../contexts/AuthContext';
+/** 1단계 유형 카드의 짧은 안내. 실제 필요한 정보는 2단계에서 유형별로 받는다. */
+const TYPE_HINTS: Record<MemberRegistrationType, string> = {
+  pharmacist: '약사 면허 정보를 확인한 뒤 이용합니다.',
+  pharmacy_owner: '약국 · 사업자 정보로 내 매장을 이용합니다.',
+  supplier: '사업자 정보로 상품을 공급합니다.',
+  partner: '제휴 · 협력 활동을 합니다.',
+  other: '그 밖의 회원으로 이용합니다.',
+};
 const errorMessage = (e: unknown) =>
   (e as { response?: { data?: { error?: string } } }).response?.data?.error ??
   '처리하지 못했습니다. 다시 확인해 주시기 바랍니다.';
@@ -31,6 +40,8 @@ export default function MemberRegistrationForm() {
       version: '',
     }),
     [attempt, setAttempt] = useState(0);
+  // 2단계 가입(2026-11-10 사용자 확정): ① 가입 유형 카드 선택 → 「다음」 → ② 그 유형에 필요한 정보만 입력.
+  const [step, setStep] = useState<'type' | 'details'>('type');
   const active = useRef(true),
     requestLock = useRef(false);
   useEffect(() => {
@@ -72,6 +83,7 @@ export default function MemberRegistrationForm() {
           version: data.member.version,
         });
         setType(data.registration?.type ?? '');
+        setStep(data.registration?.type ? 'details' : 'type');
         setFields(data.registration?.fields ?? {});
         setState(data.registration?.state ?? null);
         setCanSubmit(data.canSubmit === true);
@@ -111,6 +123,39 @@ export default function MemberRegistrationForm() {
           다시 조회
         </button>
       </div>
+    );
+  if (step === 'type' && !readOnly)
+    return (
+      <section aria-labelledby="registration-type-title" className="space-y-4">
+        <div>
+          <h2 id="registration-type-title" className="text-lg font-semibold">가입 유형 선택</h2>
+          <p className="mt-1 text-sm text-slate-600">활동하실 유형을 골라 주시기 바랍니다. 필요한 정보는 다음 단계에서 유형별로 받습니다.</p>
+        </div>
+        {notice && <p role="status" className="text-sm">{notice}</p>}
+        <div role="radiogroup" aria-label="가입 유형" className="grid gap-3 sm:grid-cols-2">
+          {(Object.entries(MEMBER_REGISTRATION_TYPES) as Array<[MemberRegistrationType, string]>).map(([key, label]) => (
+            <button
+              key={key}
+              type="button"
+              role="radio"
+              aria-checked={type === key}
+              onClick={() => { if (type !== key) { setType(key); setFields({}); } }}
+              className={`rounded-lg border p-4 text-left transition ${type === key ? 'border-emerald-700 bg-emerald-50 ring-2 ring-emerald-700' : 'border-slate-300 bg-white hover:border-emerald-500'}`}
+            >
+              <span className="block font-semibold">{label}</span>
+              <span className="mt-1 block text-sm text-slate-600">{TYPE_HINTS[key]}</span>
+            </button>
+          ))}
+        </div>
+        <button
+          type="button"
+          disabled={!type}
+          onClick={() => setStep('details')}
+          className="w-full rounded bg-emerald-800 px-4 py-3 text-white disabled:opacity-50"
+        >
+          다음
+        </button>
+      </section>
     );
   return (
     <form
@@ -161,12 +206,17 @@ export default function MemberRegistrationForm() {
         </p>
       )}
       {state === 'pending' && <p role="status">가입 검토 대기 중입니다.</p>}
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <h2 className="text-lg font-semibold">{type ? `${MEMBER_REGISTRATION_TYPES[type]} 정보 입력` : '가입 정보 입력'}</h2>
+        {!readOnly && <button type="button" disabled={busy} className="text-sm text-emerald-800 underline" onClick={() => setStep('type')}>유형 다시 선택</button>}
+      </div>
       <div className="grid gap-3 md:grid-cols-2">
-        {(['name', 'nickname', 'phone'] as const).map((key) => (
+        {/* 닉네임은 모든 유형 필수, 이름 · 휴대전화는 선택(2026-11-09 S4 · S5). */}
+        {(['nickname', 'name', 'phone'] as const).map((key) => (
           <label key={key} className="block text-sm">
-            {{ name: '이름', nickname: '닉네임', phone: '휴대전화' }[key]}
+            {{ name: '이름 (선택)', nickname: '닉네임', phone: '휴대전화 (선택)' }[key]}
             <input
-              required
+              required={key === 'nickname'}
               readOnly={readOnly}
               disabled={busy}
               maxLength={key === 'phone' ? 20 : 100}
@@ -185,6 +235,7 @@ export default function MemberRegistrationForm() {
       </div>
       <MemberRegistrationFields
         type={type}
+        hideType
         fields={fields}
         disabled={busy}
         readOnly={readOnly}
@@ -245,7 +296,7 @@ export default function MemberRegistrationForm() {
           disabled={busy || !type || !agreement.ready}
           className="w-full rounded bg-emerald-800 px-4 py-3 text-white disabled:opacity-50"
         >
-          가입 정보 제출
+          가입 신청
         </button>
       )}
     </form>

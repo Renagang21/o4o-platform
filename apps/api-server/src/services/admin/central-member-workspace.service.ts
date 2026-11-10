@@ -16,6 +16,11 @@ const identity = `${protectedMemberSql("u.id")} AS "operatorReadOnly",u.id AS "u
  u."isActive" AS "accountActive",(SELECT sm.status FROM service_memberships sm WHERE sm.user_id=u.id AND sm.service_key='neture') AS "membershipStatus",
  u."isEmailVerified" AS "emailVerified",EXISTS(SELECT 1 FROM user_password_credentials pc WHERE pc.user_id=u.id) AS "hasPassword",u."createdAt" AS "joinedAt",${version} AS version,
  ${MEMBER_REGISTRATION_TYPE_SQL} AS "registrationType",${MEMBER_REGISTRATION_STATE_SQL} AS "registrationState",${MEMBER_REGISTRATION_LEGACY_ACCESS_SQL} AS "registrationLegacyMainAccess",${MEMBER_LOGIN_METHODS_SQL} AS "loginMethods"`;
+/** 회원 목록 「가입 유형」에 운영 역할을 보이기 위한 현재 유효한 관리자 · 운영자 역할(가입 신청서가 없는 운영자를 「미등록」으로 보이지 않게 한다 · 2026-11-10).
+ *  판정식은 member-identity-guards 의 운영 권한 판정과 같다. */
+const OPERATOR_ROLES_SQL = `ARRAY(SELECT ra.role FROM role_assignments ra WHERE ra.user_id=u.id AND ra.is_active=true
+  AND (ra.valid_from IS NULL OR ra.valid_from<=statement_timestamp()) AND (ra.valid_until IS NULL OR ra.valid_until>=statement_timestamp())
+  AND (ra.role LIKE 'platform:%' OR ra.role ~ '(^|:|_)(admin|operator)$') ORDER BY ra.role)`;
 const pharmacyExists = (status: string) => `EXISTS(SELECT 1 FROM neture_pharmacy_memberships n WHERE n.applicant_user_id=u.id AND n.status='${status}')`;
 const privateValue = (value: unknown) => ({ toPostgres: () => value, toJSON: () => '[redacted]' });
 
@@ -63,7 +68,8 @@ export class CentralMemberWorkspaceService {
       u."isActive" AS "accountActive",u."isEmailVerified" AS "emailVerified",
       (SELECT sm.status FROM service_memberships sm WHERE sm.user_id=u.id AND sm.service_key='neture') AS "membershipStatus",
       COALESCE(p.qualification_status,'unrequested') AS "qualificationStatus",
-      ${permissions.pharmacies ? `(SELECT n.status FROM neture_pharmacy_memberships n WHERE n.applicant_user_id=u.id ORDER BY n.applied_at DESC,n.id LIMIT 1)` : 'NULL::text'} AS "pharmacyStatus"
+      ${permissions.pharmacies ? `(SELECT n.status FROM neture_pharmacy_memberships n WHERE n.applicant_user_id=u.id ORDER BY n.applied_at DESC,n.id LIMIT 1)` : 'NULL::text'} AS "pharmacyStatus",
+      ${OPERATOR_ROLES_SQL} AS "operatorRoles"
       ${from} AND (${conditions[task]}) ORDER BY u."createdAt" DESC,u.id LIMIT 21 OFFSET $2`,
     [query, (page - 1) * 20]);
     return { items: items.slice(0, 20).map(row=>({...row,serviceStatus:resolveNetureMainMembershipStatus({account_status:row.accountStatus,account_active:row.accountActive,email_verified:row.emailVerified,membership_status:row.membershipStatus,registration_state:row.registrationState,legacy_main_access:row.registrationLegacyMainAccess})})), hasNext: items.length > 20, counts, permissions };

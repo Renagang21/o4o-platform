@@ -517,7 +517,7 @@ fixture는 자체 생성 DB의 소유권 marker를 확인하고 baseline·전체
 ### Git 절차
 
 **worktree · branch · main 통합 · 종료 정리는 [AGENTS.md §4-1](AGENTS.md#4-1-parallel-session--worktree-policy) 이 정본입니다** —
-독립 작업은 전용 worktree + branch 에서 하고, 작업 세션은 push 후 PR 생성까지 하고, `main` 반영(PR merge)과 배포는 통합 담당만 합니다(역할 정의: [AGENTS.md §4](AGENTS.md#4-git--병렬-작업-안전)). `main` 직접 작업 · direct push 는 쓰지 않습니다.
+작업 세션 · 통합 세션의 commit · push · PR · 병합 규칙은 그 절에만 있습니다(역할 정의: [AGENTS.md §4](AGENTS.md#4-git--병렬-작업-안전)). `main` 직접 작업 · direct push 는 쓰지 않습니다.
 **stage · 커밋 · PC 이동 절차는
 [docs/baseline/operations/O4O-GIT-PARALLEL-WORK-SAFETY-V1.md](docs/baseline/operations/O4O-GIT-PARALLEL-WORK-SAFETY-V1.md) 가 정본입니다**(그 문서의 `main` 직접 작업 전제와 다르면 §4-1 우선) —
 path-specific stage, 다른 세션 미커밋 변경 불가침,

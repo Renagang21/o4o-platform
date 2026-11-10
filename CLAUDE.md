@@ -15,7 +15,7 @@
 ## 세션 시작 규칙
 - 세션 시작 시 HANDOFF.md가 있으면 먼저 읽을 것
 - 진행 상황은 CLAUDE.md가 아니라 HANDOFF.md에 기록할 것
-- 시작 · 종료 절차는 `/start` · `/handoff` 스킬(`.claude/skills/`)을 따른다. 작업 세션은 push 후 PR 생성까지 하고, 병합 · 배포는 통합 담당만 한다 — `AGENTS.md` §4 역할 · §4-1(e).
+- 시작 · 종료 절차는 `/start` · `/handoff` 스킬(`.claude/skills/`)을 따른다. 작업 세션은 commit · push · 인계 기록까지 하고, PR 생성 · 병합 · 배포는 통합 세션 · 통합 담당만 한다 — `AGENTS.md` §4 역할 · §4-1(e).
 - 그 밖의 스킬: `/wo-new`(지시서 작성 · 인계) · `/db-readonly`(로컬 전용 운영 DB 조회) · `/verify`(변경 범위 검증) · `/integrate`(통합 세션으로 지정된 PR 만 — `AGENTS.md` §4 역할) · `/worktree-cleanup`(merge 후 정리). 스킬은 규칙을 복사하지 않고 `AGENTS.md` · 정본 절을 가리킨다.
 - SessionStart 훅(`.claude/hooks/session-start.mjs`)이 `origin/main` 을 fetch 하고, **clean 한 기준 main checkout 에서만** `pull --ff-only` 한다. 작업 branch · worktree 에서는 ahead/behind 만 보고하며 merge/rebase 하지 않는다. 이 세션 유형(`실행 위치`)의 최근 미완료 지시서도 알려 준다.
 - PreToolUse 훅(`.claude/hooks/block-cloud-deploy.mjs`)은 운영 배포 명령을 **클라우드 세션에서는 거부**하고, **로컬 세션에서는 승인을 묻는다**(ask). 단 승인 창이 뜨지 않는 권한 모드(auto · bypassPermissions · dontAsk · 알 수 없음)에서는 **훅이 OS 확인 대화상자를 직접 띄운다**(Windows 예/아니요 · 기본 '아니요' · 항상 위 · 120초 무응답 시 거부) — 사람이 '예'를 누르면 allow, 아니요 · 무응답 · 대화상자를 띄울 수 없음(Linux 등)은 deny. `.claude/settings.json` 의 ask 규칙도, 훅이 반환한 ask 도 auto 모드에서는 승인 창 없이 통과하는 것이 확인됐다(2026-11-09). 판정은 `.claude/hooks/lib/shell.mjs` `approvalFor` 를 아래 `guard-ask-commands.mjs` 와 같이 쓴다. 테스트는 `O4O_HOOK_CONFIRM_DIALOG=off` 로 대화상자를 끈다(이 변수로 승인을 만들 수는 없다). 회귀 테스트 `.claude/hooks/block-cloud-deploy.test.mjs`. 정책은 `AGENTS.md` §9.
@@ -27,7 +27,7 @@
 
 | 세션 | 판별 | 하는 일 | 하지 않는 일 |
 |---|---|---|---|
-| **클라우드 세션** (claude.ai/code) | `CLAUDE_CODE_REMOTE=true` | 코드 · 문서 · 테스트 · branch push · PR 생성(`AGENTS.md` §4-1(e)) | 운영 DB 접속 — gcloud 인증 · Cloud SQL Proxy 가 없다 |
+| **클라우드 세션** (claude.ai/code) | `CLAUDE_CODE_REMOTE=true` | 코드 · 문서 · 테스트 · branch push · 인계 기록(PR 생성은 통합 세션 — `AGENTS.md` §4-1(e)) | 운영 DB 접속 — gcloud 인증 · Cloud SQL Proxy 가 없다 |
 | **로컬 세션 (VS Code)** | 그 밖 | 운영 DB read-only 조회 · 통합 담당이 승인한 운영 작업(`AGENTS.md` §5) · 실 PC smoke | 승인 없는 DB write · DDL · migration 수동 적용 (`AGENTS.md` §5) |
 
 - 작업 위치 분담(개발은 클라우드, 병합 · 배포 · 로컬 작업은 VS Code 로컬)은 `AGENTS.md` §4 「작업 위치 분담」을 따른다.

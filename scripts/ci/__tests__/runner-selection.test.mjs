@@ -38,6 +38,7 @@ const SWITCHABLE = {
   },
   'ci-appstore-guard.yml': { 'appstore-guard': LINUX_EXPR },
   'automation-pr-labeler.yml': { 'size-label': LINUX_EXPR },
+  'automation-pr-overlap.yml': { 'overlap-notice': LINUX_EXPR },
   'scheduled-api-full-jest.yml': { runner: 'ubuntu-latest', plan: SCHEDULED_EXPR, 'full-jest': SCHEDULED_EXPR, aggregate: SCHEDULED_EXPR },
 };
 
