@@ -42,14 +42,25 @@ export function lanesOf(f) {
   if (
     p.startsWith('apps/api-server/src/bootstrap/') ||
     p === 'apps/api-server/src/services/startup.service.ts' ||
-    /^packages\/[^/]+-core\//.test(p)
+    /^packages\/[^/]+-core\//.test(p) ||
+    isSharedController(p)
   ) {
     out.push('core-hub');
   }
-  const pkg = p.match(/^packages\/([^/]+)\//);
+  const pkg = /^packages\/([^/]+)\//.exec(p);
   if (pkg && !pkg[1].endsWith('-core')) out.push(`shared-package:${pkg[1]}`);
   return out;
 }
+
+/**
+ * §4-3 「공통 controller 처럼 여러 서비스가 함께 쓰는 파일」 — 서비스 키를 받아 여러 서비스가 함께 쓰는
+ * operator console controller(`controllers/operator/*` · routes/operator/* 가 연결)와 `src/common/` 공용 계층.
+ * 테스트 파일은 제외한다.
+ */
+const TEST_FILE = /(^|\/)__tests__\/|\.(test|spec)\.[cm]?[jt]sx?$/;
+export const isSharedController = (p) =>
+  !TEST_FILE.test(p) &&
+  (/^apps\/api-server\/src\/controllers\/operator\/[^/]+\.ts$/.test(p) || /^apps\/api-server\/src\/common\/.+\.ts$/.test(p));
 
 /** lane 은 아니지만 R5 · R6 대상인 허브 파일 */
 export const isHubFile = (p) => /^services\/[^/]+\/src\/App\.tsx$/.test(p) || /^docs\/work-orders\/[^/]*TODO[^/]*$/.test(p);
@@ -81,14 +92,16 @@ export function computeOverlaps(current, others) {
   for (const o of others) {
     if (o.number === current.number) continue;
     const theirPaths = pathsOf(o.files);
-    const files = [...myPaths].filter((p) => theirPaths.has(p)).sort();
-    const lanes = [...lanesOfFiles(o.files)].filter((l) => myLanes.has(l)).sort();
+    const files = [...myPaths].filter((p) => theirPaths.has(p)).sort(byText);
+    const lanes = [...lanesOfFiles(o.files)].filter((l) => myLanes.has(l)).sort(byText);
     if (files.length || lanes.length) rows.push({ number: o.number, title: o.title, draft: o.draft, files, lanes });
   }
   return rows.sort((a, b) => a.number - b.number);
 }
 
-const esc = (s) => String(s).replaceAll('|', '\\|').replaceAll('\n', ' ');
+const byText = (a, b) => (a < b ? -1 : a > b ? 1 : 0);
+const esc = (s) => String(s).replaceAll('|', String.raw`\|`).replaceAll('\n', ' ');
+const code = (s) => '`' + s + '`';
 
 /**
  * @param {ReturnType<typeof computeOverlaps>} rows
@@ -103,13 +116,12 @@ export function renderComment(rows, { sha, repo }) {
 
   const lines = ['| PR | 상태 | 같은 파일 | 같은 lane |', '|---|---|---|---|'];
   for (const r of rows) {
-    const shown = r.files.slice(0, MAX_FILES_SHOWN).map((f) => `\`${esc(f)}\``);
+    const shown = r.files.slice(0, MAX_FILES_SHOWN).map((f) => code(esc(f)));
     if (r.files.length > MAX_FILES_SHOWN) shown.push(`외 ${r.files.length - MAX_FILES_SHOWN}개`);
-    lines.push(
-      `| #${r.number} ${esc(r.title)} | ${r.draft ? '드래프트' : 'Ready'} | ${shown.join('<br>') || '—'} | ${
-        r.lanes.map((l) => `\`${l}\``).join(' ') || '—'
-      } |`,
-    );
+    const state = r.draft ? '드래프트' : 'Ready';
+    const fileCell = shown.join('<br>') || '—';
+    const laneCell = r.lanes.map(code).join(' ') || '—';
+    lines.push(`| #${r.number} ${esc(r.title)} | ${state} | ${fileCell} | ${laneCell} |`);
   }
   const notes = ['', '- PR 설명의 「겹치는 PR」 칸에 위 PR 번호와 파일을 적어 주세요(AGENTS.md §4-1(e)).'];
   if (rows.some((r) => !r.draft && r.lanes.length)) {
@@ -117,7 +129,7 @@ export function renderComment(rows, { sha, repo }) {
   }
   const hubs = [...new Set(rows.flatMap((r) => r.files.filter(isHubFile)))];
   if (hubs.length) {
-    notes.push(`- 허브 파일이 겹칩니다(${hubs.map((h) => `\`${h}\``).join(' ')}) — §4-3 R6: 정렬된 자리에 한 줄만 추가하고, WO 진행표 상태 갱신은 통합 담당이 합니다.`);
+    notes.push(`- 허브 파일이 겹칩니다(${hubs.map(code).join(' ')}) — §4-3 R6: 정렬된 자리에 한 줄만 추가하고, WO 진행표 상태 갱신은 통합 담당이 합니다.`);
   }
   return `${head}${lines.join('\n')}\n${notes.join('\n')}\n${footer}`;
 }
@@ -168,11 +180,11 @@ export async function run({ api, number, repo }) {
   const me = pulls.find((p) => p.number === number);
   if (!me) return { action: 'skip', reason: 'PR 이 열려 있지 않음' };
   const current = { number, files: await api.files(number) };
-  const others = [];
-  for (const p of pulls) {
-    if (p.number === number) continue;
-    others.push({ number: p.number, title: p.title, draft: Boolean(p.draft), files: await api.files(p.number) });
-  }
+  const others = await Promise.all(
+    pulls
+      .filter((p) => p.number !== number)
+      .map(async (p) => ({ number: p.number, title: p.title, draft: Boolean(p.draft), files: await api.files(p.number) })),
+  );
   const rows = computeOverlaps(current, others);
   const body = renderComment(rows, { sha: me.head.sha, repo });
   const existing = (await api.comments(number)).find(
@@ -196,7 +208,8 @@ async function main() {
     return 1;
   }
   const result = await run({ api: makeApi({ token, repo }), number, repo });
-  console.log(`PR #${number}: ${result.action}${result.reason ? ` (${result.reason})` : ''}`);
+  const reason = result.reason ? ` (${result.reason})` : '';
+  console.log(`PR #${number}: ${result.action}${reason}`);
   for (const r of result.rows ?? []) {
     console.log(`  #${r.number} ${r.draft ? 'draft' : 'ready'} files=${r.files.length} lanes=${r.lanes.join(',') || '-'}`);
   }

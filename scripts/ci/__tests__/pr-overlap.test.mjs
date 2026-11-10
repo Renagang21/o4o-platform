@@ -25,6 +25,12 @@ test('lane 분류 — AGENTS.md §4-3 표', () => {
   assert.deepEqual(lanesOf(f('packages/ui/src/Button.tsx')), ['shared-package:ui']);
   assert.deepEqual(lanesOf(f('services/web-neture/src/App.tsx')), []);
   assert.deepEqual(lanesOf(f('apps/api-server/src/modules/x/x.service.ts')), []);
+  // §4-3 공통 controller — 여러 서비스가 함께 쓰는 operator console · common 계층 (Codex #1015)
+  assert.deepEqual(lanesOf(f('apps/api-server/src/controllers/operator/MembershipConsoleController.ts')), ['core-hub']);
+  assert.deepEqual(lanesOf(f('apps/api-server/src/common/base.controller.ts')), ['core-hub']);
+  assert.deepEqual(lanesOf(f('apps/api-server/src/controllers/operator/__tests__/MembershipConsoleController.deleteScope.test.ts')), []);
+  assert.deepEqual(lanesOf(f('apps/api-server/src/common/x.spec.ts')), []);
+  assert.deepEqual(lanesOf(f('apps/api-server/src/controllers/kpa-branch/x.controller.ts')), []);
   assert.equal(isHubFile('services/web-neture/src/App.tsx'), true);
   assert.equal(isHubFile('docs/work-orders/TODO-O4O-X-V1.md'), true);
   assert.equal(isHubFile('docs/work-orders/WO-O4O-X-V1.md'), false);
@@ -44,6 +50,13 @@ test('같은 파일 · 이름 변경 전 경로 · 같은 lane(파일은 달라�
     { number: 4, title: 'renamed source', draft: true, files: ['old/b.ts'], lanes: [] },
     { number: 5, title: 'same lane', draft: false, files: [], lanes: ['shared-package:ui'] },
   ]);
+});
+
+test('서로 다른 공통 controller 를 바꾸는 PR 은 같은 core-hub lane 으로 겹친다 (Codex #1015)', () => {
+  const current = { number: 1, files: [f('apps/api-server/src/controllers/operator/MembershipConsoleController.ts')] };
+  const others = [{ number: 2, title: 'products', draft: false, files: [f('apps/api-server/src/controllers/operator/ProductConsoleController.ts')] }];
+  assert.deepEqual(computeOverlaps(current, others), [{ number: 2, title: 'products', draft: false, files: [], lanes: ['core-hub'] }]);
+  assert.match(renderComment(computeOverlaps(current, others), { sha: 'x', repo: REPO }), /§4-3 R1/);
 });
 
 test('댓글: marker · 표 · R1 경고(Ready 같은 lane 일 때만) · 허브 안내 · 멘션 없음', () => {
