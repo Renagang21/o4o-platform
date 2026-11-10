@@ -35,7 +35,8 @@ integration('member profile and temporary recovery PostgreSQL',()=>{
    CREATE TABLE organizations(id uuid PRIMARY KEY,type text DEFAULT 'pharmacy',address_detail jsonb,address text,phone text,metadata jsonb,name text,business_number text,"updatedAt" timestamp);
    CREATE TABLE neture_pharmacy_memberships(id uuid,organization_id uuid,applicant_user_id uuid,pharmacy_name text,business_number text,pharmacist_license_number varchar(30),status text,reason text,applied_at timestamp,decided_at timestamp,decided_by uuid,updated_at timestamp DEFAULT now());
    CREATE TABLE notifications("userId" uuid,"serviceKey" text,type text,title text,message text,metadata jsonb,channel text,"isRead" boolean);
-   CREATE TABLE action_logs(id bigserial,service_key text,user_id uuid,action_key text,source text,status text,meta jsonb,created_at timestamp DEFAULT now());`);
+   CREATE TABLE action_logs(id bigserial,service_key text,user_id uuid,action_key text,source text,status text,meta jsonb,created_at timestamp DEFAULT now());
+   CREATE TABLE account_erasure_operations(id uuid PRIMARY KEY DEFAULT gen_random_uuid(),subject_id uuid UNIQUE,state text,error_code text);`);
   for(const id of [admin,operator,target,other])await db.query(`INSERT INTO users(id,name,email,status,"isActive","isEmailVerified","businessInfo","refreshTokenFamily") VALUES($1,'합성 회원',$2,'active',true,true,'{}','old-family')`,[id,id+'@example.test']);
   await db.query(`INSERT INTO role_assignments(id,user_id,role,is_active) VALUES($1,$2,'platform:super_admin',true)`,[randomUUID(),admin]);
   const assignment=randomUUID();await db.query(`INSERT INTO role_assignments VALUES($1,$2,'neture:operator','o4o-direct',true,NULL,NULL)`,[assignment,operator]);
