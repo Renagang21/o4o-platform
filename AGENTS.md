@@ -508,8 +508,9 @@ verdict: SAFE_TO_REMOVE | KEEP | UNCERTAIN
   - 로컬 세션: **통합 담당의 지시가 있을 때만** 실행한다. 통합 담당이 그 세션에 배포를 지시한 것이 승인이며,
     이후는 §4-1(e)·(f) 의 통합 세션 흐름대로 진행한다(`promote.yml` 조건은 §4-1(f) 그대로).
     통합 담당이 아닌 개발자의 지시로는 병합 · 배포하지 않는다(§4 역할).
-    같은 훅이 로컬에서는 배포 명령마다 승인 창을 띄운다(ask). 승인 창이 뜨지 않는 권한 모드(auto 등)에서는 거부(deny)하므로
-    default 모드로 바꾼 뒤 실행한다(2026-11-09 auto 모드에서 훅의 ask 가 승인 창 없이 통과한 것이 확인됨).
+    같은 훅이 로컬에서는 배포 명령마다 승인 창을 띄운다(ask). Claude Code 승인 창이 뜨지 않는 권한 모드(auto 등)에서는
+    훅이 OS 확인 대화상자(예/아니요 · 기본 '아니요' · 120초 무응답 시 거부)를 직접 띄워 사람이 '예'를 누를 때만 실행하고,
+    대화상자를 띄울 수 없으면 거부(deny)한다(2026-11-09 auto 모드에서 훅의 ask 가 승인 창 없이 통과한 것이 확인됨 · 2026-11-10 대화상자 도입).
 - main 직접 push · force push · 원격 branch 삭제는 `.claude/settings.json` deny 로 모든 세션에서 막는다.
   콜론 refspec 삭제(`git push origin :<branch>` · `+:<branch>`)는 permission 패턴으로 표현되지 않아
   PreToolUse 훅(`.claude/hooks/guard-git-push.mjs`)이 모든 세션에서 막는다.
