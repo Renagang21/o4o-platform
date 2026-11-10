@@ -87,26 +87,45 @@ export function replacementRules(tokens: readonly string[], key: string): Array<
   });
 }
 
+/** 표 이름(`schema.table`) — 사본 검사가 찾은 그 밖의 표를 가리킨다. */
+export interface CopyTable { schema: string; table: string }
+
+/**
+ * 보존 기록 표와, 사본 검사(reviewManifest)가 회원 식별값의 단순 사본을 찾은 그 밖의 표를 정리한다.
+ * 그 밖의 표는 모두 `minimize`(식별값만 `erased:<key>` 로 치환, 행은 유지)로 처리한다 — 2026-11-10 통합 담당 결정:
+ * 등록되지 않은 표에 사본이 있다는 이유로 삭제가 「검토 필요」에서 멈추지 않게 한다. 치환 뒤에도 남으면 사후 검토가 잡는다.
+ */
 export async function minimizeRetainedRecords(
   m: Pick<EntityManager, 'query'>,
   userId: string,
   key: string,
   tokens: readonly string[],
+  copyTables: readonly CopyTable[] = [],
 ): Promise<{ table: string; mode: 'minimize' | 'delete'; rows: number }[]> {
   const rules = replacementRules(tokens, key);
   if (!rules.length) return [];
   const patterns = rules.map(rule => rule.pattern);
   const uuidTokens = tokens.filter(token => UUID.test(token));
   const result: { table: string; mode: 'minimize' | 'delete'; rows: number }[] = [];
-  for (const [table, mode] of Object.entries(RETAINED_RECORD_TABLES)) {
+  const targets: Array<{ schema: string; table: string; mode: 'minimize' | 'delete' }> =
+    Object.entries(RETAINED_RECORD_TABLES).map(([table, mode]) => ({ schema: 'public', table, mode }));
+  for (const copy of copyTables) {
+    if (!targets.some(t => t.schema === copy.schema && t.table === copy.table))
+      targets.push({ schema: copy.schema, table: copy.table, mode: 'minimize' });
+  }
+  for (const { schema, table: name, mode } of targets) {
+    // 보존 기록 표 전용 규칙(행위자 키 · 본인 문의 · 소유 연결)은 public 표 이름에만 적용한다.
+    const table = schema === 'public' ? name : '';
     const columns: Array<{ name: string; type: string; nullable: string }> = await m.query(
       `SELECT column_name AS name,data_type AS type,is_nullable AS nullable FROM information_schema.columns
-       WHERE table_schema='public' AND table_name=$1 ORDER BY ordinal_position`, [table]);
+       WHERE table_schema=$1 AND table_name=$2 ORDER BY ordinal_position`, [schema, name]);
     if (!columns.length) continue;
+    const target = `${quote(schema)}.${quote(name)}`;
+    const label = schema === 'public' ? name : `${schema}.${name}`;
     const matches = `to_jsonb(r)::text ~* ANY($1::text[])`;
     if (mode === 'delete') {
-      const deleted = await m.query(`DELETE FROM public.${quote(table)} r WHERE ${matches} RETURNING 1`, [patterns]);
-      result.push({ table, mode, rows: rowCount(deleted) });
+      const deleted = await m.query(`DELETE FROM ${target} r WHERE ${matches} RETURNING 1`, [patterns]);
+      result.push({ table: label, mode, rows: rowCount(deleted) });
       continue;
     }
     // $1 patterns, then the uuid tokens (only when a column uses them) and one parameter pair per rule.
@@ -156,8 +175,8 @@ export async function minimizeRetainedRecords(
       sets.push(`meta=CASE WHEN user_id::text=ANY($${actor}::text[]) THEN COALESCE(${meta},'{}'::jsonb)||jsonb_build_object('actorKey',$${params.length}::text) ELSE ${meta} END`);
     }
     if (!sets.length) continue;
-    const updated = await m.query(`UPDATE public.${quote(table)} r SET ${sets.join(',')} WHERE ${matches} RETURNING 1`, params);
-    result.push({ table, mode, rows: rowCount(updated) });
+    const updated = await m.query(`UPDATE ${target} r SET ${sets.join(',')} WHERE ${matches} RETURNING 1`, params);
+    result.push({ table: label, mode, rows: rowCount(updated) });
   }
   return result;
 }

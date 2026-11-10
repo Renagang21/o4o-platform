@@ -64,7 +64,14 @@ integration('account erasure — isolated PostgreSQL schema/real sessions', () =
   async function clearFixtures(){
     if(port!==55469||(await db.query('SELECT current_database() AS name'))[0].name!=='o4o_erasure_fixture')throw new Error('SYNTHETIC_DATABASE_ONLY');
     // Non-FK writer tables and purpose-separated journals must not leak between cases.
-    await db.query('TRUNCATE '+fixtureTables.join(',')+' CASCADE');
+    // 표 353개를 매번 TRUNCATE 하면 케이스마다 수 초가 걸린다(Windows 7초) — 행이 있는 표만 찾아 비운다.
+    // 이 fixture 는 일회용 클러스터의 superuser 로만 열리므로, FK · writer fence 트리거를 끄고 순서 없이 지운다.
+    const filled:string[]=(await db.query(fixtureTables.map(t=>`SELECT '${t.replace(/'/g,"''")}' AS t WHERE EXISTS(SELECT 1 FROM ${t})`).join(' UNION ALL '))).map((r:{t:string})=>r.t);
+    if(!filled.length)return;
+    await db.transaction(async m=>{
+      await m.query("SET LOCAL session_replication_role = replica");
+      for(const t of filled)await m.query(`DELETE FROM ${t}`);
+    });
   }
   const service = (storage?: PersonalStorage, years: 1|2 = 1) => {
     const core=new AccountErasureService(db,{enabled:true,inventoryReviewed:true,systemYears:years,systemBasis:'isolated-synthetic-system',personalBuckets:['fixture-private'],storage});
@@ -154,9 +161,14 @@ integration('account erasure — isolated PostgreSQL schema/real sessions', () =
     expect(after.meta.subjectKey).toMatch(/^[a-f0-9]{64}$/);expect(after.created_at).toEqual(before.created_at);
     expect((await db.query('SELECT meta FROM action_logs WHERE id=$1',[peerBefore.id]))[0].meta).toEqual(peerBefore.meta);
   });
-  it('unknown business audit copies require review and are never silently discarded',async()=>{
-    const target=await user(),[audit]=await db.query(`INSERT INTO audit_logs("entityType","entityId",action,changes) VALUES('Order',$1,'update',jsonb_build_object('contact',$2::text)) RETURNING id`,[randomUUID(),target.email]);
-    try{const result=await service().request(target.id);expect(result).toMatchObject({state:'review_required',erased:false});expect(result.reviewCodes).toContain('REVIEW:public.audit_logs');expect((await db.query('SELECT changes FROM audit_logs WHERE id=$1',[audit.id]))[0].changes.contact).toBe(target.email);}finally{await db.query('DELETE FROM audit_logs WHERE id=$1',[audit.id]);}
+  // 2026-11-10 통합 담당 결정: 등록되지 않은 표의 단순 사본은 검토로 멈추지 않고, 행은 남긴 채 식별값만 되돌릴 수 없게 치환한다.
+  it('unknown business audit copies are anonymized in place instead of blocking erasure, and the record is kept',async()=>{
+    const target=await user(),peer=await user(),[audit]=await db.query(`INSERT INTO audit_logs("entityType","entityId",action,changes) VALUES('Order',$1,'update',jsonb_build_object('contact',$2::text,'other',$3::text)) RETURNING id`,[randomUUID(),target.email,peer.email]);
+    try{
+      expect(await service().request(target.id)).toMatchObject({state:'completed',erased:true});
+      const [a]=await db.query('SELECT "entityType",changes FROM audit_logs WHERE id=$1',[audit.id]);
+      expect(a.entityType).toBe('Order');expect(a.changes.contact).toMatch(/^erased:[a-f0-9]{64}$/);expect(a.changes.other).toBe(peer.email);
+    }finally{await db.query('DELETE FROM audit_logs WHERE id=$1',[audit.id]);}
   });
   it('retained records keep their rows with this member replaced by an irreversible key, and repair copies are removed (2026-11-10)',async()=>{
     const target=await user(),peer=await user();

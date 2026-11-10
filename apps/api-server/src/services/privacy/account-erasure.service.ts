@@ -3,7 +3,7 @@ import { systemLogProjection, systemLogReviews, minimizeSystemLogs, privateLogPo
 import { CLOSED_STORE_WRITER_GAPS_SQL } from '../store/store-closure-inventory.js';
 import { personalPredicate, removePersonalDerived } from './account-personal-data.js';
 import { businessErasureProjection, businessErasureReviews, removeBusinessAccountLinks } from './account-business-data.js';
-import { isRetainedRecordTable, minimizeRetainedRecords, retainedLinkPredicate } from './account-retained-records.js';
+import { isRetainedRecordTable, minimizeRetainedRecords, retainedLinkPredicate, type CopyTable } from './account-retained-records.js';
 import { cooperativeAdminTransferRequired } from './cooperative-erasure-review.js';
 import { createHash, randomUUID } from 'node:crypto';
 import type { DataSource, EntityManager } from 'typeorm';
@@ -41,6 +41,8 @@ export function erasureOptionsFromEnv(env:NodeJS.ProcessEnv=process.env):Erasure
 type ErasureFileTask = {id:string;bucket:string;object_path:string;generation:string|null};
 type Operation = { id: string; subject_id: string | null; subject_hash: string; requested_by_key: string; state: ErasureState; review_codes: string[]; review_due_at: Date };
 const hash = (id: string) => createHash('sha256').update(id.toLowerCase()).digest('hex');
+/** 저장소 객체를 가리키는 열 — 이 열이 있는 표의 사본은 자동 치환하지 않는다(파일 삭제 경로 보존). */
+const FILE_POINTER_COLUMNS: ReadonlySet<string> = new Set(['object_path', 'bucket', 'storage_path', 'file_path', 'gcs_path', 'object_name']);
 const quote = (s: string) => '"' + s.replace(/"/g, '""') + '"';
 // Exhaustive legacy identity namespaces; recognizing stored data does not enable auth routes.
 const AUTH_IDENTITY_NAMESPACES: Readonly<Record<AuthProvider,true>> = {email:true,google:true,kakao:true,naver:true,service:true};
@@ -224,7 +226,8 @@ export class AccountErasureService {
         // Retire legacy contact hashes: a fresh account may reuse contact details.
         await m.query("DELETE FROM account_erasure_reference_keys WHERE operation_id=$1 AND key_kind='identity'",[operationId]);
         await this.captureReferenceKeys(m,operationId,o.subject_id!);
-        const reviews = await this.reviewManifest(m, user);
+        // 단순 사본은 finish 에서 치환되므로 여기서는 멈추지 않는다(목록은 finish 가 다시 만든다).
+        const reviews = await this.reviewManifest(m, user, undefined, false, []);
         if (reviews.length) {
           await m.query("UPDATE account_erasure_operations SET state='review_required',review_codes=$2,updated_at=now() WHERE id=$1", [operationId, JSON.stringify(reviews)]);
           return false;
@@ -301,7 +304,12 @@ export class AccountErasureService {
     return {tokens:[...tokens],providers};
   }
 
-  private async reviewManifest(m: EntityManager, user: Record<string, unknown>, frozenTokens?: Awaited<ReturnType<AccountErasureService["identityTokens"]>>, afterRemoval = false): Promise<string[]> {
+  /**
+   * `copies` 를 넘기면(삭제 전 검토), 소유 · 사업 판정이 필요 없는 단순 식별값 사본은 검토 코드 대신 이 목록에 모은다.
+   * 그 표들은 finish 에서 식별값만 치환되고(minimizeRetainedRecords), 정리 후 검토(afterRemoval)가 남은 것을 다시 잡는다.
+   * 2026-11-10 통합 담당 결정 — 등록되지 않은 표의 사본 때문에 삭제가 「검토 필요」로 멈추지 않게 한다.
+   */
+  private async reviewManifest(m: EntityManager, user: Record<string, unknown>, frozenTokens?: Awaited<ReturnType<AccountErasureService["identityTokens"]>>, afterRemoval = false, copies?: CopyTable[]): Promise<string[]> {
     const identities = frozenTokens ?? await this.identityTokens(m,user);
     const tokens = identities.tokens;
     const localPart = "[:alnum:]_.!#$%&'*+/=?^`{|}~-";
@@ -423,7 +431,20 @@ export class AccountErasureService {
       const [r] = await m.query(`SELECT count(*)::int AS n FROM ${table} r
         WHERE $1::text IS NOT NULL AND (${projectedLeaf}::text ~* ANY($2::text[]) OR ${projectedLeaf} ?| $3::text[])
         ${predicate ? `AND NOT (${predicate})` : ''} ${retainedOnly ? `AND (${retainedOnly})` : ''}`, [user.id, patterns,shortTokens]);
-      if (r.n || (!retainedOnly && await providerReview(table,predicate ? `AND NOT (${predicate})` : '',roleAttribution,projection))) codes.push(`REVIEW:${t.schema_name}.${t.table_name}`);
+      // 단순 사본은 치환 대상으로 모은다. 소유 연결(retainedOnly) · 제공자 ID 사본 · 정리 후 잔여는 계속 검토다
+      // (제공자 ID 사본은 치환 토큰에 없으므로, 치환 뒤 정리 후 검토에서 잡힌다).
+      // 사본이 아닌 경우는 치환하지 않는다:
+      //  - 파일 경로 열이 있는 표 — 경로를 바꾸면 지워야 할 개인 파일을 다시 찾을 수 없다(파일 작업 · 영수증).
+      //  - 열 값이 이 회원 ID 와 정확히 같은 행 — 작성 · 소유 연결이다. 처리 경로가 정해질 때까지 검토로 남긴다.
+      let copyOnly = Boolean(r.n && !retainedOnly && !afterRemoval && copies);
+      if (copyOnly && t.columns.some(c => FILE_POINTER_COLUMNS.has(c))) copyOnly = false;
+      if (copyOnly) {
+        const [linked] = await m.query(`SELECT count(*)::int AS n FROM ${table} r, jsonb_each_text(to_jsonb(r)) kv
+          WHERE kv.value=$1 ${predicate ? `AND NOT (${predicate})` : ''}`, [user.id]);
+        if (linked.n) copyOnly = false;
+      }
+      if (copyOnly) copies!.push({ schema: t.schema_name, table: t.table_name });
+      else if (r.n || (!retainedOnly && await providerReview(table,predicate ? `AND NOT (${predicate})` : '',roleAttribution,projection))) codes.push(`REVIEW:${t.schema_name}.${t.table_name}`);
     }
     // Verify the migration's writer fence on every scanned table and users, including tables added later.
     const [missing] = await m.query(`SELECT count(*)::int AS n FROM (${ERASURE_WRITER_GAPS_SQL}) missing`);
@@ -628,12 +649,13 @@ export class AccountErasureService {
       if (!user) throw new AccountErasureError('ERASURE_SOURCE_MISSING', 409);
       await this.assertTarget(m,o.subject_id!);
       const frozenTokens = await this.identityTokens(m,user);
-      const codes = await this.reviewManifest(m,user,frozenTokens);
+      const copies: CopyTable[] = [];
+      const codes = await this.reviewManifest(m,user,frozenTokens,false,copies);
       const [f] = await m.query("SELECT count(*)::int AS n FROM account_erasure_file_tasks WHERE operation_id=$1 AND state NOT IN ('deleted','already_absent')", [operationId]);
       if (codes.length || f.n) throw new AccountErasureError('ERASURE_RESIDUAL_REVIEW_REQUIRED', 409);
       await this.separateCommunityEvidence(m,o.subject_id!);
       await this.removePrivateRows(m,o.subject_id!);
-      await minimizeRetainedRecords(m, o.subject_id!, hash(o.subject_id!), frozenTokens.tokens);
+      await minimizeRetainedRecords(m, o.subject_id!, hash(o.subject_id!), frozenTokens.tokens, copies);
       if ((await this.reviewManifest(m,user,frozenTokens,true)).length) throw new AccountErasureError('ERASURE_RESIDUAL_REVIEW_REQUIRED',409);
       await m.query('DELETE FROM users WHERE id=$1', [o.subject_id]);
       await this.audit(m,operationId,o.subject_hash,actorId,'completed');
