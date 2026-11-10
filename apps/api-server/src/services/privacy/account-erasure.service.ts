@@ -3,6 +3,7 @@ import { systemLogProjection, systemLogReviews, minimizeSystemLogs, privateLogPo
 import { CLOSED_STORE_WRITER_GAPS_SQL } from '../store/store-closure-inventory.js';
 import { personalPredicate, removePersonalDerived } from './account-personal-data.js';
 import { businessErasureProjection, businessErasureReviews, removeBusinessAccountLinks } from './account-business-data.js';
+import { isRetainedRecordTable, minimizeRetainedRecords, retainedLinkPredicate } from './account-retained-records.js';
 import { cooperativeAdminTransferRequired } from './cooperative-erasure-review.js';
 import { createHash, randomUUID } from 'node:crypto';
 import type { DataSource, EntityManager } from 'typeorm';
@@ -300,7 +301,7 @@ export class AccountErasureService {
     return {tokens:[...tokens],providers};
   }
 
-  private async reviewManifest(m: EntityManager, user: Record<string, unknown>, frozenTokens?: Awaited<ReturnType<AccountErasureService["identityTokens"]>>): Promise<string[]> {
+  private async reviewManifest(m: EntityManager, user: Record<string, unknown>, frozenTokens?: Awaited<ReturnType<AccountErasureService["identityTokens"]>>, afterRemoval = false): Promise<string[]> {
     const identities = frozenTokens ?? await this.identityTokens(m,user);
     const tokens = identities.tokens;
     const localPart = "[:alnum:]_.!#$%&'*+/=?^`{|}~-";
@@ -371,6 +372,12 @@ export class AccountErasureService {
     if (await cooperativeAdminTransferRequired(m,user.id as string)) codes.push('COOPERATIVE_MANAGEMENT_TRANSFER_REQUIRED');
     for (const t of tables) {
       if (isBusinessCatalogTable(t)) continue;
+      // 보존 기록 표(account-retained-records)는 삭제 과정에서 반드시 치환·삭제되므로 삭제 전 검토에서 멈출 이유가 없다.
+      // 정리 후 검토(afterRemoval)는 이 표들도 전부 다시 확인한다 — 덜 정리되면 전체가 되돌려진다.
+      // 단, 사업 소유 연결 열(neture_suppliers.user_id 등)은 치환하지 않으므로 그 연결만 계속 검토한다.
+      const retainedOnly = !afterRemoval && isRetainedRecordTable(t.schema_name, t.table_name)
+        ? retainedLinkPredicate(t.table_name, t.columns) : undefined;
+      if (retainedOnly === null) continue;
       const table = `${quote(t.schema_name)}.${quote(t.table_name)}`;
       const owners = t.schema_name === 'public' ? PRIVATE_OWNERS[t.table_name] : undefined;
       let predicate = owners?.filter(c => t.columns.includes(c)).map(c => `r.${quote(c)}::text=$1`).join(' OR ');
@@ -415,8 +422,8 @@ export class AccountErasureService {
       const projectedLeaf = leaf('r',roleAttribution).replace('to_jsonb(r)', projection);
       const [r] = await m.query(`SELECT count(*)::int AS n FROM ${table} r
         WHERE $1::text IS NOT NULL AND (${projectedLeaf}::text ~* ANY($2::text[]) OR ${projectedLeaf} ?| $3::text[])
-        ${predicate ? `AND NOT (${predicate})` : ''}`, [user.id, patterns,shortTokens]);
-      if (r.n || await providerReview(table,predicate ? `AND NOT (${predicate})` : '',roleAttribution,projection)) codes.push(`REVIEW:${t.schema_name}.${t.table_name}`);
+        ${predicate ? `AND NOT (${predicate})` : ''} ${retainedOnly ? `AND (${retainedOnly})` : ''}`, [user.id, patterns,shortTokens]);
+      if (r.n || (!retainedOnly && await providerReview(table,predicate ? `AND NOT (${predicate})` : '',roleAttribution,projection))) codes.push(`REVIEW:${t.schema_name}.${t.table_name}`);
     }
     // Verify the migration's writer fence on every scanned table and users, including tables added later.
     const [missing] = await m.query(`SELECT count(*)::int AS n FROM (${ERASURE_WRITER_GAPS_SQL}) missing`);
@@ -626,7 +633,8 @@ export class AccountErasureService {
       if (codes.length || f.n) throw new AccountErasureError('ERASURE_RESIDUAL_REVIEW_REQUIRED', 409);
       await this.separateCommunityEvidence(m,o.subject_id!);
       await this.removePrivateRows(m,o.subject_id!);
-      if ((await this.reviewManifest(m,user,frozenTokens)).length) throw new AccountErasureError('ERASURE_RESIDUAL_REVIEW_REQUIRED',409);
+      await minimizeRetainedRecords(m, o.subject_id!, hash(o.subject_id!), frozenTokens.tokens);
+      if ((await this.reviewManifest(m,user,frozenTokens,true)).length) throw new AccountErasureError('ERASURE_RESIDUAL_REVIEW_REQUIRED',409);
       await m.query('DELETE FROM users WHERE id=$1', [o.subject_id]);
       await this.audit(m,operationId,o.subject_hash,actorId,'completed');
       // Only retired UUIDs fence a restore. Re-registration with a fresh UUID/contact is not a restore.
