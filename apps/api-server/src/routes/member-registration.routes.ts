@@ -149,9 +149,10 @@ export function createMemberRegistrationRoutes(
     '/self',
     handle((req) => {
       const extra = z.object({
-        name: z.string().trim().min(1).max(100),
+        // 닉네임 필수 · 이름과 휴대전화는 선택(2026-11-09 S4 · S5).
+        name: z.string().trim().max(100).default(''),
         nickname: z.string().trim().min(1).max(100),
-        phone: z.string().trim().max(20),
+        phone: z.string().trim().max(20).default(''),
         version,
         policyReferences: policies,
       });

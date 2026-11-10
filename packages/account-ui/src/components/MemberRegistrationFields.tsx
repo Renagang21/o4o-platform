@@ -14,6 +14,8 @@ export interface MemberRegistrationFieldsProps {
   disabled?: boolean;
   readOnly?: boolean;
   typeLocked?: boolean;
+  /** 유형을 앞 단계에서 이미 골랐을 때 유형 선택칸을 그리지 않는다(가입 신청 2단계 화면). */
+  hideType?: boolean;
   onUpload?: (file: File) => void;
   onOpenDocument?: () => void;
 }
@@ -26,6 +28,7 @@ export function MemberRegistrationFields({
   disabled = false,
   readOnly = false,
   typeLocked = false,
+  hideType = false,
   onUpload,
   onOpenDocument,
 }: MemberRegistrationFieldsProps) {
@@ -33,7 +36,7 @@ export function MemberRegistrationFields({
     'mt-1 block w-full rounded border border-slate-300 bg-white px-3 py-2 read-only:bg-slate-50 disabled:bg-slate-50';
   return (
     <fieldset disabled={disabled} className="space-y-3">
-      <label className="block text-sm">
+      {!hideType && <label className="block text-sm">
         가입 유형
         <select
           aria-label="가입 유형"
@@ -52,7 +55,7 @@ export function MemberRegistrationFields({
             </option>
           ))}
         </select>
-      </label>
+      </label>}
       <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
         {type &&
           registrationFieldKeys(type)

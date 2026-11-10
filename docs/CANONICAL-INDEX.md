@@ -108,7 +108,7 @@
 
 | 문서 | 역할 | 상태 |
 |---|---|---|
-| [O4O-UNIFIED-MEMBER-REGISTRATION-V1](baseline/O4O-UNIFIED-MEMBER-REGISTRATION-V1.md) | 2026-11-04 사용자 확정: 신규 5유형 가입·단일 승인·역할별 전체 가입정보 정정·한 줄 목록·서비스 회원 해지/복구. 직원 업무는 경영자, Admin 삭제·사업자 변경 경계 유지. 구현은 연결 TODO/CHECK와 구분 | ACTIVE |
+| [O4O-UNIFIED-MEMBER-REGISTRATION-V1](baseline/O4O-UNIFIED-MEMBER-REGISTRATION-V1.md) | 2026-11-04 사용자 확정: 신규 5유형 가입·단일 승인·역할별 전체 가입정보 정정·한 줄 목록·서비스 회원 해지/복구. 직원 업무는 경영자, Admin 삭제·사업자 변경 경계 유지. 2026-11-10: 가입 신청 2단계(유형 선택 → 유형별 입력)·닉네임만 필수·운영자는 운영 역할 표시. 구현은 연결 TODO/CHECK와 구분 | ACTIVE |
 | [O4O-NETURE-AUTH-AND-SERVICE-MEMBERSHIP-V1](baseline/O4O-NETURE-AUTH-AND-SERVICE-MEMBERSHIP-V1.md) | 메인 이메일 확인 · 공통 로그인과 서비스별 가입/역할 분리 · 모바일/닉네임 · 약국 전용 Store 신청 · 사업자등록증과 면허번호 · 약국 협력사업 개별 조건 · 모든 사용자 서비스 Demo 버튼 · 테스트 데이터 재사용/정리 · 사용자용 전체 로그아웃 제외 · 비밀번호 변경/reset 세션 폐기 · 카카오 추가 · 전체 관리자 용어 (2026-10-08 갱신, 단계별 WO에서 구현 상태 확인) | ACTIVE |
 | [O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1](baseline/O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1.md) | **`*.neture.co.kr` 주소별 사업 의미 SSOT** (2026-10-03) — `kpa` = 약사 대상 분회 · `pharmacy` = 독립 약국 지원 사업자 · `retail`/K-Cosmetics 퇴역 잔여 계약 · `store` = 약국 Store Workspace(serviceKey 없음 · 별도 약국 승인 · Owner/Member 접근 모델) · role prefix(`kpa:*` 등) ≠ 주소 의미. 서비스 목록 · 도메인 기술 정본은 `service-catalog.ts` | ACTIVE |
 | [O4O-STORE-ACCESS-AND-MEMBERSHIP-V1](baseline/O4O-STORE-ACCESS-AND-MEMBERSHIP-V1.md) | **공통 Store Workspace 접근 자격 SSOT** (2026-10-03 · 약국 예외 2026-10-05: 약국 매장은 자가 가입 없이 내 매장(약국) 신청 원장 판정) — Owner(기존 `{prefix}:store_owner` 판정 그대로) / Member(`organization_members.role='staff'`) 두 단계 · 초대는 기존 가입자 조회(메일 0 · 토큰 0) · 'invited' 는 접근 0 · 결정 순서(세션→조직→자격→업종 경계) · 새 테이블 0. 한계: 미가입자 초대 · 사업자 신규 가입 제외 | ACTIVE |
