@@ -196,6 +196,9 @@ it('switches cached detail to editable fields without a second detail request', 
   expect(screen.getByLabelText('이름', { exact: true })).not.toHaveAttribute(
     'readonly',
   );
+  // 이름은 선택 항목 — 닉네임만 필수(2026-11-10). 이름 없는 신청자도 정정할 수 있어야 한다.
+  expect(screen.getByLabelText('이름', { exact: true })).not.toBeRequired();
+  expect(screen.getByLabelText('닉네임', { exact: true })).toBeRequired();
   expect(
     api.get.mock.calls.filter(([p]) => p === base + '/member-a'),
   ).toHaveLength(calls);
