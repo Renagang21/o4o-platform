@@ -95,10 +95,10 @@ export default function MemberWorkPanel({
         </section>
       )}
       {/* 계정 삭제는 목록의 「계정 삭제」(확인 창 → 바로 삭제)에서만 한다(#990). 이 패널은 이용 복구 · 약국 이전 · 폐업만 다룬다. */}
-      {!readOnly && mode === 'delete' && (
+      {!readOnly && (mode === 'delete' || mode === 'terminate' || mode === 'restore') && (
         <MemberLifecycleActions
           adminMode={adminMode}
-          initialAction={!adminMode ? initialLifecycle : null}
+          initialAction={mode === 'terminate' || mode === 'restore' ? mode : !adminMode ? initialLifecycle : null}
           detail={detail}
           actorId={actorId}
           busy={busy}

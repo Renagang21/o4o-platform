@@ -14,7 +14,7 @@ const labels = {
 } as const;
 export type CentralGroupKey = keyof typeof labels;
 const netureAreas: Record<CentralGroupKey, readonly string[]> = {
-  members: ['members','service-members','membership-cleanup','qualifications','applications','pharmacies'],
+  members: ['members','service-members','qualifications','applications','pharmacies'],
   communication: ['actions','inbox','legacy-contact','notifications'],
   products: ['cleanup','category-mapping','products','product-approvals','service-product-approvals','service-approval-management','candidates'],
   stores: ['stores','settlements','orders'],

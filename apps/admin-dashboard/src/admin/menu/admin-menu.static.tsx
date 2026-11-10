@@ -134,6 +134,8 @@ export const adminMenuStatic: MenuItem[] = [
     { id: 'platform-members', label: '전체 회원', icon: <Layers className="w-4 h-4" />, path: '/admin/platform/users' },
     { id: 'platform-suppliers', label: '공급자', icon: <Package className="w-4 h-4" />, path: '/admin/platform/suppliers' },
     { id: 'platform-stores', label: '내 매장', icon: <Layers className="w-4 h-4" />, path: '/admin/platform/stores' },
+    // 서비스 가입·일반 역할 관계 정리(공통 계정 유지)는 전체 관리자 업무다 — 업무 운영 화면에서 옮겼다(2026-11-10).
+    { id: 'platform-membership-cleanup', label: '가입 관계 정리', icon: <Layers className="w-4 h-4" />, path: '/admin/platform/membership-cleanup' },
   ] },
   { id: 'operator-authority', label: '운영자·권한', icon: <Shield className="w-5 h-5" />, children: [
     { id: 'platform-account-overview', label: '계정·운영 권한 개요', icon: <Shield className="w-4 h-4" />, path: '/admin/platform' },

@@ -1,6 +1,8 @@
 import { CENTRAL_OPERATION_MENUS } from '@o4o/types';
+/** 메뉴 key(서버 권한 판정용)는 유지하되 화면은 관리자 사이트에 있는 업무. 업무 운영 화면에는 보이지 않는다. */
+export const ADMIN_SITE_MENU_KEYS: readonly string[] = ['neture.membership-cleanup']; // → /admin/platform/membership-cleanup (2026-11-10)
 export const centralOperationAreas: Record<string, readonly string[]> = {
-  neture: ["membership-cleanup", "service-approval-management", "service-members", "cleanup", "category-mapping", "settlements", "notifications", "ai-report", "community-advertising", "analytics", "stores", "actions", "product-approvals", "candidates", "products", "service-product-approvals", "applications", "legacy-contact", "cms", "orders", "members", "inbox", "pharmacies", "qualifications", "home", "legal", "contact-settings", "guides", "forums", "forum-delete", "forum-deleted", "forum-analytics"],
+  neture: ["service-approval-management", "service-members", "cleanup", "category-mapping", "settlements", "notifications", "ai-report", "community-advertising", "analytics", "stores", "actions", "product-approvals", "candidates", "products", "service-product-approvals", "applications", "legacy-contact", "cms", "orders", "members", "inbox", "pharmacies", "qualifications", "home", "legal", "contact-settings", "guides", "forums", "forum-delete", "forum-deleted", "forum-analytics"],
   supplier: ["members", "inbox", "suppliers", "governance", "home", "legal", "contact-settings"],
   funding: ["members", "inbox", "funding", "home", "legal", "contact-settings"],
   lecture: ["members", "inbox", "courses", "instructors", "certificates", "contact", "home", "contact-settings", "legal"],

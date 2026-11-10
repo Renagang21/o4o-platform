@@ -1,6 +1,7 @@
 import CentralOperationsPage from './pages/operators/CentralOperationsPage';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, AdminProtectedRoute } from '@o4o/auth-context';
+import OperatorsToOperations from './components/OperatorsToOperations';
 import { adminAuthClient as ssoClient } from '@/lib/auth-client';
 import toast from 'react-hot-toast';
 import { useEffect } from 'react';
@@ -142,6 +143,7 @@ function App() {
                 거부 시 AdminProtectedRoute 는 안내 화면을 렌더한다(redirect loop 없음).
             */}
             <Route path="/*" element={
+              <OperatorsToOperations>
               <AdminProtectedRoute
                 requiredRoles={['platform:super_admin']}
                 showContactAdmin={true}
@@ -164,6 +166,7 @@ function App() {
                   </Routes>
                 </AdminLayout>
               </AdminProtectedRoute>
+              </OperatorsToOperations>
             } />
         </Routes>
     </AuthProvider>

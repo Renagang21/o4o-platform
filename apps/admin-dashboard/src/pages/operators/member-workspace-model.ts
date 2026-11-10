@@ -32,7 +32,8 @@ export function memberError(error: unknown) {
   return typeof response === 'string' ? response : '처리하지 못했습니다. 권한과 최신 정보를 다시 확인해 주시기 바랍니다.';
 }
 
-export type MemberWorkMode = 'detail' | 'edit' | 'reject' | 'delete' | 'pharmacy';
+/** terminate · restore: 운영자 「회원 해지」 · 「이용 복구」(2026-11-10 분리). pharmacy 는 예전 링크 호환용으로 detail 과 같다. */
+export type MemberWorkMode = 'detail' | 'edit' | 'reject' | 'delete' | 'pharmacy' | 'terminate' | 'restore';
 /** 처리 후 동작: close 면 패널을 닫고 목록 위에 done 문구를 보인다(가입 승인·반려 · 해지·복구). */
 export interface PerformOptions { close?: boolean; done?: string }
 export type Perform = (work: () => Promise<unknown>, options?: PerformOptions) => Promise<void>;

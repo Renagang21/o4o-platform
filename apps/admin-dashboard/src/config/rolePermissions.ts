@@ -58,6 +58,7 @@ export const menuPermissions: MenuPermission[] = [
   { menuId: 'platform-members', roles: [...PLATFORM_ADMIN_ROLES] },
   { menuId: 'platform-suppliers', roles: [...PLATFORM_ADMIN_ROLES] },
   { menuId: 'platform-stores', roles: [...PLATFORM_ADMIN_ROLES] },
+  { menuId: 'platform-membership-cleanup', roles: [...PLATFORM_ADMIN_ROLES] },
   { menuId: 'platform-erasure-history', roles: [...PLATFORM_ADMIN_ROLES] },
 
   { menuId: 'operations-operators', roles: [...PLATFORM_ADMIN_ROLES] },
