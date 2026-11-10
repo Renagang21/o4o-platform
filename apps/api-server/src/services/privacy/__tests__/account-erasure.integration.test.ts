@@ -170,6 +170,36 @@ integration('account erasure — isolated PostgreSQL schema/real sessions', () =
       expect(a.entityType).toBe('Order');expect(a.changes.contact).toMatch(/^erased:[a-f0-9]{64}$/);expect(a.changes.other).toBe(peer.email);
     }finally{await db.query('DELETE FROM audit_logs WHERE id=$1',[audit.id]);}
   });
+  it('a copy next to a storage file pointer stays under review so the private object is not orphaned (#1023)',async()=>{
+    const target=await user(),[audit]=await db.query(`INSERT INTO audit_logs("entityType","entityId",action,changes) VALUES('Order',$1,'update',jsonb_build_object('proof',$2::text)) RETURNING id`,[randomUUID(),`https://storage.googleapis.com/fixture-private/${target.id}/proof.pdf`]);
+    try{
+      const result=await service().request(target.id);
+      expect(result).toMatchObject({state:'review_required',erased:false});expect(result.reviewCodes).toContain('REVIEW:public.audit_logs');
+      expect((await db.query('SELECT changes FROM audit_logs WHERE id=$1',[audit.id]))[0].changes.proof).toContain(target.id);
+    }finally{await db.query('DELETE FROM audit_logs WHERE id=$1',[audit.id]);}
+  });
+  it('own public and member inquiries keep their rows while name, phone and body are wiped (#1023)',async()=>{
+    const target=await user(),peer=await user();
+    const [inquiry]=await db.query(`INSERT INTO contact_inquiries(service_key,inquiry_type,name,email,phone,subject,message,privacy_consent,status,requester_user_id,requester_subject_type,requester_subject_id,client_request_id,created_at,updated_at)
+      VALUES('neture','general','Synthetic member','other-address@fixture.invalid','010-0000-0000','Synthetic subject','Synthetic body',true,'new',$1,'person',$1,$2,now(),now()) RETURNING id`,[target.id,randomUUID()]);
+    const [request]=await db.query(`INSERT INTO contact_requests(service_key,type,name,email,phone,message,status,privacy_consent,created_at,updated_at)
+      VALUES('neture','general','Synthetic guest',$1,'010-0000-0001','Synthetic guest body','new',true,now(),now()) RETURNING id`,[target.email]);
+    const [peerRequest]=await db.query(`INSERT INTO contact_requests(service_key,type,name,email,message,status,privacy_consent,created_at,updated_at)
+      VALUES('neture','general','Peer guest',$1,$2,'new',true,now(),now()) RETURNING id`,[peer.email,`Ask ${target.email} please`]);
+    try{
+      expect(await service().request(target.id)).toMatchObject({state:'completed',erased:true});
+      const [i]=await db.query('SELECT name,phone,subject,message,requester_user_id,requester_subject_type,requester_subject_id,client_request_id FROM contact_inquiries WHERE id=$1',[inquiry.id]);
+      expect(i).toMatchObject({name:expect.stringMatching(/^erased:/),phone:null,subject:expect.stringMatching(/^erased:/),message:expect.stringMatching(/^erased:/),
+        requester_user_id:null,requester_subject_type:null,requester_subject_id:null,client_request_id:null});
+      const [g]=await db.query('SELECT name,email,phone,message FROM contact_requests WHERE id=$1',[request.id]);
+      expect(g).toMatchObject({name:expect.stringMatching(/^erased:/),email:expect.stringMatching(/^erased:/),phone:null,message:expect.stringMatching(/^erased:/)});
+      const [p]=await db.query('SELECT name,message FROM contact_requests WHERE id=$1',[peerRequest.id]);
+      expect(p.name).toBe('Peer guest');expect(p.message).toMatch(/^Ask erased:[a-f0-9]{64} please$/);
+    }finally{
+      await db.query('DELETE FROM contact_inquiries WHERE id=$1',[inquiry.id]);
+      await db.query('DELETE FROM contact_requests WHERE id=ANY($1::uuid[])',[[request.id,peerRequest.id]]);
+    }
+  });
   it('retained records keep their rows with this member replaced by an irreversible key, and repair copies are removed (2026-11-10)',async()=>{
     const target=await user(),peer=await user();
     const [actorLog]=await db.query(`INSERT INTO action_logs(service_key,user_id,action_key,source,status,meta) VALUES('neture',$1,'member.synthetic_peer_action','test','success',jsonb_build_object('note','kept')) RETURNING id,created_at`,[target.id]);
