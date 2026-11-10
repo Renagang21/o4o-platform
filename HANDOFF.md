@@ -1,6 +1,6 @@
 # HANDOFF
 
-> 저장소: `Renagang21/o4o-platform` · 작업 branch: `claude/intelligent-cray-o2p4u3` · 코드 기준: `main` `9adcadaf97` · 작성: 2026-11-10 (클라우드 작업 세션)
+> 저장소: `Renagang21/o4o-platform` · 작업 branch: `claude/intelligent-cray-o2p4u3` · 코드 기준: `main` `13460cb183`(merge 반영) · 작성: 2026-11-10 (클라우드 작업 세션)
 > 다음 실행자: **통합 세션(PR 생성 · 병합) → LOCAL(배포 · 배포 후 확인)**
 > 이전 인계 전문(통합 진행표 포함): `git show 9adcadaf97:HANDOFF.md`
 
@@ -17,9 +17,14 @@
    - 회원 목록 · 상세 API 에 `erasureState` · `erasureErrorCode` 를 더했다.
    - 목록 배지와 회원 패널에 「삭제 확인 필요」 · 「삭제 재시도 필요」 · 「삭제 중」과 사유를 보인다.
 
+3. `e5fa077de1` fix(admin): 「해지 회원」 탭 숫자를 목록 해지 배지와 같은 기준으로 센다
+   - 사용자 지적(2026-11-10): 목록에 「해지」 2명인데 탭은 0명이었다.
+   - 배지는 계정 정지(`users.isActive=false` · `status='suspended'`, 계정 삭제 요청 포함)를 해지로 보이는데, 탭은 서비스 가입 상태만 셌다.
+   - 이제 탭도 같은 기준으로 센다. 삭제가 끝나지 않은 회원은 해지 탭에 나오고, 배지는 「삭제 확인 필요」로 보인다.
+
 ## PR 로 묶을 단위
 
-- 한 PR: 위 두 commit(주제: 계정 삭제 완료 · 상태 표시). migration · CI · 인증 · 권한 변경은 없다.
+- 한 PR: 위 세 commit(주제: 계정 삭제 완료 · 상태 표시). migration · CI · 인증 · 권한 변경은 없다.
 
 ## 결정 사항 (§9)
 
@@ -45,7 +50,7 @@
     - 「temporary suspension retains employment…」
     - 「employee access termination…」
 - privacy unit 테스트 27/27 통과(5 skip)
-- `central-member-workspace.postgres.spec.ts`: 16/16 통과. 새 테스트는 삭제 상태 표시다.
+- `central-member-workspace.postgres.spec.ts` 등 3개 파일: 34/34 통과. 새 테스트는 삭제 상태 표시와 해지 탭 숫자다(main `13460cb183` 반영 후 재실행).
 - `member-registration.postgres.spec.ts`: 26/26 통과
 - `member-profile-recovery.postgres.spec.ts`: 13/13 통과. fixture 에 `account_erasure_operations` 를 추가했다.
 - route · review 테스트 33/33 통과
