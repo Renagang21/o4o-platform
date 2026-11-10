@@ -61,7 +61,8 @@ export class CentralMemberWorkspaceService {
     const conditions: Record<MemberTask, string> = {
       all: 'true', qualifications: `p.qualification_status='pending'`, pharmacies: pharmacyExists('pending'),
       pending: `(${MEMBER_REGISTRATION_STATE_SQL}='pending' OR u.status='pending' OR (u."isEmailVerified"=false AND u.status IN ('active','approved')))`,
-      inactive: `EXISTS(SELECT 1 FROM service_memberships sm WHERE sm.user_id=u.id AND sm.service_key='neture' AND sm.status IN ('suspended','withdrawn'))`,
+      // 목록 「회원 상태」 배지(resolveNetureMainMembershipStatus)와 같은 기준 — 계정이 멈춘 회원(삭제 요청 포함)도 해지 탭에 센다(2026-11-10).
+      inactive: `(u.status='suspended' OR u."isActive"=false OR EXISTS(SELECT 1 FROM service_memberships sm WHERE sm.user_id=u.id AND sm.service_key='neture' AND sm.status IN ('suspended','withdrawn')))`,
       corrections: `(${MEMBER_REGISTRATION_STATE_SQL}='rejected' OR ${qualificationCorrections} OR ${pharmacyCorrections})`,
     };
     const query = search.trim().slice(0, 100);
