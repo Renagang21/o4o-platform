@@ -1042,7 +1042,10 @@ jobs:
 
   central-operator-integration:
     name: Central operator PostgreSQL integration
-    runs-on: ${{ fromJSON(vars.CI_RUNNER_LINUX == 'self-hosted' && github.event.repository.private == true && github.event.pull_request.head.repo.fork != true && '["self-hosted","Linux","X64","o4o-ci-linux"]' || '"ubuntu-latest"') }}
+    # service container 가 host port 55432 를 고정으로 쓰고, 테스트도 이 포트를 일회용 DB 표식으로 확인한다.
+    # 자체 실행기를 여러 대 둘 때 이 job 은 `o4o-ci-pg` label 을 단 실행기 1대에서만 돌아 같은 PC 에서 겹치지 않는다
+    # (실행기 1대 = 동시 1 job). GitHub 호스팅에서는 job 마다 VM 이 달라 상관없다.
+    runs-on: ${{ fromJSON(vars.CI_RUNNER_LINUX == 'self-hosted' && github.event.repository.private == true && github.event.pull_request.head.repo.fork != true && '["self-hosted","Linux","X64","o4o-ci-linux","o4o-ci-pg"]' || '"ubuntu-latest"') }}
     needs: [detect]
     if: needs.detect.outputs.defer_full != 'true' && needs.detect.outputs.main_verified != 'true' && (needs.detect.outputs.api_affected == 'true' || needs.detect.outputs.global_or_unknown == 'true')
     timeout-minutes: 25
