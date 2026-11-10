@@ -158,6 +158,33 @@ integration('account erasure — isolated PostgreSQL schema/real sessions', () =
     const target=await user(),[audit]=await db.query(`INSERT INTO audit_logs("entityType","entityId",action,changes) VALUES('Order',$1,'update',jsonb_build_object('contact',$2::text)) RETURNING id`,[randomUUID(),target.email]);
     try{const result=await service().request(target.id);expect(result).toMatchObject({state:'review_required',erased:false});expect(result.reviewCodes).toContain('REVIEW:public.audit_logs');expect((await db.query('SELECT changes FROM audit_logs WHERE id=$1',[audit.id]))[0].changes.contact).toBe(target.email);}finally{await db.query('DELETE FROM audit_logs WHERE id=$1',[audit.id]);}
   });
+  it('retained records keep their rows with this member replaced by an irreversible key, and repair copies are removed (2026-11-10)',async()=>{
+    const target=await user(),peer=await user();
+    const [actorLog]=await db.query(`INSERT INTO action_logs(service_key,user_id,action_key,source,status,meta) VALUES('neture',$1,'member.synthetic_peer_action','test','success',jsonb_build_object('note','kept')) RETURNING id,created_at`,[target.id]);
+    const [mentionLog]=await db.query(`INSERT INTO action_logs(service_key,user_id,action_key,source,status,meta) VALUES('neture',$1,'operator.synthetic_note','test','success',jsonb_build_object('contact',$2::text,'other',$3::text)) RETURNING id`,[peer.id,target.email,peer.email]);
+    const [invite]=await db.query(`INSERT INTO operator_invitations(invited_email,service_key,role,token_hash,status,expires_at,accepted_user_id,accepted_at) VALUES($1,'supplier','supplier:operator','synthetic-token-hash','accepted',now()+interval '7 days',$2,now()) RETURNING id`,[target.email,target.id]);
+    const [snapshot]=await db.query(`INSERT INTO canonical_demo_repair_snapshots(migration,snapshot) VALUES('synthetic',jsonb_build_object('user',$1::text)) RETURNING id`,[target.id]);
+    const [contact]=await db.query(`INSERT INTO neture_contact_messages("contactType",name,email,subject,message,status,"privacyConsent","createdAt","updatedAt") VALUES('general','Synthetic sender',$1,'Synthetic subject','Synthetic body','resolved',true,now(),now()) RETURNING id`,[target.email]);
+    const [activity]=await db.query(`INSERT INTO account_activities("userId",email,action,success,details,"createdAt") VALUES($1,$2::text,'synthetic_lookup',true,jsonb_build_object('looked_up',$2::text),now()) RETURNING id`,[peer.id,target.email]);
+    try{
+      expect(await service().request(target.id)).toMatchObject({state:'completed',erased:true});
+      const [a]=await db.query('SELECT user_id,meta,created_at FROM action_logs WHERE id=$1',[actorLog.id]);
+      expect(a.user_id).toBeNull();expect(a.meta.note).toBe('kept');expect(a.meta.actorKey).toMatch(/^[a-f0-9]{64}$/);expect(a.created_at).toEqual(actorLog.created_at);
+      const [b]=await db.query('SELECT user_id,meta FROM action_logs WHERE id=$1',[mentionLog.id]);
+      expect(b.user_id).toBe(peer.id);expect(b.meta.contact).toMatch(/^erased:[a-f0-9]{64}$/);expect(b.meta.other).toBe(peer.email);
+      expect(await db.query('SELECT 1 FROM operator_invitations WHERE id=$1',[invite.id])).toHaveLength(0);
+      expect(await db.query('SELECT 1 FROM canonical_demo_repair_snapshots WHERE id=$1',[snapshot.id])).toHaveLength(0);
+      expect((await db.query('SELECT email,message FROM neture_contact_messages WHERE id=$1',[contact.id]))[0]).toMatchObject({email:expect.stringMatching(/^erased:/),message:'Synthetic body'});
+      const [act]=await db.query('SELECT "userId",email,details FROM account_activities WHERE id=$1',[activity.id]);
+      expect(act.userId).toBe(peer.id);expect(act.email).toMatch(/^erased:/);expect(JSON.stringify(act.details)).not.toContain(target.email);
+    }finally{
+      await db.query('DELETE FROM action_logs WHERE id=ANY($1::uuid[])',[[actorLog.id,mentionLog.id]]);
+      await db.query('DELETE FROM operator_invitations WHERE id=$1',[invite.id]);
+      await db.query('DELETE FROM canonical_demo_repair_snapshots WHERE id=$1',[snapshot.id]);
+      await db.query('DELETE FROM neture_contact_messages WHERE id=$1',[contact.id]);
+      await db.query('DELETE FROM account_activities WHERE id=$1',[activity.id]);
+    }
+  });
   it('invalid security-log retention anchors block completion without changing source records',async()=>{
     const target=await user(),[login]=await db.query(`INSERT INTO login_attempts(email,"createdAt") VALUES($1,now()+interval '2 days') RETURNING id`,[target.email]);
     try{const result=await service().request(target.id);expect(result).toMatchObject({state:'review_required',erased:false});expect(result.reviewCodes).toContain('SYSTEM_LOG_RETENTION_ANCHOR_REVIEW_REQUIRED');expect((await db.query('SELECT email FROM login_attempts WHERE id=$1',[login.id]))[0].email).toBe(target.email);}finally{await db.query('DELETE FROM login_attempts WHERE id=$1',[login.id]);}
