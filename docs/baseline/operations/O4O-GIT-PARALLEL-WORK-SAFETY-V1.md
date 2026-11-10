@@ -8,6 +8,7 @@
 > stage · commit · push 안전 계약을 다룬다.
 > **2026-10-16 개정**: 개발 담당은 로컬 검증 · commit · push 후 인계하며, PR 생성부터는 통합 담당이 맡는다. PC 이동에도 PR 생성을 선행 조건으로 요구하지 않는다.
 > **2026-11-07 개정**: 위 2026-10-16 개정의 PR 책임은 대체됐다 — 작업 세션은 push 후 PR 생성까지 하고(검증 전 드래프트 → 검증 후 Ready), 병합 · 배포는 통합 담당만 한다. 역할 정의와 절차는 [`AGENTS.md` §4 · §4-1(e)](../../../AGENTS.md#4-git--병렬-작업-안전)가 정본이다.
+> **2026-11-10 개정**: 위 2026-11-07 개정의 PR 책임은 다시 대체됐다 — 작업 세션은 commit · push · 인계 기록까지, PR 생성은 통합 세션이 묶음 단위로 한다. 정본은 [`AGENTS.md` §4-1(e)](../../../AGENTS.md#4-1-parallel-session--worktree-policy).
 
 ---
 
@@ -63,7 +64,7 @@ lockfile 이 어긋난 채 push 되면 실패한다. 즉 lockfile 동기화 요�
 
 **완료 조건**은 저장소 전체 clean 이 아니라
 `이번 WO 범위의 미커밋 변경 0건` + `작업 branch push + 저장소 · branch · commit SHA · 변경 요약 · 검증 결과 · 미해결 사항 인계`이다.
-작업 세션은 push 후 PR 을 만들고(기존 PR 이 있으면 재사용), 수정 요청에도 같은 branch에 추가 push 한다. PR CI 실패·미해결 사항은 PR 설명에 명시한다. PR merge · auto-merge 설정 · 배포 dispatch · 운영 DB · IAM/WIF 변경은 작업 세션이 수행하지 않는다. 기술 gate 확인 · 순차 병합 · 배포 결과 검증은 통합 담당(또는 그 PR 의 통합 세션)이 수행한다([`AGENTS.md` §4-1(e)](../../../AGENTS.md#4-1-parallel-session--worktree-policy)). 기존 GitHub Actions 자동 배포는 유지한다. `main` 포함은 merge 후의 확인 항목이다([`AGENTS.md` §4-2](../../../AGENTS.md)).
+작업 세션 · 통합 세션의 push · PR · 병합 범위는 [`AGENTS.md` §4-1(e)](../../../AGENTS.md#4-1-parallel-session--worktree-policy) 가 정본이다. 기존 GitHub Actions 자동 배포는 유지한다. `main` 포함은 merge 후의 확인 항목이다([`AGENTS.md` §4-2](../../../AGENTS.md)).
 
 ---
 
