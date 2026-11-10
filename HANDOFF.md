@@ -1,77 +1,86 @@
 # HANDOFF
 
-> 저장소: `Renagang21/o4o-platform` · 작업 branch: `claude/elegant-albattani-5x2elv` · 코드 기준: `main` `03f1381036` · 작성: 2026-11-07 14:34Z (클라우드 통합 세션)
-> 다음 실행자: **LOCAL(통합 담당)** — [`WO-O4O-INTEGRATION-LOCAL-HANDOFF-V1`](docs/work-orders/WO-O4O-INTEGRATION-LOCAL-HANDOFF-V1.md)
-> 이전 인계 전문: `git show 03f1381036:HANDOFF.md`
+> 저장소: `Renagang21/o4o-platform` · 작업 branch: `claude/intelligent-cray-o2p4u3` · 코드 기준: `main` `13460cb183`(merge 반영) · 작성: 2026-11-10 (클라우드 작업 세션)
+> 다음 실행자: **통합 세션(PR 생성 · 병합) → LOCAL(배포 · 배포 후 확인)**
+> 이전 인계 전문(통합 진행표 포함): `git show 9adcadaf97:HANDOFF.md`
 
-## 운영 원칙 (통합 담당 지시 2026-11-07)
+## 한 일 — 계정 삭제가 끝나도록 (2026-11-10 사용자 지시)
 
-클라우드 통합 세션이 못 하는 일(원격 branch 삭제 · 운영 배포 · migration Promote · 운영 DB 조회)은 **정리해서 LOCAL 에 넘긴다.** 형식은 `docs/work-orders/` 의 WO(실행 순서 · read-only SQL · 판정 기준 포함) + 이 파일의 "다음 실행자" 칸이다. 이번 인계가 첫 사례다.
+이전 PR Renagang21/o4o-platform#1014 는 병합됐다(2026-11-10 06:16Z 조회). 같은 branch 이름을 최신 `origin/main` 에서 다시 시작했다. 이 branch 의 PR 은 **미생성**이다(PR 은 통합 세션이 만든다 — AGENTS.md §4-1(e)).
 
-## 완료된 것 (2026-11-07 클라우드 통합 세션)
+1. `4146d52f48` fix(privacy): 보존 기록 사본 때문에 「삭제 미완료 — 확인 필요」에서 멈추지 않게 한다
+   - 새 `apps/api-server/src/services/privacy/account-retained-records.ts`.
+   - 행은 남기고 이 회원 식별값만 `erased:<hash>` 로 바꾸는 표: `action_logs` · `account_activities` · `neture_contact_messages` · `neture_suppliers`.
+   - 사본을 지우는 표: `canonical_demo_repair_snapshots` · `operator_invitations`.
+   - `account-erasure.service.ts`: 삭제 전 검토는 위 표를 건너뛴다. 단, 공급자 소유 연결 `neture_suppliers.user_id` 는 계속 검토한다. finish 는 정리 후 모든 표를 다시 검토하며, 덜 정리됐으면 전체를 되돌린다.
+2. `d1af718950` fix(admin): 삭제가 끝나지 않은 회원을 「해지」가 아니라 「삭제 확인 필요」로 보인다
+   - 회원 목록 · 상세 API 에 `erasureState` · `erasureErrorCode` 를 더했다.
+   - 목록 배지와 회원 패널에 「삭제 확인 필요」 · 「삭제 재시도 필요」 · 「삭제 중」과 사유를 보인다.
 
-- 병합: #972 · #974(#972 에서 빠진 IR §8) · #978 · #977 · #979 · #983 · #982 · #973(문서 · 에이전트 설정 빠른 경로) · #984(branch 처분 조사 — 삭제 스크립트에 SHA lease 를 이 세션이 보완 `7e48c6d5`).
-- post-merge CI: #972 · #974 · #977 · #978 · #979 success. #982 의 main run 은 직후 #973 push 에 밀려 cancelled(실패 아님). #983 · #973 · #984 는 마지막 확인 때 진행 중이었다.
+3. `e5fa077de1` fix(admin): 「해지 회원」 탭 숫자를 목록 해지 배지와 같은 기준으로 센다
+   - 사용자 지적(2026-11-10): 목록에 「해지」 2명인데 탭은 0명이었다.
+   - 배지는 계정 정지(`users.isActive=false` · `status='suspended'`, 계정 삭제 요청 포함)를 해지로 보이는데, 탭은 서비스 가입 상태만 셌다.
+   - 이제 탭도 같은 기준으로 센다. 삭제가 끝나지 않은 회원은 해지 탭에 나오고, 배지는 「삭제 확인 필요」로 보인다.
 
-## 진행 중 · 대기 (2026-11-07 14:33Z 조회)
+4. `8353d0e3e8` fix(privacy): 중앙 운영 메뉴 권한 감사 기록은 삭제 전 검토에서 건너뛰지 않는다
+   - #1022 CI(run 42775488648) `service-operator-invitation.integration.test.ts` 「keeps unknown audit payload …」 2건 실패를 고쳤다.
+   - 원인: 삭제 전 검토가 `action_logs` 를 통째로 건너뛰었다. 그래서 형식이 다른 메뉴 권한 감사 기록이 검토 없이 일반 치환으로 넘어갔다.
+   - 수정: `operator.central_menu_grants_changed` · `admin.service_operator_assigned` 행은 전용 경로(`central-menu-audit-evidence`)의 판정대로 계속 검토한다.
 
-| PR | branch(원격) | 상태 | 다음 |
-|---|---|---|---|
-| ~~#968 커뮤니티 뉴스 자동 게시~~ | — | **MERGED(2026-11-08 08:47Z · `28938d50c1`)** · Promote 같은 날 09:05Z success | 남은 것: 아래 3 · 4 |
-| ~~#975 · #976 · #980 · #981~~ | 원격 branch 삭제됨 | **MERGED(2026-11-08)** | 후속은 아래 「다음에 할 일」 8~14 |
-| ~~#986 admin.neture.co.kr 운영자 메뉴 정리~~ | — | **MERGED(2026-11-08 00:42Z · `ff85ddfcee`)** | 남은 것: **사용자가 실제 화면 확인**(아래 6 · 「#986 배포 후 화면 확인」) |
+## PR 로 묶을 단위
 
-## 다음에 할 일 (우선순위 순)
+- 한 PR: 위 네 commit(주제: 계정 삭제 완료 · 상태 표시). migration · CI · 인증 · 권한 변경은 없다.
+- **#1022 반영 필요:** #1022 의 head 는 통합 세션이 만든 `claude/jolly-carson-4smjue` 이고, 위 1 · 2 와 인계 기록만 cherry-pick 돼 있다.
+  3(`e5fa077de1`)과 4(`8353d0e3e8`)를 더 가져가야 한다. #1022 설명의 「탭 숫자는 바꾸지 않았다」도 3 기준으로 고쳐야 한다.
 
-1. ~~**[LOCAL]** WO §5-A — 원격 branch 정리~~ **완료(2026-11-08)** — 선택 포함 89개 삭제 · 실패 0. 결과는 WO §6.
-2. ~~**[CLOUD]** #975 부터 CI PR 순차 통합~~ **완료(2026-11-08)** — #975 → #976 → #980 → #981 순서로 병합. 함께 병합: #995(Delivery 취소 run 기록) · #1000(#976 에서 분리한 기준 문서).
-3. ~~**[CLOUD]** #968 수정 → 병합~~ **완료(2026-11-08)**.
-4. **[통합 담당 승인 → LOCAL]** WO §5-B — Promote · SQL 1) · 2) · 3) **완료(2026-11-10)** — 테이블 존재 · fence 정상 · 뉴스 테이블 분류(통합 담당 승인, 전체 조회 320 · 검증 PASS) · 기사 291건. 결과는 WO §6.
-5. KEEP 2 branch 재판정(IR §7) — 별도 WO.
-6. **[통합 담당 → 사용자]** #986 병합 · 배포 후 아래 「#986 배포 후 화면 확인」을 사용자가 운영 화면에서 확인한다. 문제가 나오면 새 branch 로 수정 PR 을 연다(병합된 #986 branch 는 재사용하지 않는다).
-7. **[LOCAL · 2026-11-13 이후]** 계정 이용약관 · 개인정보 처리방침 · 서비스별 안내 v2 게시(공고 2026-10-12 → 시행 2026-11-13) — [`WO-O4O-ACCOUNT-POLICY-V2-PUBLICATION-V1`](docs/work-orders/WO-O4O-ACCOUNT-POLICY-V2-PUBLICATION-V1.md). §5-1 read-only 조회 · §5-2 본문 준비는 13일 전에 해도 된다. 게시(§5-3)는 통합 담당 승인 후. (2026-11-08 클라우드 세션 · branch `claude/intelligent-cray-o2p4u3`)
+## 결정 사항 (§9)
 
-**GitHub CI · 배포 정비 후속 (2026-11-09 · 클라우드 세션 `claude/nifty-sagan-csagf1` 종료 인계)** — 근거: [`IR-O4O-PRIVATE-CI-BUDGET-V1`](docs/investigations/IR-O4O-PRIVATE-CI-BUDGET-V1.md) · [`CHECK-O4O-DELIVERY-CANCELLED-RUN-REPORT-V1`](docs/checks/CHECK-O4O-DELIVERY-CANCELLED-RUN-REPORT-V1.md) · 각 PR 설명
+- **공급자(`neture_suppliers`)는 지우지 않는다** — 사용자 결정 「거래기록은 유지」.
+  - 본인 소유 공급자는 기존 detach 경로가 처리한다(개인 필드 비움 · INACTIVE).
+  - 다른 공급자 행에 들어 있는 이 회원 이메일 등은 치환한다.
+  - 소유 연결(`user_id`)은 바꾸지 않는다. 소유 · 처분 문제이므로 기존처럼 검토 대기로 둔다(기존 테스트 「legacy supplier pointer」 유지).
+- **보존 기록은 삭제가 아니라 비가역 치환으로 처리한다.** 근거는 개인정보 보존 정책 §6 · §13(처리 · 접속 기록 1년)과 §3(문의).
+  - 키는 기존 system log 최소화와 같은 `hash(userId)` 다.
+  - 이 회원이 처리한 `action_logs` 는 `user_id` 를 비우고 `meta.actorKey` 를 남긴다. 같은 사람의 처리였다는 것만 알 수 있고, 누구인지는 알 수 없다.
+- **운영자 초대(`operator_invitations`)는 삭제한다.** 근거는 두 가지다.
+  - 정책 §2.1 상 이메일 · 토큰은 파기 대상이다.
+  - 「수락됨」 행은 DB 제약상 수락자를 비울 수 없다.
+  - 지정 · 해제 이력은 `action_logs` 에 치환된 채 남는다.
+- **데모 복구 스냅숏은 보존 근거가 없는 사본이므로 삭제한다.**
+- **「해지 회원」 탭은 목록 배지와 같은 기준으로 센다**(3번 · 사용자 지적으로 처음 결정을 바꿨다). 계정이 멈춘 회원도 센다.
+  삭제가 끝나지 않은 회원은 그 안에서 「삭제 확인 필요」 배지로 구분한다.
 
-8. **[사용자 · 통합 담당]** 저장소 변수 확인 — 클라우드 세션은 Actions 변수를 조회할 수 없다(proxy 403).
-   - `CI_COST_PROFILE=budget`(드래프트 PR 경량 검사, #975): 설정 여부 확인. 시험 절차는 #975 PR 설명.
-   - `CI_MAIN_REUSE=true`(main 검증 재사용, #981): 켤지 결정. 켜기 전에는 매일 04:37 KST main 전체 검사만 추가된다. 켠 뒤 첫 main 병합에서 Detect 의 판정 요약(verified · 근거 run) · 무거운 job skip · `CI Gate` success · Delivery 동작을 확인한다.
-9. **[LOCAL · 통합 담당]** #980(Promote 같은 SHA guard) 병합 후 **첫 실제 Promote** 에서 확인 — **① 확인(2026-11-10)**: 첫 Promote `6120c5fb9d`(2026-11-09 08:10Z, api · admin)의 guard 로그 `skip=false — 같은 SHA 의 이전 Promote 없음` · 마지막 commit status `production` success DEPLOYED. ②~④ 는 Promote 를 다시 실행해야 확인되므로 다음 실제 Promote 때 본다. ① `Same-SHA guard` 로그 ② 같은 SHA 를 다시 실행하면 건너뛰는지(앞 run 이 모든 서비스를 target 에 올린 경우만) ③ `force='true'` 면 실행되는지 ④ `services` 입력 시 run 이름에 `services=` 가 남는지. 완료 판정은 그 run 이 남긴 마지막 commit status `production`(DEPLOYED · NO_DEPLOY success)이다.
-10. **[CLOUD · 사용자 결정 필요]** PC installer Windows 시험 일시 실패 안정화 PR 여부 — `tools/o4o-local-agent/test/release-install.test.mjs`. 2026-11-08 관측: `FIXTURE_WORKER_NOT_UNIQUE`(122행 · #987 · #995, 2회), `installed runtime must serve health`(#980 `988ef329a8`, 1회). 모두 재실행에서 통과. 추정 원인(로그 미확인): worker 프로세스 수를 한 번만 센다 → 정확히 1개가 될 때까지 짧게 재조회하는 시험 코드 수정안. 제품 코드 변경 없음.
-11. **[CLOUD · 사용자 결정 필요]** 배포 workflow 정비 후보 ① — Delivery 가 부르는 reusable deploy 호출마다 `detect-changes` · `CI gate` · `summary` 가 별도 job 으로 돈다(2026-10-24~11-07 Web 호출 131회 · API 34 · Admin 26). classify 가 이미 같은 확인을 하므로 두 판정 job 을 합치는 안. deploy workflow 구조 변경이라 착수 전 승인 필요(판정 · 게이트 job 변경은 `deploy-workflow-diff` 상 control = 배포 무영향).
-12. **[CLOUD]** 배포 workflow 정비 후보 ② — `deploy-web-services.yml` 상단 `on:` 주석과 `scripts/ci/deploy-orchestrate.mjs` 머리 주석이 은퇴한 `deploy-auto.yml` 을 현행 자동 진입점으로 설명한다. 주석만 정리(CHECK-O4O-DELIVERY-CANCELLED-RUN-REPORT-V1 「문서 정합」).
-13. **[CLOUD · 2026-11-22 이후]** CI 절감 실측 — #973 · #975 · #976 · #980 병합 후 2주 Actions 사용량(`scripts/ci/actions-cost.mjs`)을 IR 추정(#976 최대 약 3,600분/월 등)과 비교해 IR 에 기록. #981 은 `CI_MAIN_REUSE` 를 켠 날부터 2주.
-14. ~~별도 WO 제안: `scripts/check-forbidden-tables.mjs` 원인 정리~~ **완료** — #1006(오탐 정리 · CI 연결) · #1007(문서 정합).
+## 검증 결과 (격리 PostgreSQL — 일회용 클러스터, 운영 DB 아님)
 
-**2026-11-10 LOCAL read-only 확인 후속** (branch `wo/local-readonly-results-20261110` · PR #1011)
+4번 commit 후 재실행:
+- `service-operator-invitation.integration.test.ts`: 54/54 통과. 같은 파일에서 수정 전에는 2건이 실패했다(CI 와 같은 실패를 재현).
+- `account-erasure.integration.test.ts`: 79/81. 실패 2건은 이전부터 있던 employee 테스트다.
+- member postgres spec 3개 55/55 · privacy unit 27/27 · api-server `tsc --noEmit` 통과
 
-15. **[통합 담당 판단]** 계정 삭제 `review_required` 3건(`d2776c26` · `ac8f10cf` · `3bbf0b9d`). 삭제 지연 원인 E 는 #1010 으로 해소됐다(배포 후 16~73초). `3bbf0b9d` 에 `account_activities` 검토 코드가 남아 있어 다른 회원 행에 든 사본으로 추정한다(미확인). 근거: [`WO-O4O-ADMIN-ACCOUNT-ERASURE-HANG-DIAGNOSIS-V1`](docs/work-orders/WO-O4O-ADMIN-ACCOUNT-ERASURE-HANG-DIAGNOSIS-V1.md) §5.
-16. **[통합 담당]** 일부 서비스 데이터 삭제 — 운영 건수 확인 완료. 세 서비스 모두 해지 상태 0 이라 구현은 급하지 않다. 공급자 구현 WO 승인 시점은 통합 담당이 정한다. 근거: [`WO-O4O-PARTIAL-SERVICE-ADMIN-DATA-DELETION-SCOPE-V1`](docs/work-orders/WO-O4O-PARTIAL-SERVICE-ADMIN-DATA-DELETION-SCOPE-V1.md) §7-1.
+- `account-erasure.integration.test.ts`: 79/81 통과.
+  - 새 테스트 「retained records …」가 통과했다.
+  - 실패 2건은 이 작업 전부터 있던 employee 테스트 2건이다.
+    - 「temporary suspension retains employment…」
+    - 「employee access termination…」
+- privacy unit 테스트 27/27 통과(5 skip)
+- `central-member-workspace.postgres.spec.ts` 등 3개 파일: 34/34 통과. 새 테스트는 삭제 상태 표시와 해지 탭 숫자다(main `13460cb183` 반영 후 재실행).
+- `member-registration.postgres.spec.ts`: 26/26 통과
+- `member-profile-recovery.postgres.spec.ts`: 13/13 통과. fixture 에 `account_erasure_operations` 를 추가했다.
+- route · review 테스트 33/33 통과
+- admin-dashboard `src/pages/operators`: 148/148 통과. 새 테스트는 `member-workspace-erasure.test.ts` 다.
+- `tsc --noEmit`(api-server · admin-dashboard) 통과 · `check-unsafe-routes` 0건 · `check-forbidden-tables` 통과
 
-## #986 배포 후 화면 확인 (사용자 · 2026-11-08 결정)
+## 확인하지 못한 것 (배포 후)
 
-병합 전에는 합성 API 응답으로 PC(1440px) · iPhone 13 화면만 점검했다(PR 설명 「검증 결과」). 실제 계정 · 실제 데이터 확인은 **배포가 끝난 뒤 사용자가** admin.neture.co.kr 에서 한다. 운영 데이터를 바꾸는 동작(해지 · 삭제 · 저장)은 테스트용 데이터에서만 하고, 실제 회원 데이터로 삭제를 실행하지 않는다(AGENTS.md §5 테스트 데이터 경계).
+- **운영에서 실제로 삭제가 끝나는지.** 지난번 검토 대기로 남은 회원에 대해 Admin 「계정 삭제」를 다시 눌러, 같은 작업이 이어서 완료되는지 확인한다.
+  - 운영 데이터에서 위 6개 표 밖의 사본이 나오면 계속 검토 대기로 남는다. 그때는 「삭제 처리 내역」의 `review_codes` 를 알려 주면 된다.
+- 회원 목록 배지 · 패널 문구의 PC · 모바일 화면.
+- 소요 시간: 정리 후 검토가 한 번 더 돌아 수 초 늘 수 있다.
 
-- [ ] admin 사이드바 맨 위 「최종 삭제 처리」 그룹: 회원 계정 삭제 · 포럼 삭제·복구 · 커뮤니티 게시판 · 강좌 삭제 · 삭제 처리 내역 — 각각 진입 · 직접 URL 진입 · 현재 그룹 자동 펼침
-- [ ] 회원 계정 삭제: '해지 회원' 탭이 먼저 열리고 안내 문구가 보이는지
-- [ ] 회원 목록에서 행 선택 → 오른쪽 사이드 패널 열림 · 「다음 회원 검토」 · Esc / × 닫기 · 패널을 연 채 다른 행 선택 (PC · 모바일)
-- [ ] 강좌 삭제 · 커뮤니티 게시판 화면에 보관 처리된 대상만 나오는지
-- [ ] `/operations` 업무 운영 사이드바: 새 그룹(업무함·문의·알림 · 서비스 운영 · 콘텐츠·홈 · 최종 삭제(관리자)) 과 바뀐 메뉴 이름. 위임 운영자 계정(neture:operator 등)에서도 확인
-- [ ] 포럼 삭제 요청 화면의 「포럼 사용 중지·재개」 탭
+## 겹칠 수 있는 열린 PR
 
-## 주의 · 결정
+- 조회하지 못했다. 통합 세션이 PR 생성 시 확인한다(`pr-overlap` Action #1015 도 댓글로 알린다).
 
-- 클라우드 세션은 원격 branch 삭제 명령을 실행할 수 없다(settings deny + `guard-git-push` 훅). 로컬 시험용 bare 저장소에서도 같은 문자열이 막힌다 — #984 lease 삭제는 실행 시험을 하지 못했다. 미리보기부터 확인한다.
-- 스크립트 파일은 저장소 밖(`$env:TEMP`)에 저장한다(untracked 파일 방지).
-- 다른 PC 의 worktree 는 이 PC 에서 정리하지 않는다. main 반영은 PR merge 하나뿐이다. 저장소 Public — 실명 · 자격증명 기록 금지.
+## 문서 정합
 
-## PR #339 작업공간 — 소유 세션 확인 후 정리 (유지)
-
-PR #339 의 main 통합 · 운영 배포는 완료됐지만 작업 PC 와 소유 세션이 확인되지 않았다. 원래 소유 세션이 [AGENTS.md §4-1(i)](AGENTS.md#4-1-parallel-session--worktree-policy) 조건을 확인한 경우에만 자기 worktree · branch 를 정리한다. 불명확하면 보존한다. 2026-11-06 조회: PR #339 MERGED · 원격 branch 없음 · 포맷한 PC 에는 해당 worktree 없음. 실제 정리 확인 전까지 이 안내를 유지한다.
-
-## 집 PC 환경 (2026-11-07, 유지)
-
-- 완료: git · gh · Node 22.23.4 · pnpm 10.25.0 · gcloud(ADC) · Cloud SQL Proxy v2.14.3 · `psql`(PostgreSQL 15.19, 서버 서비스는 수동 시작). worktree 위치 `o4o-wt`.
-- 운영 DB read-only 접속 확인됨: 프록시 경유 `o4o_readonly` · `default_transaction_read_only = on`. 비밀번호는 `gcloud secrets versions access latest --secret=o4o-db-readonly-password` 로 `PGPASSWORD` 에 넣고 조회 후 지운다.
-- 미완료: `docs/local/TEST-ACCOUNTS.local.md`(사용자 원본 필요). 로컬 PG `listen_addresses` 는 로컬 DB 로 쓸 때 `localhost` 로 좁힌다.
-- 세부: [`WO-O4O-HOME-PC-DEV-ENV-REBUILD-V1`](docs/work-orders/WO-O4O-HOME-PC-DEV-ENV-REBUILD-V1.md) 5-6. D 드라이브는 작업에 쓰지 않는다.
+해당 없음.

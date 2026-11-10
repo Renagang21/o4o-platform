@@ -148,8 +148,13 @@ describe('Google-only 인증 정리 — 되살아나면 먼저 깨진다', () =>
         path.join('services','kpa-branch','branch-lifecycle.service.ts'),
         path.join('services','kpa-branch','branch-operator-designation.service.ts'),
         path.join('services','privacy','account-erasure.service.ts'),
+        // 계정 삭제 때 이 회원의 초대 사본(이메일 · 토큰)을 지우는 표로만 등록한다 — 초대 runtime 이 아니다.
+        path.join('services','privacy','account-retained-records.ts'),
         path.join('services','privacy','central-menu-grant-ownership.ts'),
       ].sort());
+      const retained=codeOnly(read(path.join(SRC,'services','privacy','account-retained-records.ts')));
+      expect(retained.match(/operator_invitations/g)).toEqual(['operator_invitations']);
+      expect(retained).toContain("operator_invitations: 'delete'");
       expect(fs.existsSync(path.join(SRC,'services','admin','operator-invitation.service.ts'))).toBe(false);
     });
 
