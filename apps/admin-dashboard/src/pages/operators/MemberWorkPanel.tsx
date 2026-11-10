@@ -4,7 +4,8 @@ import { authClient } from '@o4o/auth-client';
 import { MEMBER_STATUS_LABELS } from '@o4o/types';
 import MemberProfileForm from './MemberProfileForm';
 import MemberLifecycleActions from './MemberLifecycleActions';
-import type { MemberDetail, MemberWorkMode, Perform } from './member-workspace-model';
+import { erasureStatus, type MemberDetail, type MemberWorkMode, type Perform } from './member-workspace-model';
+import { deletionMessage } from '@/pages/platform/account-governance/AccountErasureControls';
 const REGISTRATION_STATE_LABELS: Record<string, string> = { pending: '승인 대기', rejected: '반려됨 — 보완 후 다시 처리 가능' };
 export default function MemberWorkPanel({
   detail,
@@ -115,8 +116,14 @@ export default function MemberWorkPanel({
       )}
       <p className="text-sm">
         회원 상태:{' '}
-        {MEMBER_STATUS_LABELS[member.serviceStatus ?? ''] ?? '확인 필요'}
+        {erasureStatus(member.erasureState)?.label ?? MEMBER_STATUS_LABELS[member.serviceStatus ?? ''] ?? '확인 필요'}
       </p>
+      {(member.erasureState === 'review_required' || member.erasureState === 'retry_required') && (
+        <p role="status" className="rounded border border-red-200 bg-red-50 p-2 text-sm text-red-800">
+          계정 삭제가 끝나지 않았습니다. {deletionMessage(member.erasureErrorCode ?? undefined)}
+          {member.erasureErrorCode ? ` (${member.erasureErrorCode})` : ''} Admin 「계정 삭제」를 다시 누르면 이어서 진행합니다.
+        </p>
+      )}
       {!editing ? <MemberReviewInformation detail={detail} busy={busy} onBusyChange={onBusyChange} onAccessLost={onAccessLost} /> : <MemberProfileForm
         detail={detail}
         editing={editing}
