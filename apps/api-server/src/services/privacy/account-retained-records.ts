@@ -36,10 +36,25 @@ export function isRetainedRecordTable(schema: string, table: string): boolean {
   return schema === 'public' && Object.prototype.hasOwnProperty.call(RETAINED_RECORD_TABLES, table);
 }
 
-/** 삭제 전 검토에서 보존 기록 표를 볼 때 남길 조건: 사업 소유 연결 열이 이 회원을 가리키는 행만. 없으면 null(건너뜀). */
+/**
+ * 보존 기록 표 안에서도 치환으로 넘기지 않고 계속 검토하는 행.
+ * 중앙 운영 메뉴 권한 감사 기록은 정해진 형식만 전용 경로(central-menu-audit-evidence)가 정리하고,
+ * 형식이 다른 기록은 검토로 남긴다 — 일반 치환이 그 판정을 건너뛰지 않게 한다.
+ */
+const RETAINED_RECORD_REVIEWED_ROWS: Readonly<Record<string, { columns: readonly string[]; sql: string }>> = {
+  action_logs: { columns: ['action_key'], sql: "r.action_key IN ('operator.central_menu_grants_changed','admin.service_operator_assigned')" },
+};
+
+/**
+ * 삭제 전 검토에서 보존 기록 표를 볼 때 남길 조건: 사업 소유 연결 열이 이 회원을 가리키는 행과,
+ * 전용 경로가 판정하는 행만. 둘 다 없으면 null(건너뜀).
+ */
 export function retainedLinkPredicate(table: string, columns: readonly string[]): string | null {
-  const links = (RETAINED_RECORD_LINKS[table] ?? []).filter(column => columns.includes(column));
-  return links.length ? links.map(column => `r.${quote(column)}::text=$1`).join(' OR ') : null;
+  const links = (RETAINED_RECORD_LINKS[table] ?? []).filter(column => columns.includes(column))
+    .map(column => `r.${quote(column)}::text=$1`);
+  const reviewed = RETAINED_RECORD_REVIEWED_ROWS[table];
+  if (reviewed && reviewed.columns.every(column => columns.includes(column))) links.push(`(${reviewed.sql})`);
+  return links.length ? links.join(' OR ') : null;
 }
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
