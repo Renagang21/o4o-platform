@@ -1,7 +1,7 @@
 # Admin 「계정 삭제」 무응답 원인 확인
 
 > **상태**: ACTIVE
-> **작성일**: 2026-11-09 · **최종 갱신**: 2026-11-09
+> **작성일**: 2026-11-09 · **최종 갱신**: 2026-11-10 (LOCAL Q1~Q3 · 원인 E · #1010 배포 후 확인)
 > **실행 위치**: LOCAL
 > **인계**: claude/intelligent-cray-o2p4u3 · push 전 · 다음 실행자 LOCAL (VS Code 로컬 세션)
 > **근거**: 사용자 보고(2026-11-09) — `admin.neture.co.kr/admin/platform/users` 「해지 회원」 탭에서 회원 1명을 선택하고 「계정 삭제」를 확인했더니 버튼이 모두 회색으로 바뀐 채 변화가 없음
@@ -41,7 +41,7 @@
 
 ## 4. TODO
 
-- [ ] [LOCAL] `/db-readonly` 로 아래 SQL 을 실행하고, 결과의 상태·코드·시각·건수만 §5 에 적는다(회원 식별값은 적지 않는다)
+- [x] [LOCAL] `/db-readonly` 로 아래 SQL 을 실행하고, 결과의 상태·코드·시각·건수만 §5 에 적는다(회원 식별값은 적지 않는다)
 
 ```sql
 -- Q1. 최근 3일 삭제 작업 상태 (회원 식별값 제외)
@@ -85,15 +85,36 @@ ORDER BY xact_age DESC NULLS LAST;
 
 ## 5. 실행 기록
 
-(LOCAL 세션이 채운다)
+**원인 판정: E(삭제 전 검토 단계의 테이블 검색).** 2026-11-09 운영 read-only 측정으로 확정됐고, 수정은 PR #1010(`fd9921ef7f`)이다.
+- 상품 표 24개(2,846MB)를 사본 검사에서 제외했다.
+- 본인 로그인 활동(`account_activities`)을 개인 소유 표로 분류했다.
+
+API 배포는 2026-11-09 Delivery success · commit status `production` DEPLOYED 이다.
+아래는 그 이후 2026-11-10 LOCAL 확인(`o4o_readonly` · `default_transaction_read_only = on`)이다. 작업 ID 는 앞 8자리만 적고, 회원 식별값은 적지 않았다.
 
 | 단계 | 일시 | 결과 |
 |---|---|---|
-| Q1 | | |
-| Q2 | | |
-| Q3 | | |
-| 로그 | | |
-| 배포 후 재시도(테스트 계정) | | |
+| Q1 | 2026-11-10 | 최근 3일 작업 5건. 아래 두 그룹으로 나뉜다. |
+| Q2 | 2026-11-10 | 파일 작업 0건 → B(GCS) 아님 |
+| Q3 | 2026-11-10 | advisory lock 보유 · 대기 세션 0 · 30초 넘은 transaction 0 → A 아님. 지금 멈춘 작업 없음 |
+| 로그 | — | 미실행. 원인이 #1010 측정으로 확정돼 생략했다 |
+| 배포 후 재시도(테스트 계정) | 2026-11-09 15:13Z | `bf924c2b`(테스트 계정) 재시도 → `completed`. 화면 진행 표시 확인은 사용자 몫으로 남는다 |
+
+**Q1 — 배포 전부터 멈춰 있던 2건:** 2026-11-09 15:13~15:14Z 재시도로 둘 다 `completed` 됐다.
+- `bf924c2b`: 11-09 13:14Z 요청
+- `e413875f`: 11-08 요청
+
+**Q1 — 배포 후 새로 요청된 3건:** 처리 시간은 16초 · 36초 · 73초다(요청 후 `review_required` 까지). 이전에는 수 분이었고, 시간 문제는 해소됐다.
+세 건 모두 `review_required` · `error_code` 없음 → 판정 D(오류 아님 · 사람 검토 대기).
+
+| 작업 | review_codes |
+|---|---|
+| `d2776c26` | `action_logs` · `operator_invitations` |
+| `ac8f10cf` | `canonical_demo_repair_snapshots` |
+| `3bbf0b9d` | `account_activities` · `action_logs` · `neture_contact_messages` · `neture_suppliers` |
+
+- `3bbf0b9d` 의 `account_activities` 는 #1010 이후에도 남았다. 본인 행은 이제 개인 소유로 삭제되므로, **다른 회원 행에 이 회원 값이 적힌 사본**으로 추정한다(미확인).
+- 검토 · 처리 방법(사본 정리 · 재시도)은 운영 데이터 write 라 통합 담당 판단 사항이다. 이 세션은 실행하지 않았다.
 
 ## 문서 정합
 
