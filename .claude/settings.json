@@ -906,7 +906,7 @@
           {
             "type": "command",
             "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/block-cloud-deploy.mjs\"",
-            "timeout": 30
+            "timeout": 150
           },
           {
             "type": "command",
@@ -916,7 +916,7 @@
           {
             "type": "command",
             "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/guard-ask-commands.mjs\"",
-            "timeout": 15
+            "timeout": 150
           }
         ]
       }

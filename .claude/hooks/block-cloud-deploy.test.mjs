@@ -13,6 +13,9 @@ import { spawnSync } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+// 테스트는 OS 확인 대화상자를 띄우지 않는다 — 자식 훅은 이 값을 물려받아 대화상자 대신 deny 한다(lib/shell.mjs confirmDialog).
+process.env.O4O_HOOK_CONFIRM_DIALOG = 'off';
+
 const HOOK = path.join(path.dirname(fileURLToPath(import.meta.url)), 'block-cloud-deploy.mjs');
 
 /** mode: PreToolUse 입력의 permission_mode. null 이면 필드를 넣지 않는다. */
@@ -73,7 +76,8 @@ test('로컬 세션: 승인 창이 뜨는 모드(default · acceptEdits · plan)
   }
 });
 
-// 2026-11-09: 로컬 auto 모드에서 훅의 ask 가 승인 창 없이 통과했다 — 그 모드에서는 deny 로 막는다.
+// 2026-11-09: 로컬 auto 모드에서 훅의 ask 가 승인 창 없이 통과했다 — 그 모드에서는 OS 확인 대화상자로 묻고,
+// 띄울 수 없으면(테스트는 O4O_HOOK_CONFIRM_DIALOG=off) deny 로 막는다.
 test('로컬 세션: 승인 창이 뜨지 않거나 알 수 없는 모드에서 배포 명령은 deny (fail closed)', () => {
   for (const mode of ['auto', 'bypassPermissions', 'dontAsk', 'something-new', '', null]) {
     for (const cmd of DEPLOY_COMMANDS) {
@@ -81,6 +85,7 @@ test('로컬 세션: 승인 창이 뜨지 않거나 알 수 없는 모드에서 
       assert.equal(d?.permissionDecision, 'deny', `${String(mode)}: ${cmd}`);
       assert.match(d.permissionDecisionReason, /AGENTS\.md §9/);
       assert.match(d.permissionDecisionReason, /default 모드/);
+      assert.match(d.permissionDecisionReason, /확인 대화상자를 띄울 수 없었다/);
     }
   }
 });

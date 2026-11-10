@@ -4,9 +4,10 @@
  *
  * - 클라우드 판별: CLAUDE_CODE_REMOTE === 'true' 또는 CLAUDE_CODE_REMOTE_SESSION_ID 존재.
  *   · 클라우드 → permissionDecision "deny".
- *   · 로컬 → 승인 창이 뜨는 권한 모드(default · acceptEdits · plan)면 "ask", 그 밖(auto · bypassPermissions ·
- *     dontAsk · 알 수 없음)이면 "deny". settings.json 의 ask 규칙도, 훅이 반환한 ask 도 auto 권한 모드에서는
- *     승인 창 없이 통과하는 것이 로컬에서 확인됐다(2026-11-09) — lib/shell.mjs askOrDeny.
+ *   · 로컬 → 승인 창이 뜨는 권한 모드(default · acceptEdits · plan)면 "ask". 그 밖(auto · bypassPermissions ·
+ *     dontAsk · 알 수 없음)은 훅이 OS 확인 대화상자를 직접 띄워 '예'면 "allow", 아니요 · 120초 무응답 · 띄울 수 없음은
+ *     "deny". settings.json 의 ask 규칙도, 훅이 반환한 ask 도 auto 권한 모드에서는 승인 창 없이 통과하는 것이
+ *     로컬에서 확인됐다(2026-11-09) — lib/shell.mjs approvalFor · confirmDialog.
  * - 대상
  *   · gcloud 배포: run deploy · run services update/update-traffic/replace ·
  *     run jobs deploy/update/create/execute/replace · builds submit · deploy(Cloud Deploy) ·
@@ -19,7 +20,7 @@
  *   클라우드 거부 · 로컬 승인 요청). 그 밖의 예외는 허용(exit 0)으로 넘겨 일반 명령을 막지 않는다.
  */
 import { execFileSync } from 'node:child_process';
-import { askOrDeny, baseName, commandIndex, modeDenyNote, readStdin, segments, tokenize } from './lib/shell.mjs';
+import { approvalFor, baseName, commandIndex, readStdin, segments, tokenize } from './lib/shell.mjs';
 
 const DEPLOY_NAME = /deploy|delivery|promote/i;
 
@@ -186,12 +187,13 @@ function findDeployReason(cmd, cwd) {
 }
 
 /**
- * PreToolUse 응답. 클라우드는 거부, 로컬은 승인 창이 뜨는 모드에서만 승인 요청 · 그 밖은 거부.
+ * PreToolUse 응답. 클라우드는 거부, 로컬은 승인 창이 뜨는 모드면 승인 요청 · 그 밖은 OS 확인 대화상자.
  * @param {string} reason
  * @param {boolean} cloud
  * @param {unknown} permissionMode
+ * @param {string} command
  */
-function decisionFor(reason, cloud, permissionMode) {
+function decisionFor(reason, cloud, permissionMode, command) {
   if (cloud) {
     return {
       hookSpecificOutput: {
@@ -203,14 +205,12 @@ function decisionFor(reason, cloud, permissionMode) {
       },
     };
   }
-  const decision = askOrDeny(permissionMode);
+  const { decision, note } = approvalFor(permissionMode, { title: 'O4O 운영 배포 승인', reason, command });
   return {
     hookSpecificOutput: {
       hookEventName: 'PreToolUse',
       permissionDecision: decision,
-      permissionDecisionReason:
-        `운영 배포 명령 — 통합 담당의 지시가 있을 때만 승인한다 (AGENTS.md §9): ${reason}.` +
-        (decision === 'deny' ? modeDenyNote(permissionMode) : ''),
+      permissionDecisionReason: `운영 배포 명령 — 통합 담당의 지시가 있을 때만 승인한다 (AGENTS.md §9): ${reason}.` + note,
     },
   };
 }
@@ -227,7 +227,7 @@ function main() {
   const cwd = payload.cwd || process.cwd();
 
   const reason = findDeployReason(cmd, cwd);
-  if (reason) process.stdout.write(JSON.stringify(decisionFor(reason, isCloud(), payload.permission_mode)));
+  if (reason) process.stdout.write(JSON.stringify(decisionFor(reason, isCloud(), payload.permission_mode, cmd)));
 }
 
 main();
