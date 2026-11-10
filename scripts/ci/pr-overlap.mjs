@@ -57,7 +57,7 @@ export function lanesOf(f) {
  * operator console controller(`controllers/operator/*` · routes/operator/* 가 연결)와 `src/common/` 공용 계층.
  * 테스트 파일은 제외한다.
  */
-const TEST_FILE = /(^|\/)__tests__\/|\.(test|spec)\.[cm]?[jt]sx?$/;
+const TEST_FILE = /(?:(?:^|\/)__tests__\/)|(?:\.(?:test|spec)\.[cm]?[jt]sx?$)/;
 export const isSharedController = (p) =>
   !TEST_FILE.test(p) &&
   (/^apps\/api-server\/src\/controllers\/operator\/[^/]+\.ts$/.test(p) || /^apps\/api-server\/src\/common\/.+\.ts$/.test(p));
@@ -99,7 +99,7 @@ export function computeOverlaps(current, others) {
   return rows.sort((a, b) => a.number - b.number);
 }
 
-const byText = (a, b) => (a < b ? -1 : a > b ? 1 : 0);
+const byText = (a, b) => a.localeCompare(b, 'en');
 const esc = (s) => String(s).replaceAll('|', String.raw`\|`).replaceAll('\n', ' ');
 const code = (s) => '`' + s + '`';
 
