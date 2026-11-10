@@ -1,10 +1,10 @@
 
 import type { FC } from 'react';
 import { Menu, User, LogOut, Settings as SettingsIcon, Shield, Clock } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth, buildAccountDisplayInfo } from '@o4o/auth-context';
 import toast from 'react-hot-toast';
-import { MyHomeButton, O4OHomeButton, O4O_LOGOUT_LABEL } from '@o4o/auth-react';
+import { O4OHomeButton, O4O_LOGOUT_LABEL } from '@o4o/auth-react';
 import { api } from '@/api/base';
 import {
   DropdownMenu,
@@ -88,7 +88,8 @@ const AdminHeader: FC<AdminHeaderProps> = ({ onMenuClick }) => {
         {/* Right side */}
         <div className="flex max-w-full flex-wrap items-center gap-2 sm:gap-4">
           {/* WO-O4O-REPRESENTATIVE-ENTRY-RETURN-HANDOFF-AND-HOME-NAVIGATION-V1: O4O 홈(로그인 유지 · 권한 확대 없음) */}
-          <MyHomeButton accountId={user?.id === undefined ? undefined : String(user.id)} api={api} isAuthenticated={!!user} className="text-sm font-medium" />
+          {/* 관리자 사이트에서는 My Home 대신 업무 운영자 화면으로 바로 간다(2026-11-10 사용자 확정). */}
+          <Link to="/operations" className="whitespace-nowrap px-3 py-1.5 text-sm font-medium rounded-md border border-gray-200 text-o4o-text-secondary no-underline hover:text-o4o-text-primary hover:bg-o4o-bg-tertiary">업무 운영자</Link>
           <O4OHomeButton
             api={api}
             isAuthenticated={!!user}

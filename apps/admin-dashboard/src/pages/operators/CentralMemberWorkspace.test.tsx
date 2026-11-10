@@ -51,7 +51,7 @@ async function select() {
     name: '회원 합성 회원 member-a@example.test',
   });
   fireEvent.click(screen.getAllByRole('checkbox')[1]);
-  fireEvent.click(screen.getByRole('button', { name: '회원 상세보기' }));
+  fireEvent.click(screen.getByRole('button', { name: '회원 정보', exact: true }));
   await screen.findByRole('form', { name: '회원 정보 보기' });
 }
 beforeEach(() => {
@@ -159,14 +159,32 @@ it('shows one row with separate name, nickname, email, provider, signup type and
 it('preserves checkbox action bar, single-target editing and page selection', async () => {
   mount();
   await select();
-  expect(screen.getByRole('button', { name: '회원 정보 수정' })).toBeEnabled();
+  // 보기 · 수정 · 약국·사업자 정보는 「회원 정보」 하나로 합쳤다. 해지와 복구는 따로 있다.
+  for (const merged of ['회원 상세보기', '약국·사업자 정보', '회원 해지·복구'])
+    expect(screen.queryByRole('button', { name: merged })).toBeNull();
+  expect(screen.getByRole('button', { name: '회원 해지' })).toBeEnabled();
+  expect(screen.getByRole('button', { name: '이용 복구' })).toBeDisabled();
   fireEvent.click(screen.getAllByRole('checkbox')[2]);
-  expect(screen.getByRole('button', { name: '회원 정보 수정' })).toBeDisabled();
+  expect(screen.getByRole('button', { name: '회원 해지' })).toBeDisabled();
   fireEvent.click(screen.getAllByRole('checkbox')[2]);
   fireEvent.click(screen.getByRole('button', { name: '회원 정보 수정' }));
   expect(
     await screen.findByRole('form', { name: '회원 정보 수정' }),
   ).toBeTruthy();
+});
+it('opens only the terminate form from 「회원 해지」 and only the restore form from 「이용 복구」', async () => {
+  rows[1] = { ...rows[1], serviceStatus: 'withdrawn' };
+  mount();
+  await screen.findByRole('button', { name: '회원 합성 회원 member-a@example.test' });
+  fireEvent.click(screen.getAllByRole('checkbox')[1]);
+  fireEvent.click(screen.getByRole('button', { name: '회원 해지' }));
+  const panel = await screen.findByRole('complementary', { name: '선택 회원 작업' });
+  expect(await within(panel).findByText('회원 이용을 해지합니다. 이후 이용 복구가 가능합니다.')).toBeTruthy();
+  expect(within(panel).queryByText('해지된 회원의 이용을 복구합니다.')).toBeNull();
+  fireEvent.click(within(panel).getByRole('button', { name: '회원 작업 패널 닫기' }));
+  fireEvent.click(screen.getAllByRole('checkbox')[2]);
+  expect(screen.getByRole('button', { name: '회원 해지' })).toBeDisabled();
+  expect(screen.getByRole('button', { name: '이용 복구' })).toBeEnabled();
 });
 it('switches cached detail to editable fields without a second detail request', async () => {
   mount();

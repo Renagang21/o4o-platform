@@ -18,7 +18,7 @@ import { FC, useEffect, useRef, useState } from 'react';
 import { Navigate, useLocation, useSearchParams } from 'react-router-dom';
 import { AlertTriangle } from 'lucide-react';
 import { useAuth } from '@o4o/auth-context';
-import { renderGoogleButton } from '@o4o/auth-client';
+import { loadGoogleIdentityScript, renderGoogleButton } from '@o4o/auth-client';
 import toast from 'react-hot-toast';
 
 type GoogleStage = 'loading' | 'disabled' | 'ready';
@@ -28,10 +28,10 @@ const MAIN_SITE_URL = 'https://neture.co.kr/';
 
 const Login: FC = () => {
   
-  const { loginWithGoogle, getGoogleAuthConfig, isAuthenticated, error, clearError, user, sessionConflict } = useAuth();
+  const { loginWithGoogle, getGoogleAuthConfig, isAuthenticated, error, clearError, user, sessionConflict, logout } = useAuth();
   const isPlatformAdmin = user?.roles?.includes('platform:super_admin') === true;
   const location = useLocation();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   // Google 진입: config → GIS 버튼 → ID token → loginWithGoogle (로그인만)
   const [googleStage, setGoogleStage] = useState<GoogleStage>('loading');
@@ -40,9 +40,14 @@ const Login: FC = () => {
 
   // GIS callback 은 mount 시 고정되므로 최신 코드값은 ref 로 읽는다.
 
+  // AuthProvider 는 렌더마다 새 getGoogleAuthConfig 함수를 만든다. deps 에 넣으면 세션 확인이 끝나 다시 그려질 때
+  // 설정 요청이 처음부터 다시 시작돼 Google 버튼이 늦게 뜬다 — 화면이 뜰 때 한 번만 요청한다.
+  const getGoogleAuthConfigRef = useRef(getGoogleAuthConfig);
   useEffect(() => {
     let alive = true;
-    getGoogleAuthConfig()
+    // Google 스크립트는 설정 응답을 기다리지 않고 바로 받기 시작한다(실패해도 버튼 렌더 단계에서 다시 시도·안내).
+    void loadGoogleIdentityScript().catch(() => undefined);
+    getGoogleAuthConfigRef.current()
       .then((cfg) => {
         if (!alive) return;
         setGoogleClientId(cfg.enabled ? cfg.clientId : null);
@@ -50,7 +55,7 @@ const Login: FC = () => {
       })
       .catch(() => { if (alive) setGoogleStage('disabled'); });
     return () => { alive = false; };
-  }, [getGoogleAuthConfig]);
+  }, []);
 
   useEffect(() => {
     if (googleStage !== 'ready' || !googleClientId || !googleContainerRef.current) return;
@@ -67,6 +72,17 @@ const Login: FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [googleStage, googleClientId]);
 
+  // 업무 위임이 없는 일반 회원: 업무 화면이 여기로 돌려보낸다. 세션을 끝내고 이유를 보인다.
+  const operatorsOnlyDenied = searchParams.get('denied') === 'operators-only';
+  const [operatorsOnlyNotice, setOperatorsOnlyNotice] = useState(operatorsOnlyDenied);
+  useEffect(() => {
+    if (!operatorsOnlyDenied) return;
+    setOperatorsOnlyNotice(true);
+    // 로그아웃이 끝나면 주소의 표시를 지운다 — 다른 계정으로 다시 로그인할 때 또 로그아웃되지 않게 한다.
+    if (isAuthenticated) logout();
+    else setSearchParams(previous => { const next = new URLSearchParams(previous); next.delete('denied'); return next; }, { replace: true });
+  }, [operatorsOnlyDenied, isAuthenticated, logout, setSearchParams]);
+
   // 리다이렉트 URL 처리
   const redirectUrl = searchParams.get('redirect') || '/admin';
   const fromLocation = (location.state as any)?.from || redirectUrl;
@@ -78,7 +94,7 @@ const Login: FC = () => {
     }
   }, [isAuthenticated, isPlatformAdmin]);
 
-  if (isAuthenticated) {
+  if (isAuthenticated && !operatorsOnlyDenied) {
     if (isPlatformAdmin) {
       return <Navigate to={fromLocation} replace />;
     } else {
@@ -124,6 +140,13 @@ const Login: FC = () => {
           >
             다른 계정의 로그인으로 이 브라우저의 관리자 세션이 바뀌었습니다. 보안을 위해 이전 화면을 닫았습니다.
             계속하려면 관리자 계정으로 다시 로그인하시기 바랍니다.
+          </div>
+        )}
+
+        {operatorsOnlyNotice && (
+          <div role="alert" data-testid="operators-only-notice" className="mb-5 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
+            관리자 사이트는 전체 관리자와 운영자만 이용할 수 있습니다. 이 계정에는 업무 위임이 없거나 회수되어 로그아웃했습니다.
+            업무 운영자로 초대받으셨다면 초대를 먼저 수락한 뒤 다시 로그인해 주시기 바랍니다.
           </div>
         )}
 

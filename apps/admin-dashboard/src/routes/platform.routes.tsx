@@ -7,6 +7,8 @@ import AdminErasureHistoryPage from '@/pages/platform/account-governance/AdminEr
 import CentralSupplierReview from '@/pages/operators/CentralSupplierReview';
 import AdminStoresPage from '@/pages/platform/account-governance/AdminStoresPage';
 import PlatformUsersPage from '@/pages/platform/account-governance/PlatformUsersPage';
+import { AdminMemberManagementPage } from '@o4o/operator-core-ui/modules/neture-service-operations';
+import { authClient } from '@o4o/auth-client';
 import AdminPharmacyServiceSettingsPage from '@/pages/platform/AdminPharmacyServiceSettingsPage';
 import { configurePharmacyManagementClient } from '@o4o/operator-core-ui/modules/pharmacy-management';
 import { api } from '@/api/base';
@@ -75,6 +77,7 @@ export function PlatformRoutes() {
       <Route path="users" element={<PlatformUsersPage key="users" />} />
       <Route path="suppliers" element={<CentralSupplierReview adminMode />} />
       <Route path="stores" element={<AdminStoresPage />} />
+      <Route path="membership-cleanup" element={<AdminMemberManagementPage api={authClient.api} />} />
       <Route path="member-erasure" element={<PlatformUsersPage key="member-erasure" initialTask="inactive" />} />
       <Route path="board-deletion" element={<AdminResourceDeletionPage key="board-deletion" fixedKind="community" />} />
       <Route path="course-deletion" element={<AdminResourceDeletionPage key="course-deletion" fixedKind="lecture" />} />

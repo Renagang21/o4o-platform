@@ -7,7 +7,7 @@ import {
   waitFor,
   within,
 } from "@testing-library/react";
-import { MemoryRouter, Route, Routes } from "react-router-dom";
+import { MemoryRouter, Route, Routes, useLocation } from "react-router-dom";
 const mock = vi.hoisted(() => ({
   get: vi.fn(),
   user: { id: "synthetic-user", roles: ["supplier:operator"] },
@@ -59,6 +59,7 @@ function view(path = "/operations") {
     <MemoryRouter initialEntries={[path]}>
       <Routes>
         <Route path="/operations" element={<CentralOperationsPage />} />
+        <Route path="/login" element={<LoginMarker />} />
         <Route
           path="/operations/:serviceKey/courses/:courseId"
           element={<CentralOperationsPage />}
@@ -75,14 +76,16 @@ function view(path = "/operations") {
     </MemoryRouter>,
   );
 }
+function LoginMarker() {
+  return <p>login{useLocation().search}</p>;
+}
 const denied = (code: string, status = 403) =>
   Object.assign(new Error(code), { response: { status, data: { success: false, code } } });
 it("service roles alone do not show operating screens when server delegation is denied", async () => {
   mock.get.mockRejectedValueOnce(denied("CENTRAL_DELEGATION_REQUIRED"));
   view("/operations/supplier/members");
-  expect(await screen.findByRole("alert")).toHaveTextContent(
-    "초대를 본인이 수락",
-  );
+  // 업무 위임이 없는 사용자(일반 회원)는 관리자 사이트를 쓸 수 없다 — 로그인 화면이 로그아웃과 안내를 맡는다.
+  expect(await screen.findByText("login?denied=operators-only")).toBeTruthy();
   expect(screen.queryByText("members:supplier")).toBeNull();
 });
 it.each([
@@ -133,9 +136,7 @@ it("preserves unsaved work during successful background delegation checks and re
   expect(screen.getByLabelText("작성 중")).toHaveValue("작성 중인 사유");
   mock.get.mockRejectedValueOnce(denied("CENTRAL_DELEGATION_REQUIRED"));
   fireEvent(window, new Event("focus"));
-  expect(await screen.findByRole("alert")).toHaveTextContent(
-    "유효한 업무 위임",
-  );
+  expect(await screen.findByText("login?denied=operators-only")).toBeTruthy();
   expect(screen.queryByLabelText("작성 중")).toBeNull();
 });
 
@@ -167,7 +168,7 @@ it("an explicit refusal during an outage still closes the screen", async () => {
   await screen.findByText(/현재 화면을 유지합니다/);
   mock.get.mockRejectedValueOnce(denied("CENTRAL_DELEGATION_REQUIRED"));
   fireEvent(window, new Event("focus"));
-  expect(await screen.findByRole("alert")).toHaveTextContent("유효한 업무 위임");
+  expect(await screen.findByText("login?denied=operators-only")).toBeTruthy();
   expect(screen.queryByLabelText("작성 중")).toBeNull();
 });
 it("an outage cannot carry one account's verification over to another", async () => {
