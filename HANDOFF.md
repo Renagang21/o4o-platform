@@ -22,9 +22,16 @@
    - 배지는 계정 정지(`users.isActive=false` · `status='suspended'`, 계정 삭제 요청 포함)를 해지로 보이는데, 탭은 서비스 가입 상태만 셌다.
    - 이제 탭도 같은 기준으로 센다. 삭제가 끝나지 않은 회원은 해지 탭에 나오고, 배지는 「삭제 확인 필요」로 보인다.
 
+4. `8353d0e3e8` fix(privacy): 중앙 운영 메뉴 권한 감사 기록은 삭제 전 검토에서 건너뛰지 않는다
+   - #1022 CI(run 42775488648) `service-operator-invitation.integration.test.ts` 「keeps unknown audit payload …」 2건 실패를 고쳤다.
+   - 원인: 삭제 전 검토가 `action_logs` 를 통째로 건너뛰었다. 그래서 형식이 다른 메뉴 권한 감사 기록이 검토 없이 일반 치환으로 넘어갔다.
+   - 수정: `operator.central_menu_grants_changed` · `admin.service_operator_assigned` 행은 전용 경로(`central-menu-audit-evidence`)의 판정대로 계속 검토한다.
+
 ## PR 로 묶을 단위
 
-- 한 PR: 위 세 commit(주제: 계정 삭제 완료 · 상태 표시). migration · CI · 인증 · 권한 변경은 없다.
+- 한 PR: 위 네 commit(주제: 계정 삭제 완료 · 상태 표시). migration · CI · 인증 · 권한 변경은 없다.
+- **#1022 반영 필요:** #1022 의 head 는 통합 세션이 만든 `claude/jolly-carson-4smjue` 이고, 위 1 · 2 와 인계 기록만 cherry-pick 돼 있다.
+  3(`e5fa077de1`)과 4(`8353d0e3e8`)를 더 가져가야 한다. #1022 설명의 「탭 숫자는 바꾸지 않았다」도 3 기준으로 고쳐야 한다.
 
 ## 결정 사항 (§9)
 
@@ -40,9 +47,15 @@
   - 「수락됨」 행은 DB 제약상 수락자를 비울 수 없다.
   - 지정 · 해제 이력은 `action_logs` 에 치환된 채 남는다.
 - **데모 복구 스냅숏은 보존 근거가 없는 사본이므로 삭제한다.**
-- **탭 숫자는 바꾸지 않았다.** 「해지 회원」 탭은 서비스 해지 기준 그대로다. 삭제 중인 회원은 상태 배지로만 구분한다.
+- **「해지 회원」 탭은 목록 배지와 같은 기준으로 센다**(3번 · 사용자 지적으로 처음 결정을 바꿨다). 계정이 멈춘 회원도 센다.
+  삭제가 끝나지 않은 회원은 그 안에서 「삭제 확인 필요」 배지로 구분한다.
 
 ## 검증 결과 (격리 PostgreSQL — 일회용 클러스터, 운영 DB 아님)
+
+4번 commit 후 재실행:
+- `service-operator-invitation.integration.test.ts`: 54/54 통과. 같은 파일에서 수정 전에는 2건이 실패했다(CI 와 같은 실패를 재현).
+- `account-erasure.integration.test.ts`: 79/81. 실패 2건은 이전부터 있던 employee 테스트다.
+- member postgres spec 3개 55/55 · privacy unit 27/27 · api-server `tsc --noEmit` 통과
 
 - `account-erasure.integration.test.ts`: 79/81 통과.
   - 새 테스트 「retained records …」가 통과했다.
