@@ -6,9 +6,10 @@
  * 왜 훅인가: settings.json 은 ask 가 allow 보다 우선이고 패턴에 "제외" 문법이 없다. 그래서 아래 4종은
  * 읽기 전용 명령까지 매번 승인을 물었다.
  *
- * 권한 모드: 승인 창이 뜨는 모드(default · acceptEdits · plan)에서만 "ask", 그 밖(auto · bypassPermissions ·
- * dontAsk · 알 수 없음)은 "deny". 2026-11-09 로컬 auto 모드에서 이 훅이 `gh label delete x` 에 ask 를
- * 반환했는데도 승인 창 없이 실행됐다 — lib/shell.mjs askOrDeny.
+ * 권한 모드: 승인 창이 뜨는 모드(default · acceptEdits · plan)에서는 "ask". 그 밖(auto · bypassPermissions ·
+ * dontAsk · 알 수 없음)은 훅이 OS 확인 대화상자를 띄워 '예'면 "allow", 아니요 · 무응답 · 띄울 수 없음은 "deny".
+ * 2026-11-09 로컬 auto 모드에서 이 훅이 `gh label delete x` 에 ask 를 반환했는데도 승인 창 없이 실행됐다
+ * — lib/shell.mjs approvalFor · confirmDialog.
  *
  * 대체한 settings ask (Bash · PowerShell 모두)
  *   ⓐ gh api … -X | --method | -f | -F | --field | --raw-field | --input
@@ -29,7 +30,7 @@
  * 예외 판정은 fail closed — 따옴표가 닫히지 않았거나 $ · ` 확장이 있으면 예외로 보지 않는다.
  * 훅 자체의 입력 오류(JSON 아님 등)는 허용(exit 0)으로 넘겨 일반 명령을 막지 않는다.
  */
-import { askOrDeny, baseName, modeDenyNote, readStdin, segments } from './lib/shell.mjs';
+import { approvalFor, baseName, readStdin, segments } from './lib/shell.mjs';
 
 const UNSAFE_UNQUOTED = new Set(['<', '>', '(', ')', '*', '?', '[', ']', '{', '}', '~', '#']);
 
@@ -260,15 +261,13 @@ function main() {
   if (typeof cmd !== 'string' || !cmd) return;
   const reason = findReason(cmd);
   if (!reason) return;
-  const mode = payload.permission_mode;
-  const decision = askOrDeny(mode);
+  const { decision, note } = approvalFor(payload.permission_mode, { title: 'O4O 위험 명령 승인', reason, command: cmd });
   process.stdout.write(
     JSON.stringify({
       hookSpecificOutput: {
         hookEventName: 'PreToolUse',
         permissionDecision: decision,
-        permissionDecisionReason:
-          `승인 필요 (.claude/hooks/guard-ask-commands.mjs): ${reason}.` + (decision === 'deny' ? modeDenyNote(mode) : ''),
+        permissionDecisionReason: `승인 필요 (.claude/hooks/guard-ask-commands.mjs): ${reason}.` + note,
       },
     }),
   );

@@ -14,6 +14,9 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+// 테스트는 OS 확인 대화상자를 띄우지 않는다 — 자식 훅은 이 값을 물려받아 대화상자 대신 deny 한다(lib/shell.mjs confirmDialog).
+process.env.O4O_HOOK_CONFIRM_DIALOG = 'off';
+
 const DIR = path.dirname(fileURLToPath(import.meta.url));
 const HOOK = path.join(DIR, 'guard-ask-commands.mjs');
 const SETTINGS = path.join(DIR, '..', 'settings.json');
@@ -223,6 +226,8 @@ test('승인 창이 뜨지 않거나 알 수 없는 모드는 deny (fail closed)
         const d = runHook(cmd, opts);
         assert.equal(d?.permissionDecision, 'deny', `${String(mode)}: ${cmd}`);
         assert.match(d.permissionDecisionReason, /default 모드/);
+      assert.match(d.permissionDecisionReason, /확인 대화상자를 띄울 수 없었다/);
+        assert.match(d.permissionDecisionReason, /확인 대화상자를 띄울 수 없었다/);
       }
     }
   }
