@@ -17,16 +17,16 @@
 
 | PR | branch(원격) | 상태 | 다음 |
 |---|---|---|---|
-| #968 커뮤니티 뉴스 자동 게시 | `wo/community-industry-news-v2` 있음 | OPEN · **보류** — HEAD `0db752c` | 작업 세션 수정 필요: 새 테이블 2개의 `account_erasure_write_fence` 트리거 누락(CI 실패), Codex P1(표준 리스트) · P2(URL 정규화), Sonar. base 가 오래돼 `git merge origin/main` 필요. [통합 코멘트](https://github.com/Renagang21/o4o-platform/pull/968#issuecomment-6707486063) |
+| ~~#968 커뮤니티 뉴스 자동 게시~~ | — | **MERGED(2026-11-08 08:47Z · `28938d50c1`)** · Promote 같은 날 09:05Z success | 남은 것: 아래 3 · 4 |
 | ~~#975 · #976 · #980 · #981~~ | 원격 branch 삭제됨 | **MERGED(2026-11-08)** | 후속은 아래 「다음에 할 일」 8~14 |
-| #986 admin.neture.co.kr 운영자 메뉴 정리 | `claude/vibrant-allen-56f5dq` 있음 | OPEN · Ready · CI 통과(2026-11-07) | 통합 담당 병합 · 배포 → **배포 후 사용자가 실제 화면 확인**(아래 「#986 배포 후 화면 확인」). 병합 전 LOCAL smoke 는 하지 않는다(2026-11-08 사용자 결정) |
+| ~~#986 admin.neture.co.kr 운영자 메뉴 정리~~ | — | **MERGED(2026-11-08 00:42Z · `ff85ddfcee`)** | 남은 것: **사용자가 실제 화면 확인**(아래 6 · 「#986 배포 후 화면 확인」) |
 
 ## 다음에 할 일 (우선순위 순)
 
 1. ~~**[LOCAL]** WO §5-A — 원격 branch 정리~~ **완료(2026-11-08)** — 선택 포함 89개 삭제 · 실패 0. 결과는 WO §6.
 2. ~~**[CLOUD]** #975 부터 CI PR 순차 통합~~ **완료(2026-11-08)** — #975 → #976 → #980 → #981 순서로 병합. 함께 병합: #995(Delivery 취소 run 기록) · #1000(#976 에서 분리한 기준 문서).
-3. **[CLOUD]** #968 수정(작업 세션) → 클라우드 통합 세션이 CI · 리뷰 확인 후 병합.
-4. **[LOCAL]** WO §5-B — #968 병합 후에만: 통합 담당 승인 → `promote.yml`(LEVEL_3) → read-only SQL 로 테이블 · 트리거 · 첫 실행 확인.
+3. ~~**[CLOUD]** #968 수정 → 병합~~ **완료(2026-11-08)**.
+4. **[통합 담당 승인 → LOCAL]** WO §5-B — Promote · SQL 1) · 2) **완료(2026-11-10 확인: 테이블 존재 · fence 정상)**. 남은 것: SQL 3) 이 `permission denied`(뉴스 테이블 조회 권한 미분류) → 통합 담당이 분류(DB 권한 변경)를 승인하면 분류 스크립트 → 3) 재실행. 결과는 WO §6.
 5. KEEP 2 branch 재판정(IR §7) — 별도 WO.
 6. **[통합 담당 → 사용자]** #986 병합 · 배포 후 아래 「#986 배포 후 화면 확인」을 사용자가 운영 화면에서 확인한다. 문제가 나오면 새 branch 로 수정 PR 을 연다(병합된 #986 branch 는 재사용하지 않는다).
 7. **[LOCAL · 2026-11-13 이후]** 계정 이용약관 · 개인정보 처리방침 · 서비스별 안내 v2 게시(공고 2026-10-12 → 시행 2026-11-13) — [`WO-O4O-ACCOUNT-POLICY-V2-PUBLICATION-V1`](docs/work-orders/WO-O4O-ACCOUNT-POLICY-V2-PUBLICATION-V1.md). §5-1 read-only 조회 · §5-2 본문 준비는 13일 전에 해도 된다. 게시(§5-3)는 통합 담당 승인 후. (2026-11-08 클라우드 세션 · branch `claude/intelligent-cray-o2p4u3`)
@@ -36,12 +36,17 @@
 8. **[사용자 · 통합 담당]** 저장소 변수 확인 — 클라우드 세션은 Actions 변수를 조회할 수 없다(proxy 403).
    - `CI_COST_PROFILE=budget`(드래프트 PR 경량 검사, #975): 설정 여부 확인. 시험 절차는 #975 PR 설명.
    - `CI_MAIN_REUSE=true`(main 검증 재사용, #981): 켤지 결정. 켜기 전에는 매일 04:37 KST main 전체 검사만 추가된다. 켠 뒤 첫 main 병합에서 Detect 의 판정 요약(verified · 근거 run) · 무거운 job skip · `CI Gate` success · Delivery 동작을 확인한다.
-9. **[LOCAL · 통합 담당]** #980(Promote 같은 SHA guard) 병합 후 **첫 실제 Promote** 에서 확인: ① `Same-SHA guard` 로그 ② 같은 SHA 를 다시 실행하면 건너뛰는지(앞 run 이 모든 서비스를 target 에 올린 경우만) ③ `force='true'` 면 실행되는지 ④ `services` 입력 시 run 이름에 `services=` 가 남는지. 완료 판정은 그 run 이 남긴 마지막 commit status `production`(DEPLOYED · NO_DEPLOY success)이다.
+9. **[LOCAL · 통합 담당]** #980(Promote 같은 SHA guard) 병합 후 **첫 실제 Promote** 에서 확인 — **① 확인(2026-11-10)**: 첫 Promote `6120c5fb9d`(2026-11-09 08:10Z, api · admin)의 guard 로그 `skip=false — 같은 SHA 의 이전 Promote 없음` · 마지막 commit status `production` success DEPLOYED. ②~④ 는 Promote 를 다시 실행해야 확인되므로 다음 실제 Promote 때 본다. ① `Same-SHA guard` 로그 ② 같은 SHA 를 다시 실행하면 건너뛰는지(앞 run 이 모든 서비스를 target 에 올린 경우만) ③ `force='true'` 면 실행되는지 ④ `services` 입력 시 run 이름에 `services=` 가 남는지. 완료 판정은 그 run 이 남긴 마지막 commit status `production`(DEPLOYED · NO_DEPLOY success)이다.
 10. **[CLOUD · 사용자 결정 필요]** PC installer Windows 시험 일시 실패 안정화 PR 여부 — `tools/o4o-local-agent/test/release-install.test.mjs`. 2026-11-08 관측: `FIXTURE_WORKER_NOT_UNIQUE`(122행 · #987 · #995, 2회), `installed runtime must serve health`(#980 `988ef329a8`, 1회). 모두 재실행에서 통과. 추정 원인(로그 미확인): worker 프로세스 수를 한 번만 센다 → 정확히 1개가 될 때까지 짧게 재조회하는 시험 코드 수정안. 제품 코드 변경 없음.
 11. **[CLOUD · 사용자 결정 필요]** 배포 workflow 정비 후보 ① — Delivery 가 부르는 reusable deploy 호출마다 `detect-changes` · `CI gate` · `summary` 가 별도 job 으로 돈다(2026-10-24~11-07 Web 호출 131회 · API 34 · Admin 26). classify 가 이미 같은 확인을 하므로 두 판정 job 을 합치는 안. deploy workflow 구조 변경이라 착수 전 승인 필요(판정 · 게이트 job 변경은 `deploy-workflow-diff` 상 control = 배포 무영향).
 12. **[CLOUD]** 배포 workflow 정비 후보 ② — `deploy-web-services.yml` 상단 `on:` 주석과 `scripts/ci/deploy-orchestrate.mjs` 머리 주석이 은퇴한 `deploy-auto.yml` 을 현행 자동 진입점으로 설명한다. 주석만 정리(CHECK-O4O-DELIVERY-CANCELLED-RUN-REPORT-V1 「문서 정합」).
 13. **[CLOUD · 2026-11-22 이후]** CI 절감 실측 — #973 · #975 · #976 · #980 병합 후 2주 Actions 사용량(`scripts/ci/actions-cost.mjs`)을 IR 추정(#976 최대 약 3,600분/월 등)과 비교해 IR 에 기록. #981 은 `CI_MAIN_REUSE` 를 켠 날부터 2주.
-14. 별도 WO 제안(유지): `scripts/check-forbidden-tables.mjs` 원인 정리 — IR §10-3.
+14. ~~별도 WO 제안: `scripts/check-forbidden-tables.mjs` 원인 정리~~ **완료** — #1006(오탐 정리 · CI 연결) · #1007(문서 정합).
+
+**2026-11-10 LOCAL read-only 확인 후속** (branch `wo/local-readonly-results-20261110` · PR #1011)
+
+15. **[통합 담당 판단]** 계정 삭제 `review_required` 3건(`d2776c26` · `ac8f10cf` · `3bbf0b9d`). 삭제 지연 원인 E 는 #1010 으로 해소됐다(배포 후 16~73초). `3bbf0b9d` 에 `account_activities` 검토 코드가 남아 있어 다른 회원 행에 든 사본으로 추정한다(미확인). 근거: [`WO-O4O-ADMIN-ACCOUNT-ERASURE-HANG-DIAGNOSIS-V1`](docs/work-orders/WO-O4O-ADMIN-ACCOUNT-ERASURE-HANG-DIAGNOSIS-V1.md) §5.
+16. **[통합 담당]** 일부 서비스 데이터 삭제 — 운영 건수 확인 완료. 세 서비스 모두 해지 상태 0 이라 구현은 급하지 않다. 공급자 구현 WO 승인 시점은 통합 담당이 정한다. 근거: [`WO-O4O-PARTIAL-SERVICE-ADMIN-DATA-DELETION-SCOPE-V1`](docs/work-orders/WO-O4O-PARTIAL-SERVICE-ADMIN-DATA-DELETION-SCOPE-V1.md) §7-1.
 
 ## #986 배포 후 화면 확인 (사용자 · 2026-11-08 결정)
 

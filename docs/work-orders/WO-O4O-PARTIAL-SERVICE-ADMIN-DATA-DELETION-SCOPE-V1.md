@@ -1,7 +1,7 @@
 # 일부 이용자 서비스(공급자 · 파트너 · 약국협업체) admin 의 「서비스 데이터만 삭제」 범위 조사
 
 > **상태**: ACTIVE
-> **작성일**: 2026-11-07 · **최종 갱신**: 2026-11-08 (§8 CLOUD 조사 결과 · D1~D5 확정)
+> **작성일**: 2026-11-07 · **최종 갱신**: 2026-11-10 (§7-1 LOCAL 운영 건수 — 해지 0 · 구현 급하지 않음)
 > **실행 위치**: BOTH
 > **인계**: claude/vibrant-allen-56f5dq · 다음 실행자 LOCAL (§7 운영 건수 확인) · 통합 담당 (공급자 구현 WO §6 승인)
 > **근거**: 2026-11-07 사용자 확정(아래 §2) · admin.neture.co.kr 운영자 메뉴 정리 PR(같은 branch) · [`WO-O4O-SERVICE-MEMBERSHIP-TERMINATION-GLOBAL-IDENTITY-DECOUPLING-V1`](WO-O4O-SERVICE-MEMBERSHIP-TERMINATION-GLOBAL-IDENTITY-DECOUPLING-V1.md) · [`WO-O4O-TWO-STAGE-ACCOUNT-ERASURE-CORE-V1`](WO-O4O-TWO-STAGE-ACCOUNT-ERASURE-CORE-V1.md) · [`O4O-PRIVACY-DATA-RETENTION-POLICY-V1`](../baseline/O4O-PRIVACY-DATA-RETENTION-POLICY-V1.md)
@@ -61,7 +61,7 @@
 - [x] [CLOUD] §3-3 기존 삭제 경로가 지우는 범위와 빠진 범위 대조 — §8-4
 - [x] [CLOUD] §3-4 · §3-5 · §3-6 제안 작성 — §8-5
 - [x] [사용자] §8-6 결정 D1~D5 — 2026-11-08 모두 제안대로 확정
-- [ ] [LOCAL] §7 read-only 조회로 서비스별 대상 규모 확인(건수만, 마스킹)
+- [x] [LOCAL] §7 read-only 조회로 서비스별 대상 규모 확인(건수만, 마스킹) — §7-1 (2026-11-10)
 - [ ] [CLOUD] 결과로 구현 WO 작성(서비스별 1 PR · core 먼저) — 공급자: [`WO-O4O-SUPPLIER-SERVICE-DATA-DELETION-V1`](WO-O4O-SUPPLIER-SERVICE-DATA-DELETION-V1.md)(2026-11-08 작성, 통합 담당 승인 대기). 파트너 · 약국협업체는 공급자 구현 후
 
 ## 7. 검증 계획 — LOCAL read-only 조회
@@ -108,6 +108,25 @@ SELECT status, COUNT(*) AS n FROM cooperative_memberships GROUP BY status ORDER 
 - Q4 의 `partner_support_spaces` 가 0 이면 D5 결정은 구현 WO 로 미뤄도 된다.
 - Q2 가 0 보다 크면 「개인 관계는 해지됐지만 사업자 조직 데이터가 남은」 경우가 실제로 있다 → 개인 관계 삭제와 사업자 데이터 삭제를 분리 설계해야 한다(§3-2).
 - 테이블 · 컬럼 이름이 다르면 조회를 멈추고 CLOUD 조사 결과(§6 첫 항목)로 쿼리를 고친 뒤 다시 실행한다.
+
+### 7-1. 실행 결과 (2026-11-10 LOCAL · `o4o_readonly` · `default_transaction_read_only = on`)
+
+위 SQL 을 고치지 않고 그대로 실행했다. 테이블 · 컬럼 이름 오류는 없었다.
+
+| 조회 | 결과 |
+|---|---|
+| Q1 | `supplier` active 2 · `partner-support` active 1. 해지 상태(`suspended` · `withdrawn`) 0 |
+| Q2 | 0 |
+| Q3 | `neture_suppliers` ACTIVE 3 · REJECTED 1 |
+| Q4 | 게시글 · 댓글 행 0(그룹 없음) · `partner_support_spaces` 0 |
+| Q5 | `pharmacy` · `drugstore` · `carepharm` 각 active 1. 해지(`terminated` 등) 0 |
+| Q6 | `cooperative_memberships` active 1 |
+
+판정:
+- **세 서비스 모두 해지 상태가 0 이다 → 서비스 데이터 삭제 구현은 급하지 않다.** 공급자 구현 WO 의 착수 시점은 통합 담당이 정한다.
+- Q2 가 0 이다. 지금은 「개인 관계는 해지됐지만 사업자 조직 데이터가 남은」 사례가 없다. §3-2 의 분리 설계는 구현 WO 에서 그대로 따른다.
+- Q4 의 `partner_support_spaces` 가 0 이다 → D5 는 구현 WO 로 미뤄도 된다.
+- Q3 의 REJECTED 1 은 해지가 아니라 심사 거절이라 이번 판정 대상이 아니다.
 
 ## 8. CLOUD 조사 결과 (2026-11-08, main `4c1005bc1a`)
 
