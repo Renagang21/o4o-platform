@@ -295,6 +295,16 @@ it('rejects the signup application without changing the global account', async (
   await screen.findByText('합성 회원 회원의 가입을 반려했습니다. 목록의 「회원 상태」가 반려로 바뀝니다.');
   expect(screen.queryByRole('complementary', { name: '선택 회원 작업' })).toBeNull();
 });
+it('does not offer signup approval for a terminated member whose application is still pending', async () => {
+  record.member.serviceStatus = 'withdrawn';
+  rows[0] = { ...rows[0], serviceStatus: 'withdrawn', registrationState: 'pending' };
+  mount();
+  await select();
+  const panel = screen.getByRole('complementary', { name: '선택 회원 작업' });
+  expect(within(panel).queryByRole('region', { name: '가입 신청 처리' })).toBeNull();
+  expect(within(panel).getByRole('note')).toHaveTextContent('해지된 회원입니다. 남아 있는 가입 신청(승인 대기)은 이용 복구 후 처리할 수 있습니다.');
+  expect(screen.getByRole('button', { name: '가입 반려', exact: true })).toBeDisabled();
+});
 it('opens the reject form at the top of the panel, above the submitted information', async () => {
   mount();
   await select();
