@@ -63,6 +63,13 @@ integration('central member workbench PostgreSQL authority, projection and corre
     try {
       expect((await service.list(admin, 'qualifications', 1, '')).items[0]).toMatchObject({ erasureState: 'review_required', erasureErrorCode: 'ERASURE_RESIDUAL_REVIEW_REQUIRED' });
       expect((await service.detail(admin, target)).member).toMatchObject({ erasureState: 'review_required' });
+      // 삭제 요청은 계정을 멈춘다 — 해지 탭 숫자와 목록에 같은 회원이 보인다.
+      const before = (await service.list(admin, 'inactive', 1, '')).counts.inactive;
+      await db.query(`UPDATE users SET "isActive"=false WHERE id=$1`, [target]);
+      const stopped = await service.list(admin, 'inactive', 1, '');
+      expect(stopped.counts.inactive).toBe(before + 1);
+      expect(stopped.items.map((row: any) => row.userId)).toContain(target);
+      await db.query(`UPDATE users SET "isActive"=true WHERE id=$1`, [target]);
       await db.query(`UPDATE account_erasure_operations SET state='completed' WHERE subject_id=$1`, [target]);
       expect((await service.list(admin, 'qualifications', 1, '')).items[0].erasureState).toBeNull();
     } finally { await db.query('DELETE FROM account_erasure_operations WHERE subject_id=$1', [target]); }
