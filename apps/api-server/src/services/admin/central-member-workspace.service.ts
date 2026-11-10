@@ -8,6 +8,7 @@ import { centralOperationMenuKeys } from './central-operation-menu-grants.js';
 import { OperationError, operationReason, recordOperation } from '../operations/operation-audit.js';
 import { isPhoneShapeValid, normalizePhoneDigits } from '../../common/auth/phone-shape.js';
 import { resolveNetureMainMembershipStatus } from '../../modules/neture/services/neture-main-membership.js';
+import { isRetiredRoleValue } from '../../middleware/retired-service.middleware.js';
 
 type Db = Pick<EntityManager, 'query'>;
 export type MemberTask = 'all' | 'pending' | 'inactive' | 'qualifications' | 'pharmacies' | 'corrections';
@@ -21,6 +22,11 @@ const identity = `${protectedMemberSql("u.id")} AS "operatorReadOnly",u.id AS "u
 const OPERATOR_ROLES_SQL = `ARRAY(SELECT ra.role FROM role_assignments ra WHERE ra.user_id=u.id AND ra.is_active=true
   AND (ra.valid_from IS NULL OR ra.valid_from<=statement_timestamp()) AND (ra.valid_until IS NULL OR ra.valid_until>=statement_timestamp())
   AND (ra.role LIKE 'platform:%' OR ra.role ~ '(^|:|_)(admin|operator)$') ORDER BY ra.role)`;
+/** 표시용 운영 역할 — 활성 이력으로 남은 퇴역 역할(platform:member · kpa:branch_operator · cosmetics:* 등)은 현재 역할이 아니므로 뺀다
+ *  (O4O-CURRENT-ADMIN-ROLE-POLICY-V1 · roleAssignmentService.getActiveRoles 와 같은 isRetiredRoleValue 기준). */
+export function currentOperatorRoles(roles: unknown): string[] {
+  return Array.isArray(roles) ? roles.filter((role): role is string => typeof role === 'string' && !isRetiredRoleValue(role)) : [];
+}
 const pharmacyExists = (status: string) => `EXISTS(SELECT 1 FROM neture_pharmacy_memberships n WHERE n.applicant_user_id=u.id AND n.status='${status}')`;
 const privateValue = (value: unknown) => ({ toPostgres: () => value, toJSON: () => '[redacted]' });
 
@@ -72,7 +78,7 @@ export class CentralMemberWorkspaceService {
       ${OPERATOR_ROLES_SQL} AS "operatorRoles"
       ${from} AND (${conditions[task]}) ORDER BY u."createdAt" DESC,u.id LIMIT 21 OFFSET $2`,
     [query, (page - 1) * 20]);
-    return { items: items.slice(0, 20).map(row=>({...row,serviceStatus:resolveNetureMainMembershipStatus({account_status:row.accountStatus,account_active:row.accountActive,email_verified:row.emailVerified,membership_status:row.membershipStatus,registration_state:row.registrationState,legacy_main_access:row.registrationLegacyMainAccess})})), hasNext: items.length > 20, counts, permissions };
+    return { items: items.slice(0, 20).map(row=>({...row,operatorRoles:currentOperatorRoles(row.operatorRoles),serviceStatus:resolveNetureMainMembershipStatus({account_status:row.accountStatus,account_active:row.accountActive,email_verified:row.emailVerified,membership_status:row.membershipStatus,registration_state:row.registrationState,legacy_main_access:row.registrationLegacyMainAccess})})), hasNext: items.length > 20, counts, permissions };
   }
 
   async detail(actor: string, target: string, qualificationReview = false) {
@@ -140,7 +146,7 @@ export class CentralMemberWorkspaceService {
         }
       }
       await manager.query(`UPDATE users SET name=$2,nickname=$3,phone=$4,"updatedAt"=clock_timestamp() WHERE id=$1`,
-        [target, privateValue(input.name), privateValue(input.nickname || null), privateValue(phone || null)]);
+        [target, privateValue(input.name || null), privateValue(input.nickname || null), privateValue(phone || null)]);
       await recordOperation(manager, 'neture', actor, 'member.profile_corrected', { targetUserId: target, reason,
         previous: { name: before.name, nickname: before.nickname, phone: before.phone,...(result.emailChanged?{email:before.email}:{}) }, next: { name: input.name, nickname: input.nickname, phone,...(result.emailChanged?{email:input.email?.trim().toLowerCase()}:{}) } });
       return { saved: true, ...result };

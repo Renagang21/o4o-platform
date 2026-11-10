@@ -155,3 +155,17 @@ it("uses the authenticated reviewer, URL target and exact version", async () => 
   expect(r.status).toBe(200);
   expect(decide).toHaveBeenCalledWith(actor, target, input);
 });
+// 2026-11-10 Codex 리뷰(#1014): 이름은 선택 항목 — 이름 없는 신청자도 운영자가 정정할 수 있어야 한다.
+it("accepts a member correction with an empty name and passes it to the workspace", async () => {
+  const { CentralMemberWorkspaceService } = await import("../../services/admin/central-member-workspace.service.js");
+  const correct = jest.spyOn(CentralMemberWorkspaceService.prototype, "correct").mockResolvedValue({ saved: true } as any);
+  const body = { name: "", nickname: "닉네임", phone: "", reason: "Synthetic correction", version: "2026-10-28T00:00:00.123456" };
+  const r = await request(app)
+    .patch(`/qualifications/members/${target}`)
+    .set("x-user", actor)
+    .set("x-method", "google")
+    .send(body);
+  expect(r.status).toBe(200);
+  expect(correct).toHaveBeenCalledWith(actor, target, expect.objectContaining({ name: "", nickname: "닉네임" }));
+  correct.mockRestore();
+});
