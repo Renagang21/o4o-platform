@@ -127,6 +127,12 @@ it('passes only caller identity and strict applicant fields, never client-approv
   ).toBe(200);
   expect(submit).toHaveBeenCalledWith(actor, input);
 });
+it('accepts a nickname-only applicant: name and phone are optional (2026-11-09 S4 · S5)', async () => {
+  const send = (body: unknown) => request(app).post('/self').set('x-user', actor).send(body);
+  expect((await send({ nickname: '합성 별칭', version, type: 'other', fields: {} })).status).toBe(200);
+  expect(submit).toHaveBeenLastCalledWith(actor, { name: '', nickname: '합성 별칭', phone: '', version, type: 'other', fields: {} });
+  expect((await send({ nickname: '', version, type: 'other', fields: {} })).status).toBe(400);
+});
 it('requires version and reason and preserves conflicts without leaking database failures', async () => {
   const send = (body: unknown) =>
     request(app)
