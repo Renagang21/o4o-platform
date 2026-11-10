@@ -32,6 +32,16 @@ export const RETAINED_RECORD_LINKS: Readonly<Record<string, readonly string[]>> 
   neture_suppliers: ['user_id'],
 };
 
+/**
+ * 작성자 본인 행이면 내용 전체를 지우고 행만 남기는 열 (2026-11-10 통합 담당 결정 · #1022 Codex P1).
+ * 이름 · 전화번호 · 제목 · 본문에는 회원 ID · 이메일 말고도 개인정보가 들어 있어, 식별값 치환만으로는 사후 검토가 놓친다.
+ * 작성자는 `owner` 열(문의 이메일)이 이 회원 이메일과 같은 행으로 판정한다. 다른 사람의 문의는 기존처럼 식별값만 치환한다.
+ * NOT NULL 열은 `erased:<key>`, NULL 허용 열은 NULL 로 둔다.
+ */
+const RETAINED_RECORD_WIPED_COLUMNS: Readonly<Record<string, { owner: string; columns: readonly string[] }>> = {
+  neture_contact_messages: { owner: 'email', columns: ['name', 'phone', 'subject', 'message', 'adminNotes'] },
+};
+
 export function isRetainedRecordTable(schema: string, table: string): boolean {
   return schema === 'public' && Object.prototype.hasOwnProperty.call(RETAINED_RECORD_TABLES, table);
 }
@@ -109,10 +119,26 @@ export async function minimizeRetainedRecords(
     }, expression);
     const sets: string[] = [];
     const actorKeyed = table === 'action_logs' && columns.some(column => column.name === 'meta');
+    // 작성자 본인 행 판정(SET 안의 열 참조는 갱신 전 값이다). 이메일 토큰이 없으면 내용 삭제를 하지 않는다.
+    const wipe = RETAINED_RECORD_WIPED_COLUMNS[table];
+    const emails = tokens.filter(token => token.includes('@')).map(token => token.toLowerCase());
+    let owned: string | null = null;
+    // 쓰지 않는 바인딩은 PostgreSQL 이 형식을 정하지 못해 실패하므로, 실제로 지울 열이 있을 때만 넣는다.
+    if (wipe && emails.length && columns.some(column => column.name === wipe.owner)
+      && columns.some(column => wipe.columns.includes(column.name))) {
+      params.push(emails);
+      owned = `lower(r.${quote(wipe.owner)}::text)=ANY($${params.length}::text[])`;
+    }
     for (const column of columns) {
       if (column.name === 'id' || (actorKeyed && column.name === 'meta')) continue;
       const name = quote(column.name);
       if (RETAINED_RECORD_LINKS[table]?.includes(column.name)) continue;
+      if (owned && wipe?.columns.includes(column.name)) {
+        const cleared = column.nullable === 'YES' ? 'NULL' : `$${params.push(`erased:${key}`)}::text`;
+        const kept = ['text', 'character varying'].includes(column.type) ? replace(name) : name;
+        sets.push(`${name}=CASE WHEN ${owned} THEN ${cleared} ELSE ${kept} END`);
+        continue;
+      }
       if (column.type === 'uuid' && column.nullable === 'YES')
         sets.push(`${name}=CASE WHEN ${name}::text=ANY($${uuids()}::text[]) THEN NULL ELSE ${name} END`);
       else if (['text', 'character varying'].includes(column.type))

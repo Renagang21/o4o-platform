@@ -164,7 +164,8 @@ integration('account erasure — isolated PostgreSQL schema/real sessions', () =
     const [mentionLog]=await db.query(`INSERT INTO action_logs(service_key,user_id,action_key,source,status,meta) VALUES('neture',$1,'operator.synthetic_note','test','success',jsonb_build_object('contact',$2::text,'other',$3::text)) RETURNING id`,[peer.id,target.email,peer.email]);
     const [invite]=await db.query(`INSERT INTO operator_invitations(invited_email,service_key,role,token_hash,status,expires_at,accepted_user_id,accepted_at) VALUES($1,'supplier','supplier:operator','synthetic-token-hash','accepted',now()+interval '7 days',$2,now()) RETURNING id`,[target.email,target.id]);
     const [snapshot]=await db.query(`INSERT INTO canonical_demo_repair_snapshots(migration,snapshot) VALUES('synthetic',jsonb_build_object('user',$1::text)) RETURNING id`,[target.id]);
-    const [contact]=await db.query(`INSERT INTO neture_contact_messages("contactType",name,email,subject,message,status,"privacyConsent","createdAt","updatedAt") VALUES('general','Synthetic sender',$1,'Synthetic subject','Synthetic body','resolved',true,now(),now()) RETURNING id`,[target.email]);
+    const [contact]=await db.query(`INSERT INTO neture_contact_messages("contactType",name,email,phone,subject,message,status,"privacyConsent","createdAt","updatedAt") VALUES('general','Synthetic sender',$1,'010-0000-0000','Synthetic subject','Synthetic body','resolved',true,now(),now()) RETURNING id`,[target.email.toUpperCase()]);
+    const [peerContact]=await db.query(`INSERT INTO neture_contact_messages("contactType",name,email,subject,message,status,"privacyConsent","createdAt","updatedAt") VALUES('general','Peer sender',$1,'Peer subject',$2,'resolved',true,now(),now()) RETURNING id`,[peer.email,`Please reach ${target.email} later`]);
     const [activity]=await db.query(`INSERT INTO account_activities("userId",email,action,success,details,"createdAt") VALUES($1,$2::text,'synthetic_lookup',true,jsonb_build_object('looked_up',$2::text),now()) RETURNING id`,[peer.id,target.email]);
     try{
       expect(await service().request(target.id)).toMatchObject({state:'completed',erased:true});
@@ -174,14 +175,19 @@ integration('account erasure — isolated PostgreSQL schema/real sessions', () =
       expect(b.user_id).toBe(peer.id);expect(b.meta.contact).toMatch(/^erased:[a-f0-9]{64}$/);expect(b.meta.other).toBe(peer.email);
       expect(await db.query('SELECT 1 FROM operator_invitations WHERE id=$1',[invite.id])).toHaveLength(0);
       expect(await db.query('SELECT 1 FROM canonical_demo_repair_snapshots WHERE id=$1',[snapshot.id])).toHaveLength(0);
-      expect((await db.query('SELECT email,message FROM neture_contact_messages WHERE id=$1',[contact.id]))[0]).toMatchObject({email:expect.stringMatching(/^erased:/),message:'Synthetic body'});
+      // 본인이 쓴 문의는 행만 남고 이름 · 전화 · 제목 · 본문이 지워진다(2026-11-10 결정). 남의 문의는 이 회원 식별값만 치환된다.
+      const [own]=await db.query('SELECT name,email,phone,subject,message FROM neture_contact_messages WHERE id=$1',[contact.id]);
+      expect(own).toMatchObject({name:expect.stringMatching(/^erased:[a-f0-9]{64}$/),email:expect.stringMatching(/^erased:/),phone:null,subject:expect.stringMatching(/^erased:/),message:expect.stringMatching(/^erased:/)});
+      const [other]=await db.query('SELECT name,email,message FROM neture_contact_messages WHERE id=$1',[peerContact.id]);
+      expect(other).toMatchObject({name:'Peer sender',email:peer.email});
+      expect(other.message).toMatch(/^Please reach erased:[a-f0-9]{64} later$/);
       const [act]=await db.query('SELECT "userId",email,details FROM account_activities WHERE id=$1',[activity.id]);
       expect(act.userId).toBe(peer.id);expect(act.email).toMatch(/^erased:/);expect(JSON.stringify(act.details)).not.toContain(target.email);
     }finally{
       await db.query('DELETE FROM action_logs WHERE id=ANY($1::uuid[])',[[actorLog.id,mentionLog.id]]);
       await db.query('DELETE FROM operator_invitations WHERE id=$1',[invite.id]);
       await db.query('DELETE FROM canonical_demo_repair_snapshots WHERE id=$1',[snapshot.id]);
-      await db.query('DELETE FROM neture_contact_messages WHERE id=$1',[contact.id]);
+      await db.query('DELETE FROM neture_contact_messages WHERE id=ANY($1::uuid[])',[[contact.id,peerContact.id]]);
       await db.query('DELETE FROM account_activities WHERE id=$1',[activity.id]);
     }
   });
