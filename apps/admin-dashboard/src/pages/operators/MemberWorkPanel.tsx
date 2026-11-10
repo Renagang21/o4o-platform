@@ -34,7 +34,10 @@ export default function MemberWorkPanel({
     [reason, setReason] = useState('');
   const readOnly = member.operatorReadOnly && !adminMode;
   const editing = !readOnly && mode === 'edit' && permissions.edit;
-  const reviewable = !readOnly && registration && registration.state !== 'approved';
+  // 가입 신청(승인 대기 · 반려)과 이용 해지는 다른 기록이다. 해지된 회원의 신청은 서버도 처리하지 않으므로
+  // (MEMBER_SERVICE_INACTIVE) 승인 · 반려 칸을 보이지 않고 이유만 보인다.
+  const serviceInactive = ['suspended', 'withdrawn'].includes(member.serviceStatus ?? '');
+  const reviewable = !readOnly && !serviceInactive && registration && registration.state !== 'approved';
   const initialLifecycle = ['suspended', 'withdrawn'].includes(
     member.serviceStatus ?? '',
   )
@@ -43,6 +46,11 @@ export default function MemberWorkPanel({
   return (
     <div className="space-y-4">
       {readOnly && <output className="block">전체 관리자 — 처리 대상 아님</output>}
+      {!readOnly && serviceInactive && registration && registration.state !== 'approved' && (
+        <p role="note" className="rounded border border-slate-200 bg-slate-50 p-3 text-sm text-slate-700">
+          해지된 회원입니다. 남아 있는 가입 신청({REGISTRATION_STATE_LABELS[registration.state] ?? '확인 필요'})은 이용 복구 후 처리할 수 있습니다.
+        </p>
+      )}
       {/* 가입 승인·반려는 패널 맨 위에서 처리한다. 제출 정보는 그 아래에서 확인한다. */}
       {!editing && reviewable && actorId !== member.userId && (
         <section aria-label="가입 신청 처리" className="space-y-3 rounded border border-blue-200 bg-blue-50 p-3">

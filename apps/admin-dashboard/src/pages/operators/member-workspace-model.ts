@@ -47,8 +47,10 @@ export const memberStatusTone: Record<string, string> = {
   approved: 'border-green-300 bg-green-50 text-green-800',
 };
 /** 목록에서 고른 회원에게 가입 승인·반려를 할 수 없는 이유. 상태를 모르면(undefined) 서버 판정에 맡긴다. */
-export function registrationDecisionBlock(row: Pick<MemberRow,'registrationState'>|undefined): string | null {
-  if (!row || row.registrationState === undefined) return null;
+export function registrationDecisionBlock(row: Pick<MemberRow,'registrationState'|'serviceStatus'>|undefined): string | null {
+  if (!row) return null;
+  if (['suspended','withdrawn'].includes(row.serviceStatus ?? '')) return '해지된 회원입니다. 가입 신청은 이용 복구 후 처리해 주시기 바랍니다.';
+  if (row.registrationState === undefined) return null;
   if (row.registrationState === null) return '가입 유형·제출 정보가 없습니다. 「회원 정보 수정」에서 먼저 저장해 주시기 바랍니다.';
   if (row.registrationState === 'approved') return '이미 승인된 회원입니다. 이용 종료는 「회원 해지·복구」로 처리해 주시기 바랍니다.';
   return null;
