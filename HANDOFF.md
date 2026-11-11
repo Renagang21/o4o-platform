@@ -7,7 +7,7 @@
 ## 2026-11-11 · Promote · Delivery 짧은 job 통합 (비용 절감 · branch `claude/peaceful-lamport-sjwtri-promote-cost`)
 
 > 이 절만 이 branch 의 인계다. 아래 계정 삭제 절은 다른 세션의 인계로 그대로 둔다.
-> 다음 실행자: **통합 담당** — PR 검토 · 병합(배포 workflow 변경 · AGENTS.md §5). 병합 뒤 다음 실제 Delivery/Promote 1회에서 아래 「병합 후 확인」.
+> 다음 실행자: **LOCAL** — [`WO-O4O-PROMOTE-SHORT-JOB-CONSOLIDATION-V1`](docs/work-orders/WO-O4O-PROMOTE-SHORT-JOB-CONSOLIDATION-V1.md) §5-A actionlint(병합 전 조건) → **통합 담당** PR 검토 · 병합(배포 workflow 변경 · AGENTS.md §5) → 같은 WO §5-B 병합 후 첫 실행 확인.
 
 - **바꾼 것:** `deploy-api.yml` · `deploy-admin.yml` · `deploy-web-services.yml` 의 `ci-gate` job 을 detect job 의 step(`ci_gate`)으로 옮겼다. 배포 job 은 `needs.<detect>.outputs.ci_gate == 'passed'` 를 요구한다(게이트 조건식 · `ci-gate.mjs --enforce` · 30분 대기 · 권한 그대로). Web `summary` 는 직접 dispatch 에서만 돈다(`github.workflow_ref` 로 판별 — Delivery · Promote 호출 시 skip).
 - **절감(실측 2026-10-27~11-10, Promote 62 · Delivery 183 run):** 1분 청구 job 약 665개/15일 제거 → 월 약 1,300분(약 $7.7, private Linux 요금) · 배포 workflow 사용량의 약 22%.
