@@ -17,6 +17,9 @@ export const RETAINED_RECORD_TABLES: Readonly<Record<string, 'minimize' | 'delet
   account_activities: 'minimize',
   action_logs: 'minimize',
   canonical_demo_repair_snapshots: 'delete',
+  // 공개 · 회원 문의 저장소(contact-inquiry). 본인 문의는 아래 WIPED 규칙으로 내용까지 지운다(#1023 Codex P1).
+  contact_inquiries: 'minimize',
+  contact_requests: 'minimize',
   neture_contact_messages: 'minimize',
   neture_suppliers: 'minimize',
   // 초대 이메일 · 토큰은 정책 §2.1 상 파기 대상이고, 「수락됨」은 DB 제약상 수락자를 비울 수 없다.
@@ -30,6 +33,21 @@ export const RETAINED_RECORD_TABLES: Readonly<Record<string, 'minimize' | 'delet
  */
 export const RETAINED_RECORD_LINKS: Readonly<Record<string, readonly string[]>> = {
   neture_suppliers: ['user_id'],
+};
+
+/**
+ * 작성자 본인 행이면 내용 전체를 지우고 행만 남기는 열 (2026-11-10 통합 담당 결정 · #1022 Codex P1).
+ * 이름 · 전화번호 · 제목 · 본문에는 회원 ID · 이메일 말고도 개인정보가 들어 있어, 식별값 치환만으로는 사후 검토가 놓친다.
+ * 작성자는 `owner` 열(문의 이메일)이 이 회원 이메일과 같거나, `ownerIds` 열(작성 회원 ID)이 이 회원인 행으로 판정한다.
+ * 다른 사람의 문의는 기존처럼 식별값만 치환한다. NOT NULL 열은 `erased:<key>`, NULL 허용 열은 NULL 로 둔다.
+ */
+const RETAINED_RECORD_WIPED_COLUMNS: Readonly<Record<string, { owner: string; ownerIds?: readonly string[]; columns: readonly string[]; clearTogether?: readonly string[] }>> = {
+  // 요청자 4개 열은 「모두 NULL 이거나 모두 값」 제약(cooperation_contact_owner_check)이 있어 본인 행이면 함께 비운다.
+  contact_inquiries: { owner: 'email', ownerIds: ['requester_user_id', 'requester_subject_id'],
+    columns: ['name', 'phone', 'organization_name', 'subject', 'message', 'source_path', 'user_agent', 'internal_note'],
+    clearTogether: ['requester_user_id', 'requester_subject_type', 'requester_subject_id', 'client_request_id'] },
+  contact_requests: { owner: 'email', ownerIds: ['created_by'], columns: ['name', 'phone', 'organization_name', 'subject', 'message'] },
+  neture_contact_messages: { owner: 'email', columns: ['name', 'phone', 'subject', 'message', 'adminNotes'] },
 };
 
 export function isRetainedRecordTable(schema: string, table: string): boolean {
@@ -77,26 +95,45 @@ export function replacementRules(tokens: readonly string[], key: string): Array<
   });
 }
 
+/** 표 이름(`schema.table`) — 사본 검사가 찾은 그 밖의 표를 가리킨다. */
+export interface CopyTable { schema: string; table: string }
+
+/**
+ * 보존 기록 표와, 사본 검사(reviewManifest)가 회원 식별값의 단순 사본을 찾은 그 밖의 표를 정리한다.
+ * 그 밖의 표는 모두 `minimize`(식별값만 `erased:<key>` 로 치환, 행은 유지)로 처리한다 — 2026-11-10 통합 담당 결정:
+ * 등록되지 않은 표에 사본이 있다는 이유로 삭제가 「검토 필요」에서 멈추지 않게 한다. 치환 뒤에도 남으면 사후 검토가 잡는다.
+ */
 export async function minimizeRetainedRecords(
   m: Pick<EntityManager, 'query'>,
   userId: string,
   key: string,
   tokens: readonly string[],
+  copyTables: readonly CopyTable[] = [],
 ): Promise<{ table: string; mode: 'minimize' | 'delete'; rows: number }[]> {
   const rules = replacementRules(tokens, key);
   if (!rules.length) return [];
   const patterns = rules.map(rule => rule.pattern);
   const uuidTokens = tokens.filter(token => UUID.test(token));
   const result: { table: string; mode: 'minimize' | 'delete'; rows: number }[] = [];
-  for (const [table, mode] of Object.entries(RETAINED_RECORD_TABLES)) {
+  const targets: Array<{ schema: string; table: string; mode: 'minimize' | 'delete' }> =
+    Object.entries(RETAINED_RECORD_TABLES).map(([table, mode]) => ({ schema: 'public', table, mode }));
+  for (const copy of copyTables) {
+    if (!targets.some(t => t.schema === copy.schema && t.table === copy.table))
+      targets.push({ schema: copy.schema, table: copy.table, mode: 'minimize' });
+  }
+  for (const { schema, table: name, mode } of targets) {
+    // 보존 기록 표 전용 규칙(행위자 키 · 본인 문의 · 소유 연결)은 public 표 이름에만 적용한다.
+    const table = schema === 'public' ? name : '';
     const columns: Array<{ name: string; type: string; nullable: string }> = await m.query(
       `SELECT column_name AS name,data_type AS type,is_nullable AS nullable FROM information_schema.columns
-       WHERE table_schema='public' AND table_name=$1 ORDER BY ordinal_position`, [table]);
+       WHERE table_schema=$1 AND table_name=$2 ORDER BY ordinal_position`, [schema, name]);
     if (!columns.length) continue;
+    const target = `${quote(schema)}.${quote(name)}`;
+    const label = schema === 'public' ? name : `${schema}.${name}`;
     const matches = `to_jsonb(r)::text ~* ANY($1::text[])`;
     if (mode === 'delete') {
-      const deleted = await m.query(`DELETE FROM public.${quote(table)} r WHERE ${matches} RETURNING 1`, [patterns]);
-      result.push({ table, mode, rows: rowCount(deleted) });
+      const deleted = await m.query(`DELETE FROM ${target} r WHERE ${matches} RETURNING 1`, [patterns]);
+      result.push({ table: label, mode, rows: rowCount(deleted) });
       continue;
     }
     // $1 patterns, then the uuid tokens (only when a column uses them) and one parameter pair per rule.
@@ -109,10 +146,36 @@ export async function minimizeRetainedRecords(
     }, expression);
     const sets: string[] = [];
     const actorKeyed = table === 'action_logs' && columns.some(column => column.name === 'meta');
+    // 작성자 본인 행 판정(SET 안의 열 참조는 갱신 전 값이다). 이메일 토큰이 없으면 내용 삭제를 하지 않는다.
+    const wipe = RETAINED_RECORD_WIPED_COLUMNS[table];
+    const emails = tokens.filter(token => token.includes('@')).map(token => token.toLowerCase());
+    let owned: string | null = null;
+    // 쓰지 않는 바인딩은 PostgreSQL 이 형식을 정하지 못해 실패하므로, 실제로 지울 열이 있을 때만 넣는다.
+    if (wipe && columns.some(column => wipe.columns.includes(column.name))) {
+      const owners: string[] = [];
+      if (emails.length && columns.some(column => column.name === wipe.owner))
+        owners.push(`lower(r.${quote(wipe.owner)}::text)=ANY($${params.push(emails)}::text[])`);
+      const idColumns = (wipe.ownerIds ?? []).filter(id => columns.some(column => column.name === id));
+      if (idColumns.length) {
+        const subject = params.push(userId);
+        for (const id of idColumns) owners.push(`r.${quote(id)}::text=$${subject}::text`);
+      }
+      if (owners.length) owned = `(${owners.join(' OR ')})`;
+    }
     for (const column of columns) {
       if (column.name === 'id' || (actorKeyed && column.name === 'meta')) continue;
       const name = quote(column.name);
       if (RETAINED_RECORD_LINKS[table]?.includes(column.name)) continue;
+      if (owned && wipe?.clearTogether?.includes(column.name)) {
+        sets.push(`${name}=CASE WHEN ${owned} THEN NULL ELSE ${name} END`);
+        continue;
+      }
+      if (owned && wipe?.columns.includes(column.name)) {
+        const cleared = column.nullable === 'YES' ? 'NULL' : `$${params.push(`erased:${key}`)}::text`;
+        const kept = ['text', 'character varying'].includes(column.type) ? replace(name) : name;
+        sets.push(`${name}=CASE WHEN ${owned} THEN ${cleared} ELSE ${kept} END`);
+        continue;
+      }
       if (column.type === 'uuid' && column.nullable === 'YES')
         sets.push(`${name}=CASE WHEN ${name}::text=ANY($${uuids()}::text[]) THEN NULL ELSE ${name} END`);
       else if (['text', 'character varying'].includes(column.type))
@@ -130,8 +193,8 @@ export async function minimizeRetainedRecords(
       sets.push(`meta=CASE WHEN user_id::text=ANY($${actor}::text[]) THEN COALESCE(${meta},'{}'::jsonb)||jsonb_build_object('actorKey',$${params.length}::text) ELSE ${meta} END`);
     }
     if (!sets.length) continue;
-    const updated = await m.query(`UPDATE public.${quote(table)} r SET ${sets.join(',')} WHERE ${matches} RETURNING 1`, params);
-    result.push({ table, mode, rows: rowCount(updated) });
+    const updated = await m.query(`UPDATE ${target} r SET ${sets.join(',')} WHERE ${matches} RETURNING 1`, params);
+    result.push({ table: label, mode, rows: rowCount(updated) });
   }
   return result;
 }
