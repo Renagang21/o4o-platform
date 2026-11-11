@@ -1,7 +1,7 @@
 # O4O 자체 실행기(집 PC) CI 전환 기준 V1
 
 > **상태**: DRAFT
-> **작성일**: 2026-11-07 · **최종 갱신**: 2026-11-07
+> **작성일**: 2026-11-07 · **최종 갱신**: 2026-11-10 (실행기 3대 구성 · `o4o-ci-pg` label · WSL 48GB · 1주 실측)
 > **근거 WO/IR**: WO-O4O-SELF-HOSTED-CI-PREPARATION-V1 · WO-O4O-SELF-HOSTED-CI-PR969-CLOSURE-V1 · [`IR-O4O-PRIVATE-CI-BUDGET-V1`](../../investigations/IR-O4O-PRIVATE-CI-BUDGET-V1.md)
 > **범위**: 저장소를 private 로 전환한 **뒤** 일반 CI 를 집 PC 실행기로 옮기기 위한 구조 · 준비 절차 · 복귀 절차.
 > 이 문서 작성 시점의 상태는 **public 유지 / GitHub 호스팅 실행 유지 / 자체 실행기 미등록 / 저장소 변수 미설정**이다.
@@ -80,7 +80,7 @@ schedule 이벤트에는 repository payload 가 없어 2-2 식이 항상 호스�
 | | API Server Jest (1~3/3) | Linux 일반 | 지원 | 실행기 1대면 3 shard 가 순차 → wall-clock 증가 |
 | | Build Applications · Web production build | Linux 일반 | 지원 | |
 | | Docs Fast · Admin Fast ×2 (문서 민감정보 guard · RoleGuard 는 Detect 의 step) | Linux 일반 | 지원 | |
-| | Central operator PostgreSQL integration | Linux 일반 | 지원 | service container — 실행기에 Docker 필요. host port `55432` 고정이라 같은 PC 동시 실행 불가(순차 전제) |
+| | Central operator PostgreSQL integration | Linux 일반 | 지원 | service container — 실행기에 Docker 필요. host port `55432` 고정(테스트가 일회용 DB 표식으로 확인)이라 같은 PC 동시 실행 불가 → 자체 실행기에서는 label **`o4o-ci-pg`** 를 단 실행기 1대에서만 돈다([#1020](https://github.com/Renagang21/o4o-platform/pull/1020) · §9) |
 | | API production dependency smoke | Linux 일반 | 지원 | `$RUNNER_TEMP` 만 사용 |
 | | PC installer Windows | Windows 전용 | 지원(기본 보류 권장) | §5-3 |
 | | **CI Gate** | 관리(결과 집계) | 지원 | 이름 · `if: always()` · needs 불변 |
@@ -94,6 +94,8 @@ schedule 이벤트에는 repository payload 가 없어 2-2 식이 항상 호스�
 | `delivery` · `deploy-*` · `promote` · `account-erasure-activation` · `gcp-wif-auth-smoke` · `production-secret-resolution-check` · `pharmacyhub-qr-cutover` | 배포 · GCP | **유지** | OIDC/WIF · `production` Environment · 배포 concurrency · 위험 판정 불변 |
 
 비공개 전환 후에도 위 "보류 · 유지" job 은 GitHub 호스팅 사용량으로 남는다. 조사 기준 월 실행량 중 Delivery · Promote 가 약 4,800분 규모(표본 추정, [`IR-O4O-PRIVATE-CI-BUDGET-V1`](../../investigations/IR-O4O-PRIVATE-CI-BUDGET-V1.md))이므로 "0원" 이 아니다. 절감률은 실측 전 제시하지 않는다.
+
+> **2026-11-10 표본 실측 (2026-11-03~11-09, 961 run, `actions-cost.mjs` · 청구서 아님):** GitHub 호스팅 기준 주 약 11,900분(월 환산 약 50,900분 · 약 $312, private 표준 요금 가정). 이 중 CI Pipeline 이 주 약 9,500분으로 집 PC 이전 대상이고, CodeQL(주 약 1,100분)은 private 에서 자동 생략된다. 이전 후 호스팅에 남는 양은 Promote(주 약 640분) · Delivery 등 **월 약 3,800분(약 $23)** 이다. 포함 사용량 차감 전 금액이며, 실행기 등록 후 실측으로 다시 확인한다.
 
 ## 4. 기존 절약 정책과의 관계
 
@@ -176,6 +178,17 @@ memory=32GB
 processors=10
 swap=8GB
 ```
+
+실행기 **3대 동시 실행**(§9-3) 기준 권장값 — API Jest 최대 RSS 약 4.5GiB × 3 + PostgreSQL service container + 빌드 여유, Windows 에 약 16GB 를 남긴다:
+
+```ini
+[wsl2]
+memory=48GB
+processors=12
+swap=8GB
+```
+
+바꾼 뒤 PowerShell 에서 `wsl --shutdown` → 예약 작업(§7-7) 또는 재부팅으로 다시 띄우고, Ubuntu 에서 `free -g` 로 상한을 확인한다.
 
 ### 7-3. Ubuntu 기본 도구 · systemd
 
@@ -291,7 +304,8 @@ Windows 자동 로그인은 요구하지 않는다.
 
 - 실행기는 OS 별 1개로 시작한다(동시 1 job). CI Pipeline 1회의 job(최대 약 12개)이 순서대로 돈다.
 - PR 1건과 main push 1건이 겹칠 때의 전체 대기 시간을 Actions 화면 job 의 생성 → 시작 시각으로 기록한다.
-- 동시 실행(실행기 2개 이상)은 이 측정 후 판단한다. `55432` 고정 포트처럼 같은 PC 에서 겹치면 안 되는 job 이 있다(§3).
+- 동시 실행(실행기 2개 이상)은 이 측정 후 판단한다. `55432` 고정 포트 job 은 `o4o-ci-pg` label 로 실행기 1대에만 가므로 실행기를 늘려도 겹치지 않는다(§3 · §9-3).
+- 3대 구성에서는 CI Pipeline 1회의 job 이 최대 3개씩 동시에 돈다. 바쁜 시간대(한국 시간 9~16시 · 20~23시)의 대기 시간과 `free -g` 최댓값을 함께 기록한다.
 - 비용 집계: `node scripts/ci/actions-cost.mjs --repo Renagang21/o4o-platform --from <YYYY-MM-DD> --to <YYYY-MM-DD>`. self-hosted label job 은 중단하지 않고 `estimatedSelfHostedMinutes`(올림 없는 실제 실행 시간)로 따로 모으고, GitHub 실행기 job 은 기존대로 `estimatedHostedMinutes` · `grossEstimatedUsd`(job 별 분 단위 올림 · 표준 요금)로 계산한다. 자체 실행기 요금은 `SELF_HOSTED_USD_PER_MINUTE`(현재 0) 이며 전기료는 포함하지 않는다. 대기열 시간은 집계하지 않는다.
 
 ## 8. 실기 확인 항목 (이 문서를 ACTIVE 로 바꾸기 전)
@@ -302,6 +316,8 @@ Windows 자동 로그인은 요구하지 않는다.
 - [ ] service container(PostgreSQL 15) 기동 · 종료 후 컨테이너/네트워크 잔존 0
 - [ ] job 종료 후 남은 node/jest 프로세스 0
 - [ ] API Jest 3 shard 순차 실행의 메모리 · 시간
+- [ ] (3대 구성) `Central operator PostgreSQL integration` 이 `o4o-ci-pg` 실행기에서만 돌고, 다른 실행기는 이 job 을 받지 않는다
+- [ ] (3대 구성) API Jest 3 shard 동시 실행 시 WSL 메모리 최댓값이 상한(48GB) 안
 - [ ] `CI Gate` 가 실패 · 취소를 그대로 실패로 보고
 - [ ] 재부팅(로그인 없음) 후 실행기 Idle 복귀
 - [ ] 변수 삭제 후 다음 run 이 호스팅으로 돌아감
@@ -312,9 +328,13 @@ Windows 자동 로그인은 요구하지 않는다.
 2. 저장소 private 전환 → ruleset · `production` Environment 가 유지됐는지 read-only 확인.
 3. 실행기 등록 — GitHub Settings → Actions → Runners → New self-hosted runner 에서 **화면이 주는 다운로드 · 검증 · 등록 명령**을 `o4oci` 로 실행한다. 등록 토큰은 화면에서만 쓰고 저장 · 공유하지 않는다. `config.sh` 에 `--labels o4o-ci-linux --unattended` 를 더하고, 서비스 설치는 `sudo ./svc.sh install o4oci` → `sudo ./svc.sh start`.
    (Windows 를 옮기는 경우에만: 같은 화면의 Windows 명령 + `--labels o4o-ci-windows --runasservice`.)
+   **3대 구성 (RAM 64GB · 권장):** 실행기마다 폴더를 따로 두고(`/home/o4oci/actions-runner-1` · `-2` · `-3`, 각 폴더에 같은 다운로드 압축을 푼다), 폴더마다 등록 명령을 한 번씩 실행한다. 등록 토큰은 화면에서 새로 받는다. 이름은 `--name o4o-home-1` · `-2` · `-3` 으로 구분한다.
+   - **1번만** `--labels o4o-ci-linux,o4o-ci-pg` (고정 포트 PostgreSQL job 전용 — §3). 2 · 3번은 `--labels o4o-ci-linux`.
+   - 서비스는 폴더마다 `sudo ./svc.sh install o4oci` → `sudo ./svc.sh start` (서비스 이름이 폴더별로 따로 생긴다).
+   - `.wslconfig` 를 §7-2 의 3대 기준(48GB)으로 먼저 올린다.
 4. 이 시점까지 변수는 없다 → 모든 job 은 여전히 호스팅. 실행기가 Idle 인지만 본다.
 5. `CI_RUNNER_LINUX=self-hosted` 설정 → Draft 가 아닌 시험 PR 1건으로 §8 확인.
-6. 1~2주 측정 후 동시 실행 · Windows 이전 여부 판단.
+6. 1~2주 측정 후 실행기 대수(1~3) · Windows 이전 여부 판단. 3대로 시작했다면 메모리 · 대기 시간을 보고 줄일지 판단한다.
 
 ## 10. GitHub 호스팅 복귀
 
