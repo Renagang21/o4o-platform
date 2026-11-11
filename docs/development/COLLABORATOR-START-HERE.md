@@ -176,7 +176,7 @@ DB 의 `o4o_api` 는 로그인 계정이 아니라 **NOLOGIN owner role** 이다
 
 ## 7. 다음에 읽을 문서
 
-1. 이 문서
+1. 이 문서 — 실제 설치 · 첫 작업 순서는 [공동개발자 시작 체크리스트](COLLABORATOR-ONBOARDING-CHECKLIST.md)
 2. [O4O-BUSINESS-PHILOSOPHY-V1](../baseline/O4O-BUSINESS-PHILOSOPHY-V1.md) · [O4O-AI-AUTOMATION-EVOLUTION-PRINCIPLES-V1](../baseline/O4O-AI-AUTOMATION-EVOLUTION-PRINCIPLES-V1.md)
 3. [README.md](../../README.md) — 기여 · Production 변경 원칙
 4. [SETUP.md](../../SETUP.md) — 로컬 개발환경 · 검증 명령 · DB. 공동개발 로컬환경(로컬 API + web-neture, 운영 credential 불필요)은 [§3-1](../../SETUP.md#3-1-공동개발-로컬환경--로컬-api--web-neture)

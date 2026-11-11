@@ -293,9 +293,12 @@ Admin 개발 서버의 기준 포트는 **3001**입니다. `apps/admin-dashboard
 3. **로컬 DB** — PostgreSQL 15 에 빈 DB(예: `o4o_platform`)와 그 DB 의 owner 사용자를 만듭니다.
    필요한 extension(`uuid-ossp`)은 아래 bootstrap 이 생성합니다.
 4. **API env** — §2-4 대로 `apps/api-server/.env` 작성 (`PORT=3002`, 로컬 DB 값, 임의 JWT/SESSION secret).
-5. **스키마 bootstrap** — `pnpm --filter @o4o/api-server migration:run`.
+5. **스키마 bootstrap** — `cd apps/api-server` 후 `npx tsx --env-file=.env src/migrate.ts`.
    빈 DB 면 canonical schema baseline 을 적용한 뒤 incremental migration 을 적용합니다(`apps/api-server/src/migrate.ts`).
    반드시 **로컬 DB** 를 가리키는 `.env` 로 실행합니다. seed · 테스트 계정은 없습니다.
+   `migrate.ts` 는 `.env` 를 스스로 읽지 않고 셸 환경변수 `DB_*` 만 읽습니다. 그래서 `--env-file=.env` 를 붙입니다.
+   `pnpm --filter @o4o/api-server migration:run` 을 그대로 실행하면 `DB_HOST: MISSING` 으로 실패합니다(2026-11-11 빈 DB 에서 확인).
+   이 명령은 Claude Code 에서 승인 확인 대상입니다(`.claude/hooks/guard-ask-commands.mjs`).
    현재 등록 manifest에는 AI quota 예약/정산 테이블과 비용 정밀도 migration도 포함됩니다. 운영에는 적용된 변경이지만 새 로컬 DB에는 정상 bootstrap/incremental 절차가 필요합니다. 운영 DB에서 같은 작업을 임의 재실행하지 않습니다.
 6. **API 기동** — `pnpm run dev:api` → `curl http://localhost:3002/health`.
 7. **web-neture 기동** — `pnpm --filter @o4o/web-neture dev` → http://localhost:3000 . `/` 에 `O4OHomePage`(메인 화면)가 보이면 정상입니다.
@@ -380,10 +383,11 @@ API 서버는 **`apps/api-server/.env`** 만 읽습니다 (루트 `.env` 아님)
 **운영 DB migration은 승인된 표준 API 배포의 migration job이 실행합니다.** migration 포함 변경은 LEVEL 3으로 자동 rollout되지 않으며,
 현재 CI/freeze/ref/계정 gate와 명시적인 운영 DB 실행 승인 범위를 확인한 뒤 정상 Promote를 사용합니다([README — 배포](README.md#배포), [운영 migration 정본](docs/baseline/operations/PRODUCTION-MIGRATION-STANDARD.md)).
 2026-10-14의 AI quota 정상 up은 실행 완료됐고 rollback/archive repair는 실행하지 않았습니다. 이 승인을 신규 migration·DB write로 확대하지 않습니다.
-로컬 DB bootstrap은 [§3-1](#3-1-공동개발-로컬환경--로컬-api--web-neture)의 같은 명령으로 합니다.
+로컬 DB bootstrap은 [§3-1](#3-1-공동개발-로컬환경--로컬-api--web-neture)의 같은 명령으로 합니다. `apps/api-server/.env` 를 쓰므로 `--env-file` 을 붙입니다.
 
 ```bash
-pnpm --filter @o4o/api-server migration:run
+cd apps/api-server
+npx tsx --env-file=.env src/migrate.ts
 ```
 
 프로덕션 DB에 대한 접근 정책·검증 채널은 [CLAUDE.md](CLAUDE.md) §0을 따릅니다.
