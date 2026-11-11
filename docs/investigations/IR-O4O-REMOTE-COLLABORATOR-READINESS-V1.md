@@ -8,6 +8,7 @@
 > - 로컬 개발환경은 이 클라우드 컨테이너(새 clone 과 같은 상태)에서 직접 실행해 확인했다.
 > - 신규 개발자 PC 에서는 실행하지 않았다.
 > **근거 WO**: WO-O4O-REMOTE-COLLABORATOR-ONBOARDING-V1
+> **결정 반영**: 2026-11-11 사용자가 결과를 수용하고 §6-2 ①(초기 자체 실행기 미사용) · §7-2 후보 1(첫 과제) · §5-3(별도 WO) · §1-1 classify(별도 CI 보완)를 확정했다. Private 전환 · 실행기 활성화 · 권한 변경 · 배포는 별도 지시 전까지 실행하지 않는다.
 > **산출물**: 이 보고서, [`COLLABORATOR-ONBOARDING-CHECKLIST.md`](../development/COLLABORATOR-ONBOARDING-CHECKLIST.md)(시작 체크리스트), `SETUP.md` §3-1 · §4 migration 명령 정정
 
 판정 어휘: **READY**(지금 사용 가능) · **NEEDS_PREPARATION**(합류 전 보완 필요) · **VERIFY_WITH_BUSINNECT**(신규 개발자 PC · 계정에서 직접 확인)
@@ -213,7 +214,7 @@
 | 로컬 검증 | vitest 컴포넌트 테스트(이동 경로 고정) · web-neture build | 같음 | vitest(가짜 행 · 가짜 성공 0) · build |
 | 로그인 화면 확인 | 관리자 전용이라 로컬 계정이 없다(§5) → 테스트로 대신하고, 배포 후 통합 담당이 운영 관리자 계정으로 클릭 확인 | 같음 | 같음 |
 
-### 7-2. 추천 — 후보 1
+### 7-2. 추천 — 후보 1 (2026-11-11 첫 과제로 확정)
 
 - 메뉴에 보이는 관리자 화면의 실제 404 결함이고, 근거가 코드 두 줄과 route 선언으로 바로 증명된다.
 - 판단할 거리가 없어 저장소 절차 자체를 시험하기에 맞다. 절차: branch → 수정 · 테스트 → 로컬 검증 → push → HANDOFF → 통합 세션 PR → CI.

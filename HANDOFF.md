@@ -1,7 +1,7 @@
 # HANDOFF
 
 > 저장소: `Renagang21/o4o-platform` · 작업 branch: `claude/clever-bohr-g532hw` · 코드 기준: `main` `c5da5631`(merge 반영) · 작성: 2026-11-11 (클라우드 작업 세션)
-> 다음 실행자: **통합 담당(결정 · 병합) → Businnect(체크리스트 실행 · 첫 과제)**
+> 다음 실행자: **통합 담당(이 branch 의 PR 생성 · CI · 병합) → Businnect(체크리스트 실행 · 첫 과제)**
 > 이전 인계 전문: `git show 0c812623:HANDOFF.md`
 
 ## 한 일 3 — WO-O4O-REMOTE-COLLABORATOR-ONBOARDING-V1 (2026-11-11 사용자 지시)
@@ -80,13 +80,30 @@
 - web-neture dev server 기동(이 세션에서는 하지 않음).
 - `require_extra_approval_for_unattributed_changes=true` ruleset 항목의 정확한 동작.
 
-## 결정 필요 (통합 담당 · 사용자) — 한 일 3
+## 확정 사항 (2026-11-11 사용자 결정 — 결과 수용) — 한 일 3
 
-1. 자체 실행기 × Write 협업자: IR §6-2 ①(켜지 않음) · ②(격리 강화 후) · ③(작성자 조건 추가 · 부분 대책) 중 결정
-2. Private 전환 전: 개인 계정 플랜(ruleset · Environment 유지)과 secret scanning 대책
-3. 로컬 합성 계정 CLI 별도 WO 진행 여부(IR §5-3)
-4. 첫 과제 지정(추천: IR §7-2 후보 1)
-5. (후속 · CI 트랙) `delivery.yml` classify 에 소유자 조건 추가 여부
+1. Businnect 는 신규 원격 공동개발자이며 기존 Write 권한을 유지한다.
+2. 초기에는 Businnect 의 PR · branch 코드를 집 PC 자체 실행기에서 실행하지 않는다(IR §6-2 ①).
+3. 저장소 Private 전환을 추진한다. 실행 전에 다음을 확인한다.
+   - ruleset
+   - `production` Environment
+   - secret 검사(secret scanning · push protection)
+   - Actions 비용
+4. 로컬 합성 계정 CLI 는 별도 WO 로 준비한다(IR §5-3). 운영 DB · 실제 개인정보는 쓰지 않는다.
+5. Businnect 첫 시험 과제는 IR §7-2 후보 1(Neture 카탈로그 일괄등록 카드 404 수정)로 확정한다. 성공 기준은 IR §7-3 이다.
+6. `delivery.yml` 비소유자 수동 실행 시 GCP 인증 진입 문제는 별도 CI 보완 작업으로 분리한다.
+
+**이 결정만으로 실행하지 않는 것:** Private 전환 · 자체 실행기 활성화(`CI_RUNNER_LINUX` 설정 포함) · GitHub 권한 변경 · 운영 배포. 각각 별도 지시와 사전 확인 후에 한다.
+
+### 후속 작업 (각각 별도 WO · 별도 branch)
+
+| # | 작업 | 실행 위치 · 주체 | 비고 |
+|---|---|---|---|
+| F1 | Private 전환 사전 확인 — 플랜 · ruleset · `production` Environment(ref 제한 · reviewer) · secret scanning · push protection · Actions 비용/예산 차단 · `GITHUB_TOKEN` 기본 권한 | 통합 담당(설정 화면 · read-only) | IR §2 · §1 표의 VERIFY 항목. 전환 실행은 그 뒤 별도 결정 |
+| F2 | 자체 실행기 기준 문서에 「Write 협업자 코드는 초기 미실행」 반영 · 선택식 보완 검토 | CI 정비 트랙 | `O4O-SELF-HOSTED-CI-RUNNER-V1`(DRAFT) §6 · §9. 이번에 문서 · workflow 는 바꾸지 않았다 |
+| F3 | 로컬 합성 계정 provision CLI | 클라우드 작업 세션 | IR §5-3. loopback · 표식 DB 전용, 기본 dry-run, 3역할 |
+| F4 | `delivery.yml` classify 소유자 조건 | CI 정비 트랙(§5 위험 변경 · 통합 담당 병합 판단) | IR §1-1 |
+| F5 | Businnect 첫 과제 | Businnect 작업 branch → 통합 세션 PR | IR §7-3 성공 기준. 배포 후 관리자 화면 클릭 확인은 통합 담당 |
 
 ## 겹칠 수 있는 열린 PR — 한 일 3
 
