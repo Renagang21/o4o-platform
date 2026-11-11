@@ -1,9 +1,9 @@
 # WO-O4O-SOCIAL-SIGNUP-DIRECT-ROLE-REGISTRATION-V1 — 소셜 가입 직후 역할별 정보 입력으로 바로 진입
 
-> **상태**: DRAFT
-> **작성일**: 2026-11-09 · **최종 갱신**: 2026-11-09
+> **상태**: ACTIVE
+> **작성일**: 2026-11-09 · **최종 갱신**: 2026-11-11
 > **실행 위치**: BOTH (구현 CLOUD · 운영 DB 조회 · migration 적용 · 배포 후 실계정 확인 LOCAL)
-> **인계**: `wo/social-signup-direct-role-registration` · push 전 · 다음 실행자 통합 담당(§2 확인 필요 3건 결정) → CLOUD(T1~)
+> **인계**: PR #1008 병합(2026-11-11) · §2 Q1~Q3 결정 완료 · 다음 실행자 LOCAL(T0) · CLOUD(T1 남은 범위 → T2~)
 > **근거**: 2026-11-09 사용자(통합 담당) 확정(대화, PR #987 운영 검증 중) · [`O4O-UNIFIED-MEMBER-REGISTRATION-V1`](../baseline/O4O-UNIFIED-MEMBER-REGISTRATION-V1.md) 「가입과 승인」 · [`WO-O4O-AUTH-ONBOARDING-UX-CLEANUP-V1`](WO-O4O-AUTH-ONBOARDING-UX-CLEANUP-V1.md) U2 · U3 · U4 · [`WO-O4O-PRIVACY-IDENTITY-TARGET-MODEL-DECISION-CLOSURE-V1`](WO-O4O-PRIVACY-IDENTITY-TARGET-MODEL-DECISION-CLOSURE-V1.md) D1
 
 ## 1. 배경 (운영 확인 · 현재 코드 대조)
@@ -47,9 +47,9 @@
 | S5 | 역할별 입력 화면의 이름 · 휴대전화는 **직역별로 판단**한다. 공통 칸에서는 선택이고, 그 직역에 꼭 필요한 경우(예: 약사 면허 확인)만 그 유형의 정보로 받는다 |
 | S6 | 가입 유형으로 부여받은 공간 외의 추가 가입은 My Home 에서 한다(정본 유지) |
 
-**확인 필요 (구현 전 통합 담당 결정):**
+**결정 (2026-11-11 — 통합 담당이 #1008 처리를 위임, 권장안을 그대로 채택):**
 
-| # | 질문 | 권장안 |
+| # | 질문 | 결정 |
 |---|---|---|
 | Q1 | 약관 동의를 어디서 받는가 | **기본 인증 단계에 동의 체크만 남긴다**(입력칸 0개). 계정 생성은 곧 개인정보 처리의 시작이다. 또 `recordSignupTerms` · `recordSignupPrivacy` 가 users 생성 트랜잭션에 묶여 있다. 역할 입력 화면으로 옮기면 동의 없이 계정이 생기는 구간이 생긴다 |
 | Q2 | 소셜 제공자가 확인한 이메일을 저장하는가, 이미 쓰는 주소와 겹치면 어떻게 하는가 | 제공자가 **확인한** 이메일은 저장한다(Google 은 항상, 카카오는 제공 · 확인된 경우만). 겹치면 기존 `EMAIL_IN_USE` 안내를 유지한다(#987 U2 · 자동 병합 금지). 미확인 · 미제공이면 `NULL` 로 둔다 |
@@ -79,6 +79,7 @@
 
 - [ ] T0 [LOCAL] 영향 조회(read-only, 아래 SQL-1) — 확인 메일 관문에 막혀 있는 기존 계정 수를 파악한다
 - [ ] T1 [CLOUD] 정본 문서 PR(문서 전용, R6)
+  - 일부 완료(#1014, 2026-11-10): 통합 가입 정본 상단 · 12행에 S4 · S5(닉네임만 필수 · 이름 · 휴대전화 선택)와 2단계 가입 신청이 반영됐다. 남은 것은 S1 ~ S3 이다
   - [`O4O-UNIFIED-MEMBER-REGISTRATION-V1`](../baseline/O4O-UNIFIED-MEMBER-REGISTRATION-V1.md) 에 S1~S5 를 반영한다
   - [`O4O-NETURE-AUTH-AND-SERVICE-MEMBERSHIP-V1`](../baseline/O4O-NETURE-AUTH-AND-SERVICE-MEMBERSHIP-V1.md) 의 「메인 이메일 확인」을 소셜 가입 기준으로 고친다
   - 기준 문서의 내용 변경이므로 통합 담당 확인 후 진행한다
@@ -93,12 +94,12 @@
   - 카카오 signup: 이메일 입력을 받지 않는다. Q2 에 따라 제공자 확인 이메일만 저장한다
   - 소셜 `sessionOrVerification`: 미확인 이메일로 세션을 막지 않는다
   - Google signup: 이름 · 휴대전화 입력을 제거한다
-  - 역할 입력(`member-registration.service.ts`) 검증을 S4 · S5 로 바꾼다
+  - ~~역할 입력(`member-registration.service.ts`) 검증을 S4 · S5 로 바꾼다~~ — #1014 에서 완료(zod · service 검증, 빈 값은 기존 값 유지)
   - DTO · 테스트를 갱신한다
 - [ ] T5 [CLOUD] 공통 인증 화면(`shared-package:auth-react`)
   - `KakaoContinue` · `GoogleContinue` 가입 단계를 「약관 동의(Q1) → 계정 생성 → 역할 입력으로 이동」으로 바꾼다
   - #987 의 오류 안내(`EMAIL_IN_USE` · 만료)는 남는 경로에서 유지한다
-- [ ] T6 [CLOUD] 역할 입력 화면
+- [x] T6 [CLOUD] 역할 입력 화면 — #1014 에서 완료(2단계 가입 신청 · 닉네임 필수 · 이름 · 휴대전화 선택)
   - `MemberRegistrationForm.tsx`: 닉네임 필수, 이름 · 휴대전화는 직역별 처리(S5)
   - 약사 유형이 면허 확인에 이름이 필요한지 그 유형 필드에서 확인한다
 - [ ] T7 [CLOUD] 소비 서비스 확인: `web-neture` · `web-kpa-branch` · `web-pharmacy-business` 의 가입 후 이동(`/signup` · `MemberRegistrationCompletion`) 동작을 확인한다
