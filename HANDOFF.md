@@ -4,6 +4,18 @@
 > 다음 실행자: **통합 세션(PR 생성 · 병합) → LOCAL(배포 · 배포 후 확인)**
 > 이전 인계 전문(통합 진행표 포함): `git show 9adcadaf97:HANDOFF.md`
 
+## 2026-11-11 · Promote · Delivery 짧은 job 통합 (비용 절감 · branch `claude/peaceful-lamport-sjwtri-promote-cost`)
+
+> 이 절만 이 branch 의 인계다. 아래 계정 삭제 절은 다른 세션의 인계로 그대로 둔다.
+> 다음 실행자: **통합 담당** — PR 검토 · 병합(배포 workflow 변경 · AGENTS.md §5). 병합 뒤 다음 실제 Delivery/Promote 1회에서 아래 「병합 후 확인」.
+
+- **바꾼 것:** `deploy-api.yml` · `deploy-admin.yml` · `deploy-web-services.yml` 의 `ci-gate` job 을 detect job 의 step(`ci_gate`)으로 옮겼다. 배포 job 은 `needs.<detect>.outputs.ci_gate == 'passed'` 를 요구한다(게이트 조건식 · `ci-gate.mjs --enforce` · 30분 대기 · 권한 그대로). Web `summary` 는 직접 dispatch 에서만 돈다(`github.workflow_ref` 로 판별 — Delivery · Promote 호출 시 skip).
+- **절감(실측 2026-10-27~11-10, Promote 62 · Delivery 183 run):** 1분 청구 job 약 665개/15일 제거 → 월 약 1,300분(약 $7.7, private Linux 요금) · 배포 workflow 사용량의 약 22%.
+- **위험 판정:** `deploy-risk.mjs --base origin/main --head <이 branch>` = LEVEL_1 · deploy_required=false(세 파일 모두 control 변경). 병합만으로 서비스 재배포 없음.
+- **테스트:** 새 `scripts/ci/__tests__/promote-short-job-consolidation.test.mjs`(실제 조건식을 평가해 freeze · dry_run · 소유자 · 대상 · migrate_only · force_deploy · CI 결과 전 조합에서 배포 여부가 종전과 같음 · 결함 6종 주입 시 모두 실패 확인) · `deploy-workflow-gates.test.mjs` 를 새 구조로 갱신 · CI node:test 목록 추가. `scripts/ci/__tests__/*.test.mjs` 520 pass.
+- **병합 후 확인(미검증 — 실제 실행 필요):** ① 다음 Delivery 배포 run 에서 각 deploy 호출이 `Detect …`(CI gate step 포함) → 배포 순서로 돌고 `ci-gate` job 이 없음 ② CI gate step 로그에 `ci-gate.mjs` 통과 ③ web 호출에 `summary` 가 skip ④ detect job 시간이 60초 안(넘으면 2분 청구 — 절감 축소). 문제가 있으면 이 PR 을 되돌리는 revert PR 하나로 원상 복구된다(데이터 · 설정 변경 없음).
+- **하지 않은 것:** Promote 실행 · 운영 배포 · GitHub 설정 변경. `Same-SHA guard` · `Classify` · `Report` 는 GCP 인증 · 승격 판정 경계라 합치지 않았다.
+
 ## 한 일 — 계정 삭제가 끝나도록 (2026-11-10 사용자 지시)
 
 이전 PR Renagang21/o4o-platform#1014 는 병합됐다(2026-11-10 06:16Z 조회). 같은 branch 이름을 최신 `origin/main` 에서 다시 시작했다. 이 branch 의 PR 은 **미생성**이다(PR 은 통합 세션이 만든다 — AGENTS.md §4-1(e)).
