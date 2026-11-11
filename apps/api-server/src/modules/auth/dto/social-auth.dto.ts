@@ -31,9 +31,10 @@ export class SocialSignupDto {
 
   @IsString() @IsNotEmpty() @MaxLength(100)
   token!: string;
-  @IsString() @IsNotEmpty() @MaxLength(255)
-  email!: string;
-  // WO-O4O-AUTH-ONBOARDING-UX-CLEANUP-V1 T2: 이름 · 휴대전화는 가입 선택 항목이다.
+  // WO-O4O-SOCIAL-SIGNUP-DIRECT-ROLE-REGISTRATION-V1: 카카오 가입은 이메일 · 이름 · 닉네임 · 휴대전화를 받지 않는다.
+  // 예전 화면이 보내는 값만 형식 검사 후 무시한다(카카오가 확인한 이메일만 저장).
+  @IsOptional() @IsString() @MaxLength(255)
+  email?: string;
   @IsOptional() @IsString() @MaxLength(100)
   name?: string;
   @IsOptional() @IsString() @MaxLength(20)

@@ -84,7 +84,7 @@ integration('account erasure — isolated PostgreSQL schema/real sessions', () =
   const user = async (extra: Record<string,unknown>={}) => {
     const id=randomUUID();
     const [r]=await db.query(`INSERT INTO users(id,email,name,status,"isActive","isEmailVerified",avatar)
-      VALUES($1,$2,$3,'active',true,true,$4) RETURNING *`,[id,extra.email??`${id}@fixture.invalid`,extra.name??`Privacy fixture ${id}`,extra.avatar??null]);
+      VALUES($1,$2,$3,'active',true,true,$4) RETURNING *`,[id,Object.prototype.hasOwnProperty.call(extra,'email')?extra.email:`${id}@fixture.invalid`,extra.name??`Privacy fixture ${id}`,extra.avatar??null]);
     if(extra.netureStopped!==false) await db.query("INSERT INTO service_memberships(user_id,service_key,role,status) VALUES($1,'neture','member','suspended')",[id]);
     return Object.assign(new User(),r);
   };
@@ -121,6 +121,15 @@ integration('account erasure — isolated PostgreSQL schema/real sessions', () =
     await connectDefaultPharmacyMembership(db.manager,{organizationId,applicantId,approvedBy:fixtureAdminId,actorId:fixtureAdminId});
     return business.id;
   }
+  it('an account created without email (social signup, 2026-11-11) is erased without treating "null" as an identifier',async()=>{
+    const target=await user({email:null}),peer=await user();
+    const [log]=await db.query(`INSERT INTO action_logs(service_key,user_id,action_key,source,status,meta) VALUES('neture',$1,'member.synthetic_peer_action','test','success',jsonb_build_object('note','null'))  RETURNING id`,[peer.id]);
+    try{
+      expect(await service().request(target.id)).toMatchObject({state:'completed',erased:true});
+      expect(await db.query('SELECT 1 FROM users WHERE id=$1',[target.id])).toHaveLength(0);
+      expect((await db.query('SELECT meta FROM action_logs WHERE id=$1',[log.id]))[0].meta).toEqual({note:'null'});
+    }finally{await db.query('DELETE FROM action_logs WHERE id=$1',[log.id]);}
+  });
   it('normal signup/login records are minimized without retaining a profile or resetting retention clocks',async()=>{
     const target=await user(),peer=await user(),anchor='2026-10-20T09:00:00.000Z';
     const [login]=await db.query(`INSERT INTO login_attempts(email,"userAgent","failureReason",success,"createdAt") VALUES($1,$2::text,$2::text,false,$3) RETURNING id`,[target.email,target.email,anchor]);

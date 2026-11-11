@@ -100,10 +100,11 @@ export interface GoogleSignupConsents {
   terms: boolean;
   privacy: boolean;
   marketing?: boolean;
-  /** 선택(WO-O4O-AUTH-ONBOARDING-UX-CLEANUP-V1 T2). */
+  /** @deprecated 서버가 쓰지 않는다 — 이름 · 닉네임 · 휴대전화는 가입 신청(역할 입력)에서 받는다(WO-O4O-SOCIAL-SIGNUP-DIRECT-ROLE-REGISTRATION-V1). */
   phone?: string;
-  /** 선택(WO-O4O-AUTH-ONBOARDING-UX-CLEANUP-V1 T2). */
+  /** @deprecated 위와 같다. */
   name?: string;
+  /** @deprecated 위와 같다. */
   nickname?: string;
 }
 
@@ -154,7 +155,8 @@ export interface SocialProof { token: string; idToken?: string; code?: string }
 export interface SocialGrant { token: string; nonce?: string; authorizationUrl?: string; provider?: SocialProvider }
 export interface SignupTermsReference { policyDocumentId: string; version: number }
 export interface SignupTermsDocument extends SignupTermsReference { title: string; termsHref: string; privacyHref?: string; privacyPolicy?: SignupTermsReference & { title: string } }
-export interface KakaoSignupRequest { email: string; name?: string; nickname?: string; phone?: string; consents: { terms: boolean; privacy: boolean; marketing?: boolean; termsPolicy: SignupTermsReference; privacyPolicy?: SignupTermsReference } }
+/** 카카오 가입은 약관 동의만 보낸다(WO-O4O-SOCIAL-SIGNUP-DIRECT-ROLE-REGISTRATION-V1). email · name · nickname · phone 은 예전 화면 호환용이며 서버가 쓰지 않는다. */
+export interface KakaoSignupRequest { email?: string; name?: string; nickname?: string; phone?: string; consents: { terms: boolean; privacy: boolean; marketing?: boolean; termsPolicy: SignupTermsReference; privacyPolicy?: SignupTermsReference } }
 export interface KakaoAuthResponse extends GoogleAuthResponse {
   nextStep?: 'signup' | 'verify-email'; signupTicket?: string; email?: string; maskedEmail?: string; mailSent?: boolean;
 }
