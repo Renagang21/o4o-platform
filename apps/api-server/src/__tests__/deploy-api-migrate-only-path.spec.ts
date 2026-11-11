@@ -30,6 +30,11 @@ type Ctx = {
   /** 'true' = 배포 가능(DEPLOY_FREEZE='false') · 그 외 = freeze */
   gate: string;
   affected?: string;
+  /**
+   * detect job 의 CI gate step 결과(`needs.detect.outputs.ci_gate`). 기본 'passed' = 게이트 통과 —
+   * 종전 구조(`needs: [detect, ci-gate]` · ci-gate 성공)와 같은 전제. WO-O4O-PROMOTE-SHORT-JOB-CONSOLIDATION-V1.
+   */
+  ciGate?: string;
   inputs?: Record<string, string>;
 };
 
@@ -50,6 +55,7 @@ function evaluate(expr: string, c: Ctx): boolean {
     // DEPLOY_FREEZE: 'false' 일 때만 배포 가능 — gate 'true' ↔ freeze 'false'
     .replace(/vars\.DEPLOY_FREEZE/g, "(__gate === 'true' ? 'false' : 'true')")
     .replace(/needs\.detect\.outputs\.api_deploy_affected/g, '__affected')
+    .replace(/needs\.detect\.outputs\.ci_gate/g, '__ciGate')
     .replace(/github\.event_name/g, '__event')
     .replace(/github\.event\.inputs\.(\w+)/g, (_m, k: string) => `__in(${JSON.stringify(k)})`)
     .replace(/\binputs\.(\w+)/g, (_m, k: string) => `__in(${JSON.stringify(k)})`);
@@ -57,8 +63,8 @@ function evaluate(expr: string, c: Ctx): boolean {
     throw new Error(`평가기가 모르는 식: ${expr}`);
   }
   // GH: null != 'true' → true, null == 'true' → false (JS == 와 같은 결과만 쓴다)
-  const fn = new Function('__gate', '__affected', '__event', '__in', `return (${js});`);
-  return Boolean(fn(c.gate, c.affected ?? 'true', c.eventName, (k: string) => (inputs ? ((inputs as Record<string, string>)[k] ?? null) : null)));
+  const fn = new Function('__gate', '__affected', '__ciGate', '__event', '__in', `return (${js});`);
+  return Boolean(fn(c.gate, c.affected ?? 'true', c.ciGate ?? 'passed', c.eventName, (k: string) => (inputs ? ((inputs as Record<string, string>)[k] ?? null) : null)));
 }
 
 const job = WF.jobs['build-and-deploy'];
@@ -102,6 +108,17 @@ describe('일반 배포 경로 — 종전과 같다', () => {
     ['promote 호출 · 게이트 열림 → 실행 (migrate_only 아님)', { eventName: 'workflow_dispatch', call: true, gate: 'true' }, true],
   ])('%s', (_label, c, expected) => {
     expect(evaluate(job.if, c)).toBe(expected);
+  });
+
+  // WO-O4O-PROMOTE-SHORT-JOB-CONSOLIDATION-V1 — CI gate 는 detect job 의 step. 통과(ci_gate='passed')가 아니면 어느 경로도 열리지 않는다.
+  it.each<[string, Ctx]>([
+    ['push · 게이트 열림 · CI gate 미통과', { eventName: 'push', gate: 'true', ciGate: '' }],
+    ['수동 · 게이트 열림 · CI gate 미통과', { eventName: 'workflow_dispatch', gate: 'true', ciGate: '' }],
+    ['Delivery 호출 · CI gate 미통과', { eventName: 'workflow_run', call: true, gate: 'true', ciGate: '' }],
+    ['migrate_only · CI gate 미통과', { eventName: 'workflow_dispatch', gate: 'true', ciGate: '', inputs: { migrate_only: 'true', expected_sha: 'b'.repeat(40) } }],
+  ])('%s → skip', (_label, c) => {
+    expect(evaluate(job.if, c)).toBe(false);
+    expect(job.needs).toEqual(['detect']);
   });
 
   it('workflow_call 진입점: migrate_only · expected_sha 는 노출하지 않는다 (수동 전용) · rollout_mode 기본 verified', () => {
