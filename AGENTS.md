@@ -381,7 +381,7 @@ verdict: SAFE_TO_REMOVE | KEEP | UNCERTAIN
 - DB schema / migration / 데이터 삭제 / 대량 update / seed 변경
 - `package.json` / dependency / lockfile 변경
 - Docker / CI / build·deployment infrastructure 변경
-- Core / Frozen / shared contract 변경
+- Core / Frozen / shared contract 변경 — Core 경로와 등급은 [O4O-CORE-REGISTRY-V1](docs/baseline/O4O-CORE-REGISTRY-V1.md)
 - 권한 / role / route / API contract의 변경 또는 범위 확대
 - 결제 / 정산 / 법률 / 규제 판단
 - 실제 계정 / 자격정보 / 외부 서비스 승인
@@ -465,7 +465,7 @@ verdict: SAFE_TO_REMOVE | KEEP | UNCERTAIN
 | 사업 철학 (참여 주체 · HUB · AI 역할) | [O4O-BUSINESS-PHILOSOPHY-V1](docs/baseline/O4O-BUSINESS-PHILOSOPHY-V1.md) — 역할 경계 · 업무공간 · 콘텐츠 유입 · Partner 는 아래 Architecture 가 우선 |
 | 역할 경계 · 업무공간 · 콘텐츠 유입 경로 · Legacy Partner · 리팩터링 단계 WO | [O4O-ROLE-WORKSPACE-ARCHITECTURE-V1](docs/baseline/O4O-ROLE-WORKSPACE-ARCHITECTURE-V1.md) — §9 실행 규칙(매 단계 최신 `origin/main` 에서 모집단 재산출) 적용 |
 | commerce | [STORE-COMMERCE-BOUNDARY](docs/baseline/O4O-STORE-COMMERCE-BOUNDARY-V1.md) + [B2B-SUPPLIER-TO-STORE-ORDER-CONTRACT](docs/baseline/O4O-B2B-SUPPLIER-TO-STORE-ORDER-CONTRACT-V1.md) |
-| Core / Frozen / Boundary / 도메인 | [CANONICAL-INDEX](docs/CANONICAL-INDEX.md)의 해당 정본 |
+| Core / Frozen / Boundary / 도메인 | Core 목록 · 변경 등급(A/B/C)은 [O4O-CORE-REGISTRY-V1](docs/baseline/O4O-CORE-REGISTRY-V1.md), 그 밖은 [CANONICAL-INDEX](docs/CANONICAL-INDEX.md)의 해당 정본 |
 | shared module | [O4O-SHARED-MODULE-CHANGE-PROTOCOL-V1](docs/baseline/O4O-SHARED-MODULE-CHANGE-PROTOCOL-V1.md) |
 | AI 자동화 (Local Agent · Browser · Computer Use · Adapter · Workflow) | [O4O-AI-AUTOMATION-EVOLUTION-PRINCIPLES-V1](docs/baseline/O4O-AI-AUTOMATION-EVOLUTION-PRINCIPLES-V1.md) — §25 의 현행 정렬 상태를 먼저 확인 → 구조·개발 순서는 [O4O-PERSONAL-ASSISTANT-ARCHITECTURE-V2](docs/baseline/O4O-PERSONAL-ASSISTANT-ARCHITECTURE-V2.md) §18 (ARCHITECTURE-V1 SUPERSEDED) |
 | TypeORM / ESM | [ESM-CIRCULAR-DEPENDENCY-ANALYSIS-V01](docs/reference/ESM-CIRCULAR-DEPENDENCY-ANALYSIS-V01.md) — Entity 관계는 type-only import + 문자열 참조 |
