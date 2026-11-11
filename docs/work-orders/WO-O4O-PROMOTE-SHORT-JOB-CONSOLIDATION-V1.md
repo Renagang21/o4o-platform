@@ -110,10 +110,12 @@
 
 ## 7. 결과 (LOCAL 기록란)
 
-- actionlint 버전 · shellcheck 유무:
-- branch 지적 수 / main 기준선 지적 수:
-- branch 에만 있는 지적(원문 · 파일:줄):
-- 판정(A): PASS | FAIL
+- actionlint 버전 · shellcheck 유무: actionlint 1.7.12(winget `rhysd.actionlint`) · shellcheck 0.11.0 있음(winget `koalaman.shellcheck`) · pyflakes 없음(비활성). 실행 2026-11-11 LOCAL(Windows 11), branch `3f6ea24425` vs `origin/main` `4f44f5299c`
+- branch 지적 수 / main 기준선 지적 수: **23 / 23** (줄 번호를 뺀 지적 내용 비교 시 6개 파일 모두 동일)
+  - deploy-admin 3/3 · deploy-web-services 18/18 · ci-pipeline 2/2 · delivery 0/0 · promote 0/0 · deploy-api 0/0 — 전부 기존 shellcheck SC2086 · SC2129 · SC2155(info · style · warning), main 에도 있으므로 보고만 하고 고치지 않음
+  - 제약: 이 PC 에서 `deploy-api.yml` 은 shellcheck 를 켜면 actionlint 가 branch · main **양쪽 모두** 멈춘다(shellcheck 프로세스가 뜨기 전 · 도구 쪽 문제로 판단). 그래서 deploy-api 는 `-shellcheck=` 로 actionlint 규칙만 검사(양쪽 0건)하고, branch 가 새로 넣은 `run:` 스크립트(CI gate step — `set -euo pipefail` · `ci-gate.mjs` · `echo "ci_gate=passed" >> "$GITHUB_OUTPUT"`)만 shellcheck 0.11.0 으로 따로 검사해 0건이다. 나머지 5개 파일은 shellcheck 포함, 파일별로 실행했다
+- branch 에만 있는 지적(원문 · 파일:줄): 없음 — `steps.ci_gate` · `steps.scope` · `steps.changes` 참조 · `needs.*.outputs.ci_gate` · 하이픈 키 · `github.workflow_ref` 관련 지적 0건
+- 판정(A): **PASS**
 - 첫 실행 run ID · 판정(B):
 
 ## 문서 정합
