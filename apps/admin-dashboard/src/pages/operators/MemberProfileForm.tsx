@@ -118,7 +118,7 @@ export default function MemberProfileForm({
                 type={
                   key === 'email' ? 'email' : key === 'phone' ? 'tel' : 'text'
                 }
-                required={['name', 'nickname', 'email'].includes(key)}
+                required={['nickname', 'email'].includes(key)}
                 maxLength={key === 'email' ? 255 : key === 'phone' ? 20 : 100}
                 readOnly={!editing}
                 disabled={busy}

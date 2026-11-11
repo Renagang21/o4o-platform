@@ -8,14 +8,28 @@ import { centralOperationMenuKeys } from './central-operation-menu-grants.js';
 import { OperationError, operationReason, recordOperation } from '../operations/operation-audit.js';
 import { isPhoneShapeValid, normalizePhoneDigits } from '../../common/auth/phone-shape.js';
 import { resolveNetureMainMembershipStatus } from '../../modules/neture/services/neture-main-membership.js';
+import { isRetiredRoleValue } from '../../middleware/retired-service.middleware.js';
 
 type Db = Pick<EntityManager, 'query'>;
 export type MemberTask = 'all' | 'pending' | 'inactive' | 'qualifications' | 'pharmacies' | 'corrections';
 const version = `to_char(u."updatedAt",'YYYY-MM-DD"T"HH24:MI:SS.US')`;
+/** 끝나지 않은 계정 삭제(검토 필요 · 재시도 필요 · 진행 중). 삭제 요청이 계정을 먼저 멈추므로 목록에 「해지」가 아니라 이 상태를 보인다(2026-11-10). */
+const ERASURE_SQL = `(SELECT o.state FROM account_erasure_operations o WHERE o.subject_id=u.id AND o.state<>'completed') AS "erasureState",
+ (SELECT o.error_code FROM account_erasure_operations o WHERE o.subject_id=u.id AND o.state<>'completed') AS "erasureErrorCode"`;
 const identity = `${protectedMemberSql("u.id")} AS "operatorReadOnly",u.id AS "userId",u.name,u.nickname,u.email,u.phone,u.status AS "accountStatus",
  u."isActive" AS "accountActive",(SELECT sm.status FROM service_memberships sm WHERE sm.user_id=u.id AND sm.service_key='neture') AS "membershipStatus",
  u."isEmailVerified" AS "emailVerified",EXISTS(SELECT 1 FROM user_password_credentials pc WHERE pc.user_id=u.id) AS "hasPassword",u."createdAt" AS "joinedAt",${version} AS version,
- ${MEMBER_REGISTRATION_TYPE_SQL} AS "registrationType",${MEMBER_REGISTRATION_STATE_SQL} AS "registrationState",${MEMBER_REGISTRATION_LEGACY_ACCESS_SQL} AS "registrationLegacyMainAccess",${MEMBER_LOGIN_METHODS_SQL} AS "loginMethods"`;
+ ${MEMBER_REGISTRATION_TYPE_SQL} AS "registrationType",${MEMBER_REGISTRATION_STATE_SQL} AS "registrationState",${MEMBER_REGISTRATION_LEGACY_ACCESS_SQL} AS "registrationLegacyMainAccess",${MEMBER_LOGIN_METHODS_SQL} AS "loginMethods",${ERASURE_SQL}`;
+/** 회원 목록 「가입 유형」에 운영 역할을 보이기 위한 현재 유효한 관리자 · 운영자 역할(가입 신청서가 없는 운영자를 「미등록」으로 보이지 않게 한다 · 2026-11-10).
+ *  판정식은 member-identity-guards 의 운영 권한 판정과 같다. */
+const OPERATOR_ROLES_SQL = `ARRAY(SELECT ra.role FROM role_assignments ra WHERE ra.user_id=u.id AND ra.is_active=true
+  AND (ra.valid_from IS NULL OR ra.valid_from<=statement_timestamp()) AND (ra.valid_until IS NULL OR ra.valid_until>=statement_timestamp())
+  AND (ra.role LIKE 'platform:%' OR ra.role ~ '(^|:|_)(admin|operator)$') ORDER BY ra.role)`;
+/** 표시용 운영 역할 — 활성 이력으로 남은 퇴역 역할(platform:member · kpa:branch_operator · cosmetics:* 등)은 현재 역할이 아니므로 뺀다
+ *  (O4O-CURRENT-ADMIN-ROLE-POLICY-V1 · roleAssignmentService.getActiveRoles 와 같은 isRetiredRoleValue 기준). */
+export function currentOperatorRoles(roles: unknown): string[] {
+  return Array.isArray(roles) ? roles.filter((role): role is string => typeof role === 'string' && !isRetiredRoleValue(role)) : [];
+}
 const pharmacyExists = (status: string) => `EXISTS(SELECT 1 FROM neture_pharmacy_memberships n WHERE n.applicant_user_id=u.id AND n.status='${status}')`;
 const privateValue = (value: unknown) => ({ toPostgres: () => value, toJSON: () => '[redacted]' });
 
@@ -47,7 +61,8 @@ export class CentralMemberWorkspaceService {
     const conditions: Record<MemberTask, string> = {
       all: 'true', qualifications: `p.qualification_status='pending'`, pharmacies: pharmacyExists('pending'),
       pending: `(${MEMBER_REGISTRATION_STATE_SQL}='pending' OR u.status='pending' OR (u."isEmailVerified"=false AND u.status IN ('active','approved')))`,
-      inactive: `EXISTS(SELECT 1 FROM service_memberships sm WHERE sm.user_id=u.id AND sm.service_key='neture' AND sm.status IN ('suspended','withdrawn'))`,
+      // 목록 「회원 상태」 배지(resolveNetureMainMembershipStatus)와 같은 기준 — 계정이 멈춘 회원(삭제 요청 포함)도 해지 탭에 센다(2026-11-10).
+      inactive: `(u.status='suspended' OR u."isActive"=false OR EXISTS(SELECT 1 FROM service_memberships sm WHERE sm.user_id=u.id AND sm.service_key='neture' AND sm.status IN ('suspended','withdrawn')))`,
       corrections: `(${MEMBER_REGISTRATION_STATE_SQL}='rejected' OR ${qualificationCorrections} OR ${pharmacyCorrections})`,
     };
     const query = search.trim().slice(0, 100);
@@ -63,10 +78,11 @@ export class CentralMemberWorkspaceService {
       u."isActive" AS "accountActive",u."isEmailVerified" AS "emailVerified",
       (SELECT sm.status FROM service_memberships sm WHERE sm.user_id=u.id AND sm.service_key='neture') AS "membershipStatus",
       COALESCE(p.qualification_status,'unrequested') AS "qualificationStatus",
-      ${permissions.pharmacies ? `(SELECT n.status FROM neture_pharmacy_memberships n WHERE n.applicant_user_id=u.id ORDER BY n.applied_at DESC,n.id LIMIT 1)` : 'NULL::text'} AS "pharmacyStatus"
+      ${permissions.pharmacies ? `(SELECT n.status FROM neture_pharmacy_memberships n WHERE n.applicant_user_id=u.id ORDER BY n.applied_at DESC,n.id LIMIT 1)` : 'NULL::text'} AS "pharmacyStatus",
+      ${OPERATOR_ROLES_SQL} AS "operatorRoles",${ERASURE_SQL}
       ${from} AND (${conditions[task]}) ORDER BY u."createdAt" DESC,u.id LIMIT 21 OFFSET $2`,
     [query, (page - 1) * 20]);
-    return { items: items.slice(0, 20).map(row=>({...row,serviceStatus:resolveNetureMainMembershipStatus({account_status:row.accountStatus,account_active:row.accountActive,email_verified:row.emailVerified,membership_status:row.membershipStatus,registration_state:row.registrationState,legacy_main_access:row.registrationLegacyMainAccess})})), hasNext: items.length > 20, counts, permissions };
+    return { items: items.slice(0, 20).map(row=>({...row,operatorRoles:currentOperatorRoles(row.operatorRoles),serviceStatus:resolveNetureMainMembershipStatus({account_status:row.accountStatus,account_active:row.accountActive,email_verified:row.emailVerified,membership_status:row.membershipStatus,registration_state:row.registrationState,legacy_main_access:row.registrationLegacyMainAccess})})), hasNext: items.length > 20, counts, permissions };
   }
 
   async detail(actor: string, target: string, qualificationReview = false) {
@@ -134,7 +150,7 @@ export class CentralMemberWorkspaceService {
         }
       }
       await manager.query(`UPDATE users SET name=$2,nickname=$3,phone=$4,"updatedAt"=clock_timestamp() WHERE id=$1`,
-        [target, privateValue(input.name), privateValue(input.nickname || null), privateValue(phone || null)]);
+        [target, privateValue(input.name || null), privateValue(input.nickname || null), privateValue(phone || null)]);
       await recordOperation(manager, 'neture', actor, 'member.profile_corrected', { targetUserId: target, reason,
         previous: { name: before.name, nickname: before.nickname, phone: before.phone,...(result.emailChanged?{email:before.email}:{}) }, next: { name: input.name, nickname: input.nickname, phone,...(result.emailChanged?{email:input.email?.trim().toLowerCase()}:{}) } });
       return { saved: true, ...result };

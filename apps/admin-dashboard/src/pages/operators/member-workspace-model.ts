@@ -1,8 +1,9 @@
 import type {MemberRegistration,MemberRegistrationType} from '@o4o/types';
+import { getRoleMeta, getServiceMeta, parseRole } from '@/lib/rbac-catalog';
 export type MemberTask = 'all' | 'pending' | 'inactive' | 'qualifications' | 'pharmacies' | 'corrections';
 export interface MemberPermissions { readDocuments?: boolean; qualifications: boolean; pharmacies: boolean; applications?: boolean; edit: boolean; manageAccount?: boolean; erase?: boolean }
-export interface MemberRow { operatorReadOnly?:boolean; userId: string; name: string | null; nickname?:string|null;email: string; loginMethods?:string[];registrationType?:MemberRegistrationType|null;registrationState?:string|null;accountStatus: string; accountActive?:boolean; serviceStatus?: string; qualificationStatus?: string; pharmacyStatus?: string | null }
-export interface MemberProfile { operatorReadOnly?:boolean; loginMethods?:string[]; hasPassword?:boolean; userId: string; name: string | null; nickname: string | null; email: string; phone: string | null; accountStatus: string; accountActive?:boolean; serviceStatus?: string; emailVerified: boolean; joinedAt: string; version: string }
+export interface MemberRow { operatorReadOnly?:boolean; userId: string; name: string | null; nickname?:string|null;email: string; loginMethods?:string[];registrationType?:MemberRegistrationType|null;registrationState?:string|null;operatorRoles?:string[];accountStatus: string; accountActive?:boolean; serviceStatus?: string; qualificationStatus?: string; pharmacyStatus?: string | null; erasureState?: string | null; erasureErrorCode?: string | null }
+export interface MemberProfile { operatorReadOnly?:boolean; loginMethods?:string[]; hasPassword?:boolean; userId: string; name: string | null; nickname: string | null; email: string; phone: string | null; accountStatus: string; accountActive?:boolean; serviceStatus?: string; erasureState?: string | null; erasureErrorCode?: string | null; emailVerified: boolean; joinedAt: string; version: string }
 export interface Qualification { licenseNumber: string | null; status: string; reason: string | null; approvedAt: string | null; reviewedBy: string | null; version: string }
 export interface MemberPharmacy {
   id: string; version?: string; organizationId: string; name: string; businessNumber: string; licenseNumber: string; status: string; reason: string | null;
@@ -32,7 +33,20 @@ export function memberError(error: unknown) {
   return typeof response === 'string' ? response : '처리하지 못했습니다. 권한과 최신 정보를 다시 확인해 주시기 바랍니다.';
 }
 
-export type MemberWorkMode = 'detail' | 'edit' | 'reject' | 'delete' | 'pharmacy';
+/** terminate · restore: 운영자 「회원 해지」 · 「이용 복구」(2026-11-10 분리). pharmacy 는 예전 링크 호환용으로 detail 과 같다. */
+/** 운영 역할 → 「공급자 운영자」 · 「유통참여형 펀딩 관리자」 · 「전체 관리자」 (서비스가 여럿이면 전부). */
+export function operatorRoleLabels(roles: readonly string[] | undefined): string[] {
+  if (!roles?.length) return [];
+  const labels = roles.map(role => {
+    if (role === 'platform:super_admin') return '전체 관리자';
+    const parsed = parseRole(role);
+    const service = getServiceMeta(parsed).label;
+    const level = /admin$/.test(parsed.roleKey) ? '관리자' : /operator$/.test(parsed.roleKey) ? '운영자' : getRoleMeta(parsed).label;
+    return `${service} ${level}`;
+  });
+  return [...new Set(labels)];
+}
+export type MemberWorkMode = 'detail' | 'edit' | 'reject' | 'delete' | 'pharmacy' | 'terminate' | 'restore';
 /** 처리 후 동작: close 면 패널을 닫고 목록 위에 done 문구를 보인다(가입 승인·반려 · 해지·복구). */
 export interface PerformOptions { close?: boolean; done?: string }
 export type Perform = (work: () => Promise<unknown>, options?: PerformOptions) => Promise<void>;
@@ -45,9 +59,21 @@ export const memberStatusTone: Record<string, string> = {
   active: 'border-green-300 bg-green-50 text-green-800',
   approved: 'border-green-300 bg-green-50 text-green-800',
 };
+/**
+ * 끝나지 않은 계정 삭제의 표시. 삭제 요청은 계정을 먼저 멈추므로 서비스 상태만 보면 「해지」로 보인다 —
+ * 삭제가 진행 · 실패 · 검토 대기면 그 상태를 대신 보인다(2026-11-10). 다시 「계정 삭제」를 누르면 같은 삭제를 이어서 한다.
+ */
+export function erasureStatus(state: string | null | undefined): { label: string; tone: string } | null {
+  if (!state || state === 'completed') return null;
+  if (state === 'review_required') return { label: '삭제 확인 필요', tone: 'border-red-300 bg-red-50 text-red-700' };
+  if (state === 'retry_required') return { label: '삭제 재시도 필요', tone: 'border-red-300 bg-red-50 text-red-700' };
+  return { label: '삭제 중', tone: 'border-amber-300 bg-amber-50 text-amber-800' };
+}
 /** 목록에서 고른 회원에게 가입 승인·반려를 할 수 없는 이유. 상태를 모르면(undefined) 서버 판정에 맡긴다. */
-export function registrationDecisionBlock(row: Pick<MemberRow,'registrationState'>|undefined): string | null {
-  if (!row || row.registrationState === undefined) return null;
+export function registrationDecisionBlock(row: Pick<MemberRow,'registrationState'|'serviceStatus'>|undefined): string | null {
+  if (!row) return null;
+  if (['suspended','withdrawn'].includes(row.serviceStatus ?? '')) return '해지된 회원입니다. 가입 신청은 이용 복구 후 처리해 주시기 바랍니다.';
+  if (row.registrationState === undefined) return null;
   if (row.registrationState === null) return '가입 유형·제출 정보가 없습니다. 「회원 정보 수정」에서 먼저 저장해 주시기 바랍니다.';
   if (row.registrationState === 'approved') return '이미 승인된 회원입니다. 이용 종료는 「회원 해지·복구」로 처리해 주시기 바랍니다.';
   return null;

@@ -14,16 +14,22 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+// 테스트는 OS 확인 대화상자를 띄우지 않는다 — 자식 훅은 이 값을 물려받아 대화상자 대신 deny 한다(lib/shell.mjs confirmDialog).
+process.env.O4O_HOOK_CONFIRM_DIALOG = 'off';
+
 const DIR = path.dirname(fileURLToPath(import.meta.url));
 const HOOK = path.join(DIR, 'guard-ask-commands.mjs');
 const SETTINGS = path.join(DIR, '..', 'settings.json');
 
-function runHook(command, { cloud = false, tool = 'Bash' } = {}) {
+/** mode: PreToolUse 입력의 permission_mode. null 이면 필드를 넣지 않는다. */
+function runHook(command, { cloud = false, tool = 'Bash', mode = 'default' } = {}) {
   const env = { ...process.env };
   delete env.CLAUDE_CODE_REMOTE;
   delete env.CLAUDE_CODE_REMOTE_SESSION_ID;
   if (cloud) env.CLAUDE_CODE_REMOTE = 'true';
-  const input = JSON.stringify({ hook_event_name: 'PreToolUse', tool_name: tool, tool_input: { command }, cwd: process.cwd() });
+  const payload = { hook_event_name: 'PreToolUse', tool_name: tool, tool_input: { command }, cwd: process.cwd() };
+  if (mode !== null) payload.permission_mode = mode;
+  const input = JSON.stringify(payload);
   const r = spawnSync(process.execPath, [HOOK], { input, env, encoding: 'utf8', timeout: 20000 });
   assert.equal(r.status, 0, `훅 종료 코드 0 이어야 함: ${r.stderr}`);
   const out = r.stdout.trim();
@@ -199,6 +205,37 @@ test('ⓓ 삭제 명령은 ask', () => {
     "gh 'label' 'delete' wip",
   ]) {
     assertAsk(cmd);
+  }
+});
+
+// 권한 모드 -------------------------------------------------------------------------------------
+// 2026-11-09: 로컬 auto 모드에서 이 훅의 ask 가 승인 창 없이 통과했다(gh label delete x).
+
+const RISKY = ['gh label delete x', "gh api -X POST repos/o/r/issues -f title=x", 'pnpm --filter @o4o/api-server migration:run'];
+
+test('승인 창이 뜨는 모드(default · acceptEdits · plan)는 ask', () => {
+  for (const mode of ['default', 'acceptEdits', 'plan']) {
+    for (const cmd of RISKY) assertAsk(cmd, { mode });
+  }
+});
+
+test('승인 창이 뜨지 않거나 알 수 없는 모드는 deny (fail closed)', () => {
+  for (const mode of ['auto', 'bypassPermissions', 'dontAsk', 'something-new', '', null]) {
+    for (const opts of [{ mode }, { mode, tool: 'PowerShell' }, { mode, cloud: true }]) {
+      for (const cmd of RISKY) {
+        const d = runHook(cmd, opts);
+        assert.equal(d?.permissionDecision, 'deny', `${String(mode)}: ${cmd}`);
+        assert.match(d.permissionDecisionReason, /default 모드/);
+      assert.match(d.permissionDecisionReason, /확인 대화상자를 띄울 수 없었다/);
+        assert.match(d.permissionDecisionReason, /확인 대화상자를 띄울 수 없었다/);
+      }
+    }
+  }
+});
+
+test('예외 · 무관한 명령은 auto 모드에서도 통과한다', () => {
+  for (const cmd of ["gh api -X GET search/code -f q='x'", 'gh pr list --search delete', 'git status']) {
+    assertPass(cmd, { mode: 'auto' });
   }
 });
 

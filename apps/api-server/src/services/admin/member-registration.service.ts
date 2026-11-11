@@ -12,6 +12,7 @@ import {
 } from '../operations/operation-audit.js';
 import { memberWorkspaceAccess } from './central-member-workspace.service.js';
 import { assertRecoverableTarget } from './member-identity-guards.js';
+import { demoAccountService } from '../auth/demo-account.service.js';
 import { validateRegistration } from './member-registration-contract.js';
 import {
   assertRegistrationDocument,
@@ -100,24 +101,28 @@ export class MemberRegistrationService {
       { type: input.type, fields: input.fields },
       true,
     );
-    const name = input.name.trim(),
-      nickname = input.nickname.trim(),
-      phone = normalizePhoneDigits(input.phone);
+    // 2026-11-09 결정 S4 · S5: 닉네임은 모든 직역 필수, 이름 · 휴대전화는 공통 칸에서 선택(값이 있을 때만 형식 검사).
+    // 직역에 꼭 필요한 값은 유형별 validateRegistration 이 받는다.
+    const name = (input.name ?? '').trim(),
+      nickname = (input.nickname ?? '').trim(),
+      phone = normalizePhoneDigits(input.phone ?? '');
     if (
-      !name ||
       name.length > 100 ||
       !nickname ||
       nickname.length > 100 ||
-      !isPhoneShapeValid(phone)
+      (phone !== '' && !isPhoneShapeValid(phone))
     )
       throw new OperationError(
         400,
         'INVALID_MEMBER_PROFILE',
-        '이름·닉네임·휴대전화를 확인해 주시기 바랍니다.',
+        '닉네임을 입력하고, 이름 · 휴대전화는 입력한 경우 형식을 확인해 주시기 바랍니다.',
       );
     return this.db.transaction(async (m) => {
       const row = await this.lock(m, user, input.version);
-      await assertRecoverableTarget(m, user, false, false);
+      // 본인 제출이다. 다른 사람이 운영자 계정을 바꾸지 못하게 하는 assertRecoverableTarget 은 적용하지 않는다
+      // (운영자도 본인 가입 정보를 낼 수 있다 · 2026-11-10). Demo 계정 보호만 유지한다.
+      if (await demoAccountService.isDemoAccount(user, m))
+        throw new OperationError(403, 'DEMO_ACCOUNT_FORBIDDEN', 'Demo 계정의 인증 정보는 변경할 수 없습니다.');
       if (!row.isActive || !['active', 'approved'].includes(row.status))
         throw new OperationError(
           409,
@@ -154,7 +159,8 @@ export class MemberRegistrationService {
         ...(prior?.legacyMainAccess ? { legacyMainAccess: true } : {}),
       });
       await m.query(
-        'UPDATE users SET name=$2,nickname=$3,phone=$4,"updatedAt"=clock_timestamp() WHERE id=$1',
+        // 이름 · 휴대전화는 선택이다. 비워 두면 이미 저장된 값을 지우지 않는다.
+        'UPDATE users SET name=COALESCE(NULLIF($2::text,\'\'),name),nickname=$3,phone=COALESCE(NULLIF($4::text,\'\'),phone),"updatedAt"=clock_timestamp() WHERE id=$1',
         [user, secret(name), secret(nickname), secret(phone)],
       );
       if (scope)

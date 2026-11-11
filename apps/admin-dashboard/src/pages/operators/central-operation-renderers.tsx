@@ -20,7 +20,6 @@ import CentralNetureServiceOperations,{type CentralNetureServiceArea} from './Ce
 import CentralNetureProductOperations,{type CentralNetureProductArea} from './CentralNetureProductOperations';
 import CentralNetureStores from './CentralNetureStores';
 import CentralNetureAnalytics from './CentralNetureAnalytics';
-import {AdminMemberManagementPage} from '@o4o/operator-core-ui/modules/neture-service-operations';
 import {AdminServiceApprovalPage,createAdminServiceApprovalApi} from '@o4o/operator-core-ui/modules/neture-product-operations';
 interface Context {service:string;area:string;actorId:string;roles:string[];menuKeys:string[];courseId?:string;id?:string;userId?:string;search:string;navigate:NavigateFunction;}
 type Renderer = (context:Context)=>ReactNode;
@@ -41,7 +40,6 @@ const renderers:Record<string,Renderer>={
  'neture.pharmacies':()=> <PharmacyMembershipReviewPage />,
  'neture.stores':()=> <CentralNetureStores />,
  'neture.analytics':()=> <CentralNetureAnalytics />,
- 'neture.membership-cleanup':()=> <AdminMemberManagementPage api={http} />,
  'neture.service-approval-management':()=> <AdminServiceApprovalPage api={serviceApprovalApi} />,
  'neture.ai-report':()=> <AiReportPage config={{mode:'empty',theme:'green',assetTypes:[],infoBannerText:'실제 집계 데이터가 연결되면 운영 리포트를 제공합니다.',emptyStateDescription:'분석 인프라 연동 준비 중입니다.'}} />,
  'funding.funding':c=><CentralFundingOperations detail={!!c.id} />,

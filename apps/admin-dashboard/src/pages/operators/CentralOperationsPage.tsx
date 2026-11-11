@@ -37,6 +37,9 @@ export default function CentralOperationsPage() {
   const verifiedUser = useRef<string | null>(null);
   const [checkFailed, setCheckFailed] = useState(false);
   const [error, setError] = useState("");
+  // 관리자 사이트는 전체 관리자와 운영자(admin · operator)만 쓴다. 업무 위임이 없는 일반 회원은 로그아웃시키고
+  // 로그인 화면에서 이유를 보인다(2026-11-10 사용자 확정).
+  const [operatorsOnly, setOperatorsOnly] = useState(false);
   const load = useCallback(async () => {
     const seq = ++sequence.current;
     setError("");
@@ -61,6 +64,7 @@ export default function CentralOperationsPage() {
         verifiedUser.current = null;
         setCheckFailed(false);
         setGrant(null);
+        if (data?.code === "CENTRAL_DELEGATION_REQUIRED") { setOperatorsOnly(true); return; }
         setError((data?.code && CENTRAL_ACCESS_DENIAL[data.code]) || CENTRAL_ACCESS_UNVERIFIED);
       }
     }
@@ -82,6 +86,7 @@ export default function CentralOperationsPage() {
       window.removeEventListener("focus", refresh);
     };
   }, [isAuthenticated, load]);
+  if (operatorsOnly) return <Navigate to="/login?denied=operators-only" replace />;
   if (isLoading) return <p role="status">인증 확인 중…</p>;
   if (!isAuthenticated)
     return <Navigate to="/login" state={{ from: "/operations" }} replace />;
@@ -114,6 +119,9 @@ export default function CentralOperationsPage() {
         <Link to="/operations">업무 목록</Link>
       </main>
     );
+  // 가입 관계 정리는 관리자 사이트로 옮겼다 — 예전 업무 운영 주소는 전체 관리자 화면으로 보낸다.
+  if (serviceKey === "neture" && area === "membership-cleanup" && isPlatform)
+    return <Navigate to="/admin/platform/membership-cleanup" replace />;
   if (serviceKey && !centralOperationAreas[serviceKey]?.includes(area ?? ""))
     return (
       <main className="p-6">
@@ -130,7 +138,8 @@ export default function CentralOperationsPage() {
         <h1 className="text-2xl font-bold">O4O 업무 운영</h1>
         <Link to="/operations">위임 업무</Link>
         <CentralOperationNotifications key={user.id} scopeKey={[...roles, ...menuKeys].sort((left,right)=>left.localeCompare(right)).join('|')} />
-        {isPlatform && <><Link to="/admin/operations-operators">업무 운영자 지정</Link><Link to="/admin">전체 관리자</Link></>}
+        {/* 업무 운영자 지정은 전체 관리자 화면(운영자·권한)에서 한다. */}
+        {isPlatform && <Link to="/admin">전체 관리자</Link>}
         <button onClick={logout}>로그아웃</button>
       </header>}
     >

@@ -29,7 +29,8 @@ integration('central member workbench PostgreSQL authority, projection and corre
       CREATE TABLE kpa_pharmacist_profiles(user_id uuid,license_number text,qualification_status text,qualification_reason text,verified_at timestamp,verified_by uuid,updated_at timestamp);
       CREATE TABLE organizations(id uuid PRIMARY KEY,type text DEFAULT 'pharmacy',address_detail jsonb,address text,phone text,metadata jsonb,name text,business_number text,"updatedAt" timestamp DEFAULT now());
       CREATE TABLE neture_pharmacy_memberships(id uuid PRIMARY KEY,organization_id uuid,applicant_user_id uuid,pharmacy_name text,business_number text,pharmacist_license_number text,status text,reason text,applied_at timestamp,decided_at timestamp,decided_by uuid,updated_at timestamp DEFAULT now());
-      CREATE TABLE action_logs(id bigserial,service_key text,user_id uuid,action_key text,source text,status text,meta jsonb,created_at timestamp DEFAULT now());`);
+      CREATE TABLE action_logs(id bigserial,service_key text,user_id uuid,action_key text,source text,status text,meta jsonb,created_at timestamp DEFAULT now());
+      CREATE TABLE account_erasure_operations(id uuid PRIMARY KEY DEFAULT gen_random_uuid(),subject_id uuid UNIQUE,state text,error_code text);`);
     for (const id of [admin, reader, target, other]) await db.query(`INSERT INTO users VALUES($1,'합성 회원','합성 별칭',$2,NULL,'active',true,true,now(),now(),$3)`, [id, `${id}@example.test`, { licenseNumber: 'legacy-license', businessName: '과거 합성 사업장', internalFutureField: 'do-not-disclose' }]);
     await db.query(`INSERT INTO role_assignments(id,user_id,role,is_active) VALUES($1,$2,'platform:super_admin',true)`, [randomUUID(), admin]);
     const assignment = randomUUID();
@@ -55,6 +56,23 @@ integration('central member workbench PostgreSQL authority, projection and corre
     expect(detail.legacyBusiness).toEqual({ name: '과거 합성 사업장' });
     expect(detail.pharmacies).toHaveLength(1); expect(detail.pharmacies[0].businessType).toBe('합성 업태');
     expect(JSON.stringify(detail)).not.toContain('do-not-disclose');
+  });
+  it('shows an unfinished account deletion instead of the stopped service status (2026-11-10)', async () => {
+    expect((await service.list(admin, 'qualifications', 1, '')).items[0]).toMatchObject({ erasureState: null, erasureErrorCode: null });
+    await db.query(`INSERT INTO account_erasure_operations(subject_id,state,error_code) VALUES($1,'review_required','ERASURE_RESIDUAL_REVIEW_REQUIRED')`, [target]);
+    try {
+      expect((await service.list(admin, 'qualifications', 1, '')).items[0]).toMatchObject({ erasureState: 'review_required', erasureErrorCode: 'ERASURE_RESIDUAL_REVIEW_REQUIRED' });
+      expect((await service.detail(admin, target)).member).toMatchObject({ erasureState: 'review_required' });
+      // 삭제 요청은 계정을 멈춘다 — 해지 탭 숫자와 목록에 같은 회원이 보인다.
+      const before = (await service.list(admin, 'inactive', 1, '')).counts.inactive;
+      await db.query(`UPDATE users SET "isActive"=false WHERE id=$1`, [target]);
+      const stopped = await service.list(admin, 'inactive', 1, '');
+      expect(stopped.counts.inactive).toBe(before + 1);
+      expect(stopped.items.map((row: any) => row.userId)).toContain(target);
+      await db.query(`UPDATE users SET "isActive"=true WHERE id=$1`, [target]);
+      await db.query(`UPDATE account_erasure_operations SET state='completed' WHERE subject_id=$1`, [target]);
+      expect((await service.list(admin, 'qualifications', 1, '')).items[0].erasureState).toBeNull();
+    } finally { await db.query('DELETE FROM account_erasure_operations WHERE subject_id=$1', [target]); }
   });
   it('exposes signup correction fields to member delegates while preserving specialized tasks and protected administrator guards', async () => {
     const detail = await service.detail(reader, target);

@@ -52,6 +52,7 @@ describe('메뉴 트리 — 플랫폼 관리자 사이트 canonical 구조', () 
     '/admin/platform/users',
     '/admin/platform/suppliers',
     '/admin/platform/stores',
+    '/admin/platform/membership-cleanup',
     '/admin/platform/erasure-operations',
     // WO-O4O-ADMIN-OPERATOR-MENU-REALIGNMENT-V1: 최종 삭제 처리 그룹(대상별) · 전체 관리자 계정
     '/admin/platform/member-erasure',

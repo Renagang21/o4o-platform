@@ -8,7 +8,7 @@ import MemberWorkPanel from './MemberWorkPanel';
 import { api } from '@/api/base';
 import { ERASURE_STATE_LABELS, deletionMessage } from '@/pages/platform/account-governance/AccountErasureControls';
 import type { UserErasureResult } from '@/types/user';
-import { memberError, memberStatusTone, registrationDecisionBlock, type MemberDetail, type MemberPermissions, type MemberRow, type MemberTask, type MemberWorkMode, type PerformOptions } from './member-workspace-model';
+import { erasureStatus, memberError, memberStatusTone, operatorRoleLabels, registrationDecisionBlock, type MemberDetail, type MemberPermissions, type MemberRow, type MemberTask, type MemberWorkMode, type PerformOptions } from './member-workspace-model';
 
 const base = '/qualifications/pharmacist/members';
 const tasks: Array<[MemberTask, string]> = [['all', '전체 회원'], ['pending', '가입 대기'], ['corrections', '반려·보완'], ['inactive', '해지 회원']];
@@ -19,7 +19,7 @@ function taskAllowed(task: MemberTask, permissions: MemberPermissions) {
   return permissions.qualifications || permissions.pharmacies;
 }
 function workActionVariant(key:MemberWorkMode,mode:MemberWorkMode):'danger'|'primary'|'default' {
-  if(key==='delete')return 'danger';
+  if(key==='delete'||key==='terminate')return 'danger';
   if(key===mode)return 'primary';
   return 'default';
 }
@@ -159,8 +159,9 @@ export default function CentralMemberWorkspace({ actorId, initialQuery = '', ini
   const protectedSelection = !adminMode && rows.some(row=>selectedIds.has(row.userId)&&row.operatorReadOnly);
   const columns: ListColumnDef<MemberRow>[] = [
     {key:'name',header:'이름',stickyOnMobile:true,minWidth:120,render:(_value,row)=><span className="flex flex-col items-start gap-0.5"><button type="button" disabled={busy} aria-label={`회원 ${row.name||'미등록'} ${row.email||'이메일 미제공'}`} aria-pressed={selectedId===row.userId} className="whitespace-nowrap text-left underline" onClick={event=>{event.stopPropagation();void openMember(row.userId);}}>{row.name||'미등록'}</button>{row.operatorReadOnly&&<span className="whitespace-nowrap text-xs text-slate-500">전체 관리자 — 처리 대상 아님</span>}</span>},
-    {key:'serviceStatus',header:'회원 상태',minWidth:100,render:(value,row)=>erasing[row.userId]?<span className="inline-block whitespace-nowrap rounded-full border border-amber-300 bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-800">삭제 중</span>:<span className={`inline-block whitespace-nowrap rounded-full border px-2 py-0.5 text-xs font-medium ${memberStatusTone[String(value)]??'border-slate-300 bg-white text-slate-600'}`}>{MEMBER_STATUS_LABELS[String(value)]??'확인 필요'}</span>},
-    {key:'registrationType',header:'가입 유형',minWidth:110,render:value=><span className="whitespace-nowrap">{MEMBER_REGISTRATION_TYPES[value as keyof typeof MEMBER_REGISTRATION_TYPES]??'미등록'}</span>},
+    {key:'serviceStatus',header:'회원 상태',minWidth:100,render:(value,row)=>{const erasure=erasing[row.userId]?erasureStatus('processing'):erasureStatus(row.erasureState);return erasure?<span title={row.erasureState==='review_required'||row.erasureState==='retry_required'?`${deletionMessage(row.erasureErrorCode??undefined)} 「계정 삭제」를 다시 누르면 이어서 진행합니다.`:undefined} className={`inline-block whitespace-nowrap rounded-full border px-2 py-0.5 text-xs font-medium ${erasure.tone}`}>{erasure.label}</span>:<span className={`inline-block whitespace-nowrap rounded-full border px-2 py-0.5 text-xs font-medium ${memberStatusTone[String(value)]??'border-slate-300 bg-white text-slate-600'}`}>{MEMBER_STATUS_LABELS[String(value)]??'확인 필요'}</span>}},
+    // 운영자는 가입 신청서가 없어도 「미등록」이 아니라 맡은 서비스의 운영 역할을 모두 보인다(2026-11-10).
+    {key:'registrationType',header:'가입 유형',minWidth:110,render:(value,row)=>{const type=MEMBER_REGISTRATION_TYPES[value as keyof typeof MEMBER_REGISTRATION_TYPES];const operator=operatorRoleLabels(row.operatorRoles);if(!operator.length)return <span className="whitespace-nowrap">{type??'미등록'}</span>;return <span className="flex flex-col items-start gap-0.5">{type&&<span className="whitespace-nowrap">{type}</span>}{operator.map(label=><span key={label} className="whitespace-nowrap rounded border border-indigo-200 bg-indigo-50 px-1.5 text-xs text-indigo-800">{label}</span>)}</span>;}},
     {key:'nickname',header:'닉네임',minWidth:120,render:value=><span className="whitespace-nowrap">{value||'미등록'}</span>},
     {key:'email',header:'이메일',minWidth:240,render:value=><span className="whitespace-nowrap">{value||'미제공'}</span>},
     {key:'loginMethods',header:'로그인 방식',minWidth:120,render:value=><span className="whitespace-nowrap">{Array.isArray(value)&&value.length?value.map(key=>({google:'Google',kakao:'카카오',email:'이메일'})[key]??'기타').join(' · '):'미등록'}</span>},
@@ -177,25 +178,33 @@ export default function CentralMemberWorkspace({ actorId, initialQuery = '', ini
     {erasingCount>0 && <output aria-live="polite" className="block space-y-1 rounded border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">{Object.entries(erasing).map(([id,item])=><span key={id} className="block">{item.name} 계정을 삭제하는 중입니다… {Math.max(0,Math.floor((clock-item.startedAt)/1000))}초 경과.</span>)}<span className="block text-amber-800">삭제는 서버에서 계속 진행됩니다. 다른 업무를 계속하셔도 되며, 끝나면 목록과 탭 숫자가 바뀝니다. 이 창은 닫지 마시기 바랍니다.</span></output>}
     {!selectedId && error && <p role="alert" className="rounded border border-red-200 bg-red-50 p-3 text-sm text-red-800">{error}</p>}{!selectedId && notice && <output className="block rounded border border-green-200 bg-green-50 p-3 text-sm text-green-800">{notice}</output>}
     <div className="[&>div>div]:flex-wrap"><ActionBar selectedCount={selectedIds.size} onClearSelection={()=>{if(busy)return;++detailSequence.current;setSelectedIds(new Set());setSelectedId(null);setDetail(null);setReading(false);}} actions={([
-      ['detail','회원 상세보기'],['edit','회원 정보 수정'],['reject','가입 반려'],
+      // 「회원 정보」 하나에서 보기 · 수정 · 약국·사업자 정보를 함께 다룬다(패널 안에서 보기/수정 전환 · 2026-11-10).
+      ['detail','회원 정보'],['reject','가입 반려'],
       // Admin: 「계정 삭제」는 바로 삭제하고, 이용 복구 · 약국 매도 이전 · 완전폐업은 「이용·약국 관리」 패널에서 한다(#990 Codex P1).
-      ...(adminMode?[['manage','이용·약국 관리'] as const]:[]),
-      ['delete',adminMode?'계정 삭제':'회원 해지·복구'],['pharmacy','약국·사업자 정보'],
+      // Operator: 「회원 해지」와 「이용 복구」를 나눈다 — 누른 버튼의 양식만 연다.
+      ...(adminMode?[['manage','이용·약국 관리'] as const,['delete','계정 삭제'] as const]:[['terminate','회원 해지'] as const,['restore','이용 복구'] as const]),
     ] as ReadonlyArray<readonly [MemberWorkMode|'manage',string]>).map(([key,label])=>{
       const mode:MemberWorkMode=key==='manage'?'delete':key;
       let variant=workActionVariant(mode,workMode);
       if(key==='manage')variant=workMode==='delete'?'primary':'default';
       const selectedErasing=rows.some(row=>selectedIds.has(row.userId)&&erasing[row.userId]);
-      const rejectBlock=key==='reject'&&selectedIds.size===1?registrationDecisionBlock(rows.find(row=>selectedIds.has(row.userId))):null;
-      return {key,label,visible:!protectedSelection||key==='detail',variant,tooltip:key==='delete'&&deleteForbidden?'전체 관리자 권한이 필요합니다.':rejectBlock??undefined,disabled:busy||loading||(key!=='detail'&&(selectedIds.size!==1||selectedErasing))||(key==='edit'&&!permissions.edit)||(key==='reject'&&(!permissions.edit||rejectBlock!==null))||(key==='manage'&&!permissions.edit)||(key==='delete'&&deleteForbidden),onClick:()=>{const first=rows.find(row=>selectedIds.has(row.userId));if(!first)return;if(adminMode&&key==='delete'){void eraseAccount(first);return;}void openMember(first.userId,mode);}};
+      const selectedRow=selectedIds.size===1?rows.find(row=>selectedIds.has(row.userId)):undefined;
+      const rejectBlock=key==='reject'&&selectedRow?registrationDecisionBlock(selectedRow):null;
+      const lifecycleBlock=key==='terminate'&&selectedRow&&selectedRow.serviceStatus!=='active'?'이용 중(정상)인 회원만 해지할 수 있습니다.'
+        :key==='restore'&&selectedRow&&!['suspended','withdrawn'].includes(selectedRow.serviceStatus??'')?'해지된 회원만 이용을 복구할 수 있습니다.':null;
+      return {key,label,visible:!protectedSelection||key==='detail',variant,tooltip:key==='delete'&&deleteForbidden?'전체 관리자 권한이 필요합니다.':rejectBlock??lifecycleBlock??undefined,disabled:busy||loading||(key!=='detail'&&(selectedIds.size!==1||selectedErasing))||(key==='edit'&&!permissions.edit)||(key==='reject'&&(!permissions.edit||rejectBlock!==null))||(key==='manage'&&!permissions.edit)||(key==='delete'&&deleteForbidden)||((key==='terminate'||key==='restore')&&(!permissions.edit||lifecycleBlock!==null)),onClick:()=>{const first=rows.find(row=>selectedIds.has(row.userId));if(!first)return;if(adminMode&&key==='delete'){void eraseAccount(first);return;}void openMember(first.userId,mode);}};
     })}/></div>
     {selectedIds.size>1 && <p className="text-sm text-slate-600">선택 회원은 순서대로 상세 검토할 수 있습니다. 수정·거부·삭제는 한 명씩 확인 후 진행합니다.</p>}
     {selectedId && createPortal(<aside ref={panel} tabIndex={-1} aria-label="선택 회원 작업" className="fixed inset-y-0 right-0 z-50 flex w-full max-w-full flex-col border-l border-slate-200 bg-white shadow-2xl outline-none sm:w-[560px] lg:w-[640px]">
-      <header className="flex flex-wrap items-center gap-x-2 gap-y-1 border-b border-slate-200 bg-blue-50 px-3 py-3 text-sm sm:flex-nowrap sm:px-4"><h3 className="min-w-0 flex-1 truncate text-base font-semibold">{workMode==='edit'?'회원 정보 수정':workMode==='detail'?'회원 정보 보기':workMode==='pharmacy'?'약국·사업자 정보':'선택 회원 작업'}</h3><div className="order-last flex w-full justify-end gap-2 sm:order-none sm:w-auto"><button type="button" className="shrink-0 whitespace-nowrap px-1" disabled={busy || reading || !nextMember} onClick={() => { if (nextMember) void openMember(nextMember.userId); }}>다음 회원 검토</button><button type="button" className="shrink-0 whitespace-nowrap px-1" disabled={busy} onClick={closePanel}>선택 해제</button></div><button type="button" aria-label="회원 작업 패널 닫기" disabled={busy} className="shrink-0 rounded px-2 text-xl leading-none text-slate-500 hover:bg-slate-100" onClick={closePanel}>×</button></header>
+      <header className="flex flex-wrap items-center gap-x-2 gap-y-1 border-b border-slate-200 bg-blue-50 px-3 py-3 text-sm sm:flex-nowrap sm:px-4"><h3 className="min-w-0 flex-1 truncate text-base font-semibold">{workMode==='edit'?'회원 정보 수정':workMode==='detail'||workMode==='pharmacy'?'회원 정보 보기':workMode==='terminate'?'회원 해지':workMode==='restore'?'이용 복구':'선택 회원 작업'}</h3><div className="order-last flex w-full justify-end gap-2 sm:order-none sm:w-auto"><button type="button" className="shrink-0 whitespace-nowrap px-1" disabled={busy || reading || !nextMember} onClick={() => { if (nextMember) void openMember(nextMember.userId); }}>다음 회원 검토</button><button type="button" className="shrink-0 whitespace-nowrap px-1" disabled={busy} onClick={closePanel}>선택 해제</button></div><button type="button" aria-label="회원 작업 패널 닫기" disabled={busy} className="shrink-0 rounded px-2 text-xl leading-none text-slate-500 hover:bg-slate-100" onClick={closePanel}>×</button></header>
       <div className="flex-1 space-y-3 overflow-y-auto p-4">
         {error && <p role="alert" className="rounded border border-red-200 bg-red-50 p-2 text-sm text-red-800">{error}<button type="button" className="ml-2 underline" disabled={busy} onClick={()=>void openMember(selectedId,workMode,true)}>최신 정보 다시 조회</button></p>}
         {notice && <output className="block rounded border border-green-200 bg-green-50 p-2 text-sm text-green-800">{notice}</output>}
         {!adminMode && workMode==='delete' && <p className="text-sm text-slate-600">회원 해지는 해당 서비스 이용 자격을 종료하며 계정을 삭제하지 않습니다. 계정·개인자료 완전삭제는 Admin 회원·사업체 관리에서 처리합니다.</p>}
+        {detail && !reading && ['detail','edit','pharmacy'].includes(workMode) && <div role="group" aria-label="회원 정보 보기·수정" className="flex gap-2">
+          <button type="button" aria-pressed={workMode!=='edit'} disabled={busy} className={`rounded border px-3 py-1.5 text-sm ${workMode!=='edit'?'border-blue-700 bg-blue-700 text-white':'bg-white'}`} onClick={()=>setWorkMode('detail')}>회원 정보 보기</button>
+          {detail.permissions.edit && !(detail.member.operatorReadOnly && !adminMode) && <button type="button" aria-pressed={workMode==='edit'} disabled={busy} className={`rounded border px-3 py-1.5 text-sm ${workMode==='edit'?'border-blue-700 bg-blue-700 text-white':'bg-white'}`} onClick={()=>setWorkMode('edit')}>회원 정보 수정</button>}
+        </div>}
         {panelContent}
       </div>
     </aside>, document.body)}

@@ -32,6 +32,12 @@ const TITLES: Record<View, string> = {
   activity: "커뮤니티 활동",
   management: "경영 현황",
 };
+/** 운영 업무는 admin.neture.co.kr/operations 한 곳에서 한다. My Home 에는 운영 역할이 있는 사람에게 진입 링크만 둔다(2026-11-10 사용자 확정).
+ *  판정식은 서버 운영 권한 판정(member-identity-guards)과 같다. 실제 업무 권한은 업무 운영 화면과 서버가 다시 확인한다. */
+export const OPERATIONS_URL = "https://admin.neture.co.kr/operations";
+export function hasOperatorRole(roles: readonly string[] | undefined): boolean {
+  return (roles ?? []).some(role => role.startsWith("platform:") || /(^|:|_)(admin|operator)$/.test(role));
+}
 function MyHomeContent({ view }: { view: View }) {
   const { user } = useAuth();
   const { search } = useLocation();
@@ -86,6 +92,15 @@ function MyHomeContent({ view }: { view: View }) {
           <ServiceReturnLink sourceKey={sourceKey} returnPath={returnPath} api={api} accountId={user.id} />
         )}
       </div>
+      {hasOperatorRole(user.roles) && (
+        <a href={OPERATIONS_URL} className="mb-5 flex items-center justify-between gap-3 rounded-xl border border-indigo-200 bg-indigo-50 p-4 text-indigo-900 no-underline hover:border-indigo-400">
+          <span>
+            <span className="block font-semibold">업무 운영으로 가기</span>
+            <span className="block text-sm text-indigo-800">맡은 서비스의 운영 업무는 업무 운영 화면에서 처리합니다.</span>
+          </span>
+          <span aria-hidden>→</span>
+        </a>
+      )}
       {view === "overview" ? (
         <div id="my-home-overview" className="space-y-5">
           <MyHomeWorkspaces

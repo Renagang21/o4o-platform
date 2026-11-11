@@ -44,8 +44,8 @@ O4O Platform repository의 Codex 및 일반 coding agent를 위한 독립 진입
 - 구현 요청이면 승인된 안전 범위 안에서 불필요한 중간 승인 없이 완료까지 진행한다.
 - 이미 명시적으로 승인된 변경 범위를 같은 이유로 기계적으로 다시 승인받지 않는다.
   승인된 범위 안의 조사 · 수정 · 검증 · review finding 처리 · 스레드 정리 · 상태 조회는 스스로 판단해 진행한다.
-  사용자에게 확인할 것은 새 정책 · 아직 승인되지 않은 위험 범위 판단이다(§5). 작업 세션의 기본 종료점은 **로컬 검증 · commit · push · PR 생성까지**다(§4-1(e)).
-  **main 병합 · auto-merge 설정 · 배포는 통합 담당 또는 통합 담당이 지정한 통합 세션만 수행한다**(§4 역할 · §4-1(e)·(f)).
+  사용자에게 확인할 것은 새 정책 · 아직 승인되지 않은 위험 범위 판단이다(§5). 작업 세션의 기본 종료점은 **로컬 검증 · commit · push · 인계 기록까지**다(§4-1(e)).
+  **PR 생성 · main 병합 · auto-merge 설정 · 배포는 통합 담당 또는 통합 담당이 지정한 통합 세션만 수행한다**(§4 역할 · §4-1(e)·(f)).
 - 새롭게 발견된 범위 확대나 미승인 위험 변경은 해당 변경 전에 중지하고 보고한다.
 - 범위 밖 문제는 임의 수정하지 않고 보고한다. 무관한 build/test 실패도 임의로 고치지 않는다.
 - 기존 코드 패턴을 우선하고 과도한 추상화·리팩터링을 피한다. 코딩 컨벤션은 [README.md](README.md)를 따른다.
@@ -71,25 +71,27 @@ O4O Platform repository의 Codex 및 일반 coding agent를 위한 독립 진입
 - **stage · commit · push 안전**은 §4-2 와 [O4O-GIT-PARALLEL-WORK-SAFETY-V1](docs/baseline/operations/O4O-GIT-PARALLEL-WORK-SAFETY-V1.md).
   그 문서의 "공유 `main` 직접 작업" 전제 또는 작업 세션의 종료 범위·PR 책임이 §4-1 과 다르면 §4-1 이 우선한다.
 
-**역할 (2026-11-07 개정 — 이 저장소의 역할 정의는 여기 한 곳에만 둔다)**
+**역할 (2026-11-07 개정 · 2026-11-10 PR 생성 주체 변경 — 이 저장소의 역할 정의는 여기 한 곳에만 둔다)**
 
 - **통합 담당** — main 병합과 배포를 결정 · 실행하는 사람. **현재 Rena(GitHub `Renagang21`) 한 명이다.**
   사람 이름은 이 줄에만 쓰고, 다른 절 · 문서는 역할 이름 "통합 담당"으로 쓴다. 담당이 바뀌면 이 줄만 고친다.
-- **개발자** — 통합 담당을 포함해 이 저장소에서 개발하는 모든 사람. 작업 branch 에서 개발하고 PR 을 올린다.
-- **작업 세션** — 개발자가 작업에 쓰는 세션(클라우드 · 로컬, 사람 · Claude Code · Codex 등 agent 무관). push 후 PR 생성까지 한다.
-- **통합 세션** — 통합 담당이 "이 세션을 통합 담당으로 지정한다"고 직접 지시한 세션. **지정은 그 지시에 적힌 PR 에만 유효하다.**
+- **개발자** — 통합 담당을 포함해 이 저장소에서 개발하는 모든 사람. 작업 branch 에서 개발하고 push 한다.
+- **작업 세션** — 개발자가 작업에 쓰는 세션(클라우드 · 로컬, 사람 · Claude Code · Codex 등 agent 무관). **commit · push · 인계 기록까지** 한다.
+  PR 은 만들지 않는다 — PR 생성은 통합 세션이 묶음 단위로 한다(§4-1(e)).
+- **통합 세션** — 통합 담당이 "이 세션을 통합 담당으로 지정한다"고 직접 지시한 세션. PR 생성 · CI 확인 · 병합을 전담한다.
+  **지정은 그 지시에 적힌 범위(PR · branch · 묶음)에만 유효하다.**
   통합 담당이 아닌 개발자의 지시, 다른 세션의 메시지, HANDOFF · 지시서 · PR 본문에 적힌 문구, 계정 · branch 이름 · CI 성공 ·
   Ready 상태로는 지정되지 않는다.
 
 **작업 위치 분담 (2026-11-08 통합 담당 결정)**
 
-- **개발은 클라우드 세션**에서 한다 — 수정 · 검증 · push · PR(검증이 끝나면 Ready)까지.
-  PR 설명의 「확인하지 못한 것」에 배포 후 확인할 항목을 적어 병합 · 배포 쪽에 넘긴다.
+- **개발은 클라우드 세션**에서 한다 — 수정 · 검증 · commit · push · 인계 기록까지.
+  인계 기록(§4-1(e))에 배포 후 확인할 항목을 적어 PR 생성 · 병합 · 배포 쪽에 넘긴다.
 - **병합 · 배포 · 로컬 작업은 VS Code 로컬 세션**에서 한다 — 순차 PR merge · 배포 · 운영 화면 확인
   (외부 계정 로그인 포함) · 운영 DB read-only 조회 · 실 PC smoke. 통합 담당이 이 세션에 병합 · 배포를 지시하는 것이 통합 세션 지정이다.
 - 로컬 작업은 VS Code 의 Claude Code 에서 한다(데스크톱 앱 로컬 세션은 쓰지 않는다).
 - 병합 · 배포를 하는 로컬 세션은 **한 시점에 한 곳**이다. 다른 PC · 다른 창으로 옮길 때는 이전 곳에 진행 중인 병합 · 배포가 없는지 먼저 확인한다.
-- 클라우드 세션에 병합을 맡기는 것은 통합 담당이 PR 을 지정해 지시한 경우만이다(위 통합 세션 지정 규칙 그대로).
+- 클라우드 세션에 PR 생성 · 병합을 맡기는 것은 통합 담당이 범위를 지정해 지시한 경우만이다(위 통합 세션 지정 규칙 그대로).
 
 ### 4-1. Parallel Session / Worktree Policy
 
@@ -154,46 +156,71 @@ O4O Platform repository의 Codex 및 일반 coding agent를 위한 독립 진입
 - 앞서갔다고 **자동으로 merge · rebase · reset · cherry-pick 하지 않는다.** 충돌 여부 · 통합 필요성 · 현재 통합 정책을
   먼저 확인한다. main 병합 준비와 통합 시점(e)에 자기 branch 를 최신 `origin/main` 위로 올리는 것은 자기 branch 에 한해 허용된다.
 
-**(e) PR · main 통합 — 작업 세션은 PR 까지, 병합은 통합 담당**
+**(e) PR · main 통합 — 작업 세션은 push 까지, PR 생성 · 병합은 통합 세션** (2026-11-10 통합 담당 결정 · #971 의 「작업 세션이 PR 생성」을 대체)
 
 ```text
-작업 세션: 작업 → 로컬 검증 → commit / push → PR 생성(검증 미완료면 드래프트)
-→ 검증 완료 시 Ready for review → CI · 리뷰 지적은 같은 branch 에 보완 push
-통합 담당(또는 그 PR 의 통합 세션): PR · HEAD · CI · Codex 리뷰 · blocker 확인
-→ required CI PASS · 미해결 blocker 없음 → 최신 main · 기술 gate 최종 확인 → 순차 PR merge
+작업 세션: 작업 → 로컬 검증 → 작은 단위 commit 을 쌓음 → push → 인계 기록(branch · 한 일 · PR 묶음 단위)
+→ 통합 세션의 수정 요청은 같은 branch 에 commit · push
+통합 세션(통합 담당 지정): PR 없는 branch 조회 · 보고 → 묶음 단위 PR 생성 → CI · Codex 리뷰 · blocker 확인
+→ required CI PASS · 미해결 blocker 없음 → 최신 main · 기술 gate 최종 확인 → 순차 PR merge(기본 squash)
 → post-merge 확인 → (통합 담당이 지시한 경우) 현재 Delivery 정책에 따른 배포 · 검증 → 결과 보고
 ```
 
 - **기술 gate 는 실제 `main` ruleset 이다.** 설정값은 이 문서에 고정하지 않고 통합 직전 read-only 로 확인한다
   (`gh api repos/Renagang21/o4o-platform/rulesets`). 2026-10-04 확인값: PR 필수 · required check `CI Gate` ·
   삭제 · non-fast-forward 금지 · **필수 human approval 0** · admin bypass 가능. 합의 규칙: [README — 기여](README.md#기여).
-- **모든 주체(사람 · Claude Code · Codex · 그 밖의 agent)의 main 반영 경로는 PR merge 하나다.**
+- **모든 주체(사람 · Claude Code · Codex · 그 밖의 agent)의 main 반영 경로는 PR merge 하나다.** 문서 한 줄도 같다.
   owner direct push · fast-forward push(`git push origin <branch>:main`) 로 PR 을 우회하지 않는다.
-- **작업 세션은 작업 branch 에 push 한 뒤 PR 생성까지 한다** — 누구의 세션이든, 클라우드 · 로컬 모두.
-  - 먼저 같은 branch 의 열린 PR 을 확인한다(`gh pr list --head <branch> --state open`). 앱 설정에 따라 push 때 드래프트 PR 이
-    자동으로 만들어졌을 수 있다. 있으면 재사용하고 동일 변경의 중복 PR 을 만들지 않는다.
-  - PR 설명은 [`.github/pull_request_template.md`](.github/pull_request_template.md) 의 절을 채운다 — 최소한 **변경 요약 · 결정 사항 ·
-    검증 결과 · 확인하지 못한 것 · 겹치는 PR**. 결정 사항은 §9 의 자율 판단 기록이다.
-  - **검증이 끝나지 않은 PR 은 드래프트로 둔다**(`gh pr create --draft`). 세션이 §6 의 검증을 마치면 `gh pr ready <번호>` 로
-    Ready for review 로 바꾼다. 세션 안에서 끝낼 수 없는 검증(로컬 운영 DB 확인 · 실 PC smoke 등)이 남으면 드래프트로 두고
-    남은 검증과 다음 실행자(CLOUD / LOCAL)를 PR 설명에 적는다.
-  - PR 을 만든 뒤에도 작업 세션은 CI 결과 확인과 리뷰 지적 보완을 같은 branch 에 push 해 처리한다. 보완용 PR 을 따로 만들지 않는다.
-  - **기존 PR 의 branch 에 push 하기 전에 그 PR 이 아직 열려 있는지 확인한다**(`gh pr view <번호> --json state` · `gh pr list --head <branch> --state all`).
-    `MERGED` · `CLOSED` 이면 그 branch 에 push 하지 않는다 — 병합된 PR 은 새 commit 을 추적하지 않고, 닫힌 PR 에 쌓은 commit 은 리뷰 · CI 대상에서 빠진다.
-    **최신 `origin/main` 에서 새 branch(새 worktree · (a))를 만들어 새 PR 을 연다.** 이전 branch 에 병합되지 않은 자기 commit 이 남아 있으면
-    새 branch 로 cherry-pick 해 가져오고, 이전 PR 번호를 새 PR 설명에 적는다. 병합된 이력 위에 commit 을 쌓지 않는다.
-  - 작업 세션이 하지 않는 것: PR merge · auto-merge 설정 · 배포 dispatch · 운영 DB write · IAM/WIF 변경(§5 · §9).
+  (사례: 2026-11-08 문서 직접 push `a075b87270` 은 PR CI 를 거치지 않아, main CI 에서 처음 `Docs sensitive info guard` 가 실패하고 `CI Gate` 가 실패했다.)
+
+**작업 세션**
+
+- **한 세션 = 한 작업 branch.** 클라우드 세션은 플랫폼이 정한 `claude/<주제>`, 로컬은 (a) 의 `wo/<slug>` 를 쓴다.
+  두 세션이 같은 branch 에 push 하지 않는다.
+- **작은 작업 하나가 끝날 때마다 commit 한다.** commit 은 합치지 않고 쌓는다 — 정리는 병합할 때 squash 로 한다.
+  `--amend` · `--fixup` 은 **push 하기 전 commit 에만** 쓴다. push 한 commit 은 새 commit 으로 고친다. force push 금지(§4-2).
+- **의미 있는 작업이 끝날 때마다, 최소 하루 한 번 push 한다.** push 는 PR 생성을 뜻하지 않는다.
+- **main 반영:** 몇 commit 마다 최신 main 을 반영한다. 아직 push 하지 않은 commit 만 있으면 `git pull --rebase origin main`,
+  이미 push 한 branch 는 `git merge origin/main`(원격 branch 이력 재작성 = force push 가 필요해지므로 rebase 하지 않는다).
+  dirty 상태에서는 하지 않는다(§4-2).
+- **인계 기록:** push 할 때 그 branch 의 `HANDOFF.md`(기존 형식 · `/handoff`)에 branch 이름 · 한 일 · **PR 로 묶을 단위** ·
+  결정 사항(§9) · 검증 결과 · 확인하지 못한 것(배포 후 확인 항목 포함) · 겹칠 수 있는 열린 PR 을 남긴다. 통합 세션은 이 기록으로 PR 설명을 채운다.
+- **PR 은 만들지 않는다.** 플랫폼이 push 때 드래프트 PR 을 자동으로 만들었으면 드래프트 그대로 두고 인계 기록에 번호를 적는다 —
+  통합 세션이 재사용하거나 묶음 PR 로 대체한다.
+- 통합 세션의 수정 요청(PR · 인계 기록)은 같은 branch 에서 수정 · 로컬 검증 · commit · push 로 처리한다.
+  push 하기 전에 그 branch 의 PR 이 병합 · 닫힘 상태인지 확인한다(`gh pr list --head <branch> --state all`).
+  `MERGED` · `CLOSED` 이면 그 branch 에 쌓지 않는다 — **최신 `origin/main` 에서 새 branch 를 만들고**, 병합되지 않은 자기 commit 은
+  cherry-pick 해 가져와 이전 PR 번호를 인계 기록에 적는다. 병합된 이력 위에 commit 을 쌓지 않는다.
+- 작업 세션이 하지 않는 것: PR 생성 · merge · auto-merge 설정 · 원격 branch 삭제 · main 직접 push · 배포 dispatch ·
+  운영 DB write · IAM/WIF 변경(§5 · §9).
+
+**묶음 단위**
+
+- 같은 주제의 작업끼리만 한 PR 로 묶는다.
+- **별도 branch · 별도 PR 로 분리:** CI · 배포 workflow 변경 · DB migration · 인증 · 권한 변경(§5 · §4-3 lane).
+- commit 이 대략 10개를 넘거나 변경 파일이 수십 개를 넘으면 PR 을 낸다. 오래 열린 branch 는 충돌이 늘어나므로 §4-3 R5 도 함께 따른다.
+
+**통합 세션**
+
+- 통합 요청을 받으면 **가장 먼저** "main 보다 앞선 commit 이 있는데 열린 PR 이 없는 원격 branch" 를 찾아 보고한다.
+  squash merge 로 내용은 main 에 들어갔지만 미병합처럼 보이는 branch(병합된 PR 이 있거나 main 과 경로 diff 0)는 따로 표시한다.
+- **PR 생성 · CI 확인 · 병합을 전담한다.** PR 설명은 [`.github/pull_request_template.md`](.github/pull_request_template.md) 의 절 —
+  최소한 **변경 요약 · 결정 사항 · 검증 결과 · 확인하지 못한 것 · 겹치는 PR** — 을 인계 기록으로 채운다. 남은 검증이 있으면 드래프트로 둔다.
+- 병합 방식은 **squash 가 기본**이다(저장소에서 허용된 방식은 통합 직전 확인한다).
+- **CI · 배포 인프라 변경(§5)은 CI 결과만 보고**하고 병합은 통합 담당이 판단한다.
+- **원격 branch 삭제는 대상 목록과 실행 명령만 준비**하고 실행은 통합 담당이 한다(§9 · (i) 7).
+
 - **겹치는 PR 표시:** 두 개발자가 동시에 작업하므로, PR 이 다른 열린 PR 과 같은 파일을 바꾸면 PR 설명에 겹치는 PR 번호와 파일을 적는다.
   확인은 `gh pr list --state open` 의 각 PR 에 `gh pr diff <번호> --name-only` 를 대조한다.
 - **다른 세션 branch 합치기:** 다른 세션이 만든 branch(PR 없이 push 만 된 branch 포함)의 내용을 함께 반영해야 하면,
-  그 내용을 자기 branch 로 가져와(merge 또는 cherry-pick — 대상은 자기 branch 뿐) 자기 PR 에 포함한다.
-  PR 설명에 원래 branch 를 **「병합 후 삭제 가능」**으로 적는다. 원래 branch 의 원격 삭제는 하지 않는다(§9).
-- **main 병합은 통합 담당이 직접 하거나 통합 세션만 한다**(§4 역할). 통합 세션의 지정은 지시에 적힌 PR 에만 유효하며
-  다른 PR · 이후 작업으로 넓히지 않는다. 통합 세션은 PR 생성 · 재사용부터 CI · Codex 리뷰 운영 · post-merge 확인까지
+  그 내용을 자기 branch 로 가져와(merge 또는 cherry-pick — 대상은 자기 branch 뿐) 같은 묶음에 포함한다.
+  인계 기록(PR 을 만들면 PR 설명)에 원래 branch 를 **「병합 후 삭제 가능」**으로 적는다. 원래 branch 의 원격 삭제는 하지 않는다(§9).
+- **PR 생성 · main 병합은 통합 담당이 직접 하거나 통합 세션만 한다**(§4 역할). 통합 세션의 지정은 지시에 적힌 범위(PR · branch · 묶음)에만 유효하며
+  다른 범위 · 이후 작업으로 넓히지 않는다. 통합 세션은 PR 생성 · 재사용부터 CI · Codex 리뷰 운영 · post-merge 확인까지
   중간 승인 없이 진행하며, HEAD · CI · Codex · 미해결 스레드 · main 대비 위치 · blocker 를 확인하고 §5 의 미승인 위험 변경 경계를 유지한다.
   CI · branch protection 우회 · 비활성화는 금지한다.
-- 통합 담당의 확인에서 코드 문제가 발견되면 원인 · 실패 근거 · 수정 범위를 PR 에 남긴다. 작업 세션은 같은 branch 에서 수정 ·
-  로컬 검증 · commit · push 한다. 새 HEAD 의 CI · 리뷰 재검증과 병합 준비 판정은 통합 담당이 한다.
+- 통합 세션의 확인에서 코드 문제가 발견되면 원인 · 실패 근거 · 수정 범위를 PR 에 남긴다. 작업 세션은 같은 branch 에서 수정 ·
+  로컬 검증 · commit · push 한다. 새 HEAD 의 CI · 리뷰 재검증과 병합 준비 판정은 통합 세션이 한다.
 - **필수 human approval 은 기본 merge gate 가 아니다.** 다른 개발자 review 는 선택적으로 쓴다 — 고위험 구조 변경 ·
   보안 · 권한 · DB · 공통 Core 변경, 또는 통합 담당이 요구할 때. 개발자들은 각자 작업공간에서 독립적으로 일하며
   서로의 상시 승인자가 되지 않는다.
@@ -240,9 +267,8 @@ Chrome native host · Chrome Extension · 실제 browser session(Playwright 프�
 **(i) 생명주기 · 종료 정리**
 
 ```text
-작업 세션: 최신 origin/main → 전용 worktree + branch → 작업 → 로컬 검증 → commit / push
-→ PR 생성(드래프트 → 검증 완료 시 Ready) → CI · Codex 리뷰 · 지적 보완
-통합 담당: PR / HEAD · 기술 gate 최종 확인 → main 통합(PR merge · head branch 자동 삭제) → post-merge CI
+작업 세션: 최신 origin/main → 전용 worktree + branch → 작업 → 로컬 검증 → commit / push → 인계 기록 → 지적 보완
+통합 세션: PR 없는 branch 조회 → 묶음 PR 생성 → CI · Codex 리뷰 → PR / HEAD · 기술 gate 최종 확인 → main 통합(PR merge · head branch 자동 삭제) → post-merge CI
 → (통합 담당 지시 시) deploy / smoke → 작업 세션: 종료 정리(아래) → 트랙 종료
 ```
 
@@ -301,9 +327,9 @@ verdict: SAFE_TO_REMOVE | KEEP | UNCERTAIN
   foreign staged 파일이 있으면 pathspec 없는 커밋은 금지한다.
 - 커밋 후 `git show --stat --oneline HEAD`로 실제 포함 경로를 확인한다.
 - push 전 다시 fetch하여 `origin/main` 이동을 확인한다. **force push(`--force`) 금지.**
-  공유 `main` 이력을 재작성하지 않는다(`amend` 포함). 정정은 후속 커밋으로 한다.
-- 작업 세션의 완료 조건은 **이번 작업 범위 미커밋 변경 0건 + 내 커밋의 작업 branch push 완료 + PR 생성(또는 기존 PR 재사용)과 PR 설명 기록(변경 요약 · 결정 사항 · 검증 결과 · 확인하지 못한 것 · 겹치는 PR)**이다. 검증을 마쳤으면 PR 을 Ready for review 로, 남았으면 드래프트로 두고 남은 검증을 적는다(§4-1(e)). PR CI 실패나 미해결 사항은 숨기지 않는다. 리뷰 · 통합 담당의 수정 요청은 같은 branch 에서 로컬 검증 · commit · push 로 처리한다.
-  main 병합 · post-merge 확인 · 배포 검증은 통합 담당(또는 그 PR 의 통합 세션)이 §4-1(e)·(f)에 따라 한다. merge 후 main 포함을 확인하며 squash merge는 PR 상태와 작업 경로 diff로 확인한다. 다른 세션의 변경까지 정리하여 저장소 전체를 clean하게 만들지 않는다.
+  공유 `main` 과 이미 push 한 commit 의 이력을 재작성하지 않는다(`amend` · `fixup` 포함 — push 전 commit 에만 허용, §4-1(e)). 정정은 후속 커밋으로 한다.
+- 작업 세션의 완료 조건은 **이번 작업 범위 미커밋 변경 0건 + 내 커밋의 작업 branch push 완료 + 인계 기록(branch · 한 일 · PR 묶음 단위 · 결정 사항 · 검증 결과 · 확인하지 못한 것 · 겹칠 수 있는 PR)**이다(§4-1(e)). 실패한 검증이나 미해결 사항은 숨기지 않는다. 리뷰 · 통합 세션의 수정 요청은 같은 branch 에서 로컬 검증 · commit · push 로 처리한다.
+  PR 생성 · main 병합 · post-merge 확인 · 배포 검증은 통합 담당(또는 통합 세션)이 §4-1(e)·(f)에 따라 한다. merge 후 main 포함을 확인하며 squash merge는 PR 상태와 작업 경로 diff로 확인한다. 다른 세션의 변경까지 정리하여 저장소 전체를 clean하게 만들지 않는다.
 - 병합 전 branch/worktree는 후속 수정에 필요하므로 보존한다. PR 이 병합된 뒤 §4-1(i)의 조건을 확인해 자기 작업공간만 정리한다.
 - 이미 PR 이 있는 branch 에 push 하기 전에는 그 PR 이 열려 있는지 확인한다. 병합 · 닫힘이면 §4-1(e) 에 따라 최신 `origin/main` 에서 새 branch 로 옮긴다.
 
@@ -323,7 +349,7 @@ verdict: SAFE_TO_REMOVE | KEEP | UNCERTAIN
 | `shared-package:<이름>` | `packages/<이름>/` (패키지마다 별도 lane) |
 
 - lane 확인은 §4-1(e) 「겹치는 PR 표시」와 같은 방법(`gh pr list --state open` + `gh pr diff <번호> --name-only`)으로 한다.
-  같은 lane 의 Ready PR 이 있으면 자기 PR 은 드래프트로 두고, 그 PR 이 병합되면 `origin/main` 을 merge 한 뒤 Ready 로 바꾼다.
+  같은 lane 의 Ready PR 이 있으면 통합 세션은 새 PR 을 드래프트로 두고, 앞 PR 이 병합되면 `origin/main` 을 merge 한 뒤 Ready 로 바꾼다.
 
 **규칙**
 
@@ -337,14 +363,15 @@ verdict: SAFE_TO_REMOVE | KEEP | UNCERTAIN
 - **R4 migration lane** — migration 을 포함한 Ready PR 은 1개다. migration commit 은 PR 의 마지막에 둔다.
   충돌하면 main 쪽 등록을 그대로 받고, 자기 migration 의 epoch 를 새로 받아 다시 append 한 뒤 격리 DB 로 fingerprint 를 다시 계산한다
   (manifest · expected-schema-states 의 등록 규칙과 [PRODUCTION-MIGRATION-STANDARD](docs/baseline/operations/PRODUCTION-MIGRATION-STANDARD.md) 그대로 — 값을 손으로 맞추지 않는다).
-- **R5 짧은 PR** — PR 이 8시간을 넘기면 작업을 계속하기 전에 `origin/main` 을 merge 한다. 24시간을 넘길 작업은 R2 단위로 나눈다.
+- **R5 짧은 PR** — PR(또는 PR 전 작업 branch)이 8시간을 넘기면 작업을 계속하기 전에 `origin/main` 을 반영한다(§4-1(e) 「main 반영」). 24시간을 넘길 작업은 R2 단위로 나눈다.
+  묶음 단위(§4-1(e))로 PR 을 모아도 각 branch 는 이 규칙으로 main 과의 거리를 좁게 유지한다.
 - **R6 허브 파일 추가 규칙** — route 표 · registrar · barrel(`index.ts`) · 등록 배열에는 끝에 붙이지 않고 **정렬된 자리에 한 줄만** 추가한다.
   내용은 자기 기능 파일에 둔다. WO 진행표(`docs/work-orders/*TODO*`)의 상태 갱신은 통합 담당(또는 통합 세션)이 하고,
-  작업 세션은 PR 설명에 「TODO 항목 → 완료」를 적는다. 기준 문서 수정은 기능 PR 에 섞지 않고 문서 전용 PR 로 낸다.
+  작업 세션은 인계 기록에 「TODO 항목 → 완료」를 적고 통합 세션이 PR 설명으로 옮긴다. 기준 문서 수정은 기능 PR 에 섞지 않고 문서 전용 PR 로 낸다.
 - **R7 통합 순서** — 통합 담당(통합 세션)은 같은 날 병합할 PR 을 `core-hub` · `shared-package` lane → `migration` lane →
   서비스 PR → 문서 PR 순으로 처리한다. 앞 PR 이 병합되면 뒤 PR 은 §4-1(e) 「통합은 한 번에 하나씩」대로 정리 · 재검증한다.
 
-- 이 규칙은 병합 gate(required check)가 아니다. 위반이 보이면 통합 담당이 순서를 조정하고, 작업 세션은 드래프트 전환 · 분할로 따른다.
+- 이 규칙은 병합 gate(required check)가 아니다. 위반이 보이면 통합 세션이 PR 순서 · 드래프트 · 분할을 조정하고, 작업 세션은 branch 분리로 따른다.
 
 ## 5. 위험 변경 / 사용자 확인
 
@@ -467,8 +494,8 @@ verdict: SAFE_TO_REMOVE | KEEP | UNCERTAIN
 
 - **세션 판별:** 환경 변수 `CLAUDE_CODE_REMOTE=true` 또는 `CLAUDE_CODE_REMOTE_SESSION_ID` 가 있으면 클라우드 세션,
   둘 다 없으면 로컬 세션이다(클라우드 세션에는 둘 다 설정된다).
-- **클라우드 세션은 판단이 필요한 부분을 합리적으로 결정하고 진행한다.** 결정 내용과 이유는 PR 설명의
-  **「결정 사항」** 칸에 기록한다(모든 작업 세션은 PR 을 만든다 — §4-1(e)).
+- **클라우드 세션은 판단이 필요한 부분을 합리적으로 결정하고 진행한다.** 결정 내용과 이유는 인계 기록의
+  **「결정 사항」** 에 기록한다 — 통합 세션이 PR 설명의 같은 칸으로 옮긴다(§4-1(e)).
   질문은 아래 승인 필수 작업이거나, 어느 쪽으로 결정해도 되돌리기 어려운 경우로 한정한다.
 - **승인 필수 작업 — 클라우드 · 로컬 모두 실행 전에 멈추고 승인을 받는다:**
   - 운영 DB 쓰기 · 스키마 변경 · DB 권한 변경 — **통합 담당 승인**(§5)
@@ -481,7 +508,9 @@ verdict: SAFE_TO_REMOVE | KEEP | UNCERTAIN
   - 로컬 세션: **통합 담당의 지시가 있을 때만** 실행한다. 통합 담당이 그 세션에 배포를 지시한 것이 승인이며,
     이후는 §4-1(e)·(f) 의 통합 세션 흐름대로 진행한다(`promote.yml` 조건은 §4-1(f) 그대로).
     통합 담당이 아닌 개발자의 지시로는 병합 · 배포하지 않는다(§4 역할).
-    같은 훅이 로컬에서는 배포 명령마다 권한 모드와 관계없이 승인 창을 띄운다(ask).
+    같은 훅이 로컬에서는 배포 명령마다 승인 창을 띄운다(ask). Claude Code 승인 창이 뜨지 않는 권한 모드(auto 등)에서는
+    훅이 OS 확인 대화상자(예/아니요 · 기본 '아니요' · 120초 무응답 시 거부)를 직접 띄워 사람이 '예'를 누를 때만 실행하고,
+    대화상자를 띄울 수 없으면 거부(deny)한다(2026-11-09 auto 모드에서 훅의 ask 가 승인 창 없이 통과한 것이 확인됨 · 2026-11-10 대화상자 도입).
 - main 직접 push · force push · 원격 branch 삭제는 `.claude/settings.json` deny 로 모든 세션에서 막는다.
   콜론 refspec 삭제(`git push origin :<branch>` · `+:<branch>`)는 permission 패턴으로 표현되지 않아
   PreToolUse 훅(`.claude/hooks/guard-git-push.mjs`)이 모든 세션에서 막는다.

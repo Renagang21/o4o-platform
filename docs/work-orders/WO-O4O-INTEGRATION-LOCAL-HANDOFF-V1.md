@@ -1,7 +1,7 @@
 # WO-O4O-INTEGRATION-LOCAL-HANDOFF-V1 — 클라우드 통합 세션이 못 하는 일의 LOCAL 인계
 
 > **상태**: ACTIVE
-> **작성일**: 2026-11-07 · **최종 갱신**: 2026-11-08 (§5-A 완료 · §6 기록)
+> **작성일**: 2026-11-07 · **최종 갱신**: 2026-11-10 (§5-B 1) · 2) 확인 · 분류 · 3) 완료)
 > **실행 위치**: LOCAL
 > **인계**: PR #985 로 main 반영 · 다음 실행자 LOCAL(통합 담당) — 결과는 최신 `origin/main` 에서 새 branch(`wo/integration-local-handoff-result` 등)로 기록한다
 > **근거**: 통합 담당 지시(2026-11-07 — "클라우드 통합 세션이 못 하는 일은 정리해서 로컬 에이전트에게 넘긴다") · [`IR-O4O-UNMERGED-BRANCH-AND-PR-DISPOSITION-V1`](../investigations/IR-O4O-UNMERGED-BRANCH-AND-PR-DISPOSITION-V1.md) §6 (#984) · PR #968 통합 확인 코멘트
@@ -63,11 +63,11 @@
 
 선행 조건: #968 이 수정돼 클라우드 통합 세션이 병합한 뒤. 그 전에는 실행하지 않는다.
 
-- [ ] [LOCAL] **통합 담당 명시 승인 필요** — migration `1794013771244-CreateCommunityNewsAutomation` 이 포함된 Promote(LEVEL_3)는 운영 DB DDL 이다. 승인 뒤 [README — 배포](../../README.md#배포) · [`PRODUCTION-MIGRATION-STANDARD`](../baseline/operations/PRODUCTION-MIGRATION-STANDARD.md) 절차로 `promote.yml` 을 1회 실행한다(`gh workflow run promote.yml -f sha=<40자 main HEAD>`).
-- [ ] [LOCAL] Promote run 과 `o4o-api-migrations` Job 이 성공했는지 확인한다.
-- [ ] [LOCAL] 운영 DB read-only(`o4o_readonly`) 로 아래 SQL 1) · 2) 를 실행한다. 둘 다 시스템 카탈로그만 읽어서 새 테이블 조회 권한이 없어도 된다.
-- [ ] [LOCAL] **통합 담당 명시 승인 필요(DB 권한 변경)** — 새 테이블은 `o4o_readonly` 에 기본 거부다([SETUP.md 운영 DB identity](../../SETUP.md) — "새 표는 기본 거부"). 3) 을 실행하기 전에 운영자 로컬의 분류 스크립트를 다시 실행해 두 테이블을 분류한다. 분류 전에는 3) 을 실행하지 않는다.
-- [ ] [LOCAL] 분류 뒤 3) 을 실행한다.
+- [x] [LOCAL] **통합 담당 명시 승인 필요** — migration `1794013771244-CreateCommunityNewsAutomation` 이 포함된 Promote(LEVEL_3)는 운영 DB DDL 이다. 승인 뒤 [README — 배포](../../README.md#배포) · [`PRODUCTION-MIGRATION-STANDARD`](../baseline/operations/PRODUCTION-MIGRATION-STANDARD.md) 절차로 `promote.yml` 을 1회 실행한다(`gh workflow run promote.yml -f sha=<40자 main HEAD>`).
+- [x] [LOCAL] Promote run 과 `o4o-api-migrations` Job 이 성공했는지 확인한다.
+- [x] [LOCAL] 운영 DB read-only(`o4o_readonly`) 로 아래 SQL 1) · 2) 를 실행한다. 둘 다 시스템 카탈로그만 읽어서 새 테이블 조회 권한이 없어도 된다.
+- [x] [LOCAL] **통합 담당 명시 승인 필요(DB 권한 변경)** — 새 테이블은 `o4o_readonly` 에 기본 거부다([SETUP.md 운영 DB identity](../../SETUP.md) — "새 표는 기본 거부"). 3) 을 실행하기 전에 운영자 로컬의 분류 스크립트를 다시 실행해 두 테이블을 분류한다. 분류 전에는 3) 을 실행하지 않는다.
+- [x] [LOCAL] 분류 뒤 3) 을 실행한다.
 
 ```sql
 -- 1) 새 테이블 2개가 생겼는가
@@ -114,7 +114,11 @@ SELECT count(*) AS article_rows FROM public.community_news_articles;
     - `claude/elegant-albattani-5x2elv`: #988 이 병합되지 않고 CLOSED 됐다. 같은 branch 의 #985 는 MERGED 다. tip `fa02b4f0e7`.
   - #975 는 그사이 MERGED 됐다(2026-11-08). head branch 는 자동 삭제됐다.
 - A. 임시 스크립트: 세션 PC 에서는 저장소 밖 두 곳(세션 scratchpad · `C:\Users\sohae\cleanup-branches.ps1`)에 사본이 생겼다. 실행 PC 에도 `C:\Users\sohae\cleanup-branches.ps1` 이 있다. 저장소 안에는 파일이 생기지 않았다. 정리 상태는 PR 에 적는다.
-- B. (대기)
+- B. Promote: run `Promote 28938d50c1`(#968 merge commit) 2026-11-08 09:05Z · conclusion `success` · job `API / build-and-deploy` success(migration 은 이 job 안에서 실행 — 별도 job 이름 없음. 반영은 아래 1) 로 확인). 이 세션은 실행하지 않았고 GitHub Actions 기록을 조회했다(2026-11-10).
+- B. 1) · 2) (2026-11-10 LOCAL · `o4o_readonly` · `default_transaction_read_only = on`): 1) 두 값 모두 `true`. 2) 두 행 모두 `fenced = true` → **migration 반영 정상 · 계정 삭제 보호 트리거 정상.**
+- B. 3): `permission denied for table community_news_articles` — 판정표상 **조회 권한 미확보(분류 스크립트 미실행)**. 장애 · 자동 게시 실패 판정 근거가 아니다. 분류(DB 권한 변경)는 통합 담당 명시 승인 사항이라 실행하지 않았다. 남은 것: 승인 → 분류 스크립트 → 3) 재실행.
+- B. 분류(2026-11-10, 통합 담당 승인): 운영자 로컬 분류 스크립트를 사전 점검(dry run) → 적용 순으로 실행했다. 결과 전체 조회 318 → 320 · 일부 컬럼 26 · 거부 8 · 소유 밖 0. 늘어난 2개는 뉴스 테이블 2개다(JSON · 비밀값 컬럼 없음). 기존 거부 · 일부 컬럼 목록은 11-06 적용과 같다. 검증 스크립트(`o4o_readonly`)는 PASS 12 · FAIL 0 이다. 되돌리기는 분류 스크립트를 다시 실행하거나 롤백 스크립트로 한다.
+- B. 3) 재실행(2026-11-10, `o4o_readonly` · read-only): `article_rows = 291` → 0 이 아니므로 자동 수집은 정상 동작 중으로 판정한다. 원문은 조회하지 않았다.
 
 ## 7. 검증 계획
 

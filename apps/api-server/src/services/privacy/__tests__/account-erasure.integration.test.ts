@@ -64,7 +64,14 @@ integration('account erasure — isolated PostgreSQL schema/real sessions', () =
   async function clearFixtures(){
     if(port!==55469||(await db.query('SELECT current_database() AS name'))[0].name!=='o4o_erasure_fixture')throw new Error('SYNTHETIC_DATABASE_ONLY');
     // Non-FK writer tables and purpose-separated journals must not leak between cases.
-    await db.query('TRUNCATE '+fixtureTables.join(',')+' CASCADE');
+    // 표 353개를 매번 TRUNCATE 하면 케이스마다 수 초가 걸린다(Windows 7초) — 행이 있는 표만 찾아 비운다.
+    // 이 fixture 는 일회용 클러스터의 superuser 로만 열리므로, FK · writer fence 트리거를 끄고 순서 없이 지운다.
+    const filled:string[]=(await db.query(fixtureTables.map(t=>`SELECT '${t.replace(/'/g,"''")}' AS t WHERE EXISTS(SELECT 1 FROM ${t})`).join(' UNION ALL '))).map((r:{t:string})=>r.t);
+    if(!filled.length)return;
+    await db.transaction(async m=>{
+      await m.query("SET LOCAL session_replication_role = replica");
+      for(const t of filled)await m.query(`DELETE FROM ${t}`);
+    });
   }
   const service = (storage?: PersonalStorage, years: 1|2 = 1) => {
     const core=new AccountErasureService(db,{enabled:true,inventoryReviewed:true,systemYears:years,systemBasis:'isolated-synthetic-system',personalBuckets:['fixture-private'],storage});
@@ -154,9 +161,77 @@ integration('account erasure — isolated PostgreSQL schema/real sessions', () =
     expect(after.meta.subjectKey).toMatch(/^[a-f0-9]{64}$/);expect(after.created_at).toEqual(before.created_at);
     expect((await db.query('SELECT meta FROM action_logs WHERE id=$1',[peerBefore.id]))[0].meta).toEqual(peerBefore.meta);
   });
-  it('unknown business audit copies require review and are never silently discarded',async()=>{
-    const target=await user(),[audit]=await db.query(`INSERT INTO audit_logs("entityType","entityId",action,changes) VALUES('Order',$1,'update',jsonb_build_object('contact',$2::text)) RETURNING id`,[randomUUID(),target.email]);
-    try{const result=await service().request(target.id);expect(result).toMatchObject({state:'review_required',erased:false});expect(result.reviewCodes).toContain('REVIEW:public.audit_logs');expect((await db.query('SELECT changes FROM audit_logs WHERE id=$1',[audit.id]))[0].changes.contact).toBe(target.email);}finally{await db.query('DELETE FROM audit_logs WHERE id=$1',[audit.id]);}
+  // 2026-11-10 통합 담당 결정: 등록되지 않은 표의 단순 사본은 검토로 멈추지 않고, 행은 남긴 채 식별값만 되돌릴 수 없게 치환한다.
+  it('unknown business audit copies are anonymized in place instead of blocking erasure, and the record is kept',async()=>{
+    const target=await user(),peer=await user(),[audit]=await db.query(`INSERT INTO audit_logs("entityType","entityId",action,changes) VALUES('Order',$1,'update',jsonb_build_object('contact',$2::text,'other',$3::text)) RETURNING id`,[randomUUID(),target.email,peer.email]);
+    try{
+      expect(await service().request(target.id)).toMatchObject({state:'completed',erased:true});
+      const [a]=await db.query('SELECT "entityType",changes FROM audit_logs WHERE id=$1',[audit.id]);
+      expect(a.entityType).toBe('Order');expect(a.changes.contact).toMatch(/^erased:[a-f0-9]{64}$/);expect(a.changes.other).toBe(peer.email);
+    }finally{await db.query('DELETE FROM audit_logs WHERE id=$1',[audit.id]);}
+  });
+  it('a copy next to a storage file pointer stays under review so the private object is not orphaned (#1023)',async()=>{
+    const target=await user(),[audit]=await db.query(`INSERT INTO audit_logs("entityType","entityId",action,changes) VALUES('Order',$1,'update',jsonb_build_object('proof',$2::text)) RETURNING id`,[randomUUID(),`https://storage.googleapis.com/fixture-private/${target.id}/proof.pdf`]);
+    try{
+      const result=await service().request(target.id);
+      expect(result).toMatchObject({state:'review_required',erased:false});expect(result.reviewCodes).toContain('REVIEW:public.audit_logs');
+      expect((await db.query('SELECT changes FROM audit_logs WHERE id=$1',[audit.id]))[0].changes.proof).toContain(target.id);
+    }finally{await db.query('DELETE FROM audit_logs WHERE id=$1',[audit.id]);}
+  });
+  it('own public and member inquiries keep their rows while name, phone and body are wiped (#1023)',async()=>{
+    const target=await user(),peer=await user();
+    const [inquiry]=await db.query(`INSERT INTO contact_inquiries(service_key,inquiry_type,name,email,phone,subject,message,privacy_consent,status,requester_user_id,requester_subject_type,requester_subject_id,client_request_id,created_at,updated_at)
+      VALUES('neture','general','Synthetic member','other-address@fixture.invalid','010-0000-0000','Synthetic subject','Synthetic body',true,'new',$1,'person',$1,$2,now(),now()) RETURNING id`,[target.id,randomUUID()]);
+    const [request]=await db.query(`INSERT INTO contact_requests(service_key,type,name,email,phone,message,status,privacy_consent,created_at,updated_at)
+      VALUES('neture','general','Synthetic guest',$1,'010-0000-0001','Synthetic guest body','new',true,now(),now()) RETURNING id`,[target.email]);
+    const [peerRequest]=await db.query(`INSERT INTO contact_requests(service_key,type,name,email,message,status,privacy_consent,created_at,updated_at)
+      VALUES('neture','general','Peer guest',$1,$2,'new',true,now(),now()) RETURNING id`,[peer.email,`Ask ${target.email} please`]);
+    try{
+      expect(await service().request(target.id)).toMatchObject({state:'completed',erased:true});
+      const [i]=await db.query('SELECT name,phone,subject,message,requester_user_id,requester_subject_type,requester_subject_id,client_request_id FROM contact_inquiries WHERE id=$1',[inquiry.id]);
+      expect(i).toMatchObject({name:expect.stringMatching(/^erased:/),phone:null,subject:expect.stringMatching(/^erased:/),message:expect.stringMatching(/^erased:/),
+        requester_user_id:null,requester_subject_type:null,requester_subject_id:null,client_request_id:null});
+      const [g]=await db.query('SELECT name,email,phone,message FROM contact_requests WHERE id=$1',[request.id]);
+      expect(g).toMatchObject({name:expect.stringMatching(/^erased:/),email:expect.stringMatching(/^erased:/),phone:null,message:expect.stringMatching(/^erased:/)});
+      const [p]=await db.query('SELECT name,message FROM contact_requests WHERE id=$1',[peerRequest.id]);
+      expect(p.name).toBe('Peer guest');expect(p.message).toMatch(/^Ask erased:[a-f0-9]{64} please$/);
+    }finally{
+      await db.query('DELETE FROM contact_inquiries WHERE id=$1',[inquiry.id]);
+      await db.query('DELETE FROM contact_requests WHERE id=ANY($1::uuid[])',[[request.id,peerRequest.id]]);
+    }
+  });
+  it('retained records keep their rows with this member replaced by an irreversible key, and repair copies are removed (2026-11-10)',async()=>{
+    const target=await user(),peer=await user();
+    const [actorLog]=await db.query(`INSERT INTO action_logs(service_key,user_id,action_key,source,status,meta) VALUES('neture',$1,'member.synthetic_peer_action','test','success',jsonb_build_object('note','kept')) RETURNING id,created_at`,[target.id]);
+    const [mentionLog]=await db.query(`INSERT INTO action_logs(service_key,user_id,action_key,source,status,meta) VALUES('neture',$1,'operator.synthetic_note','test','success',jsonb_build_object('contact',$2::text,'other',$3::text)) RETURNING id`,[peer.id,target.email,peer.email]);
+    const [invite]=await db.query(`INSERT INTO operator_invitations(invited_email,service_key,role,token_hash,status,expires_at,accepted_user_id,accepted_at) VALUES($1,'supplier','supplier:operator','synthetic-token-hash','accepted',now()+interval '7 days',$2,now()) RETURNING id`,[target.email,target.id]);
+    const [snapshot]=await db.query(`INSERT INTO canonical_demo_repair_snapshots(migration,snapshot) VALUES('synthetic',jsonb_build_object('user',$1::text)) RETURNING id`,[target.id]);
+    const [contact]=await db.query(`INSERT INTO neture_contact_messages("contactType",name,email,phone,subject,message,status,"privacyConsent","createdAt","updatedAt") VALUES('general','Synthetic sender',$1,'010-0000-0000','Synthetic subject','Synthetic body','resolved',true,now(),now()) RETURNING id`,[target.email.toUpperCase()]);
+    const [peerContact]=await db.query(`INSERT INTO neture_contact_messages("contactType",name,email,subject,message,status,"privacyConsent","createdAt","updatedAt") VALUES('general','Peer sender',$1,'Peer subject',$2,'resolved',true,now(),now()) RETURNING id`,[peer.email,`Please reach ${target.email} later`]);
+    const [activity]=await db.query(`INSERT INTO account_activities("userId",email,action,success,details,"createdAt") VALUES($1,$2::text,'synthetic_lookup',true,jsonb_build_object('looked_up',$2::text),now()) RETURNING id`,[peer.id,target.email]);
+    try{
+      expect(await service().request(target.id)).toMatchObject({state:'completed',erased:true});
+      const [a]=await db.query('SELECT user_id,meta,created_at FROM action_logs WHERE id=$1',[actorLog.id]);
+      expect(a.user_id).toBeNull();expect(a.meta.note).toBe('kept');expect(a.meta.actorKey).toMatch(/^[a-f0-9]{64}$/);expect(a.created_at).toEqual(actorLog.created_at);
+      const [b]=await db.query('SELECT user_id,meta FROM action_logs WHERE id=$1',[mentionLog.id]);
+      expect(b.user_id).toBe(peer.id);expect(b.meta.contact).toMatch(/^erased:[a-f0-9]{64}$/);expect(b.meta.other).toBe(peer.email);
+      expect(await db.query('SELECT 1 FROM operator_invitations WHERE id=$1',[invite.id])).toHaveLength(0);
+      expect(await db.query('SELECT 1 FROM canonical_demo_repair_snapshots WHERE id=$1',[snapshot.id])).toHaveLength(0);
+      // 본인이 쓴 문의는 행만 남고 이름 · 전화 · 제목 · 본문이 지워진다(2026-11-10 결정). 남의 문의는 이 회원 식별값만 치환된다.
+      const [own]=await db.query('SELECT name,email,phone,subject,message FROM neture_contact_messages WHERE id=$1',[contact.id]);
+      expect(own).toMatchObject({name:expect.stringMatching(/^erased:[a-f0-9]{64}$/),email:expect.stringMatching(/^erased:/),phone:null,subject:expect.stringMatching(/^erased:/),message:expect.stringMatching(/^erased:/)});
+      const [other]=await db.query('SELECT name,email,message FROM neture_contact_messages WHERE id=$1',[peerContact.id]);
+      expect(other).toMatchObject({name:'Peer sender',email:peer.email});
+      expect(other.message).toMatch(/^Please reach erased:[a-f0-9]{64} later$/);
+      const [act]=await db.query('SELECT "userId",email,details FROM account_activities WHERE id=$1',[activity.id]);
+      expect(act.userId).toBe(peer.id);expect(act.email).toMatch(/^erased:/);expect(JSON.stringify(act.details)).not.toContain(target.email);
+    }finally{
+      await db.query('DELETE FROM action_logs WHERE id=ANY($1::uuid[])',[[actorLog.id,mentionLog.id]]);
+      await db.query('DELETE FROM operator_invitations WHERE id=$1',[invite.id]);
+      await db.query('DELETE FROM canonical_demo_repair_snapshots WHERE id=$1',[snapshot.id]);
+      await db.query('DELETE FROM neture_contact_messages WHERE id=ANY($1::uuid[])',[[contact.id,peerContact.id]]);
+      await db.query('DELETE FROM account_activities WHERE id=$1',[activity.id]);
+    }
   });
   it('invalid security-log retention anchors block completion without changing source records',async()=>{
     const target=await user(),[login]=await db.query(`INSERT INTO login_attempts(email,"createdAt") VALUES($1,now()+interval '2 days') RETURNING id`,[target.email]);
@@ -380,6 +455,23 @@ integration('account erasure — isolated PostgreSQL schema/real sessions', () =
     expect((await service().request(target.id)).erased).toBe(true);
     expect(await db.query('SELECT 1 FROM supplier_product_offers WHERE id=$1 AND supplier_id=$2',[offer,supplier])).toHaveLength(1);
     expect((await db.query('SELECT user_id,contact_email,manager_name,settlement_account_number,status FROM neture_suppliers WHERE id=$1',[supplier]))[0]).toEqual({user_id:null,contact_email:null,manager_name:null,settlement_account_number:null,status:'INACTIVE'});
+  });
+  it('product catalog rows are business records: a subject copy in product data neither blocks erasure nor is removed',async()=>{
+    const target=await user(),master=randomUUID();
+    // Before 2026-11-09 this free-text copy produced REVIEW:public.product_masters and a multi-minute global-lock scan.
+    await db.query(`INSERT INTO product_masters(id,regulatory_name,name,manufacturer_name) VALUES($1,$2,$3,$4)`,
+      [master,`Synthetic regulatory ${target.id}`,`Synthetic product ${target.email}`,'Synthetic manufacturer']);
+    expect(await service().request(target.id)).toMatchObject({state:'completed',erased:true});
+    expect(await db.query('SELECT id FROM users WHERE id=$1',[target.id])).toHaveLength(0);
+    expect((await db.query('SELECT name FROM product_masters WHERE id=$1',[master]))[0].name).toBe(`Synthetic product ${target.email}`);
+  });
+  it('the subject own login activity rows are removed with the account instead of blocking it for review',async()=>{
+    const target=await user(),peer=await user();
+    await db.query(`INSERT INTO account_activities("userId",action,type,"ipAddress","userAgent",success,details) VALUES($1,'login','login_google','203.0.113.7','Synthetic UA',true,'{"provider":"google"}')`,[target.id]);
+    await db.query(`INSERT INTO account_activities("userId",action,type,success,details) VALUES($1,'login','login_password',true,'{"provider":"password"}')`,[peer.id]);
+    expect(await service().request(target.id)).toMatchObject({state:'completed',erased:true});
+    expect(await db.query('SELECT 1 FROM account_activities WHERE "userId"=$1',[target.id])).toHaveLength(0);
+    expect(await db.query('SELECT 1 FROM account_activities WHERE "userId"=$1',[peer.id])).toHaveLength(1);
   });
   it('supplier proof-file ownership uses canonical organization membership and rejects shared documents',async()=>{
     const target=await user(),peer=await user(),org=await organization(target.id),supplier=randomUUID(),document=randomUUID();

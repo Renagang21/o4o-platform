@@ -51,7 +51,7 @@ async function select() {
     name: '회원 합성 회원 member-a@example.test',
   });
   fireEvent.click(screen.getAllByRole('checkbox')[1]);
-  fireEvent.click(screen.getByRole('button', { name: '회원 상세보기' }));
+  fireEvent.click(screen.getByRole('button', { name: '회원 정보', exact: true }));
   await screen.findByRole('form', { name: '회원 정보 보기' });
 }
 beforeEach(() => {
@@ -159,14 +159,32 @@ it('shows one row with separate name, nickname, email, provider, signup type and
 it('preserves checkbox action bar, single-target editing and page selection', async () => {
   mount();
   await select();
-  expect(screen.getByRole('button', { name: '회원 정보 수정' })).toBeEnabled();
+  // 보기 · 수정 · 약국·사업자 정보는 「회원 정보」 하나로 합쳤다. 해지와 복구는 따로 있다.
+  for (const merged of ['회원 상세보기', '약국·사업자 정보', '회원 해지·복구'])
+    expect(screen.queryByRole('button', { name: merged })).toBeNull();
+  expect(screen.getByRole('button', { name: '회원 해지' })).toBeEnabled();
+  expect(screen.getByRole('button', { name: '이용 복구' })).toBeDisabled();
   fireEvent.click(screen.getAllByRole('checkbox')[2]);
-  expect(screen.getByRole('button', { name: '회원 정보 수정' })).toBeDisabled();
+  expect(screen.getByRole('button', { name: '회원 해지' })).toBeDisabled();
   fireEvent.click(screen.getAllByRole('checkbox')[2]);
   fireEvent.click(screen.getByRole('button', { name: '회원 정보 수정' }));
   expect(
     await screen.findByRole('form', { name: '회원 정보 수정' }),
   ).toBeTruthy();
+});
+it('opens only the terminate form from 「회원 해지」 and only the restore form from 「이용 복구」', async () => {
+  rows[1] = { ...rows[1], serviceStatus: 'withdrawn' };
+  mount();
+  await screen.findByRole('button', { name: '회원 합성 회원 member-a@example.test' });
+  fireEvent.click(screen.getAllByRole('checkbox')[1]);
+  fireEvent.click(screen.getByRole('button', { name: '회원 해지' }));
+  const panel = await screen.findByRole('complementary', { name: '선택 회원 작업' });
+  expect(await within(panel).findByText('회원 이용을 해지합니다. 이후 이용 복구가 가능합니다.')).toBeTruthy();
+  expect(within(panel).queryByText('해지된 회원의 이용을 복구합니다.')).toBeNull();
+  fireEvent.click(within(panel).getByRole('button', { name: '회원 작업 패널 닫기' }));
+  fireEvent.click(screen.getAllByRole('checkbox')[2]);
+  expect(screen.getByRole('button', { name: '회원 해지' })).toBeDisabled();
+  expect(screen.getByRole('button', { name: '이용 복구' })).toBeEnabled();
 });
 it('switches cached detail to editable fields without a second detail request', async () => {
   mount();
@@ -178,6 +196,9 @@ it('switches cached detail to editable fields without a second detail request', 
   expect(screen.getByLabelText('이름', { exact: true })).not.toHaveAttribute(
     'readonly',
   );
+  // 이름은 선택 항목 — 닉네임만 필수(2026-11-10). 이름 없는 신청자도 정정할 수 있어야 한다.
+  expect(screen.getByLabelText('이름', { exact: true })).not.toBeRequired();
+  expect(screen.getByLabelText('닉네임', { exact: true })).toBeRequired();
   expect(
     api.get.mock.calls.filter(([p]) => p === base + '/member-a'),
   ).toHaveLength(calls);
@@ -276,6 +297,27 @@ it('rejects the signup application without changing the global account', async (
   // 처리 후 패널을 닫고, 목록 위에 결과를 보인다.
   await screen.findByText('합성 회원 회원의 가입을 반려했습니다. 목록의 「회원 상태」가 반려로 바뀝니다.');
   expect(screen.queryByRole('complementary', { name: '선택 회원 작업' })).toBeNull();
+});
+it('shows every service operator role instead of 미등록 for an operator without a signup record', async () => {
+  rows[1] = { ...rows[1], registrationType: null, operatorRoles: ['funding:admin', 'neture:pharmcoop_operator', 'supplier:operator'] };
+  mount();
+  const name = await screen.findByRole('button', { name: '회원 다른 합성 회원 member-b@example.test' });
+  const row = name.closest('tr')!;
+  const headers = [...name.closest('table')!.querySelectorAll('th')].map(th => th.textContent?.trim());
+  const typeCell = row.querySelectorAll('td')[headers.indexOf('가입 유형')] as HTMLElement;
+  expect(typeCell.textContent).not.toContain('미등록');
+  for (const label of ['유통참여형 펀딩 관리자', '공급자 운영자']) expect(within(typeCell).getByText(label)).toBeTruthy();
+  expect(within(typeCell).getAllByText(/(운영자|관리자)$/)).toHaveLength(3);
+});
+it('does not offer signup approval for a terminated member whose application is still pending', async () => {
+  record.member.serviceStatus = 'withdrawn';
+  rows[0] = { ...rows[0], serviceStatus: 'withdrawn', registrationState: 'pending' };
+  mount();
+  await select();
+  const panel = screen.getByRole('complementary', { name: '선택 회원 작업' });
+  expect(within(panel).queryByRole('region', { name: '가입 신청 처리' })).toBeNull();
+  expect(within(panel).getByRole('note')).toHaveTextContent('해지된 회원입니다. 남아 있는 가입 신청(승인 대기)은 이용 복구 후 처리할 수 있습니다.');
+  expect(screen.getByRole('button', { name: '가입 반려', exact: true })).toBeDisabled();
 });
 it('opens the reject form at the top of the panel, above the submitted information', async () => {
   mount();

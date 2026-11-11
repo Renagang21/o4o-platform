@@ -181,6 +181,8 @@ jobs:
       run: node scripts/check-unsafe-routes.mjs
     - name: Check for console.log statements
       run: bash scripts/ci/check-console-log.sh apps/
+    - name: Guard forbidden order/payment tables
+      run: node scripts/check-forbidden-tables.mjs
     - name: Check agent config (.claude/) when the checker exists
       run: |
         if [ -f scripts/ci/check-agent-config.mjs ]; then
@@ -308,6 +310,11 @@ jobs:
     - name: Guard TypeORM entity registry integrity
       run: node scripts/check-typeorm-entities.mjs
 
+    # 서비스별 독립 *_orders · *_payments 테이블 신설 차단(CLAUDE.md §4 · CHECKOUT-STABLE-DECLARATION-V2 §2). blocking.
+    #   허용 목록은 계약 근거가 있는 테이블만 둔다(스크립트 상단 ALLOWED_TABLES). node 내장 모듈만 쓰므로 Draft light checks 에서도 돈다.
+    - name: Guard forbidden order/payment tables
+      run: node scripts/check-forbidden-tables.mjs
+
     # WO-O4O-CANONICAL-DATABASE-BOOTSTRAP-AND-INCREMENTAL-MIGRATION-SEPARATION-V1
     # 빈 DB bootstrap(canonical snapshot + o4o_schema_baselines) 과 기존 운영 DB incremental migration 을 분리한다. blocking.
     #   historical 644 migration 파일명/class/name 동결 · incremental manifest 명명(13자리 epoch, 순서 증가, 중복 0)
@@ -359,6 +366,8 @@ jobs:
         scripts/ci/__tests__/short-job-consolidation.test.mjs
         scripts/ci/__tests__/promote-dedupe.test.mjs
         scripts/ci/__tests__/main-verified-reuse.test.mjs
+        scripts/ci/__tests__/check-forbidden-tables.test.mjs
+        scripts/ci/__tests__/pr-overlap.test.mjs
 
     # WO-O4O-DOCS-FAST-AGENT-CONFIG-V1 — `.claude/` 경량 검사(settings JSON · 훅 node --check · 훅 단위 테스트).
     # `.claude/` 가 코드와 섞여 full 경로로 오는 경우에도 같은 검사를 돌린다(1초 미만 · 의존성 0).
@@ -1033,7 +1042,10 @@ jobs:
 
   central-operator-integration:
     name: Central operator PostgreSQL integration
-    runs-on: ${{ fromJSON(vars.CI_RUNNER_LINUX == 'self-hosted' && github.event.repository.private == true && github.event.pull_request.head.repo.fork != true && '["self-hosted","Linux","X64","o4o-ci-linux"]' || '"ubuntu-latest"') }}
+    # service container 가 host port 55432 를 고정으로 쓰고, 테스트도 이 포트를 일회용 DB 표식으로 확인한다.
+    # 자체 실행기를 여러 대 둘 때 이 job 은 `o4o-ci-pg` label 을 단 실행기 1대에서만 돌아 같은 PC 에서 겹치지 않는다
+    # (실행기 1대 = 동시 1 job). GitHub 호스팅에서는 job 마다 VM 이 달라 상관없다.
+    runs-on: ${{ fromJSON(vars.CI_RUNNER_LINUX == 'self-hosted' && github.event.repository.private == true && github.event.pull_request.head.repo.fork != true && '["self-hosted","Linux","X64","o4o-ci-linux","o4o-ci-pg"]' || '"ubuntu-latest"') }}
     needs: [detect]
     if: needs.detect.outputs.defer_full != 'true' && needs.detect.outputs.main_verified != 'true' && (needs.detect.outputs.api_affected == 'true' || needs.detect.outputs.global_or_unknown == 'true')
     timeout-minutes: 25

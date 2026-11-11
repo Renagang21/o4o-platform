@@ -23,8 +23,11 @@ const load = (f) => yaml.load(readFileSync(path.join(wfDir, f), 'utf8'));
 
 const LINUX_LABELS = '["self-hosted","Linux","X64","o4o-ci-linux"]';
 const WINDOWS_LABELS = '["self-hosted","Windows","X64","o4o-ci-windows"]';
+// 고정 포트(55432) PostgreSQL job 전용 — o4o-ci-pg label 을 단 실행기 1대에서만 돈다.
+const LINUX_PG_LABELS = '["self-hosted","Linux","X64","o4o-ci-linux","o4o-ci-pg"]';
 const guard = "github.event.repository.private == true && github.event.pull_request.head.repo.fork != true";
 export const LINUX_EXPR = `\${{ fromJSON(vars.CI_RUNNER_LINUX == 'self-hosted' && ${guard} && '${LINUX_LABELS}' || '"ubuntu-latest"') }}`;
+export const LINUX_PG_EXPR = `\${{ fromJSON(vars.CI_RUNNER_LINUX == 'self-hosted' && ${guard} && '${LINUX_PG_LABELS}' || '"ubuntu-latest"') }}`;
 export const WINDOWS_EXPR = `\${{ fromJSON(vars.CI_RUNNER_WINDOWS == 'self-hosted' && ${guard} && '${WINDOWS_LABELS}' || '"windows-latest"') }}`;
 const SCHEDULED_EXPR = `\${{ fromJSON(needs.runner.outputs.linux || '"ubuntu-latest"') }}`;
 
@@ -34,10 +37,11 @@ const SWITCHABLE = {
     detect: LINUX_EXPR, 'draft-light': LINUX_EXPR, 'quality-check': LINUX_EXPR, 'api-tests': LINUX_EXPR, build: LINUX_EXPR,
     'web-build': LINUX_EXPR, 'docs-fast-validate': LINUX_EXPR, 'admin-fast-validate': LINUX_EXPR,
     'admin-fast-guards': LINUX_EXPR, 'pc-installer-windows': WINDOWS_EXPR,
-    'central-operator-integration': LINUX_EXPR, 'api-runtime-dependencies': LINUX_EXPR, 'ci-gate': LINUX_EXPR,
+    'central-operator-integration': LINUX_PG_EXPR, 'api-runtime-dependencies': LINUX_EXPR, 'ci-gate': LINUX_EXPR,
   },
   'ci-appstore-guard.yml': { 'appstore-guard': LINUX_EXPR },
   'automation-pr-labeler.yml': { 'size-label': LINUX_EXPR },
+  'automation-pr-overlap.yml': { 'overlap-notice': LINUX_EXPR },
   'scheduled-api-full-jest.yml': { runner: 'ubuntu-latest', plan: SCHEDULED_EXPR, 'full-jest': SCHEDULED_EXPR, aggregate: SCHEDULED_EXPR },
 };
 
@@ -86,6 +90,18 @@ test('private + 명시적 self-hosted 일 때만 전용 label 을 고른다', ()
   for (const value of ['', 'github', 'true', '1', 'selfhosted', '["self-hosted"]']) {
     assert.equal(evaluate(LINUX_EXPR, ctx({ linux: value, isPrivate: true })), 'ubuntu-latest', value);
   }
+});
+
+test('고정 포트 PostgreSQL job: public · 변수 없음은 호스팅, private + self-hosted 일 때만 o4o-ci-pg 실행기', () => {
+  for (const isPrivate of [false, true]) assert.equal(evaluate(LINUX_PG_EXPR, ctx({ isPrivate })), 'ubuntu-latest');
+  for (const event of ['push', 'pull_request']) {
+    assert.equal(evaluate(LINUX_PG_EXPR, ctx({ linux: 'self-hosted', isPrivate: false, event })), 'ubuntu-latest');
+    assert.deepEqual(evaluate(LINUX_PG_EXPR, ctx({ linux: 'self-hosted', isPrivate: true, event })), JSON.parse(LINUX_PG_LABELS));
+  }
+  assert.equal(evaluate(LINUX_PG_EXPR, ctx({ linux: 'self-hosted', isPrivate: true, event: 'pull_request', fork: true })), 'ubuntu-latest');
+  // o4o-ci-pg 는 이 job 하나만 쓴다 — 다른 job 이 이 label 을 요구하면 전용 실행기 1대에 몰린다.
+  const users = Object.entries(SWITCHABLE).flatMap(([f, jobs]) => Object.entries(jobs).filter(([, e]) => e.includes('o4o-ci-pg')).map(([id]) => `${f}:${id}`));
+  assert.deepEqual(users, ['ci-pipeline.yml:central-operator-integration']);
 });
 
 test('Linux · Windows 는 서로의 변수에 반응하지 않는다', () => {

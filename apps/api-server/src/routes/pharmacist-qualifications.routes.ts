@@ -94,7 +94,8 @@ pharmacistQualificationsRouter.get('/members/:userId', handle(req => {
 pharmacistQualificationsRouter.patch('/members/:userId', handle(req => {
   google(req);
   const input = z.object({
-    name: z.string().trim().min(1).max(100), nickname: z.string().trim().max(100),
+    // 이름은 선택 항목이다(닉네임만 필수 · O4O-UNIFIED-MEMBER-REGISTRATION-V1 2026-11-10) — 비워 두면 NULL 로 저장한다.
+    name: z.string().trim().max(100), nickname: z.string().trim().max(100),
     email:z.string().trim().email().max(255).optional(),licenseNumber:z.string().trim().max(100).refine(value=>[...value].every(char=>char.charCodeAt(0)>=32&&char.charCodeAt(0)!==127)).optional(),qualificationVersion:z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{6}$/).nullable().optional(),evidenceConfirmed:z.boolean().optional(),
     phone: z.string().trim().max(20), reason: z.string().trim().min(1).max(2000),
     version: z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{6}$/),

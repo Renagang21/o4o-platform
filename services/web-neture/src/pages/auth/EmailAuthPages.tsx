@@ -91,7 +91,7 @@ export function SignupPage() {
   const [googleError, setGoogleError] = useState<string | null>(null);
   const [emailSignup, setEmailSignup] = useState(false);
   if (isLoading) return null;
-  if (isAuthenticated) return <AuthCard title="가입 정보"><MemberRegistrationForm key={user?.id}/></AuthCard>;
+  if (isAuthenticated) return <AuthCard title="가입 신청"><MemberRegistrationForm key={user?.id}/></AuthCard>;
   return (
     <AuthCard title="회원가입" subtitle={emailSignup ? '이메일로 가입' : '개인정보 보호를 위해 Google·카카오 가입을 권장합니다.'}>
       {emailSignup ? (
