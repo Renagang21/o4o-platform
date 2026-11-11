@@ -146,4 +146,4 @@ git push -u origin wo/<짧은-주제>
 
 ## 10. 첫 과제
 
-통합 담당이 지정한다. 후보와 성공 기준은 [IR §7](../investigations/IR-O4O-REMOTE-COLLABORATOR-READINESS-V1.md#7-첫-시험-과제) 에 있다.
+Businnect 의 첫 과제는 **Neture 「카탈로그 일괄등록」 화면의 카드 2개 404 수정**으로 확정됐다(2026-11-11). 근거 · 바꿀 파일 · 성공 기준은 [IR §7](../investigations/IR-O4O-REMOTE-COLLABORATOR-READINESS-V1.md#7-첫-시험-과제) 에 있다. 이후 과제는 통합 담당이 지정한다.
