@@ -8,7 +8,7 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import yaml from 'js-yaml';
-import { MARKER, computeOverlaps, isHubFile, lanesOf, makeApi, renderComment, run } from '../pr-overlap.mjs';
+import { CORE_LABEL, MARKER, computeOverlaps, isHubFile, lanesOf, makeApi, renderComment, run, syncCoreLabel } from '../pr-overlap.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
 const REPO = 'Renagang21/o4o-platform';
@@ -83,8 +83,12 @@ test('댓글: marker · 표 · R1 경고(Ready 같은 lane 일 때만) · 허브
   assert.match(renderComment([], { sha: 'x', repo: REPO }), /열린 PR 은 없습니다/);
 });
 
-function fakeApi({ pulls, files, comments = [] }) {
+function fakeApi({ pulls, files, comments = [], labelError = null }) {
   const calls = [];
+  const label = (kind) => async (n, name) => {
+    if (labelError) throw new Error(labelError);
+    calls.push([kind, n, name]);
+  };
   return {
     calls,
     openPulls: async () => pulls,
@@ -92,9 +96,11 @@ function fakeApi({ pulls, files, comments = [] }) {
     comments: async () => comments,
     createComment: async (n, body) => calls.push(['create', n, body]),
     updateComment: async (id, body) => calls.push(['update', id, body]),
+    addLabel: label('addLabel'),
+    removeLabel: label('removeLabel'),
   };
 }
-const pr = (number, draft = false) => ({ number, title: `PR ${number}`, draft, head: { sha: `sha${number}000000` } });
+const pr = (number, draft = false, labels = []) => ({ number, title: `PR ${number}`, draft, labels, head: { sha: `sha${number}000000` } });
 
 test('run: 겹치면 댓글 생성, 없고 이전 댓글도 없으면 아무것도 쓰지 않는다', async () => {
   const api = fakeApi({ pulls: [pr(1), pr(2)], files: { 1: [f('a.ts')], 2: [f('a.ts')] } });
@@ -124,6 +130,43 @@ test('run: 이전 봇 댓글은 고치고(겹침 해소 포함), 같은 내용�
   assert.equal((await run({ api: closed, number: 1, repo: REPO })).action, 'skip');
 });
 
+test('core-change 라벨: Core 경로를 바꾸면 달고, 아니면 떼며, 이미 맞으면 건드리지 않는다', async () => {
+  const CORE = 'apps/api-server/src/services/checkout.service.ts';
+  const add = fakeApi({ pulls: [pr(1)], files: { 1: [f(CORE)] } });
+  const r1 = await run({ api: add, number: 1, repo: REPO });
+  assert.equal(r1.coreLabel.label, 'added');
+  assert.deepEqual(r1.coreLabel.core, [{ file: CORE, area: 'commerce' }]);
+  assert.deepEqual(add.calls, [['addLabel', 1, CORE_LABEL]], 'Core 경로만 바뀌고 겹침이 없으면 댓글은 쓰지 않는다');
+
+  const keep = fakeApi({ pulls: [pr(1, false, [{ name: CORE_LABEL }])], files: { 1: [f(CORE)] } });
+  assert.equal((await run({ api: keep, number: 1, repo: REPO })).coreLabel.label, 'kept');
+  assert.equal(keep.calls.length, 0);
+
+  const remove = fakeApi({ pulls: [pr(1, false, [{ name: CORE_LABEL }, { name: 'backend' }])], files: { 1: [f('services/web-neture/src/x.tsx')] } });
+  assert.equal((await run({ api: remove, number: 1, repo: REPO })).coreLabel.label, 'removed');
+  assert.deepEqual(remove.calls, [['removeLabel', 1, CORE_LABEL]]);
+
+  const plain = fakeApi({ pulls: [pr(1)], files: { 1: [f('a.ts')] } });
+  assert.equal((await run({ api: plain, number: 1, repo: REPO })).coreLabel.label, 'absent');
+  assert.equal(plain.calls.length, 0);
+});
+
+test('core-change 라벨: 라벨 API 가 실패해도 겹침 알림은 계속하고 예외를 던지지 않는다(병합 gate 아님)', async () => {
+  const api = fakeApi({
+    pulls: [pr(1), pr(2)],
+    files: { 1: [f('packages/payment-core/src/index.ts')], 2: [f('packages/payment-core/src/index.ts')] },
+    labelError: 'GitHub POST /issues/1/labels → 403',
+  });
+  const result = await run({ api, number: 1, repo: REPO });
+  assert.equal(result.coreLabel.label, 'error');
+  assert.match(result.coreLabel.error, /403/);
+  assert.equal(result.action, 'created');
+  assert.equal(api.calls[0][0], 'create');
+
+  const direct = await syncCoreLabel({ api, number: 1, files: [f('a.ts')], labels: [CORE_LABEL] });
+  assert.equal(direct.label, 'error', '문자열 라벨 목록도 읽는다');
+});
+
 test('makeApi: 인증 헤더 · 페이지네이션 · 오류 상태 전달', async () => {
   const seen = [];
   const fetchImpl = async (url, init) => {
@@ -150,13 +193,19 @@ test('workflow: Ready 에서만 · fork 제외 · 최소 권한 · 병합 gate �
   assert.match(job.if, /!github\.event\.pull_request\.draft/);
   assert.match(job.if, /head\.repo\.fork != true/);
   assert.ok(job.steps.some((s) => s.run === 'node scripts/ci/pr-overlap.mjs'));
+  const sparse = job.steps.find((s) => s.uses?.startsWith('actions/checkout'))?.with?.['sparse-checkout'] ?? '';
+  for (const file of ['scripts/ci/pr-overlap.mjs', 'scripts/ci/core-paths.mjs']) {
+    assert.ok(sparse.split('\n').map((l) => l.trim()).includes(file), `sparse-checkout 에 ${file}`);
+  }
   assert.ok(!job.steps.some((s) => /pnpm|npm ci|npm install/.test(s.run ?? '')), '설치 없이 실행');
 
   const ci = yaml.load(readFileSync(path.join(root, '.github/workflows/ci-pipeline.yml'), 'utf8'));
   assert.ok(!JSON.stringify(ci.jobs['ci-gate'].needs).includes('overlap'), 'CI Gate needs 에 넣지 않는다');
 
-  const src = readFileSync(path.join(root, 'scripts/ci/pr-overlap.mjs'), 'utf8');
-  for (const m of src.matchAll(/^\s*import\s[^'"]*?['"]([^'"]+)['"]/gm)) {
-    assert.ok(m[1].startsWith('node:'), `외부 패키지 import: ${m[1]}`);
+  for (const file of ['scripts/ci/pr-overlap.mjs', 'scripts/ci/core-paths.mjs']) {
+    const src = readFileSync(path.join(root, file), 'utf8');
+    for (const m of src.matchAll(/^\s*import\s[^'"]*?['"]([^'"]+)['"]/gm)) {
+      assert.ok(m[1].startsWith('node:') || m[1] === './core-paths.mjs', `${file}: 외부 패키지 import: ${m[1]}`);
+    }
   }
 });

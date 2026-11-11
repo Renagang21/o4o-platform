@@ -11,14 +11,21 @@
  * - 겹침이 없고 이전 댓글도 없으면 아무것도 쓰지 않는다. 이전 댓글이 있으면 "겹침 없음" 으로 고친다.
  * - 사람을 @멘션하지 않는다(PR 번호 링크만).
  * - 다른 PR 에는 쓰지 않는다 — 그 PR 은 자기 다음 push · Ready 전환 때 같은 판정을 받는다.
- * - node 내장 모듈과 전역 fetch 만 쓴다(설치 없이 실행).
+ * - node 내장 모듈과 전역 fetch 만 쓴다(설치 없이 실행). 저장소 안 모듈은 `./core-paths.mjs` 하나만 import 한다.
+ *
+ * Core 변경 표시(WO-O4O-CORE-OWNERSHIP-AND-CHANGE-BOUNDARY-V1):
+ * - 이 PR 이 Core 계약 경로(`./core-paths.mjs` · docs/baseline/O4O-CORE-REGISTRY-V1.md 의 B 등급)를 바꾸면
+ *   `core-change` 라벨을 달고, 더 이상 바꾸지 않으면 뗀다. 겹침 댓글과 독립이다.
+ * - 라벨은 표시일 뿐 병합 gate 가 아니다. 라벨 API 가 실패해도 로그만 남기고 겹침 알림은 계속한다.
  *
  *   GITHUB_TOKEN=… GITHUB_REPOSITORY=owner/repo PR_NUMBER=123 node scripts/ci/pr-overlap.mjs
  */
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { coreChangesOf } from './core-paths.mjs';
 
 export const MARKER = '<!-- o4o-pr-overlap -->';
+export const CORE_LABEL = 'core-change';
 const MAX_FILES_SHOWN = 10;
 
 // ---------------------------------------------------------------------------------------------
@@ -170,8 +177,32 @@ export function makeApi({ token, repo, fetchImpl = fetch }) {
     files: (n) => all(`/pulls/${n}/files`),
     comments: (n) => all(`/issues/${n}/comments`),
     createComment: (n, body) => call('POST', `/issues/${n}/comments`, { body }),
+    addLabel: (n, name) => call('POST', `/issues/${n}/labels`, { labels: [name] }),
+    removeLabel: (n, name) => call('DELETE', `/issues/${n}/labels/${encodeURIComponent(name)}`),
     updateComment: (id, body) => call('PATCH', `/issues/comments/${id}`, { body }),
   };
+}
+
+/**
+ * `core-change` 라벨을 PR 파일 목록에 맞춘다. 실패는 던지지 않고 결과로 돌려준다(병합 gate 아님).
+ * @returns {Promise<{ label: 'added' | 'removed' | 'kept' | 'absent' | 'error', core: { file: string, area: string }[], error?: string }>}
+ */
+export async function syncCoreLabel({ api, number, files, labels }) {
+  const core = coreChangesOf(files);
+  const has = (labels ?? []).some((l) => (typeof l === 'string' ? l : l?.name) === CORE_LABEL);
+  try {
+    if (core.length && !has) {
+      await api.addLabel(number, CORE_LABEL);
+      return { label: 'added', core };
+    }
+    if (!core.length && has) {
+      await api.removeLabel(number, CORE_LABEL);
+      return { label: 'removed', core };
+    }
+    return { label: core.length ? 'kept' : 'absent', core };
+  } catch (error) {
+    return { label: 'error', core, error: error.message };
+  }
 }
 
 /** 한 PR 에 대해 판정하고 댓글을 만든다 · 고친다. 반환: 수행한 동작 */
@@ -180,6 +211,12 @@ export async function run({ api, number, repo }) {
   const me = pulls.find((p) => p.number === number);
   if (!me) return { action: 'skip', reason: 'PR 이 열려 있지 않음' };
   const current = { number, files: await api.files(number) };
+  const coreLabel = await syncCoreLabel({ api, number, files: current.files, labels: me.labels });
+  const result = await notifyOverlaps({ api, number, repo, me, current, pulls });
+  return { ...result, coreLabel };
+}
+
+async function notifyOverlaps({ api, number, repo, me, current, pulls }) {
   const others = await Promise.all(
     pulls
       .filter((p) => p.number !== number)
@@ -210,6 +247,11 @@ async function main() {
   const result = await run({ api: makeApi({ token, repo }), number, repo });
   const reason = result.reason ? ` (${result.reason})` : '';
   console.log(`PR #${number}: ${result.action}${reason}`);
+  if (result.coreLabel) {
+    const { label, core, error } = result.coreLabel;
+    console.log(`  ${CORE_LABEL}: ${label}${error ? ` — ${error}` : ''} (Core 계약 경로 ${core.length}개)`);
+    for (const c of core.slice(0, 20)) console.log(`    [${c.area}] ${c.file}`);
+  }
   for (const r of result.rows ?? []) {
     console.log(`  #${r.number} ${r.draft ? 'draft' : 'ready'} files=${r.files.length} lanes=${r.lanes.join(',') || '-'}`);
   }

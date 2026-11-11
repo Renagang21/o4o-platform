@@ -1,31 +1,92 @@
 # O4O Platform Code Owners
-# 각 영역별 코드 리뷰어 자동 할당
+#
+# WO-O4O-CORE-OWNERSHIP-AND-CHANGE-BOUNDARY-V1 (2026-11-11) 로 정비했다.
+# - 이전 내용은 존재하지 않는 조직 팀(@o4o-platform/*-team)을 지정해 GitHub 가 전부 "Unknown owner" 로 판정했다
+#   (repos/{owner}/{repo}/codeowners/errors). 저장소는 개인 계정 소유라 조직 팀을 지정할 수 없다.
+# - 실제 확인된 계정만 쓴다: 통합 담당(AGENTS.md §4 역할). 다른 계정 · 팀은 사용자 결정 없이 넣지 않는다.
+# - 아래 「Core 계약 경로」는 scripts/ci/core-paths.mjs 와 같은 문자열이어야 한다(scripts/ci/__tests__/core-paths.test.mjs).
+#   등급 · 변경 절차: docs/baseline/O4O-CORE-REGISTRY-V1.md
+# - 이 파일은 리뷰 요청(표시)만 한다. 병합 승인 강제(ruleset 의 code owner review)는 별도 결정 전까지 켜지 않는다.
+# - 전체(*) 기본 소유자는 두지 않는다 — 모든 PR 에 리뷰 요청이 붙어 표시 효과가 사라진다.
 
-# 전체 프로젝트
-* @o4o-platform/core-team
+# 저장소 자동화 · 이 파일 자체 (README — Production 변경 원칙: workflow 변경은 merge 전 소유자 검토)
+/.github/workflows/ @Renagang21
+/.github/CODEOWNERS @Renagang21
 
-# API 서버
-/apps/api-server/ @o4o-platform/backend-team
-/apps/api-server/src/entities/ @o4o-platform/database-team
-/apps/api-server/src/routes/ @o4o-platform/api-team
+# Core 계약 경로 — identity
+/apps/api-server/src/modules/auth/ @Renagang21
+/apps/api-server/src/common/middleware/auth/ @Renagang21
+/apps/api-server/src/common/middleware/auth.middleware.ts @Renagang21
+/apps/api-server/src/common/middleware/membership-guard.middleware.ts @Renagang21
+/apps/api-server/src/middleware/service-membership.middleware.ts @Renagang21
+/apps/api-server/src/modules/policy-acceptance/ @Renagang21
+/apps/api-server/src/modules/service-legal/ @Renagang21
+/apps/api-server/src/entities/LinkedAccount.ts @Renagang21
+/apps/api-server/src/controllers/admin/AdminUserController.ts @Renagang21
+/apps/api-server/src/controllers/operator/MembershipConsoleController.ts @Renagang21
+/packages/security-core/ @Renagang21
+/packages/auth-utils/ @Renagang21
+/packages/auth-client/ @Renagang21
+/packages/types/src/auth.ts @Renagang21
 
-# 프론트엔드 - 어드민
-/apps/admin-dashboard/ @o4o-platform/admin-team
+# Core 계약 경로 — organization
+/packages/organization-core/ @Renagang21
+/packages/platform-core/ @Renagang21
 
-# 공유 패키지
-/packages/types/ @o4o-platform/core-team
-/packages/auth-*/ @o4o-platform/security-team
-/packages/ui/ @o4o-platform/ui-team
-/packages/utils/ @o4o-platform/core-team
+# Core 계약 경로 — commerce
+/apps/api-server/src/services/checkout.service.ts @Renagang21
+/apps/api-server/src/services/cart/ @Renagang21
+/apps/api-server/src/entities/checkout/ @Renagang21
+/apps/api-server/src/entities/cart/ @Renagang21
+/packages/payment-core/ @Renagang21
 
-# 설정 파일
-*.json @o4o-platform/devops-team
-*.yml @o4o-platform/devops-team
-*.yaml @o4o-platform/devops-team
+# Core 계약 경로 — product
+/apps/api-server/src/modules/neture/entities/ @Renagang21
+/apps/api-server/src/modules/neture/services/master-link-policy.ts @Renagang21
+/apps/api-server/src/modules/neture/services/offer-write-policy.ts @Renagang21
+/apps/api-server/src/modules/neture/services/supplier-offer-distribution.service.ts @Renagang21
+/apps/api-server/src/modules/neture/services/offer-service-approval.service.ts @Renagang21
+/apps/api-server/src/modules/neture/services/offer-service-price.service.ts @Renagang21
+/apps/api-server/src/modules/neture/services/spot-price-policy.service.ts @Renagang21
+/apps/api-server/src/modules/neture/services/recruitment-supply-price.service.ts @Renagang21
+/apps/api-server/src/modules/neture/services/bulk-match.service.ts @Renagang21
+/apps/api-server/src/modules/neture/services/alias.service.ts @Renagang21
+/apps/api-server/src/modules/neture/services/catalog.service.ts @Renagang21
+/apps/api-server/src/modules/neture/utils/product-identifier.util.ts @Renagang21
+/apps/api-server/src/modules/neture/guards/drug-commerce.guard.ts @Renagang21
+/apps/api-server/src/utils/gtin.ts @Renagang21
+/apps/api-server/src/modules/product-policy-v2/ @Renagang21
+/apps/api-server/src/entities/ProductApproval.ts @Renagang21
+/apps/api-server/src/modules/store-core/entities/ @Renagang21
 
-# 문서
-*.md @o4o-platform/docs-team
-/docs/ @o4o-platform/docs-team
+# Core 계약 경로 — ai
+/packages/ai-core/ @Renagang21
+/apps/api-server/src/modules/ai-policy/ @Renagang21
+/packages/file-understanding-core/ @Renagang21
 
-# CI/CD
-/.github/ @o4o-platform/devops-team
+# Core 계약 경로 — assistant
+/apps/api-server/src/services/assistant/ @Renagang21
+/apps/api-server/src/services/ai-tools/work-planner.ts @Renagang21
+/apps/api-server/src/services/ai-tools/unified-request-router.ts @Renagang21
+/apps/api-server/src/services/ai-tools/task-modality-router.ts @Renagang21
+/apps/api-server/src/services/ai-tools/workflow-candidate.ts @Renagang21
+/apps/api-server/src/services/ai-tools/work-experience.ts @Renagang21
+/apps/api-server/src/services/local-agent/browser-dom-contract.ts @Renagang21
+/tools/o4o-local-agent/src/browser-dom-limits.mjs @Renagang21
+/tools/o4o-local-agent/src/handlers.mjs @Renagang21
+/tools/o4o-local-agent/release/ @Renagang21
+
+# Core 계약 경로 — schema
+/apps/api-server/src/database/entities.ts @Renagang21
+/apps/api-server/src/database/migrations/ @Renagang21
+/apps/api-server/src/database/incremental/ @Renagang21
+/packages/cms-core/ @Renagang21
+/packages/forum-core/src/backend/entities/ @Renagang21
+/packages/digital-signage-core/src/backend/entities/ @Renagang21
+/packages/interactive-content-core/src/entities/ @Renagang21
+/packages/education-extension/src/entities/ @Renagang21
+/packages/lms-core/src/entities/ @Renagang21
+/packages/mail-core/src/entities/ @Renagang21
+/packages/market-trial/src/entities/ @Renagang21
+/packages/asset-copy-core/src/entities/ @Renagang21
+/packages/action-log-core/src/action-log.entity.ts @Renagang21
