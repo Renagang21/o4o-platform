@@ -312,12 +312,15 @@ export const WEB_KEYS = FRONTENDS.filter((k) => k !== 'admin');
  * reusable deploy job 에 넘길 계획. API 를 배포하면 **의존 프런트는 API 성공 뒤**, 독립 프런트는 병렬.
  * deps 가 없거나 판정이 없으면 API 뒤로 보낸다(종전 순서 = 보수).
  */
-export function buildPlan(decisions, deps) {
+export function buildPlan(decisions, deps, perService) {
   const deploy = (k) => DEPLOYING.has(decisions[k]?.decision);
   const api = deploy('api');
   const afterApi = (k) => api && deps?.[k]?.dependent !== false;
   return {
     deploy_api: api,
+    // WO-O4O-CICD-PROMOTE-APPROVAL-REDUCTION-V1 — migration 이 바뀌는 API 배포는 적용 직전 Cloud SQL 백업.
+    //   판정을 모르면(필드 없음 · UNKNOWN) 백업한다(fail-closed). 바뀌지 않았다고 확인된 경우만 건너뛴다.
+    backup_before_migration: api && perService?.api?.migration_changed !== false,
     admin_after_api: deploy('admin') && afterApi('admin'),
     admin_parallel: deploy('admin') && !afterApi('admin'),
     web_after_api: WEB_KEYS.filter((k) => deploy(k) && afterApi(k)),
@@ -373,6 +376,7 @@ export function wiringPlan(services) {
     execute: 'true',
     dry_call: 'true',
     deploy_api: String(api),
+    api_backup_before_migration: 'true',
     admin_after_api: String(api && keys.includes('admin')),
     admin_parallel: String(!api && keys.includes('admin')),
     web_after_api: api ? web : [],
@@ -683,7 +687,7 @@ async function main() {
     perService = Object.fromEntries(
       DEPLOY_TARGETS.map((t) => {
         const s = r?.services[t.key];
-        return [t.key, r ? { serving_sha: String(args.base), serving_source: 'fixture-base', status: s.affected ? 'BEHIND' : 'BEHIND_NO_RUNTIME_CHANGE', deploy_required: s.affected, level: s.affected ? s.level : 'LEVEL_1', level3: s.affected ? s.level3.concat(r.pipeline_hits) : [], rollout_pending: s.rollout.length > 0, reasons: s.reasons } : { status: 'UNKNOWN', deploy_required: true, level: LEVEL_3, level3: [], reasons: [read.reason] }];
+        return [t.key, r ? { serving_sha: String(args.base), serving_source: 'fixture-base', status: s.affected ? 'BEHIND' : 'BEHIND_NO_RUNTIME_CHANGE', deploy_required: s.affected, level: s.affected ? s.level : 'LEVEL_1', level3: s.affected ? s.level3.concat(r.pipeline_hits) : [], rollout_pending: s.rollout.length > 0, reasons: s.reasons, migration_changed: t.key === 'api' && s.affected && r.migration_changed === true } : { status: 'UNKNOWN', deploy_required: true, level: LEVEL_3, level3: [], reasons: [read.reason], migration_changed: true }];
       }),
     );
     ci = { green: true, reason: 'fixture 모드 — CI 판정 생략', state: 'FIXTURE' };
@@ -748,7 +752,7 @@ async function main() {
 
   if (planOnly) {
     // 태그 · dispatch 0. 배포는 workflow 의 reusable job 이 수행한다.
-    const plan = buildPlan(decisions, deps);
+    const plan = buildPlan(decisions, deps, perService);
     const planned = plan.deploy_api || plan.admin_after_api || plan.admin_parallel || plan.web_after_api.length + plan.web_parallel.length > 0;
     report.plan = plan;
     report.execute = planned && !shadow && !forceDry;
@@ -763,6 +767,7 @@ async function main() {
       dry_call: 'false',
       target_sha: target,
       deploy_api: String(ex && plan.deploy_api),
+      api_backup_before_migration: String(!ex || !plan.deploy_api || plan.backup_before_migration),
       admin_after_api: String(ex && plan.admin_after_api),
       admin_parallel: String(ex && plan.admin_parallel),
       web_after_api: ex ? plan.web_after_api : [],

@@ -33,6 +33,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { DEPLOY_WORKFLOWS, analyzeWorkflowChange } from './deploy-workflow-diff.mjs';
+import { ADDITIVE, classifyMigrationSource, isAppendOnly } from './migration-safety.mjs';
 import {
   REPO_ROOT,
   WEB_SERVICES,
@@ -307,6 +308,74 @@ export function matchLevel3(file, status = 'M') {
   return hits.length > 0 ? hits.map((r) => ({ rule: r.id, category: r.category, file })) : [];
 }
 
+// ---------------------------------------------------------------------------
+// 승인 정책 — WO-O4O-CICD-PROMOTE-APPROVAL-REDUCTION-V1 (2026-11-11 사용자 결정)
+// ---------------------------------------------------------------------------
+
+/**
+ * 탐지는 그대로 두고(LEVEL3_RULES · 기록), **Promote 승인을 요구하는 규칙만** 줄인다.
+ *
+ *   자동 배포 (승인 없음 · advisory 로 기록):
+ *     인증 · 권한(RBAC · 접근 제어 계층) · 결제 · 배포 설정(deploy workflow 설정 · Dockerfile · nginx · infra)
+ *     그리고 **추가형 migration** (migration-safety.mjs 가 ADDITIVE 로 판정한 새 파일 + 등록부 append)
+ *   승인 유지 (LEVEL_3):
+ *     파괴형 · 판정 불가 migration · 적용된 migration 수정 · bootstrap · migration runner,
+ *     배포로 운영 DB 를 쓰는 job · seed(db-write-runtime), secret · credential 처리, 서비스 삭제,
+ *     배포 기계(rollout 방식 · pipeline) 변경 뒤 첫 배포, serving SHA 판정 불가(UNKNOWN)
+ *
+ * 적용 직전 Cloud SQL 백업은 migration 이 바뀐 모든 API 배포에서 만든다(추가형 포함 · deploy-api.yml).
+ */
+export const AUTO_DEPLOY_RULES = new Set([
+  'auth-backend',
+  'auth-package',
+  'auth-frontend',
+  'auth-build-input',
+  'rbac',
+  'access-control-layer',
+  'payment',
+  'deploy-config',
+  'deploy-infra',
+]);
+
+const MIGRATION_RULES = new Set(['db-migration', 'db-migration-runner']);
+const INCREMENTAL_REGISTRY = new Set([
+  `${API_SRC}database/incremental/manifest.ts`,
+  `${API_SRC}database/incremental/expected-schema-states.ts`,
+]);
+const MIGRATION_FILE = /^apps\/api-server\/src\/database\/migrations\/[^/]+\.ts$/;
+
+/**
+ * diff 안의 migration 관련 파일 판정.
+ *   ADDITIVE  — 새 migration 파일이 전부 추가형이고, 나머지는 등록부(manifest · expected states) append 뿐
+ *   그 밖     — 승인 (원문 없음 · 수정 · 삭제 · bootstrap · runner · 파괴형 · 판정 불가)
+ * @param {{status: string, path: string}[]} files  db-migration · db-migration-runner 규칙에 걸린 파일
+ */
+export function assessMigrationChange(files, readFile) {
+  const items = [];
+  let additiveMigration = 0;
+  for (const f of files) {
+    if (f.status === 'A' && MIGRATION_FILE.test(f.path)) {
+      const src = typeof readFile === 'function' ? readFile('head', f.path) : undefined;
+      const r = classifyMigrationSource(src);
+      if (r.verdict === ADDITIVE) additiveMigration += 1;
+      items.push({ file: f.path, verdict: r.verdict, findings: r.findings.slice(0, 5) });
+      continue;
+    }
+    if (f.status === 'M' && INCREMENTAL_REGISTRY.has(f.path)) {
+      const ok = typeof readFile === 'function' && isAppendOnly(readFile('base', f.path), readFile('head', f.path));
+      items.push({ file: f.path, verdict: ok ? 'REGISTRY_APPEND' : 'REVIEW', findings: ok ? [] : ['등록부가 append 만이 아님(또는 원문 없음)'] });
+      continue;
+    }
+    items.push({
+      file: f.path,
+      verdict: 'REVIEW',
+      findings: [f.status === 'A' ? 'migration 파일 밖의 migration 경로 추가' : `적용됐을 수 있는 migration 경로 변경(${f.status})`],
+    });
+  }
+  const additive = items.length > 0 && additiveMigration > 0 && items.every((i) => i.verdict === ADDITIVE || i.verdict === 'REGISTRY_APPEND');
+  return { additive, items };
+}
+
 /**
  * rollout 방식(트래픽 전환 · env 주입 해석) — artifact · runtime 설정을 바꾸지 않는다.
  * 바뀌어도 **배포가 필요하지 않다.** 다만 이 서비스들의 **다음 배포**는 바뀐 방식으로 처음 도는 것이므로 통제(L3).
@@ -444,6 +513,9 @@ export function assessRisk(changedFiles, graph, opts = {}) {
     pipeline_hits: [],
     risk_reducing: [],
     presentation_only: [],
+    auto_approved: [],
+    migration_changed: false,
+    migrations: [],
     advisories: [],
     non_runtime_files: 0,
     changed_files: Array.isArray(changedFiles) ? changedFiles.length : 0,
@@ -534,6 +606,28 @@ export function assessRisk(changedFiles, graph, opts = {}) {
     base.presentation_only.push({ file, rules: entry.hits.map((h) => h.rule), changed_lines: changed.length });
     base.advisories.push(`로그인 화면 표현층만 변경(민감 구문 0 · ${changed.length}줄) — LEVEL_3 아님: ${file}`);
   }
+  // 승인 정책 (WO-O4O-CICD-PROMOTE-APPROVAL-REDUCTION-V1) — 인증 · 권한 · 결제 · 배포 설정 · 추가형 migration 은 자동 배포.
+  //   opts.approvalPolicy === 'strict' 는 종전 판정(탐지된 LEVEL_3 규칙 전부 승인) — 규칙 탐지 회귀 시험 · 비상 복귀용.
+  const strict = opts.approvalPolicy === 'strict';
+  const migrationFiles = [...hitsByFile].filter(([, e]) => e.hits.some((h) => MIGRATION_RULES.has(h.rule))).map(([p, e]) => ({ status: e.status, path: p }));
+  base.migration_changed = migrationFiles.length > 0;
+  if (migrationFiles.length > 0) {
+    const m = assessMigrationChange(migrationFiles, opts.readFile);
+    base.migrations = m.items;
+    for (const [file, entry] of hitsByFile) {
+      if (!entry.hits.some((h) => MIGRATION_RULES.has(h.rule))) continue;
+      const item = m.items.find((i) => i.file === file);
+      entry.hits = entry.hits.map((h) => (MIGRATION_RULES.has(h.rule) ? { ...h, migration: item?.verdict ?? 'REVIEW', detail: item?.findings ?? [] } : h));
+      if (m.additive && !strict) entry.hits = entry.hits.filter((h) => !MIGRATION_RULES.has(h.rule));
+    }
+    if (m.additive && !strict) base.advisories.push(`추가형 migration — 자동 배포 · 적용 직전 Cloud SQL 백업: ${m.items.map((i) => i.file.split('/').pop()).join(', ')}`);
+  }
+  for (const [file, entry] of strict ? [] : [...hitsByFile]) {
+    const auto = entry.hits.filter((h) => AUTO_DEPLOY_RULES.has(h.rule));
+    if (auto.length > 0) base.auto_approved.push(...auto);
+    entry.hits = entry.hits.filter((h) => !AUTO_DEPLOY_RULES.has(h.rule));
+    if (entry.hits.length === 0) hitsByFile.delete(file);
+  }
   base.level3_hits = [...hitsByFile.values()].flatMap((v) => v.hits);
 
   const hasWorkflowEffect = workflowEffects.length > 0 || rolloutFiles.length > 0;
@@ -570,10 +664,15 @@ export function assessRisk(changedFiles, graph, opts = {}) {
       if (a.config.length > 0) {
         s.affected = true;
         s.reasons.push(`배포 설정 변경 (${eff.file}): ${a.config.slice(0, 3).join(' | ')}`);
-        s.level3.push({ rule: 'deploy-config', category: 'Cloud infrastructure / deploy config', file: eff.file, detail: a.config.slice(0, 5) });
+        // 배포 설정 — 자동 배포(승인 정책). 탐지는 기록으로 남긴다.
+        const hit = { rule: 'deploy-config', category: 'Cloud infrastructure / deploy config', file: eff.file, detail: a.config.slice(0, 5) };
+        if (strict) s.level3.push(hit);
+        else base.auto_approved.push({ ...hit, service: key });
       }
       if (a.auth.length > 0) {
-        s.level3.push({ rule: 'auth-build-input', category: 'auth', file: eff.file, detail: a.auth.slice(0, 5) });
+        const hit = { rule: 'auth-build-input', category: 'auth', file: eff.file, detail: a.auth.slice(0, 5) };
+        if (strict) s.level3.push(hit);
+        else base.auto_approved.push({ ...hit, service: key });
       }
       if (a.rollout.length > 0) s.rollout.push(`${eff.file}: ${a.rollout.slice(0, 3).join(' | ')}`);
       if (a.control > 0 && a.build.length + a.config.length + a.rollout.length === 0 && a.notes.length === 0) {
@@ -689,7 +788,8 @@ export function assessServingGap(target, serving, graph, provider = gitDiffProvi
   for (const t of DEPLOY_TARGETS) {
     const s = serving?.[t.key] ?? { sha: null, source: 'missing' };
     const entry = { serving_sha: s.sha ?? null, serving_source: s.source ?? 'missing', revision: s.revision ?? null };
-    const fail = (reason) => ({ ...entry, status: 'UNKNOWN', deploy_required: true, level: LEVEL_3, reasons: [reason], level3: [] });
+    // 판정 불가 — migration 이 바뀌었을 수 있으므로 적용 직전 백업을 만든다(migration_changed=true · fail-closed).
+    const fail = (reason) => ({ ...entry, status: 'UNKNOWN', deploy_required: true, level: LEVEL_3, reasons: [reason], level3: [], migration_changed: true });
 
     if (!SHA40.test(target ?? '')) {
       perService[t.key] = fail(`target SHA 형식 오류 (${target})`);
@@ -704,7 +804,7 @@ export function assessServingGap(target, serving, graph, provider = gitDiffProvi
       continue;
     }
     if (s.sha === target) {
-      perService[t.key] = { ...entry, status: 'UP_TO_DATE', deploy_required: false, level: LEVEL_1, reasons: ['serving SHA == target'], level3: [] };
+      perService[t.key] = { ...entry, status: 'UP_TO_DATE', deploy_required: false, level: LEVEL_1, reasons: ['serving SHA == target'], level3: [], migration_changed: false };
       continue;
     }
     if (!provider.exists(s.sha)) {
@@ -746,6 +846,10 @@ export function assessServingGap(target, serving, graph, provider = gitDiffProvi
       rollout_pending: svc.rollout.length > 0,
       risk_reducing: got.result.risk_reducing.slice(0, 5),
       advisories: got.result.advisories.slice(0, 5),
+      // migration 은 API 이미지의 migration Job 이 적용한다 — API 에만 귀속한다.
+      migration_changed: t.key === 'api' && svc.affected && got.result.migration_changed === true,
+      migrations: t.key === 'api' ? got.result.migrations.slice(0, 10) : [],
+      auto_approved: got.result.auto_approved.filter((h) => !h.service || h.service === t.key).slice(0, 10),
     };
   }
   return perService;
