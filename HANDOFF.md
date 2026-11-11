@@ -1,86 +1,53 @@
 # HANDOFF
 
-> 저장소: `Renagang21/o4o-platform` · 작업 branch: `claude/intelligent-cray-o2p4u3` · 코드 기준: `main` `13460cb183`(merge 반영) · 작성: 2026-11-10 (클라우드 작업 세션)
-> 다음 실행자: **통합 세션(PR 생성 · 병합) → LOCAL(배포 · 배포 후 확인)**
-> 이전 인계 전문(통합 진행표 포함): `git show 9adcadaf97:HANDOFF.md`
+> 저장소: `Renagang21/o4o-platform` · 작업 branch: `claude/clever-bohr-g532hw` · 코드 기준: `main` `fb649107` · 작성: 2026-11-11 (클라우드 작업 세션)
+> 다음 실행자: **사용자(IR 검토 · 결정) → 통합 세션(문서 PR 생성 · 병합)**
+> 이전 인계 전문: `git show 0c812623:HANDOFF.md`
 
-## 한 일 — 계정 삭제가 끝나도록 (2026-11-10 사용자 지시)
+## 한 일 — O4O Core 중앙화 · 원격 공동개발 접근 경계 조사 (2026-11-11 사용자 지시)
 
-이전 PR Renagang21/o4o-platform#1014 는 병합됐다(2026-11-10 06:16Z 조회). 같은 branch 이름을 최신 `origin/main` 에서 다시 시작했다. 이 branch 의 PR 은 **미생성**이다(PR 은 통합 세션이 만든다 — AGENTS.md §4-1(e)).
+이 branch 의 이전 PR Renagang21/o4o-platform#1002(배포 차단 훅 로컬 ask)는 병합됐다. 그래서 같은 branch 이름을 최신 `origin/main` 에서 다시 시작했다. 이 branch 의 PR 은 **미생성**이다(PR 은 통합 세션이 만든다 — AGENTS.md §4-1(e)).
 
-1. `4146d52f48` fix(privacy): 보존 기록 사본 때문에 「삭제 미완료 — 확인 필요」에서 멈추지 않게 한다
-   - 새 `apps/api-server/src/services/privacy/account-retained-records.ts`.
-   - 행은 남기고 이 회원 식별값만 `erased:<hash>` 로 바꾸는 표: `action_logs` · `account_activities` · `neture_contact_messages` · `neture_suppliers`.
-   - 사본을 지우는 표: `canonical_demo_repair_snapshots` · `operator_invitations`.
-   - `account-erasure.service.ts`: 삭제 전 검토는 위 표를 건너뛴다. 단, 공급자 소유 연결 `neture_suppliers.user_id` 는 계속 검토한다. finish 는 정리 후 모든 표를 다시 검토하며, 덜 정리됐으면 전체를 되돌린다.
-2. `d1af718950` fix(admin): 삭제가 끝나지 않은 회원을 「해지」가 아니라 「삭제 확인 필요」로 보인다
-   - 회원 목록 · 상세 API 에 `erasureState` · `erasureErrorCode` 를 더했다.
-   - 목록 배지와 회원 패널에 「삭제 확인 필요」 · 「삭제 재시도 필요」 · 「삭제 중」과 사유를 보인다.
-
-3. `e5fa077de1` fix(admin): 「해지 회원」 탭 숫자를 목록 해지 배지와 같은 기준으로 센다
-   - 사용자 지적(2026-11-10): 목록에 「해지」 2명인데 탭은 0명이었다.
-   - 배지는 계정 정지(`users.isActive=false` · `status='suspended'`, 계정 삭제 요청 포함)를 해지로 보이는데, 탭은 서비스 가입 상태만 셌다.
-   - 이제 탭도 같은 기준으로 센다. 삭제가 끝나지 않은 회원은 해지 탭에 나오고, 배지는 「삭제 확인 필요」로 보인다.
-
-4. `8353d0e3e8` fix(privacy): 중앙 운영 메뉴 권한 감사 기록은 삭제 전 검토에서 건너뛰지 않는다
-   - #1022 CI(run 42775488648) `service-operator-invitation.integration.test.ts` 「keeps unknown audit payload …」 2건 실패를 고쳤다.
-   - 원인: 삭제 전 검토가 `action_logs` 를 통째로 건너뛰었다. 그래서 형식이 다른 메뉴 권한 감사 기록이 검토 없이 일반 치환으로 넘어갔다.
-   - 수정: `operator.central_menu_grants_changed` · `admin.service_operator_assigned` 행은 전용 경로(`central-menu-audit-evidence`)의 판정대로 계속 검토한다.
+- 새 문서 [`docs/investigations/IR-O4O-CORE-CONSOLIDATION-V1.md`](docs/investigations/IR-O4O-CORE-CONSOLIDATION-V1.md) 하나를 추가했다.
+- 조사 전용이다. 코드 · DB · CI · 배포 · GitHub 설정과 기준 문서는 바꾸지 않았다.
+- 핵심 결론:
+  - 실제 Core 는 api-server 안에 있다. `packages/*-core` 는 이름과 실제가 다르고, 소비처 0 패키지가 9개다.
+  - 최상위 `core/` 이동은 비권장이다.
+  - Core registry 문서 + CODEOWNERS · `core-change` 라벨로 경계를 표시하는 것을 권한다. 그다음 잔재 제거와 중복 일원화를 하고, api-server `src/core/` 이동은 선택으로 둔다.
+  - C(소스 분리)는 지금 하지 않고, 필요하면 프롬프트 · 정책 값의 외부화를 먼저 검토한다.
 
 ## PR 로 묶을 단위
 
-- 한 PR: 위 네 commit(주제: 계정 삭제 완료 · 상태 표시). migration · CI · 인증 · 권한 변경은 없다.
-- **#1022 반영 필요:** #1022 의 head 는 통합 세션이 만든 `claude/jolly-carson-4smjue` 이고, 위 1 · 2 와 인계 기록만 cherry-pick 돼 있다.
-  3(`e5fa077de1`)과 4(`8353d0e3e8`)를 더 가져가야 한다. #1022 설명의 「탭 숫자는 바꾸지 않았다」도 3 기준으로 고쳐야 한다.
+- **문서 전용 PR 1개:** `docs/investigations/IR-O4O-CORE-CONSOLIDATION-V1.md` + 이 HANDOFF.md.
 
 ## 결정 사항 (§9)
 
-- **공급자(`neture_suppliers`)는 지우지 않는다** — 사용자 결정 「거래기록은 유지」.
-  - 본인 소유 공급자는 기존 detach 경로가 처리한다(개인 필드 비움 · INACTIVE).
-  - 다른 공급자 행에 들어 있는 이 회원 이메일 등은 치환한다.
-  - 소유 연결(`user_id`)은 바꾸지 않는다. 소유 · 처분 문제이므로 기존처럼 검토 대기로 둔다(기존 테스트 「legacy supplier pointer」 유지).
-- **보존 기록은 삭제가 아니라 비가역 치환으로 처리한다.** 근거는 개인정보 보존 정책 §6 · §13(처리 · 접속 기록 1년)과 §3(문의).
-  - 키는 기존 system log 최소화와 같은 `hash(userId)` 다.
-  - 이 회원이 처리한 `action_logs` 는 `user_id` 를 비우고 `meta.actorKey` 를 남긴다. 같은 사람의 처리였다는 것만 알 수 있고, 누구인지는 알 수 없다.
-- **운영자 초대(`operator_invitations`)는 삭제한다.** 근거는 두 가지다.
-  - 정책 §2.1 상 이메일 · 토큰은 파기 대상이다.
-  - 「수락됨」 행은 DB 제약상 수락자를 비울 수 없다.
-  - 지정 · 해제 이력은 `action_logs` 에 치환된 채 남는다.
-- **데모 복구 스냅숏은 보존 근거가 없는 사본이므로 삭제한다.**
-- **「해지 회원」 탭은 목록 배지와 같은 기준으로 센다**(3번 · 사용자 지적으로 처음 결정을 바꿨다). 계정이 멈춘 회원도 센다.
-  삭제가 끝나지 않은 회원은 그 안에서 「삭제 확인 필요」 배지로 구분한다.
+- 조사 범위가 넓어 4개 영역(Platform · Business · AI · 기타 공통)을 병렬로 조사했다. 보고서 핵심 주장(소비처 0 패키지, `organizations` 이중 매핑, organization-core 의 `role_assignments` 쓰기, FREEZE 문서 경로 부재, `createOrder` 위치, `build:deps` 누락, Skill 0건)은 직접 명령으로 다시 확인했다.
+- 정본과 코드의 차이 12건은 CLAUDE.md §16-2 에 따라 보고만 했다. 기준 문서는 수정하지 않았다.
 
-## 검증 결과 (격리 PostgreSQL — 일회용 클러스터, 운영 DB 아님)
+## 검증 결과
 
-4번 commit 후 재실행:
-- `service-operator-invitation.integration.test.ts`: 54/54 통과. 같은 파일에서 수정 전에는 2건이 실패했다(CI 와 같은 실패를 재현).
-- `account-erasure.integration.test.ts`: 79/81. 실패 2건은 이전부터 있던 employee 테스트다.
-- member postgres spec 3개 55/55 · privacy unit 27/27 · api-server `tsc --noEmit` 통과
+- `node scripts/check-doc-sensitive.mjs` — 민감정보 0건.
 
-- `account-erasure.integration.test.ts`: 79/81 통과.
-  - 새 테스트 「retained records …」가 통과했다.
-  - 실패 2건은 이 작업 전부터 있던 employee 테스트 2건이다.
-    - 「temporary suspension retains employment…」
-    - 「employee access termination…」
-- privacy unit 테스트 27/27 통과(5 skip)
-- `central-member-workspace.postgres.spec.ts` 등 3개 파일: 34/34 통과. 새 테스트는 삭제 상태 표시와 해지 탭 숫자다(main `13460cb183` 반영 후 재실행).
-- `member-registration.postgres.spec.ts`: 26/26 통과
-- `member-profile-recovery.postgres.spec.ts`: 13/13 통과. fixture 에 `account_erasure_operations` 를 추가했다.
-- route · review 테스트 33/33 통과
-- admin-dashboard `src/pages/operators`: 148/148 통과. 새 테스트는 `member-workspace-erasure.test.ts` 다.
-- `tsc --noEmit`(api-server · admin-dashboard) 통과 · `check-unsafe-routes` 0건 · `check-forbidden-tables` 통과
+## 확인하지 못한 것
 
-## 확인하지 못한 것 (배포 후)
+- 운영 DB 테이블 · 행(`content_assets` · `cosmetics_forum_meta` · `lms_engagement_logs` · `payment_event_logs` · `catalog_products` · `store_products`). LOCAL read-only 조회 대상이다.
+- GitHub `@o4o-platform` 조직 · 팀 존재 여부, 개인 소유 Private 저장소의 CODEOWNERS · ruleset 플랜 조건.
+- 그 밖의 미확인 항목은 IR §11 「미확인」에 있다.
 
-- **운영에서 실제로 삭제가 끝나는지.** 지난번 검토 대기로 남은 회원에 대해 Admin 「계정 삭제」를 다시 눌러, 같은 작업이 이어서 완료되는지 확인한다.
-  - 운영 데이터에서 위 6개 표 밖의 사본이 나오면 계속 검토 대기로 남는다. 그때는 「삭제 처리 내역」의 `review_codes` 를 알려 주면 된다.
-- 회원 목록 배지 · 패널 문구의 PC · 모바일 화면.
-- 소요 시간: 정리 후 검토가 한 번 더 돌아 수 초 늘 수 있다.
+## 사용자 결정이 필요한 것 (IR §11)
+
+1. 「동결 Core」 정의 일원화 — CORE-FREEZE(api-server 파일) ↔ CLAUDE.md §3(패키지 4개)
+2. 공동개발자 저장소 전체 읽기 허용 여부 → C 처리 방식
+3. B 강제 수준(라벨 · CODEOWNERS 만 vs ruleset code owner review)
+4. `organizations` 이중 매핑 · `PermissionService.assignRole` 처리 방향
+5. `catalog_products` · `store_products` 원장 처리
+6. Skill 설계 위치
 
 ## 겹칠 수 있는 열린 PR
 
-- 조회하지 못했다. 통합 세션이 PR 생성 시 확인한다(`pr-overlap` Action #1015 도 댓글로 알린다).
+해당 없음(새 문서 1개와 HANDOFF.md 만 바꿈).
 
 ## 문서 정합
 
-해당 없음.
+`발견 12건 / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 1건` — 상세는 IR §5 · 「문서 정합」.
