@@ -288,7 +288,9 @@ export class AccountErasureService {
   private async identityTokens(m: EntityManager, user: Record<string, unknown>): Promise<{ tokens: string[]; providers: { provider: string; id: string }[] }> {
     // These identify THIS subject. Actor/alias/provider values in arbitrary metadata
     // are not globally unique subject keys; their typed domain handlers require review.
-    const tokens=new Set<string>([String(user.id),String(user.email)]);
+    // 이메일 없는 계정은 "null" 문자열을 식별값으로 쓰지 않는다(모든 행이 사본으로 잡힌다).
+    const tokens=new Set<string>([String(user.id)]);
+    if(typeof user.email==='string' && user.email.length)tokens.add(user.email);
     for(const r of await m.query(`SELECT k.reference_id FROM account_erasure_reference_keys k
       JOIN account_erasure_operations o ON o.id=k.operation_id WHERE o.subject_id=$1`,[user.id])) {
       if(r.reference_id)tokens.add(String(r.reference_id));

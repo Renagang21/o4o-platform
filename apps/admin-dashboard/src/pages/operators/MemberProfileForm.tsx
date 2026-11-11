@@ -37,7 +37,8 @@ export default function MemberProfileForm({
   const [fields, setFields] = useState({
     name: member.name ?? '',
     nickname: member.nickname ?? '',
-    email: member.email,
+    // 소셜 가입은 이메일 없이 만들 수 있다(2026-11-11) — 비어 있으면 보내지 않아 그대로 둔다.
+    email: member.email ?? '',
     phone: member.phone ?? '',
   });
   const [type, setType] = useState<MemberRegistrationType | ''>(
@@ -81,10 +82,9 @@ export default function MemberProfileForm({
               `/qualifications/pharmacist/members/${encodeURIComponent(member.userId)}`,
               {
                 ...Object.fromEntries(
-                  Object.entries(fields).map(([key, value]) => [
-                    key,
-                    value.trim(),
-                  ]),
+                  Object.entries(fields)
+                    .filter(([key, value]) => key !== 'email' || value.trim())
+                    .map(([key, value]) => [key, value.trim()]),
                 ),
                 reason: reason.trim(),
                 version: member.version,
@@ -118,7 +118,8 @@ export default function MemberProfileForm({
                 type={
                   key === 'email' ? 'email' : key === 'phone' ? 'tel' : 'text'
                 }
-                required={['nickname', 'email'].includes(key)}
+                required={key === 'nickname' || (key === 'email' && !!member.email)}
+                placeholder={key === 'email' && !member.email ? '미제공' : undefined}
                 maxLength={key === 'email' ? 255 : key === 'phone' ? 20 : 100}
                 readOnly={!editing}
                 disabled={busy}

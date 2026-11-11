@@ -9,7 +9,6 @@ import { UserStatus } from '../../types/auth.js';
 import { defaultSemiFranchiseAccessResolver, evaluateServiceLoginAccess, resolveLoginMembershipGateKey, serviceNotMemberMessage } from '../../common/auth/service-login-eligibility.policy.js';
 import { resolveAccountAccess } from '../../common/auth/account-access.policy.js';
 import { isSessionAuthMethodAllowed } from '../../common/auth/password-session.policy.js';
-import { normalizePhoneDigits, isPhoneShapeValid } from '../../common/auth/phone-shape.js';
 import { demoAccountService } from './demo-account.service.js';
 import { freshenUserContext, generateTokensWithContext, injectRolesIntoPublicData } from './auth-context.helper.js';
 import { emailAuthService } from './email-auth.service.js';
@@ -17,7 +16,11 @@ import { kakaoIdentityService, type KakaoIdentityService, type VerifiedKakaoIden
 import { socialFlowService, type SocialFlowService } from './social-flow.service.js';
 import { SocialAuthError } from './social-auth-error.js';
 
-export interface KakaoSignupInput { email: string; name?: string; nickname?: string; phone?: string; consents: { terms: boolean; privacy: boolean; marketing?: boolean; termsPolicy?: SignupTermsReference; privacyPolicy?: SignupTermsReference } }
+/**
+ * WO-O4O-SOCIAL-SIGNUP-DIRECT-ROLE-REGISTRATION-V1 S1 · Q1: 카카오 가입은 약관 동의만 받는다.
+ * 이메일 · 이름 · 닉네임 · 휴대전화는 받지 않는다(예전 화면이 보내도 쓰지 않는다) — 닉네임 · 직역 정보는 가입 신청(역할 입력)에서 받는다.
+ */
+export interface KakaoSignupInput { email?: string; name?: string; nickname?: string; phone?: string; consents: { terms: boolean; privacy: boolean; marketing?: boolean; termsPolicy?: SignupTermsReference; privacyPolicy?: SignupTermsReference } }
 const uniqueViolation = (error: unknown): boolean => {
   const e = error as { code?: string; driverError?: { code?: string } };
   return (e?.code ?? e?.driverError?.code) === '23505';
@@ -42,12 +45,6 @@ export class KakaoAuthService {
   }
 
   async signup(token: string, binding: string, origin: string, input: KakaoSignupInput) {
-    const email=normalizeLoginEmail(input.email);
-    if (!isLoginEmailShapeValid(email)) throw new SocialAuthError('INVALID_EMAIL','이메일 주소를 확인해 주시기 바랍니다.');
-    // WO-O4O-AUTH-ONBOARDING-UX-CLEANUP-V1 T2: 이름 · 휴대전화는 가입 선택 항목이다(가입 유형 입력이 필수로 받는다).
-    const name=(input.name??'').trim();const phone=(input.phone??'').trim();
-    if (name.length>100) throw new SocialAuthError('INVALID_NAME','이름을 100자 이내로 입력해 주시기 바랍니다.');
-    if (phone && !isPhoneShapeValid(phone)) throw new SocialAuthError('INVALID_PHONE','휴대전화 번호 형식을 확인해 주시기 바랍니다. (예: 01012345678)');
     if (!input.consents?.terms || !input.consents?.privacy) throw new SocialAuthError('CONSENT_REQUIRED','이용약관과 개인정보 처리방침에 동의해 주시기 바랍니다.');
     let serviceKey='';
     try {
@@ -55,12 +52,18 @@ export class KakaoAuthService {
         const flow=await this.flows.consume(token,binding,'kakao-signup',origin,undefined,manager);serviceKey=flow.service_key;
         const identity=flow.payload as unknown as VerifiedKakaoIdentity;
         if (!identity.providerId) throw new SocialAuthError('SOCIAL_FLOW_INVALID','인증을 다시 시작해 주시기 바랍니다.',401);
-        if (await demoAccountService.isDemoLoginEmail(email,manager)) throw new SocialAuthError('DEMO_ACCOUNT_FORBIDDEN','테스트 계정의 인증 수단은 변경할 수 없습니다.',403);
-        const duplicate: unknown[] = await manager.query('SELECT 1 FROM users WHERE lower(email)=$1 LIMIT 1',[email]);
-        if (duplicate.length) throw new SocialAuthError('EMAIL_IN_USE','이미 사용 중인 이메일입니다. 기존 계정으로 로그인한 뒤 명시적으로 연결해 주시기 바랍니다.',409);
+        // Q2: 카카오가 확인한 이메일만 저장한다. 제공하지 않았거나 확인되지 않았으면 비워 둔다(S2 · S3 — 확인 메일 없음).
+        const email=identity.emailVerified===true&&isLoginEmailShapeValid(identity.email)?normalizeLoginEmail(identity.email):null;
+        if (email) {
+          if (await demoAccountService.isDemoLoginEmail(email,manager)) throw new SocialAuthError('DEMO_ACCOUNT_FORBIDDEN','테스트 계정의 인증 수단은 변경할 수 없습니다.',403);
+          // #987 U2: 같은 이메일의 기존 계정과 자동으로 합치지 않는다.
+          const duplicate: unknown[] = await manager.query('SELECT 1 FROM users WHERE lower(email)=$1 LIMIT 1',[email]);
+          if (duplicate.length) throw new SocialAuthError('EMAIL_IN_USE','이미 사용 중인 이메일입니다. 기존 계정으로 로그인한 뒤 명시적으로 연결해 주시기 바랍니다.',409);
+        }
         const now=new Date();const repo=manager.getRepository(User);
-        const created=repo.create({businessInfo:initialMemberRegistration(),email,name:name||null,nickname:input.nickname?.trim() || undefined,phone:normalizePhoneDigits(phone)||undefined,
-          status:UserStatus.ACTIVE,isActive:true,isEmailVerified:identity.emailVerified===true&&normalizeLoginEmail(identity.email??'')===email,
+        // 확인이 남은 이메일이 없다(카카오 확인 이메일이거나 이메일 없음) — 이메일 확인 관문을 두지 않는다.
+        const created=repo.create({businessInfo:initialMemberRegistration(),email,name:null,
+          status:UserStatus.ACTIVE,isActive:true,isEmailVerified:true,
           tosAcceptedAt:now,privacyAcceptedAt:now,marketingAccepted:input.consents.marketing===true});
         await repo.save(created);
         await manager.getRepository(LinkedAccount).save(manager.getRepository(LinkedAccount).create({
@@ -82,7 +85,8 @@ export class KakaoAuthService {
     if (!user.isActive || resolveAccountAccess(user.status)==='blocked') throw new SocialAuthError('ACCOUNT_NOT_ACTIVE','이용할 수 없는 계정입니다.',403);
     const context=await freshenUserContext(user.id);
     if (!isSessionAuthMethodAllowed('kakao',serviceKey,context.roles)) throw new SocialAuthError('GOOGLE_SESSION_REQUIRED','전체관리자 계정은 Google로 로그인해 주시기 바랍니다.',403);
-    if (!user.isEmailVerified) {
+    // 예전 카카오 가입은 이메일을 직접 입력받아 확인 메일로 확인했다 — 그 계정만 이 관문이 남는다. 이메일이 없으면 확인할 것이 없다.
+    if (!user.isEmailVerified && normalizeLoginEmail(user.email)) {
       const mailSent=await emailAuthService.sendVerificationMail(user,serviceKey);
       return {nextStep:'verify-email' as const,maskedEmail:maskLoginEmail(user.email),mailSent};
     }
