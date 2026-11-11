@@ -63,7 +63,7 @@ on:
         required: false
         default: ''
       dry_run:
-        description: "'true' = 배선 검증 — detect 까지만 (ci-gate · build · deploy 0)"
+        description: "'true' = 배선 검증 — detect 까지만 (CI gate · build · deploy 0)"
         type: string
         required: false
         default: 'false'
@@ -120,10 +120,19 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
           echo "DEPLOY_FREEZE_ACTIVE=1 (DEPLOY_FREEZE='${{ vars.DEPLOY_FREEZE }}')"
 
+  # WO-O4O-PROMOTE-SHORT-JOB-CONSOLIDATION-V1 — 판정(detect)과 CI gate 를 한 job 으로 둔다.
+  #   둘 다 수 초~수십 초짜리 job 이라 job 마다 1분씩 청구됐다(호출 1번 = 2분 → 1분). 게이트 조건 · 스크립트 · 권한은 종전
+  #   ci-gate job 그대로이고, 배포 job 은 `needs.detect-changes.outputs.ci_gate == 'passed'` 일 때만 돈다(fail-closed:
+  #   게이트 step 이 skip 되면 출력이 비고, 실패하면 이 job 이 실패해 배포 job 이 needs 로 skip 된다).
   detect-changes:
     if: (inputs.pharmacy_preparation || 'none') == 'none'
     runs-on: ubuntu-latest
+    timeout-minutes: 45
+    permissions:
+      contents: read
+      actions: read   # CI gate (CI run 조회)
     outputs:
+      ci_gate: ${{ steps.ci_gate.outputs.ci_gate }}
       partner: ${{ steps.changes.outputs.partner }}
       neture: ${{ steps.changes.outputs.neture }}
       kpa-society: ${{ steps.changes.outputs.kpa-society }}
@@ -205,48 +214,53 @@ jobs:
           # output key 는 기존과 동일하다 — detector 가 그 이름 그대로 써넣는다.
           BASE_SHA="$BASE_SHA" HEAD_SHA="$HEAD_SHA" node scripts/ci/detect-affected.mjs
 
-  # WO-O4O-CICD-SAFE-AUTODEPLOY-AND-RISK-GATE-V1 Phase 1 — CI success gate (enforced)
-  #   CI Pipeline 이 target SHA 에서 green 이 아니면 어떤 web 서비스도 배포하지 않는다.
-  #   게이트가 열려 있고 배포 대상 서비스가 하나라도 있을 때만 돈다(평상시 러너 시간 0).
-  ci-gate:
-    name: CI gate (target SHA must be green)
-    needs: detect-changes
-    # dry_run(배선 검증 · workflow_call 전용) 이면 게이트를 열지 않는다 → deploy-* 도 needs 로 skip.
-    # WO-O4O-PUBLIC-COLLABORATOR-PRODUCTION-BOUNDARY-AND-MAIN-PROTECTION-V1 — 수동 실행(직접 dispatch · promote 경유)은 저장소 소유자만.
-    #   collaborator 가 dispatch 하면 게이트를 열지 않는다(→ 배포 job 전부 skip). 자동 경로(workflow_run)는 그대로.
-    if: >-
-      vars.DEPLOY_FREEZE == 'false' && inputs.dry_run != 'true' &&
-      (github.event_name != 'workflow_dispatch' || github.triggering_actor == github.repository_owner) &&
-      contains(toJSON(needs.detect-changes.outputs), '"true"')
-    runs-on: ubuntu-latest
-    timeout-minutes: 40
-    permissions:
-      contents: read
-      actions: read
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          sparse-checkout: scripts/ci
-      - uses: actions/setup-node@v7
+      # WO-O4O-CICD-SAFE-AUTODEPLOY-AND-RISK-GATE-V1 Phase 1 — CI success gate (enforced)
+      #   CI Pipeline 이 target SHA 에서 green 이 아니면 어떤 web 서비스도 배포하지 않는다.
+      #   게이트가 열려 있고 배포 대상 서비스가 하나라도 있을 때만 돈다(평상시 0). 대상 판정은 위 job outputs 의 web 서비스 7개 키 그대로다
+      #   (판정기가 step 에 쓰는 다른 키 — api_affected 등 — 는 보지 않는다).
+      #   dry_run(배선 검증 · workflow_call 전용) 이면 게이트를 열지 않는다 → deploy-* 도 skip.
+      #   WO-O4O-PUBLIC-COLLABORATOR-PRODUCTION-BOUNDARY-AND-MAIN-PROTECTION-V1 — 수동 실행(직접 dispatch · promote 경유)은 저장소 소유자만.
+      #   collaborator 가 dispatch 하면 게이트를 열지 않는다(→ 배포 job 전부 skip). 자동 경로(workflow_run)는 그대로.
+      - name: Set up Node for CI gate
+        if: >-
+          vars.DEPLOY_FREEZE == 'false' && inputs.dry_run != 'true' &&
+          (github.event_name != 'workflow_dispatch' || github.triggering_actor == github.repository_owner) &&
+          (steps.changes.outputs.partner == 'true' || steps.changes.outputs.neture == 'true' ||
+           steps.changes.outputs.kpa-society == 'true' || steps.changes.outputs.lecture == 'true' ||
+           steps.changes.outputs.store == 'true' || steps.changes.outputs.kpa-branch == 'true' ||
+           steps.changes.outputs.hospital-pharmacy == 'true')
+        uses: actions/setup-node@v7
         with:
           node-version: '22.23.4'
-      - name: Require green CI for target SHA
+      - name: CI gate (target SHA must be green)
+        id: ci_gate
+        if: >-
+          vars.DEPLOY_FREEZE == 'false' && inputs.dry_run != 'true' &&
+          (github.event_name != 'workflow_dispatch' || github.triggering_actor == github.repository_owner) &&
+          (steps.changes.outputs.partner == 'true' || steps.changes.outputs.neture == 'true' ||
+           steps.changes.outputs.kpa-society == 'true' || steps.changes.outputs.lecture == 'true' ||
+           steps.changes.outputs.store == 'true' || steps.changes.outputs.kpa-branch == 'true' ||
+           steps.changes.outputs.hospital-pharmacy == 'true')
+        timeout-minutes: 40
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: node scripts/ci/ci-gate.mjs --target "${{ github.sha }}" --wait-seconds 1800 --enforce
+        run: |
+          set -euo pipefail
+          node scripts/ci/ci-gate.mjs --target "${{ github.sha }}" --wait-seconds 1800 --enforce
+          echo "ci_gate=passed" >> "$GITHUB_OUTPUT"
 
   deploy-neture:
-    needs: [detect-changes, ci-gate]
+    needs: [detect-changes]
     # WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 §19 (2026-09-23 INCIDENT)
     #   DEPLOY GATE (fail-closed): `DEPLOY_FREEZE` 가 정확히 'false' 일 때만 배포한다.
     #   변수가 없거나 비어 있으면 Actions 가 빈 문자열을 돌려주므로 **freeze 가 기본값**이다.
-    if: vars.DEPLOY_FREEZE == 'false' && needs.detect-changes.outputs.neture == 'true'
+    if: vars.DEPLOY_FREEZE == 'false' && needs.detect-changes.outputs.neture == 'true' && needs.detect-changes.outputs.ci_gate == 'passed'
     runs-on: ubuntu-latest
     # `environment: production` — 배포 ref 경계다(WO-O4O-PUBLIC-COLLABORATOR-PRODUCTION-BOUNDARY-AND-MAIN-PROTECTION-V1).
     #   GitHub `production` Environment 는 배포 ref 를 `main` branch · `deploy/*` tag 로 제한하고, production credential 은
     #   environment secret 으로 둔다 — 그 밖의 ref(collaborator branch · PR)에서는 이 job 이 시작되지 않는다. required reviewer 는
     #   없다(대기 없이 실행). 배포 게이트는 그대로 이 job `if:` 의 `DEPLOY_FREEZE`(정확히 'false' 일 때만 · 부재/공백/오타 = freeze)
-    #   와 ci-gate(수동 실행 = 소유자만)다.
+    #   와 CI gate(detect-changes 의 step · 수동 실행 = 소유자만)다.
     environment: production
     permissions:
       contents: read
@@ -362,17 +376,17 @@ jobs:
           fi
 
   deploy-kpa-society:
-    needs: [detect-changes, ci-gate]
+    needs: [detect-changes]
     # WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 §19 (2026-09-23 INCIDENT)
     #   DEPLOY GATE (fail-closed): `DEPLOY_FREEZE` 가 정확히 'false' 일 때만 배포한다.
     #   변수가 없거나 비어 있으면 Actions 가 빈 문자열을 돌려주므로 **freeze 가 기본값**이다.
-    if: vars.DEPLOY_FREEZE == 'false' && needs.detect-changes.outputs.kpa-society == 'true'
+    if: vars.DEPLOY_FREEZE == 'false' && needs.detect-changes.outputs.kpa-society == 'true' && needs.detect-changes.outputs.ci_gate == 'passed'
     runs-on: ubuntu-latest
     # `environment: production` — 배포 ref 경계다(WO-O4O-PUBLIC-COLLABORATOR-PRODUCTION-BOUNDARY-AND-MAIN-PROTECTION-V1).
     #   GitHub `production` Environment 는 배포 ref 를 `main` branch · `deploy/*` tag 로 제한하고, production credential 은
     #   environment secret 으로 둔다 — 그 밖의 ref(collaborator branch · PR)에서는 이 job 이 시작되지 않는다. required reviewer 는
     #   없다(대기 없이 실행). 배포 게이트는 그대로 이 job `if:` 의 `DEPLOY_FREEZE`(정확히 'false' 일 때만 · 부재/공백/오타 = freeze)
-    #   와 ci-gate(수동 실행 = 소유자만)다.
+    #   와 CI gate(detect-changes 의 step · 수동 실행 = 소유자만)다.
     environment: production
     permissions:
       contents: read
@@ -477,17 +491,17 @@ jobs:
           python3 scripts/ops/pharmacy_transition.py --phase assert-route
 
   deploy-lecture:
-    needs: [detect-changes, ci-gate]
+    needs: [detect-changes]
     # WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 §19 (2026-09-23 INCIDENT)
     #   DEPLOY GATE (fail-closed): `DEPLOY_FREEZE` 가 정확히 'false' 일 때만 배포한다.
     #   변수가 없거나 비어 있으면 Actions 가 빈 문자열을 돌려주므로 **freeze 가 기본값**이다.
-    if: vars.DEPLOY_FREEZE == 'false' && needs.detect-changes.outputs.lecture == 'true'
+    if: vars.DEPLOY_FREEZE == 'false' && needs.detect-changes.outputs.lecture == 'true' && needs.detect-changes.outputs.ci_gate == 'passed'
     runs-on: ubuntu-latest
     # `environment: production` — 배포 ref 경계다(WO-O4O-PUBLIC-COLLABORATOR-PRODUCTION-BOUNDARY-AND-MAIN-PROTECTION-V1).
     #   GitHub `production` Environment 는 배포 ref 를 `main` branch · `deploy/*` tag 로 제한하고, production credential 은
     #   environment secret 으로 둔다 — 그 밖의 ref(collaborator branch · PR)에서는 이 job 이 시작되지 않는다. required reviewer 는
     #   없다(대기 없이 실행). 배포 게이트는 그대로 이 job `if:` 의 `DEPLOY_FREEZE`(정확히 'false' 일 때만 · 부재/공백/오타 = freeze)
-    #   와 ci-gate(수동 실행 = 소유자만)다.
+    #   와 CI gate(detect-changes 의 step · 수동 실행 = 소유자만)다.
     environment: production
     permissions:
       contents: read
@@ -571,17 +585,17 @@ jobs:
             --format="value(status.url)"
 
   deploy-hospital-pharmacy:
-    needs: [detect-changes, ci-gate]
+    needs: [detect-changes]
     # WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 §19 (2026-09-23 INCIDENT)
     #   DEPLOY GATE (fail-closed): `DEPLOY_FREEZE` 가 정확히 'false' 일 때만 배포한다.
     #   변수가 없거나 비어 있으면 Actions 가 빈 문자열을 돌려주므로 **freeze 가 기본값**이다.
-    if: vars.DEPLOY_FREEZE == 'false' && needs.detect-changes.outputs.hospital-pharmacy == 'true'
+    if: vars.DEPLOY_FREEZE == 'false' && needs.detect-changes.outputs.hospital-pharmacy == 'true' && needs.detect-changes.outputs.ci_gate == 'passed'
     runs-on: ubuntu-latest
     # `environment: production` — 배포 ref 경계다(WO-O4O-PUBLIC-COLLABORATOR-PRODUCTION-BOUNDARY-AND-MAIN-PROTECTION-V1).
     #   GitHub `production` Environment 는 배포 ref 를 `main` branch · `deploy/*` tag 로 제한하고, production credential 은
     #   environment secret 으로 둔다 — 그 밖의 ref(collaborator branch · PR)에서는 이 job 이 시작되지 않는다. required reviewer 는
     #   없다(대기 없이 실행). 배포 게이트는 그대로 이 job `if:` 의 `DEPLOY_FREEZE`(정확히 'false' 일 때만 · 부재/공백/오타 = freeze)
-    #   와 ci-gate(수동 실행 = 소유자만)다.
+    #   와 CI gate(detect-changes 의 step · 수동 실행 = 소유자만)다.
     environment: production
     permissions:
       contents: read
@@ -665,17 +679,17 @@ jobs:
             --format="value(status.url)"
 
   deploy-partner:
-    needs: [detect-changes, ci-gate]
+    needs: [detect-changes]
     # WO-O4O-PARTNER-INDEPENDENT-SERVICE-SEPARATION-V1 §19 (2026-09-23 INCIDENT)
     #   DEPLOY GATE (fail-closed): `DEPLOY_FREEZE` 가 정확히 'false' 일 때만 배포한다.
     #   변수가 없거나 비어 있으면 Actions 가 빈 문자열을 돌려주므로 **freeze 가 기본값**이다.
-    if: vars.DEPLOY_FREEZE == 'false' && needs.detect-changes.outputs.partner == 'true'
+    if: vars.DEPLOY_FREEZE == 'false' && needs.detect-changes.outputs.partner == 'true' && needs.detect-changes.outputs.ci_gate == 'passed'
     runs-on: ubuntu-latest
     # `environment: production` — 배포 ref 경계다(WO-O4O-PUBLIC-COLLABORATOR-PRODUCTION-BOUNDARY-AND-MAIN-PROTECTION-V1).
     #   GitHub `production` Environment 는 배포 ref 를 `main` branch · `deploy/*` tag 로 제한하고, production credential 은
     #   environment secret 으로 둔다 — 그 밖의 ref(collaborator branch · PR)에서는 이 job 이 시작되지 않는다. required reviewer 는
     #   없다(대기 없이 실행). 배포 게이트는 그대로 이 job `if:` 의 `DEPLOY_FREEZE`(정확히 'false' 일 때만 · 부재/공백/오타 = freeze)
-    #   와 ci-gate(수동 실행 = 소유자만)다.
+    #   와 CI gate(detect-changes 의 step · 수동 실행 = 소유자만)다.
     environment: production
     permissions:
       contents: read
@@ -758,17 +772,17 @@ jobs:
             --format="value(status.url)"
 
   deploy-store:
-    needs: [detect-changes, ci-gate]
+    needs: [detect-changes]
     # WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 §19 (2026-09-23 INCIDENT)
     #   DEPLOY GATE (fail-closed): `DEPLOY_FREEZE` 가 정확히 'false' 일 때만 배포한다.
     #   변수가 없거나 비어 있으면 Actions 가 빈 문자열을 돌려주므로 **freeze 가 기본값**이다.
-    if: vars.DEPLOY_FREEZE == 'false' && needs.detect-changes.outputs.store == 'true'
+    if: vars.DEPLOY_FREEZE == 'false' && needs.detect-changes.outputs.store == 'true' && needs.detect-changes.outputs.ci_gate == 'passed'
     runs-on: ubuntu-latest
     # `environment: production` — 배포 ref 경계다(WO-O4O-PUBLIC-COLLABORATOR-PRODUCTION-BOUNDARY-AND-MAIN-PROTECTION-V1).
     #   GitHub `production` Environment 는 배포 ref 를 `main` branch · `deploy/*` tag 로 제한하고, production credential 은
     #   environment secret 으로 둔다 — 그 밖의 ref(collaborator branch · PR)에서는 이 job 이 시작되지 않는다. required reviewer 는
     #   없다(대기 없이 실행). 배포 게이트는 그대로 이 job `if:` 의 `DEPLOY_FREEZE`(정확히 'false' 일 때만 · 부재/공백/오타 = freeze)
-    #   와 ci-gate(수동 실행 = 소유자만)다.
+    #   와 CI gate(detect-changes 의 step · 수동 실행 = 소유자만)다.
     environment: production
     permissions:
       contents: read
@@ -852,17 +866,17 @@ jobs:
             --format="value(status.url)"
 
   deploy-kpa-branch:
-    needs: [detect-changes, ci-gate]
+    needs: [detect-changes]
     # WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 §19 (2026-09-23 INCIDENT)
     #   DEPLOY GATE (fail-closed): `DEPLOY_FREEZE` 가 정확히 'false' 일 때만 배포한다.
     #   변수가 없거나 비어 있으면 Actions 가 빈 문자열을 돌려주므로 **freeze 가 기본값**이다.
-    if: vars.DEPLOY_FREEZE == 'false' && needs.detect-changes.outputs.kpa-branch == 'true'
+    if: vars.DEPLOY_FREEZE == 'false' && needs.detect-changes.outputs.kpa-branch == 'true' && needs.detect-changes.outputs.ci_gate == 'passed'
     runs-on: ubuntu-latest
     # `environment: production` — 배포 ref 경계다(WO-O4O-PUBLIC-COLLABORATOR-PRODUCTION-BOUNDARY-AND-MAIN-PROTECTION-V1).
     #   GitHub `production` Environment 는 배포 ref 를 `main` branch · `deploy/*` tag 로 제한하고, production credential 은
     #   environment secret 으로 둔다 — 그 밖의 ref(collaborator branch · PR)에서는 이 job 이 시작되지 않는다. required reviewer 는
     #   없다(대기 없이 실행). 배포 게이트는 그대로 이 job `if:` 의 `DEPLOY_FREEZE`(정확히 'false' 일 때만 · 부재/공백/오타 = freeze)
-    #   와 ci-gate(수동 실행 = 소유자만)다.
+    #   와 CI gate(detect-changes 의 step · 수동 실행 = 소유자만)다.
     environment: production
     permissions:
       contents: read
@@ -1016,7 +1030,6 @@ jobs:
     # 함께 갱신되지 않았다 — 그 3개는 summary 에 전혀 드러나지 않았다.
     needs:
       - detect-changes
-      - ci-gate
       - deploy-partner
       - deploy-neture
       - deploy-kpa-society
@@ -1024,7 +1037,10 @@ jobs:
       - deploy-store
       - deploy-kpa-branch
       - deploy-hospital-pharmacy
-    if: always() && (inputs.pharmacy_preparation || 'none') == 'none'
+    # WO-O4O-PROMOTE-SHORT-JOB-CONSOLIDATION-V1 — 직접 실행(이 workflow 의 dispatch)에서만 돈다. Delivery · Promote 가 호출할 때는
+    #   호출자의 report job 이 서비스별 배포 결과를 commit status `production` 으로 확정하므로 이 출력 job(1분 청구)은 건너뛴다.
+    #   reusable 로 호출되면 github.workflow_ref 는 호출자(delivery.yml)를 가리킨다.
+    if: always() && (inputs.pharmacy_preparation || 'none') == 'none' && contains(github.workflow_ref, '/.github/workflows/deploy-web-services.yml@')
     runs-on: ubuntu-latest
     steps:
       - name: Deployment Summary
@@ -1035,7 +1051,7 @@ jobs:
           echo ""
           # 아래 값은 **변경 판정**이다. 실제 배포 여부는 각 deploy-* job 결과(skipped = 배포 0)로 본다.
           echo "Change detection (not deploy result):"
-          echo "  - DEPLOY_FREEZE: '${{ vars.DEPLOY_FREEZE }}' · ci-gate: ${{ needs.ci-gate.result }}"
+          echo "  - DEPLOY_FREEZE: '${{ vars.DEPLOY_FREEZE }}' · ci-gate: ${{ needs.detect-changes.outputs.ci_gate || 'not passed' }}"
           echo "  - partner-web: ${{ needs.detect-changes.outputs.partner }}"
           echo "  - neture-web: ${{ needs.detect-changes.outputs.neture }}"
           echo "  - pharmacy-business-web: ${{ needs.detect-changes.outputs.kpa-society }}"

@@ -64,22 +64,35 @@ describe('상담 정리 운영 설정은 기존 verified API 배포 경로에서
   });
 });
 
+// WO-O4O-PROMOTE-SHORT-JOB-CONSOLIDATION-V1 — CI gate 는 detect job 의 step(id ci_gate)이다. 조건식의 의미 동등성은
+//   promote-short-job-consolidation.test.mjs 가 식 평가로 전 조합을 확인한다. 여기서는 배선만 고정한다.
+const detectJob = (file) => (file.endsWith('web-services.yml') ? 'detect-changes' : 'detect');
+const jobBlock = (wf, id) => wf.split(new RegExp(`\\n(?= {2}${id}:\\n)`))[1]?.split(/\n(?= {2}[a-z][a-z0-9-]*:\n)/)[0] ?? '';
+const gateStep = (file) => {
+  const job = jobBlock(read(file), detectJob(file));
+  return /\n {4,6}- name: CI gate \(target SHA must be green\)\n([\s\S]*?)(?=\n {4,6}- |\n*$)/.exec(job)?.[1] ?? '';
+};
+const gateIf = (file) => /\n\s+if: >-\n([\s\S]*?)\n\s+timeout-minutes:/.exec(gateStep(file))?.[1] ?? '';
+
 describe('Phase 1 — CI gate 는 모든 배포 경로 앞에 있다', () => {
   for (const file of DEPLOY) {
-    it(`${file}: ci-gate job 이 --enforce 로 CI green 을 요구한다`, () => {
+    it(`${file}: detect job 의 CI gate step 이 --enforce 로 CI green 을 요구한다 · ci-gate job 은 없다`, () => {
       const wf = read(file);
-      assert.match(wf, /^ {2}ci-gate:\n/m);
-      assert.match(wf, /node scripts\/ci\/ci-gate\.mjs --target "\$\{\{ github\.sha \}\}" --wait-seconds \d+ --enforce/);
-      assert.match(wf, /actions: read/);
+      assert.doesNotMatch(wf, /^ {2}ci-gate:\n/m);
+      const step = gateStep(file);
+      assert.match(step, /id: ci_gate/);
+      assert.match(step, /node scripts\/ci\/ci-gate\.mjs --target "\$\{\{ github\.sha \}\}" --wait-seconds \d+ --enforce\n\s+echo "ci_gate=passed" >> "\$GITHUB_OUTPUT"/);
+      assert.match(jobBlock(wf, detectJob(file)), /\n {4}permissions:\n {6}contents: read\n {6}actions: read/);
     });
   }
 
   // web 7 — pharmacy-hub-web 배포 은퇴 · signage-player-web 배포 은퇴(WO-O4O-RETIRED-WEB-SERVICES-DEPLOYMENT-AND-INFRA-CLEANUP-V1) ·
   //         k-cosmetics-web 배포 은퇴(WO-O4O-KCOSMETICS-RETIREMENT-PHASE1A-WEB-APP-AND-DEPLOY-TARGET-V1).
-  it('모든 배포 job 이 ci-gate 를 needs 로 가진다 (api 1 · web 7 · admin 1)', () => {
-    assert.match(read(DEPLOY[0]), /build-and-deploy:[\s\S]*?needs: \[detect, ci-gate\]/);
-    assert.equal(count(read(DEPLOY[1]), /^ {4}needs: \[detect-changes, ci-gate\]$/gm), 7);
-    assert.match(read(DEPLOY[2]), /\n {2}deploy:[\s\S]*?needs: \[detect, ci-gate\]/);
+  it('모든 배포 job 이 CI gate 통과(ci_gate == passed)를 요구한다 (api 1 · web 7 · admin 1)', () => {
+    assert.match(read(DEPLOY[0]), /build-and-deploy:[\s\S]*?needs: \[detect\][\s\S]*?needs\.detect\.outputs\.ci_gate == 'passed'/);
+    assert.equal(count(read(DEPLOY[1]), /^ {4}needs: \[detect-changes\]$/gm), 7);
+    assert.equal(count(read(DEPLOY[1]), /^ {4}if: vars\.DEPLOY_FREEZE == 'false' && needs\.detect-changes\.outputs\.[a-z-]+ == 'true' && needs\.detect-changes\.outputs\.ci_gate == 'passed'$/gm), 7);
+    assert.match(read(DEPLOY[2]), /\n {2}deploy:[\s\S]*?needs: \[detect\][\s\S]*?needs\.detect\.outputs\.ci_gate == 'passed'/);
   });
 });
 
@@ -134,10 +147,11 @@ describe('DEPLOY_FREEZE cutover — 게이트 · trigger · 동시성 (WO-O4O-CI
       assert.match(wf, /^ {2}workflow_dispatch:/m);
     });
 
-    it(`${file}: 배포 · ci-gate job 은 DEPLOY_FREEZE == 'false' 일 때만 (fail-closed) · freeze-notice 는 그 반대`, () => {
+    it(`${file}: 배포 job · CI gate step 은 DEPLOY_FREEZE == 'false' 일 때만 (fail-closed) · freeze-notice 는 그 반대`, () => {
       const wf = read(file);
       const deployIfs = count(wf, /vars\.DEPLOY_FREEZE == 'false'/g);
-      const expected = file.endsWith('web-services.yml') ? 9 : file.endsWith('deploy-api.yml') ? 3 : 2; // API adds the separately gated erasure operations job
+      // 배포 job + CI gate step 2개(setup-node · gate) — web 7+2+pharmacy 1 · api 1+2+erasure 1 · admin 1+2
+      const expected = file.endsWith('web-services.yml') ? 10 : file.endsWith('deploy-api.yml') ? 4 : 3;
       assert.equal(deployIfs, expected);
       assert.match(wf, /^ {2}freeze-notice:\n(?: {4}#.*\n)* {4}if: vars\.DEPLOY_FREEZE != 'false'\n/m);
       assert.doesNotMatch(wf, /DEPLOY_FREEZE == 'true'|DEPLOY_FREEZE != 'true'/, '"true" 비교는 부재 · 오타를 허용으로 만든다');
@@ -182,7 +196,7 @@ describe('DEPLOY_FREEZE cutover — 게이트 · trigger · 동시성 (WO-O4O-CI
 
   it('api migrate_only 도 freeze 가 적용된다', () => {
     const job = /\n {2}build-and-deploy:[\s\S]*?\n {4}if: >-\n([\s\S]*?)\n\n/.exec(read(DEPLOY[0]))?.[1] ?? '';
-    assert.match(job, /^\s+vars\.DEPLOY_FREEZE == 'false' &&\n\s+\(\(github\.event_name == 'workflow_dispatch' && inputs\.migrate_only == 'true'\) \|\|/);
+    assert.match(job, /^\s+vars\.DEPLOY_FREEZE == 'false' && needs\.detect\.outputs\.ci_gate == 'passed' &&\n\s+\(\(github\.event_name == 'workflow_dispatch' && inputs\.migrate_only == 'true'\) \|\|/);
   });
 });
 
@@ -198,9 +212,8 @@ describe('Unified Delivery — reusable deploy 진입점 (WO-O4O-CICD-UNIFIED-DE
     it(`${file}: github.event.inputs 참조 0 (workflow_call 에서는 호출자 이벤트의 입력이 된다)`, () => {
       assert.doesNotMatch(read(file), /github\.event\.inputs/);
     });
-    it(`${file}: dry_run 이면 ci-gate 가 열리지 않는다 (→ build · migration · deploy 0)`, () => {
-      const gate = /\n {2}ci-gate:\n[\s\S]*?\n {4}if: (>-\n[\s\S]*?\n {4}runs-on|[^\n]+)/.exec(read(file))?.[1] ?? '';
-      assert.match(gate, /vars\.DEPLOY_FREEZE == 'false' && inputs\.dry_run != 'true'/);
+    it(`${file}: dry_run 이면 CI gate 가 열리지 않는다 (→ build · migration · deploy 0)`, () => {
+      assert.match(gateIf(file), /vars\.DEPLOY_FREEZE == 'false' && inputs\.dry_run != 'true'/);
     });
   }
 
@@ -324,9 +337,8 @@ describe('Public collaborator 경계 — production credential 은 environment �
     });
   }
   for (const file of DEPLOY) {
-    it(`${file}: ci-gate 는 직접 dispatch 를 소유자에게만 연다`, () => {
-      const gate = read(file).split(/\n(?= {2}ci-gate:\n)/)[1].split(/\n(?= {2}[a-z][a-z0-9-]*:\n)/)[0];
-      assert.ok(gate.includes(OWNER), file);
+    it(`${file}: CI gate 는 직접 dispatch 를 소유자에게만 연다`, () => {
+      assert.ok(gateIf(file).replace(/\s+/g, ' ').includes(OWNER), file);
     });
   }
 });
