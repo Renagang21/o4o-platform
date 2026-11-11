@@ -38,7 +38,8 @@ jobs:
               { name: 'styles', color: 'E91E63', description: 'Styling changes' },
               { name: 'security', color: 'D73A4A', description: 'Security-related changes' },
               { name: 'large-change', color: 'B60205', description: 'Large PR (>20 files)' },
-              { name: 'small-change', color: '008672', description: 'Small PR (≤5 files)' }
+              { name: 'small-change', color: '008672', description: 'Small PR (≤5 files)' },
+              { name: 'core-change', color: 'D93F0B', description: 'Core 계약 경로(B) 변경 — docs/baseline/O4O-CORE-REGISTRY-V1.md' }
             ];
             
             for (const label of labels) {
