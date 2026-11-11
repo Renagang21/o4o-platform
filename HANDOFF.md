@@ -1,8 +1,106 @@
 # HANDOFF
 
 > 저장소: `Renagang21/o4o-platform` · 작업 branch: `claude/clever-bohr-g532hw` · 코드 기준: `main` `c5da5631`(merge 반영) · 작성: 2026-11-11 (클라우드 작업 세션)
-> 다음 실행자: **통합 세션(PR 생성 · 병합) → 통합 담당(아래 「결정 필요」)**
+> 다음 실행자: **통합 담당(결정 · 병합) → Businnect(체크리스트 실행 · 첫 과제)**
 > 이전 인계 전문: `git show 0c812623:HANDOFF.md`
+
+## 한 일 3 — WO-O4O-REMOTE-COLLABORATOR-ONBOARDING-V1 (2026-11-11 사용자 지시)
+
+신규 원격 공동개발자 `Businnect` 합류 준비를 조사하고 문서를 보완했다. 저장소 공개 상태 · 권한 · ruleset · CI · Runner · secret · 배포는 바꾸지 않았다.
+
+- `1e200899` + 이 commit
+  - 새 [`docs/investigations/IR-O4O-REMOTE-COLLABORATOR-READINESS-V1.md`](docs/investigations/IR-O4O-REMOTE-COLLABORATOR-READINESS-V1.md) — 준비도 보고서. 다룬 것:
+    - GitHub 접근
+    - Private 전환 영향
+    - 개발환경 실측
+    - 테스트 계정 공백
+    - CI · 자체 실행기 경계
+    - 준비 항목 총괄(READY / NEEDS_PREPARATION / VERIFY_WITH_BUSINNECT)
+    - 첫 시험 과제 후보 3개 · 추천 1개 · 성공 기준
+  - 새 [`docs/development/COLLABORATOR-ONBOARDING-CHECKLIST.md`](docs/development/COLLABORATOR-ONBOARDING-CHECKLIST.md) — Businnect 가 순서대로 실행할 시작 체크리스트(정본 링크만, 규칙 복제 없음).
+  - `SETUP.md` §3-1 5단계 · §4: 로컬 DB bootstrap 명령 정정. 기존 `pnpm --filter @o4o/api-server migration:run` 은 `migrate.ts` 가 `.env` 를 읽지 않아 `DB_HOST: MISSING` 으로 실패한다(실측). `npx tsx --env-file=.env src/migrate.ts` 로 바꿨다.
+  - `docs/development/COLLABORATOR-START-HERE.md`: 체크리스트 링크 한 줄.
+
+### 핵심 발견
+
+1. **운영 정보 없이 개발은 된다**(새 clone 상태 실측). 설치 · `build:packages`(1분) · 빈 DB bootstrap(baseline + 60 · fingerprint PASS) · API `/health` 200 이 모두 통과했다.
+2. **로컬 로그인 계정 공백.**
+   - Demo 「테스트 로그인」은 운영 DB 에만 있다.
+   - 로컬 이메일 가입은 출처 제한(`SIGNUP_ORIGIN_NOT_ALLOWED`)과 메일 인증에 막힌다.
+   - 합성 계정은 격리 심사 환경의 매장 경영자 1개뿐이다.
+   - → 로컬 합성 계정 CLI 를 별도 WO 로 제안한다(IR §5-3).
+3. **GitHub 경계는 준비돼 있다.**
+   - `main` 은 PR + `CI Gate` 필수이고 bypass 가 없다.
+   - `deploy/*` 태그는 소유자만 만든다.
+   - 배포 job 은 `triggering_actor == owner` 일 때만 열린다.
+   - production secret 은 Environment 에만 있다.
+4. **Private + 자체 실행기 결정 필요.**
+   - Write 협업자의 PR 과 자기 branch 의 새 workflow 가 fork 가 아니어서 집 PC 실행기에서 돈다.
+   - 자기 branch 의 새 workflow 는 push 만으로도 돈다.
+   - 선택지 ①~③ 은 IR §6-2 에 있다.
+5. **Private 전환 시 확인할 것:**
+   - 개인 Free 플랜에서 ruleset · Environment 보호가 유지되는지(유지되지 않으면 write 협업자가 main 에 직접 push 할 수 있다)
+   - secret scanning · push protection 이 꺼지는지
+
+## PR 로 묶을 단위 (이 branch 전체)
+
+- **묶음 ① 문서**
+  - `d388157e`(Core IR) · `7c55c4ff`(Core registry · 문서 정합) · `1e200899` 와 이 commit(합류 준비 IR · 체크리스트 · SETUP 정정) · HANDOFF.md
+- **묶음 ② CI · 설정**(§5 · `.github/` · 병합은 통합 담당 판단)
+  - `cd6aebf1`(core-paths · `core-change` 라벨 · CODEOWNERS · workflow 3개)
+- 순서: ① → ②, 또는 한 PR. ②의 테스트가 ①의 registry 문서 존재를 확인한다.
+- 같은 branch 에 두 묶음이 있는 이유: 세션 지정 branch 외 push 금지. 분리 여부는 통합 세션이 정한다.
+
+## 결정 사항 (§9) — 한 일 3
+
+- 시작 체크리스트는 새 문서 1개로 만들었다. 규칙은 복제하지 않고 정본 링크와 「확인」 기준만 둔다. 이름은 계정과 무관하게 다음 합류자에게도 재사용할 수 있도록 `COLLABORATOR-ONBOARDING-CHECKLIST` 로 했다.
+- SETUP 명령 정정은 온보딩 문서 보완 범위로 보고 이번에 했다(동작 · 판정 변경 없음, 실측 근거).
+  - `migrate.ts` 가 `.env` 를 읽게 고치는 코드 변경은 하지 않았다. migration 도구는 Core(schema) 영역이라 별도 판단으로 넘긴다.
+- 첫 과제 추천: 후보 1(Neture 카탈로그 일괄등록 카드 2개 404). 근거가 명확하고 판단할 거리가 없으며, 파일 1개와 테스트 1개다.
+  - 관리자 화면이라 로컬 로그인 확인은 테스트로 대신하고, 배포 후 통합 담당이 확인한다.
+- 로컬 실측에 PostgreSQL 16(이 컨테이너 설치본)을 썼다. 기준 15 재현은 Businnect 몫으로 남겼다.
+
+## 검증 결과 — 한 일 3
+
+- 실측(이 클라우드 컨테이너 · 운영 정보 0):
+  - `pnpm install --frozen-lockfile` 통과
+  - `build:packages` exit 0(1분 1초)
+  - 빈 DB `npx tsx --env-file=.env src/migrate.ts` → `Migration Job - SUCCESS`
+  - 기존 SETUP 명령 실패 재현
+  - api `build` 29초
+  - `node dist/main.js` → `/health` 200
+- 정리: 실측 뒤 API 종료 · 임시 DB 중지 · 로컬 `.env` 삭제. 임시 DB 데이터 폴더(저장소 밖)는 권한상 재귀 삭제가 막혀 컨테이너 회수에 맡겼다.
+- `node scripts/check-doc-sensitive.mjs` — 0건.
+- GitHub 조회(read-only): 저장소 설정 · ruleset 2개 · 협업자 · CODEOWNERS 오류.
+
+## 확인하지 못한 것 — 한 일 3
+
+- `production` Environment 의 ref 제한 · reviewer, Actions `GITHUB_TOKEN` 기본 권한(이 세션 proxy 가 해당 API 를 막음) → 통합 담당이 설정 화면에서 확인.
+- 신규 개발자 PC 의 clone · 설치 · 빌드 · 로컬 API · 서비스 dev server · PostgreSQL 15 · Windows → Businnect 가 체크리스트 §1~§5 로 확인하고 결과를 HANDOFF 로 보고.
+- web-neture dev server 기동(이 세션에서는 하지 않음).
+- `require_extra_approval_for_unattributed_changes=true` ruleset 항목의 정확한 동작.
+
+## 결정 필요 (통합 담당 · 사용자) — 한 일 3
+
+1. 자체 실행기 × Write 협업자: IR §6-2 ①(켜지 않음) · ②(격리 강화 후) · ③(작성자 조건 추가 · 부분 대책) 중 결정
+2. Private 전환 전: 개인 계정 플랜(ruleset · Environment 유지)과 secret scanning 대책
+3. 로컬 합성 계정 CLI 별도 WO 진행 여부(IR §5-3)
+4. 첫 과제 지정(추천: IR §7-2 후보 1)
+5. (후속 · CI 트랙) `delivery.yml` classify 에 소유자 조건 추가 여부
+
+## 겹칠 수 있는 열린 PR — 한 일 3
+
+이 commit 직전 조회에서 겹치는 열린 PR 은 없다. `SETUP.md` 는 여러 작업이 자주 바꾸는 파일이다.
+
+## 문서 정합 — 한 일 3
+
+`발견 2건 / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 2건`
+
+- 발견 1: AGENTS.md §4-1(e) ruleset 기록값 「admin bypass 가능」 ↔ 현재 bypass_actors 없음. 보고만 한다.
+- 발견 2: SETUP migration 명령 오류. 정정했다.
+- WO 제안: 로컬 합성 계정 CLI, 자체 실행기 × 협업자 결정.
+
+---
 
 ## 한 일 2 — WO-O4O-CORE-OWNERSHIP-AND-CHANGE-BOUNDARY-V1 (2026-11-11 사용자 지시)
 
@@ -38,7 +136,7 @@ IR(아래 「한 일 1」)을 바탕으로 Core 소유권 · 변경 경계를 �
      - CI node:test 목록에 추가했다(`ci-pipeline.yml` 1줄).
    - `automation-repo-setup.yml` 라벨 목록에 `core-change` 를 추가했다(색 · 설명. 수동 실행용).
 
-## PR 로 묶을 단위
+## PR 로 묶을 단위 (한 일 2 시점 — 위 「이 branch 전체」 표가 최신)
 
 AGENTS.md §4-1(e) 「묶음 단위」는 CI · workflow 변경을 별도 PR 로 분리한다. 이 branch 하나에 두 묶음이 있으므로, 통합 세션이 분리 여부를 정한다. 별도 branch 를 만들지 않은 이유: 세션 지정 branch 외 push 금지.
 
@@ -77,7 +175,7 @@ AGENTS.md §4-1(e) 「묶음 단위」는 CI · workflow 변경을 별도 PR 로
 
 ## 결정 필요 (통합 담당 · 사용자)
 
-1. `Businnect` 계정을 CODEOWNERS 의 어느 경로 소유자로 둘지(현재 미지정)
+1. ~~`Businnect` 계정을 CODEOWNERS 의 어느 경로 소유자로 둘지~~ — 2026-11-11 WO-O4O-REMOTE-COLLABORATOR-ONBOARDING-V1 에서 「지정하지 않음 · 필수 리뷰 강제 없음」으로 확정
 2. B 변경에 ruleset code owner review 를 필수로 켤지
 3. IR §11 의 나머지 항목: 공동개발자 전체 읽기 허용 · `organizations` 이중 매핑 · 원장 정리 · Skill 설계 위치
 

@@ -191,9 +191,45 @@
 
 ## 7. 첫 시험 과제
 
-(아래 §7-1 은 열린 지시서 · 현재 코드 조사 결과다.)
+### 7-0. 고른 방법
 
-<!-- TRIAL-TASKS -->
+조건은 다음 다섯 가지다.
+- 현행 서비스의 실제 결함
+- 작다
+- Core 경로(`scripts/ci/core-paths.mjs`) · DB · 운영 secret 이 필요 없다
+- 로컬에서 검증할 수 있다
+- 다른 진행 중 작업과 겹치지 않는다
+
+열린 지시서 10개(ACTIVE · DRAFT · TODO)의 미완 항목은 대부분 이 조건을 만족하지 못했다. 병합 · 배포 · 실계정 확인 같은 운영 단계이거나, 큰 설계 작업이거나, 다른 세션이 진행 중이었다. 그래서 범위를 넓혀 최신 코드에서 결함을 직접 확인했다. 근거 줄 번호는 `origin/main` `c5da5631` 기준이다.
+
+### 7-1. 후보
+
+| | 후보 1 — Neture 「카탈로그 일괄등록」 화면의 카드 2개가 404 | 후보 2 — Neture `/workspace/hub` 관리 카드의 끊긴 · 엉뚱한 링크 | 후보 3 — Neture AI 관리 「Context Asset」 화면의 가짜 데이터 · 가짜 저장 |
+|---|---|---|---|
+| 결함 근거 | `services/web-neture/src/pages/admin/catalog-import/CatalogImportDashboardPage.tsx:16,22` 가 `/operator/catalog-import/csv` · `/history` 로 이동한다. 선언된 route 는 `App.tsx:1120-1122` 의 `/admin/catalog-import*` 뿐이라 `App.tsx:1340` NotFound 로 간다. 메뉴에 노출된 화면이다(`config/operatorMenuGroups.ts:70,171`) | `pages/hub/HubPage.tsx:105` 「서비스 설정」 → `/operator/settings`(route 없음 · 있는 것은 `/operator/settings/notifications`). `:98` · `:112` · `:120` 은 화면 대신 `/admin` 으로 간다(카탈로그 일괄등록은 `/admin/catalog-import` 가 있다. 감사 로그 화면은 없다) | `pages/admin/ai/ContextAssetListPage.tsx:43,313` 하드코딩 `mockContextAssets` 를 실제 목록처럼 보여 준다. `ContextAssetFormPage.tsx:179` 저장이 `console.log` 뒤 성공처럼 없는 `/operator/...` 로 이동한다. 백엔드 API 는 없다 |
+| 바꿀 파일 | `CatalogImportDashboardPage.tsx`(경로 2줄) + 테스트 1개 | `HubPage.tsx` + 테스트 1개 | `ContextAssetListPage.tsx` · `ContextAssetFormPage.tsx` + 테스트 1개 |
+| Core 경로 | 해당 없음 | 해당 없음(`@o4o/hub-core` import 는 있지만 바꾸지 않는다 · Core 목록 밖) | 해당 없음. API · 테이블 신설 금지 범위라 「저장소 미연결」 정직 표시까지만 한다 |
+| 판단 필요 | 없음(정답 하나) | 있음 — 감사 로그 · 수수료 정책 카드의 목적지(없으면 카드 제거?) | 있음 — 준비 중 표시 vs 메뉴 숨김 |
+| 로컬 검증 | vitest 컴포넌트 테스트(이동 경로 고정) · web-neture build | 같음 | vitest(가짜 행 · 가짜 성공 0) · build |
+| 로그인 화면 확인 | 관리자 전용이라 로컬 계정이 없다(§5) → 테스트로 대신하고, 배포 후 통합 담당이 운영 관리자 계정으로 클릭 확인 | 같음 | 같음 |
+
+### 7-2. 추천 — 후보 1
+
+- 메뉴에 보이는 관리자 화면의 실제 404 결함이고, 근거가 코드 두 줄과 route 선언으로 바로 증명된다.
+- 판단할 거리가 없어 저장소 절차 자체를 시험하기에 맞다. 절차: branch → 수정 · 테스트 → 로컬 검증 → push → HANDOFF → 통합 세션 PR → CI.
+- Core · DB · API · secret 이 필요 없다. 변경 파일 1개와 테스트 1개다.
+- 같은 결함 종류인 후보 2 「서비스 설정」 링크 한 줄은 원하면 함께 묶어도 된다(목적지 `/operator/settings/notifications` 가 명확하다). 후보 2의 나머지와 후보 3은 판단이 들어가므로 두 번째 과제로 둔다.
+
+### 7-3. 첫 과제 성공 기준
+
+| 단계 | 기준 | 확인자 |
+|---|---|---|
+| 개발 | 두 카드가 `/admin/catalog-import/csv` · `/admin/catalog-import/history` 로 이동한다. 새 vitest 가 이동 경로를 고정한다(수정 전 코드에서 실패 · 수정 후 통과) | Businnect |
+| 로컬 검증 | 루트에서 `npx vitest run --config services/web-neture/vitest.config.mjs <테스트>` 통과, web-neture `build` 통과. 실행한 명령과 결과를 HANDOFF 에 적는다 | Businnect |
+| 절차 | 전용 branch · path-specific commit · push · HANDOFF(묶음 단위 · 결정 사항 · 검증 · 확인하지 못한 것: 「배포 후 관리자 화면 클릭 확인」) · PR 생성 · merge · 배포 dispatch 0 | Businnect · 통합 세션 |
+| 통합 | 통합 세션이 PR 을 만들고 `CI Gate` 통과 · 병합 | 통합 세션 |
+| 배포 후 | 운영 관리자 계정으로 두 카드 클릭 → 각 화면이 열린다 | 통합 담당 |
+| 회고 | 체크리스트 · SETUP 에서 막힌 곳을 HANDOFF 에 적고, 다음 문서 보완에 반영한다 | Businnect → 통합 담당 |
 
 ## 8. 준비 항목 총괄
 
