@@ -66,6 +66,22 @@ describe('A additive', () => {
     assert.equal(verdictOf("// 설명 주석\nawait q.query('CREATE TABLE t (id int)');\n/* 블록 */ await q.query('CREATE INDEX i ON t (id)');"), ADDITIVE);
   });
 
+  it('JS line terminators other than LF (CR · U+2028 · U+2029) need review; CRLF files still work', () => {
+    const add = "await q.query('CREATE TABLE t (id int)');";
+    for (const eol of ['\r', '\u2028', '\u2029']) {
+      assert.equal(verdictOf(`${add}\n// 설명${eol}await this.clean(q);`), REVIEW, JSON.stringify(eol));
+    }
+    assert.equal(verdictOf(`// 설명\r\n${add}\r\n`), ADDITIVE);
+  });
+
+  it('quoted identifiers with whitespace need review ("user  staging" ≠ "user staging")', () => {
+    const up = 'await q.query(`CREATE TABLE "user  staging" (id int)`);\nawait q.query(`ALTER TABLE "user staging" ALTER COLUMN id SET NOT NULL`);';
+    assert.equal(verdictOf(up), REVIEW);
+    assert.equal(verdictOf('await q.query(`CREATE TABLE "a b" (id int)`);'), REVIEW);
+    // 식별자 사이의 공백 · 문자열 안의 " 는 해당 없음
+    assert.equal(verdictOf('await q.query(`CREATE TABLE "t" ("id" int, "note" text DEFAULT \'say "hi there"\')`);'), ADDITIVE);
+  });
+
   it('SQL comments (including nested block comments) need review', () => {
     assert.notEqual(verdictOf("await q.query('CREATE TABLE t (id int) /* a /* b */ ; DROP TABLE users; */');"), ADDITIVE);
     assert.equal(verdictOf("await q.query('CREATE TABLE t (id int) /* a /* b */ ; CREATE INDEX i ON t (id); */');"), REVIEW);

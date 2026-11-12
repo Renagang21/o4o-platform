@@ -392,6 +392,25 @@ function classifyNewTableAction(action) {
  * SQL 문장 하나 — 허용 목록에 맞으면 ADDITIVE, 알아볼 수 있는 파괴형이면 DESTRUCTIVE, 나머지는 REVIEW.
  * @param {Set<string>} created 이 migration 에서 IF NOT EXISTS 없이 만든 표 (호출 중 갱신 · 구조 정의에만 쓴다)
  */
+/** 따옴표 식별자("...", "" 는 escape) 안에 공백이 있는가 — 작은따옴표 문자열 안의 " 는 식별자가 아니다. 짝이 맞지 않으면 true(fail-closed) */
+function quotedIdentHasSpace(sql) {
+  let quote = null;
+  let ident = '';
+  for (let i = 0; i < sql.length; i += 1) {
+    const c = sql[i];
+    if (quote === "'") { if (c === "'") quote = null; continue; }
+    if (quote === '"') {
+      if (c === '"' && sql[i + 1] === '"') { ident += c; i += 1; continue; }
+      if (c === '"') { if (/\s/.test(ident)) return true; quote = null; continue; }
+      ident += c;
+      continue;
+    }
+    if (c === "'") quote = "'";
+    else if (c === '"') { quote = '"'; ident = ''; }
+  }
+  return quote !== null;
+}
+
 export function classifyStatement(stmt, created = new Set()) {
   const s = stmt.replace(/\s+/g, ' ').trim();
   const u = s.toUpperCase();
@@ -402,6 +421,8 @@ export function classifyStatement(stmt, created = new Set()) {
   if (s.includes('$')) return review('`$` 포함 (dollar-quote · 함수 · DO 블록 · 매개변수) — 자동 판정 불가');
   // 역슬래시는 E'...' 문자열의 escape 가 될 수 있다 — 아래 동작 분리 · 괄호 짝 맞춤은 표준 문자열('' 만 escape)만 이해한다
   if (s.includes('\\')) return review('역슬래시 포함 (E 문자열 escape 등) — 자동 판정 불가');
+  // 위의 공백 정규화는 따옴표 식별자 안의 공백도 합친다("a  b" → "a b") — 서로 다른 표가 같은 이름으로 보이지 않게 승인 대상으로 보낸다
+  if (quotedIdentHasSpace(stmt)) return review('공백이 든 따옴표 식별자 — 자동 판정 불가');
 
   let m;
   // ── 허용 목록 ──────────────────────────────────────────────────────────
@@ -446,6 +467,9 @@ export function classifyStatement(stmt, created = new Set()) {
  */
 export function classifyMigrationSource(source) {
   if (typeof source !== 'string' || source.trim() === '') return { verdict: REVIEW, findings: ['원문을 읽을 수 없음'] };
+  // 스캐너는 LF 만 줄 끝으로 안다 — JS 의 다른 줄 종결자(CR · U+2028 · U+2029)는 `//` 주석을 끝내 뒤의 코드를 실행시킨다
+  source = source.replace(/\r\n/g, '\n');
+  if (/[\r\u2028\u2029]/.test(source)) return { verdict: REVIEW, findings: ['LF 가 아닌 줄 종결자(CR · U+2028 · U+2029) — 자동 판정 불가'] };
   const up = extractUp(source);
   if (up === null) return { verdict: REVIEW, findings: ['up() 을 찾지 못함'] };
   const { sql, runnerCalls, problems, conditional } = extractStatements(up.body, up.runner);
