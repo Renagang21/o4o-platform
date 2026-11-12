@@ -113,6 +113,22 @@ describe('R ambiguous → approval', () => {
     assert.equal(classifyMigrationSource('export const x = 1;').verdict, REVIEW);
     assert.equal(verdictOf('// nothing'), REVIEW);
   });
+
+  // PR #1028 Codex 리뷰 — 판정을 빠져나가던 세 경로
+  it('CREATE TABLE IF NOT EXISTS does not make an existing table count as new', () => {
+    assert.equal(verdictOf("await q.query('CREATE TABLE IF NOT EXISTS users (id uuid); DELETE FROM users;');"), DESTRUCTIVE);
+    assert.equal(verdictOf("await q.query('CREATE TABLE IF NOT EXISTS t (id uuid)'); await q.query(`INSERT INTO t(id) VALUES (gen_random_uuid())`);"), REVIEW);
+    assert.equal(verdictOf("await q.query('CREATE TABLE IF NOT EXISTS t (id uuid)');"), ADDITIVE);
+  });
+
+  it('QueryRunner used through an alias, destructuring or a sub-object needs review', () => {
+    for (const up of [
+      "await q.query('ALTER TABLE existing ADD COLUMN c int'); const manager = q.manager; await manager.query('DELETE FROM users');",
+      "await q.query('ALTER TABLE existing ADD COLUMN c int'); const { manager } = q; await manager.query('DELETE FROM users');",
+      "await q.query('ALTER TABLE existing ADD COLUMN c int'); await q.connection.query('DELETE FROM users');",
+      "await q.query('ALTER TABLE existing ADD COLUMN c int'); await dataSource.query('DELETE FROM users');",
+    ]) assert.notEqual(verdictOf(up), ADDITIVE, up);
+  });
 });
 
 describe('S scanner', () => {
@@ -121,6 +137,13 @@ describe('S scanner', () => {
     const quote = (v: string) => '"' + v.replace(/"/g, '""') + '"';
     await q.query(\`CREATE TABLE t (id int)\`);`;
     assert.equal(verdictOf(up), ADDITIVE);
+  });
+
+  it('SQL comment markers inside string literals do not hide the next statement', () => {
+    assert.equal(verdictOf(`await q.query("COMMENT ON TABLE users IS 'user -- account'; DELETE FROM users;");`), DESTRUCTIVE);
+    assert.equal(verdictOf(`await q.query("COMMENT ON TABLE users IS 'a /* b'; DELETE FROM users; -- */");`), DESTRUCTIVE);
+    assert.equal(verdictOf(`await q.query("COMMENT ON TABLE users IS E'it\\\\'s -- x'; DELETE FROM users;");`), DESTRUCTIVE);
+    assert.equal(verdictOf(`await q.query("ALTER TABLE existing ADD COLUMN c int; -- DROP TABLE users\\n/* DELETE FROM users; */");`), ADDITIVE);
   });
 
   it('findings name the reason', () => {

@@ -154,10 +154,27 @@ export function extractStatements(body, runner) {
     if (!insideLiteral(body.slice(0, m.index))) { problems.push('QueryRunner 를 다른 함수에 넘김'); break; }
   }
   const re = new RegExp(`(?<![\\w$.])${esc}\\s*\\.\\s*(?:manager\\s*\\.\\s*)?([A-Za-z_$][\\w$]*)\\s*\\(`, 'g');
+  // runner 는 직접 메서드 호출로만 써야 한다 — 별칭(`const m = q.manager`) · 구조 분해 · 하위 객체(`q.connection`)로
+  // 넘어간 호출은 아래 수집에서 빠지므로 판정할 수 없다.
+  const use = new RegExp(`(?<![\\w$.])${esc}(?![\\w$])`, 'g');
+  while ((m = use.exec(body))) {
+    if (insideLiteral(body.slice(0, m.index))) continue;
+    const direct = new RegExp(re.source, 'y');
+    direct.lastIndex = m.index;
+    if (!direct.test(body)) { problems.push('QueryRunner 를 직접 메서드 호출 밖에서 사용 (별칭 · 구조 분해 · 하위 객체)'); break; }
+  }
+  // runner 를 거치지 않은 query() 호출(별칭 · 다른 연결)은 무엇을 실행하는지 수집되지 않는다
+  let queryCalls = 0;
+  const anyQuery = /(?<![\w$])query\s*\(/g;
+  while ((m = anyQuery.exec(body))) {
+    if (!insideLiteral(body.slice(0, m.index))) queryCalls += 1;
+  }
+  let runnerQueries = 0;
   while ((m = re.exec(body))) {
     if (insideLiteral(body.slice(0, m.index))) continue;
     const method = m[1];
     if (method === 'query') {
+      runnerQueries += 1;
       let p = m.index + m[0].length;
       while (/\s/.test(body[p] ?? '')) p += 1;
       const lit = readStringLiteral(body, p);
@@ -176,6 +193,7 @@ export function extractStatements(body, runner) {
     else if (RUNNER_DESTRUCTIVE.test(method)) runnerCalls.push({ method, verdict: DESTRUCTIVE });
     else runnerCalls.push({ method, verdict: REVIEW });
   }
+  if (queryCalls > runnerQueries) problems.push('QueryRunner 매개변수가 아닌 query() 호출 — 실행 대상을 알 수 없음');
   return { sql, runnerCalls, problems };
 }
 
@@ -198,19 +216,40 @@ function insideLiteral(prefix) {
 // SQL 문장 판정
 // ---------------------------------------------------------------------------
 
-/** 주석 제거 · 세미콜론 분리 (문자열 · 따옴표 식별자 안의 세미콜론은 무시) */
+/**
+ * 주석 제거와 세미콜론 분리를 한 번의 스캔으로 한다 — 문자열 · 따옴표 식별자 안의 `--` · `/*` · `;` 는 SQL 이 아니다.
+ * (주석을 먼저 지우면 `'a -- b'; DELETE ...` 의 뒤 문장까지 사라진다.) E'...' 문자열은 역슬래시 escape 를 따른다.
+ */
 export function splitSql(text) {
-  const noComments = text.replace(/--[^\n]*/g, ' ').replace(/\/\*[\s\S]*?\*\//g, ' ');
   const out = [];
   let cur = '';
   let quote = null;
-  for (const c of noComments) {
+  let backslash = false;
+  for (let i = 0; i < text.length; i += 1) {
+    const c = text[i];
     if (quote) {
       cur += c;
+      if (backslash && c === '\\') { cur += text[i + 1] ?? ''; i += 1; continue; }
       if (c === quote) quote = null;
       continue;
     }
-    if (c === "'" || c === '"') { quote = c; cur += c; continue; }
+    if (c === '-' && text[i + 1] === '-') {
+      while (i < text.length && text[i] !== '\n') i += 1;
+      cur += ' ';
+      continue;
+    }
+    if (c === '/' && text[i + 1] === '*') {
+      const end = text.indexOf('*/', i + 2);
+      i = end < 0 ? text.length : end + 1;
+      cur += ' ';
+      continue;
+    }
+    if (c === "'" || c === '"') {
+      backslash = c === "'" && /[Ee]/.test(text[i - 1] ?? '') && !/[\w$]/.test(text[i - 2] ?? '');
+      quote = c;
+      cur += c;
+      continue;
+    }
     if (c === ';') { if (cur.trim()) out.push(cur.trim()); cur = ''; continue; }
     cur += c;
   }
@@ -271,9 +310,10 @@ export function classifyStatement(stmt, created = new Set()) {
   if (/^LOCK TABLE\b/.test(u)) return { verdict: ADDITIVE, why: '잠금(데이터 불변)' };
 
   // ── 생성 ───────────────────────────────────────────────────────────────
-  if ((m = new RegExp(`^CREATE (?:UNLOGGED )?TABLE (?:IF NOT EXISTS )?${IDENT}`, 'i').exec(s))) {
+  if ((m = new RegExp(`^CREATE (?:UNLOGGED )?TABLE (IF NOT EXISTS )?${IDENT}`, 'i').exec(s))) {
     if (/\bAS\s+SELECT\b/i.test(s)) return { verdict: REVIEW, why: `CREATE TABLE AS — 자동 판정 불가: ${short}` };
-    created.add(tableName(m[1]));
+    // IF NOT EXISTS 는 표가 이미 있으면(기존 데이터 포함) 아무것도 하지 않는다 — 새 표 예외를 주지 않는다
+    if (!m[1]) created.add(tableName(m[2]));
     return { verdict: ADDITIVE, why: '표 추가' };
   }
   if (/^CREATE (UNIQUE )?INDEX\b/.test(u)) return { verdict: ADDITIVE, why: '인덱스 추가' };
