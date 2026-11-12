@@ -1,5 +1,15 @@
 # HANDOFF
 
+## 2026-11-12 · AI 비용 절감 7차 사전 검증·운영 인계
+
+- **branch / 통합 단위:** `wo/consultation-cost-verification`. 시작 main `2271a2f59` + 자체 3~6차 검증 의존(`668e0c79f`·`d08bbbf6b`·`9aaac766b`·`d563407be`). 작업 중 기존 3~6차 **PR #1044**를 확인했다. **3~7차 중복 PR 생성 금지**. 이 branch의 `test(consultation): verify reuse savings and customer isolation` commit만 #1044 후속으로 가져오거나 #1044 병합 뒤 7차 차이만 반영한다. 기존 PR·원래 branch를 변경/삭제하지 않았다. 아래 과거 절의 3~6차 통합 안내는 그때의 기록이며 현재 통합 단위는 이 절을 따른다.
+- **한 일 / 결정:** 실제 서비스·Extension·policy runtime을 연결한 합성 전체 상담 비교, 동시 상담·60초 만료·다음 고객·자료/표현 변경·권한 거부, 잘못된 번역 후 정상 재시도·정책 중지, 화면의 다음 고객 세션 교체 검증. runtime·schema·비용/권한 정책은 변경하지 않음.
+- **실측 범위:** 합성 동일 상담 2회에서 policy 실행 **8→4**, 검증된 출력 동일. fixture DB 조회 **50→86**으로 증가해 운영 부하·전체 비용 개선은 미판정. 실제 공급자 attempt/청구/응답 품질·운영 지연을 측정한 것이 아니다. [7차 CHECK와 운영 절차](docs/checks/CHECK-O4O-AI-COST-REDUCTION-PHASE7-V1.md).
+- **검증:** API 상담 15 suites / 148 pass, 매장 화면 5 files / 66 pass. API·매장 typecheck 및 이번 변경 lint/diff/문서 민감정보 검사 통과. Node 24.22.1(안내 22.23.4와 차이)·pnpm 10.25.0. provider/DB는 fixture이며 운영 연결·DB write·유료 호출·배포 없음.
+- **확인하지 못한 것 / 다음 실행자:** 통합 세션이 #1044·후속 7차·별도 #1042를 통합하고 배포 버전을 확인한 후 운영 계정/자료로 CHECK §3~4 실행. 약사 검수·PC/mobile Demo·기존 QR·직접 등록 보존·실제 비용/지연 확인 전 **7차 운영 완료 아님**. neture 초기화면 SIWC는 실제 참여 후 별도 범위. 약사 지정 인계 전체 신규 구현도 별도.
+- **겹치는 PR / 문서 정합:** #1044와 선행 3~6차 전체 및 이번 번역 테스트, #1042·#1043과 HANDOFF가 겹침. 기존 정본 경계 유지, 앞서 기록한 B2B 전용 안내 2건은 별도 정비 대상. worktree `KEEP` — 미병합 인계용, 미완료 운영 검증 포함.
+
+
 ## 2026-11-12 · 상담 반복 생성 감소·매장 표현 설정 (6차)
 
 - **branch / PR 묶음:** `wo/consultation-reuse-expression` — main `31be41b49` + 자체 3차 `017f9dac3`·4차 `b60710778`·5차 `5a67ed453` + 6차. **3~6차 통합 묶음**이다. 이전 `wo/product-consultation-resource-separation`·`wo/consultation-structured-product-search`·`wo/shared-product-material-preparation`는 이 묶음 **병합 후 삭제 가능**. 원래 branch를 수정·삭제하지 않았고 별도로 중복 통합하지 않는다.
@@ -39,6 +49,8 @@
 - **후속:** 4차는 상담자료 성분·용도·주의사항의 후보 검색 반영. 현재 자연어 검색의 B2B 본문 참조는 남음. 5차는 공통 상품 연결/정기 관리자 준비/재사용. 배포 전 구형 API가 CONSULTATION을 처리하지 못하는 점을 확인하고, 배포 후 관리자·매장·약사 화면·기존 QR을 검증한다. 롤백 시 새 자료를 B2B로 덮어쓰거나 삭제하지 않음.
 - **겹치는 PR:** #1042(2차)·#1039와 HANDOFF.md만 겹침. 공통 types 소비처 관련 #1037은 다른 파일. 새 인계 절을 보존해 순차 통합한다. 이 branch는 최신 origin/main에서 시작했으며 미병합 2차 branch를 합치지 않았다.
 - **문서 정합:** 발견 1건 / 별도 정비 1건 — 기존 매장 Excel·AI 자료 흐름의 B2B 전용·자유 본문 표시 안내. 정본 변경은 별도 문서 작업으로 인계.
+
+
 
 ## 2026-11-12 · ChatGPT 콘텐츠 비용 경계 검증
 
