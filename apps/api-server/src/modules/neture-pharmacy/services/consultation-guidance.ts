@@ -150,7 +150,12 @@ export class ConsultationGuidanceService {
     this.products = new StoreStaffSupportService(db);
     this.contextSearch = new ConsultationContextService(db, createConsultationContextPlanner(db));
   }
-  async configuration(org: string, reusable: boolean) {
+  // 반환 타입을 명시한다 — ModelControlService.read() 의 반환 타입(Control)은 export 되지 않아,
+  // 추론에 맡기면 배포 빌드(declaration 생성)가 TS4053 으로 실패한다(2026-11-12 #1044 배포 실패).
+  async configuration(
+    org: string,
+    reusable: boolean,
+  ): Promise<{ expression?: ConsultationExpression; policy?: Awaited<ReturnType<ModelControlService['read']>> } | undefined> {
     const expression = await this.readExpression?.(org);
     const policy = reusable ? await new ModelControlService(this.db).read() : undefined;
     return expression || policy ? { expression, policy } : undefined;
