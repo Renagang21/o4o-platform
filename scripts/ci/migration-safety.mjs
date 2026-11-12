@@ -15,6 +15,8 @@
  *   - COMMENT ON ... · CREATE SEQUENCE ...(OWNED BY 제외) · CREATE TYPE .. AS ENUM (...) · ALTER TYPE .. ADD VALUE ...
  *   - QueryRunner 구조 API: createTable · createIndex · createIndices (읽기 · 트랜잭션 제어는 중립 · addColumn(s) 는 승인 대상)
  *   - query() 인자는 문자열 상수 하나 · 보간 없음 · 값이 확정되는 escape 만
+ *   - up() 본문은 `await <runner>.query('<SQL>');` 문장과 JS 주석뿐 (helper · 변수 · 구조 API 호출은 승인 대상)
+ *   - SQL 안의 주석(-- · /* */)은 승인 대상 (중첩 주석으로 문장을 숨길 수 있다)
  * 데이터를 쓰는 문장(INSERT · UPDATE · DELETE · TRUNCATE · MERGE)은 새 표 대상이어도 추가형으로 보지 않는다.
  * 읽기(SELECT) · 잠금 · 확장 · 스키마 · 트리거 · 함수 · 권한 · 동적 SQL · 그 밖의 QueryRunner 호출도 승인 대상이다.
  *
@@ -147,6 +149,26 @@ function readStringLiteral(src, pos) {
   return null;
 }
 
+/**
+ * 분석한 query() 호출 범위와 주석 · `await` · `;` · 공백을 지운 뒤 남는 코드가 있는지.
+ * @param {string} body
+ * @param {[number, number][]} ranges
+ */
+function residueOf(body, ranges) {
+  let text = '';
+  let last = 0;
+  for (const [s, e] of ranges) { text += body.slice(last, s) + ' '; last = e; }
+  text += body.slice(last);
+  let out = '';
+  let i = 0;
+  while (i < text.length) {
+    if (text[i] === '/' && (text[i + 1] === '/' || text[i + 1] === '*')) { i = skipLiteral(text, i); out += ' '; continue; }
+    out += text[i];
+    i += 1;
+  }
+  return out.replace(/(?<![\w$])await(?![\w$])/g, ' ').replace(/[;\s]/g, '') !== '';
+}
+
 /** QueryRunner 의 구조 API — 이름으로 판정한다 (query 외) */
 // addColumn(s) 는 열 옵션(NOT NULL · unique · 외래 키 등)을 객체로 받아 분석할 수 없으므로 승인 대상이다 — 추가형으로 두려면 SQL ADD COLUMN 을 쓴다
 const RUNNER_ADDITIVE = new Set(['createTable', 'createIndex', 'createIndices']);
@@ -187,6 +209,8 @@ export function extractStatements(body, runner) {
     if (!insideLiteral(body.slice(0, m.index))) queryCalls += 1;
   }
   let runnerQueries = 0;
+  /** 분석을 마친 query() 호출 범위 [시작, 끝) — 본문 형태 검사에서 제외한다 */
+  const calls = [];
   while ((m = re.exec(body))) {
     if (insideLiteral(body.slice(0, m.index))) continue;
     const method = m[1];
@@ -201,10 +225,13 @@ export function extractStatements(body, runner) {
       }
       let after = lit.end;
       while (/\s/.test(body[after] ?? '')) after += 1;
-      // 첫 인자는 문자열 상수 하나여야 한다 — 뒤에 `+` · `.concat()` · `.replace()` · 삼항 등이 붙으면 실행 SQL 이 달라진다
-      if (body[after] !== ')' && body[after] !== ',') problems.push('query() 첫 인자가 문자열 상수 하나가 아님 (이어 붙임 · 메서드 호출 등)');
+      // 인자는 문자열 상수 하나뿐이어야 한다 — 뒤에 `+` · `.concat()` · 매개변수 배열 등이 붙으면 승인 대상
+      if (body[after] !== ')') problems.push('query() 인자가 문자열 상수 하나가 아님 (이어 붙임 · 메서드 호출 · 매개변수 등)');
+      else calls.push([m.index, after + 1]);
       if (lit.interpolated) problems.push('query() 문자열에 `${}` 보간');
       if (lit.unsafeEscape) problems.push('query() 문자열에 해석하지 않는 escape (\\u · \\x · 8진 · 줄 이음 등)');
+      // SQL 주석(-- · /* */ · 중첩 주석)은 문장 분리를 흐릴 수 있다
+      if (/--|\/\*|\*\//.test(lit.value)) problems.push('query() SQL 에 주석 (-- · /* */) — 자동 판정 불가');
       sql.push(lit.value);
       continue;
     }
@@ -213,6 +240,9 @@ export function extractStatements(body, runner) {
     else runnerCalls.push({ method, verdict: REVIEW });
   }
   if (queryCalls > runnerQueries) problems.push('QueryRunner 매개변수가 아닌 query() 호출 — 실행 대상을 알 수 없음');
+  // up() 본문은 `await <runner>.query('<SQL>');` 문장과 주석만으로 이뤄져야 한다 — 그 밖의 코드(helper 호출 · 변수 ·
+  // 구조 API 등)는 무엇을 실행하는지 확정할 수 없으므로 승인 대상이다
+  if (residueOf(body, calls)) problems.push('up() 에 `await <runner>.query(\'<SQL>\');` 외 코드 (helper · 변수 · 구조 API 등)');
   // 템플릿 문자열의 `${}` 안은 실행 코드다 — 위 수집은 문자열 전체를 건너뛰므로, up() 안의 보간은 어디에 있든 승인 대상이다
   if (body.includes('${')) problems.push('up() 안의 템플릿 문자열 보간 `${}` — 보간식 안의 실행 코드를 분석하지 않음');
   // 조건 · 반복 · 예외 처리 안의 CREATE TABLE 은 건너뛰어질 수 있다 — 그때는 "새 표" 예외를 주지 않는다

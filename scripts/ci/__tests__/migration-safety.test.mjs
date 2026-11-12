@@ -56,8 +56,20 @@ describe('A additive', () => {
     assert.equal(verdictOf("await q.query('CREATE TABLE t (id int)');", "await q.query('DROP TABLE t'); await q.query('DELETE FROM users');"), ADDITIVE);
   });
 
-  it('QueryRunner structure API that only adds is additive', () => {
-    assert.equal(verdictOf("await q.createTable(new Table({ name: 't', columns: [] })); await q.createIndex('t', idx);"), ADDITIVE);
+  it('QueryRunner structure API needs review (arguments are code, not analysed)', () => {
+    assert.equal(verdictOf("await q.createTable(new Table({ name: 't', columns: [] })); await q.createIndex('t', idx);"), REVIEW);
+  });
+
+  it('up() may contain only `await runner.query(<literal>);` statements', () => {
+    assert.equal(verdictOf("await this.clean(q);\nawait q.query('CREATE TABLE t (id int)');"), REVIEW);
+    assert.equal(verdictOf("const n = 1;\nawait q.query('CREATE TABLE t (id int)');"), REVIEW);
+    assert.equal(verdictOf("// 설명 주석\nawait q.query('CREATE TABLE t (id int)');\n/* 블록 */ await q.query('CREATE INDEX i ON t (id)');"), ADDITIVE);
+  });
+
+  it('SQL comments (including nested block comments) need review', () => {
+    assert.notEqual(verdictOf("await q.query('CREATE TABLE t (id int) /* a /* b */ ; DROP TABLE users; */');"), ADDITIVE);
+    assert.equal(verdictOf("await q.query('CREATE TABLE t (id int) /* a /* b */ ; CREATE INDEX i ON t (id); */');"), REVIEW);
+    assert.equal(verdictOf("await q.query('CREATE TABLE t (id int) -- x');"), REVIEW);
   });
 
   it('any dollar sign in SQL (dollar-quote with digits, parameters) needs review', () => {
@@ -214,16 +226,19 @@ describe('R ambiguous → approval', () => {
 describe('S scanner', () => {
   it('ignores SQL words inside JS comments and handles regex literals', () => {
     const up = `// DROP TABLE users — 주석일 뿐이다
-    const quote = (v: string) => '"' + v.replace(/"/g, '""') + '"';
     await q.query(\`CREATE TABLE t (id int)\`);`;
     assert.equal(verdictOf(up), ADDITIVE);
+    // 정규식이 든 helper 는 본문 모양 규칙으로 승인 대상 — 파서는 무너지지 않아야 한다
+    const withHelper = `const quote = (v: string) => '"' + v.replace(/"/g, '""') + '"';
+    await q.query(\`CREATE TABLE t (id int)\`);`;
+    assert.equal(verdictOf(withHelper), REVIEW);
   });
 
   it('SQL comment markers inside string literals do not hide the next statement', () => {
     assert.equal(verdictOf(`await q.query("COMMENT ON TABLE users IS 'user -- account'; DELETE FROM users;");`), DESTRUCTIVE);
     assert.equal(verdictOf(`await q.query("COMMENT ON TABLE users IS 'a /* b'; DELETE FROM users; -- */");`), DESTRUCTIVE);
     assert.equal(verdictOf(`await q.query("COMMENT ON TABLE users IS E'it\\\\'s -- x'; DELETE FROM users;");`), DESTRUCTIVE);
-    assert.equal(verdictOf(`await q.query("ALTER TABLE existing ADD COLUMN c int; -- DROP TABLE users\\n/* DELETE FROM users; */");`), ADDITIVE);
+    assert.equal(verdictOf(`await q.query("ALTER TABLE existing ADD COLUMN c int; -- DROP TABLE users\\n/* DELETE FROM users; */");`), REVIEW);
   });
 
   it('quoted identifiers keep case and are matched whole ("Users" ≠ users · "users-live" ≠ "users-staging")', () => {
