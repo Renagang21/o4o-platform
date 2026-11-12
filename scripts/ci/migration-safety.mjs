@@ -184,7 +184,8 @@ export function extractStatements(body, runner) {
       }
       let after = lit.end;
       while (/\s/.test(body[after] ?? '')) after += 1;
-      if (body[after] === '+') problems.push('query() 문자열을 이어 붙임');
+      // 첫 인자는 문자열 상수 하나여야 한다 — 뒤에 `+` · `.concat()` · `.replace()` · 삼항 등이 붙으면 실행 SQL 이 달라진다
+      if (body[after] !== ')' && body[after] !== ',') problems.push('query() 첫 인자가 문자열 상수 하나가 아님 (이어 붙임 · 메서드 호출 등)');
       if (lit.interpolated) problems.push('query() 문자열에 `${}` 보간');
       sql.push(lit.value);
       continue;
@@ -312,10 +313,16 @@ function afterParens(text, open) {
   return null;
 }
 
-/** 기존 표의 ALTER TABLE 한 동작 — 열 추가와 NOT NULL 해제만 허용 */
+/**
+ * 기존 표의 ALTER TABLE 한 동작 — 제약 없는 열 추가와 NOT NULL 해제만 허용.
+ * 열 정의 안의 제약(CHECK · UNIQUE · PRIMARY KEY · REFERENCES · GENERATED · CONSTRAINT)은 기존 행에 대해 실패하거나
+ * 다른 표와 엮이므로 승인 대상이다. NOT NULL 은 DEFAULT 가 함께 있을 때만 허용한다(기존 행이 기본값으로 채워진다).
+ */
 function classifyAlterAction(action) {
   const a = action.replace(/\s+/g, ' ').trim().toUpperCase();
-  if (/^ADD (COLUMN )?(IF NOT EXISTS )?(?!CONSTRAINT\b|PRIMARY\b|UNIQUE\b|CHECK\b|FOREIGN\b|EXCLUDE\b)/.test(a) && !/\bREFERENCES\b/.test(a)) {
+  if (/^ADD (COLUMN )?(IF NOT EXISTS )?(?!CONSTRAINT\b|PRIMARY\b|UNIQUE\b|CHECK\b|FOREIGN\b|EXCLUDE\b)/.test(a)
+    && !/\b(REFERENCES|CHECK|UNIQUE|PRIMARY|GENERATED|CONSTRAINT|EXCLUDE)\b/.test(a)
+    && (!/\bNOT NULL\b/.test(a) || /\bDEFAULT\b/.test(a))) {
     return { verdict: ADDITIVE, why: '열 추가' };
   }
   if (/^ALTER (COLUMN )?\S+ DROP NOT NULL$/.test(a)) return { verdict: ADDITIVE, why: 'NOT NULL 해제(제약 완화 · 데이터 불변)' };

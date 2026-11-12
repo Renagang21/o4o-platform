@@ -35,7 +35,7 @@ describe('A additive', () => {
       'await q.query(`CREATE INDEX IF NOT EXISTS idx_t ON existing (a)`);',
       "await q.query('ALTER TABLE existing ADD COLUMN note text');",
       "await q.query(`ALTER TABLE existing ADD COLUMN IF NOT EXISTS tags text[] NOT NULL DEFAULT '{}', ADD COLUMN x uuid NULL`);",
-      "await q.query(`ALTER TABLE existing ADD COLUMN mode varchar(16) NOT NULL DEFAULT 'a' CHECK (mode IN ('a','b'))`);",
+      "await q.query(`ALTER TABLE existing ADD COLUMN mode varchar(16) NOT NULL DEFAULT 'a'`);",
       'await q.query(`ALTER TABLE users ALTER COLUMN email DROP NOT NULL`);',
       "await q.query(`COMMENT ON COLUMN existing.note IS '설명; 세미콜론 포함'`);",
       "await q.query(`CREATE TYPE mode_enum AS ENUM ('a', 'b')`);",
@@ -106,6 +106,17 @@ describe('R ambiguous → approval', () => {
       "await q.query(`SELECT setval('seq', 10)`);",
       'await helper(q);',
       'await q.manager.save(entity);',
+      // query() 첫 인자가 문자열 상수 하나가 아님
+      "await q.query('CREATE TABLE a (id int)'.concat('; DROP TABLE users'));",
+      "await q.query('CREATE INDEX i ON t (a)'.replace('INDEX', 'TABLE'));",
+      "await q.query(flag ? 'CREATE INDEX i ON t (a)' : 'DROP TABLE t');",
+      // 기존 표 열 정의 안의 제약 · 기본값 없는 NOT NULL
+      "await q.query(`ALTER TABLE existing ADD COLUMN mode varchar(16) NOT NULL DEFAULT 'a' CHECK (mode IN ('a','b'))`);",
+      'await q.query(`ALTER TABLE existing ADD COLUMN code text UNIQUE`);',
+      'await q.query(`ALTER TABLE existing ADD COLUMN id2 int PRIMARY KEY`);',
+      'await q.query(`ALTER TABLE existing ADD COLUMN total int GENERATED ALWAYS AS (a + b) STORED`);',
+      'await q.query(`ALTER TABLE existing ADD COLUMN k int CONSTRAINT k_chk CHECK (k > 0)`);',
+      'await q.query(`ALTER TABLE existing ADD COLUMN required text NOT NULL`);',
       // 2026-11-12 허용 목록 전환 — 아래는 전부 승인 대상
       'const [row] = await q.query(`SELECT EXISTS(SELECT 1 FROM existing) AS used`); if (row.used) throw new Error("x");',
       "await q.query('LOCK TABLE existing IN EXCLUSIVE MODE');",
