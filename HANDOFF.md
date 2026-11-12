@@ -12,8 +12,42 @@
 - **문서 정합:** 기존 비용 정책·외부 연결 설계 유지. canonical 변경 없음.
 
 > 저장소: `Renagang21/o4o-platform` · 작업 branch: `claude/clever-bohr-g532hw` · 코드 기준: `main` `c5da5631`(merge 반영) · 작성: 2026-11-11 (클라우드 작업 세션)
+
+> 저장소: `Renagang21/o4o-platform` · 작업 branch: `claude/epic-rubin-5g04vm`(맨 위 절) · 이전 절 branch: `claude/clever-bohr-g532hw` · 코드 기준: `main` `c5da5631`(merge 반영) · 작성: 2026-11-11 (클라우드 작업 세션)
 > 다음 실행자: **통합 담당(이 branch 의 PR 생성 · CI · 병합) → Businnect(체크리스트 실행 · 첫 과제)**
 > 이전 인계 전문: `git show 0c812623:HANDOFF.md`
+
+## 2026-11-12 · 상시 통합 세션 환경 정비 (branch `claude/epic-rubin-5g04vm`)
+
+> 이 절만 이 branch 의 인계다. 아래 절들은 다른 세션의 인계로 그대로 둔다.
+> 다음 실행자: **통합 담당(로컬)** — 이 PR 은 `.claude/hooks/` · `.claude/settings.json` · 등록 파일을 바꾸므로 상시 통합 세션이 병합할 수 없다(새 훅이 거부). 로컬에서 검토 · 병합하면 이 세션의 클라우드 병합이 열린다.
+
+- **결정 사항**
+  - 통합 담당이 이 클라우드 세션을 **상시 통합 세션**으로 지정(2026-11-12). 등록은 main 의 `.claude/integration-sessions.json`(세션 `cse_013JvDHnRfTd2t74jmcLH726`) — 등록 파일을 main 에서 읽어야 위조가 안 되므로, 병합 전에는 클라우드 병합이 계속 거부된다(의도).
+  - 상시 통합 세션의 범위: 묶음 PR 생성 · CI · 리뷰 확인 · squash 병합 · 자동 Delivery 결과 확인 · 배포 후 Demo 확인. 배포 · promote · CI/배포 인프라 · 에이전트 안전 설정 PR 의 병합은 로컬(통합 담당).
+  - 통합 담당이 병합 대상 · 순서 · 시점 판단을 상시 통합 세션에 위임(2026-11-12 통합 담당 지시 — `AGENTS.md` 기록도 통합 담당 지시). 사람 승인이 필요한 병합 · 배포 · promote 는 위임 밖.
+  - 병합 방식은 훅에서 squash 로 고정 · `expectedHeadSha` 필수. 다른 방식이 필요하면 로컬.
+  - `CLAUDE.md` 의 「setup script 에 의존성 설치 금지」를 실제 환경에 맞춰 「setup script 는 미리 데우기 · 정확한 설치는 SessionStart 훅」으로 고쳤다(환경을 바꾸는 대신 문서를 맞춤 — SessionStart 훅이 매번 `--frozen-lockfile` 을 돌려 lockfile 누락 위험이 없다). 환경 이름 `o4o-dev` → 실제 `o4o-platform`.
+- **바꾼 것**
+  - 새 `.claude/hooks/guard-mcp-github.mjs`(matcher `mcp__github__.*`) + 테스트 14개. 조사에서 확인한 빈틈: MCP 도구는 Bash 훅을 거치지 않고, 클라우드 MCP 토큰이 소유자 계정이라 `actions_run_trigger` 로 deploy · promote 를 실행하면 workflow 소유자 게이트도 통과했다. 판정:
+    - auto-merge 거부 · main 에 직접 쓰는 파일 도구(`push_files` 등) 거부(모든 세션)
+    - 클라우드: 검사 전용 workflow(CI Pipeline · CodeQL · AppStore Guard · PR 라벨 · 겹침 알림) 밖의 실행 · 재실행 · 취소 거부. 숫자 ID 조회 실패도 거부. 로컬은 승인 창/대화상자
+    - 병합: squash + `expectedHeadSha` 필수. 클라우드는 main 등록 확인 + PR 이 보호 경로(`.github/` · `.claude/hooks/` · `.claude/settings.json` · 등록 파일 · `scripts/ci/` · workflow 가 운영에 실행하는 `scripts/deployment/` · `scripts/privacy/account-erasure-*` · `scripts/db/` · `scripts/ci-build-app.sh` · `infra/` · `deploy/` · `Dockerfile*` · `cloudbuild*`)를 바꾸거나 거기서 옮기지 않을 것(rename 이전 경로 포함 — Codex #1039 P1 2건 반영). 조회 실패는 거부
+  - `.claude/settings.json` 에 훅 등록 · 새 `.claude/integration-sessions.json`(`.gitignore` 의 `.claude/*` 에 걸려 예외 한 줄 추가)
+  - `AGENTS.md` §4 역할(상시 통합 세션) · 작업 위치 분담(PR 생성 · 병합은 상시 통합 세션, 배포 · 로컬 작업은 VS Code, 병합은 한 시점에 한 곳) · §9(MCP 훅)
+  - `CLAUDE.md` 훅 목록 · 세션 표(상시 통합 세션 행) · 환경 이름 · setup script 문구 · branch/PR 문구(작업 세션은 PR 을 만들지 않는다 — §4-1(e) 와 어긋나 있던 것) · 클라우드 GitHub 도구 제약
+  - `/integrate` 스킬: 클라우드 명령 대응표(GraphQL 대신 REST · MCP) · 병합 후 Delivery 확인 절차 · HOLD/FAILED/FREEZE 시 로컬 인계
+- **검증**
+  - `node scripts/ci/check-agent-config.mjs` PASS(훅 테스트 3파일 37개 통과)
+  - 변이 검사: 보호 경로 · 등록 확인 · CI 목록 · main 쓰기 · squash 조건을 하나씩 빼면 매번 테스트 실패
+  - 실제 GitHub 대상: PR #1036 병합 판정 → 등록 파일이 main 에 없어 거부(fail closed). 이 세션에서 MCP `enable_pr_auto_merge` 호출 → 훅이 거부(훅 작동 확인)
+  - 스킬의 REST 명령(`pulls?head=…`) 실제 실행 확인
+- **확인하지 못한 것**
+  - 병합 후 이 세션에서 실제 MCP 병합이 통과하는지(등록이 main 에 들어간 뒤 첫 병합 때 확인)
+  - Windows 로컬에서 새 훅의 승인 대화상자(로컬 `mcp__github__merge_pull_request` 는 approvalFor 경로) — 가짜 gh 테스트는 Windows 에서 skip 된다
+  - Bash 훅 `block-cloud-deploy.mjs` 는 `deploy|delivery|promote` 이름만 보므로 `account-erasure-activation.yml` · `pharmacyhub-qr-cutover.yml` 같은 운영 workflow 의 클라우드 `gh workflow run` 은 막지 않는다(새 MCP 훅은 허용 목록 방식이라 막는다). 별도 정비 후보
+- **PR 로 묶을 단위:** 한 PR(에이전트 안전 설정 · 문서). DEPLOYMENT = NOT_APPLICABLE(`.claude/` · 문서만)
+- **겹칠 수 있는 열린 PR:** 없음 — 열린 PR #1028 · #1031 · #1034 · #1035 · #1036 · #1037 · #1038 은 `AGENTS.md` · `CLAUDE.md` · `HANDOFF.md` · `.claude/` 를 바꾸지 않는다(2026-11-12 `gh pr diff --name-only` 대조)
 
 ## 2026-11-12 · migration 전 백업 보관 정리 (branch `wo/premigration-backup-retention`)
 

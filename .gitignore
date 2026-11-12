@@ -145,6 +145,7 @@ storybook-static
 !.claude/skills/
 !.claude/hooks/
 !.claude/settings.json
+!.claude/integration-sessions.json
 
 # Codex per-machine local configuration
 .codex/

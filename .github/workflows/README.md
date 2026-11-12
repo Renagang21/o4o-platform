@@ -21,7 +21,7 @@
 | `deploy-admin.yml` | `o4o-admin-dashboard` |
 | `deploy-auto.yml` | **은퇴** (P3 cutover 2026-10-02) — 종전 자동 경로(태그 ref dispatch). workflow_run trigger 제거 · job `if: false` |
 | `delivery.yml` | **Unified Delivery** — main CI 완료 → 판정 → 위 deploy workflow 를 `workflow_call` 로 호출(태그 · dispatch 0) → serving SHA 확인 → commit status. **자동 배포의 유일한 진입점**(`DELIVERY_ENFORCE: 'true'` · P3 cutover 2026-10-02) |
-| `promote.yml` | LEVEL 3 · 첫 rollout **승인 1회** — `gh workflow run promote.yml -f sha=<40자>` (SHA == main HEAD). 서비스 · migration · rollout 방식은 다시 계산 |
+| `promote.yml` | LEVEL 3 · 첫 rollout **승인 1회** — `gh workflow run promote.yml -f sha=<40자>` (SHA == main HEAD). 서비스 · migration · rollout 방식은 다시 계산. LEVEL 3 = 파괴형 · 판정 불가 migration · 운영 DB write job · secret · 서비스 삭제(인증 · 권한 · 결제 · 배포 설정 · 추가형 migration 은 자동 — `deploy-risk.mjs` `AUTO_DEPLOY_RULES`) |
 
 배포 게이트는 저장소 변수 `DEPLOY_FREEZE`(정상 `false` · 부재/공백/오타 = freeze · fail-closed) 하나다. `DEPLOY_ENABLED` 는 은퇴했다.
 deploy workflow 3종은 push 에 반응하지 않는다 — `delivery.yml`/`promote.yml` 의 `workflow_call` · 사람의 통제 dispatch(break-glass)로만 실행된다.
