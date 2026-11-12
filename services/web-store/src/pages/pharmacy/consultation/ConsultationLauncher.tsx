@@ -4,6 +4,7 @@ import {
   type OperatingType,
 } from "../../../api/consultationWorkspace";
 import { useUnifiedStore } from "../../../contexts/StoreContext";
+import { ConsultationExpressionSettings } from './ConsultationExpressionSettings';
 const layouts = {
   standard: [
     [
@@ -51,6 +52,7 @@ export function ConsultationLauncher() {
   }, [organizationId, retry]);
   return (
     <div className="space-y-3">
+      {organizationId && <ConsultationExpressionSettings key={organizationId} organizationId={organizationId} />}
       <p className="text-sm text-slate-600">
         이곳에서는 상담 화면을 준비합니다. 실제 상담은 별도 화면에서 진행하시기 바랍니다.
       </p>

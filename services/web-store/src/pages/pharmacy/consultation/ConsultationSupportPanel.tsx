@@ -15,6 +15,7 @@ export function ConsultationSupportPanel({ organizationId, mode, product, room, 
   const [result, setResult] = useState<ConsultationSupportResult | null>(null),
     [error, setError] = useState(''), [notice, setNotice] = useState(''), [busy, setBusy] = useState(false);
   const generation = useRef(0), alive = useRef(false), lock = useRef(false);
+  const [reuseSession] = useState(() => crypto.randomUUID());
   const [turns, setTurns] = useState<string[]>([]), [search, setSearch] = useState<ConsultationProductSearchResult | null>(null);
   useEffect(() => { alive.current = true; return () => { alive.current = false; }; }, []);
   useEffect(() => { generation.current++; setResult(null); setError(''); setNotice(''); setReviewed(false); }, [organizationId, mode, product?.id, product?.kind, room?.epoch]);
@@ -27,7 +28,7 @@ export function ConsultationSupportPanel({ organizationId, mode, product, room, 
     const captured = result, request = ++generation.current;
     lock.current = true; setBusy(true); setError(''); setNotice('');
     try {
-      const data = await prepareConsultationSupport({ mode, productKind: product.kind, productId: product.id,
+      const data = await prepareConsultationSupport({ mode, productKind: product.kind, productId: product.id, reuseSession,
         ...(room?.active ? { stationId: room.id, epoch: room.epoch } : {}),
         ...(useDraft ? { verifyOnly: true, sourceVersion: captured?.sourceVersion } : {
           question, ...(reference.trim() ? { reference: { text: reference, source, reviewed } } : {}),
@@ -58,7 +59,7 @@ export function ConsultationSupportPanel({ organizationId, mode, product, room, 
     const request = ++generation.current;
     lock.current = true; setBusy(true); setError(''); setSearch(null); setResult(null);
     try {
-      const data = await findConsultationProducts({ mode, question, context: turns.slice(-3),
+      const data = await findConsultationProducts({ mode, question, context: turns.slice(-3), reuseSession,
         ...(room?.active ? { stationId: room.id, epoch: room.epoch } : {}) });
       if (!alive.current || request !== generation.current) return;
       if (data.organizationId !== organizationId || data.mode !== mode) throw new Error('현재 상담을 다시 확인해 주시기 바랍니다.');

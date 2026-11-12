@@ -21,7 +21,7 @@ import {
   storeWorkspaceBase,
 } from "../../components/store/StoreWorkflowNavigation";
 
-vi.mock('../../api/consultationWorkspace', () => ({ fetchConsultationLayout: vi.fn(async () => ({ organizationId: 'fixture-store', name: 'Fixture', operatingType: 'large' })) }));
+vi.mock('../../api/consultationWorkspace', () => ({ fetchConsultationLayout: vi.fn(async () => ({ organizationId: 'fixture-store', name: 'Fixture', operatingType: 'large' })), readConsultationExpression: vi.fn(async()=>({organizationId:'fixture-store',canEdit:false,expression:{tone:'neutral',formality:'polite',length:'standard'}})) }));
 vi.mock('../pharmacy/StoreHandledProductsPage', () => ({ default: ({ navigation }: { navigation?: React.ReactNode }) => <><h1>상품 목록</h1>{navigation}</> }));
 vi.mock('../neture-pharmacy/SupplyOptionsPage', () => ({default:({navigation}:{navigation?:React.ReactNode})=><><h1>상품 주문</h1>{navigation}</>}));
 vi.mock('../pharmacy/StoreLibraryContentsPage', () => ({ default: ({ navigation, quickLinks, productLink, moreNavigation }: { navigation?: React.ReactNode; quickLinks?: React.ReactNode; productLink?: React.ReactNode; moreNavigation?: React.ReactNode }) => <><h1>저장한 안내 목록</h1>{quickLinks}{productLink}{navigation}{moreNavigation}</> }));

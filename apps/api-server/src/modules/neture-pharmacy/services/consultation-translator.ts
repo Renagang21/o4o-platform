@@ -8,9 +8,10 @@ import { NeturePharmacyError } from '../constants.js';
 import { consultationTranslationExtension, type ConsultationTranslationInput, type ConsultationTranslationOutput } from './consultation-translation.extension.js';
 import { ModelControlService } from '../../../services/ai-management/model-controls.js';
 import { ConsultationGoogleService } from './consultation-google.js';
+import { ConsultationReuse, consultationReuseDigest } from './consultation-reuse.js';
 
 export type ConsultationTranslator = (input: ConsultationTranslationInput, access: {
-  actorId: string; organizationId: string; authorize: () => Promise<boolean>;
+  actorId: string; organizationId: string; authorize: () => Promise<boolean>; reuseKey?: string;
 }) => Promise<ConsultationTranslationOutput>;
 
 const quantityUnits = new Set(['mcg', 'mg', 'kg', 'ml', 'iu', 'meq', 'mmol', 'μg', 'µg', 'ug', 'g', 'l', '%']);
@@ -33,6 +34,7 @@ function numericSignatures(text: string) {
 /** Reuses the existing platform-funded translation policy and metadata-only accounting. */
 export function createConsultationTranslator(db: DataSource): ConsultationTranslator {
   const policy = createPolicyExecutor(db);
+  const reuse = new ConsultationReuse<ConsultationTranslationOutput>();
   return async (input, access) => {
     try {
       const settings = await new ModelControlService(db).read();
@@ -42,6 +44,7 @@ export function createConsultationTranslator(db: DataSource): ConsultationTransl
           throw new NeturePharmacyError(422, 'CONSULTATION_LANGUAGE_UNCERTAIN', '입력 언어를 확인하지 못했습니다. 고객 언어를 직접 선택해 주시기 바랍니다.');
         return output;
       };
+      const invoke = async () => {
       if (settings.consultation?.translation === 'google-cloud') {
         await policy.assertEnabled('CONTENT_TRANSLATION');
         return validate(consultationTranslationExtension.parse(JSON.stringify(await new ConsultationGoogleService(db).translate(input, access))));
@@ -57,6 +60,11 @@ export function createConsultationTranslator(db: DataSource): ConsultationTransl
         maxTokens: 2048, temperature: 0, responseMode: 'json', usage: 'pharmacy.consultation',
       }), { authorize: () => access.authorize(), record: event => { logger.info('[AI_EXTENSION]', event); return Promise.resolve(); } });
       return result.output;
+      };
+      if (access.reuseKey) await policy.assertEnabled('CONTENT_TRANSLATION');
+      // A server-derived reuseKey already binds a validated UI session, mode and source version.
+      const key = access.reuseKey ? consultationReuseDigest({ actor:access.actorId,org:access.organizationId,scope:access.reuseKey,input,settings }) : undefined;
+      return validate(await reuse.execute(key, invoke, access.authorize));
     } catch (error) {
       if (error instanceof NeturePharmacyError) throw error;
       const reason = error instanceof Error ? error.message : '';

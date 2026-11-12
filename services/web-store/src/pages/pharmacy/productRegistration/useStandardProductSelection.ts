@@ -4,10 +4,10 @@ import { searchO4oStandardProducts, registerStandardProductToStore, type O4oStan
 import { useStoreProductSession } from '../../../components/store/StoreProductSession';
 import { useLatestStoreRequest } from '../hooks/useLatestStoreRequest';
 
-export function useStandardProductSelection(organizationId: string, onRegistered: () => void) {
+export function useStandardProductSelection(organizationId: string, onRegistered: () => void, initialQuery = '') {
   const current = useStoreProductSession(organizationId);
   const latest = useLatestStoreRequest();
-  const [searchInput, setSearchInput] = useState('');
+  const [searchInput, setSearchInput] = useState(initialQuery);
   const [classification, setClassification] = useState('');
   const [page, setPage] = useState(1);
   const [retry, setRetry] = useState(0);

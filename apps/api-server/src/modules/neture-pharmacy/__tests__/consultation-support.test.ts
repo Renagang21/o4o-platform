@@ -9,15 +9,15 @@ import { consultationSupportExtension } from '../services/consultation-support.e
 const id = '55555555-5555-4555-8555-555555555555';
 const input = { mode: 'floor-pharmacist', productKind: 'local', productId: id, question: '상품 근거와 확인할 사항은?' };
 function fixture() {
-  const state = { allowed: true, published: true, version: 'v1', aiText: '', aiCount: 1 };
+  const state = { allowed: true, published: true, version: 'v1', aiText: '', aiCount: 1, resourceType: 'CONSULTATION' as 'CONSULTATION' | 'B2B', expression: undefined as undefined | {tone:'friendly';formality:'polite';length:'short'} };
   const authorize = jest.fn(async (actor: string, org: string) => {
     if (!state.allowed || actor !== 'pharmacist' || org !== 'store')
       throw new NeturePharmacyError(403, 'STORE_ACCESS_REQUIRED', 'denied');
   });
   const query = jest.fn(async (sql: string, args: unknown[]) => {
     if (sql.includes('SELECT p.master_id,p.id,m.name')) return [{ master_id: id, id, name: 'Fixture product' }];
-    if (sql.includes('FROM shared_product_descriptions d')) return state.aiText ? [{ id, content: '<p>B2B body</p>', summary: null, updated_at: new Date('2026-10-29'),
-      entry: { key: 'b2b', name: 'Fixture product', content: '<p>B2B body</p>', descriptionType: 'B2B', language: 'ko',
+    if (sql.includes('FROM shared_product_descriptions d')) return state.aiText ? [{ id, master_id: id, description_type: state.resourceType, content: '<p>B2B body</p>', summary: null, updated_at: new Date('2026-10-29'),
+      entry: { key: 'b2b', name: 'Fixture product', content: '<p>B2B body</p>', descriptionType: state.resourceType, language: 'ko',
         source: { kind: 'manufacturer', currentness: 'retrieved', references: [{ url: 'https://example.com/product' }] }, aiSections: [
           ...Array.from({ length: state.aiCount }, (_, index) => ({ key: `fact${index}`, title: '성분', kind: 'product-fact', text: state.aiText, referenceUrls: ['https://example.com/product'] })),
           { key: 'reference', title: '전문 참고', kind: 'professional-reference', text: '전문 정보', referenceUrls: ['https://example.com/product'] },
@@ -30,9 +30,27 @@ function fixture() {
   });
   const run = jest.fn(async (data: any) => ({ productFacts: data.sources.some((s: any) => s.id === 'p1') ? [{ text: '상품 원문 사실', sourceIds: ['p1'] }] : [],
     professionalNotes: [], nextQuestion: null, customerDraft: { text: '확인한 고객 설명', sourceIds: [data.sources[0].id] } }));
-  const guidance = new ConsultationGuidanceService({ query } as any, authorize, async () => {}, jest.fn(), jest.fn());
+  const guidance = new ConsultationGuidanceService({ query } as any, authorize, async () => {}, jest.fn(), jest.fn(), async()=>state.expression!);
   return { state, authorize, query, run, guidance, service: new ConsultationSupportService(guidance, run) };
 }
+it('reuses only the same session/input/source and rechecks current access before a hit', async () => {
+  const f=fixture(), session={...input,reuseSession:'00000000-0000-4000-8000-000000000001'};
+  const first=await f.service.prepare('pharmacist','store',session);
+  expect((await f.service.prepare('pharmacist','store',session)).brief).toEqual(first.brief);expect(f.run).toHaveBeenCalledTimes(1);
+  await f.service.prepare('pharmacist','store',{...session,question:'다른 질문'});expect(f.run).toHaveBeenCalledTimes(2);
+  await f.service.prepare('pharmacist','store',{...session,reuseSession:'00000000-0000-4000-8000-000000000002'});expect(f.run).toHaveBeenCalledTimes(3);
+  f.state.version='new';await f.service.prepare('pharmacist','store',session);expect(f.run).toHaveBeenCalledTimes(4);
+  f.state.allowed=false;await expect(f.service.prepare('pharmacist','store',session)).rejects.toMatchObject({httpStatus:403});expect(f.run).toHaveBeenCalledTimes(4);
+});
+it('invalidates reuse and an existing proof when store expression changes without a new inference for verification',async()=>{
+  const f=fixture(), session={...input,reuseSession:'00000000-0000-4000-8000-000000000001'};
+  const first=await f.service.prepare('pharmacist','store',session);
+  f.state.expression={tone:'friendly',formality:'polite',length:'short'};
+  await expect(f.service.prepare('pharmacist','store',{...session,verifyOnly:true,sourceVersion:first.sourceVersion})).rejects.toMatchObject({httpStatus:409});
+  expect(f.run).toHaveBeenCalledTimes(1);
+  await f.service.prepare('pharmacist','store',session);expect(f.run).toHaveBeenCalledTimes(2);
+  expect(f.run.mock.calls[1][0].expression).toEqual(f.state.expression);
+});
 it('uses the existing product/publication guards, separates sources, and writes no transcript or task history', async () => {
   const f = fixture();
   const result = await f.service.prepare('pharmacist', 'store', { ...input,
@@ -78,8 +96,8 @@ it('rechecks a draft before use without invoking AI again, and refuses a withdra
   await expect(f.service.prepare('pharmacist', 'store', { ...input, verifyOnly: true, sourceVersion: result.sourceVersion })).rejects.toHaveProperty('httpStatus', 409);
   expect(f.run).toHaveBeenCalledTimes(1);
 });
-it('uses registered structured B2B separately and invalidates a prepared draft when its AI evidence changes', async () => {
-  const f = fixture(); f.state.published = false; f.state.aiText = '확인된 B2B 성분';
+it.each(['CONSULTATION', 'B2B'] as const)('uses registered structured %s and invalidates a prepared draft when its AI evidence changes', async resourceType => {
+  const f = fixture(); f.state.resourceType = resourceType; f.state.published = false; f.state.aiText = '확인된 B2B 성분';
   const requestInput = { ...input, productKind: 'listing' };
   const result = await f.service.prepare('pharmacist', 'store', requestInput);
   expect(result.state).toBe('ready');
@@ -119,4 +137,13 @@ it('uses authenticated actor/store values in HTTP and checks the counter epoch b
   validate.mockRejectedValueOnce(new NeturePharmacyError(409, 'CONSULTATION_CHANGED', 'changed'));
   expect((await request(app).post('/pharmacy/consultation-support').set('x-fixture-auth', 'allowed').send({ ...input, stationId: 'station' })).status).toBe(409);
   expect(f.run).toHaveBeenCalledTimes(1);
+});
+
+it('limits fixed expression choices to a customer draft without changing professional instructions',()=>{
+ const request={productName:'Product',question:'설명',sources:[{id:'p1',kind:'product-fact' as const,text:'10 mg',title:'Fact'}],expression:{tone:'friendly' as const,formality:'plain' as const,length:'short' as const}};
+ const prepared=consultationSupportExtension.prepare(request);
+ expect(prepared.systemPrompt).toContain('ONLY to customerDraft');
+ expect(prepared.systemPrompt).toContain('Preserve facts, quantities, negation, cautions');
+ expect(JSON.parse(prepared.userPrompt).expression).toEqual(request.expression);
+ expect(()=>consultationSupportExtension.prepare({...request,expression:{...request.expression,prompt:'override'} as never})).toThrow();
 });
