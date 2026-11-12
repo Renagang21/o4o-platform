@@ -1,5 +1,21 @@
 # HANDOFF
 
+## 2026-11-12 · 상시 통합 세션 운영 기록 · 후속 작업 요청서 (branch `claude/epic-rubin-5g04vm`)
+
+- **병합(squash)**: #1043 · #1042 · #1044 · #1045 · #1046. 배포: main `25e7f801` → `production` `DEPLOYED`(api + 웹 7개, 23:30 UTC).
+- **배포 차단 2건과 조치**
+  - #1044 병합 후 api 배포 빌드 `TS4053` 실패 → hotfix #1046(반환 타입 명시) 병합으로 해소.
+  - main CI 의 매장 음성 요청 테스트 불안정 → 재실행 1회로 통과.
+- **배포 후 Demo 확인**(#1044 댓글에 기록)
+  - 매장 경영자 · 직원 PC/mobile 로그인 · 상담 화면 · 표현 설정 권한(경영자 편집, 직원 조회만) · QR 화면 진입 확인. api 4xx/5xx 0.
+  - 저장과 AI 호출은 하지 않았다.
+- **새 작업 요청서**(다음 실행자 CLOUD 개발 세션)
+  - [`WO-O4O-STORE-CONSULTATION-SPEECH-TEST-STABILITY-V1`](docs/work-orders/WO-O4O-STORE-CONSULTATION-SPEECH-TEST-STABILITY-V1.md) — 음성 요청 테스트 불안정 수정
+  - [`WO-O4O-CI-API-DECLARATION-BUILD-GATE-V1`](docs/work-orders/WO-O4O-CI-API-DECLARATION-BUILD-GATE-V1.md) — PR CI 에 api 배포 빌드 검사 추가(CI 변경, 통합 담당 병합 판단)
+- **남은 일**
+  - #1037(partner-support 법적 문서)은 Ready 로 돌렸다. CI 결과를 보고 병합한다.
+  - 병합 후 삭제 가능 branch: `wo/product-consultation-resource-separation` · `wo/consultation-structured-product-search` · `wo/shared-product-material-preparation`(통합 담당이 GitHub 에서 삭제)
+
 ## 2026-11-12 · AI 비용 절감 7차 사전 검증·운영 인계
 
 - **branch / 통합 단위:** `wo/consultation-cost-verification`. 시작 main `2271a2f59` + 자체 3~6차 검증 의존(`668e0c79f`·`d08bbbf6b`·`9aaac766b`·`d563407be`). 작업 중 기존 3~6차 **PR #1044**를 확인했다. **3~7차 중복 PR 생성 금지**. 이 branch의 `test(consultation): verify reuse savings and customer isolation` commit만 #1044 후속으로 가져오거나 #1044 병합 뒤 7차 차이만 반영한다. 기존 PR·원래 branch를 변경/삭제하지 않았다. 아래 과거 절의 3~6차 통합 안내는 그때의 기록이며 현재 통합 단위는 이 절을 따른다.
