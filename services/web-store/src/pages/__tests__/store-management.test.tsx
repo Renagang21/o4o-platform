@@ -27,7 +27,7 @@ vi.mock('../../api/neturePharmacy', () => ({
 vi.mock('../pharmacy/StoreLocalProductsPage', () => ({ ProductFormModal: ({ onSave, product }: { onSave: (v: unknown) => void; product: { name: string } | null }) => <div><output data-testid="local-form">{product?.name ?? '신규 제품'}</output><button onClick={() => onSave({ name: '직접 등록 샘플' })}>제품 저장</button></div> }));
 vi.mock('../pharmacy/StoreDescriptionViewModal', () => ({ StoreDescriptionViewModal: () => null }));
 vi.mock('../pharmacy/StoreProductQrModal', () => ({ StoreProductQrModal: () => null }));
-vi.mock('../pharmacy/AddO4oStandardProductModal', () => ({ AddO4oStandardProductModal: () => null }));
+vi.mock('../pharmacy/AddO4oStandardProductModal', () => ({ AddO4oStandardProductModal: ({ open, initialQuery }: { open: boolean; initialQuery?: string }) => open ? <div data-testid="common-comparison">{initialQuery}</div> : null }));
 vi.mock('../pharmacy/StoreNewProductRequestModal', () => ({ StoreNewProductRequestModal: () => null }));
 vi.mock('../pharmacy/StoreProductRequestsListModal', () => ({ StoreProductRequestsListModal: () => null }));
 vi.mock('../neture-pharmacy/PaymentGroupPay', () => ({ usePaymentMode: () => 'disabled', PaymentGroupPay: () => null }));
@@ -110,7 +110,7 @@ describe('내 매장 경영지원', () => {
     mount(<StoreHandledProductsPage />, '/store/my-products');
     await waitFor(() => expect(mocks.products).toHaveBeenCalledWith(expect.objectContaining({ source: 'all' })));
     fireEvent.click(screen.getByText('제품 등록', { selector: 'summary' }));
-  fireEvent.click(screen.getByRole('button', { name: /^직접 등록하기$/ }));
+  fireEvent.click(screen.getByRole('button', { name: /^매장 자체 진열용 직접 등록$/ }));
     fireEvent.click(screen.getByRole('button', { name: '제품 저장' }));
     await waitFor(() => expect(mocks.create).toHaveBeenCalledWith({ name: '직접 등록 샘플' }));
     await waitFor(() => expect(mocks.products).toHaveBeenCalledTimes(2));
@@ -238,6 +238,14 @@ describe('제작·사본 동선', () => {
 });
 
 const localRow = (id: string) => ({ sourceType: 'local', sourceId: id, name: id, imageUrl: null, price: null, originLabel: '직접 등록', ownerLabel: '내 매장', isActive: true, classificationCode: '', classificationLabel: '', updatedAt: '', managePath: '' });
+it('선택한 직접 등록 상품은 이름으로 공통 상품 대조를 열고 기존 상품을 변경하지 않는다', async () => {
+  mocks.products.mockResolvedValue({ items: [localRow('local-compare')], pagination: { total: 1 } });
+  mount(<StoreHandledProductsPage />);
+  fireEvent.click(await screen.findByRole('checkbox', { name: 'local:local-compare 선택' }));
+  fireEvent.click(screen.getByRole('button', { name: '공통 상품과 대조·등록' }));
+  expect(screen.getByTestId('common-comparison').textContent).toContain('local-compare');
+  expect(mocks.create).not.toHaveBeenCalled(); expect(mocks.update).not.toHaveBeenCalled();
+});
 it('늦은 제품 조회가 새 직접 등록 양식을 덮어쓰지 않는다', async () => {
   const pending = deferred<{ id: string; name: string }>(); mocks.single.mockReturnValue(pending.promise);
   mocks.products.mockResolvedValue({ items: [localRow('local-a')], pagination: { total: 1 } });
@@ -245,7 +253,7 @@ it('늦은 제품 조회가 새 직접 등록 양식을 덮어쓰지 않는다',
   fireEvent.click(await screen.findByRole('checkbox', { name: 'local:local-a 선택' }));
   fireEvent.click(screen.getByRole('button', { name: '직접 등록 제품 수정' }));
   fireEvent.click(screen.getByText('제품 등록', { selector: 'summary' }));
-  fireEvent.click(screen.getByRole('button', { name: /^직접 등록하기$/ }));
+  fireEvent.click(screen.getByRole('button', { name: /^매장 자체 진열용 직접 등록$/ }));
   await act(async () => pending.resolve({ id: 'local-a', name: '이전 제품' }));
   expect(screen.getByTestId('local-form').textContent).toBe('신규 제품');
 });
@@ -278,11 +286,11 @@ it('저장 중 중복 제출과 다른 등록 화면 진입을 막는다', async
   const pending = deferred<{ id: string }>(); mocks.create.mockReturnValue(pending.promise);
   mount(<StoreHandledProductsPage />);
   fireEvent.click(screen.getByText('제품 등록', { selector: 'summary' }));
-  fireEvent.click(screen.getByRole('button', { name: /^직접 등록하기$/ }));
+  fireEvent.click(screen.getByRole('button', { name: /^매장 자체 진열용 직접 등록$/ }));
   const save = screen.getByRole('button', { name: '제품 저장' });
   fireEvent.click(save); fireEvent.click(save);
   expect(mocks.create).toHaveBeenCalledTimes(1);
-  expect((screen.getByRole('button', { name: /^직접 등록하기$/ }) as HTMLButtonElement).disabled).toBe(true);
+  expect((screen.getByRole('button', { name: /^매장 자체 진열용 직접 등록$/ }) as HTMLButtonElement).disabled).toBe(true);
   await act(async () => pending.resolve({ id: 'new-local' }));
   expect(screen.queryByTestId('local-form')).toBeNull();
 });
@@ -290,7 +298,7 @@ it('매장 전환 후 이전 저장 완료가 성공 알림이나 새 목록 갱
   const pending = deferred<{ id: string }>(); mocks.create.mockReturnValue(pending.promise);
   const view = mount(<StoreHandledProductsPage />);
   fireEvent.click(screen.getByText('제품 등록', { selector: 'summary' }));
-  fireEvent.click(screen.getByRole('button', { name: /^직접 등록하기$/ }));
+  fireEvent.click(screen.getByRole('button', { name: /^매장 자체 진열용 직접 등록$/ }));
   fireEvent.click(screen.getByRole('button', { name: '제품 저장' }));
   mocks.organizationId = 'store-b'; view.rerender(<MemoryRouter><StoreHandledProductsPage /></MemoryRouter>);
   await waitFor(() => expect(mocks.products).toHaveBeenCalledTimes(2));

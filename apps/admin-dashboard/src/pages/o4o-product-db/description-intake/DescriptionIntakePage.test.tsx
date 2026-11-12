@@ -2,6 +2,7 @@ import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/re
 import { MemoryRouter } from 'react-router-dom';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import DescriptionIntakePage from '../DescriptionIntakePage';
+vi.mock('./MaterialPreparationPanel', () => ({ default: () => null }));
 const state = vi.hoisted(() => ({ writable: true, list: vi.fn(), detail: vi.fn(), approve: vi.fn(), edit: vi.fn(), reject: vi.fn() }));
 vi.mock('../useProductDbWriteAccess', () => ({ useProductDbWriteAccess: () => state.writable, ProductDbReadOnlyNotice: () => <p>조회 전용</p> }));
 vi.mock('@/api/product-description-intake.api', () => ({ descriptionIntakeApi: state }));
