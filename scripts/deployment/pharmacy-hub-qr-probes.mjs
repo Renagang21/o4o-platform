@@ -27,9 +27,9 @@ export function safeInventoryError(error, stage) {
   return new InventoryDiagnosticError(code, stage);
 }
 
-export function readPassword(run = execFileSync) {
+export function readPassword(run = execFileSync, secret = 'o4o-db-password') {
   try {
-    return run('gcloud', ['secrets', 'versions', 'access', 'latest', '--secret=o4o-db-password', '--project=netureyoutube'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
+    return run('gcloud', ['secrets', 'versions', 'access', 'latest', `--secret=${secret}`, '--project=netureyoutube'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
   } catch (error) {
     throw safeInventoryError(error, 'read-secret');
   }
