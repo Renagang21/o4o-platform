@@ -1,8 +1,52 @@
 # HANDOFF
 
 > 저장소: `Renagang21/o4o-platform` · 작업 branch: `claude/clever-bohr-g532hw` · 코드 기준: `main` `c5da5631`(merge 반영) · 작성: 2026-11-11 (클라우드 작업 세션)
-> 다음 실행자: **통합 담당(이 branch 의 PR 생성 · CI · 병합) → Businnect(체크리스트 실행 · 첫 과제)**
+> 다음 실행자: **통합 담당(이 branch 의 PR 생성 · CI · 병합 — 묶음 ①②③) → Businnect(체크리스트 실행 · 첫 과제)**
 > 이전 인계 전문: `git show 0c812623:HANDOFF.md` · main 의 다른 branch 인계(병합 시점): `git show 31d13046:HANDOFF.md`
+
+## 한 일 4 — 공급자 대시보드 등록 상품 수 · 공급 예정 품목군 화면 (2026-11-12 사용자 지시)
+
+이번 두 건은 온보딩 문서와 별개 주제다. 세션 지정 branch 하나에 쌓았으므로 아래 「PR 로 묶을 단위」에서 따로 묶는다.
+
+1. `a4ff64c8` fix(neture) — **대시보드 「등록 상품 5」인데 실제 상품 없음**
+   - 원인: 「내 제품」 목록(`supplier-offer-read.service.ts`)은 삭제 처리된 offer(`deleted_at`)를 빼는데, 대시보드 집계(`supplier-copilot.service.ts` `getKpiSummary` 등)와 재고 목록(`inventory.service.ts` `getSupplierInventory`)은 빼지 않았다.
+   - 수정: 등록 상품 · 판매 중 · 매장 진열 · 상품 성과 · 매장 분포 · 인기 추이 · 재고 목록(「재고 주의」 원천)에 `spo.deleted_at IS NULL` 을 추가했다.
+   - 테스트: `supplier-phase1.integration.spec.ts` 에 삭제된 offer 와 그 진열을 넣었다. 수정 전에는 등록 4 · 진열 1 로 실패하고, 수정 후 통과한다.
+   - 이 테스트는 원래부터 실패하던 상태였다. 임시 `checkout_orders."supplierId"` 가 uuid 로 정의돼 있었는데 실제 스키마는 varchar 다. 이번에 맞췄다.
+   - 같은 파일의 두 번째 테스트(`sf.organization_id`)는 범위 밖이라 그대로 실패한다. CI 에서는 env 가 없어 skip 된다.
+2. `891af03f` feat(neture) — **공급 예정 품목군 UI**(사용자 결정: 화장품 · 식품 제외, 선택만, 법률 검토 불필요)
+   - 선택지는 의약품 · 의약외품 · 의료기기 · 건강기능식품 4개로 줄였다(`services/web-neture/src/pages/supplier/profile/supplierCategoryGuidance.ts`).
+   - 각 카드에 「공급에 필요한 자격」(도매 · 유통 / 제조 / 수입)과 「상품 등록 때 필요한 것」을 보여 준다. 안내 문구는 약사법 · 의료기기법 · 건강기능식품법 기준을 웹 조사로 요약한 것이다.
+   - 빠진 품목군을 이미 선택한 공급자는 「이전에 선택한 품목군」 영역에서 보류 상태와 제출 자료를 계속 보고, 해제할 수 있다. 일반 상품 행은 숨긴다.
+   - 백엔드 enum · 상품 gate · 운영자 화면 · `operator-core-ui` 공유 목록은 바꾸지 않았다.
+
+### 검증 — 한 일 4
+
+- API:
+  - `npx tsc --noEmit` exit 0
+  - `ai-overview-http.spec` 12/12
+  - `supplier-phase1` 첫 테스트: 로컬 PostgreSQL 16 임시 클러스터에서 통과, 수정 전 코드에서 실패하는 것도 확인
+  - 바꾼 쿼리 6개를 migration 적용된 로컬 DB(실제 스키마)에서 실행해 오류가 없음을 확인
+- web-neture:
+  - `SupplierProfilePage.behavior.test.tsx` 34/34(새 테스트 2개 포함)
+  - `tsc --noEmit` exit 0
+  - `pnpm --filter @o4o/web-neture run build` 통과
+  - 첫 시도는 `packages/auth-react/KakaoContinue.tsx` 타입 오류로 실패했다. main 반영 후 공통 패키지 dist 가 오래된 것이 원인이라 `build:packages` 재실행 후 통과했다.
+- CI 스크립트: `pr-overlap` · `core-paths` node:test 15/15(main merge 자동 병합분 포함). Core 경로 해당 0건.
+
+### 확인하지 못한 것 — 한 일 4 (배포 후)
+
+- **공급자 대시보드:** 배포 후 Demo 「공급자」로 `/supplier/dashboard` 의 등록 상품 · 판매 중 수가 「내 제품」 목록 건수와 같은지 확인. 운영 DB 의 해당 공급자 offer 삭제 상태는 조회하지 않았다(LOCAL read-only 대상).
+- **품목군 화면:** 배포 후 Demo 「공급자」 → 공급자 프로필 「공급 예정 품목군」을 PC · 모바일 화면에서 확인. 클라우드에서는 로그인 화면을 띄우지 않았다(화면 확인은 동작 테스트로 대신했다).
+- 법정 안내 문구는 웹 조사 요약이다(국가법령정보센터 원문 미대조). 사용자는 법률 검토가 필요 없다고 결정했다.
+
+### 보고만 — 한 일 4
+
+- `services/web-neture/src/pages/supplier/supplier-products/productListFeedback.ts` 의 `SUPPLIER_CATEGORY_NOT_SELECTED` · `NEEDS_UPDATE` 안내는 「증빙 제출」을 말한다.
+  - 현재 백엔드 gate(`evaluateGate`)는 보류(suspended)만 내보내서 이 안내가 화면에 나오지 않는다.
+  - 하지만 「선택만 받음」 정책과 맞지 않는 잔여 문구다. 정리할지는 별도 판단이다.
+
+---
 
 ## 한 일 3 — WO-O4O-REMOTE-COLLABORATOR-ONBOARDING-V1 (2026-11-11 사용자 지시)
 
@@ -44,6 +88,10 @@
 
 ## PR 로 묶을 단위 (이 branch 전체)
 
+- **묶음 ③ Neture 공급자**(한 일 4 · 코드)
+  - `a4ff64c8`(대시보드 · 재고 삭제 상품 제외)
+  - `891af03f`(공급 예정 품목군 UI)
+  - Core 경로 0건이고 문서 묶음과 무관하다. ①②와 분리해 먼저 PR 로 내도 된다.
 - **묶음 ① 문서**
   - `d388157e`(Core IR) · `7c55c4ff`(Core registry · 문서 정합) · `1e200899` 와 이 commit(합류 준비 IR · 체크리스트 · SETUP 정정) · HANDOFF.md
 - **묶음 ② CI · 설정**(§5 · `.github/` · 병합은 통합 담당 판단)
