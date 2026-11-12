@@ -7,6 +7,8 @@
 export { ServiceLegalSettingsPage } from './ServiceLegalSettingsPage';
 export {
   POLICY_DOCUMENT_TYPES,
+  ENROLLMENT_POLICY_SERVICE_KEYS,
+  recommendedPolicySlug,
 } from './types';
 export type {
   ServiceLegalApi,

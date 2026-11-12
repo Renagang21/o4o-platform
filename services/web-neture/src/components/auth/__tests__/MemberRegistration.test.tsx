@@ -109,7 +109,7 @@ describe('role-specific signup', () => {
       },
     });
     render(<MemberRegistrationForm />);
-    await screen.findByText('가입 검토 대기 중입니다.');
+    await screen.findByText(/가입 신청을 검토하고 있습니다/);
     expect(screen.queryByRole('button', { name: '가입 신청' })).toBeNull();
   });
   it('lets the member submit consent when the operator prepared a pending role profile', async () => {
@@ -178,3 +178,80 @@ describe('new signup completion', () => {
     expect(mocks.get).not.toHaveBeenCalled();
   });
 });
+
+// 2026-11-12 사용자 지적: 개업일 연도 · 우편번호 검색 · 제출 후 이동 · 휴대전화 입력.
+describe('signup screen usability', () => {
+  const chooseOwner = async () => {
+    fireEvent.click(await screen.findByRole('radio', { name: /^약국경영자/ }));
+    fireEvent.click(screen.getByRole('button', { name: '다음' }));
+  };
+  it('opening date is chosen by year (newest first, no future) · month · day and submitted as YYYY-MM-DD', async () => {
+    render(<MemberRegistrationForm />);
+    await chooseOwner();
+    const year = screen.getByLabelText('개업일 연도') as HTMLSelectElement;
+    const years = [...year.options].map((o) => o.value).filter(Boolean);
+    const thisYear = new Date().getFullYear();
+    expect(years[0]).toBe(String(thisYear));
+    expect(years.at(-1)).toBe('1950');
+    expect(years.some((y) => Number(y) > thisYear)).toBe(false);
+    fireEvent.change(year, { target: { value: '1998' } });
+    fireEvent.change(screen.getByLabelText('개업일 월'), { target: { value: '02' } });
+    const day = screen.getByLabelText('개업일 일') as HTMLSelectElement;
+    expect([...day.options].filter((o) => o.value).length).toBe(28);
+    fireEvent.change(day, { target: { value: '15' } });
+    fireEvent.change(screen.getByLabelText('닉네임'), { target: { value: '별칭' } });
+    fireEvent.change(screen.getByLabelText('휴대전화 (선택)'), { target: { value: '01012345678' } });
+    for (const [label, value] of [['약사 면허번호', '12345'], ['사업장명', '합성 약국'], ['사업자등록번호', '1234567890']])
+      fireEvent.change(screen.getByLabelText(label), { target: { value } });
+    fireEvent.submit(screen.getByRole('button', { name: '가입 신청' }).closest('form')!);
+    await waitFor(() => expect(mocks.post).toHaveBeenCalled());
+    const body = mocks.post.mock.calls[0][1];
+    expect(body.fields.businessStartDate).toBe('1998-02-15');
+    expect(body.phone).toBe('01012345678');
+  });
+  it('address uses the postcode search instead of a free zip-code input', async () => {
+    render(<MemberRegistrationForm />);
+    await chooseOwner();
+    expect(screen.getByRole('button', { name: '우편번호 검색' })).toBeTruthy();
+    expect(screen.queryByLabelText('사업장 주소')).toBeNull();
+  });
+  it('phone field opens the numeric keypad and accepts typing', async () => {
+    render(<MemberRegistrationForm />);
+    await chooseOwner();
+    const phone = screen.getByLabelText('휴대전화 (선택)') as HTMLInputElement;
+    expect(phone.inputMode).toBe('numeric');
+    expect(phone.readOnly).toBe(false);
+    fireEvent.change(phone, { target: { value: '01098765432' } });
+    expect(phone.value).toBe('01098765432');
+  });
+  it('after a successful submission the page hands control back (returns to the main screen)', async () => {
+    const onSubmitted = vi.fn();
+    render(<MemberRegistrationForm onSubmitted={onSubmitted} />);
+    fireEvent.click(await screen.findByRole('radio', { name: /^기타/ }));
+    fireEvent.click(screen.getByRole('button', { name: '다음' }));
+    fireEvent.change(screen.getByLabelText('닉네임'), { target: { value: '별칭' } });
+    fireEvent.submit(screen.getByRole('button', { name: '가입 신청' }).closest('form')!);
+    await waitFor(() => expect(onSubmitted).toHaveBeenCalledTimes(1));
+    expect(screen.queryByText(/가입 정보를 제출했습니다/)).toBeNull();
+  });
+});
+
+describe('submitted registration under review', () => {
+  it('shows that the submitted fields cannot be changed instead of looking editable', async () => {
+    mocks.get.mockResolvedValue({ data: { data: { member: { name: '합성', nickname: '별칭', phone: null, version }, registration: { type: 'pharmacy_owner', state: 'pending', requestId: 'r1', fields: {} }, canSubmit: false } } });
+    render(<MemberRegistrationForm />);
+    await screen.findByText(/검토 중에는 내용을 고칠 수 없습니다/);
+    const phone = screen.getByLabelText('휴대전화 (선택)') as HTMLInputElement;
+    expect(phone.readOnly).toBe(true);
+    expect(phone.className).toMatch(/read-only:bg-slate-100/);
+    expect(phone.placeholder).toBe('');
+    expect(screen.queryByRole('button', { name: '가입 신청' })).toBeNull();
+  });
+  it('a new member before submission is not told that review is pending', async () => {
+    mocks.get.mockResolvedValue({ data: { data: { member: { name: null, nickname: null, phone: null, version }, registration: { type: null, state: 'pending', fields: {} }, canSubmit: true } } });
+    render(<MemberRegistrationForm />);
+    await screen.findByRole('heading', { name: '가입 유형 선택' });
+    expect(screen.queryByText(/검토/)).toBeNull();
+  });
+});
+

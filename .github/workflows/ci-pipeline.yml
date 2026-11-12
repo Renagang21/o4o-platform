@@ -370,6 +370,8 @@ jobs:
         scripts/ci/__tests__/pr-overlap.test.mjs
         scripts/ci/__tests__/approval-policy.test.mjs
         scripts/ci/__tests__/migration-safety.test.mjs
+        scripts/ci/__tests__/promote-short-job-consolidation.test.mjs
+        scripts/ci/__tests__/core-paths.test.mjs
 
     # WO-O4O-DOCS-FAST-AGENT-CONFIG-V1 — `.claude/` 경량 검사(settings JSON · 훅 node --check · 훅 단위 테스트).
     # `.claude/` 가 코드와 섞여 full 경로로 오는 경우에도 같은 검사를 돌린다(1초 미만 · 의존성 0).

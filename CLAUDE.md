@@ -87,7 +87,9 @@ import type { RelatedEntity } from './related.entity.js';
 
 ## 3. Core 동결 정책
 
-동결 Core: `cms-core` · `auth-core` · `platform-core` · `organization-core`. 구조 · 테이블 변경은 명시적 WO 승인 필요. 정본: [`O4O-CORE-FREEZE-V1`](docs/architecture/O4O-CORE-FREEZE-V1.md).
+- **현행 Core 목록 · 위치 · 변경 등급(A/B/C)은 [`O4O-CORE-REGISTRY-V1`](docs/baseline/O4O-CORE-REGISTRY-V1.md) 이 정본이다**(2026-11-11). Core 계약 경로(B)를 바꾸는 PR 에는 `core-change` 라벨이 자동으로 붙는다(표시만 · 병합 gate 아님). 경로 목록은 `scripts/ci/core-paths.mjs` 다.
+- 동결 결정(구조 · 테이블 · 계약 변경은 명시적 WO 승인 필요)은 [`O4O-CORE-FREEZE-V1`](docs/architecture/O4O-CORE-FREEZE-V1.md)(F10) 그대로다. 그 문서의 파일 경로는 2026-03-11 기록이며, 현재 위치는 registry 를 본다.
+- 예전 「동결 Core: `cms-core` · `auth-core` · `platform-core` · `organization-core`」 패키지 목록은 registry 로 대체했다. `auth-core` 는 소비처 0 인 껍데기이고 실제 인증 Core 는 api-server `modules/auth` 다. 네 패키지 모두 registry 에서 B 등급이며 WO 규칙도 유지된다.
 
 ## 4. Order / Commerce Contract
 

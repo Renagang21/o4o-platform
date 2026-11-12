@@ -215,6 +215,7 @@ function BusinessOperations({
                     serviceKey={state.businessName}
                     title={`${state.businessName} 법정정보·약관`}
                     api={legalApi}
+                    slugInput={false}
                   />
                 </>
               )}

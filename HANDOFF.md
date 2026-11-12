@@ -1,86 +1,236 @@
 # HANDOFF
 
-> 저장소: `Renagang21/o4o-platform` · 작업 branch: `claude/intelligent-cray-o2p4u3` · 코드 기준: `main` `13460cb183`(merge 반영) · 작성: 2026-11-10 (클라우드 작업 세션)
-> 다음 실행자: **통합 세션(PR 생성 · 병합) → LOCAL(배포 · 배포 후 확인)**
-> 이전 인계 전문(통합 진행표 포함): `git show 9adcadaf97:HANDOFF.md`
+> 저장소: `Renagang21/o4o-platform` · 작업 branch: `claude/clever-bohr-g532hw` · 코드 기준: `main` `c5da5631`(merge 반영) · 작성: 2026-11-11 (클라우드 작업 세션)
+> 다음 실행자: **통합 담당(이 branch 의 PR 생성 · CI · 병합) → Businnect(체크리스트 실행 · 첫 과제)**
+> 이전 인계 전문: `git show 0c812623:HANDOFF.md`
 
-## 한 일 — 계정 삭제가 끝나도록 (2026-11-10 사용자 지시)
+## 2026-11-11 · Promote · Delivery 짧은 job 통합 (비용 절감 · branch `claude/peaceful-lamport-sjwtri-promote-cost`)
 
-이전 PR Renagang21/o4o-platform#1014 는 병합됐다(2026-11-10 06:16Z 조회). 같은 branch 이름을 최신 `origin/main` 에서 다시 시작했다. 이 branch 의 PR 은 **미생성**이다(PR 은 통합 세션이 만든다 — AGENTS.md §4-1(e)).
+> 이 절만 이 branch 의 인계다. 아래 절들은 다른 세션의 인계로 그대로 둔다.
+> 다음 실행자: **LOCAL** — [`WO-O4O-PROMOTE-SHORT-JOB-CONSOLIDATION-V1`](docs/work-orders/WO-O4O-PROMOTE-SHORT-JOB-CONSOLIDATION-V1.md) §5-A actionlint(병합 전 조건) → **통합 담당** PR 검토 · 병합(배포 workflow 변경 · AGENTS.md §5) → 같은 WO §5-B 병합 후 첫 실행 확인.
 
-1. `4146d52f48` fix(privacy): 보존 기록 사본 때문에 「삭제 미완료 — 확인 필요」에서 멈추지 않게 한다
-   - 새 `apps/api-server/src/services/privacy/account-retained-records.ts`.
-   - 행은 남기고 이 회원 식별값만 `erased:<hash>` 로 바꾸는 표: `action_logs` · `account_activities` · `neture_contact_messages` · `neture_suppliers`.
-   - 사본을 지우는 표: `canonical_demo_repair_snapshots` · `operator_invitations`.
-   - `account-erasure.service.ts`: 삭제 전 검토는 위 표를 건너뛴다. 단, 공급자 소유 연결 `neture_suppliers.user_id` 는 계속 검토한다. finish 는 정리 후 모든 표를 다시 검토하며, 덜 정리됐으면 전체를 되돌린다.
-2. `d1af718950` fix(admin): 삭제가 끝나지 않은 회원을 「해지」가 아니라 「삭제 확인 필요」로 보인다
-   - 회원 목록 · 상세 API 에 `erasureState` · `erasureErrorCode` 를 더했다.
-   - 목록 배지와 회원 패널에 「삭제 확인 필요」 · 「삭제 재시도 필요」 · 「삭제 중」과 사유를 보인다.
+- **바꾼 것:** `deploy-api.yml` · `deploy-admin.yml` · `deploy-web-services.yml` 의 `ci-gate` job 을 detect job 의 step(`ci_gate`)으로 옮겼다. 배포 job 은 `needs.<detect>.outputs.ci_gate == 'passed'` 를 요구한다(게이트 조건식 · `ci-gate.mjs --enforce` · 30분 대기 · 권한 그대로). Web `summary` 는 직접 dispatch 에서만 돈다(`github.workflow_ref` 로 판별 — Delivery · Promote 호출 시 skip).
+- **절감(실측 2026-10-27~11-10, Promote 62 · Delivery 183 run):** 1분 청구 job 약 665개/15일 제거 → 월 약 1,300분(약 $7.7, private Linux 요금) · 배포 workflow 사용량의 약 22%.
+- **위험 판정:** `deploy-risk.mjs --base origin/main --head <이 branch>` = LEVEL_1 · deploy_required=false(세 파일 모두 control 변경). 병합만으로 서비스 재배포 없음.
+- **테스트:** 새 `scripts/ci/__tests__/promote-short-job-consolidation.test.mjs`(실제 조건식을 평가해 freeze · dry_run · 소유자 · 대상 · migrate_only · force_deploy · CI 결과 전 조합에서 배포 여부가 종전과 같음 · 결함 6종 주입 시 모두 실패 확인) · `deploy-workflow-gates.test.mjs` 를 새 구조로 갱신 · CI node:test 목록 추가. `scripts/ci/__tests__/*.test.mjs` 520 pass.
+- **병합 후 확인(미검증 — 실제 실행 필요):** ① 다음 Delivery 배포 run 에서 각 deploy 호출이 `Detect …`(CI gate step 포함) → 배포 순서로 돌고 `ci-gate` job 이 없음 ② CI gate step 로그에 `ci-gate.mjs` 통과 ③ web 호출에 `summary` 가 skip ④ detect job 시간이 60초 안(넘으면 2분 청구 — 절감 축소). 문제가 있으면 이 PR 을 되돌리는 revert PR 하나로 원상 복구된다(데이터 · 설정 변경 없음).
+- **하지 않은 것:** Promote 실행 · 운영 배포 · GitHub 설정 변경. `Same-SHA guard` · `Classify` · `Report` 는 GCP 인증 · 승격 판정 경계라 합치지 않았다.
 
-3. `e5fa077de1` fix(admin): 「해지 회원」 탭 숫자를 목록 해지 배지와 같은 기준으로 센다
-   - 사용자 지적(2026-11-10): 목록에 「해지」 2명인데 탭은 0명이었다.
-   - 배지는 계정 정지(`users.isActive=false` · `status='suspended'`, 계정 삭제 요청 포함)를 해지로 보이는데, 탭은 서비스 가입 상태만 셌다.
-   - 이제 탭도 같은 기준으로 센다. 삭제가 끝나지 않은 회원은 해지 탭에 나오고, 배지는 「삭제 확인 필요」로 보인다.
+## 한 일 3 — WO-O4O-REMOTE-COLLABORATOR-ONBOARDING-V1 (2026-11-11 사용자 지시)
 
-4. `8353d0e3e8` fix(privacy): 중앙 운영 메뉴 권한 감사 기록은 삭제 전 검토에서 건너뛰지 않는다
-   - #1022 CI(run 42775488648) `service-operator-invitation.integration.test.ts` 「keeps unknown audit payload …」 2건 실패를 고쳤다.
-   - 원인: 삭제 전 검토가 `action_logs` 를 통째로 건너뛰었다. 그래서 형식이 다른 메뉴 권한 감사 기록이 검토 없이 일반 치환으로 넘어갔다.
-   - 수정: `operator.central_menu_grants_changed` · `admin.service_operator_assigned` 행은 전용 경로(`central-menu-audit-evidence`)의 판정대로 계속 검토한다.
+신규 원격 공동개발자 `Businnect` 합류 준비를 조사하고 문서를 보완했다. 저장소 공개 상태 · 권한 · ruleset · CI · Runner · secret · 배포는 바꾸지 않았다.
 
-## PR 로 묶을 단위
+- `1e200899` + 이 commit
+  - 새 [`docs/investigations/IR-O4O-REMOTE-COLLABORATOR-READINESS-V1.md`](docs/investigations/IR-O4O-REMOTE-COLLABORATOR-READINESS-V1.md) — 준비도 보고서. 다룬 것:
+    - GitHub 접근
+    - Private 전환 영향
+    - 개발환경 실측
+    - 테스트 계정 공백
+    - CI · 자체 실행기 경계
+    - 준비 항목 총괄(READY / NEEDS_PREPARATION / VERIFY_WITH_BUSINNECT)
+    - 첫 시험 과제 후보 3개 · 추천 1개 · 성공 기준
+  - 새 [`docs/development/COLLABORATOR-ONBOARDING-CHECKLIST.md`](docs/development/COLLABORATOR-ONBOARDING-CHECKLIST.md) — Businnect 가 순서대로 실행할 시작 체크리스트(정본 링크만, 규칙 복제 없음).
+  - `SETUP.md` §3-1 5단계 · §4: 로컬 DB bootstrap 명령 정정. 기존 `pnpm --filter @o4o/api-server migration:run` 은 `migrate.ts` 가 `.env` 를 읽지 않아 `DB_HOST: MISSING` 으로 실패한다(실측). `npx tsx --env-file=.env src/migrate.ts` 로 바꿨다.
+  - `docs/development/COLLABORATOR-START-HERE.md`: 체크리스트 링크 한 줄.
 
-- 한 PR: 위 네 commit(주제: 계정 삭제 완료 · 상태 표시). migration · CI · 인증 · 권한 변경은 없다.
-- **#1022 반영 필요:** #1022 의 head 는 통합 세션이 만든 `claude/jolly-carson-4smjue` 이고, 위 1 · 2 와 인계 기록만 cherry-pick 돼 있다.
-  3(`e5fa077de1`)과 4(`8353d0e3e8`)를 더 가져가야 한다. #1022 설명의 「탭 숫자는 바꾸지 않았다」도 3 기준으로 고쳐야 한다.
+### 핵심 발견
+
+1. **운영 정보 없이 개발은 된다**(새 clone 상태 실측). 설치 · `build:packages`(1분) · 빈 DB bootstrap(baseline + 60 · fingerprint PASS) · API `/health` 200 이 모두 통과했다.
+2. **로컬 로그인 계정 공백.**
+   - Demo 「테스트 로그인」은 운영 DB 에만 있다.
+   - 로컬 이메일 가입은 출처 제한(`SIGNUP_ORIGIN_NOT_ALLOWED`)과 메일 인증에 막힌다.
+   - 합성 계정은 격리 심사 환경의 매장 경영자 1개뿐이다.
+   - → 로컬 합성 계정 CLI 를 별도 WO 로 제안한다(IR §5-3).
+3. **GitHub 경계는 준비돼 있다.**
+   - `main` 은 PR + `CI Gate` 필수이고 bypass 가 없다.
+   - `deploy/*` 태그는 소유자만 만든다.
+   - 배포 job 은 `triggering_actor == owner` 일 때만 열린다.
+   - production secret 은 Environment 에만 있다.
+4. **Private + 자체 실행기 결정 필요.**
+   - Write 협업자의 PR 과 자기 branch 의 새 workflow 가 fork 가 아니어서 집 PC 실행기에서 돈다.
+   - 자기 branch 의 새 workflow 는 push 만으로도 돈다.
+   - 선택지 ①~③ 은 IR §6-2 에 있다.
+5. **Private 전환 시 확인할 것:**
+   - 개인 Free 플랜에서 ruleset · Environment 보호가 유지되는지(유지되지 않으면 write 협업자가 main 에 직접 push 할 수 있다)
+   - secret scanning · push protection 이 꺼지는지
+
+## PR 로 묶을 단위 (이 branch 전체)
+
+- **묶음 ① 문서**
+  - `d388157e`(Core IR) · `7c55c4ff`(Core registry · 문서 정합) · `1e200899` 와 이 commit(합류 준비 IR · 체크리스트 · SETUP 정정) · HANDOFF.md
+- **묶음 ② CI · 설정**(§5 · `.github/` · 병합은 통합 담당 판단)
+  - `cd6aebf1`(core-paths · `core-change` 라벨 · CODEOWNERS · workflow 3개)
+- 순서: ① → ②, 또는 한 PR. ②의 테스트가 ①의 registry 문서 존재를 확인한다.
+- 같은 branch 에 두 묶음이 있는 이유: 세션 지정 branch 외 push 금지. 분리 여부는 통합 세션이 정한다.
+
+## 결정 사항 (§9) — 한 일 3
+
+- 시작 체크리스트는 새 문서 1개로 만들었다. 규칙은 복제하지 않고 정본 링크와 「확인」 기준만 둔다. 이름은 계정과 무관하게 다음 합류자에게도 재사용할 수 있도록 `COLLABORATOR-ONBOARDING-CHECKLIST` 로 했다.
+- SETUP 명령 정정은 온보딩 문서 보완 범위로 보고 이번에 했다(동작 · 판정 변경 없음, 실측 근거).
+  - `migrate.ts` 가 `.env` 를 읽게 고치는 코드 변경은 하지 않았다. migration 도구는 Core(schema) 영역이라 별도 판단으로 넘긴다.
+- 첫 과제 추천: 후보 1(Neture 카탈로그 일괄등록 카드 2개 404). 근거가 명확하고 판단할 거리가 없으며, 파일 1개와 테스트 1개다.
+  - 관리자 화면이라 로컬 로그인 확인은 테스트로 대신하고, 배포 후 통합 담당이 확인한다.
+- 로컬 실측에 PostgreSQL 16(이 컨테이너 설치본)을 썼다. 기준 15 재현은 Businnect 몫으로 남겼다.
+
+## 검증 결과 — 한 일 3
+
+- 실측(이 클라우드 컨테이너 · 운영 정보 0):
+  - `pnpm install --frozen-lockfile` 통과
+  - `build:packages` exit 0(1분 1초)
+  - 빈 DB `npx tsx --env-file=.env src/migrate.ts` → `Migration Job - SUCCESS`
+  - 기존 SETUP 명령 실패 재현
+  - api `build` 29초
+  - `node dist/main.js` → `/health` 200
+- 정리: 실측 뒤 API 종료 · 임시 DB 중지 · 로컬 `.env` 삭제. 임시 DB 데이터 폴더(저장소 밖)는 권한상 재귀 삭제가 막혀 컨테이너 회수에 맡겼다.
+- `node scripts/check-doc-sensitive.mjs` — 0건.
+- GitHub 조회(read-only): 저장소 설정 · ruleset 2개 · 협업자 · CODEOWNERS 오류.
+
+## 확인하지 못한 것 — 한 일 3
+
+- `production` Environment 의 ref 제한 · reviewer, Actions `GITHUB_TOKEN` 기본 권한(이 세션 proxy 가 해당 API 를 막음) → 통합 담당이 설정 화면에서 확인.
+- 신규 개발자 PC 의 clone · 설치 · 빌드 · 로컬 API · 서비스 dev server · PostgreSQL 15 · Windows → Businnect 가 체크리스트 §1~§5 로 확인하고 결과를 HANDOFF 로 보고.
+- web-neture dev server 기동(이 세션에서는 하지 않음).
+- `require_extra_approval_for_unattributed_changes=true` ruleset 항목의 정확한 동작.
+
+## 확정 사항 (2026-11-11 사용자 결정 — 결과 수용) — 한 일 3
+
+1. Businnect 는 신규 원격 공동개발자이며 기존 Write 권한을 유지한다.
+2. 초기에는 Businnect 의 PR · branch 코드를 집 PC 자체 실행기에서 실행하지 않는다(IR §6-2 ①).
+3. 저장소 Private 전환을 추진한다. 실행 전에 다음을 확인한다.
+   - ruleset
+   - `production` Environment
+   - secret 검사(secret scanning · push protection)
+   - Actions 비용
+4. 로컬 합성 계정 CLI 는 별도 WO 로 준비한다(IR §5-3). 운영 DB · 실제 개인정보는 쓰지 않는다.
+5. Businnect 첫 시험 과제는 IR §7-2 후보 1(Neture 카탈로그 일괄등록 카드 404 수정)로 확정한다. 성공 기준은 IR §7-3 이다.
+6. `delivery.yml` 비소유자 수동 실행 시 GCP 인증 진입 문제는 별도 CI 보완 작업으로 분리한다.
+
+**이 결정만으로 실행하지 않는 것:** Private 전환 · 자체 실행기 활성화(`CI_RUNNER_LINUX` 설정 포함) · GitHub 권한 변경 · 운영 배포. 각각 별도 지시와 사전 확인 후에 한다.
+
+### 후속 작업 (각각 별도 WO · 별도 branch)
+
+| # | 작업 | 실행 위치 · 주체 | 비고 |
+|---|---|---|---|
+| F1 | Private 전환 사전 확인 — 플랜 · ruleset · `production` Environment(ref 제한 · reviewer) · secret scanning · push protection · Actions 비용/예산 차단 · `GITHUB_TOKEN` 기본 권한 | 통합 담당(설정 화면 · read-only) | IR §2 · §1 표의 VERIFY 항목. 전환 실행은 그 뒤 별도 결정 |
+| F2 | 자체 실행기 기준 문서에 「Write 협업자 코드는 초기 미실행」 반영 · 선택식 보완 검토 | CI 정비 트랙 | `O4O-SELF-HOSTED-CI-RUNNER-V1`(DRAFT) §6 · §9. 이번에 문서 · workflow 는 바꾸지 않았다 |
+| F3 | 로컬 합성 계정 provision CLI | 클라우드 작업 세션 | IR §5-3. loopback · 표식 DB 전용, 기본 dry-run, 3역할 |
+| F4 | `delivery.yml` classify 소유자 조건 | CI 정비 트랙(§5 위험 변경 · 통합 담당 병합 판단) | IR §1-1 |
+| F5 | Businnect 첫 과제 | Businnect 작업 branch → 통합 세션 PR | IR §7-3 성공 기준. 배포 후 관리자 화면 클릭 확인은 통합 담당 |
+
+## 겹칠 수 있는 열린 PR — 한 일 3
+
+이 commit 직전 조회에서 겹치는 열린 PR 은 없다. `SETUP.md` 는 여러 작업이 자주 바꾸는 파일이다.
+
+## 문서 정합 — 한 일 3
+
+`발견 2건 / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 2건`
+
+- 발견 1: AGENTS.md §4-1(e) ruleset 기록값 「admin bypass 가능」 ↔ 현재 bypass_actors 없음. 보고만 한다.
+- 발견 2: SETUP migration 명령 오류. 정정했다.
+- WO 제안: 로컬 합성 계정 CLI, 자체 실행기 × 협업자 결정.
+
+---
+
+## 한 일 2 — WO-O4O-CORE-OWNERSHIP-AND-CHANGE-BOUNDARY-V1 (2026-11-11 사용자 지시)
+
+IR(아래 「한 일 1」)을 바탕으로 Core 소유권 · 변경 경계를 정비했다. 실행 코드 · DB · 배포 · ruleset 변경은 없다.
+
+1. `7c55c4ff` docs(core) — 문서
+   - 새 정본 [`docs/baseline/O4O-CORE-REGISTRY-V1.md`](docs/baseline/O4O-CORE-REGISTRY-V1.md):
+     - Core 의 현행 정의 · 실제 위치
+     - A/B/C 등급(파일 · 모듈 단위)
+     - `core-change` 라벨 · CODEOWNERS 표시 방법
+     - 과거 Freeze 결정은 보존
+   - 상충 정비:
+     - `CLAUDE.md` §3 · `docs/baseline/core-boundary.md` 의 패키지 4개 「동결 Core」 목록을 registry 로 대체했다. `auth-core` 는 소비처 0 이다. 네 패키지는 B 등급이고 WO 규칙도 유지한다.
+     - `O4O-CORE-FREEZE-V1` 상단에 현행 위치 안내 한 줄을 넣었다(본문 보존).
+     - `CANONICAL-INDEX` §2 에 행을 추가했다.
+     - `AGENTS.md` §5 · §7 에 registry 링크를 넣었다.
+   - `docs/development/COLLABORATOR-START-HERE.md`:
+     - §5-1 「일반 개발과 Core 계약 변경」을 추가했다.
+     - 작업 흐름을 AGENTS.md §4-1(e)(push · 인계까지, PR 은 통합 세션)에 맞췄다.
+2. `cd6aebf1` ci(core) — 자동화 · CODEOWNERS
+   - `scripts/ci/core-paths.mjs`: B 경로 단일 목록(64개, 모두 실제 존재) + 판정 함수.
+   - 기존 `automation-pr-overlap.yml` · `scripts/ci/pr-overlap.mjs` 를 재사용했다.
+     - Ready PR 의 파일을 B 목록과 대조해 `core-change` 라벨을 달고 뗀다.
+     - 표시만 하고 `CI Gate` needs 에 없다. 라벨 API 실패는 로그만 남긴다.
+     - workflow 변경은 sparse-checkout 1줄 · 주석뿐이고 권한은 그대로다.
+   - `.github/CODEOWNERS`:
+     - 존재하지 않는 조직 팀(`@o4o-platform/*-team`)을 지정하던 내용을 걷어 냈다(GitHub 판정 Unknown owner 15건).
+     - 확인된 계정(통합 담당 `@Renagang21`)만 B 경로 · `/.github/workflows/` · CODEOWNERS 자체에 지정했다.
+     - 전체(`*`) 기본 소유자는 두지 않는다.
+   - 회귀 테스트:
+     - `scripts/ci/__tests__/core-paths.test.mjs`(신규): 형식 · 경로 존재 · CODEOWNERS 일치 · 판정.
+     - `pr-overlap.test.mjs`: 라벨 추가 · 유지 · 제거 · API 실패 시 계속.
+     - CI node:test 목록에 추가했다(`ci-pipeline.yml` 1줄).
+   - `automation-repo-setup.yml` 라벨 목록에 `core-change` 를 추가했다(색 · 설명. 수동 실행용).
+
+## PR 로 묶을 단위 (한 일 2 시점 — 위 「이 branch 전체」 표가 최신)
+
+AGENTS.md §4-1(e) 「묶음 단위」는 CI · workflow 변경을 별도 PR 로 분리한다. 이 branch 하나에 두 묶음이 있으므로, 통합 세션이 분리 여부를 정한다. 별도 branch 를 만들지 않은 이유: 세션 지정 branch 외 push 금지.
+
+- **묶음 ① 문서**
+  - `d388157e`(IR) + `7c55c4ff`(registry · 문서 정합) + 이 HANDOFF.md
+- **묶음 ② CI · 설정** — §5 위험 변경 · `.github/` 라 병합은 통합 담당이 판단
+  - `cd6aebf1`(core-paths · pr-overlap 라벨 · CODEOWNERS · workflow 3개)
+  - ②의 테스트(`core-paths.test.mjs`)는 ①의 registry 문서 존재를 확인한다. 따라서 ①을 먼저 병합하거나 둘을 한 PR 로 낸다.
 
 ## 결정 사항 (§9)
 
-- **공급자(`neture_suppliers`)는 지우지 않는다** — 사용자 결정 「거래기록은 유지」.
-  - 본인 소유 공급자는 기존 detach 경로가 처리한다(개인 필드 비움 · INACTIVE).
-  - 다른 공급자 행에 들어 있는 이 회원 이메일 등은 치환한다.
-  - 소유 연결(`user_id`)은 바꾸지 않는다. 소유 · 처분 문제이므로 기존처럼 검토 대기로 둔다(기존 테스트 「legacy supplier pointer」 유지).
-- **보존 기록은 삭제가 아니라 비가역 치환으로 처리한다.** 근거는 개인정보 보존 정책 §6 · §13(처리 · 접속 기록 1년)과 §3(문의).
-  - 키는 기존 system log 최소화와 같은 `hash(userId)` 다.
-  - 이 회원이 처리한 `action_logs` 는 `user_id` 를 비우고 `meta.actorKey` 를 남긴다. 같은 사람의 처리였다는 것만 알 수 있고, 누구인지는 알 수 없다.
-- **운영자 초대(`operator_invitations`)는 삭제한다.** 근거는 두 가지다.
-  - 정책 §2.1 상 이메일 · 토큰은 파기 대상이다.
-  - 「수락됨」 행은 DB 제약상 수락자를 비울 수 없다.
-  - 지정 · 해제 이력은 `action_logs` 에 치환된 채 남는다.
-- **데모 복구 스냅숏은 보존 근거가 없는 사본이므로 삭제한다.**
-- **「해지 회원」 탭은 목록 배지와 같은 기준으로 센다**(3번 · 사용자 지적으로 처음 결정을 바꿨다). 계정이 멈춘 회원도 센다.
-  삭제가 끝나지 않은 회원은 그 안에서 「삭제 확인 필요」 배지로 구분한다.
+- **CODEOWNERS 소유자:** GitHub 협업자는 `Renagang21`(admin) · `Businnect`(write) 두 계정이다. 역할 정의가 확인된 계정은 통합 담당뿐이라 `@Renagang21` 만 지정했다. `Businnect` 는 지정하지 않았다(WO: 확인되지 않은 계정 임의 등록 금지 — 소유 범위는 사용자 결정).
+- **라벨 위치:** 새 workflow 를 만들지 않고 기존 PR 겹침 자동화에 붙였다.
+  - 그 자동화가 이미 PR 파일 목록 · `issues: write` 권한을 가지고 있다.
+  - 실행 정책(Ready 만 · fork 제외 · gate 아님)도 같다.
+  - `.github/labeler.yml` 은 이를 읽는 workflow 가 없는 죽은 설정이라 쓰지 않았다(정리는 범위 밖).
+- **목록 일치 강제:** `core-paths.mjs` · CODEOWNERS · registry 표가 어긋나지 않도록 테스트가 경로 존재와 CODEOWNERS 일치를 확인한다. 파일을 옮기면 테스트가 실패해 목록 갱신을 강제한다.
+- **C 등급:** 분리하지 않고 B 로 관리한다(registry §3-4).
 
-## 검증 결과 (격리 PostgreSQL — 일회용 클러스터, 운영 DB 아님)
+## 검증 결과
 
-4번 commit 후 재실행:
-- `service-operator-invitation.integration.test.ts`: 54/54 통과. 같은 파일에서 수정 전에는 2건이 실패했다(CI 와 같은 실패를 재현).
-- `account-erasure.integration.test.ts`: 79/81. 실패 2건은 이전부터 있던 employee 테스트다.
-- member postgres spec 3개 55/55 · privacy unit 27/27 · api-server `tsc --noEmit` 통과
+- CI 와 같은 node:test 목록 25개 파일 — 492 pass / 0 fail(신규 `core-paths.test.mjs` 5 · `pr-overlap.test.mjs` 10 포함).
+- `node scripts/check-doc-sensitive.mjs` — 0건.
+- `node scripts/ci/check-agent-config.mjs` — PASS.
+- 바꾼 workflow 3개 YAML 파싱 — 통과.
+- **GitHub CODEOWNERS 판정**(`repos/Renagang21/o4o-platform/codeowners/errors`, read-only): main **15건** → 이 branch **0건**.
 
-- `account-erasure.integration.test.ts`: 79/81 통과.
-  - 새 테스트 「retained records …」가 통과했다.
-  - 실패 2건은 이 작업 전부터 있던 employee 테스트 2건이다.
-    - 「temporary suspension retains employment…」
-    - 「employee access termination…」
-- privacy unit 테스트 27/27 통과(5 skip)
-- `central-member-workspace.postgres.spec.ts` 등 3개 파일: 34/34 통과. 새 테스트는 삭제 상태 표시와 해지 탭 숫자다(main `13460cb183` 반영 후 재실행).
-- `member-registration.postgres.spec.ts`: 26/26 통과
-- `member-profile-recovery.postgres.spec.ts`: 13/13 통과. fixture 에 `account_erasure_operations` 를 추가했다.
-- route · review 테스트 33/33 통과
-- admin-dashboard `src/pages/operators`: 148/148 통과. 새 테스트는 `member-workspace-erasure.test.ts` 다.
-- `tsc --noEmit`(api-server · admin-dashboard) 통과 · `check-unsafe-routes` 0건 · `check-forbidden-tables` 통과
+## 확인하지 못한 것
 
-## 확인하지 못한 것 (배포 후)
+- **실제 PR 에서 `core-change` 라벨이 붙는지(라이브):** 작업 세션은 PR 을 만들지 않아 확인하지 못했다.
+  - 이 묶음의 PR 이 Ready 가 되면 그 PR 의 `PR Overlap Notice` 로그에 `core-change: absent` 가 나와야 한다. 이 PR 은 B 경로를 바꾸지 않는다.
+  - 이후 B 경로를 바꾸는 첫 PR 에서 라벨이 붙는지 통합 세션이 확인한다.
+- **라벨 자동 생성:** 저장소에 `core-change` 라벨이 아직 없다(조회 확인). 첫 부착 때 GitHub 가 만든다는 동작에 기대고 있다. 실패하면 로그에 `core-change: error` 가 남고 겹침 알림은 계속된다. 그때는 `automation-repo-setup.yml` 을 수동 실행해 라벨을 먼저 만든다(라벨 생성은 GitHub 설정 변경이라 실행하지 않았다).
+- **CODEOWNERS 리뷰 요청:** PR 작성자 본인에게는 요청이 가지 않는다. 통합 세션이 통합 담당 계정으로 PR 을 만들면 리뷰 요청은 사실상 생기지 않고 라벨이 주 표시가 된다.
+- **ruleset code owner review 필수화:** 변경하지 않았다(WO 제외 범위). 개인 소유 Private 저장소에서의 플랜 조건도 미확인이다.
 
-- **운영에서 실제로 삭제가 끝나는지.** 지난번 검토 대기로 남은 회원에 대해 Admin 「계정 삭제」를 다시 눌러, 같은 작업이 이어서 완료되는지 확인한다.
-  - 운영 데이터에서 위 6개 표 밖의 사본이 나오면 계속 검토 대기로 남는다. 그때는 「삭제 처리 내역」의 `review_codes` 를 알려 주면 된다.
-- 회원 목록 배지 · 패널 문구의 PC · 모바일 화면.
-- 소요 시간: 정리 후 검토가 한 번 더 돌아 수 초 늘 수 있다.
+## 결정 필요 (통합 담당 · 사용자)
+
+1. ~~`Businnect` 계정을 CODEOWNERS 의 어느 경로 소유자로 둘지~~ — 2026-11-11 WO-O4O-REMOTE-COLLABORATOR-ONBOARDING-V1 에서 「지정하지 않음 · 필수 리뷰 강제 없음」으로 확정
+2. B 변경에 ruleset code owner review 를 필수로 켤지
+3. IR §11 의 나머지 항목: 공동개발자 전체 읽기 허용 · `organizations` 이중 매핑 · 원장 정리 · Skill 설계 위치
 
 ## 겹칠 수 있는 열린 PR
 
-- 조회하지 못했다. 통합 세션이 PR 생성 시 확인한다(`pr-overlap` Action #1015 도 댓글로 알린다).
+- 조회 시점에 확인한 결과 겹치는 PR 은 없다. 통합 세션이 PR 을 만들 때 다시 확인한다.
+- `scripts/ci/pr-overlap.mjs` 와 `ci-pipeline.yml` 은 CI 작업이 자주 바꾸는 파일이다.
 
 ## 문서 정합
 
-해당 없음.
+`발견 12건 / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 1건`
+- 발견은 IR §5 와 같다.
+- 이번 WO 에서 그중 「동결 Core」 정의 상충(CLAUDE.md §3 · core-boundary ↔ CORE-FREEZE)을 정비했다. 대체가 아니라 현행 안내를 추가했으므로 SUPERSEDED 표기는 하지 않았다.
+- 나머지 11건(RBAC-FREEZE · USER-OPERATOR · NETURE-DISTRIBUTION · CHECKOUT-V2 · STORE-LAYER · APP-LMS · CONTENT-STABLE 등 경로 · 서술 drift, `.github/labeler.yml` 죽은 설정 포함)은 범위 밖이라 보고만 한다. 별도 문서 정합 WO 를 제안한다.
+
+---
+
+## 한 일 1 — O4O Core 중앙화 · 원격 공동개발 접근 경계 조사 (2026-11-11 사용자 지시)
+
+이 branch 의 이전 PR Renagang21/o4o-platform#1002(배포 차단 훅 로컬 ask)는 병합됐다. 그래서 같은 branch 이름을 최신 `origin/main` 에서 다시 시작했다. 이 branch 의 PR 은 **미생성**이다(PR 은 통합 세션이 만든다 — AGENTS.md §4-1(e)).
+
+- 새 문서 [`docs/investigations/IR-O4O-CORE-CONSOLIDATION-V1.md`](docs/investigations/IR-O4O-CORE-CONSOLIDATION-V1.md) 하나를 추가했다.
+- 조사 전용이다. 코드 · DB · CI · 배포 · GitHub 설정과 기준 문서는 바꾸지 않았다.
+- 핵심 결론:
+  - 실제 Core 는 api-server 안에 있다. `packages/*-core` 는 이름과 실제가 다르고, 소비처 0 패키지가 9개다.
+  - 최상위 `core/` 이동은 비권장이다.
+  - Core registry 문서 + CODEOWNERS · `core-change` 라벨로 경계를 표시하는 것을 권한다. 그다음 잔재 제거와 중복 일원화를 하고, api-server `src/core/` 이동은 선택으로 둔다.
+  - C(소스 분리)는 지금 하지 않고, 필요하면 프롬프트 · 정책 값의 외부화를 먼저 검토한다.
+

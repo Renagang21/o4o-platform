@@ -63,7 +63,7 @@ on:
         required: false
         default: ''
       dry_run:
-        description: "'true' = 배선 검증 — detect 까지만 (ci-gate · build · deploy 0)"
+        description: "'true' = 배선 검증 — detect 까지만 (CI gate · build · deploy 0)"
         type: string
         required: false
         default: 'false'
@@ -102,10 +102,18 @@ jobs:
   # 판정기는 `scripts/ci/detect-affected.mjs` 로 CI Pipeline 과 **같은 단일 지점**이다.
   # base SHA 이상 · force push · shallow history · 매핑 불가 경로는 모두
   # `admin_affected=true` 로 fallback 한다 (배포 누락보다 1회 더 배포).
+  # WO-O4O-PROMOTE-SHORT-JOB-CONSOLIDATION-V1 — 판정(detect)과 CI gate 를 한 job 으로 둔다(job 마다 1분 청구 → 호출 1번 2분 → 1분).
+  #   게이트 조건 · 스크립트 · 권한은 종전 ci-gate job 그대로이고, 배포 job 은 `needs.detect.outputs.ci_gate == 'passed'` 일 때만
+  #   돈다(fail-closed: 게이트 step 이 skip 되면 출력이 비고, 실패하면 이 job 이 실패해 배포 job 이 needs 로 skip 된다).
   detect:
     name: Detect admin impact
     runs-on: ubuntu-latest
+    timeout-minutes: 45
+    permissions:
+      contents: read
+      actions: read   # CI gate (CI run 조회)
     outputs:
+      ci_gate: ${{ steps.ci_gate.outputs.ci_gate }}
       admin_affected: ${{ steps.scope.outputs.admin_affected }}
       fallback: ${{ steps.scope.outputs.fallback }}
 
@@ -122,34 +130,33 @@ jobs:
         HEAD_SHA: ${{ inputs.head_sha || github.sha }}
       run: node scripts/ci/detect-affected.mjs
 
-  # WO-O4O-CICD-SAFE-AUTODEPLOY-AND-RISK-GATE-V1 Phase 1 — CI success gate (enforced)
-  #   CI Pipeline 이 target SHA 에서 green 이 아니면 배포하지 않는다. 배포가 열릴 수 있을 때만 돈다.
-  ci-gate:
-    name: CI gate (target SHA must be green)
-    needs: [detect]
-    # dry_run(배선 검증 · workflow_call 전용) 이면 게이트를 열지 않는다 → deploy 도 needs 로 skip.
-    # WO-O4O-PUBLIC-COLLABORATOR-PRODUCTION-BOUNDARY-AND-MAIN-PROTECTION-V1 — 수동 실행(직접 dispatch · promote 경유)은 저장소 소유자만.
-    #   collaborator 가 dispatch 하면 게이트를 열지 않는다(→ 배포 job 전부 skip). 자동 경로(workflow_run)는 그대로.
-    if: >-
-      vars.DEPLOY_FREEZE == 'false' && inputs.dry_run != 'true' &&
-      (github.event_name != 'workflow_dispatch' || github.triggering_actor == github.repository_owner) &&
-      (needs.detect.outputs.admin_affected == 'true' || inputs.force_deploy == 'true')
-    runs-on: ubuntu-latest
-    timeout-minutes: 40
-    permissions:
-      contents: read
-      actions: read
-    steps:
-    - uses: actions/checkout@v6
-      with:
-        sparse-checkout: scripts/ci
-    - uses: actions/setup-node@v7
+    # WO-O4O-CICD-SAFE-AUTODEPLOY-AND-RISK-GATE-V1 Phase 1 — CI success gate (enforced)
+    #   원칙 A: CI 가 green 이 아닌 commit 은 production 배포 대상이 될 수 없다. 필수 CI = `CI Pipeline` 의 target SHA 최신 run.
+    #   failure · cancelled · pending · 부재 · SHA 불일치 = 차단. push 직후 CI 가 도는 중이면 최대 30분 기다린다.
+    #   dry_run(배선 검증 · workflow_call 전용) 이면 게이트를 열지 않는다 → 배포 job 도 skip.
+    #   WO-O4O-PUBLIC-COLLABORATOR-PRODUCTION-BOUNDARY-AND-MAIN-PROTECTION-V1 — 수동 실행(직접 dispatch · promote 경유)은 저장소 소유자만.
+    #   collaborator 가 dispatch 하면 게이트를 열지 않는다(→ 배포 job skip). 자동 경로(workflow_run)는 그대로.
+    - name: Set up Node for CI gate
+      if: >-
+        vars.DEPLOY_FREEZE == 'false' && inputs.dry_run != 'true' &&
+        (github.event_name != 'workflow_dispatch' || github.triggering_actor == github.repository_owner) &&
+        (steps.scope.outputs.admin_affected == 'true' || inputs.force_deploy == 'true')
+      uses: actions/setup-node@v7
       with:
         node-version: '22.23.4'
-    - name: Require green CI for target SHA
+    - name: CI gate (target SHA must be green)
+      id: ci_gate
+      if: >-
+        vars.DEPLOY_FREEZE == 'false' && inputs.dry_run != 'true' &&
+        (github.event_name != 'workflow_dispatch' || github.triggering_actor == github.repository_owner) &&
+        (steps.scope.outputs.admin_affected == 'true' || inputs.force_deploy == 'true')
+      timeout-minutes: 40
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: node scripts/ci/ci-gate.mjs --target "${{ github.sha }}" --wait-seconds 1800 --enforce
+      run: |
+        set -euo pipefail
+        node scripts/ci/ci-gate.mjs --target "${{ github.sha }}" --wait-seconds 1800 --enforce
+        echo "ci_gate=passed" >> "$GITHUB_OUTPUT"
 
   deploy:
     runs-on: ubuntu-latest
@@ -157,17 +164,17 @@ jobs:
     #   GitHub `production` Environment 는 배포 ref 를 `main` branch · `deploy/*` tag 로 제한하고, production credential 은
     #   environment secret 으로 둔다 — 그 밖의 ref(collaborator branch · PR)에서는 이 job 이 시작되지 않는다. required reviewer 는
     #   없다(대기 없이 실행). 배포 게이트는 그대로 이 job `if:` 의 `DEPLOY_FREEZE`(정확히 'false' 일 때만 · 부재/공백/오타 = freeze)
-    #   와 ci-gate(수동 실행 = 소유자만)다.
+    #   와 CI gate(detect 의 step · 수동 실행 = 소유자만)다.
     environment: production
-    # ci-gate skip(게이트 닫힘) · 실패(CI not green) → 이 job 도 skip
-    needs: [detect, ci-gate]
+    # CI gate step skip(게이트 닫힘 → ci_gate 출력 없음) · 실패(CI not green → detect 실패) → 이 job 도 skip
+    needs: [detect]
     # Admin 과 무관한 변경에서는 install / build / Docker push / Cloud Run deploy 가
     # 한 줄도 실행되지 않는다. 수동 강제 배포는 force_deploy 로 계속 가능하다.
     # WO-O4O-LECTURE-INDEPENDENT-SERVICE-SEPARATION-V1 §19 (2026-09-23 INCIDENT)
     #   DEPLOY GATE (fail-closed): `DEPLOY_FREEZE` 가 정확히 'false' 일 때만. 변수 부재/공백/오타 = freeze.
     #   force_deploy 수동 실행보다도 우선한다(괄호로 묶어 AND).
     if: >-
-      vars.DEPLOY_FREEZE == 'false' &&
+      vars.DEPLOY_FREEZE == 'false' && needs.detect.outputs.ci_gate == 'passed' &&
       (needs.detect.outputs.admin_affected == 'true' || inputs.force_deploy == 'true')
 
     permissions:

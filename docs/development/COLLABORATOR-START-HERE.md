@@ -1,7 +1,7 @@
 # COLLABORATOR-START-HERE
 
 > **대상**: O4O 에 새로 참여하는 사람 공동개발자 · **일자**: 2026-09-30
-> **상태**: ACTIVE · **최종 갱신**: 2026-10-27 — O4O 업무 도우미·O4O Service AI Agent 명칭 정합 (AI 공통 회계·전문 기능 가격 준비 경계 유지)
+> **상태**: ACTIVE · **최종 갱신**: 2026-11-11 — 일반 개발과 Core 계약 변경의 구분(§5-1) · 작업 흐름을 AGENTS.md §4-1(e)(작업 세션은 push 와 인계 기록까지, PR 생성 · 병합은 통합 세션)에 맞춤
 > 기술 교육 문서가 아니다. **"O4O 가 무엇을 중요하게 보는가, 이 저장소를 어떻게 읽어야 하는가, 어디부터 보면 되는가"** 만 다룬다.
 > 규칙의 원문은 각 정본 문서에 있고, 이 문서는 그 문서들을 가리키기만 한다.
 
@@ -132,15 +132,29 @@ DB 의 `o4o_api` 는 로그인 계정이 아니라 **NOLOGIN owner role** 이다
 ## 5. 작업 방식
 
 - **도구는 자유다.** IDE · LLM · 코딩 에이전트 등은 본인 판단과 비용으로 쓴다. O4O 가 특정 도구(Claude · Codex · Cursor 등)를 요구하지 않는다. 중요한 것은 결과물과 저장소 규칙 준수다. 다만 production secret · 실제 개인정보 · 운영 DB credential 등 외부 반출이 금지된 정보를 외부 도구에 넣지 않는다.
-- **`main` 이 저장소 정본이다.** 독립 작업은 최신 main에서 전용 worktree·branch로 시작하고 PR로 반영한다([AGENTS §4-1](../../AGENTS.md#4-1-parallel-session--worktree-policy)). 개발은 병렬, main 통합·공유 runtime 변경은 순차다.
+- **`main` 이 저장소 정본이다.** 독립 작업은 최신 main에서 전용 worktree·branch로 시작한다. 작업 세션은 commit · push 와 인계 기록(`HANDOFF.md`)까지 하고, PR 생성 · 병합은 통합 담당이 지정한 통합 세션이 묶음 단위로 한다([AGENTS §4-1(e)](../../AGENTS.md#4-1-parallel-session--worktree-policy)). 개발은 병렬, main 통합·공유 runtime 변경은 순차다.
 - 다른 작업자의 변경을 임의로 되돌리지 않는다. 사람과 AI 세션 여럿이 같은 저장소에서 동시에 작업한다.
 - 리팩토링 중이므로 기존 구조를 무조건 보존해야 한다고 가정하지 않는다. 반대로, 기존 구조를 이해하지 않은 채 대규모로 재설계하지도 않는다.
 - 중복·함수 길이만으로 즉시 공통화하지 않는다. 개별 서비스 작업에서는 업무 차이를 확인하고, 서비스 간 공통화는 전체 정비에서 소비처를 함께 조사한다.
 - AI 코딩 도구를 쓴다면 [CLAUDE.md](../../CLAUDE.md) · [AGENTS.md](../../AGENTS.md) 가 에이전트용 진입점이다(Git · DB 안전 규칙 포함).
 
+### 5-1. 일반 개발과 Core 계약 변경
+
+어디가 Core 이고 무엇을 조심해야 하는지는 [O4O-CORE-REGISTRY-V1](../baseline/O4O-CORE-REGISTRY-V1.md) 이 정한다. 요지는 다음과 같다.
+
+| 구분 | 대상 (예) | 하는 방법 |
+|---|---|---|
+| **일반 개발 (A)** | `services/web-*` · 공통 UI 패키지 · 서비스별 업무 모듈 · AI 실행기 · 사이트 어댑터 | 평소대로 개발 · 테스트 · push · 인계 기록 |
+| **Core 계약 변경 (B)** | 인증 · 권한 · 가입, 주문 · 장바구니 · 결제, 상품 마스터 · 공급 오퍼 · 가격 규칙, AI 실행 계약 · 사용량 정산, Personal Assistant 판단 · PC 프로그램 프로토콜, 엔티티 등록 · DB migration | 읽기 · 수정은 자유다. **여러 서비스가 기대는 계약(API · 테이블 · 권한 · 상태 규칙)이 바뀌면** 인계 기록의 결정 사항에 「Core 계약 변경 — 영역 · 영향 서비스」를 적는다. 병합 판단은 통합 담당이 한다. 계약이 그대로인 버그 수정 · 테스트는 일반 개발과 같다 |
+
+- Core 경로를 바꾼 PR 에는 `core-change` 라벨이 자동으로 붙는다. 경로 목록은 `scripts/ci/core-paths.mjs` 다. 표시일 뿐이고 병합을 막지 않는다.
+- 패키지 이름에 `core` 가 붙었다고 Core 는 아니다(UI 패키지가 여럿이다). 반대로 Core 의 대부분은 `apps/api-server` 안에 있다.
+- 동결 문서(F8 · F9 · F10 · F11)가 걸리는 구조 · 테이블 변경은 지금처럼 명시적 WO 가 필요하다.
+- C 등급(소스 분리 검토 후보)은 아직 분리하지 않았다. 지금은 B 와 같이 다룬다.
+
 ## 6. Production 경계
 
-이 저장소는 **Public** 이다. 공동개발자 작업 경로는 **본인 worktree/branch → PR → required CI·review blocker 확인 → PR merge → `main`** 이다.
+이 저장소는 **Public** 이다. 공동개발자 작업 경로는 **본인 worktree/branch → push · 인계 기록 → (통합 세션) PR 생성 → required CI·review blocker 확인 → PR merge → `main`** 이다.
 
 - `main`은 PR + required check `CI Gate`로 보호된다. 필수 human approval은 기본 gate가 아니며, 기술 gate와 계정 권한을 충족한 정상 PR merge에는 반복 사용자 승인을 요구하지 않는다. 직접 push·force push·ruleset 우회는 하지 않는다 — 상세는 [AGENTS.md §4-1(e)](../../AGENTS.md#4-1-parallel-session--worktree-policy). 실제 ruleset은 통합 직전에 조회한다.
 - Production 은 소유자 통제다: `production` Environment 는 `main` · `deploy/*` tag 에서만 실행되고, `deploy/*` tag 는 소유자만 만들 수 있으며, 수동 배포는 소유자가 실행할 때만 게이트가 열린다.
@@ -162,7 +176,7 @@ DB 의 `o4o_api` 는 로그인 계정이 아니라 **NOLOGIN owner role** 이다
 
 ## 7. 다음에 읽을 문서
 
-1. 이 문서
+1. 이 문서 — 실제 설치 · 첫 작업 순서는 [공동개발자 시작 체크리스트](COLLABORATOR-ONBOARDING-CHECKLIST.md)
 2. [O4O-BUSINESS-PHILOSOPHY-V1](../baseline/O4O-BUSINESS-PHILOSOPHY-V1.md) · [O4O-AI-AUTOMATION-EVOLUTION-PRINCIPLES-V1](../baseline/O4O-AI-AUTOMATION-EVOLUTION-PRINCIPLES-V1.md)
 3. [README.md](../../README.md) — 기여 · Production 변경 원칙
 4. [SETUP.md](../../SETUP.md) — 로컬 개발환경 · 검증 명령 · DB. 공동개발 로컬환경(로컬 API + web-neture, 운영 credential 불필요)은 [§3-1](../../SETUP.md#3-1-공동개발-로컬환경--로컬-api--web-neture)
