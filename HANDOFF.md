@@ -1,5 +1,18 @@
 # HANDOFF
 
+## 2026-11-12 · ChatGPT 콘텐츠 비용 경계 검증
+
+- **branch / PR 묶음:** `wo/chatgpt-content-no-inference` — 외부 콘텐츠 도구 회귀 테스트와 후속 계약 차이 기록 1개 묶음. PR 생성·병합은 통합 세션. 런타임·API·권한·DB·배포 변경 없음.
+- **한 일:** 콘텐츠 11종의 실제 dispatcher에서 권한·분기·멱등·실패 검증, 어댑터/직접 저장 서비스 14개 파일의 AST 추론 의존성 검사, MCP HTTP의 Bearer 연결 ID 전달과 위조 인자 제거 검증. 추가 45개 테스트, 기존 포함 7 suites / 85 tests 통과.
+- **결정 사항:** 제거할 유료 호출은 발견하지 않아 임의 런타임 가드를 추가하지 않음. 구조화 상담자료 전체 노출은 약사/근무자 접근 및 B2B 논리 분리 전에 하지 않음. 기존 소비자 다국어 초안 저장을 중앙 상담자료/QR 표준설명서 저장으로 취급하지 않음. SIWC 유보.
+- **후속 명세:** [IR-O4O-CHATGPT-CONTENT-COST-BOUNDARY-V1](docs/investigations/IR-O4O-CHATGPT-CONTENT-COST-BOUNDARY-V1.md). 다음 3차는 자료 논리 유형·공개 대상·기존 연결 보존, 4차는 구조화 상담자료 검색 반영.
+- **검증:** `pnpm@10.25.0 install --frozen-lockfile` 성공(호스트 Node 24.22.1, 저장소 안내 정확 버전 22.23.4와 다름). Jest external-ai 전체 85/85, lint 수정 후 영향받은 26건 재통과. 변경 테스트 3개 ESLint 오류 0(기존 eslintignore 경고 있음), `git diff --check`, docs 민감정보 검사 통과. 앱 전체 build/typecheck·실제 DB/공급자 호출·ChatGPT OAuth 왕복 미실행. 단위 테스트는 어댑터 mock, AST 검사는 전체 전이 분석이 아님.
+- **확인하지 못한 것 / 배포 후:** 운영 청구액, 관리자 설정, 실제 ChatGPT 연결 및 기존 화면 재열기. 배포를 요구하는 런타임 변경 없음. 운영 측정은 1차 수집 명세대로 로컬 `o4o_readonly` 경로에서 별도 수행.
+- **겹치는 PR:** 조회 시 #1039의 `HANDOFF.md`만 겹침. #1038·#1037·#1028과 이 변경의 코드 경로 겹침 없음. 통합 시 새 인계 절을 보존.
+- **문서 정합:** 기존 비용 정책·외부 연결 설계 유지. canonical 변경 없음.
+
+> 저장소: `Renagang21/o4o-platform` · 작업 branch: `claude/clever-bohr-g532hw` · 코드 기준: `main` `c5da5631`(merge 반영) · 작성: 2026-11-11 (클라우드 작업 세션)
+
 > 저장소: `Renagang21/o4o-platform` · 작업 branch: `claude/epic-rubin-5g04vm`(맨 위 절) · 이전 절 branch: `claude/clever-bohr-g532hw` · 코드 기준: `main` `c5da5631`(merge 반영) · 작성: 2026-11-11 (클라우드 작업 세션)
 > 다음 실행자: **통합 담당(이 branch 의 PR 생성 · CI · 병합) → Businnect(체크리스트 실행 · 첫 과제)**
 > 이전 인계 전문: `git show 0c812623:HANDOFF.md`
