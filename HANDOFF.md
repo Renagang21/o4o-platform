@@ -1,5 +1,15 @@
 # HANDOFF
 
+## 2026-11-12 · 구조화 상담자료의 상품 후보 검색 반영
+
+- **branch / PR 묶음:** `wo/consultation-structured-product-search` — 3차 선행 커밋 `f56c1b3ed`를 최신 main `31be41b49`에 cherry-pick한 `1b2ab0813` + 4차 검색 변경. 원래 `wo/product-consultation-resource-separation`는 이 묶음 **병합 후 삭제 가능**. 원래 branch는 수정·삭제하지 않음. 이미 3차를 따로 통합할 경우 같은 diff를 중복 반영하지 않도록 확인한다.
+- **한 일:** 현재 매장의 활성 취급 상품에서 구조화 상담자료 제목·내용으로 후보 검색. 자료 선택 SQL·Zod 검증을 최종 상담자료 읽기와 공유. 일반 B2B HTML 의존 제거. 50건씩 검증 후 상위 12개 정렬, 1,000개 초과는 422 조건 구체화 안내. 늦은 유효 후보/높은 점수를 버리지 않고 원문·내부 점수는 응답에 넣지 않음.
+- **결정 사항:** 기존 맥락 계획 1회 유지, 추가 AI 호출 없음. DB schema·운영 데이터·권한·화면·SIWC 변경 없음. 직접 등록 상품의 이름 검색은 유지하고 중앙 자료를 임의 연결하지 않음. 공통 상품 연결·관리자 준비·자료 재사용은 5차. broad 검색은 조용한 부분 결과/빈 결과 대신 명시적 실패.
+- **검증:** API 관련 178 pass / 11 skip(전용 PostgreSQL 통합 연결 미설정). 실제 승인→검색→stale 무효화 시나리오를 기존 DB suite에 보강했으나 이 suite는 미실행. 별도 PGlite 격리 PostgreSQL에서 실제 검색 SQL·유형/언어 partial unique index·구조화 전용 용어·scope/status/언어/출처/JSON/stale·중복 listing·pagination·정렬·접근 철회 검증. API typecheck, 변경 6개 TS 파일 ESLint 오류 0. 세부 [조사 기록](docs/investigations/IR-O4O-STRUCTURED-CONSULTATION-PRODUCT-SEARCH-V1.md).
+- **확인하지 못한 것 / 배포 후:** 운영 데이터 부하·실제 비용·실제 약사 화면. 성분·용도·주의사항으로 후보→상품 선택→근거 확인→판단 지원, 타 매장/자격 거부, 검색 중 권한 철회, 원천 변경 후 재준비를 확인한다. 실제 운영 DB·공급자 호출·배포는 실행하지 않음. 롤백 시 상담자료를 삭제하거나 B2B로 덮어쓰지 않는다.
+- **겹치는 PR:** 조회 시 #1042·#1039와 HANDOFF.md만 겹침. 3차 branch와 새 묶음의 중복 통합에 유의. PR 생성·병합·배포는 통합 세션 담당.
+- **문서 정합:** 누적 발견 2건 / 별도 문서 정비 1묶음 — 매장 Excel·AI 자료 흐름 및 상담 맥락 운영 안내의 B2B 전용 설명. 정본 수정은 별도 인계.
+
 ## 2026-11-12 · 상품 상담자료 논리 분리
 
 - **branch / PR 묶음:** `wo/product-consultation-resource-separation` — CONSULTATION 유형·공통 조회·관리자 접수·매장 표시·회귀 검증의 한 기능 묶음. 공통 snapshot union은 값 하나만 추가. 기존 소비처 호환을 유지하기 위해 API와 최소 화면 변경을 함께 검증한다. PR 생성·병합·배포는 통합 세션에 인계한다.
