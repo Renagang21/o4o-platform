@@ -86,7 +86,7 @@ on:
         required: false
         default: ''
       dry_run:
-        description: "'true' = 배선 검증 — detect 까지만 (ci-gate · build · migration · deploy 0)"
+        description: "'true' = 배선 검증 — detect 까지만 (CI gate · build · migration · deploy 0)"
         type: string
         required: false
         default: 'false'
@@ -151,11 +151,19 @@ jobs:
   #
   # 안전 방향은 한쪽뿐이다 — base SHA 이상 · force push · git diff 실패 ·
   # workspace graph 실패 · lockfile 비교 불가는 전부 `api_deploy_affected=true` 다.
+  # WO-O4O-PROMOTE-SHORT-JOB-CONSOLIDATION-V1 — 판정(detect)과 CI gate 를 한 job 으로 둔다(job 마다 1분 청구 → 호출 1번 2분 → 1분).
+  #   게이트 조건 · 스크립트 · 권한은 종전 ci-gate job 그대로이고, 배포 job 은 `needs.detect.outputs.ci_gate == 'passed'` 일 때만
+  #   돈다(fail-closed: 게이트 step 이 skip 되면 출력이 비고, 실패하면 이 job 이 실패해 배포 job 이 needs 로 skip 된다).
   detect:
     if: inputs.erasure_operation == ''
     name: Detect API deploy scope
     runs-on: ubuntu-latest
+    timeout-minutes: 45
+    permissions:
+      contents: read
+      actions: read   # CI gate (CI run 조회)
     outputs:
+      ci_gate: ${{ steps.ci_gate.outputs.ci_gate }}
       api_deploy_affected: ${{ steps.scope.outputs.api_deploy_affected }}
       api_ci_affected: ${{ steps.scope.outputs.api_ci_affected }}
       reason: ${{ steps.scope.outputs.reason }}
@@ -184,41 +192,33 @@ jobs:
           echo "- 사유: ${{ steps.scope.outputs.reason }}"
         } >> "$GITHUB_STEP_SUMMARY"
 
-  # ===========================================================================
-  # WO-O4O-CICD-SAFE-AUTODEPLOY-AND-RISK-GATE-V1 Phase 1 — CI success gate (enforced)
-  #
-  # 원칙 A: CI 가 green 이 아닌 commit 은 production 배포 대상이 될 수 없다.
-  #   종전에는 배포 workflow 가 CI 결과를 기다리지 않았다 — 게이트가 열린 순간 CI 실패 commit 도 배포될 수 있었다.
-  #   필수 CI = `CI Pipeline`(ci-pipeline.yml) 의 target SHA 최신 run. failure · cancelled · pending · 부재 · SHA 불일치 = 차단.
-  #   push 직후에는 CI 가 아직 도는 중이므로 최대 30분 기다린다(그래도 pending 이면 차단).
-  #   배포가 실제로 열릴 수 있을 때만 돈다 — 게이트가 닫힌 평상시에는 러너 시간을 쓰지 않는다.
-  #   실패하면 이 job 이 red 가 되고 build-and-deploy 는 needs 로 skip 된다(= migration 0 · deploy 0).
-  ci-gate:
-    name: CI gate (target SHA must be green)
-    needs: [detect]
-    # dry_run(배선 검증 · workflow_call 전용) 이면 게이트를 열지 않는다 → build-and-deploy 도 needs 로 skip.
-    # WO-O4O-PUBLIC-COLLABORATOR-PRODUCTION-BOUNDARY-AND-MAIN-PROTECTION-V1 — 수동 실행(직접 dispatch · promote 경유)은 저장소 소유자만.
-    #   collaborator 가 dispatch 하면 게이트를 열지 않는다(→ 배포 job 전부 skip). 자동 경로(workflow_run)는 그대로.
-    if: >-
-      vars.DEPLOY_FREEZE == 'false' && inputs.dry_run != 'true' &&
-      (github.event_name != 'workflow_dispatch' || github.triggering_actor == github.repository_owner) &&
-      (inputs.migrate_only == 'true' || needs.detect.outputs.api_deploy_affected == 'true')
-    runs-on: ubuntu-latest
-    timeout-minutes: 40
-    permissions:
-      contents: read
-      actions: read
-    steps:
-    - uses: actions/checkout@v6
-      with:
-        sparse-checkout: scripts/ci
-    - uses: actions/setup-node@v7
+    # WO-O4O-CICD-SAFE-AUTODEPLOY-AND-RISK-GATE-V1 Phase 1 — CI success gate (enforced)
+    #   원칙 A: CI 가 green 이 아닌 commit 은 production 배포 대상이 될 수 없다. 필수 CI = `CI Pipeline` 의 target SHA 최신 run.
+    #   failure · cancelled · pending · 부재 · SHA 불일치 = 차단. push 직후 CI 가 도는 중이면 최대 30분 기다린다.
+    #   dry_run(배선 검증 · workflow_call 전용) 이면 게이트를 열지 않는다 → 배포 job 도 skip.
+    #   WO-O4O-PUBLIC-COLLABORATOR-PRODUCTION-BOUNDARY-AND-MAIN-PROTECTION-V1 — 수동 실행(직접 dispatch · promote 경유)은 저장소 소유자만.
+    #   collaborator 가 dispatch 하면 게이트를 열지 않는다(→ 배포 job skip). 자동 경로(workflow_run)는 그대로.
+    - name: Set up Node for CI gate
+      if: >-
+        vars.DEPLOY_FREEZE == 'false' && inputs.dry_run != 'true' &&
+        (github.event_name != 'workflow_dispatch' || github.triggering_actor == github.repository_owner) &&
+        (inputs.migrate_only == 'true' || steps.scope.outputs.api_deploy_affected == 'true')
+      uses: actions/setup-node@v7
       with:
         node-version: '22.23.4'
-    - name: Require green CI for target SHA
+    - name: CI gate (target SHA must be green)
+      id: ci_gate
+      if: >-
+        vars.DEPLOY_FREEZE == 'false' && inputs.dry_run != 'true' &&
+        (github.event_name != 'workflow_dispatch' || github.triggering_actor == github.repository_owner) &&
+        (inputs.migrate_only == 'true' || steps.scope.outputs.api_deploy_affected == 'true')
+      timeout-minutes: 40
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: node scripts/ci/ci-gate.mjs --target "${{ github.sha }}" --wait-seconds 1800 --enforce
+      run: |
+        set -euo pipefail
+        node scripts/ci/ci-gate.mjs --target "${{ github.sha }}" --wait-seconds 1800 --enforce
+        echo "ci_gate=passed" >> "$GITHUB_OUTPUT"
 
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -226,10 +226,10 @@ jobs:
     #   GitHub `production` Environment 는 배포 ref 를 `main` branch · `deploy/*` tag 로 제한하고, production credential 은
     #   environment secret 으로 둔다 — 그 밖의 ref(collaborator branch · PR)에서는 이 job 이 시작되지 않는다. required reviewer 는
     #   없다(대기 없이 실행). 배포 게이트는 그대로 이 job `if:` 의 `DEPLOY_FREEZE`(정확히 'false' 일 때만 · 부재/공백/오타 = freeze)
-    #   와 ci-gate(수동 실행 = 소유자만)다.
+    #   와 CI gate(detect 의 step · 수동 실행 = 소유자만)다.
     environment: production
-    # ci-gate 가 skip(게이트 닫힘) 또는 실패(CI not green)면 이 job 도 skip 된다 (if 에 status 함수가 없으므로 암묵 success()).
-    needs: [detect, ci-gate]
+    # CI gate step 이 skip(게이트 닫힘)이면 ci_gate 출력이 비어 이 job 이 skip, 실패(CI not green)면 detect 가 실패해 needs 로 skip 된다.
+    needs: [detect]
     # WO-O4O-API-CD-RUNTIME-AFFECTED-DEPLOY-GATE-V1 §11 · §13 · §15
     #
     #   1. `api_deploy_affected=false` → Docker build/push 0 · migration 0 ·
@@ -248,7 +248,7 @@ jobs:
     #   이 잡을 열되, 첫 step 이 태그 ref · SHA 일치를 검사하고 "Deploy to Cloud Run" 이후 step 은 전부 skip 한다.
     #   일반 경로(첫 분기)는 migrate_only 가 'true' 가 아닐 때만 — push 이벤트에서는 inputs 가 없어 항상 성립.
     if: >-
-      vars.DEPLOY_FREEZE == 'false' &&
+      vars.DEPLOY_FREEZE == 'false' && needs.detect.outputs.ci_gate == 'passed' &&
       ((github.event_name == 'workflow_dispatch' && inputs.migrate_only == 'true') ||
        (needs.detect.outputs.api_deploy_affected == 'true' &&
         inputs.migrate_only != 'true' &&

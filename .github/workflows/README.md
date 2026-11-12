@@ -27,8 +27,8 @@
 deploy workflow 3종은 push 에 반응하지 않는다 — `delivery.yml`/`promote.yml` 의 `workflow_call` · 사람의 통제 dispatch(break-glass)로만 실행된다.
 cutover(`DELIVERY_ENFORCE: 'true'` + `deploy-auto.yml` 비활성, 같은 commit · 2026-10-02) 로 자동 경로는 `delivery.yml` 하나다 — 절차와 상태는
 [`CHECK-O4O-CICD-UNIFIED-DELIVERY-PIPELINE-V1`](../../docs/checks/CHECK-O4O-CICD-UNIFIED-DELIVERY-PIPELINE-V1.md).
-각 deploy workflow 의 `ci-gate` job 이 target SHA 의 `CI Pipeline` green 을 요구하고, rollout 은 서비스 단위 concurrency 로 1개씩이다.
-job 의 `environment: production` 은 승인 게이트가 아니라 배포 ref 경계다 — `main` · `deploy/*` 에서만 실행되고 production credential 은 environment secret 이다(required reviewer 없음). 수동 dispatch 는 소유자만 `ci-gate` 를 연다.
+각 deploy workflow 의 detect job 안 CI gate step(`ci_gate`)이 target SHA 의 `CI Pipeline` green 을 요구하고(통과해야 배포 job 이 돈다 · 2026-11-11 detect 와 한 job 으로 통합 — 1분 단위 청구 절감), rollout 은 서비스 단위 concurrency 로 1개씩이다. Web `summary` 는 직접 dispatch 에서만 돈다(Delivery · Promote 호출은 report job 이 결과를 기록).
+job 의 `environment: production` 은 승인 게이트가 아니라 배포 ref 경계다 — `main` · `deploy/*` 에서만 실행되고 production credential 은 environment secret 이다(required reviewer 없음). 수동 dispatch 는 소유자만 CI gate 를 연다.
 production credential 7개는 `production` Environment 에만 있고 repository secret 은 0개다(2026-10-02 이전 완료). DB 비밀번호 runtime source 는 Secret Manager `o4o-db-password`.
 scope 검증은 `production-secret-resolution-check.yml`(수동 · 소유자 · 값 출력 0) — 이름 · 용도는 [`SECRETS_SETUP.md`](../SECRETS_SETUP.md).
 GCP 인증은 WIF(`workload_identity_provider` + `service_account` · 장기 key 없음)다 — provider 조건과 인증 smoke(`gcp-wif-auth-smoke.yml`)는 [`SECRETS_SETUP.md`](../SECRETS_SETUP.md).
