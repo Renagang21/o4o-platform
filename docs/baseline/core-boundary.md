@@ -28,7 +28,10 @@
 
 ### Frozen Cores
 
-`auth-core`, `cms-core`, `platform-core`, `organization-core` — 구조/테이블 변경 금지 (CLAUDE.md §5)
+> **2026-11-11 정합**: 현행 Core 목록 · 위치 · 변경 등급은 [`O4O-CORE-REGISTRY-V1`](O4O-CORE-REGISTRY-V1.md) 이 정본이다. 아래 패키지 목록은 이전 기준이다.
+> `auth-core` 는 소비처 0 인 껍데기다(실제 인증 Core 는 api-server `modules/auth`). 네 패키지는 registry 에서 B 등급이며 구조 · 테이블 변경 WO 규칙은 그대로다.
+
+`auth-core`, `cms-core`, `platform-core`, `organization-core` — 구조/테이블 변경 금지 (CLAUDE.md §3)
 
 ---
 

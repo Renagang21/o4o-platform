@@ -1,6 +1,5 @@
 import {initialMemberRegistration} from './new-member-registration.js';
 import { recordSignupTerms, recordSignupPrivacy, type SignupTermsReference } from './signup-policy.service.js';
-import { isPhoneShapeValid, normalizePhoneDigits } from '../../common/auth/phone-shape.js';
 /**
  * @core O4O_PLATFORM_CORE — Auth
  * GoogleAuthService — Google Signup/Login (WO-O4O-GOOGLE-ONLY-SIGNUP-LOGIN-V1 · WO-2D)
@@ -298,12 +297,8 @@ export class GoogleAuthService {
       throw new GoogleAuthError('GOOGLE_EMAIL_MISSING');
     }
 
-    // WO-O4O-AUTH-ONBOARDING-UX-CLEANUP-V1 T2: 이름 · 휴대전화는 가입 선택 항목이다(가입 유형 입력이 필수로 받는다).
-    //   값이 있을 때만 형식을 검사한다.
-    const name = typeof input.consents.name === 'string' ? input.consents.name.trim() : '';
-    if (name.length > 100) throw new GoogleAuthError('INVALID_NAME');
-    const phone = typeof input.consents.phone === 'string' ? input.consents.phone.trim() : '';
-    if (phone && !isPhoneShapeValid(phone)) throw new GoogleAuthError('INVALID_PHONE');
+    // WO-O4O-SOCIAL-SIGNUP-DIRECT-ROLE-REGISTRATION-V1 S1 (2026-11-11): Google 가입은 약관 동의만 받는다.
+    //   이름 · 닉네임 · 휴대전화는 받지 않는다(예전 화면이 보내도 쓰지 않는다) — 가입 신청(역할 입력)에서 받는다.
     const user = await this.dataSource.transaction(async (manager) => {
       const created = await this.createGoogleUser(manager, identity, input.consents);
       await recordSignupTerms(created.id, input.policyServiceKey ?? '', input.consents.termsPolicy, manager);
@@ -371,9 +366,7 @@ export class GoogleAuthService {
     const user = userRepo.create({businessInfo:initialMemberRegistration(),
       // WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1 Phase B-1: `password: null` write 제거 — 컬럼이 B-2 에서 사라진다.
       email,
-      name: consents.name?.trim() || null,
-      nickname: consents.nickname?.trim() || undefined,
-      phone: normalizePhoneDigits(consents.phone) || undefined,
+      name: null,
       status: UserStatus.ACTIVE,
       isActive: true,
       isEmailVerified: true,

@@ -98,9 +98,6 @@ export function GoogleContinue<TUser = unknown>({
   const [terms, setTerms] = useState(false);
   const [privacy, setPrivacy] = useState(false);
   const [marketing, setMarketing] = useState(false);
-  const [phone, setPhone] = useState('');
-  const [name, setName] = useState('');
-  const [nickname, setNickname] = useState('');
   const containerRef = useRef<HTMLDivElement>(null);
   const mountedRef = useRef(true);
   const alertRef = useAlertIntoView<HTMLParagraphElement>(message);
@@ -186,18 +183,11 @@ export function GoogleContinue<TUser = unknown>({
       setMessage('이용약관과 개인정보 처리방침에 동의해야 계정을 만들 수 있습니다.');
       return;
     }
-    // WO-O4O-AUTH-ONBOARDING-UX-CLEANUP-V1 T2: 이름 · 휴대전화는 선택 — 값이 있을 때만 형식을 확인한다.
-    if (name.trim().length > 100) { setMessage('이름을 100자 이내로 입력해 주시기 바랍니다.'); return; }
-    if (!nickname.trim()) { setMessage('닉네임을 입력해 주시기 바랍니다.'); return; }
-    const phoneDigits = phone.replace(/\D/g, '');
-    if (phoneDigits && !/^01\d{8,9}$/.test(phoneDigits)) { setMessage('휴대전화 번호 형식을 확인해 주시기 바랍니다. (예: 01012345678)'); return; }
     const idToken = stage.idToken;
     setMessage(null);
     setStage({ kind: 'busy' });
     const result = await callbacksRef.current.signupWithGoogle(idToken, {
-      terms, privacy, marketing, nickname: nickname.trim(),
-      ...(name.trim() ? { name: name.trim() } : {}),
-      ...(phoneDigits ? { phone: phoneDigits } : {}),
+      terms, privacy, marketing,
       ...signupPolicyReferences(policy!),
     });
     if (!mountedRef.current) return;
@@ -220,7 +210,7 @@ export function GoogleContinue<TUser = unknown>({
     fail(result.code === 'EMAIL_IN_USE' ? { ...result, error: GOOGLE_SIGNUP_EMAIL_IN_USE_MESSAGE } : result);
     // 동의 화면에 머물러 입력을 고친 뒤 재시도할 수 있게 한다.
     setStage({ kind: 'consent', idToken });
-  }, [stage, terms, privacy, marketing, phone, name, nickname, policy, fail, loadConfig]);
+  }, [stage, terms, privacy, marketing, policy, fail, loadConfig]);
 
   return (
     <div className={className} style={box} data-testid="google-continue">
@@ -241,12 +231,9 @@ export function GoogleContinue<TUser = unknown>({
       {stage.kind === 'consent' && (
         <div style={box} data-testid="google-continue-consent">
           <p style={{ fontSize: 14, color: '#111827', margin: 0 }}>
-            처음 오셨네요. 계정을 만들려면 아래 항목에 동의해 주시기 바랍니다.
+            {/* WO-O4O-SOCIAL-SIGNUP-DIRECT-ROLE-REGISTRATION-V1 S1 · Q1: 여기서는 약관 동의만 받는다. 닉네임 · 직역 정보는 이어지는 가입 신청에서 받는다. */}
+            처음 오셨네요. 약관에 동의하면 계정이 만들어지고, 이어서 가입 유형과 필요한 정보를 입력합니다.
           </p>
-          <label style={styles.field}>닉네임 (필수)<input style={styles.input} type="text" maxLength={50} value={nickname} onChange={(e) => setNickname(e.target.value)} /></label>
-          <label style={styles.field}>이름 (선택)<input style={styles.input} type="text" autoComplete="name" maxLength={100} value={name} onChange={(e) => setName(e.target.value)} /></label>
-          <label style={styles.field}>개인 휴대전화 (선택)<input style={styles.input} type="tel" autoComplete="tel" value={phone} onChange={(e) => setPhone(e.target.value)} /></label>
-          <p style={muted}>연락처를 등록합니다. 휴대전화 본인 인증을 수행하는 것은 아닙니다.</p>
           <SignupTermsAgreement load={getSignupTerms} checked={terms} onChecked={setTerms} onDocument={document => { setPolicy(document); setPrivacy(false); }} reloadKey={policyReload} />
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
             <label style={checkRow}><input type="checkbox" checked={privacy} onChange={(e) => setPrivacy(e.target.checked)} /><span>개인정보 처리방침 동의 (필수)</span></label>
@@ -259,7 +246,7 @@ export function GoogleContinue<TUser = unknown>({
           {/* T1: 오류는 제출 버튼 바로 위에 — 스크롤되는 모달 하단에 숨지 않게 한다. */}
           {message && <p ref={alertRef} style={errorStyle} role="alert" data-testid="google-continue-signup-error">{message}</p>}
           <button type="button" disabled={!policy || !terms || !privacy} style={primaryBtn} onClick={() => { void submitSignup(); }}>
-            동의하고 계정 만들기
+            동의하고 가입하기
           </button>
           <button type="button" style={ghostBtn} onClick={() => { setMessage(null); void loadConfig(); }}>
             취소
