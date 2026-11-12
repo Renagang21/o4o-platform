@@ -146,10 +146,19 @@ test('병합 클라우드: 등록 · 변경 파일 판정 (가짜 gh)', { skip: 
   assert.equal(r, null);
 
   // 등록됨 · 보호 경로 → 거부
-  for (const f of ['.github/workflows/deploy-api.yml', '.claude/hooks/x.mjs', '.claude/settings.json', '.claude/integration-sessions.json', 'scripts/ci/ci-gate.mjs', 'apps/api-server/Dockerfile', 'cloudbuild.yaml']) {
+  for (const f of [
+    '.github/workflows/deploy-api.yml', '.claude/hooks/x.mjs', '.claude/settings.json', '.claude/integration-sessions.json',
+    'scripts/ci/ci-gate.mjs', 'apps/api-server/Dockerfile', 'cloudbuild.yaml',
+    'scripts/deployment/pharmacy-hub-domain-detachment.mjs', 'scripts/privacy/account-erasure-operations.mjs',
+    'scripts/db/migration-identity.mjs', 'scripts/ci-build-app.sh', 'infra/artifact-registry/x.json', 'deploy/chatgpt-review-demo/compose.yml',
+  ]) {
     r = runHook('merge_pull_request', merge(), { cloud: true, gh: { [reg]: registry([ME]), 'pulls/7/files': `docs/a.md\n${f}\n` } });
     assert.equal(r?.permissionDecision, 'deny', f);
   }
+
+  // rename: 가짜 gh 는 jq 를 적용하지 않으므로 훅이 받는 출력(새 경로 · 이전 경로 줄)을 그대로 준다 — 이전 경로가 보호면 거부
+  r = runHook('merge_pull_request', merge(), { cloud: true, gh: { [reg]: registry([ME]), 'pulls/7/files': 'docs/settings.json\n.claude/settings.json\n' } });
+  assert.equal(r?.permissionDecision, 'deny');
 
   // 변경 파일 조회 실패 → 거부
   r = runHook('merge_pull_request', merge(), { cloud: true, gh: { [reg]: registry([ME]) } });

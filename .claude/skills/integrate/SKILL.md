@@ -45,4 +45,4 @@ main 의 `.claude/integration-sessions.json` 에 등록된 클라우드 세션�
 5. 배포된 사용자 화면은 Playwright 로 Demo 「테스트 로그인」 확인(`SETUP.md` 배포 후 Demo 검증). 클라우드는 neture 도메인만 접속할 수 있고, `/health` 에는 SHA 가 없다.
 6. **`HOLD`(LEVEL_3 · 첫 rollout) · `FAILED` · `BLOCKED_*FREEZE`** 이면 멈추고, PR · SHA · 판정 · 로그 위치를 `HANDOFF.md` 에 적어 로컬 세션(promote · 수동 배포 · 원인 확인)으로 넘긴다.
 
-**훅이 병합을 거부하는 PR** — `.github/` · `.claude/hooks/` · `.claude/settings.json` · `.claude/integration-sessions.json` · `scripts/ci/` · `Dockerfile*` · `cloudbuild*` 를 바꾸는 PR 은 CI 결과만 보고하고 통합 담당(로컬)에 넘긴다. 훅을 우회하려고 `gh api -X PUT …/merge` 나 다른 경로를 쓰지 않는다.
+**훅이 병합을 거부하는 PR** — `guard-mcp-github.mjs` 의 `PROTECTED_PATHS`(`.github/` · `.claude/hooks/` · `.claude/settings.json` · 등록 파일 · `scripts/ci/` · `scripts/deployment/` · `scripts/db/` · 계정 삭제 스크립트 · `infra/` · `deploy/` · `Dockerfile*` 등, rename 이전 경로 포함)를 바꾸는 PR 은 CI 결과만 보고하고 통합 담당(로컬)에 넘긴다. 훅을 우회하려고 `gh api -X PUT …/merge` 나 다른 경로를 쓰지 않는다.

@@ -48,6 +48,13 @@ export const PROTECTED_PATHS = [
   /^\.claude\/settings\.json$/,
   /^\.claude\/integration-sessions\.json$/,
   /^scripts\/ci\//,
+  // workflow 가 운영 자원에 대해 직접 실행하는 스크립트 — YAML 을 고치지 않고 스크립트만 바꿔도 운영 동작이 바뀐다(Codex #1039 P1).
+  /^scripts\/deployment\//, // 배포 · 도메인 · URL map 변경
+  /^scripts\/privacy\/account-erasure-/, // 운영 계정 삭제 실행
+  /^scripts\/db\//, // migration 계약 · 식별
+  /^scripts\/ci-build-app\.sh$/,
+  /^infra\//,
+  /^deploy\//,
   /(^|\/)Dockerfile[^/]*$/,
   /(^|\/)cloudbuild[^/]*$/,
 ];
@@ -90,7 +97,8 @@ function registeredSessions(slug, cwd) {
 }
 
 function prFiles(slug, number, cwd) {
-  const out = gh(['api', `repos/${slug}/pulls/${number}/files`, '--paginate', '--jq', '.[].filename'], cwd);
+  // rename 은 이전 경로도 본다 — 보호 파일을 비보호 경로로 옮기는 PR 을 놓치지 않는다(Codex #1039 P1 · core-paths.mjs 와 같은 기준).
+  const out = gh(['api', `repos/${slug}/pulls/${number}/files`, '--paginate', '--jq', '.[] | .filename, (.previous_filename // empty)'], cwd);
   return out.split('\n').map((s) => s.trim()).filter(Boolean);
 }
 

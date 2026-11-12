@@ -18,7 +18,7 @@
   - 새 `.claude/hooks/guard-mcp-github.mjs`(matcher `mcp__github__.*`) + 테스트 14개. 조사에서 확인한 빈틈: MCP 도구는 Bash 훅을 거치지 않고, 클라우드 MCP 토큰이 소유자 계정이라 `actions_run_trigger` 로 deploy · promote 를 실행하면 workflow 소유자 게이트도 통과했다. 판정:
     - auto-merge 거부 · main 에 직접 쓰는 파일 도구(`push_files` 등) 거부(모든 세션)
     - 클라우드: 검사 전용 workflow(CI Pipeline · CodeQL · AppStore Guard · PR 라벨 · 겹침 알림) 밖의 실행 · 재실행 · 취소 거부. 숫자 ID 조회 실패도 거부. 로컬은 승인 창/대화상자
-    - 병합: squash + `expectedHeadSha` 필수. 클라우드는 main 등록 확인 + PR 이 `.github/` · `.claude/hooks/` · `.claude/settings.json` · 등록 파일 · `scripts/ci/` · `Dockerfile*` · `cloudbuild*` 를 바꾸지 않을 것. 조회 실패는 거부
+    - 병합: squash + `expectedHeadSha` 필수. 클라우드는 main 등록 확인 + PR 이 보호 경로(`.github/` · `.claude/hooks/` · `.claude/settings.json` · 등록 파일 · `scripts/ci/` · workflow 가 운영에 실행하는 `scripts/deployment/` · `scripts/privacy/account-erasure-*` · `scripts/db/` · `scripts/ci-build-app.sh` · `infra/` · `deploy/` · `Dockerfile*` · `cloudbuild*`)를 바꾸거나 거기서 옮기지 않을 것(rename 이전 경로 포함 — Codex #1039 P1 2건 반영). 조회 실패는 거부
   - `.claude/settings.json` 에 훅 등록 · 새 `.claude/integration-sessions.json`(`.gitignore` 의 `.claude/*` 에 걸려 예외 한 줄 추가)
   - `AGENTS.md` §4 역할(상시 통합 세션) · 작업 위치 분담(PR 생성 · 병합은 상시 통합 세션, 배포 · 로컬 작업은 VS Code, 병합은 한 시점에 한 곳) · §9(MCP 훅)
   - `CLAUDE.md` 훅 목록 · 세션 표(상시 통합 세션 행) · 환경 이름 · setup script 문구 · branch/PR 문구(작업 세션은 PR 을 만들지 않는다 — §4-1(e) 와 어긋나 있던 것) · 클라우드 GitHub 도구 제약
