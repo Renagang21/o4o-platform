@@ -1,5 +1,15 @@
 # HANDOFF
 
+## 2026-11-12 · 상품 상담자료 논리 분리
+
+- **branch / PR 묶음:** `wo/product-consultation-resource-separation` — CONSULTATION 유형·공통 조회·관리자 접수·매장 표시·회귀 검증의 한 기능 묶음. 공통 snapshot union은 값 하나만 추가. 기존 소비처 호환을 유지하기 위해 API와 최소 화면 변경을 함께 검증한다. PR 생성·병합·배포는 통합 세션에 인계한다.
+- **한 일:** 상품 상담자료 CONSULTATION 추가, QR은 STORE 유지. 새 유형 정본을 우선하고 이전 B2B는 원천·언어·본문·aiSections 근거가 유효한 구조화 자료만 호환 읽기. 일반 B2B 본문 대체 제거. 조회·자료 현황·Excel 공통 리더 사용. 외부 ChatGPT 일반 조회에 새 전문 자료 자동 노출 방지.
+- **결정 사항:** 기존 B2B·QR 행은 이동/수정/삭제하지 않음. DB schema·migration 없음. API의 기존 purpose=B2B는 구형 클라이언트용 deprecated 전송 필드로만 보존하고 resourcePurpose=CONSULTATION 추가. 조회/준비 상태의 실제 선택은 새 공통 리더에서 수행. 약사/직원 권한·SIWC·생성 비용 정책 변경 없음.
+- **검증:** API 관련 154 pass / 11 skip(전용 PostgreSQL 통합 연결 미설정), 이후 변경한 리더·현황 16건 재통과. 관리자 10건·매장 10건. API·관리자·매장 typecheck, 공통 types 빌드. 격리 PGlite에서 실제 SQL 및 canonical partial unique index 실행 검증. 전체 어댑터/접수의 실제 PostgreSQL 통합·운영 smoke·실제 절감액 검증은 미실행. 세부는 [조사 기록](docs/investigations/IR-O4O-PRODUCT-CONSULTATION-RESOURCE-SEPARATION-V1.md).
+- **후속:** 4차는 상담자료 성분·용도·주의사항의 후보 검색 반영. 현재 자연어 검색의 B2B 본문 참조는 남음. 5차는 공통 상품 연결/정기 관리자 준비/재사용. 배포 전 구형 API가 CONSULTATION을 처리하지 못하는 점을 확인하고, 배포 후 관리자·매장·약사 화면·기존 QR을 검증한다. 롤백 시 새 자료를 B2B로 덮어쓰거나 삭제하지 않음.
+- **겹치는 PR:** #1042(2차)·#1039와 HANDOFF.md만 겹침. 공통 types 소비처 관련 #1037은 다른 파일. 새 인계 절을 보존해 순차 통합한다. 이 branch는 최신 origin/main에서 시작했으며 미병합 2차 branch를 합치지 않았다.
+- **문서 정합:** 발견 1건 / 별도 정비 1건 — 기존 매장 Excel·AI 자료 흐름의 B2B 전용·자유 본문 표시 안내. 정본 변경은 별도 문서 작업으로 인계.
+
 > 저장소: `Renagang21/o4o-platform` · 작업 branch: `claude/clever-bohr-g532hw` · 코드 기준: `main` `c5da5631`(merge 반영) · 작성: 2026-11-11 (클라우드 작업 세션)
 > 다음 실행자: **통합 담당(이 branch 의 PR 생성 · CI · 병합) → Businnect(체크리스트 실행 · 첫 과제)**
 > 이전 인계 전문: `git show 0c812623:HANDOFF.md`

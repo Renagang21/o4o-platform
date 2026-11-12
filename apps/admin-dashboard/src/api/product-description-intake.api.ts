@@ -2,7 +2,7 @@ import { authClient } from '@o4o/auth-client';
 export interface DescriptionEntry {
   aiSections?: Array<{ key: string; title: string; kind: 'product-fact' | 'professional-reference' | 'counseling-support' | 'unclassified'; text: string; referenceUrls: string[] }>;
   key: string; name: string; manufacturer: string | null; category: string | null; content: string; summary?: string | null;
-  descriptionType: 'B2B' | 'B2C' | 'STORE' | 'SUPPLIER_STORE'; language: 'ko' | 'en' | 'ja' | 'zh'; barcodes: string[];
+  descriptionType: 'B2B' | 'B2C' | 'STORE' | 'SUPPLIER_STORE' | 'CONSULTATION'; language: 'ko' | 'en' | 'ja' | 'zh'; barcodes: string[];
   identifiers: { mfdsItemSeq?: string; statementNo?: string };
   source: { kind: 'government' | 'manufacturer' | 'user_contribution'; currentness: 'retrieved' | 'archived' | 'user'; checkedOn: string | null; references: Array<{ url: string; label?: string; sha256?: string }> };
 }
