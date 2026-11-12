@@ -17,3 +17,32 @@ description: 통합 세션 - PR 없는 branch 조회 · 묶음 PR 생성, CI · 
 4. merge: 한 번에 하나씩. 병합 방식은 squash 가 기본이다(허용된 방식은 직전에 확인). 직전에 `git fetch origin` → main 이 움직였으면 push 된 branch 는 `git merge origin/main`(이력 재작성 금지) → 재검증 → PR merge. admin bypass 는 쓰지 않는다. merge 는 `.claude/settings.json` ask 대상이다. `--delete-branch` 는 쓰지 않는다 — head branch 는 저장소 설정이 자동 삭제한다(AGENTS.md §4-1(i) 7).
 5. 배포: workflow dispatch 등 배포 실행은 통합 담당이 배포를 지시했고 로컬 세션일 때만 한다(클라우드 세션은 실행하지 않는다 — AGENTS.md §9). 현재 Delivery 정책으로 `DEPLOYMENT = REQUIRED | AUTOMATIC | MANUAL/GATED | NOT_APPLICABLE` 판정. merge 후 `delivery.yml` 자동 결과를 확인한다. `promote.yml`(LEVEL_3) 은 통합 담당의 메시지에 promote 또는 LEVEL_3 가 있을 때만.
 6. 결과 보고: PR 링크 · merge SHA · post-merge CI · 배포 run · 서빙 확인 · 미검증 항목 · 자동 삭제되지 않아 통합 담당이 지울 원격 branch(대상 목록과 실행 명령만 준비하고 실행하지 않는다). 이후 `/worktree-cleanup` 으로 자기 worktree 를 정리한다.
+
+## 클라우드 상시 통합 세션 (AGENTS.md §4 역할 「상시 통합 세션」 · 2026-11-12)
+
+main 의 `.claude/integration-sessions.json` 에 등록된 클라우드 세션은 통합 담당의 병합 요청마다 범위 지정 없이 위 0~6 을 한다. 등록되지 않은 클라우드 세션의 병합은 `guard-mcp-github.mjs` 훅이 거부한다. **병합은 한 시점에 한 곳** — 로컬 세션이 병합 · 배포 중이면 기다린다.
+
+**명령 대응** — 클라우드는 GraphQL 이 막혀 `gh pr view` · `checks` · `list` · `create` · `merge` 가 실패한다.
+
+| 할 일 | 클라우드에서 쓰는 것 |
+|---|---|
+| branch 의 PR 찾기(0단계) | `gh api "repos/Renagang21/o4o-platform/pulls?head=Renagang21:<b>&state=all" --jq '.[]\|"\(.number) \(.state) \(.merged_at)"'` |
+| 열린 PR 목록 · 변경 파일 | MCP `list_pull_requests` · `gh pr diff <n> --name-only` |
+| PR 상태 · HEAD · 충돌 | `gh api repos/Renagang21/o4o-platform/pulls/<n> --jq '{draft,mergeable_state,head:.head.sha}'` |
+| check 결과(`CI Gate`) | `gh api repos/Renagang21/o4o-platform/commits/<HEAD>/check-runs --jq '.check_runs[]\|"\(.name) \(.status) \(.conclusion)"'` |
+| 미해결 리뷰 스레드 | `gh api repos/Renagang21/o4o-platform/pulls/<n>/ccr/review_threads` |
+| ruleset | `gh api repos/Renagang21/o4o-platform/rulesets/<id>` |
+| PR 생성 · Ready 전환 | MCP `create_pull_request`(본문은 `.github/pull_request_template.md` 절) · `POST …/pulls/<n>/ccr/ready_for_review` |
+| head branch 를 main 과 맞춤 | MCP `update_pull_request_branch`(`expectedHeadSha` 지정) — 이후 새 HEAD 의 CI 를 다시 본다 |
+| 병합 | MCP `merge_pull_request` — `merge_method: "squash"` · `expectedHeadSha: <gate 를 확인한 HEAD 40자>` 필수(훅이 검사) |
+
+**병합 후 Delivery 확인** (배포는 실행하지 않는다 — 자동 Delivery 결과만 본다)
+
+1. `gh run list --workflow "CI Pipeline" --branch main -L 3` → merge commit 의 CI 완료 확인.
+2. `gh run list --workflow Delivery -L 3` → run 이름이 merge SHA 인 run 의 결과.
+3. `gh api repos/Renagang21/o4o-platform/actions/runs/<id>/jobs --jq '.jobs[]|"\(.name) \(.conclusion)"'` · `gh run view <id> --log` 의 Classify 단계에서 freeze · LEVEL · 배포 대상 판정을 읽는다(Actions 변수 API 는 막혀 있다).
+4. `gh api repos/Renagang21/o4o-platform/commits/<SHA>/statuses --jq '.[]|"\(.context) \(.state) \(.description)"'` → `production` 상태(설명 값: `DEPLOYED` · `NO_DEPLOY` · `HOLD` · `FAILED` · `CANCELLED` · `SUPERSEDED` · `BLOCKED_CI*` · `BLOCKED_*FREEZE`). 같은 SHA 에 여러 개면 최신 것을 본다.
+5. 배포된 사용자 화면은 Playwright 로 Demo 「테스트 로그인」 확인(`SETUP.md` 배포 후 Demo 검증). 클라우드는 neture 도메인만 접속할 수 있고, `/health` 에는 SHA 가 없다.
+6. **`HOLD`(LEVEL_3 · 첫 rollout) · `FAILED` · `BLOCKED_*FREEZE`** 이면 멈추고, PR · SHA · 판정 · 로그 위치를 `HANDOFF.md` 에 적어 로컬 세션(promote · 수동 배포 · 원인 확인)으로 넘긴다.
+
+**훅이 병합을 거부하는 PR** — `guard-mcp-github.mjs` 의 `PROTECTED_PATHS`(`.github/` · `.claude/hooks/` · `.claude/settings.json` · 등록 파일 · `scripts/ci/` · `scripts/deployment/` · `scripts/db/` · 계정 삭제 스크립트 · `infra/` · `deploy/` · `Dockerfile*` 등, rename 이전 경로 포함)를 바꾸는 PR 은 CI 결과만 보고하고 통합 담당(로컬)에 넘긴다. 훅을 우회하려고 `gh api -X PUT …/merge` 나 다른 경로를 쓰지 않는다.
