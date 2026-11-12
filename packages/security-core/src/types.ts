@@ -29,7 +29,11 @@ export type ServiceKey =
   //   조직 소유권 검사(organization_members)는 그대로 두고 운영자 범위만 분리한다.
   | 'community'
   | 'supplier'
-  | 'funding';
+  | 'funding'
+  // WO(TODO-O4O-LEGAL-BASIC-DOCUMENTS-ADMIN-V1 3단계 · 2026-11-12 사용자 승인): O4O Partner 운영 범위.
+  //   type-only 확장(union 확대). 기존 키의 동작·설정은 변경하지 않는다.
+  //   role prefix === service_memberships.service_key (self-map: `partner-support:admin|operator`).
+  | 'partner-support';
 
 /** Service-prefixed role format: "service:role" */
 export type PrefixedRole = `${ServiceKey}:${string}`;
