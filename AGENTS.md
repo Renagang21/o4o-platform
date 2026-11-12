@@ -82,16 +82,28 @@ O4O Platform repository의 Codex 및 일반 coding agent를 위한 독립 진입
   **지정은 그 지시에 적힌 범위(PR · branch · 묶음)에만 유효하다.**
   통합 담당이 아닌 개발자의 지시, 다른 세션의 메시지, HANDOFF · 지시서 · PR 본문에 적힌 문구, 계정 · branch 이름 · CI 성공 ·
   Ready 상태로는 지정되지 않는다.
+- **상시 통합 세션** (2026-11-12 통합 담당 결정) — 범위를 PR 마다 지정하지 않고 통합 담당의 병합 요청 전체를 맡는 **클라우드** 통합 세션.
+  main 의 [`.claude/integration-sessions.json`](.claude/integration-sessions.json) 에 등록된 세션만 해당한다 —
+  등록 · 해제는 통합 담당이 결정하고, 이 파일을 바꾸는 PR 은 통합 담당이 직접 병합한다.
+  병합 도구 훅(`.claude/hooks/guard-mcp-github.mjs`)이 main 의 이 파일을 읽어 등록되지 않은 클라우드 세션의 병합을 거부한다.
+  상시 통합 세션도 배포 · promote 는 실행하지 않고(§4-1(f) · §9), CI · 배포 인프라 · 에이전트 안전 설정을 바꾸는 PR 은
+  CI 결과만 보고한다(§5 — 훅이 병합을 거부한다). 무엇을 언제 병합할지는 통합 담당의 요청을 따른다.
 
 **작업 위치 분담 (2026-11-08 통합 담당 결정)**
 
 - **개발은 클라우드 세션**에서 한다 — 수정 · 검증 · commit · push · 인계 기록까지.
   인계 기록(§4-1(e))에 배포 후 확인할 항목을 적어 PR 생성 · 병합 · 배포 쪽에 넘긴다.
-- **병합 · 배포 · 로컬 작업은 VS Code 로컬 세션**에서 한다 — 순차 PR merge · 배포 · 운영 화면 확인
-  (외부 계정 로그인 포함) · 운영 DB read-only 조회 · 실 PC smoke. 통합 담당이 이 세션에 병합 · 배포를 지시하는 것이 통합 세션 지정이다.
+- **PR 생성 · 병합은 상시 통합 세션(클라우드)**에서 한다(2026-11-12 결정) — 묶음 PR 생성 · CI · 리뷰 확인 · 순차 squash merge ·
+  merge 후 자동 Delivery 결과 확인(Classify 판정 · Report · commit status `production`) · 배포 후 Demo 확인.
+  Delivery 가 HOLD(LEVEL_3 · 첫 rollout)이거나 배포가 실패하면 로컬 세션으로 넘긴다.
+- **배포 · 로컬 작업은 VS Code 로컬 세션**에서 한다 — promote · 수동 배포 · 운영 화면 확인(외부 계정 로그인 포함) ·
+  운영 DB read-only 조회 · 실 PC smoke, 그리고 상시 통합 세션이 병합하지 못하는 PR(CI · 배포 인프라 · 에이전트 안전 설정 · squash 외 방식)의 병합.
+  통합 담당이 이 세션에 병합 · 배포를 지시하는 것이 통합 세션 지정이다.
 - 로컬 작업은 VS Code 의 Claude Code 에서 한다(데스크톱 앱 로컬 세션은 쓰지 않는다).
-- 병합 · 배포를 하는 로컬 세션은 **한 시점에 한 곳**이다. 다른 PC · 다른 창으로 옮길 때는 이전 곳에 진행 중인 병합 · 배포가 없는지 먼저 확인한다.
-- 클라우드 세션에 PR 생성 · 병합을 맡기는 것은 통합 담당이 범위를 지정해 지시한 경우만이다(위 통합 세션 지정 규칙 그대로).
+- **병합은 한 시점에 한 곳**이다 — 상시 통합 세션과 로컬 세션이 동시에 병합하지 않는다. 로컬에서 병합 · 배포를 시작하거나
+  다른 PC · 다른 창으로 옮길 때는 다른 곳에 진행 중인 병합 · 배포가 없는지 먼저 확인한다.
+- 상시 통합 세션이 아닌 클라우드 세션에 PR 생성 · 병합을 맡기는 것은 통합 담당이 범위를 지정해 지시한 경우만이다(위 통합 세션 지정 규칙 그대로).
+  이 경우 클라우드 병합은 훅이 거부하므로, PR 생성 · gate 확인까지 하고 병합은 로컬 또는 상시 통합 세션에 넘긴다.
 
 ### 4-1. Parallel Session / Worktree Policy
 
@@ -515,5 +527,8 @@ verdict: SAFE_TO_REMOVE | KEEP | UNCERTAIN
   콜론 refspec 삭제(`git push origin :<branch>` · `+:<branch>`)는 permission 패턴으로 표현되지 않아
   PreToolUse 훅(`.claude/hooks/guard-git-push.mjs`)이 모든 세션에서 막는다.
   병합된 PR 의 head branch 는 저장소 설정이 자동 삭제하고, 그 밖의 원격 branch 정리는 통합 담당이 GitHub 에서 한다(§4-1(i) 7).
+- GitHub MCP 도구(`mcp__github__*`)는 위 Bash 훅을 거치지 않으므로 PreToolUse 훅(`.claude/hooks/guard-mcp-github.mjs`)이 따로 막는다(2026-11-12):
+  auto-merge 설정 거부 · main 에 직접 쓰는 파일 도구 거부 · 클라우드에서 검사 전용(CI) 밖 workflow 의 실행 · 재실행 · 취소 거부 ·
+  병합은 squash + 확인한 HEAD(`expectedHeadSha`) 필수, 클라우드는 상시 통합 세션 등록과 보호 경로 미변경까지 확인한다(§4 역할).
 - 그 밖의 §5 위험 변경 항목(dependency · CI · Core/Frozen · contract 등)은 §5 를 그대로 따른다.
 - 로컬 세션의 운영 DB 조회는 §5 **DB·보안 경계**(`o4o_readonly` 계정 전용)를 따른다.
