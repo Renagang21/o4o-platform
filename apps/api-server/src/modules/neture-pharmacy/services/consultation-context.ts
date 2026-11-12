@@ -7,6 +7,8 @@ import { createPolicyExtensionRuntime } from '../../../services/ai-extensions/po
 import { NeturePharmacyError } from '../constants.js';
 import logger from '../../../utils/logger.js';
 import { searchConsultationProducts } from './consultation-product-search.js';
+import { ConsultationReuse, consultationReuseKey } from './consultation-reuse.js';
+import { ModelControlService } from '../../../services/ai-management/model-controls.js';
 
 const inquiry = z.object({ question: z.string().trim().min(1).max(1000),
   context: z.array(z.string().trim().min(1).max(1000)).max(4).default([]) }).strict()
@@ -42,14 +44,17 @@ export function createConsultationContextPlanner(db: DataSource): ConsultationCo
 }
 
 export class ConsultationContextService {
+  private readonly plans = new ConsultationReuse<ConsultationSearchPlan>();
   constructor(private db: DataSource, private plan: ConsultationContextPlanner) {}
-  async search(raw: { question?: unknown; context?: unknown }, access: {
+  async search(raw: { question?: unknown; context?: unknown; reuseSession?: unknown; mode?: unknown; stationId?: unknown; epoch?: unknown }, access: {
     actorId: string; organizationId: string; authorize: () => Promise<boolean>;
   }) {
     const parsed = inquiry.safeParse({ question: raw.question, context: raw.context });
     if (!parsed.success) throw new NeturePharmacyError(400, 'INVALID_CONSULTATION_CONTEXT', '현재 질문과 이번 상담의 확인 내용을 4,000자 이내로 입력해 주시기 바랍니다.');
     if (!await access.authorize()) throw new NeturePharmacyError(403, 'STORE_ACCESS_REQUIRED', '현재 매장의 상담 권한을 확인해 주시기 바랍니다.');
-    const plan = planSchema.parse(await this.plan(parsed.data, access));
+    const settings = raw.reuseSession === undefined ? undefined : await new ModelControlService(this.db).read();
+    const key = consultationReuseKey(raw,access.actorId,access.organizationId,{ input: parsed.data,settings });
+    const plan = await this.plans.execute(key,async()=>planSchema.parse(await this.plan(parsed.data,access)),access.authorize);
     if (!await access.authorize()) throw new NeturePharmacyError(403, 'STORE_ACCESS_REQUIRED', '현재 매장의 상담 권한을 확인해 주시기 바랍니다.');
     if (!plan.needsProduct) return { state: 'not-needed', message: '이 질문은 상품 선택 없이 상담을 이어갈 수 있습니다.', candidates: [] };
     if (plan.clarification || !plan.terms.length) return { state: 'clarify', message: plan.clarification ?? '어떤 내용을 확인하고 싶은지 조금 더 알려 주세요.', candidates: [] };

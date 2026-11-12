@@ -8,6 +8,7 @@ import { getNetureMainMembershipStatus } from '../../neture/services/neture-main
 import { roleAssignmentService } from '../../auth/services/role-assignment.service.js';
 import { ModelControlService } from '../../../services/ai-management/model-controls.js';
 import { consultationRuntimeSchema } from '../../../services/ai-management/consultation-runtime.js';
+import { consultationReuseKey } from './consultation-reuse.js';
 
 export const CONSULTATION_MODES = [
   { key: 'counter-pharmacist', label: '매대 약사 상담', feature: 'multilingual-consultation', professional: true },
@@ -107,6 +108,7 @@ export class MultilingualConsultationService {
     const output = await this.deps.translate({ text, source: input.direction === 'to-customer' ? 'ko' : source,
       target: input.direction === 'to-customer' ? language : 'ko' }, {
       actorId: userId, organizationId,
+      reuseKey: consultationReuseKey(input,userId,organizationId,{ direction: input.direction, language, auto }),
       authorize: async () => { await this.authorize(userId, organizationId, mode); return true; },
     });
     // A removed invitation, expired feature or revoked professional confirmation cannot yield a late result.

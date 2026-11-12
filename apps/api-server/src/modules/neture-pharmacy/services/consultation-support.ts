@@ -2,6 +2,8 @@ import { evidenceExcerpt } from './consultation-evidence.js';
 import { NeturePharmacyError } from '../constants.js';
 import type { ConsultationGuidanceService } from './consultation-guidance.js';
 import { validateConsultationSupport, type ConsultationSupportRunner, type ConsultationSupportSource } from './consultation-support.extension.js';
+import { ConsultationReuse, consultationReuseKey } from './consultation-reuse.js';
+import type { ConsultationSupportBrief } from './consultation-support.extension.js';
 
 /** Preserve the existing runner's 18k total/5k per-source contract, reserving the checked user reference. */
 function boundSources(input: ConsultationSupportSource[]): ConsultationSupportSource[] {
@@ -22,6 +24,7 @@ function boundSources(input: ConsultationSupportSource[]): ConsultationSupportSo
 
 /** Transient pharmacist draft. Reusable content is saved only through the existing reviewed editors. */
 export class ConsultationSupportService {
+  private readonly drafts = new ConsultationReuse<ConsultationSupportBrief>();
   constructor(private readonly guidance: ConsultationGuidanceService, private readonly run: ConsultationSupportRunner) {}
   async prepare(actor: string, org: string, input: Record<string, unknown>) {
     const context = await this.guidance.supportMaterial(actor, org, input);
@@ -44,8 +47,14 @@ export class ConsultationSupportService {
     sources = boundSources(sources);
     if (!sources.length) return { state: 'empty', message: '게시된 상품 자료가 없습니다. 상품 자료를 준비하거나 확인한 전문 참고자료를 추가해 주시기 바랍니다.' };
     try {
-      const brief = await this.run({ productName: context.productName, question: input.question.trim(), sources },
-        { actorId: actor, organizationId: org, authorize: context.authorize });
+      const request = { productName: context.productName, question: input.question.trim(), sources,
+        ...(context.expression ? { expression: context.expression } : {}) };
+      const key = consultationReuseKey(input, actor, org, { sourceVersion: context.sourceVersion, request });
+      const brief = await this.drafts.execute(key, async () => {
+        const draft = await this.run(request, { actorId: actor, organizationId: org, authorize: context.authorize });
+        validateConsultationSupport(draft, sources);
+        return draft;
+      }, context.authorize);
       await context.authorize();
       validateConsultationSupport(brief, sources);
       return { state: 'ready', brief, sourceVersion: context.sourceVersion,

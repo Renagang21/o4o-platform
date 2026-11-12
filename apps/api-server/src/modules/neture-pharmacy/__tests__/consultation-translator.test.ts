@@ -1,5 +1,6 @@
 const execute = jest.fn();
-jest.mock('../../ai-policy/ai-policy-factory.js', () => ({ createPolicyExecutor: () => ({ execute }) }));
+const assertEnabled=jest.fn(async()=>{});
+jest.mock('../../ai-policy/ai-policy-factory.js', () => ({ createPolicyExecutor: () => ({ execute, assertEnabled }) }));
 import { createConsultationTranslator } from '../services/consultation-translator.js';
 import logger from '../../../utils/logger.js';
 
@@ -11,6 +12,12 @@ beforeEach(() => {
 afterEach(() => jest.restoreAllMocks());
 const input = { text: 'Private original utterance', source: 'ko' as const, target: 'en' as const };
 const access = () => ({ actorId: 'actor', organizationId: 'store', authorize: jest.fn(async () => true) });
+it('reuses a translation only in its authorized scope and still checks policy on a hit',async()=>{
+ const translate=createConsultationTranslator({} as never),a={...access(),reuseKey:'server-session-mode-source'};
+ await translate(input,a);await translate(input,a);expect(execute).toHaveBeenCalledTimes(1);expect(assertEnabled).toHaveBeenCalledTimes(2);
+ await translate(input,{...a,organizationId:'other'});expect(execute).toHaveBeenCalledTimes(2);
+ a.authorize.mockResolvedValue(false);await expect(translate(input,a)).rejects.toMatchObject({httpStatus:403});expect(execute).toHaveBeenCalledTimes(2);
+});
 it('reuses existing policy and actor quota while recording only execution metadata', async () => {
   expect(await createConsultationTranslator({} as any)(input, access())).toEqual({ translation: 'Private translated utterance' });
   expect(execute).toHaveBeenCalledWith('CONTENT_TRANSLATION', expect.any(String), expect.any(String), expect.objectContaining({ userId: 'actor', temperature: 0, usage: 'pharmacy.consultation' }));

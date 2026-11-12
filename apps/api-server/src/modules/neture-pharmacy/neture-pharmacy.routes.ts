@@ -1,6 +1,7 @@
 import { OperationError } from '../../services/operations/operation-audit.js';
 import { ConsultationGuidanceService } from './services/consultation-guidance.js';
 import { createConsultationGuidanceSelector } from './services/consultation-guidance.extension.js';
+import { ConsultationExpressionService } from './services/consultation-expression.js';
 import { ConsultationSupportService } from './services/consultation-support.js';
 import { createConsultationSupportRunner } from './services/consultation-support.extension.js';
 import { BusinessHomeShowcaseService } from './services/business-home-showcase.service.js';
@@ -187,7 +188,8 @@ export function createNeturePharmacyRoutes(dataSource: DataSource, consultationD
   const guidance=new ConsultationGuidanceService(dataSource,
     (actor,org,mode)=>consultation.requireMode(actor,org,mode),
     async(actor,org)=>{await serviceFeatures.require(actor,org,'store-staff-support');},
-    consultationDependencies?.selectGuidance ?? createConsultationGuidanceSelector(dataSource),consultationDeps.translate);
+    consultationDependencies?.selectGuidance ?? createConsultationGuidanceSelector(dataSource),consultationDeps.translate,
+    org => new ConsultationExpressionService(dataSource).values(org));
   const stations = new ConsultationStationService(dataSource,
     (actor,organizationId,mode)=>consultation.requireMode(actor,organizationId,mode),
     async (actor,organizationId,input)=>{

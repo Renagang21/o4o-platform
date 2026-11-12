@@ -1,5 +1,14 @@
 # HANDOFF
 
+## 2026-11-12 · 상담 반복 생성 감소·매장 표현 설정 (6차)
+
+- **branch / PR 묶음:** `wo/consultation-reuse-expression` — main `31be41b49` + 자체 3차 `017f9dac3`·4차 `b60710778`·5차 `5a67ed453` + 6차. **3~6차 통합 묶음**이다. 이전 `wo/product-consultation-resource-separation`·`wo/consultation-structured-product-search`·`wo/shared-product-material-preparation`는 이 묶음 **병합 후 삭제 가능**. 원래 branch를 수정·삭제하지 않았고 별도로 중복 통합하지 않는다.
+- **한 일:** 동일 actor/store/session/mode/epoch·질문·근거·설정의 검색 계획/문단 선택/약사 초안/번역을 프로세스 메모리에서 60초 재사용·동시 요청 합류. 단계당 완료 결과 64개·1MB 및 합류 대상 64개 제한. 현재 권한·원천을 매번 확인하고 후보 DB 조회는 계속 수행한다. 다음 고객은 새 세션이며 이전 메모리 값은 최대 TTL까지 남을 수 있다. 실패는 미보관. 실제 절감액을 측정한 것은 아니다.
+- **표현 설정:** 현재 매장 경영자만 고정 말투·경어·길이를 기존 organizations.metadata에 저장. 직원 조회 가능. 약사 검토용 고객 초안에만 적용하고 전문 자료 권한·수치/출처 검증 유지. 설정·모델 변경 시 이전 초안 사용 검증 실패→재준비. schema·운영 DB·일정·SIWC 변경 없음.
+- **검증:** 상담 API 138건 통과 후 표현/초안 2건 추가 및 해당 suite 재검증. 화면 65건 통과, 마지막 설정 화면 수정 후 4건 재검증. API·매장 typecheck, 변경 TS/TSX lint 오류 0(기존 routes 미사용 변수 경고 1). 격리 PGlite 실제 저장 SQL·metadata 보존·직원/다른 매장/퇴사/미인증/비활성 거부 확인. [상세 기록](docs/investigations/IR-O4O-CONSULTATION-REUSE-AND-EXPRESSION-V1.md).
+- **배포 후 / 7차:** 실제 공급자 호출·비용·지연·설명 품질, 권한 철회·자료/설정 변경·다음 고객·두 매장 격리·기존 QR 보존을 확인한다. 배포·실제 API 호출·운영 DB write·약사 지정 인계 신규 구현은 하지 않았다. 다중 인스턴스/재시작/만료는 다시 호출될 수 있다. 구형 클라이언트는 기존 비재사용 동작. 배포 전 열린 초안은 다시 준비한다.
+- **겹치는 PR / 문서 정합:** 조회 시 #1042·#1039·#1043과 HANDOFF.md만 겹침. #1042(2차)는 별도. PR 생성·병합·배포는 통합 세션 담당. 기존 비용·전문 자료·Display 경계 유지. 이전 B2B 전용 안내 2건은 별도 정비 대상으로 유지.
+
 ## 2026-11-12 · 공통 상품 자료 준비·정기 검토·재사용
 
 - **branch / PR 묶음:** `wo/shared-product-material-preparation` — 최신 main `31be41b49` + 3차 `5702b2de6`(원본 `1b2ab0813`/`f56c1b3ed`) + 4차 `95049f85b`(원본 `ec4704ede`) + 5차. 3~5차를 포함한다. 원래 `wo/product-consultation-resource-separation`·`wo/consultation-structured-product-search`는 이 묶음 **병합 후 삭제 가능**이며 원래 branch를 수정·삭제하지 않았다. 중복 통합에 주의한다.
