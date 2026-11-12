@@ -13,7 +13,7 @@ export default function DescriptionIntakePage() {
   const [entries, setEntries] = useState<DescriptionEntry[]>([]), [preview, setPreview] = useState<Array<{ entry: DescriptionEntry; targets: DescriptionTarget[] }>>([]);
   const [rows, setRows] = useState<IntakeRow[]>([]), [total, setTotal] = useState(0), [page, setPage] = useState(1), [status, setStatus] = useState('pending');
   const [detail, setDetail] = useState<IntakeDetail | null>(null), [body, setBody] = useState(''), [selected, setSelected] = useState<string[]>([]), [archived, setArchived] = useState(false), [note, setNote] = useState('');
-  const [purpose, setPurpose] = useState<DescriptionEntry['descriptionType']>('B2B'), [language, setLanguage] = useState<DescriptionEntry['language']>('ko');
+  const [purpose, setPurpose] = useState<DescriptionEntry['descriptionType']>('CONSULTATION'), [language, setLanguage] = useState<DescriptionEntry['language']>('ko');
   const [busy, setBusy] = useState(false), [message, setMessage] = useState(''), [progress, setProgress] = useState('');
   const generation = useRef(0), listGeneration = useRef(0);
   const list = async () => { const key = ++listGeneration.current; try { const result = await api.list(page, status); if (key === listGeneration.current) { setRows(result.items); setTotal(result.total); } } catch { if (key === listGeneration.current) setMessage('검토 목록을 불러오지 못했습니다.'); } };
@@ -50,7 +50,7 @@ export default function DescriptionIntakePage() {
     <section className="space-y-3 rounded border p-4">
       <h3 className="font-semibold">준비된 설명 JSON 가져오기</h3>
       <div className="flex flex-wrap gap-3">
-        <label>목적 <select aria-label="가져올 설명 목적" value={purpose} disabled={busy} onChange={e => { setPurpose(e.target.value as typeof purpose); setEntries([]); setPreview([]); }} className={box}>{['B2B', 'B2C', 'STORE', 'SUPPLIER_STORE'].map(v => <option key={v}>{v}</option>)}</select></label>
+        <label>목적 <select aria-label="가져올 설명 목적" value={purpose} disabled={busy} onChange={e => { setPurpose(e.target.value as typeof purpose); setEntries([]); setPreview([]); }} className={box}>{[['CONSULTATION', '상품 상담자료'], ['B2B', 'B2B 주문용 정보'], ['B2C', 'B2C 상품정보'], ['STORE', '상품 표준설명서(QR)'], ['SUPPLIER_STORE', '공급자 매장용 정보']].map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label>
         <label>언어 <select aria-label="가져올 설명 언어" value={language} disabled={busy} onChange={e => { setLanguage(e.target.value as typeof language); setEntries([]); setPreview([]); }} className={box}>{['ko', 'en', 'ja', 'zh'].map(v => <option key={v}>{v}</option>)}</select></label>
         <label>설명 파일 <input type="file" accept=".json,application/json" disabled={busy} onChange={e => loadFile(e.target.files?.[0])} className={box} /></label>
       </div>

@@ -187,11 +187,33 @@ integration('description intake — isolated PostgreSQL', () => {
     expect(await db.query("SELECT content FROM shared_product_descriptions WHERE master_id=$1 AND description_type='STORE' AND status='canonical'", [id])).toEqual([{ content: '<p>관리자 QR 본문</p>' }]);
     await db.query("UPDATE shared_product_descriptions SET content='<p>일반 편집으로 바뀐 본문</p>' WHERE master_id=$1 AND description_type='B2B' AND status='canonical'", [id]);
     const legacy = await readStoreProductAiContext(db, org, listing, 'ko');
-    expect(legacy).toMatchObject({ state: 'legacy', description: { source: null, sections: [{ kind: 'unclassified', text: '일반 편집으로 바뀐 본문' }] } });
+    expect(legacy).toMatchObject({ state: 'missing', description: null });
     const changedPreview = await previewStoreExcel(db, org, file, { barcodeColumn: 0, nameColumn: 1, language: 'ko' });
-    expect(changedPreview.rows[0].candidates[0]).toMatchObject({ hasAiDescription: false, aiState: 'legacy' });
+    expect(changedPreview.rows[0].candidates[0]).toMatchObject({ hasAiDescription: false, aiState: 'missing' });
     await db.query('UPDATE organization_product_listings SET is_active=false WHERE id=$1', [listing]);
     expect(await readStoreProductAiContext(db, org, listing, 'ko')).toBeNull();
+  });
+
+  it('approves independent consultation canonicals without replacing B2B or QR and never reuses stale new facts', async () => {
+    const id = randomUUID(), listing = randomUUID(), name = `Synthetic separate ${id}`;
+    await db.query("INSERT INTO product_masters(id,name,status) VALUES($1,$2,'ACTIVE')", [id, name]);
+    await db.query('INSERT INTO organization_product_listings VALUES($1,$2,true,$3)', [listing, org, id]);
+    await db.getRepository(SharedProductDescription).save({ masterId: id, descriptionType: 'STORE', language: 'ko', status: 'canonical', content: '<p>QR stable</p>', sourceType: 'manual' });
+    for (const type of ['B2B', 'CONSULTATION']) {
+      const input = entry({ name, barcodes: [], descriptionType: type,
+        aiSections: [{ key: 'fact', title: '제품 사실', kind: 'product-fact', text: `${type} synthetic fact`, referenceUrls: ['https://nedrug.mfds.go.kr/synthetic'] }] });
+      const submitted = await service.submit({ entries: [input] }, actor);
+      const detail = await service.detail(submitted.items[0].id);
+      await service.approve(detail.id, { expectedRevision: detail.revision, acknowledgeArchived: false,
+        targets: [{ masterId: id, expectedCanonicalRevision: detail.targets.find(t => t.id === id)?.canonical?.revision ?? null }] }, actor);
+    }
+    const rows = await db.query("SELECT id,description_type,content FROM shared_product_descriptions WHERE master_id=$1 AND status='canonical' ORDER BY description_type", [id]);
+    expect(rows.map(r => r.description_type)).toEqual(['B2B', 'CONSULTATION', 'STORE']);
+    expect(await readStoreProductAiContext(db, org, listing, 'ko')).toMatchObject({ state: 'structured', description: { sections: [{ text: 'CONSULTATION synthetic fact' }] } });
+    await db.query("UPDATE shared_product_descriptions SET content='<p>Changed consultation</p>' WHERE master_id=$1 AND description_type='CONSULTATION'", [id]);
+    expect(await readStoreProductAiContext(db, org, listing, 'ko')).toMatchObject({ state: 'missing', description: null });
+    expect(await db.query("SELECT id,description_type,content FROM shared_product_descriptions WHERE master_id=$1 AND description_type IN ('B2B','STORE') ORDER BY description_type", [id]))
+      .toEqual(rows.filter(r => r.description_type !== 'CONSULTATION'));
   });
 
   it('drops stale structured statements when a pending HTML body is edited', async () => {

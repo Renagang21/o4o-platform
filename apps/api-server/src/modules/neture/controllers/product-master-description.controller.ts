@@ -36,7 +36,7 @@ import { requireProductDbWrite } from './product-db-write-authority.js';
 const MAX_CONTENT_LEN = 200_000;
 const ALLOWED_LANG = new Set(['ko', 'zh', 'en', 'ja']);
 // WO-O4O-ADMIN-PRODUCT-DESCRIPTION-TYPE-GENERIC-API-V1: B2B/B2C/STORE/SUPPLIER_STORE × 다국어 지원.
-const ALLOWED_TYPE = new Set<SharedProductDescriptionType>(['STORE', 'B2B', 'B2C', 'SUPPLIER_STORE']);
+const ALLOWED_TYPE = new Set<SharedProductDescriptionType>(['STORE', 'B2B', 'B2C', 'SUPPLIER_STORE', 'CONSULTATION']);
 
 /** descriptionType 정규화 — 허용값만, 그 외 기본 STORE */
 function normalizeType(raw: unknown): SharedProductDescriptionType {

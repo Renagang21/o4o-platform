@@ -90,12 +90,14 @@ export const SHARED_PRODUCT_DESCRIPTION_STATUSES: SharedProductDescriptionStatus
 /**
  * 설명서 유형 축 (application-level union, varchar) — WO-O4O-PRODUCT-DESCRIPTION-TYPE-IMPLEMENTATION-V1
  * Baseline: O4O-PRODUCT-RESOURCE-ARCHITECTURE-BASELINE-V1 (F12) — Resource Type=DESCRIPTION 하위 속성.
- *   B2B/B2C/STORE/SUPPLIER_STORE. canonical 은 (master_id, description_type, COALESCE(language,'ko')) 당 1개
+ *   B2B/B2C/STORE/SUPPLIER_STORE/CONSULTATION. canonical 은 (master_id, description_type, COALESCE(language,'ko')) 당 1개
  *   (WO-O4O-STORE-MULTILINGUAL-CANONICAL-DESCRIPTION-V1 — 언어별 canonical 허용).
  */
-export type SharedProductDescriptionType = 'B2B' | 'B2C' | 'STORE' | 'SUPPLIER_STORE';
+/** CONSULTATION=상품 상담자료, STORE=상품 표준설명서(QR). B2B 주문 정보와 별도 정본이다. */
+export type SharedProductDescriptionType = 'B2B' | 'B2C' | 'STORE' | 'SUPPLIER_STORE' | 'CONSULTATION';
 
 export const SHARED_PRODUCT_DESCRIPTION_TYPES: SharedProductDescriptionType[] = [
+  'CONSULTATION',
   'B2B',
   'B2C',
   'STORE',
@@ -135,7 +137,7 @@ export class SharedProductDescription {
   sourceType: SharedProductDescriptionSourceType;
 
   /**
-   * 설명서 유형 (B2B/B2C/STORE/SUPPLIER_STORE) — WO-...-DESCRIPTION-TYPE-IMPLEMENTATION-V1
+   * 설명서 유형 (B2B/B2C/STORE/SUPPLIER_STORE/CONSULTATION)
    * canonical 은 (master_id, description_type, COALESCE(language,'ko')) 당 1개(언어별 canonical). 기본값 STORE.
    */
   @Column({ name: 'description_type', type: 'varchar', length: 32, default: 'STORE' })

@@ -159,7 +159,7 @@ export class StoreAdapter {
     );
     if (!listing) throw new ExternalAiError("PRODUCT_NOT_FOUND", 404);
     const descriptions = await db.query(
-      `SELECT id,description_type AS type,language,content,source_type AS source FROM shared_product_descriptions WHERE master_id=$1 AND status='canonical' AND deleted_at IS NULL ORDER BY updated_at DESC LIMIT 20`,
+      `SELECT id,description_type AS type,language,content,source_type AS source FROM shared_product_descriptions WHERE master_id=$1 AND description_type<>'CONSULTATION' AND status='canonical' AND deleted_at IS NULL ORDER BY updated_at DESC LIMIT 20`,
       [listing.masterId],
     );
     return {

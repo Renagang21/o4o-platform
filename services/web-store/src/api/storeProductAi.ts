@@ -13,7 +13,8 @@ export interface ProductFileRow {
 }
 export interface ProductFilePreview { headerRow: number; columns: Array<{ index: number; label: string }>; rows: ProductFileRow[] }
 export interface StoreAiReadiness {
-  organizationId: string; purpose: 'B2B'; language: string; listingCount: number; masterCount: number; localCount: number;
+  /** purpose is a deprecated transport field, not the selected description type. */
+  organizationId: string; purpose: 'B2B'; resourcePurpose?: 'CONSULTATION'; language: string; listingCount: number; masterCount: number; localCount: number;
   states: { structured: number; unclassified: number; legacy: number; missing: number };
 }
 export async function getStoreAiReadiness(language: string) {
