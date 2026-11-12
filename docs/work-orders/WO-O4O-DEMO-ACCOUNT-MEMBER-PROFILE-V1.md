@@ -27,7 +27,7 @@ Admin 회원 목록에서 Demo 계정의 「가입 유형」 · 「닉네임」�
 |---|---|---|
 | 닉네임 | 경영자 `테스트-약국경영자` · 공급자 `테스트-공급자` · 직원 `테스트-직원` | 사용자 지정 「테스트-…」 형식. 띄어쓰기는 통일했다 |
 | 매장 직원 가입 유형 | `other`(기타) · 승인 상태 | 약사로 두면 Demo 가 약사 자격을 갖게 돼 체험 범위가 넓어진다(정본 「별도 자격 없이 가장하지 않는다」) |
-| 매장 경영자 약사 면허 | 승인된 면허가 **없을 때만** `99991` 승인 | 약국경영자는 약사여야 한다. 99991~99995 는 가상 대역이고, 경영자만 쓴다 |
+| 매장 경영자 약사 면허 | **쓰지 않음** (2026-11-12 통합 리뷰로 제외) | 승인 면허를 만들면 Demo 가 실제 약사 자격 확인(`hasApprovedPharmacist`)을 통과해 매장 접근 · 세미프랜차이즈 가입 조건까지 열린다. 정본 「Demo 약국 경영 체험 자격」은 실제 면허 승인 기록 생성을 금지한다. 회원 목록의 가입 유형은 약국 원장에서 이미 「약국경영자」로 보인다 |
 | 공급자 · 경영자 가입 유형 | 쓰지 않음 | 원장에서 이미 올바르게 추정된다 |
 | 「테스트-약사」 | 적용 안 함 | 해당하는 Demo 계정(약사)이 없다. 새 계정 생성은 범위 밖 — 필요하면 별도 지시 |
 | 하지 않는 것 | 가입 승인 흐름 재실행 · 자격증명 · 세션 · 역할 · 소속 변경 · 운영자 등 실제 계정 변경 | 승인 흐름은 약국 · 공급자 조직을 새로 만들 수 있다 |
@@ -36,10 +36,10 @@ Admin 회원 목록에서 Demo 계정의 「가입 유형」 · 「닉네임」�
 
 - `apps/api-server/src/scripts/demo-account-profile.service.ts`:
   - plan(읽기 전용 transaction) → 같은 before-image digest 로 apply → 사후 재검사 → 복구 스냅숏(`canonical_demo_repair_snapshots`).
-  - apply 는 실행 승인자(활성 `platform:super_admin`)의 사용자 ID 를 요구한다. 그 ID 를 면허 확인자 · 가입 검토자로 기록한다.
-  - 예약 면허번호가 다른 계정에 승인돼 있으면 멈춘다(`DEMO_LICENSE_IN_USE`).
+  - apply 는 실행 승인자(활성 `platform:super_admin`)의 사용자 ID 를 요구한다. 그 ID 를 가입 검토자로 기록한다.
+  - `kpa_pharmacist_profiles` 는 읽지도 쓰지도 않는다.
 - CLI: 기존 `apps/api-server/src/scripts/demo-account-reconcile.ts` 에 `DEMO_ACCOUNTS_PROFILE=true` 로 선택한다.
-- 시험: `src/scripts/__tests__/demo-account-profile.test.ts`. 실제 canonical schema(baseline + migration)에서 9/9.
+- 시험: `src/scripts/__tests__/demo-account-profile.test.ts`. 실제 canonical schema(baseline + migration)에서 실행한다.
 
 ## 4. TODO
 
@@ -67,12 +67,11 @@ DEMO_ACCOUNTS_PROFILE=true DEMO_ACCOUNTS_MODE=apply DEMO_ACCOUNTS_DIGEST=<T1 dig
 **판정 기준**
 
 - plan 의 `changes` 는 최대 3 이다.
-  - 경영자: 닉네임 + (면허 없을 때) 면허
+  - 경영자: 닉네임
   - 공급자: 닉네임
   - 직원: 닉네임 + 가입 유형
 - 실패 코드가 나오면 apply 하지 않고 코드를 기록해 CLOUD 로 넘긴다.
   - `BEFORE_IMAGE_CHANGED_REPLAN` 은 plan 부터 다시 한다.
-  - `DEMO_LICENSE_IN_USE` 는 다른 번호(99992~99995)로 바꿀지 결정이 필요하다.
 - 결과는 식별자 · 원문 없이 `accounts` 의 참/거짓만 기록한다(공개 저장소).
 
 ## 6. 문서 정합

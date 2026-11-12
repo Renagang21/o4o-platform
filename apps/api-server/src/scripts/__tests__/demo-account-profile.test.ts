@@ -17,9 +17,9 @@ describe('Demo profile reconcile gates (no database)', () => {
     expect(calls.at(-1)).toBe('ROLLBACK');
     expect(calls.some(sql => /^(INSERT|UPDATE|DELETE)/.test(sql))).toBe(false);
   });
-  it('canonical values: test nicknames, staff as other, a reserved fictitious license for the owner only', () => {
+  it('canonical values: test nicknames and staff as other — no pharmacist license', () => {
     expect(DEMO_PROFILES).toEqual({
-      STORE_OWNER: { nickname: '테스트-약국경영자', license: '99991' },
+      STORE_OWNER: { nickname: '테스트-약국경영자' },
       SUPPLIER: { nickname: '테스트-공급자' },
       STORE_STAFF: { nickname: '테스트-직원', registrationType: 'other' },
     });
@@ -60,14 +60,14 @@ integration('Demo profile reconcile on isolated PostgreSQL', () => {
   const types = async () => Object.fromEntries((await query(`SELECT u.id,${MEMBER_REGISTRATION_TYPE_SQL} AS type FROM users u`)).map(row => [row.id, row.type]));
   const snapshotCount = async () => Number((await query('SELECT count(*) AS n FROM canonical_demo_repair_snapshots'))[0].n);
 
-  it('plan is read-only and reports nickname, staff registration and owner license', async () => {
+  it('plan is read-only and reports nickname and staff registration', async () => {
     const before = await query('SELECT id,nickname,"businessInfo"::text,"updatedAt" FROM users ORDER BY id');
     const plan = await runDemoProfileReconcile(client);
     expect(plan.changes).toBe(3);
     expect(plan.accounts).toEqual([
-      { type: 'STORE_OWNER', present: true, nickname: true, registration: false, license: true },
-      { type: 'SUPPLIER', present: true, nickname: true, registration: false, license: false },
-      { type: 'STORE_STAFF', present: true, nickname: true, registration: true, license: false },
+      { type: 'STORE_OWNER', present: true, nickname: true, registration: false },
+      { type: 'SUPPLIER', present: true, nickname: true, registration: false },
+      { type: 'STORE_STAFF', present: true, nickname: true, registration: true },
     ]);
     expect(await query('SELECT id,nickname,"businessInfo"::text,"updatedAt" FROM users ORDER BY id')).toEqual(before);
     expect(await snapshotCount()).toBe(0);
@@ -83,7 +83,7 @@ integration('Demo profile reconcile on isolated PostgreSQL', () => {
   it('apply fills the list values, records the approver, keeps others untouched, then becomes a no-op', async () => {
     const plan = await runDemoProfileReconcile(client);
     const applied = await runDemoProfileReconcile(client, { apply: true, expectedDigest: plan.digest, approvedBy: admin });
-    expect(applied).toMatchObject({ verified: true, writes: 7 });
+    expect(applied).toMatchObject({ verified: true, writes: 6 });
     const nick = Object.fromEntries((await query('SELECT id,nickname FROM users')).map(row => [row.id, row.nickname]));
     expect([nick[owner], nick[supplier], nick[staff]]).toEqual(['테스트-약국경영자', '테스트-공급자', '테스트-직원']);
     expect(nick[operator]).toBeNull();
@@ -91,28 +91,21 @@ integration('Demo profile reconcile on isolated PostgreSQL', () => {
     expect([t[owner], t[supplier], t[staff], t[operator]]).toEqual(['pharmacy_owner', 'supplier', 'other', null]);
     const [registration] = await query(`SELECT "businessInfo"->'o4oMembershipRegistrationV1' AS r FROM users WHERE id=$1`, [staff]);
     expect(registration.r).toMatchObject({ type: 'other', state: 'approved', reviewedBy: admin });
-    const [license] = await query('SELECT license_number,license_verified,qualification_status,verified_by FROM kpa_pharmacist_profiles WHERE user_id=$1', [owner]);
-    expect(license).toEqual({ license_number: '99991', license_verified: true, qualification_status: 'approved', verified_by: admin });
-    expect(await query('SELECT 1 FROM kpa_pharmacist_profiles WHERE user_id<>$1', [owner])).toHaveLength(0);
+    // 승인 면허를 만들면 Demo 가 실제 약사 자격 확인을 통과한다 — O4O-CANONICAL-DEMO-ACCOUNTS-V1.
+    expect(await query('SELECT 1 FROM kpa_pharmacist_profiles')).toHaveLength(0);
     expect(await snapshotCount()).toBe(1);
     const again = await runDemoProfileReconcile(client);
     expect(again.changes).toBe(0);
     expect(await runDemoProfileReconcile(client, { apply: true, expectedDigest: again.digest, approvedBy: admin })).toMatchObject({ writes: 0 });
   });
 
-  it('keeps an owner license that is already approved', async () => {
-    await query(`INSERT INTO kpa_pharmacist_profiles(user_id,license_number,license_verified,qualification_status,verified_at,verified_by,qualification_reason)
-      VALUES($1,'12345',true,'approved',now(),$2,'fixture')`, [owner, admin]);
+  it('never creates or changes a pharmacist license record', async () => {
+    await query(`INSERT INTO kpa_pharmacist_profiles(user_id,license_number,license_verified,qualification_status)
+      VALUES($1,'12345',false,'pending')`, [owner]);
+    const before = await query('SELECT * FROM kpa_pharmacist_profiles ORDER BY user_id');
     const plan = await runDemoProfileReconcile(client);
-    expect(plan.accounts[0]).toMatchObject({ license: false });
     await runDemoProfileReconcile(client, { apply: true, expectedDigest: plan.digest, approvedBy: admin });
-    expect((await query('SELECT license_number FROM kpa_pharmacist_profiles WHERE user_id=$1', [owner]))[0].license_number).toBe('12345');
-  });
-
-  it('refuses when the reserved license is already approved for someone else', async () => {
-    await query(`INSERT INTO kpa_pharmacist_profiles(user_id,license_number,license_verified,qualification_status,verified_at,verified_by,qualification_reason)
-      VALUES($1,'99991',true,'approved',now(),$2,'fixture')`, [operator, admin]);
-    await expect(runDemoProfileReconcile(client)).rejects.toThrow('DEMO_LICENSE_IN_USE');
+    expect(await query('SELECT * FROM kpa_pharmacist_profiles ORDER BY user_id')).toEqual(before);
   });
 
   it('a changed before-image requires a new plan', async () => {
