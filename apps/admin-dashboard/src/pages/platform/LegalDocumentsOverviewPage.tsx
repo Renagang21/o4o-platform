@@ -31,6 +31,12 @@ const TYPE_LABEL: Record<string, string> = {
   refund: '환불정책', commerce: '전자상거래 안내', seller: '판매자 안내', community: '커뮤니티 운영정책', location: '위치기반 서비스', custom: '기타',
 };
 
+function nextVersionLabel(draft: DocRow['pendingDraft']): string {
+  if (!draft) return '-';
+  const when = draft.effectiveDate ? '시행 예정 ' + draft.effectiveDate : '시행일 미정';
+  return `v${draft.version} 초안 · ${when}`;
+}
+
 export default function LegalDocumentsOverviewPage() {
   const [scopes, setScopes] = useState<LegalScope[] | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -81,7 +87,7 @@ export default function LegalDocumentsOverviewPage() {
                           <td className="px-4 py-2">{d.published ? `v${d.published.version}` : '미게시'}</td>
                           <td className="px-4 py-2">{d.published?.effectiveDate ?? '-'}</td>
                           <td className="px-4 py-2">{d.published ? `${d.published.acceptances}건` : '-'}</td>
-                          <td className="px-4 py-2">{d.pendingDraft ? `v${d.pendingDraft.version} 초안 · ${d.pendingDraft.effectiveDate ? `시행 예정 ${d.pendingDraft.effectiveDate}` : '시행일 미정'}` : '-'}</td>
+                          <td className="px-4 py-2">{nextVersionLabel(d.pendingDraft)}</td>
                         </tr>
                       ))}
                     </tbody>

@@ -21,6 +21,8 @@ import logger from '../../utils/logger.js';
 
 export type LegalScopeTier = 'account' | 'service' | 'business' | 'other';
 
+type DateLike = string | Date | null;
+
 export interface PolicyRow {
   id: string;
   service_key: string;
@@ -29,8 +31,8 @@ export interface PolicyRow {
   title: string;
   version: number;
   status: string;
-  effective_date: string | Date | null;
-  published_at: string | Date | null;
+  effective_date: DateLike;
+  published_at: DateLike;
 }
 
 const DIRECT_SERVICES = ['supplier', 'community', 'funding', 'lecture', 'partner-support'] as const;
@@ -48,52 +50,82 @@ export function tierOf(serviceKey: string): LegalScopeTier {
   return 'other';
 }
 
-const day = (v: string | Date | null) => (v ? new Date(v).toISOString().slice(0, 10) : null);
+const day = (v: DateLike) => (v ? new Date(v).toISOString().slice(0, 10) : null);
+
+type BusinessInfo = { key: string; name: string; status: string };
+interface DocEntry {
+  documentType: string;
+  slug: string | null;
+  title: string;
+  published: { id: string; version: number; effectiveDate: string | null; publishedAt: string | null; acceptances: number } | null;
+  pendingDraft: { id: string; version: number; effectiveDate: string | null } | null;
+}
+interface ScopeEntry { serviceKey: string; tier: LegalScopeTier; label: string; note: string | null; editPath: string | null; documents: Map<string, DocEntry> }
+
+function newScope(serviceKey: string, businesses: Map<string, BusinessInfo>): ScopeEntry {
+  const tier = tierOf(serviceKey);
+  const businessId = tier === 'business' ? BUSINESS_SCOPE.exec(serviceKey)?.[1]?.toLowerCase() : undefined;
+  const business = businessId ? businesses.get(businessId) : undefined;
+  const editable = tier === 'account' || tier === 'service';
+  return {
+    serviceKey,
+    tier,
+    label: business ? `${business.name} (${business.key})` : serviceKey,
+    note: tier === 'business' ? '해당 사업 관리자가 사업 운영 화면에서 편집합니다' : (SCOPE_NOTES[serviceKey] ?? null),
+    editPath: editable ? `/operations/${serviceKey}/legal` : null,
+    documents: new Map(),
+  };
+}
+
+/** 한 문서(종류 · 표식)에 행을 반영한다 — 가장 높은 게시본 · 가장 높은 초안을 남긴다. */
+function applyRow(doc: DocEntry, r: PolicyRow, acceptances: Map<string, number>): void {
+  const version = Number(r.version);
+  if (r.status === 'published' && (!doc.published || version > doc.published.version)) {
+    doc.published = { id: r.id, version, effectiveDate: day(r.effective_date), publishedAt: day(r.published_at), acceptances: acceptances.get(r.id) ?? 0 };
+    doc.title = r.title;
+  }
+  if (r.status === 'draft' && (!doc.pendingDraft || version > doc.pendingDraft.version)) {
+    doc.pendingDraft = { id: r.id, version, effectiveDate: day(r.effective_date) };
+  }
+}
+
+/** 게시본 이하 버전의 초안은 대기 초안이 아니다. */
+function finalizeDoc(d: DocEntry): DocEntry {
+  const pending = d.pendingDraft && (!d.published || d.pendingDraft.version > d.published.version) ? d.pendingDraft : null;
+  return { ...d, pendingDraft: pending };
+}
+
+const TIER_ORDER: LegalScopeTier[] = ['account', 'service', 'business', 'other'];
 
 /** 순수 함수 — 문서 행 · 동의 건수 · 사업 이름으로 현황을 만든다. */
 export function buildLegalOverview(
   rows: PolicyRow[],
   acceptances: Map<string, number>,
-  businesses: Map<string, { key: string; name: string; status: string }>,
+  businesses: Map<string, BusinessInfo>,
 ) {
-  const scopes = new Map<string, { serviceKey: string; tier: LegalScopeTier; label: string; note: string | null; editPath: string | null; documents: Map<string, any> }>();
+  const scopes = new Map<string, ScopeEntry>();
   for (const r of rows) {
-    const tier = tierOf(r.service_key);
-    if (!scopes.has(r.service_key)) {
-      const business = tier === 'business' ? businesses.get(BUSINESS_SCOPE.exec(r.service_key)![1].toLowerCase()) : undefined;
-      scopes.set(r.service_key, {
-        serviceKey: r.service_key,
-        tier,
-        label: business ? `${business.name} (${business.key})` : r.service_key,
-        note: tier === 'business'
-          ? '해당 사업 관리자가 사업 운영 화면에서 편집합니다'
-          : (SCOPE_NOTES[r.service_key] ?? null),
-        editPath: tier === 'account' || tier === 'service' ? `/operations/${r.service_key}/legal` : null,
-        documents: new Map(),
-      });
+    let scope = scopes.get(r.service_key);
+    if (!scope) {
+      scope = newScope(r.service_key, businesses);
+      scopes.set(r.service_key, scope);
     }
-    const docs = scopes.get(r.service_key)!.documents;
     const key = `${r.document_type}|${r.slug ?? ''}`;
-    if (!docs.has(key)) docs.set(key, { documentType: r.document_type, slug: r.slug, title: r.title, published: null, pendingDraft: null });
-    const doc = docs.get(key);
-    const version = Number(r.version);
-    if (r.status === 'published' && (!doc.published || version > doc.published.version)) {
-      doc.published = { id: r.id, version, effectiveDate: day(r.effective_date), publishedAt: day(r.published_at), acceptances: acceptances.get(r.id) ?? 0 };
-      doc.title = r.title;
+    let doc = scope.documents.get(key);
+    if (!doc) {
+      doc = { documentType: r.document_type, slug: r.slug, title: r.title, published: null, pendingDraft: null };
+      scope.documents.set(key, doc);
     }
-    if (r.status === 'draft' && (!doc.pendingDraft || version > doc.pendingDraft.version)) {
-      doc.pendingDraft = { id: r.id, version, effectiveDate: day(r.effective_date) };
-    }
+    applyRow(doc, r, acceptances);
   }
-  const order: LegalScopeTier[] = ['account', 'service', 'business', 'other'];
   return [...scopes.values()]
     .map((s) => ({
       ...s,
       documents: [...s.documents.values()]
-        .map((d) => ({ ...d, pendingDraft: d.pendingDraft && (!d.published || d.pendingDraft.version > d.published.version) ? d.pendingDraft : null }))
+        .map(finalizeDoc)
         .sort((a, b) => a.documentType.localeCompare(b.documentType, 'en') || String(a.slug).localeCompare(String(b.slug), 'en')),
     }))
-    .sort((a, b) => order.indexOf(a.tier) - order.indexOf(b.tier) || a.label.localeCompare(b.label, 'ko'));
+    .sort((a, b) => TIER_ORDER.indexOf(a.tier) - TIER_ORDER.indexOf(b.tier) || a.label.localeCompare(b.label, 'ko'));
 }
 
 export function createAdminLegalOverviewController(db: DataSource): Router {

@@ -43,7 +43,7 @@ describe('법적 문서 통합 현황 — 순수 판정', () => {
     });
     expect(out[1].editPath).toBe('/operations/supplier/legal');
     expect(out[2]).toMatchObject({ label: '합성 사업 (drugstore)', editPath: null, note: expect.stringContaining('사업 관리자') });
-    expect(out[2].documents[0].published.acceptances).toBe(2);
+    expect(out[2].documents[0].published?.acceptances).toBe(2);
     expect(out[3]).toMatchObject({ serviceKey: 'k-cosmetics', editPath: null, note: expect.stringContaining('퇴역') });
   });
 
