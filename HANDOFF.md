@@ -4,6 +4,14 @@
 > 다음 실행자: **통합 담당(이 branch 의 PR 생성 · CI · 병합) → Businnect(체크리스트 실행 · 첫 과제)**
 > 이전 인계 전문: `git show 0c812623:HANDOFF.md`
 
+## 2026-11-12 · migration 전 백업 보관 정리 (branch `wo/premigration-backup-retention`)
+
+> 다음 실행자: **CLOUD** — PR #1028 병합 후 [`WO-O4O-PREMIGRATION-BACKUP-RETENTION-V1`](docs/work-orders/WO-O4O-PREMIGRATION-BACKUP-RETENTION-V1.md) T1 ~ T4.
+
+- **결정 사항(통합 담당 2026-11-12):** 보관 30일 + 최근 5개 유지. 정리는 `deploy-api.yml` 의 migration 성공 뒤에 하고, 실패해도 배포는 막지 않는다. `pre-migration-` on-demand 백업만 대상이다.
+- **완료(LOCAL):** 커스텀 역할 `o4oCloudSqlPreMigrationBackup` 에 `cloudsql.backupRuns.delete` 추가.
+- **겹칠 수 있는 PR:** #1028(`deploy-api.yml` · `ci-pipeline.yml` 테스트 목록) — 병합 뒤에 시작한다.
+
 ## 2026-11-11 · Promote · Delivery 짧은 job 통합 (비용 절감 · branch `claude/peaceful-lamport-sjwtri-promote-cost`)
 
 > 이 절만 이 branch 의 인계다. 아래 절들은 다른 세션의 인계로 그대로 둔다.
