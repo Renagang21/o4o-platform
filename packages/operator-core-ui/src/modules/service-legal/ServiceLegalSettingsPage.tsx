@@ -25,6 +25,7 @@ import { DataTable, type ListColumnDef } from '@o4o/operator-ux-core';
 import { RowActionMenu } from '@o4o/ui';
 import {
   POLICY_DOCUMENT_TYPES,
+  recommendedPolicySlug,
   type ServiceLegalProfileDto,
   type ServiceLegalProfileInput,
   type ServicePolicyDocumentDto,
@@ -123,7 +124,7 @@ function fmtDate(iso: string | null | undefined): string {
   try { return new Date(iso).toLocaleDateString('ko-KR'); } catch { return '-'; }
 }
 
-export function ServiceLegalSettingsPage({ serviceKey, api, title, enabledTabs }: ServiceLegalSettingsPageProps) {
+export function ServiceLegalSettingsPage({ serviceKey, api, title, enabledTabs, slugInput = true }: ServiceLegalSettingsPageProps) {
   // WO-O4O-KPA-ADMIN-SERVICE-LEGAL-SETTINGS-WIRING-V1: 일부 서비스는 정책문서 탭을 숨긴다(법정정보만).
   const allowedTabs: TabKey[] = enabledTabs && enabledTabs.length > 0 ? enabledTabs : ALL_TABS;
   const showProfile = allowedTabs.includes('profile');
@@ -146,6 +147,8 @@ export function ServiceLegalSettingsPage({ serviceKey, api, title, enabledTabs }
   const [editing, setEditing] = useState<ServicePolicyDocumentDto | 'new' | null>(null);
   const [docForm, setDocForm] = useState<ServicePolicyDocumentInput>({ documentType: 'terms', title: '', content: '', version: 1 });
   const [docSaving, setDocSaving] = useState(false);
+  // 표식을 사용자가 직접 고쳤는지 — 고치지 않았으면 문서 유형을 바꿀 때 권장 표식을 따라간다.
+  const [slugTouched, setSlugTouched] = useState(false);
 
   const loadProfile = useCallback(async () => {
     setProfileLoading(true);
@@ -204,7 +207,11 @@ export function ServiceLegalSettingsPage({ serviceKey, api, title, enabledTabs }
   };
 
   const openNewDoc = () => {
-    setDocForm({ documentType: 'terms', title: '', content: '', version: 1, effectiveDate: null, changeReason: '' });
+    setDocForm({
+      documentType: 'terms', title: '', content: '', version: 1, effectiveDate: null, changeReason: '',
+      slug: slugInput ? recommendedPolicySlug(serviceKey, 'terms') : null,
+    });
+    setSlugTouched(false);
     setEditing('new');
   };
   const openEditDoc = (d: ServicePolicyDocumentDto) => {
@@ -386,11 +393,42 @@ export function ServiceLegalSettingsPage({ serviceKey, api, title, enabledTabs }
                   className={C.input}
                   value={docForm.documentType}
                   disabled={editing !== 'new'}
-                  onChange={(e) => setDocForm((p) => ({ ...p, documentType: e.target.value }))}
+                  onChange={(e) => {
+                    const documentType = e.target.value;
+                    setDocForm((p) => ({
+                      ...p,
+                      documentType,
+                      ...(slugInput && !slugTouched ? { slug: recommendedPolicySlug(serviceKey, documentType) } : {}),
+                    }));
+                  }}
                 >
                   {POLICY_DOCUMENT_TYPES.map((d) => <option key={d.value} value={d.value}>{d.label}</option>)}
                 </select>
               </div>
+              {slugInput && editing === 'new' && (
+                <div className={C.field}>
+                  <label className={C.label} htmlFor="service-legal-doc-slug">표식(slug)</label>
+                  <input
+                    id="service-legal-doc-slug"
+                    className={C.input}
+                    value={docForm.slug ?? ''}
+                    placeholder="예: neture-account-terms"
+                    onChange={(e) => { setSlugTouched(true); setDocForm((p) => ({ ...p, slug: e.target.value.trim() || null })); }}
+                  />
+                  <p className={C.help}>
+                    {recommendedPolicySlug(serviceKey, docForm.documentType)
+                      ? `권장 표식: ${recommendedPolicySlug(serviceKey, docForm.documentType)} — 계정 재동의 · 서비스 신청 약관으로 쓰려면 이 값을 그대로 둡니다. `
+                      : ''}
+                    표식은 등록 후 바꿀 수 없습니다.
+                  </p>
+                </div>
+              )}
+              {editing !== 'new' && editing && (
+                <div className={C.field}>
+                  <span className={C.label}>표식(slug)</span>
+                  <p className={C.help}>{editing.slug || '없음'} · 등록 후에는 바꿀 수 없습니다.</p>
+                </div>
+              )}
               <div className={C.field}>
                 <label className={C.label}>제목</label>
                 <input className={C.input} value={docForm.title ?? ''} onChange={(e) => setDocForm((p) => ({ ...p, title: e.target.value }))} />
