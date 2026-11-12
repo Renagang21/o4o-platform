@@ -83,6 +83,7 @@ jobs:
       dry_call: ${{ steps.decide.outputs.dry_call }}
       target_sha: ${{ steps.decide.outputs.target_sha }}
       deploy_api: ${{ steps.decide.outputs.deploy_api }}
+      api_backup_before_migration: ${{ steps.decide.outputs.api_backup_before_migration }}
       admin_after_api: ${{ steps.decide.outputs.admin_after_api }}
       admin_parallel: ${{ steps.decide.outputs.admin_parallel }}
       web_after_api: ${{ steps.decide.outputs.web_after_api }}
@@ -164,6 +165,8 @@ jobs:
     with:
       rollout_mode: verified
       dry_run: ${{ needs.classify.outputs.dry_call }}
+      # migration 변경이 없다고 확인된 배포만 'false' — 비어 있으면 백업한다(deploy-api.yml).
+      backup_before_migration: ${{ needs.classify.outputs.api_backup_before_migration }}
     secrets: inherit
 
   # API 변경에 의존하는 프런트 — API 성공 뒤에만 (API 실패 · skip = 배포 0)

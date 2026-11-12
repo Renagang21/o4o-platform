@@ -121,8 +121,8 @@ GCP Cloud Run으로 배포합니다. **일상 배포는 자동**이고, 위험�
 ```text
 main push → CI Pipeline → Delivery (delivery.yml) → 서비스별 "서빙 중인 SHA → 이 commit" 판정
   LEVEL 1  runtime 무영향 (문서 · CI · 테스트 · 판정 스크립트)         → 배포 없음
-  LEVEL 2  일반 runtime 변경                                         → 자동 verified 배포
-  LEVEL 3  migration · 인증 · 권한 · 결제 · 배포 설정 · 판정 불가      → 자동 배포 차단 → promote 1회 (통제 배포)
+  LEVEL 2  일반 runtime 변경 · 인증 · 권한 · 결제 · 배포 설정 · 추가형 migration → 자동 verified 배포
+  LEVEL 3  파괴형 · 판정 불가 migration · 운영 DB write job · secret · 서비스 삭제 · 판정 불가 → 자동 배포 차단 → promote 1회 (통제 배포)
 비상 · 정비 → 저장소 변수 DEPLOY_FREEZE=true (정상 운영값 false)
 ```
 
@@ -147,7 +147,10 @@ main push → CI Pipeline → Delivery (delivery.yml) → 서비스별 "서빙 �
   deploy workflow 들은 더 이상 push 에 반응하지 않습니다.
 - DB 마이그레이션은 API 배포가 실행합니다
   ([PRODUCTION-MIGRATION-STANDARD](docs/baseline/operations/PRODUCTION-MIGRATION-STANDARD.md)).
-  migration 이 포함된 변경은 LEVEL 3 이므로 자동 배포되지 않습니다. `deploy-api.yml` 의 `migrate_only` 수동 실행
+  migration 은 `scripts/ci/migration-safety.mjs` 가 `up()` 을 분석합니다. **추가형**(표 · 열 · 인덱스 추가 · NOT NULL 해제)만
+  자동 배포하고, **파괴형**(DROP · 이름 · 타입 변경 · 일괄 UPDATE / DELETE)과 **판정 불가**(동적 SQL · 함수 · 권한 · 기존 표 제약 등)는
+  LEVEL 3 입니다. migration 이 바뀐 API 배포는 migration Job 직전에 **Cloud SQL on-demand 백업**을 만들고,
+  백업이 실패하면 migration · 배포를 중단합니다(WO-O4O-CICD-PROMOTE-APPROVAL-REDUCTION-V1). `deploy-api.yml` 의 `migrate_only` 수동 실행
   (`refs/tags/deploy/*` 태그 + `expected_sha` 일치)은 migration 만 실행합니다(freeze 적용).
 - **CI gate**: target commit 의 `CI Pipeline` 이 green 이 아니면(실패 · 취소 · 진행 중 · 부재 — 부재와 진행 중은 제한 시간 재조회)
   배포 job 은 실행되지 않습니다 (`migrate_only` 포함).
