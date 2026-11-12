@@ -77,6 +77,11 @@ const input = (patch = {}) => ({
   productId,
   ...patch,
 });
+it('reuses passage selection inside one explicit session and invalidates on published content change',async()=>{
+ const request=input({useAi:true,reuseSession:'00000000-0000-4000-8000-000000000001'});
+ await service.prepare('staff','store',request);await service.prepare('staff','store',request);expect(select).toHaveBeenCalledTimes(1);
+ pages[0].updatedAt='changed';await service.prepare('staff','store',request);expect(select).toHaveBeenCalledTimes(2);
+});
 it("preserves existing published-only fallback order", () => {
   const p = [
     { locale: "ko", status: "published" },

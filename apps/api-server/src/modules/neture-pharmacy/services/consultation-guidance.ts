@@ -17,6 +17,9 @@ import { readStoreProductAiContext } from '../../neture/product-description-inta
 type Json = Record<string, unknown>;
 import { approvedAiSupportSources } from './consultation-evidence.js';
 import { ConsultationContextService, createConsultationContextPlanner } from './consultation-context.js';
+import { ConsultationReuse, consultationReuseKey } from './consultation-reuse.js';
+import type { ConsultationExpression } from './consultation-expression.contracts.js';
+import { ModelControlService } from '../../../services/ai-management/model-controls.js';
 export type GuidanceIntent =
   | "find-product"
   | "location"
@@ -131,6 +134,8 @@ function passages(page: Page) {
 }
 export class ConsultationGuidanceService {
   private readonly products: StoreStaffSupportService;
+  private readonly selected = new ConsultationReuse<number[]>();
+  private readonly contextSearch: ConsultationContextService;
   constructor(
     private readonly db: DataSource,
     private readonly authorize: StationAuthorization,
@@ -140,8 +145,15 @@ export class ConsultationGuidanceService {
     ) => Promise<void>,
     private readonly select: GuidanceSelector,
     private readonly translate: ConsultationTranslator,
+    private readonly readExpression?: (org: string) => Promise<ConsultationExpression>,
   ) {
     this.products = new StoreStaffSupportService(db);
+    this.contextSearch = new ConsultationContextService(db, createConsultationContextPlanner(db));
+  }
+  async configuration(org: string, reusable: boolean) {
+    const expression = await this.readExpression?.(org);
+    const policy = reusable ? await new ModelControlService(this.db).read() : undefined;
+    return expression || policy ? { expression, policy } : undefined;
   }
   private async access(
     actor: string,
@@ -265,7 +277,7 @@ export class ConsultationGuidanceService {
             source: "ko",
             target: language as Exclude<ConsultationLocale, "ko">,
           },
-          { actorId: actor, organizationId: org, authorize },
+          { actorId: actor, organizationId: org, authorize, reuseKey: consultationReuseKey(input,actor,org,{ product, intent }) },
         );
         await authorize();
         card.text = output.translation;
@@ -369,7 +381,10 @@ export class ConsultationGuidanceService {
           "GUIDANCE_QUESTION_REQUIRED",
           "관련 자료를 추릴 질문을 입력해 주세요.",
         );
-      const ids = await this.select(
+      const configuration = input.reuseSession !== undefined ? await this.configuration(org, true) : undefined;
+      const key = consultationReuseKey(input, actor, org, { sourceVersion, question, configuration });
+      const ids = await this.selected.execute(key, async () => {
+        const picked = await this.select(
         { question, productName: product.name, passages: material.passages },
         {
           actorId: actor,
@@ -377,7 +392,11 @@ export class ConsultationGuidanceService {
           materialId: material.page.id,
           authorize,
         },
-      );
+        );
+        if (!Array.isArray(picked) || picked.length > 3 || new Set(picked).size !== picked.length || picked.some(id => !Number.isSafeInteger(id) || !material!.passages.some(p => p.id === id)))
+          fail(503, 'GUIDANCE_AI_UNAVAILABLE', 'AI 결과를 확인하지 못했습니다. 게시 자료로 계속해 주세요.');
+        return picked;
+      }, authorize);
       await authorize();
       if (ids.some((id) => !material!.passages.some((p) => p.id === id)))
         fail(
@@ -412,7 +431,7 @@ export class ConsultationGuidanceService {
           source: "ko",
           target: language as Exclude<ConsultationLocale, "ko">,
         },
-        { actorId: actor, organizationId: org, authorize },
+        { actorId: actor, organizationId: org, authorize, reuseKey: consultationReuseKey(input,actor,org,{ sourceVersion, intent }) },
       );
       text = output.translation;
       actualLanguage = language;
@@ -502,7 +521,7 @@ export class ConsultationGuidanceService {
       return fail(403, 'PHARMACIST_CONFIRMATION_REQUIRED', '약사 상담의 사용 확인이 필요합니다.');
     const mode = input.mode;
     const authorize = async () => { await this.access(actor, org, mode); return true; };
-    return new ConsultationContextService(this.db, createConsultationContextPlanner(this.db))
+    return this.contextSearch
       .search(input, { actorId: actor, organizationId: org, authorize });
   }
 
@@ -519,11 +538,12 @@ export class ConsultationGuidanceService {
     const readAi = () => input.productKind === 'listing'
       ? readStoreProductAiContext(this.db, org, productId, 'ko') : Promise.resolve(null);
     const ai = await readAi();
-    const sourceVersion = digest({ product, material: material?.version ?? null, ai });
+    const configuration = await this.configuration(org, true);
+    const sourceVersion = digest({ product, material: material?.version ?? null, ai, configuration });
     const authorize = async () => {
       await this.access(actor, org, mode);
       const current = await this.products.product(org, input.productKind, input.productId);
-      if (digest({ product: current, material: (await read())?.version ?? null, ai: await readAi() }) !== sourceVersion)
+      if (digest({ product: current, material: (await read())?.version ?? null, ai: await readAi(), configuration: await this.configuration(org, true) }) !== sourceVersion)
         fail(409, 'GUIDANCE_SOURCE_CHANGED', '상품 또는 게시 자료가 변경되었습니다. 현재 근거로 다시 준비해 주세요.');
       return true;
     };
@@ -531,9 +551,9 @@ export class ConsultationGuidanceService {
       id: `p${passage.id}`, kind: 'product-fact', title: `${material!.page.title} · ${material!.page.locale}`,
       text: passage.text,
     }));
-    // Only approved, typed B2B sections enter this existing request. Never consume STORE/QR,
+    // Only approved, typed CONSULTATION sections (and validated legacy sections) enter this request. Never consume STORE/QR,
     // unpublished candidates or a legacy HTML body as proven product facts.
     sources.unshift(...approvedAiSupportSources(ai, typeof input.question === 'string' ? input.question : ''));
-    return { productName: product.name as string, sources, sourceVersion, authorize };
+    return { productName: product.name as string, sources, sourceVersion, authorize, expression: configuration?.expression };
   }
 }

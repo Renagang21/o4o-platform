@@ -12,6 +12,7 @@ import { ConsultationGoogleService } from './services/consultation-google.js';
 import { ModelControlService } from '../../services/ai-management/model-controls.js';
 import { consultationRuntimeSchema } from '../../services/ai-management/consultation-runtime.js';
 import { createPolicyExecutor } from '../ai-policy/ai-policy-factory.js';
+import { ConsultationExpressionService } from './services/consultation-expression.js';
 
 type StoreRequest = Request & { organizationId?: string };
 const org = (req: StoreRequest) => {
@@ -60,6 +61,9 @@ export function consultationWorkspaceRoutes(
 ) {
   const router = Router(),
     layouts = new ConsultationLayoutService(db);
+  const expressions = new ConsultationExpressionService(db);
+  router.get('/pharmacy/consultation-expression', ...store, handle(req => expressions.read(req.user!.id!, org(req))));
+  router.put('/pharmacy/consultation-expression', ...store, handle(req => expressions.save(req.user!.id!, org(req), req.body)));
   const limits = (max: number, peer = false) =>
     rateLimit({
       windowMs: 60_000,

@@ -1,6 +1,13 @@
 import { ConsultationContextService } from '../services/consultation-context.js';
 
 const access = () => ({ actorId: 'fixture-actor', organizationId: 'fixture-store', authorize: jest.fn(async () => true) });
+it('reuses only the search plan and queries current products again for each request',async()=>{
+ const plan=jest.fn(async()=>({needsProduct:true,terms:['성분'],clarification:null}));
+ const query=jest.fn().mockResolvedValueOnce([{id:'a',kind:'local',name:'A',metadata:'성분',knowledge:null}]).mockResolvedValueOnce([{id:'b',kind:'local',name:'B',metadata:'성분',knowledge:null}]);
+ const service=new ConsultationContextService({query} as never,plan),request={question:'성분 자료',reuseSession:'00000000-0000-4000-8000-000000000001'};
+ expect((await service.search(request,access())).candidates[0].id).toBe('a');
+ expect((await service.search(request,access())).candidates[0].id).toBe('b');expect(plan).toHaveBeenCalledTimes(1);expect(query).toHaveBeenCalledTimes(2);
+});
 it('keeps ordinary conversation and clarification free of product reads', async () => {
   const db = { query: jest.fn() } as any, actor = access();
   const plan = jest.fn().mockResolvedValueOnce({ needsProduct: false, terms: [], clarification: null })
