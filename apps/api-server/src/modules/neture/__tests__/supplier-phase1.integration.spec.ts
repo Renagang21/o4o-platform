@@ -18,17 +18,22 @@ localTests('Supplier phase 1 — PostgreSQL temporary fixtures', () => {
   it('counts paid orders per product and supplier, excludes unpaid/refunded orders, and compares periods', async () => {
     await database.transaction(async manager => {
       await manager.query(`CREATE TEMP TABLE product_masters(id uuid PRIMARY KEY, name text) ON COMMIT DROP;
-        CREATE TEMP TABLE supplier_product_offers(id uuid PRIMARY KEY, master_id uuid, supplier_id uuid, is_active boolean) ON COMMIT DROP;
-        CREATE TEMP TABLE organization_product_listings(id uuid, offer_id uuid, is_active boolean) ON COMMIT DROP;
-        CREATE TEMP TABLE checkout_orders(id uuid PRIMARY KEY, "supplierId" uuid, "createdAt" timestamptz,
+        CREATE TEMP TABLE supplier_product_offers(id uuid PRIMARY KEY, master_id uuid, supplier_id uuid, is_active boolean, deleted_at timestamptz) ON COMMIT DROP;
+        CREATE TEMP TABLE organization_product_listings(id uuid, offer_id uuid, is_active boolean, organization_id uuid, created_at timestamptz DEFAULT now()) ON COMMIT DROP;
+        CREATE TEMP TABLE checkout_orders(id uuid PRIMARY KEY, "supplierId" varchar, "createdAt" timestamptz,
           "paymentStatus" text, status text, items jsonb) ON COMMIT DROP`);
       const supplier = randomUUID(), other = randomUUID();
       const masterA = randomUUID(), masterB = randomUUID(), masterC = randomUUID();
       const offerA = randomUUID(), offerB = randomUUID(), offerC = randomUUID();
       for (const [master, offer, name] of [[masterA, offerA, 'A'], [masterB, offerB, 'B'], [masterC, offerC, 'C']]) {
         await manager.query('INSERT INTO product_masters VALUES ($1, $2)', [master, name]);
-        await manager.query('INSERT INTO supplier_product_offers VALUES ($1,$2,$3,true)', [offer, master, supplier]);
+        await manager.query('INSERT INTO supplier_product_offers VALUES ($1,$2,$3,true,NULL)', [offer, master, supplier]);
       }
+      // 삭제 처리된 상품(soft delete)은 「내 제품」 목록에서 빠지므로 대시보드 집계 · 성과 · 진열에서도 빠져야 한다.
+      const masterDeleted = randomUUID(), offerDeleted = randomUUID();
+      await manager.query('INSERT INTO product_masters VALUES ($1, $2)', [masterDeleted, 'Deleted']);
+      await manager.query('INSERT INTO supplier_product_offers VALUES ($1,$2,$3,true,now())', [offerDeleted, masterDeleted, supplier]);
+      await manager.query('INSERT INTO organization_product_listings VALUES ($1,$2,true)', [randomUUID(), offerDeleted]);
       const insert = (owner: string, offer: string, subtotal: number, days: number, payment = 'paid', status = 'paid') =>
         manager.query(`INSERT INTO checkout_orders VALUES ($1,$2,CURRENT_DATE - $3 * INTERVAL '1 day',$4,$5,$6::jsonb)`,
           [randomUUID(), owner, days, payment, status, JSON.stringify([{ productId: offer, subtotal }])]);
@@ -40,12 +45,13 @@ localTests('Supplier phase 1 — PostgreSQL temporary fixtures', () => {
       await insert(supplier, offerA, 999, 1, 'paid', 'refunded');
       await insert(other, offerA, 999, 1);
       const service = new SupplierCopilotService(manager as unknown as DataSource);
-      expect(await service.getKpiSummary(supplier)).toMatchObject({ registeredProducts: 3, recentOrders: 3 });
+      expect(await service.getKpiSummary(supplier)).toMatchObject({ registeredProducts: 3, activeProducts: 3, storeListings: 0, recentOrders: 3 });
       expect(await service.getProductPerformance(supplier)).toEqual([
         { productId: masterB, productName: 'B', orders: 1, revenue: 400, qrScans: 0 },
         { productId: masterA, productName: 'A', orders: 3, revenue: 350, qrScans: 0 },
         { productId: masterC, productName: 'C', orders: 0, revenue: 0, qrScans: 0 },
       ]);
+      expect(await service.getDistribution(supplier)).toEqual([]);
       expect(await service.getTrendingProducts(supplier)).toEqual(expect.arrayContaining([
         { productName: 'A', currentOrders: 2, previousOrders: 1, growthRate: 100 },
         { productName: 'B', currentOrders: 1, previousOrders: 0, growthRate: 100 },
