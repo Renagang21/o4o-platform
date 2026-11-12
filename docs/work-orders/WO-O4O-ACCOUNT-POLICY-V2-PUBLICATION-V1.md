@@ -1,9 +1,9 @@
 # Neture 계정 이용약관·개인정보 처리방침 · 서비스별 안내 v2 게시
 
 > **상태**: ACTIVE
-> **작성일**: 2026-11-08 · **최종 갱신**: 2026-11-08 (LOCAL §5-1 · §5-2 완료)
+> **작성일**: 2026-11-08 · **최종 갱신**: 2026-11-12 (시행 · 게시 일정을 관리자 지정으로 변경 — 고정 일정 2026-11-13 삭제)
 > **실행 위치**: LOCAL
-> **인계**: claude/intelligent-cray-o2p4u3 · §5-1 · §5-2 완료(2026-11-08) · §5-3 · §5-4 는 사용자 수작업(2026-11-13 이후 · §6-3) · kpa-society 는 게시 대상 아님(삭제한 서비스 · 2026-11-08 사용자)
+> **인계**: claude/intelligent-cray-o2p4u3 · §5-1 · §5-2 완료(2026-11-08) · §5-3 · §5-4 는 사용자 수작업(관리자가 정한 시행일 이후 · §6-3) · kpa-society 는 게시 대상 아님(삭제한 서비스 · 2026-11-08 사용자)
 > **근거**: 사용자 확인(2026-11-08) — 공개 `/terms` · `/privacy` 가 리팩터링 전 서비스(KPA Society · K-Cosmetics · PharmacyHub)를 적용 대상으로 나열. 이미 공고된 개정안(공고일 2026-10-12 · 시행 예정일 2026-11-13)을 시행일에 게시해 해소하기로 함
 
 ## 1. 배경
@@ -20,6 +20,7 @@
 
 - 공고 페이지: `neture.co.kr/policies/account-update` (`services/web-neture/src/pages/legal/AccountPolicyNoticePage.tsx`).
   `ACCOUNT_POLICY_NOTICE_DATE = '2026-10-12'` · `ACCOUNT_POLICY_EFFECTIVE_DATE = '2026-11-13'`.
+  (2026-11-12 결정으로 `ACCOUNT_POLICY_EFFECTIVE_DATE` 상수는 제거 — 시행일은 관리자 입력값을 공개 API 로 읽는다 · §2)
 - 공고 본문 원본(저장소):
 
   | 문서 | 원본 파일 | 게시 본문에서 뺄 내부 절 |
@@ -35,14 +36,20 @@
 ### 1-3. 게시 규칙(현재 코드)
 
 - 법적 문서는 덮어쓰지 않는다. 새 문서(새 ID · version 2 이상)를 만들어 게시하고, v1 은 보존한다(`service-policy-lifecycle.ts` — 삭제 없음 · archive/restore 만).
-- 시행일 전에는 게시가 거부된다(`assertPolicyEffectiveForPublication` — 한국 날짜 기준). **2026-11-13 당일 이후에 게시한다.**
+- 시행일 전에는 게시가 거부된다(`assertPolicyEffectiveForPublication` — 한국 날짜 기준). **관리자가 정한 시행일 당일 이후에 게시한다**(2026-11-12 결정 — §2).
 - 게시되면 기존 회원은 다음 로그인 때 새 약관 재동의 화면을 본다(`user_policy_acceptances` · `428 TERMS_ACCEPTANCE_REQUIRED`). 공고문에 적은 동작 그대로다.
 
 ## 2. 사용자 확정
 
+- **2026-11-12 사용자 결정: 게시 날짜를 이 지시서 · 코드에 고정하지 않는다. 시행일과 게시는 관리자 화면에서 정한다.**
+  - 시행일 = 관리자가 새 문서(초안)의 「시행일」에 입력한 값. 서버는 그 날짜 전에는 게시를 거부한다(`assertPolicyEffectiveForPublication`).
+  - 공고 페이지(`/policies/account-update`)는 시행일을 코드에 두지 않고, 게시된 v2 의 시행일 또는 관리자가 입력한 다음 버전 초안의 시행일을 읽어 보여 준다(공개 API `GET /public/services/:key/policies/:type/scheduled` — 본문 없이 메타만).
+  - 이미 공고한 시행 예정일(2026-11-13)보다 **앞당기지는 않는다**(공고 효력 · 공고일 2026-10-12 + 30일). 늦추는 것은 관리자 판단이다.
+  - 아래 본문의 「2026-11-13」 표기는 이 결정으로 「관리자가 정한 시행일」로 읽는다.
+
 - v1 본문을 직접 고치지 않는다. 회원이 동의한 원문이고, 동의 증빙이 문서 ID · version · 본문 hash 로 남아 있다.
 - 공고된 v2 본문을 바꾸지 않는다. 바꾸면 다시 30일 공고해야 한다.
-- 시행일(2026-11-13)에 v2 를 게시해 `/terms` · `/privacy` 를 현재 구조로 바꾼다. 실행은 VS Code 로컬 세션이 한다.
+- 관리자가 정한 시행일에 v2 를 게시해 `/terms` · `/privacy` 를 현재 구조로 바꾼다(2026-11-12 결정 전에는 2026-11-13 고정이었다). 실행은 VS Code 로컬 세션이 한다.
 
 ## 3. 설계 판단
 
@@ -63,7 +70,7 @@
 
 ## 5. TODO
 
-### 5-1. 사전 확인 — 운영 DB read-only (2026-11-13 전에 해도 됨)
+### 5-1. 사전 확인 — 운영 DB read-only (시행일 전에 해도 됨)
 
 - [x] [LOCAL] `/db-readonly` 로 아래 SQL 실행 · 결과를 마스킹 없이 적어도 되는 값(서비스 · 종류 · version · 상태 · 날짜 · 건수 · hash)만 §6 에 기록
 
@@ -89,11 +96,11 @@ ORDER BY 1, 2, 3;
 | Q1 결과 | 판정 | 다음 |
 |---|---|---|
 | `neture` terms/privacy 에 version ≥2 · `draft` 행이 있음 | 초안 등록됨(A) | 그 초안의 `content_md5` 를 §5-2 의 게시 본문 md5 와 비교. 다르면 게시하지 말고 보고 |
-| version ≥2 행이 없음 | 초안 미등록(B) | 11-13 에 관리자 화면에서 새 문서 작성 → 게시 |
+| version ≥2 행이 없음 | 초안 미등록(B) | 관리자 화면에서 새 문서 작성(시행일 입력) → 시행일 이후 게시 |
 | version ≥2 · `published` 가 이미 있음 | 이미 게시됨(C) | 게시 생략 · §5-4 확인만 |
 | 서비스별(supplier · community · funding · lecture · kpa-society) 도 같은 기준 | 서비스마다 A/B/C 기록 | |
 
-### 5-2. 게시 본문 준비 (2026-11-13 전에 해도 됨)
+### 5-2. 게시 본문 준비 (시행일 전에 해도 됨)
 
 - [x] [LOCAL] 최신 `origin/main` 에서 위 원본 파일 3개를 읽어, 공고 페이지와 같은 규칙(§3 첫 행)으로 게시 본문 8개를 만든다:
   - `neture` terms(계정 이용약관) · `neture` privacy(계정 개인정보 처리방침)
@@ -101,7 +108,7 @@ ORDER BY 1, 2, 3;
 - [x] [LOCAL] `neture.co.kr/policies/account-update` 화면 본문과 대조해 글자가 같은지 확인. 본문 파일은 커밋하지 않는다(저장소 원본이 정본)
 - [x] [LOCAL] 각 본문의 md5 를 기록(§6) — 게시 후 Q1 `content_md5` 와 대조한다
 
-### 5-3. 게시 — 2026-11-13 이후 · **통합 담당 명시 승인 필요**(운영 데이터 변경 · `AGENTS.md` §5)
+### 5-3. 게시 — 관리자가 정한 시행일 이후 · **통합 담당 명시 승인 필요**(운영 데이터 변경 · `AGENTS.md` §5)
 
 - [ ] [CLOUD · 선행 필수] **새 문서 등록 화면에서 slug(표식)를 지정할 수 있게 한다.** 현재 공통 화면 `packages/operator-core-ui/src/modules/service-legal/ServiceLegalSettingsPage.tsx` 의 `openNewDoc()` 는 slug 없이 폼을 열고 입력란도 없다. `admin-service-legal.controller.ts` 는 slug 를 자동으로 만들지 않고, 표식 slug 는 **새 문서 등록 때만** 지정할 수 있다(`ENROLLMENT_POLICY_MARKER_IMMUTABLE`). 그대로 게시하면 표식 없는 문서가 되어 계정 재동의 · 서비스 신청 정책 선택에 포함되지 않고, 나중에 slug 를 붙일 수도 없다. 별도 PR 로 화면을 고쳐 배포한 뒤에 아래 게시를 한다
 - [ ] [LOCAL] **중지 조건:** 위 선행 작업이 배포되지 않았거나, 새 문서 폼에서 아래 표의 slug 를 입력할 수 없으면 게시하지 않고 보고한다
@@ -113,10 +120,10 @@ ORDER BY 1, 2, 3;
 
   | service_key | document_type | slug | version | 시행일 | 제목 |
   |---|---|---|---|---|---|
-  | neture | terms | `neture-account-terms` | 2 (privacy 게시 후 · §6-3) | 2026-11-13 | Neture 계정 이용약관 |
-  | neture | privacy | `neture-account-privacy` (§6-3) | 2 | 2026-11-13 | Neture 계정 개인정보 처리방침 |
-  | supplier · community · funding · lecture | terms | `<service_key>-service-terms` | 2 (§6-3) | 2026-11-13 | <서비스명> 서비스 이용약관 |
-  | 같음 | privacy | `<service_key>-service-privacy` | 2 (§6-3) | 2026-11-13 | <서비스명> 서비스 개인정보 안내 |
+  | neture | terms | `neture-account-terms` | 2 (privacy 게시 후 · §6-3) | 관리자 지정(2026-11-13 이후) | Neture 계정 이용약관 |
+  | neture | privacy | `neture-account-privacy` (§6-3) | 2 | 관리자 지정(2026-11-13 이후) | Neture 계정 개인정보 처리방침 |
+  | supplier · community · funding · lecture | terms | `<service_key>-service-terms` | 2 (§6-3) | 관리자 지정(2026-11-13 이후) | <서비스명> 서비스 이용약관 |
+  | 같음 | privacy | `<service_key>-service-privacy` | 2 (§6-3) | 관리자 지정(2026-11-13 이후) | <서비스명> 서비스 개인정보 안내 |
 
   - 변경 사유(`change_reason`): `2026-10-12 공고 개정안 시행 (공고: /policies/account-update)`
 - [ ] [LOCAL] 게시 중 오류 · 화면이 예상과 다르면 남은 게시를 멈추고 게시한 것 / 남은 것을 보고
@@ -139,7 +146,7 @@ ORDER BY 1, 2, 3;
 | 5-1 Q1 | 2026-11-08 | 아래 6-1. 판정: `neture` **B(초안 미등록)** · `kpa-society` **B** · `supplier` · `community` · `funding` · `lecture` **B — 문서 0건(첫 게시)** |
 | 5-1 Q2 | 2026-11-08 | 아래 6-1. v1 동의 기록 합계 14건(neture terms 6 · privacy 3, kpa-society terms 2, k-cosmetics terms 3) |
 | 5-2 본문 md5 | 2026-11-08 | 아래 6-2. 본문 12개 생성(`origin/main` 1084f51486) · 공고 화면과 대조 3/3 일치 · 퇴역 서비스명 0건 |
-| 5-3 게시(통합 담당 승인) | | 미실행 — 2026-11-13 이후 사용자 수작업. **6-3 입력값으로 게시 · kpa-society 게시 안 함(삭제한 서비스)** |
+| 5-3 게시(통합 담당 승인) | | 미실행 — 관리자가 정한 시행일 이후 사용자 수작업(2026-11-12 결정). **6-3 입력값으로 게시 · kpa-society 게시 안 함(삭제한 서비스)** |
 | 5-4 확인 | | |
 
 ### 6-1. 운영 DB 조회 결과 (`o4o_readonly` · read-only 트랜잭션 · 2026-11-08)

@@ -35,6 +35,14 @@
 - **PR 로 묶을 단위:** 한 PR(에이전트 안전 설정 · 문서). DEPLOYMENT = NOT_APPLICABLE(`.claude/` · 문서만)
 - **겹칠 수 있는 열린 PR:** 없음 — 열린 PR #1028 · #1031 · #1034 · #1035 · #1036 · #1037 · #1038 은 `AGENTS.md` · `CLAUDE.md` · `HANDOFF.md` · `.claude/` 를 바꾸지 않는다(2026-11-12 `gh pr diff --name-only` 대조)
 
+## 2026-11-12 · migration 전 백업 보관 정리 (branch `wo/premigration-backup-retention`)
+
+> 다음 실행자: **CLOUD** — PR #1028 병합 후 [`WO-O4O-PREMIGRATION-BACKUP-RETENTION-V1`](docs/work-orders/WO-O4O-PREMIGRATION-BACKUP-RETENTION-V1.md) T1 ~ T4.
+
+- **결정 사항(통합 담당 2026-11-12):** 보관 30일 + 최근 5개 유지. 정리는 `deploy-api.yml` 의 migration 성공 뒤에 하고, 실패해도 배포는 막지 않는다. `pre-migration-` on-demand 백업만 대상이다.
+- **완료(LOCAL):** 커스텀 역할 `o4oCloudSqlPreMigrationBackup` 에 `cloudsql.backupRuns.delete` 추가.
+- **겹칠 수 있는 PR:** #1028(`deploy-api.yml` · `ci-pipeline.yml` 테스트 목록) — 병합 뒤에 시작한다.
+
 ## 2026-11-11 · Promote · Delivery 짧은 job 통합 (비용 절감 · branch `claude/peaceful-lamport-sjwtri-promote-cost`)
 
 > 이 절만 이 branch 의 인계다. 아래 절들은 다른 세션의 인계로 그대로 둔다.

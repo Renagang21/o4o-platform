@@ -25,7 +25,7 @@ export class InventoryService {
        FROM supplier_product_offers spo
        JOIN product_masters pm ON pm.id = spo.master_id
        LEFT JOIN product_images pi ON pi.master_id = pm.id AND pi.is_primary = true
-       WHERE spo.supplier_id = $1
+       WHERE spo.supplier_id = $1 AND spo.deleted_at IS NULL
        ORDER BY spo.track_inventory DESC, pm.name ASC`,
       [supplierId],
     );
