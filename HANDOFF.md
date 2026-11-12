@@ -1,7 +1,7 @@
 # HANDOFF
 
 > 저장소: `Renagang21/o4o-platform` · 작업 branch: `claude/clever-bohr-g532hw` · 코드 기준: `main` `c5da5631`(merge 반영) · 작성: 2026-11-11 (클라우드 작업 세션)
-> 다음 실행자: **통합 담당(이 branch 의 PR 생성 · CI · 병합 — 묶음 ①②③) → Businnect(체크리스트 실행 · 첫 과제)**
+> 다음 실행자: **통합 세션(통합 담당 지정 필요 — 이 branch 의 PR 생성 · CI · 병합, 묶음 ③ 먼저 가능) → Businnect(체크리스트 실행 · 첫 과제)**
 > 이전 인계 전문: `git show 0c812623:HANDOFF.md` · main 의 다른 branch 인계(병합 시점): `git show 31d13046:HANDOFF.md`
 
 ## 한 일 4 — 공급자 대시보드 등록 상품 수 · 공급 예정 품목군 화면 (2026-11-12 사용자 지시)
@@ -40,11 +40,13 @@
 - **품목군 화면:** 배포 후 Demo 「공급자」 → 공급자 프로필 「공급 예정 품목군」을 PC · 모바일 화면에서 확인. 클라우드에서는 로그인 화면을 띄우지 않았다(화면 확인은 동작 테스트로 대신했다).
 - 법정 안내 문구는 웹 조사 요약이다(국가법령정보센터 원문 미대조). 사용자는 법률 검토가 필요 없다고 결정했다.
 
-### 보고만 — 한 일 4
+### 후속 정리 — 한 일 4 (2026-11-12 「판단해서 진행」 지시)
 
-- `services/web-neture/src/pages/supplier/supplier-products/productListFeedback.ts` 의 `SUPPLIER_CATEGORY_NOT_SELECTED` · `NEEDS_UPDATE` 안내는 「증빙 제출」을 말한다.
-  - 현재 백엔드 gate(`evaluateGate`)는 보류(suspended)만 내보내서 이 안내가 화면에 나오지 않는다.
-  - 하지만 「선택만 받음」 정책과 맞지 않는 잔여 문구다. 정리할지는 별도 판단이다.
+3. `bbccb931` fix(neture) — `productListFeedback.ts` 의 품목군 승인 실패 안내 정리
+   - 「증빙 제출 · 재제출」 요구를 「품목군 선택 · 운영자 메모 확인 · 문의」로 바꿨다.
+   - 보류 표기를 「운영자 보류」로 통일했다.
+   - 단위 테스트 3개를 추가했다(수정 전 문구에서 2개 실패 확인). `tsc` exit 0, `SupplierProductsPage` 동작 테스트 11/11.
+   - 현재 백엔드는 품목군 사유로 보류(suspended)만 내보낸다.
 
 ---
 
@@ -91,6 +93,7 @@
 - **묶음 ③ Neture 공급자**(한 일 4 · 코드)
   - `a4ff64c8`(대시보드 · 재고 삭제 상품 제외)
   - `891af03f`(공급 예정 품목군 UI)
+  - `bbccb931`(승인 요청 실패 안내 문구)
   - Core 경로 0건이고 문서 묶음과 무관하다. ①②와 분리해 먼저 PR 로 내도 된다.
 - **묶음 ① 문서**
   - `d388157e`(Core IR) · `7c55c4ff`(Core registry · 문서 정합) · `1e200899` 와 이 commit(합류 준비 IR · 체크리스트 · SETUP 정정) · HANDOFF.md
