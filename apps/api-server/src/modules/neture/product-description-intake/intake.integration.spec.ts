@@ -3,6 +3,7 @@ import { DESCRIPTION_INTAKE_LABEL } from './namespace.js';
 import { randomUUID } from 'node:crypto';
 import * as XLSX from 'xlsx';
 import { readStoreProductAiContext } from './ai-context.service.js';
+import { searchConsultationProducts } from '../../neture-pharmacy/services/consultation-product-search.js';
 import { previewStoreExcel } from './store-excel-preview.js';
 import { DataSource, Entity, PrimaryColumn, Column } from 'typeorm';
 import { Pool } from 'pg';
@@ -32,6 +33,7 @@ integration('description intake — isolated PostgreSQL', () => {
       @Column('text', { nullable: true }) barcode: string;
       @Column('text', { default: 'ACTIVE' }) status: string;
       @Column('text', { nullable: true }) manufacturer_name: string;
+      @Column('text', { nullable: true }) specification: string;
       @Column('text', { nullable: true }) regulatory_name: string;
       @Column('text', { nullable: true }) mfds_product_id: string;
       @Column('text', { nullable: true }) mfds_permit_number: string;
@@ -42,6 +44,7 @@ integration('description intake — isolated PostgreSQL', () => {
       CREATE TABLE settings(key text PRIMARY KEY,type text,value jsonb,description text,"updatedAt" timestamp DEFAULT now());
       CREATE UNIQUE INDEX test_canonical_scope ON shared_product_descriptions(master_id,description_type,COALESCE(language,'ko')) WHERE status='canonical' AND deleted_at IS NULL;
       CREATE TABLE organization_product_listings(id uuid PRIMARY KEY,organization_id uuid,is_active boolean,master_id uuid);
+      CREATE TABLE product_ai_tags(product_id uuid,tag text);
       CREATE TABLE store_local_products(id uuid PRIMARY KEY,organization_id uuid,is_active boolean,name text,barcode text);
       CREATE TABLE kpa_store_content_product_links(id uuid DEFAULT gen_random_uuid(),organization_id uuid,content_id uuid,product_source_type text,product_source_id uuid,link_type text);`);
     await db.query("INSERT INTO product_masters(id,name,barcode,status) VALUES($1,'Synthetic reference','8806541001115','ACTIVE'),($2,'Synthetic reference',NULL,'ACTIVE')", [master, second]);
@@ -210,8 +213,11 @@ integration('description intake — isolated PostgreSQL', () => {
     const rows = await db.query("SELECT id,description_type,content FROM shared_product_descriptions WHERE master_id=$1 AND status='canonical' ORDER BY description_type", [id]);
     expect(rows.map(r => r.description_type)).toEqual(['B2B', 'CONSULTATION', 'STORE']);
     expect(await readStoreProductAiContext(db, org, listing, 'ko')).toMatchObject({ state: 'structured', description: { sections: [{ text: 'CONSULTATION synthetic fact' }] } });
+    expect(await searchConsultationProducts(db, org, ['CONSULTATION synthetic fact'], async () => true)).toMatchObject([{ id: listing }]);
+    expect(await searchConsultationProducts(db, org, ['B2B synthetic fact', 'QR stable'], async () => true)).toEqual([]);
     await db.query("UPDATE shared_product_descriptions SET content='<p>Changed consultation</p>' WHERE master_id=$1 AND description_type='CONSULTATION'", [id]);
     expect(await readStoreProductAiContext(db, org, listing, 'ko')).toMatchObject({ state: 'missing', description: null });
+    expect(await searchConsultationProducts(db, org, ['CONSULTATION synthetic fact'], async () => true)).toEqual([]);
     expect(await db.query("SELECT id,description_type,content FROM shared_product_descriptions WHERE master_id=$1 AND description_type IN ('B2B','STORE') ORDER BY description_type", [id]))
       .toEqual(rows.filter(r => r.description_type !== 'CONSULTATION'));
   });

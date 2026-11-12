@@ -25,25 +25,35 @@ export async function readConsultationDescriptions(
 ) {
   if (!masterIds.length) return new Map<string, ConsultationDescriptionRow>();
   const rows: ConsultationDescriptionRow[] = await db.query(
-    `
+    consultationDescriptionSql("d.master_id=ANY($1::uuid[])", "$2"),
+    [[...new Set(masterIds)], language],
+  );
+  return new Map(rows.map((row) => [row.master_id, row]));
+}
+
+/** Only fixed SQL identifiers/placeholders; user values remain bound parameters.
+ * Search and final reading must choose the same canonical before matching terms.
+ */
+export function consultationDescriptionSql(
+  masterPredicate: "d.master_id=ANY($1::uuid[])" | "d.master_id=e.master_id",
+  languageParameter: "$2" | "'ko'",
+) {
+  return `
     SELECT DISTINCT ON (d.master_id) d.master_id,d.id,d.description_type,d.content,d.summary,d.updated_at,
       c.raw_payload->'descriptionResource'->'entry' AS entry
     FROM shared_product_descriptions d LEFT JOIN product_candidates c
       ON c.id=d.source_ref_id AND c.source_label='PRODUCT_DESCRIPTION_RESOURCE_V1' AND c.deleted_at IS NULL
-    WHERE d.master_id=ANY($1::uuid[]) AND COALESCE(d.language,'ko')=$2
+    WHERE ${masterPredicate} AND COALESCE(d.language,'ko')=${languageParameter}
       AND d.status='canonical' AND d.deleted_at IS NULL
       AND (d.description_type='CONSULTATION' OR (
         d.description_type='B2B'
         AND c.raw_payload->'descriptionResource'->'entry'->>'descriptionType'='B2B'
-        AND c.raw_payload->'descriptionResource'->'entry'->>'language'=$2
+        AND c.raw_payload->'descriptionResource'->'entry'->>'language'=${languageParameter}
         AND c.raw_payload->'descriptionResource'->'entry'->>'content'=d.content
         AND jsonb_typeof(c.raw_payload->'descriptionResource'->'entry'->'aiSections')='array'
         AND c.raw_payload->'descriptionResource'->'entry'->'aiSections'<>'[]'::jsonb
       ))
-    ORDER BY d.master_id,CASE WHEN d.description_type='CONSULTATION' THEN 0 ELSE 1 END,d.updated_at DESC,d.id`.trim(),
-    [[...new Set(masterIds)], language],
-  );
-  return new Map(rows.map((row) => [row.master_id, row]));
+    ORDER BY d.master_id,CASE WHEN d.description_type='CONSULTATION' THEN 0 ELSE 1 END,d.updated_at DESC,d.id`.trim();
 }
 
 export function consultationEntry(
