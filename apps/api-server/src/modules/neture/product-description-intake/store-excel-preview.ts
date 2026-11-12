@@ -2,6 +2,7 @@ import * as XLSX from 'xlsx';
 import type { DataSource } from 'typeorm';
 import { DescriptionIntakeError, normalizeProductBarcode } from './contracts.js';
 import { findDescriptionTargets } from './lookup.service.js';
+import { consultationReadiness, readConsultationDescriptions } from './consultation-resource.js';
 
 export const MAX_EXCEL_PRODUCTS = 5000;
 export const MAX_PRODUCT_FILE_BYTES = 10 * 1024 * 1024;
@@ -34,9 +35,10 @@ export function readProductWorkbook(buffer: Buffer, requestedHeaderRow?: number)
 async function previewPage(db: DataSource, organizationId: string, page: InputRow[], language: Mapping['language']) {
   const matches = await findDescriptionTargets(db, page.map(row => ({
     barcodes: row.valid && !row.oversized && row.barcode ? [normalizeProductBarcode(row.barcode)!] : [],
-    name: row.valid && !row.oversized ? row.name : '', identifiers: {}, descriptionType: 'B2B', language,
+    name: row.valid && !row.oversized ? row.name : '', identifiers: {}, descriptionType: 'CONSULTATION', language,
   })));
   const ids = [...new Set(matches.flatMap(items => items.map(item => item.id)))];
+  const descriptions = await readConsultationDescriptions(db, ids, language);
   const listed: Array<{ master_id: string }> = ids.length ? await db.query(
     `SELECT DISTINCT master_id FROM organization_product_listings WHERE organization_id=$1 AND is_active=true AND master_id=ANY($2::uuid[])`, [organizationId, ids]) : [];
   return page.map((row, index) => {
@@ -45,9 +47,8 @@ async function previewPage(db: DataSource, organizationId: string, page: InputRo
     else if (!matches[index].length) state = 'not_found';
     return { ...row, state, candidates: matches[index].map(item => ({
       id: item.id, name: item.name, barcode: item.barcode, manufacturer: item.manufacturer, matchedBy: item.matchedBy,
-      hasAiDescription: !!item.canonical?.aiSections?.some(section => section.kind !== 'unclassified' && section.referenceUrls.length > 0),
-      aiState: !item.canonical ? 'missing' : !item.canonical.aiSections?.length ? 'legacy'
-        : item.canonical.aiSections.some(section => section.kind !== 'unclassified' && section.referenceUrls.length > 0) ? 'structured' : 'unclassified',
+      hasAiDescription: consultationReadiness(descriptions.get(item.id), language) === 'structured',
+      aiState: consultationReadiness(descriptions.get(item.id), language),
       registered: listed.some(l => l.master_id === item.id),
     })) };
   });

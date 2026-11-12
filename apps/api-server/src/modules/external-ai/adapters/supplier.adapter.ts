@@ -128,7 +128,7 @@ export class SupplierAdapter {
     if (!rows[0]) throw new ExternalAiError("PRODUCT_NOT_FOUND", 404);
     const descriptions = await db.query(
       `SELECT id,description_type AS type,language,status,content,source_type AS source,
-      updated_at AS "updatedAt" FROM shared_product_descriptions WHERE master_id=$1 AND deleted_at IS NULL
+      updated_at AS "updatedAt" FROM shared_product_descriptions WHERE master_id=$1 AND description_type<>'CONSULTATION' AND deleted_at IS NULL
       AND (status='canonical' OR created_by_supplier_id=$2) ORDER BY updated_at DESC LIMIT 20`,
       [rows[0].masterId, supplierId],
     );
