@@ -919,6 +919,16 @@
             "timeout": 150
           }
         ]
+      },
+      {
+        "matcher": "mcp__github__.*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/guard-mcp-github.mjs\"",
+            "timeout": 200
+          }
+        ]
       }
     ]
   },
