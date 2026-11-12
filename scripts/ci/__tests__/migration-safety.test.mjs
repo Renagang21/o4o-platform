@@ -60,6 +60,20 @@ describe('A additive', () => {
     assert.equal(verdictOf("await q.createTable(new Table({ name: 't', columns: [] })); await q.createIndex('t', idx);"), ADDITIVE);
   });
 
+  it('code inside a template interpolation anywhere in up() needs review', () => {
+    assert.equal(verdictOf("await q.query('CREATE INDEX i ON t (a)');\nconsole.log(`deleted: ${await q.query('DELETE FROM users')}`);"), REVIEW);
+  });
+
+  it('only a single up() outside comments and strings is analysed', () => {
+    const real = "export class M { async up(q: QueryRunner): Promise<void> { await q.query('DELETE FROM users'); } async down(q) {} }";
+    const commented = "// Example: up(q) { await q.query('CREATE TABLE example (id int)'); }\n" + real;
+    const blockCommented = "/* up(q) { await q.query('CREATE TABLE example (id int)'); } */\n" + real;
+    assert.equal(classifyMigrationSource(commented).verdict, DESTRUCTIVE);
+    assert.equal(classifyMigrationSource(blockCommented).verdict, DESTRUCTIVE);
+    const two = "class A { async up(q) { await q.query('CREATE INDEX i ON t (a)'); } }\nclass B { async up(q) { await q.query('DELETE FROM users'); } }";
+    assert.equal(classifyMigrationSource(two).verdict, REVIEW);
+  });
+
   it('addColumn(s) options cannot be analysed — review', () => {
     assert.equal(verdictOf("await q.addColumn('users', new TableColumn({ name: 'required', type: 'text', isNullable: false }));"), REVIEW);
     assert.equal(verdictOf("await q.addColumns('users', [col]);"), REVIEW);

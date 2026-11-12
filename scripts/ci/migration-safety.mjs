@@ -89,24 +89,31 @@ function matchBracket(src, open) {
   return -1;
 }
 
-/** `up(...)` 메서드 본문과 QueryRunner 매개변수 이름. 못 찾으면 null. */
+/**
+ * `up(...)` 메서드 본문과 QueryRunner 매개변수 이름.
+ * 주석 · 문자열 밖의 up 메서드 정의가 정확히 하나일 때만 돌려준다 — 없거나 둘 이상이면(예제 주석 · 여러 클래스) null.
+ */
 export function extractUp(source) {
   const re = /\b(?:public\s+)?(?:async\s+)?up\s*\(/g;
   let m;
+  let found = null;
   while ((m = re.exec(source))) {
+    if (insideLiteral(source.slice(0, m.index))) continue;
     const paramsOpen = m.index + m[0].length - 1;
     const paramsClose = matchBracket(source, paramsOpen);
     if (paramsClose < 0) return null;
     const bodyOpen = source.indexOf('{', paramsClose);
-    if (bodyOpen < 0) return null;
+    if (bodyOpen < 0) continue;
     // `up(q): Promise<void> {` — 괄호 뒤에는 반환 타입만 올 수 있다
     if (!/^\s*(:[^{;]*)?$/.test(source.slice(paramsClose + 1, bodyOpen))) continue;
     const bodyClose = matchBracket(source, bodyOpen);
     if (bodyClose < 0) return null;
+    if (found) return null;
     const runner = /^\s*([A-Za-z_$][\w$]*)/.exec(source.slice(paramsOpen + 1, paramsClose))?.[1] ?? null;
-    return { body: source.slice(bodyOpen + 1, bodyClose), runner };
+    found = { body: source.slice(bodyOpen + 1, bodyClose), runner };
+    re.lastIndex = bodyClose;
   }
-  return null;
+  return found;
 }
 
 /** 값이 그대로 확정되는 escape 만 해석한다 */
@@ -206,6 +213,8 @@ export function extractStatements(body, runner) {
     else runnerCalls.push({ method, verdict: REVIEW });
   }
   if (queryCalls > runnerQueries) problems.push('QueryRunner 매개변수가 아닌 query() 호출 — 실행 대상을 알 수 없음');
+  // 템플릿 문자열의 `${}` 안은 실행 코드다 — 위 수집은 문자열 전체를 건너뛰므로, up() 안의 보간은 어디에 있든 승인 대상이다
+  if (body.includes('${')) problems.push('up() 안의 템플릿 문자열 보간 `${}` — 보간식 안의 실행 코드를 분석하지 않음');
   // 조건 · 반복 · 예외 처리 안의 CREATE TABLE 은 건너뛰어질 수 있다 — 그때는 "새 표" 예외를 주지 않는다
   let conditional = false;
   const flow = /(?<![\w$])(?:if|else|for|while|do|switch|case|try|catch|finally)(?![\w$])|\?|&&|\|\|/g;
