@@ -101,7 +101,25 @@ test('CLI reads only its fixed workspace plan, never a caller-supplied file path
   assert.equal(result.status, 0, result.stderr);
   assert.match(readFileSync(output, 'utf8'), /valid<<O4O_BUILD_CACHE\ntrue\n/);
 });
-test('symlink sources or cached outputs are not reusable and cleanup never follows links', t => {
+// Windows 는 개발자 모드 · 관리자 권한이 없으면 symlink 생성을 EPERM 으로 거부한다.
+// 이 경우에만 건너뛰고(이유 표시), CI(Linux)와 링크를 만들 수 있는 PC 는 그대로 검사한다.
+function canSymlink() {
+  if (process.platform !== 'win32') return true;
+  const dir = mkdtempSync(path.join(tmpdir(), 'o4o-symlink-probe-'));
+  try {
+    writeFileSync(path.join(dir, 'target'), '');
+    symlinkSync(path.join(dir, 'target'), path.join(dir, 'link'));
+    return true;
+  } catch (error) {
+    if (error.code === 'EPERM') return false;
+    throw error;
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+}
+test('symlink sources or cached outputs are not reusable and cleanup never follows links', {
+  skip: canSymlink() ? false : 'Windows 에서 symlink 생성 권한 없음(EPERM) — 개발자 모드를 켜면 검사된다 · CI(Linux)는 항상 검사',
+}, t => {
   const f = fixture(t); const plan = f.plan();
   f.put('outside.txt', 'must survive', false);
   mkdirSync(path.join(f.root, 'packages/test-dep/dist'));
