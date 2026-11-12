@@ -120,6 +120,7 @@ function Consultation({
     sequence: number;
   } | null>(null);
   const [guidanceReset, setGuidanceReset] = useState(0);
+  const reuseSession = useRef(crypto.randomUUID());
   const [supportProduct, setSupportProduct] = useState<ConsultationProduct | null>(null);
   const voiceSequence = useRef(0);
   const voiceTarget = useRef<"guidance" | "sentence">("sentence");
@@ -199,6 +200,7 @@ function Consultation({
   useEffect(() => {
     alive.current = true;
     const forget = () => {
+      reuseSession.current = crypto.randomUUID();
       version.current++;
       clearDrafts();
       setGuidanceVoice(null);
@@ -266,6 +268,7 @@ function Consultation({
   }, [organizationId, retry, initialMode]);
 
   const clear = useCallback(() => {
+    reuseSession.current = crypto.randomUUID();
     resetSpeech();
     version.current++;
     clearDrafts();
@@ -330,6 +333,7 @@ function Consultation({
         success: boolean;
         data: Result;
       }>(`${base}/translate`, {
+        reuseSession: reuseSession.current,
         ...captured,
         ...(captured.direction === 'to-customer' && supportSource.current ? { supportSource: supportSource.current } : {}),
         ...(captured.direction === 'to-staff' && autoLanguage ? { detectLanguage: true } : {}),

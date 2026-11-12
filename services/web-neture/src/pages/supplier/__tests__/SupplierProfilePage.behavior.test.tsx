@@ -23,8 +23,16 @@ vi.mock('../../../lib/api', () => ({
   supplierProfileApi: api.profile,
   supplierOnboardingApi: api.onboarding,
   supplierRegulatedCategoryApi: api.categories,
-  REGULATED_CATEGORY_ORDER: ['general', 'drug'],
-  REGULATED_CATEGORY_LABELS: { general: '일반 상품', drug: '의약품' },
+  REGULATED_CATEGORY_LABELS: {
+    general: '일반 상품',
+    pharmaceutical: '의약품',
+    quasi_drug: '의약외품',
+    medical_device: '의료기기',
+    health_functional_food: '건강기능식품',
+    food: '식품',
+    cosmetics: '화장품',
+    other_regulated: '기타 법정 관리 품목',
+  },
 }));
 vi.mock('@o4o/account-ui', async () => ({
   BusinessRegistrationFields: (await import('../../../../../../packages/account-ui/src/components/BusinessRegistrationFields')).BusinessRegistrationFields,
@@ -165,9 +173,9 @@ describe('SupplierProfilePage existing section ownership', () => {
     api.categories.list.mockRejectedValueOnce(new Error('unavailable'));
     render(<SupplierProfilePage />);
     await loaded();
-    expect(screen.queryByLabelText('일반 상품')).toBeNull();
+    expect(screen.queryByLabelText('의약품')).toBeNull();
     fireEvent.click(card('공급 예정 품목군').getByRole('button', { name: '다시 시도' }));
-    await screen.findByLabelText('일반 상품');
+    await screen.findByLabelText('의약품');
     expect(api.profile.getProfile).toHaveBeenCalledTimes(1);
     expect(api.onboarding.getOnboarding).toHaveBeenCalledTimes(1);
   });
@@ -374,15 +382,46 @@ describe('SupplierProfilePage existing section ownership', () => {
   it('selects a category and refreshes categories without saving the business profile', async () => {
     render(<SupplierProfilePage />);
     await loaded();
-    fireEvent.click(screen.getByLabelText('일반 상품'));
+    fireEvent.click(screen.getByLabelText('의약품'));
     await waitFor(() => expect(api.categories.list).toHaveBeenCalledTimes(2));
-    expect(api.categories.select).toHaveBeenCalledWith('general');
+    expect(api.categories.select).toHaveBeenCalledWith('pharmaceutical');
     expect(api.profile.updateProfile).not.toHaveBeenCalled();
+  });
+  it('offers only the four legally regulated categories with qualification and product document guidance', async () => {
+    render(<SupplierProfilePage />);
+    await loaded();
+    const section = card('공급 예정 품목군');
+    for (const label of ['의약품', '의약외품', '의료기기', '건강기능식품']) expect(section.getByLabelText(label)).toBeTruthy();
+    for (const label of ['일반 상품', '식품', '화장품', '기타 법정 관리 품목']) expect(section.queryByLabelText(label)).toBeNull();
+    expect(section.getByText(/의약품 도매상 허가가 필요합니다/)).toBeTruthy();
+    expect(section.getByText(/의료기기 판매업 신고가 필요합니다/)).toBeTruthy();
+    expect(section.getByText(/건강기능식품 판매업 신고가 필요합니다/)).toBeTruthy();
+    expect(section.getAllByText(/상품 등록 때 필요한 것/)).toHaveLength(4);
+    expect(section.queryByText('서류 불필요')).toBeNull();
+  });
+  it('keeps previously selected removed categories visible: hold stays, general is hidden, removable ones can be cleared', async () => {
+    api.categories.list.mockResolvedValue([
+      { category: 'general', status: 'not_requested', evidenceDocument: null },
+      { category: 'cosmetics', status: 'suspended', reviewNote: '보류 사유 확인 필요', evidenceDocument: null },
+      { category: 'food', status: 'not_requested', evidenceDocument: null },
+    ]);
+    render(<SupplierProfilePage />);
+    await loaded();
+    const section = card('공급 예정 품목군');
+    expect(section.getByText('이전에 선택한 품목군')).toBeTruthy();
+    expect(section.queryByText('일반 상품')).toBeNull();
+    expect(section.getByText('화장품')).toBeTruthy();
+    expect(section.getByText('운영자 보류')).toBeTruthy();
+    expect(section.getByText('운영자 메모: 보류 사유 확인 필요')).toBeTruthy();
+    const clear = section.getAllByRole('button', { name: '선택 해제' });
+    expect(clear).toHaveLength(1);
+    fireEvent.click(clear[0]);
+    await waitFor(() => expect(api.categories.remove).toHaveBeenCalledWith('food'));
   });
   it('prevents deselecting an approved category and retains prior evidence access', async () => {
     api.categories.list.mockResolvedValue([
       {
-        category: 'drug',
+        category: 'pharmaceutical',
         status: 'approved',
         evidenceDocument: { fileName: 'fixture.pdf' },
       },

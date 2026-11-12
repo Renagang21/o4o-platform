@@ -51,7 +51,7 @@ export class SupplierCopilotService {
          COUNT(*)::int AS "registeredProducts",
          COUNT(*) FILTER (WHERE spo.is_active = true)::int AS "activeProducts"
        FROM supplier_product_offers spo
-       WHERE spo.supplier_id = $1`,
+       WHERE spo.supplier_id = $1 AND spo.deleted_at IS NULL`,
       [supplierId]
     );
 
@@ -60,7 +60,7 @@ export class SupplierCopilotService {
       `SELECT COUNT(DISTINCT opl.id)::int AS "storeListings"
        FROM organization_product_listings opl
        JOIN supplier_product_offers spo ON spo.id = opl.offer_id
-       WHERE spo.supplier_id = $1 AND opl.is_active = true`,
+       WHERE spo.supplier_id = $1 AND spo.deleted_at IS NULL AND opl.is_active = true`,
       [supplierId]
     );
 
@@ -97,7 +97,7 @@ export class SupplierCopilotService {
          AND o."paymentStatus" = 'paid' AND o.status NOT IN ('cancelled', 'refunded')
        LEFT JOIN LATERAL jsonb_array_elements(o.items) AS item
          ON (item->>'productId')::uuid = spo.id
-       WHERE spo.supplier_id = $1::uuid
+       WHERE spo.supplier_id = $1::uuid AND spo.deleted_at IS NULL
        GROUP BY pm.id, pm.name
        ORDER BY revenue DESC
        LIMIT $2`,
@@ -125,7 +125,7 @@ export class SupplierCopilotService {
        FROM supplier_product_offers spo
        JOIN product_masters pm ON pm.id = spo.master_id
        JOIN organization_product_listings opl ON opl.offer_id = spo.id AND opl.is_active = true
-       WHERE spo.supplier_id = $1
+       WHERE spo.supplier_id = $1 AND spo.deleted_at IS NULL
        GROUP BY pm.id, pm.name
        ORDER BY "storeCount" DESC`,
       [supplierId]
@@ -176,7 +176,7 @@ export class SupplierCopilotService {
          JOIN product_masters pm ON pm.id = spo.master_id
          LEFT JOIN current_period cp ON cp.product_id = spo.id::text
          LEFT JOIN prev_period pp ON pp.product_id = spo.id::text
-         WHERE spo.supplier_id = $1::uuid
+         WHERE spo.supplier_id = $1::uuid AND spo.deleted_at IS NULL
            AND (COALESCE(cp.orders, 0) > 0 OR COALESCE(pp.orders, 0) > 0)
          ORDER BY "growthRate" DESC, "currentOrders" DESC
          LIMIT $2`,

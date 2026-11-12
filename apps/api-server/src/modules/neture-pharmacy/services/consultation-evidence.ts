@@ -45,7 +45,7 @@ export function approvedAiSupportSources(
     remaining -= text.length;
     const omitted = text.length < section.text.length || sections.length > 16;
     sources.push({ id: section.kind === 'product-fact' ? `p${index + 11}` : `r${index + 2}`, kind: section.kind as ConsultationSupportSource['kind'],
-      title: `O4O B2B · ${labels[section.kind]} · ${section.title}${omitted ? ' · 일부 근거 생략' : ''}`,
+      title: `O4O 상품 상담자료 · ${labels[section.kind]} · ${section.title}${omitted ? ' · 일부 근거 생략' : ''}`,
       text, urls: safeEvidenceUrls(section.referenceUrls), checkedOn: description.source?.checkedOn ?? null,
       revision: description.revision, currentness: description.source?.currentness ?? 'unknown' });
   }

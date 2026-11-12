@@ -87,6 +87,14 @@ async function createWork() {
   await screen.findByLabelText('보완 초안');
 }
 describe('관리자 상품 보정 작업', () => {
+  it('prepares recurring shared consultation review without saving or enabling it', async () => {
+    render(<ProductCorrectionWorkspace />); await screen.findByRole('option', { name: '수치 기준 · v1' });
+    fireEvent.click(screen.getByRole('button', { name: '공통 상담자료 점검 초안' }));
+    expect(screen.getByLabelText('대상 설명서')).toHaveValue('CONSULTATION');
+    expect(screen.getByLabelText('활성 매장이 취급하는 공통 상품만 점검')).toBeChecked();
+    expect(screen.getByLabelText('기준 사용')).not.toBeChecked();
+    expect(mocks.api.saveRule).not.toHaveBeenCalled();
+  });
   it('loads editable operational templates without saving and preserves explicit purpose selection', async () => {
     render(<ProductCorrectionWorkspace />);
     await screen.findByRole('option', { name: '수치 기준 · v1' });

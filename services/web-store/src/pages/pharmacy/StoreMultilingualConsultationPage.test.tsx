@@ -30,7 +30,7 @@ it('shows only fixed outgoing staff phrases and submits their identifier, not ar
   expect(translation().queryByRole('textbox')).toBeNull();
   fireEvent.click(screen.getByRole('button', { name: '번역하기' }));
   await screen.findAllByText('Translated words');
-  expect(state.post).toHaveBeenCalledWith('/neture/pharmacy/multilingual-consultation/translate', { mode: 'floor-staff', language: 'en', direction: 'to-customer', phrase: 'pharmacist' });
+  expect(state.post).toHaveBeenCalledWith('/neture/pharmacy/multilingual-consultation/translate', { mode: 'floor-staff', language: 'en', direction: 'to-customer', phrase: 'pharmacist', reuseSession: expect.any(String) });
   fireEvent.click(screen.getByRole('button', { name: '고객에게 크게 보여주기' }));
   const dialog = screen.getByRole('dialog', { name: '고객용 번역 화면' });
   expect(within(dialog).getByText('Translated words')).toBeTruthy();

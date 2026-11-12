@@ -20,6 +20,7 @@ export function LoginCard({
   onClose,
   heading = "h1",
   logoSrc,
+  wide = false,
   children,
 }: {
   brand: string;
@@ -29,13 +30,15 @@ export function LoginCard({
   onClose?: () => void;
   heading?: "h1" | "h2";
   logoSrc?: string;
+  /** 넓은 입력 화면(가입 신청 등) — 데스크톱에서만 넓어지고, 720px 이하에서는 기본 카드와 같다. */
+  wide?: boolean;
   children: ReactNode;
 }) {
   const id = useId();
   const Heading = heading;
   return (
     <section
-      className="o4o-login-card o4o-login-surface"
+      className={`o4o-login-card o4o-login-surface${wide ? " o4o-login-card--wide" : ""}`}
       data-tone={tone}
       aria-labelledby={id}
     >

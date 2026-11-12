@@ -1,6 +1,17 @@
 import { coreApiClient } from "./client";
 
 export const CONSULTATION_BASE = "/neture/pharmacy";
+export interface ConsultationExpression { tone: 'neutral' | 'friendly'; formality: 'polite' | 'plain'; length: 'short' | 'standard' }
+export async function readConsultationExpression() {
+  const r = await coreApiClient.get<Envelope<{ organizationId: string; expression: ConsultationExpression; canEdit: boolean }>>(`${CONSULTATION_BASE}/consultation-expression`);
+  if (!r.success || !r.data?.expression) throw new Error('매장 표현 설정을 확인하지 못했습니다.');
+  return r.data;
+}
+export async function saveConsultationExpression(expression: ConsultationExpression) {
+  const r = await coreApiClient.put<Envelope<{ organizationId: string; expression: ConsultationExpression; canEdit: boolean }>>(`${CONSULTATION_BASE}/consultation-expression`, expression);
+  if (!r.success || !r.data?.expression) throw new Error('매장 표현 설정을 저장하지 못했습니다.');
+  return r.data;
+}
 export type OperatingType = "standard" | "large";
 export interface SharedConsultation {
   kind: string;
@@ -212,6 +223,7 @@ export async function prepareConsultationGuidance(input: {
   language: string;
   intent: GuidanceIntent;
   question: string;
+  reuseSession?: string;
   productKind?: string;
   productId?: string;
   useAi?: boolean;
@@ -241,7 +253,7 @@ export interface ConsultationProductSearchResult {
   organizationId: string; mode: string; state: 'candidates' | 'clarify' | 'not-needed' | 'empty'; message: string;
   candidates: Array<{ id: string; kind: 'listing' | 'local'; name: string; location: string }>;
 }
-export async function findConsultationProducts(input: { mode: string; question: string; context: string[]; stationId?: string; epoch?: string }) {
+export async function findConsultationProducts(input: { mode: string; question: string; context: string[]; stationId?: string; epoch?: string; reuseSession?: string }) {
   const response = await coreApiClient.post<Envelope<ConsultationProductSearchResult>>(`${CONSULTATION_BASE}/consultation-products/prepare`, input);
   const value = response.data;
   if (!response.success || !value || !['candidates', 'clarify', 'not-needed', 'empty'].includes(value.state) || !Array.isArray(value.candidates) ||
@@ -266,6 +278,7 @@ export async function prepareConsultationSupport(input: {
   mode: string; productKind: string; productId: string; question?: string;
   reference?: { text: string; source: string; reviewed: boolean };
   verifyOnly?: boolean; sourceVersion?: string; stationId?: string; epoch?: string;
+  reuseSession?: string;
 }): Promise<ConsultationSupportResult> {
   const r = await coreApiClient.post<Envelope<ConsultationSupportResult>>(`${CONSULTATION_BASE}/consultation-support`, input);
   if (!r.success || !['ready', 'empty', 'verified'].includes(r.data?.state) ||

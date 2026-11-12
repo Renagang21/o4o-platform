@@ -1,8 +1,145 @@
 # HANDOFF
 
+## 2026-11-12 · AI 비용 절감 7차 사전 검증·운영 인계
+
+- **branch / 통합 단위:** `wo/consultation-cost-verification`. 시작 main `2271a2f59` + 자체 3~6차 검증 의존(`668e0c79f`·`d08bbbf6b`·`9aaac766b`·`d563407be`). 작업 중 기존 3~6차 **PR #1044**를 확인했다. **3~7차 중복 PR 생성 금지**. 이 branch의 `test(consultation): verify reuse savings and customer isolation` commit만 #1044 후속으로 가져오거나 #1044 병합 뒤 7차 차이만 반영한다. 기존 PR·원래 branch를 변경/삭제하지 않았다. 아래 과거 절의 3~6차 통합 안내는 그때의 기록이며 현재 통합 단위는 이 절을 따른다.
+- **한 일 / 결정:** 실제 서비스·Extension·policy runtime을 연결한 합성 전체 상담 비교, 동시 상담·60초 만료·다음 고객·자료/표현 변경·권한 거부, 잘못된 번역 후 정상 재시도·정책 중지, 화면의 다음 고객 세션 교체 검증. runtime·schema·비용/권한 정책은 변경하지 않음.
+- **실측 범위:** 합성 동일 상담 2회에서 policy 실행 **8→4**, 검증된 출력 동일. fixture DB 조회 **50→86**으로 증가해 운영 부하·전체 비용 개선은 미판정. 실제 공급자 attempt/청구/응답 품질·운영 지연을 측정한 것이 아니다. [7차 CHECK와 운영 절차](docs/checks/CHECK-O4O-AI-COST-REDUCTION-PHASE7-V1.md).
+- **검증:** API 상담 15 suites / 148 pass, 매장 화면 5 files / 66 pass. API·매장 typecheck 및 이번 변경 lint/diff/문서 민감정보 검사 통과. Node 24.22.1(안내 22.23.4와 차이)·pnpm 10.25.0. provider/DB는 fixture이며 운영 연결·DB write·유료 호출·배포 없음.
+- **확인하지 못한 것 / 다음 실행자:** 통합 세션이 #1044·후속 7차·별도 #1042를 통합하고 배포 버전을 확인한 후 운영 계정/자료로 CHECK §3~4 실행. 약사 검수·PC/mobile Demo·기존 QR·직접 등록 보존·실제 비용/지연 확인 전 **7차 운영 완료 아님**. neture 초기화면 SIWC는 실제 참여 후 별도 범위. 약사 지정 인계 전체 신규 구현도 별도.
+- **겹치는 PR / 문서 정합:** #1044와 선행 3~6차 전체 및 이번 번역 테스트, #1042·#1043과 HANDOFF가 겹침. 기존 정본 경계 유지, 앞서 기록한 B2B 전용 안내 2건은 별도 정비 대상. worktree `KEEP` — 미병합 인계용, 미완료 운영 검증 포함.
+
+
+## 2026-11-12 · 상담 반복 생성 감소·매장 표현 설정 (6차)
+
+- **branch / PR 묶음:** `wo/consultation-reuse-expression` — main `31be41b49` + 자체 3차 `017f9dac3`·4차 `b60710778`·5차 `5a67ed453` + 6차. **3~6차 통합 묶음**이다. 이전 `wo/product-consultation-resource-separation`·`wo/consultation-structured-product-search`·`wo/shared-product-material-preparation`는 이 묶음 **병합 후 삭제 가능**. 원래 branch를 수정·삭제하지 않았고 별도로 중복 통합하지 않는다.
+- **한 일:** 동일 actor/store/session/mode/epoch·질문·근거·설정의 검색 계획/문단 선택/약사 초안/번역을 프로세스 메모리에서 60초 재사용·동시 요청 합류. 단계당 완료 결과 64개·1MB 및 합류 대상 64개 제한. 현재 권한·원천을 매번 확인하고 후보 DB 조회는 계속 수행한다. 다음 고객은 새 세션이며 이전 메모리 값은 최대 TTL까지 남을 수 있다. 실패는 미보관. 실제 절감액을 측정한 것은 아니다.
+- **표현 설정:** 현재 매장 경영자만 고정 말투·경어·길이를 기존 organizations.metadata에 저장. 직원 조회 가능. 약사 검토용 고객 초안에만 적용하고 전문 자료 권한·수치/출처 검증 유지. 설정·모델 변경 시 이전 초안 사용 검증 실패→재준비. schema·운영 DB·일정·SIWC 변경 없음.
+- **검증:** 상담 API 138건 통과 후 표현/초안 2건 추가 및 해당 suite 재검증. 화면 65건 통과, 마지막 설정 화면 수정 후 4건 재검증. API·매장 typecheck, 변경 TS/TSX lint 오류 0(기존 routes 미사용 변수 경고 1). 격리 PGlite 실제 저장 SQL·metadata 보존·직원/다른 매장/퇴사/미인증/비활성 거부 확인. [상세 기록](docs/investigations/IR-O4O-CONSULTATION-REUSE-AND-EXPRESSION-V1.md).
+- **배포 후 / 7차:** 실제 공급자 호출·비용·지연·설명 품질, 권한 철회·자료/설정 변경·다음 고객·두 매장 격리·기존 QR 보존을 확인한다. 배포·실제 API 호출·운영 DB write·약사 지정 인계 신규 구현은 하지 않았다. 다중 인스턴스/재시작/만료는 다시 호출될 수 있다. 구형 클라이언트는 기존 비재사용 동작. 배포 전 열린 초안은 다시 준비한다.
+- **겹치는 PR / 문서 정합:** 조회 시 #1042·#1039·#1043과 HANDOFF.md만 겹침. #1042(2차)는 별도. PR 생성·병합·배포는 통합 세션 담당. 기존 비용·전문 자료·Display 경계 유지. 이전 B2B 전용 안내 2건은 별도 정비 대상으로 유지.
+
+## 2026-11-12 · 공통 상품 자료 준비·정기 검토·재사용
+
+- **branch / PR 묶음:** `wo/shared-product-material-preparation` — 최신 main `31be41b49` + 3차 `5702b2de6`(원본 `1b2ab0813`/`f56c1b3ed`) + 4차 `95049f85b`(원본 `ec4704ede`) + 5차. 3~5차를 포함한다. 원래 `wo/product-consultation-resource-separation`·`wo/consultation-structured-product-search`는 이 묶음 **병합 후 삭제 가능**이며 원래 branch를 수정·삭제하지 않았다. 중복 통합에 주의한다.
+- **한 일:** 공통 상품 등록/없는 제품 등록 요청을 주 진입점으로, 기존 직접 상품의 공통 상품 대조를 추가. 관리자 공통 자료 준비 목록(상품당 한 행, 상담/QR 분리), 현재 상태를 재확인해 준비된 자료를 제외하는 읽기 전용 조사 요청문, 기존 정기 검토의 CONSULTATION 유형·handledOnly 선택 범위·사용 꺼짐 초안 및 화면 왕복 동선.
+- **결정 사항:** 신규 저장소·DB schema·자동 생성·추가 AI 호출·운영 일정 활성화 없음. 기존 접수·승인·정기 worker·취급 등록 API를 재사용. handledOnly 미지정이면 기존 전체 상품 범위 유지. 조회는 최대 250개를 확인하고 sparse continuation 제공. 요청문은 최대 25개 공통 상품 식별 정보만 추려 매장/가격/고객 데이터 제외. 실제 생성/검수는 사용자의 외부 AI 및 관리자 기존 승인 절차.
+- **직접 등록 보존:** 태블릿/공개 진열·매장 상담/기여·다국어·POP·QR에 local ID 소비처가 남아 있어 일괄 이관/삭제/비활성화하지 않음. 공통 상품 대조는 이름 초깃값을 넣고 사용자가 상품·규격을 선택하는 절차이며 기존 자료 참조를 자동 바꾸지 않음. 운영 이관 완료로 보고하지 않는다.
+- **검증:** API 관련 161 pass / 11 skip(전용 PostgreSQL 통합 연결 미설정), 변경 후 준비·권한 12건 재검증. 관리자 30건·매장 57건 통과. API·관리자·매장 typecheck 통과. 변경 19개 TS 파일 ESLint 오류 0(기존 접수 화면 hook 경고 2건). 격리 PGlite에서 실제 SQL·중복 제거·stale/빈 QR·준비 자료 제외·미취급/삭제·두 매장의 동일 상담자료 ID 재사용·정기 범위 검증. [상세 기록](docs/investigations/IR-O4O-SHARED-PRODUCT-MATERIAL-PREPARATION-V1.md).
+- **확인하지 못한 것 / 배포 후:** 운영 자료·부하·일정/worker 활성화·실제 자료 이관·실제 관리자/매장 화면·절감액. 관리자 준비 조회→선택→요청문→접수/대조/승인, 두 매장 공통 자료 참조, 기존 QR 보존, 점검 기준 검토·사용 설정·저장 후 일정 설정을 확인한다. 운영 DB 및 배포는 실행하지 않음.
+- **겹치는 PR:** 조회 시 #1042·#1039와 HANDOFF.md만 겹침. #1037의 shared types는 다른 파일. PR 생성·병합·배포는 통합 세션 담당. 원래 3·4차 커밋을 따로 중복 적용하지 않는다.
+- **문서 정합:** 기존 비용·전문 자료·Display 경계 유지. 앞서 기록한 B2B 전용 안내 2건은 별도 정비 묶음으로 인계. 자동 데이터 이관과 직접 등록 도메인 폐기는 별도 범위.
+
+## 2026-11-12 · 구조화 상담자료의 상품 후보 검색 반영
+
+- **branch / PR 묶음:** `wo/consultation-structured-product-search` — 3차 선행 커밋 `f56c1b3ed`를 최신 main `31be41b49`에 cherry-pick한 `1b2ab0813` + 4차 검색 변경. 원래 `wo/product-consultation-resource-separation`는 이 묶음 **병합 후 삭제 가능**. 원래 branch는 수정·삭제하지 않음. 이미 3차를 따로 통합할 경우 같은 diff를 중복 반영하지 않도록 확인한다.
+- **한 일:** 현재 매장의 활성 취급 상품에서 구조화 상담자료 제목·내용으로 후보 검색. 자료 선택 SQL·Zod 검증을 최종 상담자료 읽기와 공유. 일반 B2B HTML 의존 제거. 50건씩 검증 후 상위 12개 정렬, 1,000개 초과는 422 조건 구체화 안내. 늦은 유효 후보/높은 점수를 버리지 않고 원문·내부 점수는 응답에 넣지 않음.
+- **결정 사항:** 기존 맥락 계획 1회 유지, 추가 AI 호출 없음. DB schema·운영 데이터·권한·화면·SIWC 변경 없음. 직접 등록 상품의 이름 검색은 유지하고 중앙 자료를 임의 연결하지 않음. 공통 상품 연결·관리자 준비·자료 재사용은 5차. broad 검색은 조용한 부분 결과/빈 결과 대신 명시적 실패.
+- **검증:** API 관련 178 pass / 11 skip(전용 PostgreSQL 통합 연결 미설정). 실제 승인→검색→stale 무효화 시나리오를 기존 DB suite에 보강했으나 이 suite는 미실행. 별도 PGlite 격리 PostgreSQL에서 실제 검색 SQL·유형/언어 partial unique index·구조화 전용 용어·scope/status/언어/출처/JSON/stale·중복 listing·pagination·정렬·접근 철회 검증. API typecheck, 변경 6개 TS 파일 ESLint 오류 0. 세부 [조사 기록](docs/investigations/IR-O4O-STRUCTURED-CONSULTATION-PRODUCT-SEARCH-V1.md).
+- **확인하지 못한 것 / 배포 후:** 운영 데이터 부하·실제 비용·실제 약사 화면. 성분·용도·주의사항으로 후보→상품 선택→근거 확인→판단 지원, 타 매장/자격 거부, 검색 중 권한 철회, 원천 변경 후 재준비를 확인한다. 실제 운영 DB·공급자 호출·배포는 실행하지 않음. 롤백 시 상담자료를 삭제하거나 B2B로 덮어쓰지 않는다.
+- **겹치는 PR:** 조회 시 #1042·#1039와 HANDOFF.md만 겹침. 3차 branch와 새 묶음의 중복 통합에 유의. PR 생성·병합·배포는 통합 세션 담당.
+- **문서 정합:** 누적 발견 2건 / 별도 문서 정비 1묶음 — 매장 Excel·AI 자료 흐름 및 상담 맥락 운영 안내의 B2B 전용 설명. 정본 수정은 별도 인계.
+
+## 2026-11-12 · 상품 상담자료 논리 분리
+
+- **branch / PR 묶음:** `wo/product-consultation-resource-separation` — CONSULTATION 유형·공통 조회·관리자 접수·매장 표시·회귀 검증의 한 기능 묶음. 공통 snapshot union은 값 하나만 추가. 기존 소비처 호환을 유지하기 위해 API와 최소 화면 변경을 함께 검증한다. PR 생성·병합·배포는 통합 세션에 인계한다.
+- **한 일:** 상품 상담자료 CONSULTATION 추가, QR은 STORE 유지. 새 유형 정본을 우선하고 이전 B2B는 원천·언어·본문·aiSections 근거가 유효한 구조화 자료만 호환 읽기. 일반 B2B 본문 대체 제거. 조회·자료 현황·Excel 공통 리더 사용. 외부 ChatGPT 일반 조회에 새 전문 자료 자동 노출 방지.
+- **결정 사항:** 기존 B2B·QR 행은 이동/수정/삭제하지 않음. DB schema·migration 없음. API의 기존 purpose=B2B는 구형 클라이언트용 deprecated 전송 필드로만 보존하고 resourcePurpose=CONSULTATION 추가. 조회/준비 상태의 실제 선택은 새 공통 리더에서 수행. 약사/직원 권한·SIWC·생성 비용 정책 변경 없음.
+- **검증:** API 관련 154 pass / 11 skip(전용 PostgreSQL 통합 연결 미설정), 이후 변경한 리더·현황 16건 재통과. 관리자 10건·매장 10건. API·관리자·매장 typecheck, 공통 types 빌드. 격리 PGlite에서 실제 SQL 및 canonical partial unique index 실행 검증. 전체 어댑터/접수의 실제 PostgreSQL 통합·운영 smoke·실제 절감액 검증은 미실행. 세부는 [조사 기록](docs/investigations/IR-O4O-PRODUCT-CONSULTATION-RESOURCE-SEPARATION-V1.md).
+- **후속:** 4차는 상담자료 성분·용도·주의사항의 후보 검색 반영. 현재 자연어 검색의 B2B 본문 참조는 남음. 5차는 공통 상품 연결/정기 관리자 준비/재사용. 배포 전 구형 API가 CONSULTATION을 처리하지 못하는 점을 확인하고, 배포 후 관리자·매장·약사 화면·기존 QR을 검증한다. 롤백 시 새 자료를 B2B로 덮어쓰거나 삭제하지 않음.
+- **겹치는 PR:** #1042(2차)·#1039와 HANDOFF.md만 겹침. 공통 types 소비처 관련 #1037은 다른 파일. 새 인계 절을 보존해 순차 통합한다. 이 branch는 최신 origin/main에서 시작했으며 미병합 2차 branch를 합치지 않았다.
+- **문서 정합:** 발견 1건 / 별도 정비 1건 — 기존 매장 Excel·AI 자료 흐름의 B2B 전용·자유 본문 표시 안내. 정본 변경은 별도 문서 작업으로 인계.
+
+
+
+## 2026-11-12 · ChatGPT 콘텐츠 비용 경계 검증
+
+- **branch / PR 묶음:** `wo/chatgpt-content-no-inference` — 외부 콘텐츠 도구 회귀 테스트와 후속 계약 차이 기록 1개 묶음. PR 생성·병합은 통합 세션. 런타임·API·권한·DB·배포 변경 없음.
+- **한 일:** 콘텐츠 11종의 실제 dispatcher에서 권한·분기·멱등·실패 검증, 어댑터/직접 저장 서비스 14개 파일의 AST 추론 의존성 검사, MCP HTTP의 Bearer 연결 ID 전달과 위조 인자 제거 검증. 추가 45개 테스트, 기존 포함 7 suites / 85 tests 통과.
+- **결정 사항:** 제거할 유료 호출은 발견하지 않아 임의 런타임 가드를 추가하지 않음. 구조화 상담자료 전체 노출은 약사/근무자 접근 및 B2B 논리 분리 전에 하지 않음. 기존 소비자 다국어 초안 저장을 중앙 상담자료/QR 표준설명서 저장으로 취급하지 않음. SIWC 유보.
+- **후속 명세:** [IR-O4O-CHATGPT-CONTENT-COST-BOUNDARY-V1](docs/investigations/IR-O4O-CHATGPT-CONTENT-COST-BOUNDARY-V1.md). 다음 3차는 자료 논리 유형·공개 대상·기존 연결 보존, 4차는 구조화 상담자료 검색 반영.
+- **검증:** `pnpm@10.25.0 install --frozen-lockfile` 성공(호스트 Node 24.22.1, 저장소 안내 정확 버전 22.23.4와 다름). Jest external-ai 전체 85/85, lint 수정 후 영향받은 26건 재통과. 변경 테스트 3개 ESLint 오류 0(기존 eslintignore 경고 있음), `git diff --check`, docs 민감정보 검사 통과. 앱 전체 build/typecheck·실제 DB/공급자 호출·ChatGPT OAuth 왕복 미실행. 단위 테스트는 어댑터 mock, AST 검사는 전체 전이 분석이 아님.
+- **확인하지 못한 것 / 배포 후:** 운영 청구액, 관리자 설정, 실제 ChatGPT 연결 및 기존 화면 재열기. 배포를 요구하는 런타임 변경 없음. 운영 측정은 1차 수집 명세대로 로컬 `o4o_readonly` 경로에서 별도 수행.
+- **겹치는 PR:** 조회 시 #1039의 `HANDOFF.md`만 겹침. #1038·#1037·#1028과 이 변경의 코드 경로 겹침 없음. 통합 시 새 인계 절을 보존.
+- **문서 정합:** 기존 비용 정책·외부 연결 설계 유지. canonical 변경 없음.
+
 > 저장소: `Renagang21/o4o-platform` · 작업 branch: `claude/clever-bohr-g532hw` · 코드 기준: `main` `c5da5631`(merge 반영) · 작성: 2026-11-11 (클라우드 작업 세션)
+
+> 저장소: `Renagang21/o4o-platform` · 작업 branch: `claude/epic-rubin-5g04vm`(맨 위 절) · 이전 절 branch: `claude/clever-bohr-g532hw` · 코드 기준: `main` `c5da5631`(merge 반영) · 작성: 2026-11-11 (클라우드 작업 세션)
 > 다음 실행자: **통합 담당(이 branch 의 PR 생성 · CI · 병합) → Businnect(체크리스트 실행 · 첫 과제)**
 > 이전 인계 전문: `git show 0c812623:HANDOFF.md`
+
+## 2026-11-12 · Windows 설치본 실행 테스트 불안정 수정 (branch `claude/intelligent-cray-o2p4u3-pc-installer-test`)
+
+> 다음 실행자: **통합 세션** — 이 branch 로 PR 생성 → `PC installer Windows` 결과 확인 → 병합. main 배포 차단 해소 대상.
+> 변경 파일: `tools/o4o-local-agent/test/release-install.test.mjs` 하나(workflow 변경 없음).
+
+- **증상:** 테스트 「Windows packaged runtime starts and health proves its release and data readiness」가 `installed runtime must serve health` 로 간헐 실패.
+  - main `31be41b4` run 43209177440: GitHub-hosted `windows-latest` 에서 실패했고, 같은 run 의 재실행(attempt 2)은 통과했다.
+  - #1028 branch run 43173519086: 같은 실행기에서 같은 메시지로 실패했다(테스트 21.6s).
+- **원인:**
+  - 테스트는 설치본 실행 뒤 health 를 약 10초만 기다렸다(250ms × 40회, 연결 거부가 즉시 돌아옴).
+  - 그런데 설치본 시작 경로가 무겁다: Start.cmd → PowerShell → `launch.mjs` → 숨긴 PowerShell 창(`pc-window.ps1`: WPF · `Add-Type` C# 컴파일) → `launch.mjs --worker` → `index.mjs run`. 여기에 node.exe 무결성 해시와 Defender 검사가 더해진다.
+  - 새 VM 에서 이 경로가 10초를 넘기면 실패한다. 제품 설치기(`install.mjs --window`)는 30초를 기다린다.
+  - 실패 뒤의 정리 단계(worker 종료)도 실패하면, `finally` 의 정리 오류가 원래 health 실패를 덮어썼다(`FIXTURE_WORKER_NOT_UNIQUE` 류 메시지). 같은 원인이 다른 증상처럼 보이게 했다.
+- **수정(재시도 · skip 없음 · 기다림을 실제 준비 신호 기준으로):**
+  - `waitForReadyHealth`: health 의 `releaseId` 가 설치한 release 와 같고 `localData.ready === true` 일 때까지 최대 60초 기다린다(요청당 1초 timeout). 시간이 지나면 남은 시간이 아니라 진단을 담아 실패한다: 마지막 응답 · launcher 종료 코드 · `pc-program.log` 끝부분 · 시험 경로 아래 프로세스 목록.
+  - `withRuntime`: 본문이 실패하면 그 실패를 그대로 던지고, 정리 오류는 뒤에 덧붙인다(원래 실패를 덮지 않음).
+  - `stopFixtureRuntime`:
+    - worker 프로세스가 나타날 때까지 최대 30초 기다리고, 종료 대기를 20초로 늘렸다.
+    - 실패 시 단계 코드와 프로세스 목록을 보인다.
+    - 포트 해제 확인은 10초 기한이다.
+  - 테스트 전체 timeout 을 120s → 300s 로 늘렸다(job timeout 10분 안).
+- **검증:**
+  - Linux: `node --check` 통과. `node --test tools/o4o-local-agent/test/release-install.test.mjs` 는 13 pass · 2 skipped(Windows 전용) · 0 fail.
+  - `withRuntime` 의 오류 보존 동작은 단독으로 확인했다.
+  - **Windows 실행은 이 클라우드 세션에서 하지 못했다**(Linux 환경). 반복 실행(10회) 결과도 없다.
+- **확인하지 못한 것 — 통합 세션이 PR CI 로 확인:**
+  - PR CI 의 `PC installer Windows` 가 통과하는지. 가능하면 `workflow_dispatch` 나 re-run 으로 여러 번 돌려 연속 통과를 확인한다.
+  - 실패하면 새 진단 출력(`pc-program.log` · 프로세스 목록)으로 원인을 다시 판정한다.
+  - 자체 실행기(self-hosted)는 확인하지 못했다. 이번 실패는 모두 `windows-latest` 였다.
+  - 자체 실행기에서는 기존 47821 포트 guard step 이 따로 돈다.
+- **겹칠 수 있는 PR:** 없음(이 테스트 파일을 바꾸는 열린 PR 은 확인하지 못함 — 통합 세션이 `gh pr diff --name-only` 로 대조).
+
+## 2026-11-12 · 상시 통합 세션 환경 정비 (branch `claude/epic-rubin-5g04vm`)
+
+> 이 절만 이 branch 의 인계다. 아래 절들은 다른 세션의 인계로 그대로 둔다.
+> 다음 실행자: **통합 담당(로컬)** — 이 PR 은 `.claude/hooks/` · `.claude/settings.json` · 등록 파일을 바꾸므로 상시 통합 세션이 병합할 수 없다(새 훅이 거부). 로컬에서 검토 · 병합하면 이 세션의 클라우드 병합이 열린다.
+
+- **결정 사항**
+  - 통합 담당이 이 클라우드 세션을 **상시 통합 세션**으로 지정(2026-11-12). 등록은 main 의 `.claude/integration-sessions.json`(세션 `cse_013JvDHnRfTd2t74jmcLH726`) — 등록 파일을 main 에서 읽어야 위조가 안 되므로, 병합 전에는 클라우드 병합이 계속 거부된다(의도).
+  - 상시 통합 세션의 범위: 묶음 PR 생성 · CI · 리뷰 확인 · squash 병합 · 자동 Delivery 결과 확인 · 배포 후 Demo 확인. 배포 · promote · CI/배포 인프라 · 에이전트 안전 설정 PR 의 병합은 로컬(통합 담당).
+  - 통합 담당이 병합 대상 · 순서 · 시점 판단을 상시 통합 세션에 위임(2026-11-12 통합 담당 지시 — `AGENTS.md` 기록도 통합 담당 지시). 사람 승인이 필요한 병합 · 배포 · promote 는 위임 밖.
+  - 병합 방식은 훅에서 squash 로 고정 · `expectedHeadSha` 필수. 다른 방식이 필요하면 로컬.
+  - `CLAUDE.md` 의 「setup script 에 의존성 설치 금지」를 실제 환경에 맞춰 「setup script 는 미리 데우기 · 정확한 설치는 SessionStart 훅」으로 고쳤다(환경을 바꾸는 대신 문서를 맞춤 — SessionStart 훅이 매번 `--frozen-lockfile` 을 돌려 lockfile 누락 위험이 없다). 환경 이름 `o4o-dev` → 실제 `o4o-platform`.
+- **바꾼 것**
+  - 새 `.claude/hooks/guard-mcp-github.mjs`(matcher `mcp__github__.*`) + 테스트 14개. 조사에서 확인한 빈틈: MCP 도구는 Bash 훅을 거치지 않고, 클라우드 MCP 토큰이 소유자 계정이라 `actions_run_trigger` 로 deploy · promote 를 실행하면 workflow 소유자 게이트도 통과했다. 판정:
+    - auto-merge 거부 · main 에 직접 쓰는 파일 도구(`push_files` 등) 거부(모든 세션)
+    - 클라우드: 검사 전용 workflow(CI Pipeline · CodeQL · AppStore Guard · PR 라벨 · 겹침 알림) 밖의 실행 · 재실행 · 취소 거부. 숫자 ID 조회 실패도 거부. 로컬은 승인 창/대화상자
+    - 병합: squash + `expectedHeadSha` 필수. 클라우드는 main 등록 확인 + PR 이 보호 경로(`.github/` · `.claude/hooks/` · `.claude/settings.json` · 등록 파일 · `scripts/ci/` · workflow 가 운영에 실행하는 `scripts/deployment/` · `scripts/privacy/account-erasure-*` · `scripts/db/` · `scripts/ci-build-app.sh` · `infra/` · `deploy/` · `Dockerfile*` · `cloudbuild*`)를 바꾸거나 거기서 옮기지 않을 것(rename 이전 경로 포함 — Codex #1039 P1 2건 반영). 조회 실패는 거부
+  - `.claude/settings.json` 에 훅 등록 · 새 `.claude/integration-sessions.json`(`.gitignore` 의 `.claude/*` 에 걸려 예외 한 줄 추가)
+  - `AGENTS.md` §4 역할(상시 통합 세션) · 작업 위치 분담(PR 생성 · 병합은 상시 통합 세션, 배포 · 로컬 작업은 VS Code, 병합은 한 시점에 한 곳) · §9(MCP 훅)
+  - `CLAUDE.md` 훅 목록 · 세션 표(상시 통합 세션 행) · 환경 이름 · setup script 문구 · branch/PR 문구(작업 세션은 PR 을 만들지 않는다 — §4-1(e) 와 어긋나 있던 것) · 클라우드 GitHub 도구 제약
+  - `/integrate` 스킬: 클라우드 명령 대응표(GraphQL 대신 REST · MCP) · 병합 후 Delivery 확인 절차 · HOLD/FAILED/FREEZE 시 로컬 인계
+- **검증**
+  - `node scripts/ci/check-agent-config.mjs` PASS(훅 테스트 3파일 37개 통과)
+  - 변이 검사: 보호 경로 · 등록 확인 · CI 목록 · main 쓰기 · squash 조건을 하나씩 빼면 매번 테스트 실패
+  - 실제 GitHub 대상: PR #1036 병합 판정 → 등록 파일이 main 에 없어 거부(fail closed). 이 세션에서 MCP `enable_pr_auto_merge` 호출 → 훅이 거부(훅 작동 확인)
+  - 스킬의 REST 명령(`pulls?head=…`) 실제 실행 확인
+- **확인하지 못한 것**
+  - 병합 후 이 세션에서 실제 MCP 병합이 통과하는지(등록이 main 에 들어간 뒤 첫 병합 때 확인)
+  - Windows 로컬에서 새 훅의 승인 대화상자(로컬 `mcp__github__merge_pull_request` 는 approvalFor 경로) — 가짜 gh 테스트는 Windows 에서 skip 된다
+  - Bash 훅 `block-cloud-deploy.mjs` 는 `deploy|delivery|promote` 이름만 보므로 `account-erasure-activation.yml` · `pharmacyhub-qr-cutover.yml` 같은 운영 workflow 의 클라우드 `gh workflow run` 은 막지 않는다(새 MCP 훅은 허용 목록 방식이라 막는다). 별도 정비 후보
+- **PR 로 묶을 단위:** 한 PR(에이전트 안전 설정 · 문서). DEPLOYMENT = NOT_APPLICABLE(`.claude/` · 문서만)
+- **겹칠 수 있는 열린 PR:** 없음 — 열린 PR #1028 · #1031 · #1034 · #1035 · #1036 · #1037 · #1038 은 `AGENTS.md` · `CLAUDE.md` · `HANDOFF.md` · `.claude/` 를 바꾸지 않는다(2026-11-12 `gh pr diff --name-only` 대조)
+
+## 2026-11-12 · migration 전 백업 보관 정리 (branch `wo/premigration-backup-retention`)
+
+> 다음 실행자: **CLOUD** — PR #1028 병합 후 [`WO-O4O-PREMIGRATION-BACKUP-RETENTION-V1`](docs/work-orders/WO-O4O-PREMIGRATION-BACKUP-RETENTION-V1.md) T1 ~ T4.
+
+- **결정 사항(통합 담당 2026-11-12):** 보관 30일 + 최근 5개 유지. 정리는 `deploy-api.yml` 의 migration 성공 뒤에 하고, 실패해도 배포는 막지 않는다. `pre-migration-` on-demand 백업만 대상이다.
+- **완료(LOCAL):** 커스텀 역할 `o4oCloudSqlPreMigrationBackup` 에 `cloudsql.backupRuns.delete` 추가.
+- **겹칠 수 있는 PR:** #1028(`deploy-api.yml` · `ci-pipeline.yml` 테스트 목록) — 병합 뒤에 시작한다.
 
 ## 2026-11-11 · Promote · Delivery 짧은 job 통합 (비용 절감 · branch `claude/peaceful-lamport-sjwtri-promote-cost`)
 

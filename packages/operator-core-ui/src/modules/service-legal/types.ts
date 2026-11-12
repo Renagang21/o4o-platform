@@ -123,6 +123,24 @@ export const POLICY_DOCUMENT_TYPES: { value: string; label: string }[] = [
   { value: 'custom', label: '기타' },
 ];
 
+/**
+ * 정책 문서 표식(slug) 권장값 — 서버 규칙과 같다.
+ *   - 공통 계정 약관: neture terms → `neture-account-terms` · privacy → `neture-account-privacy`
+ *     (`apps/api-server/src/common/auth/terms-acceptance.policy.ts` COMMON_ACCOUNT_TERMS_SLUG)
+ *   - 서비스 신청 약관: `<serviceKey>-service-terms|privacy`
+ *     (`apps/api-server/src/modules/policy-acceptance/service-enrollment-policy.service.ts` ENROLLMENT_POLICY_SERVICES)
+ * 표식은 새 문서 등록 때만 정할 수 있고 나중에 바꿀 수 없다(서버 ENROLLMENT_POLICY_MARKER_IMMUTABLE).
+ * 표식이 없으면 계정 재동의 · 서비스 신청 정책 선택에 포함되지 않는다.
+ */
+export const ENROLLMENT_POLICY_SERVICE_KEYS: readonly string[] = ['supplier', 'kpa-society', 'community', 'funding', 'lecture', 'partner-support'];
+
+export function recommendedPolicySlug(serviceKey: string, documentType: string | undefined): string | null {
+  if (documentType !== 'terms' && documentType !== 'privacy') return null;
+  if (serviceKey === 'neture') return documentType === 'terms' ? 'neture-account-terms' : 'neture-account-privacy';
+  if (ENROLLMENT_POLICY_SERVICE_KEYS.includes(serviceKey)) return `${serviceKey}-service-${documentType}`;
+  return null;
+}
+
 /** 노출 가능한 탭 키. */
 export type ServiceLegalTabKey = 'profile' | 'policies' | 'status';
 
@@ -139,4 +157,9 @@ export interface ServiceLegalSettingsPageProps {
    * service_policy_documents 편집 탭을 숨길 수 있다. (WO-O4O-KPA-ADMIN-SERVICE-LEGAL-SETTINGS-WIRING-V1)
    */
   enabledTabs?: ServiceLegalTabKey[];
+  /**
+   * 새 문서 등록 폼에 표식(slug) 입력을 보일지(기본 true).
+   * 서버가 표식을 정하는 화면(약국 협력사업 — `business-operations.routes.ts` 가 terms/privacy 표식을 붙인다)은 false.
+   */
+  slugInput?: boolean;
 }

@@ -21,6 +21,7 @@
 - PreToolUse 훅(`.claude/hooks/block-cloud-deploy.mjs`)은 운영 배포 명령을 **클라우드 세션에서는 거부**하고, **로컬 세션에서는 승인을 묻는다**(ask). 단 승인 창이 뜨지 않는 권한 모드(auto · bypassPermissions · dontAsk · 알 수 없음)에서는 **훅이 OS 확인 대화상자를 직접 띄운다**(Windows 예/아니요 · 기본 '아니요' · 항상 위 · 120초 무응답 시 거부) — 사람이 '예'를 누르면 allow, 아니요 · 무응답 · 대화상자를 띄울 수 없음(Linux 등)은 deny. `.claude/settings.json` 의 ask 규칙도, 훅이 반환한 ask 도 auto 모드에서는 승인 창 없이 통과하는 것이 확인됐다(2026-11-09). 판정은 `.claude/hooks/lib/shell.mjs` `approvalFor` 를 아래 `guard-ask-commands.mjs` 와 같이 쓴다. 테스트는 `O4O_HOOK_CONFIRM_DIALOG=off` 로 대화상자를 끈다(이 변수로 승인을 만들 수는 없다). 회귀 테스트 `.claude/hooks/block-cloud-deploy.test.mjs`. 정책은 `AGENTS.md` §9.
 - PreToolUse 훅(`.claude/hooks/guard-git-push.mjs`)은 **모든 세션에서** 콜론 refspec 원격 branch 삭제를 거부한다. permission 패턴은 끝이 `:*` 이면 예전 접두어 문법으로 해석돼 의도대로 매칭되지 않으므로, 새 규칙을 `:*` 로 끝내지 않는다(`pnpm run build:*` 처럼 접두어 일치가 의도인 경우만 예외).
 - PreToolUse 훅(`.claude/hooks/guard-ask-commands.mjs`)은 **모든 세션에서** `gh api` 쓰기 가능 플래그 · `node`/`pnpm` 의 migration · seed 실행 · `gh … delete` 에 승인을 묻는다(ask — 승인 창이 뜨지 않는 권한 모드에서는 위와 같이 확인 대화상자, 띄울 수 없으면 deny). settings 패턴에는 제외 문법이 없어 읽기 전용 명령까지 묻던 넓은 ask 패턴을 이 훅으로 옮겼고, 예외는 훅 상단 주석의 정확한 형태(GitHub 검색 · CI 정적 검사 · 테스트 파일 실행)뿐이다. 예외를 넓힐 때는 회귀 테스트 `.claude/hooks/guard-ask-commands.test.mjs` 에 우회 사례를 함께 넣는다.
+- PreToolUse 훅(`.claude/hooks/guard-mcp-github.mjs` · matcher `mcp__github__.*`)은 위 Bash 훅이 닿지 않는 GitHub MCP 도구를 막는다 — auto-merge 거부 · main 직접 쓰기 거부 · 클라우드에서 검사 전용 workflow 밖 실행 · 재실행 · 취소 거부 · 병합은 squash + `expectedHeadSha` 필수, 클라우드 병합은 main 의 `.claude/integration-sessions.json` 등록과 보호 경로(CI · 배포 인프라 · 에이전트 안전 설정) 미변경까지 확인(조회 실패는 거부). 클라우드 MCP 토큰이 저장소 소유자 계정이라 workflow 의 소유자 게이트도 통과하므로 생긴 훅이다(2026-11-12). 회귀 테스트 `.claude/hooks/guard-mcp-github.test.mjs`. 정책은 `AGENTS.md` §4 역할 · §9.
 - 플러그인: 클라우드는 claude.ai 계정 활성화, 로컬은 저장소 선언 — 이유는 `SETUP.md` §1 「Claude Code 플러그인」.
 
 ## 세션 유형 — 클라우드 · 데스크톱 로컬
@@ -28,20 +29,22 @@
 | 세션 | 판별 | 하는 일 | 하지 않는 일 |
 |---|---|---|---|
 | **클라우드 세션** (claude.ai/code) | `CLAUDE_CODE_REMOTE=true` | 코드 · 문서 · 테스트 · branch push · 인계 기록(PR 생성은 통합 세션 — `AGENTS.md` §4-1(e)) | 운영 DB 접속 — gcloud 인증 · Cloud SQL Proxy 가 없다 |
+| **상시 통합 세션** (클라우드) | 위 판별 + main 의 `.claude/integration-sessions.json` 에 세션 ID 등록 | 묶음 PR 생성 · CI · 리뷰 확인 · squash 병합 · 자동 Delivery 결과 · 배포 후 Demo 확인(`/integrate`) | 배포 · promote 실행 · CI · 배포 인프라 · 에이전트 안전 설정 PR 의 병합(로컬 · 통합 담당) |
 | **로컬 세션 (VS Code)** | 그 밖 | 운영 DB read-only 조회 · 통합 담당이 승인한 운영 작업(`AGENTS.md` §5) · 실 PC smoke | 승인 없는 DB write · DDL · migration 수동 적용 (`AGENTS.md` §5) |
 
 - 작업 위치 분담(개발은 클라우드, 병합 · 배포 · 로컬 작업은 VS Code 로컬)은 `AGENTS.md` §4 「작업 위치 분담」을 따른다.
 - 클라우드 세션에서 운영 DB 확인이 필요하면 멈추고, read-only SQL 과 판정 기준을 담은 지시서를 `docs/work-orders/` 에 작성해 작업 branch 로 push 한 뒤 `HANDOFF.md` 로 로컬 세션에 넘긴다. 로컬 세션은 결과를 마스킹해 같은 branch 에 기록하고 push 한다.
 - 두 세션 모두 `AGENTS.md` §4-1 의 전용 worktree · branch 규칙을 따른다.
 
-### 클라우드 세션 규칙 (환경 `o4o-dev`)
+### 클라우드 세션 규칙 (환경 `o4o-platform`)
 
-- **의존성:** SessionStart 훅(`.claude/hooks/session-start.sh`)이 클라우드에서만 `pnpm install --frozen-lockfile` 을 실행한다. 실패해도 세션은 열리며 마지막 출력을 보여 준다 — 그때는 같은 명령을 직접 다시 실행한다. 환경 setup script 에는 의존성 설치를 넣지 않는다(캐시돼 lockfile 변경을 놓친다).
+- **의존성:** SessionStart 훅(`.claude/hooks/session-start.sh`)이 클라우드에서만 `pnpm install --frozen-lockfile` 을 실행한다. 실패해도 세션은 열리며 마지막 출력을 보여 준다 — 그때는 같은 명령을 직접 다시 실행한다. 환경 setup script 의 설치 · `build:packages` 는 미리 데워 두는 용도일 뿐이다 — setup 결과는 캐시돼 lockfile 변경을 놓칠 수 있으므로, 정확한 설치는 매 세션 SessionStart 훅의 `--frozen-lockfile` 이 맡는다(2026-11-12 실제 setup script 와 맞춤).
 - **시작 동기화:** 작업 전에는 `git fetch origin` 후 working tree 상태와 `origin/main` 대비 ahead/behind 만 확인한다. 시작했다는 이유로 merge · rebase 하지 않는다(`AGENTS.md` §4-1(d)).
   - 최신 main 이 실제로 필요하면(충돌 · 통합 준비 · 의존 변경) 충돌 여부와 통합 필요성을 먼저 확인한 뒤, clean 상태에서 자기 branch 에만 반영한다.
   - 아직 push 하지 않은 branch 는 `git pull --rebase origin main`, 이미 push 한 branch 는 `git merge origin/main` 을 쓴다(원격 이력 재작성 금지 · §4-1(e) · §4-2). dirty 상태에서는 pull 하지 않는다.
-- **branch · PR:** 세션에 지정된 `claude/*` branch 에서 작업하고 결과는 PR 로 낸다. main 직접 push · PR 병합 · auto-merge 는 하지 않는다.
-- **통합 담당 몫:** 원격 branch 삭제 · 배포 · CI · 배포 인프라 변경(`AGENTS.md` §5) PR 의 병합은 통합 담당이 직접 한다. 클라우드 세션은 PR 까지만 한다.
+- **branch · PR:** 세션에 지정된 `claude/*` branch 에서 작업하고 push · 인계 기록까지 한다. PR 생성 · 병합은 통합 세션 몫이다(`AGENTS.md` §4-1(e)). main 직접 push · auto-merge 는 어느 세션도 하지 않는다.
+- **통합 담당 몫:** 원격 branch 삭제 · 배포 · CI · 배포 인프라 변경(`AGENTS.md` §5) PR 의 병합은 통합 담당이 직접 한다. 상시 통합 세션도 그 PR 은 CI 결과만 보고한다.
+- **클라우드 GitHub 도구:** GraphQL 이 막혀 `gh pr view` · `checks` · `list` · `create` · `merge` 는 실패한다. 조회는 `gh api` REST GET · `gh pr diff` · `gh run list/view [--log]`, PR 생성 · 병합은 GitHub MCP 도구를 쓴다(대응표는 `/integrate`). Actions 변수 · Environments API 는 프록시가 막는다 — `DEPLOY_FREEZE` 등은 Delivery Classify 로그로 확인한다.
 - **테스트 계정:** [`docs/TEST-ACCOUNTS.md`](docs/TEST-ACCOUNTS.md) 를 쓴다. 환경 변수에 계정 값을 두지 않는다.
 - **시크릿:** 코드 · 문서 · 커밋 · PR · 대화에 남기지 않는다. 환경 설정 화면의 환경 변수에도 넣지 않는다(편집 권한자와 에이전트가 읽을 수 있다).
 

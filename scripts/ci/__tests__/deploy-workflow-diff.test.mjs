@@ -150,7 +150,7 @@ describe('W. deploy workflow 변경 분류 (§8)', () => {
 
 describe('W+. assessRisk 통합 — 원문 주입 시 workflow 변경이 서비스별로 귀속된다', () => {
   const run = (head, consumes = () => true) =>
-    assessRisk([{ status: 'M', path: WF }], graph, { readFile: (which) => (which === 'base' ? BASE : head), consumes });
+    assessRisk([{ status: 'M', path: WF }], graph, { readFile: (which) => (which === 'base' ? BASE : head), consumes, approvalPolicy: 'strict' });
 
   it('control-only workflow 변경 → LEVEL_1 · 배포 없음 (종전: 9개 전부 L3)', () => {
     const r = run(mutate([['echo "사유: Lecture Phase 2 cutover 전"', 'echo "paused"']]));
@@ -189,7 +189,7 @@ describe('W+. assessRisk 통합 — 원문 주입 시 workflow 변경이 서비�
   });
 
   it('신규 추가(A) deploy workflow → 보수 fallback L3', () => {
-    const r = assessRisk([{ status: 'A', path: WF }], graph, { readFile: () => BASE });
+    const r = assessRisk([{ status: 'A', path: WF }], graph, { readFile: () => BASE, approvalPolicy: 'strict' });
     assert.equal(r.risk_level, LEVEL_3);
   });
 });
@@ -212,8 +212,8 @@ describe('D. 위험 감소 삭제 (§10 · §11)', () => {
 
   it('migration 삭제 · middleware/guard 삭제는 위험 감소가 아니다 (L3 유지)', () => {
     assert.equal(assessRisk([f('D', 'apps/api-server/src/database/migrations/1790683000000-X.ts')], graph).services.api.level, LEVEL_3);
-    assert.equal(assessRisk([f('D', 'apps/api-server/src/modules/neture/guards/drug-access.guard.ts')], graph).services.api.level, LEVEL_3);
-    assert.equal(assessRisk([f('D', 'apps/api-server/src/common/middleware/auth/authentication.middleware.ts')], graph).services.api.level, LEVEL_3);
+    assert.equal(assessRisk([f('D', 'apps/api-server/src/modules/neture/guards/drug-access.guard.ts')], graph, { approvalPolicy: 'strict' }).services.api.level, LEVEL_3);
+    assert.equal(assessRisk([f('D', 'apps/api-server/src/common/middleware/auth/authentication.middleware.ts')], graph, { approvalPolicy: 'strict' }).services.api.level, LEVEL_3);
   });
 
   it('추가 · 수정된 DB write 진입점은 여전히 L3', () => {

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { MemberRegistrationFields } from '@o4o/account-ui';
+import { AddressSearch } from '@o4o/ui';
 import {
   MEMBER_REGISTRATION_TYPES,
   type MemberRegistration,
@@ -23,7 +24,11 @@ const TYPE_HINTS: Record<MemberRegistrationType, string> = {
 const errorMessage = (e: unknown) =>
   (e as { response?: { data?: { error?: string } } }).response?.data?.error ??
   '처리하지 못했습니다. 다시 확인해 주시기 바랍니다.';
-export default function MemberRegistrationForm() {
+/**
+ * onSubmitted: 제출이 끝난 뒤 화면을 떠나는 동작(가입 신청 페이지 → 메인 · 2026-11-12 사용자 지적).
+ * 주지 않으면 종전처럼 이 화면에서 안내 문구를 보이고 제출 상태를 다시 읽는다.
+ */
+export default function MemberRegistrationForm({ onSubmitted }: { onSubmitted?: () => void } = {}) {
   const { user } = useAuth();
   const [loading, setLoading] = useState(true),
     [busy, setBusy] = useState(false),
@@ -132,7 +137,7 @@ export default function MemberRegistrationForm() {
           <p className="mt-1 text-sm text-slate-600">활동하실 유형을 골라 주시기 바랍니다. 필요한 정보는 다음 단계에서 유형별로 받습니다.</p>
         </div>
         {notice && <p role="status" className="text-sm">{notice}</p>}
-        <div role="radiogroup" aria-label="가입 유형" className="grid gap-3 sm:grid-cols-2">
+        <div role="radiogroup" aria-label="가입 유형" className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {(Object.entries(MEMBER_REGISTRATION_TYPES) as Array<[MemberRegistrationType, string]>).map(([key, label]) => (
             <button
               key={key}
@@ -151,7 +156,7 @@ export default function MemberRegistrationForm() {
           type="button"
           disabled={!type}
           onClick={() => setStep('details')}
-          className="w-full rounded bg-emerald-800 px-4 py-3 text-white disabled:opacity-50"
+          className="w-full rounded bg-emerald-800 px-4 py-3 text-white disabled:opacity-50 md:ml-auto md:block md:w-auto md:min-w-[200px]"
         >
           다음
         </button>
@@ -184,6 +189,10 @@ export default function MemberRegistrationForm() {
           })
           .then(() => {
             if (active.current) {
+              if (onSubmitted) {
+                onSubmitted();
+                return;
+              }
               setNotice(
                 '가입 정보를 제출했습니다. 운영자가 확인 후 승인합니다.',
               );
@@ -205,7 +214,12 @@ export default function MemberRegistrationForm() {
           주시기 바랍니다.
         </p>
       )}
-      {state === 'pending' && <p role="status">가입 검토 대기 중입니다.</p>}
+      {/* 제출한 신청은 검토가 끝날 때까지 고칠 수 없다 — 입력 칸처럼 보여 「입력이 안 된다」로 오해되던 것(2026-11-12). */}
+      {state === 'pending' && readOnly && (
+        <p role="status" className="rounded border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">
+          가입 신청을 검토하고 있습니다. 검토 중에는 내용을 고칠 수 없습니다. 승인되면 이용하실 수 있습니다.
+        </p>
+      )}
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h2 className="text-lg font-semibold">{type ? `${MEMBER_REGISTRATION_TYPES[type]} 정보 입력` : '가입 정보 입력'}</h2>
         {!readOnly && <button type="button" disabled={busy} className="text-sm text-emerald-800 underline" onClick={() => setStep('type')}>유형 다시 선택</button>}
@@ -221,7 +235,8 @@ export default function MemberRegistrationForm() {
               disabled={busy}
               maxLength={key === 'phone' ? 20 : 100}
               type={key === 'phone' ? 'tel' : 'text'}
-              className="mt-1 block w-full rounded border p-2"
+              {...(key === 'phone' ? { inputMode: 'numeric' as const, autoComplete: 'tel', ...(readOnly ? {} : { placeholder: '01012345678' }) } : {})}
+              className="mt-1 block w-full rounded border p-2 read-only:cursor-default read-only:bg-slate-100 read-only:text-slate-600"
               value={member[key]}
               onChange={(event) =>
                 setMember((previous) => ({
@@ -236,6 +251,7 @@ export default function MemberRegistrationForm() {
       <MemberRegistrationFields
         type={type}
         hideType
+        AddressSearch={AddressSearch}
         fields={fields}
         disabled={busy}
         readOnly={readOnly}
@@ -294,7 +310,7 @@ export default function MemberRegistrationForm() {
         <button
           type="submit"
           disabled={busy || !type || !agreement.ready}
-          className="w-full rounded bg-emerald-800 px-4 py-3 text-white disabled:opacity-50"
+          className="w-full rounded bg-emerald-800 px-4 py-3 text-white disabled:opacity-50 md:ml-auto md:block md:w-auto md:min-w-[200px]"
         >
           가입 신청
         </button>
