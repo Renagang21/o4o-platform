@@ -368,6 +368,8 @@ jobs:
         scripts/ci/__tests__/main-verified-reuse.test.mjs
         scripts/ci/__tests__/check-forbidden-tables.test.mjs
         scripts/ci/__tests__/pr-overlap.test.mjs
+        scripts/ci/__tests__/approval-policy.test.mjs
+        scripts/ci/__tests__/migration-safety.test.mjs
         scripts/ci/__tests__/promote-short-job-consolidation.test.mjs
         scripts/ci/__tests__/core-paths.test.mjs
 

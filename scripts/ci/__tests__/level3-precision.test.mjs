@@ -33,7 +33,8 @@ function judge(files, { withSource = true } = {}) {
   return assessRisk(
     files.map((f) => ({ status: f.status ?? 'M', path: f.path })),
     graph,
-    withSource ? { readFile: (which, p) => src.get(p)?.[which] } : {},
+    // 규칙 탐지 · 표현층 판정 회귀 — 종전 판정(strict). 기본 승인 정책은 approval-policy.test.mjs.
+    withSource ? { readFile: (which, p) => src.get(p)?.[which], approvalPolicy: 'strict' } : { approvalPolicy: 'strict' },
   );
 }
 
@@ -160,7 +161,7 @@ describe('N. §27 downgrade 금지 축 — 원문이 표현층처럼 보여도 L
 
 describe('G. non-runtime global (§12 · §13)', () => {
   const noDeploy = (paths) => {
-    const r = assessRisk(paths.map((p) => ({ status: 'M', path: p })), graph, {});
+    const r = assessRisk(paths.map((p) => ({ status: 'M', path: p })), graph, { approvalPolicy: 'strict' });
     assert.equal(r.deploy_required, false, `${paths}: ${JSON.stringify(r.affected_services)}`);
     assert.equal(r.risk_level, LEVEL_1);
   };
