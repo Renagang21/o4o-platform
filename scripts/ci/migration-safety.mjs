@@ -13,7 +13,8 @@
  *   - 기존 표 ALTER TABLE — 동작이 모두 ADD COLUMN(제약 · REFERENCES 없음) 또는 ALTER COLUMN .. DROP NOT NULL
  *   - 같은 migration 에서 IF NOT EXISTS 없이 만든 표의 ALTER TABLE — ADD ... · ALTER COLUMN .. SET/DROP DEFAULT · SET/DROP NOT NULL
  *   - COMMENT ON ... · CREATE SEQUENCE ...(OWNED BY 제외) · CREATE TYPE .. AS ENUM (...) · ALTER TYPE .. ADD VALUE ...
- *   - QueryRunner 구조 API: createTable · addColumn(s) · createIndex · createIndices (읽기 · 트랜잭션 제어는 중립)
+ *   - QueryRunner 구조 API: createTable · createIndex · createIndices (읽기 · 트랜잭션 제어는 중립 · addColumn(s) 는 승인 대상)
+ *   - query() 인자는 문자열 상수 하나 · 보간 없음 · 값이 확정되는 escape 만
  * 데이터를 쓰는 문장(INSERT · UPDATE · DELETE · TRUNCATE · MERGE)은 새 표 대상이어도 추가형으로 보지 않는다.
  * 읽기(SELECT) · 잠금 · 확장 · 스키마 · 트리거 · 함수 · 권한 · 동적 SQL · 그 밖의 QueryRunner 호출도 승인 대상이다.
  *
@@ -108,23 +109,31 @@ export function extractUp(source) {
   return null;
 }
 
-/** 인용 문자열 하나를 읽는다 → {value, end, interpolated} · 문자열이 아니면 null */
+/** 값이 그대로 확정되는 escape 만 해석한다 */
+const SIMPLE_ESCAPE = { n: '\n', t: '\t', r: '\r', '\\': '\\', "'": "'", '"': '"', '`': '`', $: '$' };
+
+/**
+ * 인용 문자열 하나를 읽는다 → {value, end, interpolated, unsafeEscape} · 문자열이 아니면 null.
+ * SIMPLE_ESCAPE 밖의 escape(\u · \x · 8진 · 줄 이음 등)는 실행 SQL 과 판정 문자열이 달라질 수 있으므로 unsafeEscape 로 표시한다.
+ */
 function readStringLiteral(src, pos) {
   const q = src[pos];
   if (q !== '"' && q !== "'" && q !== '`') return null;
   let out = '';
   let interpolated = false;
+  let unsafeEscape = false;
   let i = pos + 1;
   while (i < src.length) {
     const c = src[i];
     if (c === '\\') {
       const n = src[i + 1];
-      out += n === 'n' ? '\n' : n === 't' ? '\t' : n;
+      if (Object.hasOwn(SIMPLE_ESCAPE, n ?? '')) out += SIMPLE_ESCAPE[n];
+      else { unsafeEscape = true; out += n ?? ''; }
       i += 2;
       continue;
     }
     if (q === '`' && c === '$' && src[i + 1] === '{') interpolated = true;
-    if (c === q) return { value: out, end: i + 1, interpolated };
+    if (c === q) return { value: out, end: i + 1, interpolated, unsafeEscape };
     out += c;
     i += 1;
   }
@@ -132,7 +141,8 @@ function readStringLiteral(src, pos) {
 }
 
 /** QueryRunner 의 구조 API — 이름으로 판정한다 (query 외) */
-const RUNNER_ADDITIVE = new Set(['createTable', 'addColumn', 'addColumns', 'createIndex', 'createIndices']);
+// addColumn(s) 는 열 옵션(NOT NULL · unique · 외래 키 등)을 객체로 받아 분석할 수 없으므로 승인 대상이다 — 추가형으로 두려면 SQL ADD COLUMN 을 쓴다
+const RUNNER_ADDITIVE = new Set(['createTable', 'createIndex', 'createIndices']);
 const RUNNER_DESTRUCTIVE = /^(drop|rename|change|clear|update|delete|truncate)/i;
 /** 상태를 바꾸지 않는 읽기 · 제어 */
 const RUNNER_NEUTRAL = new Set(['hasTable', 'hasColumn', 'getTable', 'getTables', 'startTransaction', 'commitTransaction', 'rollbackTransaction']);
@@ -187,6 +197,7 @@ export function extractStatements(body, runner) {
       // 첫 인자는 문자열 상수 하나여야 한다 — 뒤에 `+` · `.concat()` · `.replace()` · 삼항 등이 붙으면 실행 SQL 이 달라진다
       if (body[after] !== ')' && body[after] !== ',') problems.push('query() 첫 인자가 문자열 상수 하나가 아님 (이어 붙임 · 메서드 호출 등)');
       if (lit.interpolated) problems.push('query() 문자열에 `${}` 보간');
+      if (lit.unsafeEscape) problems.push('query() 문자열에 해석하지 않는 escape (\\u · \\x · 8진 · 줄 이음 등)');
       sql.push(lit.value);
       continue;
     }

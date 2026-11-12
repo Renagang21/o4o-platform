@@ -57,7 +57,19 @@ describe('A additive', () => {
   });
 
   it('QueryRunner structure API that only adds is additive', () => {
-    assert.equal(verdictOf("await q.createTable(new Table({ name: 't', columns: [] })); await q.addColumn('existing', new TableColumn({ name: 'c', type: 'int' }));"), ADDITIVE);
+    assert.equal(verdictOf("await q.createTable(new Table({ name: 't', columns: [] })); await q.createIndex('t', idx);"), ADDITIVE);
+  });
+
+  it('addColumn(s) options cannot be analysed — review', () => {
+    assert.equal(verdictOf("await q.addColumn('users', new TableColumn({ name: 'required', type: 'text', isNullable: false }));"), REVIEW);
+    assert.equal(verdictOf("await q.addColumns('users', [col]);"), REVIEW);
+  });
+
+  it('escapes whose value is not fixed by the scanner need review', () => {
+    assert.equal(verdictOf("await q.query('COMMENT ON TABLE users IS NULL\\u003b DELETE FROM users');"), REVIEW);
+    assert.equal(verdictOf("await q.query('COMMENT ON TABLE users IS NULL\\x3b DELETE FROM users');"), REVIEW);
+    assert.equal(verdictOf("await q.query('COMMENT ON TABLE users IS \\'a\\'');"), ADDITIVE);
+    assert.equal(verdictOf("await q.query(`COMMENT ON TABLE users IS 'a\\nb'`);"), ADDITIVE);
   });
 });
 
