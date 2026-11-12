@@ -21,6 +21,7 @@ import { StoreProductDialog, useStoreProductScope } from '../../components/store
 
 interface Props {
   open: boolean;
+  initialQuery?: string;
   onClose: () => void;
   /** 등록 성공 후 호출 — 매장 경영활용 제품 목록 갱신 */
   onRegistered: () => void;
@@ -56,8 +57,8 @@ export function AddO4oStandardProductModal(props: Props) {
   if (!props.open || !scope.ready) return null;
   return <StandardProductSelection key={scope.key} {...props} organizationId={scope.organizationId!} />;
 }
-function StandardProductSelection({ onClose, onRegistered, organizationId }: Props & { organizationId: string }) {
-  const state = useStandardProductSelection(organizationId, onRegistered);
+function StandardProductSelection({ onClose, onRegistered, organizationId, initialQuery }: Props & { organizationId: string }) {
+  const state = useStandardProductSelection(organizationId, onRegistered, initialQuery);
   const { searchInput, setSearchInput, classification, setClassification, page, setPage,
     items, total, loading, error, registeringId, registeredIds, handleRegister, totalPages } = state;
 
@@ -67,6 +68,7 @@ function StandardProductSelection({ onClose, onRegistered, organizationId }: Pro
         <div style={styles.header}>
           <div>
             <h2 style={styles.title}>O4O 표준 상품에서 추가</h2>
+            {initialQuery && <p>상품·규격을 확인해 공통 상품으로 등록하세요. 기존 직접 등록 자료·QR은 보존됩니다.</p>}
             <p style={styles.subtitle}>
               O4O 표준 상품 DB에서 제품을 검색하여 매장 경영활용 제품으로 등록합니다.
             </p>
