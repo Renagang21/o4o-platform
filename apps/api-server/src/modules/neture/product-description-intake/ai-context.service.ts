@@ -1,7 +1,8 @@
 import type { DataSource, EntityManager } from 'typeorm';
 import { JSDOM } from 'jsdom';
 import { z } from 'zod';
-import { canonicalRevision, descriptionEntrySchema, type DescriptionEntry } from './contracts.js';
+import { canonicalRevision } from './contracts.js';
+import { consultationEntry, readConsultationDescriptions } from './consultation-resource.js';
 import { sanitizeDescriptionHtml } from '../utils/sanitize-description-html.util.js';
 
 type Db = Pick<DataSource | EntityManager, 'query'>;
@@ -15,28 +16,18 @@ export function descriptionPlainText(html: string) {
   return (root.textContent ?? '').trim();
 }
 
-/** Exact B2B/language only. STORE/QR is never a fallback knowledge source. */
+/** Consultation facts only; legacy structured intake is read without moving B2B rows. */
 export async function readApprovedProductAiContext(db: Db, masterId: string, language: string) {
-  const rows: Array<{ id: string; content: string; summary: string | null; updated_at: Date; entry: unknown }> = await db.query(
-    `SELECT d.id,d.content,d.summary,d.updated_at,c.raw_payload->'descriptionResource'->'entry' AS entry
-     FROM shared_product_descriptions d LEFT JOIN product_candidates c
-       ON c.id=d.source_ref_id AND c.source_label='PRODUCT_DESCRIPTION_RESOURCE_V1' AND c.deleted_at IS NULL
-     WHERE d.master_id=$1 AND d.description_type='B2B' AND COALESCE(d.language,'ko')=$2
-       AND d.status='canonical' AND d.deleted_at IS NULL`, [masterId, language]);
-  const row = rows[0];
+  const row = (await readConsultationDescriptions(db, [masterId], language)).get(masterId);
   if (!row) return { state: 'missing' as const, masterId, language, description: null };
-  const parsed = descriptionEntrySchema.safeParse(row.entry);
   // A later generic canonical edit invalidates the old structured payload and evidence association.
-  const entry: DescriptionEntry | null = parsed.success && parsed.data.descriptionType === 'B2B' &&
-    parsed.data.language === language && parsed.data.content === row.content ? parsed.data : null;
+  const entry = consultationEntry(row, language);
+  if (!entry) return { state: 'missing' as const, masterId, language, description: null };
   const text = descriptionPlainText(row.content);
   if (!text) return { state: 'missing' as const, masterId, language, description: null };
-  const sections = entry?.aiSections?.length ? entry.aiSections : [
-    { key: 'legacy', title: '기존 미분류 설명', kind: 'unclassified' as const, text: text.slice(0, 20000), referenceUrls: [] },
-  ];
-  return { state: entry?.aiSections?.length ? 'structured' as const : 'legacy' as const, masterId, language,
+  return { state: 'structured' as const, masterId, language,
     description: { id: row.id, revision: canonicalRevision({ id: row.id, content: row.content, summary: row.summary, updatedAt: row.updated_at }),
-      source: entry?.source ?? null, sections, truncated: !entry?.aiSections?.length && text.length > 20000 } };
+      source: entry.source, sections: entry.aiSections!, truncated: false } };
 }
 
 /** Ownership is resolved in the selected store, not from a client supplied master id. */

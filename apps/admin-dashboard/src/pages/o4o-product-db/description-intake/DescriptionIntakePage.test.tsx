@@ -9,6 +9,15 @@ const detail = { id: 'candidate-a', status: 'pending', revision: 'candidate-revi
 afterEach(cleanup);
 beforeEach(() => { vi.clearAllMocks(); state.writable = true; state.list.mockResolvedValue({ items: [{ id: detail.id, name: 'Synthetic product', source: detail.entry.source, descriptionType: 'B2B', language: 'ko' }], total: 1 }); state.detail.mockResolvedValue(detail); state.approve.mockResolvedValue({ ...detail, status: 'matched' }); });
 const open = async () => { render(<MemoryRouter><DescriptionIntakePage /></MemoryRouter>); fireEvent.click(await screen.findByRole('button', { name: /Synthetic product/ })); await screen.findByText('Current body'); };
+it('starts new imports as consultation knowledge and keeps QR and ordering purposes separate', async () => {
+ render(<MemoryRouter><DescriptionIntakePage /></MemoryRouter>);
+ await screen.findByRole('button', { name: /Synthetic product/ });
+ const purpose = screen.getByRole('combobox', { name: '가져올 설명 목적' });
+ expect(purpose).toHaveValue('CONSULTATION');
+ expect(screen.getByRole('option', { name: '상품 표준설명서(QR)' })).toHaveValue('STORE');
+ fireEvent.change(purpose, { target: { value: 'B2B' } });
+ expect(purpose).toHaveValue('B2B');
+});
 it('requires explicit master selection and archive acknowledgement and sends both optimistic revisions', async () => {
  await open(); const approve = screen.getByRole('button', { name: /선택 상품에 승인/ }); expect(approve).toBeDisabled();
  fireEvent.click(screen.getByRole('checkbox', { name: /Synthetic canonical product/ })); expect(approve).toBeDisabled();

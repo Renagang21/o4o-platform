@@ -9,15 +9,15 @@ import { consultationSupportExtension } from '../services/consultation-support.e
 const id = '55555555-5555-4555-8555-555555555555';
 const input = { mode: 'floor-pharmacist', productKind: 'local', productId: id, question: '상품 근거와 확인할 사항은?' };
 function fixture() {
-  const state = { allowed: true, published: true, version: 'v1', aiText: '', aiCount: 1 };
+  const state = { allowed: true, published: true, version: 'v1', aiText: '', aiCount: 1, resourceType: 'CONSULTATION' as 'CONSULTATION' | 'B2B' };
   const authorize = jest.fn(async (actor: string, org: string) => {
     if (!state.allowed || actor !== 'pharmacist' || org !== 'store')
       throw new NeturePharmacyError(403, 'STORE_ACCESS_REQUIRED', 'denied');
   });
   const query = jest.fn(async (sql: string, args: unknown[]) => {
     if (sql.includes('SELECT p.master_id,p.id,m.name')) return [{ master_id: id, id, name: 'Fixture product' }];
-    if (sql.includes('FROM shared_product_descriptions d')) return state.aiText ? [{ id, content: '<p>B2B body</p>', summary: null, updated_at: new Date('2026-10-29'),
-      entry: { key: 'b2b', name: 'Fixture product', content: '<p>B2B body</p>', descriptionType: 'B2B', language: 'ko',
+    if (sql.includes('FROM shared_product_descriptions d')) return state.aiText ? [{ id, master_id: id, description_type: state.resourceType, content: '<p>B2B body</p>', summary: null, updated_at: new Date('2026-10-29'),
+      entry: { key: 'b2b', name: 'Fixture product', content: '<p>B2B body</p>', descriptionType: state.resourceType, language: 'ko',
         source: { kind: 'manufacturer', currentness: 'retrieved', references: [{ url: 'https://example.com/product' }] }, aiSections: [
           ...Array.from({ length: state.aiCount }, (_, index) => ({ key: `fact${index}`, title: '성분', kind: 'product-fact', text: state.aiText, referenceUrls: ['https://example.com/product'] })),
           { key: 'reference', title: '전문 참고', kind: 'professional-reference', text: '전문 정보', referenceUrls: ['https://example.com/product'] },
@@ -78,8 +78,8 @@ it('rechecks a draft before use without invoking AI again, and refuses a withdra
   await expect(f.service.prepare('pharmacist', 'store', { ...input, verifyOnly: true, sourceVersion: result.sourceVersion })).rejects.toHaveProperty('httpStatus', 409);
   expect(f.run).toHaveBeenCalledTimes(1);
 });
-it('uses registered structured B2B separately and invalidates a prepared draft when its AI evidence changes', async () => {
-  const f = fixture(); f.state.published = false; f.state.aiText = '확인된 B2B 성분';
+it.each(['CONSULTATION', 'B2B'] as const)('uses registered structured %s and invalidates a prepared draft when its AI evidence changes', async resourceType => {
+  const f = fixture(); f.state.resourceType = resourceType; f.state.published = false; f.state.aiText = '확인된 B2B 성분';
   const requestInput = { ...input, productKind: 'listing' };
   const result = await f.service.prepare('pharmacist', 'store', requestInput);
   expect(result.state).toBe('ready');

@@ -63,7 +63,7 @@ export const descriptionEntrySchema = z.object({
   category: z.string().trim().max(255).nullable().default(null),
   content: z.string().max(200000),
   summary: z.string().max(4000).nullable().default(null),
-  descriptionType: z.enum(['B2B', 'B2C', 'STORE', 'SUPPLIER_STORE']).default('B2B'),
+  descriptionType: z.enum(['B2B', 'B2C', 'STORE', 'SUPPLIER_STORE', 'CONSULTATION']).default('B2B'),
   language: z.enum(['ko', 'en', 'ja', 'zh']).default('ko'),
   barcodes: z.array(z.string().max(128)).max(200).default([]),
   identifiers: z.object({
