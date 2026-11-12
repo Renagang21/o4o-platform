@@ -16,7 +16,7 @@
  *   - QueryRunner 구조 API: createTable · createIndex · createIndices (읽기 · 트랜잭션 제어는 중립 · addColumn(s) 는 승인 대상)
  *   - query() 인자는 문자열 상수 하나 · 보간 없음 · 값이 확정되는 escape 만
  *   - up() 본문은 `await <runner>.query('<SQL>');` 문장과 JS 주석뿐 (helper · 변수 · 구조 API 호출은 승인 대상)
- *   - SQL 안의 주석(-- · /* */)은 승인 대상 (중첩 주석으로 문장을 숨길 수 있다)
+ *   - SQL 안의 주석(-- · 블록 주석)은 승인 대상 (중첩 주석으로 문장을 숨길 수 있다)
  * 데이터를 쓰는 문장(INSERT · UPDATE · DELETE · TRUNCATE · MERGE)은 새 표 대상이어도 추가형으로 보지 않는다.
  * 읽기(SELECT) · 잠금 · 확장 · 스키마 · 트리거 · 함수 · 권한 · 동적 SQL · 그 밖의 QueryRunner 호출도 승인 대상이다.
  *
