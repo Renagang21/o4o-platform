@@ -3,6 +3,7 @@ import { Client } from 'pg';
 import { writeFileSync } from 'node:fs';
 import { runDemoOwnerParticipation } from './demo-owner-participation.service.js';
 import { runDemoAccountReconcile } from './demo-account-reconcile.service.js';
+import { runDemoProfileReconcile } from './demo-account-profile.service.js';
 import { readPassword, safeInventoryError } from '../../../../scripts/deployment/pharmacy-hub-qr-probes.mjs';
 
 async function main() {
@@ -14,9 +15,13 @@ async function main() {
     ...(mode==='plan'?{options:'-c default_transaction_read_only=on'}:{})});
   try {
     await client.connect();
-    const operation=process.env.DEMO_ACCOUNTS_PARTICIPATION==='true' ? runDemoOwnerParticipation : runDemoAccountReconcile;
-    const summary=await operation({query:async(sql,params)=>(await client.query(sql,params)).rows},
-      {apply:mode==='apply',expectedDigest:process.env.DEMO_ACCOUNTS_DIGEST});
+    const runner={query:async(sql:string,params?:unknown[])=>(await client.query(sql,params)).rows};
+    const options={apply:mode==='apply',expectedDigest:process.env.DEMO_ACCOUNTS_DIGEST};
+    // DEMO_ACCOUNTS_PROFILE=true — 회원 목록 표시 정보(닉네임 · 가입 유형 · 경영자 면허) 보정.
+    //   apply 는 실행 승인자(활성 platform:super_admin)의 사용자 ID 를 DEMO_ACCOUNTS_APPROVED_BY 로 받는다.
+    const summary=process.env.DEMO_ACCOUNTS_PROFILE==='true'
+      ? await runDemoProfileReconcile(runner,{...options,approvedBy:process.env.DEMO_ACCOUNTS_APPROVED_BY})
+      : await (process.env.DEMO_ACCOUNTS_PARTICIPATION==='true' ? runDemoOwnerParticipation : runDemoAccountReconcile)(runner,options);
     console.log(JSON.stringify(summary));
     // Same sanitized result in native Actions annotations, independently reviewable through the GitHub API.
     const notice=JSON.stringify(summary).replaceAll('%','%25').replaceAll('\r','%0D').replaceAll('\n','%0A');
