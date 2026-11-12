@@ -60,6 +60,7 @@
 | F11 | [USER-OPERATOR-FREEZE-V1](architecture/USER-OPERATOR-FREEZE-V1.md) | users · service_memberships · role_assignments 3테이블 고정, Operator = membership 기반 | FROZEN |
 | F12 | [O4O-PRODUCT-RESOURCE-ARCHITECTURE-BASELINE-V1](baseline/O4O-PRODUCT-RESOURCE-ARCHITECTURE-BASELINE-V1.md) | 2계층(Product Resource / Store Production Material) + 6불변식. 상세 설계: [IR](architecture/IR-O4O-PRODUCT-CONTENT-RESOURCE-ARCHITECTURE-V1.md) · [Persistence Design](architecture/WO-O4O-PRODUCT-CONTENT-RESOURCE-PERSISTENCE-DESIGN-V1.md) | FROZEN |
 | — | [UX-CORE-FREEZE-V1](baseline/UX-CORE-FREEZE-V1.md) | UX Core 동결 | FROZEN |
+| — | [O4O-CORE-REGISTRY-V1](baseline/O4O-CORE-REGISTRY-V1.md) | 현행 Core 목록 · 실제 위치 · 변경 등급 A/B/C · `core-change` 라벨 · CODEOWNERS. 기계 판독 목록 `scripts/ci/core-paths.mjs`. F10 동결 결정은 보존(2026-11-11 `WO-O4O-CORE-OWNERSHIP-AND-CHANGE-BOUNDARY-V1`) | ACTIVE |
 | — | [O4O-SHARED-MODULE-CHANGE-PROTOCOL-V1](baseline/O4O-SHARED-MODULE-CHANGE-PROTOCOL-V1.md) | 공통 모듈 · config · sidebar · capability map 변경 시 전 소비처 식별 절차 (raw-source spec 포함) | ACTIVE |
 | — | [O4O-STORE-PRODUCTION-MATERIAL-CANONICAL-V1](architecture/O4O-STORE-PRODUCTION-MATERIAL-CANONICAL-V1.md) | Store Production Material 논리 canonical (`kpa_store_contents` = legacy 물리명) | ACTIVE |
 | — | [O4O-CONTENT-PRODUCTION-FLOW-CANONICAL-V1](architecture/O4O-CONTENT-PRODUCTION-FLOW-CANONICAL-V1.md) | 매장 콘텐츠 제작 6단계 흐름(대상 선택 → 자료 투입 → 편집기/AI → 용도별 저장 → 템플릿 → 산출물) — AI 단계는 선택(운영 원칙 문서 §3) | ACTIVE |
