@@ -10,16 +10,42 @@ function body(source: string, internalHeading: string) {
   return source.split(internalHeading)[0].split('\n').filter(line => !/^>( |$)|^# /.test(line))
     .map(line => line.replace(/\*\*(.*?)\*\*/g, '$1').replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')).join('\n').trim();
 }
+/** 공고일은 이미 게시한 공고의 사실 기록이다. 시행일은 코드에 두지 않고 관리자 화면에서 정한다(아래 effectiveLine). */
 export const ACCOUNT_POLICY_NOTICE_DATE = '2026-10-12';
-export const ACCOUNT_POLICY_EFFECTIVE_DATE = '2026-11-13';
+const ACCOUNT_TERMS_SLUG = 'neture-account-terms';
+type PolicyMeta = { version: number; slug: string | null; effectiveDate: string | null };
+
+/**
+ * 시행일 표시 — 관리자가 정한 값만 쓴다.
+ *   1) v2 이상 계정 약관이 게시돼 있으면 그 시행일(시행 중)
+ *   2) 관리자가 시행일을 입력한 다음 버전 초안이 있으면 그 날짜(시행 예정)
+ *   3) 둘 다 없으면 날짜를 쓰지 않는다
+ */
+export function effectiveLine(published: PolicyMeta | null, scheduled: PolicyMeta | null): string {
+  const day = (d: string | null) => (d ? d.slice(0, 10) : '');
+  if (published && published.slug === ACCOUNT_TERMS_SLUG && published.version >= 2 && published.effectiveDate) return `시행일 ${day(published.effectiveDate)} (시행 중)`;
+  if (scheduled?.effectiveDate) return `시행 예정일 ${day(scheduled.effectiveDate)}`;
+  return '시행일은 확정되면 이 공고에 안내합니다';
+}
+
 export default function AccountPolicyNoticePage() {
   const [profile, setProfile] = useState<{ privacyOfficerName?: string; privacyOfficerEmail?: string; privacyOfficerPhone?: string } | null>(null);
+  const [effective, setEffective] = useState<string | null>(null);
   useEffect(() => { let alive = true; api.get('/public/services/neture/legal-profile').then((r: { data: { data: typeof profile } }) => { if (alive) setProfile(r.data.data); }).catch(() => {}); return () => { alive = false; }; }, []);
+  useEffect(() => {
+    let alive = true;
+    const read = (path: string) => api.get(path).then((r: { data: { data: PolicyMeta | null } }) => r.data.data ?? null).catch(() => null);
+    Promise.all([
+      read('/public/services/neture/policies/terms'),
+      read(`/public/services/neture/policies/terms/scheduled?slug=${ACCOUNT_TERMS_SLUG}`),
+    ]).then(([published, scheduled]) => { if (alive) setEffective(effectiveLine(published, scheduled)); });
+    return () => { alive = false; };
+  }, []);
   const documents = [{ title: 'Neture 계정 이용약관 개정안', content: body(termsSource, '## 부칙 및 게시 전 대조') }, { title: 'Neture 계정 개인정보 처리방침 개정안', content: body(privacySource, '## 9. 게시 대조 기록') }, { title: '서비스별 이용약관·개인정보 안내 개정안', content: body(serviceSource, '## 내부 게시·적용 대조') }];
   return <article className="mx-auto max-w-4xl px-4 py-10 text-slate-800">
     <Link to="/notices" className="text-blue-700">공지사항</Link>
     <h1 className="mt-5 text-3xl font-semibold">계정 이용약관·개인정보 처리방침 개정 공고</h1>
-    <p className="mt-4">공고일 {ACCOUNT_POLICY_NOTICE_DATE} · 시행 예정일 {ACCOUNT_POLICY_EFFECTIVE_DATE} (한국 시간)</p>
+    <p className="mt-4">공고일 {ACCOUNT_POLICY_NOTICE_DATE}{effective ? ` · ${effective}` : ''} (한국 시간)</p>
     <p className="mt-4">Neture 공통 계정과 서비스별 가입·승인을 구분하고, Google·카카오 로그인과 회원이 요청한 로그인 수단 연결, 개인정보 처리 항목을 현재 제공 기능에 맞춰 안내합니다.</p>
     <ul className="mt-4 list-disc space-y-2 pl-6"><li>공통 계정은 neture.co.kr에서 관리합니다. 계정 가입이 서비스 승인이나 업무 권한을 만들지 않습니다.</li><li>각 서비스의 신청 조건과 추가 개인정보는 해당 서비스 신청 때 확인합니다.</li><li>이메일 주소가 같다는 이유로 계정을 자동 연결하지 않습니다.</li><li>현재 보유기간과 클라우드·메일 처리자 안내를 유지합니다.</li></ul>
     <p className="mt-4">서비스별 개정안도 아래에서 확인할 수 있습니다. 해당 서비스 신청에 필요한 내용만 적용하며, 현재 정책의 과거 기록은 보존합니다.</p>
