@@ -60,6 +60,11 @@ describe('A additive', () => {
     assert.equal(verdictOf("await q.createTable(new Table({ name: 't', columns: [] })); await q.createIndex('t', idx);"), ADDITIVE);
   });
 
+  it('any dollar sign in SQL (dollar-quote with digits, parameters) needs review', () => {
+    assert.equal(verdictOf("await q.query(\"COMMENT ON TABLE users IS $note1$owner's note$note1$; DELETE FROM users;\");"), REVIEW);
+    assert.equal(verdictOf("await q.query('COMMENT ON TABLE users IS $$x$$');"), REVIEW);
+  });
+
   it('a backslash in SQL (E-string escape) needs review', () => {
     assert.equal(verdictOf("await q.query(`ALTER TABLE users ADD COLUMN note text DEFAULT E'it\\\\'s', DROP COLUMN email`);"), REVIEW);
     assert.equal(verdictOf("await q.query(`CREATE TABLE t (a text DEFAULT E'x\\\\')') AS SELECT 1`);"), REVIEW);

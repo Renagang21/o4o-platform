@@ -368,7 +368,8 @@ export function classifyStatement(stmt, created = new Set()) {
   const short = s.slice(0, 80);
   const review = (what) => ({ verdict: REVIEW, why: `${what}: ${short}` });
 
-  if (/\$[A-Za-z_]*\$/.test(s)) return review('함수 · DO 블록 — 자동 판정 불가');
+  // `$` 는 dollar-quote($tag$ · $a1$ …) 또는 매개변수($1)다 — 문장 분리가 dollar-quote 를 이해하지 못하므로 `$` 가 있으면 전부 승인 대상
+  if (s.includes('$')) return review('`$` 포함 (dollar-quote · 함수 · DO 블록 · 매개변수) — 자동 판정 불가');
   // 역슬래시는 E'...' 문자열의 escape 가 될 수 있다 — 아래 동작 분리 · 괄호 짝 맞춤은 표준 문자열('' 만 escape)만 이해한다
   if (s.includes('\\')) return review('역슬래시 포함 (E 문자열 escape 등) — 자동 판정 불가');
 
