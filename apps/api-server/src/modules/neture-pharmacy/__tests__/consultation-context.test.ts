@@ -12,17 +12,25 @@ it('keeps ordinary conversation and clarification free of product reads', async 
   expect(plan.mock.calls[1][0]).toEqual({ question: '이전에 말씀한 것과 달라요', context: ['앞선 조건'] });
 });
 it('authorizes before planning, ranks within the active store and rechecks before returning', async () => {
-  const db = { query: jest.fn(async () => [{ id: 'listing-a', kind: 'listing', name: '현재 매장 상품', location: '', score: 1 }]) } as any;
+  const db = { query: jest.fn(async () => [{ id: 'listing-a', kind: 'listing', name: '현재 매장 상품', metadata: '비타민', knowledge: null }]) } as any;
   const actor = access(), plan = jest.fn(async () => ({ needsProduct: true, terms: ['비타민', '비타민'], clarification: null }));
   const result = await new ConsultationContextService(db, plan).search({ question: '이 조건에 맞는 자료를 찾아주세요' }, actor);
   expect(result.state).toBe('candidates');
-  expect(db.query.mock.calls[0][1]).toEqual(['fixture-store', ['비타민']]);
+  expect(db.query.mock.calls[0][1]).toEqual(['fixture-store', ['비타민'], null, null]);
   const sql = db.query.mock.calls[0][0];
   expect(sql).toContain('l.organization_id=$1 AND l.is_active=true');
   expect(sql).toContain("m.status='ACTIVE'");
   expect(sql).toContain('DISTINCT ON (l.master_id)');
   expect(result.candidates[0]).not.toHaveProperty('score');
   expect(actor.authorize).toHaveBeenCalledTimes(3);
+  expect(plan).toHaveBeenCalledTimes(1);
+});
+it('discards verified candidates when access is revoked before returning them', async () => {
+  const actor = access(), query = jest.fn().mockResolvedValue([{ id: 'a', kind: 'local', name: '상품', metadata: '성분', knowledge: null }]);
+  actor.authorize.mockResolvedValueOnce(true).mockResolvedValueOnce(true).mockResolvedValueOnce(false);
+  const plan = jest.fn(async () => ({ needsProduct: true, terms: ['성분'], clarification: null }));
+  await expect(new ConsultationContextService({ query } as never, plan).search({ question: '현재 매장 자료' }, actor)).rejects.toMatchObject({ httpStatus: 403 });
+  expect(query).toHaveBeenCalledTimes(1); expect(plan).toHaveBeenCalledTimes(1);
 });
 it('discards a planned or queried result when current access is revoked', async () => {
   const db = { query: jest.fn(async () => []) } as any, actor = access();
