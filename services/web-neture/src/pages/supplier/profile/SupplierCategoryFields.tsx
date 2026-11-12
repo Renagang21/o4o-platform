@@ -166,7 +166,13 @@ export default function SupplierCategoryFields({
                             </button>
                           )}
                         </div>
-                        <div className="pl-0 mt-1">
+                        <div className="pl-0 mt-1 space-y-2">
+                          {/* 보류 품목군은 상품 승인 요청이 막히고 안내가 이 메모를 보라고 하므로 이전 선택에서도 보여 준다. */}
+                          {row.status === 'suspended' && row.reviewNote && (
+                            <p className="text-xs text-amber-700 bg-amber-50 border border-amber-100 rounded px-2 py-1.5">
+                              운영자 메모: {row.reviewNote}
+                            </p>
+                          )}
                           <PriorSubmission row={row} onDownload={() => handleDownloadCategoryEvidence(row.category)} />
                         </div>
                       </li>

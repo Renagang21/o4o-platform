@@ -402,7 +402,7 @@ describe('SupplierProfilePage existing section ownership', () => {
   it('keeps previously selected removed categories visible: hold stays, general is hidden, removable ones can be cleared', async () => {
     api.categories.list.mockResolvedValue([
       { category: 'general', status: 'not_requested', evidenceDocument: null },
-      { category: 'cosmetics', status: 'suspended', reviewNote: null, evidenceDocument: null },
+      { category: 'cosmetics', status: 'suspended', reviewNote: '보류 사유 확인 필요', evidenceDocument: null },
       { category: 'food', status: 'not_requested', evidenceDocument: null },
     ]);
     render(<SupplierProfilePage />);
@@ -412,6 +412,7 @@ describe('SupplierProfilePage existing section ownership', () => {
     expect(section.queryByText('일반 상품')).toBeNull();
     expect(section.getByText('화장품')).toBeTruthy();
     expect(section.getByText('운영자 보류')).toBeTruthy();
+    expect(section.getByText('운영자 메모: 보류 사유 확인 필요')).toBeTruthy();
     const clear = section.getAllByRole('button', { name: '선택 해제' });
     expect(clear).toHaveLength(1);
     fireEvent.click(clear[0]);
