@@ -57,3 +57,20 @@ it('does not treat a unit prefix inside a longer word as an interchangeable quan
   execute.mockResolvedValueOnce({ content: '{"translation":"10 mg"}', provider: 'gemini', model: 'policy-model', requestId: 'provider-id', promptTokens: 10, completionTokens: 5 });
   await expect(createConsultationTranslator({} as any)({ text: '10 mgX', source: 'ko', target: 'en' }, access())).rejects.toMatchObject({ httpStatus: 503 });
 });
+it('retries the provider after rejecting an invalid numeric translation in a reusable session', async () => {
+  const translate = createConsultationTranslator({} as never), scoped = { ...access(), reuseKey: 'numeric-retry-session' };
+  execute.mockResolvedValueOnce({ content: '{"translation":"20 mg"}', provider: 'gemini', model: 'policy-model', requestId: 'bad', promptTokens: 10, completionTokens: 5 })
+    .mockResolvedValueOnce({ content: '{"translation":"10 mg"}', provider: 'gemini', model: 'policy-model', requestId: 'good', promptTokens: 10, completionTokens: 5 });
+  await expect(translate({ text: '10 mg', source: 'ko', target: 'en' }, scoped)).rejects.toMatchObject({ httpStatus: 503 });
+  await expect(translate({ text: '10 mg', source: 'ko', target: 'en' }, scoped)).resolves.toEqual({ translation: '10 mg' });
+  await translate({ text: '10 mg', source: 'ko', target: 'en' }, scoped);
+  expect(execute).toHaveBeenCalledTimes(2);
+});
+
+it('blocks a previously reusable translation when the current policy is disabled', async () => {
+  const translate = createConsultationTranslator({} as never), scoped = { ...access(), reuseKey: 'policy-revoked-session' };
+  await translate(input, scoped);
+  assertEnabled.mockRejectedValueOnce(new Error('AI_DISABLED:CONTENT_TRANSLATION'));
+  await expect(translate(input, scoped)).rejects.toMatchObject({ httpStatus: 503, code: 'CONSULTATION_AI_DISABLED' });
+  expect(execute).toHaveBeenCalledTimes(1);
+});
