@@ -12,6 +12,7 @@
 - **결정 사항**
   - 통합 담당이 이 클라우드 세션을 **상시 통합 세션**으로 지정(2026-11-12). 등록은 main 의 `.claude/integration-sessions.json`(세션 `cse_013JvDHnRfTd2t74jmcLH726`) — 등록 파일을 main 에서 읽어야 위조가 안 되므로, 병합 전에는 클라우드 병합이 계속 거부된다(의도).
   - 상시 통합 세션의 범위: 묶음 PR 생성 · CI · 리뷰 확인 · squash 병합 · 자동 Delivery 결과 확인 · 배포 후 Demo 확인. 배포 · promote · CI/배포 인프라 · 에이전트 안전 설정 PR 의 병합은 로컬(통합 담당).
+  - 통합 담당이 병합 대상 · 순서 · 시점 판단을 상시 통합 세션에 위임(2026-11-12 통합 담당 지시 — `AGENTS.md` 기록도 통합 담당 지시). 사람 승인이 필요한 병합 · 배포 · promote 는 위임 밖.
   - 병합 방식은 훅에서 squash 로 고정 · `expectedHeadSha` 필수. 다른 방식이 필요하면 로컬.
   - `CLAUDE.md` 의 「setup script 에 의존성 설치 금지」를 실제 환경에 맞춰 「setup script 는 미리 데우기 · 정확한 설치는 SessionStart 훅」으로 고쳤다(환경을 바꾸는 대신 문서를 맞춤 — SessionStart 훅이 매번 `--frozen-lockfile` 을 돌려 lockfile 누락 위험이 없다). 환경 이름 `o4o-dev` → 실제 `o4o-platform`.
 - **바꾼 것**
