@@ -54,10 +54,12 @@ Admin 회원 목록에서 Demo 계정의 「가입 유형」 · 「닉네임」�
 ## 5. 실행 (LOCAL)
 
 Cloud SQL Proxy 를 `127.0.0.1:55432` 로 띄운 상태에서, 저장소 루트에서 실행한다(접속 절차는 [`SETUP.md`](../../SETUP.md)).
-CLI 는 기존 Demo 보정과 같은 운영 계정 비밀번호를 Secret Manager 에서 읽는다. plan 도 운영 계정으로 접속하므로(세션은 읽기 전용), 통합 담당이 지정한 세션에서만 실행한다.
+- **plan(T1)** 은 읽기 전용 계정 `o4o_readonly` 로만 접속한다 — CLI 가 계정과 secret `o4o-db-readonly-password` 를 고정하므로 `DB_USERNAME` 은 받지 않는다(AGENTS.md §5).
+  권한이 막히면(`42501`) 다른 계정으로 우회하지 않고 멈춰서 보고한다.
+- **apply(T2)** 만 쓰기 가능한 운영 계정(secret `o4o-db-password`)으로 접속한다. 통합 담당의 명시 승인이 있을 때만 실행한다.
 
 ```bash
-DEMO_ACCOUNTS_PROFILE=true DEMO_ACCOUNTS_MODE=plan DB_USERNAME=<운영 계정> DB_NAME=<운영 DB> npx tsx apps/api-server/src/scripts/demo-account-reconcile.ts
+DEMO_ACCOUNTS_PROFILE=true DEMO_ACCOUNTS_MODE=plan DB_NAME=<운영 DB> npx tsx apps/api-server/src/scripts/demo-account-reconcile.ts
 ```
 
 ```bash
