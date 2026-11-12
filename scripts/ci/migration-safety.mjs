@@ -369,6 +369,8 @@ export function classifyStatement(stmt, created = new Set()) {
   const review = (what) => ({ verdict: REVIEW, why: `${what}: ${short}` });
 
   if (/\$[A-Za-z_]*\$/.test(s)) return review('함수 · DO 블록 — 자동 판정 불가');
+  // 역슬래시는 E'...' 문자열의 escape 가 될 수 있다 — 아래 동작 분리 · 괄호 짝 맞춤은 표준 문자열('' 만 escape)만 이해한다
+  if (s.includes('\\')) return review('역슬래시 포함 (E 문자열 escape 등) — 자동 판정 불가');
 
   let m;
   // ── 허용 목록 ──────────────────────────────────────────────────────────

@@ -60,6 +60,11 @@ describe('A additive', () => {
     assert.equal(verdictOf("await q.createTable(new Table({ name: 't', columns: [] })); await q.createIndex('t', idx);"), ADDITIVE);
   });
 
+  it('a backslash in SQL (E-string escape) needs review', () => {
+    assert.equal(verdictOf("await q.query(`ALTER TABLE users ADD COLUMN note text DEFAULT E'it\\\\'s', DROP COLUMN email`);"), REVIEW);
+    assert.equal(verdictOf("await q.query(`CREATE TABLE t (a text DEFAULT E'x\\\\')') AS SELECT 1`);"), REVIEW);
+  });
+
   it('code inside a template interpolation anywhere in up() needs review', () => {
     assert.equal(verdictOf("await q.query('CREATE INDEX i ON t (a)');\nconsole.log(`deleted: ${await q.query('DELETE FROM users')}`);"), REVIEW);
   });
