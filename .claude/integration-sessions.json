@@ -1,0 +1,11 @@
+{
+  "$comment": "상시 통합 세션 등록부 — AGENTS.md §4 역할. guard-mcp-github.mjs 가 GitHub API 로 main 의 이 파일을 읽어, 등록된 클라우드 세션만 PR 을 병합하게 한다. 추가 · 삭제는 통합 담당이 결정하고, 이 파일을 바꾸는 PR 은 통합 담당이 직접 병합한다(클라우드 통합 세션은 병합할 수 없다). session 은 CLAUDE_CODE_REMOTE_SESSION_ID 값(cse_…) 또는 claude.ai 세션 URL 의 session_… 표기.",
+  "cloud": [
+    {
+      "session": "cse_013JvDHnRfTd2t74jmcLH726",
+      "role": "상시 통합 세션 — PR 생성 · CI · 리뷰 확인 · squash 병합 · post-merge Delivery 결과 확인",
+      "designated": "2026-11-12",
+      "by": "통합 담당"
+    }
+  ]
+}
