@@ -214,7 +214,12 @@ export default function MemberRegistrationForm({ onSubmitted }: { onSubmitted?: 
           주시기 바랍니다.
         </p>
       )}
-      {state === 'pending' && <p role="status">가입 검토 대기 중입니다.</p>}
+      {/* 제출한 신청은 검토가 끝날 때까지 고칠 수 없다 — 입력 칸처럼 보여 「입력이 안 된다」로 오해되던 것(2026-11-12). */}
+      {state === 'pending' && readOnly && (
+        <p role="status" className="rounded border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">
+          가입 신청을 검토하고 있습니다. 검토 중에는 내용을 고칠 수 없습니다. 승인되면 이용하실 수 있습니다.
+        </p>
+      )}
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h2 className="text-lg font-semibold">{type ? `${MEMBER_REGISTRATION_TYPES[type]} 정보 입력` : '가입 정보 입력'}</h2>
         {!readOnly && <button type="button" disabled={busy} className="text-sm text-emerald-800 underline" onClick={() => setStep('type')}>유형 다시 선택</button>}
@@ -230,8 +235,8 @@ export default function MemberRegistrationForm({ onSubmitted }: { onSubmitted?: 
               disabled={busy}
               maxLength={key === 'phone' ? 20 : 100}
               type={key === 'phone' ? 'tel' : 'text'}
-              {...(key === 'phone' ? { inputMode: 'numeric' as const, autoComplete: 'tel', placeholder: '01012345678' } : {})}
-              className="mt-1 block w-full rounded border p-2"
+              {...(key === 'phone' ? { inputMode: 'numeric' as const, autoComplete: 'tel', ...(readOnly ? {} : { placeholder: '01012345678' }) } : {})}
+              className="mt-1 block w-full rounded border p-2 read-only:cursor-default read-only:bg-slate-100 read-only:text-slate-600"
               value={member[key]}
               onChange={(event) =>
                 setMember((previous) => ({

@@ -109,7 +109,7 @@ describe('role-specific signup', () => {
       },
     });
     render(<MemberRegistrationForm />);
-    await screen.findByText('가입 검토 대기 중입니다.');
+    await screen.findByText(/가입 신청을 검토하고 있습니다/);
     expect(screen.queryByRole('button', { name: '가입 신청' })).toBeNull();
   });
   it('lets the member submit consent when the operator prepared a pending role profile', async () => {
@@ -233,6 +233,25 @@ describe('signup screen usability', () => {
     fireEvent.submit(screen.getByRole('button', { name: '가입 신청' }).closest('form')!);
     await waitFor(() => expect(onSubmitted).toHaveBeenCalledTimes(1));
     expect(screen.queryByText(/가입 정보를 제출했습니다/)).toBeNull();
+  });
+});
+
+describe('submitted registration under review', () => {
+  it('shows that the submitted fields cannot be changed instead of looking editable', async () => {
+    mocks.get.mockResolvedValue({ data: { data: { member: { name: '합성', nickname: '별칭', phone: null, version }, registration: { type: 'pharmacy_owner', state: 'pending', requestId: 'r1', fields: {} }, canSubmit: false } } });
+    render(<MemberRegistrationForm />);
+    await screen.findByText(/검토 중에는 내용을 고칠 수 없습니다/);
+    const phone = screen.getByLabelText('휴대전화 (선택)') as HTMLInputElement;
+    expect(phone.readOnly).toBe(true);
+    expect(phone.className).toMatch(/read-only:bg-slate-100/);
+    expect(phone.placeholder).toBe('');
+    expect(screen.queryByRole('button', { name: '가입 신청' })).toBeNull();
+  });
+  it('a new member before submission is not told that review is pending', async () => {
+    mocks.get.mockResolvedValue({ data: { data: { member: { name: null, nickname: null, phone: null, version }, registration: { type: null, state: 'pending', fields: {} }, canSubmit: true } } });
+    render(<MemberRegistrationForm />);
+    await screen.findByRole('heading', { name: '가입 유형 선택' });
+    expect(screen.queryByText(/검토/)).toBeNull();
   });
 });
 

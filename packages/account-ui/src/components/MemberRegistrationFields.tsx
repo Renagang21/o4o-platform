@@ -93,7 +93,7 @@ export function MemberRegistrationFields({
   AddressSearch,
 }: MemberRegistrationFieldsProps) {
   const input =
-    'mt-1 block w-full rounded border border-slate-300 bg-white px-3 py-2 read-only:bg-slate-50 disabled:bg-slate-50';
+    'mt-1 block w-full rounded border border-slate-300 bg-white px-3 py-2 read-only:cursor-default read-only:bg-slate-100 read-only:text-slate-600 disabled:bg-slate-100';
   return (
     <fieldset disabled={disabled} className="space-y-3">
       {!hideType && <label className="block text-sm">
@@ -130,7 +130,7 @@ export function MemberRegistrationFields({
                       address={fields.address ?? ''}
                       addressDetail={fields.addressDetail ?? ''}
                       disabled={disabled || readOnly}
-                      inputClassName="block w-full rounded border border-slate-300 bg-white px-3 py-2"
+                      inputClassName="block w-full rounded border border-slate-300 px-3 py-2 read-only:bg-slate-100 read-only:text-slate-600 disabled:bg-slate-100 disabled:text-slate-600"
                       onChange={(value) => onChange({ ...fields, ...value })}
                     />
                   </div>
