@@ -28,7 +28,7 @@ export class Fixture1790000000000 implements MigrationInterface {
 const verdictOf = (up, down) => classifyMigrationSource(wrap(up, down)).verdict;
 
 describe('A additive', () => {
-  it('table · index · column · comment · NOT NULL relaxation are additive', () => {
+  it('table · index · column · comment · NOT NULL relaxation · enum · sequence are additive', () => {
     for (const up of [
       'await q.query(`CREATE TABLE t (id uuid PRIMARY KEY, name text NOT NULL)`);',
       'await q.query(`CREATE UNIQUE INDEX idx_t ON existing (a, b)`);',
@@ -38,16 +38,17 @@ describe('A additive', () => {
       "await q.query(`ALTER TABLE existing ADD COLUMN mode varchar(16) NOT NULL DEFAULT 'a' CHECK (mode IN ('a','b'))`);",
       'await q.query(`ALTER TABLE users ALTER COLUMN email DROP NOT NULL`);',
       "await q.query(`COMMENT ON COLUMN existing.note IS '설명; 세미콜론 포함'`);",
-      'await q.query(`CREATE EXTENSION IF NOT EXISTS pgcrypto`);',
-      'const [row] = await q.query(`SELECT EXISTS(SELECT 1 FROM existing) AS used`); if (row.used) throw new Error("x");',
+      "await q.query(`CREATE TYPE mode_enum AS ENUM ('a', 'b')`);",
+      "await q.query(`ALTER TYPE mode_enum ADD VALUE IF NOT EXISTS 'c'`);",
+      'await q.query(`CREATE SEQUENCE seq_t START 1`);',
+      "await q.query(`CREATE TABLE \"users-staging\" (id int, payload jsonb DEFAULT '{}'::jsonb) WITH (fillfactor = 90)`);",
     ]) assert.equal(verdictOf(up), ADDITIVE, up);
   });
 
-  it('constraints · triggers · rows on a table created in the same migration are additive', () => {
-    const up = `await q.query(\`CREATE TABLE public.fresh (id uuid PRIMARY KEY, kind text)\`);
-    await q.query(\`ALTER TABLE fresh ADD CONSTRAINT fresh_kind CHECK (kind IN ('a'))\`);
-    await q.query(\`CREATE TRIGGER fence BEFORE INSERT OR UPDATE ON public.fresh FOR EACH ROW EXECUTE FUNCTION f()\`);
-    await q.query(\`INSERT INTO fresh(id, kind) VALUES (gen_random_uuid(), 'a')\`);`;
+  it('constraints · defaults on a table created in the same migration are additive', () => {
+    const up = `await q.query(\`CREATE TABLE public.fresh (id uuid PRIMARY KEY, kind text, owner uuid)\`);
+    await q.query(\`ALTER TABLE fresh ADD CONSTRAINT fresh_kind CHECK (kind IN ('a')), ADD CONSTRAINT fresh_owner FOREIGN KEY (owner) REFERENCES users(id) ON DELETE CASCADE\`);
+    await q.query(\`ALTER TABLE "fresh" ALTER COLUMN kind SET DEFAULT 'a', ALTER COLUMN kind SET NOT NULL\`);`;
     assert.equal(verdictOf(up), ADDITIVE);
   });
 
@@ -105,6 +106,21 @@ describe('R ambiguous → approval', () => {
       "await q.query(`SELECT setval('seq', 10)`);",
       'await helper(q);',
       'await q.manager.save(entity);',
+      // 2026-11-12 허용 목록 전환 — 아래는 전부 승인 대상
+      'const [row] = await q.query(`SELECT EXISTS(SELECT 1 FROM existing) AS used`); if (row.used) throw new Error("x");',
+      "await q.query('LOCK TABLE existing IN EXCLUSIVE MODE');",
+      'await q.query(`CREATE EXTENSION IF NOT EXISTS pgcrypto`);',
+      'await q.query(`CREATE SCHEMA audit`);',
+      'await q.query(`CREATE TABLE copy AS SELECT * FROM existing`);',
+      'await q.query(`CREATE TABLE copy (id int) INHERITS (existing)`);',
+      "await q.query(`CREATE TABLE p2026 PARTITION OF existing FOR VALUES IN ('x')`);",
+      'await q.query(`CREATE SEQUENCE seq_t OWNED BY existing.id`);',
+      'await q.query(`ALTER TABLE existing ADD COLUMN owner uuid REFERENCES users(id) ON DELETE CASCADE`);',
+      'await q.query(`ALTER TABLE existing ALTER COLUMN a DROP DEFAULT`);',
+      'await q.query(`MERGE INTO existing USING src ON true WHEN MATCHED THEN DO NOTHING`);',
+      "await q.createForeignKey('existing', fk);",
+      "await q.createCheckConstraint('existing', check);",
+      "await q.createView(view);",
     ]) assert.equal(verdictOf(up), REVIEW, up);
   });
 
@@ -119,6 +135,23 @@ describe('R ambiguous → approval', () => {
     assert.equal(verdictOf("await q.query('CREATE TABLE IF NOT EXISTS users (id uuid); DELETE FROM users;');"), DESTRUCTIVE);
     assert.equal(verdictOf("await q.query('CREATE TABLE IF NOT EXISTS t (id uuid)'); await q.query(`INSERT INTO t(id) VALUES (gen_random_uuid())`);"), REVIEW);
     assert.equal(verdictOf("await q.query('CREATE TABLE IF NOT EXISTS t (id uuid)');"), ADDITIVE);
+  });
+
+  it('data written to a table created in the same migration is never additive', () => {
+    const mk = 'await q.query(`CREATE TABLE fresh (id uuid, kind text)`);\n';
+    assert.equal(verdictOf(mk + "await q.query(`INSERT INTO fresh(id, kind) VALUES (gen_random_uuid(), 'a')`);"), REVIEW);
+    assert.equal(verdictOf(mk + 'await q.query(`CREATE TRIGGER fence BEFORE INSERT ON fresh FOR EACH ROW EXECUTE FUNCTION f()`);'), REVIEW);
+    assert.equal(verdictOf(mk + "await q.query(`UPDATE fresh SET kind = 'b'`);"), DESTRUCTIVE);
+    assert.equal(verdictOf(mk + 'await q.query(`DELETE FROM fresh`);'), DESTRUCTIVE);
+    assert.equal(verdictOf(mk + 'await q.query(`TRUNCATE fresh`);'), DESTRUCTIVE);
+  });
+
+  it('a conditionally executed CREATE TABLE gives no new-table exception', () => {
+    for (const up of [
+      "if (!(await q.hasTable('users'))) { await q.query('CREATE TABLE users (id int)'); }\nawait q.query(`ALTER TABLE users ADD CONSTRAINT u_fk FOREIGN KEY (id) REFERENCES orgs(id) ON DELETE CASCADE`);",
+      "try { await q.query('CREATE TABLE users (id int)'); } catch {}\nawait q.query(`ALTER TABLE users ALTER COLUMN id SET DEFAULT 1`);",
+      "(await q.hasTable('users')) || await q.query('CREATE TABLE users (id int)');\nawait q.query(`ALTER TABLE users ADD PRIMARY KEY (id)`);",
+    ]) assert.equal(verdictOf(up), REVIEW, up);
   });
 
   it('QueryRunner used through an alias, destructuring or a sub-object needs review', () => {
@@ -146,20 +179,14 @@ describe('S scanner', () => {
     assert.equal(verdictOf(`await q.query("ALTER TABLE existing ADD COLUMN c int; -- DROP TABLE users\\n/* DELETE FROM users; */");`), ADDITIVE);
   });
 
-  it('TRUNCATE checks every target and CASCADE', () => {
-    const mk = 'await q.query(`CREATE TABLE staging (id int)`);\n';
-    assert.equal(verdictOf(mk + 'await q.query(`TRUNCATE staging, users`);'), DESTRUCTIVE);
-    assert.equal(verdictOf(mk + 'await q.query(`TRUNCATE TABLE ONLY staging, public.users RESTART IDENTITY`);'), DESTRUCTIVE);
-    assert.equal(verdictOf(mk + 'await q.query(`TRUNCATE staging CASCADE`);'), DESTRUCTIVE);
-    assert.equal(verdictOf(mk + 'await q.query(`TRUNCATE staging RESTART IDENTITY`);'), ADDITIVE);
-    assert.equal(verdictOf(mk + 'await q.query(`TRUNCATE staging, (SELECT 1)`);'), REVIEW);
-  });
-
-  it('quoted identifiers keep case (\"Users\" is not users)', () => {
-    assert.equal(verdictOf('await q.query(`CREATE TABLE "Users" (id int)`);\nawait q.query(`DELETE FROM users`);'), DESTRUCTIVE);
-    assert.equal(verdictOf('await q.query(`CREATE TABLE "Users" (id int)`);\nawait q.query(`DELETE FROM "Users"`);'), ADDITIVE);
-    assert.equal(verdictOf('await q.query(`CREATE TABLE new_t (id int)`);\nawait q.query(`DELETE FROM public."new_t"`);'), ADDITIVE);
-    assert.equal(verdictOf('await q.query(`CREATE TABLE new_t (id int)`);\nawait q.query(`DELETE FROM "New_t"`);'), DESTRUCTIVE);
+  it('quoted identifiers keep case and are matched whole ("Users" ≠ users · "users-live" ≠ "users-staging")', () => {
+    const fk = 'ADD CONSTRAINT c CHECK (id > 0)';
+    assert.equal(verdictOf(`await q.query(\`CREATE TABLE "Users" (id int)\`);\nawait q.query(\`ALTER TABLE users ${fk}\`);`), REVIEW);
+    assert.equal(verdictOf(`await q.query(\`CREATE TABLE "Users" (id int)\`);\nawait q.query(\`ALTER TABLE "Users" ${fk}\`);`), ADDITIVE);
+    assert.equal(verdictOf(`await q.query(\`CREATE TABLE new_t (id int)\`);\nawait q.query(\`ALTER TABLE public."new_t" ${fk}\`);`), ADDITIVE);
+    assert.equal(verdictOf(`await q.query(\`CREATE TABLE new_t (id int)\`);\nawait q.query(\`ALTER TABLE "New_t" ${fk}\`);`), REVIEW);
+    assert.equal(verdictOf(`await q.query(\`CREATE TABLE "users-staging" (id int)\`);\nawait q.query(\`ALTER TABLE "users-live" ${fk}\`);`), REVIEW);
+    assert.equal(verdictOf(`await q.query(\`CREATE TABLE "a""b" (id int)\`);\nawait q.query(\`ALTER TABLE "a" ${fk}\`);`), REVIEW);
   });
 
   it('runner manager alias is not additive', () => {
@@ -194,12 +221,15 @@ describe('X repository migrations', () => {
     ]) assert.notEqual(classifyMigrationSource(read(name)).verdict, ADDITIVE, name);
   });
 
+  it('a new table with a trigger needs approval (trigger is outside the allowlist)', () => {
+    assert.equal(classifyMigrationSource(read('1793186241009-CreateCentralOperationMenuGrants.ts')).verdict, REVIEW);
+  });
+
   it('known purely additive migrations are additive', () => {
     for (const name of [
       '1793586897000-AddAdminOperationsDelegation.ts',
       '1793750400000-AddTemporaryPasswordExpiry.ts',
       '1793857542325-AddStorePlaylistTags.ts',
-      '1793186241009-CreateCentralOperationMenuGrants.ts',
       '1794357598911-AllowUsersWithoutEmail.ts',
     ]) assert.equal(classifyMigrationSource(read(name)).verdict, ADDITIVE, name);
   });

@@ -3,15 +3,19 @@
  *
  * 질문은 하나다 — "이 migration 의 up() 을 운영에 적용하면 기존 데이터 · 구조가 사라지거나 바뀌는가."
  *
- *   ADDITIVE     표 · 열 · 인덱스를 **더하기만** 한다 → 자동 배포 (적용 직전 Cloud SQL 백업은 그대로 만든다)
- *   DESTRUCTIVE  DROP · 이름 변경 · 타입 변경 · 데이터 일괄 UPDATE / DELETE / TRUNCATE → Promote 승인
- *   REVIEW       판정이 애매하다 → Promote 승인 (fail-closed)
+ *   ADDITIVE     아래 허용 목록의 문장만 있다 → 자동 배포 (적용 직전 Cloud SQL 백업은 그대로 만든다)
+ *   DESTRUCTIVE  DROP · 이름 변경 · 타입 변경 · 데이터 UPDATE / DELETE / TRUNCATE → Promote 승인
+ *   REVIEW       그 밖의 모든 문장 → Promote 승인 (fail-closed)
  *
- * 애매함의 기준 (전부 승인 쪽):
- *   - up() 을 찾지 못함 · query() 인자가 문자열 상수가 아님(변수 · 연결 · `${}` 보간) · QueryRunner 의 다른 메서드
- *   - 함수 · DO 블록(`$$`) · 권한(GRANT / REVOKE / POLICY) · 기존 표의 제약 추가 · 기존 표 INSERT · 기본값 변경 등
- *     아래 허용 목록에 없는 문장
- * 같은 migration 에서 새로 만든 표에 대한 작업(제약 · 트리거 · INSERT 등)은 기존 데이터가 없으므로 ADDITIVE 로 본다.
+ * 허용 목록 (2026-11-12 통합 담당 결정 — 확실히 안전한 몇 가지 문장 형태만 추가형으로 보고 나머지는 전부 승인):
+ *   - CREATE TABLE <이름> ( ... )            (AS · INHERITS · PARTITION OF 제외)
+ *   - CREATE [UNIQUE] INDEX ...
+ *   - 기존 표 ALTER TABLE — 동작이 모두 ADD COLUMN(제약 · REFERENCES 없음) 또는 ALTER COLUMN .. DROP NOT NULL
+ *   - 같은 migration 에서 IF NOT EXISTS 없이 만든 표의 ALTER TABLE — ADD ... · ALTER COLUMN .. SET/DROP DEFAULT · SET/DROP NOT NULL
+ *   - COMMENT ON ... · CREATE SEQUENCE ...(OWNED BY 제외) · CREATE TYPE .. AS ENUM (...) · ALTER TYPE .. ADD VALUE ...
+ *   - QueryRunner 구조 API: createTable · addColumn(s) · createIndex · createIndices (읽기 · 트랜잭션 제어는 중립)
+ * 데이터를 쓰는 문장(INSERT · UPDATE · DELETE · TRUNCATE · MERGE)은 새 표 대상이어도 추가형으로 보지 않는다.
+ * 읽기(SELECT) · 잠금 · 확장 · 스키마 · 트리거 · 함수 · 권한 · 동적 SQL · 그 밖의 QueryRunner 호출도 승인 대상이다.
  *
  * 과탐(승인 유지)은 허용, 미탐(파괴형을 자동 배포)은 금지 — 판단이 서지 않으면 REVIEW 로 둔다.
  */
@@ -128,11 +132,7 @@ function readStringLiteral(src, pos) {
 }
 
 /** QueryRunner 의 구조 API — 이름으로 판정한다 (query 외) */
-const RUNNER_ADDITIVE = new Set([
-  'createTable', 'addColumn', 'addColumns', 'createIndex', 'createIndices', 'createForeignKey', 'createForeignKeys',
-  'createUniqueConstraint', 'createUniqueConstraints', 'createCheckConstraint', 'createCheckConstraints',
-  'createPrimaryKey', 'createSchema', 'createView',
-]);
+const RUNNER_ADDITIVE = new Set(['createTable', 'addColumn', 'addColumns', 'createIndex', 'createIndices']);
 const RUNNER_DESTRUCTIVE = /^(drop|rename|change|clear|update|delete|truncate)/i;
 /** 상태를 바꾸지 않는 읽기 · 제어 */
 const RUNNER_NEUTRAL = new Set(['hasTable', 'hasColumn', 'getTable', 'getTables', 'startTransaction', 'commitTransaction', 'rollbackTransaction']);
@@ -194,7 +194,13 @@ export function extractStatements(body, runner) {
     else runnerCalls.push({ method, verdict: REVIEW });
   }
   if (queryCalls > runnerQueries) problems.push('QueryRunner 매개변수가 아닌 query() 호출 — 실행 대상을 알 수 없음');
-  return { sql, runnerCalls, problems };
+  // 조건 · 반복 · 예외 처리 안의 CREATE TABLE 은 건너뛰어질 수 있다 — 그때는 "새 표" 예외를 주지 않는다
+  let conditional = false;
+  const flow = /(?<![\w$])(?:if|else|for|while|do|switch|case|try|catch|finally)(?![\w$])|\?|&&|\|\|/g;
+  while ((m = flow.exec(body))) {
+    if (!insideLiteral(body.slice(0, m.index))) { conditional = true; break; }
+  }
+  return { sql, runnerCalls, problems, conditional };
 }
 
 /** prefix 끝이 문자열 · 주석 안인가 (간이 스캐너) */
@@ -262,11 +268,14 @@ export function splitSql(text) {
  * ("Users" ≠ users). 스키마 public 은 생략한다.
  */
 const tableName = (raw) => {
-  const parts = String(raw ?? '').split('.').map(p => (/^".*"$/.test(p) ? p.slice(1, -1) : p.toLowerCase()));
+  const parts = (String(raw ?? '').match(/"(?:[^"]|"")*"|[^.]+/g) ?? [])
+    .map(p => (p.startsWith('"') ? p.slice(1, -1).replace(/""/g, '"') : p.toLowerCase()));
   if (parts.length === 2 && parts[0] === 'public') parts.shift();
-  return parts.join('.');
+  return parts.join('\u0000');
 };
-const IDENT = '("?[A-Za-z_][\\w$]*"?(?:\\."?[A-Za-z_][\\w$]*"?)?)';
+// 이름 한 부분은 따옴표로 완전히 닫힌 식별자("users-live" · "a""b") 또는 따옴표 없는 식별자다 — 앞부분만 잡지 않는다
+const IDENT_PART = '(?:"(?:[^"]|"")+"|[A-Za-z_][\\w$]*(?![\\w$"-]))';
+const IDENT = `(${IDENT_PART}(?:\\.${IDENT_PART})?)`;
 
 /** 괄호 밖의 쉼표로 ALTER TABLE 동작을 나눈다 */
 function splitActions(text) {
@@ -289,93 +298,86 @@ function splitActions(text) {
 // 두 갈래: 문두 DROP(NOT NULL 해제 제외) · RENAME, 또는 어디서든 열 타입 변경.
 const DESTRUCTIVE_ACTION = /(?:^(?:DROP\b(?!\s+NOT\s+NULL\b)|RENAME\b))|(?:\bALTER\s+(?:COLUMN\s+)?\S+\s+(?:SET\s+DATA\s+)?TYPE\b)/;
 
-/** ALTER TABLE 한 동작 */
+/** text[open] 의 '(' 와 짝인 ')' 뒤 문자열 — 짝이 없으면 null (문자열 · 따옴표 식별자 안의 괄호는 무시) */
+function afterParens(text, open) {
+  let depth = 0;
+  let quote = null;
+  for (let i = open; i < text.length; i += 1) {
+    const c = text[i];
+    if (quote) { if (c === quote) quote = null; continue; }
+    if (c === "'" || c === '"') { quote = c; continue; }
+    if (c === '(') depth += 1;
+    if (c === ')' && --depth === 0) return text.slice(i + 1);
+  }
+  return null;
+}
+
+/** 기존 표의 ALTER TABLE 한 동작 — 열 추가와 NOT NULL 해제만 허용 */
 function classifyAlterAction(action) {
   const a = action.replace(/\s+/g, ' ').trim().toUpperCase();
-  if (/^ADD (COLUMN )?(IF NOT EXISTS )?(?!CONSTRAINT\b|PRIMARY\b|UNIQUE\b|CHECK\b|FOREIGN\b|EXCLUDE\b)/.test(a)) return { verdict: ADDITIVE, why: '열 추가' };
+  if (/^ADD (COLUMN )?(IF NOT EXISTS )?(?!CONSTRAINT\b|PRIMARY\b|UNIQUE\b|CHECK\b|FOREIGN\b|EXCLUDE\b)/.test(a) && !/\bREFERENCES\b/.test(a)) {
+    return { verdict: ADDITIVE, why: '열 추가' };
+  }
   if (/^ALTER (COLUMN )?\S+ DROP NOT NULL$/.test(a)) return { verdict: ADDITIVE, why: 'NOT NULL 해제(제약 완화 · 데이터 불변)' };
   if (DESTRUCTIVE_ACTION.test(a)) return { verdict: DESTRUCTIVE, why: `파괴형 변경: ${a.slice(0, 60)}` };
-  return { verdict: REVIEW, why: `기존 표 변경 — 자동 판정 불가: ${a.slice(0, 60)}` };
+  return { verdict: REVIEW, why: `기존 표 변경 — 허용 목록 밖: ${a.slice(0, 60)}` };
+}
+
+/** 이 migration 에서 만든 표의 ALTER TABLE 한 동작 — 정의를 마저 붙이는 동작만 허용 */
+function classifyNewTableAction(action) {
+  const a = action.replace(/\s+/g, ' ').trim().toUpperCase();
+  if (/^ADD\b/.test(a)) return { verdict: ADDITIVE, why: '새 표 정의' };
+  if (/^ALTER (COLUMN )?\S+ (SET DEFAULT\b|DROP DEFAULT$|SET NOT NULL$|DROP NOT NULL$)/.test(a)) return { verdict: ADDITIVE, why: '새 표 정의' };
+  return classifyAlterAction(action);
 }
 
 /**
- * SQL 문장 하나.
- * @param {Set<string>} created 이 migration 에서 만든 표 (호출 중 갱신)
+ * SQL 문장 하나 — 허용 목록에 맞으면 ADDITIVE, 알아볼 수 있는 파괴형이면 DESTRUCTIVE, 나머지는 REVIEW.
+ * @param {Set<string>} created 이 migration 에서 IF NOT EXISTS 없이 만든 표 (호출 중 갱신 · 구조 정의에만 쓴다)
  */
 export function classifyStatement(stmt, created = new Set()) {
   const s = stmt.replace(/\s+/g, ' ').trim();
   const u = s.toUpperCase();
   const short = s.slice(0, 80);
+  const review = (what) => ({ verdict: REVIEW, why: `${what}: ${short}` });
 
-  if (/\$[A-Za-z_]*\$/.test(s)) return { verdict: REVIEW, why: `함수 · DO 블록 — 자동 판정 불가: ${short}` };
+  if (/\$[A-Za-z_]*\$/.test(s)) return review('함수 · DO 블록 — 자동 판정 불가');
 
   let m;
-  // ── 읽기 · 잠금 ────────────────────────────────────────────────────────
-  if (/^SELECT\b/.test(u)) {
-    if (/\b(INTO|SETVAL|NEXTVAL|PG_TERMINATE_BACKEND|PG_CANCEL_BACKEND|DBLINK\w*|LO_\w+)\b/.test(u)) return { verdict: REVIEW, why: `상태를 바꿀 수 있는 SELECT: ${short}` };
-    return { verdict: ADDITIVE, why: '읽기' };
-  }
-  if (/^LOCK TABLE\b/.test(u)) return { verdict: ADDITIVE, why: '잠금(데이터 불변)' };
-
-  // ── 생성 ───────────────────────────────────────────────────────────────
-  if ((m = new RegExp(`^CREATE (?:UNLOGGED )?TABLE (IF NOT EXISTS )?${IDENT}`, 'i').exec(s))) {
-    if (/\bAS\s+SELECT\b/i.test(s)) return { verdict: REVIEW, why: `CREATE TABLE AS — 자동 판정 불가: ${short}` };
-    // IF NOT EXISTS 는 표가 이미 있으면(기존 데이터 포함) 아무것도 하지 않는다 — 새 표 예외를 주지 않는다
+  // ── 허용 목록 ──────────────────────────────────────────────────────────
+  if ((m = new RegExp(`^CREATE TABLE (IF NOT EXISTS )?${IDENT} ?\\(`, 'i').exec(s))) {
+    // 열 정의 괄호 뒤의 부가 절(AS SELECT · INHERITS · PARTITION OF)은 기존 데이터 · 표와 엮인다
+    const tail = afterParens(s, m.index + m[0].length - 1);
+    if (tail === null || /\b(AS|INHERITS|PARTITION|OF)\b/i.test(tail)) return review('CREATE TABLE 부가 절 — 허용 목록 밖');
+    // IF NOT EXISTS 는 표가 이미 있으면(기존 데이터 포함) 아무것도 하지 않는다 — 새 표로 기록하지 않는다
     if (!m[1]) created.add(tableName(m[2]));
     return { verdict: ADDITIVE, why: '표 추가' };
   }
   if (/^CREATE (UNIQUE )?INDEX\b/.test(u)) return { verdict: ADDITIVE, why: '인덱스 추가' };
-  if (/^CREATE (SEQUENCE|TYPE|SCHEMA)\b/.test(u)) return { verdict: ADDITIVE, why: '객체 추가' };
-  if (/^CREATE EXTENSION\b/.test(u)) return { verdict: ADDITIVE, why: '확장 추가' };
   if (/^COMMENT ON\b/.test(u)) return { verdict: ADDITIVE, why: '주석' };
+  if (/^CREATE SEQUENCE\b/.test(u) && !/\bOWNED BY\b/.test(u)) return { verdict: ADDITIVE, why: '시퀀스 추가' };
+  if (new RegExp(`^CREATE TYPE ${IDENT} AS ENUM ?\\(`, 'i').test(s)) return { verdict: ADDITIVE, why: 'enum 추가' };
+  if (new RegExp(`^ALTER TYPE ${IDENT} ADD VALUE `, 'i').test(s)) return { verdict: ADDITIVE, why: 'enum 값 추가' };
 
-  // ── 새 표에만 거는 부속 객체 ────────────────────────────────────────────
-  if ((m = new RegExp(`^CREATE (?:CONSTRAINT )?TRIGGER \\S+ .*? ON ${IDENT}`, 'i').exec(s))) {
-    return created.has(tableName(m[1]))
-      ? { verdict: ADDITIVE, why: '새 표의 트리거' }
-      : { verdict: REVIEW, why: `기존 표에 트리거 — 쓰기 동작이 바뀔 수 있음: ${short}` };
-  }
-  if ((m = new RegExp(`^INSERT INTO ${IDENT}`, 'i').exec(s))) {
-    return created.has(tableName(m[1]))
-      ? { verdict: ADDITIVE, why: '새 표에 초기 행' }
-      : { verdict: REVIEW, why: `기존 표에 행 추가 — 자동 판정 불가: ${short}` };
-  }
-
-  // ── 구조 변경 ──────────────────────────────────────────────────────────
   if ((m = new RegExp(`^ALTER TABLE (?:IF EXISTS )?(?:ONLY )?${IDENT} (.*)$`, 'i').exec(s))) {
-    const table = tableName(m[1]);
-    if (created.has(table)) return { verdict: ADDITIVE, why: '새 표 정의' };
+    const classify = created.has(tableName(m[1])) ? classifyNewTableAction : classifyAlterAction;
     let verdict = ADDITIVE;
     const whys = [];
     for (const action of splitActions(m[2])) {
-      const r = classifyAlterAction(action);
+      const r = classify(action);
       verdict = worst(verdict, r.verdict);
       whys.push(r.why);
     }
     return { verdict, why: whys.join(' · ') };
   }
 
-  // ── 데이터 일괄 변경 · 삭제 ─────────────────────────────────────────────
-  // TRUNCATE 는 대상이 여럿일 수 있다 — 모든 대상이 이 migration 의 새 표일 때만 예외. CASCADE 는 참조하는 기존 표까지 비운다.
-  if ((m = /^TRUNCATE (?:TABLE )?(.*)$/i.exec(s))) {
-    const list = m[1].replace(/\s+(?:(?:RESTART|CONTINUE) IDENTITY|CASCADE|RESTRICT)\b/gi, ' ').trim();
-    const one = new RegExp(`^(?:ONLY )?${IDENT}(?: ?\\*)?$`, 'i');
-    const targets = list.split(',').map(t => one.exec(t.trim()));
-    if (targets.some(t => !t)) return { verdict: REVIEW, why: `TRUNCATE 대상 — 자동 판정 불가: ${short}` };
-    return !/\bCASCADE\b/i.test(m[1]) && targets.every(t => created.has(tableName(t[1])))
-      ? { verdict: ADDITIVE, why: '새 표 데이터' }
-      : { verdict: DESTRUCTIVE, why: `데이터 일괄 TRUNCATE: ${short}` };
-  }
-  if ((m = new RegExp(`^(UPDATE|DELETE FROM) (?:ONLY )?${IDENT}`, 'i').exec(s))) {
-    return created.has(tableName(m[2]))
-      ? { verdict: ADDITIVE, why: '새 표 데이터' }
-      : { verdict: DESTRUCTIVE, why: `데이터 일괄 ${m[1].split(' ')[0].toUpperCase()}: ${short}` };
-  }
+  // ── 알아볼 수 있는 파괴형 (승인 사유를 분명히 하려는 것 — 놓쳐도 아래 REVIEW 로 승인 대상이다) ──
+  if (/^(UPDATE|DELETE|TRUNCATE)\b/.test(u)) return { verdict: DESTRUCTIVE, why: `데이터 일괄 ${u.split(' ')[0]}: ${short}` };
   if (/^(DROP|ALTER \w+ \S+ RENAME|ALTER (TYPE|SEQUENCE|INDEX|VIEW|SCHEMA)\b.*\bRENAME\b)/.test(u)) {
     return { verdict: DESTRUCTIVE, why: `파괴형 변경: ${short}` };
   }
 
-  return { verdict: REVIEW, why: `허용 목록 밖 문장 — 자동 판정 불가: ${short}` };
+  return review('허용 목록 밖 문장 — 승인 필요');
 }
 
 /**
@@ -386,7 +388,7 @@ export function classifyMigrationSource(source) {
   if (typeof source !== 'string' || source.trim() === '') return { verdict: REVIEW, findings: ['원문을 읽을 수 없음'] };
   const up = extractUp(source);
   if (up === null) return { verdict: REVIEW, findings: ['up() 을 찾지 못함'] };
-  const { sql, runnerCalls, problems } = extractStatements(up.body, up.runner);
+  const { sql, runnerCalls, problems, conditional } = extractStatements(up.body, up.runner);
   let verdict = ADDITIVE;
   const findings = [];
   for (const p of problems) { verdict = worst(verdict, REVIEW); findings.push(p); }
@@ -398,7 +400,8 @@ export function classifyMigrationSource(source) {
   if (sql.length === 0 && runnerCalls.length === 0) {
     return { verdict: REVIEW, findings: [...findings, 'up() 에 실행 문장이 없음'] };
   }
-  const created = new Set();
+  // 조건부 실행이 있으면 기록하지 않는 집합을 넘긴다 — 모든 ALTER TABLE 이 기존 표 기준으로 판정된다
+  const created = conditional ? Object.assign(new Set(), { add() { return this; } }) : new Set();
   for (const text of sql) {
     for (const stmt of splitSql(text)) {
       const r = classifyStatement(stmt, created);
