@@ -19,6 +19,7 @@ import MemberRegistrationForm from '../../components/auth/MemberRegistrationForm
  */
 import { useLayoutEffect, useMemo, useState, type ReactNode } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { toast } from '@o4o/error-handling';
 import {
   O4OHomeButton,
   LoginCard,
@@ -92,7 +93,8 @@ export function SignupPage() {
   const [emailSignup, setEmailSignup] = useState(false);
   if (isLoading) return null;
   // 가입 신청은 입력이 많다 — 데스크톱 웹에서는 넓은 카드, 모바일은 기본 카드(반응형 · 2026-11-12).
-  if (isAuthenticated) return <AuthCard title="가입 신청" wide><MemberRegistrationForm key={user?.id}/></AuthCard>;
+  // 제출하면 메인으로 돌아가고, 결과는 안내 toast 로 알린다(2026-11-12 사용자 지적).
+  if (isAuthenticated) return <AuthCard title="가입 신청" wide><MemberRegistrationForm key={user?.id} onSubmitted={() => { toast.success('가입 신청을 제출했습니다. 운영자가 확인한 뒤 승인 결과를 알려 드립니다.'); navigate('/', { replace: true }); }}/></AuthCard>;
   return (
     <AuthCard title="회원가입" subtitle={emailSignup ? '이메일로 가입' : '개인정보 보호를 위해 Google·카카오 가입을 권장합니다.'}>
       {emailSignup ? (

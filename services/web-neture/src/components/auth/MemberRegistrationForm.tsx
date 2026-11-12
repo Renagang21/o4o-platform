@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { MemberRegistrationFields } from '@o4o/account-ui';
+import { AddressSearch } from '@o4o/ui';
 import {
   MEMBER_REGISTRATION_TYPES,
   type MemberRegistration,
@@ -23,7 +24,11 @@ const TYPE_HINTS: Record<MemberRegistrationType, string> = {
 const errorMessage = (e: unknown) =>
   (e as { response?: { data?: { error?: string } } }).response?.data?.error ??
   '처리하지 못했습니다. 다시 확인해 주시기 바랍니다.';
-export default function MemberRegistrationForm() {
+/**
+ * onSubmitted: 제출이 끝난 뒤 화면을 떠나는 동작(가입 신청 페이지 → 메인 · 2026-11-12 사용자 지적).
+ * 주지 않으면 종전처럼 이 화면에서 안내 문구를 보이고 제출 상태를 다시 읽는다.
+ */
+export default function MemberRegistrationForm({ onSubmitted }: { onSubmitted?: () => void } = {}) {
   const { user } = useAuth();
   const [loading, setLoading] = useState(true),
     [busy, setBusy] = useState(false),
@@ -184,6 +189,10 @@ export default function MemberRegistrationForm() {
           })
           .then(() => {
             if (active.current) {
+              if (onSubmitted) {
+                onSubmitted();
+                return;
+              }
               setNotice(
                 '가입 정보를 제출했습니다. 운영자가 확인 후 승인합니다.',
               );
@@ -221,6 +230,7 @@ export default function MemberRegistrationForm() {
               disabled={busy}
               maxLength={key === 'phone' ? 20 : 100}
               type={key === 'phone' ? 'tel' : 'text'}
+              {...(key === 'phone' ? { inputMode: 'numeric' as const, autoComplete: 'tel', placeholder: '01012345678' } : {})}
               className="mt-1 block w-full rounded border p-2"
               value={member[key]}
               onChange={(event) =>
@@ -236,6 +246,7 @@ export default function MemberRegistrationForm() {
       <MemberRegistrationFields
         type={type}
         hideType
+        AddressSearch={AddressSearch}
         fields={fields}
         disabled={busy}
         readOnly={readOnly}
