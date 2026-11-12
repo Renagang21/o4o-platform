@@ -36,11 +36,11 @@ import type { User } from '../../contexts/AuthContext';
 import { authClient } from '../../lib/apiClient';
 import { operatorInvitationReturnPath, recoverOperatorInvitationContinuation } from '../../lib/operatorInvitationReturn';
 
-function AuthCard({ title, subtitle, children }: { title: string; subtitle?: string; children: ReactNode }) {
+function AuthCard({ title, subtitle, wide = false, children }: { title: string; subtitle?: string; wide?: boolean; children: ReactNode }) {
   const { isAuthenticated, isLoading } = useAuth();
   return (
     <main className="o4o-login-page">
-      <LoginCard brand="Neture" title={title} description={subtitle} tone="green" logoSrc={NETURE_LOGO_SRC}>
+      <LoginCard brand="Neture" title={title} description={subtitle} tone="green" logoSrc={NETURE_LOGO_SRC} wide={wide}>
         {children}
         <div className="o4o-login-footnote"><O4OHomeButton api={authClient.api} isAuthenticated={isAuthenticated} authLoading={isLoading} label="O4O 메인으로" className="o4o-home-link" /></div>
       </LoginCard>
@@ -91,7 +91,8 @@ export function SignupPage() {
   const [googleError, setGoogleError] = useState<string | null>(null);
   const [emailSignup, setEmailSignup] = useState(false);
   if (isLoading) return null;
-  if (isAuthenticated) return <AuthCard title="가입 신청"><MemberRegistrationForm key={user?.id}/></AuthCard>;
+  // 가입 신청은 입력이 많다 — 데스크톱 웹에서는 넓은 카드, 모바일은 기본 카드(반응형 · 2026-11-12).
+  if (isAuthenticated) return <AuthCard title="가입 신청" wide><MemberRegistrationForm key={user?.id}/></AuthCard>;
   return (
     <AuthCard title="회원가입" subtitle={emailSignup ? '이메일로 가입' : '개인정보 보호를 위해 Google·카카오 가입을 권장합니다.'}>
       {emailSignup ? (

@@ -132,7 +132,7 @@ export default function MemberRegistrationForm() {
           <p className="mt-1 text-sm text-slate-600">활동하실 유형을 골라 주시기 바랍니다. 필요한 정보는 다음 단계에서 유형별로 받습니다.</p>
         </div>
         {notice && <p role="status" className="text-sm">{notice}</p>}
-        <div role="radiogroup" aria-label="가입 유형" className="grid gap-3 sm:grid-cols-2">
+        <div role="radiogroup" aria-label="가입 유형" className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {(Object.entries(MEMBER_REGISTRATION_TYPES) as Array<[MemberRegistrationType, string]>).map(([key, label]) => (
             <button
               key={key}
@@ -151,7 +151,7 @@ export default function MemberRegistrationForm() {
           type="button"
           disabled={!type}
           onClick={() => setStep('details')}
-          className="w-full rounded bg-emerald-800 px-4 py-3 text-white disabled:opacity-50"
+          className="w-full rounded bg-emerald-800 px-4 py-3 text-white disabled:opacity-50 md:ml-auto md:block md:w-auto md:min-w-[200px]"
         >
           다음
         </button>
@@ -294,7 +294,7 @@ export default function MemberRegistrationForm() {
         <button
           type="submit"
           disabled={busy || !type || !agreement.ready}
-          className="w-full rounded bg-emerald-800 px-4 py-3 text-white disabled:opacity-50"
+          className="w-full rounded bg-emerald-800 px-4 py-3 text-white disabled:opacity-50 md:ml-auto md:block md:w-auto md:min-w-[200px]"
         >
           가입 신청
         </button>
