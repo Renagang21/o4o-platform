@@ -257,8 +257,15 @@ export function splitSql(text) {
   return out;
 }
 
-/** 표 이름 정규화 — 따옴표 · public. 제거 · 소문자 */
-const tableName = (raw) => String(raw ?? '').replace(/"/g, '').replace(/^public\./i, '').toLowerCase();
+/**
+ * 표 이름 정규화 — PostgreSQL 규칙대로 따옴표 없는 부분만 소문자로 접고, 따옴표로 감싼 부분은 대소문자를 보존한다
+ * ("Users" ≠ users). 스키마 public 은 생략한다.
+ */
+const tableName = (raw) => {
+  const parts = String(raw ?? '').split('.').map(p => (/^".*"$/.test(p) ? p.slice(1, -1) : p.toLowerCase()));
+  if (parts.length === 2 && parts[0] === 'public') parts.shift();
+  return parts.join('.');
+};
 const IDENT = '("?[A-Za-z_][\\w$]*"?(?:\\."?[A-Za-z_][\\w$]*"?)?)';
 
 /** 괄호 밖의 쉼표로 ALTER TABLE 동작을 나눈다 */
@@ -349,7 +356,17 @@ export function classifyStatement(stmt, created = new Set()) {
   }
 
   // ── 데이터 일괄 변경 · 삭제 ─────────────────────────────────────────────
-  if ((m = new RegExp(`^(UPDATE|DELETE FROM|TRUNCATE(?: TABLE)?) (?:ONLY )?${IDENT}`, 'i').exec(s))) {
+  // TRUNCATE 는 대상이 여럿일 수 있다 — 모든 대상이 이 migration 의 새 표일 때만 예외. CASCADE 는 참조하는 기존 표까지 비운다.
+  if ((m = /^TRUNCATE (?:TABLE )?(.*)$/i.exec(s))) {
+    const list = m[1].replace(/\s+(?:(?:RESTART|CONTINUE) IDENTITY|CASCADE|RESTRICT)\b/gi, ' ').trim();
+    const one = new RegExp(`^(?:ONLY )?${IDENT}(?: ?\\*)?$`, 'i');
+    const targets = list.split(',').map(t => one.exec(t.trim()));
+    if (targets.some(t => !t)) return { verdict: REVIEW, why: `TRUNCATE 대상 — 자동 판정 불가: ${short}` };
+    return !/\bCASCADE\b/i.test(m[1]) && targets.every(t => created.has(tableName(t[1])))
+      ? { verdict: ADDITIVE, why: '새 표 데이터' }
+      : { verdict: DESTRUCTIVE, why: `데이터 일괄 TRUNCATE: ${short}` };
+  }
+  if ((m = new RegExp(`^(UPDATE|DELETE FROM) (?:ONLY )?${IDENT}`, 'i').exec(s))) {
     return created.has(tableName(m[2]))
       ? { verdict: ADDITIVE, why: '새 표 데이터' }
       : { verdict: DESTRUCTIVE, why: `데이터 일괄 ${m[1].split(' ')[0].toUpperCase()}: ${short}` };

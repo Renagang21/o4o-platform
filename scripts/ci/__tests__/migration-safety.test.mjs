@@ -146,6 +146,26 @@ describe('S scanner', () => {
     assert.equal(verdictOf(`await q.query("ALTER TABLE existing ADD COLUMN c int; -- DROP TABLE users\\n/* DELETE FROM users; */");`), ADDITIVE);
   });
 
+  it('TRUNCATE checks every target and CASCADE', () => {
+    const mk = 'await q.query(`CREATE TABLE staging (id int)`);\n';
+    assert.equal(verdictOf(mk + 'await q.query(`TRUNCATE staging, users`);'), DESTRUCTIVE);
+    assert.equal(verdictOf(mk + 'await q.query(`TRUNCATE TABLE ONLY staging, public.users RESTART IDENTITY`);'), DESTRUCTIVE);
+    assert.equal(verdictOf(mk + 'await q.query(`TRUNCATE staging CASCADE`);'), DESTRUCTIVE);
+    assert.equal(verdictOf(mk + 'await q.query(`TRUNCATE staging RESTART IDENTITY`);'), ADDITIVE);
+    assert.equal(verdictOf(mk + 'await q.query(`TRUNCATE staging, (SELECT 1)`);'), REVIEW);
+  });
+
+  it('quoted identifiers keep case (\"Users\" is not users)', () => {
+    assert.equal(verdictOf('await q.query(`CREATE TABLE "Users" (id int)`);\nawait q.query(`DELETE FROM users`);'), DESTRUCTIVE);
+    assert.equal(verdictOf('await q.query(`CREATE TABLE "Users" (id int)`);\nawait q.query(`DELETE FROM "Users"`);'), ADDITIVE);
+    assert.equal(verdictOf('await q.query(`CREATE TABLE new_t (id int)`);\nawait q.query(`DELETE FROM public."new_t"`);'), ADDITIVE);
+    assert.equal(verdictOf('await q.query(`CREATE TABLE new_t (id int)`);\nawait q.query(`DELETE FROM "New_t"`);'), DESTRUCTIVE);
+  });
+
+  it('runner manager alias is not additive', () => {
+    assert.equal(verdictOf("await q.query('ALTER TABLE a ADD COLUMN b int');\nconst manager = q.manager;\nawait manager.query('DELETE FROM users');"), REVIEW);
+  });
+
   it('findings name the reason', () => {
     const r = classifyMigrationSource(wrap("await q.query('DROP TABLE legacy');"));
     assert.match(r.findings.join(' '), /DROP TABLE legacy/);
