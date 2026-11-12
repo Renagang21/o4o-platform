@@ -18,8 +18,8 @@ export class User {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @Column({ type: 'varchar', length: 255, unique: true })
-  email!: string;
+  @Column({ type: 'varchar', length: 255, unique: true, nullable: true })
+  email!: string | null; // 소셜 가입은 이메일 없이 만들 수 있다(WO-O4O-SOCIAL-SIGNUP-DIRECT-ROLE-REGISTRATION-V1)
 
   // WO-O4O-LEGACY-PASSWORD-AUTH-RETIREMENT-V1 Phase B-1: `password` 컬럼 선언을 제거했다.
   //   런타임 reader 0 · writer 0 인 상태에서 entity 를 먼저 떼어내고(이 배포),

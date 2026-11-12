@@ -112,6 +112,17 @@ integration('central member workbench PostgreSQL authority, projection and corre
     await expect(service.correct(admin, target, input)).rejects.toMatchObject({ status: 409 });
     expect((await service.detail(admin, target)).history.filter((row: any) => row.action === 'member.profile_corrected')).toHaveLength(1);
   });
+  it('corrects a member created without email (social signup) and keeps the email empty (2026-11-11)', async () => {
+    const before = await db.query('SELECT email FROM users WHERE id=$1', [target]);
+    await db.query('UPDATE users SET email=NULL WHERE id=$1', [target]);
+    try {
+      const detail = await service.detail(admin, target);
+      expect(detail.member.email).toBeNull();
+      await service.correct(admin, target, { name: '', nickname: '이메일 없는 별칭', phone: '', reason: '본인 요청 확인', version: detail.member.version, email: '' });
+      const after = await service.detail(admin, target);
+      expect(after.member).toMatchObject({ nickname: '이메일 없는 별칭', email: null });
+    } finally { await db.query('UPDATE users SET email=$2 WHERE id=$1', [target, before[0].email]); }
+  });
   it('rechecks revoked central authority instead of trusting earlier detail permissions', async () => {
     await db.query(`UPDATE role_assignments SET is_active=false WHERE user_id=$1`, [reader]);
     await expect(service.detail(reader, target)).rejects.toMatchObject({ status: 403 });

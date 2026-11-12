@@ -190,17 +190,14 @@ describe('GoogleAuthService — Google-only Signup/Login', () => {
     semiFranchiseResolver = jest.fn(async (_userId: string, key: string) => decideSemiFranchiseAccess(key, semiFranchiseRows));
   });
 
-  it('signup rejects an oversized name before creating an account', async () => {
+  // WO-O4O-SOCIAL-SIGNUP-DIRECT-ROLE-REGISTRATION-V1 S1 (2026-11-11): 이름 · 닉네임 · 휴대전화는 가입 신청(역할 입력)에서 받는다.
+  it('signup ignores account fields an older screen still sends (name, nickname, phone)', async () => {
     build({ 'tok-a': { sub: SUB_A, email: 'new@example.test', emailVerified: true } });
-    await expect(svc.signup({ idToken: 'tok-a', consents: { ...CONSENTS, name: 'x'.repeat(101) }, ...META })).rejects.toMatchObject({ code: 'INVALID_NAME' });
-    expect(store.users).toHaveLength(0);
-    expect(store.linked).toHaveLength(0);
-  });
-
-  it('signup rejects a malformed phone when one is given', async () => {
-    build({ 'tok-a': { sub: SUB_A, email: 'new@example.test', emailVerified: true } });
-    await expect(svc.signup({ idToken: 'tok-a', consents: { ...CONSENTS, phone: '02-123-4567' }, ...META })).rejects.toMatchObject({ code: 'INVALID_PHONE' });
-    expect(store.users).toHaveLength(0);
+    await svc.signup({ idToken: 'tok-a', consents: { ...CONSENTS, name: 'x'.repeat(101), nickname: 'Synthetic nick', phone: '02-123-4567' }, ...META });
+    expect(store.users).toHaveLength(1);
+    expect(store.users[0].name ?? null).toBeNull();
+    expect(store.users[0].nickname ?? null).toBeNull();
+    expect(store.users[0].phone ?? null).toBeNull();
   });
 
   // WO-O4O-AUTH-ONBOARDING-UX-CLEANUP-V1 T2: 이름 · 휴대전화는 가입 선택 항목이다.
@@ -217,7 +214,7 @@ describe('GoogleAuthService — Google-only Signup/Login', () => {
   });
 
   // ── signup ────────────────────────────────────────────────────────────────
-  it('signup · 신규 sub → users + linked_accounts 생성, password 키 자체 없음, 입력 이름·모바일 저장, picture 미저장, role/membership 0', async () => {
+  it('signup · 신규 sub → users + linked_accounts 생성, password 키 자체 없음, 이름·모바일 미저장(가입 신청에서 받음), picture 미저장, role/membership 0', async () => {
     build({ 'tok-a': { sub: SUB_A, email: 'new@example.test', emailVerified: true } });
 
     const session = await svc.signup({ idToken: 'tok-a', consents: { ...CONSENTS, marketing: true }, ...META });
@@ -231,8 +228,8 @@ describe('GoogleAuthService — Google-only Signup/Login', () => {
     //   구 계약은 `password: null` 을 명시적으로 기록하는 것이었다. 컬럼이 B-2 에서 사라지므로
     //   이제는 **키 자체를 만들지 않는다**. 다시 생기면 password 축이 부활한 것이다.
     expect('password' in u).toBe(false);
-    expect(u.name).toBe('테스트회원');
-    expect(u.phone).toBe('01012345678');
+    expect(u.name ?? null).toBeNull();
+    expect(u.phone ?? null).toBeNull();
     expect(u.status).toBe('active');
     expect(u.isEmailVerified).toBe(true);
     expect(u.tosAcceptedAt).toBeInstanceOf(Date);

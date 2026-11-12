@@ -2,7 +2,7 @@
 
 > 저장소: `Renagang21/o4o-platform` · 작업 branch: `claude/clever-bohr-g532hw` · 코드 기준: `main` `c5da5631`(merge 반영) · 작성: 2026-11-11 (클라우드 작업 세션)
 > 다음 실행자: **통합 담당(이 branch 의 PR 생성 · CI · 병합) → Businnect(체크리스트 실행 · 첫 과제)**
-> 이전 인계 전문: `git show 0c812623:HANDOFF.md`
+> 이전 인계 전문: `git show 0c812623:HANDOFF.md` · main 의 다른 branch 인계(병합 시점): `git show 31d13046:HANDOFF.md`
 
 ## 한 일 3 — WO-O4O-REMOTE-COLLABORATOR-ONBOARDING-V1 (2026-11-11 사용자 지시)
 

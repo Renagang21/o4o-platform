@@ -323,6 +323,8 @@ export class EmailAuthService {
     user: User,
     sessionServiceKey: string | null,
   ): Promise<boolean> {
+    // 이메일 없는 계정(소셜 가입 · 2026-11-11)에는 확인 메일 · 토큰을 만들지 않는다.
+    if (!normalizeLoginEmail(user.email)) return false;
     return this.tokens.send('verification', user, VERIFICATION_TOKEN_TTL_MS, async plain => {
       const verifyUrl = `${resolveMailLinkOrigin(sessionServiceKey)}/verify-email#token=${encodeURIComponent(plain)}`;
       const mailer = await this.mailer();

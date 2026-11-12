@@ -159,7 +159,10 @@ export function makeApi({ token, repo, fetchImpl = fetch }) {
       headers: body ? { ...headers, 'content-type': 'application/json' } : headers,
       body: body ? JSON.stringify(body) : undefined,
     });
-    if (!res.ok) throw new Error(`GitHub ${method} ${path} → ${res.status}`);
+    if (!res.ok) {
+      const detail = typeof res.text === 'function' ? (await res.text().catch(() => '')).slice(0, 200) : '';
+      throw new Error(`GitHub ${method} ${path} → ${res.status}${detail ? ` ${detail}` : ''}`);
+    }
     return res.json();
   }
   async function all(path) {

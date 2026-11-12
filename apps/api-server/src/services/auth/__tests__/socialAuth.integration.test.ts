@@ -131,10 +131,15 @@ integration('social proofs and explicit linking (isolated PostgreSQL)', () => {
     const rows: { id: string }[] = await db.query('SELECT id FROM users WHERE email=$1', [email]);
     await removeFixtureUsers(rows.map(row => row.id));
   }
-  it.each([false,true])('signup requires O4O email verification when provider verification=%s and never creates a session for an unverified address',async verified=>{
+  // WO-O4O-SOCIAL-SIGNUP-DIRECT-ROLE-REGISTRATION-V1 (2026-11-11): 카카오가 확인하지 않은 이메일은 저장하지 않고,
+  // 입력 이메일도 받지 않는다. 확인할 이메일이 없으므로 확인 메일 없이 바로 세션을 만든다(S1 · S3).
+  it('signup without a Kakao-verified email stores no email, sends no verification mail and issues the Kakao session',async()=>{
     jest.mocked(generateTokensWithContext).mockClear();jest.mocked(emailAuthService.sendVerificationMail).mockClear();
-    const input=signupInput();const identity={providerId:'567890',email:verified?'different@fixture.invalid':input.email,emailVerified:verified};const grant=await signupGrant(identity);
-    try{const result=await signupService(identity).signup(grant.token,grant.binding,origin,input);expect(result).toMatchObject({nextStep:'verify-email',mailSent:true});expect(generateTokensWithContext).not.toHaveBeenCalled();expect(emailAuthService.sendVerificationMail).toHaveBeenCalled();const rows=await db.query('SELECT "isEmailVerified" FROM users WHERE email=$1',[input.email]);expect(rows).toEqual([{isEmailVerified:false}]);}finally{await removeSignup(input.email);}
+    const input=signupInput();const identity={providerId:'567891',email:input.email,emailVerified:false};const grant=await signupGrant(identity);
+    let ids:string[]=[];
+    try{const result=await signupService(identity).signup(grant.token,grant.binding,origin,input);expect(result).toHaveProperty('tokens');expect(emailAuthService.sendVerificationMail).not.toHaveBeenCalled();
+      const rows=await db.query(`SELECT u.id,u.email,u."isEmailVerified" FROM users u JOIN linked_accounts l ON l."userId"=u.id WHERE l.provider='kakao' AND l."providerId"='567891'`);ids=rows.map((r:any)=>r.id);
+      expect(rows).toEqual([{id:expect.any(String),email:null,isEmailVerified:true}]);}finally{await removeFixtureUsers(ids);}
   });
   it('only matching provider-proven email issues an explicitly Kakao session, with no password credential/role/membership',async()=>{
     const input=signupInput();const identity={providerId:'567890',email:input.email,emailVerified:true};const grant=await signupGrant(identity);jest.mocked(generateTokensWithContext).mockClear();

@@ -11,7 +11,12 @@ export interface MemberCorrection {
   registration?:MemberRegistrationInput;businessVersion?:string|null;
 }
 const secret=(value:unknown)=>({toPostgres:()=>value,toJSON:()=>'[redacted]'});
-export async function correctIdentity(m:EntityManager,actor:string,target:string,before:{email:string;emailVerified?:boolean},access:{manageAccount:boolean;qualifications:boolean},input:MemberCorrection){
+export async function correctIdentity(m:EntityManager,actor:string,target:string,before:{email:string|null;emailVerified?:boolean},access:{manageAccount:boolean;qualifications:boolean},input:MemberCorrection){
+  // 이메일 없는 계정(소셜 가입 · 2026-11-11)은 이메일 칸을 비워 둔 채 다른 정보를 정정할 수 있다. 빈 값으로 지우지는 않는다.
+  if(!normalizeLoginEmail(before.email)&&!normalizeLoginEmail(input.email)){
+    await correctLicense(m,actor,target,access.qualifications,input);
+    return {emailChanged:false};
+  }
   const email=input.email===undefined?before.email:normalizeLoginEmail(input.email);
   if(!isLoginEmailShapeValid(email))throw new OperationError(400,'INVALID_EMAIL','올바른 이메일을 입력해 주시기 바랍니다.');
   if(email!==before.email){
