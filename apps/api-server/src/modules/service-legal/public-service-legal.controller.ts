@@ -9,16 +9,19 @@
  *   GET /:serviceKey/legal-profile          — 활성 법정정보 (없으면 data:null, placeholder 금지)
  *   GET /:serviceKey/footer-legal           — 푸터용 법정정보 (legal-profile 동일 데이터)
  *   GET /:serviceKey/policies/:documentType — 최신 published 정책 문서 (없으면 404)
+ *   GET /:serviceKey/policies/:documentType/scheduled[?slug=] — 관리자가 시행일을 정해 둔 다음 버전의 메타(본문 없음 · 없으면 data:null)
  *
  * 정책:
  *   - is_active 법정정보 / published 정책 문서만 반환.
  *   - 값 없는 필드는 null (준비중/미정 등 placeholder 생성 금지).
  *   - 내부/audit 필드(updated_by 등) 미노출.
+ *   - scheduled 는 공고 화면이 시행 예정일을 하드코딩하지 않도록 관리자 입력(effective_date)을 읽는다.
+ *     본문 · 작성자 · 변경 사유 등은 내보내지 않는다(버전 · 시행일 · 제목 · 표식만).
  */
 
 import { Router } from 'express';
 import type { Request, Response } from 'express';
-import type { DataSource } from 'typeorm';
+import { IsNull, Not, type DataSource } from 'typeorm';
 import { ServiceLegalProfile } from './entities/ServiceLegalProfile.entity.js';
 import { ServicePolicyDocument } from './entities/ServicePolicyDocument.entity.js';
 import { toPublicLegalProfile, toPublicPolicyDocument } from './service-legal.mapper.js';
@@ -72,6 +75,39 @@ export function createPublicServiceLegalController(dataSource: DataSource, suppo
     } catch (error) {
       if (error instanceof PolicyAcceptanceError) return res.status(error.httpStatus).json({ success: false, error: { code: error.code, message: error.message } });
       res.status(503).json({ success: false, error: { code: 'POLICY_UNAVAILABLE', message: '정책 문서를 불러올 수 없습니다.' } });
+    }
+  });
+
+  // ── GET /:serviceKey/policies/:documentType/scheduled (다음 버전 시행 예정 메타) ──
+  //   공고 페이지가 시행 예정일을 코드에 고정하지 않고, 관리자가 초안에 입력한 시행일을 읽는다.
+  //   draft 이고 시행일이 있고 현재 published 보다 버전이 높은 문서만. 본문은 내보내지 않는다.
+  router.get('/:serviceKey/policies/:documentType/scheduled', async (req: Request, res: Response) => {
+    const serviceKey = guardServiceKey(req, res, true);
+    if (!serviceKey) return;
+    const { documentType } = req.params;
+    const slug = typeof req.query.slug === 'string' && req.query.slug.trim() ? req.query.slug.trim() : undefined;
+    try {
+      const draft = await policyRepo.findOne({
+        where: { service_key: serviceKey, document_type: documentType, status: 'draft', effective_date: Not(IsNull()), ...(slug ? { slug } : {}) },
+        order: { version: 'DESC', effective_date: 'ASC' },
+      });
+      const published = draft
+        ? await policyRepo.findOne({
+          where: { service_key: serviceKey, document_type: documentType, status: 'published', ...(slug ? { slug } : {}) },
+          order: { version: 'DESC' },
+        })
+        : null;
+      const upcoming = draft && (!published || Number(draft.version) > Number(published.version)) ? draft : null;
+      res.setHeader('Cache-Control', 'no-store');
+      res.json({
+        success: true,
+        data: upcoming
+          ? { serviceKey, documentType, version: upcoming.version, title: upcoming.title, slug: upcoming.slug, effectiveDate: upcoming.effective_date }
+          : null,
+      });
+    } catch (error) {
+      logger.error('[ServiceLegal Public] scheduled policy error:', error);
+      res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: '정책 문서 조회 실패' } });
     }
   });
 
