@@ -9,10 +9,11 @@ on:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
 
+# PR 의 댓글 · 라벨은 issues API 로 쓰지만 대상이 PR 이라 `pull-requests: write` 가 필요하다
+# (`issues: write` 만으로는 403 — 2026-11-12 #1029 · #1030 에서 확인).
 permissions:
   contents: read
-  pull-requests: read
-  issues: write
+  pull-requests: write
 
 concurrency:
   group: pr-overlap-${{ github.event.pull_request.number }}

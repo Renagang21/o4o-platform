@@ -188,7 +188,7 @@ test('makeApi: 인증 헤더 · 페이지네이션 · 오류 상태 전달', asy
 test('workflow: Ready 에서만 · fork 제외 · 최소 권한 · 병합 gate 아님', () => {
   const wf = yaml.load(readFileSync(path.join(root, '.github/workflows/automation-pr-overlap.yml'), 'utf8'));
   assert.deepEqual(wf.on.pull_request.types, ['opened', 'synchronize', 'reopened', 'ready_for_review']);
-  assert.deepEqual(wf.permissions, { contents: 'read', 'pull-requests': 'read', issues: 'write' });
+  assert.deepEqual(wf.permissions, { contents: 'read', 'pull-requests': 'write' });
   const job = wf.jobs['overlap-notice'];
   assert.match(job.if, /!github\.event\.pull_request\.draft/);
   assert.match(job.if, /head\.repo\.fork != true/);
