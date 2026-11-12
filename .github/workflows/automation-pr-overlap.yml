@@ -3,14 +3,17 @@ name: PR Overlap Notice
 # AGENTS.md §4-1(e) 「겹치는 PR 표시」 · §4-3 lane(R1) 보조 — 같은 파일 · 같은 lane 을 바꾸는 열린 PR 을 댓글 하나로 알린다.
 # 병합 gate 가 아니다(CI Gate needs 에 넣지 않는다). 판정 · 댓글 규칙은 scripts/ci/pr-overlap.mjs 상단 주석.
 # 드래프트 동안은 돌지 않고 Ready 전환 · Ready 이후 push 때 돈다(Size Labeler 와 같은 정책).
+# Core 계약 경로(scripts/ci/core-paths.mjs · docs/baseline/O4O-CORE-REGISTRY-V1.md)를 바꾸면 `core-change` 라벨도 단다 · 뗀다.
+# 라벨은 표시일 뿐 병합 gate 가 아니다(WO-O4O-CORE-OWNERSHIP-AND-CHANGE-BOUNDARY-V1).
 on:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
 
+# PR 의 댓글 · 라벨은 issues API 로 쓰지만 대상이 PR 이라 `pull-requests: write` 가 필요하다
+# (`issues: write` 만으로는 403 — 2026-11-12 #1029 · #1030 에서 확인).
 permissions:
   contents: read
-  pull-requests: read
-  issues: write
+  pull-requests: write
 
 concurrency:
   group: pr-overlap-${{ github.event.pull_request.number }}
@@ -28,11 +31,12 @@ jobs:
         with:
           sparse-checkout: |
             scripts/ci/pr-overlap.mjs
+            scripts/ci/core-paths.mjs
           sparse-checkout-cone-mode: false
       - uses: actions/setup-node@v7
         with:
           node-version: '22.23.4'
-      - name: Find overlapping open PRs and update the notice comment
+      - name: Find overlapping open PRs, update the notice comment and core-change label
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_REPOSITORY: ${{ github.repository }}
