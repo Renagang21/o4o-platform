@@ -91,7 +91,7 @@ test('real agent backup/bootstrap on existing v8 preserves datasets and credenti
  await installPackage({source,...options,preflight:(_slot,dataHome)=>{const run=(...args)=>execFileSync(process.execPath,[entry,'data',...args],{env:{...process.env,O4O_AGENT_HOME:dataHome},encoding:'utf8'});run('backup');assert.equal(JSON.parse(run('status')).ready,true);}});
  bootstrapLocalDb();assert.equal(LocalDatasetRepository.rows('fixture_products')[0].code,'0001');assert.deepEqual(fs.readFileSync(path.join(options.dataHome,'credentials.json')),credential);assert.ok(fs.readdirSync(path.join(options.dataHome,'backups')).length>0);
 });
-test('Windows packaged runtime starts and health proves its release and data readiness', {skip:process.platform!=='win32',timeout:120000}, async()=>{
+test('Windows packaged runtime starts and health proves its release and data readiness', {skip:process.platform!=='win32',timeout:300000}, async()=>{
  const { spawn }=await import('node:child_process');const { runningAgent }=await import('../release/install-core.mjs');
  assert.equal(await runningAgent(),false);
  const src=fileURLToPath(new URL('../src/',import.meta.url));const release=fileURLToPath(new URL('../release/',import.meta.url));
@@ -102,11 +102,48 @@ test('Windows packaged runtime starts and health proves its release and data rea
  delete options.preflight;
  const result=await installPackage({source,...options});const slot=installedSlot(options.home);
  const system=process.env.SystemRoot;
+ const powershell=path.join(system,'System32','WindowsPowerShell','v1.0','powershell.exe');
+ // 2026-11-12 CI 불안정 수정: 설치본 시작은 PowerShell 두 번의 첫 실행 · 창 스크립트의 C# 컴파일 · 큰 node.exe 무결성 확인과
+ // 백신 검사를 거친다. 새 Windows 실행기에서는 10초를 넘기도 했다(종전 대기 ≈ 10초). 실제 준비 신호(이 release 의 health ·
+ // 로컬 데이터 준비)를 기다리고, 실패하면 원인을 볼 수 있게 남긴다. 재시도 · 건너뛰기로 가리지 않는다.
+ const HEALTH_DEADLINE_MS=60000;
+ const sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms));
+ const logTail=dataHome=>{try{return fs.readFileSync(path.join(dataHome,'logs','pc-program.log'),'utf8').slice(-1500)||'(empty)';}catch(error){return `(no pc-program.log: ${error.code})`;}};
+ // Only synthetic package paths and command lines under this test's temporary root; no environment values.
+ const processSnapshot=()=>{try{return execFileSync(powershell,['-NoProfile','-Command',`
+$root=$env:O4O_TEST_ROOT
+@(Get-CimInstance Win32_Process | Where-Object { ($_.ExecutablePath -and $_.ExecutablePath.StartsWith($root)) -or ($_.Name -eq 'powershell.exe' -and $_.CommandLine -match 'O4O_WINDOW_SCRIPT|O4O_RUN_NODE') }) |
+ ForEach-Object { '{0} parent={1} {2} {3}' -f $_.ProcessId,$_.ParentProcessId,$_.Name,(($_.CommandLine -replace '\\s+',' ').Replace($root,'<root>')) }
+`],{env:{...process.env,O4O_TEST_ROOT:path.resolve(root)},encoding:'utf8',stdio:'pipe',timeout:20000}).slice(0,2500)||'(none)';}catch(error){return `(process snapshot failed: ${String(error.stderr||error.message).slice(0,300)})`;}};
+ const waitForReadyHealth=async({label,releaseId,dataHome,launcher})=>{
+  const started=Date.now();let last='no response yet';
+  while(Date.now()-started<HEALTH_DEADLINE_MS){
+   try{
+    const response=await fetch('http://127.0.0.1:47821/health',{headers:{Origin:'https://neture.co.kr'},signal:AbortSignal.timeout(1000)});
+    if(response.ok){const health=await response.json();if(health.releaseId===releaseId&&health.localData?.ready===true)return health;last=`health not ready (release ${health.releaseId===releaseId?'matches':'differs'}, localData.ready=${health.localData?.ready})`;}
+    else last=`HTTP ${response.status}`;
+   }catch(error){last=String(error?.cause?.code||error?.name||error);}
+   await sleep(250);
+  }
+  assert.fail([`${label}: installed runtime must serve ready health within ${HEALTH_DEADLINE_MS}ms`,`last attempt: ${last}`,
+   ...(launcher?[`launcher exit code: ${launcher.exitCode}`]:[]),`pc-program.log tail:\n${logTail(dataHome)}`,`processes:\n${processSnapshot()}`].join('\n'));
+ };
+ // The original failure stays the reported cause; a stop failure after it is appended, never substituted.
+ const withRuntime=async(run,stop)=>{
+  let failure;
+  try{return await run();}catch(error){failure=error;throw error;}
+  finally{
+   try{await stop();}catch(stopError){
+    if(!failure)throw stopError;
+    throw new Error(`${failure.message}\n--- runtime stop after the failure above: ${stopError.message}`,{cause:failure});
+   }
+  }
+ };
  const stopFixtureRuntime = async runtime => {
   // Only the executable inside this test's random package is eligible. Exercise
   // normal Ctrl+C shutdown rather than assuming the short-lived CMD owns a tree.
   assert.ok(path.resolve(runtime).startsWith(path.resolve(root)+path.sep));
-  execFileSync(path.join(system,'System32','WindowsPowerShell','v1.0','powershell.exe'),['-NoProfile','-Command',`
+  try{execFileSync(powershell,['-NoProfile','-Command',`
 $ErrorActionPreference='Stop'
 Add-Type @'
 using System;
@@ -118,25 +155,38 @@ public static class FixtureConsole {
  [DllImport("kernel32.dll")] public static extern bool GenerateConsoleCtrlEvent(uint type, uint group);
 }
 '@
-$workers=@(Get-CimInstance Win32_Process | Where-Object { $_.ExecutablePath -eq $env:O4O_TEST_RUNTIME -and $_.CommandLine -match '--worker' })
-if ($workers.Count -ne 1) { throw 'FIXTURE_WORKER_NOT_UNIQUE' }
+# The worker is started by the window script; wait for it to appear instead of assuming it already exists.
+# More than one is a real defect and is reported at once with the count.
+$deadline=(Get-Date).AddSeconds(30)
+do {
+ $workers=@(Get-CimInstance Win32_Process | Where-Object { $_.ExecutablePath -eq $env:O4O_TEST_RUNTIME -and $_.CommandLine -match '--worker' })
+ if ($workers.Count -ge 1) { break }
+ Start-Sleep -Milliseconds 250
+} while ((Get-Date) -lt $deadline)
+if ($workers.Count -ne 1) { throw ('FIXTURE_WORKER_NOT_UNIQUE count=' + $workers.Count) }
 $worker=[Diagnostics.Process]::GetProcessById([int]$workers[0].ProcessId)
 [void][FixtureConsole]::FreeConsole()
 if (-not [FixtureConsole]::AttachConsole([uint32]$worker.Id)) { throw 'FIXTURE_CONSOLE_UNAVAILABLE' }
 try {
  [void][FixtureConsole]::SetConsoleCtrlHandler([IntPtr]::Zero,$true)
  if (-not [FixtureConsole]::GenerateConsoleCtrlEvent(0,0)) { throw 'FIXTURE_STOP_NOT_SENT' }
- if (-not $worker.WaitForExit(10000)) { throw 'FIXTURE_STOP_NOT_CONFIRMED' }
+ if (-not $worker.WaitForExit(20000)) { throw 'FIXTURE_STOP_NOT_CONFIRMED' }
 } finally {
  [void][FixtureConsole]::FreeConsole()
  [void][FixtureConsole]::SetConsoleCtrlHandler([IntPtr]::Zero,$false)
 }
-`],{env:{...process.env,O4O_TEST_RUNTIME:runtime},stdio:'pipe',timeout:20000});
-  for(let n=0;n<30;n++) {
-   if(!await runningAgent()) return;
-   await new Promise(resolve=>setTimeout(resolve,100));
+`],{env:{...process.env,O4O_TEST_RUNTIME:runtime},stdio:'pipe',timeout:60000});}
+  catch(error){
+   // Name the failed step instead of echoing the PowerShell source.
+   const step=/FIXTURE_[A-Z_]+(?: count=\d+)?/.exec(String(error.stderr||''))?.[0]??(error.code==='ETIMEDOUT'?'POWERSHELL_TIMEOUT':'POWERSHELL_FAILED');
+   throw new Error(`fixture runtime stop failed: ${step}\nprocesses:\n${processSnapshot()}`);
   }
-  assert.fail('fixture runtime did not stop normally');
+  const stopped=Date.now();
+  while(Date.now()-stopped<10000) {
+   if(!await runningAgent()) return;
+   await sleep(100);
+  }
+  assert.fail(`fixture runtime did not release port 47821 within 10s after a confirmed stop\nprocesses:\n${processSnapshot()}`);
  };
  execFileSync(path.join(system,'System32','cmd.exe'),['/d','/s','/c',`""${path.join(source,'Install.cmd')}""`],{
    env:{...process.env,GITHUB_ACTIONS:'true',PATH:path.join(system,'System32'),O4O_PC_INSTALL_HOME:options.home,O4O_AGENT_HOME:options.dataHome,APPDATA:path.join(root,'roaming')},
@@ -144,15 +194,12 @@ try {
  });
  assert.ok(fs.existsSync(path.join(root,'roaming','Microsoft','Windows','Start Menu','Programs','O4O PC 연결.cmd')));
  const child=spawn(path.join(system,'System32','cmd.exe'),['/d','/s','/c',`""${path.join(options.home,'Start.cmd')}""`],{cwd:slot,env:{...process.env,GITHUB_ACTIONS:'true',PATH:path.join(system,'System32')},windowsVerbatimArguments:true,stdio:'ignore'});
- try{
-  let health;for(let n=0;n<40;n++){
-   try{const response=await fetch('http://127.0.0.1:47821/health',{headers:{Origin:'https://neture.co.kr'},signal:AbortSignal.timeout(500)});if(response.ok){health=await response.json();break;}}catch{}
-   await new Promise(resolve=>setTimeout(resolve,250));
-  }
-  assert.ok(health,'installed runtime must serve health');assert.equal(health.releaseId,result.releaseId);assert.equal(health.agentVersion,'0.6.0');assert.equal(health.localData.ready,true);assert.equal(health.localData.schemaVersion,10);
+ await withRuntime(async()=>{
+  const health=await waitForReadyHealth({label:'Start.cmd',releaseId:result.releaseId,dataHome:options.dataHome,launcher:child});
+  assert.equal(health.releaseId,result.releaseId);assert.equal(health.agentVersion,'0.6.0');assert.equal(health.localData.ready,true);assert.equal(health.localData.schemaVersion,10);
   assert.equal(health.connected,false);assert.equal('credentials'in health,false);
   assert.equal(child.exitCode,0,'CMD bootstrap must finish while the GUI/runtime remain usable');
- }finally{await stopFixtureRuntime(path.join(slot,'runtime','node.exe'));}
+ },()=>stopFixtureRuntime(path.join(slot,'runtime','node.exe')));
  const freshHome=options.home+'-fresh',freshData=options.dataHome+'-fresh';
  execFileSync(path.join(system,'System32','cmd.exe'),['/d','/s','/c',`""${path.join(source,'Install.cmd')}""`],{
    env:{...process.env,GITHUB_ACTIONS:'true',PATH:path.join(system,'System32'),O4O_PC_INSTALL_HOME:freshHome,O4O_AGENT_HOME:freshData,APPDATA:path.join(root,'roaming-fresh')},
@@ -162,20 +209,14 @@ try {
  // Window mode on an existing installation needs no terminal input and starts
  // the installed runtime automatically. First-install GUI consent is not bypassed.
  const freshSlot=installedSlot(freshHome),runtime=path.join(freshSlot,'runtime','node.exe');
- try {
+ await withRuntime(async()=>{
   const installOutput=execFileSync(path.join(source,'runtime','node.exe'),[path.join(source,'install.mjs'),'--window'],{
    env:{...process.env,GITHUB_ACTIONS:'true',PATH:path.join(system,'System32'),O4O_PC_INSTALL_HOME:freshHome,O4O_AGENT_HOME:freshData,APPDATA:path.join(root,'roaming-fresh')},stdio:'pipe',timeout:60000,
   });
   assert.match(installOutput.toString('utf8'),/설치와 프로그램 실행을 확인했습니다/);
-  let health;
-  for(let n=0;n<40;n++) {
-   try{const response=await fetch('http://127.0.0.1:47821/health',{headers:{Origin:'https://neture.co.kr'},signal:AbortSignal.timeout(500)});if(response.ok){health=await response.json();break;}}catch{}
-   await new Promise(resolve=>setTimeout(resolve,250));
-  }
-  assert.equal(health?.releaseId,result.releaseId);assert.equal(health?.localData?.ready,true);
- } finally {
-  await stopFixtureRuntime(runtime);
- }
+  const health=await waitForReadyHealth({label:'install --window',releaseId:result.releaseId,dataHome:freshData});
+  assert.equal(health.releaseId,result.releaseId);assert.equal(health.localData.ready,true);
+ },()=>stopFixtureRuntime(runtime));
 
  // A child which spawns but immediately fails must never be reported ready.
  const brokenFiles=files.map(([name,bytes])=>[name,name==='src/index.mjs'?Buffer.concat([Buffer.from("if (process.argv[2] === 'run') process.exit(23);\n"),bytes]):bytes]);

@@ -9,6 +9,7 @@
 - **확인하지 못한 것 / 다음 실행자:** 통합 세션이 #1044·후속 7차·별도 #1042를 통합하고 배포 버전을 확인한 후 운영 계정/자료로 CHECK §3~4 실행. 약사 검수·PC/mobile Demo·기존 QR·직접 등록 보존·실제 비용/지연 확인 전 **7차 운영 완료 아님**. neture 초기화면 SIWC는 실제 참여 후 별도 범위. 약사 지정 인계 전체 신규 구현도 별도.
 - **겹치는 PR / 문서 정합:** #1044와 선행 3~6차 전체 및 이번 번역 테스트, #1042·#1043과 HANDOFF가 겹침. 기존 정본 경계 유지, 앞서 기록한 B2B 전용 안내 2건은 별도 정비 대상. worktree `KEEP` — 미병합 인계용, 미완료 운영 검증 포함.
 
+
 ## 2026-11-12 · 상담 반복 생성 감소·매장 표현 설정 (6차)
 
 - **branch / PR 묶음:** `wo/consultation-reuse-expression` — main `31be41b49` + 자체 3차 `017f9dac3`·4차 `b60710778`·5차 `5a67ed453` + 6차. **3~6차 통합 묶음**이다. 이전 `wo/product-consultation-resource-separation`·`wo/consultation-structured-product-search`·`wo/shared-product-material-preparation`는 이 묶음 **병합 후 삭제 가능**. 원래 branch를 수정·삭제하지 않았고 별도로 중복 통합하지 않는다.
@@ -49,9 +50,56 @@
 - **겹치는 PR:** #1042(2차)·#1039와 HANDOFF.md만 겹침. 공통 types 소비처 관련 #1037은 다른 파일. 새 인계 절을 보존해 순차 통합한다. 이 branch는 최신 origin/main에서 시작했으며 미병합 2차 branch를 합치지 않았다.
 - **문서 정합:** 발견 1건 / 별도 정비 1건 — 기존 매장 Excel·AI 자료 흐름의 B2B 전용·자유 본문 표시 안내. 정본 변경은 별도 문서 작업으로 인계.
 
+
+
+## 2026-11-12 · ChatGPT 콘텐츠 비용 경계 검증
+
+- **branch / PR 묶음:** `wo/chatgpt-content-no-inference` — 외부 콘텐츠 도구 회귀 테스트와 후속 계약 차이 기록 1개 묶음. PR 생성·병합은 통합 세션. 런타임·API·권한·DB·배포 변경 없음.
+- **한 일:** 콘텐츠 11종의 실제 dispatcher에서 권한·분기·멱등·실패 검증, 어댑터/직접 저장 서비스 14개 파일의 AST 추론 의존성 검사, MCP HTTP의 Bearer 연결 ID 전달과 위조 인자 제거 검증. 추가 45개 테스트, 기존 포함 7 suites / 85 tests 통과.
+- **결정 사항:** 제거할 유료 호출은 발견하지 않아 임의 런타임 가드를 추가하지 않음. 구조화 상담자료 전체 노출은 약사/근무자 접근 및 B2B 논리 분리 전에 하지 않음. 기존 소비자 다국어 초안 저장을 중앙 상담자료/QR 표준설명서 저장으로 취급하지 않음. SIWC 유보.
+- **후속 명세:** [IR-O4O-CHATGPT-CONTENT-COST-BOUNDARY-V1](docs/investigations/IR-O4O-CHATGPT-CONTENT-COST-BOUNDARY-V1.md). 다음 3차는 자료 논리 유형·공개 대상·기존 연결 보존, 4차는 구조화 상담자료 검색 반영.
+- **검증:** `pnpm@10.25.0 install --frozen-lockfile` 성공(호스트 Node 24.22.1, 저장소 안내 정확 버전 22.23.4와 다름). Jest external-ai 전체 85/85, lint 수정 후 영향받은 26건 재통과. 변경 테스트 3개 ESLint 오류 0(기존 eslintignore 경고 있음), `git diff --check`, docs 민감정보 검사 통과. 앱 전체 build/typecheck·실제 DB/공급자 호출·ChatGPT OAuth 왕복 미실행. 단위 테스트는 어댑터 mock, AST 검사는 전체 전이 분석이 아님.
+- **확인하지 못한 것 / 배포 후:** 운영 청구액, 관리자 설정, 실제 ChatGPT 연결 및 기존 화면 재열기. 배포를 요구하는 런타임 변경 없음. 운영 측정은 1차 수집 명세대로 로컬 `o4o_readonly` 경로에서 별도 수행.
+- **겹치는 PR:** 조회 시 #1039의 `HANDOFF.md`만 겹침. #1038·#1037·#1028과 이 변경의 코드 경로 겹침 없음. 통합 시 새 인계 절을 보존.
+- **문서 정합:** 기존 비용 정책·외부 연결 설계 유지. canonical 변경 없음.
+
+> 저장소: `Renagang21/o4o-platform` · 작업 branch: `claude/clever-bohr-g532hw` · 코드 기준: `main` `c5da5631`(merge 반영) · 작성: 2026-11-11 (클라우드 작업 세션)
+
 > 저장소: `Renagang21/o4o-platform` · 작업 branch: `claude/epic-rubin-5g04vm`(맨 위 절) · 이전 절 branch: `claude/clever-bohr-g532hw` · 코드 기준: `main` `c5da5631`(merge 반영) · 작성: 2026-11-11 (클라우드 작업 세션)
 > 다음 실행자: **통합 담당(이 branch 의 PR 생성 · CI · 병합) → Businnect(체크리스트 실행 · 첫 과제)**
 > 이전 인계 전문: `git show 0c812623:HANDOFF.md`
+
+## 2026-11-12 · Windows 설치본 실행 테스트 불안정 수정 (branch `claude/intelligent-cray-o2p4u3-pc-installer-test`)
+
+> 다음 실행자: **통합 세션** — 이 branch 로 PR 생성 → `PC installer Windows` 결과 확인 → 병합. main 배포 차단 해소 대상.
+> 변경 파일: `tools/o4o-local-agent/test/release-install.test.mjs` 하나(workflow 변경 없음).
+
+- **증상:** 테스트 「Windows packaged runtime starts and health proves its release and data readiness」가 `installed runtime must serve health` 로 간헐 실패.
+  - main `31be41b4` run 43209177440: GitHub-hosted `windows-latest` 에서 실패했고, 같은 run 의 재실행(attempt 2)은 통과했다.
+  - #1028 branch run 43173519086: 같은 실행기에서 같은 메시지로 실패했다(테스트 21.6s).
+- **원인:**
+  - 테스트는 설치본 실행 뒤 health 를 약 10초만 기다렸다(250ms × 40회, 연결 거부가 즉시 돌아옴).
+  - 그런데 설치본 시작 경로가 무겁다: Start.cmd → PowerShell → `launch.mjs` → 숨긴 PowerShell 창(`pc-window.ps1`: WPF · `Add-Type` C# 컴파일) → `launch.mjs --worker` → `index.mjs run`. 여기에 node.exe 무결성 해시와 Defender 검사가 더해진다.
+  - 새 VM 에서 이 경로가 10초를 넘기면 실패한다. 제품 설치기(`install.mjs --window`)는 30초를 기다린다.
+  - 실패 뒤의 정리 단계(worker 종료)도 실패하면, `finally` 의 정리 오류가 원래 health 실패를 덮어썼다(`FIXTURE_WORKER_NOT_UNIQUE` 류 메시지). 같은 원인이 다른 증상처럼 보이게 했다.
+- **수정(재시도 · skip 없음 · 기다림을 실제 준비 신호 기준으로):**
+  - `waitForReadyHealth`: health 의 `releaseId` 가 설치한 release 와 같고 `localData.ready === true` 일 때까지 최대 60초 기다린다(요청당 1초 timeout). 시간이 지나면 남은 시간이 아니라 진단을 담아 실패한다: 마지막 응답 · launcher 종료 코드 · `pc-program.log` 끝부분 · 시험 경로 아래 프로세스 목록.
+  - `withRuntime`: 본문이 실패하면 그 실패를 그대로 던지고, 정리 오류는 뒤에 덧붙인다(원래 실패를 덮지 않음).
+  - `stopFixtureRuntime`:
+    - worker 프로세스가 나타날 때까지 최대 30초 기다리고, 종료 대기를 20초로 늘렸다.
+    - 실패 시 단계 코드와 프로세스 목록을 보인다.
+    - 포트 해제 확인은 10초 기한이다.
+  - 테스트 전체 timeout 을 120s → 300s 로 늘렸다(job timeout 10분 안).
+- **검증:**
+  - Linux: `node --check` 통과. `node --test tools/o4o-local-agent/test/release-install.test.mjs` 는 13 pass · 2 skipped(Windows 전용) · 0 fail.
+  - `withRuntime` 의 오류 보존 동작은 단독으로 확인했다.
+  - **Windows 실행은 이 클라우드 세션에서 하지 못했다**(Linux 환경). 반복 실행(10회) 결과도 없다.
+- **확인하지 못한 것 — 통합 세션이 PR CI 로 확인:**
+  - PR CI 의 `PC installer Windows` 가 통과하는지. 가능하면 `workflow_dispatch` 나 re-run 으로 여러 번 돌려 연속 통과를 확인한다.
+  - 실패하면 새 진단 출력(`pc-program.log` · 프로세스 목록)으로 원인을 다시 판정한다.
+  - 자체 실행기(self-hosted)는 확인하지 못했다. 이번 실패는 모두 `windows-latest` 였다.
+  - 자체 실행기에서는 기존 47821 포트 guard step 이 따로 돈다.
+- **겹칠 수 있는 PR:** 없음(이 테스트 파일을 바꾸는 열린 PR 은 확인하지 못함 — 통합 세션이 `gh pr diff --name-only` 로 대조).
 
 ## 2026-11-12 · 상시 통합 세션 환경 정비 (branch `claude/epic-rubin-5g04vm`)
 
