@@ -23,7 +23,7 @@ type PolicyMeta = { version: number; slug: string | null; effectiveDate: string 
  */
 export function effectiveLine(published: PolicyMeta | null, scheduled: PolicyMeta | null): string {
   const day = (d: string | null) => (d ? d.slice(0, 10) : '');
-  if (published && published.slug === ACCOUNT_TERMS_SLUG && published.version >= 2 && published.effectiveDate) return `시행일 ${day(published.effectiveDate)} (시행 중)`;
+  if (published?.slug === ACCOUNT_TERMS_SLUG && published.version >= 2 && published.effectiveDate) return `시행일 ${day(published.effectiveDate)} (시행 중)`;
   if (scheduled?.effectiveDate) return `시행 예정일 ${day(scheduled.effectiveDate)}`;
   return '시행일은 확정되면 이 공고에 안내합니다';
 }
@@ -38,7 +38,7 @@ export default function AccountPolicyNoticePage() {
     Promise.all([
       read('/public/services/neture/policies/terms'),
       read(`/public/services/neture/policies/terms/scheduled?slug=${ACCOUNT_TERMS_SLUG}`),
-    ]).then(([published, scheduled]) => { if (alive) setEffective(effectiveLine(published, scheduled)); });
+    ]).then(([published, scheduled]) => { if (alive) setEffective(effectiveLine(published, scheduled)); }).catch(() => { if (alive) setEffective(effectiveLine(null, null)); });
     return () => { alive = false; };
   }, []);
   const documents = [{ title: 'Neture 계정 이용약관 개정안', content: body(termsSource, '## 부칙 및 게시 전 대조') }, { title: 'Neture 계정 개인정보 처리방침 개정안', content: body(privacySource, '## 9. 게시 대조 기록') }, { title: '서비스별 이용약관·개인정보 안내 개정안', content: body(serviceSource, '## 내부 게시·적용 대조') }];
