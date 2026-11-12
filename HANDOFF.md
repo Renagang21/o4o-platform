@@ -4,6 +4,38 @@
 > 다음 실행자: **통합 담당(이 branch 의 PR 생성 · CI · 병합) → Businnect(체크리스트 실행 · 첫 과제)**
 > 이전 인계 전문: `git show 0c812623:HANDOFF.md`
 
+## 2026-11-12 · Windows 설치본 실행 테스트 불안정 수정 (branch `claude/intelligent-cray-o2p4u3-pc-installer-test`)
+
+> 다음 실행자: **통합 세션** — 이 branch 로 PR 생성 → `PC installer Windows` 결과 확인 → 병합. main 배포 차단 해소 대상.
+> 변경 파일: `tools/o4o-local-agent/test/release-install.test.mjs` 하나(workflow 변경 없음).
+
+- **증상:** 테스트 「Windows packaged runtime starts and health proves its release and data readiness」가 `installed runtime must serve health` 로 간헐 실패.
+  - main `31be41b4` run 43209177440: GitHub-hosted `windows-latest` 에서 실패했고, 같은 run 의 재실행(attempt 2)은 통과했다.
+  - #1028 branch run 43173519086: 같은 실행기에서 같은 메시지로 실패했다(테스트 21.6s).
+- **원인:**
+  - 테스트는 설치본 실행 뒤 health 를 약 10초만 기다렸다(250ms × 40회, 연결 거부가 즉시 돌아옴).
+  - 그런데 설치본 시작 경로가 무겁다: Start.cmd → PowerShell → `launch.mjs` → 숨긴 PowerShell 창(`pc-window.ps1`: WPF · `Add-Type` C# 컴파일) → `launch.mjs --worker` → `index.mjs run`. 여기에 node.exe 무결성 해시와 Defender 검사가 더해진다.
+  - 새 VM 에서 이 경로가 10초를 넘기면 실패한다. 제품 설치기(`install.mjs --window`)는 30초를 기다린다.
+  - 실패 뒤의 정리 단계(worker 종료)도 실패하면, `finally` 의 정리 오류가 원래 health 실패를 덮어썼다(`FIXTURE_WORKER_NOT_UNIQUE` 류 메시지). 같은 원인이 다른 증상처럼 보이게 했다.
+- **수정(재시도 · skip 없음 · 기다림을 실제 준비 신호 기준으로):**
+  - `waitForReadyHealth`: health 의 `releaseId` 가 설치한 release 와 같고 `localData.ready === true` 일 때까지 최대 60초 기다린다(요청당 1초 timeout). 시간이 지나면 남은 시간이 아니라 진단을 담아 실패한다: 마지막 응답 · launcher 종료 코드 · `pc-program.log` 끝부분 · 시험 경로 아래 프로세스 목록.
+  - `withRuntime`: 본문이 실패하면 그 실패를 그대로 던지고, 정리 오류는 뒤에 덧붙인다(원래 실패를 덮지 않음).
+  - `stopFixtureRuntime`:
+    - worker 프로세스가 나타날 때까지 최대 30초 기다리고, 종료 대기를 20초로 늘렸다.
+    - 실패 시 단계 코드와 프로세스 목록을 보인다.
+    - 포트 해제 확인은 10초 기한이다.
+  - 테스트 전체 timeout 을 120s → 300s 로 늘렸다(job timeout 10분 안).
+- **검증:**
+  - Linux: `node --check` 통과. `node --test tools/o4o-local-agent/test/release-install.test.mjs` 는 13 pass · 2 skipped(Windows 전용) · 0 fail.
+  - `withRuntime` 의 오류 보존 동작은 단독으로 확인했다.
+  - **Windows 실행은 이 클라우드 세션에서 하지 못했다**(Linux 환경). 반복 실행(10회) 결과도 없다.
+- **확인하지 못한 것 — 통합 세션이 PR CI 로 확인:**
+  - PR CI 의 `PC installer Windows` 가 통과하는지. 가능하면 `workflow_dispatch` 나 re-run 으로 여러 번 돌려 연속 통과를 확인한다.
+  - 실패하면 새 진단 출력(`pc-program.log` · 프로세스 목록)으로 원인을 다시 판정한다.
+  - 자체 실행기(self-hosted)는 확인하지 못했다. 이번 실패는 모두 `windows-latest` 였다.
+  - 자체 실행기에서는 기존 47821 포트 guard step 이 따로 돈다.
+- **겹칠 수 있는 PR:** 없음(이 테스트 파일을 바꾸는 열린 PR 은 확인하지 못함 — 통합 세션이 `gh pr diff --name-only` 로 대조).
+
 ## 2026-11-12 · 상시 통합 세션 환경 정비 (branch `claude/epic-rubin-5g04vm`)
 
 > 이 절만 이 branch 의 인계다. 아래 절들은 다른 세션의 인계로 그대로 둔다.
