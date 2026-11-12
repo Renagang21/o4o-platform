@@ -1,5 +1,16 @@
 # HANDOFF
 
+## 2026-11-12 · 공통 상품 자료 준비·정기 검토·재사용
+
+- **branch / PR 묶음:** `wo/shared-product-material-preparation` — 최신 main `31be41b49` + 3차 `5702b2de6`(원본 `1b2ab0813`/`f56c1b3ed`) + 4차 `95049f85b`(원본 `ec4704ede`) + 5차. 3~5차를 포함한다. 원래 `wo/product-consultation-resource-separation`·`wo/consultation-structured-product-search`는 이 묶음 **병합 후 삭제 가능**이며 원래 branch를 수정·삭제하지 않았다. 중복 통합에 주의한다.
+- **한 일:** 공통 상품 등록/없는 제품 등록 요청을 주 진입점으로, 기존 직접 상품의 공통 상품 대조를 추가. 관리자 공통 자료 준비 목록(상품당 한 행, 상담/QR 분리), 현재 상태를 재확인해 준비된 자료를 제외하는 읽기 전용 조사 요청문, 기존 정기 검토의 CONSULTATION 유형·handledOnly 선택 범위·사용 꺼짐 초안 및 화면 왕복 동선.
+- **결정 사항:** 신규 저장소·DB schema·자동 생성·추가 AI 호출·운영 일정 활성화 없음. 기존 접수·승인·정기 worker·취급 등록 API를 재사용. handledOnly 미지정이면 기존 전체 상품 범위 유지. 조회는 최대 250개를 확인하고 sparse continuation 제공. 요청문은 최대 25개 공통 상품 식별 정보만 추려 매장/가격/고객 데이터 제외. 실제 생성/검수는 사용자의 외부 AI 및 관리자 기존 승인 절차.
+- **직접 등록 보존:** 태블릿/공개 진열·매장 상담/기여·다국어·POP·QR에 local ID 소비처가 남아 있어 일괄 이관/삭제/비활성화하지 않음. 공통 상품 대조는 이름 초깃값을 넣고 사용자가 상품·규격을 선택하는 절차이며 기존 자료 참조를 자동 바꾸지 않음. 운영 이관 완료로 보고하지 않는다.
+- **검증:** API 관련 161 pass / 11 skip(전용 PostgreSQL 통합 연결 미설정), 변경 후 준비·권한 12건 재검증. 관리자 30건·매장 57건 통과. API·관리자·매장 typecheck 통과. 변경 19개 TS 파일 ESLint 오류 0(기존 접수 화면 hook 경고 2건). 격리 PGlite에서 실제 SQL·중복 제거·stale/빈 QR·준비 자료 제외·미취급/삭제·두 매장의 동일 상담자료 ID 재사용·정기 범위 검증. [상세 기록](docs/investigations/IR-O4O-SHARED-PRODUCT-MATERIAL-PREPARATION-V1.md).
+- **확인하지 못한 것 / 배포 후:** 운영 자료·부하·일정/worker 활성화·실제 자료 이관·실제 관리자/매장 화면·절감액. 관리자 준비 조회→선택→요청문→접수/대조/승인, 두 매장 공통 자료 참조, 기존 QR 보존, 점검 기준 검토·사용 설정·저장 후 일정 설정을 확인한다. 운영 DB 및 배포는 실행하지 않음.
+- **겹치는 PR:** 조회 시 #1042·#1039와 HANDOFF.md만 겹침. #1037의 shared types는 다른 파일. PR 생성·병합·배포는 통합 세션 담당. 원래 3·4차 커밋을 따로 중복 적용하지 않는다.
+- **문서 정합:** 기존 비용·전문 자료·Display 경계 유지. 앞서 기록한 B2B 전용 안내 2건은 별도 정비 묶음으로 인계. 자동 데이터 이관과 직접 등록 도메인 폐기는 별도 범위.
+
 ## 2026-11-12 · 구조화 상담자료의 상품 후보 검색 반영
 
 - **branch / PR 묶음:** `wo/consultation-structured-product-search` — 3차 선행 커밋 `f56c1b3ed`를 최신 main `31be41b49`에 cherry-pick한 `1b2ab0813` + 4차 검색 변경. 원래 `wo/product-consultation-resource-separation`는 이 묶음 **병합 후 삭제 가능**. 원래 branch는 수정·삭제하지 않음. 이미 3차를 따로 통합할 경우 같은 diff를 중복 반영하지 않도록 확인한다.

@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { descriptionIntakeApi as api, type DescriptionEntry, type IntakeDetail, type IntakeRow, type DescriptionTarget } from '@/api/product-description-intake.api';
 import { readPublicDescriptionCatalog } from './description-intake/catalogAdapter';
 import { useProductDbWriteAccess, ProductDbReadOnlyNotice } from './useProductDbWriteAccess';
+import MaterialPreparationPanel from './description-intake/MaterialPreparationPanel';
 const box = 'rounded border p-3 w-full';
 const button = 'rounded border px-3 py-2 disabled:opacity-40';
 const Html = ({ html }: { html: string }) => <div className="prose max-w-none break-words overflow-auto max-h-96" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(html) }} />;
@@ -47,6 +48,7 @@ export default function DescriptionIntakePage() {
     <h2 className="text-xl font-semibold">공개자료·매장 제안 설명서</h2>
     <p>정부 공개자료 → 제조사 공개 상세설명 순으로 근거를 확인합니다. 상품명은 기존 O4O 상품에서 확인하며, 포장별 상품을 선택해도 같은 상담 본문을 연결할 수 있습니다.</p>
     {!writable && <ProductDbReadOnlyNotice />}
+    <MaterialPreparationPanel />
     <section className="space-y-3 rounded border p-4">
       <h3 className="font-semibold">준비된 설명 JSON 가져오기</h3>
       <div className="flex flex-wrap gap-3">
