@@ -279,7 +279,8 @@ function splitActions(text) {
   return out;
 }
 
-const DESTRUCTIVE_ACTION = /^(DROP\b(?!\s+NOT\s+NULL\b)|RENAME\b)|\bALTER\s+(COLUMN\s+)?\S+\s+(SET\s+DATA\s+)?TYPE\b/;
+// 두 갈래: 문두 DROP(NOT NULL 해제 제외) · RENAME, 또는 어디서든 열 타입 변경.
+const DESTRUCTIVE_ACTION = /(?:^(?:DROP\b(?!\s+NOT\s+NULL\b)|RENAME\b))|(?:\bALTER\s+(?:COLUMN\s+)?\S+\s+(?:SET\s+DATA\s+)?TYPE\b)/;
 
 /** ALTER TABLE 한 동작 */
 function classifyAlterAction(action) {
