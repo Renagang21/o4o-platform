@@ -59,7 +59,10 @@ export class SupplierOrderService {
   }
 
   async listOrders(supplierId: string, params: { page: number; limit: number; status?: string }) {
-    const { page, limit, status } = params;
+    const { page: rawPage, limit: rawLimit, status } = params;
+    // LIMIT/OFFSET 도 binding 한다(Raw SQL 문자열 삽입 금지). page=1e400(Infinity)·소수는 SQL 오류(500)가 되므로 정수로 맞춘다.
+    const page = toPositiveInt(rawPage, 1, 1_000_000);
+    const limit = toPositiveInt(rawLimit, 20, 100);
     const offset = (page - 1) * limit;
 
     // WO-O4O-SUPPLIER-FULFILLMENT-SERVICE-SCOPE-V1:
@@ -89,8 +92,8 @@ export class SupplierOrderService {
          JOIN supplier_product_offers spo ON spo.id = oi.product_id::uuid
          WHERE spo.supplier_id = $1 ${serviceClause} ${statusClause}
          ORDER BY o.created_at DESC, o.id
-         LIMIT ${limit} OFFSET ${offset}`,
-        baseParams,
+         LIMIT $${baseParams.length + 1} OFFSET $${baseParams.length + 2}`,
+        [...baseParams, limit, offset],
       ),
       this.dataSource.query(
         `SELECT COUNT(DISTINCT o.id)::int AS total
@@ -271,4 +274,11 @@ export class SupplierOrderService {
     );
     return rows[0] || null;
   }
+}
+
+/** 1 이상 정수로 맞춘다 — 유한하지 않거나 1 미만이면 fallback, max 초과는 max */
+function toPositiveInt(value: number, fallback: number, max: number): number {
+  const n = Math.floor(Number(value));
+  if (!Number.isFinite(n) || n < 1) return fallback;
+  return Math.min(n, max);
 }

@@ -116,6 +116,28 @@ describe('공급자 이미지 write 는 master 소유를 확인한다', () => {
     expect(writes).toHaveLength(0);
   });
 
+  // 같은 Master 를 쓰는 다른 공급자 · 매장에도 보이는 이미지라 javascript: · data: · 상대 경로를 저장하지 않는다
+  it.each(['javascript:alert(1)', 'data:image/svg+xml;base64,PHN2Zz4=', '/relative/a.png', 'not a url'])(
+    'URL 등록 — http(s) 가 아닌 주소(%s)는 400 INVALID_IMAGE_URL · write 0',
+    async (imageUrl) => {
+      const { app, writes } = buildApp({ owned: true });
+      const res = await request(app).post('/products/master-1/images/from-url').send({ imageUrl });
+      expect(res.status).toBe(400);
+      expect(res.body.error).toBe('INVALID_IMAGE_URL');
+      expect(writes).toHaveLength(0);
+    },
+  );
+
+  it('URL 등록 — 앞뒤 공백은 지우고 저장한다', async () => {
+    const { app, writes } = buildApp({ owned: true });
+    const res = await request(app)
+      .post('/products/master-1/images/from-url')
+      .send({ imageUrl: '  https://example.com/a.png  ' });
+    expect(res.status).toBe(201);
+    const insert = writes.find((w) => w.sql.startsWith('INSERT INTO product_images'));
+    expect(insert!.params).toContain('https://example.com/a.png');
+  });
+
   it('URL 등록 — 소유한 master 는 통과하고 source·created_by 를 기록한다', async () => {
     const { app, writes } = buildApp({ owned: true });
     const res = await request(app)

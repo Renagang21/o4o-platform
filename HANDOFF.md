@@ -1,5 +1,20 @@
 # HANDOFF
 
+## 2026-11-13 · 공급자 API 안정성 · 경계 보완 (branch `claude/supplier-api-stability`)
+
+- **근거 / PR 묶음:** 공급자 전반 조사(같은 세션, 화면 · API · 문서 3갈래) 결과의 1순위 묶음. **이 branch 단독 1 PR**(api-server 공급자 모듈 · 서비스 PR, schema · migration 없음). 화면 수정 PR #1057(`claude/focused-edison-ky4e3u`)과 파일이 겹치지 않는다 — 섞지 않으려고 사용자 확인 후 branch 를 분리했다. PR 은 만들지 않았다.
+- **한 일:**
+  - 공급자 guard(`createRequireActiveSupplier` · `createRequireLinkedSupplier` · copilot `createRequireSupplier`)가 DB 오류에 503 `SUPPLIER_CONTEXT_UNAVAILABLE` 로 응답 — Express 4.22.3 은 async middleware reject 를 잡지 않아 요청이 멈추고, 운영은 `unhandledRejection` → `gracefulShutdown` 으로 인스턴스가 내려갈 수 있었다.
+  - `GET /neture/products/:masterId/images`: 삭제(`deleted_at`) 이미지 제외 · 공개 컬럼만 반환(`gcsPath` · `createdBy` · `deletedBy` · `source` 비노출). 화면은 id · imageUrl · isPrimary · sortOrder · type 만 쓴다.
+  - 공급자 내 제품 목록 정렬: `ORDER BY pm.id, <정렬>` → `ORDER BY <정렬>, spo.id`. offer 는 (master, supplier) 유일이라 정렬 선택이 무시되던 문제.
+  - 공급자 주문 처리 · 정산 목록의 `LIMIT ${limit} OFFSET ${offset}` 문자열 삽입 → binding, page/limit 을 유한 정수로 정규화(`Infinity` · 소수 → SQL 오류 방지).
+  - 이미지 URL 등록(`images/from-url`) · 자료함 `fileUrl`: 절대 http(s) URL 만 허용(`javascript:` · `data:` · 상대 경로 400). 기준은 Candidate 이미지 URL 과 같다(`modules/neture/utils/http-url.util.ts`).
+- **결정 사항:** 503 은 기존 403/401/409 계약을 바꾸지 않는 새 코드(일시 오류를 '공급자 아님'으로 오판시키지 않음). `next()` 는 try 밖이라 하위 handler 오류를 503 으로 바꾸지 않는다. 이미지 목록의 접근 수준(로그인 사용자)은 유지 — 공용 카탈로그라 필드만 줄였다. URL 은 https 전용 · 호스트 허용 목록까지는 가지 않았다(외부 자료 링크가 정상 용도).
+- **검증:** 변경 관련 jest(neture 모듈 · supplier · utils) 145 suites PASS(31 skipped = DB 통합 미설정), 신규 테스트 5 파일 · 기존 테스트 4 파일 보강(정렬 · settlement 는 옛 문자열 삽입을 고정하던 기대값을 binding 으로 갱신). `tsc --noEmit` PASS, 변경 파일 ESLint 0, `check-unsafe-routes` 위반 0. 전체 API 3 shard 결과는 아래 「확인하지 못한 것」 참조.
+- **확인하지 못한 것 / 배포 후:** 운영 DB 연결 없음 — 실제 DB 장애 시 503 동작은 단위 테스트로만 확인. 배포 후 공급자 Demo 로 내 제품 목록 정렬(최신순 · 가격 · 이름) 변경이 실제 순서에 반영되는지, 상품 상세의 이미지 목록 · 자료함 등록이 정상인지 확인.
+- **범위 밖 발견(별도 묶음):** 다른 서비스에도 LIMIT/OFFSET 문자열 삽입이 남아 있다 — `admin-settlement-read.service.ts` · `product-content-browse.service.ts` · `shared-product-description.service.ts` · `product-image-quality.service.ts`. 자료함 · 이미지 경로의 별도 guard(`supplier-library/access.ts` · `supplier-images/access.ts`)는 조직 문맥 · 멤버십 확인이 없고 DB 오류를 403 으로 바꾼다 — 표준 guard 로 교체는 다음 묶음. 기존 혼합 공급자 `neture_orders` 의 상세 · 상태 변경 범위는 운영 데이터 확인(로컬 read-only) 후 결정.
+- **겹치는 PR / 문서 정합:** #1057(화면)과 파일 겹침 없음. 문서 정합: 해당 없음.
+
 ## 2026-11-13 · 참고 · 기준 문서 정비 — 상담 매장 단위 판단 반영 (branch `claude/wizardly-bardeen-ldq332` · 문서 전용 커밋)
 
 - **PR 묶음:** 문서 전용 커밋이다. §4-3 R6(기준 문서는 문서 전용 PR)에 따라 통합 세션이 이 커밋을 별도 PR 로 분리할 수 있다 — 같은 branch 의 코드 변경(상담 매장 단위 판단 · My Home 약사 확인 정리)과 내용이 맞물려 있어 코드 PR 병합 뒤에 병합한다.
