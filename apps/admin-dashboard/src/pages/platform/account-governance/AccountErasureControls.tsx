@@ -25,9 +25,20 @@ const ERRORS: Record<string, string> = {
   SYSTEM_LOG_RETENTION_ANCHOR_REVIEW_REQUIRED: '최소 보존 기록의 기준 시각을 확인해야 합니다. 원본 기준을 검토한 뒤 재시도해 주시기 바랍니다.',
   SUPPLIER_PRIVATE_FILES_REVIEW_REQUIRED: '공급자 개인 증빙파일 삭제가 필요합니다. 제품·거래 자료와 분리해 처리해 주시기 바랍니다.',
   USER_NOT_FOUND: '이미 삭제됐거나 존재하지 않는 회원입니다. 목록을 새로 조회해 주시기 바랍니다.',
+  ERASURE_RESIDUAL_REVIEW_REQUIRED: '삭제 뒤 다시 확인했을 때 이 회원 정보가 다른 기록에 남아 있어 삭제를 되돌렸습니다. 개발 담당에게 확인을 요청해 주시기 바랍니다.',
+  WRITER_MANIFEST_REQUIRES_REFRESH: '새로 추가된 데이터 표의 삭제 준비가 완료되지 않았습니다. 개발 담당의 확인이 필요합니다.',
+  COMMUNITY_SYSTEM_CLASSIFICATION_REQUIRED: '커뮤니티 기록의 보존 기준 설정이 필요합니다. 배포 담당자의 확인이 필요합니다.',
+  PERSONAL_FILE_MANIFEST_REVIEW_REQUIRED: '프로필 사진 등 개인 파일 위치를 확인할 수 없습니다. 개발 담당의 확인이 필요합니다.',
+  PRIVATE_ATTACHMENT_MANIFEST_REVIEW_REQUIRED: '개인 첨부파일 위치를 확인할 수 없습니다. 개발 담당의 확인이 필요합니다.',
+  PERSONAL_FILE_OWNERSHIP_REVIEW_REQUIRED: '개인 파일의 소유 관계를 확인해야 합니다. 개발 담당의 확인이 필요합니다.',
+  ERASURE_STEP_FAILED: '삭제 처리 중 오류가 났습니다. 잠시 뒤 다시 시도해 주시기 바랍니다.',
   SERVICE_STOP_REQUIRED: '서비스 이용 상태를 다시 확인해 주시기 바랍니다. 최신 계정 삭제 API에서는 사전 정지가 필요하지 않습니다.',
 };
+/** 삭제 전 검토가 멈춘 표. 다시 눌러도 같은 결과이므로 재시도를 안내하지 않는다(2026-11-13). */
+const REVIEW_TABLE = /^REVIEW:([a-z0-9_]+)\.([a-z0-9_]+)$/;
 export function deletionMessage(code?: string) {
+  const table = code ? REVIEW_TABLE.exec(code) : null;
+  if (table) return `다른 기록(${table[2]})에 이 회원 정보가 남아 있어 자동 삭제를 멈췄습니다. 다시 눌러도 같은 결과입니다 — 개발 담당에게 이 표 이름을 전달해 주시기 바랍니다.`;
   return code && ERRORS[code] ? ERRORS[code] : '삭제를 완료하지 못했습니다. 다시 시도해 주시기 바랍니다.';
 }
 

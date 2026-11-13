@@ -15,6 +15,7 @@ import {
   SUPPORTED_LEGAL_SERVICE_KEYS,
   isSupportedLegalServiceKey,
 } from '../service-legal-scope.js';
+import { PARTNER_SUPPORT_SCOPE_CONFIG } from '../../../middleware/partner-support-scope.middleware.js';
 
 describe('SUPPORTED_LEGAL_SERVICE_KEYS', () => {
   it('은퇴한 pharmacy-hub 관리 경로를 허용하지 않는다', () => {
@@ -43,7 +44,7 @@ describe('SUPPORTED_LEGAL_SERVICE_KEYS', () => {
     expect(isSupportedLegalServiceKey('lecture')).toBe(true);
   });
 
-  it('현재 관리 대상 7개 canonical key만 포함한다', () => {
+  it('현재 관리 대상 8개 canonical key만 포함한다', () => {
     expect([...SUPPORTED_LEGAL_SERVICE_KEYS].sort()).toEqual([
       'k-cosmetics',
       'kpa-society',
@@ -52,6 +53,19 @@ describe('SUPPORTED_LEGAL_SERVICE_KEYS', () => {
       'community',
       'funding',
       'supplier',
+      'partner-support',
     ].sort());
+  });
+
+  // TODO-O4O-LEGAL-BASIC-DOCUMENTS-ADMIN-V1 3단계 — O4O Partner 문서는 Partner 운영 범위로만 편집 · 조회한다.
+  it('partner-support: 편집은 partner-support:admin, 조회는 operator ⊂ admin (다른 서비스 역할 불가)', () => {
+    expect(isSupportedLegalServiceKey('partner-support')).toBe(true);
+    const c = PARTNER_SUPPORT_SCOPE_CONFIG;
+    expect(c.serviceKey).toBe('partner-support');
+    expect(c.allowedRoles).toEqual(['partner-support:admin', 'partner-support:operator']);
+    expect(c.scopeRoleMapping?.['partner-support:admin']).toEqual(['partner-support:admin']);
+    expect(c.scopeRoleMapping?.['partner-support:operator']).toEqual(['partner-support:operator', 'partner-support:admin']);
+    expect(c.blockedServicePrefixes).not.toContain('partner-support');
+    expect(c.blockedServicePrefixes).toEqual(expect.arrayContaining(['kpa', 'community', 'lecture']));
   });
 });
