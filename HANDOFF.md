@@ -1,6 +1,5 @@
 # HANDOFF
 
-<<<<<<< HEAD
 ## 2026-11-13 · TinyFish 운영자 연결·상담 번역 비용 집계 대조
 
 - **branch / 묶음:** `wo/consultation-live-cost-comparison`, main `35703c665`(#1050)에서 시작한 문서 후속. [운영 비용 대조 CHECK](docs/checks/CHECK-O4O-CONSULTATION-LIVE-COST-COMPARISON-2026-11-13.md).
@@ -10,7 +9,6 @@
 - **미완료:** 실제 권한 철회·근거 변경·두 허용 매장 격리·원시 로그/가격 버전/청구·대표 부하/지연. 기존 QR 무손실 전체 대조도 새로 완료한 것이 아님. **7차 전체 운영 완료 선언 아님.**
 - **겹치는 PR:** 종료 조회 시 #1052·#1051·#1049와 HANDOFF.md만 겹침. main은 시작 기준 `35703c665` 그대로. 기존 절을 보존해 통합하며 PR 생성·병합·배포는 통합 세션 담당.
 - **검증/데이터:** TinyFish 실제 운영 화면 3회 관측·인증된 Demo의 번역 HTTP 4회·집계 차이 검산·문서 민감정보/diff 검사. 문서만 변경해 unit/typecheck 재실행 불필요. 업무 데이터/station/권한/설정/DB write·배포 없음. 정상 AI/보안 메타데이터는 기존 보존 정책. 기존 비용·전문 권한 정본과 문서 정합 유지. worktree KEEP(미병합 인계용).
-=======
 
 ## 2026-11-13 · 소비자 다국어 정리 1단계 — QR 다국어 탭 숨김 · OTC 번역 비교 표본 (branch `claude/intelligent-cray-o2p4u3-multilingual`)
 
@@ -39,7 +37,6 @@
   - 운영 번역 경로 호출(T2) — 클라우드에는 DB · AI 키가 없다.
   - 배포 후 Demo(매장 경영자)로 `/store/marketing/qr?workspace=studio` 「자산 선택」에 탭이 두 개(내 매장 자료 · 운영자 콘텐츠)만 보이는지.
 - **겹칠 수 있는 PR:** 확인하지 못했다(통합 세션이 대조).
->>>>>>> origin/main
 
 ## 2026-11-13 · AI 비용 절감 운영 검증 — 실제 번역 표본·접근 차단
 
