@@ -469,7 +469,7 @@ function Consultation({
                 })
               }
             >
-              매대 상담 시작
+              상담 시작
             </button>
           )}
         </div>

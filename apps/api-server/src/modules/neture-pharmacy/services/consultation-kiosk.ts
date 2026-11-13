@@ -116,7 +116,7 @@ export class ConsultationKioskService {
     const tabletId = row.station_key.startsWith('kiosk-') ? row.station_key.slice(6) : '';
     const tablet = await this.consumerTablet(row.organization_id, tabletId);
     return { actor: row.operator_user_id!, org: row.organization_id, mode: await this.staffMode(row.operator_user_id!, row.organization_id),
-      speechLanguages: tablet.speechLanguages ?? null };
+      speechLanguages: tablet.speechLanguages ?? null, showKorean: tablet.showKorean !== false };
   }
   /** 기기 요청마다 기기 자격 · 태블릿 등록 · 등록 경영자의 현재 권한을 확인한다. */
   async device(input: Json) {
@@ -171,12 +171,57 @@ export class ConsultationKioskService {
     if (this.needsPharmacist(korean, String(input.text))) return { ...this.referral(language), language };
     await this.deps.requireProductSupport(device.actor, device.org);
     const terms = [...new Set([korean, String(input.text).trim()].map(term => term.slice(0, 80)))];
-    const found = new Map<string, { kind: string; id: string; name: string }>();
+    const found = new Map<string, { kind: string; id: string; name: string; location: string }>();
     for (const term of terms)
-      for (const item of await this.deps.products.products(device.org, term) as Array<{ kind: string; id: string; name: string }>)
-        found.set(`${item.kind}:${item.id}`, { kind: item.kind, id: item.id, name: item.name });
+      for (const item of await this.deps.products.products(device.org, term) as Array<{ kind: string; id: string; name: string; location?: string | null }>)
+        found.set(`${item.kind}:${item.id}`, { kind: item.kind, id: item.id, name: item.name,
+          location: (item.location ?? '').trim() || found.get(`${item.kind}:${item.id}`)?.location || '' });
+    const listed = [...found.values()].slice(0, 20);
+    // 찾은 상품마다 위치를 바로 보여 준다(소비자가 가장 먼저 묻는 것). 위치 원문은 매장이 한국어로 적은 고객 안내 문구다.
+    const locations = await this.localizedLocations(device, language, listed.map(item => item.location));
     if (!await device.authorize()) fail(409, 'CONSULTATION_CHANGED', '매장 상담 설정이 변경되었습니다. 다시 시도해 주세요.');
-    return { state: 'products', language, products: [...found.values()].slice(0, 20) };
+    const copy = consultationCopy(language);
+    return { state: 'products', language, products: listed.map(item => {
+      const located = item.location ? locations.get(item.location) : undefined;
+      return { kind: item.kind, id: item.id, name: item.name,
+        location: located
+          ? { text: `${copy.location}: ${located.text}`, language: located.language,
+            // 번역해 보여 줄 때 한국어 원문을 함께 보인다(병기가 AI 번역 표시를 겸한다).
+            ...(device.showKorean && located.language !== 'ko' ? { korean: `${consultationCopy('ko').location}: ${item.location}` } : {}) }
+          : { text: copy.missingLocation, language } };
+    }) };
+  }
+
+  /**
+   * 검색 결과의 위치 문구를 고객 언어로 — 서로 다른 위치만 모아 번역 한 번으로 처리한다(상품마다 호출하지 않는다).
+   * 번역할 수 없거나 실패하면 한국어 원문을 그대로 보여 준다(위치는 짧은 매장 문구라 원문으로도 직원에게 보일 수 있다).
+   * 권한 · 상담 변경 오류는 그대로 올린다.
+   */
+  private async localizedLocations(device: Awaited<ReturnType<ConsultationKioskService['device']>>, language: ConsultationLocale, raw: string[]) {
+    const unique = [...new Set(raw.filter(Boolean))];
+    const result = new Map(unique.map(text => [text, { text, language: 'ko' as ConsultationLocale }]));
+    if (language === 'ko' || !unique.length) return result;
+    const batch: string[] = [];
+    let length = 0;
+    for (const text of unique) {
+      const line = `${batch.length + 1}) ${text.replace(/\s+/g, ' ')}`;
+      if (length + line.length + 1 > 1000) break;
+      batch.push(line); length += line.length + 1;
+    }
+    if (!batch.length) return result;
+    try {
+      // 같은 위치 묶음 · 같은 언어는 번역을 재사용한다(정책 §2-3). 키는 서버가 만들고 원문 · 언어 · 설정이 바뀌면 달라진다.
+      const output = await this.deps.translate({ text: batch.join('\n'), source: 'ko', target: language as Exclude<ConsultationLocale, 'ko'> },
+        { actorId: device.actor, organizationId: device.org, authorize: device.authorize, reuseKey: 'kiosk-locations' });
+      const lines = (output?.translation ?? '').split('\n').map(line => line.trim()).filter(Boolean);
+      // 줄 수와 번호가 그대로일 때만 쓴다 — 하나라도 어긋나면 원문을 보여 준다(잘못된 상품에 위치가 붙지 않게).
+      const parsed = lines.map((line, index) => new RegExp(`^${index + 1}[).]\\s*(.+)$`).exec(line)?.[1]?.trim());
+      if (parsed.length === batch.length && parsed.every(Boolean))
+        parsed.forEach((text, index) => result.set(unique[index], { text: text!, language }));
+    } catch (error) {
+      if (error instanceof NeturePharmacyError && [401, 403, 409].includes(error.httpStatus)) throw error;
+    }
+    return result;
   }
 
   /** 선택한 상품의 위치 또는 게시 제품 설명. 질문이 있으면 게시 문단 중 관련 문단을 AI 가 고른다. */
@@ -200,13 +245,37 @@ export class ConsultationKioskService {
       if (!(error instanceof NeturePharmacyError) || error.code !== 'GUIDANCE_TRANSLATION_UNAVAILABLE') throw error;
       prepared = await this.deps.guidance.prepare(device.actor, device.org, request) as Json;
     }
+    const card = prepared.card as Json | undefined;
+    const korean = device.showKorean && card?.translated === true ? await this.koreanOriginal(device, request, prepared) : null;
     if (!await device.authorize()) fail(409, 'CONSULTATION_CHANGED', '매장 상담 설정이 변경되었습니다. 다시 시도해 주세요.');
     // 기기에는 소비자에게 보여 줄 카드 · 안내 문구만 보낸다(직원용 증명 · 내부 식별 정보 제외).
-    const card = prepared.card as Json | undefined;
     return { state: prepared.state, intent: prepared.intent, language,
       ...(card ? { card: { kind: card.kind, title: card.title, text: card.text, language: card.language, requestedLanguage: card.requestedLanguage,
-        publicKey: card.publicKey ?? null, fallbackUsed: card.fallbackUsed === true, translated: card.translated === true } } : {}),
+        publicKey: card.publicKey ?? null, fallbackUsed: card.fallbackUsed === true, translated: card.translated === true,
+        ...(korean ? { korean } : {}) } } : {}),
       ...(typeof prepared.message === 'string' ? { message: prepared.message } : {}) };
+  }
+
+  /**
+   * 번역한 카드의 한국어 원문(병기용). 위치는 상품의 위치 문구, 제품 설명은 같은 게시 문단을 한국어로 다시 읽는다 —
+   * 이미 고른 문단(selection)을 넘기므로 AI 호출 · 번역 없이 원문만 읽는다. 못 읽으면 병기 없이 번역문만 보여 준다.
+   */
+  private async koreanOriginal(device: Awaited<ReturnType<ConsultationKioskService['device']>>, request: Json, prepared: Json): Promise<string | null> {
+    const copy = consultationCopy('ko');
+    if (prepared.intent === 'location' || prepared.intent === 'find-product') {
+      const location = (prepared.product as { location?: unknown } | undefined)?.location;
+      return typeof location === 'string' && location.trim() ? `${copy.location}: ${location.trim()}` : null;
+    }
+    if (prepared.intent !== 'product-details' || !prepared.selection) return null;
+    try {
+      const original = await this.deps.guidance.prepare(device.actor, device.org, { mode: request.mode, intent: request.intent,
+        productKind: request.productKind, productId: request.productId, language: 'ko', selection: prepared.selection }) as Json;
+      const card = original.card as Json | undefined;
+      return card?.language === 'ko' && typeof card.text === 'string' ? card.text : null;
+    } catch (error) {
+      if (error instanceof NeturePharmacyError && [401, 403].includes(error.httpStatus)) throw error;
+      return null;
+    }
   }
 
   /** 약사 연결 안내(소비자가 직접 누른 경우). */

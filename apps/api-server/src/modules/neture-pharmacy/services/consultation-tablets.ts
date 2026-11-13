@@ -23,6 +23,11 @@ export const consultationTabletSchema = z.object({
   role: z.enum(CONSULTATION_TABLET_ROLES),
   name: z.string().trim().min(1).max(40).refine(value => !/[<>]/.test(value)),
   speechLanguages: tabletSpeechLanguagesSchema.optional(),
+  /**
+   * 소비자 태블릿(키오스크)의 외국어 화면에 한국어를 함께 보일지. 없으면 켜짐(기본).
+   * 소비자 다국어 정책(O4O-CONSUMER-MULTILINGUAL-POLICY-V1 §2-4): 기본 켜짐 · 매장(약사)이 끌 수 있음 · 병기가 AI 번역 표시를 겸한다.
+   */
+  showKorean: z.boolean().optional(),
 }).strict();
 export const consultationTabletsSchema = z.array(consultationTabletSchema).max(MAX_CONSULTATION_TABLETS)
   .refine(items => new Set(items.map(item => item.id)).size === items.length);

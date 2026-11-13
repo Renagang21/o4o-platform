@@ -521,6 +521,18 @@ export class ConsultationGuidanceService {
     await current.authorize();
   }
 
+  /**
+   * 상담 화면의 상품 이름 검색. 상담은 매장 단위로 판단한다(2026-11-13 통합 담당 승인) —
+   * 상담 방식 권한(authorize)과 매장의 store-staff-support 이용 자격(requireProducts)만 본다.
+   * 근무자별 허용은 매장 관리용 /staff-support/products 에서만 검사한다.
+   */
+  async searchProducts(actor: string, org: string, input: Json) {
+    if (typeof input.mode !== "string" || !input.mode)
+      fail(400, "INVALID_GUIDANCE", "상담 방식을 확인해 주세요.");
+    await this.access(actor, org, String(input.mode));
+    return this.products.products(org, input.q);
+  }
+
   async searchSupportProducts(actor: string, org: string, input: Json) {
     if (typeof input.mode !== 'string' || !['counter-pharmacist', 'floor-pharmacist'].includes(input.mode))
       return fail(403, 'PHARMACIST_CONFIRMATION_REQUIRED', '약사 상담의 사용 확인이 필요합니다.');

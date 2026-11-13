@@ -77,9 +77,21 @@ it('supplier filters remain bound and unknown sorting cannot become SQL', async 
   expect(countSql).toContain("spo.approval_status = 'APPROVED'");
   expect(countSql).toContain("jsonb_typeof(pm.tags) = 'array'");
   const [rowSql, rowBindings] = query.mock.calls[1];
-  expect(rowSql).toContain('ORDER BY pm.id, spo.created_at DESC');
+  expect(rowSql).toContain('ORDER BY spo.created_at DESC, spo.id');
   expect(rowSql).not.toContain('DROP TABLE');
   expect(rowBindings).toEqual([...bindings, 100, 0]);
+});
+// 요청한 정렬이 먼저 적용되어야 한다 — 예전 `ORDER BY pm.id, <정렬>` 은 offer 가 (master, supplier) 유일이라
+// 항상 master UUID 순이 되어 정렬 선택이 무시됐다. spo.id 는 페이지 경계의 안정 순서용 tiebreaker.
+it.each([
+  ['createdAt', 'asc', 'spo.created_at ASC'],
+  ['priceGeneral', 'desc', 'spo.price_general DESC'],
+  ['name', 'asc', 'pm.name ASC'],
+])('supplier page sorts by requested %s first', async (sort, order, expected) => {
+  await service.getSupplierProductsPaginated('supplier-fixture', { sort, order });
+  const rowSql = query.mock.calls[1][0] as string;
+  expect(rowSql).toMatch(new RegExp(`ORDER BY ${expected.replace(/\./g, '\\.')}, spo\\.id\\s`));
+  expect(rowSql).not.toContain('ORDER BY pm.id');
 });
 it.each(['unrequested', 'pending', 'approved', 'rejected'])('supplier approval tab %s uses product registration approval', async (status) => {
   await service.getSupplierProductsPaginated('supplier-fixture', { serviceApprovalStatus: status });

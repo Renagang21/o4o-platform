@@ -36,7 +36,7 @@ beforeEach(() => {
   state.get.mockImplementation(async () => ({ success: true, data: { organizationId: state.org,
     supportAllowed: true,
     languages: [{ key: 'en', label: 'English' }, { key: 'ja', label: 'Japanese' }], phrases: [{ key: 'welcome', text: '안녕하십니까.' }],
-    modes: [{ key: 'counter-pharmacist', label: '매대 약사 상담', entitled: true, allowed: true, professional: true },
+    modes: [{ key: 'counter-pharmacist', label: '약사 상담', entitled: true, allowed: true, professional: true },
       { key: 'floor-staff', label: '매장 직원 응대', entitled: true, allowed: true, professional: false }] } }));
   state.post.mockImplementation(async (_path, body) => ({ success: true, data: { organizationId: state.org, ...body, source: body.text ?? '안녕하십니까.', translation: 'Translated words' } }));
 });

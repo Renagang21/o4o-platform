@@ -13,6 +13,7 @@
  */
 
 import type { DataSource } from 'typeorm';
+import { toPositiveInt } from '../utils/pagination-sql.util.js';
 
 const DEFAULT_LIMIT = 20;
 const MAX_LIMIT = 100;
@@ -73,7 +74,8 @@ export class ProductUsageLinksService {
 
   /** master 없으면 null. */
   async getUsageLinks(masterId: string, limitRaw?: number): Promise<ProductUsageLinks | null> {
-    const limit = Math.min(Math.max(limitRaw ?? DEFAULT_LIMIT, 1), MAX_LIMIT);
+    // LIMIT 은 binding 한다 — 요청 값이 NaN · Infinity · 소수여도 SQL 오류가 되지 않게 정수로 맞춘다.
+    const limit = toPositiveInt(limitRaw, DEFAULT_LIMIT, MAX_LIMIT);
 
     const masterRows: { barcode: string | null }[] = await this.dataSource.query(
       `SELECT barcode FROM product_masters WHERE id = $1`,
@@ -107,8 +109,8 @@ export class ProductUsageLinksService {
          LEFT JOIN organizations o ON o.id = opl.organization_id
         WHERE opl.master_id = $1
         ORDER BY opl.updated_at DESC NULLS LAST
-        LIMIT ${limit}`,
-      [masterId],
+        LIMIT $2`,
+      [masterId, limit],
     );
 
     const localRows: Array<{
@@ -123,8 +125,8 @@ export class ProductUsageLinksService {
              LEFT JOIN organizations o ON o.id = slp.organization_id
             WHERE slp.barcode = $1 AND slp.barcode <> ''
             ORDER BY slp.updated_at DESC NULLS LAST
-            LIMIT ${limit}`,
-          [barcode],
+            LIMIT $2`,
+          [barcode, limit],
         )
       : [];
 
@@ -140,8 +142,8 @@ export class ProductUsageLinksService {
          JOIN kpa_store_contents c ON c.id = l.content_id
         WHERE l.master_id = $1
         ORDER BY c.updated_at DESC NULLS LAST
-        LIMIT ${limit}`,
-      [masterId],
+        LIMIT $2`,
+      [masterId, limit],
     );
 
     return {

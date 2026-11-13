@@ -86,3 +86,26 @@ describe.each([
     expect(req.supplierId).toBe('row1');
   });
 });
+
+/**
+ * 공급자 문맥 조회 실패(DB 오류) — Express 4 는 async middleware reject 를 잡지 않으므로
+ * guard 가 직접 503 으로 응답해야 한다(처리되지 않은 reject → 요청 멈춤 · 운영 인스턴스 종료 방지).
+ * '공급자 아님(403)'으로 바꾸지 않는다.
+ */
+describe.each([
+  ['requireActiveSupplier', createRequireActiveSupplier],
+  ['requireLinkedSupplier', createRequireLinkedSupplier],
+] as const)('%s — 조회 실패', (_name, factory) => {
+  it('DB 오류 → 503 SUPPLIER_CONTEXT_UNAVAILABLE · reject 를 밖으로 던지지 않음 · next 미호출', async () => {
+    const next = jest.fn();
+    const res = mockRes();
+    const failing = { query: jest.fn(async () => { throw new Error('connection terminated'); }) } as unknown as DataSource;
+    await expect(factory(failing)({ ...USER_REQ }, res, next)).resolves.toBeUndefined();
+    expect(res.status).toHaveBeenCalledWith(503);
+    expect(res.json.mock.calls[0][0]).toEqual({
+      success: false,
+      error: expect.objectContaining({ code: 'SUPPLIER_CONTEXT_UNAVAILABLE' }),
+    });
+    expect(next).not.toHaveBeenCalled();
+  });
+});

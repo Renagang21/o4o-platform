@@ -25,6 +25,7 @@
 import type { Request, Response, NextFunction } from 'express';
 import { requireNetureMainMembership } from '../../../middleware/neture-main-membership.middleware.js';
 import type { DataSource } from 'typeorm';
+import logger from '../../../utils/logger.js';
 import {
   resolveSupplierForUser,
   readOrganizationContext,
@@ -77,6 +78,21 @@ function sendContextRequired(res: Response, resolution: Extract<SupplierResoluti
 }
 
 /**
+ * 공급자 문맥 조회 자체가 실패(DB 오류 등)했을 때 — 503.
+ * Express 4 는 async middleware 의 reject 를 잡지 않는다. 처리되지 않은 reject 는 요청을 응답 없이 멈추게 하고,
+ * 운영에서는 unhandledRejection → gracefulShutdown 으로 인스턴스를 내린다(bootstrap/setup-shutdown.ts).
+ * 권한 없음(403)으로 바꾸지 않는다 — 일시 오류를 '공급자 아님'으로 오판시키지 않기 위해서다.
+ */
+function sendContextUnavailable(res: Response, guard: string, err: unknown): void {
+  logger.error(`[NetureIdentity] ${guard} supplier context lookup failed`, { error: (err as Error)?.message });
+  if (res.headersSent) return;
+  res.status(503).json({
+    success: false,
+    error: { code: 'SUPPLIER_CONTEXT_UNAVAILABLE', message: '공급자 정보를 확인하지 못했습니다. 잠시 후 다시 시도해 주시기 바랍니다.' },
+  });
+}
+
+/**
  * canonical resolve + 기존 응답 계약 매핑.
  * 통과하면 req.supplierId / req.supplierOrganizationId 를 세팅한다.
  */
@@ -117,7 +133,13 @@ async function resolveOrRespond(
  */
 export function createRequireActiveSupplier(dataSource: DataSource) {
   return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-    const resolved = await resolveOrRespond(dataSource, req, res);
+    let resolved: Awaited<ReturnType<typeof resolveOrRespond>>;
+    try {
+      resolved = await resolveOrRespond(dataSource, req, res);
+    } catch (err) {
+      sendContextUnavailable(res, 'requireActiveSupplier', err);
+      return;
+    }
     if (!resolved) return;
     if (resolved.status !== 'ACTIVE') {
       res.status(403).json({
@@ -141,7 +163,13 @@ export function createRequireActiveSupplier(dataSource: DataSource) {
  */
 export function createRequireLinkedSupplier(dataSource: DataSource) {
   return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-    const resolved = await resolveOrRespond(dataSource, req, res);
+    let resolved: Awaited<ReturnType<typeof resolveOrRespond>>;
+    try {
+      resolved = await resolveOrRespond(dataSource, req, res);
+    } catch (err) {
+      sendContextUnavailable(res, 'requireLinkedSupplier', err);
+      return;
+    }
     if (!resolved) return;
     next();
   };

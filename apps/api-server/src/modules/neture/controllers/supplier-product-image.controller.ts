@@ -34,7 +34,7 @@ export function createSupplierProductImageController(dataSource: DataSource): Ro
   const netureService = new NetureService();
   const imageStorageService = new ImageStorageService();
   const imageService = new SupplierProductImageService(dataSource);
-  const access = createSupplierImageAccess(dataSource, netureService, imageService);
+  const access = createSupplierImageAccess(dataSource, imageService);
   const { requireActiveSupplier } = access;
   const handlers = createSupplierImageHandlers(
     dataSource,
@@ -44,7 +44,6 @@ export function createSupplierProductImageController(dataSource: DataSource): Ro
     access,
   );
 
-  // Inline requireActiveSupplier middleware (matches original neture.routes.ts)
 
   /**
    * 공급자 소유 master 인지 확인한다 — WO-O4O-NETURE-SUPPLIER-PRODUCT-AUTHORING-EXPANSION-CLOSEOUT-BATCH-V1
