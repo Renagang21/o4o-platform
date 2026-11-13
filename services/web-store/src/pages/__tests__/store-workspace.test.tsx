@@ -21,7 +21,7 @@ import {
   storeWorkspaceBase,
 } from "../../components/store/StoreWorkflowNavigation";
 
-vi.mock('../../api/consultationWorkspace', () => ({ fetchConsultationLayout: vi.fn(async () => ({ organizationId: 'fixture-store', name: 'Fixture', operatingType: 'large' })), readConsultationExpression: vi.fn(async()=>({organizationId:'fixture-store',canEdit:false,expression:{tone:'neutral',formality:'polite',length:'standard'}})) }));
+vi.mock('../../api/consultationWorkspace', () => ({ readConsultationTablets: vi.fn(async () => ({ organizationId: 'fixture-store', canEdit: false, configured: true, tablets: [{ id: 'pharmacist-a', role: 'pharmacist', name: '조제실 앞' }, { id: 'staff-a', role: 'staff', name: '입구' }, { id: 'staff-b', role: 'staff', name: '진열대' }] })), saveConsultationTablets: vi.fn(), readConsultationExpression: vi.fn(async()=>({organizationId:'fixture-store',canEdit:false,expression:{tone:'neutral',formality:'polite',length:'standard'}})) }));
 vi.mock('../pharmacy/StoreHandledProductsPage', () => ({ default: ({ navigation }: { navigation?: React.ReactNode }) => <><h1>상품 목록</h1>{navigation}</> }));
 vi.mock('../neture-pharmacy/SupplyOptionsPage', () => ({default:({navigation}:{navigation?:React.ReactNode})=><><h1>상품 주문</h1>{navigation}</>}));
 vi.mock('../pharmacy/StoreLibraryContentsPage', () => ({ default: ({ navigation, quickLinks, productLink, moreNavigation }: { navigation?: React.ReactNode; quickLinks?: React.ReactNode; productLink?: React.ReactNode; moreNavigation?: React.ReactNode }) => <><h1>저장한 안내 목록</h1>{quickLinks}{productLink}{navigation}{moreNavigation}</> }));
@@ -345,10 +345,12 @@ it.each(['/store', '/work/kpa-society/store'])('상담 첫 화면은 기존 기�
       </Route>
     </Routes></MemoryRouter>);
     await screen.findByRole('heading', {name:'상담'});
-    const consultation = await screen.findByRole('link', {name:/매장 약사 상담/});
-    expect(consultation.getAttribute('href')).toBe('/consultation/staff?store=fixture-store&mode=floor-pharmacist&station=counter-1');
+    const consultation = await screen.findByRole('link', {name:/조제실 앞 화면 열기/});
+    expect(consultation.getAttribute('href')).toBe('/consultation/staff?store=fixture-store&role=pharmacist&tablet=pharmacist-a&name=%EC%A1%B0%EC%A0%9C%EC%8B%A4+%EC%95%9E');
     expect(consultation.getAttribute('target')).toBe('_blank');
-    expect(screen.getByRole('link', {name:/매대 소비자 화면/}).getAttribute('href')).toBe('/consultation/customer');
+    expect(within(screen.getByRole('region', {name:'근무자 태블릿'})).getAllByRole('link').map(link => link.textContent)).toEqual(['입구 화면 열기 ↗', '진열대 화면 열기 ↗']);
+    expect(screen.queryByRole('link', {name:/소비자 화면/})).toBeNull();
+    expect(screen.queryByRole('button', {name:/추가/})).toBeNull();
     expect(screen.getByRole('link', {name:'상담 요청 확인'}).getAttribute('href')).toBe(base + '/requests');
     expect(screen.queryByRole('link', {name:'재생할 안내·순서 변경'})).toBeNull();
     expect(screen.queryByRole('heading', {name:'실행 현황'})).toBeNull();

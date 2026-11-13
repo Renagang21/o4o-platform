@@ -1,5 +1,38 @@
 # HANDOFF
 
+## 2026-11-13 · 상담 태블릿별 음성 자동 감지 언어 (branch `claude/wizardly-bardeen-ldq332`)
+
+- **통합 세션 수정(2026-11-13 · 통합 담당 지시로 이번 건만 통합 세션이 직접 수정):** 키오스크는 분리하지 않고 1 · 2단계를 한 PR(#1049)로 병합한다(통합 담당 결정 — 앞선 분리 판정 철회). 태블릿 목록 응답에 `configured` 를 더해 저장된 빈 목록과 최초 미등록을 구분(Codex P2) · 태블릿 관리에 행 체크 · 전체 선택 · 상단 ActionBar 선택 삭제(§3-1, Codex P1) · 키오스크 버튼 type · 언어 문구 `kioskLocale.json` 분리(SonarCloud) · 테스트 `Array.at` 제거(TS2550). 검증: 매장 상담 13개 파일 129건 · API 태블릿 · 키오스크 25건 통과, web-store `tsc -b` · api `tsc --noEmit` · 선언 빌드 · ESLint 통과.
+- **PR 묶음:** 태블릿 1 · 2단계와 같은 PR. 지시서 [`WO-O4O-STORE-CONSULTATION-TABLET-ROLES-V1`](docs/work-orders/WO-O4O-STORE-CONSULTATION-TABLET-ROLES-V1.md) §3 2-1단계.
+- **조사 결과:** 관리자 「음성 자동 감지 후보 · 최대 3개」는 Google 음성 자동 감지에만 쓰인다(직접 고른 언어 · 문자 번역 · 브라우저 음성과 무관). 3개 상한은 Google Speech-to-Text 제약(요청당 후보 최대 3개 · 적을수록 정확 — Google 공식 문서로 확인).
+- **한 일:** 태블릿마다 후보 최대 3개(`consultationTablets[].speechLanguages`, 경영자 편집). 직원 음성 인식 · 키오스크가 서버 저장 목록에서 태블릿 후보를 읽고, 없으면 관리자 기본 후보. 키오스크 언어 버튼은 후보를 앞에. 관리자 화면 문구 「기본 후보」. 설계 문서 §1 · 음성 후보 문단 갱신.
+- **결정 사항(§9):** 화면이 보낸 언어 목록은 쓰지 않고 서버가 `tabletId` 로 저장 목록에서 읽는다. 후보를 비우면 관리자 기본으로 돌아간다. schema 변경 없음.
+- **검증:** API neture-pharmacy 40 suites / 315 통과(15 suites · 218 skip — 전용 PostgreSQL 미설정; 후보 검증 · 저장 목록 읽기 · 키오스크 context 포함). web-store pages/pharmacy + pages/__tests__ 74 files / 852 통과. api · web-store · admin `tsc --noEmit` 통과. 변경 파일 ESLint 오류 · 경고 0.
+- **확인하지 못한 것:** 운영 실행 수단이 현재 브라우저 음성이라 Google 후보 효과는 Google 설정 전환 후에만 확인된다(지시서 §4).
+- **문서 정합:** 설계 문서 1건 갱신(사용자 지시) · 그 밖 해당 없음.
+
+## 2026-11-13 · 매장 상담 태블릿 구조 2단계 — 소비자 태블릿(키오스크) · 다국어 · 안내 수준 AI (branch `claude/wizardly-bardeen-ldq332`)
+
+- **PR 묶음:** 1단계와 같은 PR(이 branch). 지시서 [`WO-O4O-STORE-CONSULTATION-TABLET-ROLES-V1`](docs/work-orders/WO-O4O-STORE-CONSULTATION-TABLET-ROLES-V1.md) §3 2단계.
+- **한 일:** 소비자 태블릿 등록 · 연결 코드(경영자) → 로그인 없는 `/consultation/kiosk`(7개 언어 화면 · 자동 감지 · 음성 · 읽어 주기). 상품 찾기 · 위치 · 게시 제품 설명(질문 시 AI 문단 선택) · 약사 연결 안내. 2분 무조작 초기화.
+- **API:** `POST /neture/pharmacy/consultation-tablets/:tabletId/pairing`(store · owner), `POST /neture/pharmacy/consultation-kiosk/*`(기기 자격 · 로그인 없음 · rate limit). 기존 `store_consultation_stations` 행 재사용(`mode='consumer-kiosk'`) — schema 변경 없음. 상담 정리 job 에서 키오스크 행 제외.
+- **결정 사항(§9):** 키오스크 권한은 연결 코드를 만든 경영자의 근무자 상담 방식 이용 자격을 매 요청 다시 확인(이용권 · 결제 구조 그대로). 소비자 노출은 근무자 안내 경로만 재사용 — 약사 판단 지원 경로는 연결하지 않음. 약 선택 · 복용 질문 판정은 기존 서버 정규식(`consultationIntent`)을 원문 · 번역 둘 다에 적용(모델 출력에 의존하지 않음). 게시 자료가 길어 번역 불가면 원문 언어로 표시. 질문 비저장.
+- **검증:** API jest neture-pharmacy 40 suites / 313 통과(15 suites · 218 skip — 전용 PostgreSQL 미설정), 키오스크 14건 포함. web-store vitest 전체 102 files / 994 통과(키오스크 화면 4 · 목록 2 신규). api-server · web-store `tsc --noEmit` 통과. 변경 파일 ESLint 오류 0(기존 `_next` 경고 1).
+- **확인하지 못한 것 / 배포 후 Demo:** 실제 키오스크 기기 · 브라우저 음성 · Google 음성 · 운영 상품 자료 · 실제 AI 호출 비용. 지시서 §4 순서로 확인. 정규식 판정이 놓치는 의료 질문 표현이 있을 수 있다 — 운영 표본으로 보강 필요.
+- **다음:** 3단계 정리(고객 화면 짝짓기 · 관리자 배치 설정 제거) · 가격 표시(준비 조건만 기록) — 지시서 §3.
+- **겹치는 PR / 문서 정합:** 열린 PR 대조 못 함(통합 세션 확인). 문서 정합: 해당 없음.
+
+## 2026-11-13 · 매장 상담 태블릿 구조 1단계 — 약사 · 근무자 태블릿 목록 · 단일 화면 (branch `claude/wizardly-bardeen-ldq332`)
+
+- **PR 묶음:** 이 branch 단독 1 PR(서비스 + API 소비 · core-hub/migration lane 아님). 지시서 [`WO-O4O-STORE-CONSULTATION-TABLET-ROLES-V1`](docs/work-orders/WO-O4O-STORE-CONSULTATION-TABLET-ROLES-V1.md).
+- **한 일:** 내 매장 → 상담을 「약사 태블릿 · 근무자 태블릿」 목록으로 교체(경영자가 이름 붙여 추가 · 삭제, 직원은 조회). 태블릿 한 대에서 문의 · 답변을 끝내고 고객 화면 2대 연결 UI 는 쓰지 않는다. 근무자 화면은 자유 문장 · 음성 입력 + 안내 문구 빠른 입력. 관리자 일반/대형 배치 화면에 「반영되지 않음 · 정리 예정」 안내.
+- **API:** `GET/PUT /neture/pharmacy/consultation-tablets`(organizations.metadata.consultationTablets · owner 재확인 UPDATE · schema 변경 없음). `floor-staff` 고객 방향 자유 문장 허용(이용 자격 검사 유지). mode key · 이용 자격 key 는 그대로.
+- **결정 사항(§9):** 사용자 결정 — 3종(약사 · 근무자 · 소비자) 복수, 기존 연결 방식 교체, 근무자 자유 입력, 키오스크 안내 수준 AI, 다국어 기본, 가격은 준비만. 세션 판단 — 결제 · 이용권을 건드리지 않으려고 태블릿 종류를 기존 mode(`floor-*` 우선, 없으면 `counter-*`)로 매핑. 소비자 키오스크는 기기 인증 · 소비자용 AI 가 새로 필요해 2단계로 분리(지금은 목록에 노출하지 않음 — route 없는 메뉴 금지). 고객 연결 서버 API · `/consultation/customer` 는 3단계 정리까지 남김.
+- **검증:** API jest — consultation-tablets 9 · multilingual-consultation 15 통과, neture-pharmacy 전체 39 suites / 299 통과(15 suites · 218 skip — 전용 PostgreSQL 통합 연결 미설정). web-store vitest pages/pharmacy + pages/__tests__ 72 files / 844 통과. admin platform 18 통과. web-store · api-server · admin-dashboard `tsc --noEmit` 통과. 변경 TS ESLint 오류 0. 문서 민감정보 0.
+- **삭제한 테스트:** 매대 연결(heartbeat · 연결 시작) 화면 테스트 2건 — 해당 UI 를 화면에서 뺐기 때문. station 서버 · hook 테스트는 유지.
+- **확인하지 못한 것 / 배포 후 Demo:** 실제 브라우저 확인 안 함. 경영자 태블릿 추가 · 삭제(PC/mobile), 직원 조회 전용, 근무자 화면 자유 입력 · 음성 · 판단 지원 없음, 약사 화면 판단 지원 — 지시서 §4.
+- **다음:** 2단계(소비자 키오스크 · 다국어 · 안내 수준 AI) · 가격 표시 준비 조건 · 3단계 정리 — 지시서 §3.
+- **겹치는 PR / 문서 정합:** 열린 PR 대조 못 함(통합 세션 확인). 문서 정합: 해당 없음.
 ## 2026-11-13 · TinyFish 운영자 연결·상담 번역 비용 집계 대조
 
 - **branch / 묶음:** `wo/consultation-live-cost-comparison`, main `35703c665`(#1050)에서 시작한 문서 후속. [운영 비용 대조 CHECK](docs/checks/CHECK-O4O-CONSULTATION-LIVE-COST-COMPARISON-2026-11-13.md).

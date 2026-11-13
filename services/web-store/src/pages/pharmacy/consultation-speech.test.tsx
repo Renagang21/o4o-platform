@@ -73,10 +73,10 @@ it('finishes a guidance voice request beside its microphone button and waits for
   expect((guidance().getByRole('textbox') as HTMLInputElement).value).toBe('상품 위치를 알려주시기 바랍니다');
   expect(document.activeElement).not.toBe(guidance().getByRole('textbox'));
 });
-it('keeps nonprofessional outgoing phrases fixed and records the customer in the selected language', async () => {
+it('lets the staff screen speak freely and records the customer in the selected language', async () => {
   render(<Page />); await screen.findByLabelText('고객에게 전달할 한국어 문장');
   fireEvent.change(screen.getByLabelText('상담 방식'), { target: { value: 'floor-staff' } });
-  expect(screen.queryByRole('button', { name: '직원·약사가 말하기' })).toBeNull(); expect(translation().queryByRole('textbox')).toBeNull();
+  expect(screen.getByRole('button', { name: '직원·약사가 말하기' })).toBeTruthy(); expect(translation().getByLabelText('고객에게 전달할 한국어 문장')).toBeTruthy();
   fireEvent.click(screen.getByRole('button', { name: '고객 → 직원' }));
   fireEvent.change(screen.getByLabelText('고객 언어'), { target: { value: 'ja' } });
   fireEvent.click(screen.getByRole('button', { name: '고객이 말하기' })); expect(latest().lang).toBe('ja-JP');

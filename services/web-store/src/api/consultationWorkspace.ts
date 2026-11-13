@@ -13,6 +13,23 @@ export async function saveConsultationExpression(expression: ConsultationExpress
   return r.data;
 }
 export type OperatingType = "standard" | "large";
+export type ConsultationTabletRole = "pharmacist" | "staff" | "consumer";
+/** speechLanguages: 이 태블릿의 Google 음성 자동 감지 후보(최대 3개). 없으면 관리자 기본 후보. */
+export interface ConsultationTablet { id: string; role: ConsultationTabletRole; name: string; speechLanguages?: string[] }
+/** configured: 한 번이라도 저장했는지(false 면 기본 태블릿을 보여 준다). 이전 서버 응답에 없으면 목록이 비었는지로 판단한다. */
+export interface ConsultationTablets { organizationId: string; tablets: ConsultationTablet[]; configured: boolean; canEdit: boolean }
+function tablets(r: Envelope<ConsultationTablets>, message: string) {
+  if (!r.success || typeof r.data?.organizationId !== "string" || !Array.isArray(r.data.tablets) || typeof r.data.canEdit !== "boolean" ||
+    r.data.tablets.some((t) => typeof t?.id !== "string" || typeof t.name !== "string" || !["pharmacist", "staff", "consumer"].includes(t.role)))
+    throw new Error(message);
+  return { ...r.data, configured: typeof r.data.configured === "boolean" ? r.data.configured : r.data.tablets.length > 0 };
+}
+export async function readConsultationTablets() {
+  return tablets(await coreApiClient.get<Envelope<ConsultationTablets>>(`${CONSULTATION_BASE}/consultation-tablets`), "상담 태블릿 목록을 확인하지 못했습니다.");
+}
+export async function saveConsultationTablets(list: ConsultationTablet[]) {
+  return tablets(await coreApiClient.put<Envelope<ConsultationTablets>>(`${CONSULTATION_BASE}/consultation-tablets`, { tablets: list }), "상담 태블릿 목록을 저장하지 못했습니다.");
+}
 export interface SharedConsultation {
   kind: string;
   title: string;
@@ -169,6 +186,45 @@ export async function customerRequest<T>(
   } finally {
     clearTimeout(timer);
     signal?.removeEventListener("abort", cancel);
+  }
+}
+/** 경영자 화면: 소비자 태블릿(키오스크) 연결 코드(10분). */
+export async function createKioskPairing(tabletId: string) {
+  const r = await coreApiClient.post<Envelope<{ code: string; expiresAt: string }>>(
+    `${CONSULTATION_BASE}/consultation-tablets/${encodeURIComponent(tabletId)}/pairing`, {});
+  if (!r.success || typeof r.data?.code !== "string" || typeof r.data.expiresAt !== "string")
+    throw new Error("연결 코드를 만들지 못했습니다.");
+  return r.data;
+}
+export interface KioskCredential { id: string; name: string; token: string }
+export interface KioskCard { kind: string; title: string; text: string; language: string; requestedLanguage: string; publicKey: string | null; fallbackUsed: boolean; translated: boolean }
+export interface KioskAnswer { state: string; intent?: string; language: string; card?: KioskCard; message?: string;
+  products?: Array<{ kind: string; id: string; name: string }> }
+export interface KioskContext { name: string; languages: Array<{ key: string; label: string }>;
+  runtime?: import('../pages/pharmacy/consultation/ConsultationParts').Context['runtime'] }
+/**
+ * 소비자 태블릿(키오스크) 요청. 직원 로그인 밖의 기기 자격(credentials: omit)만 쓴다 —
+ * 고객 화면(consultation-device)과 같은 방식이다.
+ */
+export async function kioskRequest<T>(
+  action: "claim" | "context" | "search" | "answer" | "pharmacist" | "speech/recognize" | "speech/synthesize",
+  body: unknown,
+): Promise<T> {
+  const controller = new AbortController();
+  const timer = window.setTimeout(() => controller.abort(), action === "claim" || action === "context" ? 10_000 : 30_000);
+  try {
+    const base = import.meta.env.VITE_API_BASE_URL || "";
+    const response = await fetch(`${base}/api/v1${CONSULTATION_BASE}/consultation-kiosk/${action}`, {
+      method: "POST", credentials: "omit", cache: "no-store", signal: controller.signal,
+      headers: { "Content-Type": "application/json" }, body: JSON.stringify(body),
+    });
+    const result = await response.json();
+    if (!response.ok || result.success !== true)
+      throw Object.assign(new Error(typeof result.error === "string" ? result.error : "연결을 확인하지 못했습니다."),
+        { status: response.status, code: result.code });
+    return result.data as T;
+  } finally {
+    clearTimeout(timer);
   }
 }
 export function validCustomerScreen(value: CustomerScreen): boolean {
