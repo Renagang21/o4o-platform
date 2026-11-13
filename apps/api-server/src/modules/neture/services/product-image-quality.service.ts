@@ -15,6 +15,7 @@
  */
 
 import type { DataSource } from 'typeorm';
+import { pageWindow } from '../utils/pagination-sql.util.js';
 
 export type ImageStatus = 'has_representative_image' | 'has_images_no_representative' | 'missing_image';
 
@@ -93,8 +94,8 @@ export class ProductImageQualityService {
     );
     const total = Number(count);
 
-    const limit = Math.min(Math.max(params.limit ?? 20, 1), 100);
-    const offset = Math.max(((params.page ?? 1) - 1) * limit, 0);
+    // LIMIT/OFFSET 은 binding 한다 — page/limit 은 유한 정수로 맞춘다(Infinity · NaN · 소수 → SQL 오류 방지).
+    const { limit, offset } = pageWindow(params.page, params.limit, { defaultLimit: 20, maxLimit: 100 });
     const rows: {
       master_id: string; name: string; manufacturer_name: string | null; regulatory_type: string | null;
       barcode: string | null; image_count: string; has_primary: boolean; thumb_url: string | null;
@@ -105,8 +106,8 @@ export class ProductImageQualityService {
          image_count, has_primary, thumb_url, thumb_type, img_updated_at, image_status
        FROM joined ${whereSql}
        ORDER BY (image_status='missing_image') ASC, name ASC
-       LIMIT ${limit} OFFSET ${offset}`,
-      args,
+       LIMIT $${args.length + 1} OFFSET $${args.length + 2}`,
+      [...args, limit, offset],
     );
 
     return {

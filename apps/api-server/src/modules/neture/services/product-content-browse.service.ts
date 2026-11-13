@@ -18,6 +18,7 @@
  */
 
 import type { DataSource } from 'typeorm';
+import { pageWindow } from '../utils/pagination-sql.util.js';
 
 export interface ProductContentBrowseParams {
   q?: string;
@@ -187,8 +188,8 @@ export class ProductContentBrowseService {
     );
     const total = Number(countRows[0]?.count ?? 0);
 
-    const limit = Math.min(Math.max(params.limit ?? 20, 1), 100);
-    const offset = Math.max(((params.page ?? 1) - 1) * limit, 0);
+    // LIMIT/OFFSET 은 binding 한다 — page/limit 은 유한 정수로 맞춘다(Infinity · NaN · 소수 → SQL 오류 방지).
+    const { limit, offset } = pageWindow(params.page, params.limit, { defaultLimit: 20, maxLimit: 100 });
 
     const rows: any[] = await this.dataSource.query(
       `${UNIFIED_CTE}
@@ -196,8 +197,8 @@ export class ProductContentBrowseService {
          source, status, language, service_key, title, summary_preview, has_product_master, updated_at, extra
        FROM unified ${whereSql}
        ORDER BY updated_at DESC NULLS LAST
-       LIMIT ${limit} OFFSET ${offset}`,
-      args,
+       LIMIT $${args.length + 1} OFFSET $${args.length + 2}`,
+      [...args, limit, offset],
     );
 
     // hasStoreCopy: 페이지 결과의 master 기준 후처리(1회 조회). 미연결/미상 시 false.

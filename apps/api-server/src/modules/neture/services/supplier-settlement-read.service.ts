@@ -1,5 +1,6 @@
 import type { DataSource } from 'typeorm';
 import { VALID_STATUSES, type SettlementFilters } from './settlement-query-types.js';
+import { pageWindow } from '../utils/pagination-sql.util.js';
 
 /** Existing settlement responsibility; public callers use NetureSettlementService. */
 export class SupplierSettlementReadService {
@@ -13,8 +14,9 @@ export class SupplierSettlementReadService {
    * 공급자 정산 목록 (페이지네이션 + 상태 필터)
    */
   async getSupplierSettlements(supplierId: string, filters: SettlementFilters) {
-    const { page, limit, status } = filters;
-    const offset = (page - 1) * limit;
+    const { page: rawPage, limit: rawLimit, status } = filters;
+    // LIMIT/OFFSET 도 binding 한다(Raw SQL 문자열 삽입 금지). page=1e400(Infinity)·소수는 SQL 오류(500)가 되므로 정수로 맞춘다.
+    const { page, limit, offset } = pageWindow(rawPage, rawLimit, { defaultLimit: 20, maxLimit: 100 });
 
     const baseParams: any[] = [supplierId];
     let statusClause = '';
@@ -32,8 +34,8 @@ export class SupplierSettlementReadService {
          FROM neture_settlements s
          WHERE s.supplier_id = $1 ${statusClause}
          ORDER BY s.period_end DESC, s.created_at DESC
-         LIMIT ${limit} OFFSET ${offset}`,
-        baseParams,
+         LIMIT $${baseParams.length + 1} OFFSET $${baseParams.length + 2}`,
+        [...baseParams, limit, offset],
       ),
       this.dataSource.query(
         `SELECT COUNT(*)::int AS total

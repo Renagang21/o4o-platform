@@ -10,6 +10,7 @@ import {
   SUPPLIER_VISIBLE_FULFILLMENT_SERVICE_KEYS,
   netureOrderServiceSetSql,
 } from '../constants/fulfillment-service-scope.js';
+import { pageWindow } from '../utils/pagination-sql.util.js';
 
 /** Allowed supplier status transitions */
 const SUPPLIER_STATUS_TRANSITIONS: Record<string, string[]> = {
@@ -59,8 +60,9 @@ export class SupplierOrderService {
   }
 
   async listOrders(supplierId: string, params: { page: number; limit: number; status?: string }) {
-    const { page, limit, status } = params;
-    const offset = (page - 1) * limit;
+    const { page: rawPage, limit: rawLimit, status } = params;
+    // LIMIT/OFFSET 도 binding 한다(Raw SQL 문자열 삽입 금지). page=1e400(Infinity)·소수는 SQL 오류(500)가 되므로 정수로 맞춘다.
+    const { page, limit, offset } = pageWindow(rawPage, rawLimit, { defaultLimit: 20, maxLimit: 100 });
 
     // WO-O4O-SUPPLIER-FULFILLMENT-SERVICE-SCOPE-V1:
     //   서비스 경계를 $2 로 고정한다(목록·카운트 동일 조건). status 는 $3 으로 밀린다.
@@ -89,8 +91,8 @@ export class SupplierOrderService {
          JOIN supplier_product_offers spo ON spo.id = oi.product_id::uuid
          WHERE spo.supplier_id = $1 ${serviceClause} ${statusClause}
          ORDER BY o.created_at DESC, o.id
-         LIMIT ${limit} OFFSET ${offset}`,
-        baseParams,
+         LIMIT $${baseParams.length + 1} OFFSET $${baseParams.length + 2}`,
+        [...baseParams, limit, offset],
       ),
       this.dataSource.query(
         `SELECT COUNT(DISTINCT o.id)::int AS total

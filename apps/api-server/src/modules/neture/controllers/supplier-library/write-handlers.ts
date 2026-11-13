@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { NetureLibraryService } from '../../services/neture-library.service.js';
 import logger from '../../../../utils/logger.js';
 import type { SupplierRequest } from './access.js';
+import { isSupplierHttpUrl } from '../../utils/http-url.util.js';
 export function createSupplierLibraryWriteHandlers(
   libraryService: Pick<NetureLibraryService, 'create' | 'update' | 'delete'>,
 ) {
@@ -54,6 +55,14 @@ export function createSupplierLibraryWriteHandlers(
                 success: false,
                 error: { code: 'MISSING_FILE_URL', message: 'fileUrl is required' },
               });
+            return;
+          }
+          // 자료함 fileUrl 은 비로그인 공개 조회와 CMS 전달에 쓰인다 — javascript: · data: 등은 받지 않는다.
+          if (!isSupplierHttpUrl(fileUrl)) {
+            res.status(400).json({
+              success: false,
+              error: { code: 'INVALID_FILE_URL', message: 'fileUrl 은 http(s) URL 이어야 합니다.' },
+            });
             return;
           }
           if (!fileName || typeof fileName !== 'string') {
@@ -129,7 +138,17 @@ export function createSupplierLibraryWriteHandlers(
         const input: Record<string, unknown> = {};
         if (title !== undefined) input.title = String(title).slice(0, 200);
         if (description !== undefined) input.description = description;
-        if (fileUrl !== undefined) input.fileUrl = fileUrl;
+        if (fileUrl !== undefined) {
+          // 문서형은 fileUrl 을 '' 로 둔다(생성과 같음). 값이 있으면 http(s) URL 만 허용한다.
+          if (fileUrl !== '' && !isSupplierHttpUrl(fileUrl)) {
+            res.status(400).json({
+              success: false,
+              error: { code: 'INVALID_FILE_URL', message: 'fileUrl 은 http(s) URL 이어야 합니다.' },
+            });
+            return;
+          }
+          input.fileUrl = fileUrl;
+        }
         if (fileName !== undefined) input.fileName = String(fileName).slice(0, 255);
         if (fileSize !== undefined) input.fileSize = fileSize;
         if (mimeType !== undefined) input.mimeType = String(mimeType).slice(0, 100);

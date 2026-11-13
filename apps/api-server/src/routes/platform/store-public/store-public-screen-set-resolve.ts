@@ -34,6 +34,7 @@ import type { ContentSourceAdapter } from './store-public-tablet-content-source.
 //   이 resolver 는 **공개 read-only 경로**다. QR 생성(ensureScreenSetQr)은 저장(write) 경로에서만 수행하며
 //   여기서는 이미 발급된 public_qr_slug 를 읽어 URL 로 변환만 한다(DB write 0).
 import { buildScreenSetQrUrl } from '../store-screen-set-qr.service.js';
+import { productLandingUrl } from '../../../modules/neture/services/product-landing.service.js';
 
 export interface ScreenSection {
   blockType: string;
@@ -174,6 +175,34 @@ async function resolveSelectedQrUrls(
 }
 
 /**
+ * 매장이 QR 을 따로 고르지 않은 O4O 상품의 기본 QR = 상품 대표 QR(제품 Landing `/p/{key}`).
+ * WO-O4O-STORE-QR-TABLET-CHANNEL-SEPARATION-V1 T5(2026-11-13) — 코너 제품의 QR 이 대부분 비어 있던 문제.
+ * 공개 경로는 읽기 전용이다: 이미 발급된 Landing(활성 · 노출 가능)만 쓰고 새로 발급하지 않는다(취급 제품 화면이 발급한다).
+ * 이 매장(organization)의 listing 만 본다. 결과: listingId → 대표 QR URL.
+ */
+export async function resolveProductLandingQrUrls(
+  dataSource: DataSource,
+  organizationId: string,
+  listingIds: string[],
+): Promise<Map<string, string>> {
+  const ids = Array.from(new Set(listingIds.filter((id) => UUID_RE.test(id))));
+  const map = new Map<string, string>();
+  if (ids.length === 0) return map;
+  const rows = await dataSource.query(
+    `SELECT opl.id, pl.public_key AS "publicKey"
+       FROM organization_product_listings opl
+       JOIN product_landings pl ON pl.product_master_id = opl.master_id AND pl.deleted_at IS NULL
+        AND pl.status = 'active' AND pl.exposure_state = 'ok'
+      WHERE opl.organization_id = $1 AND opl.id = ANY($2::uuid[])`,
+    [organizationId, ids],
+  );
+  for (const r of rows ?? []) {
+    if (r?.id && r?.publicKey) map.set(String(r.id), productLandingUrl(String(r.publicKey)));
+  }
+  return map;
+}
+
+/**
  * WO-O4O-SCREEN-SET-PREVIEW-PRODUCT-PARITY-V1
  *   product_list **명시 선택** 상품 resolve 의 단일 소스.
  *   저장된 Screen Set(공개 태블릿·QR 모바일)과 미저장 draft preview(POST /screen-sets/preview)가
@@ -237,13 +266,22 @@ export async function resolveSelectedProductListSection(
     ctx.serviceKey,
     selected.map((s) => s.qrCodeId).filter((v): v is string => !!v),
   );
+  // 매장이 QR 을 고르지 않은 O4O 상품은 상품 대표 QR 을 기본으로 보인다(T5). 매장 자체 상품은 대표 QR 이 없다.
+  const landingQrByListing = await resolveProductLandingQrUrls(
+    dataSource,
+    ctx.organizationId,
+    selected.filter((s) => s.productType === 'supplier' && !s.qrCodeId).map((s) => s.productId),
+  );
   // 저장된 선택 순서 그대로 출력(supplier/local 혼합 순서 보존).
   const ordered = selected
     .map((s) => {
       const base = s.productType === 'supplier' ? supplierByListing.get(s.productId) : localById.get(s.productId);
       if (!base) return null;
-      // 상품 데이터에 qrUrl 을 additive 로 부여. 미선택·비활성·삭제 QR 은 null(소비처는 표시하지 않는다).
-      return { ...base, qrUrl: (s.qrCodeId && qrUrlById.get(s.qrCodeId)) || null };
+      // 상품 데이터에 qrUrl 을 additive 로 부여. 매장이 고른 QR 이 우선이다. 고른 QR 이 비활성 · 삭제면 대표 QR 로 대신하지 않는다
+      // (매장이 의도한 QR 이 사라진 상태를 숨기지 않는다 — 소비처는 표시하지 않는다).
+      const selectedQr = s.qrCodeId ? qrUrlById.get(s.qrCodeId) ?? null : null;
+      const landingQr = !s.qrCodeId && s.productType === 'supplier' ? landingQrByListing.get(s.productId) ?? null : null;
+      return { ...base, qrUrl: selectedQr ?? landingQr, qrSource: selectedQr ? 'selected' : landingQr ? 'product' : null };
     })
     .filter(Boolean);
 
