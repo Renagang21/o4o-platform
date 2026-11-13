@@ -789,10 +789,8 @@ function QrSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
         // WO-O4O-CONTENT-SAVE-MEANS-READY-GLOBAL-STANDARD-V1 §7.4:
         //   QR 대상 범위 확장 — '운영자 콘텐츠'(kpa_contents ready) 소스 탭 활성화.
         enableContentHubSource
-        // WO-O4O-KPA-STORE-QR-TARGET-SCOPE-AUDIT-V1 (B안):
-        // WO-O4O-KPA-QR-MULTILINGUAL-PRODUCT-LINK-SOURCE-V1:
-        //   '다국어 제품 콘텐츠' 소스 탭 활성화 — publicKey 발급 후 공개 landing 으로 link 연결.
-        enableMlcSource
+        // '다국어 제품 콘텐츠' 소스 탭은 쓰지 않는다(2026-11-13 사용자 결정) — 소비자 다국어는 한국어 원본 + AI 번역으로 보인다.
+        //   이미 발급된 다국어 QR · 공개 링크는 그대로 열린다(저장된 QR 의 landing 은 이 선택 창과 무관).
         // WO-O4O-KPA-QR-ASSET-PICKER-INCLUDE-DIRECT-CONTENTS-V1:
         //   '내 매장 자료' 탭에 매장 직접 작성 콘텐츠(kpa_store_contents)도 병합 표시 → 콘텐츠 목록과 정합.
         enableDirectContentSource

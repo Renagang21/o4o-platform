@@ -1,5 +1,33 @@
 # HANDOFF
 
+
+## 2026-11-13 · 소비자 다국어 정리 1단계 — QR 다국어 탭 숨김 · OTC 번역 비교 표본 (branch `claude/intelligent-cray-o2p4u3-multilingual`)
+
+> 다음 실행자: **통합 세션**(PR 생성 · 병합) → **LOCAL** — [`WO-O4O-OTC-TRANSLATION-QUALITY-SAMPLE-V1`](docs/work-orders/WO-O4O-OTC-TRANSLATION-QUALITY-SAMPLE-V1.md) T1~T3 → **CLOUD** T4 판정.
+> 기준 문서 초안은 문서 전용 branch `claude/intelligent-cray-o2p4u3-multilingual-docs` 에 따로 냈다(AGENTS.md §4-3 R6).
+
+- **결정 사항(2026-11-13 사용자):**
+  - 소비자 대상 다국어는 한국어 원본 + AI 번역으로 보인다. 외국어 화면에는 한국어를 병기한다(약사가 함께 보며 설명).
+  - 「다국어 제품 콘텐츠」(언어별 페이지 별도 작성)는 쓰지 않는다.
+  - OTC 는 허가 정보라 원문이 같고 확인할 것은 번역 품질뿐이다 — 표본 비교 뒤 통일 여부를 정한다.
+- **한 일:**
+  - `services/web-store/src/pages/pharmacy/StoreQRPage.tsx`: QR 자산 선택 창에 `enableMlcSource` 를 넘기지 않는다. 「다국어 제품 콘텐츠」 탭이 사라진다.
+  - 이미 발급된 다국어 QR · 공개 링크는 그대로 열린다. 다국어 화면에서 QR 로 넘어오는 기존 진입(`MultilingualQrEntry`)도 그대로다 — 다국어 기능 자체의 정리는 기준 문서 확정 뒤 별도 작업이다.
+  - OTC 번역 비교 CLI `apps/api-server/src/scripts/otc-translation-sample.ts`:
+    - `extract` — 읽기 전용, 층별 30건.
+    - `translate` — 운영 번역 경로, 설명 표 미저장.
+    - `compare` — 파일만.
+  - 시험 `src/scripts/__tests__/otc-translation-sample.test.ts`. 실행 WO 를 함께 넣었다.
+- **검증:**
+  - web-store QR 관련 vitest 19/19 · `tsc` 오류 0.
+  - api `otc-translation-sample.test.ts` 5/5. 그중 표본 SQL 은 격리 PostgreSQL 의 실제 migration schema 에서 확인했다.
+  - api `tsc` 의 오류 2건(`partner-support-scope.middleware.ts` · `product-correction/preview.ts`)은 이 변경과 무관하다.
+- **확인하지 못한 것:**
+  - 운영 데이터에서 표본이 층별 10건씩 나오는지(T1).
+  - 운영 번역 경로 호출(T2) — 클라우드에는 DB · AI 키가 없다.
+  - 배포 후 Demo(매장 경영자)로 `/store/marketing/qr?workspace=studio` 「자산 선택」에 탭이 두 개(내 매장 자료 · 운영자 콘텐츠)만 보이는지.
+- **겹칠 수 있는 PR:** 확인하지 못했다(통합 세션이 대조).
+
 ## 2026-11-12 · 상시 통합 세션 운영 기록 · 후속 작업 요청서 (branch `claude/epic-rubin-5g04vm`)
 
 - **병합(squash)**: #1043 · #1042 · #1044 · #1045 · #1046. 배포: main `25e7f801` → `production` `DEPLOYED`(api + 웹 7개, 23:30 UTC).
