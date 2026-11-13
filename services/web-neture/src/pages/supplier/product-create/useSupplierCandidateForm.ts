@@ -15,7 +15,11 @@ import {
   type SupplierProductApplyMode,
   type SupplierProductCandidateDraft,
 } from '../../../lib/supplier-product-authoring';
-import { flattenCategories, type SupplierCandidateForm } from './candidateFormHelpers';
+import {
+  flattenCategories,
+  pickImportShortDescription,
+  type SupplierCandidateForm,
+} from './candidateFormHelpers';
 
 export function useSupplierCandidateForm(importDraft: ImportDraft | null) {
   const navigate = useNavigate();
@@ -64,6 +68,8 @@ export function useSupplierCandidateForm(importDraft: ImportDraft | null) {
   const [searching, setSearching] = useState(false);
   const [master, setMaster] = useState<AdminMaster | null>(null);
   const [barcodeChecked, setBarcodeChecked] = useState(false);
+  // 마지막 조회만 반영한다 — AI 적용 취소·재조회 뒤 늦게 도착한 이전 결과가 Master 를 되살리지 않게.
+  const barcodeSearchSeq = useRef(0);
 
   // Reference data
   const [categories, setCategories] = useState<CategoryTreeItem[]>([]);
@@ -75,8 +81,14 @@ export function useSupplierCandidateForm(importDraft: ImportDraft | null) {
   const [brands, setBrands] = useState<BrandItem[]>([]);
 
   // Description editor — WO-O4O-PRODUCT-IMPORT-ASSISTANT-V1: draft 초기값 지원
-  const [consumerShortDesc, setConsumerShortDesc] = useState(
-    importDraft?.consumerDetailDesc || importDraft?.consumerShortDesc || '',
+  //   간이 설명 칸(500자)에 들어가는 값만 쓴다 — 긴 상세 설명은 넣지 않고 안내한다(제출 FIELD_TOO_LONG 방지).
+  const initialImportDescription = useMemo(
+    () => (importDraft ? pickImportShortDescription(importDraft) : { value: '', skipped: false }),
+    [importDraft],
+  );
+  const [consumerShortDesc, setConsumerShortDesc] = useState(initialImportDescription.value);
+  const [importDescriptionSkipped, setImportDescriptionSkipped] = useState(
+    initialImportDescription.skipped,
   );
 
   const [submitError, setSubmitError] = useState('');
@@ -124,12 +136,14 @@ export function useSupplierCandidateForm(importDraft: ImportDraft | null) {
     async (code?: string) => {
       const bc = (code || form.barcode).trim();
       if (!bc) return;
+      const seq = ++barcodeSearchSeq.current;
       setSearching(true);
       setMaster(null);
       setBarcodeChecked(false);
 
       try {
         const result = await productApi.getMasterByBarcode(bc);
+        if (seq !== barcodeSearchSeq.current) return;
         // 조회 성공 시에만 checked 처리(성공적으로 '없음'과 '조회 실패'를 구분).
         setBarcodeChecked(true);
         if (result) {
@@ -142,10 +156,11 @@ export function useSupplierCandidateForm(importDraft: ImportDraft | null) {
           }));
         }
       } catch {
+        if (seq !== barcodeSearchSeq.current) return;
         // 조회 실패를 '새 상품'으로 오인시키지 않는다 — checked 미설정 + 안내.
         toast.error('바코드 조회에 실패했습니다. 잠시 후 다시 시도해 주시기 바랍니다.');
       } finally {
-        setSearching(false);
+        if (seq === barcodeSearchSeq.current) setSearching(false);
       }
     },
     [form.barcode],
@@ -173,6 +188,14 @@ export function useSupplierCandidateForm(importDraft: ImportDraft | null) {
   // WO-O4O-SUPPLIER-PRODUCT-AI-ASSISTED-CANDIDATE-AUTHORING-V1 §2.3:
   //   검증된 Draft → 폼(저장 없음). regulatoryType 은 진입 유형이 있으면 잠근다.
   //   바코드가 새로 채워지면 기존 Master 조회 → 발견 시 [기존 제품에 공급 연결] 안내(Candidate 대신 from-master).
+  // WO-O4O-SUPPLIER-AI-ASSISTANCE-ROLLOUT-V1 P1: 마지막 AI 결과 적용 직전 상태(적용 취소용 · 저장 아님)
+  const [lastApplySnapshot, setLastApplySnapshot] = useState<{
+    form: SupplierCandidateForm;
+    consumerShortDesc: string;
+    barcodeChecked: boolean;
+    master: AdminMaster | null;
+  } | null>(null);
+
   const handleApplyDraft = (
     draft: SupplierProductCandidateDraft,
     mode: SupplierProductApplyMode,
@@ -182,6 +205,10 @@ export function useSupplierCandidateForm(importDraft: ImportDraft | null) {
       lockRegulatoryType: !!productType?.regulatoryType,
       currentDescription: consumerShortDesc,
     });
+    // 바뀐 값이 없는 적용(같은 결과 재적용 등)은 직전 되돌림 지점을 지우지 않는다.
+    if (result.changedFields.length > 0) {
+      setLastApplySnapshot({ form, consumerShortDesc, barcodeChecked, master });
+    }
     setForm(result.form);
     if (result.description !== null) setConsumerShortDesc(result.description);
     const notes = [...result.notes];
@@ -196,6 +223,19 @@ export function useSupplierCandidateForm(importDraft: ImportDraft | null) {
     if (result.changedFields.length === 0)
       notes.push('적용할 새 값이 없습니다(빈 칸이 없거나 결과가 모두 null).');
     return notes;
+  };
+
+  /** 마지막 AI 결과 적용을 되돌린다. 적용 뒤 직접 고친 내용도 적용 전 값으로 돌아간다. */
+  const handleUndoApplyDraft = (): boolean => {
+    if (!lastApplySnapshot) return false;
+    barcodeSearchSeq.current += 1; // 적용으로 시작한 바코드 조회 결과는 버린다
+    setSearching(false);
+    setForm(lastApplySnapshot.form);
+    setConsumerShortDesc(lastApplySnapshot.consumerShortDesc);
+    setBarcodeChecked(lastApplySnapshot.barcodeChecked);
+    setMaster(lastApplySnapshot.master);
+    setLastApplySnapshot(null);
+    return true;
   };
 
   // WO-NETURE-SUPPLIER-PRODUCT-PRICE-INPUT-FIX-V1: stable initialData to prevent circular update
@@ -290,7 +330,10 @@ export function useSupplierCandidateForm(importDraft: ImportDraft | null) {
   // 같은 폼을 유지한 채 도우미를 연다. 초안·파일·AI 결과를 저장소에 복제하지 않는다.
   const [sourceImportOpen, setSourceImportOpen] = useState(false);
   const goToSourceImport = () => setSourceImportOpen(true);
-  const applySourceImport = (draft: ImportDraft) => {
+  /** Import 초안을 빈 칸에 보완한다. 설명이 간이 설명 한도를 넘어 넣지 못했으면 true. */
+  const applySourceImport = (draft: ImportDraft): boolean => {
+    const picked = pickImportShortDescription(draft);
+    const descriptionSkipped = !consumerShortDesc.trim() && picked.skipped;
     setForm((prev) => ({ ...prev,
       marketingName: prev.marketingName || draft.marketingName,
       brandName: prev.brandName || draft.brandName,
@@ -302,9 +345,11 @@ export function useSupplierCandidateForm(importDraft: ImportDraft | null) {
       consumerReferencePrice: prev.consumerReferencePrice || draft.consumerReferencePrice,
       regulatoryType: prev.regulatoryType,
     }));
-    setConsumerShortDesc((prev) => prev || draft.consumerDetailDesc || draft.consumerShortDesc);
+    setConsumerShortDesc((prev) => prev || picked.value);
+    setImportDescriptionSkipped(descriptionSkipped);
     setCurrentStep(1);
     setSourceImportOpen(false);
+    return descriptionSkipped;
   };
 
   return {
@@ -332,6 +377,8 @@ export function useSupplierCandidateForm(importDraft: ImportDraft | null) {
     searchBarcode,
     handleChange,
     handleApplyDraft,
+    handleUndoApplyDraft,
+    canUndoApplyDraft: lastApplySnapshot !== null,
     productFormInitialData,
     handleProductFormChange,
     goNext,
@@ -341,5 +388,6 @@ export function useSupplierCandidateForm(importDraft: ImportDraft | null) {
     sourceImportOpen,
     setSourceImportOpen,
     applySourceImport,
+    importDescriptionSkipped,
   };
 }
