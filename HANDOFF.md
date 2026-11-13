@@ -1,5 +1,14 @@
 # HANDOFF
 
+## 2026-11-13 · My Home 약사 확인 체크 정리 (branch `claude/wizardly-bardeen-ldq332`)
+
+- **PR 묶음:** 같은 branch 의 상담 매장 단위 판단과 같은 PR(함께 봐야 하는 변경). 지시서 [`WO-O4O-STORE-CONSULTATION-TABLET-ROLES-V1`](docs/work-orders/WO-O4O-STORE-CONSULTATION-TABLET-ROLES-V1.md) §3 2-4단계.
+- **한 일(사용자 지시):** My Home 의 경영자 본인 약사 확인 화면 · 근무자 「이 근무자가 약사임을 확인」 체크 삭제. API `PUT /neture/pharmacy/pharmacist-confirmation` 삭제, 근무자 기능 저장 · 직원 승인의 약사 확인 요구 · `pharmacistConfirmed` 입력 · 직원 목록 응답 필드 삭제, `requiresProfessional` · `consultationProfessionalConfirmed` · `confirmOwnerPharmacist` 삭제, 운영자 화면의 약사 사용 확인 문구 삭제.
+- **결정 사항(§9):** schema 변경 · 일괄 데이터 삭제 없음 — 남은 `pharmacyPharmacistConfirmed` 값은 읽지 않고, 근무자 기능을 다음에 저장할 때 지운다. 직원 승인 기본 기능은 매장이 쓸 수 있는 기능 전체(이전에는 약사 기능 제외). 면허 승인 규칙(`hasApprovedPharmacist`)은 유지하고 DB 테스트의 면허 검증을 이 함수로 옮겼다. 매장별 약사 확인 DB 테스트 1건 삭제.
+- **검증:** API 전체 3 shard 681 suites 통과(84 skip). DB 테스트 `central-operation-access` 를 로컬 임시 PostgreSQL 로 실행 — 고친 4건 통과, 실패 5건은 모두 `column u.businessInfo does not exist`(테스트 fixture 의 users 표가 #968 이후 코드보다 낡음 · 이번 변경과 무관 · 수정하지 않음). `business-operations` · `collaboration-application` DB 테스트는 전체 migrate 된 schema 가 필요해 실행하지 못함(컴파일만 확인). web-neture 185 files / 1578, operator-core-ui 36 / 242, web-store 1003 통과. web-neture · admin · store-web · api type-check 통과. ESLint 오류 0(기존 `_next` 경고 2).
+- **확인하지 못한 것 / 배포 후 Demo:** My Home 「매장 직원 및 초대」에서 약사 확인 체크가 사라지고 상담 기능도 일반 체크로 저장 · 승인되는지(경영자 계정). 운영 DB 에 남은 확인 값 개수.
+- **문서 정합:** 이어지는 「참고 문서 정비」 커밋에서 처리(사용자 지시).
+
 ## 2026-11-13 · 상담은 매장 단위로 판단 · 「매대」 용어 정리 · 이용 안내 문구 (branch `claude/wizardly-bardeen-ldq332`)
 
 - **PR 묶음:** 같은 branch 의 키오스크 위치 · 한국어 병기와 같은 PR. 지시서 [`WO-O4O-STORE-CONSULTATION-TABLET-ROLES-V1`](docs/work-orders/WO-O4O-STORE-CONSULTATION-TABLET-ROLES-V1.md) §3 2-4단계.

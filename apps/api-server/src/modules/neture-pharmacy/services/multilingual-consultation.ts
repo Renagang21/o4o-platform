@@ -47,8 +47,6 @@ export interface ConsultationDependencies {
   selectGuidance?: import('./consultation-guidance.extension.js').GuidanceSelector;
   supportConsultation?: import('./consultation-support.extension.js').ConsultationSupportRunner;
   translate: ConsultationTranslator;
-  /** 더 이상 쓰지 않는다(2026-11-13 약사 상담은 매장 단위 판단). 기존 호출부 호환용으로만 남긴다. */
-  professional?: (userId: string, organizationId: string) => Promise<boolean>;
 }
 
 /** No transcript storage. Business/payment and employee permissions remain in the common resolver. */

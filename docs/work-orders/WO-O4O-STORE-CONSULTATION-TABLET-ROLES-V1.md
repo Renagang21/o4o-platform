@@ -91,7 +91,13 @@
 - 서버(`multilingual-consultation.ts`): 상담 방식 4개 모두 매장 단위 이용 기능(`requireStore`)으로 판단한다. 계정별 약사 확인(`consultationProfessionalConfirmed`)과 근무자별 기능 허용은 상담에서 쓰지 않는다. 상담 안의 상품 안내(`store-staff-support`)와 키오스크 상품 검색도 매장 단위. 매장 소속 · 회원 상태 · 약국 승인 확인은 그대로다.
 - 용어: 「매대 약사 상담」→「약사 상담」, 「매대 직원 안내」→「근무자 상담」, 기능 이름 「다국어 매대 약사 상담」→「다국어 약사 상담」, 관리자 배치 화면의 「매대 … 소비자 화면」→「소비자 상담」. 화면에 남은 「매대」 문구 0건.
 - 이용 안내: 이해하기 어려웠던 「제공 기능은 확인됐습니다. 개인의 승인된 약사 자격과…」 안내를 「이 매장에서 ○○ 상담을 아직 쓸 수 없습니다 — 매장 이용 기능에 포함되어 있지 않음, 경영자가 My Home에서 확인」으로 바꿨다(이제 이 경우에만 나온다).
-- 남은 정리(별도): My Home 「매장 직원 및 초대」의 약사 확인 체크(경영자 본인 · 「이 근무자가 약사임을 확인」)와 근무자별 약사 기능 제한은 상담에 더 이상 쓰이지 않는다. 다른 사용처가 없으면 3단계에서 화면 · API 를 정리한다(사용처 확인 먼저).
+- My Home 약사 확인 정리(완료 · 2026-11-13 사용자 지시): 사용처를 저장소 전체에서 확인한 뒤 모두 걷어냈다.
+  - My Home: 경영자 본인 「약사 상담 사용 확인」(`OwnerPharmacistConfirmation`) 삭제, 근무자 기능 편집의 「이 근무자가 약사임을 확인」 체크와 약사 기능 잠금 삭제 — 상담 기능도 다른 기능처럼 고른다.
+  - API: `PUT /neture/pharmacy/pharmacist-confirmation` 삭제, 근무자 기능 저장 · 직원 승인에서 약사 확인 요구와 `pharmacistConfirmed` 입력 삭제(승인 기본값은 매장이 쓸 수 있는 기능 전체), 직원 목록 응답의 `pharmacistConfirmed` 삭제, 기능 목록의 `requiresProfessional` 삭제, `consultationProfessionalConfirmed` · `confirmOwnerPharmacist` 삭제.
+  - 운영자 화면(`MemberPaidFeaturesPanel`): 「약사 사용 확인이 별도로 필요합니다」 문구 삭제.
+  - 데이터: schema 변경 없음. 운영 DB 에 남은 `organization_members.metadata.pharmacyPharmacistConfirmed` 값은 읽지 않으며, 근무자 기능을 다음에 저장할 때 지운다(일괄 삭제 migration 은 하지 않음).
+  - 면허 승인 규칙(`hasApprovedPharmacist` · 중앙 자격 심사)은 그대로다 — DB 테스트의 면허 검증은 이 함수로 옮겼다.
+- 기준 문서 정합(별도 문서 PR 제안): `O4O-STORE-ACCESS-AND-MEMBERSHIP-V1` 18행 · `O4O-AI-CORE-EXTENSION-FOUNDATION-V1` 296행 · `DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1` 565 · 583 · 589행이 약사 사용 확인을 현행 규칙으로 적고 있다.
 
 ### 가격 표시 준비 (구현 보류 — 설계 조건만)
 

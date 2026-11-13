@@ -8,7 +8,6 @@ import { createStoreTabletRoutes } from '../../../routes/platform/store-tablet.r
 import { createMultilingualProductContentController } from '../../../routes/o4o-store/controllers/multilingual-product-content.controller.js';
 import { roleAssignmentService } from '../../auth/services/role-assignment.service.js';
 import { SemiFranchiseService } from '../services/semi-franchise.service.js';
-import { consultationProfessionalConfirmed } from '../services/consultation-professional.js';
 import { RoleAssignment } from '../../auth/entities/RoleAssignment.js';
 import { createStoreMembershipRoutes } from '../../../routes/store/store-membership.routes.js';
 
@@ -105,8 +104,7 @@ suite('business registration through approved staff execution (PostgreSQL + HTTP
       }
       next();
     });
-    app.use(base, createNeturePharmacyRoutes(db, { translate,
-      professional: (userId, organizationId) => consultationProfessionalConfirmed(db, userId, organizationId) }));
+    app.use(base, createNeturePharmacyRoutes(db, { translate }));
     app.use('/tablet', createStoreTabletRoutes(db, { storeOwnerServiceKey: 'kpa' }));
     app.use('/mlc', createMultilingualProductContentController(db, (_req, _res, next) => next(), 'kpa'));
     app.use('/api/v1/store', createStoreMembershipRoutes(db, (req, res, next) => req.user ? next() : res.status(401).json({ code: 'UNAUTHORIZED' })));
@@ -285,23 +283,18 @@ suite('business registration through approved staff execution (PostgreSQL + HTTP
       expect(translate).toHaveBeenCalledTimes(count);
       // 2026-11-13: 상담은 매장 단위로 판단한다 — 매장이 약사 상담 자격을 가지면 근무자별 허용 · 약사 확인 없이 쓴다.
       expect((await consult(clinical)).status).toBe(200);
-      const selfConfirmation = await request(app).put(base + '/pharmacy/pharmacist-confirmation')
-        .set('x-fixture-user', staff).set('x-store-organization-id', store).send({ confirmed: true });
-      expect(selfConfirmation.status).toBe(403);
+      // 약사 확인 API 는 없어졌다(2026-11-13) — 근무자별 약사 확인 없이 기능을 저장 · 승인한다.
+      expect((await request(app).put(base + '/pharmacy/pharmacist-confirmation')
+        .set('x-fixture-user', owner).set('x-store-organization-id', store).send({ confirmed: true })).status).toBe(404);
       const features = ['multilingual-staff-response', 'multilingual-consultation'];
-      expect((await permit({ serviceFeatures: features })).status).toBe(400);
-      expect((await permit({ serviceFeatures: features, pharmacistConfirmed: true })).status).toBe(200);
-      expect((await consult(clinical)).status).toBe(200);
-      await db.query(`UPDATE organization_members SET role='accepted',metadata=metadata-'pharmacyPharmacistConfirmed' WHERE organization_id=$1 AND user_id=$2`, [store, staff]);
+      expect((await permit({ serviceFeatures: features })).status).toBe(200);
+      await db.query(`UPDATE organization_members SET role='accepted',metadata=metadata||'{"pharmacyPharmacistConfirmed":true}'::jsonb WHERE organization_id=$1 AND user_id=$2`, [store, staff]);
       const approve = await request(app).post('/api/v1/store/members/' + staff + '/approve?serviceKey=kpa')
-        .set('x-fixture-user', owner).set('x-store-organization-id', store).send({ serviceFeatures: features, pharmacistConfirmed: true });
+        .set('x-fixture-user', owner).set('x-store-organization-id', store).send({ serviceFeatures: features });
       expect(approve.status).toBe(200);
       const [approved] = await db.query(`SELECT role,metadata->'pharmacyPharmacistConfirmed' AS confirmed FROM organization_members WHERE organization_id=$1 AND user_id=$2`, [store, staff]);
-      expect(approved).toMatchObject({ role: 'staff', confirmed: true });
+      expect(approved).toMatchObject({ role: 'staff', confirmed: null }); // 남아 있던 확인 값은 저장할 때 지운다
       expect((await consult(clinical)).status).toBe(200);
-      const ownerConfirmation = await request(app).put(base + '/pharmacy/pharmacist-confirmation')
-        .set('x-fixture-user', owner).set('x-store-organization-id', store).send({ confirmed: true });
-      expect(ownerConfirmation.status).toBe(200);
       const ownerContext = await request(app).get(base + '/pharmacy/multilingual-consultation/context')
         .set('x-fixture-user', owner).set('x-store-organization-id', store);
       expect(ownerContext.body.data.modes[0].allowed).toBe(true);
@@ -309,13 +302,13 @@ suite('business registration through approved staff execution (PostgreSQL + HTTP
         await db.query(`UPDATE role_assignments SET is_active=false WHERE user_id=$1 AND role='kpa:store_member'`, [staff]);
         return { translation: 'Late private translation' };
       });
-      expect((await consult(clinical)).status).toBe(403);
+      expect((await consult(clinical)).status).toBe(403); // 매장 소속이 끊기면 늦게 온 결과도 버린다
       await db.query(`UPDATE role_assignments SET is_active=true WHERE user_id=$1 AND role='kpa:store_member'`, [staff]);
       await configure('paid', []);
-      expect((await consult(clinical)).status).toBe(403);
+      expect((await consult(clinical)).status).toBe(403); // 매장 이용 기능이 없으면 쓸 수 없다
       await configure('paid', features);
-      expect((await permit({ serviceFeatures: ['multilingual-staff-response'], pharmacistConfirmed: false })).status).toBe(200);
-      expect((await consult(clinical)).status).toBe(403);
+      expect((await permit({ serviceFeatures: ['multilingual-staff-response'] })).status).toBe(200);
+      expect((await consult(clinical)).status).toBe(200); // 근무자별 허용은 상담에 쓰지 않는다(매장 관리용)
     } finally {
       await db.query('DELETE FROM settings WHERE key=ANY($1::text[])', [policyKeys]);
       for (const row of previous) await db.query(`INSERT INTO settings(key,value,type) VALUES ($1,$2::jsonb,'pharmacy-service-features')`, [row.key, JSON.stringify(row.value)]);

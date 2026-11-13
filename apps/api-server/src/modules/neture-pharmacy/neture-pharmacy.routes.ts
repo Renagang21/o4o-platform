@@ -12,7 +12,6 @@ import { CooperativeService } from './services/cooperative.service.js';
 import { MemberPaidFeatureService, createPharmacyFeatureService } from './services/member-paid-features.js';
 import { PharmacyServicePolicyService } from './services/service-feature-policy.js';
 import { saveStaffFeatures } from './services/staff-feature-permissions.js';
-import { confirmOwnerPharmacist } from './services/consultation-professional.js';
 import { MultilingualConsultationService, type ConsultationDependencies } from './services/multilingual-consultation.js';
 import { ConsultationStationService } from './services/consultation-stations.js';
 import { ConsultationKioskService } from './services/consultation-kiosk.js';
@@ -461,9 +460,6 @@ export function createNeturePharmacyRoutes(dataSource: DataSource, consultationD
     const prepared = { ...result, ...(input.supportSource !== undefined ? { supportSource: input.supportSource } : {}) };
     return input.stationId === undefined ? prepared : stations.recordTranslation(req.user!.id,org(req),input.stationId,input.epoch,prepared);
   }));
-  router.put('/pharmacy/pharmacist-confirmation', ...store, handle(async (req, res) => {
-    res.setHeader('Cache-Control', 'private, no-store'); return confirmOwnerPharmacist(dataSource, req.user!.id, org(req), req.body?.confirmed);
-  }));
   router.get('/admin/service-features', ...admin, handle(() => Promise.resolve(PHARMACY_SERVICE_FEATURES)));
   const featurePolicies = new PharmacyServicePolicyService(dataSource);
   router.get('/admin/service-feature-policies', ...admin, handle(async (_req, res) => {
@@ -488,7 +484,7 @@ export function createNeturePharmacyRoutes(dataSource: DataSource, consultationD
     if (!owners.length) throw new NeturePharmacyError(403, 'STORE_OWNER_REQUIRED', '근무자 기능 설정은 경영자가 할 수 있습니다.');
     const access = await serviceFeatures.resolveStore(org(req));
     return saveStaffFeatures(dataSource, org(req), uuidParam(req, 'userId'), req.body?.serviceFeatures,
-      access.features.filter(feature => feature.allowed === true).map(feature => feature.key), false, req.body?.pharmacistConfirmed);
+      access.features.filter(feature => feature.allowed === true).map(feature => feature.key), false);
   }));
   const memberPaidFeatures = new MemberPaidFeatureService(dataSource);
   router.get('/admin/member-paid-entitlements', ...admin, handle(async (req, res) => { res.setHeader('Cache-Control', 'private, no-store'); return memberPaidFeatures.find(req.query.email); }));
