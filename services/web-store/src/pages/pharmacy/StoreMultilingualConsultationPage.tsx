@@ -38,6 +38,8 @@ export const TABLET_ROLE_MODES = {
 } as const;
 export type TabletRole = keyof typeof TABLET_ROLE_MODES;
 const ROLE_TITLE: Record<TabletRole, string> = { pharmacist: "약사 상담", staff: "근무자 상담" };
+/** 번역 방향 · 말하기 버튼의 응대자 이름 — 태블릿 종류가 없으면(예전 주소) 예전 문구 그대로. */
+const ROLE_PARTY: Record<TabletRole, string> = { pharmacist: "약사", staff: "근무자" };
 const tabletRole = (value: string | null): TabletRole | null =>
   value === "pharmacist" || value === "staff" ? value : null;
 function translationErrorMessage(code?: string) {
@@ -170,6 +172,7 @@ function Consultation({
   const current = context?.modes.find((item) => item.key === mode);
   // 근무자 태블릿도 자유 문장 · 음성으로 답한다. 안내 문구는 빠른 입력으로만 남긴다.
   const fixedResponse = false;
+  const speaker = role ? ROLE_PARTY[role] : "직원";
   const roleModes: readonly string[] | null = role ? TABLET_ROLE_MODES[role] : null;
   const visibleContext = context && roleModes
     ? { ...context, modes: context.modes.filter((item) => roleModes.includes(item.key)) }
@@ -645,8 +648,8 @@ function Consultation({
               <div className="flex flex-wrap gap-2" aria-label="번역 방향">
                 {(
                   [
-                    { key: "to-customer", label: "직원 → 고객" },
-                    { key: "to-staff", label: "고객 → 직원" },
+                    { key: "to-customer", label: `${speaker} → 고객` },
+                    { key: "to-staff", label: `고객 → ${speaker}` },
                   ] as const
                 ).map((item) => (
                   <button
@@ -714,7 +717,7 @@ function Consultation({
                       setPendingVoice("to-customer");
                     }}
                   >
-                    {role === "pharmacist" ? "약사가 말하기" : role === "staff" ? "근무자가 말하기" : "직원·약사가 말하기"}
+                    {role ? `${ROLE_PARTY[role]}가 말하기` : "직원·약사가 말하기"}
                   </button>
                 )}
                 {speech.listening && (

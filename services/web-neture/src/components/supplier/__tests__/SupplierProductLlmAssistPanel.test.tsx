@@ -96,6 +96,25 @@ describe('SupplierProductLlmAssistPanel — apply 계약', () => {
     expect(screen.getByText('note-from-page')).toBeTruthy();
   });
 
+  it('결과 JSON 을 고쳐도 저장된 적용 취소 지점이 있으면 [적용 취소] 를 계속 보여 준다', () => {
+    const onApplyDraft = vi.fn(() => []);
+    const onUndoApply = vi.fn(() => true);
+    const { rerender } = render(
+      <SupplierProductLlmAssistPanel context={context} fromImport onApplyDraft={onApplyDraft} onUndoApply={onUndoApply} canUndoApply={false} />,
+    );
+    const ta = screen.getByPlaceholderText(/"name"/) as HTMLTextAreaElement;
+    fireEvent.change(ta, { target: { value: JSON.stringify({ name: '홍삼정' }) } });
+    fireEvent.click(screen.getByText('결과 적용'));
+    rerender(
+      <SupplierProductLlmAssistPanel context={context} fromImport onApplyDraft={onApplyDraft} onUndoApply={onUndoApply} canUndoApply />,
+    );
+    expect(screen.getByText('적용 취소')).toBeTruthy();
+    // 다음 결과를 받으려고 JSON 을 고친다 — 직전 적용은 여전히 되돌릴 수 있다
+    fireEvent.change(ta, { target: { value: JSON.stringify({ name: '홍삼정 골드' }) } });
+    fireEvent.click(screen.getByText('적용 취소'));
+    expect(onUndoApply).toHaveBeenCalledTimes(1);
+  });
+
   it('요청문 미리보기에 사진/PDF 첨부 안내와 JSON 계약이 들어 있다', () => {
     setup(true);
     fireEvent.click(screen.getByText('소개서 PDF'));

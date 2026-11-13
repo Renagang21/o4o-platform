@@ -113,7 +113,7 @@
 ### 3단계 — 정리 (contract)
 
 - [ ] 2단계 배포 후 고객 화면 짝짓기(`/consultation/customer` · `consultation-device/*` · station pairing) 사용처를 확인하고 제거한다.
-- [ ] 관리자 일반/대형 배치 설정(`PharmacyConsultationLayoutsPanel` · `/admin/pharmacy-consultation-layouts` · `/pharmacy/consultation-layout`) 제거.
+- [x] 관리자 일반/대형 배치 설정(`PharmacyConsultationLayoutsPanel` · `/admin/pharmacy-consultation-layouts` · `/pharmacy/consultation-layout` · `ConsultationLayoutService` · 매장 `fetchConsultationLayout`) 제거(2026-11-13). 운영 DB `organizations.metadata.consultationLayout` 값은 그대로 둔다(읽는 곳 없음).
 - [ ] `counter-*` 방식과 이용 자격 key(`multilingual-consultation` 등) 통합 여부 — 결제 · 이용권 영향이 있어 사업 판단 후 진행.
 
 ## 4. 배포 후 Demo 확인 (1 · 2단계)

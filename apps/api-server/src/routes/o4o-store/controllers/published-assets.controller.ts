@@ -20,7 +20,22 @@
 
 import { Router, Request, Response } from 'express';
 import { DataSource } from 'typeorm';
-import { buildPublishedAssetQuery } from '../../kpa/helpers/asset-render-filter.js';
+import { buildPublishedAssetQuery, PUBLISHED_CHANNEL_KEY } from '../../kpa/helpers/asset-render-filter.js';
+
+const UUID = /^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/i;
+const channelParam = (value: unknown) => (typeof value === 'string' && value ? value : null);
+/** 공개 요청 입력 검사 — 잘못된 값은 400 으로 돌려보내 SQL 에 닿지 않게 한다. */
+function invalidPublicInput(res: Response, ids: string[], channelKey: string | null): boolean {
+  if (ids.some(id => !UUID.test(id))) {
+    res.status(400).json({ success: false, error: { code: 'INVALID_ID', message: 'Invalid identifier' } });
+    return true;
+  }
+  if (channelKey !== null && !PUBLISHED_CHANNEL_KEY.test(channelKey)) {
+    res.status(400).json({ success: false, error: { code: 'INVALID_CHANNEL', message: 'Invalid channel' } });
+    return true;
+  }
+  return false;
+}
 
 export function createPublishedAssetsController(
   dataSource: DataSource,
@@ -44,7 +59,8 @@ export function createPublishedAssetsController(
     async (req: Request, res: Response): Promise<void> => {
       try {
         const { organizationId } = req.params;
-        const channelKey = (req.query.channel as string) || null;
+        const channelKey = channelParam(req.query.channel);
+        if (invalidPublicInput(res, [organizationId], channelKey)) return;
         const assetType = req.query.type as 'cms' | 'signage' | undefined;
         const page = Math.max(1, parseInt(req.query.page as string) || 1);
         const limit = Math.min(100, Math.max(1, parseInt(req.query.limit as string) || 20));
@@ -71,10 +87,11 @@ export function createPublishedAssetsController(
             limit,
           },
         });
-      } catch (error: any) {
+      } catch {
+        // 내부 오류 내용은 공개 응답에 싣지 않는다.
         res.status(500).json({
           success: false,
-          error: { code: 'INTERNAL_ERROR', message: error.message },
+          error: { code: 'INTERNAL_ERROR', message: 'Failed to load published assets' },
         });
       }
     },
@@ -92,12 +109,11 @@ export function createPublishedAssetsController(
     async (req: Request, res: Response): Promise<void> => {
       try {
         const { organizationId, snapshotId } = req.params;
-        const channelKey = (req.query.channel as string) || null;
+        const channelKey = channelParam(req.query.channel);
+        if (invalidPublicInput(res, [organizationId, snapshotId], channelKey)) return;
 
-        // Build channel filter condition
-        const channelCondition = channelKey
-          ? `AND (c.channel_map->>'${channelKey}')::boolean = true`
-          : '';
+        // Channel filter — 값은 $3 으로 바인딩한다.
+        const channelCondition = channelKey ? 'AND (c.channel_map->>$3)::boolean = true' : '';
 
         const query = `
           SELECT
@@ -138,7 +154,7 @@ export function createPublishedAssetsController(
           LIMIT 1
         `;
 
-        const result = await dataSource.query(query, [organizationId, snapshotId]);
+        const result = await dataSource.query(query, channelKey ? [organizationId, snapshotId, channelKey] : [organizationId, snapshotId]);
 
         if (!result.length) {
           res.status(404).json({
@@ -152,10 +168,11 @@ export function createPublishedAssetsController(
           success: true,
           data: result[0],
         });
-      } catch (error: any) {
+      } catch {
+        // 내부 오류 내용은 공개 응답에 싣지 않는다.
         res.status(500).json({
           success: false,
-          error: { code: 'INTERNAL_ERROR', message: error.message },
+          error: { code: 'INTERNAL_ERROR', message: 'Failed to load published assets' },
         });
       }
     },

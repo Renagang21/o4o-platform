@@ -51,7 +51,7 @@ export const SUPPLIER_PRODUCT_OUTPUT_RULES: readonly string[] = [
   '의약품의 일반의약품(OTC)/전문의약품(Rx) 구분을 추측하지 마세요(drugCategory 는 항상 null).',
   'regulatoryType 은 자료에서 명확할 때만 ' + SUPPLIER_CANDIDATE_REGULATORY_TYPES.join(' | ') + ' 중 하나, 아니면 null.',
   'supplierId · masterId · serviceKeys · distributionType · 재고(stock)·유효기간·일련번호 같은 키는 넣지 마세요.',
-  '가격(priceGeneral · consumerReferencePrice)은 자료에 숫자로 명시된 경우에만 숫자(원 단위)로 적고, 없으면 null.',
+  '가격(priceGeneral · consumerReferencePrice)은 이 단계(제품 정보 검토 요청)에서 받지 않습니다. 자료에 있어도 항상 null 로 두세요. isFeatured 는 항상 false 입니다.',
   '질병 치료·예방 효능을 단정하는 표현이나 확인되지 않은 수치(함량·용량·기간)를 설명에 넣지 마세요.',
   '결과는 아래 형식의 JSON 객체 1개만 출력하세요. 설명 문장·주석·여러 개의 JSON 을 붙이지 마세요.',
 ];
@@ -72,9 +72,9 @@ const OUTPUT_SCHEMA_TEXT = `{
   "imageUrl": null,
   "contentImageUrls": [],
   "offerDraft": {
-    "priceGeneral": "숫자 또는 null",
-    "consumerReferencePrice": "숫자 또는 null",
-    "consumerShortDescription": "소비자용 한 줄 설명(200자 이내) 또는 null",
+    "priceGeneral": null,
+    "consumerReferencePrice": null,
+    "consumerShortDescription": "소비자용 간이 설명(200자 이내) 또는 null",
     "consumerDetailDescription": "소비자용 상세 설명(줄바꿈 가능한 텍스트) 또는 null",
     "isFeatured": false
   }

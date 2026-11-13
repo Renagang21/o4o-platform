@@ -353,7 +353,14 @@ function LegacyHubRedirect() {
   return <Navigate to={`${destination}${search}${hash}`} replace />;
 }
 
+/**
+ * 예전 상담 메뉴 경로. 태블릿 주소(mode · role 등)를 가진 예전 링크만 상담 화면으로 보내고,
+ * 메뉴로 들어온 경우는 매장 화면 안의 상담 태블릿 목록으로 보낸다(2026-11-13 — 매장 화면 밖으로 나가지 않게).
+ */
 function LegacyConsultationEntry() {
   const location = useLocation();
-  return <Navigate to={`/consultation/staff${location.search}`} replace />;
+  const params = new URLSearchParams(location.search);
+  if (params.has('mode') || params.has('role') || params.has('tablet'))
+    return <Navigate to={`/consultation/staff${location.search}`} replace />;
+  return <Navigate to="../workspace/use?topic=consultation" relative="path" replace />;
 }

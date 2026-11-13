@@ -2,7 +2,11 @@ import { useState } from 'react';
 import { supplierApi } from '../../../lib/api';
 import { mediaApi } from '../../../lib/api/media';
 import { toast } from '@o4o/error-handling';
-import { createErrorMessage } from './candidateFormHelpers';
+import {
+  CANDIDATE_SHORT_DESCRIPTION_MAX_LENGTH,
+  createErrorMessage,
+  shortDescriptionLength,
+} from './candidateFormHelpers';
 import type { useSupplierCandidateForm } from './useSupplierCandidateForm';
 import type { useSupplierCandidateMedia } from './useSupplierCandidateMedia';
 
@@ -31,6 +35,14 @@ export function useSupplierCandidateSubmission(
   const handleSubmit = async () => {
     if (barcodeChecked && master) {
       setSubmitError('이미 등록된 제품입니다. [기존 제품에 공급 연결]로 진행해 주시기 바랍니다.');
+      return;
+    }
+    // 서버 한도를 넘는 설명은 이미지 업로드 전에 막는다(업로드 후 FIELD_TOO_LONG 실패 방지).
+    const descLength = shortDescriptionLength(consumerShortDesc);
+    if (descLength > CANDIDATE_SHORT_DESCRIPTION_MAX_LENGTH) {
+      setSubmitError(
+        `소비자용 간이 설명이 ${CANDIDATE_SHORT_DESCRIPTION_MAX_LENGTH}자(서식 포함)를 넘습니다(현재 ${descLength}자). 줄여서 다시 요청해 주시기 바랍니다.`,
+      );
       return;
     }
     setSubmitting(true);

@@ -15,6 +15,7 @@ import SupplierProfilePage from '../supplier/SupplierProfilePage';
 import { useAuth } from '../../contexts';
 import { useLoginModal } from '../../contexts/LoginModalContext';
 import { getNetureMyPageNavItems } from './navItems';
+import { knownHasStore } from '../../lib/my-home-store-presence';
 
 export default function MyBusinessProfilePage() {
   const { user, isAuthenticated, isLoading } = useAuth();
@@ -76,7 +77,7 @@ export default function MyBusinessProfilePage() {
         { label: 'My Home', href: '/mypage' },
         { label: '사업자 정보' },
       ]}
-      navItems={getNetureMyPageNavItems(user?.roles)}
+      navItems={getNetureMyPageNavItems(user?.roles, knownHasStore(user?.id))}
     >
       <SupplierProfilePage />
     </MyPageLayout>

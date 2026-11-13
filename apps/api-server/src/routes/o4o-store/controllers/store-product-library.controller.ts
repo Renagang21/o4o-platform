@@ -41,6 +41,22 @@ import { assertDrugActionAllowed } from '../../../modules/neture/guards/drug-acc
 import logger from '../../../utils/logger.js';
 import { deriveListingServiceKeyFromMemberships } from '../../../utils/listing-service-key.js';
 import { registerStoreProductAiRoutes } from './store-product-ai.controller.js';
+import {
+  STORE_IMAGE_SOURCE, StoreImageGuardError, assertHandledMaster, assertPrimaryReplaceable, assertPublicImageUrl, ownStoreImage,
+} from './store-product-image-guard.js';
+
+/** 이미지 쓰기 경계 위반은 정해진 상태 코드로 돌려준다(그 밖의 오류는 기존 처리로). */
+function imageGuard(fn: (req: Request, res: Response) => Promise<unknown>) {
+  return async (req: Request, res: Response) => {
+    try {
+      return await fn(req, res);
+    } catch (error) {
+      if (error instanceof StoreImageGuardError)
+        return res.status(error.status).json({ success: false, error: { code: error.code, message: error.message } });
+      throw error;
+    }
+  };
+}
 
 // ─────────────────────────────────────────────────────
 // WO-O4O-STORE-PRODUCT-LIBRARY-SERVICE-KEY-DERIVATION-V1
@@ -418,15 +434,18 @@ export function createStoreProductLibraryController(dataSource: DataSource): Rou
   // ─── GET /master/:masterId/images — 상품 이미지 목록 ────────────────
   router.get('/master/:masterId/images', requireAuth, requireStoreOwner as RequestHandler, asyncHandler(async (req: Request, res: Response) => {
     const { masterId } = req.params;
+    const userId = (req as any).user?.id as string;
 
+    // editable: 이 계정이 매장에서 올린 이미지만 정렬 · 삭제 · 대표 지정할 수 있다(공용 이미지 보호).
     const images = await dataSource.query(
       `SELECT id, image_url AS "imageUrl", gcs_path AS "gcsPath",
               type, is_primary AS "isPrimary", sort_order AS "sortOrder",
-              created_at AS "createdAt"
+              created_at AS "createdAt",
+              (source = $2 AND created_by = $3) AS "editable"
        FROM product_images
        WHERE master_id = $1 AND deleted_at IS NULL
        ORDER BY sort_order ASC, created_at ASC`,
-      [masterId],
+      [masterId, STORE_IMAGE_SOURCE, userId],
     );
 
     res.json({ success: true, data: images });
@@ -436,17 +455,23 @@ export function createStoreProductLibraryController(dataSource: DataSource): Rou
   // URL에서 이미지를 fetch하여 GCS에 저장 후 ProductImage로 등록.
   // 외부 URL은 저장하지 않는다 (GCS 경로만 참조).
   // WO-O4O-STORE-PRODUCT-IMAGE-REGISTRATION-PHASE2-V1
-  router.post('/master/:masterId/images/from-url', requireAuth, requireStoreOwner as RequestHandler, asyncHandler(async (req: Request, res: Response) => {
+  router.post('/master/:masterId/images/from-url', requireAuth, requireStoreOwner as RequestHandler, asyncHandler(imageGuard(async (req: Request, res: Response) => {
     const { masterId } = req.params;
-    const { url: imageUrl, type = 'detail' } = req.body;
+    const { url: rawImageUrl, type = 'detail' } = req.body;
+    const organizationId = (req as any).organizationId as string;
+    const userId = (req as any).user?.id as string;
 
-    if (!imageUrl || typeof imageUrl !== 'string') {
+    if (!rawImageUrl || typeof rawImageUrl !== 'string') {
       return res.status(400).json({ success: false, error: { code: 'INVALID_INPUT', message: 'url is required' } });
     }
 
-    const imageType = ['thumbnail', 'detail', 'content'].includes(type)
-      ? (type as 'thumbnail' | 'detail' | 'content')
-      : 'detail';
+    // 매장은 공용 썸네일(대표 교체)을 올리지 않는다 — 상세 · 콘텐츠 이미지만 더한다.
+    if (type === 'thumbnail') {
+      return res.status(403).json({ success: false, error: { code: 'PRIMARY_PROTECTED', message: '매장에서는 상세 · 콘텐츠 이미지만 추가할 수 있습니다.' } });
+    }
+    const imageType = ['detail', 'content'].includes(type) ? (type as 'detail' | 'content') : 'detail';
+    await assertHandledMaster(dataSource, organizationId, masterId);
+    const imageUrl = await assertPublicImageUrl(rawImageUrl);
 
     // 1. ProductMaster 존재 확인
     const masters = await dataSource.query(
@@ -465,6 +490,7 @@ export function createStoreProductLibraryController(dataSource: DataSource): Rou
       const response = await fetch(imageUrl, {
         headers: { 'User-Agent': 'Mozilla/5.0 (compatible; O4OImageImport/1.0)' },
         size: 10 * 1024 * 1024, // 10MB limit
+        redirect: 'error', // 공인 주소 검사를 우회하는 리다이렉트를 따라가지 않는다
       });
 
       if (!response.ok) {
@@ -501,51 +527,35 @@ export function createStoreProductLibraryController(dataSource: DataSource): Rou
       imageType,
     );
 
-    // 4. DB 저장 (CatalogService 로직과 동일하게 직접 처리)
-    // thumbnail: 기존 교체, detail/content: 다중 허용
-    if (imageType === 'thumbnail') {
-      const existing = await dataSource.query(
-        `SELECT id, gcs_path FROM product_images WHERE master_id = $1 AND type = 'thumbnail'`,
-        [masterId],
-      );
-      if (existing.length > 0) {
-        await dataSource.query(`DELETE FROM product_images WHERE id = $1`, [existing[0].id]);
-        if (existing[0].gcs_path) {
-          imageStorageService.deleteImage(existing[0].gcs_path).catch(() => {});
-        }
-        // 기존 primary 해제
-        await dataSource.query(
-          `UPDATE product_images SET is_primary = false WHERE master_id = $1 AND is_primary = true`,
-          [masterId],
-        );
-      }
-    }
-
+    // 4. DB 저장 — 매장 업로드는 출처 · 작성자를 남긴다(이후 정렬 · 삭제는 본인 업로드만).
     const countResult = await dataSource.query(
       `SELECT COUNT(*)::int AS cnt FROM product_images WHERE master_id = $1 AND deleted_at IS NULL`,
       [masterId],
     );
     const existingCount: number = countResult[0]?.cnt ?? 0;
-    const isPrimary = imageType === 'thumbnail' ? true : existingCount === 0;
+    // 이미지가 하나도 없는 상품에서만 첫 이미지를 대표로 둔다(다른 출처의 대표는 건드리지 않는다).
+    const isPrimary = existingCount === 0;
 
     const inserted = await dataSource.query(
       `INSERT INTO product_images
-         (id, master_id, image_url, gcs_path, type, is_primary, sort_order, created_at, updated_at)
-       VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, NOW(), NOW())
+         (id, master_id, image_url, gcs_path, type, is_primary, sort_order, source, created_by, updated_by, created_at, updated_at)
+       VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7, $8, $8, NOW(), NOW())
        RETURNING id, image_url AS "imageUrl", gcs_path AS "gcsPath",
                  type, is_primary AS "isPrimary", sort_order AS "sortOrder", created_at AS "createdAt"`,
-      [masterId, gcsUrl, gcsPath, imageType, isPrimary, existingCount],
+      [masterId, gcsUrl, gcsPath, imageType, isPrimary, existingCount, STORE_IMAGE_SOURCE, userId],
     );
 
     logger.info(`[StoreProductImage] Image imported: master=${masterId}, type=${imageType}, gcs=${gcsPath}`);
     res.status(201).json({ success: true, data: inserted[0] });
-  }));
+  })));
 
   // ─── PATCH /images/reorder — 이미지 정렬 순서 일괄 저장 ───────────────
   // body: { items: [{ id: string, sortOrder: number }] }
   // WO-O4O-STORE-PRODUCT-IMAGE-REGISTRATION-PHASE3-V1
-  router.patch('/images/reorder', requireAuth, requireStoreOwner as RequestHandler, asyncHandler(async (req: Request, res: Response) => {
+  router.patch('/images/reorder', requireAuth, requireStoreOwner as RequestHandler, asyncHandler(imageGuard(async (req: Request, res: Response) => {
     const { items } = req.body;
+    const organizationId = (req as any).organizationId as string;
+    const userId = (req as any).user?.id as string;
 
     if (!Array.isArray(items) || items.length === 0) {
       return res.status(400).json({ success: false, error: { code: 'INVALID_INPUT', message: 'items array is required' } });
@@ -561,61 +571,58 @@ export function createStoreProductLibraryController(dataSource: DataSource): Rou
     // Bulk UPDATE: unnest arrays for efficiency
     const ids = items.map((i: { id: string; sortOrder: number }) => i.id);
     const sortOrders = items.map((i: { id: string; sortOrder: number }) => i.sortOrder);
+    // 모두 이 계정이 매장에서 올린 이미지여야 한다(하나라도 아니면 아무것도 바꾸지 않는다).
+    for (const id of new Set<string>(ids)) await ownStoreImage(dataSource, organizationId, userId, id);
 
     await dataSource.query(
-      `UPDATE product_images SET sort_order = t.sort_order::int, updated_at = NOW()
+      `UPDATE product_images SET sort_order = t.sort_order::int, updated_by = $4, updated_at = NOW()
        FROM (SELECT unnest($1::uuid[]) AS id, unnest($2::int[]) AS sort_order) t
-       WHERE product_images.id = t.id`,
-      [ids, sortOrders],
+       WHERE product_images.id = t.id AND product_images.source = $3 AND product_images.created_by = $4`,
+      [ids, sortOrders, STORE_IMAGE_SOURCE, userId],
     );
 
     logger.info(`[StoreProductImage] Reordered ${items.length} images`);
     res.json({ success: true });
-  }));
+  })));
 
   // ─── PATCH /images/:imageId/primary — 대표 이미지 지정 ──────────────
-  router.patch('/images/:imageId/primary', requireAuth, requireStoreOwner as RequestHandler, asyncHandler(async (req: Request, res: Response) => {
+  router.patch('/images/:imageId/primary', requireAuth, requireStoreOwner as RequestHandler, asyncHandler(imageGuard(async (req: Request, res: Response) => {
     const { imageId } = req.params;
+    const organizationId = (req as any).organizationId as string;
+    const userId = (req as any).user?.id as string;
 
-    // 어느 master 소속인지 확인
-    const rows = await dataSource.query(
-      `SELECT id, master_id FROM product_images WHERE id = $1`,
-      [imageId],
-    );
-    if (rows.length === 0) {
-      return res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'Image not found' } });
-    }
-    const masterId = rows[0].master_id;
+    // 본인 업로드 이미지이고, 지금 대표가 없거나 대표도 본인 업로드일 때만 바꾼다.
+    const image = await ownStoreImage(dataSource, organizationId, userId, imageId);
+    const masterId = image.master_id;
+    await assertPrimaryReplaceable(dataSource, userId, masterId);
 
-    // 기존 primary 해제 → 선택 이미지 primary 설정
     await dataSource.query(
-      `UPDATE product_images SET is_primary = false WHERE master_id = $1`,
+      `UPDATE product_images SET is_primary = false WHERE master_id = $1 AND is_primary = true`,
       [masterId],
     );
     await dataSource.query(
-      `UPDATE product_images SET is_primary = true WHERE id = $1`,
-      [imageId],
+      `UPDATE product_images SET is_primary = true, updated_by = $2, updated_at = NOW() WHERE id = $1`,
+      [imageId, userId],
     );
 
     logger.info(`[StoreProductImage] Primary set: imageId=${imageId}, master=${masterId}`);
     res.json({ success: true });
-  }));
+  })));
 
   // ─── DELETE /images/:imageId — 이미지 삭제 ─────────────────────────
-  router.delete('/images/:imageId', requireAuth, requireStoreOwner as RequestHandler, asyncHandler(async (req: Request, res: Response) => {
+  router.delete('/images/:imageId', requireAuth, requireStoreOwner as RequestHandler, asyncHandler(imageGuard(async (req: Request, res: Response) => {
     const { imageId } = req.params;
+    const organizationId = (req as any).organizationId as string;
+    const userId = (req as any).user?.id as string;
 
-    const rows = await dataSource.query(
-      `SELECT id, master_id, gcs_path, is_primary FROM product_images WHERE id = $1`,
-      [imageId],
+    // 본인이 매장에서 올린 이미지만 지운다(공급자 · 운영자 이미지는 보호).
+    const { master_id: masterId, gcs_path: gcsPath, is_primary: wasPrimary } =
+      await ownStoreImage(dataSource, organizationId, userId, imageId);
+
+    await dataSource.query(
+      `DELETE FROM product_images WHERE id = $1 AND source = $2 AND created_by = $3`,
+      [imageId, STORE_IMAGE_SOURCE, userId],
     );
-    if (rows.length === 0) {
-      return res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'Image not found' } });
-    }
-
-    const { master_id: masterId, gcs_path: gcsPath, is_primary: wasPrimary } = rows[0];
-
-    await dataSource.query(`DELETE FROM product_images WHERE id = $1`, [imageId]);
 
     // GCS 파일 삭제 (실패해도 무시)
     if (gcsPath) {
@@ -633,7 +640,7 @@ export function createStoreProductLibraryController(dataSource: DataSource): Rou
 
     logger.info(`[StoreProductImage] Image deleted: imageId=${imageId}, master=${masterId}`);
     res.json({ success: true });
-  }));
+  })));
 
   // ─── GET /my-channels — 내 매장 채널 목록 (B2C/KIOSK) ──────────────
   // 채널 노출 토글 UI에서 사용. organization_channels에서 직접 조회.

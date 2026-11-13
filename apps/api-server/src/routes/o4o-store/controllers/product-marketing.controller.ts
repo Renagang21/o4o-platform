@@ -59,7 +59,8 @@ export function createProductMarketingController(
       // QR 자산 상세 조회 (scanCount 포함)
       let qrAssets: any[] = [];
       if (qrIds.length > 0) {
-        const placeholders = qrIds.map((_, i) => `$${i + 3}`).join(', ');
+        // $1 = organizationId, $2.. = QR ids (쓰지 않는 매개변수를 넘기면 PostgreSQL 이 타입을 정하지 못해 실패한다).
+        const placeholders = qrIds.map((_, i) => `$${i + 2}`).join(', ');
         qrAssets = await dataSource.query(
           `SELECT
              qr.id,
@@ -78,7 +79,7 @@ export function createProductMarketingController(
            ) sc ON sc.qr_code_id = qr.id
            WHERE qr.organization_id = $1 AND qr.id IN (${placeholders})
            ORDER BY qr.created_at DESC`,
-          [organizationId, productId, ...qrIds],
+          [organizationId, ...qrIds],
         );
       }
 
@@ -126,17 +127,31 @@ export function createProductMarketingController(
       const { productId } = req.params;
       const { assetType, assetId } = req.body;
 
-      if (!assetType || !['qr', 'library', 'pop', 'signage'].includes(assetType)) {
+      // 연결할 수 있는 자산은 이 매장 소유의 QR · 자료함 자산뿐이다(조회 화면도 이 두 종류만 보여 준다).
+      const ASSET_TABLE: Record<string, string> = { qr: 'store_qr_codes', library: 'store_execution_assets' };
+      if (!assetType || !ASSET_TABLE[assetType]) {
         res.status(400).json({
           success: false,
-          error: { code: 'VALIDATION_ERROR', message: 'assetType must be qr, library, pop, or signage' },
+          error: { code: 'VALIDATION_ERROR', message: 'assetType must be qr or library' },
         });
         return;
       }
-      if (!assetId) {
+      const uuid = /^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/i;
+      if (typeof assetId !== 'string' || !uuid.test(assetId) || !uuid.test(productId)) {
         res.status(400).json({
           success: false,
           error: { code: 'VALIDATION_ERROR', message: 'assetId is required' },
+        });
+        return;
+      }
+      const owned = await dataSource.query(
+        `SELECT 1 FROM ${ASSET_TABLE[assetType]} WHERE id = $1 AND organization_id = $2 LIMIT 1`,
+        [assetId, organizationId],
+      );
+      if (!owned.length) {
+        res.status(404).json({
+          success: false,
+          error: { code: 'NOT_FOUND', message: 'Marketing asset not found' },
         });
         return;
       }

@@ -123,24 +123,6 @@ async function withQrLink(
   }
 }
 
-/**
- * 관리자 보정(backfill) 전용 — 소유자 인증 하 상세 조회 시 과거 누락 QR 을 보정한다.
- * 저장 경로가 아니므로 실패해도 조회 자체를 막지 않는다(다음 저장에서 확실히 실패로 드러난다).
- */
-async function withQrLinkBestEffort(
-  executor: { query: (sql: string, params?: unknown[]) => Promise<unknown> },
-  organizationId: string,
-  screenSetId: string,
-  base: Record<string, unknown>,
-  serviceKey: string,
-): Promise<Record<string, unknown>> {
-  try {
-    return await withQrLink(executor, organizationId, screenSetId, base, serviceKey);
-  } catch {
-    return { ...base, publicQrSlug: (base.publicQrSlug as string) ?? null, publicQrUrl: null };
-  }
-}
-
 /** QR 실패 응답(모든 저장 경로 공통). 저장은 롤백되었으므로 '부분 성공' 문구를 쓰지 않는다. */
 function respondQrFailure(res: import('express').Response): void {
   res.status(503).json({
@@ -1527,9 +1509,10 @@ export function createStoreTabletRoutes(
         `SELECT ${blockCols('')} FROM store_tablet_screen_blocks WHERE screen_set_id = $1 ORDER BY sort_order ASC`,
         [req.params.id],
       );
-      // WO-O4O-KPA-TABLET-QR-AUTO-LINK-AND-GUIDE-URL-V1 §4: 관리 상세 진입 시 owner 인증 하 lazy ensure
-      //   (과거 저장/연결 누락 콘텐츠 복구). 공개 runtime 은 read-only 유지(여기 아님).
-      res.json({ success: true, data: await withQrLinkBestEffort(dataSource, organizationId, req.params.id, { ...rows[0], blocks }, qrServiceKey) });
+      // GET 은 상태를 바꾸지 않는다(CLAUDE.md §8-4, 2026-11-13). 이전에는 여기서 누락 QR 을 만들었지만(lazy ensure),
+      // 이제 이미 있는 QR 만 보여 준다. 모든 저장 경로가 같은 트랜잭션에서 QR 을 만들므로, QR 이 없던 예전 세트는 다음 저장 때 생긴다.
+      const slug = typeof rows[0].publicQrSlug === 'string' && rows[0].publicQrSlug ? rows[0].publicQrSlug as string : null;
+      res.json({ success: true, data: { ...rows[0], blocks, publicQrSlug: slug, publicQrUrl: slug ? buildScreenSetQrUrl(qrServiceKey, slug) : null } });
     } catch (error: any) {
       console.error('[StoreTablet] GET /screen-sets/:id error:', error);
       res.status(500).json({ success: false, error: 'Failed to fetch screen set', code: 'INTERNAL_ERROR' });

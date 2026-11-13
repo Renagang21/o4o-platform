@@ -11,6 +11,7 @@ import { useLoginModal } from "../../contexts/LoginModalContext";
 import { api } from "../../lib/apiClient";
 import { CURRENT_HOST_PROFILE } from "../../lib/hostProfile";
 import { getNetureMyPageNavItems } from "../mypage/navItems";
+import { knownHasStore } from "../../lib/my-home-store-presence";
 import {
   personalMailApi,
   mailErrorMessage,
@@ -624,7 +625,7 @@ export default function PersonalMailPage() {
     <MyPageLayout
       title="개인 메일 관리"
       width="wide"
-      navItems={getNetureMyPageNavItems(user?.roles)}
+      navItems={getNetureMyPageNavItems(user?.roles, knownHasStore(user?.id))}
     >
       {isLoading ? (
         <MyPageLoadingState message="계정을 확인하고 있습니다…" />

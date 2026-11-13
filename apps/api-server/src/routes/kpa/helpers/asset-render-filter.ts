@@ -25,6 +25,9 @@
  * @param channelKey     - Channel key (e.g. 'home', 'signage', 'promotion'). null = no channel filter
  * @param options        - Additional filter options
  */
+/** channel_map 키 형식. 요청 값은 SQL 문장에 넣지 않고 바인딩하며, 형식이 다르면 호출부가 400 으로 거절한다. */
+export const PUBLISHED_CHANNEL_KEY = /^[a-z][a-z0-9_-]{0,39}$/;
+
 export interface RenderFilterOptions {
   assetType?: 'cms' | 'signage';
   page?: number;
@@ -69,9 +72,13 @@ export function buildPublishedAssetQuery(
   const countParams: any[] = [organizationId];
   let paramIdx = 2;
 
-  // Channel filter
+  // Channel filter — 값은 항상 바인딩한다.
   if (channelKey) {
-    conditions.push(`(c.channel_map->>'${channelKey}')::boolean = true`);
+    if (!PUBLISHED_CHANNEL_KEY.test(channelKey)) throw new Error('INVALID_CHANNEL');
+    conditions.push(`(c.channel_map->>$${paramIdx})::boolean = true`);
+    queryParams.push(channelKey);
+    countParams.push(channelKey);
+    paramIdx++;
   }
 
   // Asset type filter

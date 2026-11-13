@@ -1,4 +1,30 @@
 import type { CategoryTreeItem } from '../../../lib/api';
+import { SUPPLIER_PRODUCT_DESCRIPTION_MAX_LENGTH } from '../../../lib/supplier-product-authoring';
+
+/**
+ * 「소비자용 간이 설명」 칸 한도 — 서버 consumerShortDescription 500자(서식 HTML 포함 · trim 후 길이).
+ * 넘으면 제출이 FIELD_TOO_LONG 으로 실패하므로 화면에서 먼저 알린다.
+ */
+export const CANDIDATE_SHORT_DESCRIPTION_MAX_LENGTH = SUPPLIER_PRODUCT_DESCRIPTION_MAX_LENGTH;
+
+export function shortDescriptionLength(html: string): number {
+  return html.trim().length;
+}
+
+/**
+ * Import 초안 설명 → 간이 설명 칸 값. 간이 설명을 먼저, 상세 설명은 한도 안일 때만 쓴다.
+ * 내용이 있었지만 한도 안에 드는 것이 없으면 skipped=true(칸은 비우고 안내한다).
+ */
+export function pickImportShortDescription(draft: {
+  consumerShortDesc?: string | null;
+  consumerDetailDesc?: string | null;
+}): { value: string; skipped: boolean } {
+  const candidates = [draft.consumerShortDesc, draft.consumerDetailDesc]
+    .map((v) => (v ?? '').trim())
+    .filter((v) => v !== '');
+  const fit = candidates.find((v) => v.length <= CANDIDATE_SHORT_DESCRIPTION_MAX_LENGTH);
+  return { value: fit ?? '', skipped: !fit && candidates.length > 0 };
+}
 
 // WO-O4O-NETURE-SUPPLIER-PRODUCT-CREATE-INFO-FIRST-V1: 정보-우선 — 공급 방식은 승격 후 Offer 연결 시 설정
 export const STEPS = ['제품 정보', '이미지 / 설명'];
