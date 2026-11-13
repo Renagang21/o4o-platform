@@ -2,6 +2,8 @@
 
 상태: **Draft V0.5** (2026-07-15) · 대상: **일반의약품(OTC) 전용** · 진입: [DOCUMENT-INDEX](common/DOCUMENT-INDEX.md)
 
+> **2026-11-13:** 영문 설명을 미리 번역해 저장하는 작업은 [`O4O-CONSUMER-MULTILINGUAL-POLICY-V1`](../baseline/O4O-CONSUMER-MULTILINGUAL-POLICY-V1.md) §4 판정 전까지 멈춘다(새로 만들거나 늘리지 않는다). 이 지침의 오역 기준은 AI 번역 품질 검사에 그대로 쓴다.
+
 > 이 문서는 완성된 규정이 아니다. **테스트 번역을 시작하기 위한 초안**이다.
 > 테스트에서 발견된 문제는 [OTC-EN-TRANSLATION-TEST-LOG](OTC-EN-TRANSLATION-TEST-LOG.md)에 기록하고, 반복되는 것만 이 문서와 [OTC-KO-EN-GLOSSARY](OTC-KO-EN-GLOSSARY.md)에 반영한다.
 

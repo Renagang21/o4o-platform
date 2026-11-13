@@ -61,6 +61,7 @@ describe('메뉴 트리 — 플랫폼 관리자 사이트 canonical 구조', () 
     '/admin/platform/course-deletion',
     '/settings/admin-accounts',
     '/admin/pharmacy-service-settings',
+    '/admin/legal-documents',
     // Core
     '/operators',
     '/operator/points',
