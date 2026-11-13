@@ -1,6 +1,38 @@
 # HANDOFF
 
 
+
+## 2026-11-13 · 이 영상의 제품 — 사이니지 영상 ↔ 제품 연결 (branch `claude/intelligent-cray-o2p4u3-product-video` · migration 포함)
+
+> 다음 실행자: **통합 세션** — 이 branch 로 PR. **migration lane**(AGENTS.md §4-3 R4): 다른 migration Ready PR 이 없을 때 Ready 로 둔다. 병합 뒤 **CLOUD** 가 [`WO-O4O-STORE-QR-TABLET-CHANNEL-SEPARATION-V1`](docs/work-orders/WO-O4O-STORE-QR-TABLET-CHANNEL-SEPARATION-V1.md) T5(태블릿 코너 제품 QR · 영상 보기)를 진행한다.
+
+- **결정 사항:**
+  - 2026-11-13 통합 담당이 `signage_media` 제품 열 migration 을 승인했다.
+  - 세션 판단:
+    - 외래 키를 두지 않는다. 쓰는 API 가 제품 존재와 범위를 확인한다.
+    - 매장은 자기 취급 제품(listing)으로만 연결한다.
+    - 운영자는 공용(HQ) 영상에, 공급자는 자기가 공급하는 제품만 연결한다.
+    - 매장이 가져온 사본(`parentMediaId`)은 원본의 연결을 「(원본)」으로 보이고 해제할 수 없다.
+    - 연결 제품 목록은 보조 정보라, 못 불러와도 영상 목록은 보인다.
+- **migration:**
+  - `1794550173646-AddSignageMediaProductMaster` — `ADD COLUMN "productMasterId" uuid NULL` + 부분 색인.
+  - 자동 판정(#1028 분류기)은 ADDITIVE 다. 따라서 Promote 승인 대상이 아니다.
+  - fingerprint `9611acea…`(7596 lines)는 격리 PostgreSQL 16 에서 baseline + incremental 1..62 를 실행해 얻었다. 직전 상태 `34b34a48…` 가 등록값과 일치하는 것을 먼저 확인했다. 실행 결과 `POST_MIGRATION_SCHEMA_ASSERTION = PASS`.
+- **검증:**
+  - api:
+    - `media-product-link.test.ts` 7/7(실제 schema · 다른 매장 · 공용 · 다른 서비스 영상 차단 포함)
+    - `signage-resource-id-validation.spec.ts` 93/93(UUID route census 30→32 · `/media/product-links` static route 회귀)
+    - schema 상태 jest 32 pass
+    - `tsc` 0
+  - `scripts/ci/__tests__/migration-safety.test.mjs` 31/31(새 migration 을 「알려진 추가형」 목록에 넣었다).
+  - web-store: `vitest src/pages` 83 files / 901 · `tsc` 0. 새 파일 ESLint 0.
+- **확인하지 못한 것:**
+  - `node scripts/db/check-migration-contract.mjs` — 이 세션의 명령 가드가 막았다. CI 가 같은 검사를 돈다.
+  - 배포 후 Demo 「매장 경영자」로 사이니지 → 동영상에서 확인할 것:
+    - 직접 등록한 영상 1개 → 「선택 영상 제품 연결」 → 취급 제품 선택 → 목록의 「연결 제품」 표시 → 해제.
+    - 공용 Demo 데이터이므로 확인 뒤 해제해 원복한다.
+- **겹칠 수 있는 PR:** #1049(상담 태블릿) — 겹치는 파일 없음.
+
 ## 2026-11-13 · 매장 콘텐츠 QR · 태블릿 분리 지시서 (branch `claude/intelligent-cray-o2p4u3-qr-tablet` · 문서만)
 
 > 다음 실행자: **통합 세션** — 지시서 PR. 이후 **CLOUD** 가 [`WO-O4O-STORE-QR-TABLET-CHANNEL-SEPARATION-V1`](docs/work-orders/WO-O4O-STORE-QR-TABLET-CHANNEL-SEPARATION-V1.md) T1~T5 를 순서대로 진행한다(T2 · T5 는 #1049 병합 뒤 · T4 는 DB 구조 변경 승인 뒤).

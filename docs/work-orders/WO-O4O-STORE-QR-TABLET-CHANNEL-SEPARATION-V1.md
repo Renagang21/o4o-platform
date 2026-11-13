@@ -32,7 +32,9 @@
 - [ ] T1 [CLOUD] 기준 문서 반영 — [`O4O-STORE-MENU-CANONICAL-TREE-V1`](../baseline/O4O-STORE-MENU-CANONICAL-TREE-V1.md) 에 D1 · D2 · D5 를 반영한다. 문서 전용 PR(AGENTS.md §4-3 R6)
 - [ ] T2 [CLOUD] 「매장 콘텐츠」 탭 — QR · 태블릿을 각자 탭으로 노출한다(D1). 공유 shell · workspace config 변경이라 모든 소비처(KPA 등 `storeWorkspaceEnabled` 서비스)를 먼저 확인한다(CLAUDE.md §1 · shared module protocol). **#1049 병합 후**
 - [ ] T3 [CLOUD] QR 탭 정리 — 목록 기본값에서 코너 QR 제외 · 「태블릿 코너 포함」 필터(D3), 「콘텐츠 연결」 만들기 제거와 「링크 QR」 정리, 콘텐츠 화면 「QR 출력 · QR 목록에 담기」(D5). 기존 콘텐츠 연결 QR(13건 등)은 그대로 열리고 목록에 남는다
-- [ ] T4 [CLOUD] 제품 ↔ 영상 연결(D6 · §7 조사 반영) — ① O4O 보관 영상(`media_assets`)은 기존 `media_entity_links`(`entity_type='product'`)를 쓴다(DB 변경 없음) ② 매장 · 공급자 사이니지 영상(`signage_media`)은 제품 열을 추가한다 — 추가형 migration(nullable · index). **DB 구조 변경 승인 완료(2026-11-13 통합 담당 · 이 열 하나에 한한다)** · migration lane 직렬(§4-3 R4). 영상 올리기 · 고르기에 「제품 선택(선택 사항)」. 조회는 Boundary 규칙(매장 영상 = `organizationId`, 공급자 · 운영자 영상 = 공유 source)을 지킨다
+- [x] T4 [CLOUD] 제품 ↔ 영상 연결(D6 · §7 조사 반영) — ① O4O 보관 영상(`media_assets`)은 기존 `media_entity_links`(`entity_type='product'`)를 쓴다(DB 변경 없음) ② 매장 · 공급자 사이니지 영상(`signage_media`)은 제품 열을 추가한다 — 추가형 migration(nullable · index). **DB 구조 변경 승인 완료(2026-11-13 통합 담당 · 이 열 하나에 한한다)** · migration lane 직렬(§4-3 R4). 영상 올리기 · 고르기에 「제품 선택(선택 사항)」. 조회는 Boundary 규칙(매장 영상 = `organizationId`, 공급자 · 운영자 영상 = 공유 source)을 지킨다
+  - 2026-11-13 구현(branch `claude/intelligent-cray-o2p4u3-product-video`): migration `1794550173646-AddSignageMediaProductMaster`(추가형 판정) · 연결 API(매장 `PUT /media/:id/product` · `GET /media/product-links`, 운영자 `PUT /hq/media/:id/product`, 공급자 `PATCH /supplier/signage/media/:id` 의 `productMasterId`) · 매장 동영상 목록의 「연결 제품」 열 · 「선택 영상 제품 연결」.
+  - 남은 것: ① O4O 보관 영상(`media_assets`)의 `media_entity_links` 연결은 관리자 카탈로그에 이미 있고 매장 화면은 아직 없다(필요성은 T5 에서 판단) ② 운영자 · 공급자 화면의 연결 UI(API 만 준비) ③ 매장이 가져온 사본(asset snapshot)은 연결하지 않는다 — 원본(공급자 · 운영자 영상)의 연결을 T5 조회가 따른다
 - [ ] T5 [CLOUD] 태블릿 코너 — 제품 QR 기본값을 상품 대표 QR 로(§7), [영상 보기](D7), 코너 화면의 코너 QR 출력(D4). **T4 병합 후**(#1049 와 무관)
 
 ## 4. 검증 (각 단계)
