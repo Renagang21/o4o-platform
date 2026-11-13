@@ -32,12 +32,14 @@ async function productName(db: Pick<DataSource, 'query'>, masterId: string | nul
 }
 
 async function apply(db: Pick<DataSource, 'query'>, where: string, params: unknown[], mediaId: string, masterId: string | null): Promise<MediaProductLink> {
-  const rows = await db.query(
+  const result = await db.query(
     `UPDATE signage_media SET "productMasterId" = $1, "updatedAt" = NOW(), version = version + 1
      WHERE id = $2 AND "deletedAt" IS NULL AND ${where} RETURNING id`,
     [masterId, mediaId, ...params],
   );
-  if (!rows.length) fail('MEDIA_NOT_FOUND', 404, '이 영상을 찾을 수 없거나 연결할 수 없는 영상입니다.');
+  // TypeORM DataSource.query() 는 Postgres UPDATE … RETURNING 에 [rows, affectedCount] 를 돌려준다(pg 드라이버 직접 호출은 rows 만).
+  const rows = Array.isArray(result?.[0]) ? result[0] : result;
+  if (!Array.isArray(rows) || rows.length === 0) fail('MEDIA_NOT_FOUND', 404, '이 영상을 찾을 수 없거나 연결할 수 없는 영상입니다.');
   return { mediaId, productMasterId: masterId, productName: await productName(db, masterId) };
 }
 

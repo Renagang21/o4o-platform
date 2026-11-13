@@ -121,3 +121,24 @@ const url = process.env.MEDIA_PRODUCT_LINK_TEST_DATABASE_URL;
     expect(await masterOf(registered)).toBeNull();
   });
 });
+
+// TypeORM DataSource.query() 는 Postgres UPDATE … RETURNING 에 [rows, affectedCount] 를 돌려준다(Codex P2 · PR #1058).
+describe('media product link with the TypeORM UPDATE result shape', () => {
+  const db = { query: jest.fn() };
+  beforeEach(() => db.query.mockReset());
+  const org = randomUUID();
+  it('0 updated rows ([[], 0]) is MEDIA_NOT_FOUND for store and HQ', async () => {
+    db.query.mockResolvedValue([[], 0]);
+    await expect(linkStoreMediaProduct(db as any, { serviceKey: 'kpa-society', organizationId: org }, randomUUID(), null)).rejects.toMatchObject({ code: 'MEDIA_NOT_FOUND', statusCode: 404 });
+    await expect(linkHqMediaProduct(db as any, 'kpa-society', randomUUID(), null)).rejects.toMatchObject({ code: 'MEDIA_NOT_FOUND', statusCode: 404 });
+  });
+  it('1 updated row ([[{id}], 1]) succeeds', async () => {
+    const id = randomUUID();
+    db.query.mockResolvedValue([[{ id }], 1]);
+    await expect(linkStoreMediaProduct(db as any, { serviceKey: 'kpa-society', organizationId: org }, id, null)).resolves.toEqual({ mediaId: id, productMasterId: null, productName: null });
+  });
+  it('plain row arrays (pg driver) still work', async () => {
+    db.query.mockResolvedValueOnce([]);
+    await expect(linkHqMediaProduct(db as any, 'kpa-society', randomUUID(), null)).rejects.toMatchObject({ code: 'MEDIA_NOT_FOUND' });
+  });
+});
