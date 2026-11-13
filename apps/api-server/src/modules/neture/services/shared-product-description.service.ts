@@ -446,7 +446,7 @@ export class SharedProductDescriptionService {
     limit?: number;
   }): Promise<{ items: SupplierStoreReviewRow[]; total: number }> {
     // LIMIT/OFFSET 은 binding 한다 — page/limit 은 유한 정수로 맞춘다(Infinity · NaN · 소수 → SQL 오류 방지).
-    const { page, limit, offset } = pageWindow(params.page, params.limit, { defaultLimit: 20, maxLimit: 100 });
+    const { limit, offset } = pageWindow(params.page, params.limit, { defaultLimit: 20, maxLimit: 100 });
 
     const where: string[] = [
       'spd.deleted_at IS NULL',
@@ -989,7 +989,7 @@ export class SharedProductDescriptionService {
     limit?: number;
   }): Promise<{ items: ReviewListRow[]; total: number }> {
     // LIMIT/OFFSET 은 binding 한다 — page/limit 은 유한 정수로 맞춘다(Infinity · NaN · 소수 → SQL 오류 방지).
-    const { page, limit, offset } = pageWindow(params.page, params.limit, { defaultLimit: 20, maxLimit: 100 });
+    const { limit, offset } = pageWindow(params.page, params.limit, { defaultLimit: 20, maxLimit: 100 });
 
     const where: string[] = ['spd.deleted_at IS NULL'];
     const args: unknown[] = [];

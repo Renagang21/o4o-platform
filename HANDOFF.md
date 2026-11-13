@@ -10,9 +10,13 @@
   - 공급자 주문 처리 · 정산 목록의 `LIMIT ${limit} OFFSET ${offset}` 문자열 삽입 → binding, page/limit 을 유한 정수로 정규화(`Infinity` · 소수 → SQL 오류 방지).
   - 이미지 URL 등록(`images/from-url`) · 자료함 `fileUrl`: 절대 http(s) URL 만 허용(`javascript:` · `data:` · 상대 경로 400). 기준은 Candidate 이미지 URL 과 같다(`modules/neture/utils/http-url.util.ts`).
 - **결정 사항:** 503 은 기존 403/401/409 계약을 바꾸지 않는 새 코드(일시 오류를 '공급자 아님'으로 오판시키지 않음). `next()` 는 try 밖이라 하위 handler 오류를 503 으로 바꾸지 않는다. 이미지 목록의 접근 수준(로그인 사용자)은 유지 — 공용 카탈로그라 필드만 줄였다. URL 은 https 전용 · 호스트 허용 목록까지는 가지 않았다(외부 자료 링크가 정상 용도).
-- **검증:** 변경 관련 jest(neture 모듈 · supplier · utils) 145 suites PASS(31 skipped = DB 통합 미설정), 신규 테스트 5 파일 · 기존 테스트 4 파일 보강(정렬 · settlement 는 옛 문자열 삽입을 고정하던 기대값을 binding 으로 갱신). `tsc --noEmit` PASS, 변경 파일 ESLint 0, `check-unsafe-routes` 위반 0. 전체 API 3 shard 결과는 아래 「확인하지 못한 것」 참조.
+- **검증:** 아래 「전체 회귀」 줄 참조. 신규 테스트 6 파일 · 기존 테스트 6 파일 보강(정렬 · settlement 는 옛 문자열 삽입을 고정하던 기대값을 binding 으로, 자료함 · 이미지 HTTP 테스트는 guard mock 을 표준 계약 기준으로 갱신).
 - **확인하지 못한 것 / 배포 후:** 운영 DB 연결 없음 — 실제 DB 장애 시 503 동작은 단위 테스트로만 확인. 배포 후 공급자 Demo 로 내 제품 목록 정렬(최신순 · 가격 · 이름) 변경이 실제 순서에 반영되는지, 상품 상세의 이미지 목록 · 자료함 등록이 정상인지 확인.
-- **범위 밖 발견(별도 묶음):** 다른 서비스에도 LIMIT/OFFSET 문자열 삽입이 남아 있다 — `admin-settlement-read.service.ts` · `product-content-browse.service.ts` · `shared-product-description.service.ts` · `product-image-quality.service.ts`. 자료함 · 이미지 경로의 별도 guard(`supplier-library/access.ts` · `supplier-images/access.ts`)는 조직 문맥 · 멤버십 확인이 없고 DB 오류를 403 으로 바꾼다 — 표준 guard 로 교체는 다음 묶음. 기존 혼합 공급자 `neture_orders` 의 상세 · 상태 변경 범위는 운영 데이터 확인(로컬 read-only) 후 결정.
+- **후속 정비(같은 branch · 같은 PR 묶음, 사용자 지시):**
+  - LIMIT/OFFSET 문자열 삽입 → binding: 관리자 정산 · 제품 콘텐츠 조회 · 상품 설명 검수 큐 2곳 · 교체 감사 로그 · 이미지 품질 · 제품 사용처(3 질의). 공통 `modules/neture/utils/pagination-sql.util.ts`(`toPositiveInt` · `pageWindow`)로 정규화하고 앞 commit 의 공급자 주문 · 정산 로컬 helper 도 이것으로 교체.
+  - 자료함(`supplier-library/access.ts`) · 상품 이미지(`supplier-images/access.ts`) guard 를 표준 `createRequireActiveSupplier` / `createRequireLinkedSupplier` 로 교체 — 조직 지정 409 · 쓰기 경로 Neture 회원 상태 확인 · 조회 실패 503 이 다른 공급자 경로와 같아진다. 응답 계약(401 · 403 NO_SUPPLIER · 403 SUPPLIER_NOT_ACTIVE)은 유지.
+  - 예전 혼합 공급자 `neture_orders` → [`WO-O4O-SUPPLIER-LEGACY-MIXED-ORDER-ISOLATION-V1`](docs/work-orders/WO-O4O-SUPPLIER-LEGACY-MIXED-ORDER-ISOLATION-V1.md) 작성. **다음 실행자 LOCAL** — `/db-readonly` 로 §5 Q1~Q4(SELECT · 건수만) 실행 후 판정(A/B/C/D)을 §7 에 기록. 판정 C(진행 중 혼합 주문)이면 통합 담당에게 먼저 보고. CLOUD 구현은 그 뒤.
+- **남은 범위 밖:** `hub-trigger.controller.ts` 4곳이 아직 예전 `getSupplierByUserId` 판정을 쓴다(HUB 트리거 기능 — 별도 묶음). `drug-import` 의 `LIMIT ${take}` 는 CLI 배치 내부 값, `product-library.controller.ts` 는 상수라 그대로 두었다.
 - **겹치는 PR / 문서 정합:** #1057(화면)과 파일 겹침 없음. 문서 정합: 해당 없음.
 
 ## 2026-11-13 · 참고 · 기준 문서 정비 — 상담 매장 단위 판단 반영 (branch `claude/wizardly-bardeen-ldq332` · 문서 전용 커밋)
