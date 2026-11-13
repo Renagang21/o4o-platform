@@ -25,13 +25,13 @@
 | P0-2 | 매장 계정의 공용 상품(master) 이미지 쓰기 범위가 공급자 영역 기준 문서의 이미지 보호와 맞지 않음 | 취급 상품에만 추가 · 본인이 매장에서 올린 이미지만 정렬 · 삭제 · 대표 지정 · 다른 출처 대표 보호 · 외부 주소 제한 (`store-product-image-guard.ts`) — **장기 방향(매장별 이미지 여부)은 사용자 결정 필요** |
 | P0-3 | 플레이리스트 항목의 매장 경계 보강 | 같은 매장 자료만 추가 · 공개 조회도 같은 매장 자료만 (`store-playlist.repository.ts`) |
 
-### P1 — 데이터 경계 · 규칙 위반 (대기)
+### P1 — 데이터 경계 · 규칙 위반 (일부 완료)
 
 | # | 내용 | 위치 | 방향 |
 |---|---|---|---|
-| P1-1 | GET 이 QR 행을 만들고 고친다(§8-4 「GET 으로 상태 변경 금지」) | `routes/platform/store-tablet.routes.ts` `GET /screen-sets/:id` → `store-screen-set-qr.service.ts` | GET 은 읽기만, 보정은 저장 경로 · CLI 로 |
-| P1-2 | 상품 마케팅 연결이 상품 · 자산의 매장 소유를 확인하지 않고, 중복 키에 매장이 없다 | `product-marketing.controller.ts` | 두 ID 매장 소유 확인 · 키에 매장 포함(키 변경은 migration — 승인 필요) |
-| P1-3 | 콘텐츠 공개 · 채널 변경 API 의 역할 확인과 조직 결정 규칙 재확인 필요(의심) | `store-asset-control.controller.ts` · `kpa-content-organization.ts` | 실제 데이터 사용처 확인 뒤 역할 확인 추가 |
+| P1-1 | **완료** — GET 이 QR 행을 만들고 고쳤다(§8-4) | `routes/platform/store-tablet.routes.ts` `GET /screen-sets/:id` | GET 은 있는 QR 만 읽는다. 모든 저장 경로가 QR 을 만들므로 QR 없던 예전 세트는 다음 저장 때 생긴다 |
+| P1-2 | **완료** — 상품 마케팅 연결의 매장 경계 | `product-marketing.controller.ts` | 연결은 이 매장 소유 QR · 자료함 자산만(자산이 매장 소유이므로 중복 키 충돌도 사라짐 — migration 불필요). 같은 파일 조회의 매개변수 오류도 수정 |
+| P1-3 | 콘텐츠 공개 · 채널 변경 API — 매장이 없는 사용자는 예전 KPA 소속 조직으로 넘어간다(의도된 동작으로 보임) | `store-asset-control.controller.ts` · `kpa-content-organization.ts` `resolveKpaContentOrganization` | **로컬 DB 확인 필요**: 약국 매장이 아닌 조직이 가진 공개 자료(`kpa_store_asset_controls`) 수. 0 이면 넘김 규칙을 쓰기 경로에서 빼고, 있으면 역할 확인 추가 |
 | P1-4 | serviceKey 를 경로가 아닌 query · body 에서 받음(Guard Rule 4) | `store-membership.routes.ts` · `pharmacy-products.controller.ts`(문서화된 예외) | 경로 파라미터로 이동 또는 예외 기록 |
 | P1-5 | 500 응답에 내부 오류 문구를 그대로 싣는 곳 약 100곳, 오류 응답 형식 혼재 | o4o-store 컨트롤러 다수 | 표준 `{ success:false, error, code }` · 일반 문구 |
 | P1-6 | UUID 단독 후속 조회(앞 단계에서 매장 확인은 함) | 여러 컨트롤러 · 서비스 | 문장 자체에 매장 조건 추가 |
