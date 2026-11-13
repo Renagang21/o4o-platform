@@ -2,6 +2,7 @@
 
 > **QR ↔ 구독(entitlement) 2계층 정책 결정 기록.** QR을 만들 때 구독제를 감안할 필요 없이 지금 발급하고, 구독 도입 시 QR 재발급 없이 resolver에 게이트만 얹는다.
 > **상태**: Active(결정) · **날짜**: 2026-07-11 · **성격**: 정책/아키텍처 결정 기록. 구현 착수는 별도 WO.
+> 다국어(2026-11-13): §1-B 의 「다국어」 QR 은 [`O4O-CONSUMER-MULTILINGUAL-POLICY-V1`](O4O-CONSUMER-MULTILINGUAL-POLICY-V1.md) 에 따라 한국어 원본 콘텐츠의 QR 을 AI 번역으로 보인다. 언어별로 따로 만든 「다국어 제품 콘텐츠」 QR 은 새로 만들지 않으며, 이미 발급된 QR 은 계속 열린다.
 > 관련 Boundary: Store Ops = `organizationId` (F6). 관련 자산: `store_paid_feature_entitlements`(WO-O4O-STORE-PAID-FEATURE-ENTITLEMENT-V1).
 
 ---

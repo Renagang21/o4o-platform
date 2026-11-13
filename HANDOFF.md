@@ -20,6 +20,25 @@
 - **배포 후 Demo 확인:** Demo 계정은 운영자 · 관리자 화면 권한이 없음 — 통합 담당이 운영자 화면에서 삭제 미완료 회원 선택 시 링크 · Admin 삭제 보류 시 빨간 안내를 확인.
 - **문서 정합:** 해당 없음.
 
+## 2026-11-13 · 소비자 다국어 기준 문서 초안 (branch `claude/intelligent-cray-o2p4u3-multilingual-docs` · 문서 전용)
+
+> **2026-11-13 통합 담당 확정(DRAFT → Active).** 다음 실행자: **통합 세션** — 문서 PR 은 코드 branch `claude/intelligent-cray-o2p4u3-multilingual` 다음에 병합한다(그 branch 의 WO 를 링크한다 · AGENTS.md §4-3 R7).
+
+- **새 문서:** [`docs/baseline/O4O-CONSUMER-MULTILINGUAL-POLICY-V1.md`](docs/baseline/O4O-CONSUMER-MULTILINGUAL-POLICY-V1.md) — 상태 DRAFT. 내용:
+  - 원본은 한국어 하나, 번역은 AI, 번역본은 재사용, 원본이 바뀌면 다시 번역한다.
+  - 외국어 화면에는 한국어를 병기한다(기본 켜짐 · 약사가 끌 수 있음).
+  - 「다국어 제품 콘텐츠」는 새로 만들지 않는다(이미 발급된 링크는 계속 열린다).
+  - OTC 는 표본 비교 결과로 정한다.
+- **결정 사항(2026-11-13 사용자):** 위 내용 그대로다. 한국어 병기를 기본 켜짐으로 둔 것은 이 세션의 판단이다 — 근거는 매장 안에서 약사가 함께 보는 화면이라는 점이다.
+- **확정 후 반영(같은 branch · 통합 담당 승인):**
+  - `CANONICAL-INDEX` §6 에 ACTIVE 로 등재했다.
+  - 기준 문서 4건과 OTC 번역 지침에 이 정책을 가리키는 표기 한 줄을 넣었다. 본문 판정은 바꾸지 않았다.
+    - `O4O-STORE-MENU-CANONICAL-TREE-V1`
+    - `PRODUCT-RESOURCE-ARCHITECTURE-BASELINE-V3-AMENDMENT`(F12 개정 문서 · 구독 경계 그대로)
+    - `O4O-QR-ENTITLEMENT-TWO-TIER-POLICY-V1`
+    - `OTC-DESCRIPTION-DESIGN-GUIDE` · `OTC-EN-TRANSLATION-GUIDE`
+  - OTC 영문 사전 번역은 정책 §4 판정 전까지 멈춘다.
+- **검증:** `check-doc-sensitive` 통과. WO 링크는 코드 branch 병합 전까지 깨진 상태다(병합 순서로 해결).
 ## 2026-11-13 · 매장 콘텐츠 QR · 태블릿 분리 지시서 (branch `claude/intelligent-cray-o2p4u3-qr-tablet` · 문서만)
 
 > 다음 실행자: **통합 세션** — 지시서 PR. 이후 **CLOUD** 가 [`WO-O4O-STORE-QR-TABLET-CHANNEL-SEPARATION-V1`](docs/work-orders/WO-O4O-STORE-QR-TABLET-CHANNEL-SEPARATION-V1.md) T1~T5 를 순서대로 진행한다(T2 · T5 는 #1049 병합 뒤 · T4 는 DB 구조 변경 승인 뒤).

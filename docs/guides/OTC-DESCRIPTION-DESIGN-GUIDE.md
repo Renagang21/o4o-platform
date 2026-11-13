@@ -1,6 +1,7 @@
 # OTC-DESCRIPTION-DESIGN-GUIDE — 일반의약품 설명서 화면 디자인 지침
 
 상태: **Draft V0.9** (2026-07-16) · 대상: **일반의약품(OTC) 전용** · 진입: [DOCUMENT-INDEX](common/DOCUMENT-INDEX.md)
+다국어(2026-11-13): 소비자 다국어는 [`O4O-CONSUMER-MULTILINGUAL-POLICY-V1`](../baseline/O4O-CONSUMER-MULTILINGUAL-POLICY-V1.md) 을 따른다. 아래 D(다국어 공개 랜딩)는 새로 만들지 않는다. 영문 설명은 같은 정책 §4 판정 전까지 새로 만들거나 늘리지 않는다.
 번역 기준: [OTC-EN-TRANSLATION-GUIDE](OTC-EN-TRANSLATION-GUIDE.md) · 테스트 기록: [OTC-DESCRIPTION-DESIGN-TEST-LOG](OTC-DESCRIPTION-DESIGN-TEST-LOG.md)
 
 > 이 문서는 **새 디자인 시스템을 만들지 않는다.** 이미 구현된 공용 렌더러를 그대로 쓴다.
