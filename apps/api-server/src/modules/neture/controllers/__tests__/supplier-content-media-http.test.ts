@@ -28,20 +28,38 @@ jest.mock('../../../../middleware/auth.middleware.js', () => ({
     next();
   },
 }));
-jest.mock('../../middleware/neture-identity.middleware.js', () => ({
-  createRequireLinkedSupplier:
-    () => (req: express.Request, _res: express.Response, next: express.NextFunction) => {
-      (req as any).supplierId = 'fixture-supplier';
-      next();
-    },
-  createRequireActiveSupplier:
-    () => (req: express.Request, res: express.Response, next: express.NextFunction) => {
-      if (req.headers['x-test-state'] === 'pending')
-        return res.status(403).json({ error: 'SUPPLIER_NOT_ACTIVE' });
-      (req as any).supplierId = 'fixture-supplier';
-      next();
-    },
-}));
+// 표준 공급자 guard 의 응답 계약(403 NO_SUPPLIER · 403 SUPPLIER_NOT_ACTIVE)을 흉내낸다.
+// 자료함 경로도 이 guard 를 쓴다 — 공급자 조회 결과는 mockSupplier 로 정한다.
+jest.mock('../../middleware/neture-identity.middleware.js', () => {
+  const resolve = async (req: express.Request, res: express.Response) => {
+    const supplier = await mockSupplier();
+    if (!supplier) {
+      res.status(403).json({ success: false, error: { code: 'NO_SUPPLIER', message: 'No linked supplier account found' } });
+      return null;
+    }
+    (req as any).supplierId = supplier.id;
+    return supplier;
+  };
+  return {
+    createRequireLinkedSupplier:
+      () => async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+        if (await resolve(req, res)) next();
+      },
+    createRequireActiveSupplier:
+      () => async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+        const supplier = await resolve(req, res);
+        if (!supplier) return;
+        if (req.headers['x-test-state'] === 'pending' || supplier.status !== 'ACTIVE') {
+          res.status(403).json({
+            success: false,
+            error: { code: 'SUPPLIER_NOT_ACTIVE', message: 'Only ACTIVE suppliers can perform this action.' },
+          });
+          return;
+        }
+        next();
+      },
+  };
+});
 jest.mock('../../entities/index.js', () => ({ SupplierStatus: { ACTIVE: 'ACTIVE' } }));
 jest.mock('../../neture.service.js', () => ({
   NetureService: jest.fn().mockImplementation(() => ({ getSupplierByUserId: mockSupplier })),
@@ -194,13 +212,20 @@ describe('library existing HTTP boundary', () => {
     [
       {
         title: 'fixture',
-        fileUrl: 'url',
+        fileUrl: 'https://fixture.invalid/file.png',
         fileName: 'name',
         fileSize: 'bad',
         mimeType: 'image/png',
       },
       'MISSING_FILE_SIZE',
     ],
+    // 자료함 fileUrl 은 공개 조회 · CMS 전달에 쓰인다 — 절대 http(s) URL 만 받는다
+    ...['javascript:alert(1)', 'data:text/html;base64,PHNjcmlwdD4=', '/relative/file.png', 'url'].map(
+      (fileUrl) => [
+        { title: 'fixture', fileUrl, fileName: 'name', fileSize: 1, mimeType: 'image/png' },
+        'INVALID_FILE_URL',
+      ],
+    ),
   ])('creation validates media/document shape: %s', async (body, error) => {
     const res = await call('post', '/neture/library').send(body);
     expect(res.status).toBe(400);
@@ -228,6 +253,19 @@ describe('library existing HTTP boundary', () => {
         isPublic: true,
       }),
     );
+  });
+  it('update rejects a non-http(s) fileUrl but keeps the document empty value', async () => {
+    const bad = await call('patch', '/neture/library/fixture').send({ fileUrl: 'javascript:alert(1)' });
+    expect(bad.status).toBe(400);
+    expect(bad.body.error.code).toBe('INVALID_FILE_URL');
+    expect(mockLibrary.update).not.toHaveBeenCalled();
+    mockLibrary.update.mockResolvedValue({ success: true, data: { id: 'fixture' } });
+    await call('patch', '/neture/library/fixture').send({ fileUrl: '' });
+    expect(mockLibrary.update).toHaveBeenLastCalledWith('fixture', 'fixture-supplier', { fileUrl: '' });
+    await call('patch', '/neture/library/fixture').send({ fileUrl: 'https://fixture.invalid/next.pdf' });
+    expect(mockLibrary.update).toHaveBeenLastCalledWith('fixture', 'fixture-supplier', {
+      fileUrl: 'https://fixture.invalid/next.pdf',
+    });
   });
   it('update whitelist and empty/no-owner cases remain distinct', async () => {
     expect(

@@ -220,7 +220,7 @@ export class SupplierOfferReadService {
            LIMIT 1
          ) kpa_review ON true
          WHERE ${q.where}
-         ORDER BY pm.id, ${q.sortField} ${q.sortOrder}
+         ORDER BY ${q.sortField} ${q.sortOrder}, spo.id
          LIMIT $${q.idx} OFFSET $${q.idx + 1}`,
         [...q.params, q.limit, q.offset],
       ),

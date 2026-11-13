@@ -19,6 +19,38 @@
 - **확인하지 못한 것 / 배포 후:** 실제 이미지 관리 창(경영자 계정 — 공용 이미지에 「공용」 표시 · 버튼 없음, 본인 업로드는 정렬 · 삭제), 공개 게시 자산 화면 정상 표시. 운영 DB 확인 항목은 조사 기록 §2.
 - **다음:** 조사 기록 P1(GET 부수효과 · 마케팅 연결 경계 · 공개 설정 권한 재확인 …) → P2 → P3.
 - **문서 정합:** 해당 없음.
+## 2026-11-13 · 공급자 API 안정성 · 경계 보완 (branch `claude/supplier-api-stability`)
+
+- **근거 / PR 묶음:** 공급자 전반 조사(같은 세션, 화면 · API · 문서 3갈래) 결과의 1순위 묶음. **이 branch 단독 1 PR**(api-server 공급자 모듈 · 서비스 PR, schema · migration 없음). 화면 수정 PR #1057(`claude/focused-edison-ky4e3u`)과 파일이 겹치지 않는다 — 섞지 않으려고 사용자 확인 후 branch 를 분리했다. PR 은 만들지 않았다.
+- **한 일:**
+  - 공급자 guard(`createRequireActiveSupplier` · `createRequireLinkedSupplier` · copilot `createRequireSupplier`)가 DB 오류에 503 `SUPPLIER_CONTEXT_UNAVAILABLE` 로 응답 — Express 4.22.3 은 async middleware reject 를 잡지 않아 요청이 멈추고, 운영은 `unhandledRejection` → `gracefulShutdown` 으로 인스턴스가 내려갈 수 있었다.
+  - `GET /neture/products/:masterId/images`: 삭제(`deleted_at`) 이미지 제외 · 공개 컬럼만 반환(`gcsPath` · `createdBy` · `deletedBy` · `source` 비노출). 화면은 id · imageUrl · isPrimary · sortOrder · type 만 쓴다.
+  - 공급자 내 제품 목록 정렬: `ORDER BY pm.id, <정렬>` → `ORDER BY <정렬>, spo.id`. offer 는 (master, supplier) 유일이라 정렬 선택이 무시되던 문제.
+  - 공급자 주문 처리 · 정산 목록의 `LIMIT ${limit} OFFSET ${offset}` 문자열 삽입 → binding, page/limit 을 유한 정수로 정규화(`Infinity` · 소수 → SQL 오류 방지).
+  - 이미지 URL 등록(`images/from-url`) · 자료함 `fileUrl`: 절대 http(s) URL 만 허용(`javascript:` · `data:` · 상대 경로 400). 기준은 Candidate 이미지 URL 과 같다(`modules/neture/utils/http-url.util.ts`).
+- **결정 사항:** 503 은 기존 403/401/409 계약을 바꾸지 않는 새 코드(일시 오류를 '공급자 아님'으로 오판시키지 않음). `next()` 는 try 밖이라 하위 handler 오류를 503 으로 바꾸지 않는다. 이미지 목록의 접근 수준(로그인 사용자)은 유지 — 공용 카탈로그라 필드만 줄였다. URL 은 https 전용 · 호스트 허용 목록까지는 가지 않았다(외부 자료 링크가 정상 용도).
+- **검증:** **전체 회귀** — API jest 3 shard(CI 와 같은 방식) 모두 PASS: 10,479 pass · 1,297 skip(DB 통합 미설정) · 실패 0, `tsc --noEmit` PASS, 변경 파일 ESLint 0, `check-unsafe-routes` 위반 0. 신규 테스트 6 파일 · 기존 테스트 6 파일 보강(정렬 · settlement 는 옛 문자열 삽입을 고정하던 기대값을 binding 으로, 자료함 · 이미지 HTTP 테스트는 guard mock 을 표준 계약 기준으로 갱신).
+- **확인하지 못한 것 / 배포 후:** 운영 DB 연결 없음 — 실제 DB 장애 시 503 동작은 단위 테스트로만 확인. 배포 후 공급자 Demo 로 내 제품 목록 정렬(최신순 · 가격 · 이름) 변경이 실제 순서에 반영되는지, 상품 상세의 이미지 목록 · 자료함 등록이 정상인지 확인.
+- **후속 정비(같은 branch · 같은 PR 묶음, 사용자 지시):**
+  - LIMIT/OFFSET 문자열 삽입 → binding: 관리자 정산 · 제품 콘텐츠 조회 · 상품 설명 검수 큐 2곳 · 교체 감사 로그 · 이미지 품질 · 제품 사용처(3 질의). 공통 `modules/neture/utils/pagination-sql.util.ts`(`toPositiveInt` · `pageWindow`)로 정규화하고 앞 commit 의 공급자 주문 · 정산 로컬 helper 도 이것으로 교체.
+  - 자료함(`supplier-library/access.ts`) · 상품 이미지(`supplier-images/access.ts`) guard 를 표준 `createRequireActiveSupplier` / `createRequireLinkedSupplier` 로 교체 — 조직 지정 409 · 쓰기 경로 Neture 회원 상태 확인 · 조회 실패 503 이 다른 공급자 경로와 같아진다. 응답 계약(401 · 403 NO_SUPPLIER · 403 SUPPLIER_NOT_ACTIVE)은 유지.
+  - 예전 혼합 공급자 `neture_orders` → [`WO-O4O-SUPPLIER-LEGACY-MIXED-ORDER-ISOLATION-V1`](docs/work-orders/WO-O4O-SUPPLIER-LEGACY-MIXED-ORDER-ISOLATION-V1.md) 작성. **다음 실행자 LOCAL** — `/db-readonly` 로 §5 Q1~Q4(SELECT · 건수만) 실행 후 판정(A/B/C/D)을 §7 에 기록. 판정 C(진행 중 혼합 주문)이면 통합 담당에게 먼저 보고. CLOUD 구현은 그 뒤.
+- **남은 범위 밖:** `hub-trigger.controller.ts` 4곳이 아직 예전 `getSupplierByUserId` 판정을 쓴다(HUB 트리거 기능 — 별도 묶음). `drug-import` 의 `LIMIT ${take}` 는 CLI 배치 내부 값, `product-library.controller.ts` 는 상수라 그대로 두었다.
+- **겹치는 PR / 문서 정합:** #1057(화면)과 파일 겹침 없음. 문서 정합: 해당 없음.
+
+## 2026-11-13 · 태블릿 코너 제품 QR 기본값 = 상품 대표 QR (branch `claude/intelligent-cray-o2p4u3-tablet-product-qr` · API)
+
+> 다음 실행자: **통합 세션** — 이 branch 로 PR. [`WO-O4O-STORE-QR-TABLET-CHANNEL-SEPARATION-V1`](docs/work-orders/WO-O4O-STORE-QR-TABLET-CHANNEL-SEPARATION-V1.md) T5 의 첫 부분. [영상 보기]는 #1058(이 영상의 제품) 병합 뒤에 한다.
+
+- **한 일:** 태블릿 코너 · 코너 QR 모바일 화면의 「제품 목록」에서 매장이 QR 을 따로 고르지 않은 O4O 상품은 상품 대표 QR(`/p/{key}`)을 기본으로 보인다.
+  - 매장이 고른 QR 이 있으면 그것이 우선이다(`qrSource: 'selected' | 'product'`).
+  - 고른 QR 이 비활성 · 삭제된 경우에는 대표 QR 로 대신하지 않는다. 매장이 의도한 QR 이 사라진 상태를 숨기지 않기 위해서다.
+  - 매장 자체 상품에는 대표 QR 이 없다.
+- **공개 경로 쓰기 0 유지:** 이미 발급된 대표 QR(Landing · 활성 · 노출 가능)만 읽는다. 발급은 하지 않는다 — 취급 제품 화면의 상품 QR 조회가 발급한다. 이 매장의 listing 만 본다.
+- **검증:**
+  - 새 `store-public/__tests__/product-landing-qr-fallback.test.ts`(실제 schema — 다른 매장 listing · 노출 중지 · 미발급 제외 · 쓰기 0) 와 `kpa-tablet-generation-consolidation-contract.spec.ts` 를 합쳐 20 pass.
+  - api `tsc` 의 오류 2건(`partner-support-scope` · `product-correction/preview`)은 이 변경과 무관하다.
+- **배포 후 확인:** Demo 「매장 경영자」의 태블릿 코너(제품 진열형) 미리보기 · 코너 QR 모바일에서, QR 을 고르지 않은 O4O 상품에 QR 이 보이고 스캔하면 상품 대표 화면이 열리는지.
 
 ## 2026-11-13 · 참고 · 기준 문서 정비 — 상담 매장 단위 판단 반영 (branch `claude/wizardly-bardeen-ldq332` · 문서 전용 커밋)
 

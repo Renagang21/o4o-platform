@@ -16,7 +16,6 @@
 import { Router } from 'express';
 import type { Router as ExpressRouter } from 'express';
 import { requireAuth } from '../../middleware/auth.middleware.js';
-import { NetureService } from './neture.service.js';
 import { NetureLibraryService } from './services/neture-library.service.js';
 import { AppDataSource } from '../../database/connection.js';
 import { SupplierLibraryHandoffService } from './services/supplier-library-handoff.service.js';
@@ -26,10 +25,9 @@ import { createSupplierLibraryReadHandlers } from './controllers/supplier-librar
 import { createSupplierLibraryWriteHandlers } from './controllers/supplier-library/write-handlers.js';
 import { createSupplierLibraryHandoffHandlers } from './controllers/supplier-library/handoff-handlers.js';
 const router: ExpressRouter = Router();
-const netureService = new NetureService();
 const libraryService = new NetureLibraryService(AppDataSource);
 const handoffService = new SupplierLibraryHandoffService(AppDataSource);
-const { requireActiveSupplier, requireLinkedSupplier } = createSupplierLibraryAccess(netureService);
+const { requireActiveSupplier, requireLinkedSupplier } = createSupplierLibraryAccess(AppDataSource);
 const readHandlers = createSupplierLibraryReadHandlers(libraryService);
 const writeHandlers = createSupplierLibraryWriteHandlers(libraryService);
 const handoffHandlers = createSupplierLibraryHandoffHandlers(handoffService);
