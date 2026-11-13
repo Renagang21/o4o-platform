@@ -98,10 +98,48 @@ describe('device credential', () => {
 });
 
 describe('consumer answers', () => {
-  it('searches by original and translated words and returns names only', async () => {
+  it('searches by original and translated words and shows each product location in the customer language', async () => {
+    translate.mockImplementation(async (input: { text: string }) => ({ translation: input.text === 'vitamin' ? '비타민' : input.text === '1) A-1' ? '1) Shelf A-1' : '번역', detectedLanguage: 'en' }));
     const result = await service.search({ ...device, text: 'vitamin', language: 'en' });
-    expect(translate).toHaveBeenCalledWith({ text: 'vitamin', source: 'en', target: 'ko' }, expect.objectContaining({ actorId: 'owner', organizationId: STORE }));
-    expect(result).toEqual({ state: 'products', language: 'en', products: [{ kind: 'listing', id: PRODUCT, name: '비타민' }] });
+    expect(translate).toHaveBeenNthCalledWith(1, { text: 'vitamin', source: 'en', target: 'ko' }, expect.objectContaining({ actorId: 'owner', organizationId: STORE }));
+    expect(translate).toHaveBeenNthCalledWith(2, { text: '1) A-1', source: 'ko', target: 'en' }, expect.objectContaining({ actorId: 'owner', organizationId: STORE }));
+    expect(result).toEqual({ state: 'products', language: 'en', products: [
+      { kind: 'listing', id: PRODUCT, name: '비타민', location: { text: 'Product location: Shelf A-1', language: 'en' } },
+    ] });
+  });
+  it('translates distinct locations once and falls back to the Korean text when lines do not line up', async () => {
+    const OTHER = '44444444-4444-4444-8444-444444444444', THIRD = '55555555-5555-4555-8555-555555555555';
+    products.mockResolvedValue([
+      { kind: 'listing', id: PRODUCT, name: '비타민C', location: '2번 진열대 왼쪽' },
+      { kind: 'local', id: OTHER, name: '비타민D', location: '2번 진열대 왼쪽' },
+      { kind: 'listing', id: THIRD, name: '비타민B', location: '' },
+    ]);
+    translate.mockImplementation(async (input: { text: string; source: string }) => input.source === 'ko'
+      ? { translation: 'Left of shelf 2, and something else' } : { translation: '비타민', detectedLanguage: 'en' });
+    const result = await service.search({ ...device, text: 'vitamin', language: 'en' }) as { products: Array<{ name: string; location: { text: string; language: string } }> };
+    expect(translate.mock.calls.filter(([input]) => input.source === 'ko')).toHaveLength(1);
+    expect(translate.mock.calls.find(([input]) => input.source === 'ko')![0].text).toBe('1) 2번 진열대 왼쪽');
+    expect(result.products.map(item => item.location)).toEqual([
+      { text: 'Product location: 2번 진열대 왼쪽', language: 'ko' },
+      { text: 'Product location: 2번 진열대 왼쪽', language: 'ko' },
+      { text: 'Please ask a staff member for the product location.', language: 'en' },
+    ]);
+  });
+  it('shows Korean locations without any translation call and keeps access errors from the location step', async () => {
+    const korean = await service.search({ ...device, text: '비타민', language: 'ko' }) as { products: Array<{ location: unknown }> };
+    expect(korean.products[0].location).toEqual({ text: '상품 위치: A-1', language: 'ko' });
+    expect(translate).not.toHaveBeenCalled();
+    translate.mockImplementation(async (input: { source: string }) => {
+      if (input.source === 'ko') throw new NeturePharmacyError(403, 'STORE_ACCESS_REQUIRED', 'revoked');
+      return { translation: '비타민', detectedLanguage: 'en' };
+    });
+    await expect(service.search({ ...device, text: 'vitamin', language: 'en' })).rejects.toMatchObject({ httpStatus: 403 });
+    translate.mockImplementation(async (input: { source: string }) => {
+      if (input.source === 'ko') throw new Error('provider down');
+      return { translation: '비타민', detectedLanguage: 'en' };
+    });
+    const fallback = await service.search({ ...device, text: 'vitamin', language: 'en' }) as { products: Array<{ location: unknown }> };
+    expect(fallback.products[0].location).toEqual({ text: 'Product location: A-1', language: 'ko' });
   });
   it('refuses product search when the store lost the staff product-support feature', async () => {
     requireProductSupport.mockRejectedValue(new NeturePharmacyError(403, 'SERVICE_FEATURE_REQUIRED', 'feature'));

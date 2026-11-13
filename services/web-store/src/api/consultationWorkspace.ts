@@ -199,7 +199,8 @@ export async function createKioskPairing(tabletId: string) {
 export interface KioskCredential { id: string; name: string; token: string }
 export interface KioskCard { kind: string; title: string; text: string; language: string; requestedLanguage: string; publicKey: string | null; fallbackUsed: boolean; translated: boolean }
 export interface KioskAnswer { state: string; intent?: string; language: string; card?: KioskCard; message?: string;
-  products?: Array<{ kind: string; id: string; name: string }> }
+  /** location: 매장이 등록한 위치(고객 언어로 번역 · 실패 시 한국어 원문) 또는 위치 미등록 안내. */
+  products?: Array<{ kind: string; id: string; name: string; location?: { text: string; language: string } }> }
 export interface KioskContext { name: string; languages: Array<{ key: string; label: string }>;
   runtime?: import('../pages/pharmacy/consultation/ConsultationParts').Context['runtime'] }
 /**

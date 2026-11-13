@@ -13,7 +13,7 @@ const credentialKey = "o4o:consultation-kiosk-device:v1";
 /** 다음 고객을 위해 마지막 조작 뒤 이 시간이 지나면 처음 화면으로 돌아간다. */
 export const KIOSK_IDLE_MS = 120_000;
 const big = "min-h-14 rounded-xl border px-5 py-3 text-lg disabled:opacity-50";
-type Product = { kind: string; id: string; name: string };
+type Product = { kind: string; id: string; name: string; location?: { text: string; language: string } };
 const rank = (context: KioskContext, key: string) => {
   const index = context.runtime?.speechLanguages?.indexOf(key) ?? -1;
   return index < 0 ? 99 : index;
@@ -232,6 +232,8 @@ export default function KioskConsultationPage() {
                       <button type="button" aria-pressed={product?.id === item.id} disabled={busy}
                         className={`${big} w-full text-left ${product?.id === item.id ? "border-teal-700 bg-teal-50" : ""}`}
                         onClick={() => { setProduct(item); setCard(null); setMessage(""); setQuestion(""); }}>{item.name}</button>
+                      {/* 찾은 상품마다 위치를 바로 보여 준다 — 고객이 가장 먼저 묻는 것이다. */}
+                      {item.location && <p className="mt-1 px-1 text-base text-teal-900" lang={item.location.language}>{item.location.text}</p>}
                     </li>
                   ))}
                 </ul>
@@ -241,8 +243,16 @@ export default function KioskConsultationPage() {
           {product && (
             <section aria-label={product.name} className="space-y-3 rounded-xl border bg-white p-4">
               <h2 className="text-xl font-semibold">{product.name}</h2>
+              {product.location && (
+                <p className="text-lg" lang={product.location.language}>{product.location.text}</p>
+              )}
               <div className="flex flex-wrap gap-3">
-                <button type="button" className={big} disabled={busy || speech.listening} onClick={() => void answer("location")}>{copy.location}</button>
+                {product.location && speech.outputSupported && (
+                  <button type="button" className={big} disabled={busy}
+                    onClick={() => speech.speaking ? speech.stopReading() : speech.read(product.location!.text, product.location!.language)}>
+                    {speech.speaking ? copy.stop : copy.listen}
+                  </button>
+                )}
                 <button type="button" className={big} disabled={busy || speech.listening} onClick={() => void answer("product-details")}>{copy.details}</button>
               </div>
               <label className="block space-y-2">

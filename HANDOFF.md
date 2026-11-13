@@ -1,5 +1,15 @@
 # HANDOFF
 
+## 2026-11-13 · 키오스크 검색 결과에 위치 바로 표시 (branch `claude/wizardly-bardeen-ldq332` — #1049 병합 후 최신 main 에서 다시 시작)
+
+- **PR 묶음:** 이 branch 단독 1 PR(서비스 · API, lane 아님). 지시서 [`WO-O4O-STORE-CONSULTATION-TABLET-ROLES-V1`](docs/work-orders/WO-O4O-STORE-CONSULTATION-TABLET-ROLES-V1.md) §3 2-2단계. 이전 #1049 는 병합됨(`9647760b`) — 그 branch 를 main 에서 새로 시작했다(force push 없음 · 원격 head 는 병합 때 자동 삭제).
+- **한 일:** 키오스크 상품 검색 결과마다 위치(고객 언어) 또는 위치 미등록 안내를 바로 표시. 「위치 보기」 버튼 제거, 선택한 상품에 위치 · 읽어 주기.
+- **결정 사항(§9):** 위치 번역은 결과의 서로 다른 위치만 번호 붙여 1회 번역(상품마다 호출하지 않음). 번호 · 줄 수가 어긋나거나 실패하면 한국어 원문(오배정 방지). 권한 오류는 그대로 올림. 원문 · 번역 검색어 결과 합칠 때 위치를 빈 값으로 덮어쓰던 문제 수정.
+- **검증:** API neture-pharmacy 40 suites / 318 통과(15 suites · 218 skip — 전용 PostgreSQL 미설정; 키오스크 18 포함). web-store 전체 102 files / 1000 통과. CI 와 같은 `pnpm --filter store-web run type-check`(`tsc -b`) · api type-check 통과. 변경 파일 ESLint 오류 · 경고 0.
+- **확인하지 못한 것 / 배포 후 Demo:** 실제 번역 모델이 번호 줄을 유지하는지(유지 못 하면 한국어 원문으로 표시됨) · 실제 매장 위치 데이터. 지시서 §4.
+- **로컬 참고:** 대체된 이전 로컬 커밋은 로컬 branch `backup/1049-local-superseded` 에만 있다(push 하지 않음).
+- **겹치는 PR / 문서 정합:** 열린 PR 대조는 통합 세션. 문서 정합: 해당 없음.
+
 ## 2026-11-13 · 상담 태블릿별 음성 자동 감지 언어 (branch `claude/wizardly-bardeen-ldq332`)
 
 - **통합 세션 수정(2026-11-13 · 통합 담당 지시로 이번 건만 통합 세션이 직접 수정):** 키오스크는 분리하지 않고 1 · 2단계를 한 PR(#1049)로 병합한다(통합 담당 결정 — 앞선 분리 판정 철회). 태블릿 목록 응답에 `configured` 를 더해 저장된 빈 목록과 최초 미등록을 구분(Codex P2) · 태블릿 관리에 행 체크 · 전체 선택 · 상단 ActionBar 선택 삭제(§3-1, Codex P1) · 키오스크 버튼 type · 언어 문구 `kioskLocale.json` 분리(SonarCloud) · 테스트 `Array.at` 제거(TS2550). 검증: 매장 상담 13개 파일 129건 · API 태블릿 · 키오스크 25건 통과, web-store `tsc -b` · api `tsc --noEmit` · 선언 빌드 · ESLint 통과.
