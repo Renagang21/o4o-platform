@@ -17,6 +17,7 @@ let tablets: unknown[];
 let row: Record<string, unknown> | null;
 let query: jest.Mock;
 let requireMode: jest.Mock;
+let requireProductSupport: jest.Mock;
 let prepare: jest.Mock;
 let products: jest.Mock;
 let translate: jest.Mock;
@@ -39,11 +40,12 @@ beforeEach(() => {
   requireMode = jest.fn(async (_actor: string, _org: string, mode: string) => {
     if (mode !== 'floor-staff') throw new NeturePharmacyError(403, 'SERVICE_FEATURE_REQUIRED', 'feature');
   });
+  requireProductSupport = jest.fn(async () => undefined);
   prepare = jest.fn(async () => ({ state: 'ready', intent: 'location', card: { kind: 'product', title: '비타민', text: 'Product location: A-1', language: 'en', requestedLanguage: 'en', publicKey: 'pub' },
     proof: { sourceVersion: 'secret' }, product: { id: PRODUCT, location: 'A-1' } }));
   products = jest.fn(async (_org: string, term: string) => term === '비타민' ? [{ kind: 'listing', id: PRODUCT, name: '비타민', location: 'A-1' }] : term === 'vitamin' ? [{ kind: 'listing', id: PRODUCT, name: '비타민' }] : []);
   translate = jest.fn(async (input: { text: string; source: string }) => ({ translation: input.text === 'vitamin' ? '비타민' : input.text === 'Which medicine should I take for a headache?' ? '두통에 어떤 약을 복용해야 하나요?' : '번역', detectedLanguage: 'en' }));
-  service = new ConsultationKioskService({ query } as never, { requireMode, guidance: { prepare } as never, products: { products } as never, translate });
+  service = new ConsultationKioskService({ query } as never, { requireMode, requireProductSupport, guidance: { prepare } as never, products: { products } as never, translate });
 });
 
 describe('pairing', () => {
@@ -100,6 +102,12 @@ describe('consumer answers', () => {
     const result = await service.search({ ...device, text: 'vitamin', language: 'en' });
     expect(translate).toHaveBeenCalledWith({ text: 'vitamin', source: 'en', target: 'ko' }, expect.objectContaining({ actorId: 'owner', organizationId: STORE }));
     expect(result).toEqual({ state: 'products', language: 'en', products: [{ kind: 'listing', id: PRODUCT, name: '비타민' }] });
+  });
+  it('refuses product search when the store lost the staff product-support feature', async () => {
+    requireProductSupport.mockRejectedValue(new NeturePharmacyError(403, 'SERVICE_FEATURE_REQUIRED', 'feature'));
+    await expect(service.search({ ...device, text: '비타민', language: 'ko' })).rejects.toMatchObject({ httpStatus: 403 });
+    expect(requireProductSupport).toHaveBeenCalledWith('owner', STORE);
+    expect(products).not.toHaveBeenCalled();
   });
   it('turns medicine-choice questions into the pharmacist notice without searching or preparing guidance', async () => {
     const searched = await service.search({ ...device, text: 'Which medicine should I take for a headache?', language: 'en' });

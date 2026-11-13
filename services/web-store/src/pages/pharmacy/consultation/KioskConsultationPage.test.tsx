@@ -94,3 +94,27 @@ it('puts this kiosk\'s speech auto-detect languages first', async () => {
   const group = await screen.findByRole('group', { name: '언어' });
   expect(within(group).getAllByRole('button').map(button => button.textContent)).toEqual(['Tiếng Việt · 베트남어', 'English · 영어', '한국어']);
 });
+
+it('locks product choices while guidance is being prepared so a late answer cannot land on another product', async () => {
+  localStorage.setItem('o4o:consultation-kiosk-device:v1', JSON.stringify(credential));
+  const base = respond;
+  respond = (action, body) => action === 'search'
+    ? ok({ state: 'products', language: body.language, products: [{ kind: 'listing', id: 'p1', name: '비타민C' }, { kind: 'listing', id: 'p2', name: '유산균' }] })
+    : base(action, body);
+  let release!: () => void;
+  const fetchMock = vi.mocked(fetch);
+  const original = fetchMock.getMockImplementation()!;
+  fetchMock.mockImplementation(async (url, init) => {
+    if (String(url).endsWith('/answer')) await new Promise<void>((resolve) => { release = resolve; });
+    return original(url as string, init as RequestInit);
+  });
+  render(<KioskConsultationPage />);
+  fireEvent.change(await screen.findByLabelText('찾으시는 상품'), { target: { value: '비타민' } });
+  fireEvent.click(screen.getByRole('button', { name: '상품 찾기' }));
+  fireEvent.click(await screen.findByRole('button', { name: '비타민C' }));
+  fireEvent.click(screen.getByRole('button', { name: '위치 보기' }));
+  expect((screen.getByRole('button', { name: '유산균' }) as HTMLButtonElement).disabled).toBe(true);
+  await act(async () => { release(); });
+  expect(await screen.findByText('Product location: Shelf A-1')).toBeTruthy();
+  expect((screen.getByRole('button', { name: '유산균' }) as HTMLButtonElement).disabled).toBe(false);
+});

@@ -228,7 +228,8 @@ export default function KioskConsultationPage() {
                 <ul className="grid gap-2 sm:grid-cols-2">
                   {products.map((item) => (
                     <li key={`${item.kind}:${item.id}`}>
-                      <button type="button" aria-pressed={product?.id === item.id}
+                      {/* 안내를 준비하는 동안 다른 상품으로 바꾸지 않는다 — 늦게 온 이전 상품 안내가 새 상품에 붙지 않게 한다. */}
+                      <button type="button" aria-pressed={product?.id === item.id} disabled={busy}
                         className={`${big} w-full text-left ${product?.id === item.id ? "border-teal-700 bg-teal-50" : ""}`}
                         onClick={() => { setProduct(item); setCard(null); setMessage(""); setQuestion(""); }}>{item.name}</button>
                     </li>

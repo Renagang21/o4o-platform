@@ -203,6 +203,7 @@ export function createNeturePharmacyRoutes(dataSource: DataSource, consultationD
     consultationDependencies?.supportConsultation ?? createConsultationSupportRunner(dataSource));
   const kiosk = new ConsultationKioskService(dataSource, {
     requireMode: (actor,org,mode)=>consultation.requireMode(actor,org,mode),
+    requireProductSupport: async(actor,org)=>{await serviceFeatures.require(actor,org,'store-staff-support');},
     guidance, products: stationProducts, translate: consultationDeps.translate,
   });
   router.use(consultationWorkspaceRoutes(dataSource,stations,store,admin,guidance,consultationSupport,kiosk));

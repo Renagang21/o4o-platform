@@ -33,6 +33,8 @@ export const kioskStationKey = (tabletId: string) => `kiosk-${tabletId}`;
 
 export interface KioskDependencies {
   requireMode: (actor: string, org: string, mode: string) => Promise<void>;
+  /** 상품 검색 이용 자격(store-staff-support). 기존 근무자 상품 검색 · 키오스크 위치 · 설명 안내와 같은 검사다. */
+  requireProductSupport: (actor: string, org: string) => Promise<void>;
   guidance: Pick<ConsultationGuidanceService, 'prepare'>;
   products: Pick<StoreStaffSupportService, 'products'>;
   translate: ConsultationTranslator;
@@ -167,6 +169,7 @@ export class ConsultationKioskService {
     const device = await this.device(input);
     const { korean, language } = await this.korean(device, input.text, input.language);
     if (this.needsPharmacist(korean, String(input.text))) return { ...this.referral(language), language };
+    await this.deps.requireProductSupport(device.actor, device.org);
     const terms = [...new Set([korean, String(input.text).trim()].map(term => term.slice(0, 80)))];
     const found = new Map<string, { kind: string; id: string; name: string }>();
     for (const term of terms)
