@@ -1,5 +1,24 @@
 # HANDOFF
 
+
+## 2026-11-13 · 매장 콘텐츠 QR · 태블릿 분리 지시서 (branch `claude/intelligent-cray-o2p4u3-qr-tablet` · 문서만)
+
+> 다음 실행자: **통합 세션** — 지시서 PR. 이후 **CLOUD** 가 [`WO-O4O-STORE-QR-TABLET-CHANNEL-SEPARATION-V1`](docs/work-orders/WO-O4O-STORE-QR-TABLET-CHANNEL-SEPARATION-V1.md) T1~T5 를 순서대로 진행한다(T2 · T5 는 #1049 병합 뒤 · T4 는 DB 구조 변경 승인 뒤).
+
+- **결정 사항:** 지시서 §2 D1~D7.
+  - 사용자 결정:
+    - 채널은 QR · 태블릿 · 사이니지로 나누고, QR · 태블릿은 각자 탭으로 둔다.
+    - 사이니지는 화면 크기와 무관한 재생 목록이다.
+    - 콘텐츠를 만들면 QR 이 함께 준비된다.
+    - 코너의 제품 · 영상 연결은 근무자가 불편하지 않아야 한다.
+  - 세션 판단:
+    - QR 목록 기본값에서 코너 QR 을 뺀다. 필터로 볼 수 있다.
+    - 코너 QR 은 태블릿 코너 화면에서 출력한다.
+    - 콘텐츠 QR 은 출력하거나 담은 것만 목록에 올린다.
+    - 제품 ↔ 영상은 `signage_media` 에 제품 열 하나를 둔다(설명서 본문에는 넣지 않는다).
+- **검증:** 문서만(`check-doc-sensitive` 통과).
+- **겹칠 수 있는 PR:** #1049(태블릿 구조 1단계) — 이 지시서는 코드를 바꾸지 않는다. T2 · T5 구현은 그 병합 뒤에 시작한다.
+
 ## 2026-11-13 · 상담 태블릿별 음성 자동 감지 언어 (branch `claude/wizardly-bardeen-ldq332`)
 
 - **통합 세션 수정(2026-11-13 · 통합 담당 지시로 이번 건만 통합 세션이 직접 수정):** 키오스크는 분리하지 않고 1 · 2단계를 한 PR(#1049)로 병합한다(통합 담당 결정 — 앞선 분리 판정 철회). 태블릿 목록 응답에 `configured` 를 더해 저장된 빈 목록과 최초 미등록을 구분(Codex P2) · 태블릿 관리에 행 체크 · 전체 선택 · 상단 ActionBar 선택 삭제(§3-1, Codex P1) · 키오스크 버튼 type · 언어 문구 `kioskLocale.json` 분리(SonarCloud) · 테스트 `Array.at` 제거(TS2550). 검증: 매장 상담 13개 파일 129건 · API 태블릿 · 키오스크 25건 통과, web-store `tsc -b` · api `tsc --noEmit` · 선언 빌드 · ESLint 통과.
