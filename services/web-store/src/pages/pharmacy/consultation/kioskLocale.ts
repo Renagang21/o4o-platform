@@ -1,0 +1,98 @@
+/** 소비자 태블릿(키오스크) 화면 문구. 상담 언어 목록(ko · en · zh · ja · vi · th · id)과 같다. */
+export interface KioskCopy {
+  title: string; connectTitle: string; connectHelp: string; code: string; connect: string;
+  language: string; auto: string; searchLabel: string; searchPlaceholder: string; speak: string; finish: string;
+  find: string; results: string; noResults: string; location: string; details: string;
+  questionLabel: string; questionPlaceholder: string; ask: string; pharmacist: string;
+  listen: string; stop: string; fallback: string; back: string; privacy: string; failed: string; busy: string;
+}
+const ko: KioskCopy = {
+  title: '상품 안내', connectTitle: '소비자 태블릿 연결', connectHelp: '매장 경영자가 내 매장 → 상담에서 만든 연결 코드를 입력해 주세요.',
+  code: '연결 코드', connect: '연결하기', language: '언어', auto: '자동 감지',
+  searchLabel: '찾으시는 상품', searchPlaceholder: '상품 이름을 입력하거나 말씀해 주세요', speak: '눌러서 말하기', finish: '말하기 마치기',
+  find: '상품 찾기', results: '찾은 상품', noResults: '찾는 상품이 없습니다. 직원에게 문의해 주세요.',
+  location: '위치 보기', details: '제품 설명 보기',
+  questionLabel: '이 상품에 대해 궁금한 점(선택)', questionPlaceholder: '예: 어떤 성분이 들어 있나요?', ask: '질문하기',
+  pharmacist: '복용 · 약 선택은 약사에게 문의', listen: '읽어 주기', stop: '읽기 중지',
+  fallback: '선택한 언어의 자료가 없어 게시된 원문 언어로 보여 드립니다.', back: '처음으로',
+  privacy: '이름 · 연락처 등 개인 정보는 입력하지 마세요. 질문 내용은 저장하지 않습니다.',
+  failed: '안내를 준비하지 못했습니다. 다시 시도하거나 직원에게 문의해 주세요.', busy: '준비하고 있습니다…',
+};
+const copies: Record<string, KioskCopy> = {
+  ko,
+  en: {
+    title: 'Product help', connectTitle: 'Connect customer tablet', connectHelp: 'Enter the connection code created by the store owner.',
+    code: 'Connection code', connect: 'Connect', language: 'Language', auto: 'Auto detect',
+    searchLabel: 'Product you are looking for', searchPlaceholder: 'Type or say a product name', speak: 'Tap to speak', finish: 'Stop speaking',
+    find: 'Find product', results: 'Products found', noResults: 'No matching product. Please ask a staff member.',
+    location: 'Show location', details: 'Product information',
+    questionLabel: 'Question about this product (optional)', questionPlaceholder: 'e.g. What ingredients does it contain?', ask: 'Ask',
+    pharmacist: 'Ask a pharmacist about medicines', listen: 'Read aloud', stop: 'Stop reading',
+    fallback: 'Information in your language is not available, so it is shown in the published language.', back: 'Start over',
+    privacy: 'Please do not enter your name or contact details. Questions are not stored.',
+    failed: 'We could not prepare the information. Please try again or ask a staff member.', busy: 'Preparing…',
+  },
+  zh: {
+    title: '商品咨询', connectTitle: '连接顾客平板', connectHelp: '请输入店主生成的连接码。',
+    code: '连接码', connect: '连接', language: '语言', auto: '自动识别',
+    searchLabel: '您要找的商品', searchPlaceholder: '请输入或说出商品名称', speak: '按下说话', finish: '结束说话',
+    find: '查找商品', results: '找到的商品', noResults: '没有找到该商品，请咨询店员。',
+    location: '查看位置', details: '商品说明',
+    questionLabel: '关于该商品的问题（可选）', questionPlaceholder: '例如：含有哪些成分？', ask: '提问',
+    pharmacist: '用药和选药请咨询药师', listen: '朗读', stop: '停止朗读',
+    fallback: '没有所选语言的资料，以发布的原文语言显示。', back: '返回首页',
+    privacy: '请勿输入姓名、联系方式等个人信息。提问内容不会被保存。',
+    failed: '未能准备说明，请重试或咨询店员。', busy: '正在准备…',
+  },
+  ja: {
+    title: '商品案内', connectTitle: 'お客様用タブレットの接続', connectHelp: '店舗の経営者が作成した接続コードを入力してください。',
+    code: '接続コード', connect: '接続する', language: '言語', auto: '自動検出',
+    searchLabel: 'お探しの商品', searchPlaceholder: '商品名を入力するか話してください', speak: '押して話す', finish: '話し終える',
+    find: '商品を探す', results: '見つかった商品', noResults: '該当する商品がありません。スタッフにお尋ねください。',
+    location: '場所を見る', details: '商品説明を見る',
+    questionLabel: 'この商品についての質問（任意）', questionPlaceholder: '例：どんな成分が入っていますか？', ask: '質問する',
+    pharmacist: '服用・薬選びは薬剤師にご相談ください', listen: '読み上げ', stop: '読み上げ停止',
+    fallback: '選択した言語の資料がないため、掲載された原文の言語で表示します。', back: '最初に戻る',
+    privacy: 'お名前・連絡先などの個人情報は入力しないでください。質問内容は保存しません。',
+    failed: 'ご案内を準備できませんでした。もう一度お試しいただくか、スタッフにお尋ねください。', busy: '準備しています…',
+  },
+  vi: {
+    title: 'Hướng dẫn sản phẩm', connectTitle: 'Kết nối máy tính bảng khách hàng', connectHelp: 'Nhập mã kết nối do chủ cửa hàng tạo.',
+    code: 'Mã kết nối', connect: 'Kết nối', language: 'Ngôn ngữ', auto: 'Tự động nhận diện',
+    searchLabel: 'Sản phẩm bạn cần tìm', searchPlaceholder: 'Nhập hoặc nói tên sản phẩm', speak: 'Nhấn để nói', finish: 'Dừng nói',
+    find: 'Tìm sản phẩm', results: 'Sản phẩm tìm thấy', noResults: 'Không tìm thấy sản phẩm. Vui lòng hỏi nhân viên.',
+    location: 'Xem vị trí', details: 'Thông tin sản phẩm',
+    questionLabel: 'Câu hỏi về sản phẩm này (không bắt buộc)', questionPlaceholder: 'Ví dụ: Sản phẩm có thành phần gì?', ask: 'Hỏi',
+    pharmacist: 'Hỏi dược sĩ về cách dùng và chọn thuốc', listen: 'Đọc to', stop: 'Dừng đọc',
+    fallback: 'Không có tài liệu bằng ngôn ngữ bạn chọn, nên hiển thị bằng ngôn ngữ gốc đã đăng.', back: 'Bắt đầu lại',
+    privacy: 'Vui lòng không nhập tên hoặc thông tin liên lạc. Câu hỏi không được lưu lại.',
+    failed: 'Không thể chuẩn bị thông tin. Vui lòng thử lại hoặc hỏi nhân viên.', busy: 'Đang chuẩn bị…',
+  },
+  th: {
+    title: 'ข้อมูลสินค้า', connectTitle: 'เชื่อมต่อแท็บเล็ตลูกค้า', connectHelp: 'กรุณาใส่รหัสเชื่อมต่อที่เจ้าของร้านสร้างไว้',
+    code: 'รหัสเชื่อมต่อ', connect: 'เชื่อมต่อ', language: 'ภาษา', auto: 'ตรวจจับอัตโนมัติ',
+    searchLabel: 'สินค้าที่คุณต้องการ', searchPlaceholder: 'พิมพ์หรือพูดชื่อสินค้า', speak: 'กดเพื่อพูด', finish: 'หยุดพูด',
+    find: 'ค้นหาสินค้า', results: 'สินค้าที่พบ', noResults: 'ไม่พบสินค้า กรุณาสอบถามพนักงาน',
+    location: 'ดูตำแหน่ง', details: 'ข้อมูลสินค้า',
+    questionLabel: 'คำถามเกี่ยวกับสินค้านี้ (ไม่บังคับ)', questionPlaceholder: 'เช่น มีส่วนผสมอะไรบ้าง?', ask: 'ถาม',
+    pharmacist: 'สอบถามเภสัชกรเรื่องการใช้และการเลือกยา', listen: 'อ่านออกเสียง', stop: 'หยุดอ่าน',
+    fallback: 'ไม่มีข้อมูลในภาษาที่เลือก จึงแสดงเป็นภาษาต้นฉบับที่เผยแพร่', back: 'เริ่มใหม่',
+    privacy: 'กรุณาอย่าใส่ชื่อหรือข้อมูลติดต่อ คำถามจะไม่ถูกบันทึก',
+    failed: 'ไม่สามารถเตรียมข้อมูลได้ กรุณาลองใหม่หรือสอบถามพนักงาน', busy: 'กำลังเตรียม…',
+  },
+  id: {
+    title: 'Info produk', connectTitle: 'Hubungkan tablet pelanggan', connectHelp: 'Masukkan kode koneksi yang dibuat oleh pemilik toko.',
+    code: 'Kode koneksi', connect: 'Hubungkan', language: 'Bahasa', auto: 'Deteksi otomatis',
+    searchLabel: 'Produk yang Anda cari', searchPlaceholder: 'Ketik atau ucapkan nama produk', speak: 'Tekan untuk bicara', finish: 'Selesai bicara',
+    find: 'Cari produk', results: 'Produk ditemukan', noResults: 'Produk tidak ditemukan. Silakan tanya staf.',
+    location: 'Lihat lokasi', details: 'Informasi produk',
+    questionLabel: 'Pertanyaan tentang produk ini (opsional)', questionPlaceholder: 'Contoh: Apa saja bahannya?', ask: 'Tanya',
+    pharmacist: 'Tanyakan apoteker tentang pemakaian dan pemilihan obat', listen: 'Bacakan', stop: 'Berhenti membaca',
+    fallback: 'Informasi dalam bahasa Anda tidak tersedia, jadi ditampilkan dalam bahasa aslinya.', back: 'Mulai lagi',
+    privacy: 'Jangan masukkan nama atau kontak Anda. Pertanyaan tidak disimpan.',
+    failed: 'Informasi tidak dapat disiapkan. Silakan coba lagi atau tanya staf.', busy: 'Sedang menyiapkan…',
+  },
+};
+export function kioskUi(language: string): KioskCopy {
+  return copies[language] ?? ko;
+}

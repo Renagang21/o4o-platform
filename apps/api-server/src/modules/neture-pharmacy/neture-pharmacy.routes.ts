@@ -15,6 +15,7 @@ import { saveStaffFeatures } from './services/staff-feature-permissions.js';
 import { consultationProfessionalConfirmed, confirmOwnerPharmacist } from './services/consultation-professional.js';
 import { MultilingualConsultationService, type ConsultationDependencies } from './services/multilingual-consultation.js';
 import { ConsultationStationService } from './services/consultation-stations.js';
+import { ConsultationKioskService } from './services/consultation-kiosk.js';
 import { consultationWorkspaceRoutes } from './consultation-workspace.routes.js';
 import { createConsultationTranslator } from './services/consultation-translator.js';
 import { resolveBusinessStoreAccess } from './services/business-store-access.js';
@@ -199,7 +200,11 @@ export function createNeturePharmacyRoutes(dataSource: DataSource, consultationD
     (actor,org,mode,proof)=>guidance.verifySupportSource(actor,org,mode,proof));
   const consultationSupport = new ConsultationSupportService(guidance,
     consultationDependencies?.supportConsultation ?? createConsultationSupportRunner(dataSource));
-  router.use(consultationWorkspaceRoutes(dataSource,stations,store,admin,guidance,consultationSupport));
+  const kiosk = new ConsultationKioskService(dataSource, {
+    requireMode: (actor,org,mode)=>consultation.requireMode(actor,org,mode),
+    guidance, products: stationProducts, translate: consultationDeps.translate,
+  });
+  router.use(consultationWorkspaceRoutes(dataSource,stations,store,admin,guidance,consultationSupport,kiosk));
   const featurePolicyAdmin: RequestHandler = (req, res, next) => {
     if (req.body?.serviceFeatures === undefined) return next();
     return (requireRole(['platform:super_admin']) as RequestHandler)(req, res, next);

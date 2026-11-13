@@ -3,7 +3,7 @@
 > **상태**: ACTIVE
 > **작성일**: 2026-11-13 · **최종 갱신**: 2026-11-13
 > **실행 위치**: CLOUD
-> **인계**: claude/wizardly-bardeen-ldq332 · 1단계 push · 다음 실행자 CLOUD(2단계)
+> **인계**: claude/wizardly-bardeen-ldq332 · 1 · 2단계 push · 다음: 통합 세션 PR · 배포 후 Demo 확인 → 3단계 정리
 > **근거**: 사용자 지시(2026-11-13, 내 매장 디버깅 세션)
 
 ## 1. 배경 — 매장에서 일어나는 상담
@@ -44,15 +44,22 @@
 - 관리자: 일반/대형 배치 화면에 「현재 매장 상담 화면에 반영되지 않음 · 정리 예정」 안내를 붙였다.
 - 노출 수준 확인: 약사 방식만 판단 지원(전문 참고 · 성분 · 주의)을 받는다(서버 `consultation-guidance.ts` `supportMaterial` · `searchSupportProducts` 가 약사 방식 외 403). 근무자는 상품 찾기 · 위치 · 게시된 제품 설명 · 약사 연결 안내만 받는다.
 
-### 2단계 — 소비자 화면(키오스크) · 안내 수준 AI (다음 실행자)
+### 2단계 — 소비자 태블릿(키오스크) · 다국어 · 안내 수준 AI (완료 · 이 branch)
 
-- [ ] 기기 인증: 키오스크는 직원 로그인 없이 쓴다. 경영자가 상담 화면에서 소비자 태블릿을 등록하면 연결 코드로 기기 자격을 1회 발급한다. 기존 `store_consultation_stations` 의 `device_hash` · `pairing_hash` 재사용 가능성을 먼저 검토하고, 새 테이블이 필요하면 §5 승인(migration lane) 후 진행한다.
-- [ ] 태블릿 목록 role 에 `consumer` 추가(서버 schema · 매장 화면).
-- [ ] **다국어 기본**: 키오스크 화면 문구 · 질문 입력(문자 · 음성) · 답변 · 읽어 주기를 소비자 언어로 제공한다. 언어 자동 감지와 직접 선택을 함께 둔다. 기존 상담 언어 목록(`CONSULTATION_SCREEN_LANGUAGES`) · 화면 문구(`consultationLocale`) · 음성 runtime 을 재사용한다.
-- [ ] 소비자 질문 → 번역 → 상품 후보(이름 · 위치 · 게시된 소비자용 설명) → 안내 답변. 소비자에게 보이는 자료는 B2C 공개 범위만 쓴다. 전문 참고 · 약사 판단 지원 자료는 넣지 않는다.
-- [ ] 복용 · 약 선택 · 증상 판단 질문은 답하지 않고 「약사에게 문의」로 안내한다. 이 판정과 출력 검증을 서버에서 한다(모델 출력만 믿지 않는다).
-- [ ] AI 비용 주체 · 한도 · 중지 정책은 기존 상담 runtime(`consultationRuntimeSchema` · policy executor)을 따른다. 기기 요청에 rate limit.
-- [ ] 키오스크 화면에서 경영자 · 직원 메뉴로 나갈 수 없게 한다(기존 `CustomerConsultationPage` 의 인증 밖 구조 참고).
+- 서버(`services/consultation-kiosk.ts` · routes)
+  - 태블릿 목록 role 에 `consumer` 추가.
+  - `POST /pharmacy/consultation-tablets/:tabletId/pairing` — 매장 경영자만 10분 연결 코드 생성(등록된 소비자 태블릿만).
+  - `POST /pharmacy/consultation-kiosk/{claim,context,search,answer,pharmacist,speech/:operation}` — 로그인 없는 기기 자격(64자 token, hash 저장). rate limit 은 IP + token.
+  - 기기 등록은 기존 `store_consultation_stations` 행(`mode='consumer-kiosk'`, `station_key='kiosk-<tabletId>'`)을 쓴다 — **schema 변경 없음**. 질문 · 답변은 저장하지 않는다.
+  - 매 요청마다 ① 기기 token ② 태블릿이 목록에 consumer 로 남아 있는지 ③ 연결 코드를 만든 경영자가 근무자 상담 방식(`floor-staff` → `counter-staff`)을 지금 쓸 수 있는지 다시 확인한다. 하나라도 빠지면 즉시 차단.
+  - 답변은 기존 근무자 안내(`ConsultationGuidanceService.prepare`)만 쓴다: 상품 이름 검색(원문 + 한국어 번역), 위치(번역), 게시된 소비자용 제품 설명(질문이 있으면 AI 가 게시 문단 최대 3개 선택 · 번역, 길면 원문 언어로 표시). 약사 판단 지원 · 전문 참고 자료는 쓰지 않는다. 기기 응답에서 직원용 증명 · 내부 값은 뺀다.
+  - 복용 · 약 선택 · 증상 · 추천 질문(기존 `consultationIntent` 서버 판정, 원문과 번역 모두)은 상품 검색 · 자료 준비 없이 약사 연결 안내로 바꾼다.
+  - 90초 상담 정리 작업이 키오스크 행의 연결 코드 · 기기 자격을 지우지 않도록 제외. 매대 상담 시작이 `kiosk-` 키를 가로채지 못하게 막음.
+- 매장 화면
+  - 내 매장 → 상담에 「소비자 태블릿(키오스크)」 칸: 경영자가 추가 · 삭제 · 연결 코드 생성, 직원은 조회만.
+  - `/consultation/kiosk` — 로그인 · 매장 관리 화면 밖. 연결 코드 입력 → 언어 선택(자동 감지는 관리자 설정 시) → 상품 찾기(문자 · 음성) → 위치 / 제품 설명 / 질문 → 읽어 주기. 「약사에게 문의」 버튼 상시. 화면 문구 7개 언어(`kioskLocale.ts`).
+  - 마지막 조작 2분 뒤 · 화면 이탈 시 처음 화면으로(다음 고객 보호). 기기 자격이 끊기면(401 · 태블릿 삭제 · 경영자 권한 철회) 연결을 지운다.
+- 남은 확인: 실제 기기 · 브라우저 음성 · 운영 자료로 확인하지 않았다(§4).
 
 ### 가격 표시 준비 (구현 보류 — 설계 조건만)
 
@@ -67,12 +74,13 @@
 - [ ] 관리자 일반/대형 배치 설정(`PharmacyConsultationLayoutsPanel` · `/admin/pharmacy-consultation-layouts` · `/pharmacy/consultation-layout`) 제거.
 - [ ] `counter-*` 방식과 이용 자격 key(`multilingual-consultation` 등) 통합 여부 — 결제 · 이용권 영향이 있어 사업 판단 후 진행.
 
-## 4. 배포 후 Demo 확인 (1단계)
+## 4. 배포 후 Demo 확인 (1 · 2단계)
 
 - 매장 경영자: 내 매장 → 상담에서 약사 · 근무자 태블릿 추가 · 삭제, PC/mobile 에서 목록 · 링크 확인.
 - 매장 직원: 목록 조회만 되고 추가 · 삭제 버튼이 없는지 확인.
 - 근무자 태블릿 화면: 자유 문장 번역 · 음성 버튼 · 안내 문구 빠른 입력 · 판단 지원 패널 없음.
 - 약사 태블릿 화면: 약사 자격 계정에서 판단 지원 표시, 자격 없는 계정은 이용 확인 안내.
+- 소비자 태블릿: 경영자가 키오스크 추가 → 연결 코드 → 다른 브라우저(로그인 없음)에서 `/consultation/kiosk` 연결 → 영어 · 한국어로 상품 찾기 · 위치 · 제품 설명 · 질문 · 읽어 주기 → 「두통약 추천」 같은 질문이 약사 안내로 바뀌는지 → 2분 뒤 초기화 → 목록에서 삭제하면 키오스크 연결이 끊기는지. 운영 데이터를 남기지 않는다(질문 비저장).
 
 ## 5. 문서 정합
 

@@ -6,10 +6,10 @@ import { NeturePharmacyError } from '../constants.js';
 
 /**
  * 매장 상담 태블릿 목록. 한 태블릿 = 한 화면에서 문의와 답변을 끝낸다(2대 연결 없음).
- * 역할은 화면 종류(약사용 · 근무자용)만 정하며 로그인 사용자의 권한 · 약사 자격을 바꾸지 않는다.
+ * 역할은 화면 종류(약사용 · 근무자용 · 소비자용 키오스크)만 정하며 로그인 사용자의 권한 · 약사 자격을 바꾸지 않는다.
  * 저장 위치는 기존 organizations.metadata(consultationExpression 과 같은 방식) — schema 변경 없음.
  */
-export const CONSULTATION_TABLET_ROLES = ['pharmacist', 'staff'] as const;
+export const CONSULTATION_TABLET_ROLES = ['pharmacist', 'staff', 'consumer'] as const;
 export const MAX_CONSULTATION_TABLETS = 30;
 export const consultationTabletSchema = z.object({
   id: z.string().regex(/^[a-z0-9-]{1,40}$/),

@@ -14,6 +14,7 @@ import { consultationRuntimeSchema } from '../../services/ai-management/consulta
 import { createPolicyExecutor } from '../ai-policy/ai-policy-factory.js';
 import { ConsultationExpressionService } from './services/consultation-expression.js';
 import { ConsultationTabletService } from './services/consultation-tablets.js';
+import type { ConsultationKioskService } from './services/consultation-kiosk.js';
 
 type StoreRequest = Request & { organizationId?: string };
 const org = (req: StoreRequest) => {
@@ -59,6 +60,7 @@ export function consultationWorkspaceRoutes(
   admin: RequestHandler[],
   guidance?: ConsultationGuidanceService,
   support?: ConsultationSupportService,
+  kiosk?: ConsultationKioskService,
 ) {
   const router = Router(),
     layouts = new ConsultationLayoutService(db);
@@ -224,6 +226,31 @@ export function consultationWorkspaceRoutes(
       stations.action(req.user!.id!, org(req), req.params.id, req.body ?? {}),
     ),
   );
+  if (kiosk) {
+    // 소비자 태블릿(키오스크): 경영자가 연결 코드를 만들고, 기기는 로그인 없이 기기 자격으로만 요청한다.
+    router.post('/pharmacy/consultation-tablets/:tabletId/pairing', ...store, limits(20),
+      handle(req => kiosk.pairing(req.user!.id!, org(req), { tabletId: req.params.tabletId })));
+    router.post('/pharmacy/consultation-kiosk/claim', limits(10), handle(req => kiosk.claim(req.body ?? {})));
+    router.post('/pharmacy/consultation-kiosk/context', limits(120, true), handle(req => kiosk.context(req.body ?? {})));
+    router.post('/pharmacy/consultation-kiosk/search', limits(30, true), handle(req => kiosk.search(req.body ?? {})));
+    router.post('/pharmacy/consultation-kiosk/answer', limits(30, true), handle(req => kiosk.answer(req.body ?? {})));
+    router.post('/pharmacy/consultation-kiosk/pharmacist', limits(30, true), handle(req => kiosk.pharmacist(req.body ?? {})));
+    router.post('/pharmacy/consultation-kiosk/speech/:operation', limits(15, true), handle(async req => {
+      const input = req.body ?? {}, device = await kiosk.device(input);
+      const authorize = async () => { if (!await device.authorize()) throw new NeturePharmacyError(409, 'CONSULTATION_CHANGED', '매장 상담 설정이 변경되었습니다.'); return true; };
+      const runtime = consultationRuntimeSchema.parse((await new ModelControlService(db).read()).consultation ?? {});
+      const operation = req.params.operation;
+      if (!['recognize', 'synthesize'].includes(operation) || (operation === 'recognize' ? runtime.recognition : runtime.synthesis) !== 'google-cloud')
+        throw new NeturePharmacyError(409, 'CONSULTATION_PROVIDER_CHANGED', '음성 실행 수단을 다시 확인해 주시기 바랍니다.');
+      await createPolicyExecutor(db).assertEnabled('CONTENT_TRANSLATION');
+      const cloud = new ConsultationGoogleService(db), access = { actorId: device.actor, authorize };
+      const data = operation === 'recognize'
+        ? await cloud.recognize(input.audioBase64, input.language === 'auto' && runtime.detectLanguage ? runtime.speechLanguages : [String(input.language)], access)
+        : await cloud.synthesize(typeof input.text === 'string' ? input.text.slice(0, 1000) : '', String(input.language), access);
+      await authorize();
+      return data;
+    }));
+  }
   // Capability-only endpoints. The bearer is separate from a login or display-device credential.
   router.post('/pharmacy/consultation-device/speech/:operation', limits(15, true), handle(async req => {
     const input = req.body ?? {}, owner = await stations.deviceSpeechAccess(input);

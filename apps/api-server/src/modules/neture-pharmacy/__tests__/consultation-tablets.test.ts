@@ -41,7 +41,7 @@ it.each(['member', 'none', 'other-store', 'manager', 'expired'])('denies %s befo
 
 it('rejects an invalid list before checking access or writing', async () => {
   const db = { query: jest.fn() };
-  await expect(new ConsultationTabletService(db as never).save('owner', 'store', { tablets: [{ id: 'x', role: 'consumer', name: 'kiosk' }] })).rejects.toMatchObject({ httpStatus: 400 });
+  await expect(new ConsultationTabletService(db as never).save('owner', 'store', { tablets: [{ id: 'x', role: 'admin', name: 'kiosk' }] })).rejects.toMatchObject({ httpStatus: 400 });
   expect(db.query).not.toHaveBeenCalled();
 });
 

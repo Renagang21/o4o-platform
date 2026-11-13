@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import {
+  createKioskPairing,
   readConsultationTablets,
   saveConsultationTablets,
   type ConsultationTablet,
@@ -15,7 +16,9 @@ import { ConsultationExpressionSettings } from './ConsultationExpressionSettings
 const ROLES: ReadonlyArray<{ role: ConsultationTabletRole; title: string; description: string; fallback: string }> = [
   { role: "pharmacist", title: "약사 태블릿", description: "약사와 고객이 함께 봅니다. 약사용 전문 상담 내용이 보입니다.", fallback: "약사 태블릿 1" },
   { role: "staff", title: "근무자 태블릿", description: "근무자와 고객이 함께 봅니다. 상품 찾기 · 위치 · 제품 설명 등 근무자용 내용만 보입니다.", fallback: "근무자 태블릿 1" },
+  { role: "consumer", title: "소비자 태블릿(키오스크)", description: "고객이 직접 사용합니다. 직원 로그인 없이 연결 코드로 한 번 연결하며, 상품 찾기 · 위치 · 게시된 제품 설명과 약사 연결 안내만 보입니다.", fallback: "" },
 ];
+const KIOSK_PATH = "/consultation/kiosk";
 const MAX_TABLETS = 30;
 const newId = (role: ConsultationTabletRole) =>
   `${role}-${Array.from(crypto.getRandomValues(new Uint8Array(4)), (b) => b.toString(16).padStart(2, "0")).join("")}`;
@@ -30,7 +33,7 @@ export function ConsultationLauncher() {
   const [canEdit, setCanEdit] = useState(false);
   const [error, setError] = useState(false), [retry, setRetry] = useState(0);
   const [busy, setBusy] = useState(false), [message, setMessage] = useState("");
-  const [names, setNames] = useState<Record<ConsultationTabletRole, string>>({ pharmacist: "", staff: "" });
+  const [names, setNames] = useState<Record<ConsultationTabletRole, string>>({ pharmacist: "", staff: "", consumer: "" });
   const generation = useRef(0), lock = useRef(false);
   useEffect(() => {
     const current = ++generation.current;
@@ -47,7 +50,21 @@ export function ConsultationLauncher() {
 
   // 등록 전에는 종류별 기본 태블릿 1대를 보여 준다. 경영자가 추가 · 삭제하면 저장된 목록으로 바뀐다.
   const tablets = saved && saved.length ? saved
-    : ROLES.map(({ role, fallback }) => ({ id: `${role}-1`, role, name: fallback }));
+    : ROLES.filter(({ fallback }) => fallback).map(({ role, fallback }) => ({ id: `${role}-1`, role, name: fallback }));
+  const [pairing, setPairing] = useState<{ tabletId: string; code: string; expiresAt: string } | null>(null);
+  const pair = async (tablet: ConsultationTablet) => {
+    if (!canEdit || lock.current) return;
+    const current = generation.current;
+    lock.current = true; setBusy(true); setMessage(""); setPairing(null);
+    try {
+      const data = await createKioskPairing(tablet.id);
+      if (generation.current === current) setPairing({ tabletId: tablet.id, ...data });
+    } catch {
+      if (generation.current === current) setMessage("연결 코드를 만들지 못했습니다. 태블릿 목록 저장과 경영자 권한을 확인해 주세요.");
+    } finally {
+      if (generation.current === current) { lock.current = false; setBusy(false); }
+    }
+  };
   const update = async (next: ConsultationTablet[], done: string) => {
     if (!canEdit || lock.current) return;
     const current = generation.current;
@@ -65,7 +82,7 @@ export function ConsultationLauncher() {
   };
   const add = (role: ConsultationTabletRole) => {
     const count = tablets.filter((t) => t.role === role).length;
-    const label = ROLES.find((r) => r.role === role)!.title;
+    const label = role === "consumer" ? "키오스크" : ROLES.find((r) => r.role === role)!.title;
     const name = names[role].trim() || `${label} ${count + 1}`;
     if (name.length > 40 || /[<>]/.test(name)) { setMessage("태블릿 이름은 40자 이내로 입력해 주세요."); return; }
     void update([...tablets, { id: newId(role), role, name }], `${name}을(를) 추가했습니다.`)
@@ -89,7 +106,7 @@ export function ConsultationLauncher() {
       ) : !saved ? (
         <p role="status">상담 태블릿 목록을 확인하는 중…</p>
       ) : (
-        <div className="grid gap-3 sm:grid-cols-2">
+        <div className="grid gap-3 lg:grid-cols-3 sm:grid-cols-2">
           {ROLES.map(({ role, title, description }) => (
             <section key={role} aria-label={title} className="space-y-3 rounded-xl border p-4">
               <div>
@@ -99,10 +116,24 @@ export function ConsultationLauncher() {
               <ul className="space-y-2">
                 {tablets.filter((t) => t.role === role).map((tablet) => (
                   <li key={tablet.id} className="flex flex-wrap items-center gap-2">
-                    <a target="_blank" rel="noreferrer" href={tabletHref(organizationId || "", tablet)}
-                      className="min-h-11 flex-1 rounded border px-3 py-2 hover:bg-teal-50">
-                      {tablet.name} 화면 열기 ↗
-                    </a>
+                    {role === "consumer" ? (
+                      <span className="min-h-11 flex-1 content-center rounded border px-3 py-2">{tablet.name}</span>
+                    ) : (
+                      <a target="_blank" rel="noreferrer" href={tabletHref(organizationId || "", tablet)}
+                        className="min-h-11 flex-1 rounded border px-3 py-2 hover:bg-teal-50">
+                        {tablet.name} 화면 열기 ↗
+                      </a>
+                    )}
+                    {role === "consumer" && canEdit && (
+                      <button type="button" className="min-h-11 rounded border px-3" disabled={busy}
+                        aria-label={`${tablet.name} 연결 코드 만들기`} onClick={() => void pair(tablet)}>연결 코드</button>
+                    )}
+                    {pairing?.tabletId === tablet.id && (
+                      <output className="w-full rounded bg-teal-50 p-2 text-sm">
+                        연결 코드 <strong className="text-lg tracking-widest">{pairing.code}</strong> ·{" "}
+                        {new Date(pairing.expiresAt).toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit" })}까지 사용
+                      </output>
+                    )}
                     {canEdit && saved.length > 0 && (
                       <button type="button" className="min-h-11 rounded border px-3" disabled={busy}
                         aria-label={`${tablet.name} 삭제`} onClick={() => remove(tablet)}>삭제</button>
@@ -110,10 +141,15 @@ export function ConsultationLauncher() {
                   </li>
                 ))}
               </ul>
+              {role === "consumer" && (
+                <p className="text-sm text-slate-600">
+                  키오스크 기기에서 <a className="underline" target="_blank" rel="noreferrer" href={KIOSK_PATH}>{KIOSK_PATH} ↗</a> 를 열고 연결 코드를 입력합니다.
+                </p>
+              )}
               {canEdit && (
                 <div className="flex flex-wrap gap-2">
                   <input className="min-h-11 flex-1 rounded border p-2" maxLength={40}
-                    aria-label={`새 ${title} 이름`} placeholder={`예: ${role === "pharmacist" ? "조제실 앞" : "입구"}`}
+                    aria-label={`새 ${title} 이름`} placeholder={`예: ${role === "pharmacist" ? "조제실 앞" : role === "consumer" ? "입구 키오스크" : "입구"}`}
                     value={names[role]} onChange={(e) => setNames((prev) => ({ ...prev, [role]: e.target.value }))} />
                   <button type="button" className="min-h-11 rounded border px-3" disabled={busy || tablets.length >= MAX_TABLETS}
                     onClick={() => add(role)}>{title} 추가</button>
@@ -125,9 +161,6 @@ export function ConsultationLauncher() {
       )}
       {saved && !canEdit && <p className="text-sm text-slate-500">태블릿 추가 · 삭제는 매장 경영자가 할 수 있습니다.</p>}
       {message && <p role="status" className="text-sm">{message}</p>}
-      <p className="text-xs text-slate-500">
-        고객이 직접 사용하는 소비자 화면(키오스크)은 다음 단계에서 추가합니다.
-      </p>
     </div>
   );
 }
