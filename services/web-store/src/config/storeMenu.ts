@@ -75,9 +75,9 @@ export const PHARMACY_STORE_MENU_SECTIONS: NonNullable<StoreDashboardConfig['men
   { label: '자료 가져오기', items: [
     { key: 'pharmacy-contents', label: '자료 가져오기', subPath: '/pharmacy/contents' },
   ]},
-  { label: '직원 지원', items: [
-      { key: 'staff-support', label: '직원 현장 지원', subPath: '/staff-support' },
-      { key: 'multilingual-consultation', label: '다국어 상담', subPath: '/multilingual-consultation' },
+  { label: '근무자 지원', items: [
+      { key: 'staff-support', label: '근무자 현장 지원', subPath: '/staff-support' },
+      { key: 'multilingual-consultation', label: '상담 태블릿', subPath: '/multilingual-consultation' },
   ]},
 ];
 

@@ -99,7 +99,7 @@ function StaffSupportBody({ owner }: Readonly<{ owner: boolean }>) {
   return (
     <div className="mx-auto max-w-5xl space-y-6 p-4">
       <header>
-        <h1 className="text-2xl font-semibold">직원 현장 지원</h1>
+        <h1 className="text-2xl font-semibold">근무자 현장 지원</h1>
         <p className="mt-2">
           상품 위치와 게시된 제품 자료를 안내합니다. 증상·의약품 선택·복약
           상담은 약사에게 연결해 주시기 바랍니다.

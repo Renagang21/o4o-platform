@@ -355,7 +355,7 @@ it.each(['/store', '/work/kpa-society/store'])('상담 첫 화면은 기존 기�
     expect(screen.queryByRole('link', {name:'재생할 안내·순서 변경'})).toBeNull();
     expect(screen.queryByRole('heading', {name:'실행 현황'})).toBeNull();
     expect(screen.getByText('배치·이용 현황 확인').closest('details')?.open).toBe(false);
-    expect(within(screen.getByRole('navigation', {name:'매장 보조 메뉴'})).queryByRole('link', {name:'다국어 상담'})).toBeNull();
+    expect(within(screen.getByRole('navigation', {name:'매장 보조 메뉴'})).queryByRole('link', {name:'상담 태블릿'})).toBeNull();
     expect(get).not.toHaveBeenCalled();
   } finally { get.mockRestore(); }
 });
@@ -369,7 +369,7 @@ it('업무 선택은 뒤로가기로 복구하며 query·hash·state를 보존�
   await screen.findByRole('heading', {name:'상담'});
   fireEvent.click(within(screen.getByRole('navigation', {name:'매장 운영 업무'})).getByRole('link', {name:'태블릿'}));
   expect(screen.getByRole('heading', {name:'태블릿'})).toBeTruthy();
-  expect(screen.queryByRole('link', {name:'다국어 상담 시작'})).toBeNull();
+  expect(screen.queryByRole('link', {name:'상담 태블릿 열기'})).toBeNull();
   const location = JSON.parse(screen.getByTestId('location').textContent!);
   expect(location.search).toBe('?topic=tablet&view=compact');
   expect(location.hash).toBe('#work');
@@ -385,7 +385,7 @@ it('권한에서 빠진 업무·참고 자료를 새 첫 화면이 복원하지 
   await screen.findByRole('heading', {name:'QR'});
   const topics = screen.getByRole('navigation', {name:'매장 운영 업무'});
   expect(within(topics).getAllByRole('link')).toHaveLength(1);
-  expect(screen.queryByRole('link', {name:'다국어 상담 시작'})).toBeNull();
+  expect(screen.queryByRole('link', {name:'상담 태블릿 열기'})).toBeNull();
   expect(screen.queryByText('상담에 사용할 상품·안내 자료')).toBeNull();
   expect(screen.queryByRole('link', {name:'태블릿 위치·화면 관리'})).toBeNull();
 });
