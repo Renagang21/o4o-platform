@@ -89,7 +89,9 @@ export default function AdminErasureHistoryPage() {
     {
       key: "errorCode",
       header: "실패 원인",
-      render: (value) => String(value ?? "—"),
+      // 삭제 전 검토에서 멈춘 경우 원인은 reviewCodes 에만 있다.
+      render: (value, row) =>
+        String(value ?? (row.reviewCodes?.length ? row.reviewCodes.join(", ") : "—")),
     },
   ];
   return (
