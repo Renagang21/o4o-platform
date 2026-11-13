@@ -6,7 +6,7 @@ import { StoreOperationsNavigation } from '../../components/store/StoreOperation
 import { currentStoreOperation, workspaceGroups } from '../../config/storeWorkspace';
 
 const actionLabels: Record<string, string> = {
-  'multilingual-consultation': '다국어 상담 시작',
+  'multilingual-consultation': '상담 태블릿 열기',
   'staff-support': '상품 위치·기본 안내',
   'tablet-requests': '상담 요청 확인',
   'signage-playlist': '재생할 안내·순서 변경',
@@ -15,7 +15,7 @@ const actionLabels: Record<string, string> = {
   'store-execution': '위치별 저장 설정',
 };
 const actionDescriptions: Record<string, string> = {
-  'multilingual-consultation': '약사 상담·직원 응대 모드와 고객 언어를 선택합니다. 이용 가능한 모드는 상담 화면에서 확인합니다.',
+  'multilingual-consultation': '약사 · 근무자 · 소비자 태블릿을 등록하고 각 태블릿의 상담 화면을 엽니다.',
   'staff-support': '상품 위치와 짧은 안내를 찾아 고객에게 설명하고 요청을 기록합니다.',
   'signage-playlist': '저장된 안내로 재생 목록을 구성하고 미리보기로 확인합니다.',
   'tablet-displays': '저장한 화면을 적용하고 고객이 볼 구성을 확인합니다.',

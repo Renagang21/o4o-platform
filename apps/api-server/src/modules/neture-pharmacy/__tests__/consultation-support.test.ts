@@ -126,7 +126,7 @@ it('uses authenticated actor/store values in HTTP and checks the counter epoch b
     if (req.headers['x-fixture-auth'] !== 'allowed') return res.status(401).json({ success: false });
     req.user = { id: 'pharmacist' }; req.organizationId = 'store'; next();
   };
-  app.use(consultationWorkspaceRoutes({} as any, { validate } as any, [guard], [], undefined, f.service));
+  app.use(consultationWorkspaceRoutes({} as any, { validate } as any, [guard], undefined, f.service));
   expect((await request(app).post('/pharmacy/consultation-support').send(input)).status).toBe(401);
   expect(f.run).not.toHaveBeenCalled();
   const response = await request(app).post('/pharmacy/consultation-support').set('x-fixture-auth', 'allowed')

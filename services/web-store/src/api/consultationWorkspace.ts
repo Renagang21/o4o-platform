@@ -12,7 +12,6 @@ export async function saveConsultationExpression(expression: ConsultationExpress
   if (!r.success || !r.data?.expression) throw new Error('매장 표현 설정을 저장하지 못했습니다.');
   return r.data;
 }
-export type OperatingType = "standard" | "large";
 export type ConsultationTabletRole = "pharmacist" | "staff" | "consumer";
 /** speechLanguages: 이 태블릿의 Google 음성 자동 감지 후보(최대 3개). 없으면 관리자 기본 후보. */
 /** showKorean: 소비자 태블릿 외국어 화면의 한국어 병기(없으면 켜짐 · 소비자 다국어 정책 §2-4). */
@@ -78,18 +77,6 @@ export interface CustomerScreen {
   runtime?: import('../pages/pharmacy/consultation/ConsultationParts').Context['runtime'];
 }
 type Envelope<T> = { success: boolean; data: T };
-export async function fetchConsultationLayout() {
-  const r = await coreApiClient.get<
-    Envelope<{
-      organizationId: string;
-      name: string;
-      operatingType: OperatingType;
-    }>
-  >(`${CONSULTATION_BASE}/consultation-layout`);
-  if (!r.success || !["large", "standard"].includes(r.data?.operatingType))
-    throw new Error("상담 화면 구성을 확인하지 못했습니다.");
-  return r.data;
-}
 function station(r: Envelope<ConsultationStation>) {
   if (
     !r.success ||

@@ -6,7 +6,6 @@ import rateLimit from "express-rate-limit";
 import { createHash } from "node:crypto";
 import { getTrustedClientIp } from "../../utils/trusted-client-ip.js";
 import { NeturePharmacyError } from "./constants.js";
-import { ConsultationLayoutService } from "./services/consultation-layout.js";
 import type { ConsultationStationService } from "./services/consultation-stations.js";
 import { ConsultationGoogleService } from './services/consultation-google.js';
 import { ModelControlService } from '../../services/ai-management/model-controls.js';
@@ -57,13 +56,11 @@ export function consultationWorkspaceRoutes(
   db: DataSource,
   stations: ConsultationStationService,
   store: RequestHandler[],
-  admin: RequestHandler[],
   guidance?: ConsultationGuidanceService,
   support?: ConsultationSupportService,
   kiosk?: ConsultationKioskService,
 ) {
-  const router = Router(),
-    layouts = new ConsultationLayoutService(db);
+  const router = Router();
   const expressions = new ConsultationExpressionService(db);
   router.get('/pharmacy/consultation-expression', ...store, handle(req => expressions.read(req.user!.id!, org(req))));
   router.put('/pharmacy/consultation-expression', ...store, handle(req => expressions.save(req.user!.id!, org(req), req.body)));
@@ -171,33 +168,6 @@ export function consultationWorkspaceRoutes(
       await stations.validate(req.user!.id!, organizationId, input.stationId, input.epoch);
     return { ...data, organizationId, mode: input.mode, productId: input.productId, productKind: input.productKind };
   }));
-  router.get(
-    "/pharmacy/consultation-layout",
-    ...store,
-    handle((req) => layouts.read(org(req))),
-  );
-  router.get(
-    "/admin/pharmacy-consultation-layouts",
-    ...admin,
-    handle((req) => layouts.list(req.query)),
-  );
-  router.put(
-    "/admin/pharmacy-consultation-layouts/:organizationId",
-    ...admin,
-    handle((req) => {
-      if (
-        !/^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/i.test(
-          req.params.organizationId,
-        )
-      )
-        throw new NeturePharmacyError(
-          400,
-          "INVALID_STORE",
-          "약국을 선택해 주시기 바랍니다.",
-        );
-      return layouts.save(req.params.organizationId, req.body?.operatingType);
-    }),
-  );
   router.post(
     "/pharmacy/consultation-stations/open",
     ...store,
