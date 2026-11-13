@@ -4,6 +4,7 @@
 > **작성일**: 2026-11-13
 > **실행 위치**: BOTH (스크립트 CLOUD 완료 · 실행 LOCAL · 판정 CLOUD)
 > **인계**: 코드 병합 후 LOCAL 이 T1 → T2 → T3 를 실행하고 결과 파일을 CLOUD 에 넘긴다 → CLOUD 가 T4 판정
+> **정책**: [`O4O-CONSUMER-MULTILINGUAL-POLICY-V1`](../baseline/O4O-CONSUMER-MULTILINGUAL-POLICY-V1.md) §4(2026-11-13 확정 · 문서 branch `claude/intelligent-cray-o2p4u3-multilingual-docs`)
 > **근거**: 2026-11-13 사용자 결정 — 소비자 다국어는 한국어 원본 + AI 번역 + 한국어 병기. OTC 내용(용법 · 용량 · 금기)은 허가 정보라 원문이 같고, 확인할 것은 번역 품질뿐이다. 매장 안에는 약사가 있다.
 
 ## 1. 질문
@@ -24,7 +25,7 @@ OTC 설명에 미리 만들어 둔 영문(기존 검수 번역) 대신, 한국�
 ## 3. TODO
 
 - [ ] T1 [LOCAL] extract — 읽기 전용
-- [ ] T2 [LOCAL] translate — **통합 담당 승인 후**(AI 비용 · 사용 기록 쓰기 · AGENTS.md §5). 30건 정도로 비용은 작다
+- [ ] T2 [LOCAL] translate — **통합 담당 승인 완료(2026-11-13)**: 이 표본 30건 1회 실행에 한한다(AI 비용 · 사용 기록 쓰기 · AGENTS.md §5). 표본을 늘리거나 다시 뽑으면 새로 승인받는다
 - [ ] T3 [LOCAL] compare — 파일만. `*.json` 과 `*.compare.json` 두 파일을 CLOUD 세션에 첨부로 넘긴다
 - [ ] T4 [CLOUD] 판정 — `check` 항목을 사람 눈으로 확인하고, 결과를 이 문서 §6 에 요약한다
 

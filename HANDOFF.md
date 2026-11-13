@@ -4,6 +4,7 @@
 ## 2026-11-13 · 소비자 다국어 정리 1단계 — QR 다국어 탭 숨김 · OTC 번역 비교 표본 (branch `claude/intelligent-cray-o2p4u3-multilingual`)
 
 > 다음 실행자: **통합 세션**(PR 생성 · 병합) → **LOCAL** — [`WO-O4O-OTC-TRANSLATION-QUALITY-SAMPLE-V1`](docs/work-orders/WO-O4O-OTC-TRANSLATION-QUALITY-SAMPLE-V1.md) T1~T3 → **CLOUD** T4 판정.
+> **T2(운영 번역 경로 호출 · AI 사용 기록 쓰기)는 2026-11-13 통합 담당 승인 완료** — 표본 30건 1회 실행에 한한다.
 > 기준 문서 초안은 문서 전용 branch `claude/intelligent-cray-o2p4u3-multilingual-docs` 에 따로 냈다(AGENTS.md §4-3 R6).
 
 - **결정 사항(2026-11-13 사용자):**
