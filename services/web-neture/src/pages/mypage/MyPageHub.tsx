@@ -1,6 +1,6 @@
 import { MyHomeWorkspaces } from '../../components/mypage/MyHomeWorkspaces';
 import { MyHomeStoreMembers } from '../../components/mypage/MyHomeStoreMembers';
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import {
   MyPageLayout,
@@ -17,6 +17,8 @@ import { CURRENT_HOST_PROFILE } from "../../lib/hostProfile";
 import HomeEntryPanel from "../../components/home/HomeEntryPanel";
 import { MyHomeParticipation } from "../../components/mypage/MyHomeParticipation";
 import { getNetureMyPageNavItems } from "./navItems";
+import { knownHasStore, rememberHasStore } from "../../lib/my-home-store-presence";
+import { MyHomeRegistrationStatus } from "../../components/mypage/MyHomeRegistrationStatus";
 import {
   MyHomeActivity,
   MyHomeManagement,
@@ -38,7 +40,29 @@ export const OPERATIONS_URL = "https://admin.neture.co.kr/operations";
 export function hasOperatorRole(roles: readonly string[] | undefined): boolean {
   return (roles ?? []).some(role => role.startsWith("platform:") || /(^|:|_)(admin|operator)$/.test(role));
 }
-function MyHomeContent({ view }: { view: View }) {
+/** 모아보기 「내 현황 요약」 — 홈 진입 데이터의 실제 상태로 만든다. 모르면 「확인 중」 · 실패면 그렇게 말한다(0 으로 위장하지 않는다). */
+export function overviewSummaries(
+  model: { myServices: unknown[]; statusItems?: { status: string }[] } | null,
+  data: { communities?: { canParticipate: boolean }[] } | null,
+  failed: boolean,
+): { to: string; title: string; value: string }[] {
+  const unknown = failed ? "불러오지 못했습니다" : "확인 중…";
+  const statusItems = model?.statusItems ?? [];
+  const pending = statusItems.filter(item => item.status === "pending").length;
+  const rejected = statusItems.filter(item => item.status === "rejected").length;
+  const services = !model ? unknown
+    : [`이용 중 ${model.myServices.length}개`, pending ? `승인 대기 ${pending}개` : "", rejected ? `반려 ${rejected}개` : ""].filter(Boolean).join(" · ");
+  const communities = data ? (data.communities ?? []).filter(c => c.canParticipate).length : null;
+  const items = [
+    { to: "/mypage/services", title: "참여 서비스", value: services },
+    { to: "/mypage/activity", title: "커뮤니티 활동", value: communities === null ? unknown : communities ? `참여 커뮤니티 ${communities}곳 · 내가 쓴 글 보기` : "참여 중인 커뮤니티 없음" },
+  ];
+  const stores = data ? homeEntryStoreOrganizationIds(data as Parameters<typeof homeEntryStoreOrganizationIds>[0]).length : 0;
+  if (stores) items.push({ to: "/mypage/management", title: "경영 현황", value: `매장 ${stores}곳 · 사업 요약과 방문 통계` });
+  return items;
+}
+
+function MyHomeContent({ view, onHasStore }: { view: View; onHasStore: (hasStore: boolean) => void }) {
   const { user } = useAuth();
   const { search } = useLocation();
   const entry = useHomeEntry(!!user, user?.id);
@@ -69,9 +93,15 @@ function MyHomeContent({ view }: { view: View }) {
     }
   }, [source, sourceKey, returnPath, user]);
 
+  const hasStore = !!entry.data && homeEntryStoreOrganizationIds(entry.data).length > 0;
+  const storeKnown = !!entry.data;
+  useEffect(() => {
+    if (!storeKnown) return;
+    rememberHasStore(user?.id, hasStore);
+    onHasStore(hasStore);
+  }, [storeKnown, hasStore, user?.id, onHasStore]);
   if (!user) return null;
   const model = entry.data && buildHomeEntryModel(user, entry.data);
-  const hasStore = !!entry.data && homeEntryStoreOrganizationIds(entry.data).length > 0;
   const renderStoreWorkspace = (store: HomeEntryStoreRef) => <HomeEntryPanel
     key={`${user.id}:${store.organizationId}`}
     user={user}
@@ -103,6 +133,7 @@ function MyHomeContent({ view }: { view: View }) {
       )}
       {view === "overview" ? (
         <div id="my-home-overview" className="space-y-5">
+          <MyHomeRegistrationStatus accountId={user.id} />
           <MyHomeWorkspaces
             user={user}
             data={entry.data}
@@ -114,28 +145,13 @@ function MyHomeContent({ view }: { view: View }) {
             <MyHomeNotifications accountId={user.id} previewLimit={3} />
             <MyHomeStoreMembers key={user.id} accountId={user.id} onChanged={entry.reload} compact />
           </div>
-          <nav aria-label="내 현황 자세히 보기" className="rounded-2xl border border-slate-200 bg-white p-5">
-            <h2 className="font-semibold text-slate-900">내 현황 자세히 보기</h2>
-            <p className="mt-1 text-sm text-slate-600">개인 활동과 매장 현황을 구분해 확인할 수 있습니다.</p>
-            <div className="mt-4 grid gap-3 sm:grid-cols-2">
-              {[
-                {
-                  to: "/mypage/services",
-                  title: "참여 서비스",
-                  value: model ? "가입·참여 현황과 이용 상태 확인"
-                    : entry.error ? "이용 상태를 불러오지 못했습니다" : "이용 상태 확인 중…",
-                },
-                { to: "/mypage/activity", title: "커뮤니티 활동", value: "내가 작성한 글 모아보기" },
-                ...(hasStore ? [{
-                  to: "/mypage/management",
-                  title: "경영 현황",
-                  value: `${homeEntryStoreOrganizationIds(entry.data!).length}개 매장 · 사업 요약과 방문 통계`,
-                }] : []),
-                { to: "/mypage/settings", title: "계정 설정", value: "프로필·로그인 설정" },
-                { to: '/mypage/mail', title: '개인 메일 관리', value: '내 메일 계정·발신처 규칙·정리 현황' },
-              ].map(item => <Link key={item.to} to={item.to} className="rounded-lg border border-slate-100 p-3 no-underline hover:border-blue-400">
+          {/* 2026-11-13 My Home 개선 4: 왼쪽 메뉴와 같은 링크 목록 대신 실제 상태 요약을 보인다. 계정 설정 · 개인 메일은 메뉴로 간다. */}
+          <nav aria-label="내 현황 요약" className="rounded-2xl border border-slate-200 bg-white p-5">
+            <h2 className="font-semibold text-slate-900">내 현황 요약</h2>
+            <div className="mt-4 grid gap-3 sm:grid-cols-3">
+              {overviewSummaries(model ?? null, entry.data ?? null, !!entry.error).map(item => <Link key={item.to} to={item.to} className="rounded-lg border border-slate-100 p-3 no-underline hover:border-blue-400">
                 <span className="font-medium text-blue-700">{item.title} →</span>
-                <span className="mt-1 block text-xs text-slate-500">{item.value}</span>
+                <span className="mt-1 block text-sm text-slate-700">{item.value}</span>
               </Link>)}
             </div>
           </nav>
@@ -166,13 +182,16 @@ export default function MyPageHub({ view = "overview" }: { view?: View }) {
   const { user, isAuthenticated, isLoading } = useAuth();
   const { openLoginModal } = useLoginModal();
   const location = useLocation();
+  // 「경영 현황」 메뉴는 매장이 없다고 확인된 계정에서만 숨긴다(모르면 보인다).
+  const [hasStore, setHasStore] = useState<boolean | undefined>(() => knownHasStore(user?.id));
+  useEffect(() => { setHasStore(knownHasStore(user?.id)); }, [user?.id]);
   return (
     <MyPageLayout
       title="My Home"
       subtitle={TITLES[view]}
       breadcrumb={[{ label: "홈", href: "/" }, { label: "My Home" }]}
       width="wide"
-      navItems={getNetureMyPageNavItems(user?.roles)}
+      navItems={getNetureMyPageNavItems(user?.roles, hasStore)}
     >
       {isLoading ? (
         <MyPageLoadingState message="My Home을 불러오는 중…" />
@@ -194,7 +213,7 @@ export default function MyPageHub({ view = "overview" }: { view?: View }) {
           />
         </section>
       ) : (
-        <MyHomeContent key={user.id} view={view} />
+        <MyHomeContent key={user.id} view={view} onHasStore={setHasStore} />
       )}
     </MyPageLayout>
   );
