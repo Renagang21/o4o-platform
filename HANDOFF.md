@@ -1,5 +1,21 @@
 # HANDOFF
 
+
+## 2026-11-13 · 소비자 다국어 기준 문서 초안 (branch `claude/intelligent-cray-o2p4u3-multilingual-docs` · 문서 전용)
+
+> 다음 실행자: **통합 담당** — 초안 확정(DRAFT → Active) 여부 판단. **통합 세션** — 문서 PR 은 코드 branch `claude/intelligent-cray-o2p4u3-multilingual` 다음에 병합한다(그 branch 의 WO 를 링크한다 · AGENTS.md §4-3 R7).
+
+- **새 문서:** [`docs/baseline/O4O-CONSUMER-MULTILINGUAL-POLICY-V1.md`](docs/baseline/O4O-CONSUMER-MULTILINGUAL-POLICY-V1.md) — 상태 DRAFT. 내용:
+  - 원본은 한국어 하나, 번역은 AI, 번역본은 재사용, 원본이 바뀌면 다시 번역한다.
+  - 외국어 화면에는 한국어를 병기한다(기본 켜짐 · 약사가 끌 수 있음).
+  - 「다국어 제품 콘텐츠」는 새로 만들지 않는다(이미 발급된 링크는 계속 열린다).
+  - OTC 는 표본 비교 결과로 정한다.
+- **결정 사항(2026-11-13 사용자):** 위 내용 그대로다. 한국어 병기를 기본 켜짐으로 둔 것은 이 세션의 판단이다 — 근거는 매장 안에서 약사가 함께 보는 화면이라는 점이다.
+- **하지 않은 것:**
+  - `CANONICAL-INDEX` 등재는 확정 뒤에 한다.
+  - 영향을 받는 기준 문서 4건(문서 §5)은 갱신하지 않았다 — 확정 뒤 별도 문서 작업이다(AGENTS.md §8).
+- **검증:** `check-doc-sensitive` 통과. WO 링크는 코드 branch 병합 전까지 깨진 상태다(병합 순서로 해결).
+
 ## 2026-11-12 · 상시 통합 세션 운영 기록 · 후속 작업 요청서 (branch `claude/epic-rubin-5g04vm`)
 
 - **병합(squash)**: #1043 · #1042 · #1044 · #1045 · #1046. 배포: main `25e7f801` → `production` `DEPLOYED`(api + 웹 7개, 23:30 UTC).
