@@ -137,8 +137,10 @@ export default function CentralMemberWorkspace({ actorId, initialQuery = '', ini
       const response = await api.delete(`/admin/users/${encodeURIComponent(row.userId)}`, { timeout: 300_000 });
       const data = response.data?.data as UserErasureResult | undefined;
       if (!data || typeof data.erased !== 'boolean' || !Object.prototype.hasOwnProperty.call(ERASURE_STATE_LABELS, data.state)) throw new Error('INVALID_RESPONSE');
+      // 삭제 전 검토에서 멈추면 errorCode 는 비고 원인은 reviewCodes 에만 있다.
+      const reason = data.errorCode ?? data.reviewCodes?.[0];
       message = data.erased ? `${name} 계정을 삭제했습니다.`
-        : `${name} — ${ERASURE_STATE_LABELS[data.state]} — 삭제가 아직 끝나지 않았습니다. 「삭제 처리 내역」에서 상태를 확인하거나 재시도해 주시기 바랍니다.${data.errorCode ? ` ${deletionMessage(data.errorCode)} (${data.errorCode})` : ''}`;
+        : `${name} — ${ERASURE_STATE_LABELS[data.state]} — 삭제가 아직 끝나지 않았습니다. 「삭제 처리 내역」에서 상태를 확인하거나 재시도해 주시기 바랍니다.${reason ? ` ${deletionMessage(reason)} (${reason})` : ''}`;
     } catch (error_) {
       const e = error_ as { code?: string; response?: { data?: { code?: string } } };
       const code = e.response?.data?.code;
