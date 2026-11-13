@@ -154,6 +154,7 @@ export const adminMenuStatic: MenuItem[] = [
     icon: <Settings className="w-5 h-5" />,
     children: [
       { id: 'pharmacy-service-settings', label: '약국 서비스 설정', icon: <Layers className="w-4 h-4" />, path: '/admin/pharmacy-service-settings' },
+      { id: 'legal-documents', label: '약관·정책 문서', icon: <FileText className="w-4 h-4" />, path: '/admin/legal-documents' },
       // PLATFORM HUB — 현행 공식 주소의 기본 접속 상태를 확인한다. 업무 승인 집계/실행은 각 서비스 소관.
       { id: 'platform-hub', label: '서비스 상태', icon: <Layers className="w-4 h-4" />, path: '/admin/platform/hub' },
       // WO-O4O-SERVICE-IDENTITY-AND-OPERATOR-SCOPE-V1: '분회 서비스 가입 승인'(core-kpa-branch-service-members) 제거.

@@ -46,6 +46,25 @@
 - **로컬 참고:** 대체된 이전 로컬 커밋은 로컬 branch `backup/1049-local-superseded` 에만 있다(push 하지 않음).
 - **겹치는 PR / 문서 정합:** 열린 PR 대조는 통합 세션. 문서 정합: 해당 없음.
 
+## 2026-11-13 · 계정 삭제 「약국 경영자」 보류 안내 · 운영자 화면 → 관리자 화면 연결 (branch `claude/ecstatic-mendel-2ohu27`)
+
+- **배경(조사):** Admin 「계정 삭제」가 `PHARMACY_TRANSFER_OR_CLOSURE_REQUIRED` 로 멈춤. 코드 · 배포 문제 아님(#1048 배포 확인, 미병합 branch 없음) — 서버의 의도된 보류(`account-business-data.ts` 현재 경영자 검사). 사용자는 Admin 「이용·약국 관리」 → 완전폐업 처리 후 삭제 완료. 운영자 화면(`/operations/neture/members`)에는 그 버튼이 없어 처리 위치를 찾지 못한 것이 원인.
+- **한 일 (admin-dashboard 화면만):**
+  - `AccountErasureControls.tsx`: `PHARMACY_TRANSFER_OR_CLOSURE_REQUIRED` · `PHARMACY_CLOSURE_INCOMPLETE` 문구에 실제 처리 순서(체크 → 「이용·약국 관리」 → 이전 / 완전폐업 → 「계정 삭제」 재실행).
+  - `CentralMemberWorkspace.tsx`: Admin 계정 삭제가 끝나지 않으면 초록 안내가 아니라 빨간 오류 안내로 표시. 원인 코드가 있으면 「삭제 처리 내역에서 재시도」 일반 문구 대신 그 원인의 처리 방법만 표시.
+  - 운영자 화면에서 삭제 미완료(`review_required` · `retry_required`) 회원 1명을 고르면 「관리자 화면에서 처리」 링크(`/admin/platform/users?userId=…` · 전체 관리자 권한 필요) 표시. Admin 화면에는 표시하지 않음.
+- **추가 (같은 날 · 사용자 보고 「리스트 맨 끝 행이 무엇인지 보이지 않는다」):**
+  - 원인: 운영 역할이 많은 관리자 계정은 「가입 유형」 칸에 역할 배지가 모두 쌓여 행이 화면보다 길어지고, 이름 · 이메일이 아래로 밀려 보이지 않았다. Admin 「O4O 플랫폼 관리」 영역의 폭도 `max-w-5xl`(1024px)로 좁았다.
+  - `CentralMemberWorkspace.tsx`: 역할 3개까지는 모두 표시하고, 그보다 많으면 「전체 관리자」를 앞에 둔 2개 + 「외 N개」(마우스를 올리면 전체 목록 표시). 운영자 · Admin 회원 목록 공용.
+  - `PlatformSectionLayout.tsx`: 폭을 운영자 레이아웃과 같은 `max-w-[1400px]` 로 넓힘. 소비처는 `/admin/platform/*` 탭 전체(플랫폼 홈 · 관리자 계정 · 전체 회원 · 공급자 · 내 매장 · 삭제 화면들) — 폭만 넓어지고 동작은 같다.
+  - 검증: admin-dashboard vitest `src/pages/platform` · `src/pages/operators` · `platform-menu-cleanup` 172 통과(신규 1건). `tsc --noEmit` · 변경 파일 ESLint 통과. 실제 브라우저 확인 안 함 — 배포 후 `/admin/platform/users` PC · mobile 에서 마지막 행 이름 표시와 표 폭 확인.
+- **결정 사항(§9):** 링크는 권한과 무관하게 보이되 「전체 관리자 권한 필요」를 함께 적는다(Admin route guard 가 막는다). API · 권한 · 서버 판정은 바꾸지 않음.
+- **알려진 남은 위험(미수정):** 삭제 차단은 `organization_members` owner 도 보지만, 회원 상세의 약국 목록(이전 · 폐업 버튼 근거)은 `neture_pharmacy_memberships` 만 읽는다(`central-member-workspace.service.ts:117`). 약국 가입 기록 없이 매장 경영자만인 회원은 화면에서 해결 경로가 없을 수 있다 — 실제 사례 확인 시 별도 작업.
+- **검증:** admin-dashboard vitest `src/pages/operators` · `src/pages/platform/account-governance` 21 files / 168 통과(신규 3건). admin-dashboard `tsc --noEmit` 통과. 변경 파일 ESLint 오류 0.
+- **PR 묶음:** 이 branch 단독 1 PR(서비스 화면 · lane 해당 없음). 겹칠 수 있는 PR 미대조(통합 세션 확인).
+- **배포 후 Demo 확인:** Demo 계정은 운영자 · 관리자 화면 권한이 없음 — 통합 담당이 운영자 화면에서 삭제 미완료 회원 선택 시 링크 · Admin 삭제 보류 시 빨간 안내를 확인.
+- **문서 정합:** 해당 없음.
+
 ## 2026-11-13 · 소비자 다국어 기준 문서 초안 (branch `claude/intelligent-cray-o2p4u3-multilingual-docs` · 문서 전용)
 
 > **2026-11-13 통합 담당 확정(DRAFT → Active).** 다음 실행자: **통합 세션** — 문서 PR 은 코드 branch `claude/intelligent-cray-o2p4u3-multilingual` 다음에 병합한다(그 branch 의 WO 를 링크한다 · AGENTS.md §4-3 R7).

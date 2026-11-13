@@ -64,6 +64,7 @@ export const menuPermissions: MenuPermission[] = [
   { menuId: 'operations-operators', roles: [...PLATFORM_ADMIN_ROLES] },
   { menuId: 'central-operations', roles: [...PLATFORM_ADMIN_ROLES] },
   { menuId: 'pharmacy-service-settings', roles: [...PLATFORM_ADMIN_ROLES] },
+  { menuId: 'legal-documents', roles: [...PLATFORM_ADMIN_ROLES] },
   {
     menuId: 'dashboard',
     roles: [...PLATFORM_ADMIN_ROLES]
