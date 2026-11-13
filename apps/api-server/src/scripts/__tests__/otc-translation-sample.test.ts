@@ -33,6 +33,11 @@ describe('OTC translation sample comparison', () => {
       aiEn: '<p>Suitable for children under 12.</p>' };
     expect(compareItem(reversed)).toMatchObject({ verdict: 'check', koProhibitions: 1, aiProhibitions: 0, savedProhibitions: 0 });
   });
+  it('noun-form source prohibitions (복용 금지) are counted too', () => {
+    const noun: SampleItem = { ...item(null), ko: '<p>만 12세 미만 복용 금지.</p>', savedEn: '<p>Do not take if under 12 years.</p>',
+      aiEn: '<p>Suitable for children under 12 years.</p>' };
+    expect(compareItem(noun)).toMatchObject({ verdict: 'check', koProhibitions: 1, aiProhibitions: 0 });
+  });
   it('a missing translation fails and the summary counts it', () => {
     expect(summarize([item(null), item('<p>2 tablets 3 times. Do not use under 12. 6 max.</p>')])).toMatchObject({ total: 2, ok: 1, failed: 1 });
   });

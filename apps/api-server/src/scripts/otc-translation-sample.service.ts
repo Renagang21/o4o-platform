@@ -71,7 +71,8 @@ export function numbersOf(html: string): string[] {
     .filter(n => n !== '1').sort((a, b) => a.localeCompare(b));
 }
 
-const KO_PROHIBIT = /(복용하지 마|사용하지 마|투여하지 마|금기|복용하지 말|사용하지 말)/g;
+// 동사형(「복용하지 마십시오」)과 명사형(「복용 금지」 · 「사용을 삼가」)을 모두 원문 금지 표현으로 센다.
+const KO_PROHIBIT = /(복용하지 마|사용하지 마|투여하지 마|금기|복용하지 말|사용하지 말|금지|삼가)/g;
 const EN_PROHIBIT = /\b(do not|don't|must not|should not|never|contraindicated|avoid)\b/gi;
 
 export interface Comparison {
