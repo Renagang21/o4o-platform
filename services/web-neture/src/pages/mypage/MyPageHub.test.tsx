@@ -41,6 +41,7 @@ vi.mock("../../components/home/HomeEntryPanel", () => ({
   default: ({ workspaceOnly }: { workspaceOnly?: boolean }) => <p>{workspaceOnly ? "내 업무 바로가기" : "참여 서비스 목록"}</p>,
 }));
 vi.mock("../../components/mypage/MyHomeWorkspaces", () => ({ MyHomeWorkspaces: () => <p>내 업무 바로가기</p> }));
+vi.mock("../../components/mypage/MyHomeRegistrationStatus", () => ({ MyHomeRegistrationStatus: () => null }));
 vi.mock("../../components/mypage/MyHomeStoreMembers", () => ({ MyHomeStoreMembers: () => <p>본인 매장 초대 관리</p> }));
 vi.mock("../../components/mypage/MyHomeParticipation", () => ({
   MyHomeParticipation: () => <p>본인 학습과 펀딩 참여 현황</p>,
@@ -82,10 +83,11 @@ it("offers a personal home without requiring a store role or a service membershi
     "모아보기",
     "참여 서비스",
     "커뮤니티 활동",
-    "경영 현황",
     "계정 설정",
   ])
     expect(screen.getAllByRole("link", { name }).length).toBeGreaterThan(0);
+  // 매장이 없다고 확인된 일반 회원에게는 경영 현황 메뉴를 보이지 않는다(2026-11-13 개선 3).
+  expect(screen.queryByRole("link", { name: "경영 현황" })).toBeNull();
   expect(screen.getByText("본인 알림")).toBeTruthy();
   expect(screen.queryByText("본인 학습과 펀딩 참여 현황")).toBeNull();
   expect(screen.queryByText("권한 있는 매장 통계")).toBeNull();
@@ -96,7 +98,7 @@ it("puts available work before notifications and detailed-view links without mou
   render(app());
   const notices = screen.getByText("본인 알림");
   const work = screen.getByText("내 업무 바로가기");
-  const details = screen.getByRole("navigation", { name: "내 현황 자세히 보기" });
+  const details = screen.getByRole("navigation", { name: "내 현황 요약" });
   expect(work.compareDocumentPosition(notices) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   expect(work.compareDocumentPosition(details) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   expect(screen.queryByText("본인 커뮤니티 활동")).toBeNull();
@@ -107,14 +109,14 @@ it("offers management details for an approved store without mounting statistics"
   render(app());
   expect(screen.queryByRole("region", { name: "내 매장 경영 요약" })).toBeNull();
   expect(screen.queryByText("권한 있는 매장 통계")).toBeNull();
-  expect(screen.getByText("1개 매장 · 사업 요약과 방문 통계")).toBeTruthy();
+  expect(screen.getByText("매장 1곳 · 사업 요약과 방문 통계")).toBeTruthy();
   fireEvent.click(screen.getByRole("link", { name: /경영 현황 →/ }));
   expect(screen.getByText("권한 있는 매장 통계")).toBeTruthy();
 });
 it("offers management for an organization-only Store Workspace (workspaceStores without legacy stores)", () => {
   entry.data.workspaceStores = [{ organizationId: "fixture-org", organizationName: "조직 매장", memberRole: "owner" }];
   render(app());
-  expect(screen.getByText("1개 매장 · 사업 요약과 방문 통계")).toBeTruthy();
+  expect(screen.getByText("매장 1곳 · 사업 요약과 방문 통계")).toBeTruthy();
 });
 it("keeps participation history in Services", () => {
   render(app());
