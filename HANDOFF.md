@@ -31,6 +31,21 @@
   - 배포 후 Demo 「매장 경영자」로 사이니지 → 동영상에서 확인할 것:
     - 직접 등록한 영상 1개 → 「선택 영상 제품 연결」 → 취급 제품 선택 → 목록의 「연결 제품」 표시 → 해제.
     - 공용 Demo 데이터이므로 확인 뒤 해제해 원복한다.
+- **2026-11-13 추가(같은 branch · 남은 부분 해소):**
+  - 운영자: 관리자 미디어 카탈로그의 제품 연결에 제품 이름 검색을 넣었다(용도 `product-video`). HQ 사이니지 영상 화면은 현재 쓰이지 않아 따로 만들지 않았다.
+  - 공급자:
+    - 「연결 상품」이 `productMasterId` 로도 저장된다. 서버가 공급 제품인지 확인한다(POST · PATCH).
+    - 기존 영상은 `metadata` 의 연결을 읽는다.
+  - 매장: 보관 영상 등록본과 가져온 사본도 원본의 연결 제품을 「(원본)」으로 보인다.
+  - 검증:
+    - api `media-product-link.test.ts` 8/8 · `signage-resource-id-validation` 93 · `tsc` 0
+    - web-store `vitest src/pages/pharmacy` 60 files / 695 · `tsc` 0
+    - web-neture vitest(CI config) 185 files / 1578 · `tsc` 0
+    - admin `ProductMasterPicker.test.tsx` 2/2 · `tsc` 오류 0
+    - 바뀐 파일 ESLint 0
+  - 배포 후 확인할 것:
+    - Admin 미디어 카탈로그 → 보관 영상 → 연결 유형 product → 제품 찾기 → 저장.
+    - neture 공급자 사이니지에서 연결 상품을 고른 뒤 저장한다. 그다음 매장 사이니지 목록의 「연결 제품」에 「(원본)」이 보이는지 확인한다(공급자 영상을 가져온 매장).
 - **겹칠 수 있는 PR:** #1049(상담 태블릿) — 겹치는 파일 없음.
 
 ## 2026-11-13 · 매장 콘텐츠 QR · 태블릿 분리 지시서 (branch `claude/intelligent-cray-o2p4u3-qr-tablet` · 문서만)

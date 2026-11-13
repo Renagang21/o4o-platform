@@ -274,7 +274,8 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
       if (!Array.isArray(data)) throw new Error('Invalid media');
       if (current() && isCurrent()) {
         setSignageMediaItems(data);
-        setProductLinks(links ? new Map(links.map(link => [link.mediaId, link])) : null);
+        // 직접 등록 영상은 media:<id>, 가져온 사본은 snapshot:<id> 로 찾는다.
+        setProductLinks(links ? new Map(links.map(link => [link.mediaId ? `media:${link.mediaId}` : `snapshot:${link.snapshotId}`, link])) : null);
       }
     } catch { if (current() && isCurrent()) setMediaLoadError('동영상을 불러오지 못했습니다. 다시 시도해 주시기 바랍니다.'); }
     finally { if (current() && isCurrent()) setMediaLoading(false); }
@@ -540,10 +541,11 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
       key: 'product',
       title: '연결 제품',
       render: (_v: unknown, v: UnifiedVideoItem) => {
-        // 직접 등록한 영상만 매장에서 연결한다. 가져온 사본(snapshot)은 원본 쪽 연결을 따른다.
-        if (v.source !== 'direct' || !v._media) return <span className="text-xs text-slate-400">—</span>;
+        // 직접 등록한 영상만 매장에서 연결한다. 가져온 사본(snapshot)은 원본 영상의 연결을 「(원본)」으로 보인다.
+        const key = v.source === 'direct' && v._media ? `media:${v._media.id}` : v._snapshot ? `snapshot:${v._snapshot.id}` : null;
+        if (!key) return <span className="text-xs text-slate-400">—</span>;
         if (!productLinks) return <span className="text-xs text-slate-400">확인 불가</span>;
-        const link = productLinks.get(v._media.id);
+        const link = productLinks.get(key);
         return link
           ? <span className="text-sm text-slate-700 break-words">{link.productName}{link.inherited && <span className="ml-1 text-xs text-slate-500">(원본)</span>}</span>
           : <span className="text-xs text-slate-400">없음</span>;
@@ -1047,7 +1049,7 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
 
       {productLinkTarget?._media && organizationId && (() => {
         const media = productLinkTarget._media;
-        const link = productLinks?.get(media.id);
+        const link = productLinks?.get(`media:${media.id}`);
         return (
           <VideoProductLinkDialog key={media.id} organizationId={organizationId} mediaId={media.id} videoTitle={productLinkTarget.title}
             currentListingId={link?.inherited ? null : link?.listingId ?? null} currentProductName={link?.productName ?? null} inherited={!!link?.inherited}

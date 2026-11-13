@@ -162,10 +162,13 @@ export function createYoutubeVideoApi(organizationId: string, current:()=>boolea
 /* ─── 이 영상의 제품 (WO-O4O-STORE-QR-TABLET-CHANNEL-SEPARATION-V1 T4) ─── */
 
 export interface SignageMediaProductLink {
-  mediaId: string;
+  /** 직접 등록한 영상이면 그 ID, 가져온 사본이면 null. */
+  mediaId: string | null;
+  /** 가져온 사본(asset snapshot)이면 그 ID — 원본 영상의 연결을 따른다. */
+  snapshotId: string | null;
   productMasterId: string;
   productName: string;
-  /** 공용 영상을 가져온 사본이 원본의 연결을 따르는 경우. */
+  /** 원본(공용 · 공급자 영상, O4O 보관 영상)의 연결을 따르는 경우. 매장에서 해제할 수 없다. */
   inherited: boolean;
   /** 이 매장의 취급 제품 ID(다시 고를 때 선택 표시용). 없으면 null. */
   listingId: string | null;

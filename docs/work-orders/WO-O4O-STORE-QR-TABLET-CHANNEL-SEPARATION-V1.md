@@ -34,7 +34,11 @@
 - [ ] T3 [CLOUD] QR 탭 정리 — 목록 기본값에서 코너 QR 제외 · 「태블릿 코너 포함」 필터(D3), 「콘텐츠 연결」 만들기 제거와 「링크 QR」 정리, 콘텐츠 화면 「QR 출력 · QR 목록에 담기」(D5). 기존 콘텐츠 연결 QR(13건 등)은 그대로 열리고 목록에 남는다
 - [x] T4 [CLOUD] 제품 ↔ 영상 연결(D6 · §7 조사 반영) — ① O4O 보관 영상(`media_assets`)은 기존 `media_entity_links`(`entity_type='product'`)를 쓴다(DB 변경 없음) ② 매장 · 공급자 사이니지 영상(`signage_media`)은 제품 열을 추가한다 — 추가형 migration(nullable · index). **DB 구조 변경 승인 완료(2026-11-13 통합 담당 · 이 열 하나에 한한다)** · migration lane 직렬(§4-3 R4). 영상 올리기 · 고르기에 「제품 선택(선택 사항)」. 조회는 Boundary 규칙(매장 영상 = `organizationId`, 공급자 · 운영자 영상 = 공유 source)을 지킨다
   - 2026-11-13 구현(branch `claude/intelligent-cray-o2p4u3-product-video`): migration `1794550173646-AddSignageMediaProductMaster`(추가형 판정) · 연결 API(매장 `PUT /media/:id/product` · `GET /media/product-links`, 운영자 `PUT /hq/media/:id/product`, 공급자 `PATCH /supplier/signage/media/:id` 의 `productMasterId`) · 매장 동영상 목록의 「연결 제품」 열 · 「선택 영상 제품 연결」.
-  - 남은 것: ① O4O 보관 영상(`media_assets`)의 `media_entity_links` 연결은 관리자 카탈로그에 이미 있고 매장 화면은 아직 없다(필요성은 T5 에서 판단) ② 운영자 · 공급자 화면의 연결 UI(API 만 준비) ③ 매장이 가져온 사본(asset snapshot)은 연결하지 않는다 — 원본(공급자 · 운영자 영상)의 연결을 T5 조회가 따른다
+  - 2026-11-13 남은 것 해소(같은 branch):
+    - 운영자: 서비스 공용(HQ) 사이니지 영상 화면은 현재 어디에서도 쓰이지 않는다(`operator-core-ui` `HqMediaDetailPage` 미사용). 운영자 영상은 O4O 보관 영상(관리자 미디어 카탈로그)으로 나간다 → 카탈로그의 제품 연결에 **제품 이름 검색**(`ProductMasterPicker`)을 넣고 용도를 `product-video` 로 채운다. HQ 연결 API 는 남겨 둔다.
+    - 공급자: 기존 「연결 상품」 선택이 표준 제품 마스터를 `productMasterId` 로도 저장한다(생성 · 수정 · 공급 제품만). 칸이 생기기 전 저장된 공급자 영상은 `metadata.linkedProduct.masterId` 를 읽어 따른다(데이터 변경 없음).
+    - O4O 보관 영상 · 사본: 매장 화면에 별도 연결 UI 를 두지 않는다. 보관 영상에서 등록한 영상은 그 보관 영상의 연결(`media_entity_links` · `product-video`)을, 가져온 사본(`o4o_asset_snapshots`)은 원본 영상의 연결을 「(원본)」으로 보인다.
+    - 한 식(`effectiveProductSql`)으로 모았다 — T5 태블릿 코너가 같은 식을 쓴다.
 - [ ] T5 [CLOUD] 태블릿 코너 — 제품 QR 기본값을 상품 대표 QR 로(§7), [영상 보기](D7), 코너 화면의 코너 QR 출력(D4). **T4 병합 후**(#1049 와 무관)
 
 ## 4. 검증 (각 단계)

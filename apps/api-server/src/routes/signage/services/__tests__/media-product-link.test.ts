@@ -89,8 +89,35 @@ const url = process.env.MEDIA_PRODUCT_LINK_TEST_DATABASE_URL;
     const rows = await listStoreMediaProducts(db, { serviceKey: SERVICE, organizationId: store });
     expect(rows).toHaveLength(2);
     expect(rows).toEqual(expect.arrayContaining([
-      { mediaId: mine, productMasterId: master, productName: '연결 제품', inherited: false, listingId: listing },
-      { mediaId: copy, productMasterId: master, productName: '연결 제품', inherited: true, listingId: listing },
+      { mediaId: mine, snapshotId: null, productMasterId: master, productName: '연결 제품', inherited: false, listingId: listing },
+      { mediaId: copy, snapshotId: null, productMasterId: master, productName: '연결 제품', inherited: true, listingId: listing },
     ]));
+  });
+
+  it('inherits a supplier video\'s legacy linked product, a stored-video product link and an imported snapshot\'s original', async () => {
+    // 공급자 영상: 칸이 생기기 전 metadata 에만 저장된 연결 상품
+    const supplierVideo = (await db.query(`INSERT INTO signage_media("serviceKey",name,"mediaType","sourceType","sourceUrl",source,scope,metadata)
+      VALUES($1,'공급자 영상','video','youtube','https://www.youtube.com/watch?v=supplier','supplier','global',$2::jsonb) RETURNING id`,
+    [SERVICE, JSON.stringify({ linkedProduct: { masterId: otherMaster, name: 'x' } })]))[0].id;
+    const snapshot = (await db.query(`INSERT INTO o4o_asset_snapshots(organization_id,source_service,source_asset_id,asset_type,title)
+      VALUES($1,'kpa',$2,'signage','가져온 영상') RETURNING id`, [store, supplierVideo]))[0].id;
+    // O4O 보관 영상: 관리자 카탈로그의 제품 연결(product-video)을 매장이 등록한 영상이 따른다
+    const asset = (await db.query(`INSERT INTO media_assets(url,file_name,original_name,mime_type,consented_at,gcs_path)
+      VALUES('https://storage.googleapis.com/fixture/v.mp4','v.mp4','v.mp4','video/mp4',now(),'fixture/v.mp4') RETURNING id`))[0].id;
+    await db.query(`INSERT INTO media_entity_links(media_asset_id,entity_type,entity_id,purpose) VALUES($1,'product',$2,'product-video')`, [asset, master]);
+    const registered = (await db.query(`INSERT INTO signage_media("serviceKey","organizationId",name,"mediaType","sourceType","sourceUrl",source,scope,metadata)
+      VALUES($1,$2,'보관 영상 등록','video','url','https://storage.googleapis.com/fixture/v.mp4','store','store',$3::jsonb) RETURNING id`,
+    [SERVICE, store, JSON.stringify({ mediaLibraryAssetId: asset })]))[0].id;
+    const rows = await listStoreMediaProducts(db, { serviceKey: SERVICE, organizationId: store });
+    expect(rows).toEqual(expect.arrayContaining([
+      { mediaId: null, snapshotId: snapshot, productMasterId: otherMaster, productName: '다른 매장 제품', inherited: true, listingId: null },
+      { mediaId: registered, snapshotId: null, productMasterId: master, productName: '연결 제품', inherited: true, listingId: listing },
+    ]));
+    // 다른 매장의 사본은 보이지 않는다
+    await db.query(`INSERT INTO o4o_asset_snapshots(organization_id,source_service,source_asset_id,asset_type,title) VALUES($1,'kpa',$2,'signage','남의 사본')`, [other, supplierVideo]);
+    expect(await listStoreMediaProducts(db, { serviceKey: SERVICE, organizationId: store })).toHaveLength(2);
+    // 매장이 자기 칸을 지정하면 그 값이 우선한다
+    await linkStoreMediaProduct(db, { serviceKey: SERVICE, organizationId: store }, registered, null);
+    expect(await masterOf(registered)).toBeNull();
   });
 });

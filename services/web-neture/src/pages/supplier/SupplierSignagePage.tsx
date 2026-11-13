@@ -7,7 +7,9 @@
  *       → 매장이 HUB 에서 가져가 독립 사본(Full Copy)으로 사용.
  * 보관(archived)은 HUB 목록·가져오기·캠페인 대상에서 제외되며, 이미 가져간 매장 사본은 영향 없다.
  *
- * 정책: 연결 상품은 참고 정보(metadata)일 뿐 — 상품 분류로 콘텐츠 조회·가져오기를 제한하지 않는다.
+ * 정책: 연결 상품은 상품 분류로 콘텐츠 조회·가져오기를 제한하지 않는다.
+ *   2026-11-13 — 연결 상품의 표준 제품 마스터를 「이 영상의 제품」(productMasterId)으로도 저장한다.
+ *   매장 태블릿 코너에서 그 제품의 [영상 보기]로 쓰인다(WO-O4O-STORE-QR-TABLET-CHANNEL-SEPARATION-V1 T4).
  */
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
@@ -135,6 +137,8 @@ export default function SupplierSignagePage() {
         description: form.description.trim() || null,
         sourceUrl: form.sourceUrl.trim(),
         metadata,
+        // 표준 제품 정보가 없는 상품은 참고 정보로만 남는다.
+        productMasterId: product?.masterId ?? null,
       };
       if (editing) {
         await updateSupplierSignage(editing.id, input);
@@ -340,7 +344,7 @@ export default function SupplierSignagePage() {
                 />
               </div>
               <div>
-                <label className="text-xs font-semibold text-slate-500">연결 상품 (선택 — 참고 정보)</label>
+                <label className="text-xs font-semibold text-slate-500">연결 상품 (선택 — 매장 태블릿에서 이 상품의 영상으로 보입니다)</label>
                 <select
                   value={form.linkedProductId}
                   onChange={(e) => setForm((f) => ({ ...f, linkedProductId: e.target.value }))}

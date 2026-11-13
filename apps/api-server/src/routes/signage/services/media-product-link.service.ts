@@ -86,22 +86,51 @@ export async function assertSupplierProduct(db: Pick<DataSource, 'query'>, suppl
   return masterId;
 }
 
+/** 매장 태블릿이 「이 제품의 영상」으로 읽는 O4O 보관 영상(media_assets) 연결 용도. 관리자 미디어 카탈로그가 같은 값을 쓴다. */
+export const PRODUCT_VIDEO_PURPOSE = 'product-video';
+
 /**
- * 매장 영상 목록 옆에 보일 「연결 제품」. 공용 영상을 가져온 사본(parentMediaId)은 원본의 연결을 따른다(inherited).
+ * 사이니지 영상 한 행(alias)의 「이 영상의 제품」 — 표준 제품 마스터 ID(text). 우선순위:
+ *   1. "productMasterId" 칸(매장 · 운영자 · 공급자가 지정)
+ *   2. 공급자 영상의 기존 연결 상품(metadata.linkedProduct.masterId) — 칸이 생기기 전에 저장된 공급자 영상(데이터 변경 없이 읽는다)
+ *   3. O4O 보관 영상에서 등록한 영상이면 그 보관 영상의 제품 연결(media_entity_links · product · product-video)
+ * 태블릿 코너(T5)도 이 식을 그대로 쓴다.
+ */
+export function effectiveProductSql(alias: string): string {
+  return `COALESCE(${alias}."productMasterId"::text,
+    CASE WHEN ${alias}.source = 'supplier' THEN NULLIF(${alias}.metadata->'linkedProduct'->>'masterId', '') END,
+    (SELECT l.entity_id FROM media_entity_links l
+      WHERE l.media_asset_id::text = ${alias}.metadata->>'mediaLibraryAssetId'
+        AND l.entity_type = 'product' AND l.purpose = '${PRODUCT_VIDEO_PURPOSE}'
+      ORDER BY l.created_at LIMIT 1))`;
+}
+
+/**
+ * 매장 영상 목록 옆에 보일 「연결 제품」.
+ *   - 직접 등록한 영상(mediaId): 자기 칸이 비면 공용 원본(parentMediaId) · 보관 영상 연결을 따른다(inherited).
+ *   - 가져온 사본(snapshotId · o4o_asset_snapshots): 원본 영상(source_asset_id)의 연결을 따른다(항상 inherited · 매장에서 바꾸지 않는다).
  * listingId 는 이 매장의 취급 제품 중 그 마스터의 것(다시 고를 때 선택 표시용) — 없으면 null.
  */
 export async function listStoreMediaProducts(db: Pick<DataSource, 'query'>, scope: { serviceKey: string; organizationId?: string | null }) {
   if (!scope.organizationId) fail('ORGANIZATION_REQUIRED', 403, '매장을 확인할 수 없습니다.');
   return db.query(
-    `SELECT sm.id AS "mediaId", eff.master_id AS "productMasterId", pm.name AS "productName",
-       (sm."productMasterId" IS NULL) AS inherited,
-       (SELECT opl.id FROM organization_product_listings opl WHERE opl.master_id = eff.master_id AND opl.organization_id = $2
+    `WITH linked AS (
+       SELECT sm.id AS "mediaId", NULL::uuid AS "snapshotId",
+         COALESCE(${effectiveProductSql('sm')}, ${effectiveProductSql('parent')}) AS master_id,
+         (sm."productMasterId" IS NULL) AS inherited
+       FROM signage_media sm
+       LEFT JOIN signage_media parent ON parent.id = sm."parentMediaId" AND parent."serviceKey" = sm."serviceKey" AND parent."deletedAt" IS NULL
+       WHERE sm."serviceKey" = $1 AND sm."organizationId" = $2 AND sm."deletedAt" IS NULL
+       UNION ALL
+       SELECT NULL::uuid, s.id, ${effectiveProductSql('src')}, true
+       FROM o4o_asset_snapshots s
+       JOIN signage_media src ON src.id = s.source_asset_id AND src."deletedAt" IS NULL
+       WHERE s.organization_id = $2 AND s.asset_type = 'signage'
+     )
+     SELECT linked."mediaId", linked."snapshotId", pm.id AS "productMasterId", pm.name AS "productName", linked.inherited,
+       (SELECT opl.id FROM organization_product_listings opl WHERE opl.master_id = pm.id AND opl.organization_id = $2
          ORDER BY opl.created_at DESC LIMIT 1) AS "listingId"
-     FROM signage_media sm
-     LEFT JOIN signage_media parent ON parent.id = sm."parentMediaId" AND parent."serviceKey" = sm."serviceKey" AND parent."deletedAt" IS NULL
-     CROSS JOIN LATERAL (SELECT COALESCE(sm."productMasterId", parent."productMasterId") AS master_id) eff
-     JOIN product_masters pm ON pm.id = eff.master_id
-     WHERE sm."serviceKey" = $1 AND sm."organizationId" = $2 AND sm."deletedAt" IS NULL`,
+     FROM linked JOIN product_masters pm ON pm.id::text = linked.master_id`,
     [scope.serviceKey, scope.organizationId],
   );
 }
