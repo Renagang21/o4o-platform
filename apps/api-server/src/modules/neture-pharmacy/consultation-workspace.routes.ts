@@ -111,6 +111,9 @@ export function consultationWorkspaceRoutes(
     return { ...data, organizationId, mode: input.mode };
   }));
   if (guidance)
+    router.get('/pharmacy/consultation-products', ...store, limits(60), handle(async req =>
+      guidance.searchProducts(req.user!.id!, org(req), { mode: req.query.mode, q: req.query.q })));
+  if (guidance)
     router.post('/pharmacy/consultation-products/prepare', ...store, limits(30), handle(async req => {
       const input = req.body ?? {}, organizationId = org(req);
       if (input.stationId !== undefined) await stations.validate(req.user!.id!, organizationId, input.stationId, input.epoch);
