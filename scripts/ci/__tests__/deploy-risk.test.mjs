@@ -28,7 +28,8 @@ import { buildWorkspaceGraph } from '../detect-affected.mjs';
 
 const graph = buildWorkspaceGraph();
 const files = (...paths) => paths.map((p) => (Array.isArray(p) ? { status: p[0], path: p[1] } : { status: 'M', path: p }));
-const risk = (...paths) => assessRisk(files(...paths), graph);
+// 규칙 탐지 회귀 — 종전 판정(strict). 기본 승인 정책은 approval-policy.test.mjs 가 고정한다.
+const risk = (...paths) => assessRisk(files(...paths), graph, { approvalPolicy: 'strict' });
 
 it('pharmacy deploy registry preserves its selector while resolving only the renamed runtime/image', () => {
   const pharmacy = DEPLOY_TARGETS.find((target) => target.key === 'kpa-society');

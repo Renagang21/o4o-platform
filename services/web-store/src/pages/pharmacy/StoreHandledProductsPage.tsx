@@ -210,6 +210,7 @@ function HandledProductsSession({ workspace, navigation }: ProductPageProps) {
   const [qrTarget, setQrTarget] = useState<StoreProductQrTarget | null>(null);
   // WO-O4O-STORE-HANDLED-PRODUCTS-PRODUCTMASTER-LIST-LINK-V1: O4O 표준 상품 검색·선택·등록 모달
   const [showAddO4oModal, setShowAddO4oModal] = useState(false);
+  const [commonProductQuery, setCommonProductQuery] = useState('');
   const [showExcel, setShowExcel] = useState(false);
   // WO-O4O-KPA-STORE-NEW-PRODUCT-REQUEST-AND-ADMIN-APPROVAL-V1 (P1): O4O DB 등록 요청 상태
   const [showNewRequestModal, setShowNewRequestModal] = useState(false);
@@ -355,15 +356,13 @@ function HandledProductsSession({ workspace, navigation }: ProductPageProps) {
           <button type="button" onClick={() => setShowExcel(true)} style={styles.refreshBtn}>엑셀 상품 등록·AI 자료 준비</button>
           {/* WO-O4O-STORE-HANDLED-PRODUCTS-PRODUCTMASTER-LIST-LINK-V1:
               O4O 표준 상품 DB(ProductMaster)를 검색·선택하여 내 매장 제품으로 등록. */}
-          <button type="button" onClick={() => setShowAddO4oModal(true)} style={styles.refreshBtn}>
+          <button type="button" onClick={() => { setCommonProductQuery(''); setShowAddO4oModal(true); }} style={styles.refreshBtn}>
             <Boxes size={14} />
-            O4O 제품에서 찾아 등록
+            공통 상품에서 찾아 등록
           </button>
           {/* WO-O4O-KPA-STORE-NEW-PRODUCT-REQUEST-AND-ADMIN-APPROVAL-V1 (P1):
               O4O DB 에 없는 신규 상품의 등록 요청(제출·상태). 기존 상품은 위 '표준 상품에서 추가'로. */}
-          <button type="button" onClick={openLocalCreate} disabled={localSaving} style={styles.refreshBtn}>
-            <PlusCircle size={14} /> 직접 등록하기
-          </button>
+          <button type="button" onClick={openNewRequest} style={styles.requestBtn}><PlusCircle size={14} /> 공통 상품에 없는 제품 등록 요청</button>
             </div>
           </details>
           <button type="button" onClick={() => navigate(`${base}/product-settings`)} style={styles.refreshBtn}>제품 진열 설정</button>
@@ -381,6 +380,7 @@ function HandledProductsSession({ workspace, navigation }: ProductPageProps) {
             <ClipboardList size={14} />
             내 등록 요청
           </button>
+          <button type="button" onClick={openLocalCreate} disabled={localSaving} style={styles.refreshBtn}>매장 자체 진열용 직접 등록</button>
 
 
             </div>
@@ -439,6 +439,7 @@ function HandledProductsSession({ workspace, navigation }: ProductPageProps) {
                 매장용 상세설명서 보기
               </button>}
               {singleSelected.sourceType === 'local' && <button type="button" style={styles.importBtn} onClick={() => editLocal(singleSelected.sourceId)}>직접 등록 제품 수정</button>}
+              {singleSelected.sourceType === 'local' && <button type="button" style={styles.importBtn} onClick={() => { setCommonProductQuery(singleSelected.name); setShowAddO4oModal(true); }}>공통 상품과 대조·등록</button>}
               <button type="button" style={styles.importBtn} onClick={openProductGuidance}>콘텐츠 만들기</button>
 
               <details className="relative"><summary className="min-h-11 cursor-pointer content-center px-3 text-sm">더보기</summary><div className="absolute right-0 z-20 mt-1 flex w-60 flex-col gap-2 rounded-xl border bg-white p-3 shadow-lg">
@@ -492,6 +493,7 @@ function HandledProductsSession({ workspace, navigation }: ProductPageProps) {
       {/* WO-O4O-STORE-HANDLED-PRODUCTS-PRODUCTMASTER-LIST-LINK-V1: O4O 표준 상품 검색·선택·등록 모달 */}
       <AddO4oStandardProductModal
         open={showAddO4oModal}
+        initialQuery={commonProductQuery}
         onClose={() => setShowAddO4oModal(false)}
         onRegistered={reload}
       />
@@ -502,7 +504,7 @@ function HandledProductsSession({ workspace, navigation }: ProductPageProps) {
         editRequest={editRequest}
         onClose={() => { setShowNewRequestModal(false); setEditRequest(null); }}
         onSubmitted={handleRequestSubmitted}
-        onAddExisting={() => setShowAddO4oModal(true)}
+        onAddExisting={() => { setCommonProductQuery(''); setShowAddO4oModal(true); }}
       />
 
       {/* 내 O4O DB 등록 요청 목록·상태 */}

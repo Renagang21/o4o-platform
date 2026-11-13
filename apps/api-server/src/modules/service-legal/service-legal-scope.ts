@@ -28,6 +28,7 @@ import { LECTURE_SCOPE_CONFIG } from '../../middleware/lecture-scope.middleware.
 import { SUPPLIER_SCOPE_CONFIG } from '../../middleware/supplier-service-scope.middleware.js';
 import { COMMUNITY_SCOPE_CONFIG } from '../../middleware/community-service-scope.middleware.js';
 import { FUNDING_SCOPE_CONFIG } from '../../middleware/funding-service-scope.middleware.js';
+import { PARTNER_SUPPORT_SCOPE_CONFIG } from '../../middleware/partner-support-scope.middleware.js';
 import { createMembershipScopeGuard } from '../../common/middleware/membership-guard.middleware.js';
 
 /** 본 기능이 관리하는 canonical serviceKey (service-catalog 기준). */
@@ -42,6 +43,8 @@ export const SUPPORTED_LEGAL_SERVICE_KEYS = [
   'supplier',
   'community',
   'funding',
+  // TODO-O4O-LEGAL-BASIC-DOCUMENTS-ADMIN-V1 3단계: O4O Partner 이용약관 · 개인정보 안내 편집.
+  'partner-support',
 ] as const;
 
 export type LegalServiceKey = (typeof SUPPORTED_LEGAL_SERVICE_KEYS)[number];
@@ -84,6 +87,7 @@ const CONFIG_BY_SERVICE_KEY: Record<LegalServiceKey, ServiceScopeGuardConfig> = 
   supplier: SUPPLIER_SCOPE_CONFIG,
   community: COMMUNITY_SCOPE_CONFIG,
   funding: FUNDING_SCOPE_CONFIG,
+  'partner-support': PARTNER_SUPPORT_SCOPE_CONFIG,
 };
 
 const GUARD_BY_SERVICE_KEY: Record<

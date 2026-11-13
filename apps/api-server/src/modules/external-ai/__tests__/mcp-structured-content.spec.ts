@@ -6,16 +6,29 @@ import type { ExternalAiOAuthProvider } from "../auth/oauth-provider.js";
 
 // get_material / get_content_draft return an object with a top-level `content` key.
 // Sent only as JSON text, ChatGPT handed the model {} — the result must also be structuredContent.
-const material = { id: "m1", title: "자료", content: "<p>본문</p>", notice: "참고 자료입니다." };
+const material = {
+  id: "m1",
+  title: "자료",
+  content: "<p>본문</p>",
+  notice: "참고 자료입니다.",
+};
+const mockExecute = jest.fn<Promise<typeof material>, unknown[]>(
+  async () => material,
+);
 jest.mock("../tools/tool.service.js", () => ({
   ExternalAiToolService: class {
-    execute = jest.fn(async () => material);
+    execute = (...args: unknown[]) => mockExecute(...args);
   },
 }));
-jest.mock("../settings/settings.service.js", () => ({ assertEnabled: jest.fn(async () => undefined) }));
+jest.mock("../settings/settings.service.js", () => ({
+  assertEnabled: jest.fn(async () => undefined),
+}));
 
 const provider = {
-  config: { issuer: new URL("http://127.0.0.1/"), webOrigin: new URL("https://web.example.invalid") },
+  config: {
+    issuer: new URL("http://127.0.0.1/"),
+    webOrigin: new URL("https://web.example.invalid"),
+  },
   verifyAccessToken: async (token: string) => ({
     token,
     clientId: "client-1",
@@ -40,16 +53,57 @@ function callTool(name: string) {
       jsonrpc: "2.0",
       id: 1,
       method: "tools/call",
-      params: { name, arguments: { workspaceId: `store:${uuid}`, materialId: uuid } },
+      params: {
+        name,
+        arguments: { workspaceId: `store:${uuid}`, materialId: uuid },
+      },
     });
 }
 
 describe("MCP tool results", () => {
+  beforeEach(() => mockExecute.mockClear());
   it("return the result as structuredContent and as JSON text", async () => {
     const res = await callTool("get_material");
     expect(res.status).toBe(200);
     expect(res.body.result.isError).toBeFalsy();
     expect(res.body.result.structuredContent).toEqual(material);
     expect(JSON.parse(res.body.result.content[0].text)).toEqual(material);
+  });
+  it("dispatches with the connection from the verified Bearer token", async () => {
+    await callTool("get_material");
+    expect(mockExecute).toHaveBeenCalledWith(
+      "get_material",
+      { workspaceId: `store:${uuid}`, materialId: uuid },
+      "connection-1",
+    );
+  });
+  it("discards a smuggled connection id and still uses the verified connection", async () => {
+    const server = express();
+    server.use(express.json());
+    server.use(createMcpRouter({} as DataSource, provider));
+    const res = await request(server)
+      .post("/")
+      .set("Host", "127.0.0.1")
+      .set("Authorization", "Bearer token-1")
+      .set("Accept", "application/json, text/event-stream")
+      .send({
+        jsonrpc: "2.0",
+        id: 1,
+        method: "tools/call",
+        params: {
+          name: "get_material",
+          arguments: {
+            workspaceId: `store:${uuid}`,
+            materialId: uuid,
+            connectionId: "forged",
+          },
+        },
+      });
+    expect(res.body.result.isError).toBeFalsy();
+    expect(mockExecute).toHaveBeenCalledWith(
+      "get_material",
+      { workspaceId: `store:${uuid}`, materialId: uuid },
+      "connection-1",
+    );
   });
 });

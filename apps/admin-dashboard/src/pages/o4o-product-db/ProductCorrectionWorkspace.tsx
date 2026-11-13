@@ -493,6 +493,7 @@ function RuleEditor({
           instructions: rule.instructions,
           purpose: rule.purpose,
           regulatoryTypes: rule.regulatoryTypes,
+          handledOnly: rule.handledOnly,
           descriptionType: rule.descriptionType,
           language: rule.language,
           cadenceDays: rule.cadenceDays,
@@ -526,6 +527,16 @@ function RuleEditor({
   return (
     <section className="space-y-3" aria-label="보정 기준 편집">
       <h4 className="font-semibold">1. 보정 기준 편집</h4>
+      {!rule && <div className="flex flex-wrap gap-2">
+        {(['CONSULTATION', 'STORE'] as const).map(type => <button type="button" className="rounded border px-3 py-2" disabled={!canWrite || busy} key={type} onClick={() => setDraft({ ...emptyRule,
+          title: type === 'CONSULTATION' ? '공통 상품 상담자료 정기 검토' : '공통 상품 QR 표준설명서 정기 검토',
+          descriptionType: type, purpose: type === 'CONSULTATION' ? 'ai-support' : 'consumer-qr', handledOnly: true, enabled: false,
+          instructions: '활성 매장에서 취급하는 공통 상품을 한 번씩 점검한다. 공개자료·매장 제안 설명서의 공통 자료 준비 현황에서 기존 자료를 먼저 확인·재사용하고 미확보·변경 항목만 준비한다. 상담자료와 QR 표준설명서는 별도로 접수·대조·승인하며 상품 등록이나 검토 완료만으로 게시하지 않는다.'
+        })}>{type === 'CONSULTATION' ? '공통 상담자료 점검 초안' : '공통 QR 설명서 점검 초안'}</button>)}
+        <p className="text-sm">한국어·30일 주기의 공통 자료 초안입니다. 검토해 사용을 켜고 저장한 뒤 기존 정기 점검에서 실행 시간을 지정하세요.</p>
+        {canWrite && <a className="underline" href="/admin/o4o-product-db/description-intake">공통 자료 준비 현황·접수 열기</a>}
+      </div>}
+      <label className="block text-sm"><input type="checkbox" checked={draft.handledOnly ?? false} disabled={!canWrite || busy} onChange={e => update('handledOnly', e.target.checked)} /> 활성 매장이 취급하는 공통 상품만 점검</label>
       {!rule && <fieldset className="space-y-2 rounded border p-3" disabled={!canWrite || busy}>
         <legend>운영 기준 초안</legend>
         <p className="text-sm">버튼을 누르면 작성 중인 기준 입력을 초안으로 바꿉니다. 목적·유형·언어·주기는 유지하며 사용 여부는 꺼집니다. 편집 후 저장해야 등록됩니다.</p>
@@ -588,7 +599,7 @@ function RuleEditor({
               update('descriptionType', e.target.value as ProductCorrectionRuleInput['descriptionType'])
             }
           >
-            {['STORE', 'B2B', 'B2C', 'SUPPLIER_STORE'].map((v) => (
+            {['STORE', 'B2B', 'B2C', 'SUPPLIER_STORE', 'CONSULTATION'].map((v) => (
               <option key={v}>{v}</option>
             ))}
           </select>

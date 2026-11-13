@@ -61,6 +61,8 @@ for(const area of ['courses','instructors','certificates'])
  renderers[`lecture.${area}`]=c=> <CentralLectureOperations area={area} courseId={c.courseId} />;
 for(const area of ['reports','posts','members','boards','events'])
  renderers[`partner-support.${area}`]=c=> <CentralPartnerModeration userId={c.actorId} area={area} admin={c.roles.includes('platform:super_admin') || c.roles.includes('partner-support:admin')} />;
+// TODO-O4O-LEGAL-BASIC-DOCUMENTS-ADMIN-V1 3단계 — Partner 법적 문서는 다른 직영 서비스와 같은 공통 편집기.
+renderers['partner-support.legal']=()=> <CentralSharedWork serviceKey="partner-support" area="legal" />;
 for(const service of ['neture','supplier','funding','lecture','community','pharmcoop']) {
  renderers[`${service}.inbox`]=()=> <CentralOperatorInbox serviceKey={service} />;
  if(!['neture','pharmcoop'].includes(service)) renderers[`${service}.members`]=c=> <ServiceMembersWorkspace serviceKey={service} basePath={`/operations/${service}/members`} api={memberApi} roles={c.roles} userId={c.userId} navigate={c.navigate} allowDestructiveActions={false} />;

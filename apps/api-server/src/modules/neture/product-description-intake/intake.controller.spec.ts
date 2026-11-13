@@ -28,4 +28,10 @@ describe('description intake platform authority', () => {
   expect((await request(app).post('/intake/preview').set('x-test-user', 'platform').send({ entries: [], isAdmin: true })).status).toBe(400);
   expect(query).not.toHaveBeenCalled(); expect(repository).not.toHaveBeenCalled();
  });
+ it('applies the same platform guard to preparation views and read-only exports', async () => {
+  expect((await request(app).get('/intake/preparation')).status).toBe(401);
+  expect((await request(app).get('/intake/preparation').set('x-test-user', 'neture-admin')).status).toBe(403);
+  expect((await request(app).post('/intake/preparation/request').set('x-test-user', 'neture-admin').send({})).status).toBe(403);
+  expect(query).not.toHaveBeenCalled();
+ });
 });

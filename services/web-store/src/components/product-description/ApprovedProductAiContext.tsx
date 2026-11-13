@@ -37,7 +37,7 @@ export function ApprovedProductAiContext({ listingId, language, disabled, isCurr
         if (!isCurrent()) return;
         onUse({ facts: description.sections.filter(s => s.kind === 'product-fact').map(s => `${s.title}\n${s.text}`).join('\n\n'),
           references: description.sections.filter(s => s.kind !== 'product-fact').map(s => `[${roles[s.kind]}] ${s.title}\n${s.text}`).join('\n\n'),
-          source: `O4O B2B ${description.id} / revision ${description.revision}\n${description.source?.references.map(r => r.url).join('\n') ?? '출처 확인 필요'}` });
+          source: `O4O 상품 상담자료 ${description.id} / revision ${description.revision}\n${description.source?.references.map(r => r.url).join('\n') ?? '출처 확인 필요'}` });
       }}>확인한 항목을 상담 작성 근거로 사용</button>
     </div>}
   </details>;

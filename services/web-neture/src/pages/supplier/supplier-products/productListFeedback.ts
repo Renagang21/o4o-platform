@@ -11,10 +11,12 @@ export type RecruitModalProduct = {
 export const APPROVAL_GATE_PROFILE_URL = '/mypage/business-profile';
 type GateReasonDisplay = { status: string; nextAction: string; cta: boolean };
 export const APPROVAL_GATE_REASON_DISPLAY: Record<string, GateReasonDisplay> = {
+  // 2026-11-12: 공급 예정 품목군은 「선택만」 받는다(서류 제출 없음). 아래 문구는 증빙 제출을 요구하지 않는다.
+  // 현재 backend gate(evaluateGate)가 내보내는 사유는 SUPPLIER_CATEGORY_SUSPENDED 뿐이고, 나머지는 계약상 남아 있는 코드다.
   SUPPLIER_CATEGORY_NOT_SELECTED: {
-    status: '공급 예정 품목군에 아직 등록되지 않았습니다.',
+    status: '공급 예정 품목군에 선택되지 않은 품목입니다.',
     nextAction:
-      '공급자 프로필 > 공급 예정 품목군에서 해당 품목군을 추가하고 필요한 증빙을 제출해 주시기 바랍니다.',
+      '공급자 프로필 > 공급 예정 품목군에서 해당 품목군을 선택해 주시기 바랍니다. 필요한 서류는 운영자 확인 단계에서 안내됩니다.',
     cta: true,
   },
   SUPPLIER_CATEGORY_NOT_APPROVED: {
@@ -23,24 +25,24 @@ export const APPROVAL_GATE_REASON_DISPLAY: Record<string, GateReasonDisplay> = {
     cta: true,
   },
   SUPPLIER_CATEGORY_NEEDS_UPDATE: {
-    status: '해당 품목군 증빙에 보완이 필요합니다.',
+    status: '해당 품목군에 운영자 보완 요청이 있습니다.',
     nextAction:
-      '공급자 프로필 > 공급 예정 품목군에서 보완 요청 내용을 확인하고 증빙을 다시 제출해 주시기 바랍니다.',
+      '공급자 프로필 > 공급 예정 품목군에서 운영자 메모를 확인해 주시기 바랍니다. 필요한 자료는 운영자 확인 단계에서 안내됩니다.',
     cta: true,
   },
   SUPPLIER_CATEGORY_REJECTED: {
-    status: '해당 품목군 신청이 반려되었습니다.',
-    nextAction: '반려 사유를 확인한 뒤 필요한 증빙을 보완하여 다시 제출해 주시기 바랍니다.',
+    status: '해당 품목군이 운영자 확인에서 반려되었습니다.',
+    nextAction: '공급자 프로필 > 공급 예정 품목군에서 운영자 메모를 확인하거나 운영자에게 문의해 주시기 바랍니다.',
     cta: true,
   },
   SUPPLIER_CATEGORY_SUSPENDED: {
-    status: '해당 품목군이 정지 상태입니다.',
-    nextAction: '운영자 확인 또는 문의가 필요합니다.',
+    status: '해당 품목군이 운영자 보류 상태입니다.',
+    nextAction: '공급자 프로필 > 공급 예정 품목군에서 운영자 메모를 확인하거나 운영자에게 문의해 주시기 바랍니다.',
     cta: true,
   },
   SUPPLIER_CATEGORY_UNRESOLVED: {
     status: '해당 상품의 품목군 상태를 확인할 수 없습니다.',
-    nextAction: '상품의 규제/품목군 정보를 확인하거나 공급 예정 품목군 등록 상태를 확인해 주시기 바랍니다.',
+    nextAction: '상품의 규제/품목군 정보를 확인하거나 공급 예정 품목군 선택 상태를 확인해 주시기 바랍니다.',
     cta: true,
   },
   NO_ELIGIBLE_SERVICE_KEYS: {
@@ -67,7 +69,7 @@ export const APPROVAL_GATE_REASON_DISPLAY: Record<string, GateReasonDisplay> = {
 };
 export const APPROVAL_GATE_FALLBACK: GateReasonDisplay = {
   status: '승인 요청 조건을 충족하지 못했습니다.',
-  nextAction: '상품 정보와 공급자 품목군 등록 상태를 확인해 주시기 바랍니다.',
+  nextAction: '상품 정보와 공급자 품목군 선택 상태를 확인해 주시기 바랍니다.',
   cta: false,
 };
 export type ApprovalSkippedItem = {

@@ -1,5 +1,6 @@
 const execute = jest.fn();
-jest.mock('../../ai-policy/ai-policy-factory.js', () => ({ createPolicyExecutor: () => ({ execute }) }));
+const assertEnabled=jest.fn(async()=>{});
+jest.mock('../../ai-policy/ai-policy-factory.js', () => ({ createPolicyExecutor: () => ({ execute, assertEnabled }) }));
 import { createConsultationTranslator } from '../services/consultation-translator.js';
 import logger from '../../../utils/logger.js';
 
@@ -11,6 +12,12 @@ beforeEach(() => {
 afterEach(() => jest.restoreAllMocks());
 const input = { text: 'Private original utterance', source: 'ko' as const, target: 'en' as const };
 const access = () => ({ actorId: 'actor', organizationId: 'store', authorize: jest.fn(async () => true) });
+it('reuses a translation only in its authorized scope and still checks policy on a hit',async()=>{
+ const translate=createConsultationTranslator({} as never),a={...access(),reuseKey:'server-session-mode-source'};
+ await translate(input,a);await translate(input,a);expect(execute).toHaveBeenCalledTimes(1);expect(assertEnabled).toHaveBeenCalledTimes(2);
+ await translate(input,{...a,organizationId:'other'});expect(execute).toHaveBeenCalledTimes(2);
+ a.authorize.mockResolvedValue(false);await expect(translate(input,a)).rejects.toMatchObject({httpStatus:403});expect(execute).toHaveBeenCalledTimes(2);
+});
 it('reuses existing policy and actor quota while recording only execution metadata', async () => {
   expect(await createConsultationTranslator({} as any)(input, access())).toEqual({ translation: 'Private translated utterance' });
   expect(execute).toHaveBeenCalledWith('CONTENT_TRANSLATION', expect.any(String), expect.any(String), expect.objectContaining({ userId: 'actor', temperature: 0, usage: 'pharmacy.consultation' }));
@@ -49,4 +56,21 @@ it.each([
 it('does not treat a unit prefix inside a longer word as an interchangeable quantity unit', async () => {
   execute.mockResolvedValueOnce({ content: '{"translation":"10 mg"}', provider: 'gemini', model: 'policy-model', requestId: 'provider-id', promptTokens: 10, completionTokens: 5 });
   await expect(createConsultationTranslator({} as any)({ text: '10 mgX', source: 'ko', target: 'en' }, access())).rejects.toMatchObject({ httpStatus: 503 });
+});
+it('retries the provider after rejecting an invalid numeric translation in a reusable session', async () => {
+  const translate = createConsultationTranslator({} as never), scoped = { ...access(), reuseKey: 'numeric-retry-session' };
+  execute.mockResolvedValueOnce({ content: '{"translation":"20 mg"}', provider: 'gemini', model: 'policy-model', requestId: 'bad', promptTokens: 10, completionTokens: 5 })
+    .mockResolvedValueOnce({ content: '{"translation":"10 mg"}', provider: 'gemini', model: 'policy-model', requestId: 'good', promptTokens: 10, completionTokens: 5 });
+  await expect(translate({ text: '10 mg', source: 'ko', target: 'en' }, scoped)).rejects.toMatchObject({ httpStatus: 503 });
+  await expect(translate({ text: '10 mg', source: 'ko', target: 'en' }, scoped)).resolves.toEqual({ translation: '10 mg' });
+  await translate({ text: '10 mg', source: 'ko', target: 'en' }, scoped);
+  expect(execute).toHaveBeenCalledTimes(2);
+});
+
+it('blocks a previously reusable translation when the current policy is disabled', async () => {
+  const translate = createConsultationTranslator({} as never), scoped = { ...access(), reuseKey: 'policy-revoked-session' };
+  await translate(input, scoped);
+  assertEnabled.mockRejectedValueOnce(new Error('AI_DISABLED:CONTENT_TRANSLATION'));
+  await expect(translate(input, scoped)).rejects.toMatchObject({ httpStatus: 503, code: 'CONSULTATION_AI_DISABLED' });
+  expect(execute).toHaveBeenCalledTimes(1);
 });
