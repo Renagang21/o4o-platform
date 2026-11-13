@@ -13,7 +13,7 @@ import { ModelControlService } from '../../services/ai-management/model-controls
 import { consultationRuntimeSchema } from '../../services/ai-management/consultation-runtime.js';
 import { createPolicyExecutor } from '../ai-policy/ai-policy-factory.js';
 import { ConsultationExpressionService } from './services/consultation-expression.js';
-import { ConsultationTabletService } from './services/consultation-tablets.js';
+import { ConsultationTabletService, tabletSpeechLanguages } from './services/consultation-tablets.js';
 import type { ConsultationKioskService } from './services/consultation-kiosk.js';
 
 type StoreRequest = Request & { organizationId?: string };
@@ -101,8 +101,11 @@ export function consultationWorkspaceRoutes(
       throw new NeturePharmacyError(409, 'CONSULTATION_PROVIDER_CHANGED', '현재 상담 실행 수단을 다시 확인해 주시기 바랍니다.');
     await createPolicyExecutor(db).assertEnabled('CONTENT_TRANSLATION');
     const cloud = new ConsultationGoogleService(db), access = { actorId: req.user!.id!, authorize };
+    // 자동 감지 후보: 이 매장 태블릿에 저장된 후보 → 없으면 관리자 기본 후보.
+    const candidates = input.language === 'auto' && runtime.detectLanguage
+      ? (await tabletSpeechLanguages(db, organizationId, input.tabletId)) ?? runtime.speechLanguages : null;
     const data = operation === 'recognize'
-      ? await cloud.recognize(input.audioBase64, input.language === 'auto' && runtime.detectLanguage ? runtime.speechLanguages : [String(input.language)], access)
+      ? await cloud.recognize(input.audioBase64, candidates ?? [String(input.language)], access)
       : await cloud.synthesize(typeof input.text === 'string' ? input.text : '', String(input.language), access);
     await authorize();
     return { ...data, organizationId, mode: input.mode };
@@ -245,7 +248,7 @@ export function consultationWorkspaceRoutes(
       await createPolicyExecutor(db).assertEnabled('CONTENT_TRANSLATION');
       const cloud = new ConsultationGoogleService(db), access = { actorId: device.actor, authorize };
       const data = operation === 'recognize'
-        ? await cloud.recognize(input.audioBase64, input.language === 'auto' && runtime.detectLanguage ? runtime.speechLanguages : [String(input.language)], access)
+        ? await cloud.recognize(input.audioBase64, input.language === 'auto' && runtime.detectLanguage ? device.speechLanguages ?? runtime.speechLanguages : [String(input.language)], access)
         : await cloud.synthesize(typeof input.text === 'string' ? input.text.slice(0, 1000) : '', String(input.language), access);
       await authorize();
       return data;

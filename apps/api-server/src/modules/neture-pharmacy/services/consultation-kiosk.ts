@@ -112,8 +112,9 @@ export class ConsultationKioskService {
   private async authorizeRow(row: Row) {
     if (!row.operator_user_id) fail(403, 'CONSULTATION_ACCESS_REVOKED', '매장에 소비자 태블릿 이용 상태를 확인해 주세요.');
     const tabletId = row.station_key.startsWith('kiosk-') ? row.station_key.slice(6) : '';
-    await this.consumerTablet(row.organization_id, tabletId);
-    return { actor: row.operator_user_id!, org: row.organization_id, mode: await this.staffMode(row.operator_user_id!, row.organization_id) };
+    const tablet = await this.consumerTablet(row.organization_id, tabletId);
+    return { actor: row.operator_user_id!, org: row.organization_id, mode: await this.staffMode(row.operator_user_id!, row.organization_id),
+      speechLanguages: tablet.speechLanguages ?? null };
   }
   /** 기기 요청마다 기기 자격 · 태블릿 등록 · 등록 경영자의 현재 권한을 확인한다. */
   async device(input: Json) {
@@ -130,8 +131,10 @@ export class ConsultationKioskService {
   async context(input: Json) {
     const device = await this.device(input);
     await this.db.query('UPDATE store_consultation_stations SET device_seen_at=now() WHERE id=$1 AND mode=$2', [input.id, KIOSK_MODE]);
+    const runtime = consultationRuntimeSchema.parse((await new ModelControlService(this.db).read()).consultation ?? {});
+    // 이 키오스크의 자동 감지 후보(없으면 관리자 기본). 화면은 이 언어를 앞에 둔다.
     return { name: device.name, languages: CONSULTATION_SCREEN_LANGUAGES,
-      runtime: consultationRuntimeSchema.parse((await new ModelControlService(this.db).read()).consultation ?? {}) };
+      runtime: { ...runtime, speechLanguages: device.speechLanguages ?? runtime.speechLanguages } };
   }
 
   /** 소비자 언어 → 한국어. 한국어는 그대로. 'auto' 는 관리자 설정이 허용할 때만 감지한다. */

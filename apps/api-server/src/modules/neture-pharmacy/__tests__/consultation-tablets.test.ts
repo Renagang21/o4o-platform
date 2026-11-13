@@ -54,3 +54,17 @@ it('lets members read without editing, returns an empty list by default and refu
   jest.mocked(resolveStoreAccessLevel).mockResolvedValue({ level: 'none', organizationId: null } as never);
   await expect(new ConsultationTabletService(empty as never).read('outsider', 'store')).rejects.toMatchObject({ httpStatus: 403 });
 });
+
+it('accepts up to three distinct speech auto-detect candidates per tablet and reads them only from stored data', async () => {
+  const { tabletSpeechLanguages } = await import('../services/consultation-tablets.js');
+  const base = { id: 'consumer-1', role: 'consumer', name: '키오스크' };
+  expect(consultationTabletsSchema.safeParse([{ ...base, speechLanguages: ['ko', 'vi', 'th'] }]).success).toBe(true);
+  for (const bad of [['ko', 'en', 'zh', 'ja'], ['ko', 'ko'], [], ['fr']])
+    expect(consultationTabletsSchema.safeParse([{ ...base, speechLanguages: bad }]).success).toBe(false);
+  const db = { query: jest.fn().mockResolvedValue([{ tablets: [{ ...base, speechLanguages: ['vi', 'th'] }, { id: 'staff-1', role: 'staff', name: '입구' }] }]) };
+  expect(await tabletSpeechLanguages(db as never, 'store', 'consumer-1')).toEqual(['vi', 'th']);
+  expect(await tabletSpeechLanguages(db as never, 'store', 'staff-1')).toBeNull();
+  expect(await tabletSpeechLanguages(db as never, 'store', 'missing')).toBeNull();
+  expect(await tabletSpeechLanguages(db as never, 'store', "x' OR 1=1")).toBeNull();
+  expect(db.query).toHaveBeenCalledTimes(3);
+});

@@ -20,7 +20,7 @@ export function ConsultationRuntimeControls({ control }: { control: ModelControl
           </select>
         </label>)}
         <label className="flex min-h-11 items-center gap-2"><input type="checkbox" checked={settings.detectLanguage} onChange={event => setSettings(previous => ({ ...previous, detectLanguage: event.target.checked }))} />고객 입력 언어 자동 감지 허용 · 수동 수정 가능</label>
-        <div><p>Google 음성 자동 감지 후보 · 최대 3개</p><div className="flex flex-wrap gap-3">{languages.map(([code, label]) => <label key={code} className="flex min-h-11 items-center gap-1"><input type="checkbox" checked={settings.speechLanguages.includes(code)}
+        <div><p>Google 음성 자동 감지 기본 후보 · 최대 3개</p><p className="text-xs text-slate-500">매장 경영자가 상담 태블릿마다 후보 언어를 정하면 그 태블릿은 매장 설정을 쓰고, 정하지 않은 태블릿은 이 기본 후보를 씁니다. Google은 자동 감지 후보를 요청당 최대 3개 받으며 적을수록 정확합니다.</p><div className="flex flex-wrap gap-3">{languages.map(([code, label]) => <label key={code} className="flex min-h-11 items-center gap-1"><input type="checkbox" checked={settings.speechLanguages.includes(code)}
           disabled={!settings.speechLanguages.includes(code) && settings.speechLanguages.length >= 3}
           onChange={event => setSettings(previous => ({ ...previous, speechLanguages: event.target.checked ? [...previous.speechLanguages, code] : previous.speechLanguages.filter(value => value !== code) }))} />{label}</label>)}</div></div>
         <button type="submit" className="min-h-11 rounded border px-4 disabled:opacity-50" disabled={!settings.speechLanguages.length}>상담 실행 수단 저장</button>

@@ -88,6 +88,7 @@ export default function StoreMultilingualConsultationPage() {
       organizationId={organizationId}
       initialMode={params.get("mode") || ""}
       role={tabletRole(params.get("role"))}
+      tabletId={(params.get("tablet") || "").slice(0, 40)}
       tabletName={(params.get("name") || "").slice(0, 40)}
       stationKey={params.get("station") || "counter-1"}
     />
@@ -98,12 +99,14 @@ function Consultation({
   organizationId,
   initialMode,
   role,
+  tabletId,
   tabletName,
   stationKey,
 }: Readonly<{
   organizationId: string;
   initialMode: string;
   role: TabletRole | null;
+  tabletId: string;
   tabletName: string;
   stationKey: string;
 }>) {
@@ -195,7 +198,7 @@ function Consultation({
       recognition: context?.runtime?.recognition, synthesis: context?.runtime?.synthesis,
       recognize: async (audioBase64, spokenLanguage) => {
         const response = await coreApiClient.post<{ success: boolean; data: { organizationId: string; mode: string; text: string; language: string } }>('/neture/pharmacy/consultation-speech/recognize', {
-          mode, audioBase64, language: direction === 'to-staff' && autoLanguage ? 'auto' : spokenLanguage,
+          mode, audioBase64, language: direction === 'to-staff' && autoLanguage ? 'auto' : spokenLanguage, ...(tabletId ? { tabletId } : {}),
           ...(connected ? { stationId: connected.id, epoch: connected.epoch } : {}),
         });
         if (!response.success || response.data.organizationId !== organizationId || response.data.mode !== mode || !response.data.text || !context?.languages.some(item => item.key === response.data.language)) throw new Error('음성 인식 결과를 확인하지 못했습니다.');
@@ -247,7 +250,8 @@ function Consultation({
     setContextLoading(true);
     setError("");
     coreApiClient
-      .get<{ success: boolean; data: Context }>(`${base}/context`)
+      // 태블릿 화면이면 그 태블릿의 음성 자동 감지 후보를 받는다(서버가 저장된 목록에서 읽는다).
+      .get<{ success: boolean; data: Context }>(`${base}/context${tabletId ? `?${new URLSearchParams({ tablet: tabletId })}` : ""}`)
       .then((response) => {
         if (cancelled) return;
         const data = response.data;
@@ -294,7 +298,7 @@ function Consultation({
     return () => {
       cancelled = true;
     };
-  }, [organizationId, retry, initialMode, role]);
+  }, [organizationId, retry, initialMode, role, tabletId]);
 
   const clear = useCallback(() => {
     reuseSession.current = crypto.randomUUID();
@@ -680,7 +684,7 @@ function Consultation({
                     ))}
                   </select>
                 </label>
-                <p className="text-xs text-slate-500">{context.runtime?.recognition === 'google-cloud' ? `음성 자동 감지는 관리자 후보 언어(${context.runtime.speechLanguages.join(', ')})에서 선택합니다.` : '브라우저 음성은 선택한 언어로 인식합니다. 문자 번역의 자동 감지와 다르며, 모바일에서 Chrome 언어 감지를 보장하지 않습니다.'}</p>
+                <p className="text-xs text-slate-500">{context.runtime?.recognition === 'google-cloud' ? `음성 자동 감지는 이 태블릿의 후보 언어(${context.runtime.speechLanguages.join(', ')})에서 선택합니다. 후보는 매장 경영자가 태블릿마다 정하며, 없으면 관리자 기본 후보를 씁니다.` : '브라우저 음성은 선택한 언어로 인식합니다. 문자 번역의 자동 감지와 다르며, 모바일에서 Chrome 언어 감지를 보장하지 않습니다.'}</p>
                 {result?.detectedLanguage && <p role="status">감지한 고객 언어: {context.languages.find(item => item.key === result.detectedLanguage)?.label} · 잘못 감지되면 직접 수정하시기 바랍니다.</p>}
                 </div>
               )}

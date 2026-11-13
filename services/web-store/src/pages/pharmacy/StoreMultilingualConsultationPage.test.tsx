@@ -42,8 +42,9 @@ it('lets the staff tablet type free outgoing text, offers phrases as quick input
   expect(screen.queryByText('Translated words')).toBeNull();
 });
 it('opens a pharmacist or staff tablet with only that role\'s modes and the tablet name', async () => {
-  rtlRender(<MemoryRouter initialEntries={['/consultation/staff?role=staff&name=%EC%9E%85%EA%B5%AC']}><Page /></MemoryRouter>);
+  rtlRender(<MemoryRouter initialEntries={['/consultation/staff?role=staff&tablet=staff-a&name=%EC%9E%85%EA%B5%AC']}><Page /></MemoryRouter>);
   expect(await screen.findByRole('heading', { name: '입구' })).toBeTruthy();
+  expect(state.get).toHaveBeenLastCalledWith('/neture/pharmacy/multilingual-consultation/context?tablet=staff-a');
   const select = screen.getByLabelText('상담 방식') as HTMLSelectElement;
   expect(select.disabled).toBe(true);
   expect(within(select).getAllByRole('option').map(option => (option as HTMLOptionElement).value)).toEqual(['floor-staff']);

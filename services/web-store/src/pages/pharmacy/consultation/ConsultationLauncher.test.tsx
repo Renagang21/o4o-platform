@@ -43,3 +43,20 @@ it('hides kiosk code creation and editing from staff members', async () => {
   expect(within(kiosk).queryByRole('button')).toBeNull();
   expect(screen.getByText('태블릿 추가 · 삭제는 매장 경영자가 할 수 있습니다.')).toBeTruthy();
 });
+
+it('lets the owner choose up to three speech auto-detect languages per tablet and clear them back to the admin default', async () => {
+  api.read.mockResolvedValue({ organizationId: 'store', canEdit: true, tablets: [{ ...tablets[2], speechLanguages: ['ko', 'vi'] }] });
+  render(<ConsultationLauncher />);
+  const kiosk = await screen.findByRole('region', { name: '소비자 태블릿(키오스크)' });
+  const group = within(kiosk).getByRole('group', { name: '입구 키오스크 음성 자동 감지 언어' });
+  expect(within(kiosk).getByText('음성 자동 감지 언어: 한국어 · 베트남어')).toBeTruthy();
+  fireEvent.click(within(group).getByLabelText('태국어'));
+  expect((within(group).getByLabelText('영어') as HTMLInputElement).disabled).toBe(true);
+  fireEvent.click(within(group).getByRole('button', { name: '자동 감지 언어 저장' }));
+  await within(kiosk).findByText('음성 자동 감지 언어: 한국어 · 베트남어 · 태국어');
+  expect(api.save.mock.calls[0][0]).toEqual([{ ...tablets[2], speechLanguages: ['ko', 'vi', 'th'] }]);
+  for (const name of ['한국어', '베트남어', '태국어']) fireEvent.click(within(group).getByLabelText(name));
+  fireEvent.click(within(group).getByRole('button', { name: '자동 감지 언어 저장' }));
+  await within(kiosk).findByText('음성 자동 감지 언어: 관리자 기본 후보');
+  expect(api.save.mock.calls[1][0]).toEqual([tablets[2]]);
+});

@@ -81,6 +81,13 @@ describe('device credential', () => {
     requireMode.mockRejectedValue(new NeturePharmacyError(403, 'STORE_ACCESS_REQUIRED', 'revoked'));
     await expect(service.context(device)).rejects.toMatchObject({ code: 'STORE_ACCESS_REQUIRED' });
   });
+  it('gives the kiosk its own speech auto-detect candidates and falls back to the admin default', async () => {
+    tablets = [{ id: 'consumer-kiosk1', role: 'consumer', name: '입구 키오스크', speechLanguages: ['vi', 'th'] }];
+    expect((await service.context(device)).runtime.speechLanguages).toEqual(['vi', 'th']);
+    expect((await service.device(device)).speechLanguages).toEqual(['vi', 'th']);
+    tablets = [{ id: 'consumer-kiosk1', role: 'consumer', name: '입구 키오스크' }];
+    expect((await service.device(device)).speechLanguages).toBeNull();
+  });
   it('falls back to counter-staff when the store is entitled only to that staff mode', async () => {
     requireMode.mockImplementation(async (_a: string, _o: string, mode: string) => { if (mode !== 'counter-staff') throw new NeturePharmacyError(403, 'SERVICE_FEATURE_REQUIRED', 'x'); });
     await service.answer({ ...device, intent: 'location', language: 'en', productKind: 'listing', productId: PRODUCT });

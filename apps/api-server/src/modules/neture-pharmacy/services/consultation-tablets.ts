@@ -11,10 +11,18 @@ import { NeturePharmacyError } from '../constants.js';
  */
 export const CONSULTATION_TABLET_ROLES = ['pharmacist', 'staff', 'consumer'] as const;
 export const MAX_CONSULTATION_TABLETS = 30;
+/**
+ * 태블릿별 Google 음성 자동 감지 후보(선택). Google Speech-to-Text 는 자동 감지 후보를 요청당 최대 3개 받고,
+ * 후보가 적을수록 정확하다. 없으면 관리자 기본 후보(consultation runtime speechLanguages)를 쓴다.
+ * 언어를 직접 고른 인식 · 문자 번역 · 브라우저 음성 인식에는 영향이 없다.
+ */
+export const tabletSpeechLanguagesSchema = z.array(z.enum(['ko', 'en', 'zh', 'ja', 'vi', 'th', 'id'])).min(1).max(3)
+  .refine(values => new Set(values).size === values.length);
 export const consultationTabletSchema = z.object({
   id: z.string().regex(/^[a-z0-9-]{1,40}$/),
   role: z.enum(CONSULTATION_TABLET_ROLES),
   name: z.string().trim().min(1).max(40).refine(value => !/[<>]/.test(value)),
+  speechLanguages: tabletSpeechLanguagesSchema.optional(),
 }).strict();
 export const consultationTabletsSchema = z.array(consultationTabletSchema).max(MAX_CONSULTATION_TABLETS)
   .refine(items => new Set(items.map(item => item.id)).size === items.length);
@@ -25,6 +33,15 @@ export const consultationTabletsUpdateSql = `UPDATE organizations o SET metadata
         WHERE om.organization_id=o.id AND om.user_id=$2 AND om.role='owner' AND om.left_at IS NULL
         AND u."isActive"=true AND u."isEmailVerified"=true AND u.status IN ('active','approved'))
       AND EXISTS(SELECT 1 FROM neture_pharmacy_memberships m WHERE m.organization_id=o.id AND m.status='active') RETURNING o.id`;
+
+/** 서버가 저장된 태블릿 목록에서 자동 감지 후보를 읽는다(화면이 보낸 언어 목록은 믿지 않는다). 없으면 null. */
+export async function tabletSpeechLanguages(db: Pick<DataSource, 'query'>, org: string, tabletId: unknown): Promise<string[] | null> {
+  if (typeof tabletId !== 'string' || !/^[a-z0-9-]{1,40}$/.test(tabletId)) return null;
+  const [row] = await db.query(`SELECT o.metadata->'consultationTablets' AS tablets FROM organizations o WHERE o.id=$1`, [org]);
+  const parsed = consultationTabletsSchema.safeParse(row?.tablets ?? []);
+  if (!parsed.success) return null;
+  return parsed.data.find(item => item.id === tabletId)?.speechLanguages ?? null;
+}
 
 export class ConsultationTabletService {
   constructor(private readonly db: DataSource) {}

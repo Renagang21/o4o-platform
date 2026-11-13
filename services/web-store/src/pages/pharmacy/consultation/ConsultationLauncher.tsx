@@ -19,6 +19,46 @@ const ROLES: ReadonlyArray<{ role: ConsultationTabletRole; title: string; descri
   { role: "consumer", title: "소비자 태블릿(키오스크)", description: "고객이 직접 사용합니다. 직원 로그인 없이 연결 코드로 한 번 연결하며, 상품 찾기 · 위치 · 게시된 제품 설명과 약사 연결 안내만 보입니다.", fallback: "" },
 ];
 const KIOSK_PATH = "/consultation/kiosk";
+/** 상담 언어(서버 CONSULTATION_SCREEN_LANGUAGES 와 같은 순서). */
+const SPEECH_LANGUAGES = [
+  ["ko", "한국어"], ["en", "영어"], ["zh", "중국어"], ["ja", "일본어"], ["vi", "베트남어"], ["th", "태국어"], ["id", "인도네시아어"],
+] as const;
+/** Google 음성 자동 감지는 요청당 후보 언어를 최대 3개까지 받는다(적을수록 정확). */
+const MAX_SPEECH_LANGUAGES = 3;
+const languageName = (key: string) => SPEECH_LANGUAGES.find(([code]) => code === key)?.[1] ?? key;
+
+function SpeechCandidates({ tablet, canEdit, busy, onSave }: Readonly<{
+  tablet: ConsultationTablet; canEdit: boolean; busy: boolean; onSave: (languages: string[]) => void;
+}>) {
+  const [draft, setDraft] = useState<string[]>(tablet.speechLanguages ?? []);
+  useEffect(() => setDraft(tablet.speechLanguages ?? []), [tablet.speechLanguages]);
+  const current = tablet.speechLanguages?.length ? tablet.speechLanguages.map(languageName).join(" · ") : "관리자 기본 후보";
+  if (!canEdit) return <p className="w-full text-xs text-slate-500">음성 자동 감지 언어: {current}</p>;
+  return (
+    <details className="w-full text-sm">
+      <summary className="min-h-11 cursor-pointer content-center text-slate-600">음성 자동 감지 언어: {current}</summary>
+      <fieldset className="space-y-2 pb-2" disabled={busy} aria-label={`${tablet.name} 음성 자동 감지 언어`}>
+        <p className="text-xs text-slate-500">
+          이 태블릿에서 고객이 자동 감지로 말할 때 후보로 쓸 언어를 최대 {MAX_SPEECH_LANGUAGES}개 고릅니다. 적을수록 정확합니다.
+          고르지 않으면 관리자 기본 후보를 씁니다. 언어를 직접 고른 경우와 문자 번역에는 영향이 없습니다.
+        </p>
+        <div className="flex flex-wrap gap-3">
+          {SPEECH_LANGUAGES.map(([code, label]) => (
+            <label key={code} className="flex min-h-11 items-center gap-1">
+              <input type="checkbox" checked={draft.includes(code)}
+                disabled={!draft.includes(code) && draft.length >= MAX_SPEECH_LANGUAGES}
+                onChange={(event) => setDraft((previous) => event.target.checked
+                  ? SPEECH_LANGUAGES.map(([key]) => key).filter((key) => key === code || previous.includes(key))
+                  : previous.filter((key) => key !== code))} />
+              {label}
+            </label>
+          ))}
+        </div>
+        <button type="button" className="min-h-11 rounded border px-3" onClick={() => onSave(draft)}>자동 감지 언어 저장</button>
+      </fieldset>
+    </details>
+  );
+}
 const MAX_TABLETS = 30;
 const newId = (role: ConsultationTabletRole) =>
   `${role}-${Array.from(crypto.getRandomValues(new Uint8Array(4)), (b) => b.toString(16).padStart(2, "0")).join("")}`;
@@ -138,6 +178,15 @@ export function ConsultationLauncher() {
                       <button type="button" className="min-h-11 rounded border px-3" disabled={busy}
                         aria-label={`${tablet.name} 삭제`} onClick={() => remove(tablet)}>삭제</button>
                     )}
+                    <SpeechCandidates tablet={tablet} canEdit={canEdit} busy={busy}
+                      onSave={(languages) => void update(
+                        tablets.map((item) => {
+                          if (item.id !== tablet.id) return item;
+                          const base = { id: item.id, role: item.role, name: item.name };
+                          return languages.length ? { ...base, speechLanguages: languages } : base;
+                        }),
+                        `${tablet.name}의 음성 자동 감지 언어를 저장했습니다.`,
+                      )} />
                   </li>
                 ))}
               </ul>

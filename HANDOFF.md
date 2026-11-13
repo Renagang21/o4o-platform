@@ -1,5 +1,15 @@
 # HANDOFF
 
+## 2026-11-13 · 상담 태블릿별 음성 자동 감지 언어 (branch `claude/wizardly-bardeen-ldq332`)
+
+- **PR 묶음:** 태블릿 1 · 2단계와 같은 PR. 지시서 [`WO-O4O-STORE-CONSULTATION-TABLET-ROLES-V1`](docs/work-orders/WO-O4O-STORE-CONSULTATION-TABLET-ROLES-V1.md) §3 2-1단계.
+- **조사 결과:** 관리자 「음성 자동 감지 후보 · 최대 3개」는 Google 음성 자동 감지에만 쓰인다(직접 고른 언어 · 문자 번역 · 브라우저 음성과 무관). 3개 상한은 Google Speech-to-Text 제약(요청당 후보 최대 3개 · 적을수록 정확 — Google 공식 문서로 확인).
+- **한 일:** 태블릿마다 후보 최대 3개(`consultationTablets[].speechLanguages`, 경영자 편집). 직원 음성 인식 · 키오스크가 서버 저장 목록에서 태블릿 후보를 읽고, 없으면 관리자 기본 후보. 키오스크 언어 버튼은 후보를 앞에. 관리자 화면 문구 「기본 후보」. 설계 문서 §1 · 음성 후보 문단 갱신.
+- **결정 사항(§9):** 화면이 보낸 언어 목록은 쓰지 않고 서버가 `tabletId` 로 저장 목록에서 읽는다. 후보를 비우면 관리자 기본으로 돌아간다. schema 변경 없음.
+- **검증:** API neture-pharmacy 40 suites / 315 통과(15 suites · 218 skip — 전용 PostgreSQL 미설정; 후보 검증 · 저장 목록 읽기 · 키오스크 context 포함). web-store pages/pharmacy + pages/__tests__ 74 files / 852 통과. api · web-store · admin `tsc --noEmit` 통과. 변경 파일 ESLint 오류 · 경고 0.
+- **확인하지 못한 것:** 운영 실행 수단이 현재 브라우저 음성이라 Google 후보 효과는 Google 설정 전환 후에만 확인된다(지시서 §4).
+- **문서 정합:** 설계 문서 1건 갱신(사용자 지시) · 그 밖 해당 없음.
+
 ## 2026-11-13 · 매장 상담 태블릿 구조 2단계 — 소비자 태블릿(키오스크) · 다국어 · 안내 수준 AI (branch `claude/wizardly-bardeen-ldq332`)
 
 - **PR 묶음:** 1단계와 같은 PR(이 branch). 지시서 [`WO-O4O-STORE-CONSULTATION-TABLET-ROLES-V1`](docs/work-orders/WO-O4O-STORE-CONSULTATION-TABLET-ROLES-V1.md) §3 2단계.

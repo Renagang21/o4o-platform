@@ -14,7 +14,8 @@ export async function saveConsultationExpression(expression: ConsultationExpress
 }
 export type OperatingType = "standard" | "large";
 export type ConsultationTabletRole = "pharmacist" | "staff" | "consumer";
-export interface ConsultationTablet { id: string; role: ConsultationTabletRole; name: string }
+/** speechLanguages: 이 태블릿의 Google 음성 자동 감지 후보(최대 3개). 없으면 관리자 기본 후보. */
+export interface ConsultationTablet { id: string; role: ConsultationTabletRole; name: string; speechLanguages?: string[] }
 export interface ConsultationTablets { organizationId: string; tablets: ConsultationTablet[]; canEdit: boolean }
 function tablets(r: Envelope<ConsultationTablets>, message: string) {
   if (!r.success || typeof r.data?.organizationId !== "string" || !Array.isArray(r.data.tablets) || typeof r.data.canEdit !== "boolean" ||

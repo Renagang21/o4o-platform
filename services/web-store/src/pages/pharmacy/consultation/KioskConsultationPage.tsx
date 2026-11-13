@@ -14,6 +14,10 @@ const credentialKey = "o4o:consultation-kiosk-device:v1";
 export const KIOSK_IDLE_MS = 120_000;
 const big = "min-h-14 rounded-xl border px-5 py-3 text-lg disabled:opacity-50";
 type Product = { kind: string; id: string; name: string };
+const rank = (context: KioskContext, key: string) => {
+  const index = context.runtime?.speechLanguages?.indexOf(key) ?? -1;
+  return index < 0 ? 99 : index;
+};
 type Failure = Error & { status?: number };
 
 function stored(): KioskCredential | null {
@@ -187,7 +191,8 @@ export default function KioskConsultationPage() {
               <button type="button" aria-pressed={language === "auto"} className={`min-h-11 rounded border px-3 ${language === "auto" ? "border-teal-700 bg-teal-50" : ""}`}
                 onClick={() => { startOver(); setLanguage("auto"); }}>{copy.auto}</button>
             )}
-            {context.languages.map((item) => (
+            {/* 이 키오스크의 음성 자동 감지 후보 언어를 앞에 둔다. 나머지 언어도 직접 고를 수 있다. */}
+            {[...context.languages].sort((a, b) => rank(context, a.key) - rank(context, b.key)).map((item) => (
               <button key={item.key} type="button" lang={item.key} aria-pressed={language === item.key}
                 className={`min-h-11 rounded border px-3 ${language === item.key ? "border-teal-700 bg-teal-50" : ""}`}
                 onClick={() => { startOver(); setLanguage(item.key); setUiLanguage(item.key); }}>{item.label}</button>

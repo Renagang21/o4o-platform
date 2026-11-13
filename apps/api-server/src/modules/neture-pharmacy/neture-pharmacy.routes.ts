@@ -16,6 +16,7 @@ import { consultationProfessionalConfirmed, confirmOwnerPharmacist } from './ser
 import { MultilingualConsultationService, type ConsultationDependencies } from './services/multilingual-consultation.js';
 import { ConsultationStationService } from './services/consultation-stations.js';
 import { ConsultationKioskService } from './services/consultation-kiosk.js';
+import { tabletSpeechLanguages } from './services/consultation-tablets.js';
 import { consultationWorkspaceRoutes } from './consultation-workspace.routes.js';
 import { createConsultationTranslator } from './services/consultation-translator.js';
 import { resolveBusinessStoreAccess } from './services/business-store-access.js';
@@ -439,7 +440,11 @@ export function createNeturePharmacyRoutes(dataSource: DataSource, consultationD
   router.get('/admin/staff-support/demands', ...admin, handle(async (req, res) => { res.setHeader('Cache-Control', 'private, no-store'); return staffSupport.summary(req.query.month); }));
   router.get('/pharmacy/service-features', ...store, handle(async (req, res) => { res.setHeader('Cache-Control', 'private, no-store'); return serviceFeatures.resolve(req.user!.id, org(req)); }));
   router.get('/pharmacy/multilingual-consultation/context', ...store, handle(async (req, res) => {
-    res.setHeader('Cache-Control', 'private, no-store'); return consultation.context(req.user!.id, org(req));
+    res.setHeader('Cache-Control', 'private, no-store');
+    const data = await consultation.context(req.user!.id, org(req));
+    // 태블릿 화면이면 그 태블릿의 음성 자동 감지 후보를 보여 준다(없으면 관리자 기본).
+    const own = await tabletSpeechLanguages(dataSource, org(req), req.query.tablet);
+    return own ? { ...data, runtime: { ...data.runtime, speechLanguages: own } } : data;
   }));
   const consultationLimiter = rateLimit({ windowMs: 60_000, max: 30, keyGenerator: req => req.user!.id,
     message: { success: false, code: 'CONSULTATION_TOO_MANY_REQUESTS', error: '번역 요청이 많습니다. 잠시 후 다시 시도해 주시기 바랍니다.' } });

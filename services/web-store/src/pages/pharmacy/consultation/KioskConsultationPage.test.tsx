@@ -84,3 +84,12 @@ it('clears the previous customer after idle time and forgets a revoked device', 
   await screen.findByRole('button', { name: '연결하기' });
   expect(localStorage.getItem('o4o:consultation-kiosk-device:v1')).toBeNull();
 });
+
+it('puts this kiosk\'s speech auto-detect languages first', async () => {
+  localStorage.setItem('o4o:consultation-kiosk-device:v1', JSON.stringify(credential));
+  respond = (action) => action === 'context' ? ok({ ...context, languages: [...context.languages, { key: 'vi', label: 'Tiếng Việt · 베트남어' }],
+    runtime: { detectLanguage: false, speechLanguages: ['vi', 'en'] } }) : ok({});
+  render(<KioskConsultationPage />);
+  const group = await screen.findByRole('group', { name: '언어' });
+  expect(within(group).getAllByRole('button').map(button => button.textContent)).toEqual(['Tiếng Việt · 베트남어', 'English · 영어', '한국어']);
+});
