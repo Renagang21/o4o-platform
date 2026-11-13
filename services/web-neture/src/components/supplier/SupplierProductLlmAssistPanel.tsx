@@ -249,7 +249,8 @@ export default function SupplierProductLlmAssistPanel({
                 적용했습니다. 입력란을 확인·수정한 뒤 검토 요청을 제출하시기 바랍니다. 카테고리·브랜드·이미지는 직접 선택합니다.
               </div>
             )}
-            {applied && canUndoApply && onUndoApply && (
+            {/* 취소 가능 여부는 저장된 되돌림 지점(canUndoApply)만 따른다 — 결과 JSON 을 고쳐도 직전 적용은 되돌릴 수 있다 */}
+            {canUndoApply && onUndoApply && (
               <div className="mt-2 flex flex-wrap items-center gap-2">
                 <button
                   type="button"

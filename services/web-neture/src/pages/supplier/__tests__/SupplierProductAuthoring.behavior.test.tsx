@@ -541,6 +541,22 @@ describe('external AI draft apply on the Candidate form', () => {
     const payload = mocks.supplier.submitProductCandidate.mock.lastCall?.[0];
     expect(payload).toMatchObject({ name: '사용자 상품명', barcode: null });
   });
+
+  it('keeps the undo snapshot when the same result is applied again with no changes', async () => {
+    mocks.llm.draft = aiDraft({ consumerShortDescription: 'AI 설명' });
+    mount('create');
+    await screen.findByRole('option', { name: '일반 카테고리' });
+    fireEvent.change(screen.getByLabelText(/^상품명/), { target: { value: '사용자 상품명' } });
+    fireEvent.click(screen.getByRole('button', { name: 'fixture AI 결과 적용' }));
+    expect((screen.getByLabelText(/^상품명/) as HTMLInputElement).value).toBe('AI 상품명');
+
+    // 같은 결과를 다시 적용 → 바뀌는 값이 없다. 첫 적용의 되돌림 지점은 남아야 한다.
+    fireEvent.click(screen.getByRole('button', { name: 'fixture AI 결과 적용' }));
+    expect(mocks.llm.notes.some((n) => n.includes('적용할 새 값이 없습니다'))).toBe(true);
+    fireEvent.click(screen.getByRole('button', { name: 'fixture 적용 취소' }));
+    expect((screen.getByLabelText(/^상품명/) as HTMLInputElement).value).toBe('사용자 상품명');
+    expect(screen.queryByRole('button', { name: 'fixture 적용 취소' })).toBeNull();
+  });
 });
 
 // 간이 설명 칸(서버 500자) — Import 초안 · 직접 입력 모두 제출 전에 막는다

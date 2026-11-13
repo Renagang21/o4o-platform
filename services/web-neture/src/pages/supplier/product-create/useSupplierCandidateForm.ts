@@ -205,9 +205,10 @@ export function useSupplierCandidateForm(importDraft: ImportDraft | null) {
       lockRegulatoryType: !!productType?.regulatoryType,
       currentDescription: consumerShortDesc,
     });
-    setLastApplySnapshot(
-      result.changedFields.length > 0 ? { form, consumerShortDesc, barcodeChecked, master } : null,
-    );
+    // 바뀐 값이 없는 적용(같은 결과 재적용 등)은 직전 되돌림 지점을 지우지 않는다.
+    if (result.changedFields.length > 0) {
+      setLastApplySnapshot({ form, consumerShortDesc, barcodeChecked, master });
+    }
     setForm(result.form);
     if (result.description !== null) setConsumerShortDesc(result.description);
     const notes = [...result.notes];
