@@ -1,5 +1,13 @@
 # HANDOFF
 
+## 2026-11-13 · 참고 · 기준 문서 정비 — 상담 매장 단위 판단 반영 (branch `claude/wizardly-bardeen-ldq332` · 문서 전용 커밋)
+
+- **PR 묶음:** 문서 전용 커밋이다. §4-3 R6(기준 문서는 문서 전용 PR)에 따라 통합 세션이 이 커밋을 별도 PR 로 분리할 수 있다 — 같은 branch 의 코드 변경(상담 매장 단위 판단 · My Home 약사 확인 정리)과 내용이 맞물려 있어 코드 PR 병합 뒤에 병합한다.
+- **한 일(사용자 지시 「이번 작업이 끝나면 정비」):** `O4O-ROLE-WORKSPACE-ARCHITECTURE-V2` §2 에 매장 상담 태블릿 예외 1줄(원칙 문장 불변), `O4O-STORE-ACCESS-AND-MEMBERSHIP-V1` 상담 문단 교체, `O4O-AI-CORE-EXTENSION-FOUNDATION-V1` 1문장, `DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1` §15-8 갱신 요약 · 대체 표기.
+- **결정 사항(§9):** 조사 중 4번째 문서(`O4O-ROLE-WORKSPACE-ARCHITECTURE-V2` §2 — 약사 전용 기능은 개인 약사 자격 필요)를 발견했다. 사용자 결정과 충돌하는 상위 정책이라 원칙은 그대로 두고 상담 태블릿 예외만 날짜와 근거를 붙여 추가했다. 통합 담당이 예외 문구를 확인해 주면 좋다.
+- **검증:** 문서 민감정보 검사 0건. 남은 「약사 사용 확인」 언급은 모두 2026-11-13 갱신 · 대체 표기 문장이다.
+- **문서 정합:** 발견 4건 / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 0건 — 사용자 지시로 인라인 정비.
+
 ## 2026-11-13 · My Home 약사 확인 체크 정리 (branch `claude/wizardly-bardeen-ldq332`)
 
 - **PR 묶음:** 같은 branch 의 상담 매장 단위 판단과 같은 PR(함께 봐야 하는 변경). 지시서 [`WO-O4O-STORE-CONSULTATION-TABLET-ROLES-V1`](docs/work-orders/WO-O4O-STORE-CONSULTATION-TABLET-ROLES-V1.md) §3 2-4단계.

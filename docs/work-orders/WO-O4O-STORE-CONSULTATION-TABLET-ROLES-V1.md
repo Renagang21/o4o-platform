@@ -97,7 +97,11 @@
   - 운영자 화면(`MemberPaidFeaturesPanel`): 「약사 사용 확인이 별도로 필요합니다」 문구 삭제.
   - 데이터: schema 변경 없음. 운영 DB 에 남은 `organization_members.metadata.pharmacyPharmacistConfirmed` 값은 읽지 않으며, 근무자 기능을 다음에 저장할 때 지운다(일괄 삭제 migration 은 하지 않음).
   - 면허 승인 규칙(`hasApprovedPharmacist` · 중앙 자격 심사)은 그대로다 — DB 테스트의 면허 검증은 이 함수로 옮겼다.
-- 기준 문서 정합(별도 문서 PR 제안): `O4O-STORE-ACCESS-AND-MEMBERSHIP-V1` 18행 · `O4O-AI-CORE-EXTENSION-FOUNDATION-V1` 296행 · `DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1` 565 · 583 · 589행이 약사 사용 확인을 현행 규칙으로 적고 있다.
+- 기준 문서 정비(완료 · 2026-11-13 사용자 지시 · 문서 전용 커밋): 
+  - `O4O-ROLE-WORKSPACE-ARCHITECTURE-V2` §2 — 「약사 전용 기능은 개인 약사 자격 필요」 원칙은 그대로 두고 **매장 상담 태블릿 예외** 1줄 추가(최종 갱신일 표기).
+  - `O4O-STORE-ACCESS-AND-MEMBERSHIP-V1` — 다국어 약사 상담의 약사 사용 확인 문단을 매장 단위 판단(2026-11-13 갱신)으로 교체, 추가 서비스 교집합 문장에 상담 예외 표기.
+  - `O4O-AI-CORE-EXTENSION-FOUNDATION-V1` — `pharmacy.consultation.support` 의 「약사 사용 확인」을 매장 단위 판단으로.
+  - `DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1` §15-8 — 머리에 2026-11-13 갱신 요약(태블릿 · 매장 단위 판단 · 용어 · 삭제된 API), 약사 확인 · 배치 · 짝짓기를 현행처럼 적은 문장에 대체 표기.
 
 ### 가격 표시 준비 (구현 보류 — 설계 조건만)
 
