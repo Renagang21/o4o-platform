@@ -358,6 +358,7 @@ export function ConsultationGuidancePanel({
           </form>
           <ConsultationProducts
             query={query}
+            mode={mode}
             busy={busy}
             onSelect={pick}
             selectLabel={
