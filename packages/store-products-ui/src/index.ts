@@ -19,6 +19,8 @@ export type { StoreProductsManagerPageProps } from './StoreProductsManagerPage.j
 
 // Modal (개별 사용 가능)
 export { default as StoreProductImageManagerModal } from './StoreProductImageManagerModal.js';
+export { planStoreImageReorder } from './imageReorder.js';
+export type { StoreImageReorderPlan } from './imageReorder.js';
 
 // API 클라이언트 — 개별 함수 + 번들 객체
 export {
