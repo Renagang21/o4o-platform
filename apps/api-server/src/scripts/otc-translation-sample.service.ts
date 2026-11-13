@@ -68,7 +68,7 @@ export function numbersOf(html: string): string[] {
     word => EN_WORDS[word.toLowerCase()]);
   const found = plain.match(/\d+(?:[.,]\d+)?(?:\/\d+)?/g) ?? [];
   return found.map(n => n.replace(',', '.')).map(n => (/^\d+\.0+$/.test(n) ? n.replace(/\.0+$/, '') : n))
-    .filter(n => n !== '1').sort();
+    .filter(n => n !== '1').sort((a, b) => a.localeCompare(b));
 }
 
 const KO_PROHIBIT = /(복용하지 마|사용하지 마|투여하지 마|금기|복용하지 말|사용하지 말)/g;
@@ -103,7 +103,8 @@ export function compareItem(item: SampleItem): Comparison {
   const ko = numbersOf(item.ko), saved = numbersOf(item.savedEn);
   const koProhibitions = (text(item.ko).match(KO_PROHIBIT) ?? []).length;
   const savedProhibitions = (text(item.savedEn).match(EN_PROHIBIT) ?? []).length;
-  if (!item.aiEn) return { ...base, missingNumbers: [], extraNumbers: [], savedEnMissingNumbers: diff(ko, saved),
+  // 마크업 · 공백만 남은 응답도 번역 실패다(내용 전체 누락을 품질 통과로 세지 않는다).
+  if (!item.aiEn || !text(item.aiEn).trim()) return { ...base, missingNumbers: [], extraNumbers: [], savedEnMissingNumbers: diff(ko, saved),
     koProhibitions, aiProhibitions: 0, savedProhibitions, aiHangulLeft: false, lengthRatio: null, verdict: 'failed' };
   const ai = numbersOf(item.aiEn);
   const aiText = text(item.aiEn);
@@ -112,7 +113,8 @@ export function compareItem(item: SampleItem): Comparison {
   const aiHangulLeft = /[가-힣]/.test(aiText);
   const lengthRatio = Math.round((aiText.length / Math.max(1, text(item.savedEn).length)) * 100) / 100;
   // 금지 표현이 원문에 있는데 번역에서 줄면 강도 약화 의심이다. 숫자 차이 · 한글 잔존도 사람이 확인한다.
-  const check = missingNumbers.length > 0 || extraNumbers.length > 0 || aiHangulLeft || aiProhibitions < Math.min(koProhibitions, savedProhibitions);
+  const check = missingNumbers.length > 0 || extraNumbers.length > 0 || aiHangulLeft || aiProhibitions < koProhibitions;
+  // 기준은 원문 금지 표현 수다. 기존 영문(savedProhibitions)은 참고 값일 뿐이며, 그 표현이 정규식에 없다고 검사를 끄지 않는다.
   return { ...base, missingNumbers, extraNumbers, savedEnMissingNumbers: diff(ko, saved),
     koProhibitions, aiProhibitions, savedProhibitions, aiHangulLeft, lengthRatio, verdict: check ? 'check' : 'ok' };
 }

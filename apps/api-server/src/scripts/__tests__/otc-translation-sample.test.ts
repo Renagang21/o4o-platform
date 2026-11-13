@@ -23,6 +23,16 @@ describe('OTC translation sample comparison', () => {
     expect(compareItem(item('<p>Take 2 tablets 3 times; do not use under 12; max 8 tablets.</p>')).extraNumbers).toEqual(['8']);
     expect(compareItem(item('<p>Take 2 tablets 3 times. Do not take under 12. Max 6 tablets. 복용</p>')).aiHangulLeft).toBe(true);
   });
+  it('markup-only or blank output is a failed translation, not ok', () => {
+    const noNumbers: SampleItem = { ...item(null), ko: '<p>상처 부위에 바르십시오.</p>', savedEn: '<p>Apply to the wound.</p>' };
+    expect(compareItem({ ...noNumbers, aiEn: '<p></p>' }).verdict).toBe('failed');
+    expect(compareItem({ ...noNumbers, aiEn: '   ' }).verdict).toBe('failed');
+  });
+  it('the source prohibition is checked even when the saved English uses an unlisted phrasing', () => {
+    const reversed: SampleItem = { ...item(null), ko: '<p>만 12세 미만은 복용하지 마십시오.</p>', savedEn: '<p>Not for children under 12.</p>',
+      aiEn: '<p>Suitable for children under 12.</p>' };
+    expect(compareItem(reversed)).toMatchObject({ verdict: 'check', koProhibitions: 1, aiProhibitions: 0, savedProhibitions: 0 });
+  });
   it('a missing translation fails and the summary counts it', () => {
     expect(summarize([item(null), item('<p>2 tablets 3 times. Do not use under 12. 6 max.</p>')])).toMatchObject({ total: 2, ok: 1, failed: 1 });
   });
