@@ -22,7 +22,7 @@ const NAV = [
 
 export default function PlatformSectionLayout() {
   return (
-    <div className="max-w-5xl mx-auto px-6 py-8">
+    <div className="max-w-[1400px] mx-auto px-4 py-8 sm:px-6">
       {/* section 헤더 + local nav */}
       <div className="flex items-center gap-2 mb-1">
         <div className="w-7 h-7 rounded-md bg-slate-800 flex items-center justify-center shrink-0">

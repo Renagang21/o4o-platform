@@ -8,6 +8,11 @@
   - `AccountErasureControls.tsx`: `PHARMACY_TRANSFER_OR_CLOSURE_REQUIRED` · `PHARMACY_CLOSURE_INCOMPLETE` 문구에 실제 처리 순서(체크 → 「이용·약국 관리」 → 이전 / 완전폐업 → 「계정 삭제」 재실행).
   - `CentralMemberWorkspace.tsx`: Admin 계정 삭제가 끝나지 않으면 초록 안내가 아니라 빨간 오류 안내로 표시. 원인 코드가 있으면 「삭제 처리 내역에서 재시도」 일반 문구 대신 그 원인의 처리 방법만 표시.
   - 운영자 화면에서 삭제 미완료(`review_required` · `retry_required`) 회원 1명을 고르면 「관리자 화면에서 처리」 링크(`/admin/platform/users?userId=…` · 전체 관리자 권한 필요) 표시. Admin 화면에는 표시하지 않음.
+- **추가 (같은 날 · 사용자 보고 「리스트 맨 끝 행이 무엇인지 보이지 않는다」):**
+  - 원인: 운영 역할이 많은 관리자 계정은 「가입 유형」 칸에 역할 배지가 모두 쌓여 행이 화면보다 길어지고, 이름 · 이메일이 아래로 밀려 보이지 않았다. Admin 「O4O 플랫폼 관리」 영역의 폭도 `max-w-5xl`(1024px)로 좁았다.
+  - `CentralMemberWorkspace.tsx`: 역할 3개까지는 모두 표시하고, 그보다 많으면 「전체 관리자」를 앞에 둔 2개 + 「외 N개」(마우스를 올리면 전체 목록 표시). 운영자 · Admin 회원 목록 공용.
+  - `PlatformSectionLayout.tsx`: 폭을 운영자 레이아웃과 같은 `max-w-[1400px]` 로 넓힘. 소비처는 `/admin/platform/*` 탭 전체(플랫폼 홈 · 관리자 계정 · 전체 회원 · 공급자 · 내 매장 · 삭제 화면들) — 폭만 넓어지고 동작은 같다.
+  - 검증: admin-dashboard vitest `src/pages/platform` · `src/pages/operators` · `platform-menu-cleanup` 172 통과(신규 1건). `tsc --noEmit` · 변경 파일 ESLint 통과. 실제 브라우저 확인 안 함 — 배포 후 `/admin/platform/users` PC · mobile 에서 마지막 행 이름 표시와 표 폭 확인.
 - **결정 사항(§9):** 링크는 권한과 무관하게 보이되 「전체 관리자 권한 필요」를 함께 적는다(Admin route guard 가 막는다). API · 권한 · 서버 판정은 바꾸지 않음.
 - **알려진 남은 위험(미수정):** 삭제 차단은 `organization_members` owner 도 보지만, 회원 상세의 약국 목록(이전 · 폐업 버튼 근거)은 `neture_pharmacy_memberships` 만 읽는다(`central-member-workspace.service.ts:117`). 약국 가입 기록 없이 매장 경영자만인 회원은 화면에서 해결 경로가 없을 수 있다 — 실제 사례 확인 시 별도 작업.
 - **검증:** admin-dashboard vitest `src/pages/operators` · `src/pages/platform/account-governance` 21 files / 168 통과(신규 3건). admin-dashboard `tsc --noEmit` 통과. 변경 파일 ESLint 오류 0.

@@ -583,3 +583,15 @@ it('admin mode does not show the operator hand-off link', async () => {
   expect(screen.getByRole('button', { name: '이용·약국 관리' })).toBeTruthy();
   expect(screen.queryByRole('link', { name: '관리자 화면에서 처리' })).toBeNull();
 });
+it('collapses a long operator role list so the row stays readable', async () => {
+  rows[1] = { ...rows[1], registrationType: null, operatorRoles: ['funding:admin', 'neture:pharmcoop_operator', 'supplier:operator', 'platform:super_admin', 'neture:admin', 'neture:operator'] };
+  mount();
+  const name = await screen.findByRole('button', { name: '회원 다른 합성 회원 member-b@example.test' });
+  const row = name.closest('tr')!;
+  const headers = [...name.closest('table')!.querySelectorAll('th')].map(th => th.textContent?.trim());
+  const typeCell = row.querySelectorAll('td')[headers.indexOf('가입 유형')] as HTMLElement;
+  expect(within(typeCell).getByText('전체 관리자')).toBeTruthy();
+  const more = within(typeCell).getByText('외 4개');
+  expect(more.getAttribute('title')).toContain('공급자 운영자');
+  expect(typeCell.querySelectorAll('span.rounded')).toHaveLength(3);
+});
