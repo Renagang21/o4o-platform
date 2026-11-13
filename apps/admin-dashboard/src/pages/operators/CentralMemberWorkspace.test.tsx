@@ -554,3 +554,32 @@ it('admin 「이용·약국 관리」 still opens the panel with the access and 
   expect(within(panel).queryByRole('button', { name: '계정·개인자료 완전삭제' })).toBeNull();
   expect(api.delete).not.toHaveBeenCalled();
 });
+it('admin 「계정 삭제」 that stops on a pharmacy owner shows where to finish it, as an alert', async () => {
+  const confirm = vi.spyOn(globalThis, 'confirm').mockReturnValue(true);
+  api.delete.mockResolvedValueOnce({ data: { data: { operationId: 'op', state: 'review_required', erased: false, reviewCodes: ['PHARMACY_TRANSFER_OR_CLOSURE_REQUIRED'] } } });
+  mountAdmin();
+  await selectFirstRow();
+  fireEvent.click(screen.getByRole('button', { name: '계정 삭제' }));
+  const alert = await screen.findByRole('alert');
+  expect(alert.textContent).toContain('「이용·약국 관리」');
+  expect(alert.textContent).toContain('「약국 완전폐업·자료삭제」');
+  expect(alert.textContent).toContain('PHARMACY_TRANSFER_OR_CLOSURE_REQUIRED');
+  expect(alert.textContent).not.toContain('「삭제 처리 내역」');
+  confirm.mockRestore();
+});
+it('operator selecting a member whose deletion stopped gets a link to the admin screen', async () => {
+  rows[0] = { ...rows[0], erasureState: 'review_required', erasureErrorCode: null };
+  mount();
+  await screen.findByRole('button', { name: '회원 합성 회원 member-a@example.test' });
+  expect(screen.queryByRole('link', { name: '관리자 화면에서 처리' })).toBeNull();
+  fireEvent.click(screen.getAllByRole('checkbox')[1]);
+  const link = await screen.findByRole('link', { name: '관리자 화면에서 처리' });
+  expect(link.getAttribute('href')).toBe('/admin/platform/users?userId=member-a');
+});
+it('admin mode does not show the operator hand-off link', async () => {
+  rows[0] = { ...rows[0], erasureState: 'review_required', erasureErrorCode: null };
+  mountAdmin();
+  await selectFirstRow();
+  expect(screen.getByRole('button', { name: '이용·약국 관리' })).toBeTruthy();
+  expect(screen.queryByRole('link', { name: '관리자 화면에서 처리' })).toBeNull();
+});

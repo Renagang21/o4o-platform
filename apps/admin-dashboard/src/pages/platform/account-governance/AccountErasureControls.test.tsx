@@ -54,5 +54,5 @@ it('explains business disposition instead of hiding review reasons',async()=>{
   api.delete.mockResolvedValue({data:{data:{...pending,state:'review_required',reviewCodes:['PHARMACY_TRANSFER_OR_CLOSURE_REQUIRED']}}});
   render(<AccountErasureControls accountId="admin-a" userId="target-a" onCompleted={vi.fn()}/>);
   fireEvent.click(screen.getByText('계정·개인자료 완전삭제'));
-  expect(await screen.findByText(/약국을 매도했다면/)).toBeTruthy();
+  expect(await screen.findByText(/아직 약국 경영자로 남아 있습니다/)).toBeTruthy();
 });

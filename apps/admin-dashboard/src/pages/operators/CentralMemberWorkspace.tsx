@@ -139,8 +139,9 @@ export default function CentralMemberWorkspace({ actorId, initialQuery = '', ini
       if (!data || typeof data.erased !== 'boolean' || !Object.prototype.hasOwnProperty.call(ERASURE_STATE_LABELS, data.state)) throw new Error('INVALID_RESPONSE');
       // 삭제 전 검토에서 멈추면 errorCode 는 비고 원인은 reviewCodes 에만 있다.
       const reason = data.errorCode ?? data.reviewCodes?.[0];
-      message = data.erased ? `${name} 계정을 삭제했습니다.`
-        : `${name} — ${ERASURE_STATE_LABELS[data.state]} — 삭제가 아직 끝나지 않았습니다. 「삭제 처리 내역」에서 상태를 확인하거나 재시도해 주시기 바랍니다.${reason ? ` ${deletionMessage(reason)} (${reason})` : ''}`;
+      // 끝나지 않은 삭제는 성공 안내(초록)가 아니라 오류 안내(빨강)로 보인다. 원인 코드가 있으면 그 처리 방법만 보인다(2026-11-13).
+      if (data.erased) message = `${name} 계정을 삭제했습니다.`;
+      else failure = `${name} — ${ERASURE_STATE_LABELS[data.state]} — 삭제가 아직 끝나지 않았습니다. ${reason ? `${deletionMessage(reason)} (${reason})` : '「삭제 처리 내역」에서 상태를 확인하거나 재시도해 주시기 바랍니다.'}`;
     } catch (error_) {
       const e = error_ as { code?: string; response?: { data?: { code?: string } } };
       const code = e.response?.data?.code;
@@ -155,6 +156,8 @@ export default function CentralMemberWorkspace({ actorId, initialQuery = '', ini
       }
     }
   };
+  // Operator 화면에는 계정 삭제 · 약국 이전 · 폐업이 없으므로, 삭제가 멈춘 회원을 고르면 Admin 화면으로 안내한다.
+  const unfinishedErasure=selectedIds.size===1?rows.find(row=>selectedIds.has(row.userId)&&(row.erasureState==='review_required'||row.erasureState==='retry_required')):undefined;
   const reviewRows=selectedIds.size>1?rows.filter(row=>selectedIds.has(row.userId)):rows;
   const selectedIndex = reviewRows.findIndex(row => row.userId === selectedId);
   const nextMember = reviewRows[selectedIndex + 1];
@@ -196,6 +199,7 @@ export default function CentralMemberWorkspace({ actorId, initialQuery = '', ini
         :key==='restore'&&selectedRow&&!['suspended','withdrawn'].includes(selectedRow.serviceStatus??'')?'해지된 회원만 이용을 복구할 수 있습니다.':null;
       return {key,label,visible:!protectedSelection||key==='detail',variant,tooltip:key==='delete'&&deleteForbidden?'전체 관리자 권한이 필요합니다.':rejectBlock??lifecycleBlock??undefined,disabled:busy||loading||(key!=='detail'&&(selectedIds.size!==1||selectedErasing))||(key==='edit'&&!permissions.edit)||(key==='reject'&&(!permissions.edit||rejectBlock!==null))||(key==='manage'&&!permissions.edit)||(key==='delete'&&deleteForbidden)||((key==='terminate'||key==='restore')&&(!permissions.edit||lifecycleBlock!==null)),onClick:()=>{const first=rows.find(row=>selectedIds.has(row.userId));if(!first)return;if(adminMode&&key==='delete'){void eraseAccount(first);return;}void openMember(first.userId,mode);}};
     })}/></div>
+    {!adminMode && unfinishedErasure && <p role="note" className="rounded border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">{unfinishedErasure.name || '선택한 회원'} 회원은 계정 삭제가 끝나지 않았습니다. 약국 경영자 이전 · 완전폐업과 계정 삭제는 전체 관리자 화면에서 처리합니다. <a className="font-medium underline" href={`/admin/platform/users?userId=${encodeURIComponent(unfinishedErasure.userId)}`}>관리자 화면에서 처리</a> <span className="text-xs text-amber-800">(전체 관리자 권한 필요)</span></p>}
     {selectedIds.size>1 && <p className="text-sm text-slate-600">선택 회원은 순서대로 상세 검토할 수 있습니다. 수정·거부·삭제는 한 명씩 확인 후 진행합니다.</p>}
     {selectedId && createPortal(<aside ref={panel} tabIndex={-1} aria-label="선택 회원 작업" className="fixed inset-y-0 right-0 z-50 flex w-full max-w-full flex-col border-l border-slate-200 bg-white shadow-2xl outline-none sm:w-[560px] lg:w-[640px]">
       <header className="flex flex-wrap items-center gap-x-2 gap-y-1 border-b border-slate-200 bg-blue-50 px-3 py-3 text-sm sm:flex-nowrap sm:px-4"><h3 className="min-w-0 flex-1 truncate text-base font-semibold">{workMode==='edit'?'회원 정보 수정':workMode==='detail'||workMode==='pharmacy'?'회원 정보 보기':workMode==='terminate'?'회원 해지':workMode==='restore'?'이용 복구':'선택 회원 작업'}</h3><div className="order-last flex w-full justify-end gap-2 sm:order-none sm:w-auto"><button type="button" className="shrink-0 whitespace-nowrap px-1" disabled={busy || reading || !nextMember} onClick={() => { if (nextMember) void openMember(nextMember.userId); }}>다음 회원 검토</button><button type="button" className="shrink-0 whitespace-nowrap px-1" disabled={busy} onClick={closePanel}>선택 해제</button></div><button type="button" aria-label="회원 작업 패널 닫기" disabled={busy} className="shrink-0 rounded px-2 text-xl leading-none text-slate-500 hover:bg-slate-100" onClick={closePanel}>×</button></header>
