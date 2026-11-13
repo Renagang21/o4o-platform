@@ -20,6 +20,136 @@
     - `OTC-DESCRIPTION-DESIGN-GUIDE` · `OTC-EN-TRANSLATION-GUIDE`
   - OTC 영문 사전 번역은 정책 §4 판정 전까지 멈춘다.
 - **검증:** `check-doc-sensitive` 통과. WO 링크는 코드 branch 병합 전까지 깨진 상태다(병합 순서로 해결).
+## 2026-11-13 · 매장 콘텐츠 QR · 태블릿 분리 지시서 (branch `claude/intelligent-cray-o2p4u3-qr-tablet` · 문서만)
+
+> 다음 실행자: **통합 세션** — 지시서 PR. 이후 **CLOUD** 가 [`WO-O4O-STORE-QR-TABLET-CHANNEL-SEPARATION-V1`](docs/work-orders/WO-O4O-STORE-QR-TABLET-CHANNEL-SEPARATION-V1.md) T1~T5 를 순서대로 진행한다(T2 · T5 는 #1049 병합 뒤 · T4 는 DB 구조 변경 승인 뒤).
+
+- **결정 사항:** 지시서 §2 D1~D7.
+  - 사용자 결정:
+    - 채널은 QR · 태블릿 · 사이니지로 나누고, QR · 태블릿은 각자 탭으로 둔다.
+    - 사이니지는 화면 크기와 무관한 재생 목록이다.
+    - 콘텐츠를 만들면 QR 이 함께 준비된다.
+    - 코너의 제품 · 영상 연결은 근무자가 불편하지 않아야 한다.
+  - 세션 판단:
+    - QR 목록 기본값에서 코너 QR 을 뺀다. 필터로 볼 수 있다.
+    - 코너 QR 은 태블릿 코너 화면에서 출력한다.
+    - 콘텐츠 QR 은 출력하거나 담은 것만 목록에 올린다.
+    - 제품 ↔ 영상은 `signage_media` 에 제품 열 하나를 둔다(설명서 본문에는 넣지 않는다).
+- **검증:** 문서만(`check-doc-sensitive` 통과).
+- **겹칠 수 있는 PR:** #1049(태블릿 구조 1단계) — 이 지시서는 코드를 바꾸지 않는다. T2 · T5 구현은 그 병합 뒤에 시작한다.
+
+## 2026-11-13 · 상담 태블릿별 음성 자동 감지 언어 (branch `claude/wizardly-bardeen-ldq332`)
+
+- **통합 세션 수정(2026-11-13 · 통합 담당 지시로 이번 건만 통합 세션이 직접 수정):** 키오스크는 분리하지 않고 1 · 2단계를 한 PR(#1049)로 병합한다(통합 담당 결정 — 앞선 분리 판정 철회). 태블릿 목록 응답에 `configured` 를 더해 저장된 빈 목록과 최초 미등록을 구분(Codex P2) · 태블릿 관리에 행 체크 · 전체 선택 · 상단 ActionBar 선택 삭제(§3-1, Codex P1) · 키오스크 버튼 type · 언어 문구 `kioskLocale.json` 분리(SonarCloud) · 테스트 `Array.at` 제거(TS2550). 검증: 매장 상담 13개 파일 129건 · API 태블릿 · 키오스크 25건 통과, web-store `tsc -b` · api `tsc --noEmit` · 선언 빌드 · ESLint 통과.
+- **PR 묶음:** 태블릿 1 · 2단계와 같은 PR. 지시서 [`WO-O4O-STORE-CONSULTATION-TABLET-ROLES-V1`](docs/work-orders/WO-O4O-STORE-CONSULTATION-TABLET-ROLES-V1.md) §3 2-1단계.
+- **조사 결과:** 관리자 「음성 자동 감지 후보 · 최대 3개」는 Google 음성 자동 감지에만 쓰인다(직접 고른 언어 · 문자 번역 · 브라우저 음성과 무관). 3개 상한은 Google Speech-to-Text 제약(요청당 후보 최대 3개 · 적을수록 정확 — Google 공식 문서로 확인).
+- **한 일:** 태블릿마다 후보 최대 3개(`consultationTablets[].speechLanguages`, 경영자 편집). 직원 음성 인식 · 키오스크가 서버 저장 목록에서 태블릿 후보를 읽고, 없으면 관리자 기본 후보. 키오스크 언어 버튼은 후보를 앞에. 관리자 화면 문구 「기본 후보」. 설계 문서 §1 · 음성 후보 문단 갱신.
+- **결정 사항(§9):** 화면이 보낸 언어 목록은 쓰지 않고 서버가 `tabletId` 로 저장 목록에서 읽는다. 후보를 비우면 관리자 기본으로 돌아간다. schema 변경 없음.
+- **검증:** API neture-pharmacy 40 suites / 315 통과(15 suites · 218 skip — 전용 PostgreSQL 미설정; 후보 검증 · 저장 목록 읽기 · 키오스크 context 포함). web-store pages/pharmacy + pages/__tests__ 74 files / 852 통과. api · web-store · admin `tsc --noEmit` 통과. 변경 파일 ESLint 오류 · 경고 0.
+- **확인하지 못한 것:** 운영 실행 수단이 현재 브라우저 음성이라 Google 후보 효과는 Google 설정 전환 후에만 확인된다(지시서 §4).
+- **문서 정합:** 설계 문서 1건 갱신(사용자 지시) · 그 밖 해당 없음.
+
+## 2026-11-13 · 매장 상담 태블릿 구조 2단계 — 소비자 태블릿(키오스크) · 다국어 · 안내 수준 AI (branch `claude/wizardly-bardeen-ldq332`)
+
+- **PR 묶음:** 1단계와 같은 PR(이 branch). 지시서 [`WO-O4O-STORE-CONSULTATION-TABLET-ROLES-V1`](docs/work-orders/WO-O4O-STORE-CONSULTATION-TABLET-ROLES-V1.md) §3 2단계.
+- **한 일:** 소비자 태블릿 등록 · 연결 코드(경영자) → 로그인 없는 `/consultation/kiosk`(7개 언어 화면 · 자동 감지 · 음성 · 읽어 주기). 상품 찾기 · 위치 · 게시 제품 설명(질문 시 AI 문단 선택) · 약사 연결 안내. 2분 무조작 초기화.
+- **API:** `POST /neture/pharmacy/consultation-tablets/:tabletId/pairing`(store · owner), `POST /neture/pharmacy/consultation-kiosk/*`(기기 자격 · 로그인 없음 · rate limit). 기존 `store_consultation_stations` 행 재사용(`mode='consumer-kiosk'`) — schema 변경 없음. 상담 정리 job 에서 키오스크 행 제외.
+- **결정 사항(§9):** 키오스크 권한은 연결 코드를 만든 경영자의 근무자 상담 방식 이용 자격을 매 요청 다시 확인(이용권 · 결제 구조 그대로). 소비자 노출은 근무자 안내 경로만 재사용 — 약사 판단 지원 경로는 연결하지 않음. 약 선택 · 복용 질문 판정은 기존 서버 정규식(`consultationIntent`)을 원문 · 번역 둘 다에 적용(모델 출력에 의존하지 않음). 게시 자료가 길어 번역 불가면 원문 언어로 표시. 질문 비저장.
+- **검증:** API jest neture-pharmacy 40 suites / 313 통과(15 suites · 218 skip — 전용 PostgreSQL 미설정), 키오스크 14건 포함. web-store vitest 전체 102 files / 994 통과(키오스크 화면 4 · 목록 2 신규). api-server · web-store `tsc --noEmit` 통과. 변경 파일 ESLint 오류 0(기존 `_next` 경고 1).
+- **확인하지 못한 것 / 배포 후 Demo:** 실제 키오스크 기기 · 브라우저 음성 · Google 음성 · 운영 상품 자료 · 실제 AI 호출 비용. 지시서 §4 순서로 확인. 정규식 판정이 놓치는 의료 질문 표현이 있을 수 있다 — 운영 표본으로 보강 필요.
+- **다음:** 3단계 정리(고객 화면 짝짓기 · 관리자 배치 설정 제거) · 가격 표시(준비 조건만 기록) — 지시서 §3.
+- **겹치는 PR / 문서 정합:** 열린 PR 대조 못 함(통합 세션 확인). 문서 정합: 해당 없음.
+
+## 2026-11-13 · 매장 상담 태블릿 구조 1단계 — 약사 · 근무자 태블릿 목록 · 단일 화면 (branch `claude/wizardly-bardeen-ldq332`)
+
+- **PR 묶음:** 이 branch 단독 1 PR(서비스 + API 소비 · core-hub/migration lane 아님). 지시서 [`WO-O4O-STORE-CONSULTATION-TABLET-ROLES-V1`](docs/work-orders/WO-O4O-STORE-CONSULTATION-TABLET-ROLES-V1.md).
+- **한 일:** 내 매장 → 상담을 「약사 태블릿 · 근무자 태블릿」 목록으로 교체(경영자가 이름 붙여 추가 · 삭제, 직원은 조회). 태블릿 한 대에서 문의 · 답변을 끝내고 고객 화면 2대 연결 UI 는 쓰지 않는다. 근무자 화면은 자유 문장 · 음성 입력 + 안내 문구 빠른 입력. 관리자 일반/대형 배치 화면에 「반영되지 않음 · 정리 예정」 안내.
+- **API:** `GET/PUT /neture/pharmacy/consultation-tablets`(organizations.metadata.consultationTablets · owner 재확인 UPDATE · schema 변경 없음). `floor-staff` 고객 방향 자유 문장 허용(이용 자격 검사 유지). mode key · 이용 자격 key 는 그대로.
+- **결정 사항(§9):** 사용자 결정 — 3종(약사 · 근무자 · 소비자) 복수, 기존 연결 방식 교체, 근무자 자유 입력, 키오스크 안내 수준 AI, 다국어 기본, 가격은 준비만. 세션 판단 — 결제 · 이용권을 건드리지 않으려고 태블릿 종류를 기존 mode(`floor-*` 우선, 없으면 `counter-*`)로 매핑. 소비자 키오스크는 기기 인증 · 소비자용 AI 가 새로 필요해 2단계로 분리(지금은 목록에 노출하지 않음 — route 없는 메뉴 금지). 고객 연결 서버 API · `/consultation/customer` 는 3단계 정리까지 남김.
+- **검증:** API jest — consultation-tablets 9 · multilingual-consultation 15 통과, neture-pharmacy 전체 39 suites / 299 통과(15 suites · 218 skip — 전용 PostgreSQL 통합 연결 미설정). web-store vitest pages/pharmacy + pages/__tests__ 72 files / 844 통과. admin platform 18 통과. web-store · api-server · admin-dashboard `tsc --noEmit` 통과. 변경 TS ESLint 오류 0. 문서 민감정보 0.
+- **삭제한 테스트:** 매대 연결(heartbeat · 연결 시작) 화면 테스트 2건 — 해당 UI 를 화면에서 뺐기 때문. station 서버 · hook 테스트는 유지.
+- **확인하지 못한 것 / 배포 후 Demo:** 실제 브라우저 확인 안 함. 경영자 태블릿 추가 · 삭제(PC/mobile), 직원 조회 전용, 근무자 화면 자유 입력 · 음성 · 판단 지원 없음, 약사 화면 판단 지원 — 지시서 §4.
+- **다음:** 2단계(소비자 키오스크 · 다국어 · 안내 수준 AI) · 가격 표시 준비 조건 · 3단계 정리 — 지시서 §3.
+- **겹치는 PR / 문서 정합:** 열린 PR 대조 못 함(통합 세션 확인). 문서 정합: 해당 없음.
+## 2026-11-13 · TinyFish 운영자 연결·상담 번역 비용 집계 대조
+
+- **branch / 묶음:** `wo/consultation-live-cost-comparison`, main `35703c665`(#1050)에서 시작한 문서 후속. [운영 비용 대조 CHECK](docs/checks/CHECK-O4O-CONSULTATION-LIVE-COST-COMPARISON-2026-11-13.md).
+- **연결:** 사용자 직접 TinyFish 설치·운영자 로그인·프로필 저장 후 실제 admin 설정/AI 운영의 사용량·비용 조회 성공. 기존 “관리자·조회 연결 없음”은 해소. 이후 같은 프로필로 반복 조회 가능하되 대상 사이트의 실제 인증 재확인. 비밀번호/토큰/프로필 접근 링크는 저장소에 기록하지 않음. 약사 최종 품질 검수는 사용자 결정으로 **별도 세션**이며 현재 작업의 차단 조건으로 재요청하지 않음.
+- **실제 표본:** 같은 공개 인사말 4회 추가 시험. 기준 2회 3,655/4,503ms, 새 동일 세션 2회 2,950/488ms. 모두200/private-no-store. 각 그룹 안의 출력은 같고 그룹 사이는 다름. 번역 집계 3→5→6건, 추정 USD 0.00062100→0.00152550→0.00171750. 기준 증가2건/$0.00090450, 재사용 증가1건/$0.00019200. 다른 scope는 그대로. 7일 scope 합계 차이이며 actor별·실제 provider attempt/청구 대조가 아니고 고정 절감률을 확정하지 않음.
+- **관리자 준비:** 설명서 접수/공통 자료 준비 패널 로드·상담자료/QR 구분·오류 없음 확인. 검토/요청/검수 표시는 각0이나 전체 상품 자료 완비로 해석하지 않음. 생성·승인·게시·일정 활성화 안 함.
+- **미완료:** 실제 권한 철회·근거 변경·두 허용 매장 격리·원시 로그/가격 버전/청구·대표 부하/지연. 기존 QR 무손실 전체 대조도 새로 완료한 것이 아님. **7차 전체 운영 완료 선언 아님.**
+- **겹치는 PR:** 종료 조회 시 #1052·#1051·#1049와 HANDOFF.md만 겹침. main은 시작 기준 `35703c665` 그대로. 기존 절을 보존해 통합하며 PR 생성·병합·배포는 통합 세션 담당.
+- **검증/데이터:** TinyFish 실제 운영 화면 3회 관측·인증된 Demo의 번역 HTTP 4회·집계 차이 검산·문서 민감정보/diff 검사. 문서만 변경해 unit/typecheck 재실행 불필요. 업무 데이터/station/권한/설정/DB write·배포 없음. 정상 AI/보안 메타데이터는 기존 보존 정책. 기존 비용·전문 권한 정본과 문서 정합 유지. worktree KEEP(미병합 인계용).
+
+## 2026-11-13 · 소비자 다국어 정리 1단계 — QR 다국어 탭 숨김 · OTC 번역 비교 표본 (branch `claude/intelligent-cray-o2p4u3-multilingual`)
+
+> 다음 실행자: **통합 세션**(PR 생성 · 병합) → **LOCAL** — [`WO-O4O-OTC-TRANSLATION-QUALITY-SAMPLE-V1`](docs/work-orders/WO-O4O-OTC-TRANSLATION-QUALITY-SAMPLE-V1.md) T1~T3 → **CLOUD** T4 판정.
+> **T2(운영 번역 경로 호출 · AI 사용 기록 쓰기)는 2026-11-13 통합 담당 승인 완료** — 표본 30건 1회 실행에 한한다.
+> 기준 문서 초안은 문서 전용 branch `claude/intelligent-cray-o2p4u3-multilingual-docs` 에 따로 냈다(AGENTS.md §4-3 R6).
+
+- **결정 사항(2026-11-13 사용자):**
+  - 소비자 대상 다국어는 한국어 원본 + AI 번역으로 보인다. 외국어 화면에는 한국어를 병기한다(약사가 함께 보며 설명).
+  - 「다국어 제품 콘텐츠」(언어별 페이지 별도 작성)는 쓰지 않는다.
+  - OTC 는 허가 정보라 원문이 같고 확인할 것은 번역 품질뿐이다 — 표본 비교 뒤 통일 여부를 정한다.
+- **한 일:**
+  - `services/web-store/src/pages/pharmacy/StoreQRPage.tsx`: QR 자산 선택 창에 `enableMlcSource` 를 넘기지 않는다. 「다국어 제품 콘텐츠」 탭이 사라진다.
+  - 이미 발급된 다국어 QR · 공개 링크는 그대로 열린다. 다국어 화면에서 QR 로 넘어오는 기존 진입(`MultilingualQrEntry`)도 그대로다 — 다국어 기능 자체의 정리는 기준 문서 확정 뒤 별도 작업이다.
+  - OTC 번역 비교 CLI `apps/api-server/src/scripts/otc-translation-sample.ts`:
+    - `extract` — 읽기 전용, 층별 30건.
+    - `translate` — 운영 번역 경로, 설명 표 미저장.
+    - `compare` — 파일만.
+  - 시험 `src/scripts/__tests__/otc-translation-sample.test.ts`. 실행 WO 를 함께 넣었다.
+- **검증:**
+  - web-store QR 관련 vitest 19/19 · `tsc` 오류 0.
+  - api `otc-translation-sample.test.ts` 5/5. 그중 표본 SQL 은 격리 PostgreSQL 의 실제 migration schema 에서 확인했다.
+  - api `tsc` 의 오류 2건(`partner-support-scope.middleware.ts` · `product-correction/preview.ts`)은 이 변경과 무관하다.
+- **확인하지 못한 것:**
+  - 운영 데이터에서 표본이 층별 10건씩 나오는지(T1).
+  - 운영 번역 경로 호출(T2) — 클라우드에는 DB · AI 키가 없다.
+  - 배포 후 Demo(매장 경영자)로 `/store/marketing/qr?workspace=studio` 「자산 선택」에 탭이 두 개(내 매장 자료 · 운영자 콘텐츠)만 보이는지.
+- **겹칠 수 있는 PR:** 확인하지 못했다(통합 세션이 대조).
+
+## 2026-11-13 · AI 비용 절감 운영 검증 — 실제 번역 표본·접근 차단
+
+- **branch / 묶음:** `wo/consultation-operational-verification`, 시작 main `bb5d2134c`. #1042·#1044·#1045 병합과 `25e7f8016 production=DEPLOYED` 확인. 문서만 변경하며 재배포 불필요.
+- **실제 실행:** 운영 테스트 로그인 버튼으로 경영자/직원 context·표현 권한 조회. 비로그인 401, 두 역할의 약사 초안/허용되지 않은 임의 매장 403 확인. 경영자만 허용된 floor-staff 인사말 번역 4회: 기준 3,124/2,456ms, 같은 세션 첫 4,003ms/반복 453ms, 모두 200·동일 출력·private/no-store. 측정 2026-11-13 08:53:05~15 KST. [운영 CHECK](docs/checks/CHECK-O4O-AI-COST-REDUCTION-OPERATIONAL-2026-11-13.md).
+- **판정/미확인:** 서버 로그 대조가 없어 공급자 호출 수·token·추정/청구 비용은 미확인. 4개 표본의 왕복 시간은 proxy 포함으로 p50/p95나 전체 비용 절감 근거 아님. 경영자는 약사 미확인, 직원은 현재 모든 상담 mode 미승인. 현재 차단과 실제 상태 철회 시험을 구분하며 약사 품질·원천 변경·두 허용 매장 격리·관리자 준비는 미완료. **운영 검증 PENDING 유지**.
+- **다음 조건:** 이 환경에 읽기 전용 운영 DB/로그 연결 및 적법한 약사 계정/매장·검수 담당이 필요해 사용자에게 요청했다. 계정 값/비밀번호는 기록하지 않았다. 운영 자료·직원/약사 승인·설정 변경 없이 가능한 검증을 수행했다.
+- **겹치는 PR / main 이동:** 조회 시 두 문서와 겹치는 열린 PR 없음. 종료 fetch에서 main `913656ec7` 이동(#1037 법적 문서 범위)을 확인했으며 두 문서와 경로 충돌 없음. 배포 시점/서버별 버전을 요청마다 확인한 것으로 해석하지 않음.
+- **데이터/검증:** 업무 데이터 생성·삭제, station 저장, 운영 DB write, 배포 없음. 정상 보안/AI 비용 메타데이터는 기존 보존 정책 적용. 브라우저/API 실제 응답과 GitHub production 상태를 확인했으며 문서 민감정보·diff 검사 수행. 원래 CHECK를 운영 완료로 바꾸지 않음. 문서 정합 유지; branch/worktree는 미병합 인계용 KEEP.
+
+
+## 2026-11-13 · 계정 삭제 「확인 필요」 원인 표시 (branch `claude/intelligent-cray-o2p4u3-erasure-reason`)
+
+> 다음 실행자: **통합 세션** — PR 생성 · 병합 → 배포 후 Admin 확인. 원인을 배포 전에 알아야 하면 **LOCAL** 이 아래 read-only SQL 을 먼저 실행한다.
+
+- **증상(2026-11-12 사용자 보고):**
+  - Admin 「전체 회원 › 해지 회원」에서 한 회원(약국경영자 · 카카오 로그인 · 이메일 없음)의 삭제가 「삭제 미완료 — 확인 필요」로 멈춘다.
+  - 「계정 삭제」를 다시 눌러도 결과가 같다.
+  - 화면에는 「삭제를 완료하지 못했습니다. 다시 시도해 주시기 바랍니다.」라는 일반 문구만 보였다.
+- **원인(코드 확인):**
+  - 삭제 전 검토(`reviewManifest`)에서 멈추면 서버는 `error_code` 를 비우고, 실제 원인은 `review_codes` 에 넣는다. 예: `REVIEW:public.<표>` · `COMMUNITY_MANAGEMENT_TRANSFER_REQUIRED`.
+  - 회원 목록 · 상세 · 삭제 직후 알림 · 「삭제 처리 내역」은 모두 `error_code` 만 읽었다. 그래서 진짜 원인이 화면에 나오지 않았다.
+  - 검토 코드는 데이터가 바뀌기 전에는 매번 같으므로, 다시 눌러도 같은 결과가 반복된다.
+  - **어느 표가 막는지는 운영 DB 없이 확정하지 못했다**(클라우드 세션).
+- **수정:**
+  - 서버: 회원 목록 · 상세의 `erasureErrorCode` 는 `error_code` 가 비면 첫 검토 코드를 쓴다. 전체 검토 코드는 `erasureReviewCodes` 로 함께 준다.
+  - 화면: 「삭제 처리 내역」의 실패 원인 칸이 검토 코드를 보인다. 삭제 직후 알림도 `reviewCodes` 를 쓴다.
+  - 문구: `REVIEW:<schema>.<table>` 은 「다른 기록(<표>)에 이 회원 정보가 남아 있어 자동 삭제를 멈췄습니다. 다시 눌러도 같은 결과입니다 — 개발 담당에게 이 표 이름을 전달」로 번역한다. 미번역이던 코드 7종에도 문구를 넣었다.
+  - 삭제 규칙(무엇을 지우고 남기는지)은 바꾸지 않았다.
+- **검증:**
+  - `central-member-workspace.postgres.spec.ts` 17/17 — 격리 PostgreSQL, 검토 코드만 있는 경우를 추가했다.
+  - admin `member-workspace-erasure.test.ts` 3/3.
+  - admin `tsc` 에서 변경 파일 오류 0. `content-editor` 의 `@o4o/ui/ai` 해석 오류는 기존 것으로, 이 변경과 무관하다.
+- **원인 표 확인(LOCAL · read-only · `o4o_readonly`):** 식별자 · 개인정보 없이 코드만 나온다.
+
+  ```sql
+  SELECT state, error_code, review_codes, updated_at FROM account_erasure_operations WHERE state IN ('review_required','retry_required') ORDER BY updated_at DESC;
+  ```
+
+  결과의 표 이름을 CLOUD 로 넘기면, 그 표를 삭제 · 치환 규칙에 등록하는 후속 수정을 한다(그때까지 이 회원 삭제는 멈춘 상태로 안전하게 남는다).
+- **배포 후 확인:** Admin 「해지 회원」의 그 회원 행 · 상세에 표 이름이 들어간 문구가 보인다. 「삭제 처리 내역」 실패 원인 칸에 검토 코드가 보인다.
+- **겹칠 수 있는 PR:** 확인하지 못했다(통합 세션이 `gh pr diff --name-only` 로 대조).
 
 ## 2026-11-12 · 상시 통합 세션 운영 기록 · 후속 작업 요청서 (branch `claude/epic-rubin-5g04vm`)
 

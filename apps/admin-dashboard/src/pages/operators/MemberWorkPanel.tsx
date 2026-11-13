@@ -122,6 +122,7 @@ export default function MemberWorkPanel({
         <p role="status" className="rounded border border-red-200 bg-red-50 p-2 text-sm text-red-800">
           계정 삭제가 끝나지 않았습니다. {deletionMessage(member.erasureErrorCode ?? undefined)}
           {member.erasureErrorCode ? ` (${member.erasureErrorCode})` : ''} Admin 「계정 삭제」를 다시 누르면 이어서 진행합니다.
+          {(member.erasureReviewCodes?.length ?? 0) > 1 && <span className="mt-1 block">확인할 항목: {member.erasureReviewCodes!.join(', ')}</span>}
         </p>
       )}
       {!editing ? <MemberReviewInformation detail={detail} busy={busy} onBusyChange={onBusyChange} onAccessLost={onAccessLost} /> : <MemberProfileForm

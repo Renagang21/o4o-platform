@@ -13,8 +13,8 @@ import { consultationReuseKey } from './consultation-reuse.js';
 export const CONSULTATION_MODES = [
   { key: 'counter-pharmacist', label: '매대 약사 상담', feature: 'multilingual-consultation', professional: true },
   { key: 'counter-staff', label: '매대 직원 안내', feature: 'multilingual-staff-response', professional: false },
-  { key: 'floor-staff', label: '매장 직원 응대', feature: 'multilingual-staff-response', professional: false },
-  { key: 'floor-pharmacist', label: '매장 약사 상담', feature: 'multilingual-pharmacist-consultation', professional: true },
+  { key: 'floor-staff', label: '근무자 상담', feature: 'multilingual-staff-response', professional: false },
+  { key: 'floor-pharmacist', label: '약사 상담', feature: 'multilingual-pharmacist-consultation', professional: true },
 ] as const;
 export type ConsultationMode = typeof CONSULTATION_MODES[number]['key'];
 export const CONSULTATION_SCREEN_LANGUAGES = [{ key: 'ko', label: '한국어' }, ...CONSULTATION_LANGUAGES];
@@ -29,7 +29,8 @@ export const CONSULTATION_STAFF_PHRASES = [
 
 function consultationText(mode: typeof CONSULTATION_MODES[number], input: Record<string, unknown>) {
     let text: string;
-    if (mode.key === 'floor-staff' && input.direction === 'to-customer') {
+    // 근무자 태블릿은 자유 문장 · 음성도 쓴다(2026-11-13 사용자 결정). 안내 문구 선택도 계속 받는다.
+    if (mode.key === 'floor-staff' && input.direction === 'to-customer' && input.phrase !== undefined) {
       const phrase = CONSULTATION_STAFF_PHRASES.find(item => item.key === input.phrase);
       if (!phrase || input.text !== undefined) throw new NeturePharmacyError(400, 'STAFF_PHRASE_REQUIRED', '직원 응대는 안내 문구를 선택해 주시기 바랍니다.');
       text = phrase.text;
