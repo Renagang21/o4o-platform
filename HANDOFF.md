@@ -2,6 +2,7 @@
 
 ## 2026-11-13 · 상담 태블릿별 음성 자동 감지 언어 (branch `claude/wizardly-bardeen-ldq332`)
 
+- **통합 세션 수정(2026-11-13 · 통합 담당 지시로 이번 건만 통합 세션이 직접 수정):** 키오스크는 분리하지 않고 1 · 2단계를 한 PR(#1049)로 병합한다(통합 담당 결정 — 앞선 분리 판정 철회). 태블릿 목록 응답에 `configured` 를 더해 저장된 빈 목록과 최초 미등록을 구분(Codex P2) · 태블릿 관리에 행 체크 · 전체 선택 · 상단 ActionBar 선택 삭제(§3-1, Codex P1) · 키오스크 버튼 type · 언어 문구 `kioskLocale.json` 분리(SonarCloud) · 테스트 `Array.at` 제거(TS2550). 검증: 매장 상담 13개 파일 129건 · API 태블릿 · 키오스크 25건 통과, web-store `tsc -b` · api `tsc --noEmit` · 선언 빌드 · ESLint 통과.
 - **PR 묶음:** 태블릿 1 · 2단계와 같은 PR. 지시서 [`WO-O4O-STORE-CONSULTATION-TABLET-ROLES-V1`](docs/work-orders/WO-O4O-STORE-CONSULTATION-TABLET-ROLES-V1.md) §3 2-1단계.
 - **조사 결과:** 관리자 「음성 자동 감지 후보 · 최대 3개」는 Google 음성 자동 감지에만 쓰인다(직접 고른 언어 · 문자 번역 · 브라우저 음성과 무관). 3개 상한은 Google Speech-to-Text 제약(요청당 후보 최대 3개 · 적을수록 정확 — Google 공식 문서로 확인).
 - **한 일:** 태블릿마다 후보 최대 3개(`consultationTablets[].speechLanguages`, 경영자 편집). 직원 음성 인식 · 키오스크가 서버 저장 목록에서 태블릿 후보를 읽고, 없으면 관리자 기본 후보. 키오스크 언어 버튼은 후보를 앞에. 관리자 화면 문구 「기본 후보」. 설계 문서 §1 · 음성 후보 문단 갱신.
@@ -32,6 +33,44 @@
 - **확인하지 못한 것 / 배포 후 Demo:** 실제 브라우저 확인 안 함. 경영자 태블릿 추가 · 삭제(PC/mobile), 직원 조회 전용, 근무자 화면 자유 입력 · 음성 · 판단 지원 없음, 약사 화면 판단 지원 — 지시서 §4.
 - **다음:** 2단계(소비자 키오스크 · 다국어 · 안내 수준 AI) · 가격 표시 준비 조건 · 3단계 정리 — 지시서 §3.
 - **겹치는 PR / 문서 정합:** 열린 PR 대조 못 함(통합 세션 확인). 문서 정합: 해당 없음.
+## 2026-11-13 · TinyFish 운영자 연결·상담 번역 비용 집계 대조
+
+- **branch / 묶음:** `wo/consultation-live-cost-comparison`, main `35703c665`(#1050)에서 시작한 문서 후속. [운영 비용 대조 CHECK](docs/checks/CHECK-O4O-CONSULTATION-LIVE-COST-COMPARISON-2026-11-13.md).
+- **연결:** 사용자 직접 TinyFish 설치·운영자 로그인·프로필 저장 후 실제 admin 설정/AI 운영의 사용량·비용 조회 성공. 기존 “관리자·조회 연결 없음”은 해소. 이후 같은 프로필로 반복 조회 가능하되 대상 사이트의 실제 인증 재확인. 비밀번호/토큰/프로필 접근 링크는 저장소에 기록하지 않음. 약사 최종 품질 검수는 사용자 결정으로 **별도 세션**이며 현재 작업의 차단 조건으로 재요청하지 않음.
+- **실제 표본:** 같은 공개 인사말 4회 추가 시험. 기준 2회 3,655/4,503ms, 새 동일 세션 2회 2,950/488ms. 모두200/private-no-store. 각 그룹 안의 출력은 같고 그룹 사이는 다름. 번역 집계 3→5→6건, 추정 USD 0.00062100→0.00152550→0.00171750. 기준 증가2건/$0.00090450, 재사용 증가1건/$0.00019200. 다른 scope는 그대로. 7일 scope 합계 차이이며 actor별·실제 provider attempt/청구 대조가 아니고 고정 절감률을 확정하지 않음.
+- **관리자 준비:** 설명서 접수/공통 자료 준비 패널 로드·상담자료/QR 구분·오류 없음 확인. 검토/요청/검수 표시는 각0이나 전체 상품 자료 완비로 해석하지 않음. 생성·승인·게시·일정 활성화 안 함.
+- **미완료:** 실제 권한 철회·근거 변경·두 허용 매장 격리·원시 로그/가격 버전/청구·대표 부하/지연. 기존 QR 무손실 전체 대조도 새로 완료한 것이 아님. **7차 전체 운영 완료 선언 아님.**
+- **겹치는 PR:** 종료 조회 시 #1052·#1051·#1049와 HANDOFF.md만 겹침. main은 시작 기준 `35703c665` 그대로. 기존 절을 보존해 통합하며 PR 생성·병합·배포는 통합 세션 담당.
+- **검증/데이터:** TinyFish 실제 운영 화면 3회 관측·인증된 Demo의 번역 HTTP 4회·집계 차이 검산·문서 민감정보/diff 검사. 문서만 변경해 unit/typecheck 재실행 불필요. 업무 데이터/station/권한/설정/DB write·배포 없음. 정상 AI/보안 메타데이터는 기존 보존 정책. 기존 비용·전문 권한 정본과 문서 정합 유지. worktree KEEP(미병합 인계용).
+
+## 2026-11-13 · 소비자 다국어 정리 1단계 — QR 다국어 탭 숨김 · OTC 번역 비교 표본 (branch `claude/intelligent-cray-o2p4u3-multilingual`)
+
+> 다음 실행자: **통합 세션**(PR 생성 · 병합) → **LOCAL** — [`WO-O4O-OTC-TRANSLATION-QUALITY-SAMPLE-V1`](docs/work-orders/WO-O4O-OTC-TRANSLATION-QUALITY-SAMPLE-V1.md) T1~T3 → **CLOUD** T4 판정.
+> **T2(운영 번역 경로 호출 · AI 사용 기록 쓰기)는 2026-11-13 통합 담당 승인 완료** — 표본 30건 1회 실행에 한한다.
+> 기준 문서 초안은 문서 전용 branch `claude/intelligent-cray-o2p4u3-multilingual-docs` 에 따로 냈다(AGENTS.md §4-3 R6).
+
+- **결정 사항(2026-11-13 사용자):**
+  - 소비자 대상 다국어는 한국어 원본 + AI 번역으로 보인다. 외국어 화면에는 한국어를 병기한다(약사가 함께 보며 설명).
+  - 「다국어 제품 콘텐츠」(언어별 페이지 별도 작성)는 쓰지 않는다.
+  - OTC 는 허가 정보라 원문이 같고 확인할 것은 번역 품질뿐이다 — 표본 비교 뒤 통일 여부를 정한다.
+- **한 일:**
+  - `services/web-store/src/pages/pharmacy/StoreQRPage.tsx`: QR 자산 선택 창에 `enableMlcSource` 를 넘기지 않는다. 「다국어 제품 콘텐츠」 탭이 사라진다.
+  - 이미 발급된 다국어 QR · 공개 링크는 그대로 열린다. 다국어 화면에서 QR 로 넘어오는 기존 진입(`MultilingualQrEntry`)도 그대로다 — 다국어 기능 자체의 정리는 기준 문서 확정 뒤 별도 작업이다.
+  - OTC 번역 비교 CLI `apps/api-server/src/scripts/otc-translation-sample.ts`:
+    - `extract` — 읽기 전용, 층별 30건.
+    - `translate` — 운영 번역 경로, 설명 표 미저장.
+    - `compare` — 파일만.
+  - 시험 `src/scripts/__tests__/otc-translation-sample.test.ts`. 실행 WO 를 함께 넣었다.
+- **검증:**
+  - web-store QR 관련 vitest 19/19 · `tsc` 오류 0.
+  - api `otc-translation-sample.test.ts` 5/5. 그중 표본 SQL 은 격리 PostgreSQL 의 실제 migration schema 에서 확인했다.
+  - api `tsc` 의 오류 2건(`partner-support-scope.middleware.ts` · `product-correction/preview.ts`)은 이 변경과 무관하다.
+- **확인하지 못한 것:**
+  - 운영 데이터에서 표본이 층별 10건씩 나오는지(T1).
+  - 운영 번역 경로 호출(T2) — 클라우드에는 DB · AI 키가 없다.
+  - 배포 후 Demo(매장 경영자)로 `/store/marketing/qr?workspace=studio` 「자산 선택」에 탭이 두 개(내 매장 자료 · 운영자 콘텐츠)만 보이는지.
+- **겹칠 수 있는 PR:** 확인하지 못했다(통합 세션이 대조).
+
 ## 2026-11-13 · AI 비용 절감 운영 검증 — 실제 번역 표본·접근 차단
 
 - **branch / 묶음:** `wo/consultation-operational-verification`, 시작 main `bb5d2134c`. #1042·#1044·#1045 병합과 `25e7f8016 production=DEPLOYED` 확인. 문서만 변경하며 재배포 불필요.
