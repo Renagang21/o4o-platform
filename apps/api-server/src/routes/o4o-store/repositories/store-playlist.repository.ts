@@ -135,7 +135,8 @@ export class StorePlaylistRepository {
            (s.content_json::jsonb || jsonb_build_object('forcedStartAt', i.forced_start_at AT TIME ZONE 'UTC', 'forcedEndAt', i.forced_end_at AT TIME ZONE 'UTC')) AS "contentJson",
            NULL::uuid AS "forcedMediaId"
          FROM store_playlist_items i
-         JOIN o4o_asset_snapshots s ON s.id = i.snapshot_id
+         JOIN store_playlists pl ON pl.id = i.playlist_id
+         JOIN o4o_asset_snapshots s ON s.id = i.snapshot_id AND s.organization_id = pl.organization_id
          WHERE i.playlist_id = $1
            AND (
              i.is_forced = false
@@ -185,7 +186,8 @@ export class StorePlaylistRepository {
          s.title,
          (s.content_json::jsonb || jsonb_build_object('forcedStartAt', i.forced_start_at AT TIME ZONE 'UTC', 'forcedEndAt', i.forced_end_at AT TIME ZONE 'UTC')) AS "contentJson"
        FROM store_playlist_items i
-       JOIN o4o_asset_snapshots s ON s.id = i.snapshot_id
+       JOIN store_playlists pl ON pl.id = i.playlist_id
+       JOIN o4o_asset_snapshots s ON s.id = i.snapshot_id AND s.organization_id = pl.organization_id
        WHERE i.playlist_id = $1
          AND (
            i.is_forced = false
@@ -438,6 +440,16 @@ export class StorePlaylistRepository {
         `SELECT id, playlist_type, client_request_id FROM store_playlists WHERE id = $1 FOR UPDATE`,
         [playlistId],
       );
+
+      // 넣을 자료는 플레이리스트와 같은 매장 것이어야 한다(다른 매장 자료를 공개 플레이리스트로 내보내지 않는다).
+      const [sameStore] = await manager.query(
+        `SELECT 1 FROM o4o_asset_snapshots s JOIN store_playlists p ON p.id = $1
+          WHERE s.id = $2 AND s.organization_id = p.organization_id`,
+        [playlistId, snapshotId],
+      );
+      if (!sameStore) {
+        throw Object.assign(new Error('Snapshot not found'), { statusCode: 404, code: 'SNAPSHOT_NOT_FOUND' });
+      }
 
       if (locked[0]?.client_request_id) {
         const [existing] = await manager.query(`SELECT id,snapshot_id AS "snapshotId",display_order AS "displayOrder",is_forced AS "isForced",is_locked AS "isLocked",created_at AS "createdAt" FROM store_playlist_items WHERE playlist_id=$1 AND snapshot_id=$2 LIMIT 1`, [playlistId,snapshotId]);
