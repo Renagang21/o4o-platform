@@ -102,9 +102,9 @@ describe('consumer answers', () => {
     translate.mockImplementation(async (input: { text: string }) => ({ translation: input.text === 'vitamin' ? '비타민' : input.text === '1) A-1' ? '1) Shelf A-1' : '번역', detectedLanguage: 'en' }));
     const result = await service.search({ ...device, text: 'vitamin', language: 'en' });
     expect(translate).toHaveBeenNthCalledWith(1, { text: 'vitamin', source: 'en', target: 'ko' }, expect.objectContaining({ actorId: 'owner', organizationId: STORE }));
-    expect(translate).toHaveBeenNthCalledWith(2, { text: '1) A-1', source: 'ko', target: 'en' }, expect.objectContaining({ actorId: 'owner', organizationId: STORE }));
+    expect(translate).toHaveBeenNthCalledWith(2, { text: '1) A-1', source: 'ko', target: 'en' }, expect.objectContaining({ actorId: 'owner', organizationId: STORE, reuseKey: 'kiosk-locations' }));
     expect(result).toEqual({ state: 'products', language: 'en', products: [
-      { kind: 'listing', id: PRODUCT, name: '비타민', location: { text: 'Product location: Shelf A-1', language: 'en' } },
+      { kind: 'listing', id: PRODUCT, name: '비타민', location: { text: 'Product location: Shelf A-1', language: 'en', korean: '상품 위치: A-1' } },
     ] });
   });
   it('translates distinct locations once and falls back to the Korean text when lines do not line up', async () => {
@@ -140,6 +140,36 @@ describe('consumer answers', () => {
     });
     const fallback = await service.search({ ...device, text: 'vitamin', language: 'en' }) as { products: Array<{ location: unknown }> };
     expect(fallback.products[0].location).toEqual({ text: 'Product location: A-1', language: 'ko' });
+  });
+  it('shows Korean alongside translated locations by default, reuses the location translation, and lets the store turn it off', async () => {
+    translate.mockImplementation(async (input: { text: string }) => ({ translation: input.text === 'vitamin' ? '비타민' : input.text === '1) A-1' ? '1) Shelf A-1' : '번역', detectedLanguage: 'en' }));
+    const shown = await service.search({ ...device, text: 'vitamin', language: 'en' }) as { products: Array<{ location: unknown }> };
+    expect(shown.products[0].location).toEqual({ text: 'Product location: Shelf A-1', language: 'en', korean: '상품 위치: A-1' });
+    expect(translate.mock.calls[1][1]).toMatchObject({ reuseKey: 'kiosk-locations' });
+    tablets = [{ id: 'consumer-kiosk1', role: 'consumer', name: '입구 키오스크', showKorean: false }];
+    const hidden = await service.search({ ...device, text: 'vitamin', language: 'en' }) as { products: Array<{ location: unknown }> };
+    expect(hidden.products[0].location).toEqual({ text: 'Product location: Shelf A-1', language: 'en' });
+  });
+  it('adds the Korean original of a translated answer without another AI call, and skips it when turned off', async () => {
+    prepare.mockImplementation(async (_a: string, _o: string, input: { language: string }) => input.language === 'ko'
+      ? { state: 'ready', intent: 'product-details', card: { kind: 'guidance', title: '비타민C', text: '하루 1정 복용', language: 'ko', translated: false } }
+      : { state: 'ready', intent: 'product-details', selection: { sourceVersion: 'v1', passageIds: [2] },
+        card: { kind: 'guidance', title: '비타민C', text: 'Take one tablet a day', language: 'en', requestedLanguage: 'en', translated: true } });
+    const result = await service.answer({ ...device, intent: 'product-details', question: 'How to take?', language: 'en', productKind: 'listing', productId: PRODUCT }) as { card: { korean?: string } };
+    expect(result.card.korean).toBe('하루 1정 복용');
+    expect(prepare.mock.calls[1][2]).toEqual({ mode: 'floor-staff', intent: 'product-details', productKind: 'listing', productId: PRODUCT, language: 'ko', selection: { sourceVersion: 'v1', passageIds: [2] } });
+    prepare.mockClear();
+    tablets = [{ id: 'consumer-kiosk1', role: 'consumer', name: '입구 키오스크', showKorean: false }];
+    const off = await service.answer({ ...device, intent: 'product-details', question: 'How to take?', language: 'en', productKind: 'listing', productId: PRODUCT }) as { card: { korean?: string } };
+    expect(off.card.korean).toBeUndefined();
+    expect(prepare).toHaveBeenCalledTimes(1);
+  });
+  it('uses the product location text as the Korean original of a translated location card', async () => {
+    prepare.mockResolvedValue({ state: 'ready', intent: 'location', product: { location: '2번 진열대' },
+      card: { kind: 'product', title: '비타민C', text: 'Product location: Shelf 2', language: 'en', requestedLanguage: 'en', translated: true } });
+    const result = await service.answer({ ...device, intent: 'location', language: 'en', productKind: 'listing', productId: PRODUCT }) as { card: { korean?: string } };
+    expect(result.card.korean).toBe('상품 위치: 2번 진열대');
+    expect(prepare).toHaveBeenCalledTimes(1);
   });
   it('refuses product search when the store lost the staff product-support feature', async () => {
     requireProductSupport.mockRejectedValue(new NeturePharmacyError(403, 'SERVICE_FEATURE_REQUIRED', 'feature'));

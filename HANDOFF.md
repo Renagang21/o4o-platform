@@ -1,5 +1,14 @@
 # HANDOFF
 
+## 2026-11-13 · 키오스크를 소비자 다국어 정책(#1052)에 맞춤 — 한국어 병기 · 위치 번역 재사용 (branch `claude/wizardly-bardeen-ldq332`)
+
+- **PR 묶음:** 바로 아래 「검색 결과 위치」(`2ee3c63f`)와 같은 PR. 지시서 [`WO-O4O-STORE-CONSULTATION-TABLET-ROLES-V1`](docs/work-orders/WO-O4O-STORE-CONSULTATION-TABLET-ROLES-V1.md) §3 2-3단계. #1052(정책 문서) · #1038 은 다른 세션 branch — 통합 담당이 통합 세션에 병합 · 배포를 맡겼다(이 세션은 손대지 않음).
+- **한 일:** 키오스크 외국어 화면에 한국어 원문 병기(검색 결과 위치 · 선택 상품 · 답변 카드), 소비자 태블릿마다 끌 수 있음(`showKorean`, 기본 켜짐). 위치 일괄 번역에 재사용 키.
+- **결정 사항(§9):** 제품 설명의 한국어 원문은 이미 고른 게시 문단을 한국어로 다시 읽어 얻는다(추가 AI 호출 없음). 원문을 못 읽으면 병기 없이 번역문만(실패로 처리하지 않음). 켜짐은 기본값이라 저장하지 않는다(필드 없음 = 켜짐). 직원에게는 상태 텍스트만.
+- **검증:** API neture-pharmacy 40 suites / 322 통과(15 suites · 218 skip — 전용 PostgreSQL 미설정). web-store 전체 102 files / 1003 통과. `pnpm --filter store-web run type-check`(`tsc -b`) · api type-check 통과. 변경 파일 ESLint 오류 · 경고 0.
+- **확인하지 못한 것:** 실제 번역 · 게시 자료 · 기기 화면(지시서 §4). 정책 §2-3 의 「번역 저장 · 재사용」은 메모리 캐시 수준까지만 — 영속 저장은 별도 WO.
+- **겹치는 PR / 문서 정합:** #1052 가 병합되면 지시서의 정책 링크가 유효해진다(병합 전에는 main 에 그 파일이 없다). 문서 정합: 해당 없음.
+
 ## 2026-11-13 · 키오스크 검색 결과에 위치 바로 표시 (branch `claude/wizardly-bardeen-ldq332` — #1049 병합 후 최신 main 에서 다시 시작)
 
 - **PR 묶음:** 이 branch 단독 1 PR(서비스 · API, lane 아님). 지시서 [`WO-O4O-STORE-CONSULTATION-TABLET-ROLES-V1`](docs/work-orders/WO-O4O-STORE-CONSULTATION-TABLET-ROLES-V1.md) §3 2-2단계. 이전 #1049 는 병합됨(`9647760b`) — 그 branch 를 main 에서 새로 시작했다(force push 없음 · 원격 head 는 병합 때 자동 삭제).

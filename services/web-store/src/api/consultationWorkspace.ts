@@ -15,7 +15,8 @@ export async function saveConsultationExpression(expression: ConsultationExpress
 export type OperatingType = "standard" | "large";
 export type ConsultationTabletRole = "pharmacist" | "staff" | "consumer";
 /** speechLanguages: 이 태블릿의 Google 음성 자동 감지 후보(최대 3개). 없으면 관리자 기본 후보. */
-export interface ConsultationTablet { id: string; role: ConsultationTabletRole; name: string; speechLanguages?: string[] }
+/** showKorean: 소비자 태블릿 외국어 화면의 한국어 병기(없으면 켜짐 · 소비자 다국어 정책 §2-4). */
+export interface ConsultationTablet { id: string; role: ConsultationTabletRole; name: string; speechLanguages?: string[]; showKorean?: boolean }
 /** configured: 한 번이라도 저장했는지(false 면 기본 태블릿을 보여 준다). 이전 서버 응답에 없으면 목록이 비었는지로 판단한다. */
 export interface ConsultationTablets { organizationId: string; tablets: ConsultationTablet[]; configured: boolean; canEdit: boolean }
 function tablets(r: Envelope<ConsultationTablets>, message: string) {
@@ -197,10 +198,10 @@ export async function createKioskPairing(tabletId: string) {
   return r.data;
 }
 export interface KioskCredential { id: string; name: string; token: string }
-export interface KioskCard { kind: string; title: string; text: string; language: string; requestedLanguage: string; publicKey: string | null; fallbackUsed: boolean; translated: boolean }
+export interface KioskCard { kind: string; title: string; text: string; language: string; requestedLanguage: string; publicKey: string | null; fallbackUsed: boolean; translated: boolean; korean?: string }
 export interface KioskAnswer { state: string; intent?: string; language: string; card?: KioskCard; message?: string;
   /** location: 매장이 등록한 위치(고객 언어로 번역 · 실패 시 한국어 원문) 또는 위치 미등록 안내. */
-  products?: Array<{ kind: string; id: string; name: string; location?: { text: string; language: string } }> }
+  products?: Array<{ kind: string; id: string; name: string; location?: { text: string; language: string; korean?: string } }> }
 export interface KioskContext { name: string; languages: Array<{ key: string; label: string }>;
   runtime?: import('../pages/pharmacy/consultation/ConsultationParts').Context['runtime'] }
 /**

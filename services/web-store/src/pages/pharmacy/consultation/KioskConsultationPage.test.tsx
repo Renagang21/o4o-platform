@@ -118,3 +118,24 @@ it('locks product choices while guidance is being prepared so a late answer cann
   expect(await screen.findByText('Product location: Shelf A-1')).toBeTruthy();
   expect((screen.getByRole('button', { name: '유산균' }) as HTMLButtonElement).disabled).toBe(false);
 });
+
+it('shows the Korean original alongside translated locations and answers when the server provides it', async () => {
+  localStorage.setItem('o4o:consultation-kiosk-device:v1', JSON.stringify(credential));
+  const base = respond;
+  respond = (action, body) => {
+    if (action === 'search') return ok({ state: 'products', language: 'en', products: [{ kind: 'listing', id: 'p1', name: '비타민C',
+      location: { text: 'Product location: Shelf B-2', language: 'en', korean: '상품 위치: 2번 진열대' } }] });
+    if (action === 'answer') return ok({ state: 'ready', intent: 'product-details', language: 'en', card: { kind: 'guidance', title: '비타민C',
+      text: 'Take one tablet a day', language: 'en', requestedLanguage: 'en', publicKey: null, fallbackUsed: false, translated: true, korean: '하루 1정 복용' } });
+    return base(action, body);
+  };
+  render(<KioskConsultationPage />);
+  fireEvent.click(await screen.findByRole('button', { name: 'English · 영어' }));
+  fireEvent.change(screen.getByLabelText('Product you are looking for'), { target: { value: 'vitamin' } });
+  fireEvent.click(screen.getByRole('button', { name: 'Find product' }));
+  const results = await screen.findByRole('region', { name: 'Products found' });
+  expect(within(results).getByText('한국어 · 상품 위치: 2번 진열대').getAttribute('lang')).toBe('ko');
+  fireEvent.click(within(results).getByRole('button', { name: '비타민C' }));
+  fireEvent.click(screen.getByRole('button', { name: 'Product information' }));
+  expect((await screen.findByText('한국어 · 하루 1정 복용')).getAttribute('lang')).toBe('ko');
+});
