@@ -138,15 +138,16 @@ describe('§9-4~6 · 메뉴 권한 정책', () => {
   // WO-O4O-ADMIN-OPERATOR-MENU-REALIGNMENT-V1: 최종 삭제 대상별 4개 + 전체 관리자 계정 +5,
   //   통합 최종 삭제 · 자료 안내 -2 (28 → 31). 그룹 헤더는 재편 후에도 6개.
   // 가입 관계 정리를 업무 운영에서 회원·사업체로 옮김 +1 (31 → 32, 2026-11-10).
-  it('업무 운영과 운영자 지정을 포함한 클릭 가능한 정적 메뉴는 32개다', () => {
-    expect(CLICKABLE).toHaveLength(32);
+  // 서비스 설정 › 약관·정책 문서 +1 (32 → 33, 2026-11-12 · TODO-O4O-LEGAL-BASIC-DOCUMENTS-ADMIN-V1 4단계).
+  it('업무 운영과 운영자 지정을 포함한 클릭 가능한 정적 메뉴는 33개다', () => {
+    expect(CLICKABLE).toHaveLength(33);
   });
 
-  it('4. 정적 메뉴 전 노드(클릭 32 + 그룹 헤더 6)가 명시적 권한 설정을 갖는다', () => {
+  it('4. 정적 메뉴 전 노드(클릭 33 + 그룹 헤더 6)가 명시적 권한 설정을 갖는다', () => {
     const configured = new Set(menuPermissions.map((m) => m.menuId));
     const missing = ALL_NODES.map((n) => n.id).filter((id) => !!id && !configured.has(id));
     expect(missing).toEqual([]);
-    expect(ALL_NODES).toHaveLength(38); // 클릭 32 + 그룹 헤더 6
+    expect(ALL_NODES).toHaveLength(39); // 클릭 33 + 그룹 헤더 6
   });
 
   it('4-b. 모든 설정 항목이 명시적 역할을 갖는다 (무게이트 항목 0)', () => {

@@ -143,6 +143,7 @@
 | 문서 | 역할 | 상태 |
 |---|---|---|
 | [o4o-common-structure](o4o-common-structure.md) | forum · lms · signage 는 플랫폼 공통 구조 — KPA 가 reference implementation, 데이터는 serviceKey 격리 | ACTIVE |
+| [O4O-CONSUMER-MULTILINGUAL-POLICY-V1](baseline/O4O-CONSUMER-MULTILINGUAL-POLICY-V1.md) | 소비자 다국어 = 한국어 원본 1개 + AI 번역(재사용 · 원본 변경 시 재번역) + 외국어 화면 한국어 병기. 「다국어 제품 콘텐츠」 신규 작성 중단(발급된 QR 유지) · OTC 영문은 표본 판정 대기(§4) | ACTIVE |
 | [CONTENT-CORE-OVERVIEW](platform/content-core/CONTENT-CORE-OVERVIEW.md) | Content Core — 단일 출처 · Core 불변 · 이벤트 기반 통신 | ACTIVE |
 | [CONTENT-META-PRODUCTION-READY-V1](platform/content/CONTENT-META-PRODUCTION-READY-V1.md) | Content meta 계약 — working copy = `kpa_store_contents` · `o4o_asset_snapshots`(`@o4o/types` content-meta) | ACTIVE |
 | [O4O-HUB-TEMPLATE-STANDARD-V1](platform/hub/O4O-HUB-TEMPLATE-STANDARD-V1.md) | HUB Template 표준 | ACTIVE |
