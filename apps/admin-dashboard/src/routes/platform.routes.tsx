@@ -10,6 +10,7 @@ import PlatformUsersPage from '@/pages/platform/account-governance/PlatformUsers
 import { AdminMemberManagementPage } from '@o4o/operator-core-ui/modules/neture-service-operations';
 import { authClient } from '@o4o/auth-client';
 import AdminPharmacyServiceSettingsPage from '@/pages/platform/AdminPharmacyServiceSettingsPage';
+import LegalDocumentsOverviewPage from '@/pages/platform/LegalDocumentsOverviewPage';
 import { configurePharmacyManagementClient } from '@o4o/operator-core-ui/modules/pharmacy-management';
 import { api } from '@/api/base';
 configurePharmacyManagementClient(api);
@@ -92,6 +93,8 @@ export function PlatformRoutes() {
     <Route key="/admin/settings/service-audience" path="/admin/settings/service-audience" element={<Navigate to="/admin/platform" replace />} />,
     <Route key="/admin/semi-franchises" path="/admin/semi-franchises" element={<AdminCooperationBusinessesPage />} />,
     <Route key="/admin/pharmacy-service-settings" path="/admin/pharmacy-service-settings" element={<AdminPharmacyServiceSettingsPage />} />,
+    // TODO-O4O-LEGAL-BASIC-DOCUMENTS-ADMIN-V1 4단계 — 약관·정책 문서 통합 현황(전체 관리자).
+    <Route key="/admin/legal-documents" path="/admin/legal-documents" element={<LegalDocumentsOverviewPage />} />,
     // WO-O4O-ADMIN-INFORMATION-ARCHITECTURE-AND-MENU-ROLE-REFACTOR-V1 — 제거 내역
     //
     //   조사 정본: docs/investigations/IR-O4O-ADMIN-INFORMATION-ARCHITECTURE-AND-MENU-ROLE-CENSUS-V1.md
