@@ -13,6 +13,21 @@ export async function saveConsultationExpression(expression: ConsultationExpress
   return r.data;
 }
 export type OperatingType = "standard" | "large";
+export type ConsultationTabletRole = "pharmacist" | "staff";
+export interface ConsultationTablet { id: string; role: ConsultationTabletRole; name: string }
+export interface ConsultationTablets { organizationId: string; tablets: ConsultationTablet[]; canEdit: boolean }
+function tablets(r: Envelope<ConsultationTablets>, message: string) {
+  if (!r.success || typeof r.data?.organizationId !== "string" || !Array.isArray(r.data.tablets) || typeof r.data.canEdit !== "boolean" ||
+    r.data.tablets.some((t) => typeof t?.id !== "string" || typeof t.name !== "string" || (t.role !== "pharmacist" && t.role !== "staff")))
+    throw new Error(message);
+  return r.data;
+}
+export async function readConsultationTablets() {
+  return tablets(await coreApiClient.get<Envelope<ConsultationTablets>>(`${CONSULTATION_BASE}/consultation-tablets`), "상담 태블릿 목록을 확인하지 못했습니다.");
+}
+export async function saveConsultationTablets(list: ConsultationTablet[]) {
+  return tablets(await coreApiClient.put<Envelope<ConsultationTablets>>(`${CONSULTATION_BASE}/consultation-tablets`, { tablets: list }), "상담 태블릿 목록을 저장하지 못했습니다.");
+}
 export interface SharedConsultation {
   kind: string;
   title: string;

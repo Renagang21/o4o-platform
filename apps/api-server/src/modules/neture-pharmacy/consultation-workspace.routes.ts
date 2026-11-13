@@ -13,6 +13,7 @@ import { ModelControlService } from '../../services/ai-management/model-controls
 import { consultationRuntimeSchema } from '../../services/ai-management/consultation-runtime.js';
 import { createPolicyExecutor } from '../ai-policy/ai-policy-factory.js';
 import { ConsultationExpressionService } from './services/consultation-expression.js';
+import { ConsultationTabletService } from './services/consultation-tablets.js';
 
 type StoreRequest = Request & { organizationId?: string };
 const org = (req: StoreRequest) => {
@@ -64,6 +65,9 @@ export function consultationWorkspaceRoutes(
   const expressions = new ConsultationExpressionService(db);
   router.get('/pharmacy/consultation-expression', ...store, handle(req => expressions.read(req.user!.id!, org(req))));
   router.put('/pharmacy/consultation-expression', ...store, handle(req => expressions.save(req.user!.id!, org(req), req.body)));
+  const tablets = new ConsultationTabletService(db);
+  router.get('/pharmacy/consultation-tablets', ...store, handle(req => tablets.read(req.user!.id!, org(req))));
+  router.put('/pharmacy/consultation-tablets', ...store, handle(req => tablets.save(req.user!.id!, org(req), req.body)));
   const limits = (max: number, peer = false) =>
     rateLimit({
       windowMs: 60_000,

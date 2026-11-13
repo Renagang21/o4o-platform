@@ -1,5 +1,17 @@
 # HANDOFF
 
+## 2026-11-13 · 매장 상담 태블릿 구조 1단계 — 약사 · 근무자 태블릿 목록 · 단일 화면 (branch `claude/wizardly-bardeen-ldq332`)
+
+- **PR 묶음:** 이 branch 단독 1 PR(서비스 + API 소비 · core-hub/migration lane 아님). 지시서 [`WO-O4O-STORE-CONSULTATION-TABLET-ROLES-V1`](docs/work-orders/WO-O4O-STORE-CONSULTATION-TABLET-ROLES-V1.md).
+- **한 일:** 내 매장 → 상담을 「약사 태블릿 · 근무자 태블릿」 목록으로 교체(경영자가 이름 붙여 추가 · 삭제, 직원은 조회). 태블릿 한 대에서 문의 · 답변을 끝내고 고객 화면 2대 연결 UI 는 쓰지 않는다. 근무자 화면은 자유 문장 · 음성 입력 + 안내 문구 빠른 입력. 관리자 일반/대형 배치 화면에 「반영되지 않음 · 정리 예정」 안내.
+- **API:** `GET/PUT /neture/pharmacy/consultation-tablets`(organizations.metadata.consultationTablets · owner 재확인 UPDATE · schema 변경 없음). `floor-staff` 고객 방향 자유 문장 허용(이용 자격 검사 유지). mode key · 이용 자격 key 는 그대로.
+- **결정 사항(§9):** 사용자 결정 — 3종(약사 · 근무자 · 소비자) 복수, 기존 연결 방식 교체, 근무자 자유 입력, 키오스크 안내 수준 AI, 다국어 기본, 가격은 준비만. 세션 판단 — 결제 · 이용권을 건드리지 않으려고 태블릿 종류를 기존 mode(`floor-*` 우선, 없으면 `counter-*`)로 매핑. 소비자 키오스크는 기기 인증 · 소비자용 AI 가 새로 필요해 2단계로 분리(지금은 목록에 노출하지 않음 — route 없는 메뉴 금지). 고객 연결 서버 API · `/consultation/customer` 는 3단계 정리까지 남김.
+- **검증:** API jest — consultation-tablets 9 · multilingual-consultation 15 통과, neture-pharmacy 전체 39 suites / 299 통과(15 suites · 218 skip — 전용 PostgreSQL 통합 연결 미설정). web-store vitest pages/pharmacy + pages/__tests__ 72 files / 844 통과. admin platform 18 통과. web-store · api-server · admin-dashboard `tsc --noEmit` 통과. 변경 TS ESLint 오류 0. 문서 민감정보 0.
+- **삭제한 테스트:** 매대 연결(heartbeat · 연결 시작) 화면 테스트 2건 — 해당 UI 를 화면에서 뺐기 때문. station 서버 · hook 테스트는 유지.
+- **확인하지 못한 것 / 배포 후 Demo:** 실제 브라우저 확인 안 함. 경영자 태블릿 추가 · 삭제(PC/mobile), 직원 조회 전용, 근무자 화면 자유 입력 · 음성 · 판단 지원 없음, 약사 화면 판단 지원 — 지시서 §4.
+- **다음:** 2단계(소비자 키오스크 · 다국어 · 안내 수준 AI) · 가격 표시 준비 조건 · 3단계 정리 — 지시서 §3.
+- **겹치는 PR / 문서 정합:** 열린 PR 대조 못 함(통합 세션 확인). 문서 정합: 해당 없음.
+
 ## 2026-11-12 · 상시 통합 세션 운영 기록 · 후속 작업 요청서 (branch `claude/epic-rubin-5g04vm`)
 
 - **병합(squash)**: #1043 · #1042 · #1044 · #1045 · #1046. 배포: main `25e7f801` → `production` `DEPLOYED`(api + 웹 7개, 23:30 UTC).
