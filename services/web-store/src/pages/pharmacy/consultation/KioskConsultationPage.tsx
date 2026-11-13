@@ -175,7 +175,7 @@ export default function KioskConsultationPage() {
             <input className="w-full rounded border p-3 text-xl tracking-widest" value={code} maxLength={11}
               autoComplete="off" onChange={(event) => setCode(event.target.value.toUpperCase())} />
           </label>
-          <button className={big} disabled={busy || !code.trim()}>{copy.connect}</button>
+          <button type="submit" className={big} disabled={busy || !code.trim()}>{copy.connect}</button>
         </form>
         {error && <p role="alert" className="text-red-700">{error}</p>}
       </main>

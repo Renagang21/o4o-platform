@@ -25,7 +25,7 @@ it('accepts several tablets per role and rejects duplicates, unknown roles and e
 
 it('lets the current owner save the list inside an owner-checked metadata update', async () => {
   const db = { query: jest.fn().mockResolvedValueOnce([{ id: 'store' }]).mockResolvedValueOnce([{ tablets }]) };
-  expect(await new ConsultationTabletService(db as never).save('owner', 'store', { tablets })).toEqual({ organizationId: 'store', tablets, canEdit: true });
+  expect(await new ConsultationTabletService(db as never).save('owner', 'store', { tablets })).toEqual({ organizationId: 'store', tablets, configured: true, canEdit: true });
   expect(db.query.mock.calls[0][1]).toEqual(['store', 'owner', JSON.stringify(tablets)]);
   expect(db.query.mock.calls[0][0]).toContain("om.role='owner'");
   expect(db.query.mock.calls[0][0]).toContain('{consultationTablets}');
@@ -48,7 +48,9 @@ it('rejects an invalid list before checking access or writing', async () => {
 it('lets members read without editing, returns an empty list by default and refuses malformed stored data', async () => {
   jest.mocked(resolveStoreAccessLevel).mockResolvedValue({ level: 'member', organizationId: 'store', memberRole: 'staff' } as never);
   const empty = { query: jest.fn().mockResolvedValue([{ tablets: null }]) };
-  expect(await new ConsultationTabletService(empty as never).read('staff', 'store')).toEqual({ organizationId: 'store', tablets: [], canEdit: false });
+  expect(await new ConsultationTabletService(empty as never).read('staff', 'store')).toEqual({ organizationId: 'store', tablets: [], configured: false, canEdit: false });
+  const cleared = { query: jest.fn().mockResolvedValue([{ tablets: [] }]) };
+  expect(await new ConsultationTabletService(cleared as never).read('staff', 'store')).toEqual({ organizationId: 'store', tablets: [], configured: true, canEdit: false });
   const malformed = { query: jest.fn().mockResolvedValue([{ tablets: [{ id: 'x', role: 'admin', name: 'x' }] }]) };
   await expect(new ConsultationTabletService(malformed as never).read('staff', 'store')).rejects.toMatchObject({ httpStatus: 503 });
   jest.mocked(resolveStoreAccessLevel).mockResolvedValue({ level: 'none', organizationId: null } as never);

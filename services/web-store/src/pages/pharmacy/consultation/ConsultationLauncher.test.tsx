@@ -15,8 +15,8 @@ const tablets = [
 ];
 beforeEach(() => {
   vi.clearAllMocks();
-  api.read.mockResolvedValue({ organizationId: 'store', canEdit: true, tablets });
-  api.save.mockImplementation(async (list: unknown[]) => ({ organizationId: 'store', canEdit: true, tablets: list }));
+  api.read.mockResolvedValue({ organizationId: 'store', canEdit: true, configured: true, tablets });
+  api.save.mockImplementation(async (list: unknown[]) => ({ organizationId: 'store', canEdit: true, configured: true, tablets: list }));
   api.pair.mockResolvedValue({ code: 'ABCDE-12345', expiresAt: '2026-11-13T10:10:00.000Z' });
 });
 afterEach(cleanup);
@@ -37,7 +37,7 @@ it('shows the three tablet kinds and lets the owner add a kiosk and create its o
 });
 
 it('hides kiosk code creation and editing from staff members', async () => {
-  api.read.mockResolvedValue({ organizationId: 'store', canEdit: false, tablets });
+  api.read.mockResolvedValue({ organizationId: 'store', canEdit: false, configured: true, tablets });
   render(<ConsultationLauncher />);
   const kiosk = await screen.findByRole('region', { name: '소비자 태블릿(키오스크)' });
   expect(within(kiosk).queryByRole('button')).toBeNull();
@@ -45,7 +45,7 @@ it('hides kiosk code creation and editing from staff members', async () => {
 });
 
 it('lets the owner choose up to three speech auto-detect languages per tablet and clear them back to the admin default', async () => {
-  api.read.mockResolvedValue({ organizationId: 'store', canEdit: true, tablets: [{ ...tablets[2], speechLanguages: ['ko', 'vi'] }] });
+  api.read.mockResolvedValue({ organizationId: 'store', canEdit: true, configured: true, tablets: [{ ...tablets[2], speechLanguages: ['ko', 'vi'] }] });
   render(<ConsultationLauncher />);
   const kiosk = await screen.findByRole('region', { name: '소비자 태블릿(키오스크)' });
   const group = within(kiosk).getByRole('group', { name: '입구 키오스크 음성 자동 감지 언어' });
@@ -59,4 +59,36 @@ it('lets the owner choose up to three speech auto-detect languages per tablet an
   fireEvent.click(within(group).getByRole('button', { name: '자동 감지 언어 저장' }));
   await within(kiosk).findByText('음성 자동 감지 언어: 관리자 기본 후보');
   expect(api.save.mock.calls[1][0]).toEqual([tablets[2]]);
+});
+
+it('keeps a saved empty list empty instead of bringing back the default tablets', async () => {
+  api.read.mockResolvedValue({ organizationId: 'store', canEdit: true, configured: true, tablets: [] });
+  render(<ConsultationLauncher />);
+  const pharmacist = await screen.findByRole('region', { name: '약사 태블릿' });
+  expect(within(pharmacist).queryByText(/약사 태블릿 1/)).toBeNull();
+  api.read.mockResolvedValue({ organizationId: 'store', canEdit: true, configured: false, tablets: [] });
+  cleanup();
+  render(<ConsultationLauncher />);
+  expect(await screen.findByText('약사 태블릿 1 화면 열기 ↗')).toBeTruthy();
+});
+
+it('removes checked tablets from the top action bar and clears the selection', async () => {
+  api.read.mockResolvedValue({ organizationId: 'store', canEdit: true, configured: true, tablets });
+  render(<ConsultationLauncher />);
+  fireEvent.click(await screen.findByLabelText('조제실 앞 선택'));
+  fireEvent.click(screen.getByLabelText('입구 선택'));
+  fireEvent.click(screen.getByRole('button', { name: '선택 삭제' }));
+  fireEvent.click(await screen.findByRole('button', { name: '확인' }));
+  await screen.findByText('태블릿 2대를 목록에서 뺐습니다.');
+  expect(api.save.mock.calls[0][0]).toEqual([tablets[2]]);
+  expect((screen.getByLabelText('입구 키오스크 선택') as HTMLInputElement).checked).toBe(false);
+  expect(screen.queryByRole('button', { name: '선택 삭제' })).toBeNull();
+});
+
+it('hides selection controls from staff members', async () => {
+  api.read.mockResolvedValue({ organizationId: 'store', canEdit: false, configured: true, tablets });
+  render(<ConsultationLauncher />);
+  await screen.findByRole('region', { name: '약사 태블릿' });
+  expect(screen.queryByRole('checkbox')).toBeNull();
+  expect(screen.queryByLabelText('전체 선택')).toBeNull();
 });

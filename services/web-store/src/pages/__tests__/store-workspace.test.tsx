@@ -21,7 +21,7 @@ import {
   storeWorkspaceBase,
 } from "../../components/store/StoreWorkflowNavigation";
 
-vi.mock('../../api/consultationWorkspace', () => ({ readConsultationTablets: vi.fn(async () => ({ organizationId: 'fixture-store', canEdit: false, tablets: [{ id: 'pharmacist-a', role: 'pharmacist', name: '조제실 앞' }, { id: 'staff-a', role: 'staff', name: '입구' }, { id: 'staff-b', role: 'staff', name: '진열대' }] })), saveConsultationTablets: vi.fn(), readConsultationExpression: vi.fn(async()=>({organizationId:'fixture-store',canEdit:false,expression:{tone:'neutral',formality:'polite',length:'standard'}})) }));
+vi.mock('../../api/consultationWorkspace', () => ({ readConsultationTablets: vi.fn(async () => ({ organizationId: 'fixture-store', canEdit: false, configured: true, tablets: [{ id: 'pharmacist-a', role: 'pharmacist', name: '조제실 앞' }, { id: 'staff-a', role: 'staff', name: '입구' }, { id: 'staff-b', role: 'staff', name: '진열대' }] })), saveConsultationTablets: vi.fn(), readConsultationExpression: vi.fn(async()=>({organizationId:'fixture-store',canEdit:false,expression:{tone:'neutral',formality:'polite',length:'standard'}})) }));
 vi.mock('../pharmacy/StoreHandledProductsPage', () => ({ default: ({ navigation }: { navigation?: React.ReactNode }) => <><h1>상품 목록</h1>{navigation}</> }));
 vi.mock('../neture-pharmacy/SupplyOptionsPage', () => ({default:({navigation}:{navigation?:React.ReactNode})=><><h1>상품 주문</h1>{navigation}</>}));
 vi.mock('../pharmacy/StoreLibraryContentsPage', () => ({ default: ({ navigation, quickLinks, productLink, moreNavigation }: { navigation?: React.ReactNode; quickLinks?: React.ReactNode; productLink?: React.ReactNode; moreNavigation?: React.ReactNode }) => <><h1>저장한 안내 목록</h1>{quickLinks}{productLink}{navigation}{moreNavigation}</> }));

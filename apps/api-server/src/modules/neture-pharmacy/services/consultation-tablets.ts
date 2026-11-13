@@ -51,15 +51,18 @@ export class ConsultationTabletService {
     if (!row) throw new NeturePharmacyError(404, 'PHARMACY_NOT_FOUND', '현재 약국을 확인해 주세요.');
     const value = consultationTabletsSchema.safeParse(row.tablets ?? []);
     if (!value.success) throw new NeturePharmacyError(503, 'CONSULTATION_TABLETS_UNAVAILABLE', '상담 태블릿 목록을 다시 확인해 주세요.');
-    return value.data;
+    // configured: 한 번이라도 저장했는지. 저장된 빈 목록([])과 최초 미등록을 화면이 구분한다.
+    return { tablets: value.data, configured: row.tablets != null };
   }
   async read(actor: string, org: string) {
     const access = await resolveStoreAccessLevel(this.db, actor, 'kpa', org);
     if (access.level === 'none' || access.organizationId !== org)
       throw new NeturePharmacyError(403, 'STORE_ACCESS_REQUIRED', '현재 매장 권한을 확인해 주세요.');
+    const { tablets, configured } = await this.values(org);
     return {
       organizationId: org,
-      tablets: await this.values(org),
+      tablets,
+      configured,
       canEdit: access.level === 'owner' && access.memberRole === 'owner' && await getNetureMainMembershipStatus(this.db, actor) === 'active',
     };
   }

@@ -64,7 +64,8 @@ it('sends an optional product question for AI-picked published paragraphs and of
   fireEvent.change(screen.getByLabelText('이 상품에 대해 궁금한 점(선택)'), { target: { value: '성분이 뭐예요?' } });
   fireEvent.click(screen.getByRole('button', { name: '질문하기' }));
   await screen.findByText('Product location: Shelf A-1');
-  expect(calls.filter(call => call.action === 'answer').at(-1)!.body).toMatchObject({ intent: 'product-details', question: '성분이 뭐예요?', language: 'ko' });
+  const answers = calls.filter(call => call.action === 'answer');
+  expect(answers[answers.length - 1].body).toMatchObject({ intent: 'product-details', question: '성분이 뭐예요?', language: 'ko' });
   fireEvent.click(screen.getByRole('button', { name: 'Ask a pharmacist about medicines' }));
   expect(await screen.findByText('Please ask a pharmacist about choosing or taking medicines.')).toBeTruthy();
 });

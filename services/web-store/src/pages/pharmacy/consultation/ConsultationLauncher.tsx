@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { ActionBar } from "@o4o/ui";
 import {
   createKioskPairing,
   readConsultationTablets,
@@ -70,6 +71,9 @@ export function tabletHref(organizationId: string, tablet: ConsultationTablet) {
 export function ConsultationLauncher() {
   const { organizationId } = useUnifiedStore();
   const [saved, setSaved] = useState<ConsultationTablet[] | null>(null);
+  const [configured, setConfigured] = useState(false);
+  // O4O 표준 리스트(AGENTS.md §3-1): 행 체크 → 상단 ActionBar. 매장 · 저장 결과가 바뀌면 선택을 비운다.
+  const [selected, setSelected] = useState<Set<string>>(new Set());
   const [canEdit, setCanEdit] = useState(false);
   const [error, setError] = useState(false), [retry, setRetry] = useState(0);
   const [busy, setBusy] = useState(false), [message, setMessage] = useState("");
@@ -77,19 +81,19 @@ export function ConsultationLauncher() {
   const generation = useRef(0), lock = useRef(false);
   useEffect(() => {
     const current = ++generation.current;
-    setSaved(null); setCanEdit(false); setError(false); setMessage(""); setBusy(false); lock.current = false;
+    setSaved(null); setConfigured(false); setSelected(new Set()); setCanEdit(false); setError(false); setMessage(""); setBusy(false); lock.current = false;
     readConsultationTablets()
       .then((data) => {
         if (generation.current !== current) return;
         if (data.organizationId !== organizationId) throw new Error("Store changed");
-        setSaved(data.tablets); setCanEdit(data.canEdit);
+        setSaved(data.tablets); setConfigured(data.configured); setCanEdit(data.canEdit);
       })
       .catch(() => { if (generation.current === current) setError(true); });
     return () => { generation.current = current + 1; };
   }, [organizationId, retry]);
 
-  // 등록 전에는 종류별 기본 태블릿 1대를 보여 준다. 경영자가 추가 · 삭제하면 저장된 목록으로 바뀐다.
-  const tablets = saved && saved.length ? saved
+  // 한 번도 저장하지 않았으면 종류별 기본 태블릿 1대를 보여 준다. 저장한 뒤에는 빈 목록도 그대로 보여 준다.
+  const tablets = saved && configured ? saved
     : ROLES.filter(({ fallback }) => fallback).map(({ role, fallback }) => ({ id: `${role}-1`, role, name: fallback }));
   const [pairing, setPairing] = useState<{ tabletId: string; code: string; expiresAt: string } | null>(null);
   const pair = async (tablet: ConsultationTablet) => {
@@ -113,7 +117,8 @@ export function ConsultationLauncher() {
       const data = await saveConsultationTablets(next);
       if (generation.current !== current) return;
       if (data.organizationId !== organizationId) throw new Error("Store changed");
-      setSaved(data.tablets); setCanEdit(data.canEdit); setMessage(done);
+      setSaved(data.tablets); setConfigured(data.configured); setCanEdit(data.canEdit); setMessage(done);
+      setSelected(new Set());
     } catch {
       if (generation.current === current) setMessage("저장하지 못했습니다. 현재 매장과 경영자 권한을 확인해 주세요.");
     } finally {
@@ -128,8 +133,17 @@ export function ConsultationLauncher() {
     void update([...tablets, { id: newId(role), role, name }], `${name}을(를) 추가했습니다.`)
       .then(() => setNames((prev) => ({ ...prev, [role]: "" })));
   };
-  const remove = (tablet: ConsultationTablet) =>
-    void update(tablets.filter((t) => t.id !== tablet.id), `${tablet.name}을(를) 목록에서 뺐습니다.`);
+  const toggle = (id: string) => setSelected((prev) => {
+    const next = new Set(prev);
+    if (next.has(id)) next.delete(id); else next.add(id);
+    return next;
+  });
+  const allSelected = tablets.length > 0 && tablets.every((t) => selected.has(t.id));
+  const removeSelected = () => {
+    const removing = tablets.filter((t) => selected.has(t.id));
+    if (!removing.length) return;
+    return update(tablets.filter((t) => !selected.has(t.id)), `태블릿 ${removing.length}대를 목록에서 뺐습니다.`);
+  };
 
   return (
     <div className="space-y-3">
@@ -146,6 +160,20 @@ export function ConsultationLauncher() {
       ) : !saved ? (
         <p role="status">상담 태블릿 목록을 확인하는 중…</p>
       ) : (
+        <>
+        {canEdit && (
+          <div className="flex flex-wrap items-center gap-3">
+            <label className="flex min-h-11 items-center gap-2 text-sm">
+              <input type="checkbox" checked={allSelected} disabled={busy || !tablets.length}
+                onChange={() => setSelected(allSelected ? new Set() : new Set(tablets.map((t) => t.id)))} />
+              전체 선택
+            </label>
+            <ActionBar selectedCount={selected.size} onClearSelection={() => setSelected(new Set())}
+              actions={[{ key: "remove", label: "선택 삭제", variant: "danger", disabled: busy,
+                confirm: `선택한 태블릿 ${selected.size}대를 목록에서 뺄까요? 연결된 키오스크는 다시 연결해야 합니다.`,
+                onClick: removeSelected }]} />
+          </div>
+        )}
         <div className="grid gap-3 lg:grid-cols-3 sm:grid-cols-2">
           {ROLES.map(({ role, title, description }) => (
             <section key={role} aria-label={title} className="space-y-3 rounded-xl border p-4">
@@ -156,6 +184,10 @@ export function ConsultationLauncher() {
               <ul className="space-y-2">
                 {tablets.filter((t) => t.role === role).map((tablet) => (
                   <li key={tablet.id} className="flex flex-wrap items-center gap-2">
+                    {canEdit && (
+                      <input type="checkbox" className="h-5 w-5" aria-label={`${tablet.name} 선택`} disabled={busy}
+                        checked={selected.has(tablet.id)} onChange={() => toggle(tablet.id)} />
+                    )}
                     {role === "consumer" ? (
                       <span className="min-h-11 flex-1 content-center rounded border px-3 py-2">{tablet.name}</span>
                     ) : (
@@ -173,10 +205,6 @@ export function ConsultationLauncher() {
                         연결 코드 <strong className="text-lg tracking-widest">{pairing.code}</strong> ·{" "}
                         {new Date(pairing.expiresAt).toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit" })}까지 사용
                       </output>
-                    )}
-                    {canEdit && saved.length > 0 && (
-                      <button type="button" className="min-h-11 rounded border px-3" disabled={busy}
-                        aria-label={`${tablet.name} 삭제`} onClick={() => remove(tablet)}>삭제</button>
                     )}
                     <SpeechCandidates tablet={tablet} canEdit={canEdit} busy={busy}
                       onSave={(languages) => void update(
@@ -207,6 +235,7 @@ export function ConsultationLauncher() {
             </section>
           ))}
         </div>
+        </>
       )}
       {saved && !canEdit && <p className="text-sm text-slate-500">태블릿 추가 · 삭제는 매장 경영자가 할 수 있습니다.</p>}
       {message && <p role="status" className="text-sm">{message}</p>}

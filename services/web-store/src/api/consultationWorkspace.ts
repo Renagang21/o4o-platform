@@ -16,12 +16,13 @@ export type OperatingType = "standard" | "large";
 export type ConsultationTabletRole = "pharmacist" | "staff" | "consumer";
 /** speechLanguages: 이 태블릿의 Google 음성 자동 감지 후보(최대 3개). 없으면 관리자 기본 후보. */
 export interface ConsultationTablet { id: string; role: ConsultationTabletRole; name: string; speechLanguages?: string[] }
-export interface ConsultationTablets { organizationId: string; tablets: ConsultationTablet[]; canEdit: boolean }
+/** configured: 한 번이라도 저장했는지(false 면 기본 태블릿을 보여 준다). 이전 서버 응답에 없으면 목록이 비었는지로 판단한다. */
+export interface ConsultationTablets { organizationId: string; tablets: ConsultationTablet[]; configured: boolean; canEdit: boolean }
 function tablets(r: Envelope<ConsultationTablets>, message: string) {
   if (!r.success || typeof r.data?.organizationId !== "string" || !Array.isArray(r.data.tablets) || typeof r.data.canEdit !== "boolean" ||
     r.data.tablets.some((t) => typeof t?.id !== "string" || typeof t.name !== "string" || !["pharmacist", "staff", "consumer"].includes(t.role)))
     throw new Error(message);
-  return r.data;
+  return { ...r.data, configured: typeof r.data.configured === "boolean" ? r.data.configured : r.data.tablets.length > 0 };
 }
 export async function readConsultationTablets() {
   return tablets(await coreApiClient.get<Envelope<ConsultationTablets>>(`${CONSULTATION_BASE}/consultation-tablets`), "상담 태블릿 목록을 확인하지 못했습니다.");
