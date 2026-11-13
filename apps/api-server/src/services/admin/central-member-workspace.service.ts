@@ -13,9 +13,11 @@ import { isRetiredRoleValue } from '../../middleware/retired-service.middleware.
 type Db = Pick<EntityManager, 'query'>;
 export type MemberTask = 'all' | 'pending' | 'inactive' | 'qualifications' | 'pharmacies' | 'corrections';
 const version = `to_char(u."updatedAt",'YYYY-MM-DD"T"HH24:MI:SS.US')`;
-/** 끝나지 않은 계정 삭제(검토 필요 · 재시도 필요 · 진행 중). 삭제 요청이 계정을 먼저 멈추므로 목록에 「해지」가 아니라 이 상태를 보인다(2026-11-10). */
+/** 끝나지 않은 계정 삭제(검토 필요 · 재시도 필요 · 진행 중). 삭제 요청이 계정을 먼저 멈추므로 목록에 「해지」가 아니라 이 상태를 보인다(2026-11-10).
+ *  삭제 전 검토에서 멈추면 error_code 는 비고 원인은 review_codes 에만 있다 — 화면이 원인을 보이도록 첫 검토 코드를 대신 쓴다(2026-11-13). */
 const ERASURE_SQL = `(SELECT o.state FROM account_erasure_operations o WHERE o.subject_id=u.id AND o.state<>'completed') AS "erasureState",
- (SELECT o.error_code FROM account_erasure_operations o WHERE o.subject_id=u.id AND o.state<>'completed') AS "erasureErrorCode"`;
+ (SELECT COALESCE(o.error_code,o.review_codes->>0) FROM account_erasure_operations o WHERE o.subject_id=u.id AND o.state<>'completed') AS "erasureErrorCode",
+ (SELECT o.review_codes FROM account_erasure_operations o WHERE o.subject_id=u.id AND o.state<>'completed') AS "erasureReviewCodes"`;
 const identity = `${protectedMemberSql("u.id")} AS "operatorReadOnly",u.id AS "userId",u.name,u.nickname,u.email,u.phone,u.status AS "accountStatus",
  u."isActive" AS "accountActive",(SELECT sm.status FROM service_memberships sm WHERE sm.user_id=u.id AND sm.service_key='neture') AS "membershipStatus",
  u."isEmailVerified" AS "emailVerified",EXISTS(SELECT 1 FROM user_password_credentials pc WHERE pc.user_id=u.id) AS "hasPassword",u."createdAt" AS "joinedAt",${version} AS version,

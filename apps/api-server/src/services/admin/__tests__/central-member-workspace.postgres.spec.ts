@@ -30,7 +30,7 @@ integration('central member workbench PostgreSQL authority, projection and corre
       CREATE TABLE organizations(id uuid PRIMARY KEY,type text DEFAULT 'pharmacy',address_detail jsonb,address text,phone text,metadata jsonb,name text,business_number text,"updatedAt" timestamp DEFAULT now());
       CREATE TABLE neture_pharmacy_memberships(id uuid PRIMARY KEY,organization_id uuid,applicant_user_id uuid,pharmacy_name text,business_number text,pharmacist_license_number text,status text,reason text,applied_at timestamp,decided_at timestamp,decided_by uuid,updated_at timestamp DEFAULT now());
       CREATE TABLE action_logs(id bigserial,service_key text,user_id uuid,action_key text,source text,status text,meta jsonb,created_at timestamp DEFAULT now());
-      CREATE TABLE account_erasure_operations(id uuid PRIMARY KEY DEFAULT gen_random_uuid(),subject_id uuid UNIQUE,state text,error_code text);`);
+      CREATE TABLE account_erasure_operations(id uuid PRIMARY KEY DEFAULT gen_random_uuid(),subject_id uuid UNIQUE,state text,error_code text,review_codes jsonb NOT NULL DEFAULT '[]');`);
     for (const id of [admin, reader, target, other]) await db.query(`INSERT INTO users VALUES($1,'합성 회원','합성 별칭',$2,NULL,'active',true,true,now(),now(),$3)`, [id, `${id}@example.test`, { licenseNumber: 'legacy-license', businessName: '과거 합성 사업장', internalFutureField: 'do-not-disclose' }]);
     await db.query(`INSERT INTO role_assignments(id,user_id,role,is_active) VALUES($1,$2,'platform:super_admin',true)`, [randomUUID(), admin]);
     const assignment = randomUUID();
@@ -63,6 +63,11 @@ integration('central member workbench PostgreSQL authority, projection and corre
     try {
       expect((await service.list(admin, 'qualifications', 1, '')).items[0]).toMatchObject({ erasureState: 'review_required', erasureErrorCode: 'ERASURE_RESIDUAL_REVIEW_REQUIRED' });
       expect((await service.detail(admin, target)).member).toMatchObject({ erasureState: 'review_required' });
+      // 삭제 전 검토에서 멈추면 error_code 는 비고 원인은 review_codes 에만 있다 — 목록 · 상세가 그 원인을 보인다(2026-11-13).
+      await db.query(`UPDATE account_erasure_operations SET error_code=NULL,review_codes='["REVIEW:public.example_table","REVIEW:public.other_table"]' WHERE subject_id=$1`, [target]);
+      expect((await service.list(admin, 'qualifications', 1, '')).items[0]).toMatchObject({ erasureErrorCode: 'REVIEW:public.example_table' });
+      expect((await service.detail(admin, target)).member).toMatchObject({ erasureErrorCode: 'REVIEW:public.example_table',
+        erasureReviewCodes: ['REVIEW:public.example_table', 'REVIEW:public.other_table'] });
       // 삭제 요청은 계정을 멈춘다 — 해지 탭 숫자와 목록에 같은 회원이 보인다.
       const before = (await service.list(admin, 'inactive', 1, '')).counts.inactive;
       await db.query(`UPDATE users SET "isActive"=false WHERE id=$1`, [target]);

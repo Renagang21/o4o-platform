@@ -29,6 +29,48 @@
   - 배포 후 Demo(매장 경영자)로 `/store/marketing/qr?workspace=studio` 「자산 선택」에 탭이 두 개(내 매장 자료 · 운영자 콘텐츠)만 보이는지.
 - **겹칠 수 있는 PR:** 확인하지 못했다(통합 세션이 대조).
 
+## 2026-11-13 · AI 비용 절감 운영 검증 — 실제 번역 표본·접근 차단
+
+- **branch / 묶음:** `wo/consultation-operational-verification`, 시작 main `bb5d2134c`. #1042·#1044·#1045 병합과 `25e7f8016 production=DEPLOYED` 확인. 문서만 변경하며 재배포 불필요.
+- **실제 실행:** 운영 테스트 로그인 버튼으로 경영자/직원 context·표현 권한 조회. 비로그인 401, 두 역할의 약사 초안/허용되지 않은 임의 매장 403 확인. 경영자만 허용된 floor-staff 인사말 번역 4회: 기준 3,124/2,456ms, 같은 세션 첫 4,003ms/반복 453ms, 모두 200·동일 출력·private/no-store. 측정 2026-11-13 08:53:05~15 KST. [운영 CHECK](docs/checks/CHECK-O4O-AI-COST-REDUCTION-OPERATIONAL-2026-11-13.md).
+- **판정/미확인:** 서버 로그 대조가 없어 공급자 호출 수·token·추정/청구 비용은 미확인. 4개 표본의 왕복 시간은 proxy 포함으로 p50/p95나 전체 비용 절감 근거 아님. 경영자는 약사 미확인, 직원은 현재 모든 상담 mode 미승인. 현재 차단과 실제 상태 철회 시험을 구분하며 약사 품질·원천 변경·두 허용 매장 격리·관리자 준비는 미완료. **운영 검증 PENDING 유지**.
+- **다음 조건:** 이 환경에 읽기 전용 운영 DB/로그 연결 및 적법한 약사 계정/매장·검수 담당이 필요해 사용자에게 요청했다. 계정 값/비밀번호는 기록하지 않았다. 운영 자료·직원/약사 승인·설정 변경 없이 가능한 검증을 수행했다.
+- **겹치는 PR / main 이동:** 조회 시 두 문서와 겹치는 열린 PR 없음. 종료 fetch에서 main `913656ec7` 이동(#1037 법적 문서 범위)을 확인했으며 두 문서와 경로 충돌 없음. 배포 시점/서버별 버전을 요청마다 확인한 것으로 해석하지 않음.
+- **데이터/검증:** 업무 데이터 생성·삭제, station 저장, 운영 DB write, 배포 없음. 정상 보안/AI 비용 메타데이터는 기존 보존 정책 적용. 브라우저/API 실제 응답과 GitHub production 상태를 확인했으며 문서 민감정보·diff 검사 수행. 원래 CHECK를 운영 완료로 바꾸지 않음. 문서 정합 유지; branch/worktree는 미병합 인계용 KEEP.
+
+
+## 2026-11-13 · 계정 삭제 「확인 필요」 원인 표시 (branch `claude/intelligent-cray-o2p4u3-erasure-reason`)
+
+> 다음 실행자: **통합 세션** — PR 생성 · 병합 → 배포 후 Admin 확인. 원인을 배포 전에 알아야 하면 **LOCAL** 이 아래 read-only SQL 을 먼저 실행한다.
+
+- **증상(2026-11-12 사용자 보고):**
+  - Admin 「전체 회원 › 해지 회원」에서 한 회원(약국경영자 · 카카오 로그인 · 이메일 없음)의 삭제가 「삭제 미완료 — 확인 필요」로 멈춘다.
+  - 「계정 삭제」를 다시 눌러도 결과가 같다.
+  - 화면에는 「삭제를 완료하지 못했습니다. 다시 시도해 주시기 바랍니다.」라는 일반 문구만 보였다.
+- **원인(코드 확인):**
+  - 삭제 전 검토(`reviewManifest`)에서 멈추면 서버는 `error_code` 를 비우고, 실제 원인은 `review_codes` 에 넣는다. 예: `REVIEW:public.<표>` · `COMMUNITY_MANAGEMENT_TRANSFER_REQUIRED`.
+  - 회원 목록 · 상세 · 삭제 직후 알림 · 「삭제 처리 내역」은 모두 `error_code` 만 읽었다. 그래서 진짜 원인이 화면에 나오지 않았다.
+  - 검토 코드는 데이터가 바뀌기 전에는 매번 같으므로, 다시 눌러도 같은 결과가 반복된다.
+  - **어느 표가 막는지는 운영 DB 없이 확정하지 못했다**(클라우드 세션).
+- **수정:**
+  - 서버: 회원 목록 · 상세의 `erasureErrorCode` 는 `error_code` 가 비면 첫 검토 코드를 쓴다. 전체 검토 코드는 `erasureReviewCodes` 로 함께 준다.
+  - 화면: 「삭제 처리 내역」의 실패 원인 칸이 검토 코드를 보인다. 삭제 직후 알림도 `reviewCodes` 를 쓴다.
+  - 문구: `REVIEW:<schema>.<table>` 은 「다른 기록(<표>)에 이 회원 정보가 남아 있어 자동 삭제를 멈췄습니다. 다시 눌러도 같은 결과입니다 — 개발 담당에게 이 표 이름을 전달」로 번역한다. 미번역이던 코드 7종에도 문구를 넣었다.
+  - 삭제 규칙(무엇을 지우고 남기는지)은 바꾸지 않았다.
+- **검증:**
+  - `central-member-workspace.postgres.spec.ts` 17/17 — 격리 PostgreSQL, 검토 코드만 있는 경우를 추가했다.
+  - admin `member-workspace-erasure.test.ts` 3/3.
+  - admin `tsc` 에서 변경 파일 오류 0. `content-editor` 의 `@o4o/ui/ai` 해석 오류는 기존 것으로, 이 변경과 무관하다.
+- **원인 표 확인(LOCAL · read-only · `o4o_readonly`):** 식별자 · 개인정보 없이 코드만 나온다.
+
+  ```sql
+  SELECT state, error_code, review_codes, updated_at FROM account_erasure_operations WHERE state IN ('review_required','retry_required') ORDER BY updated_at DESC;
+  ```
+
+  결과의 표 이름을 CLOUD 로 넘기면, 그 표를 삭제 · 치환 규칙에 등록하는 후속 수정을 한다(그때까지 이 회원 삭제는 멈춘 상태로 안전하게 남는다).
+- **배포 후 확인:** Admin 「해지 회원」의 그 회원 행 · 상세에 표 이름이 들어간 문구가 보인다. 「삭제 처리 내역」 실패 원인 칸에 검토 코드가 보인다.
+- **겹칠 수 있는 PR:** 확인하지 못했다(통합 세션이 `gh pr diff --name-only` 로 대조).
+
 ## 2026-11-12 · 상시 통합 세션 운영 기록 · 후속 작업 요청서 (branch `claude/epic-rubin-5g04vm`)
 
 - **병합(squash)**: #1043 · #1042 · #1044 · #1045 · #1046. 배포: main `25e7f801` → `production` `DEPLOYED`(api + 웹 7개, 23:30 UTC).
