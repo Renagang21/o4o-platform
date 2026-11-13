@@ -140,6 +140,8 @@ import { AddStorePlaylistTags1793857542325 } from '../migrations/1793857542325-A
 import { CreateCommunityNewsAutomation1794013771244 } from '../migrations/1794013771244-CreateCommunityNewsAutomation.js';
 // WO-O4O-SOCIAL-SIGNUP-DIRECT-ROLE-REGISTRATION-V1 T2 (소셜 가입 이메일 선택)
 import { AllowUsersWithoutEmail1794357598911 } from '../migrations/1794357598911-AllowUsersWithoutEmail.js';
+// WO-O4O-STORE-QR-TABLET-CHANNEL-SEPARATION-V1 T4 (signage_media."productMasterId" · 추가형 · 통합 담당 승인 2026-11-13)
+import { AddSignageMediaProductMaster1794550173646 } from '../migrations/1794550173646-AddSignageMediaProductMaster.js';
 
 export const INCREMENTAL_MIGRATIONS: readonly MigrationClass[] = [
   CreateStoreOwnerTerminationCases1789701000000,
@@ -203,6 +205,7 @@ export const INCREMENTAL_MIGRATIONS: readonly MigrationClass[] = [
   AddStorePlaylistTags1793857542325,
   CreateCommunityNewsAutomation1794013771244,
   AllowUsersWithoutEmail1794357598911,
+  AddSignageMediaProductMaster1794550173646,
 ];
 
 export function incrementalMigrationNames(): string[] {

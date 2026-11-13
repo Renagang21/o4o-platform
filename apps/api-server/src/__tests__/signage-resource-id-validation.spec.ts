@@ -60,6 +60,10 @@ jest.mock('../routes/signage/controllers/global-content.controller.js', () => ({
 jest.mock('../routes/signage/controllers/forced-content.controller.js', () => ({
   SignageForcedContentController: stubController(),
 }));
+jest.mock('../routes/signage/controllers/media-product-link.controller.js', () => ({
+  createMediaProductLinkHandlers: () =>
+    new Proxy({} as Record<string, unknown>, { get: (_t, prop: string) => makeHandler(String(prop)) }),
+}));
 
 jest.mock('../middleware/auth.middleware.js', () => ({
   requireAuth: (req: any, res: any, next: any) => {
@@ -136,13 +140,14 @@ beforeEach(() => {
 });
 
 describe('census — UUID parameter route 전수 (미조사 0)', () => {
-  it('authenticated router: UUID parameter route 30개가 모두 validator 를 가진다', () => {
+  it('authenticated router: UUID parameter route 32개가 모두 validator 를 가진다', () => {
     const router: any = createSignageRoutes(fakeDataSource);
     const targets = uuidParamRoutes(router);
     // WO-O4O-SIGNAGE-LEGACY-STACK-SIMPLIFICATION-AND-TABLET-AUTHORING-CLOSURE-V1:
     //   content-blocks/:id (get·patch·delete) + layout-presets/:id (get·patch·delete) 6건 은퇴로 39 → 33.
     // Store schedule GET/PATCH/DELETE retired: 33 → 30.
-    expect(targets).toHaveLength(30);
+    // WO-O4O-STORE-QR-TABLET-CHANNEL-SEPARATION-V1 T4: PUT /media/:id/product · PUT /hq/media/:id/product 추가 30 → 32.
+    expect(targets).toHaveLength(32);
 
     const layers = router.stack.filter((l: any) => l.route);
     for (const t of targets) {
@@ -285,6 +290,15 @@ describe('static route 회귀 방지 (§9)', () => {
     );
     expect(res.status).toBe(200);
     expect(entered).toEqual(['getMediaLibrary']);
+  });
+
+  it('/media/product-links 는 /media/:id 에 가려지지 않는다 (T4)', async () => {
+    allowStore();
+    const res = await authed(
+      request(buildApp()).get('/api/signage/kpa-society/media/product-links')
+    );
+    expect(res.status).toBe(200);
+    expect(entered).toEqual(['listStore']);
   });
 
   it('/templates/preview 같은 static POST 도 정상', async () => {

@@ -17,6 +17,7 @@ import { readSignageMediaDraft, signageMediaMetadata, emptySignageMediaDraft, ty
 import { buildSignageVideoList, filterSignageVideos, signageVideoOrigin, signageVideoTags, summarizePlaylistDuration, SIGNAGE_VIDEO_ORIGINS, type UnifiedVideoItem, type SignageSortKey as SortKey } from './signage/signageVideoList';
 import { SignageTabs } from './signage/SignageTabs';
 import { BusinessVideoImport } from './signage/BusinessVideoImport';
+import { VideoProductLinkDialog } from './signage/VideoProductLinkDialog';
 import { useSignagePlaylists } from './hooks/useSignagePlaylists';
 /**
  * StoreSignagePage — 사이니지 운영 엔진
@@ -77,6 +78,8 @@ import {
 } from '../../api/assetSnapshot';
 import {
   fetchSignageMedia,
+  fetchSignageMediaProductLinks,
+  type SignageMediaProductLink,
   updateSignageMedia,
   deleteSignageMedia,
   type SignageMediaItem,
@@ -254,15 +257,25 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
   const [editSaving, setEditSaving] = useState(false);
   const [editError, setEditError] = useState('');
   const editBusy = useRef(false);
+  // 이 영상의 제품(WO-O4O-STORE-QR-TABLET-CHANNEL-SEPARATION-V1 T4). null = 불러오지 못함.
+  const [productLinks, setProductLinks] = useState<Map<string, SignageMediaProductLink> | null>(new Map());
+  const [productLinkTarget, setProductLinkTarget] = useState<UnifiedVideoItem | null>(null);
   const editTargetRef = useRef(editingTarget); editTargetRef.current = editingTarget;
   const editDraftRef = useRef(editDraft); editDraftRef.current = editDraft;
   const loadSignageMedia = useCallback(async () => {
     if (!organizationId || !isCurrent()) return;
     const current = mediaReads.begin(); setMediaLoading(true); setMediaLoadError(null);
     try {
-      const data = await fetchSignageMedia(organizationId);
+      const [data, links] = await Promise.all([
+        fetchSignageMedia(organizationId),
+        // 연결 제품은 보조 정보다 — 어떤 이유로 못 불러와도(호출 자체의 예외 포함) 영상 목록은 보인다.
+        Promise.resolve().then(() => fetchSignageMediaProductLinks(organizationId)).catch(() => null),
+      ]);
       if (!Array.isArray(data)) throw new Error('Invalid media');
-      if (current() && isCurrent()) setSignageMediaItems(data);
+      if (current() && isCurrent()) {
+        setSignageMediaItems(data);
+        setProductLinks(links ? new Map(links.map(link => [link.mediaId, link])) : null);
+      }
     } catch { if (current() && isCurrent()) setMediaLoadError('동영상을 불러오지 못했습니다. 다시 시도해 주시기 바랍니다.'); }
     finally { if (current() && isCurrent()) setMediaLoading(false); }
   }, [organizationId, mediaReads, isCurrent]);
@@ -523,6 +536,19 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
         );
       },
     },
+    {
+      key: 'product',
+      title: '연결 제품',
+      render: (_v: unknown, v: UnifiedVideoItem) => {
+        // 직접 등록한 영상만 매장에서 연결한다. 가져온 사본(snapshot)은 원본 쪽 연결을 따른다.
+        if (v.source !== 'direct' || !v._media) return <span className="text-xs text-slate-400">—</span>;
+        if (!productLinks) return <span className="text-xs text-slate-400">확인 불가</span>;
+        const link = productLinks.get(v._media.id);
+        return link
+          ? <span className="text-sm text-slate-700 break-words">{link.productName}{link.inherited && <span className="ml-1 text-xs text-slate-500">(원본)</span>}</span>
+          : <span className="text-xs text-slate-400">없음</span>;
+      },
+    },
     { key: 'origin', title: '출처', render: (_v: unknown, v: UnifiedVideoItem) => <span className="text-sm text-slate-600">{signageVideoOrigin(v)}</span> },
     { key: 'createdAt', title: '등록일', render: (_v: unknown, v: UnifiedVideoItem) => <span className="text-xs text-slate-500">{new Date(v.createdAt).toLocaleDateString('ko-KR')}</span> },
   ] as Column<UnifiedVideoItem>[];
@@ -612,9 +638,10 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
             actions: [
               { key: 'create', label: '선택 영상으로 재생목록 만들기', disabled: videoActionBusy || checkedVideos.some(video => video.isForced || video.isLocked), onClick: () => { setInitialVideos(checkedVideos.map(video => video.id)); setQuickStart(true); } },
               { key: 'detail', label: '선택 영상 상세·수정', disabled: !checkedVideo || videoActionBusy || checkedVideo.isLocked || checkedVideo.isForced, onClick: () => { if (checkedVideo) handleOpenEdit(checkedVideo); } },
+              { key: 'product', label: '선택 영상 제품 연결', disabled: !checkedVideo || checkedVideo.source !== 'direct' || !checkedVideo._media || !productLinks || videoActionBusy || checkedVideo.isLocked || checkedVideo.isForced, onClick: () => { if (checkedVideo) setProductLinkTarget(checkedVideo); } },
               { key: 'delete', label: '선택 영상 삭제', variant: 'danger', disabled: !checkedVideo || videoActionBusy || checkedVideo.isLocked || checkedVideo.isForced, onClick: () => (checkedVideo ? handleDeleteVideo(checkedVideo) : undefined) },
             ],
-            statusInfo: '여러 영상을 선택해 새 재생목록을 만들 수 있습니다. 상세·수정·삭제는 한 개를 선택합니다.',
+            statusInfo: '여러 영상을 선택해 새 재생목록을 만들 수 있습니다. 상세·수정·삭제·제품 연결은 한 개를 선택합니다. 제품 연결은 직접 등록한 영상만 할 수 있습니다.',
           }}
           pagination={<Pagination page={page} totalPages={totalPages} onPageChange={setPage} total={filteredUnified.length} />}
         >
@@ -1017,6 +1044,17 @@ function SignageSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
         onClose={() => { if (!playlistBusy) setShowLibrarySelector(false); }}
         usageType="signage"
       />
+
+      {productLinkTarget?._media && organizationId && (() => {
+        const media = productLinkTarget._media;
+        const link = productLinks?.get(media.id);
+        return (
+          <VideoProductLinkDialog key={media.id} organizationId={organizationId} mediaId={media.id} videoTitle={productLinkTarget.title}
+            currentListingId={link?.inherited ? null : link?.listingId ?? null} currentProductName={link?.productName ?? null} inherited={!!link?.inherited}
+            onClose={() => setProductLinkTarget(null)}
+            onSaved={() => { setProductLinkTarget(null); videoSelection.clear(); void loadSignageMedia(); }} />
+        );
+      })()}
 
       {/* ─── Media / Snapshot Edit Drawer ─────────── */}
       <StoreSignageMediaEditor key={editingTarget?.kind === 'direct' ? `media:${editingTarget.media.id}` : `snapshot:${editingTarget?.snapshot.id}`}

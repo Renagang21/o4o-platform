@@ -25,6 +25,7 @@ import type { Request, Response, RequestHandler } from 'express';
 import type { DataSource } from 'typeorm';
 import { extractYouTubeVideoId, getYouTubeThumbnail } from '@o4o/types/signage';
 import { SignageMediaUsageService } from '../../signage/services/media-usage.service.js';
+import { MediaProductLinkError, assertSupplierProduct } from '../../signage/services/media-product-link.service.js';
 import { resolveSupplierIdForUser, readOrganizationContext } from '../../../modules/neture/middleware/supplier-context.resolver.js';
 
 const SERVICE_KEY = 'kpa-society';
@@ -80,7 +81,7 @@ function normalizeVideoSource(rawUrl: unknown): NormalizedVideoSource {
 
 const MEDIA_COLS = `
   id, "serviceKey", name, description, "mediaType", "sourceType", "sourceUrl", "embedId",
-  "thumbnailUrl", tags, status, source, scope, "createdByUserId", metadata,
+  "thumbnailUrl", tags, status, source, scope, "createdByUserId", metadata, "productMasterId",
   "createdAt", "updatedAt"
 `;
 
@@ -214,6 +215,17 @@ export function createSupplierSignageMediaController(
       }
       if (req.body?.tags !== undefined) {
         push(`tags = $N`, Array.isArray(req.body.tags) ? req.body.tags.filter((t: unknown) => typeof t === 'string').slice(0, 20) : []);
+      }
+      // 이 영상의 제품 — 내가 공급하는 제품만(WO-O4O-STORE-QR-TABLET-CHANNEL-SEPARATION-V1 T4). null 이면 해제.
+      if (req.body?.productMasterId !== undefined) {
+        const supplier = await resolveSupplierIdForUser(dataSource, userId, readOrganizationContext(req as unknown as Request));
+        if (!supplier) { res.status(403).json({ success: false, error: '활성 공급자만 사용할 수 있습니다.', code: 'SUPPLIER_MEMBERSHIP_REQUIRED' }); return; }
+        try {
+          push(`"productMasterId" = $N`, await assertSupplierProduct(dataSource, supplier.supplierId, req.body.productMasterId));
+        } catch (error) {
+          if (!(error instanceof MediaProductLinkError)) throw error;
+          res.status(error.statusCode).json({ success: false, error: error.message, code: error.code }); return;
+        }
       }
       if (req.body?.metadata !== undefined) {
         const metadata =
