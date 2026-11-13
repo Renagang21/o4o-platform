@@ -10,6 +10,7 @@ import {
   SUPPLIER_VISIBLE_FULFILLMENT_SERVICE_KEYS,
   netureOrderServiceSetSql,
 } from '../constants/fulfillment-service-scope.js';
+import { pageWindow } from '../utils/pagination-sql.util.js';
 
 /** Allowed supplier status transitions */
 const SUPPLIER_STATUS_TRANSITIONS: Record<string, string[]> = {
@@ -61,9 +62,7 @@ export class SupplierOrderService {
   async listOrders(supplierId: string, params: { page: number; limit: number; status?: string }) {
     const { page: rawPage, limit: rawLimit, status } = params;
     // LIMIT/OFFSET 도 binding 한다(Raw SQL 문자열 삽입 금지). page=1e400(Infinity)·소수는 SQL 오류(500)가 되므로 정수로 맞춘다.
-    const page = toPositiveInt(rawPage, 1, 1_000_000);
-    const limit = toPositiveInt(rawLimit, 20, 100);
-    const offset = (page - 1) * limit;
+    const { page, limit, offset } = pageWindow(rawPage, rawLimit, { defaultLimit: 20, maxLimit: 100 });
 
     // WO-O4O-SUPPLIER-FULFILLMENT-SERVICE-SCOPE-V1:
     //   서비스 경계를 $2 로 고정한다(목록·카운트 동일 조건). status 는 $3 으로 밀린다.
@@ -274,11 +273,4 @@ export class SupplierOrderService {
     );
     return rows[0] || null;
   }
-}
-
-/** 1 이상 정수로 맞춘다 — 유한하지 않거나 1 미만이면 fallback, max 초과는 max */
-function toPositiveInt(value: number, fallback: number, max: number): number {
-  const n = Math.floor(Number(value));
-  if (!Number.isFinite(n) || n < 1) return fallback;
-  return Math.min(n, max);
 }

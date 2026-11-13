@@ -112,6 +112,7 @@ import type {
 } from '../entities/SharedProductDescription.entity.js';
 import { DEFAULT_SHARED_PRODUCT_DESCRIPTION_TYPE } from '../entities/SharedProductDescription.entity.js';
 import { sanitizeDescriptionHtml } from '../utils/sanitize-description-html.util.js';
+import { pageWindow, toPositiveInt } from '../utils/pagination-sql.util.js';
 
 /**
  * WO-O4O-COSMETICS-DESCRIPTION-AUTHORING-POLICY-AND-PRODUCTMASTER-PILOT-V2
@@ -444,9 +445,8 @@ export class SharedProductDescriptionService {
     page?: number;
     limit?: number;
   }): Promise<{ items: SupplierStoreReviewRow[]; total: number }> {
-    const page = Math.max(1, params.page ?? 1);
-    const limit = Math.min(100, Math.max(1, params.limit ?? 20));
-    const offset = (page - 1) * limit;
+    // LIMIT/OFFSET 은 binding 한다 — page/limit 은 유한 정수로 맞춘다(Infinity · NaN · 소수 → SQL 오류 방지).
+    const { page, limit, offset } = pageWindow(params.page, params.limit, { defaultLimit: 20, maxLimit: 100 });
 
     const where: string[] = [
       'spd.deleted_at IS NULL',
@@ -506,8 +506,8 @@ export class SharedProductDescriptionService {
          ${fromSql}
         ORDER BY (CASE spd.status WHEN 'needs_review' THEN 0 WHEN 'revision_requested' THEN 1 WHEN 'draft' THEN 2 ELSE 3 END),
                  COALESCE(spd.submitted_at, spd.updated_at) DESC
-        LIMIT ${limit} OFFSET ${offset}`,
-      args,
+        LIMIT $${args.length + 1} OFFSET $${args.length + 2}`,
+      [...args, limit, offset],
     );
     return { items, total };
   }
@@ -720,7 +720,7 @@ export class SharedProductDescriptionService {
     language: string | null,
     limit = 5,
   ): Promise<CanonicalReplaceAuditLogRow[]> {
-    const lim = Math.min(50, Math.max(1, limit));
+    const lim = toPositiveInt(limit, 5, 50);
     return this.dataSource.query(
       `SELECT a.id, a.event_type AS "eventType", a.description_type AS "descriptionType",
               a.master_id AS "masterId", a.language,
@@ -734,8 +734,8 @@ export class SharedProductDescriptionService {
         WHERE a.master_id = $1 AND a.description_type = $2
           AND COALESCE(a.language, 'ko') = COALESCE($3, 'ko')
         ORDER BY a.performed_at DESC
-        LIMIT ${lim}`,
-      [masterId, descriptionType, language],
+        LIMIT $4`,
+      [masterId, descriptionType, language, lim],
     );
   }
 
@@ -988,9 +988,8 @@ export class SharedProductDescriptionService {
     page?: number;
     limit?: number;
   }): Promise<{ items: ReviewListRow[]; total: number }> {
-    const page = Math.max(1, params.page ?? 1);
-    const limit = Math.min(100, Math.max(1, params.limit ?? 20));
-    const offset = (page - 1) * limit;
+    // LIMIT/OFFSET 은 binding 한다 — page/limit 은 유한 정수로 맞춘다(Infinity · NaN · 소수 → SQL 오류 방지).
+    const { page, limit, offset } = pageWindow(params.page, params.limit, { defaultLimit: 20, maxLimit: 100 });
 
     const where: string[] = ['spd.deleted_at IS NULL'];
     const args: unknown[] = [];
@@ -1057,8 +1056,8 @@ export class SharedProductDescriptionService {
                     WHEN 'canonical' THEN 2
                     ELSE 3 END),
                  spd.updated_at DESC
-        LIMIT ${limit} OFFSET ${offset}`,
-      args,
+        LIMIT $${args.length + 1} OFFSET $${args.length + 2}`,
+      [...args, limit, offset],
     );
     return { items: rows, total };
   }

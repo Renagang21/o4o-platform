@@ -1,5 +1,6 @@
 import type { DataSource } from 'typeorm';
 import { VALID_STATUSES, type SettlementFilters } from './settlement-query-types.js';
+import { pageWindow } from '../utils/pagination-sql.util.js';
 
 /** Existing settlement responsibility; public callers use NetureSettlementService. */
 export class SupplierSettlementReadService {
@@ -15,9 +16,7 @@ export class SupplierSettlementReadService {
   async getSupplierSettlements(supplierId: string, filters: SettlementFilters) {
     const { page: rawPage, limit: rawLimit, status } = filters;
     // LIMIT/OFFSET 도 binding 한다(Raw SQL 문자열 삽입 금지). page=1e400(Infinity)·소수는 SQL 오류(500)가 되므로 정수로 맞춘다.
-    const page = toPositiveInt(rawPage, 1, 1_000_000);
-    const limit = toPositiveInt(rawLimit, 20, 100);
-    const offset = (page - 1) * limit;
+    const { page, limit, offset } = pageWindow(rawPage, rawLimit, { defaultLimit: 20, maxLimit: 100 });
 
     const baseParams: any[] = [supplierId];
     let statusClause = '';
@@ -108,11 +107,4 @@ export class SupplierSettlementReadService {
 
     return { success: true, data: { ...settlement, orders } };
   }
-}
-
-/** 1 이상 정수로 맞춘다 — 유한하지 않거나 1 미만이면 fallback, max 초과는 max */
-function toPositiveInt(value: number, fallback: number, max: number): number {
-  const n = Math.floor(Number(value));
-  if (!Number.isFinite(n) || n < 1) return fallback;
-  return Math.min(n, max);
 }
