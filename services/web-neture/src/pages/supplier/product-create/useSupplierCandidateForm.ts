@@ -15,7 +15,11 @@ import {
   type SupplierProductApplyMode,
   type SupplierProductCandidateDraft,
 } from '../../../lib/supplier-product-authoring';
-import { flattenCategories, type SupplierCandidateForm } from './candidateFormHelpers';
+import {
+  flattenCategories,
+  pickImportShortDescription,
+  type SupplierCandidateForm,
+} from './candidateFormHelpers';
 
 export function useSupplierCandidateForm(importDraft: ImportDraft | null) {
   const navigate = useNavigate();
@@ -77,8 +81,14 @@ export function useSupplierCandidateForm(importDraft: ImportDraft | null) {
   const [brands, setBrands] = useState<BrandItem[]>([]);
 
   // Description editor — WO-O4O-PRODUCT-IMPORT-ASSISTANT-V1: draft 초기값 지원
-  const [consumerShortDesc, setConsumerShortDesc] = useState(
-    importDraft?.consumerDetailDesc || importDraft?.consumerShortDesc || '',
+  //   간이 설명 칸(500자)에 들어가는 값만 쓴다 — 긴 상세 설명은 넣지 않고 안내한다(제출 FIELD_TOO_LONG 방지).
+  const initialImportDescription = useMemo(
+    () => (importDraft ? pickImportShortDescription(importDraft) : { value: '', skipped: false }),
+    [importDraft],
+  );
+  const [consumerShortDesc, setConsumerShortDesc] = useState(initialImportDescription.value);
+  const [importDescriptionSkipped, setImportDescriptionSkipped] = useState(
+    initialImportDescription.skipped,
   );
 
   const [submitError, setSubmitError] = useState('');
@@ -319,7 +329,10 @@ export function useSupplierCandidateForm(importDraft: ImportDraft | null) {
   // 같은 폼을 유지한 채 도우미를 연다. 초안·파일·AI 결과를 저장소에 복제하지 않는다.
   const [sourceImportOpen, setSourceImportOpen] = useState(false);
   const goToSourceImport = () => setSourceImportOpen(true);
-  const applySourceImport = (draft: ImportDraft) => {
+  /** Import 초안을 빈 칸에 보완한다. 설명이 간이 설명 한도를 넘어 넣지 못했으면 true. */
+  const applySourceImport = (draft: ImportDraft): boolean => {
+    const picked = pickImportShortDescription(draft);
+    const descriptionSkipped = !consumerShortDesc.trim() && picked.skipped;
     setForm((prev) => ({ ...prev,
       marketingName: prev.marketingName || draft.marketingName,
       brandName: prev.brandName || draft.brandName,
@@ -331,9 +344,11 @@ export function useSupplierCandidateForm(importDraft: ImportDraft | null) {
       consumerReferencePrice: prev.consumerReferencePrice || draft.consumerReferencePrice,
       regulatoryType: prev.regulatoryType,
     }));
-    setConsumerShortDesc((prev) => prev || draft.consumerDetailDesc || draft.consumerShortDesc);
+    setConsumerShortDesc((prev) => prev || picked.value);
+    setImportDescriptionSkipped(descriptionSkipped);
     setCurrentStep(1);
     setSourceImportOpen(false);
+    return descriptionSkipped;
   };
 
   return {
@@ -372,5 +387,6 @@ export function useSupplierCandidateForm(importDraft: ImportDraft | null) {
     sourceImportOpen,
     setSourceImportOpen,
     applySourceImport,
+    importDescriptionSkipped,
   };
 }

@@ -132,9 +132,11 @@ export default function SupplierProductCreatePage() {
     return <SupplierProductImportPage
       onCancel={() => formState.setSourceImportOpen(false)}
       onApplyDraft={(draft) => {
-        formState.applySourceImport(draft);
+        const descriptionSkipped = formState.applySourceImport(draft);
         media.applyImportImages(draft);
         toast.success('빈 입력란과 이미지를 보완했습니다. 기존 입력과 선택한 이미지는 유지됩니다. 확인 후 검토 요청을 제출하시기 바랍니다.');
+        if (descriptionSkipped)
+          toast.error('가져온 상세 설명이 간이 설명 한도(500자)를 넘어 넣지 않았습니다. 요약해 직접 입력해 주시기 바랍니다.');
       }}
     />;
   }

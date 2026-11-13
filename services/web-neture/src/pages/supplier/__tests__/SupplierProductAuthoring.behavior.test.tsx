@@ -542,3 +542,66 @@ describe('external AI draft apply on the Candidate form', () => {
     expect(payload).toMatchObject({ name: '사용자 상품명', barcode: null });
   });
 });
+
+// 간이 설명 칸(서버 500자) — Import 초안 · 직접 입력 모두 제출 전에 막는다
+describe('consumer short description limit', () => {
+  const editorLabel = '소비자에게 보이는 간이 설명을 입력하시기 바랍니다...';
+
+  it('does not prefill an over-limit imported detail description and explains why', async () => {
+    sessionStorage.setItem(
+      'neture-import-draft',
+      JSON.stringify({ marketingName: '초안 상품', categoryId: 'cat-a', consumerShortDesc: '', consumerDetailDesc: `<p>${'가'.repeat(600)}</p>` }),
+    );
+    mount('create');
+    await screen.findByRole('option', { name: '일반 카테고리' });
+    fireEvent.click(screen.getByRole('button', { name: '다음', exact: true }));
+    expect((screen.getByLabelText(editorLabel) as HTMLTextAreaElement).value).toBe('');
+    expect(screen.getByText(/가져온 상세 설명이 간이 설명 한도\(500자\)를 넘어 넣지 않았습니다/)).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: '제품 정보 검토 요청', exact: true }));
+    await screen.findByText('제품 정보 검토 요청 완료');
+    expect(mocks.supplier.submitProductCandidate.mock.lastCall?.[0]).toMatchObject({ offerDraft: { consumerShortDescription: null } });
+  });
+
+  it('prefers the imported short description when present', async () => {
+    sessionStorage.setItem(
+      'neture-import-draft',
+      JSON.stringify({ marketingName: '초안 상품', categoryId: 'cat-a', consumerShortDesc: '<p>간이</p>', consumerDetailDesc: `<p>${'가'.repeat(600)}</p>` }),
+    );
+    mount('create');
+    await screen.findByRole('option', { name: '일반 카테고리' });
+    fireEvent.click(screen.getByRole('button', { name: '다음', exact: true }));
+    expect((screen.getByLabelText(editorLabel) as HTMLTextAreaElement).value).toBe('<p>간이</p>');
+    expect(screen.queryByText(/가져온 상세 설명이 간이 설명 한도/)).toBeNull();
+  });
+
+  it('warns when an in-page source import skips an over-limit description', async () => {
+    mount('create');
+    await screen.findByRole('option', { name: '일반 카테고리' });
+    fireEvent.click(screen.getByRole('button', { name: /상세페이지 소스로 자동 입력/ }));
+    const longHtml = firstmallHtml.replace('&lt;p&gt;검증 본문&lt;/p&gt;', `&lt;p&gt;${'가'.repeat(600)}&lt;/p&gt;`);
+    fireEvent.change(screen.getByLabelText('관리자 HTML *'), { target: { value: longHtml } });
+    fireEvent.click(screen.getByRole('button', { name: '관리자 상품 데이터 분석' }));
+    fireEvent.click(screen.getByRole('button', { name: '상품 등록 페이지로 이동 →' }));
+    await waitFor(() => expect(mocks.toast.error).toHaveBeenCalledWith(expect.stringContaining('간이 설명 한도(500자)')));
+    expect(mocks.supplier.submitProductCandidate).not.toHaveBeenCalled();
+  });
+
+  it('blocks an over-limit description before uploading images or submitting', async () => {
+    const view = await createStep3();
+    const file = new File(['fixture'], 'kept.png', { type: 'image/png' });
+    fireEvent.change(view.container.querySelector('input[type="file"][accept="image/*"]') as HTMLInputElement, { target: { files: [file] } });
+    fireEvent.change(screen.getByLabelText(editorLabel), { target: { value: '다'.repeat(501) } });
+    expect(screen.getByText(/501 \/ 500자 \(서식 포함\)/)).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: '제품 정보 검토 요청', exact: true }));
+    expect(await screen.findByText(/500자\(서식 포함\)를 넘습니다\(현재 501자\)/)).toBeTruthy();
+    expect(mocks.media.upload).not.toHaveBeenCalled();
+    expect(mocks.supplier.submitProductCandidate).not.toHaveBeenCalled();
+
+    fireEvent.change(screen.getByLabelText(editorLabel), { target: { value: '다'.repeat(500) } });
+    fireEvent.click(screen.getByRole('button', { name: '제품 정보 검토 요청', exact: true }));
+    await screen.findByText('제품 정보 검토 요청 완료');
+    expect(mocks.supplier.submitProductCandidate.mock.lastCall?.[0]).toMatchObject({
+      offerDraft: { consumerShortDescription: '다'.repeat(500) },
+    });
+  });
+});

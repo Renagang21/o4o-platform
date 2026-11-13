@@ -77,9 +77,9 @@ FROZEN 본문·canonical index·과거 WO를 이 문서에 맞춰 인라인으�
 | 결함 2 — 숨은 가격 | Candidate 는 가격·추천 표시를 받지 않고 화면 입력란도 없는데, AI 가격·isFeatured 를 숨은 폼 값에 적용하고 "적용했다"고 표시. 요청문에도 숨은 가격을 실어 외부 AI 로 보냄. → 미적용 + 후속 공급 등록 안내, 요청문 가격 null 고정 |
 | 결함 3 — 취소 없음 | 덮어쓰기 적용 후 되돌릴 방법이 없음. → 마지막 적용 직전 상태로 되돌리는 [적용 취소](저장 아님). 적용이 시작한 바코드 조회의 늦은 결과는 무시(조회 순번) |
 | 보완 — 확인 표시 | AI 가 읽은 바코드·허가번호는 「확인 필요」, 결과 null 로 비어 남은 기본 항목은 「미확인」 안내 |
-| 범위 밖 발견 | Import Assistant 초안도 상세 설명을 간이 설명 칸 초깃값으로 넣어 같은 500자 실패 가능(`useSupplierCandidateForm` 초기값) — 별도 수정 대상으로 인계 |
+| 후속 수정 — Import 초안 | Import Assistant 초안도 상세 설명을 간이 설명 칸에 넣어 같은 500자 실패 가능(진입 초깃값 · 화면 안 소스 가져오기 둘 다). → 간이 설명 우선 · 한도 안의 값만 · 넘치면 비우고 안내. 간이 설명 칸에 `n / 500자 (서식 포함)` 표시, 제출 전 한도 초과를 이미지 업로드 전에 차단(직접 입력 포함) |
 
-검증: web-neture Vitest 185 files / 1582 tests PASS(신규 apply 2 · 화면 2), `tsc --noEmit` PASS, 변경 파일 ESLint 0, `pnpm --filter @o4o/web-neture build` PASS. 브라우저 확인은 배포 후 Demo 공급자로 한다(미실행). 서버·schema·API 계약 변경 없음, 내부 LLM 호출 0.
+검증: web-neture Vitest 186 files / 1591 tests PASS(신규 apply 2 · 화면 6 · 설명 선택 5), `tsc --noEmit` PASS, 변경 파일 ESLint 0, `pnpm --filter @o4o/web-neture build` PASS. 브라우저 확인은 배포 후 Demo 공급자로 한다(미실행). 서버·schema·API 계약 변경 없음, 내부 LLM 호출 0.
 
 **산출물/종료점**: 기존 기능의 통과·결함·미실행 목록, 필요한 최소 수정, 관련 테스트·브라우저 검증. 결함이 없으면 불필요한 코드 변경 없이 결과를 남긴다.
 
