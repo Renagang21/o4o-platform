@@ -204,7 +204,10 @@ export default function StoreProductImageManagerModal({ masterId, productName, o
 
     setReordering(true);
     try {
-      const items = orderedImages.map((img, idx) => ({ id: img.id, sortOrder: idx }));
+      // 본인이 매장에서 올린 이미지의 순서만 저장한다(공용 이미지는 서버가 거절한다).
+      const items = orderedImages.map((img, idx) => ({ id: img.id, sortOrder: idx, editable: img.editable === true }))
+        .filter((item) => item.editable).map(({ id, sortOrder }) => ({ id, sortOrder }));
+      if (items.length === 0) return;
       await reorderImages(items);
       invalidate();
     } catch {
@@ -304,13 +307,13 @@ export default function StoreProductImageManagerModal({ masterId, productName, o
               {/* 이미지 유형 선택 */}
               <div className="relative">
                 <select
+                  title="매장에서는 상세 · 콘텐츠 이미지만 추가할 수 있습니다"
                   value={selectedType}
                   onChange={(e) => setSelectedType(e.target.value as ImageType)}
                   className="appearance-none rounded-lg border border-gray-200 bg-white pl-3 pr-7 py-2 text-sm text-gray-700 focus:border-blue-400 focus:outline-none cursor-pointer"
                   disabled={importing}
                 >
                   <option value="detail">상세</option>
-                  <option value="thumbnail">썸네일</option>
                   <option value="content">콘텐츠</option>
                 </select>
                 <ChevronDown size={12} className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -386,8 +389,8 @@ export default function StoreProductImageManagerModal({ masterId, productName, o
           {/* 이미지 유형 안내 */}
           <div className="rounded-lg border border-gray-100 bg-gray-50 px-4 py-3 text-xs text-gray-500 space-y-1">
             <p className="font-medium text-gray-600">이미지 유형 안내</p>
-            <p><b>썸네일</b>: 목록 카드 대표 이미지. 상품당 1개. 등록 시 기존 썸네일 교체.</p>
-            <p><b>상세</b>: 상품 상세 페이지 이미지. 다수 등록 가능. 첫 등록 시 자동 대표 이미지.</p>
+            <p><b>상세</b>: 상품 상세 페이지 이미지. 다수 등록 가능. 이미지가 없는 상품이면 첫 등록 이미지가 대표가 됩니다.</p>
+            <p>공급자 · 운영자가 등록한 이미지와 대표 이미지는 모든 매장이 함께 쓰므로 여기서 바꿀 수 없습니다. 내가 올린 이미지만 정렬 · 삭제할 수 있습니다.</p>
             <p><b>콘텐츠</b>: 상세 설명 본문용 이미지. 다수 등록 가능.</p>
           </div>
         </div>
@@ -430,11 +433,11 @@ function ImageCard({
 }) {
   return (
     <div
-      draggable
-      onDragStart={onDragStart}
-      onDragOver={onDragOver}
-      onDragEnd={onDragEnd}
-      className={`relative group rounded-lg overflow-hidden border cursor-grab active:cursor-grabbing ${
+      draggable={image.editable === true}
+      onDragStart={image.editable === true ? onDragStart : undefined}
+      onDragOver={image.editable === true ? onDragOver : undefined}
+      onDragEnd={image.editable === true ? onDragEnd : undefined}
+      className={`relative group rounded-lg overflow-hidden border ${image.editable === true ? 'cursor-grab active:cursor-grabbing' : ''} ${
         image.isPrimary ? 'border-blue-400 ring-2 ring-blue-200' : 'border-gray-200'
       } bg-gray-100`}
     >
@@ -469,8 +472,8 @@ function ImageCard({
         )}
       </div>
 
-      {/* 호버 액션 */}
-      <div className="absolute inset-0 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 bg-black/40 transition-opacity">
+      {/* 호버 액션 — 본인이 매장에서 올린 이미지만 */}
+      {image.editable === true ? <div className="absolute inset-0 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 bg-black/40 transition-opacity">
         {!image.isPrimary && (
           <button
             onClick={onSetPrimary}
@@ -489,7 +492,7 @@ function ImageCard({
         >
           <Trash2 size={14} className="text-red-500" />
         </button>
-      </div>
+      </div> : <span className="absolute bottom-1 left-1 rounded bg-black/50 px-1.5 py-0.5 text-[10px] text-white">공용</span>}
 
       {isDeleting && (
         <div className="absolute inset-0 flex items-center justify-center bg-white/70">

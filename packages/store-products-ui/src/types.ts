@@ -61,6 +61,8 @@ export interface ProductImageItem {
   isPrimary: boolean;
   sortOrder: number;
   createdAt: string;
+  /** 이 계정이 매장에서 올린 이미지인지 — true 일 때만 정렬 · 삭제 · 대표 지정(공용 이미지 보호). 없으면 false 로 본다. */
+  editable?: boolean;
 }
 
 // ── 채널 ────────────────────────────────────────────────────────────────────
