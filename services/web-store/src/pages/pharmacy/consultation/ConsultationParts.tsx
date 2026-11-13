@@ -32,10 +32,8 @@ type Speech = ReturnType<typeof useConsultationSpeech>;
 
 function modeLabel(mode: Mode) {
   if (mode.allowed) return mode.label;
-  return (
-    mode.label +
-    (mode.entitled ? " · 개인 약사 자격·약국 업무 허용 확인 필요" : " · 제공 자격 필요")
-  );
+  // 상담은 매장 단위 이용 자격으로 판단한다 — 쓸 수 없으면 매장 기능이 없는 경우뿐이다.
+  return `${mode.label} · 매장 기능 필요`;
 }
 export function ConsultationSelectors({
   context,

@@ -12,7 +12,6 @@ import { CooperativeService } from './services/cooperative.service.js';
 import { MemberPaidFeatureService, createPharmacyFeatureService } from './services/member-paid-features.js';
 import { PharmacyServicePolicyService } from './services/service-feature-policy.js';
 import { saveStaffFeatures } from './services/staff-feature-permissions.js';
-import { consultationProfessionalConfirmed, confirmOwnerPharmacist } from './services/consultation-professional.js';
 import { MultilingualConsultationService, type ConsultationDependencies } from './services/multilingual-consultation.js';
 import { ConsultationStationService } from './services/consultation-stations.js';
 import { ConsultationKioskService } from './services/consultation-kiosk.js';
@@ -146,7 +145,7 @@ export function createNeturePharmacyRoutes(dataSource: DataSource, consultationD
   router.use('/cooperative-management', cooperativeManagementRoutes(dataSource));
   const serviceFeatures = createPharmacyFeatureService(dataSource);
   const consultationDeps = consultationDependencies ?? {
-    translate: createConsultationTranslator(dataSource), professional: (userId:string, organizationId:string) => consultationProfessionalConfirmed(dataSource, userId, organizationId),
+    translate: createConsultationTranslator(dataSource),
   };
   const consultation = new MultilingualConsultationService(dataSource,consultationDeps);
   const proposals = new SupplyProposalService(dataSource);
@@ -189,13 +188,15 @@ export function createNeturePharmacyRoutes(dataSource: DataSource, consultationD
   const stationProducts = new StoreStaffSupportService(dataSource);
   const guidance=new ConsultationGuidanceService(dataSource,
     (actor,org,mode)=>consultation.requireMode(actor,org,mode),
-    async(actor,org)=>{await serviceFeatures.require(actor,org,'store-staff-support');},
+    // 상담은 매장 단위로 판단한다(2026-11-13 사용자 결정) — 직원 초대 · 근무자별 허용은 매장 관리 기능용이다.
+    // 매장 소속 확인은 requireMode 가 먼저 한다.
+    async(_actor,org)=>{await serviceFeatures.requireStore(org,'store-staff-support');},
     consultationDependencies?.selectGuidance ?? createConsultationGuidanceSelector(dataSource),consultationDeps.translate,
     org => new ConsultationExpressionService(dataSource).values(org));
   const stations = new ConsultationStationService(dataSource,
     (actor,organizationId,mode)=>consultation.requireMode(actor,organizationId,mode),
     async (actor,organizationId,input)=>{
-      await serviceFeatures.require(actor,organizationId,'store-staff-support');
+      await serviceFeatures.requireStore(organizationId,'store-staff-support');
       return stationProducts.product(organizationId,input.productKind,input.productId);
     },(actor,org,proof)=>guidance.verify(actor,org,proof),
     (actor,org,mode,proof)=>guidance.verifySupportSource(actor,org,mode,proof));
@@ -203,7 +204,7 @@ export function createNeturePharmacyRoutes(dataSource: DataSource, consultationD
     consultationDependencies?.supportConsultation ?? createConsultationSupportRunner(dataSource));
   const kiosk = new ConsultationKioskService(dataSource, {
     requireMode: (actor,org,mode)=>consultation.requireMode(actor,org,mode),
-    requireProductSupport: async(actor,org)=>{await serviceFeatures.require(actor,org,'store-staff-support');},
+    requireProductSupport: async(_actor,org)=>{await serviceFeatures.requireStore(org,'store-staff-support');},
     guidance, products: stationProducts, translate: consultationDeps.translate,
   });
   router.use(consultationWorkspaceRoutes(dataSource,stations,store,admin,guidance,consultationSupport,kiosk));
@@ -459,9 +460,6 @@ export function createNeturePharmacyRoutes(dataSource: DataSource, consultationD
     const prepared = { ...result, ...(input.supportSource !== undefined ? { supportSource: input.supportSource } : {}) };
     return input.stationId === undefined ? prepared : stations.recordTranslation(req.user!.id,org(req),input.stationId,input.epoch,prepared);
   }));
-  router.put('/pharmacy/pharmacist-confirmation', ...store, handle(async (req, res) => {
-    res.setHeader('Cache-Control', 'private, no-store'); return confirmOwnerPharmacist(dataSource, req.user!.id, org(req), req.body?.confirmed);
-  }));
   router.get('/admin/service-features', ...admin, handle(() => Promise.resolve(PHARMACY_SERVICE_FEATURES)));
   const featurePolicies = new PharmacyServicePolicyService(dataSource);
   router.get('/admin/service-feature-policies', ...admin, handle(async (_req, res) => {
@@ -486,7 +484,7 @@ export function createNeturePharmacyRoutes(dataSource: DataSource, consultationD
     if (!owners.length) throw new NeturePharmacyError(403, 'STORE_OWNER_REQUIRED', '근무자 기능 설정은 경영자가 할 수 있습니다.');
     const access = await serviceFeatures.resolveStore(org(req));
     return saveStaffFeatures(dataSource, org(req), uuidParam(req, 'userId'), req.body?.serviceFeatures,
-      access.features.filter(feature => feature.allowed === true).map(feature => feature.key), false, req.body?.pharmacistConfirmed);
+      access.features.filter(feature => feature.allowed === true).map(feature => feature.key), false);
   }));
   const memberPaidFeatures = new MemberPaidFeatureService(dataSource);
   router.get('/admin/member-paid-entitlements', ...admin, handle(async (req, res) => { res.setHeader('Cache-Control', 'private, no-store'); return memberPaidFeatures.find(req.query.email); }));

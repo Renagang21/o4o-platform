@@ -9,6 +9,7 @@ export type ConsultationProduct = {
 };
 export function ConsultationProducts({
   query,
+  mode,
   onShare,
   onShow,
   busy,
@@ -16,6 +17,8 @@ export function ConsultationProducts({
   selectLabel,
 }: {
   query: string;
+  /** 상담 방식 — 서버가 매장 단위 상담 권한으로 검색을 허용한다. */
+  mode: string;
   onShare?: (p: ConsultationProduct) => void;
   onShow?: (p: ConsultationProduct) => void;
   onSelect?: (p: ConsultationProduct) => void;
@@ -36,8 +39,8 @@ export function ConsultationProducts({
     if (query)
       coreApiClient
         .get<{ success: boolean; data: ConsultationProduct[] }>(
-          "/neture/pharmacy/staff-support/products",
-          { q: query },
+          "/neture/pharmacy/consultation-products",
+          { q: query, mode },
         )
         .then((r) => {
           if (!r.success || !Array.isArray(r.data))
@@ -53,7 +56,7 @@ export function ConsultationProducts({
     return () => {
       alive = false;
     };
-  }, [query, retry]);
+  }, [query, mode, retry]);
   return (
     <div aria-live="polite" className="space-y-3">
       {loading && <p>상품을 찾고 있습니다…</p>}

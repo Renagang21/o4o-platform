@@ -1,12 +1,11 @@
 import { Request, Response } from 'express';
 import type { DataSource } from 'typeorm';
-import { NetureService } from '../../neture.service.js';
+import { createRequireActiveSupplier } from '../../middleware/neture-identity.middleware.js';
 import {
   SupplierProductImageService,
   isSupplierOwnedImage,
   type ProductImageRow,
 } from '../../services/supplier-product-image.service.js';
-import { SupplierStatus } from '../../entities/index.js';
 export type AuthenticatedRequest = Request & { user?: { id: string; role: string } };
 export type SupplierRequest = Request & { supplierId: string };
 export const NOT_OWNED = {
@@ -26,48 +25,11 @@ export const CANNOT_REPLACE_PRIMARY = {
 };
 export function createSupplierImageAccess(
   dataSource: DataSource,
-  netureService: Pick<NetureService, 'getSupplierByUserId'>,
   imageService: Pick<SupplierProductImageService, 'getImage'>,
 ) {
-  async function requireActiveSupplier(
-    req: Request,
-    res: Response,
-    next: () => void,
-  ): Promise<void> {
-    const authReq = req as AuthenticatedRequest;
-    if (!authReq.user?.id) {
-      res
-        .status(401)
-        .json({
-          success: false,
-          error: { code: 'UNAUTHORIZED', message: 'Authentication required' },
-        });
-      return;
-    }
-    const supplier = await netureService.getSupplierByUserId(authReq.user.id);
-    if (!supplier) {
-      res
-        .status(403)
-        .json({
-          success: false,
-          error: { code: 'NO_SUPPLIER', message: 'No linked supplier account found' },
-        });
-      return;
-    }
-    if (supplier.status !== SupplierStatus.ACTIVE) {
-      res.status(403).json({
-        success: false,
-        error: {
-          code: 'SUPPLIER_NOT_ACTIVE',
-          message: `Supplier account is ${supplier.status}. Only ACTIVE suppliers can perform this action.`,
-        },
-        currentStatus: supplier.status,
-      });
-      return;
-    }
-    (req as SupplierRequest).supplierId = supplier.id;
-    next();
-  }
+  // 표준 공급자 guard — 조직 지정(409) · Neture 회원 상태 · 조회 실패 503 까지 다른 공급자 경로와 같게 판정한다.
+  // 예전 자체 판정(getSupplierByUserId)은 조직이 여럿이면 항상 403 이었고 DB 오류도 403 NO_SUPPLIER 로 바꿨다.
+  const requireActiveSupplier = createRequireActiveSupplier(dataSource);
   async function ownsMaster(supplierId: string, masterId: string): Promise<boolean> {
     if (!masterId) return false;
     const rows = await dataSource.query(

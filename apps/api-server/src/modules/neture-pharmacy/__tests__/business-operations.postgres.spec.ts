@@ -8,7 +8,6 @@ import { ServicePolicyDocument } from "../../service-legal/entities/ServicePolic
 import { businessOperationsRoutes } from "../business-operations.routes.js";
 import { businessPolicyScope } from "../services/business-policy-scope.js";
 import { SemiFranchiseService } from "../services/semi-franchise.service.js";
-import { consultationProfessionalConfirmed } from "../services/consultation-professional.js";
 import { StoreStaffSupportService } from "../services/store-staff-support.js";
 import { CooperativeManagementService } from "../services/cooperative-management.service.js";
 import { computePolicyContentHash } from "../../policy-acceptance/policy-acceptance.service.js";
@@ -356,7 +355,8 @@ suite("business operations on canonical PostgreSQL schema", () => {
         .stores,
     ).toEqual([]);
   });
-  it("shows short guides only for active membership and uses owner confirmation independently of old KPA records", async () => {
+  // 2026-11-13: 근무자별 약사 확인(owner confirmation)은 상담에서 쓰지 않아 그 검증을 뺐다 — 상담은 매장 단위로 판단한다.
+  it("shows short guides only for active membership", async () => {
     const contentId = randomUUID();
     await db.query(
       `INSERT INTO semi_franchise_contents(id,semi_franchise_id,title,status,tags) VALUES($1,$2,'Short guide','published','["staff-quick-guide"]')`,
@@ -369,19 +369,6 @@ suite("business operations on canonical PostgreSQL schema", () => {
     );
     expect(await new StoreStaffSupportService(db).guides(store)).toHaveLength(
       1,
-    );
-    expect(await consultationProfessionalConfirmed(db, staff, store)).toBe(
-      false,
-    );
-    await db.query(
-      `UPDATE organization_members SET metadata='{"pharmacyPharmacistConfirmed":true}' WHERE organization_id=$1 AND user_id=$2`,
-      [store, staff],
-    );
-    expect(await consultationProfessionalConfirmed(db, staff, store)).toBe(
-      true,
-    );
-    expect(await consultationProfessionalConfirmed(db, staff, otherStore)).toBe(
-      false,
     );
   });
   it("supports a dynamic cooperative namespace through local admin authority and personal enrollment", async () => {

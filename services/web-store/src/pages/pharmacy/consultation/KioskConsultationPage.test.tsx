@@ -13,7 +13,7 @@ beforeEach(() => {
   respond = (action, body) => {
     if (action === 'claim') return ok(credential);
     if (action === 'context') return ok(context);
-    if (action === 'search') return ok({ state: 'products', language: body.language, products: [{ kind: 'listing', id: 'p1', name: '비타민C' }] });
+    if (action === 'search') return ok({ state: 'products', language: body.language, products: [{ kind: 'listing', id: 'p1', name: '비타민C', location: { text: 'Product location: Shelf B-2', language: 'en' } }] });
     if (action === 'answer') return ok({ state: 'ready', intent: body.intent, language: 'en', card: { kind: 'product', title: '비타민C', text: 'Product location: Shelf A-1', language: 'en', requestedLanguage: 'en', publicKey: null, fallbackUsed: false, translated: true } });
     if (action === 'pharmacist') return ok({ state: 'ready', intent: 'pharmacist', language: body.language, card: { kind: 'notice', title: 'Ask a pharmacist', text: 'Please ask a pharmacist about choosing or taking medicines.', language: 'en', requestedLanguage: 'en', publicKey: null, fallbackUsed: false, translated: false } });
     return { status: 404, body: { success: false } };
@@ -39,20 +39,20 @@ it('connects with a code without any staff login and keeps only a device credent
   expect(fetchMock.mock.calls.every(([, init]) => (init as RequestInit).credentials === 'omit')).toBe(true);
 });
 
-it('lets a customer pick a language, find a product and read its location in that language', async () => {
+it('lets a customer pick a language, find a product and see its location right in the results', async () => {
   localStorage.setItem('o4o:consultation-kiosk-device:v1', JSON.stringify(credential));
   render(<KioskConsultationPage />);
   fireEvent.click(await screen.findByRole('button', { name: 'English · 영어' }));
   expect(screen.getByRole('heading', { name: 'Product help' })).toBeTruthy();
   fireEvent.change(screen.getByLabelText('Product you are looking for'), { target: { value: 'vitamin' } });
   fireEvent.click(screen.getByRole('button', { name: 'Find product' }));
-  fireEvent.click(await screen.findByRole('button', { name: '비타민C' }));
+  const results = await screen.findByRole('region', { name: 'Products found' });
+  expect(within(results).getByText('Product location: Shelf B-2').getAttribute('lang')).toBe('en');
   expect(calls.find(call => call.action === 'search')!.body).toEqual({ ...{ id: credential.id, token: credential.token }, text: 'vitamin', language: 'en' });
-  fireEvent.click(screen.getByRole('button', { name: 'Show location' }));
-  const card = await screen.findByRole('region', { name: '비타민C', hidden: false });
-  expect(await within(document.body).findByText('Product location: Shelf A-1')).toBeTruthy();
-  expect(card).toBeTruthy();
-  expect(calls.find(call => call.action === 'answer')!.body).toMatchObject({ intent: 'location', productKind: 'listing', productId: 'p1', language: 'en' });
+  fireEvent.click(within(results).getByRole('button', { name: '비타민C' }));
+  expect(within(screen.getByRole('region', { name: '비타민C' })).getByText('Product location: Shelf B-2')).toBeTruthy();
+  expect(screen.queryByRole('button', { name: 'Show location' })).toBeNull();
+  expect(calls.some(call => call.action === 'answer')).toBe(false);
 });
 
 it('sends an optional product question for AI-picked published paragraphs and offers the pharmacist notice', async () => {
@@ -112,9 +112,30 @@ it('locks product choices while guidance is being prepared so a late answer cann
   fireEvent.change(await screen.findByLabelText('찾으시는 상품'), { target: { value: '비타민' } });
   fireEvent.click(screen.getByRole('button', { name: '상품 찾기' }));
   fireEvent.click(await screen.findByRole('button', { name: '비타민C' }));
-  fireEvent.click(screen.getByRole('button', { name: '위치 보기' }));
+  fireEvent.click(screen.getByRole('button', { name: '제품 설명 보기' }));
   expect((screen.getByRole('button', { name: '유산균' }) as HTMLButtonElement).disabled).toBe(true);
   await act(async () => { release(); });
   expect(await screen.findByText('Product location: Shelf A-1')).toBeTruthy();
   expect((screen.getByRole('button', { name: '유산균' }) as HTMLButtonElement).disabled).toBe(false);
+});
+
+it('shows the Korean original alongside translated locations and answers when the server provides it', async () => {
+  localStorage.setItem('o4o:consultation-kiosk-device:v1', JSON.stringify(credential));
+  const base = respond;
+  respond = (action, body) => {
+    if (action === 'search') return ok({ state: 'products', language: 'en', products: [{ kind: 'listing', id: 'p1', name: '비타민C',
+      location: { text: 'Product location: Shelf B-2', language: 'en', korean: '상품 위치: 2번 진열대' } }] });
+    if (action === 'answer') return ok({ state: 'ready', intent: 'product-details', language: 'en', card: { kind: 'guidance', title: '비타민C',
+      text: 'Take one tablet a day', language: 'en', requestedLanguage: 'en', publicKey: null, fallbackUsed: false, translated: true, korean: '하루 1정 복용' } });
+    return base(action, body);
+  };
+  render(<KioskConsultationPage />);
+  fireEvent.click(await screen.findByRole('button', { name: 'English · 영어' }));
+  fireEvent.change(screen.getByLabelText('Product you are looking for'), { target: { value: 'vitamin' } });
+  fireEvent.click(screen.getByRole('button', { name: 'Find product' }));
+  const results = await screen.findByRole('region', { name: 'Products found' });
+  expect(within(results).getByText('한국어 · 상품 위치: 2번 진열대').getAttribute('lang')).toBe('ko');
+  fireEvent.click(within(results).getByRole('button', { name: '비타민C' }));
+  fireEvent.click(screen.getByRole('button', { name: 'Product information' }));
+  expect((await screen.findByText('한국어 · 하루 1정 복용')).getAttribute('lang')).toBe('ko');
 });
