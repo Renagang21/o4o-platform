@@ -9,6 +9,7 @@
 
 import type { DataSource } from 'typeorm';
 import type { Request, Response, NextFunction } from 'express';
+import logger from './logger.js';
 import {
   resolveSupplierIdForUser,
   readOrganizationContext,
@@ -46,7 +47,23 @@ export function createRequireSupplier(dataSource: DataSource) {
       return;
     }
 
-    const { isSupplier, supplierId } = await resolveSupplier(dataSource, user.id, readOrganizationContext(req));
+    let resolved: Awaited<ReturnType<typeof resolveSupplier>>;
+    try {
+      resolved = await resolveSupplier(dataSource, user.id, readOrganizationContext(req));
+    } catch (err) {
+      // Express 4 는 async middleware reject 를 잡지 않는다 — 응답 없이 멈추거나 운영 인스턴스 종료로 이어진다.
+      // 일시 오류를 '공급자 아님(403)'으로 바꾸지 않고 503 으로 알린다.
+      logger.error('[SupplierUtils] requireSupplier supplier context lookup failed', { error: (err as Error)?.message });
+      if (!res.headersSent) {
+        res.status(503).json({
+          success: false,
+          error: '공급자 정보를 확인하지 못했습니다. 잠시 후 다시 시도해 주시기 바랍니다.',
+          code: 'SUPPLIER_CONTEXT_UNAVAILABLE',
+        });
+      }
+      return;
+    }
+    const { isSupplier, supplierId } = resolved;
     if (isSupplier && supplierId) {
       (req as any).supplierId = supplierId;
       next();

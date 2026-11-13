@@ -120,7 +120,6 @@ it("shows paid eligibility, approved memberships and the union sources without o
                     key: "consultation",
                     label: "약사 상담",
                     allowed: false,
-                    requiresProfessional: true,
                     sources: [],
                   },
                 ],
@@ -144,7 +143,8 @@ it("shows paid eligibility, approved memberships and the union sources without o
   await screen.findByText("유효한 유료 자격: 없음");
   expect(screen.getByText("합성 약국")).toBeTruthy();
   expect(screen.getByText(/합성 협력사업 가입으로 제공/)).toBeTruthy();
-  expect(screen.getByText("약사 사용 확인이 별도로 필요합니다.")).toBeTruthy();
+  // 2026-11-13: 상담은 매장 단위로 판단하므로 약사 사용 확인 안내를 표시하지 않는다.
+  expect(screen.queryByText("약사 사용 확인이 별도로 필요합니다.")).toBeNull();
   expect(screen.queryByRole("button", { name: "승인" })).toBeNull();
   expect(api.put).not.toHaveBeenCalled();
 });

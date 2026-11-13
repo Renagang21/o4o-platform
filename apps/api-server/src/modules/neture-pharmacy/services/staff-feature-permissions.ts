@@ -1,6 +1,6 @@
 import type { DataSource } from 'typeorm';
 import { NeturePharmacyError } from '../constants.js';
-import { PHARMACY_SERVICE_FEATURES, readServiceFeatures, validateServiceFeatures, type PharmacyServiceFeature } from './service-features.js';
+import { readServiceFeatures, validateServiceFeatures, type PharmacyServiceFeature } from './service-features.js';
 
 type Executor = Pick<DataSource, 'query'>;
 // Compatibility is deliberately fixed: a future feature must not authorize legacy staff automatically.
@@ -20,23 +20,20 @@ export async function resolveStaffFeatures(db: Executor, userId: string, organiz
   return readStaffFeatures(rows[0].features, rows[0].configured === true);
 }
 
-/** The caller must resolve the owner's store. Updates cannot create a relationship or change its role. */
+/**
+ * The caller must resolve the owner's store. Updates cannot create a relationship or change its role.
+ * 근무자별 약사 확인은 쓰지 않는다(2026-11-13 — 상담은 매장 단위, 약국 경영자 = 약사). 남아 있던 확인 값은 저장할 때 지운다.
+ */
 export async function saveStaffFeatures(db: Executor, organizationId: string, userId: string,
-  input: unknown, available: readonly PharmacyServiceFeature[], pending = false, pharmacistConfirmed?: unknown) {
+  input: unknown, available: readonly PharmacyServiceFeature[], pending = false) {
   const features = validateServiceFeatures(input);
-  const professional = PHARMACY_SERVICE_FEATURES.filter(feature => 'requiresProfessional' in feature && feature.requiresProfessional).map(feature => feature.key);
-  if ((pharmacistConfirmed !== undefined && typeof pharmacistConfirmed !== 'boolean') ||
-    (features.some(feature => professional.includes(feature as typeof professional[number])) && pharmacistConfirmed !== true)) {
-    throw new NeturePharmacyError(400, 'PHARMACIST_CONFIRMATION_REQUIRED', '약사 상담을 허용하려면 해당 근무자가 약사임을 확인해 주시기 바랍니다.');
-  }
   if (features.some(feature => !available.includes(feature))) {
     throw new NeturePharmacyError(400, 'FEATURE_NOT_AVAILABLE', '현재 약국에서 이용 가능한 기능만 허용할 수 있습니다.');
   }
   const result = await db.query(`UPDATE organization_members
-    SET metadata=jsonb_set(COALESCE(metadata,'{}'::jsonb),'{pharmacyServiceFeatures}',$3::jsonb,true)
-      || CASE WHEN $5::boolean IS NULL THEN '{}'::jsonb ELSE jsonb_build_object('pharmacyPharmacistConfirmed',$5::boolean) END, updated_at=NOW()
+    SET metadata=jsonb_set(COALESCE(metadata,'{}'::jsonb),'{pharmacyServiceFeatures}',$3::jsonb,true) - 'pharmacyPharmacistConfirmed', updated_at=NOW()
     WHERE organization_id=$1 AND user_id=$2 AND left_at IS NULL AND role=$4 RETURNING user_id`,
-  [organizationId, userId, JSON.stringify(features), pending ? 'accepted' : 'staff', pharmacistConfirmed ?? null]);
+  [organizationId, userId, JSON.stringify(features), pending ? 'accepted' : 'staff']);
   const rows = Array.isArray(result[0]) ? result[0] : result;
   if (!rows.length) throw new NeturePharmacyError(404, 'STAFF_MEMBER_NOT_FOUND', '해당 매장의 근무자를 확인해 주시기 바랍니다.');
   return { organizationId, userId, serviceFeatures: features };

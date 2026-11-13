@@ -86,7 +86,7 @@ export function useConsultationStation(
         () =>
           openConsultationStation({
             stationKey,
-            name: stationKey === "counter-1" ? "매대 1" : stationKey,
+            name: stationKey === "counter-1" ? "상담 1" : stationKey,
             mode,
             language: initialLanguage,
             replace,

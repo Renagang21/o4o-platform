@@ -1,5 +1,102 @@
 # HANDOFF
 
+## 2026-11-13 · 공급자 API 안정성 · 경계 보완 (branch `claude/supplier-api-stability`)
+
+- **근거 / PR 묶음:** 공급자 전반 조사(같은 세션, 화면 · API · 문서 3갈래) 결과의 1순위 묶음. **이 branch 단독 1 PR**(api-server 공급자 모듈 · 서비스 PR, schema · migration 없음). 화면 수정 PR #1057(`claude/focused-edison-ky4e3u`)과 파일이 겹치지 않는다 — 섞지 않으려고 사용자 확인 후 branch 를 분리했다. PR 은 만들지 않았다.
+- **한 일:**
+  - 공급자 guard(`createRequireActiveSupplier` · `createRequireLinkedSupplier` · copilot `createRequireSupplier`)가 DB 오류에 503 `SUPPLIER_CONTEXT_UNAVAILABLE` 로 응답 — Express 4.22.3 은 async middleware reject 를 잡지 않아 요청이 멈추고, 운영은 `unhandledRejection` → `gracefulShutdown` 으로 인스턴스가 내려갈 수 있었다.
+  - `GET /neture/products/:masterId/images`: 삭제(`deleted_at`) 이미지 제외 · 공개 컬럼만 반환(`gcsPath` · `createdBy` · `deletedBy` · `source` 비노출). 화면은 id · imageUrl · isPrimary · sortOrder · type 만 쓴다.
+  - 공급자 내 제품 목록 정렬: `ORDER BY pm.id, <정렬>` → `ORDER BY <정렬>, spo.id`. offer 는 (master, supplier) 유일이라 정렬 선택이 무시되던 문제.
+  - 공급자 주문 처리 · 정산 목록의 `LIMIT ${limit} OFFSET ${offset}` 문자열 삽입 → binding, page/limit 을 유한 정수로 정규화(`Infinity` · 소수 → SQL 오류 방지).
+  - 이미지 URL 등록(`images/from-url`) · 자료함 `fileUrl`: 절대 http(s) URL 만 허용(`javascript:` · `data:` · 상대 경로 400). 기준은 Candidate 이미지 URL 과 같다(`modules/neture/utils/http-url.util.ts`).
+- **결정 사항:** 503 은 기존 403/401/409 계약을 바꾸지 않는 새 코드(일시 오류를 '공급자 아님'으로 오판시키지 않음). `next()` 는 try 밖이라 하위 handler 오류를 503 으로 바꾸지 않는다. 이미지 목록의 접근 수준(로그인 사용자)은 유지 — 공용 카탈로그라 필드만 줄였다. URL 은 https 전용 · 호스트 허용 목록까지는 가지 않았다(외부 자료 링크가 정상 용도).
+- **검증:** **전체 회귀** — API jest 3 shard(CI 와 같은 방식) 모두 PASS: 10,479 pass · 1,297 skip(DB 통합 미설정) · 실패 0, `tsc --noEmit` PASS, 변경 파일 ESLint 0, `check-unsafe-routes` 위반 0. 신규 테스트 6 파일 · 기존 테스트 6 파일 보강(정렬 · settlement 는 옛 문자열 삽입을 고정하던 기대값을 binding 으로, 자료함 · 이미지 HTTP 테스트는 guard mock 을 표준 계약 기준으로 갱신).
+- **확인하지 못한 것 / 배포 후:** 운영 DB 연결 없음 — 실제 DB 장애 시 503 동작은 단위 테스트로만 확인. 배포 후 공급자 Demo 로 내 제품 목록 정렬(최신순 · 가격 · 이름) 변경이 실제 순서에 반영되는지, 상품 상세의 이미지 목록 · 자료함 등록이 정상인지 확인.
+- **후속 정비(같은 branch · 같은 PR 묶음, 사용자 지시):**
+  - LIMIT/OFFSET 문자열 삽입 → binding: 관리자 정산 · 제품 콘텐츠 조회 · 상품 설명 검수 큐 2곳 · 교체 감사 로그 · 이미지 품질 · 제품 사용처(3 질의). 공통 `modules/neture/utils/pagination-sql.util.ts`(`toPositiveInt` · `pageWindow`)로 정규화하고 앞 commit 의 공급자 주문 · 정산 로컬 helper 도 이것으로 교체.
+  - 자료함(`supplier-library/access.ts`) · 상품 이미지(`supplier-images/access.ts`) guard 를 표준 `createRequireActiveSupplier` / `createRequireLinkedSupplier` 로 교체 — 조직 지정 409 · 쓰기 경로 Neture 회원 상태 확인 · 조회 실패 503 이 다른 공급자 경로와 같아진다. 응답 계약(401 · 403 NO_SUPPLIER · 403 SUPPLIER_NOT_ACTIVE)은 유지.
+  - 예전 혼합 공급자 `neture_orders` → [`WO-O4O-SUPPLIER-LEGACY-MIXED-ORDER-ISOLATION-V1`](docs/work-orders/WO-O4O-SUPPLIER-LEGACY-MIXED-ORDER-ISOLATION-V1.md) 작성. **다음 실행자 LOCAL** — `/db-readonly` 로 §5 Q1~Q4(SELECT · 건수만) 실행 후 판정(A/B/C/D)을 §7 에 기록. 판정 C(진행 중 혼합 주문)이면 통합 담당에게 먼저 보고. CLOUD 구현은 그 뒤.
+- **남은 범위 밖:** `hub-trigger.controller.ts` 4곳이 아직 예전 `getSupplierByUserId` 판정을 쓴다(HUB 트리거 기능 — 별도 묶음). `drug-import` 의 `LIMIT ${take}` 는 CLI 배치 내부 값, `product-library.controller.ts` 는 상수라 그대로 두었다.
+- **겹치는 PR / 문서 정합:** #1057(화면)과 파일 겹침 없음. 문서 정합: 해당 없음.
+
+## 2026-11-13 · 태블릿 코너 제품 QR 기본값 = 상품 대표 QR (branch `claude/intelligent-cray-o2p4u3-tablet-product-qr` · API)
+
+> 다음 실행자: **통합 세션** — 이 branch 로 PR. [`WO-O4O-STORE-QR-TABLET-CHANNEL-SEPARATION-V1`](docs/work-orders/WO-O4O-STORE-QR-TABLET-CHANNEL-SEPARATION-V1.md) T5 의 첫 부분. [영상 보기]는 #1058(이 영상의 제품) 병합 뒤에 한다.
+
+- **한 일:** 태블릿 코너 · 코너 QR 모바일 화면의 「제품 목록」에서 매장이 QR 을 따로 고르지 않은 O4O 상품은 상품 대표 QR(`/p/{key}`)을 기본으로 보인다.
+  - 매장이 고른 QR 이 있으면 그것이 우선이다(`qrSource: 'selected' | 'product'`).
+  - 고른 QR 이 비활성 · 삭제된 경우에는 대표 QR 로 대신하지 않는다. 매장이 의도한 QR 이 사라진 상태를 숨기지 않기 위해서다.
+  - 매장 자체 상품에는 대표 QR 이 없다.
+- **공개 경로 쓰기 0 유지:** 이미 발급된 대표 QR(Landing · 활성 · 노출 가능)만 읽는다. 발급은 하지 않는다 — 취급 제품 화면의 상품 QR 조회가 발급한다. 이 매장의 listing 만 본다.
+- **검증:**
+  - 새 `store-public/__tests__/product-landing-qr-fallback.test.ts`(실제 schema — 다른 매장 listing · 노출 중지 · 미발급 제외 · 쓰기 0) 와 `kpa-tablet-generation-consolidation-contract.spec.ts` 를 합쳐 20 pass.
+  - api `tsc` 의 오류 2건(`partner-support-scope` · `product-correction/preview`)은 이 변경과 무관하다.
+- **배포 후 확인:** Demo 「매장 경영자」의 태블릿 코너(제품 진열형) 미리보기 · 코너 QR 모바일에서, QR 을 고르지 않은 O4O 상품에 QR 이 보이고 스캔하면 상품 대표 화면이 열리는지.
+
+## 2026-11-13 · 참고 · 기준 문서 정비 — 상담 매장 단위 판단 반영 (branch `claude/wizardly-bardeen-ldq332` · 문서 전용 커밋)
+
+- **PR 묶음:** 문서 전용 커밋이다. §4-3 R6(기준 문서는 문서 전용 PR)에 따라 통합 세션이 이 커밋을 별도 PR 로 분리할 수 있다 — 같은 branch 의 코드 변경(상담 매장 단위 판단 · My Home 약사 확인 정리)과 내용이 맞물려 있어 코드 PR 병합 뒤에 병합한다.
+- **한 일(사용자 지시 「이번 작업이 끝나면 정비」):** `O4O-ROLE-WORKSPACE-ARCHITECTURE-V2` §2 에 매장 상담 태블릿 예외 1줄(원칙 문장 불변), `O4O-STORE-ACCESS-AND-MEMBERSHIP-V1` 상담 문단 교체, `O4O-AI-CORE-EXTENSION-FOUNDATION-V1` 1문장, `DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1` §15-8 갱신 요약 · 대체 표기.
+- **결정 사항(§9):** 조사 중 4번째 문서(`O4O-ROLE-WORKSPACE-ARCHITECTURE-V2` §2 — 약사 전용 기능은 개인 약사 자격 필요)를 발견했다. 사용자 결정과 충돌하는 상위 정책이라 원칙은 그대로 두고 상담 태블릿 예외만 날짜와 근거를 붙여 추가했다. 통합 담당이 예외 문구를 확인해 주면 좋다.
+- **검증:** 문서 민감정보 검사 0건. 남은 「약사 사용 확인」 언급은 모두 2026-11-13 갱신 · 대체 표기 문장이다.
+- **문서 정합:** 발견 4건 / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 0건 — 사용자 지시로 인라인 정비.
+
+## 2026-11-13 · My Home 약사 확인 체크 정리 (branch `claude/wizardly-bardeen-ldq332`)
+
+- **PR 묶음:** 같은 branch 의 상담 매장 단위 판단과 같은 PR(함께 봐야 하는 변경). 지시서 [`WO-O4O-STORE-CONSULTATION-TABLET-ROLES-V1`](docs/work-orders/WO-O4O-STORE-CONSULTATION-TABLET-ROLES-V1.md) §3 2-4단계.
+- **한 일(사용자 지시):** My Home 의 경영자 본인 약사 확인 화면 · 근무자 「이 근무자가 약사임을 확인」 체크 삭제. API `PUT /neture/pharmacy/pharmacist-confirmation` 삭제, 근무자 기능 저장 · 직원 승인의 약사 확인 요구 · `pharmacistConfirmed` 입력 · 직원 목록 응답 필드 삭제, `requiresProfessional` · `consultationProfessionalConfirmed` · `confirmOwnerPharmacist` 삭제, 운영자 화면의 약사 사용 확인 문구 삭제.
+- **결정 사항(§9):** schema 변경 · 일괄 데이터 삭제 없음 — 남은 `pharmacyPharmacistConfirmed` 값은 읽지 않고, 근무자 기능을 다음에 저장할 때 지운다. 직원 승인 기본 기능은 매장이 쓸 수 있는 기능 전체(이전에는 약사 기능 제외). 면허 승인 규칙(`hasApprovedPharmacist`)은 유지하고 DB 테스트의 면허 검증을 이 함수로 옮겼다. 매장별 약사 확인 DB 테스트 1건 삭제.
+- **검증:** API 전체 3 shard 681 suites 통과(84 skip). DB 테스트 `central-operation-access` 를 로컬 임시 PostgreSQL 로 실행 — 고친 4건 통과, 실패 5건은 모두 `column u.businessInfo does not exist`(테스트 fixture 의 users 표가 #968 이후 코드보다 낡음 · 이번 변경과 무관 · 수정하지 않음). `business-operations` · `collaboration-application` DB 테스트는 전체 migrate 된 schema 가 필요해 실행하지 못함(컴파일만 확인). web-neture 185 files / 1578, operator-core-ui 36 / 242, web-store 1003 통과. web-neture · admin · store-web · api type-check 통과. ESLint 오류 0(기존 `_next` 경고 2).
+- **확인하지 못한 것 / 배포 후 Demo:** My Home 「매장 직원 및 초대」에서 약사 확인 체크가 사라지고 상담 기능도 일반 체크로 저장 · 승인되는지(경영자 계정). 운영 DB 에 남은 확인 값 개수.
+- **문서 정합:** 이어지는 「참고 문서 정비」 커밋에서 처리(사용자 지시).
+
+## 2026-11-13 · 상담은 매장 단위로 판단 · 「매대」 용어 정리 · 이용 안내 문구 (branch `claude/wizardly-bardeen-ldq332`)
+
+- **PR 묶음:** 같은 branch 의 키오스크 위치 · 한국어 병기와 같은 PR. 지시서 [`WO-O4O-STORE-CONSULTATION-TABLET-ROLES-V1`](docs/work-orders/WO-O4O-STORE-CONSULTATION-TABLET-ROLES-V1.md) §3 2-4단계.
+- **사용자 결정(통합 담당 · 2026-11-13):** 약국 경영자 = 약사 → 승인된 약국은 약사 상담 가능. 직원 초대는 매장 관리(주문 등)용, 상담은 지정 사용자로 묶지 않는다. 태블릿 지정은 경영자가 오프라인에서.
+- **한 일:** 상담 4개 방식 · 상담 안 상품 안내 · 키오스크 상품 검색을 매장 단위 이용 기능(`requireStore`)으로 판단(계정별 약사 확인 · 근무자별 허용 제거, 매장 소속 · 회원 · 약국 승인 확인 유지). 「매대」 용어를 약사 상담 · 근무자 상담 · 소비자 상담으로. 이용 안내 문구를 쉬운 말로.
+- **결정 사항(§9):** 권한 범위 변경(§5)은 사용자 직접 지시로 진행. `consultationProfessionalConfirmed` 함수 · My Home 약사 확인 UI · 근무자별 약사 기능 제한은 지우지 않았다 — 다른 사용처 확인 후 3단계에서 정리. DB 기반 통합 spec 의 기대값(근무자 계정 약사 상담 403 → 200)을 새 규칙으로 고쳤다(이 환경에는 PostgreSQL 이 없어 실행하지 못함).
+- **검증:** API neture-pharmacy 40 suites / 322 통과(15 suites · 218 skip — PostgreSQL 미설정). web-store 102 files / 1003 통과. web-neture MyHomeStoreMembers 13 통과. store-web `tsc -b` · admin · api type-check 통과. 변경 파일 ESLint 오류 0(기존 `_next` 경고 1).
+- **확인하지 못한 것:** 운영 화면(사용자 캡처는 #1049 배포 전 화면으로 보인다 — 부제목이 예전 문구). DB 통합 spec 실행. 지시서 §4.
+- **문서 정합:** 설계 문서 [`DESIGN-O4O-STORE-CONSULTATION-DATA-SCOPE-V1`](docs/design/DESIGN-O4O-STORE-CONSULTATION-DATA-SCOPE-V1.md) 3곳(약사 확인 계정 · 개별 허용 · 개인 약사 자격 재확인)을 새 결정으로 갱신.
+
+## 2026-11-13 · 키오스크를 소비자 다국어 정책(#1052)에 맞춤 — 한국어 병기 · 위치 번역 재사용 (branch `claude/wizardly-bardeen-ldq332`)
+
+- **PR 묶음:** 바로 아래 「검색 결과 위치」(`2ee3c63f`)와 같은 PR. 지시서 [`WO-O4O-STORE-CONSULTATION-TABLET-ROLES-V1`](docs/work-orders/WO-O4O-STORE-CONSULTATION-TABLET-ROLES-V1.md) §3 2-3단계. #1052(정책 문서) · #1038 은 다른 세션 branch — 통합 담당이 통합 세션에 병합 · 배포를 맡겼다(이 세션은 손대지 않음).
+- **한 일:** 키오스크 외국어 화면에 한국어 원문 병기(검색 결과 위치 · 선택 상품 · 답변 카드), 소비자 태블릿마다 끌 수 있음(`showKorean`, 기본 켜짐). 위치 일괄 번역에 재사용 키.
+- **결정 사항(§9):** 제품 설명의 한국어 원문은 이미 고른 게시 문단을 한국어로 다시 읽어 얻는다(추가 AI 호출 없음). 원문을 못 읽으면 병기 없이 번역문만(실패로 처리하지 않음). 켜짐은 기본값이라 저장하지 않는다(필드 없음 = 켜짐). 직원에게는 상태 텍스트만.
+- **검증:** API neture-pharmacy 40 suites / 322 통과(15 suites · 218 skip — 전용 PostgreSQL 미설정). web-store 전체 102 files / 1003 통과. `pnpm --filter store-web run type-check`(`tsc -b`) · api type-check 통과. 변경 파일 ESLint 오류 · 경고 0.
+- **확인하지 못한 것:** 실제 번역 · 게시 자료 · 기기 화면(지시서 §4). 정책 §2-3 의 「번역 저장 · 재사용」은 메모리 캐시 수준까지만 — 영속 저장은 별도 WO.
+- **겹치는 PR / 문서 정합:** #1052 가 병합되면 지시서의 정책 링크가 유효해진다(병합 전에는 main 에 그 파일이 없다). 문서 정합: 해당 없음.
+
+## 2026-11-13 · 키오스크 검색 결과에 위치 바로 표시 (branch `claude/wizardly-bardeen-ldq332` — #1049 병합 후 최신 main 에서 다시 시작)
+
+- **PR 묶음:** 이 branch 단독 1 PR(서비스 · API, lane 아님). 지시서 [`WO-O4O-STORE-CONSULTATION-TABLET-ROLES-V1`](docs/work-orders/WO-O4O-STORE-CONSULTATION-TABLET-ROLES-V1.md) §3 2-2단계. 이전 #1049 는 병합됨(`9647760b`) — 그 branch 를 main 에서 새로 시작했다(force push 없음 · 원격 head 는 병합 때 자동 삭제).
+- **한 일:** 키오스크 상품 검색 결과마다 위치(고객 언어) 또는 위치 미등록 안내를 바로 표시. 「위치 보기」 버튼 제거, 선택한 상품에 위치 · 읽어 주기.
+- **결정 사항(§9):** 위치 번역은 결과의 서로 다른 위치만 번호 붙여 1회 번역(상품마다 호출하지 않음). 번호 · 줄 수가 어긋나거나 실패하면 한국어 원문(오배정 방지). 권한 오류는 그대로 올림. 원문 · 번역 검색어 결과 합칠 때 위치를 빈 값으로 덮어쓰던 문제 수정.
+- **검증:** API neture-pharmacy 40 suites / 318 통과(15 suites · 218 skip — 전용 PostgreSQL 미설정; 키오스크 18 포함). web-store 전체 102 files / 1000 통과. CI 와 같은 `pnpm --filter store-web run type-check`(`tsc -b`) · api type-check 통과. 변경 파일 ESLint 오류 · 경고 0.
+- **확인하지 못한 것 / 배포 후 Demo:** 실제 번역 모델이 번호 줄을 유지하는지(유지 못 하면 한국어 원문으로 표시됨) · 실제 매장 위치 데이터. 지시서 §4.
+- **로컬 참고:** 대체된 이전 로컬 커밋은 로컬 branch `backup/1049-local-superseded` 에만 있다(push 하지 않음).
+- **겹치는 PR / 문서 정합:** 열린 PR 대조는 통합 세션. 문서 정합: 해당 없음.
+
+## 2026-11-13 · 계정 삭제 「약국 경영자」 보류 안내 · 운영자 화면 → 관리자 화면 연결 (branch `claude/ecstatic-mendel-2ohu27`)
+
+- **배경(조사):** Admin 「계정 삭제」가 `PHARMACY_TRANSFER_OR_CLOSURE_REQUIRED` 로 멈춤. 코드 · 배포 문제 아님(#1048 배포 확인, 미병합 branch 없음) — 서버의 의도된 보류(`account-business-data.ts` 현재 경영자 검사). 사용자는 Admin 「이용·약국 관리」 → 완전폐업 처리 후 삭제 완료. 운영자 화면(`/operations/neture/members`)에는 그 버튼이 없어 처리 위치를 찾지 못한 것이 원인.
+- **한 일 (admin-dashboard 화면만):**
+  - `AccountErasureControls.tsx`: `PHARMACY_TRANSFER_OR_CLOSURE_REQUIRED` · `PHARMACY_CLOSURE_INCOMPLETE` 문구에 실제 처리 순서(체크 → 「이용·약국 관리」 → 이전 / 완전폐업 → 「계정 삭제」 재실행).
+  - `CentralMemberWorkspace.tsx`: Admin 계정 삭제가 끝나지 않으면 초록 안내가 아니라 빨간 오류 안내로 표시. 원인 코드가 있으면 「삭제 처리 내역에서 재시도」 일반 문구 대신 그 원인의 처리 방법만 표시.
+  - 운영자 화면에서 삭제 미완료(`review_required` · `retry_required`) 회원 1명을 고르면 「관리자 화면에서 처리」 링크(`/admin/platform/users?userId=…` · 전체 관리자 권한 필요) 표시. Admin 화면에는 표시하지 않음.
+- **추가 (같은 날 · 사용자 보고 「리스트 맨 끝 행이 무엇인지 보이지 않는다」):**
+  - 원인: 운영 역할이 많은 관리자 계정은 「가입 유형」 칸에 역할 배지가 모두 쌓여 행이 화면보다 길어지고, 이름 · 이메일이 아래로 밀려 보이지 않았다. Admin 「O4O 플랫폼 관리」 영역의 폭도 `max-w-5xl`(1024px)로 좁았다.
+  - `CentralMemberWorkspace.tsx`: 역할 3개까지는 모두 표시하고, 그보다 많으면 「전체 관리자」를 앞에 둔 2개 + 「외 N개」(마우스를 올리면 전체 목록 표시). 운영자 · Admin 회원 목록 공용.
+  - `PlatformSectionLayout.tsx`: 폭을 운영자 레이아웃과 같은 `max-w-[1400px]` 로 넓힘. 소비처는 `/admin/platform/*` 탭 전체(플랫폼 홈 · 관리자 계정 · 전체 회원 · 공급자 · 내 매장 · 삭제 화면들) — 폭만 넓어지고 동작은 같다.
+  - 검증: admin-dashboard vitest `src/pages/platform` · `src/pages/operators` · `platform-menu-cleanup` 172 통과(신규 1건). `tsc --noEmit` · 변경 파일 ESLint 통과. 실제 브라우저 확인 안 함 — 배포 후 `/admin/platform/users` PC · mobile 에서 마지막 행 이름 표시와 표 폭 확인.
+- **결정 사항(§9):** 링크는 권한과 무관하게 보이되 「전체 관리자 권한 필요」를 함께 적는다(Admin route guard 가 막는다). API · 권한 · 서버 판정은 바꾸지 않음.
+- **알려진 남은 위험(미수정):** 삭제 차단은 `organization_members` owner 도 보지만, 회원 상세의 약국 목록(이전 · 폐업 버튼 근거)은 `neture_pharmacy_memberships` 만 읽는다(`central-member-workspace.service.ts:117`). 약국 가입 기록 없이 매장 경영자만인 회원은 화면에서 해결 경로가 없을 수 있다 — 실제 사례 확인 시 별도 작업.
+- **검증:** admin-dashboard vitest `src/pages/operators` · `src/pages/platform/account-governance` 21 files / 168 통과(신규 3건). admin-dashboard `tsc --noEmit` 통과. 변경 파일 ESLint 오류 0.
+- **PR 묶음:** 이 branch 단독 1 PR(서비스 화면 · lane 해당 없음). 겹칠 수 있는 PR 미대조(통합 세션 확인).
+- **배포 후 Demo 확인:** Demo 계정은 운영자 · 관리자 화면 권한이 없음 — 통합 담당이 운영자 화면에서 삭제 미완료 회원 선택 시 링크 · Admin 삭제 보류 시 빨간 안내를 확인.
+- **문서 정합:** 해당 없음.
 
 ## 2026-11-13 · 공급자 제품 등록 AI 보조 P1 검증·최소 보완 (branch `claude/focused-edison-ky4e3u`)
 
