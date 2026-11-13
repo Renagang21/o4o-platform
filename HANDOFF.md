@@ -19,6 +19,20 @@
 - **남은 범위 밖:** `hub-trigger.controller.ts` 4곳이 아직 예전 `getSupplierByUserId` 판정을 쓴다(HUB 트리거 기능 — 별도 묶음). `drug-import` 의 `LIMIT ${take}` 는 CLI 배치 내부 값, `product-library.controller.ts` 는 상수라 그대로 두었다.
 - **겹치는 PR / 문서 정합:** #1057(화면)과 파일 겹침 없음. 문서 정합: 해당 없음.
 
+## 2026-11-13 · 태블릿 코너 제품 QR 기본값 = 상품 대표 QR (branch `claude/intelligent-cray-o2p4u3-tablet-product-qr` · API)
+
+> 다음 실행자: **통합 세션** — 이 branch 로 PR. [`WO-O4O-STORE-QR-TABLET-CHANNEL-SEPARATION-V1`](docs/work-orders/WO-O4O-STORE-QR-TABLET-CHANNEL-SEPARATION-V1.md) T5 의 첫 부분. [영상 보기]는 #1058(이 영상의 제품) 병합 뒤에 한다.
+
+- **한 일:** 태블릿 코너 · 코너 QR 모바일 화면의 「제품 목록」에서 매장이 QR 을 따로 고르지 않은 O4O 상품은 상품 대표 QR(`/p/{key}`)을 기본으로 보인다.
+  - 매장이 고른 QR 이 있으면 그것이 우선이다(`qrSource: 'selected' | 'product'`).
+  - 고른 QR 이 비활성 · 삭제된 경우에는 대표 QR 로 대신하지 않는다. 매장이 의도한 QR 이 사라진 상태를 숨기지 않기 위해서다.
+  - 매장 자체 상품에는 대표 QR 이 없다.
+- **공개 경로 쓰기 0 유지:** 이미 발급된 대표 QR(Landing · 활성 · 노출 가능)만 읽는다. 발급은 하지 않는다 — 취급 제품 화면의 상품 QR 조회가 발급한다. 이 매장의 listing 만 본다.
+- **검증:**
+  - 새 `store-public/__tests__/product-landing-qr-fallback.test.ts`(실제 schema — 다른 매장 listing · 노출 중지 · 미발급 제외 · 쓰기 0) 와 `kpa-tablet-generation-consolidation-contract.spec.ts` 를 합쳐 20 pass.
+  - api `tsc` 의 오류 2건(`partner-support-scope` · `product-correction/preview`)은 이 변경과 무관하다.
+- **배포 후 확인:** Demo 「매장 경영자」의 태블릿 코너(제품 진열형) 미리보기 · 코너 QR 모바일에서, QR 을 고르지 않은 O4O 상품에 QR 이 보이고 스캔하면 상품 대표 화면이 열리는지.
+
 ## 2026-11-13 · 참고 · 기준 문서 정비 — 상담 매장 단위 판단 반영 (branch `claude/wizardly-bardeen-ldq332` · 문서 전용 커밋)
 
 - **PR 묶음:** 문서 전용 커밋이다. §4-3 R6(기준 문서는 문서 전용 PR)에 따라 통합 세션이 이 커밋을 별도 PR 로 분리할 수 있다 — 같은 branch 의 코드 변경(상담 매장 단위 판단 · My Home 약사 확인 정리)과 내용이 맞물려 있어 코드 PR 병합 뒤에 병합한다.
