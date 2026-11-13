@@ -1,6 +1,17 @@
 # HANDOFF
 
 
+## 2026-11-13 · 공급자 제품 등록 AI 보조 P1 검증·최소 보완 (branch `claude/focused-edison-ky4e3u`)
+
+- **근거 / PR 묶음:** [`WO-O4O-SUPPLIER-AI-ASSISTANCE-ROLLOUT-V1`](docs/work-orders/WO-O4O-SUPPLIER-AI-ASSISTANCE-ROLLOUT-V1.md) P1. 이 branch 단독 1 PR(web-neture 공급자 화면 · 서비스 PR). PR 은 만들지 않았다.
+- **한 일:** 외부 AI 결과 적용 경로 점검 후 결함 3건 수정 — ① AI 상세 설명을 간이 설명 칸(서버 500자)에 넣어 제출 시 `FIELD_TOO_LONG` → 간이 설명 우선·한도 초과 미적용·안내 ② Candidate 에 없는 가격·추천 표시를 숨은 폼 값에 적용·요청문에 전송 → 미적용·요청문 null ③ 적용 되돌리기 없음 → [적용 취소](저장 아님) + 취소한 바코드 조회의 늦은 결과 무시. 바코드·허가번호 「확인 필요」, 빈 항목 「미확인」 안내 추가.
+- **결정 사항:** 서버·schema·API 계약·공용 패키지(`@o4o/content-editor`) 무변경. 요청문 빌더의 범용 계약(현재 입력값 출력)은 유지하고 화면에서 가격을 넘기지 않는다. 적용 취소는 마지막 1회만, 적용 뒤 직접 고친 내용도 되돌아감을 화면에 표시.
+- **검증:** web-neture Vitest 185 files / 1582 PASS, `tsc --noEmit` PASS, 변경 파일 ESLint 0, web-neture build PASS, `git diff --check`·문서 민감정보 PASS.
+- **확인하지 못한 것 / 배포 후 Demo(공급자):** PC/mobile 에서 신규 제품 검토 요청 → [ChatGPT로 작업] → 결과 적용(덮어쓰기)·안내 문구·[적용 취소]·제출. 저장(검토 요청 제출)은 운영 데이터가 남으므로 하지 않는다(§5).
+- **범위 밖 발견:** Import Assistant 초안의 상세 설명이 간이 설명 초깃값으로 들어가 같은 500자 실패 가능 — 별도 수정 대상.
+- **WO TODO:** P1 항목 → 완료(배포 후 Demo 확인 1건 남음).
+- **겹치는 PR / 문서 정합:** 조회하지 않음(통합 세션 확인). 문서 정합: 해당 없음.
+
 ## 2026-11-13 · 매장 콘텐츠 QR · 태블릿 분리 지시서 (branch `claude/intelligent-cray-o2p4u3-qr-tablet` · 문서만)
 
 > 다음 실행자: **통합 세션** — 지시서 PR. 이후 **CLOUD** 가 [`WO-O4O-STORE-QR-TABLET-CHANNEL-SEPARATION-V1`](docs/work-orders/WO-O4O-STORE-QR-TABLET-CHANNEL-SEPARATION-V1.md) T1~T5 를 순서대로 진행한다(T2 · T5 는 #1049 병합 뒤 · T4 는 DB 구조 변경 승인 뒤).

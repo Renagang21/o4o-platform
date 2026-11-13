@@ -34,6 +34,10 @@ export interface SupplierProductLlmAssistPanelProps {
    * 화면이 mode 에 따라 빈 칸만 / 덮어쓰기 를 결정한다.
    */
   onApplyDraft: (draft: SupplierProductCandidateDraft, mode: SupplierProductApplyMode) => string[];
+  /** 마지막 적용을 되돌린다(저장 아님). 되돌렸으면 true. 없으면 [적용 취소] 를 보이지 않는다. */
+  onUndoApply?: () => boolean;
+  /** 되돌릴 적용이 있는지 — 화면이 적용 직전 상태를 보관하고 있을 때 true */
+  canUndoApply?: boolean;
   onNotify?: (message: string, kind: 'success' | 'error') => void;
 }
 
@@ -58,6 +62,8 @@ export default function SupplierProductLlmAssistPanel({
   context,
   fromImport = false,
   onApplyDraft,
+  onUndoApply,
+  canUndoApply = false,
   onNotify,
 }: SupplierProductLlmAssistPanelProps) {
   const [open, setOpen] = useState(fromImport);
@@ -101,6 +107,13 @@ export default function SupplierProductLlmAssistPanel({
     setApplyMessages([...parsed.warnings, ...notes]);
     setApplied(true);
     onNotify?.('결과를 입력란에 적용했습니다. 내용을 확인·수정한 뒤 검토 요청을 제출해 주시기 바랍니다.', 'success');
+  };
+
+  const handleUndo = () => {
+    if (!onUndoApply?.()) return;
+    setApplied(false);
+    setApplyMessages([]);
+    onNotify?.('마지막 적용을 취소하고 적용 전 입력값으로 되돌렸습니다.', 'success');
   };
 
   return (
@@ -234,6 +247,18 @@ export default function SupplierProductLlmAssistPanel({
             {applied && (
               <div className="mt-2 rounded-lg border border-emerald-200 bg-emerald-50 p-2 text-xs text-emerald-800">
                 적용했습니다. 입력란을 확인·수정한 뒤 검토 요청을 제출하시기 바랍니다. 카테고리·브랜드·이미지는 직접 선택합니다.
+              </div>
+            )}
+            {applied && canUndoApply && onUndoApply && (
+              <div className="mt-2 flex flex-wrap items-center gap-2">
+                <button
+                  type="button"
+                  onClick={handleUndo}
+                  className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-100"
+                >
+                  적용 취소
+                </button>
+                <span className="text-[11px] text-slate-500">적용 뒤 직접 고친 내용도 적용 전 값으로 돌아갑니다.</span>
               </div>
             )}
             {applyMessages.length > 0 && (

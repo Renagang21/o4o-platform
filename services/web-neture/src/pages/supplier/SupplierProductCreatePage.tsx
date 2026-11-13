@@ -112,6 +112,8 @@ export default function SupplierProductCreatePage() {
     form,
     submitError,
     handleApplyDraft,
+    handleUndoApplyDraft,
+    canUndoApplyDraft,
     goNext,
     goBack,
     goToSourceImport,
@@ -233,18 +235,19 @@ export default function SupplierProductCreatePage() {
                 originCountry: form.originCountry || null,
                 regulatoryName: form.regulatoryName || null,
                 mfdsPermitNumber: form.mfdsPermitNumber || null,
+                // 가격·추천 표시는 Candidate 에 보내지 않는 숨은 값이라 요청문에 넣지 않는다(외부 전송 최소화).
                 offerDraft: {
-                  priceGeneral: form.priceGeneral ? Number(form.priceGeneral) : null,
-                  consumerReferencePrice: form.consumerReferencePrice
-                    ? Number(form.consumerReferencePrice)
-                    : null,
+                  priceGeneral: null,
+                  consumerReferencePrice: null,
                   consumerShortDescription: null,
                   consumerDetailDescription: null,
-                  isFeatured: form.isFeatured,
+                  isFeatured: false,
                 },
               },
             }}
             onApplyDraft={handleApplyDraft}
+            onUndoApply={handleUndoApplyDraft}
+            canUndoApply={canUndoApplyDraft}
             onNotify={(message, kind) =>
               kind === 'error' ? toast.error(message) : toast.success(message)
             }

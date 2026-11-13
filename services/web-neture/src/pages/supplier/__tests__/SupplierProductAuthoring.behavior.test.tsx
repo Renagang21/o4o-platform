@@ -19,6 +19,11 @@ const mocks = vi.hoisted(() => ({
   },
   media: { upload: vi.fn() },
   toast: { error: vi.fn(), success: vi.fn() },
+  llm: {
+    // 패널이 parse 후 넘기는 Draft 와 같은 모양(외부 AI 결과 fixture)
+    draft: null as null | Record<string, unknown>,
+    notes: [] as string[],
+  },
 }));
 vi.mock('../../../lib/api', () => ({
   supplierApi: mocks.supplier,
@@ -35,7 +40,23 @@ vi.mock('../../../components/supplier/SupplierActivationGate', () => ({
   default: ({ children }: { children: ReactNode }) => <>{children}</>,
 }));
 vi.mock('../../../components/supplier/SupplierProductLlmAssistPanel', () => ({
-  default: () => null,
+  default: ({
+    onApplyDraft,
+    onUndoApply,
+    canUndoApply,
+  }: {
+    onApplyDraft: (draft: never, mode: 'fill-empty' | 'overwrite') => string[];
+    onUndoApply?: () => boolean;
+    canUndoApply?: boolean;
+  }) =>
+    mocks.llm.draft ? (
+      <>
+        <button onClick={() => { mocks.llm.notes = onApplyDraft(mocks.llm.draft as never, 'overwrite'); }}>
+          fixture AI 결과 적용
+        </button>
+        {canUndoApply && <button onClick={() => onUndoApply?.()}>fixture 적용 취소</button>}
+      </>
+    ) : null,
 }));
 vi.mock('../../../components/common/MediaPickerModal', () => ({
   default: ({
@@ -133,6 +154,8 @@ function parseImport() {
 }
 beforeEach(() => {
   vi.resetAllMocks();
+  mocks.llm.draft = null;
+  mocks.llm.notes = [];
   sessionStorage.clear();
   vi.spyOn(window, 'confirm').mockReturnValue(true);
   vi.stubGlobal(
@@ -445,5 +468,77 @@ describe('Supplier authoring accessible controls', () => {
     expect(screen.queryByLabelText(/공급가 \(원\)/)).toBeNull();
     expect(screen.queryByLabelText(/공개\(PUBLIC\)/)).toBeNull();
     expect(screen.queryByText('유통 설정')).toBeNull();
+  });
+});
+
+// WO-O4O-SUPPLIER-AI-ASSISTANCE-ROLLOUT-V1 P1 — 외부 AI 결과 적용 → 화면 → 제출 경계
+describe('external AI draft apply on the Candidate form', () => {
+  const aiDraft = (offer: Record<string, unknown>, extra: Record<string, unknown> = {}) => ({
+    name: 'AI 상품명', barcode: '8801234567890', categoryId: null, brandId: null, brandName: null,
+    manufacturerName: null, specification: null, originCountry: null, regulatoryType: null, drugCategory: null,
+    regulatoryName: null, mfdsPermitNumber: null, imageUrl: null, contentImageUrls: [],
+    offerDraft: {
+      priceGeneral: null, consumerReferencePrice: null, consumerShortDescription: null,
+      consumerDetailDescription: null, isFeatured: false, ...offer,
+    },
+    ...extra,
+  });
+
+  it('does not put an over-limit description or AI prices into the submitted Candidate', async () => {
+    mocks.llm.draft = aiDraft({ priceGeneral: 45000, isFeatured: true, consumerDetailDescription: '가'.repeat(800) });
+    mount('create');
+    await screen.findByRole('option', { name: '일반 카테고리' });
+    fireEvent.click(screen.getByRole('button', { name: 'fixture AI 결과 적용' }));
+    expect(mocks.llm.notes.some((n) => n.includes('500자'))).toBe(true);
+    expect(mocks.llm.notes.some((n) => n.includes('가격·추천 표시'))).toBe(true);
+    expect(mocks.llm.notes.some((n) => n.startsWith('확인 필요') && n.includes('바코드'))).toBe(true);
+    expect((screen.getByLabelText(/^상품명/) as HTMLInputElement).value).toBe('AI 상품명');
+    fireEvent.change(screen.getByLabelText(/^카테고리/), { target: { value: 'cat-a' } });
+    fireEvent.click(screen.getByRole('button', { name: '다음', exact: true }));
+    expect(
+      (screen.getByLabelText('소비자에게 보이는 간이 설명을 입력하시기 바랍니다...') as HTMLTextAreaElement).value,
+    ).toBe('');
+    // 적용만으로는 제출되지 않는다
+    expect(mocks.supplier.submitProductCandidate).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole('button', { name: '제품 정보 검토 요청', exact: true }));
+    await screen.findByText('제품 정보 검토 요청 완료');
+    const payload = mocks.supplier.submitProductCandidate.mock.lastCall?.[0];
+    expect(payload.offerDraft).toEqual({ consumerShortDescription: null });
+    expect(payload.barcode).toBe('8801234567890');
+  });
+
+  it('undoes the last apply and ignores the barcode lookup it started', async () => {
+    let resolveLookup: (v: unknown) => void = () => {};
+    mocks.product.getMasterByBarcode.mockImplementation(
+      () => new Promise((resolve) => { resolveLookup = resolve; }),
+    );
+    mocks.llm.draft = aiDraft({ consumerShortDescription: 'AI 설명' });
+    mount('create');
+    await screen.findByRole('option', { name: '일반 카테고리' });
+    fireEvent.change(screen.getByLabelText(/^상품명/), { target: { value: '사용자 상품명' } });
+    fireEvent.click(screen.getByRole('button', { name: 'fixture AI 결과 적용' }));
+    expect((screen.getByLabelText(/^상품명/) as HTMLInputElement).value).toBe('AI 상품명');
+    expect(mocks.product.getMasterByBarcode).toHaveBeenCalledWith('8801234567890');
+
+    fireEvent.click(screen.getByRole('button', { name: 'fixture 적용 취소' }));
+    expect((screen.getByLabelText(/^상품명/) as HTMLInputElement).value).toBe('사용자 상품명');
+    expect(screen.queryByRole('button', { name: 'fixture 적용 취소' })).toBeNull();
+
+    // 취소 뒤 늦게 도착한 AI 바코드 조회 결과는 기존 제품 안내를 만들지 않는다
+    resolveLookup({ id: 'master-late', barcode: '8801234567890', marketingName: '늦은 결과' });
+    await waitFor(() => expect(mocks.product.getMasterByBarcode).toHaveBeenCalledTimes(1));
+    await new Promise((r) => setTimeout(r, 0));
+    expect(screen.queryByRole('button', { name: /기존 제품에 공급 연결/ })).toBeNull();
+    expect((screen.getByLabelText(/^상품명/) as HTMLInputElement).value).toBe('사용자 상품명');
+
+    fireEvent.change(screen.getByLabelText(/^카테고리/), { target: { value: 'cat-a' } });
+    fireEvent.click(screen.getByRole('button', { name: '다음', exact: true }));
+    expect(
+      (screen.getByLabelText('소비자에게 보이는 간이 설명을 입력하시기 바랍니다...') as HTMLTextAreaElement).value,
+    ).toBe('');
+    fireEvent.click(screen.getByRole('button', { name: '제품 정보 검토 요청', exact: true }));
+    await screen.findByText('제품 정보 검토 요청 완료');
+    const payload = mocks.supplier.submitProductCandidate.mock.lastCall?.[0];
+    expect(payload).toMatchObject({ name: '사용자 상품명', barcode: null });
   });
 });
