@@ -89,10 +89,27 @@ function applyRow(doc: DocEntry, r: PolicyRow, acceptances: Map<string, number>)
   }
 }
 
-/** 게시본 이하 버전의 초안은 대기 초안이 아니다. */
-function finalizeDoc(d: DocEntry): DocEntry {
-  const pending = d.pendingDraft && (!d.published || d.pendingDraft.version > d.published.version) ? d.pendingDraft : null;
+/**
+ * 게시본 이하 버전의 초안은 대기 초안이 아니다.
+ * 게시는 같은 서비스 · 문서 종류의 기존 게시본을 표식과 관계없이 초안으로 내리므로(admin-service-legal 게시 처리),
+ * 비교 기준은 이 표식의 게시본이 아니라 같은 종류의 현재 게시 버전이다. 교체되어 내려간 과거 문서는 대기 초안으로 보이지 않는다.
+ */
+function finalizeDoc(d: DocEntry, typePublished: number): DocEntry {
+  const floor = Math.max(d.published?.version ?? 0, typePublished);
+  const pending = d.pendingDraft && d.pendingDraft.version > floor ? d.pendingDraft : null;
   return { ...d, pendingDraft: pending };
+}
+
+/** 다른 표식의 게시본으로 교체되어 게시본도 대기 초안도 없는 과거 문서는 목록에서 뺀다. */
+function isReplaced(d: DocEntry, typePublished: number): boolean {
+  return !d.published && !d.pendingDraft && typePublished > 0;
+}
+
+/** 범위 안 문서 종류별 현재 게시 버전(없으면 0). */
+function publishedByType(docs: DocEntry[]): Map<string, number> {
+  const out = new Map<string, number>();
+  for (const d of docs) if (d.published) out.set(d.documentType, Math.max(out.get(d.documentType) ?? 0, d.published.version));
+  return out;
 }
 
 const TIER_ORDER: LegalScopeTier[] = ['account', 'service', 'business', 'other'];
@@ -119,12 +136,17 @@ export function buildLegalOverview(
     applyRow(doc, r, acceptances);
   }
   return [...scopes.values()]
-    .map((s) => ({
+    .map((s) => {
+      const docs = [...s.documents.values()];
+      const typePublished = publishedByType(docs);
+      return {
       ...s,
-      documents: [...s.documents.values()]
-        .map(finalizeDoc)
+      documents: docs
+        .map((d) => finalizeDoc(d, typePublished.get(d.documentType) ?? 0))
+        .filter((d) => !isReplaced(d, typePublished.get(d.documentType) ?? 0))
         .sort((a, b) => a.documentType.localeCompare(b.documentType, 'en') || String(a.slug).localeCompare(String(b.slug), 'en')),
-    }))
+      };
+    })
     .sort((a, b) => TIER_ORDER.indexOf(a.tier) - TIER_ORDER.indexOf(b.tier) || a.label.localeCompare(b.label, 'ko'));
 }
 

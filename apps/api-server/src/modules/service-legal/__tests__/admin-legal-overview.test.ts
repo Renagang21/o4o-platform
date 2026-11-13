@@ -24,6 +24,20 @@ describe('법적 문서 통합 현황 — 순수 판정', () => {
     for (const k of ['k-cosmetics', 'kpa-society', 'pharmacy-hub']) expect(tierOf(k)).toBe('other');
   });
 
+  it('다른 표식으로 교체되어 내려간 과거 게시본은 대기 초안으로 보이지 않고 목록에서 빠진다', () => {
+    const rows = [
+      row({ id: 'old', slug: null, version: 1, status: 'draft', published_at: null }),
+      row({ id: 'cur', slug: 'neture-account-terms', version: 2 }),
+      row({ id: 'next', slug: null, version: 3, status: 'draft', effective_date: '2027-01-01T00:00:00.000Z', published_at: null }),
+    ];
+    const [account] = buildLegalOverview(rows.slice(0, 2), new Map(), new Map());
+    expect(account.documents.map((d) => d.slug)).toEqual(['neture-account-terms']);
+    expect(account.documents[0].pendingDraft).toBeNull();
+    // 같은 종류의 현재 게시본보다 높은 초안은 표식이 달라도 다음 버전으로 남는다.
+    const [withNext] = buildLegalOverview(rows, new Map(), new Map());
+    expect(withNext.documents.find((d) => d.slug === null)?.pendingDraft).toMatchObject({ version: 3, effectiveDate: '2027-01-01' });
+  });
+
   it('게시본 · 동의 건수 · 다음 버전 초안을 묶고, 편집 경로는 계정 · 직영만 준다', () => {
     const rows = [
       row({ id: 'n1', version: 1 }),
