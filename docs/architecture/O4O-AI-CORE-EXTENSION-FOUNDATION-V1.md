@@ -293,7 +293,7 @@ Core는 업무 데이터의 최종 권한·저장 owner가 아니다. 자료는 
 
 ### 14-2. 내 매장 전문 판단 지원 — 개발·통합 이력 (2026-10-25)
 
-`pharmacy.consultation.support`는 약국 도메인의 현재 역할/기능·약사 사용 확인·활성 상품/게시 자료 검증을 통과한 질문과 출처 확인 자료로 읽기/초안 지원을 제공한다. 기존 `runAiExtension`·policy runtime·PRODUCT_CONTENT 모델/플랫폼 부담·quota/회계를 재사용하며 Core runtime·공통 이력·schema를 변경하지 않는다. 상품 사실/전문 참고·판단/확인 질문 하나/고객 설명을 구분하고 담당자 확인 후 기존 전달 입력에 넣는다. 자동 공유/게시·전문 자료의 공식 원장 승인은 없다.
+`pharmacy.consultation.support`는 약국 도메인의 현재 매장 소속 · 매장 단위 이용 기능(2026-11-13부터 계정별 약사 사용 확인 없음 — [`WO-O4O-STORE-CONSULTATION-TABLET-ROLES-V1`](../work-orders/WO-O4O-STORE-CONSULTATION-TABLET-ROLES-V1.md))·활성 상품/게시 자료 검증을 통과한 질문과 출처 확인 자료로 읽기/초안 지원을 제공한다. 기존 `runAiExtension`·policy runtime·PRODUCT_CONTENT 모델/플랫폼 부담·quota/회계를 재사용하며 Core runtime·공통 이력·schema를 변경하지 않는다. 상품 사실/전문 참고·판단/확인 질문 하나/고객 설명을 구분하고 담당자 확인 후 기존 전달 입력에 넣는다. 자동 공유/게시·전문 자료의 공식 원장 승인은 없다.
 
 사용자는 상담 원문 장기 이력 없이 확인한 상품·컨텐츠와 업무 결과의 재사용을 선택했다. 전문 입력은 현재 세션에 두고 승인한 자산은 기존 편집/적용 원장을 사용한다. 개발 당시 현재 상태 정리는 도메인 job의 기본 dry-run이며 운영 활성화는 별도였다. 상세 [범위](../design/DESIGN-O4O-STORE-CONSULTATION-DATA-SCOPE-V1.md) · [개발 CHECK](../checks/CHECK-O4O-STORE-CONSULTATION-CONTENT-CHANNEL-COMPLETION-V1.md).
 

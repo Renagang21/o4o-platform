@@ -11,7 +11,6 @@ type Feature = {
   key: string;
   label: string;
   allowed: boolean | null;
-  requiresProfessional?: boolean;
   sources: Array<{ type: string; key: string; name: string }>;
 };
 type Access = {
@@ -336,11 +335,6 @@ export function MemberPaidFeaturesPanel() {
                                 )
                                 .join(" + ")}
                             </>
-                          )}
-                          {feature.requiresProfessional && (
-                            <span className="block text-gray-600">
-                              약사 사용 확인이 별도로 필요합니다.
-                            </span>
                           )}
                         </li>
                       ))}

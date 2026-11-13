@@ -93,7 +93,7 @@ export function ConsultationLauncher() {
   }, [organizationId, retry]);
 
   // 한 번도 저장하지 않았으면 종류별 기본 태블릿 1대를 보여 준다. 저장한 뒤에는 빈 목록도 그대로 보여 준다.
-  const tablets = saved && configured ? saved
+  const tablets: ConsultationTablet[] = saved && configured ? saved
     : ROLES.filter(({ fallback }) => fallback).map(({ role, fallback }) => ({ id: `${role}-1`, role, name: fallback }));
   const [pairing, setPairing] = useState<{ tabletId: string; code: string; expiresAt: string } | null>(null);
   const pair = async (tablet: ConsultationTablet) => {
@@ -200,6 +200,26 @@ export function ConsultationLauncher() {
                       <button type="button" className="min-h-11 rounded border px-3" disabled={busy}
                         aria-label={`${tablet.name} 연결 코드 만들기`} onClick={() => void pair(tablet)}>연결 코드</button>
                     )}
+                    {role === "consumer" && !canEdit && (
+                      <p className="w-full text-xs text-slate-500">외국어 화면에 한국어 함께 보기: {tablet.showKorean === false ? "꺼짐" : "켜짐"}</p>
+                    )}
+                    {role === "consumer" && canEdit && (
+                      <label className="flex min-h-11 w-full items-center gap-2 text-sm">
+                        <input type="checkbox" disabled={busy} checked={tablet.showKorean !== false}
+                          aria-label={`${tablet.name} 외국어 화면에 한국어 함께 보기`}
+                          onChange={(event) => void update(
+                            tablets.map((item) => {
+                              if (item.id !== tablet.id) return item;
+                              // 켜짐은 기본값이라 저장하지 않는다(필드 없음 = 켜짐).
+                              const rest = { id: item.id, role: item.role, name: item.name,
+                                ...(item.speechLanguages ? { speechLanguages: item.speechLanguages } : {}) };
+                              return event.target.checked ? rest : { ...rest, showKorean: false };
+                            }),
+                            `${tablet.name}의 한국어 함께 보기를 ${event.target.checked ? "켰습니다" : "껐습니다"}.`,
+                          )} />
+                        외국어 화면에 한국어 함께 보기(AI 번역 표시 겸용 · 기본 켜짐)
+                      </label>
+                    )}
                     {pairing?.tabletId === tablet.id && (
                       <output className="w-full rounded bg-teal-50 p-2 text-sm">
                         연결 코드 <strong className="text-lg tracking-widest">{pairing.code}</strong> ·{" "}
@@ -210,7 +230,8 @@ export function ConsultationLauncher() {
                       onSave={(languages) => void update(
                         tablets.map((item) => {
                           if (item.id !== tablet.id) return item;
-                          const base = { id: item.id, role: item.role, name: item.name };
+                          const base = { id: item.id, role: item.role, name: item.name,
+                            ...(item.showKorean === false ? { showKorean: false } : {}) };
                           return languages.length ? { ...base, speechLanguages: languages } : base;
                         }),
                         `${tablet.name}의 음성 자동 감지 언어를 저장했습니다.`,

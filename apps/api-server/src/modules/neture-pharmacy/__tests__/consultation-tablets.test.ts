@@ -70,3 +70,9 @@ it('accepts up to three distinct speech auto-detect candidates per tablet and re
   expect(await tabletSpeechLanguages(db as never, 'store', "x' OR 1=1")).toBeNull();
   expect(db.query).toHaveBeenCalledTimes(3);
 });
+
+it('accepts an optional Korean-alongside switch per tablet and rejects non-boolean values', () => {
+  const base = { id: 'consumer-1', role: 'consumer', name: '키오스크' };
+  expect(consultationTabletsSchema.safeParse([{ ...base, showKorean: false }]).success).toBe(true);
+  expect(consultationTabletsSchema.safeParse([{ ...base, showKorean: 'no' }]).success).toBe(false);
+});

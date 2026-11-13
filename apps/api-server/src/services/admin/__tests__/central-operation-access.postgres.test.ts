@@ -28,7 +28,6 @@ import { centralOperationRoles } from "../central-operation-access.js";
 import express from 'express';
 import request from 'supertest';
 import {centralScopedNetureRequest,centralOperationRequest} from '../../../middleware/central-operation-menu.middleware.js';
-import { consultationProfessionalConfirmed } from "../../../modules/neture-pharmacy/services/consultation-professional.js";
 
 const enabled = process.env.UNIFIED_ACCESS_TEST_PORT === "55432";
 (enabled ? describe : describe.skip)(
@@ -297,49 +296,25 @@ const enabled = process.env.UNIFIED_ACCESS_TEST_PORT === "55432";
         [user, reviewer],
       );
     }
-    it("permits a verified pharmacist employee only in their confirmed store; revoke is immediate", async () => {
+    // 2026-11-13: 상담은 매장 단위로 판단하므로 매장별 약사 확인 검증은 뺐다. 면허 승인 규칙은 hasApprovedPharmacist 로 계속 검증한다.
+    it("treats a verified pharmacist licence as approved and a revoke as immediate", async () => {
       await professional();
-      expect(await consultationProfessionalConfirmed(db, user, store)).toBe(
-        true,
-      );
-      expect(
-        await consultationProfessionalConfirmed(db, user, randomUUID()),
-      ).toBe(false);
+      expect(await hasApprovedPharmacist(db, user)).toBe(true);
       await db.query(
         "UPDATE kpa_pharmacist_profiles SET qualification_status='revoked',license_verified=false",
       );
-      expect(await consultationProfessionalConfirmed(db, user, store)).toBe(
-        false,
-      );
+      expect(await hasApprovedPharmacist(db, user)).toBe(false);
     });
-    it("does not treat owner confirmation or a self-entered license as verified qualification", async () => {
+    it("does not treat a self-entered license as verified qualification", async () => {
       await professional();
       await db.query(
         `UPDATE kpa_pharmacist_profiles SET qualification_status='unrequested',verified_by=NULL`,
       );
-      expect(await consultationProfessionalConfirmed(db, user, store)).toBe(
-        false,
-      );
+      expect(await hasApprovedPharmacist(db, user)).toBe(false);
       await db.query("TRUNCATE kpa_pharmacist_profiles");
-      expect(await consultationProfessionalConfirmed(db, user, store)).toBe(
-        false,
-      );
+      expect(await hasApprovedPharmacist(db, user)).toBe(false);
     });
-    it("a valid qualification does not replace store permission or active account", async () => {
-      await professional();
-      await db.query(
-        `UPDATE organization_members SET metadata='{"pharmacyPharmacistConfirmed":false}'`,
-      );
-      expect(await consultationProfessionalConfirmed(db, user, store)).toBe(
-        false,
-      );
-      await db.query(
-        `UPDATE organization_members SET metadata='{"pharmacyPharmacistConfirmed":true}'; UPDATE users SET "isEmailVerified"=false`,
-      );
-      expect(await consultationProfessionalConfirmed(db, user, store)).toBe(
-        false,
-      );
-    });
+
     it("filling a missing licence through branch signup invalidates an old verification marker", async () => {
       await professional();
       await db.query(
@@ -356,9 +331,7 @@ const enabled = process.env.UNIFIED_ACCESS_TEST_PORT === "55432";
       ).toEqual([
         { license_verified: false, verified_at: null, verified_by: null },
       ]);
-      expect(await consultationProfessionalConfirmed(db, user, store)).toBe(
-        false,
-      );
+      expect(await hasApprovedPharmacist(db, user)).toBe(false);
     });
 
     it("constraint rejects an independent business marked as central and rollback refuses active central assignments", async () => {
@@ -528,9 +501,6 @@ const enabled = process.env.UNIFIED_ACCESS_TEST_PORT === "55432";
         [user],
       );
       expect(await hasApprovedPharmacist(db, user)).toBe(false);
-      expect(await consultationProfessionalConfirmed(db, user, store)).toBe(
-        false,
-      );
       expect(
         (await new PharmacistQualificationService(db).mine(user)).status,
       ).toBe("approved");

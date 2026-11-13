@@ -10,7 +10,7 @@ import Page from './StoreMultilingualConsultationPage';
 const outgoing = () => fireEvent.change(screen.getByLabelText('고객에게 전달할 한국어 문장'), { target: { value: '진열대 왼쪽에 있습니다.' } });
 const translation = () => within(screen.getByRole('region', { name: '문장 번역' }));
 const modes = [
-  { key: 'counter-pharmacist', label: '매대 약사 상담', professional: true, entitled: true, allowed: false },
+  { key: 'counter-pharmacist', label: '약사 상담', professional: true, entitled: true, allowed: false },
   { key: 'floor-staff', label: '매장 직원 응대', professional: false, entitled: true, allowed: true },
   { key: 'floor-pharmacist', label: '매장 약사 상담', professional: true, entitled: false, allowed: false },
 ];
@@ -92,7 +92,7 @@ it('keeps input on translation failure, supports retry and distinguishes failed 
 it('keeps professional modes unavailable when only a service entitlement exists', async () => {
   render(<Page />); const select = await screen.findByLabelText('상담 방식');
   fireEvent.click(screen.getByText(/상담 방식·고객 언어 ·/));
-  expect((within(select).getByRole('option', { name: '매대 약사 상담 · 개인 약사 자격·약국 업무 허용 확인 필요' }) as HTMLOptionElement).disabled).toBe(true);
+  expect((within(select).getByRole('option', { name: '약사 상담 · 매장 기능 필요' }) as HTMLOptionElement).disabled).toBe(true);
 });
 it('clears the customer utterance when leaving the browser page', async () => {
   render(<Page />); await screen.findByLabelText('고객에게 전달할 한국어 문장');

@@ -1,5 +1,50 @@
 # HANDOFF
 
+## 2026-11-13 · 참고 · 기준 문서 정비 — 상담 매장 단위 판단 반영 (branch `claude/wizardly-bardeen-ldq332` · 문서 전용 커밋)
+
+- **PR 묶음:** 문서 전용 커밋이다. §4-3 R6(기준 문서는 문서 전용 PR)에 따라 통합 세션이 이 커밋을 별도 PR 로 분리할 수 있다 — 같은 branch 의 코드 변경(상담 매장 단위 판단 · My Home 약사 확인 정리)과 내용이 맞물려 있어 코드 PR 병합 뒤에 병합한다.
+- **한 일(사용자 지시 「이번 작업이 끝나면 정비」):** `O4O-ROLE-WORKSPACE-ARCHITECTURE-V2` §2 에 매장 상담 태블릿 예외 1줄(원칙 문장 불변), `O4O-STORE-ACCESS-AND-MEMBERSHIP-V1` 상담 문단 교체, `O4O-AI-CORE-EXTENSION-FOUNDATION-V1` 1문장, `DESIGN-NETURE-PHARMACY-STORE-COMMERCE-V1` §15-8 갱신 요약 · 대체 표기.
+- **결정 사항(§9):** 조사 중 4번째 문서(`O4O-ROLE-WORKSPACE-ARCHITECTURE-V2` §2 — 약사 전용 기능은 개인 약사 자격 필요)를 발견했다. 사용자 결정과 충돌하는 상위 정책이라 원칙은 그대로 두고 상담 태블릿 예외만 날짜와 근거를 붙여 추가했다. 통합 담당이 예외 문구를 확인해 주면 좋다.
+- **검증:** 문서 민감정보 검사 0건. 남은 「약사 사용 확인」 언급은 모두 2026-11-13 갱신 · 대체 표기 문장이다.
+- **문서 정합:** 발견 4건 / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 0건 — 사용자 지시로 인라인 정비.
+
+## 2026-11-13 · My Home 약사 확인 체크 정리 (branch `claude/wizardly-bardeen-ldq332`)
+
+- **PR 묶음:** 같은 branch 의 상담 매장 단위 판단과 같은 PR(함께 봐야 하는 변경). 지시서 [`WO-O4O-STORE-CONSULTATION-TABLET-ROLES-V1`](docs/work-orders/WO-O4O-STORE-CONSULTATION-TABLET-ROLES-V1.md) §3 2-4단계.
+- **한 일(사용자 지시):** My Home 의 경영자 본인 약사 확인 화면 · 근무자 「이 근무자가 약사임을 확인」 체크 삭제. API `PUT /neture/pharmacy/pharmacist-confirmation` 삭제, 근무자 기능 저장 · 직원 승인의 약사 확인 요구 · `pharmacistConfirmed` 입력 · 직원 목록 응답 필드 삭제, `requiresProfessional` · `consultationProfessionalConfirmed` · `confirmOwnerPharmacist` 삭제, 운영자 화면의 약사 사용 확인 문구 삭제.
+- **결정 사항(§9):** schema 변경 · 일괄 데이터 삭제 없음 — 남은 `pharmacyPharmacistConfirmed` 값은 읽지 않고, 근무자 기능을 다음에 저장할 때 지운다. 직원 승인 기본 기능은 매장이 쓸 수 있는 기능 전체(이전에는 약사 기능 제외). 면허 승인 규칙(`hasApprovedPharmacist`)은 유지하고 DB 테스트의 면허 검증을 이 함수로 옮겼다. 매장별 약사 확인 DB 테스트 1건 삭제.
+- **검증:** API 전체 3 shard 681 suites 통과(84 skip). DB 테스트 `central-operation-access` 를 로컬 임시 PostgreSQL 로 실행 — 고친 4건 통과, 실패 5건은 모두 `column u.businessInfo does not exist`(테스트 fixture 의 users 표가 #968 이후 코드보다 낡음 · 이번 변경과 무관 · 수정하지 않음). `business-operations` · `collaboration-application` DB 테스트는 전체 migrate 된 schema 가 필요해 실행하지 못함(컴파일만 확인). web-neture 185 files / 1578, operator-core-ui 36 / 242, web-store 1003 통과. web-neture · admin · store-web · api type-check 통과. ESLint 오류 0(기존 `_next` 경고 2).
+- **확인하지 못한 것 / 배포 후 Demo:** My Home 「매장 직원 및 초대」에서 약사 확인 체크가 사라지고 상담 기능도 일반 체크로 저장 · 승인되는지(경영자 계정). 운영 DB 에 남은 확인 값 개수.
+- **문서 정합:** 이어지는 「참고 문서 정비」 커밋에서 처리(사용자 지시).
+
+## 2026-11-13 · 상담은 매장 단위로 판단 · 「매대」 용어 정리 · 이용 안내 문구 (branch `claude/wizardly-bardeen-ldq332`)
+
+- **PR 묶음:** 같은 branch 의 키오스크 위치 · 한국어 병기와 같은 PR. 지시서 [`WO-O4O-STORE-CONSULTATION-TABLET-ROLES-V1`](docs/work-orders/WO-O4O-STORE-CONSULTATION-TABLET-ROLES-V1.md) §3 2-4단계.
+- **사용자 결정(통합 담당 · 2026-11-13):** 약국 경영자 = 약사 → 승인된 약국은 약사 상담 가능. 직원 초대는 매장 관리(주문 등)용, 상담은 지정 사용자로 묶지 않는다. 태블릿 지정은 경영자가 오프라인에서.
+- **한 일:** 상담 4개 방식 · 상담 안 상품 안내 · 키오스크 상품 검색을 매장 단위 이용 기능(`requireStore`)으로 판단(계정별 약사 확인 · 근무자별 허용 제거, 매장 소속 · 회원 · 약국 승인 확인 유지). 「매대」 용어를 약사 상담 · 근무자 상담 · 소비자 상담으로. 이용 안내 문구를 쉬운 말로.
+- **결정 사항(§9):** 권한 범위 변경(§5)은 사용자 직접 지시로 진행. `consultationProfessionalConfirmed` 함수 · My Home 약사 확인 UI · 근무자별 약사 기능 제한은 지우지 않았다 — 다른 사용처 확인 후 3단계에서 정리. DB 기반 통합 spec 의 기대값(근무자 계정 약사 상담 403 → 200)을 새 규칙으로 고쳤다(이 환경에는 PostgreSQL 이 없어 실행하지 못함).
+- **검증:** API neture-pharmacy 40 suites / 322 통과(15 suites · 218 skip — PostgreSQL 미설정). web-store 102 files / 1003 통과. web-neture MyHomeStoreMembers 13 통과. store-web `tsc -b` · admin · api type-check 통과. 변경 파일 ESLint 오류 0(기존 `_next` 경고 1).
+- **확인하지 못한 것:** 운영 화면(사용자 캡처는 #1049 배포 전 화면으로 보인다 — 부제목이 예전 문구). DB 통합 spec 실행. 지시서 §4.
+- **문서 정합:** 설계 문서 [`DESIGN-O4O-STORE-CONSULTATION-DATA-SCOPE-V1`](docs/design/DESIGN-O4O-STORE-CONSULTATION-DATA-SCOPE-V1.md) 3곳(약사 확인 계정 · 개별 허용 · 개인 약사 자격 재확인)을 새 결정으로 갱신.
+
+## 2026-11-13 · 키오스크를 소비자 다국어 정책(#1052)에 맞춤 — 한국어 병기 · 위치 번역 재사용 (branch `claude/wizardly-bardeen-ldq332`)
+
+- **PR 묶음:** 바로 아래 「검색 결과 위치」(`2ee3c63f`)와 같은 PR. 지시서 [`WO-O4O-STORE-CONSULTATION-TABLET-ROLES-V1`](docs/work-orders/WO-O4O-STORE-CONSULTATION-TABLET-ROLES-V1.md) §3 2-3단계. #1052(정책 문서) · #1038 은 다른 세션 branch — 통합 담당이 통합 세션에 병합 · 배포를 맡겼다(이 세션은 손대지 않음).
+- **한 일:** 키오스크 외국어 화면에 한국어 원문 병기(검색 결과 위치 · 선택 상품 · 답변 카드), 소비자 태블릿마다 끌 수 있음(`showKorean`, 기본 켜짐). 위치 일괄 번역에 재사용 키.
+- **결정 사항(§9):** 제품 설명의 한국어 원문은 이미 고른 게시 문단을 한국어로 다시 읽어 얻는다(추가 AI 호출 없음). 원문을 못 읽으면 병기 없이 번역문만(실패로 처리하지 않음). 켜짐은 기본값이라 저장하지 않는다(필드 없음 = 켜짐). 직원에게는 상태 텍스트만.
+- **검증:** API neture-pharmacy 40 suites / 322 통과(15 suites · 218 skip — 전용 PostgreSQL 미설정). web-store 전체 102 files / 1003 통과. `pnpm --filter store-web run type-check`(`tsc -b`) · api type-check 통과. 변경 파일 ESLint 오류 · 경고 0.
+- **확인하지 못한 것:** 실제 번역 · 게시 자료 · 기기 화면(지시서 §4). 정책 §2-3 의 「번역 저장 · 재사용」은 메모리 캐시 수준까지만 — 영속 저장은 별도 WO.
+- **겹치는 PR / 문서 정합:** #1052 가 병합되면 지시서의 정책 링크가 유효해진다(병합 전에는 main 에 그 파일이 없다). 문서 정합: 해당 없음.
+
+## 2026-11-13 · 키오스크 검색 결과에 위치 바로 표시 (branch `claude/wizardly-bardeen-ldq332` — #1049 병합 후 최신 main 에서 다시 시작)
+
+- **PR 묶음:** 이 branch 단독 1 PR(서비스 · API, lane 아님). 지시서 [`WO-O4O-STORE-CONSULTATION-TABLET-ROLES-V1`](docs/work-orders/WO-O4O-STORE-CONSULTATION-TABLET-ROLES-V1.md) §3 2-2단계. 이전 #1049 는 병합됨(`9647760b`) — 그 branch 를 main 에서 새로 시작했다(force push 없음 · 원격 head 는 병합 때 자동 삭제).
+- **한 일:** 키오스크 상품 검색 결과마다 위치(고객 언어) 또는 위치 미등록 안내를 바로 표시. 「위치 보기」 버튼 제거, 선택한 상품에 위치 · 읽어 주기.
+- **결정 사항(§9):** 위치 번역은 결과의 서로 다른 위치만 번호 붙여 1회 번역(상품마다 호출하지 않음). 번호 · 줄 수가 어긋나거나 실패하면 한국어 원문(오배정 방지). 권한 오류는 그대로 올림. 원문 · 번역 검색어 결과 합칠 때 위치를 빈 값으로 덮어쓰던 문제 수정.
+- **검증:** API neture-pharmacy 40 suites / 318 통과(15 suites · 218 skip — 전용 PostgreSQL 미설정; 키오스크 18 포함). web-store 전체 102 files / 1000 통과. CI 와 같은 `pnpm --filter store-web run type-check`(`tsc -b`) · api type-check 통과. 변경 파일 ESLint 오류 · 경고 0.
+- **확인하지 못한 것 / 배포 후 Demo:** 실제 번역 모델이 번호 줄을 유지하는지(유지 못 하면 한국어 원문으로 표시됨) · 실제 매장 위치 데이터. 지시서 §4.
+- **로컬 참고:** 대체된 이전 로컬 커밋은 로컬 branch `backup/1049-local-superseded` 에만 있다(push 하지 않음).
+- **겹치는 PR / 문서 정합:** 열린 PR 대조는 통합 세션. 문서 정합: 해당 없음.
 
 ## 2026-11-13 · 계정 삭제 「약국 경영자」 보류 안내 · 운영자 화면 → 관리자 화면 연결 (branch `claude/ecstatic-mendel-2ohu27`)
 

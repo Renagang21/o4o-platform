@@ -92,3 +92,25 @@ it('hides selection controls from staff members', async () => {
   expect(screen.queryByRole('checkbox')).toBeNull();
   expect(screen.queryByLabelText('전체 선택')).toBeNull();
 });
+
+it('lets the owner turn the Korean-alongside display off and on per kiosk, keeping other tablet settings', async () => {
+  api.read.mockResolvedValue({ organizationId: 'store', canEdit: true, configured: true, tablets: [{ ...tablets[2], speechLanguages: ['vi'] }] });
+  render(<ConsultationLauncher />);
+  const kiosk = await screen.findByRole('region', { name: '소비자 태블릿(키오스크)' });
+  const toggle = within(kiosk).getByLabelText('입구 키오스크 외국어 화면에 한국어 함께 보기') as HTMLInputElement;
+  expect(toggle.checked).toBe(true);
+  fireEvent.click(toggle);
+  await screen.findByText('입구 키오스크의 한국어 함께 보기를 껐습니다.');
+  expect(api.save.mock.calls[0][0]).toEqual([{ ...tablets[2], speechLanguages: ['vi'], showKorean: false }]);
+  fireEvent.click(within(kiosk).getByLabelText('입구 키오스크 외국어 화면에 한국어 함께 보기'));
+  await screen.findByText('입구 키오스크의 한국어 함께 보기를 켰습니다.');
+  expect(api.save.mock.calls[1][0]).toEqual([{ ...tablets[2], speechLanguages: ['vi'] }]);
+});
+
+it('shows the Korean-alongside state to staff members as text without a control', async () => {
+  api.read.mockResolvedValue({ organizationId: 'store', canEdit: false, configured: true, tablets: [{ ...tablets[2], showKorean: false }] });
+  render(<ConsultationLauncher />);
+  const kiosk = await screen.findByRole('region', { name: '소비자 태블릿(키오스크)' });
+  expect(within(kiosk).getByText('외국어 화면에 한국어 함께 보기: 꺼짐')).toBeTruthy();
+  expect(within(kiosk).queryByRole('checkbox')).toBeNull();
+});
