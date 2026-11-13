@@ -1,5 +1,21 @@
 # HANDOFF
 
+
+## 2026-11-13 · QR 목록에서 태블릿 코너 QR 분리 (branch `claude/intelligent-cray-o2p4u3-qr-tab` · web-store 화면만)
+
+> 다음 실행자: **통합 세션** — 이 branch 로 PR. [`WO-O4O-STORE-QR-TABLET-CHANNEL-SEPARATION-V1`](docs/work-orders/WO-O4O-STORE-QR-TABLET-CHANNEL-SEPARATION-V1.md) T3 의 첫 부분(D3).
+
+- **한 일:**
+  - QR 목록의 기본 필터 「전체」를 「매장 QR」로 바꿨다. 매장이 직접 만든 QR 만 보인다.
+  - 태블릿 코너 QR(화면 세트 저장 시 자동 생성)은 「태블릿 코너」를 고를 때만 보인다.
+  - 업무 화면에서 특정 QR 을 열고 들어온 경우에는 코너 QR 도 그대로 보인다.
+  - 활성 · 보관 건수와 출력 · 데이터는 바꾸지 않았다.
+  - 직접 만든 QR 이 없고 코너 QR 만 있으면 빈 목록 대신 「태블릿 코너에서 볼 수 있습니다」라고 안내한다.
+- **남긴 것(T3 나머지):** 「콘텐츠 연결」 QR 만들기 제거와 콘텐츠 화면의 「QR 출력 · 목록에 담기」(D5). 콘텐츠별 고정 QR 이 먼저 필요해 다음 단계로 둔다.
+- **검증:**
+  - 새 `qr/qrListFilter.test.ts` 3 · web-store `vitest src/pages` 84 files / 905 · `tsc` 0
+  - 배포 후 Demo 「매장 경영자」로 `/store/marketing/qr?workspace=studio` 에서 확인할 것: 「매장 QR」 개수와 「태블릿 코너」 개수의 합이 예전 「전체」와 같은지.
+
 ## 2026-11-13 · 참고 · 기준 문서 정비 — 상담 매장 단위 판단 반영 (branch `claude/wizardly-bardeen-ldq332` · 문서 전용 커밋)
 
 - **PR 묶음:** 문서 전용 커밋이다. §4-3 R6(기준 문서는 문서 전용 PR)에 따라 통합 세션이 이 커밋을 별도 PR 로 분리할 수 있다 — 같은 branch 의 코드 변경(상담 매장 단위 판단 · My Home 약사 확인 정리)과 내용이 맞물려 있어 코드 PR 병합 뒤에 병합한다.

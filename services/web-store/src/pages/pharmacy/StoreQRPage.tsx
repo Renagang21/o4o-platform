@@ -4,6 +4,7 @@ import { StoreOperationReturn } from './operations/StoreExecutionActions';
 import { useStoreOperationScope } from '../../hooks/useStoreOperationScope';
 import { readMultilingualQrEntry } from './multilingual/MultilingualChannelActions';
 import { MultilingualQrEntryPanel } from './qr/MultilingualQrEntry';
+import { filterQrList, qrListTabs, type QrListFilter } from './qr/qrListFilter';
 import { printQrSelection } from './qr/printQrSelection';
 import { useQrCreation } from './qr/useQrCreation';
 import { useStoreOrganizationId } from '../../hooks/useStoreOrganizationId';
@@ -77,7 +78,6 @@ import {
 import { getActiveServicePrefix, getActiveServicePublicOrigin } from '../../lib/serviceContext';
 
 // WO-O4O-KPA-STORE-QR-SCREENSET-STATE-ALIGNMENT-V1 §3: QR 목록 필터 키.
-type QrListFilter = 'all' | 'content' | 'ai' | 'screen_set';
 
 // isArchivedCornerQr 판정(보관 코너 QR)은 @o4o/store-ui-core 가 정본이다 — PH 와 같은 판정을 쓴다.
 
@@ -383,21 +383,9 @@ function QrSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
   // WO-O4O-KPA-QR-AI-DESCRIPTION-SINGLE-CORNER-V1: 목록 필터(전체 | 콘텐츠 연결 | AI 설명)
   // WO-O4O-KPA-STORE-QR-SCREENSET-STATE-ALIGNMENT-V1 §3: '태블릿 코너'(screen_set) 필터 추가.
   //   일반 QR · AI 설명 QR · 코너 QR 구분을 유지한다(코너 QR 은 화면 세트 저장 시 자동 생성 — 수동 생성 경로 없음).
-  const filteredItems = operationItems.filter((q) => {
-    if (listFilter === 'ai') return !!q.aiDescriptionMode;
-    if (listFilter === 'content') return q.landingType === 'page' && !q.aiDescriptionMode;
-    if (listFilter === 'screen_set') return q.landingType === 'screen_set';
-    return true;
-  });
-  const aiCount = operationItems.filter((q) => !!q.aiDescriptionMode).length;
-  const contentCount = operationItems.filter((q) => q.landingType === 'page' && !q.aiDescriptionMode).length;
-  const cornerCount = operationItems.filter((q) => q.landingType === 'screen_set').length;
-  const FILTER_TABS: { key: QrListFilter; label: string; count: number }[] = [
-    { key: 'all', label: '전체', count: operationItems.length },
-    { key: 'content', label: '콘텐츠 연결', count: contentCount },
-    { key: 'ai', label: 'AI 설명', count: aiCount },
-    { key: 'screen_set', label: '태블릿 코너', count: cornerCount },
-  ];
+  // WO-O4O-STORE-QR-TABLET-CHANNEL-SEPARATION-V1 D3: 기본 「매장 QR」은 코너 QR 을 빼고 보인다(qr/qrListFilter).
+  const filteredItems = filterQrList(operationItems, listFilter, !!(focusTarget && operationEntry));
+  const FILTER_TABS = qrListTabs(operationItems);
   // WO-O4O-KPA-STORE-QR-SCREENSET-STATE-ALIGNMENT-V1 §2:
   //   홈 '활성 QR' KPI 와 **같은 판정(landable)** 으로 센 값. 두 화면의 숫자가 어긋나지 않아야 한다.
   //   landable 미제공(구버전 응답)이면 isActive 로 안전 폴백.
@@ -632,7 +620,7 @@ function QrSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
               copiedId={copiedId}
               onDeactivate={(item) => handleDeactivate(item.id)}
               onReactivate={(item) => handleReactivate(item.id)}
-              emptyText={listFilter === 'all' ? '등록된 QR 코드가 없습니다' : '해당 조건의 QR이 없습니다'}
+              emptyText={listFilter !== 'all' ? '해당 조건의 QR이 없습니다' : FILTER_TABS[3].count > 0 ? '직접 만든 QR이 없습니다. 태블릿 코너 QR은 「태블릿 코너」에서 볼 수 있습니다.' : '등록된 QR 코드가 없습니다'}
               palette={{
                 primary: colors.primary,
                 neutral100: colors.neutral100,
