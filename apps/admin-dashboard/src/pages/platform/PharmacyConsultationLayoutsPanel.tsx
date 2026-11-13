@@ -105,8 +105,8 @@ export default function PharmacyConsultationLayoutsPanel() {
     >
       <h2 className="text-xl font-semibold">매장별 상담 화면 배치</h2>
       <p className="text-sm text-slate-600">
-        일반 약국은 매대 약사·소비자 화면, 대형 약국은 매장 약사·직원 및 매대
-        직원·소비자 화면을 먼저 제시합니다. 이용권·근무자 권한·약사 사용 확인은
+        일반 약국은 약사 상담·소비자 상담 화면, 대형 약국은 약사 상담·근무자 상담·소비자 상담
+        화면을 먼저 제시합니다. 이용권·근무자 권한·약사 사용 확인은
         바뀌지 않습니다.
       </p>
       <p role="note" className="rounded border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">
@@ -174,8 +174,8 @@ export default function PharmacyConsultationLayoutsPanel() {
                 }))
               }
             >
-              <option value="standard">일반 약국 · 매대 중심</option>
-              <option value="large">대형 약국 · 매장·매대</option>
+              <option value="standard">일반 약국</option>
+              <option value="large">대형 약국</option>
             </select>
           </label>
           <button

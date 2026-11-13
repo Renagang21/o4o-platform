@@ -4,11 +4,13 @@ import { resolveStoreAccessLevel } from '../../../services/store/store-membershi
 jest.mock('../../../services/store/store-membership.service.js', () => ({ resolveStoreAccessLevel: jest.fn() }));
 
 let features: string[];
+let staffFeatures: string[] | null;
 let professional: jest.Mock;
 let translate: jest.Mock;
 let service: MultilingualConsultationService;
 beforeEach(() => {
   features = ['multilingual-consultation', 'multilingual-staff-response', 'multilingual-pharmacist-consultation'];
+  staffFeatures = null;
   professional = jest.fn().mockResolvedValue(true);
   translate = jest.fn(async (input, access) => { await access.authorize(); return { translation: 'Translated utterance' }; });
   (resolveStoreAccessLevel as jest.Mock).mockResolvedValue({ level: 'member', organizationId: 'store' });
@@ -16,7 +18,7 @@ beforeEach(() => {
     if (sql.includes('SELECT status')) return [{ status: 'active' }];
     if (sql.includes('FROM semi_franchises sf')) return [{ key: 'synthetic', name: 'Synthetic business', features }];
     if (sql.includes('ownerUserId')) return [{ ownerUserId: 'owner' }];
-    if (sql.includes("metadata->'pharmacyServiceFeatures'")) return [{ role: 'staff', configured: true, features }];
+    if (sql.includes("metadata->'pharmacyServiceFeatures'")) return [{ role: 'staff', configured: true, features: staffFeatures ?? features }];
     return [];
   });
   service = new MultilingualConsultationService({ query } as any, { translate, professional });
@@ -52,14 +54,19 @@ it('detects incoming text independently of the preselected language and rejects 
   translate.mockResolvedValueOnce({ translation: '합성 질문', detectedLanguage: 'unknown' });
   await expect(service.translate('staff', 'store', input)).rejects.toMatchObject({ httpStatus: 422, code: 'CONSULTATION_LANGUAGE_UNCERTAIN' });
 });
-it('does not equate business/payment permission with professional confirmation', async () => {
+it('decides consultation per store: no per-account pharmacist check and no per-staff permission (2026-11-13)', async () => {
   professional.mockResolvedValue(false);
+  staffFeatures = []; // 직원 초대 · 근무자별 허용은 매장 관리용 — 상담에는 쓰지 않는다
   const context = await service.context('staff', 'store');
-  expect(context.modes[0]).toMatchObject({ entitled: true, allowed: false });
-  expect(context.modes[1]).toMatchObject({ entitled: true, allowed: true });
-  await expect(service.translate('staff', 'store', { mode: 'counter-pharmacist', language: 'en', direction: 'to-customer', text: 'Original' }))
-    .rejects.toMatchObject({ code: 'PHARMACIST_CONFIRMATION_REQUIRED' });
-  expect(translate).not.toHaveBeenCalled();
+  expect(context.modes.map(mode => [mode.key, mode.allowed])).toEqual([
+    ['counter-pharmacist', true], ['counter-staff', true], ['floor-staff', true], ['floor-pharmacist', true]]);
+  await service.translate('staff', 'store', { mode: 'counter-pharmacist', language: 'en', direction: 'to-customer', text: 'Original' });
+  expect(translate).toHaveBeenCalledTimes(1);
+  expect(professional).not.toHaveBeenCalled();
+  features = ['multilingual-staff-response'];
+  expect((await service.context('staff', 'store')).modes.find(mode => mode.key === 'floor-pharmacist')).toMatchObject({ entitled: false, allowed: false });
+  await expect(service.translate('staff', 'store', { mode: 'floor-pharmacist', language: 'en', direction: 'to-customer', text: 'Original' }))
+    .rejects.toMatchObject({ code: 'SERVICE_FEATURE_REQUIRED' });
 });
 it('rejects another store and unavailable function before invoking a provider', async () => {
   const input = { mode: 'floor-staff', language: 'en', direction: 'to-staff', text: 'Original' };
@@ -68,9 +75,9 @@ it('rejects another store and unavailable function before invoking a provider', 
   await expect(service.translate('staff', 'store', input)).rejects.toMatchObject({ code: 'SERVICE_FEATURE_REQUIRED' });
   expect(translate).not.toHaveBeenCalled();
 });
-it('discards results if role, feature or professional confirmation is revoked while translating', async () => {
+it('discards results if store access or the store feature is revoked while translating', async () => {
   const input = { mode: 'floor-pharmacist', language: 'en', direction: 'to-customer', text: 'Original' };
-  for (const revoke of [() => { features = []; }, () => { professional.mockResolvedValue(false); },
+  for (const revoke of [() => { features = []; },
     () => { (resolveStoreAccessLevel as jest.Mock).mockResolvedValue({ level: 'none', organizationId: null }); }]) {
     features = ['multilingual-pharmacist-consultation']; professional.mockResolvedValue(true);
     (resolveStoreAccessLevel as jest.Mock).mockResolvedValue({ level: 'member', organizationId: 'store' });

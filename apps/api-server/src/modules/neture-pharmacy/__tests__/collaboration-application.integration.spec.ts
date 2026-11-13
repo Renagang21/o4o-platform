@@ -259,7 +259,7 @@ suite('business registration through approved staff execution (PostgreSQL + HTTP
     }
   });
 
-  it('runs multilingual staff and pharmacist consultation only for owner-configured, store-scoped users', async () => {
+  it('runs multilingual staff and pharmacist consultation for store-scoped users of an entitled store', async () => {
     const policyKeys = ['pharmacy-service-features:default', 'pharmacy-service-features:paid'];
     const previous = await db.query('SELECT key,value FROM settings WHERE key=ANY($1::text[])', [policyKeys]);
     const configure = (target: string, features: string[]) => request(app).put(base + '/admin/service-feature-policies/' + target).set('x-fixture-user', admin).send({ features });
@@ -282,8 +282,9 @@ suite('business registration through approved staff execution (PostgreSQL + HTTP
       expect((await consult(phrase, other)).status).toBe(403);
       const count = translate.mock.calls.length;
       expect((await consult({ ...phrase, text: 'Medical answer' })).status).toBe(400);
-      expect((await consult(clinical)).status).toBe(403);
       expect(translate).toHaveBeenCalledTimes(count);
+      // 2026-11-13: 상담은 매장 단위로 판단한다 — 매장이 약사 상담 자격을 가지면 근무자별 허용 · 약사 확인 없이 쓴다.
+      expect((await consult(clinical)).status).toBe(200);
       const selfConfirmation = await request(app).put(base + '/pharmacy/pharmacist-confirmation')
         .set('x-fixture-user', staff).set('x-store-organization-id', store).send({ confirmed: true });
       expect(selfConfirmation.status).toBe(403);

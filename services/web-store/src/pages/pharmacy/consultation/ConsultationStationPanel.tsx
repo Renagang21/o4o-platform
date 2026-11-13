@@ -20,7 +20,7 @@ export function ConsultationStationPanel({
       className="space-y-3 rounded-xl border bg-white p-4"
     >
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h2 className="font-semibold">매대 고객 화면</h2>
+        <h2 className="font-semibold">소비자 상담 화면</h2>
         <a
           href="/consultation/customer"
           target="_blank"
@@ -37,7 +37,7 @@ export function ConsultationStationPanel({
       </p>
       {!room?.active ? (
         <p className="text-sm text-slate-600">
-          위의 ‘매대 상담 시작’을 누른 뒤 고객 화면을 연결하시기 바랍니다.
+          위의 ‘상담 시작’을 누른 뒤 고객 화면을 연결하시기 바랍니다.
         </p>
       ) : (
         <>

@@ -161,7 +161,7 @@ export function ConsultationGuidancePanel({
     try {
       if (room?.active) {
         if (!captured.deliveryId)
-          throw new Error("현재 매대 상담에 맞는 안내를 다시 준비해 주시기 바랍니다.");
+          throw new Error("현재 상담에 맞는 안내를 다시 준비해 주시기 바랍니다.");
         const ok = await onShare(captured.deliveryId);
         if (ok && alive.current && generation.current === request)
           setNotice("연결된 고객 화면에 전달했습니다.");

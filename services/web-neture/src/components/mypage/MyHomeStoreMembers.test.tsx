@@ -122,11 +122,11 @@ describe('My Home 직원 초대·최종 승인', () => {
     const original = api.get.getMockImplementation()!;
     api.get.mockImplementation(async (path: string, config?: { headers: Record<string, string> }) => {
       const response = await original(path, config);
-      if (path.endsWith('/service-features')) response.data.data.features.push({ key: 'multilingual-consultation', label: '다국어 매대 약사 상담', allowed: true, requiresProfessional: true });
+      if (path.endsWith('/service-features')) response.data.data.features.push({ key: 'multilingual-consultation', label: '다국어 약사 상담', allowed: true, requiresProfessional: true });
       return response;
     });
     render(<MyHomeStoreMembers accountId="owner" />);
-    const professional = await screen.findByRole('checkbox', { name: '다국어 매대 약사 상담' });
+    const professional = await screen.findByRole('checkbox', { name: '다국어 약사 상담' });
     expect((professional as HTMLInputElement).disabled).toBe(true);
     fireEvent.click(screen.getByRole('checkbox', { name: '경영자로서 이 근무자가 약사임을 확인합니다.' }));
     fireEvent.click(professional);
@@ -138,7 +138,7 @@ describe('My Home 직원 초대·최종 승인', () => {
     const original = api.get.getMockImplementation()!;
     api.get.mockImplementation(async (path: string, config?: { headers: Record<string, string> }) => {
       const response = await original(path, config);
-      if (path.endsWith('/service-features')) response.data.data.features.push({ key: 'multilingual-consultation', label: '다국어 매대 약사 상담', allowed: true, requiresProfessional: true });
+      if (path.endsWith('/service-features')) response.data.data.features.push({ key: 'multilingual-consultation', label: '다국어 약사 상담', allowed: true, requiresProfessional: true });
       return response;
     });
     render(<MyHomeStoreMembers accountId="owner" />);
