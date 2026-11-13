@@ -341,6 +341,9 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
     const { createAdminServiceLegalController } = await import('../modules/service-legal/admin-service-legal.controller.js');
     app.use('/api/v1/public/services', createPublicServiceLegalController(dataSource));
     app.use('/api/v1/admin/services', createAdminServiceLegalController(dataSource));
+    // TODO-O4O-LEGAL-BASIC-DOCUMENTS-ADMIN-V1 4단계 — 전체 관리자 전용 법적 문서 통합 현황(read-only).
+    const { createAdminLegalOverviewController } = await import('../modules/service-legal/admin-legal-overview.controller.js');
+    app.use('/api/v1/admin/legal-documents', createAdminLegalOverviewController(dataSource));
     logger.info('✅ Service Legal routes registered at /api/v1/public/services and /api/v1/admin/services');
 
     // 8.2. Public Contact Inquiry (WO-O4O-CONTACT-DELIVERY-AND-NOTIFICATION-V1)
