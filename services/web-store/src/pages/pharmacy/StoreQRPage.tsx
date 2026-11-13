@@ -312,10 +312,24 @@ function QrSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
   // WO-O4O-KPA-STORE-QR-SCREENSET-STATE-ALIGNMENT-V1 §1:
   //   보관 코너 QR 은 일괄 출력 대상에서도 제외한다(개별 출력 차단과 동일 기준).
   const operationItems = focusTarget && operationEntry ? items.filter(item => item.id === operationEntry.id) : items;
-  const printableItems = operationItems.filter((i) => !isArchivedCornerQr(i));
+  // WO-O4O-KPA-QR-AI-DESCRIPTION-SINGLE-CORNER-V1: 목록 필터(전체 | 콘텐츠 연결 | AI 설명)
+  // WO-O4O-KPA-STORE-QR-SCREENSET-STATE-ALIGNMENT-V1 §3: '태블릿 코너'(screen_set) 필터 추가.
+  //   일반 QR · AI 설명 QR · 코너 QR 구분을 유지한다(코너 QR 은 화면 세트 저장 시 자동 생성 — 수동 생성 경로 없음).
+  // WO-O4O-STORE-QR-TABLET-CHANNEL-SEPARATION-V1 D3: 기본 「매장 QR」은 코너 QR 을 빼고 보인다(qr/qrListFilter).
+  const filteredItems = filterQrList(operationItems, listFilter, !!(focusTarget && operationEntry));
+  // 전체 선택 · 일괄 출력은 현재 필터에 보이는 목록 기준이다(AGENTS.md §3-1) — 숨은 코너 QR 이 출력에 섞이지 않는다.
+  const printableItems = filteredItems.filter((i) => !isArchivedCornerQr(i));
+  const visibleSelected = filteredItems.filter((i) => selectedIds.has(i.id));
+  const visibleSelectedIds = new Set(visibleSelected.map((i) => i.id));
+
+  const handleChangeListFilter = (next: QrListFilter) => {
+    if (next === listFilter) return;
+    setListFilter(next);
+    setSelectedIds(new Set());
+  };
 
   const handleSelectAll = () => {
-    if (selectedIds.size === printableItems.length) {
+    if (printableItems.length > 0 && printableItems.every((i) => selectedIds.has(i.id))) {
       setSelectedIds(new Set());
     } else {
       setSelectedIds(new Set(printableItems.map((i) => i.id)));
@@ -340,14 +354,14 @@ function QrSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
   const handleOpenPrintModal = () => {
     // WO-O4O-KPA-STORE-QR-SCREENSET-STATE-ALIGNMENT-V1 §1:
     //   보관 코너 QR 이 선택에 섞여 있으면 **조용히 빼지 않고** 명시적으로 알린 뒤 제외한다.
-    const archivedSelected = items.filter((i) => selectedIds.has(i.id) && isArchivedCornerQr(i));
+    const archivedSelected = visibleSelected.filter((i) => isArchivedCornerQr(i));
     if (archivedSelected.length > 0) {
-      const keep = new Set(Array.from(selectedIds).filter((id) => !archivedSelected.some((a) => a.id === id)));
+      const keep = new Set(Array.from(visibleSelectedIds).filter((id) => !archivedSelected.some((a) => a.id === id)));
       setSelectedIds(keep);
       toast.error(`보관된 화면 세트의 코너 QR ${archivedSelected.length}건은 출력할 수 없어 선택에서 제외했습니다.`);
       if (keep.size === 0) return;
     }
-    if (selectedIds.size === 0) {
+    if (visibleSelectedIds.size === 0) {
       toast.error('출력할 QR을 먼저 선택해 주시기 바랍니다.');
       return;
     }
@@ -358,8 +372,9 @@ function QrSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
     if (printBusy.current) return;
     const token = getAccessToken();
     const headers = captureStoreOrganizationHeaders(token ? { Authorization: `Bearer ${token}` } : {});
-    const qrIds = Array.from(selectedIds);
-    const productQrIds = items.filter(item => selectedIds.has(item.id) && item.landingType === 'product' && item.landingTargetId).map(item => item.id);
+    // 현재 필터에 보이는 선택만 출력한다(숨은 QR 제외).
+    const qrIds = visibleSelected.map(item => item.id);
+    const productQrIds = visibleSelected.filter(item => item.landingType === 'product' && item.landingTargetId).map(item => item.id);
     printBusy.current = true;
     setShowPrintModal(false);
     setPrinting(true);
@@ -380,11 +395,6 @@ function QrSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
 
   const qrBaseUrl = `${getActiveServicePublicOrigin()}/qr/`;
 
-  // WO-O4O-KPA-QR-AI-DESCRIPTION-SINGLE-CORNER-V1: 목록 필터(전체 | 콘텐츠 연결 | AI 설명)
-  // WO-O4O-KPA-STORE-QR-SCREENSET-STATE-ALIGNMENT-V1 §3: '태블릿 코너'(screen_set) 필터 추가.
-  //   일반 QR · AI 설명 QR · 코너 QR 구분을 유지한다(코너 QR 은 화면 세트 저장 시 자동 생성 — 수동 생성 경로 없음).
-  // WO-O4O-STORE-QR-TABLET-CHANNEL-SEPARATION-V1 D3: 기본 「매장 QR」은 코너 QR 을 빼고 보인다(qr/qrListFilter).
-  const filteredItems = filterQrList(operationItems, listFilter, !!(focusTarget && operationEntry));
   const FILTER_TABS = qrListTabs(operationItems);
   // WO-O4O-KPA-STORE-QR-SCREENSET-STATE-ALIGNMENT-V1 §2:
   //   홈 '활성 QR' KPI 와 **같은 판정(landable)** 으로 센 값. 두 화면의 숫자가 어긋나지 않아야 한다.
@@ -477,7 +487,7 @@ function QrSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
       {statusError && <div role="alert" className="mb-3 text-sm text-red-700">QR 상태 변경 결과를 확인하지 못했습니다. <button type="button" className="min-h-11 underline" onClick={() => void changeQrStatus(statusError.id, statusError.active)}>QR 상태 변경 다시 시도</button></div>}
       {listError && <div role="alert">{listError} <button type="button" onClick={() => void fetchItems()} disabled={loading}>다시 시도</button></div>}
       {workspaceMode === 'studio' && creating && formLandingType === 'product' && productError && <div role="alert">{productError} <button type="button" onClick={() => setProductRetry(value => value + 1)} disabled={loadingProducts}>상품 목록 다시 시도</button></div>}
-      {workspaceMode === 'use' && items.length > 0 && <StoreQrPrintToolbar selectedCount={selectedIds.size} printableCount={printableItems.length} printing={printing} onToggleAll={handleSelectAll} onPrint={handleOpenPrintModal} />}
+      {workspaceMode === 'use' && items.length > 0 && <StoreQrPrintToolbar selectedCount={visibleSelectedIds.size} printableCount={printableItems.length} printing={printing} onToggleAll={handleSelectAll} onPrint={handleOpenPrintModal} />}
 
       {workspaceMode === 'studio' && <StoreQrCreateForms
         creating={creating}
@@ -540,7 +550,7 @@ function QrSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
                 <button
                   key={t.key}
                   type="button"
-                  onClick={() => setListFilter(t.key)}
+                  onClick={() => handleChangeListFilter(t.key)}
                   style={listFilter === t.key ? styles.filterTabActive : styles.filterTab}
                 >
                   {t.label} <span style={styles.filterTabCount}>{t.count}</span>
@@ -787,7 +797,7 @@ function QrSession({ isCurrent }: Readonly<{ isCurrent: () => boolean }>) {
       {/* Print Template Modal */}
       <QrPrintTemplateModal
         open={showPrintModal}
-        selectedQrs={items.filter((i) => selectedIds.has(i.id))}
+        selectedQrs={visibleSelected}
         onConfirm={handleConfirmPrint}
         onClose={() => setShowPrintModal(false)}
       />
