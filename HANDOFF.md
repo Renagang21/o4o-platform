@@ -10,7 +10,7 @@
   - 공급자 주문 처리 · 정산 목록의 `LIMIT ${limit} OFFSET ${offset}` 문자열 삽입 → binding, page/limit 을 유한 정수로 정규화(`Infinity` · 소수 → SQL 오류 방지).
   - 이미지 URL 등록(`images/from-url`) · 자료함 `fileUrl`: 절대 http(s) URL 만 허용(`javascript:` · `data:` · 상대 경로 400). 기준은 Candidate 이미지 URL 과 같다(`modules/neture/utils/http-url.util.ts`).
 - **결정 사항:** 503 은 기존 403/401/409 계약을 바꾸지 않는 새 코드(일시 오류를 '공급자 아님'으로 오판시키지 않음). `next()` 는 try 밖이라 하위 handler 오류를 503 으로 바꾸지 않는다. 이미지 목록의 접근 수준(로그인 사용자)은 유지 — 공용 카탈로그라 필드만 줄였다. URL 은 https 전용 · 호스트 허용 목록까지는 가지 않았다(외부 자료 링크가 정상 용도).
-- **검증:** 아래 「전체 회귀」 줄 참조. 신규 테스트 6 파일 · 기존 테스트 6 파일 보강(정렬 · settlement 는 옛 문자열 삽입을 고정하던 기대값을 binding 으로, 자료함 · 이미지 HTTP 테스트는 guard mock 을 표준 계약 기준으로 갱신).
+- **검증:** **전체 회귀** — API jest 3 shard(CI 와 같은 방식) 모두 PASS: 10,479 pass · 1,297 skip(DB 통합 미설정) · 실패 0, `tsc --noEmit` PASS, 변경 파일 ESLint 0, `check-unsafe-routes` 위반 0. 신규 테스트 6 파일 · 기존 테스트 6 파일 보강(정렬 · settlement 는 옛 문자열 삽입을 고정하던 기대값을 binding 으로, 자료함 · 이미지 HTTP 테스트는 guard mock 을 표준 계약 기준으로 갱신).
 - **확인하지 못한 것 / 배포 후:** 운영 DB 연결 없음 — 실제 DB 장애 시 503 동작은 단위 테스트로만 확인. 배포 후 공급자 Demo 로 내 제품 목록 정렬(최신순 · 가격 · 이름) 변경이 실제 순서에 반영되는지, 상품 상세의 이미지 목록 · 자료함 등록이 정상인지 확인.
 - **후속 정비(같은 branch · 같은 PR 묶음, 사용자 지시):**
   - LIMIT/OFFSET 문자열 삽입 → binding: 관리자 정산 · 제품 콘텐츠 조회 · 상품 설명 검수 큐 2곳 · 교체 감사 로그 · 이미지 품질 · 제품 사용처(3 질의). 공통 `modules/neture/utils/pagination-sql.util.ts`(`toPositiveInt` · `pageWindow`)로 정규화하고 앞 commit 의 공급자 주문 · 정산 로컬 helper 도 이것으로 교체.
