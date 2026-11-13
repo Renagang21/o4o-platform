@@ -3,7 +3,7 @@
 > **상태**: ACTIVE
 > **작성일**: 2026-11-13
 > **실행 위치**: CLOUD (T4 migration 운영 적용은 병합 후 자동 Delivery · Promote 판정을 따른다)
-> **인계**: T1 → T2 → T3 는 문서 · 화면 작업. T4 는 **DB 구조 변경 승인 후**(AGENTS.md §5). 태블릿 화면을 바꾸는 T2 · T5 는 열린 PR #1049(태블릿 구조 1단계) 병합 뒤 최신 main 에서 시작한다
+> **인계**: T1 → T2 → T3 는 문서 · 화면 작업. T4 는 **DB 구조 변경 승인 완료(2026-11-13 통합 담당)**. #1049 는 상담 태블릿만 바꾸므로 태블릿 코너(T5)와 겹치지 않는다 — #1049 를 기다리는 것은 메뉴(`App.tsx` · `store-workspace.test.tsx`)를 바꾸는 T2 뿐이다(§7)
 > **근거**: 2026-11-13 사용자 지시(매장 콘텐츠 활용 채널 정리 · 콘텐츠 QR · 제품 영상 연결) · [`O4O-CONSUMER-MULTILINGUAL-POLICY-V1`](../baseline/O4O-CONSUMER-MULTILINGUAL-POLICY-V1.md)(같은 날 확정 · 병합 대기)
 
 ## 1. 문제
@@ -32,8 +32,8 @@
 - [ ] T1 [CLOUD] 기준 문서 반영 — [`O4O-STORE-MENU-CANONICAL-TREE-V1`](../baseline/O4O-STORE-MENU-CANONICAL-TREE-V1.md) 에 D1 · D2 · D5 를 반영한다. 문서 전용 PR(AGENTS.md §4-3 R6)
 - [ ] T2 [CLOUD] 「매장 콘텐츠」 탭 — QR · 태블릿을 각자 탭으로 노출한다(D1). 공유 shell · workspace config 변경이라 모든 소비처(KPA 등 `storeWorkspaceEnabled` 서비스)를 먼저 확인한다(CLAUDE.md §1 · shared module protocol). **#1049 병합 후**
 - [ ] T3 [CLOUD] QR 탭 정리 — 목록 기본값에서 코너 QR 제외 · 「태블릿 코너 포함」 필터(D3), 「콘텐츠 연결」 만들기 제거와 「링크 QR」 정리, 콘텐츠 화면 「QR 출력 · QR 목록에 담기」(D5). 기존 콘텐츠 연결 QR(13건 등)은 그대로 열리고 목록에 남는다
-- [ ] T4 [CLOUD] `signage_media` 제품 열 — 추가형 migration(nullable · index) · 영상 올리기 · 고르기에 「제품 선택(선택 사항)」(D6). **DB 구조 변경 승인 필요**(AGENTS.md §5) · migration lane 직렬(§4-3 R4). 조회는 Boundary 규칙(매장 영상 = `organizationId`, 공급자 · 운영자 영상 = 공유 source)을 지킨다
-- [ ] T5 [CLOUD] 태블릿 코너 — 제품 항목의 QR · 버튼 · [영상 보기](D7), 코너 화면의 코너 QR 출력(D4). **#1049 · T4 병합 후**
+- [ ] T4 [CLOUD] 제품 ↔ 영상 연결(D6 · §7 조사 반영) — ① O4O 보관 영상(`media_assets`)은 기존 `media_entity_links`(`entity_type='product'`)를 쓴다(DB 변경 없음) ② 매장 · 공급자 사이니지 영상(`signage_media`)은 제품 열을 추가한다 — 추가형 migration(nullable · index). **DB 구조 변경 승인 완료(2026-11-13 통합 담당 · 이 열 하나에 한한다)** · migration lane 직렬(§4-3 R4). 영상 올리기 · 고르기에 「제품 선택(선택 사항)」. 조회는 Boundary 규칙(매장 영상 = `organizationId`, 공급자 · 운영자 영상 = 공유 source)을 지킨다
+- [ ] T5 [CLOUD] 태블릿 코너 — 제품 QR 기본값을 상품 대표 QR 로(§7), [영상 보기](D7), 코너 화면의 코너 QR 출력(D4). **T4 병합 후**(#1049 와 무관)
 
 ## 4. 검증 (각 단계)
 
@@ -46,6 +46,36 @@
 - 기존 QR · 코너 QR 데이터 삭제 · 일괄 변경.
 - 사이니지 재생 목록 구조 변경.
 - 설명서(`shared_product_descriptions`) 본문 · 서식 변경.
+
+## 7. 현 상태 조사 (2026-11-13 · `origin/main` `36264ef604`)
+
+**태블릿 코너(화면 세트)가 이미 하는 것**
+
+| 항목 | 현재 | 근거 |
+|---|---|---|
+| 블록 7종 | `idle_media`(대기 영상) · `product_list`(제품 목록) · `corner_description`(코너 안내) · `health_info` · `staff_inquiry` · `qr_guide`(코너 QR 안내) · `content_list`(콘텐츠 목록) | `store_tablet_screen_blocks` CHECK |
+| 템플릿 4종 | 기본 코너 안내형 · 상품 집중형 · 코너 소개형(+QR) · 제품 진열형(+QR) | `operator-screen-set.controller.ts` |
+| 코너 안내 | 내용만 / 내용 + QR(`qr_guide`) 둘 다 된다 — 사용자 요구 그대로 | 템플릿 · 블록 |
+| 제품 → 내용 | 제품을 누르면 상세가 열린다. 내용은 O4O 공용 대표 설명(`shared_product_descriptions` STORE canonical)이 우선이다 — 상품 대표 QR 과 같은 원본 | `store-public-utils.ts` `COALESCE(spd.content, …)` · `PublicScreenSetViewer` |
+| 제품 → QR | 매장이 제품마다 **기존 QR 하나를 직접 고르면** 보인다(`qrCodeId`). 고르지 않으면 QR 이 없다. 상품 대표 QR(제품 Landing `/p/{key}`)은 자동으로 쓰지 않는다 | `resolveSelectedQrUrls` |
+| 코너 QR | 화면 세트 저장 시 자동 발급(`ensureScreenSetQr`) — QR 목록 38건의 원인 | §1 |
+| 동영상 | `idle_media` 는 대기 화면 영상(O4O 보관 영상 `media_assets` 또는 직접 지정)일 뿐 제품과 연결되지 않는다 | `store-tablet-idle-block.ts` · `stored-video.ts` |
+| 다국어 | 태블릿 제품 설명은 게시된 번역을 붙여 보인다 | `INLINE-MULTILINGUAL-DESCRIPTION-BRIDGE` |
+
+**영상 저장소는 두 곳이다**
+
+| 저장소 | 쓰는 곳 | 제품 연결 |
+|---|---|---|
+| `media_assets`(O4O 보관 영상 · 미디어 정본) | 태블릿 대기 영상 · 관리자 미디어 카탈로그 | **이미 있다** — `media_entity_links(entity_type='product')` · 관리자 카탈로그 API(`saveLink`). 매장 화면에는 연결 기능이 없다 |
+| `signage_media` | 매장 사이니지 동영상 · 공급자 사이니지 영상(`supplier-signage-media.controller`) | 없다 — 태그만 |
+
+**#1049 와의 관계:** #1049 는 상담 태블릿(약사 · 근무자 상담 화면)이다. 화면 세트 · `tablet-kiosk-core` · `store_tablet_*` 를 바꾸지 않는다. 겹치는 파일은 `services/web-store/src/App.tsx` · `store-workspace.test.tsx` · `HANDOFF.md` 뿐이다.
+
+**판단**
+- 사용자가 원한 코너 형태(코너 안내 · 내용 + QR · 제품 상품명 + QR 또는 버튼 · 같은 내용)는 대부분 이미 있다. 빠진 것은 두 가지다.
+  - 제품 QR 이 수동 선택이라 대부분 비어 있다 → 기본값을 상품 대표 QR 로 한다(T5).
+  - 제품 영상이 없다 → T4 + T5.
+- 제품 영상 연결은 저장소가 둘이라, 이미 있는 연결(`media_entity_links`)을 쓰고 `signage_media` 에만 제품 열을 더한다. 새 연결 표를 만들지 않는다.
 
 ## 6. 문서 정합
 
