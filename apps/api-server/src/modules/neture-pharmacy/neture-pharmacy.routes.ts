@@ -207,7 +207,7 @@ export function createNeturePharmacyRoutes(dataSource: DataSource, consultationD
     requireProductSupport: async(_actor,org)=>{await serviceFeatures.requireStore(org,'store-staff-support');},
     guidance, products: stationProducts, translate: consultationDeps.translate,
   });
-  router.use(consultationWorkspaceRoutes(dataSource,stations,store,admin,guidance,consultationSupport,kiosk));
+  router.use(consultationWorkspaceRoutes(dataSource,stations,store,guidance,consultationSupport,kiosk));
   const featurePolicyAdmin: RequestHandler = (req, res, next) => {
     if (req.body?.serviceFeatures === undefined) return next();
     return (requireRole(['platform:super_admin']) as RequestHandler)(req, res, next);
