@@ -29,6 +29,19 @@ jest.mock('../middleware/upload.middleware.js', () => ({
   uploadSingleMiddleware: () => (_req: any, _res: any, next: any) => next(),
 }));
 
+// 이미지 쓰기 경로는 표준 공급자 guard(neture-identity.middleware)를 쓴다.
+// 기본은 ACTIVE 공급자 sup-1 — mockGuardDenied 가 켜지면 표준 guard 의 403 응답을 흉내낸다.
+let mockGuardDenied = false;
+jest.mock('../modules/neture/middleware/neture-identity.middleware.js', () => ({
+  createRequireActiveSupplier: () => (req: any, res: any, next: any) => {
+    if (mockGuardDenied) {
+      return res.status(403).json({ success: false, error: { code: 'SUPPLIER_NOT_ACTIVE' } });
+    }
+    req.supplierId = 'sup-1';
+    next();
+  },
+}));
+
 jest.mock('../modules/neture/neture.service.js', () => ({
   NetureService: jest.fn().mockImplementation(() => ({
     getSupplierByUserId: async () => ({ id: 'sup-1', status: SUPPLIER_ACTIVE }),
@@ -105,6 +118,21 @@ function buildApp({ owned, images = [] }: { owned: boolean; images?: ImageFixtur
 }
 
 describe('공급자 이미지 write 는 master 소유를 확인한다', () => {
+  afterEach(() => {
+    mockGuardDenied = false;
+  });
+
+  it('쓰기 경로는 표준 공급자 guard 를 거친다 — guard 가 막으면 write 0', async () => {
+    mockGuardDenied = true;
+    const { app, writes } = buildApp({ owned: true });
+    const res = await request(app)
+      .post('/products/master-1/images/from-url')
+      .send({ imageUrl: 'https://example.com/a.png' });
+    expect(res.status).toBe(403);
+    expect(res.body.error.code).toBe('SUPPLIER_NOT_ACTIVE');
+    expect(writes).toHaveLength(0);
+  });
+
   it('URL 등록 — 소유하지 않은 master 는 403 MASTER_NOT_OWNED', async () => {
     const { app, writes } = buildApp({ owned: false });
     const res = await request(app)
