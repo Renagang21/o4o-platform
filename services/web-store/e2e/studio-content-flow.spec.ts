@@ -19,7 +19,7 @@ for (const base of ['/store', '/work/kpa-society/store']) {
    if (path.endsWith('/auth/me')) return json({ user: { id: 'synthetic-owner', name: '합성 사용자', email: 'owner@example.invalid', roles: [], memberships: [], status: 'active', isActive: true } });
    if (path.endsWith('/work-scope/accessible-stores')) return json({ stores: [{ organizationId: store, organizationName: '합성 매장', memberRole: 'owner' }] });
    if (path.endsWith('/work-scope/store-services')) return json({ status: 'resolved', organizationId: store, services: [{ organizationId: store, serviceKey: 'kpa-society', serviceName: '약국', enrollmentStatus: 'active', workspaceMode: 'standard', workspaceAvailable: true }], reason: null });
-   if (path.endsWith('/consultation-layout')) return json({ organizationId: store, name: '합성 매장', operatingType: 'large' });
+   if (path.endsWith('/consultation-tablets')) return json({ organizationId: store, tablets: [], canEdit: true });
    if (path.endsWith('/semi-franchises')) return json([]);
    if (path.endsWith('/store-library/contents')) {
     if (failList) { failList = false; return route.fulfill({ status: 503, json: { success: false } }); }

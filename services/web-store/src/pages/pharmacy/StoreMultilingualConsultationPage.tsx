@@ -28,6 +28,18 @@ import {
 } from "./useConsultationDrafts";
 
 const base = "/neture/pharmacy/multilingual-consultation";
+/**
+ * 상담 태블릿 종류별로 쓸 수 있는 상담 방식. 매장 이용 자격(기능)은 그대로 두고
+ * 앞쪽 방식부터 고른다. 한 태블릿에서 문의와 답변을 끝내므로 고객 화면 연결은 쓰지 않는다.
+ */
+export const TABLET_ROLE_MODES = {
+  pharmacist: ["floor-pharmacist", "counter-pharmacist"],
+  staff: ["floor-staff", "counter-staff"],
+} as const;
+export type TabletRole = keyof typeof TABLET_ROLE_MODES;
+const ROLE_TITLE: Record<TabletRole, string> = { pharmacist: "약사 상담", staff: "근무자 상담" };
+const tabletRole = (value: string | null): TabletRole | null =>
+  value === "pharmacist" || value === "staff" ? value : null;
 function translationErrorMessage(code?: string) {
   if (code === "CONSULTATION_QUOTA_EXCEEDED") return "번역 이용 한도에 도달했습니다. 잠시 후 다시 시도해 주시기 바랍니다.";
   if (code === 'CONSULTATION_LANGUAGE_UNCERTAIN') return '입력 언어가 불확실합니다. 고객 문장 언어를 직접 선택하고 자동 감지를 끈 뒤 다시 시도해 주시기 바랍니다.';
@@ -75,6 +87,9 @@ export default function StoreMultilingualConsultationPage() {
       key={`${user?.id}:${organizationId}`}
       organizationId={organizationId}
       initialMode={params.get("mode") || ""}
+      role={tabletRole(params.get("role"))}
+      tabletId={(params.get("tablet") || "").slice(0, 40)}
+      tabletName={(params.get("name") || "").slice(0, 40)}
       stationKey={params.get("station") || "counter-1"}
     />
   );
@@ -83,10 +98,16 @@ export default function StoreMultilingualConsultationPage() {
 function Consultation({
   organizationId,
   initialMode,
+  role,
+  tabletId,
+  tabletName,
   stationKey,
 }: Readonly<{
   organizationId: string;
   initialMode: string;
+  role: TabletRole | null;
+  tabletId: string;
+  tabletName: string;
   stationKey: string;
 }>) {
   const [context, setContext] = useState<Context | null>(null);
@@ -132,7 +153,8 @@ function Consultation({
     language,
     stationKey,
   );
-  const counter = mode.startsWith("counter-");
+  // 2대 연결(고객 화면 짝짓기)은 새 태블릿 구조로 교체했다(2026-11-13). 서버 계약은 정리 단계에서 제거한다.
+  const counter = false;
   const connected = counter && station.room?.active ? station.room : null;
   const version = useRef(0);
   const alive = useRef(true);
@@ -146,7 +168,12 @@ function Consultation({
     }
   }, [direction]);
   const current = context?.modes.find((item) => item.key === mode);
-  const fixedResponse = mode === "floor-staff" && direction === "to-customer";
+  // 근무자 태블릿도 자유 문장 · 음성으로 답한다. 안내 문구는 빠른 입력으로만 남긴다.
+  const fixedResponse = false;
+  const roleModes: readonly string[] | null = role ? TABLET_ROLE_MODES[role] : null;
+  const visibleContext = context && roleModes
+    ? { ...context, modes: context.modes.filter((item) => roleModes.includes(item.key)) }
+    : context;
   const inputLanguage =
     direction === "to-staff" ? replyLanguage || language : language;
   const speech = useConsultationAudio(
@@ -171,7 +198,7 @@ function Consultation({
       recognition: context?.runtime?.recognition, synthesis: context?.runtime?.synthesis,
       recognize: async (audioBase64, spokenLanguage) => {
         const response = await coreApiClient.post<{ success: boolean; data: { organizationId: string; mode: string; text: string; language: string } }>('/neture/pharmacy/consultation-speech/recognize', {
-          mode, audioBase64, language: direction === 'to-staff' && autoLanguage ? 'auto' : spokenLanguage,
+          mode, audioBase64, language: direction === 'to-staff' && autoLanguage ? 'auto' : spokenLanguage, ...(tabletId ? { tabletId } : {}),
           ...(connected ? { stationId: connected.id, epoch: connected.epoch } : {}),
         });
         if (!response.success || response.data.organizationId !== organizationId || response.data.mode !== mode || !response.data.text || !context?.languages.some(item => item.key === response.data.language)) throw new Error('음성 인식 결과를 확인하지 못했습니다.');
@@ -223,7 +250,8 @@ function Consultation({
     setContextLoading(true);
     setError("");
     coreApiClient
-      .get<{ success: boolean; data: Context }>(`${base}/context`)
+      // 태블릿 화면이면 그 태블릿의 음성 자동 감지 후보를 받는다(서버가 저장된 목록에서 읽는다).
+      .get<{ success: boolean; data: Context }>(`${base}/context${tabletId ? `?${new URLSearchParams({ tablet: tabletId })}` : ""}`)
       .then((response) => {
         if (cancelled) return;
         const data = response.data;
@@ -242,15 +270,20 @@ function Consultation({
           )
         )
           throw new Error("Invalid context");
+        const candidates: readonly string[] | null = role ? TABLET_ROLE_MODES[role] : null;
+        const pool = candidates
+          ? candidates.map((key) => data.modes.find((item) => item.key === key)).filter((item): item is Context["modes"][number] => !!item)
+          : data.modes;
+        if (!pool.length) throw new Error("Invalid context");
         setContext(data);
         autoDefault.current = data.runtime?.detectLanguage === true;
         setAutoLanguage(autoDefault.current);
         setMode(
           (
-            data.modes.find((item) => item.key === initialMode) ??
-            data.modes.find((item) => item.allowed) ??
-            data.modes.find((item) => item.entitled) ??
-            data.modes[0]
+            pool.find((item) => item.key === initialMode) ??
+            pool.find((item) => item.allowed) ??
+            pool.find((item) => item.entitled) ??
+            pool[0]
           ).key,
         );
         setLanguage(data.languages[0].key);
@@ -265,7 +298,7 @@ function Consultation({
     return () => {
       cancelled = true;
     };
-  }, [organizationId, retry, initialMode]);
+  }, [organizationId, retry, initialMode, role, tabletId]);
 
   const clear = useCallback(() => {
     reuseSession.current = crypto.randomUUID();
@@ -393,11 +426,15 @@ function Consultation({
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold">
-            {current?.label || "상담 화면"}
+            {tabletName || (role ? ROLE_TITLE[role] : current?.label) || "상담 화면"}
           </h1>
           <p className="mt-1 text-sm text-slate-600">
-            고객과 함께 보는 상담 화면입니다. 매대에서는 고객 태블릿을 별도로
-            연결할 수 있습니다.
+            {role === "pharmacist"
+              ? "약사와 고객이 이 태블릿 한 대를 함께 보는 약사용 상담 화면입니다."
+              : role === "staff"
+                ? "근무자와 고객이 이 태블릿 한 대를 함께 보는 근무자용 상담 화면입니다."
+                : "고객과 함께 보는 상담 화면입니다."}{" "}
+            문의와 답변은 이 화면에서 진행합니다.
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -486,13 +523,13 @@ function Consultation({
         <>
           <details className="rounded-xl border bg-white px-4">
             <summary className="min-h-11 cursor-pointer content-center text-sm">
-              상담 방식·고객 언어 ·{" "}
+              {roleModes ? "고객 언어" : "상담 방식·고객 언어"} ·{" "}
               {context.languages.find((l) => l.key === language)?.label}
             </summary>
             <ConsultationSelectors
               locked={station.busy}
-              modeLocked={!!connected}
-              context={context}
+              modeLocked={!!connected || !!roleModes}
+              context={visibleContext!}
               mode={mode}
               language={language}
               onMode={(value) => {
@@ -647,7 +684,7 @@ function Consultation({
                     ))}
                   </select>
                 </label>
-                <p className="text-xs text-slate-500">{context.runtime?.recognition === 'google-cloud' ? `음성 자동 감지는 관리자 후보 언어(${context.runtime.speechLanguages.join(', ')})에서 선택합니다.` : '브라우저 음성은 선택한 언어로 인식합니다. 문자 번역의 자동 감지와 다르며, 모바일에서 Chrome 언어 감지를 보장하지 않습니다.'}</p>
+                <p className="text-xs text-slate-500">{context.runtime?.recognition === 'google-cloud' ? `음성 자동 감지는 이 태블릿의 후보 언어(${context.runtime.speechLanguages.join(', ')})에서 선택합니다. 후보는 매장 경영자가 태블릿마다 정하며, 없으면 관리자 기본 후보를 씁니다.` : '브라우저 음성은 선택한 언어로 인식합니다. 문자 번역의 자동 감지와 다르며, 모바일에서 Chrome 언어 감지를 보장하지 않습니다.'}</p>
                 {result?.detectedLanguage && <p role="status">감지한 고객 언어: {context.languages.find(item => item.key === result.detectedLanguage)?.label} · 잘못 감지되면 직접 수정하시기 바랍니다.</p>}
                 </div>
               )}
@@ -668,7 +705,7 @@ function Consultation({
                     고객이 말하기
                   </button>
                 )}
-                {speech.inputSupported && mode !== "floor-staff" && (
+                {speech.inputSupported && (
                   <button
                     className="min-h-16 rounded-xl border border-teal-600 px-5 py-3 text-lg"
                     disabled={busy}
@@ -677,7 +714,7 @@ function Consultation({
                       setPendingVoice("to-customer");
                     }}
                   >
-                    직원·약사가 말하기
+                    {role === "pharmacist" ? "약사가 말하기" : role === "staff" ? "근무자가 말하기" : "직원·약사가 말하기"}
                   </button>
                 )}
                 {speech.listening && (
@@ -696,6 +733,7 @@ function Consultation({
               <details
                 open={
                   counter ||
+                  !!role ||
                   fixedResponse ||
                   direction === "to-staff" ||
                   speech.listening
@@ -728,6 +766,28 @@ function Consultation({
                     setText(value);
                   }}
                 />
+                {current && !current.professional && direction === "to-customer" && (
+                  <div className="mt-2 flex flex-wrap gap-2" role="group" aria-label="자주 쓰는 안내 문구">
+                    {context.phrases.map((item) => (
+                      <button
+                        key={item.key}
+                        type="button"
+                        className="min-h-11 rounded border px-3 py-2 text-left text-sm"
+                        disabled={busy || speech.listening}
+                        onClick={() => {
+                          speech.reset();
+                          version.current++;
+                          setBusy(false);
+                          setResult(null);
+                          setError("");
+                          setText(item.text);
+                        }}
+                      >
+                        {item.text}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </details>
               {!speech.inputSupported && (
                 <p className="text-sm text-slate-600">

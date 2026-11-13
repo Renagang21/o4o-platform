@@ -2,7 +2,8 @@ import type { DataSource } from 'typeorm';
 
 /** Clear current delivery bodies after the existing 90-second connection expiry; never delete business assets. */
 export async function cleanupConsultationState(db: Pick<DataSource, 'query'>, apply: boolean): Promise<number> {
-  const expired = `(operator_seen_at IS NULL OR operator_seen_at < now() - interval '90 seconds')
+  // 소비자 태블릿(키오스크)은 운영자 heartbeat 가 없고 상담 내용을 저장하지 않는다 — 연결 코드 · 기기 자격을 지우지 않는다.
+  const expired = `mode<>'consumer-kiosk' AND (operator_seen_at IS NULL OR operator_seen_at < now() - interval '90 seconds')
     AND (active=true OR shared<>'{}'::jsonb OR translation<>'{}'::jsonb OR reply<>'{}'::jsonb OR pairing_hash IS NOT NULL)`;
   if (!apply) {
     const [row] = await db.query(`SELECT count(*)::int AS count FROM store_consultation_stations WHERE ${expired}`);
