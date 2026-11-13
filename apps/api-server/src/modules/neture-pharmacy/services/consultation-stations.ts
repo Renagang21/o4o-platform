@@ -92,6 +92,7 @@ export class ConsultationStationService {
     if (
       typeof input.stationKey !== "string" ||
       !/^[a-z0-9_-]{1,40}$/i.test(input.stationKey) ||
+      /^kiosk-/i.test(input.stationKey) ||
       typeof input.name !== "string" ||
       !input.name.trim() ||
       input.name.length > 80 ||

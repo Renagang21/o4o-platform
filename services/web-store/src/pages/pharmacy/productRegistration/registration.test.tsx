@@ -28,6 +28,12 @@ function deferred<T>() {
   return { promise, resolve, reject };
 }
 const tick = () => act(async () => { await vi.advanceTimersByTimeAsync(300); });
+it('prefills a common-product comparison without automatically registering the local product', async () => {
+  renderHook(() => useStandardProductSelection('A', registered, '합성 직접 상품'));
+  await tick();
+  expect(api.search).toHaveBeenLastCalledWith(expect.objectContaining({ q: '합성 직접 상품' }));
+  expect(api.register).not.toHaveBeenCalled();
+});
 beforeEach(() => {
   vi.useFakeTimers(); vi.clearAllMocks(); api.store = 'A'; api.serviceKey = 'kpa-society';
   api.search.mockReset().mockResolvedValue(searchResult()); api.register.mockReset().mockResolvedValue({ success: true });

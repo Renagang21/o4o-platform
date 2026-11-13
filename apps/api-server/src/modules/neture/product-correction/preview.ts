@@ -23,6 +23,7 @@ export function previewQuery(
     return `$${params.length}`;
   };
   const where = ["m.status = 'ACTIVE'"];
+  if (rule.handledOnly) where.push('m.deleted_at IS NULL', `EXISTS (SELECT 1 FROM organization_product_listings l WHERE l.master_id=m.id AND l.is_active=true)`);
   if (rule.regulatoryTypes.length)
     where.push(
       `lower(trim(m.regulatory_type)) = ANY(${bind(expandRegulatoryTypeAliases(rule.regulatoryTypes))}::text[])`,

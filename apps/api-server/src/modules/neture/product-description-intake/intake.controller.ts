@@ -8,6 +8,7 @@ import { DescriptionIntakeError } from './contracts.js';
 import { DescriptionIntakeService } from './intake.service.js';
 import { CorrectionError } from '../product-correction/contracts.js';
 import logger from '../../../utils/logger.js';
+import { readMaterialPreparation, materialPreparationRequest } from './material-preparation.js';
 
 const revision = z.string().regex(/^[a-f0-9]{64}$/);
 export function createDescriptionIntakeController(db: DataSource): Router {
@@ -15,6 +16,7 @@ export function createDescriptionIntakeController(db: DataSource): Router {
   router.use(authenticate);
   router.use(requireAdmin);
   const handle = (task: (req: Request) => Promise<unknown>) => async (req: Request, res: Response) => {
+    res.setHeader('Cache-Control', 'private, no-store');
     try { res.json({ success: true, data: await task(req) }); }
     catch (error) {
       if (error instanceof DescriptionIntakeError || error instanceof CorrectionError) { res.status(error.status).json({ success: false, code: error.code, error: '입력·최신 설명서·선택한 상품을 다시 확인해 주시기 바랍니다.' }); return; }
@@ -28,6 +30,8 @@ export function createDescriptionIntakeController(db: DataSource): Router {
     return id;
   };
   const id = (req: Request) => z.string().uuid().parse(req.params.id);
+  router.get('/preparation', handle(req => readMaterialPreparation(db, req.query)));
+  router.post('/preparation/request', handle(req => materialPreparationRequest(db, req.body)));
   router.post('/preview', handle(req => service.preview(req.body)));
   router.post('/', requireProductDbWrite, handle(req => service.submit(req.body, actor(req))));
   router.get('/', handle(req => {

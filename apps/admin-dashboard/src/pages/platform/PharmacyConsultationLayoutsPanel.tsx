@@ -109,6 +109,10 @@ export default function PharmacyConsultationLayoutsPanel() {
         직원·소비자 화면을 먼저 제시합니다. 이용권·근무자 권한·약사 사용 확인은
         바뀌지 않습니다.
       </p>
+      <p role="note" className="rounded border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">
+        매장 상담 화면은 매장 경영자가 등록하는 약사·근무자 태블릿 목록으로 바뀌었습니다.
+        이 배치 설정은 현재 매장 상담 화면에 반영되지 않으며 정리 단계에서 제거합니다.
+      </p>
       <form
         className="flex flex-wrap gap-2"
         onSubmit={(e) => {

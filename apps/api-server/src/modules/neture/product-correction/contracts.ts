@@ -22,7 +22,8 @@ export const ruleSchema = z
           .regex(/^[A-Za-z0-9_-]{1,50}$/),
       )
       .max(12),
-    descriptionType: z.enum(['STORE', 'B2B', 'B2C', 'SUPPLIER_STORE']),
+    descriptionType: z.enum(['STORE', 'B2B', 'B2C', 'SUPPLIER_STORE', 'CONSULTATION']),
+    handledOnly: z.boolean().optional(),
     language: z.string().regex(/^[a-z]{2}(?:-[A-Z]{2})?$/),
     cadenceDays: z.number().int().min(1).max(3650),
     enabled: z.boolean(),

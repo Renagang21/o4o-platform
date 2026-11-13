@@ -66,6 +66,7 @@ export function ConsultationGuidancePanel({
     [question, setQuestion] = useState(""),
     [search, setSearch] = useState(""),
     [query, setQuery] = useState("");
+  const [reuseSession] = useState(() => crypto.randomUUID());
   const [selected, setSelected] = useState<ConsultationProduct | null>(null),
     [choose, setChoose] = useState(false),
     [result, setResult] = useState<GuidanceResult | null>(null),
@@ -105,6 +106,7 @@ export function ConsultationGuidancePanel({
   const prepare = async (options: Partial<GuidanceRequest> = {}) => {
     if (lock.current || locked || voiceListening) return;
     const input: GuidanceRequest = {
+      reuseSession,
       mode,
       language,
       intent,

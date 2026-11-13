@@ -22,7 +22,7 @@ beforeEach(() => {
   service = new MultilingualConsultationService({ query } as any, { translate, professional });
 });
 
-it('translates only a server-selected staff phrase and rejects arbitrary outgoing staff text', async () => {
+it('translates a server-selected staff phrase and rejects mixed or unknown phrase input', async () => {
   const input = { mode: 'floor-staff', language: 'en', direction: 'to-customer', phrase: 'pharmacist' };
   const output = await service.translate('staff', 'store', input);
   expect(output.source).toBe('약 선택과 복용에 관한 질문은 약사에게 연결해 드리겠습니다.');
@@ -32,6 +32,13 @@ it('translates only a server-selected staff phrase and rejects arbitrary outgoin
     await expect(service.translate('staff', 'store', invalid)).rejects.toMatchObject({ code: 'STAFF_PHRASE_REQUIRED' });
   }
   expect(translate).toHaveBeenCalledTimes(1);
+});
+it('lets the staff tablet send free outgoing text without a pharmacist qualification', async () => {
+  const output = await service.translate('staff', 'store', { mode: 'floor-staff', language: 'en', direction: 'to-customer', text: '  Free-form outgoing  ' });
+  expect(output.source).toBe('Free-form outgoing');
+  expect(translate.mock.calls[0][0]).toEqual({ source: 'ko', target: 'en', text: 'Free-form outgoing' });
+  expect(professional).not.toHaveBeenCalled();
+  await expect(service.translate('staff', 'store', { mode: 'floor-staff', language: 'en', direction: 'to-customer', text: ' ' })).rejects.toMatchObject({ code: 'INVALID_CONSULTATION_INPUT' });
 });
 it('allows incoming customer words without generating a staff answer', async () => {
   await service.translate('staff', 'store', { mode: 'floor-staff', language: 'ja', direction: 'to-staff', text: 'Original utterance' });
@@ -94,7 +101,8 @@ it('keeps Korean local and adds typed counter staff guidance without professiona
   features = [];
   await expect(service.translate('staff', 'store', input)).rejects.toMatchObject({ code: 'SERVICE_FEATURE_REQUIRED' });
 });
-it('enforces fixed floor-staff phrases for Korean as well as foreign languages', async () => {
-  await expect(service.translate('staff', 'store', { mode: 'floor-staff', language: 'ko', direction: 'to-customer', text: 'Free-form outgoing' })).rejects.toMatchObject({ code: 'STAFF_PHRASE_REQUIRED' });
+it('still requires staff-response entitlement for free floor-staff text', async () => {
+  features = ['multilingual-consultation'];
+  await expect(service.translate('staff', 'store', { mode: 'floor-staff', language: 'ko', direction: 'to-customer', text: 'Free-form outgoing' })).rejects.toMatchObject({ code: 'SERVICE_FEATURE_REQUIRED' });
   expect(translate).not.toHaveBeenCalled();
 });

@@ -248,7 +248,7 @@ const C = (n) => String(n).repeat(40).slice(0, 40);
 
 /** 실제 판정기(assessRisk)로 base → target 변경 파일을 판정해 서비스별 entry 를 만든다 (모든 서비스가 BASE 를 서빙) */
 function fromFiles(paths, over = {}) {
-  const r = assessRisk(paths.map((p) => ({ status: 'M', path: p })), graph, {});
+  const r = assessRisk(paths.map((p) => ({ status: 'M', path: p })), graph, { approvalPolicy: 'strict' });
   return all((k) => {
     const s = r.services[k];
     return {
@@ -294,7 +294,7 @@ describe('U1. fixture §31 — LEVEL 판정 → Delivery 결정 · 계획', () =
   it('L1 docs only → 전 서비스 NO_DEPLOY · 계획 0', () => {
     const d = decideAll(fromFiles(['docs/x.md']), ok, {});
     assert.ok(Object.values(d).every((x) => x.decision === 'NO_DEPLOY'));
-    assert.deepEqual(buildPlan(d, {}), { deploy_api: false, admin_after_api: false, admin_parallel: false, web_after_api: [], web_parallel: [] });
+    assert.deepEqual(buildPlan(d, {}), { deploy_api: false, backup_before_migration: false, admin_after_api: false, admin_parallel: false, web_after_api: [], web_parallel: [] });
   });
   it('L1 CI control only (판정 스크립트 · delivery/promote workflow) → NO_DEPLOY', () => {
     const per = fromFiles(['scripts/ci/deploy-orchestrate.mjs', '.github/workflows/delivery.yml', '.github/workflows/promote.yml']);
@@ -607,6 +607,7 @@ describe('U5. 상태 표현 · commit status · report (§10 · §26 · §27)', 
       execute: 'true',
       dry_call: 'true',
       deploy_api: 'true',
+      api_backup_before_migration: 'true',
       admin_after_api: 'true',
       admin_parallel: 'false',
       web_after_api: ['neture'],

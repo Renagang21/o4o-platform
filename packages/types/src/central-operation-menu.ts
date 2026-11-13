@@ -97,6 +97,8 @@ export const CENTRAL_OPERATION_MENUS: readonly CentralOperationMenu[] = [
   item('partner-support', 'members', '파트너 회원 관리', 'members', ['/operator']),
   item('partner-support', 'boards', '파트너 게시판 관리', 'service', ['/operator']),
   item('partner-support', 'events', '파트너 운영 이력', 'settings', ['/operator']),
+  // TODO-O4O-LEGAL-BASIC-DOCUMENTS-ADMIN-V1 3단계: O4O Partner 이용약관 · 개인정보 안내(본문 게시는 Partner 사업 조건 확정 후).
+  item('partner-support', 'legal', '법정정보·약관', 'settings', [], 'admin'),
   item('pharmcoop', 'federation', '연합회 가입·참여 운영', 'members', ['/operator']),
   item('pharmcoop', 'inbox', '연합회 문의 접수·처리', 'service', ['/operator/inbox']),
   item('pharmcoop', 'home', '연합회 홈·공지 운영', 'service', ['/operator/home-presentation']),

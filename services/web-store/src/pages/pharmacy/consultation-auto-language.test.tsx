@@ -73,3 +73,23 @@ it('carries the reviewed source through translation and rechecks it before showi
   expect(HTMLDialogElement.prototype.showModal).not.toHaveBeenCalled();
   expect(screen.queryAllByText('합성 번역')).toHaveLength(0);
 });
+
+it('reuses the session in one conversation and rotates it for the next customer', async () => {
+  render(<MemoryRouter><Page /></MemoryRouter>);
+  fireEvent.click(await screen.findByRole('button', { name: '고객 → 직원' }));
+  const panel = within(screen.getByRole('region', { name: '문장 번역' }));
+  const send = async (text: string, count: number) => {
+    fireEvent.change(panel.getByRole('textbox'), { target: { value: text } });
+    fireEvent.click(screen.getByRole('button', { name: '번역하기' }));
+    await waitFor(() => expect(api.post.mock.calls.filter(([path]) => path.endsWith('/translate'))).toHaveLength(count));
+    await screen.findByText(/감지한 고객 언어: 日本語/);
+  };
+  await send('合成の質問', 1);await send('別の合成質問', 2);
+  const requests = () => api.post.mock.calls.filter(([path]) => path.endsWith('/translate')).map(([,body])=>body);
+  const first = requests()[0].reuseSession;
+  expect(first).toMatch(/^[a-f0-9-]{36}$/);expect(requests()[1].reuseSession).toBe(first);
+  fireEvent.click(screen.getByRole('button', { name: '새 상담 · 내용 지우기' }));
+  await send('合成の質問', 3);
+  expect(requests()[2].reuseSession).not.toBe(first);
+  for (const request of requests()) { expect(request.actorId).toBeUndefined();expect(request.organizationId).toBeUndefined();expect(request.reuseKey).toBeUndefined(); }
+});

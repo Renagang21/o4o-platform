@@ -14,6 +14,8 @@ it('keeps facts and professional/unclassified material separate until explicit u
   fireEvent.click(screen.getByText('확인한 항목을 상담 작성 근거로 사용'));
   expect(use.mock.calls[0][0].facts).toContain('확인된 성분'); expect(use.mock.calls[0][0].facts).not.toContain('전문 판단');
   expect(use.mock.calls[0][0].references).toContain('전문 판단 참고');
+  expect(use.mock.calls[0][0].source).toContain('O4O 상품 상담자료 description');
+  expect(use.mock.calls[0][0].source).not.toContain('B2B');
 });
 it('shows missing language evidence without substituting QR content', async () => {
   read.mockResolvedValue({ state: 'missing', description: null });

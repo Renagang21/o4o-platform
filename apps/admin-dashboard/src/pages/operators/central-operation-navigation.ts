@@ -7,7 +7,7 @@ export const centralOperationAreas: Record<string, readonly string[]> = {
   funding: ["members", "inbox", "funding", "home", "legal", "contact-settings"],
   lecture: ["members", "inbox", "courses", "instructors", "certificates", "contact", "home", "contact-settings", "legal"],
   community: ["members", "inbox", "editorial", "boards", "forums", "erase-members", "erase-boards", "home", "legal", "contact-settings"],
-  "partner-support": ["reports", "posts", "members", "boards", "events"],
+  "partner-support": ["reports", "posts", "members", "boards", "events", "legal"],
   pharmcoop: ["federation", "inbox", "home"],
 };
 const origins: Record<string, string> = {

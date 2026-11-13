@@ -12,7 +12,8 @@ export interface ProductCorrectionRuleInput {
   instructions: string;
   purpose: 'professional' | 'ai-support' | 'consumer-qr';
   regulatoryTypes: string[];
-  descriptionType: 'STORE' | 'B2B' | 'B2C' | 'SUPPLIER_STORE';
+  handledOnly?: boolean;
+  descriptionType: 'STORE' | 'B2B' | 'B2C' | 'SUPPLIER_STORE' | 'CONSULTATION';
   language: string;
   cadenceDays: number;
   enabled: boolean;

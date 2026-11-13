@@ -1,6 +1,7 @@
 import ExternalAiDraftEntry from './pages/ExternalAiDraftEntry';
 import { ContactPage, OperatorInboxPage } from './pages/ContactPages';
 import CustomerConsultationPage from './pages/pharmacy/consultation/CustomerConsultationPage';
+import KioskConsultationPage from './pages/pharmacy/consultation/KioskConsultationPage';
 import TabletRunPage from './pages/tablet/TabletRunPage';
 import TabletSetupPage from './pages/tablet/TabletSetupPage';
 import StoreStaffSupportPage from './pages/pharmacy/StoreStaffSupportPage';
@@ -227,6 +228,7 @@ function storeChildRoutes() {
 export default function App() {
   return <BrowserRouter><Suspense fallback={Loading}><Routes>
     <Route path="/consultation/customer" element={<CustomerConsultationPage />} />
+    <Route path="/consultation/kiosk" element={<KioskConsultationPage />} />
     <Route path="/tablet/setup" element={<TabletSetupPage />} />
     <Route path="/tablet/:slug" element={<TabletRunPage />} />
     <Route path="/*" element={<WorkspaceApp />} />
