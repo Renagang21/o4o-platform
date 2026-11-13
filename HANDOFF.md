@@ -1,5 +1,38 @@
 # HANDOFF
 
+
+## 2026-11-13 · 계정 삭제 「확인 필요」 원인 표시 (branch `claude/intelligent-cray-o2p4u3-erasure-reason`)
+
+> 다음 실행자: **통합 세션** — PR 생성 · 병합 → 배포 후 Admin 확인. 원인을 배포 전에 알아야 하면 **LOCAL** 이 아래 read-only SQL 을 먼저 실행한다.
+
+- **증상(2026-11-12 사용자 보고):**
+  - Admin 「전체 회원 › 해지 회원」에서 한 회원(약국경영자 · 카카오 로그인 · 이메일 없음)의 삭제가 「삭제 미완료 — 확인 필요」로 멈춘다.
+  - 「계정 삭제」를 다시 눌러도 결과가 같다.
+  - 화면에는 「삭제를 완료하지 못했습니다. 다시 시도해 주시기 바랍니다.」라는 일반 문구만 보였다.
+- **원인(코드 확인):**
+  - 삭제 전 검토(`reviewManifest`)에서 멈추면 서버는 `error_code` 를 비우고, 실제 원인은 `review_codes` 에 넣는다. 예: `REVIEW:public.<표>` · `COMMUNITY_MANAGEMENT_TRANSFER_REQUIRED`.
+  - 회원 목록 · 상세 · 삭제 직후 알림 · 「삭제 처리 내역」은 모두 `error_code` 만 읽었다. 그래서 진짜 원인이 화면에 나오지 않았다.
+  - 검토 코드는 데이터가 바뀌기 전에는 매번 같으므로, 다시 눌러도 같은 결과가 반복된다.
+  - **어느 표가 막는지는 운영 DB 없이 확정하지 못했다**(클라우드 세션).
+- **수정:**
+  - 서버: 회원 목록 · 상세의 `erasureErrorCode` 는 `error_code` 가 비면 첫 검토 코드를 쓴다. 전체 검토 코드는 `erasureReviewCodes` 로 함께 준다.
+  - 화면: 「삭제 처리 내역」의 실패 원인 칸이 검토 코드를 보인다. 삭제 직후 알림도 `reviewCodes` 를 쓴다.
+  - 문구: `REVIEW:<schema>.<table>` 은 「다른 기록(<표>)에 이 회원 정보가 남아 있어 자동 삭제를 멈췄습니다. 다시 눌러도 같은 결과입니다 — 개발 담당에게 이 표 이름을 전달」로 번역한다. 미번역이던 코드 7종에도 문구를 넣었다.
+  - 삭제 규칙(무엇을 지우고 남기는지)은 바꾸지 않았다.
+- **검증:**
+  - `central-member-workspace.postgres.spec.ts` 17/17 — 격리 PostgreSQL, 검토 코드만 있는 경우를 추가했다.
+  - admin `member-workspace-erasure.test.ts` 3/3.
+  - admin `tsc` 에서 변경 파일 오류 0. `content-editor` 의 `@o4o/ui/ai` 해석 오류는 기존 것으로, 이 변경과 무관하다.
+- **원인 표 확인(LOCAL · read-only · `o4o_readonly`):** 식별자 · 개인정보 없이 코드만 나온다.
+
+  ```sql
+  SELECT state, error_code, review_codes, updated_at FROM account_erasure_operations WHERE state IN ('review_required','retry_required') ORDER BY updated_at DESC;
+  ```
+
+  결과의 표 이름을 CLOUD 로 넘기면, 그 표를 삭제 · 치환 규칙에 등록하는 후속 수정을 한다(그때까지 이 회원 삭제는 멈춘 상태로 안전하게 남는다).
+- **배포 후 확인:** Admin 「해지 회원」의 그 회원 행 · 상세에 표 이름이 들어간 문구가 보인다. 「삭제 처리 내역」 실패 원인 칸에 검토 코드가 보인다.
+- **겹칠 수 있는 PR:** 확인하지 못했다(통합 세션이 `gh pr diff --name-only` 로 대조).
+
 ## 2026-11-12 · 상시 통합 세션 운영 기록 · 후속 작업 요청서 (branch `claude/epic-rubin-5g04vm`)
 
 - **병합(squash)**: #1043 · #1042 · #1044 · #1045 · #1046. 배포: main `25e7f801` → `production` `DEPLOYED`(api + 웹 7개, 23:30 UTC).
