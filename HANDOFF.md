@@ -1,5 +1,16 @@
 # HANDOFF
 
+## 2026-11-14 · ChatGPT 연결 안내 · 거래명세서 문서 보관 시험 (branch `wo/chatgpt-entry-invoice-trial`)
+
+- **다음 실행자:** 통합 세션 — 이 branch로 PR·검사·병합·배포. 개발 세션은 PR·배포·운영 DB 쓰기를 실행하지 않았다.
+- **범위:** 사용자 요청의 새 1차·2차. 기존 비용 검증 회차와 구분한다. 설정의 외부 AI 연결 카드에 접이식 안내·요청 예제 3개·복사 기능, MCP 도구 설명 3개 보완. 새 분류기·모델 호출·권한/스키마 변경 없음.
+- **검증:** API 4 suites / 50, UI 3 files / 14, API·web-neture TypeScript, 변경 파일 ESLint 통과. 실제 컴포넌트 + 응답 fixture로 PC 1280px·모바일 390px의 연결 3상태 안내·복사·넘침을 확인했다. 전체 배포 UI 확인은 별도.
+- **명세서:** 합성 이미지의 불명확한 값을 남기고 사용자 정정을 가정한 표를 실제 dispatcher·store adapter·자료함 검증 함수로 저장·재조회했다. 메모리 저장소 대역과 모의 권한 resolver를 사용했으며 실제 SQL/ChatGPT 파일 판독/운영 저장 시험이 아니다. 실제 파일을 받으면 사용자 확인 후 목적 있는 실제 문서로 보관 시험을 진행한다. 운영 임시 자료 생성 없음.
+- **다음:** 배포 후 `/mypage/settings` Demo 경영자·근무자 PC·모바일 smoke. 실제 거래장 원장 반영은 3차, 주문 제안→수정→사이트별 장바구니는 4차, 사이트 방법 재사용은 5차. 기존 원장 입력의 원본 제한을 우회하지 않는다.
+- **통합 주의:** 현재 열려 있는 #1058은 signage 제품 연결로 변경 경로 겹침 없음. main `5590df0f`에서 시작. HANDOFF 상단 충돌은 양쪽 기록을 유지한다.
+- **문서 정합:** [사용 안내](docs/guides/O4O-CHATGPT-WORK-QUICKSTART-V1.md)와 [검증 기록](docs/checks/CHECK-O4O-CHATGPT-ENTRY-INVOICE-TRIAL-V1.md)을 새로 작성해 문서 보관과 원장 반영의 범위를 구분했다.
+
+
 
 ## 2026-11-13 · QR 목록에서 태블릿 코너 QR 분리 (branch `claude/intelligent-cray-o2p4u3-qr-tab` · web-store 화면만)
 
