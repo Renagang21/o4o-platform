@@ -106,6 +106,23 @@
 - **검증:**
   - 새 `qr/qrListFilter.test.ts` 3 · web-store `vitest src/pages` 84 files / 905 · `tsc` 0
   - 배포 후 Demo 「매장 경영자」로 `/store/marketing/qr?workspace=studio` 에서 확인할 것: 「매장 QR」 개수와 「태블릿 코너」 개수의 합이 예전 「전체」와 같은지.
+## 2026-11-14 · 운영 Demo smoke · 제품 진열 설정 빈 화면 수정 (branch `claude/wizardly-bardeen-ldq332`)
+
+- **PR 묶음:** 단독 PR(web-store `App.tsx` 한 파일 · 버그 수정). 빨리 병합 · 배포 권장.
+- **한 일:** 운영(store.neture.co.kr) Demo smoke(조회만 · 저장 · 추가 없음). 상담 화면(경영자 · 직원 · 모바일) · 약사 / 근무자 태블릿 · 예전 경로 이동 · 키오스크 연결 화면 정상, API 4xx/5xx 없음. **발견:** `/store/product-settings` 가 빈 화면 — `No QueryClient set`(web-store 에 `QueryClientProvider` 가 없는데 `@o4o/store-products-ui` 가 react-query 사용, 기존 결함). `App` 을 `QueryClientProvider` 로 감쌈(web-neture 와 같은 설정). 의존성 변경 없음(이미 선언됨).
+- **검증:** store-web type-check(`tsc -b`) · build 통과. vitest 107 files / 1016 통과(첫 전체 실행은 부하로 1건 실패 · 재실행 전부 통과 — 기존 불안정 테스트 유형).
+- **확인하지 못한 것 / 배포 후:** 매장 경영자 Demo 로 「제품 진열 설정」이 보이는지, 「이미지 관리」 창에서 공용 이미지에 「공용」 표시 · 본인 이미지만 순서 · 삭제 가능한지(빈 화면 때문에 smoke 못 함). My Home(neture.co.kr) 약사 확인 체크 제거와 관리자 화면은 smoke 하지 않음.
+- **문서 정합:** 해당 없음.
+
+### 이어서 (같은 날 · 사용자 지시) — 기본 키오스크 표시 · 문의함 403 제거
+
+- **PR 묶음:** ① 기본 키오스크(web-store `ConsultationLauncher` 한 파일 + 테스트) — 위 제품 진열 설정 수정과 같은 PR. ② 문의함 403 제거(API `contact-inquiry` + `packages/shared-space-ui`) — 서버 경로 추가가 있으므로 별도 PR 권장(권한 판정은 바뀌지 않음). **API 와 화면이 같이 배포돼야 한다**(화면만 먼저 나가면 운영자에게 「문의 관리」 메뉴가 잠시 안 보임).
+- **기본 키오스크:** 「Demo 매장에 소비자 태블릿이 없다」의 원인 — 화면은 있으나 한 번도 저장하지 않은 매장의 기본 목록에 약사 · 근무자만 있고 키오스크가 빠져 있었다. 기본 목록에 「키오스크 1」을 넣고, 저장 전 상태에서 연결 코드를 만들면 목록을 먼저 저장한 뒤 코드를 만든다(서버는 저장된 키오스크만 연결 코드를 준다). 한국어 함께 보기 설정도 바로 보인다.
+- **문의함 403:** neture 머리글이 로그인한 모든 계정에 대해 문의함 건수(`…/contact-inquiries/summary`)를 물어 권한 없는 계정은 403 이 남았다. `GET /api/v1/admin/services/:serviceKey/contact-inquiries/inbox-access` 추가 — 기존 가드(`requireContactScope`)를 그대로 실행하되 403 이면 `{allowed:false}` 를 200 으로 답하고, 그 밖의 거절(404 · 503 등)은 원래 응답 그대로. 공용 훅 `useServiceContactCount` 가 이 경로를 쓰고 `allowed:false` 면 주기 재조회를 멈춘다(kpa-branch · lecture · pharmacy-coop · neture 공용). 기존 `summary` 는 그대로 둠.
+- **결정 사항(§9):** 가드를 화면에서 역할로 미리 거르지 않았다 — 접근은 중앙 위임 · 사업 배정 등 서버만 아는 조건이라 화면 판정은 운영자를 놓친다. 판정은 서버 그대로, 응답 형식만 바꿈.
+- **검증:** 격리 로컬 PostgreSQL 로 `contact-flow.postgres.spec` 새 테스트(허용 · 거부 · 없는 서비스) 통과. 같은 파일의 Neture 수신자 8건은 기존 fixture 결함(`u.businessInfo` 열 없음 · main 동일)으로 실패 — 이번 변경 무관. 그 밖의 contact-inquiry 테스트 통과. shared-space-ui 24 files / 225 통과. web-store 107 files / 1017 통과 · type-check 통과. api type-check 통과(`digital-signage-core` 패키지 재빌드 후 — 낡은 빌드 산출물 때문). web-neture · kpa-branch · lecture · pharmacy-coop type-check 통과. `check-unsafe-routes` 위반 0.
+- **배포 후:** 매장 경영자 Demo 로 neture.co.kr 에서 `inbox-access` 가 200 `allowed:false` 이고 403 이 없는지. store 상담 화면 소비자 태블릿 칸에 「키오스크 1」 과 한국어 함께 보기 설정이 보이는지(연결 코드는 누르지 않는다 — 운영 데이터 생성).
+
 ## 2026-11-13 · 내 매장 개선 이어서 — P1 일부 · P2 일부 (branch `claude/wizardly-bardeen-ldq332`)
 
 - **PR 묶음:** 바로 아래 P0 보안 보강과 같은 PR 로 묶어도 되고, 화면 정리(`f0271f00` 이후)만 별도 PR 로 나눠도 된다. P0 보안 커밋은 먼저 병합 · 배포 권장.

@@ -2,7 +2,7 @@ import { CENTRAL_CONTACT_MENUS, assertCentralContactAccess } from './central-con
 import { centralRequestAuthMethod } from '../../middleware/central-operation-menu.middleware.js';
 import { OperationError } from '../../services/operations/operation-audit.js';
 import { centralOperationRequest } from '../../middleware/central-operation-menu.middleware.js';
-import type { RequestHandler } from "express";
+import type { Request, RequestHandler, Response } from "express";
 import type { DataSource } from "typeorm";
 import {
   requireServiceLegalScope,
@@ -188,6 +188,61 @@ export function requireContactScope(
           message: "해당 서비스 문의 처리 권한이 필요합니다.",
         },
       });
+    } catch (error) {
+      next(error);
+    }
+  };
+}
+
+export type GuardProbe = { allowed: true } | { allowed: false; status: number; body: unknown };
+
+/**
+ * 가드를 응답을 보내지 않고 실행해 통과 여부만 본다. 판정은 가드가 그대로 한다.
+ * 화면이 「문의 관리」를 보여 줄지 묻는 조회에서, 권한 없는 계정에 403 을 보내지 않기 위해 쓴다.
+ */
+export function probeGuard(guard: RequestHandler, req: Request): Promise<GuardProbe> {
+  return new Promise((resolve, reject) => {
+    let status = 200;
+    const deny = (body: unknown) => resolve({ allowed: false, status, body });
+    const shim = {
+      locals: {},
+      status(code: number) { status = code; return shim; },
+      json(body: unknown) { deny(body); return shim; },
+      send(body: unknown) { deny(body); return shim; },
+      sendStatus(code: number) { status = code; deny(undefined); return shim; },
+      end() { deny(undefined); return shim; },
+      set() { return shim; },
+      setHeader() { return shim; },
+    };
+    try {
+      Promise.resolve(guard(req, shim as unknown as Response, (error?: unknown) => (error ? reject(error) : resolve({ allowed: true }))))
+        .catch(reject);
+    } catch (error) {
+      reject(error);
+    }
+  });
+}
+
+/**
+ * 문의함 표시 여부 조회용 인가 미들웨어. 판정은 넘겨받은 가드(manageGuard)가 그대로 한다.
+ * - 통과 → res.locals.contactInboxAllowed = true
+ * - 403 → res.locals.contactInboxAllowed = false (권한 없음을 응답 본문으로 알리기 위해서다 · 데이터는 내주지 않는다)
+ * - 그 밖의 거절(401 · 404 · 503 등) → 가드의 응답을 그대로 보낸다
+ * handler 안에서 가드를 부르지 않고 라우터 미들웨어로 두어, 관리자 API guard 인벤토리가 정적으로 확인할 수 있게 한다.
+ */
+export function requireContactInboxProbe(guard: RequestHandler): RequestHandler {
+  return async (req, res, next) => {
+    try {
+      const probe = await probeGuard(guard, req);
+      if (!('status' in probe)) {
+        res.locals.contactInboxAllowed = true;
+        return next();
+      }
+      if (probe.status === 403) {
+        res.locals.contactInboxAllowed = false;
+        return next();
+      }
+      res.status(probe.status).json(probe.body);
     } catch (error) {
       next(error);
     }
