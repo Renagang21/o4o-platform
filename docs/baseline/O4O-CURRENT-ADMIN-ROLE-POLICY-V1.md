@@ -1,11 +1,13 @@
 # 현재 전체 관리자와 폐기 역할 정책
 
 > **상태**: ACTIVE
-> **작성일**: 2026-10-20 · **최종 갱신**: 2026-11-10 (Asia/Seoul)
+> **작성일**: 2026-10-20 · **최종 갱신**: 2026-11-14 (Asia/Seoul · 운영자 배치)
 > **근거 WO**: [통합 운영 책임 정비](../work-orders/WO-O4O-UNIFIED-OPERATING-RESPONSIBILITY-V1.md) · [관리자 메뉴·역할 정비](../work-orders/WO-O4O-ADMIN-PLATFORM-MENU-ROLE-CLEANUP-V1.md)
 > **부분 대체 대상**: [ROLE-POLICY-AND-GUARD-V1](ROLE-POLICY-AND-GUARD-V1.md)의 전체 관리자 역할·역할 종류 편집·폐기 역할 취급 범위
 
 ## 현재 결정
+
+**2026-11-14 사용자 확정 — 운영자 배치:** 아래 「운영 업무는 업무 운영(`/operations`) 한 곳에서」는 O4O 직접 운영 서비스에 적용한다. 중앙 업무 운영에 **분회 관리**(분회 생성·수정·삭제·분회 Admin 지정·사이트 설정)와 **O4O 회원약국**(`pharmacy.neture.co.kr`)을 추가하고, 협동조합 관리는 가입 신청 없이 중앙이 조합을 생성·수정·삭제·Admin 지정한다. 독립 운영(drugstore·carepharm·개별 조합·개별 분회 내부 업무)은 해당 서브도메인의 자체 Admin·Operator가 한다. 상세는 [운영 책임 정본 V2](O4O-ROLE-WORKSPACE-ARCHITECTURE-V2.md) 상단 2026-11-14 결정과 [WO-O4O-OPERATOR-PLACEMENT-REALIGNMENT-V1](../work-orders/WO-O4O-OPERATOR-PLACEMENT-REALIGNMENT-V1.md).
 
 **2026-11-01 사용자 재확인:** 관리자 사이트(`admin.neture.co.kr`)에는 **전체 관리자(Admin)**와 **업무 운영자(Operator)**를 둔다. 일상업무 화면 `/operations`의 명칭은 **업무 운영**으로 통일한다.
 

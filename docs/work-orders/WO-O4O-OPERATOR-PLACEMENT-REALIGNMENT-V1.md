@@ -1,7 +1,7 @@
 # 운영자 배치 재정의 — 중앙 회원 관리 · 서비스별 운영 · 분회 · 협동조합 관리 · O4O 회원약국
 
 > **상태**: DRAFT
-> **작성일**: 2026-11-14 · **최종 갱신**: 2026-11-14
+> **작성일**: 2026-11-14 · **최종 갱신**: 2026-11-14 (U10 · U11 추가)
 > **실행 위치**: BOTH
 > **인계**: `claude/ecstatic-mendel-2ohu27-operator-placement` · c92a7a1f · 다음 실행자 CLOUD(T1 기준 문서 개정안) → LOCAL(T2 조회)
 > **근거**: 사용자 확정(2026-11-14 · 아래 §2). 선행 기록 — [`O4O-ROLE-WORKSPACE-ARCHITECTURE-V2`](../baseline/O4O-ROLE-WORKSPACE-ARCHITECTURE-V2.md) §3 · [`O4O-CURRENT-ADMIN-ROLE-POLICY-V1`](../baseline/O4O-CURRENT-ADMIN-ROLE-POLICY-V1.md) · [`O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1`](../baseline/O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1.md) · [`WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1`](WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1.md)
@@ -31,6 +31,8 @@
 | U7 | **pharmacy.neture.co.kr 의 이름은 「O4O 회원약국」**이다. 약국 협업체이지만 O4O 에 가입한 모든 약국이 대상이므로 **중앙에서 운영**한다. 약국경영자는 자동으로 회원이 되므로 **별도 회원 관리 메뉴를 두지 않는다**. |
 | U8 | 약국 협업체 가운데 **독립 운영으로 남는 곳은 drugstore · carepharm** 이다. |
 | U9 | 공급자 제품 등록 승인(「상품 취급 승인」)은 상품 정비 메뉴가 아니라 **중앙의 「공급자」 메뉴**에 둔다. 공급자 · 파트너 · 협동조합 연합회는 중앙 유지. |
+| U10 | **O4O 회원약국 약관은 따로 둔다. 동의는 약국경영자로 O4O 에 가입할 때 함께 받는다.** 다른 협업체처럼 사업에 다시 가입하며 동의받는 절차는 두지 않는다. |
+| U11 | **협업체끼리 게시물 · 자료가 섞이지 않게 하는 분리(WO-PHARMACY-BUSINESS-INDEPENDENCE D2)는 O4O 회원약국에도 유지한다.** 운영 주체만 중앙으로 바뀌고, 포럼 · 콘텐츠 · 자료 · 미디어 · 사이니지 · 장바구니 · 운영 화면 데이터는 사업별로 나뉜다. 로그인 계정은 모든 사업이 O4O 공통 계정 하나다. |
 
 ## 3. 설계 판단
 
@@ -49,7 +51,7 @@
 |---|---|---|
 | `O4O-ROLE-WORKSPACE-ARCHITECTURE-V2` §3 :51 | pharmacy 「사업 운영 주체 미확정 · 중앙 편입 금지」 | U7 로 「O4O 직접 운영 · 중앙의 O4O 회원약국 담당」으로 개정 |
 | 같은 문서 :47-48 · :52-53 | 연합회 · 분회 중앙 범위가 「플랫폼 업무」로만 적혀 생성 · 수정 · 삭제 · Admin 지정 주체가 불명확 | U5 · U6 문장으로 명시 |
-| `WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1` D1(2026-10-20) | 「pharmacy 는 다른 세 협력사업과 같은 수준의 독립 사업」 | 운영 주체 부분만 U7 로 대체됨을 표기(데이터 · 약관 분리 결정은 유지 여부를 T1 에서 사용자 확인). 기록물이라 본문은 고치지 않고 개정 정본에 대체 관계를 적는다 |
+| `WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1` D1(2026-10-20) | 「pharmacy 는 다른 세 협력사업과 같은 수준의 독립 사업」 | 운영 주체(D1)는 U7, 약관 동의 시점(D3 일부)은 U10 으로 대체. 데이터 분리(D2)는 U11 로 유지. 기록물이라 본문은 고치지 않고 개정 정본에 대체 관계를 적는다 |
 | `O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1` :59 admin 행 · :68 | 「각 서비스의 관리자(운영자)는 해당 서브도메인에 배치」(2026-10-08) — V2 와도 어긋난 채 머리말 부분 대체 표기로만 덮여 있음 | 개정 정본 기준으로 SUPERSEDED 범위 표기 정리 |
 | `O4O-CURRENT-ADMIN-ROLE-POLICY-V1` :12 | 「운영 업무는 업무 운영(`/operations`) 한 곳에서」 | U3 와 일치. 독립 운영(U1 · U8) 예외 문장만 보강 |
 
@@ -64,7 +66,7 @@
 
 순서는 `AGENTS.md` §4-3 R2(공통 먼저 · 서비스 나중)와 R6(기준 문서는 문서 전용 PR)을 따른다.
 
-- [ ] **T1 [CLOUD] 기준 문서 개정** — §4 표대로 V2 §3 개정(또는 V3) · SEMANTICS 대체 범위 표기 · ADMIN-ROLE-POLICY 보강. 문서 전용 PR. 개정 전 사용자 확인 1건: pharmacy 의 사업별 데이터 · 약관 분리(WO-INDEPENDENCE D2 · D3)는 유지하는가.
+- [x] **T1 [CLOUD] 기준 문서 개정** (2026-11-14 — V2 상단 결정 · §3 행 · §8-1, SEMANTICS 상단 대체 표기, ADMIN-ROLE-POLICY 현재 결정 보강) — §4 표대로 V2 §3 개정(또는 V3) · SEMANTICS 대체 범위 표기 · ADMIN-ROLE-POLICY 보강. 문서 전용 PR. 사용자 확인 완료(U10 · U11): 데이터 분리 유지, 약관은 따로 두되 동의는 약국경영자 가입 때 받음.
 - [ ] **T2 [LOCAL] 운영 DB read-only 조회** — 아래 §7 SQL. 결과는 건수만 마스킹해 이 문서 §8 에 기록.
 - [ ] **T3 [CLOUD] 중앙 서비스 목록 · 역할 설계** — `CENTRAL_OPERATION_MENUS`(packages/types) · `centralOperationAreas` · `CENTRAL_SERVICE_PREFIXES` 에 분회 관리 · O4O 회원약국 추가 설계. 기존 역할(`kpa-branch:admin` · `neture:pharmacy_*`)과 위임 데이터 대조 후 key 확정. 공유 모듈 변경이므로 [`O4O-SHARED-MODULE-CHANGE-PROTOCOL-V1`](../baseline/O4O-SHARED-MODULE-CHANGE-PROTOCOL-V1.md) 소비처 식별 포함.
 - [ ] **T4 [CLOUD] 서버 권한(§5 승인 필요)** — ① 분회 생성 · 수정 · 삭제 API 를 중앙 분회 관리 위임자에게 열지 ② 협동조합 생성 · 수정 · 삭제 API 신설 · affiliation 신규 진입 차단 ③ O4O 회원약국 운영 API 의 중앙 위임 적용 ④ 상품 취급 승인 API 의 공급자 scope 허용과 `neture.product-approvals` 위임 이전. 각 항목 통합 담당 승인 후 진행. 위임 데이터 이전이 필요하면 별도 단계(운영 DB write — 통합 담당 명시 승인).
@@ -109,6 +111,7 @@ GROUP BY role ORDER BY 1;
 - T5 각 화면: PC · mobile 에서 목록 → 체크 → 상단 작업 → 실행 → 목록 갱신, 직접 URL · 위임 없는 운영자 차단 확인(§3-1 · `AGENTS.md` §6).
 - 분회 · 조합 생성 → 해당 서브도메인에 새 기관이 보이고, 지정한 기관 Admin 이 자기 서브도메인에서 회원 · 게시물 업무를 할 수 있는지.
 - 약국경영자 승인 → O4O 회원약국 회원 자동 연결(별도 가입 절차 없음) 확인.
+- 약국경영자 가입 시 O4O 회원약국 약관 동의가 함께 기록되는지(U10), drugstore · carepharm 게시물 · 자료가 O4O 회원약국 화면에 보이지 않는지(U11).
 - 상품 취급 승인: 중앙 공급자 담당 운영자가 승인 가능, Neture 상품 정비 위임만 있는 운영자는 메뉴가 보이지 않음.
 - 운영자 · 관리자 화면은 Demo 계정 권한 밖이다 — 통합 담당이 운영 계정으로 확인한다.
 
