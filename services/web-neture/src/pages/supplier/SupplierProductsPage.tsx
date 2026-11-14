@@ -57,7 +57,7 @@ function RegulatoryInfoModal({
 }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-      <div className="bg-white rounded-xl shadow-xl p-6 w-[420px]">
+      <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-[420px] mx-4">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-bold text-slate-900">규제 정보</h3>
           <button onClick={onClose} className="p-1 hover:bg-slate-100 rounded"><X size={18} /></button>
@@ -115,7 +115,6 @@ export default function SupplierProductsPage() {
   const [regulatoryProduct, setRegulatoryProduct] = useState<SupplierProduct | null>(null);
   const [previewProduct, setPreviewProduct] = useState<SupplierProduct | null>(null);
   const {
-    products,
     pagination,
     keyword,
     setKeyword,
@@ -163,9 +162,13 @@ export default function SupplierProductsPage() {
     handleSearch,
     handleSave,
     toggleFilter,
-    handleSubmitApproval
+    handleSubmitApproval,
+    allVisibleSelected,
+    submittingApproval,
+    confirmDialog,
   } = useSupplierProducts();
-  const enhancedColumns = useSupplierProductColumns({ products, selectedIds, highlightRowId, toggleSelect, toggleSelectAll, setDrawerProduct, showToast, navigate, setRegulatoryProduct, setPreviewProduct, setRecruitModalProduct });
+  // 표 · 체크박스 · 묶음 표시는 화면에 그린 행(filteredProducts) 기준이다.
+  const enhancedColumns = useSupplierProductColumns({ products: filteredProducts, selectedIds, highlightRowId, toggleSelect, toggleSelectAll, setDrawerProduct, showToast, navigate, setRegulatoryProduct, setPreviewProduct, setRecruitModalProduct });
   const emptyStateNode = useMemo(() => {
     if (hasAnyFilter) {
       return (
@@ -188,6 +191,7 @@ export default function SupplierProductsPage() {
 
   return (
     <div>
+      {confirmDialog}
       {/* Toast */}
       {toast && (
         <div className="fixed top-4 right-4 z-50 bg-slate-900 text-white px-4 py-2 rounded-lg shadow-lg text-sm animate-fade-in">
@@ -402,14 +406,16 @@ export default function SupplierProductsPage() {
           <span className="text-sm text-blue-700 font-medium">{selectedIds.size}개 선택</span>
           <button
             onClick={handleSubmitApproval}
-            className="flex items-center gap-1 px-3 py-1 text-sm text-white bg-emerald-600 hover:bg-emerald-700 rounded"
+            disabled={submittingApproval || bulkDeleting}
+            className="flex items-center gap-1 px-3 py-1 text-sm text-white bg-emerald-600 hover:bg-emerald-700 rounded disabled:opacity-50"
           >
             <Send size={13} />
-            등록 재검토 요청
+            {submittingApproval ? '요청 중...' : '등록 재검토 요청'}
           </button>
           <button
             onClick={() => setShowDeleteConfirm(true)}
-            className="px-3 py-1 text-sm text-white bg-red-600 hover:bg-red-700 rounded"
+            disabled={submittingApproval || bulkDeleting}
+            className="px-3 py-1 text-sm text-white bg-red-600 hover:bg-red-700 rounded disabled:opacity-50"
           >
             일괄 삭제
           </button>
@@ -466,10 +472,10 @@ export default function SupplierProductsPage() {
       />
 
       {/* Select All hint */}
-      {products.length > 0 && (
+      {filteredProducts.length > 0 && (
         <div className="mt-2 text-center">
           <button onClick={toggleSelectAll} className="text-xs text-slate-400 hover:text-slate-600">
-            {selectedIds.size === products.length ? '전체 선택 해제' : '전체 선택'}
+            {allVisibleSelected ? '전체 선택 해제' : '전체 선택'}
           </button>
         </div>
       )}
@@ -477,7 +483,7 @@ export default function SupplierProductsPage() {
       {/* Modals */}
       {showDeleteConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="bg-white rounded-xl shadow-xl p-6 w-[400px]">
+          <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-[400px] mx-4">
             <h3 className="text-lg font-bold text-slate-900 mb-2">상품 삭제 확인</h3>
             <p className="text-sm text-slate-600 mb-1">
               선택한 <strong>{selectedIds.size}개</strong> 상품을 삭제합니다.
@@ -520,7 +526,7 @@ export default function SupplierProductsPage() {
       {previewProduct && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={() => setPreviewProduct(null)}>
           <div
-            className="bg-white rounded-xl shadow-2xl w-[640px] max-h-[85vh] flex flex-col"
+            className="bg-white rounded-xl shadow-2xl w-full max-w-[640px] mx-4 max-h-[85vh] flex flex-col"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}

@@ -10,6 +10,7 @@ import { useNavigate } from 'react-router-dom';
 import { Megaphone } from 'lucide-react';
 import { DataTable, type ListColumnDef } from '@o4o/operator-ux-core';
 import { supplierRecruitmentApi, type SupplierRecruitment } from '../../lib/api/supplier';
+import { useConfirmDialog } from '../../components/common/useConfirmDialog';
 
 const SERVICE_LABELS: Record<string, string> = {
   'kpa-society': 'KPA Society',
@@ -32,6 +33,7 @@ const EXPOSURE_BADGE: Record<string, { label: string; cls: string }> = {
 };
 
 export default function SupplierRecruitmentsPage() {
+  const { confirm, dialog: confirmDialog } = useConfirmDialog();
   const navigate = useNavigate();
   const [rows, setRows] = useState<SupplierRecruitment[]>([]);
   const [loading, setLoading] = useState(true);
@@ -61,7 +63,12 @@ export default function SupplierRecruitmentsPage() {
 
   // WO-O4O-SELLER-RECRUITMENT-CLOSE-ACTION-V1
   const handleClose = async (id: string) => {
-    if (!window.confirm('이 모집을 마감하면 신규 신청을 받을 수 없습니다.\n기존 신청 및 승인된 판매자의 주문 가능 상태는 유지됩니다.\n마감하시겠습니까?')) return;
+    if (!(await confirm({
+      title: '모집 마감',
+      message: '이 모집을 마감하면 신규 신청을 받을 수 없습니다.\n기존 신청 및 승인된 판매자의 주문 가능 상태는 유지됩니다.\n마감하시겠습니까?',
+      confirmText: '마감',
+      variant: 'warning',
+    }))) return;
     setClosingId(id);
     setActionError(null);
     const result = await supplierRecruitmentApi.close(id);
@@ -75,7 +82,11 @@ export default function SupplierRecruitmentsPage() {
 
   // WO-O4O-SELLER-RECRUITMENT-REOPEN-ACTION-V1
   const handleReopen = async (id: string) => {
-    if (!window.confirm('이 모집을 다시 재개하면 신규 신청을 받을 수 있습니다.\n재개하시겠습니까?')) return;
+    if (!(await confirm({
+      title: '모집 재개',
+      message: '이 모집을 다시 재개하면 신규 신청을 받을 수 있습니다.\n재개하시겠습니까?',
+      confirmText: '재개',
+    }))) return;
     setClosingId(id);
     setActionError(null);
     const result = await supplierRecruitmentApi.reopen(id);
@@ -196,6 +207,7 @@ export default function SupplierRecruitmentsPage() {
 
   return (
     <div className="max-w-5xl">
+      {confirmDialog}
       <div className="mb-6">
         <h1 className="flex items-center gap-2 text-2xl font-bold text-slate-900">
           <Megaphone className="w-6 h-6 text-blue-600" />
