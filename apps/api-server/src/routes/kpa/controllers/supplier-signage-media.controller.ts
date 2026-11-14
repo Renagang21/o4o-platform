@@ -25,6 +25,7 @@ import type { Request, Response, RequestHandler } from 'express';
 import type { DataSource } from 'typeorm';
 import { extractYouTubeVideoId, getYouTubeThumbnail } from '@o4o/types/signage';
 import { SignageMediaUsageService } from '../../signage/services/media-usage.service.js';
+import { MediaProductLinkError, assertSupplierProduct } from '../../signage/services/media-product-link.service.js';
 import { resolveSupplierIdForUser, readOrganizationContext } from '../../../modules/neture/middleware/supplier-context.resolver.js';
 
 const SERVICE_KEY = 'kpa-society';
@@ -80,7 +81,7 @@ function normalizeVideoSource(rawUrl: unknown): NormalizedVideoSource {
 
 const MEDIA_COLS = `
   id, "serviceKey", name, description, "mediaType", "sourceType", "sourceUrl", "embedId",
-  "thumbnailUrl", tags, status, source, scope, "createdByUserId", metadata,
+  "thumbnailUrl", tags, status, source, scope, "createdByUserId", metadata, "productMasterId",
   "createdAt", "updatedAt"
 `;
 
@@ -165,16 +166,28 @@ export function createSupplierSignageMediaController(
         req.body?.metadata && typeof req.body.metadata === 'object' && !Array.isArray(req.body.metadata)
           ? req.body.metadata
           : {};
+      // 이 영상의 제품 — 내가 공급하는 제품만(WO-O4O-STORE-QR-TABLET-CHANNEL-SEPARATION-V1 T4). 없으면 null.
+      let productMasterId: string | null = null;
+      if (req.body?.productMasterId !== undefined && req.body.productMasterId !== null) {
+        const supplier = await resolveSupplierIdForUser(dataSource, userId, readOrganizationContext(req as unknown as Request));
+        if (!supplier) { res.status(403).json({ success: false, error: '활성 공급자만 사용할 수 있습니다.', code: 'SUPPLIER_MEMBERSHIP_REQUIRED' }); return; }
+        try {
+          productMasterId = await assertSupplierProduct(dataSource, supplier.supplierId, req.body.productMasterId);
+        } catch (error) {
+          if (!(error instanceof MediaProductLinkError)) throw error;
+          res.status(error.statusCode).json({ success: false, error: error.message, code: error.code }); return;
+        }
+      }
 
       const rows = await dataSource.query(
         `INSERT INTO signage_media
            (id, "serviceKey", "organizationId", name, description, "mediaType", "sourceType", "sourceUrl", "embedId",
-            "thumbnailUrl", tags, status, source, scope, "createdByUserId", metadata, "createdAt", "updatedAt", version)
+            "thumbnailUrl", tags, status, source, scope, "createdByUserId", metadata, "productMasterId", "createdAt", "updatedAt", version)
          VALUES
            (gen_random_uuid(), $1, NULL, $2, $3, 'video', $4, $5, $6,
-            $7, $8, 'draft', 'supplier', 'global', $9, $10::jsonb, NOW(), NOW(), 1)
+            $7, $8, 'draft', 'supplier', 'global', $9, $10::jsonb, $11, NOW(), NOW(), 1)
          RETURNING ${MEDIA_COLS}`,
-        [SERVICE_KEY, name, description, video.sourceType, video.sourceUrl, video.embedId, thumbnailUrl, tags, userId, JSON.stringify(metadata)],
+        [SERVICE_KEY, name, description, video.sourceType, video.sourceUrl, video.embedId, thumbnailUrl, tags, userId, JSON.stringify(metadata), productMasterId],
       );
       res.status(201).json({ success: true, data: rows[0] });
     } catch (err) {
@@ -214,6 +227,17 @@ export function createSupplierSignageMediaController(
       }
       if (req.body?.tags !== undefined) {
         push(`tags = $N`, Array.isArray(req.body.tags) ? req.body.tags.filter((t: unknown) => typeof t === 'string').slice(0, 20) : []);
+      }
+      // 이 영상의 제품 — 내가 공급하는 제품만(WO-O4O-STORE-QR-TABLET-CHANNEL-SEPARATION-V1 T4). null 이면 해제.
+      if (req.body?.productMasterId !== undefined) {
+        const supplier = await resolveSupplierIdForUser(dataSource, userId, readOrganizationContext(req as unknown as Request));
+        if (!supplier) { res.status(403).json({ success: false, error: '활성 공급자만 사용할 수 있습니다.', code: 'SUPPLIER_MEMBERSHIP_REQUIRED' }); return; }
+        try {
+          push(`"productMasterId" = $N`, await assertSupplierProduct(dataSource, supplier.supplierId, req.body.productMasterId));
+        } catch (error) {
+          if (!(error instanceof MediaProductLinkError)) throw error;
+          res.status(error.statusCode).json({ success: false, error: error.message, code: error.code }); return;
+        }
       }
       if (req.body?.metadata !== undefined) {
         const metadata =

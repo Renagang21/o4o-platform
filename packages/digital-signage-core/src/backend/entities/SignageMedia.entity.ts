@@ -136,6 +136,14 @@ export class SignageMedia {
   @Index()
   parentMediaId!: string | null;
 
+  /**
+   * 이 영상의 제품 — 표준 제품 마스터(product_masters.id). 비어 있으면 제품과 무관한 영상이다.
+   * 쓰는 쪽 API 가 제품 존재 · 범위를 확인한다(외래 키 없음). 색인은 migration 의 부분 색인이다.
+   * WO-O4O-STORE-QR-TABLET-CHANNEL-SEPARATION-V1 T4 (2026-11-13)
+   */
+  @Column({ type: 'uuid', nullable: true })
+  productMasterId!: string | null;
+
   // ========== Ownership ==========
   @Column({ type: 'uuid', nullable: true })
   createdByUserId!: string | null;

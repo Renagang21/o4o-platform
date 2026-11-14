@@ -34,6 +34,7 @@ import {
   deleteImage,
   reorderImages,
 } from './api.js';
+import { planStoreImageReorder } from './imageReorder.js';
 import type { ProductImageItem } from './types.js';
 
 // ── 타입 ───────────────────────────────────────────────────────────────────────
@@ -205,8 +206,9 @@ export default function StoreProductImageManagerModal({ masterId, productName, o
     setReordering(true);
     try {
       // 본인이 매장에서 올린 이미지의 순서만 저장한다(공용 이미지는 서버가 거절한다).
-      const items = orderedImages.map((img, idx) => ({ id: img.id, sortOrder: idx, editable: img.editable === true }))
-        .filter((item) => item.editable).map(({ id, sortOrder }) => ({ id, sortOrder }));
+      // 공용 이미지는 원래 자리에 두고 본인 이미지끼리 자리를 바꾼다 — 다시 불러온 순서와 화면을 맞춘다.
+      const { ordered, items } = planStoreImageReorder(images, orderedImages);
+      setOrderedImages(ordered);
       if (items.length === 0) return;
       await reorderImages(items);
       invalidate();

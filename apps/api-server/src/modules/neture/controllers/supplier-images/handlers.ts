@@ -16,6 +16,7 @@ import {
   type SupplierRequest,
   type createSupplierImageAccess,
 } from './access.js';
+import { isSupplierHttpUrl } from '../../utils/http-url.util.js';
 export function createSupplierImageHandlers(
   dataSource: DataSource,
   netureService: Pick<NetureService, 'getProductImages'>,
@@ -130,6 +131,10 @@ export function createSupplierImageHandlers(
         if (!imageUrl || typeof imageUrl !== 'string') {
           return res.status(400).json({ success: false, error: 'MISSING_IMAGE_URL' });
         }
+        // javascript: · data: 등은 저장하지 않는다 — 이 이미지는 같은 Master 를 쓰는 다른 공급자 · 매장에도 보인다.
+        if (!isSupplierHttpUrl(imageUrl)) {
+          return res.status(400).json({ success: false, error: 'INVALID_IMAGE_URL', message: 'imageUrl 은 http(s) URL 이어야 합니다.' });
+        }
         if (!(await ownsMaster((req as unknown as SupplierRequest).supplierId, masterId))) {
           return res.status(403).json(NOT_OWNED);
         }
@@ -148,7 +153,7 @@ export function createSupplierImageHandlers(
         // gcsPath를 빈 문자열로 설정 — 외부 참조이므로 GCS 삭제 대상 아님
         const image = await imageService.insertImage({
           masterId,
-          imageUrl,
+          imageUrl: imageUrl.trim(),
           gcsPath: '',
           type: imageType,
           userId: req.user!.id,

@@ -22,6 +22,11 @@ const quote = (value: string) => '"' + value.replace(/"/g, '""') + '"';
 const BUSINESS_ATTRIBUTION: Readonly<
   Record<string, { scope: string; fields: readonly string[] }>
 > = {
+  photo_transaction_invoices: {
+    scope: "r.organization_id IS NOT NULL",
+    fields: ["created_by", "confirmed_by"],
+  },
+  photo_transaction_revisions: { scope: "true", fields: ["actor_id"] },
   semi_franchise_memberships: { scope: "r.organization_id IS NOT NULL", fields: ["applied_by", "decided_by"] },
   store_products: {
     scope: "r.organization_id IS NOT NULL",

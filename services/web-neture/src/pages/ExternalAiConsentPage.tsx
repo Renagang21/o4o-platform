@@ -17,6 +17,8 @@ export default function ExternalAiConsentPage() {
   const [data, setData] = useState<ConsentInfo | null>(null),
     [selected, setSelected] = useState<string[]>([]),
     [write, setWrite] = useState(false),
+    [ledgerRead,setLedgerRead] = useState(false),
+    [ledgerWrite,setLedgerWrite] = useState(false),
     [mailRead,setMailRead] = useState(false),
     [mailManage,setMailManage] = useState(false),
     [mailBody,setMailBody] = useState(false),
@@ -31,6 +33,7 @@ export default function ExternalAiConsentPage() {
     setData(null);
     setSelected([]);
     setWrite(false);
+    setLedgerRead(false);setLedgerWrite(false);
     setMailRead(false);setMailManage(false);setMailBody(false);setSelectedMail([]);
     setReplaceExisting(true);
     setMessage("");
@@ -56,7 +59,7 @@ export default function ExternalAiConsentPage() {
         ? await approveExternalConsent(
             request,
             [...selected,...(mailRead?selectedMail:[])],
-            ['o4o:read',...(write?['o4o:draft:write']:[]),...(mailRead?['o4o:mail:read']:[]),...(mailRead&&mailManage?['o4o:mail:manage']:[]),...(mailRead&&mailBody?['o4o:mail:body']:[])],
+            ['o4o:read',...(ledgerRead?['o4o:ledger:read']:[]),...(ledgerRead&&ledgerWrite?['o4o:ledger:write']:[]),...(write?['o4o:draft:write']:[]),...(mailRead?['o4o:mail:read']:[]),...(mailRead&&mailManage?['o4o:mail:manage']:[]),...(mailRead&&mailBody?['o4o:mail:body']:[])],
             (data?.existingConnections ?? 0) > 0 && replaceExisting,
           )
         : await denyExternalConsent(request);
@@ -170,6 +173,11 @@ export default function ExternalAiConsentPage() {
                   계정 설정에서 해제할 수 있습니다.
                 </p>
               </fieldset>
+              {data.scopes.includes('o4o:ledger:read')&&<fieldset disabled={busy} className="space-y-3 rounded border p-4">
+                <legend>거래장 별도 동의</legend><p>일반 자료함과 별개입니다. 선택한 매장의 거래명세서와 금액이 연결한 AI에 전달됩니다. 작성 허용 시 초안을 서버에 보관하며 최종 확정은 O4O 확인 화면에서 직접 합니다.</p>
+                <label className="flex gap-2"><input type="checkbox" checked={ledgerRead} onChange={e=>{setLedgerRead(e.target.checked);if(!e.target.checked)setLedgerWrite(false);}}/>거래장 조회</label>
+                {data.scopes.includes('o4o:ledger:write')&&<label className="flex gap-2"><input type="checkbox" disabled={!ledgerRead} checked={ledgerWrite} onChange={e=>setLedgerWrite(e.target.checked)}/>거래명세서 초안 서버 저장·수정</label>}
+              </fieldset>}
               {data.scopes.includes('o4o:mail:read')&&<fieldset disabled={busy} className="space-y-3 rounded border p-4">
                 <legend>개인 메일 별도 동의</legend>
                 <p className="text-sm">콘텐츠 초안 권한과 별개입니다. 아래에서 선택한 본인 메일 계정만 AI에 연결합니다.</p>

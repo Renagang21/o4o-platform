@@ -141,6 +141,11 @@ import { CreateCommunityNewsAutomation1794013771244 } from '../migrations/179401
 // WO-O4O-SOCIAL-SIGNUP-DIRECT-ROLE-REGISTRATION-V1 T2 (소셜 가입 이메일 선택)
 import { AllowUsersWithoutEmail1794357598911 } from '../migrations/1794357598911-AllowUsersWithoutEmail.js';
 
+import { CreatePhotoTransactionLedger1794618000000 } from '../migrations/1794618000000-CreatePhotoTransactionLedger.js';
+// WO-O4O-STORE-QR-TABLET-CHANNEL-SEPARATION-V1 T4 (signage_media."productMasterId" · 추가형 · 통합 담당 승인 2026-11-13)
+// #1067(CreatePhotoTransactionLedger) 병합 후 AGENTS.md §4-3 R4 에 따라 epoch 를 새로 받아 뒤에 다시 append (구 1794550173646)
+import { AddSignageMediaProductMaster1794624815975 } from '../migrations/1794624815975-AddSignageMediaProductMaster.js';
+
 export const INCREMENTAL_MIGRATIONS: readonly MigrationClass[] = [
   CreateStoreOwnerTerminationCases1789701000000,
   AlterHandoffTokensTargetWorkspace1789974015939,
@@ -203,6 +208,8 @@ export const INCREMENTAL_MIGRATIONS: readonly MigrationClass[] = [
   AddStorePlaylistTags1793857542325,
   CreateCommunityNewsAutomation1794013771244,
   AllowUsersWithoutEmail1794357598911,
+  CreatePhotoTransactionLedger1794618000000,
+  AddSignageMediaProductMaster1794624815975,
 ];
 
 export function incrementalMigrationNames(): string[] {

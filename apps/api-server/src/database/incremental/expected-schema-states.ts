@@ -359,6 +359,11 @@ export const EXPECTED_SCHEMA_STATES: readonly ExpectedSchemaState[] = [
   { appliedThrough: 'CreateCommunityNewsAutomation1794013771244', fingerprint: '1489bb64d223656c63cdf99e06f45f25a732276d976f58eeaaff84113da37bee', fingerprintLineCount: 7594 },
 
   { appliedThrough: 'AllowUsersWithoutEmail1794357598911', fingerprint: '34b34a48068eb01426d56e8687cdf94b4268bc06ba3994af56b63d9bab2a8acc', fingerprintLineCount: 7594 },
+  // Isolated PostgreSQL 15: baseline and every prior prefix verified before this append.
+  { appliedThrough: 'CreatePhotoTransactionLedger1794618000000', fingerprint: 'ba499ae891137259ee0375322a905a410248575f56d666ce098bb56214b7c66c', fingerprintLineCount: 7668 },
+  // WO-O4O-STORE-QR-TABLET-CHANNEL-SEPARATION-V1 T4 — signage_media."productMasterId" + partial index.
+  // 격리 PostgreSQL 에서 canonical baseline + incremental 전체(CreatePhotoTransactionLedger 이후) 실행으로 재산출 — #1067 병합 후 R4 재측정: 운영 DB fingerprint 채택 아님.
+  { appliedThrough: 'AddSignageMediaProductMaster1794624815975', fingerprint: 'ed1759a17a9fcfecae1289f8b0d8cc1ef895fb09c1185957d6e30b20245d176d', fingerprintLineCount: 7670 },
 ] as const;
 
 /** Expected state after `prefixLength` incremental migrations; undefined when not registered. */

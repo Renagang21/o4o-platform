@@ -62,8 +62,10 @@ describe('settlement reads: ownership, filters, response and DB failures', () =>
       success: true, data: [row], meta: { page: 2, limit: 3, total: 7, totalPages: 3 },
     });
     const params = [...(kind === 'supplier' ? [supplierId] : []), ...(status === 'paid' ? ['paid'] : [])];
-    expect(query.mock.calls.map((call) => call[1])).toEqual([params, params]);
-    expect(query.mock.calls[0][0]).toContain('LIMIT 3 OFFSET 3');
+    // 공급자 · 관리자 목록 모두 LIMIT/OFFSET 도 binding 한다(문자열 삽입 금지) — 목록 parameter 끝에 [limit, offset]
+    expect(query.mock.calls.map((call) => call[1])).toEqual([[...params, 3, 3], params]);
+    expect(query.mock.calls[0][0]).toContain(`LIMIT $${params.length + 1} OFFSET $${params.length + 2}`);
+    expect(query.mock.calls[0][0]).not.toMatch(/LIMIT \d/);
     if (kind === 'supplier') {
       for (const [sql] of query.mock.calls) expect(sql).toContain('s.supplier_id = $1');
     } else {

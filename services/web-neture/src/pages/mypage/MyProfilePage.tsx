@@ -1,3 +1,5 @@
+import PharmacistQualificationCard from '../../components/mypage/PharmacistQualificationCard';
+import { knownHasStore } from '../../lib/my-home-store-presence';
 /**
  * MyProfilePage - 프로필 편집
  *
@@ -35,7 +37,7 @@ export default function MyProfilePage() {
    */
   if (isLoading) {
     return (
-      <MyPageLayout title="프로필" width="form" navItems={getNetureMyPageNavItems([])}>
+      <MyPageLayout title="내 정보" width="form" navItems={getNetureMyPageNavItems([])}>
         <MyPageLoadingState message="계정 정보를 불러오는 중..." />
       </MyPageLayout>
     );
@@ -45,7 +47,7 @@ export default function MyProfilePage() {
   // 로그인 안내도 Shell 안에서 렌더한다 (헤더·네비게이션 유실 금지).
   if (!isAuthenticated || !user) {
     return (
-      <MyPageLayout title="프로필" width="form" navItems={getNetureMyPageNavItems([])}>
+      <MyPageLayout title="내 정보" width="form" navItems={getNetureMyPageNavItems([])}>
         <MyPageAuthRequired
           icon={<User className="w-8 h-8 text-gray-400" />}
           description="My Home을 이용하려면 로그인해 주시기 바랍니다."
@@ -91,14 +93,14 @@ export default function MyProfilePage() {
 
   return (
     <MyPageLayout
-      title="프로필"
+      title="내 정보"
       subtitle="기본 정보를 확인하고 수정할 수 있습니다"
       width="form"
-      navItems={getNetureMyPageNavItems(user.roles)}
+      navItems={getNetureMyPageNavItems(user.roles, knownHasStore(user.id))}
       breadcrumb={[
         { label: '홈', href: '/' },
         { label: 'My Home', href: '/mypage' },
-        { label: '프로필' },
+        { label: '내 정보' },
       ]}
     >
       <AccountProfileSection
@@ -111,6 +113,8 @@ export default function MyProfilePage() {
         onSave={handleSave}
         onError={(message) => toast.error(message)}
       />
+      {/* 약사 자격은 본인 정보라 계정 설정에서 옮겼다(2026-11-13 My Home 개선 2). */}
+      <PharmacistQualificationCard key={user.id} />
     </MyPageLayout>
   );
 }

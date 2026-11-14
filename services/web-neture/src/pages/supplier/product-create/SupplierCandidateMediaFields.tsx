@@ -2,6 +2,7 @@ import { useId } from 'react';
 import { RichTextEditor } from '@o4o/content-editor';
 import type { useSupplierCandidateForm } from './useSupplierCandidateForm';
 import type { useSupplierCandidateMedia } from './useSupplierCandidateMedia';
+import { CANDIDATE_SHORT_DESCRIPTION_MAX_LENGTH, shortDescriptionLength } from './candidateFormHelpers';
 
 export default function SupplierCandidateMediaFields({
   formState,
@@ -11,7 +12,9 @@ export default function SupplierCandidateMediaFields({
   media: ReturnType<typeof useSupplierCandidateMedia>;
 }) {
   const fieldId = useId();
-  const { form, consumerShortDesc, setConsumerShortDesc, handleChange } = formState;
+  const { form, consumerShortDesc, setConsumerShortDesc, handleChange, importDescriptionSkipped } = formState;
+  const descLength = shortDescriptionLength(consumerShortDesc);
+  const descOver = descLength > CANDIDATE_SHORT_DESCRIPTION_MAX_LENGTH;
   const {
     thumbnailSource,
     setShowThumbnailPicker,
@@ -174,6 +177,19 @@ export default function SupplierCandidateMediaFields({
             onImageUpload={editorImageUpload}
             onMediaLibraryPick={(insertMedia) => setMediaPickerTarget(() => insertMedia)}
           />
+          <p
+            className={`mt-1 text-right text-[11px] ${descOver ? 'font-medium text-red-600' : 'text-slate-400'}`}
+            aria-live="polite"
+          >
+            {descLength} / {CANDIDATE_SHORT_DESCRIPTION_MAX_LENGTH}자 (서식 포함)
+            {descOver && ' — 줄여야 검토 요청할 수 있습니다'}
+          </p>
+          {importDescriptionSkipped && !consumerShortDesc.trim() && (
+            <p className="mt-1 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800">
+              가져온 상세 설명이 간이 설명 한도({CANDIDATE_SHORT_DESCRIPTION_MAX_LENGTH}자)를 넘어 넣지 않았습니다.
+              요약해 직접 입력해 주시기 바랍니다. 상세 이미지는 위 이미지 칸에 그대로 유지됩니다.
+            </p>
+          )}
         </div>
       </div>
 

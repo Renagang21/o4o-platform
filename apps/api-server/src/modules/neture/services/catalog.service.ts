@@ -1,5 +1,5 @@
 import { changedProductValues, enqueueProductEditRenewals } from '../product-correction/edit-renewal.service.js';
-import { Repository } from 'typeorm';
+import { IsNull, Repository } from 'typeorm';
 import type { DataSource } from 'typeorm';
 import { AppDataSource } from '../../../database/connection.js';
 import {
@@ -756,8 +756,11 @@ export class NetureCatalogService {
    * 특정 Master의 이미지 목록 조회
    */
   async getProductImages(masterId: string): Promise<ProductImage[]> {
+    // 삭제(deleted_at) 이미지는 목록에서 뺀다 — deleted_at 은 @DeleteDateColumn 이 아니라 TypeORM 이 자동으로 거르지 않는다.
+    // 로그인 사용자 누구나 부르는 공용 카탈로그 조회라 내부 필드(gcsPath · createdBy · deletedBy · source 등)는 내보내지 않는다.
     return this.imageRepo.find({
-      where: { masterId },
+      select: { id: true, masterId: true, imageUrl: true, sortOrder: true, isPrimary: true, type: true, createdAt: true },
+      where: { masterId, deletedAt: IsNull() },
       order: { sortOrder: 'ASC', createdAt: 'ASC' },
     });
   }

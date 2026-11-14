@@ -1,5 +1,50 @@
 # HANDOFF
 
+## 2026-11-14 · 사진 거래장 실제 저장 · O4O/ChatGPT 연결 (branch `wo/photo-ledger-chat-integration`)
+
+- **다음 실행자:** 통합 담당 — 이 branch로 PR·계약/migration 검토·병합·배포. A 커밋을 포함했으므로 `wo/photo-ledger-review-core`는 별도 병합하지 않는다. main `c649e8bbf` 기준. 현재 열린 #1058(signage 제품 연결)과 겹치는 경로: `HANDOFF.md`, `apps/api-server/src/database/incremental/expected-schema-states.ts`, `apps/api-server/src/database/incremental/manifest.ts`. 공유 경로 충돌은 양쪽 내용을 유지하고 migration prefix를 다시 검증한다.
+- **한 일:** 실제 초안/사진/수정 이력/확정 저장, 동시 중복 차단과 후보 동시 전달, 거래장 별도 scope/동의, MCP 준비·조회·목록, O4O main의 사진 판독→초안, PC·모바일 검토/수정/직접 반영 화면. 서버 중단·탈퇴 attribution·폐업 분류/쓰기 fence 포함.
+- **Core 계약 변경:** migration `CreatePhotoTransactionLedger1794618000000`(신규 4테이블), manifest/측정한 expected state, REST/MCP additive API·ledger read/write scope 2개, multimodal 출력 한도 선택 인자(기존 기본값 유지). 운영 DB·시크릿·CI·dependency·Identity/Frozen·상품 정본은 수정하지 않았다. 운영 migration/배포는 실행하지 않았다.
+- **결정 사항:** 원본이 O4O에 전달되지 않는 ChatGPT 첨부는 미보관으로 표시하고 직접 확인 또는 사진 추가를 받는다. 최종 확정 MCP는 제공하지 않고 O4O 로그인+정식 Origin에서만 확인한다. 공통 상품 미등록도 허용하며 가격·사진을 제외한 상품 관찰만 기존 관리자 pending 후보로 보낸다. 프로그램 등록 상태를 기록하며 프로그램 수집본과 자동 합산하지 않는다(상품별 자동 대조는 후속). 기존 후보의 도메인별 승격 게이트를 유지한다.
+- **검증:** 거래장 6 suites/49 tests, 기존 외부 AI/server work 10 suites/99, UI 4 files/20. API·web-neture tsc·web-neture build·변경 ESLint·migration contract 통과. PostgreSQL 15 canonical 전체 prefix·빈 down/up 검증. PC 1280px·모바일 390px 실제 컴포넌트+API fixture로 수정/확인/반영·사진 추가·로그인/동의 오류 확인. 테스트 업무 행 0 확인. 실모델·실OAuth·운영 전체 사용은 미실행.
+- **배포 후:** migration 먼저 적용, API+web-neture 배포, Demo 경영자 서버 보관/승인 직원/타매장/철회/모바일 확인, ChatGPT 도구 갱신·새 ledger 동의로 재연결, 실제 전체 명세서의 사용자 확인 시험. 기존 main에 새 migration이 들어오면 prefix·fingerprint를 재측정할 것.
+- **문서 정합:** [사용 안내](docs/guides/O4O-CHATGPT-WORK-QUICKSTART-V1.md)·[WO](docs/work-orders/WO-O4O-PHOTO-TRANSACTION-LEDGER-V1.md) 현행화, [CHECK](docs/checks/CHECK-O4O-PHOTO-LEDGER-CHAT-INTEGRATION-V1.md)에 증거/미실행 범위 기록.
+
+## 2026-11-14 · 사진 거래장 입력 공통 처리부 (branch `wo/photo-ledger-review-core`)
+
+- **범위:** 사용자 요청에 따라 QR 제외, 사진만 처리. 3차-A 공통 검증·현재 revision 확인 준비·중복 조회 힌트·관리자 상품 정비 후보 반환 함수를 구현했다. 실제 저장 API·인증·화면은 후속 B·C다. 저장 완료로 안내하지 않는다.
+- **결정 사항:** 기존 프로그램 origin·상품/포장 참조가 필요한 purchase 경로를 우회하지 않았다. 공통 상품이 없어도 확인 준비가 되며 상품 DB 자동 등록·수정은 없다. 실제 사용자 사진을 공개 저장소에 복사하지 않았다.
+- **검증:** 합성 명세서 Jest 20건·처리부 strict TypeScript·변경 파일 ESLint 통과. UI/route가 없어 브라우저 검증 해당 없음. 원본 프로그램 계약과 운영 DB는 변경하지 않았다.
+- **다음 실행자:** 통합 세션은 이 branch의 PR·검사·병합 담당. 개발 후속은 [사진 거래장 WO](docs/work-orders/WO-O4O-PHOTO-TRANSACTION-LEDGER-V1.md) B(원본·저장 계약·권한·중복 대조·상품 후보 연결), C(양쪽 채팅 연결). 할인·반올림 조정 근거를 먼저 확장할 것.
+- **문서 정합:** [사용 안내](docs/guides/O4O-CHATGPT-WORK-QUICKSTART-V1.md)에 사진만 입력·공통 상품 연결 비필수·미연결 범위 반영. 이전 체크는 당시 기록으로 유지.
+- **문서 정합:** [사용 안내](docs/guides/O4O-CHATGPT-WORK-QUICKSTART-V1.md)에 사진만 입력·공통 상품 연결 비필수·미연결 범위 반영 — 통합 세션이 AGENTS.md §4-3 R6 에 따라 문서 전용 branch `wo/chatgpt-quickstart-photo-ledger-docs` 로 분리. 이전 체크는 당시 기록으로 유지.
+
+## 2026-11-14 · ChatGPT 연결 안내 · 거래명세서 문서 보관 시험 (branch `wo/chatgpt-entry-invoice-trial`)
+
+- **다음 실행자:** 통합 세션 — 이 branch로 PR·검사·병합·배포. 개발 세션은 PR·배포·운영 DB 쓰기를 실행하지 않았다.
+- **범위:** 사용자 요청의 새 1차·2차. 기존 비용 검증 회차와 구분한다. 설정의 외부 AI 연결 카드에 접이식 안내·요청 예제 3개·복사 기능, MCP 도구 설명 3개 보완. 새 분류기·모델 호출·권한/스키마 변경 없음.
+- **검증:** API 4 suites / 50, UI 3 files / 14, API·web-neture TypeScript, 변경 파일 ESLint 통과. 실제 컴포넌트 + 응답 fixture로 PC 1280px·모바일 390px의 연결 3상태 안내·복사·넘침을 확인했다. 전체 배포 UI 확인은 별도.
+- **명세서:** 합성 이미지의 불명확한 값을 남기고 사용자 정정을 가정한 표를 실제 dispatcher·store adapter·자료함 검증 함수로 저장·재조회했다. 메모리 저장소 대역과 모의 권한 resolver를 사용했으며 실제 SQL/ChatGPT 파일 판독/운영 저장 시험이 아니다. 실제 파일을 받으면 사용자 확인 후 목적 있는 실제 문서로 보관 시험을 진행한다. 운영 임시 자료 생성 없음.
+- **다음:** 배포 후 `/mypage/settings` Demo 경영자·근무자 PC·모바일 smoke. 실제 거래장 원장 반영은 3차, 주문 제안→수정→사이트별 장바구니는 4차, 사이트 방법 재사용은 5차. 기존 원장 입력의 원본 제한을 우회하지 않는다.
+- **통합 주의:** 현재 열려 있는 #1058은 signage 제품 연결로 변경 경로 겹침 없음. main `5590df0f`에서 시작. HANDOFF 상단 충돌은 양쪽 기록을 유지한다.
+- **문서 정합:** [사용 안내](docs/guides/O4O-CHATGPT-WORK-QUICKSTART-V1.md)와 [검증 기록](docs/checks/CHECK-O4O-CHATGPT-ENTRY-INVOICE-TRIAL-V1.md)을 새로 작성해 문서 보관과 원장 반영의 범위를 구분했다.
+
+
+
+## 2026-11-13 · QR 목록에서 태블릿 코너 QR 분리 (branch `claude/intelligent-cray-o2p4u3-qr-tab` · web-store 화면만)
+
+> 다음 실행자: **통합 세션** — 이 branch 로 PR. [`WO-O4O-STORE-QR-TABLET-CHANNEL-SEPARATION-V1`](docs/work-orders/WO-O4O-STORE-QR-TABLET-CHANNEL-SEPARATION-V1.md) T3 의 첫 부분(D3).
+
+- **한 일:**
+  - QR 목록의 기본 필터 「전체」를 「매장 QR」로 바꿨다. 매장이 직접 만든 QR 만 보인다.
+  - 태블릿 코너 QR(화면 세트 저장 시 자동 생성)은 「태블릿 코너」를 고를 때만 보인다.
+  - 업무 화면에서 특정 QR 을 열고 들어온 경우에는 코너 QR 도 그대로 보인다.
+  - 활성 · 보관 건수와 출력 · 데이터는 바꾸지 않았다.
+  - 직접 만든 QR 이 없고 코너 QR 만 있으면 빈 목록 대신 「태블릿 코너에서 볼 수 있습니다」라고 안내한다.
+- **남긴 것(T3 나머지):** 「콘텐츠 연결」 QR 만들기 제거와 콘텐츠 화면의 「QR 출력 · 목록에 담기」(D5). 콘텐츠별 고정 QR 이 먼저 필요해 다음 단계로 둔다.
+- **검증:**
+  - 새 `qr/qrListFilter.test.ts` 3 · web-store `vitest src/pages` 84 files / 905 · `tsc` 0
+  - 배포 후 Demo 「매장 경영자」로 `/store/marketing/qr?workspace=studio` 에서 확인할 것: 「매장 QR」 개수와 「태블릿 코너」 개수의 합이 예전 「전체」와 같은지.
 ## 2026-11-13 · 내 매장 개선 이어서 — P1 일부 · P2 일부 (branch `claude/wizardly-bardeen-ldq332`)
 
 - **PR 묶음:** 바로 아래 P0 보안 보강과 같은 PR 로 묶어도 되고, 화면 정리(`f0271f00` 이후)만 별도 PR 로 나눠도 된다. P0 보안 커밋은 먼저 병합 · 배포 권장.
@@ -19,6 +64,38 @@
 - **확인하지 못한 것 / 배포 후:** 실제 이미지 관리 창(경영자 계정 — 공용 이미지에 「공용」 표시 · 버튼 없음, 본인 업로드는 정렬 · 삭제), 공개 게시 자산 화면 정상 표시. 운영 DB 확인 항목은 조사 기록 §2.
 - **다음:** 조사 기록 P1(GET 부수효과 · 마케팅 연결 경계 · 공개 설정 권한 재확인 …) → P2 → P3.
 - **문서 정합:** 해당 없음.
+## 2026-11-13 · 공급자 API 안정성 · 경계 보완 (branch `claude/supplier-api-stability`)
+
+- **근거 / PR 묶음:** 공급자 전반 조사(같은 세션, 화면 · API · 문서 3갈래) 결과의 1순위 묶음. **이 branch 단독 1 PR**(api-server 공급자 모듈 · 서비스 PR, schema · migration 없음). 화면 수정 PR #1057(`claude/focused-edison-ky4e3u`)과 파일이 겹치지 않는다 — 섞지 않으려고 사용자 확인 후 branch 를 분리했다. PR 은 만들지 않았다.
+- **한 일:**
+  - 공급자 guard(`createRequireActiveSupplier` · `createRequireLinkedSupplier` · copilot `createRequireSupplier`)가 DB 오류에 503 `SUPPLIER_CONTEXT_UNAVAILABLE` 로 응답 — Express 4.22.3 은 async middleware reject 를 잡지 않아 요청이 멈추고, 운영은 `unhandledRejection` → `gracefulShutdown` 으로 인스턴스가 내려갈 수 있었다.
+  - `GET /neture/products/:masterId/images`: 삭제(`deleted_at`) 이미지 제외 · 공개 컬럼만 반환(`gcsPath` · `createdBy` · `deletedBy` · `source` 비노출). 화면은 id · imageUrl · isPrimary · sortOrder · type 만 쓴다.
+  - 공급자 내 제품 목록 정렬: `ORDER BY pm.id, <정렬>` → `ORDER BY <정렬>, spo.id`. offer 는 (master, supplier) 유일이라 정렬 선택이 무시되던 문제.
+  - 공급자 주문 처리 · 정산 목록의 `LIMIT ${limit} OFFSET ${offset}` 문자열 삽입 → binding, page/limit 을 유한 정수로 정규화(`Infinity` · 소수 → SQL 오류 방지).
+  - 이미지 URL 등록(`images/from-url`) · 자료함 `fileUrl`: 절대 http(s) URL 만 허용(`javascript:` · `data:` · 상대 경로 400). 기준은 Candidate 이미지 URL 과 같다(`modules/neture/utils/http-url.util.ts`).
+- **결정 사항:** 503 은 기존 403/401/409 계약을 바꾸지 않는 새 코드(일시 오류를 '공급자 아님'으로 오판시키지 않음). `next()` 는 try 밖이라 하위 handler 오류를 503 으로 바꾸지 않는다. 이미지 목록의 접근 수준(로그인 사용자)은 유지 — 공용 카탈로그라 필드만 줄였다. URL 은 https 전용 · 호스트 허용 목록까지는 가지 않았다(외부 자료 링크가 정상 용도).
+- **검증:** **전체 회귀** — API jest 3 shard(CI 와 같은 방식) 모두 PASS: 10,479 pass · 1,297 skip(DB 통합 미설정) · 실패 0, `tsc --noEmit` PASS, 변경 파일 ESLint 0, `check-unsafe-routes` 위반 0. 신규 테스트 6 파일 · 기존 테스트 6 파일 보강(정렬 · settlement 는 옛 문자열 삽입을 고정하던 기대값을 binding 으로, 자료함 · 이미지 HTTP 테스트는 guard mock 을 표준 계약 기준으로 갱신).
+- **확인하지 못한 것 / 배포 후:** 운영 DB 연결 없음 — 실제 DB 장애 시 503 동작은 단위 테스트로만 확인. 배포 후 공급자 Demo 로 내 제품 목록 정렬(최신순 · 가격 · 이름) 변경이 실제 순서에 반영되는지, 상품 상세의 이미지 목록 · 자료함 등록이 정상인지 확인.
+- **후속 정비(같은 branch · 같은 PR 묶음, 사용자 지시):**
+  - LIMIT/OFFSET 문자열 삽입 → binding: 관리자 정산 · 제품 콘텐츠 조회 · 상품 설명 검수 큐 2곳 · 교체 감사 로그 · 이미지 품질 · 제품 사용처(3 질의). 공통 `modules/neture/utils/pagination-sql.util.ts`(`toPositiveInt` · `pageWindow`)로 정규화하고 앞 commit 의 공급자 주문 · 정산 로컬 helper 도 이것으로 교체.
+  - 자료함(`supplier-library/access.ts`) · 상품 이미지(`supplier-images/access.ts`) guard 를 표준 `createRequireActiveSupplier` / `createRequireLinkedSupplier` 로 교체 — 조직 지정 409 · 쓰기 경로 Neture 회원 상태 확인 · 조회 실패 503 이 다른 공급자 경로와 같아진다. 응답 계약(401 · 403 NO_SUPPLIER · 403 SUPPLIER_NOT_ACTIVE)은 유지.
+  - 예전 혼합 공급자 `neture_orders` → [`WO-O4O-SUPPLIER-LEGACY-MIXED-ORDER-ISOLATION-V1`](docs/work-orders/WO-O4O-SUPPLIER-LEGACY-MIXED-ORDER-ISOLATION-V1.md) 작성. **다음 실행자 LOCAL** — `/db-readonly` 로 §5 Q1~Q4(SELECT · 건수만) 실행 후 판정(A/B/C/D)을 §7 에 기록. 판정 C(진행 중 혼합 주문)이면 통합 담당에게 먼저 보고. CLOUD 구현은 그 뒤.
+- **남은 범위 밖:** `hub-trigger.controller.ts` 4곳이 아직 예전 `getSupplierByUserId` 판정을 쓴다(HUB 트리거 기능 — 별도 묶음). `drug-import` 의 `LIMIT ${take}` 는 CLI 배치 내부 값, `product-library.controller.ts` 는 상수라 그대로 두었다.
+- **겹치는 PR / 문서 정합:** #1057(화면)과 파일 겹침 없음. 문서 정합: 해당 없음.
+
+## 2026-11-13 · 태블릿 코너 제품 QR 기본값 = 상품 대표 QR (branch `claude/intelligent-cray-o2p4u3-tablet-product-qr` · API)
+
+> 다음 실행자: **통합 세션** — 이 branch 로 PR. [`WO-O4O-STORE-QR-TABLET-CHANNEL-SEPARATION-V1`](docs/work-orders/WO-O4O-STORE-QR-TABLET-CHANNEL-SEPARATION-V1.md) T5 의 첫 부분. [영상 보기]는 #1058(이 영상의 제품) 병합 뒤에 한다.
+
+- **한 일:** 태블릿 코너 · 코너 QR 모바일 화면의 「제품 목록」에서 매장이 QR 을 따로 고르지 않은 O4O 상품은 상품 대표 QR(`/p/{key}`)을 기본으로 보인다.
+  - 매장이 고른 QR 이 있으면 그것이 우선이다(`qrSource: 'selected' | 'product'`).
+  - 고른 QR 이 비활성 · 삭제된 경우에는 대표 QR 로 대신하지 않는다. 매장이 의도한 QR 이 사라진 상태를 숨기지 않기 위해서다.
+  - 매장 자체 상품에는 대표 QR 이 없다.
+- **공개 경로 쓰기 0 유지:** 이미 발급된 대표 QR(Landing · 활성 · 노출 가능)만 읽는다. 발급은 하지 않는다 — 취급 제품 화면의 상품 QR 조회가 발급한다. 이 매장의 listing 만 본다.
+- **검증:**
+  - 새 `store-public/__tests__/product-landing-qr-fallback.test.ts`(실제 schema — 다른 매장 listing · 노출 중지 · 미발급 제외 · 쓰기 0) 와 `kpa-tablet-generation-consolidation-contract.spec.ts` 를 합쳐 20 pass.
+  - api `tsc` 의 오류 2건(`partner-support-scope` · `product-correction/preview`)은 이 변경과 무관하다.
+- **배포 후 확인:** Demo 「매장 경영자」의 태블릿 코너(제품 진열형) 미리보기 · 코너 QR 모바일에서, QR 을 고르지 않은 O4O 상품에 QR 이 보이고 스캔하면 상품 대표 화면이 열리는지.
 
 ## 2026-11-13 · 참고 · 기준 문서 정비 — 상담 매장 단위 판단 반영 (branch `claude/wizardly-bardeen-ldq332` · 문서 전용 커밋)
 
@@ -66,6 +143,42 @@
 - **로컬 참고:** 대체된 이전 로컬 커밋은 로컬 branch `backup/1049-local-superseded` 에만 있다(push 하지 않음).
 - **겹치는 PR / 문서 정합:** 열린 PR 대조는 통합 세션. 문서 정합: 해당 없음.
 
+
+## 2026-11-13 · My Home 개선 1~4 (branch `claude/intelligent-cray-o2p4u3-my-home` · web-neture 화면만)
+
+> 다음 실행자: **통합 세션** — 이 branch 로 PR. API · DB 변경 없음.
+
+- **결정 사항(2026-11-13 사용자 승인 1~4):**
+  1. 모아보기 맨 위에 「가입 신청」 상태 카드를 둔다. 기존 `GET /member-registration/self` 를 읽는다.
+     - 상태: 미작성 · 미제출 · 심사 중 · 반려(사유 · 다시 제출).
+     - 승인됐거나, 이 절차를 거치지 않은 기존 계정에는 보이지 않는다. 조회 실패도 표시하지 않는다.
+  2. 계정 설정:
+     - 로그인 · 보안 3개 카드를 먼저 묶었다. 그다음 외부 AI 연결, 맨 아래 「이 PC 연결」 순서다.
+     - 「이 PC 연결」은 접힌 칸이고, 펼칠 때만 PC 를 확인한다.
+     - 약사 자격 카드는 「내 정보」(프로필)로 옮겼다.
+     - 화면 제목을 「계정 설정」으로 맞췄다.
+  3. 왼쪽 메뉴:
+     - 「경영 현황」은 매장이 없다고 확인된 계정에서만 숨긴다. 확인 결과는 모아보기가 이 탭에 계정별로 기억한다. 모르면 보인다.
+     - 「프로필」 → 「내 정보」로 바꾸고 「사업자 정보」 옆에 묶었다.
+  4. 모아보기 하단의 링크 목록을 「내 현황 요약」으로 바꿨다. 실제 상태를 보이며, 모르면 「확인 중」 · 실패면 「불러오지 못했습니다」로 표시한다(0 으로 위장하지 않음).
+     - 참여 서비스: 이용 중 · 승인 대기 · 반려 개수
+     - 커뮤니티 활동: 참여 커뮤니티 수
+     - 경영 현황: 매장 수
+- **세션 판단:** 「이 PC 연결」은 매장 전용이 아니라 개인 PC 프로그램 연결이다. 그래서 숨기지 않고 접어 두었다 — 브라우저 로컬 연결 권한 요청이 원치 않는 사람에게 뜨지 않게 하기 위해서다.
+- **검증:**
+  - web-neture vitest(CI config) 187 files / 1584 pass.
+    - 새 테스트: 가입 신청 상태 3 · 메뉴 · 요약 3.
+    - 기존 `MyPageHub.test.tsx` 는 새 문구에 맞추고, 매장 없는 회원의 경영 현황 메뉴 미노출을 기대하도록 고쳤다.
+  - `tsc` 0. 변경 파일 ESLint 0.
+- **확인하지 못한 것:**
+  - 배포 후 Demo(매장 경영자 · 공급자 · 직원) PC · mobile 에서 확인할 것:
+    - My Home 모아보기의 「내 현황 요약」
+    - 메뉴의 「경영 현황」 노출(경영자는 보이고, 매장 없는 회원은 안 보임)
+    - 계정 설정 순서 · 「이 PC 연결」 펼치기
+    - 「내 정보」의 약사 자격 카드
+  - 가입 신청 카드는 심사 중 · 반려 계정이 있어야 보인다. Demo 계정은 승인 상태라 보이지 않는 것이 정상이다.
+- **문서 정합:** `O4O-MY-HOME-CANONICAL-V1` §2 화면 구성(「계정 설정: 프로필 · 로그인 수단」, 모아보기 「상세 화면 링크」)이 이번 변경과 다르다. 보고만 하고, 정본 정렬은 별도 문서 작업으로 남긴다.
+
 ## 2026-11-13 · 계정 삭제 「약국 경영자」 보류 안내 · 운영자 화면 → 관리자 화면 연결 (branch `claude/ecstatic-mendel-2ohu27`)
 
 - **배경(조사):** Admin 「계정 삭제」가 `PHARMACY_TRANSFER_OR_CLOSURE_REQUIRED` 로 멈춤. 코드 · 배포 문제 아님(#1048 배포 확인, 미병합 branch 없음) — 서버의 의도된 보류(`account-business-data.ts` 현재 경영자 검사). 사용자는 Admin 「이용·약국 관리」 → 완전폐업 처리 후 삭제 완료. 운영자 화면(`/operations/neture/members`)에는 그 버튼이 없어 처리 위치를 찾지 못한 것이 원인.
@@ -84,6 +197,63 @@
 - **PR 묶음:** 이 branch 단독 1 PR(서비스 화면 · lane 해당 없음). 겹칠 수 있는 PR 미대조(통합 세션 확인).
 - **배포 후 Demo 확인:** Demo 계정은 운영자 · 관리자 화면 권한이 없음 — 통합 담당이 운영자 화면에서 삭제 미완료 회원 선택 시 링크 · Admin 삭제 보류 시 빨간 안내를 확인.
 - **문서 정합:** 해당 없음.
+
+
+## 2026-11-13 · 이 영상의 제품 — 사이니지 영상 ↔ 제품 연결 (branch `claude/intelligent-cray-o2p4u3-product-video` · migration 포함)
+
+> 다음 실행자: **통합 세션** — 이 branch 로 PR. **migration lane**(AGENTS.md §4-3 R4): 다른 migration Ready PR 이 없을 때 Ready 로 둔다. 병합 뒤 **CLOUD** 가 [`WO-O4O-STORE-QR-TABLET-CHANNEL-SEPARATION-V1`](docs/work-orders/WO-O4O-STORE-QR-TABLET-CHANNEL-SEPARATION-V1.md) T5(태블릿 코너 제품 QR · 영상 보기)를 진행한다.
+
+- **결정 사항:**
+  - 2026-11-13 통합 담당이 `signage_media` 제품 열 migration 을 승인했다.
+  - 세션 판단:
+    - 외래 키를 두지 않는다. 쓰는 API 가 제품 존재와 범위를 확인한다.
+    - 매장은 자기 취급 제품(listing)으로만 연결한다.
+    - 운영자는 공용(HQ) 영상에, 공급자는 자기가 공급하는 제품만 연결한다.
+    - 매장이 가져온 사본(`parentMediaId`)은 원본의 연결을 「(원본)」으로 보이고 해제할 수 없다.
+    - 연결 제품 목록은 보조 정보라, 못 불러와도 영상 목록은 보인다.
+- **migration:**
+  - `1794550173646-AddSignageMediaProductMaster` — `ADD COLUMN "productMasterId" uuid NULL` + 부분 색인.
+  - 자동 판정(#1028 분류기)은 ADDITIVE 다. 따라서 Promote 승인 대상이 아니다.
+  - fingerprint `9611acea…`(7596 lines)는 격리 PostgreSQL 16 에서 baseline + incremental 1..62 를 실행해 얻었다. 직전 상태 `34b34a48…` 가 등록값과 일치하는 것을 먼저 확인했다. 실행 결과 `POST_MIGRATION_SCHEMA_ASSERTION = PASS`.
+- **검증:**
+  - api:
+    - `media-product-link.test.ts` 7/7(실제 schema · 다른 매장 · 공용 · 다른 서비스 영상 차단 포함)
+    - `signage-resource-id-validation.spec.ts` 93/93(UUID route census 30→32 · `/media/product-links` static route 회귀)
+    - schema 상태 jest 32 pass
+    - `tsc` 0
+  - `scripts/ci/__tests__/migration-safety.test.mjs` 31/31(새 migration 을 「알려진 추가형」 목록에 넣었다).
+  - web-store: `vitest src/pages` 83 files / 901 · `tsc` 0. 새 파일 ESLint 0.
+- **확인하지 못한 것:**
+  - `node scripts/db/check-migration-contract.mjs` — 이 세션의 명령 가드가 막았다. CI 가 같은 검사를 돈다.
+  - 배포 후 Demo 「매장 경영자」로 사이니지 → 동영상에서 확인할 것:
+    - 직접 등록한 영상 1개 → 「선택 영상 제품 연결」 → 취급 제품 선택 → 목록의 「연결 제품」 표시 → 해제.
+    - 공용 Demo 데이터이므로 확인 뒤 해제해 원복한다.
+- **2026-11-13 추가(같은 branch · 남은 부분 해소):**
+  - 운영자: 관리자 미디어 카탈로그의 제품 연결에 제품 이름 검색을 넣었다(용도 `product-video`). HQ 사이니지 영상 화면은 현재 쓰이지 않아 따로 만들지 않았다.
+  - 공급자:
+    - 「연결 상품」이 `productMasterId` 로도 저장된다. 서버가 공급 제품인지 확인한다(POST · PATCH).
+    - 기존 영상은 `metadata` 의 연결을 읽는다.
+  - 매장: 보관 영상 등록본과 가져온 사본도 원본의 연결 제품을 「(원본)」으로 보인다.
+  - 검증:
+    - api `media-product-link.test.ts` 8/8 · `signage-resource-id-validation` 93 · `tsc` 0
+    - web-store `vitest src/pages/pharmacy` 60 files / 695 · `tsc` 0
+    - web-neture vitest(CI config) 185 files / 1578 · `tsc` 0
+    - admin `ProductMasterPicker.test.tsx` 2/2 · `tsc` 오류 0
+    - 바뀐 파일 ESLint 0
+  - 배포 후 확인할 것:
+    - Admin 미디어 카탈로그 → 보관 영상 → 연결 유형 product → 제품 찾기 → 저장.
+    - neture 공급자 사이니지에서 연결 상품을 고른 뒤 저장한다. 그다음 매장 사이니지 목록의 「연결 제품」에 「(원본)」이 보이는지 확인한다(공급자 영상을 가져온 매장).
+- **겹칠 수 있는 PR:** #1049(상담 태블릿) — 겹치는 파일 없음.
+## 2026-11-13 · 공급자 제품 등록 AI 보조 P1 검증·최소 보완 (branch `claude/focused-edison-ky4e3u`)
+
+- **근거 / PR 묶음:** [`WO-O4O-SUPPLIER-AI-ASSISTANCE-ROLLOUT-V1`](docs/work-orders/WO-O4O-SUPPLIER-AI-ASSISTANCE-ROLLOUT-V1.md) P1. 이 branch 단독 1 PR(web-neture 공급자 화면 · 서비스 PR). PR 은 만들지 않았다.
+- **한 일:** 외부 AI 결과 적용 경로 점검 후 결함 3건 수정 — ① AI 상세 설명을 간이 설명 칸(서버 500자)에 넣어 제출 시 `FIELD_TOO_LONG` → 간이 설명 우선·한도 초과 미적용·안내 ② Candidate 에 없는 가격·추천 표시를 숨은 폼 값에 적용·요청문에 전송 → 미적용·요청문 null ③ 적용 되돌리기 없음 → [적용 취소](저장 아님) + 취소한 바코드 조회의 늦은 결과 무시. 바코드·허가번호 「확인 필요」, 빈 항목 「미확인」 안내 추가.
+- **결정 사항:** 서버·schema·API 계약·공용 패키지(`@o4o/content-editor`) 무변경. 요청문 빌더의 범용 계약(현재 입력값 출력)은 유지하고 화면에서 가격을 넘기지 않는다. 적용 취소는 마지막 1회만, 적용 뒤 직접 고친 내용도 되돌아감을 화면에 표시.
+- **검증:** web-neture Vitest 186 files / 1591 PASS, `tsc --noEmit` PASS, 변경 파일 ESLint 0, web-neture build PASS, `git diff --check`·문서 민감정보 PASS.
+- **확인하지 못한 것 / 배포 후 Demo(공급자):** PC/mobile 에서 신규 제품 검토 요청 → [ChatGPT로 작업] → 결과 적용(덮어쓰기)·안내 문구·[적용 취소], 상세페이지 소스 가져오기 후 간이 설명 안내·글자 수 표시. 저장(검토 요청 제출)은 운영 데이터가 남으므로 하지 않는다(§5).
+- **후속 수정(같은 branch · 같은 PR 묶음):** Import Assistant 초안도 상세 설명을 간이 설명 칸에 넣어 같은 500자 실패 — 진입 초깃값·화면 안 소스 가져오기 모두 간이 설명 우선·한도 안 값만 넣고, 넘치면 비우고 안내(화면 문구 · toast). 간이 설명 칸에 글자 수(서식 포함) 표시, 한도 초과는 이미지 업로드 전에 제출 차단(직접 입력 포함). 긴 상세 설명 본문은 Candidate 로 보내지 않는다(화면에 보이지 않는 값을 숨겨 보내지 않음) — 상세 이미지는 기존대로 유지.
+- **WO TODO:** P1 항목 → 완료(배포 후 Demo 확인 1건 남음).
+- **겹치는 PR / 문서 정합:** 조회하지 않음(통합 세션 확인). 문서 정합: 해당 없음.
 
 ## 2026-11-13 · 소비자 다국어 기준 문서 초안 (branch `claude/intelligent-cray-o2p4u3-multilingual-docs` · 문서 전용)
 
@@ -120,7 +290,13 @@
     - 콘텐츠 QR 은 출력하거나 담은 것만 목록에 올린다.
     - 제품 ↔ 영상은 `signage_media` 에 제품 열 하나를 둔다(설명서 본문에는 넣지 않는다).
 - **검증:** 문서만(`check-doc-sensitive` 통과).
-- **겹칠 수 있는 PR:** #1049(태블릿 구조 1단계) — 이 지시서는 코드를 바꾸지 않는다. T2 · T5 구현은 그 병합 뒤에 시작한다.
+- **2026-11-13 추가:**
+  - T4(`signage_media` 제품 열 migration)는 통합 담당이 승인했다.
+  - 현 상태 조사를 지시서 §7 에 넣었다.
+    - 태블릿 코너는 대부분 이미 있다.
+    - 빠진 것은 제품 QR 기본값(상품 대표 QR)과 제품 영상이다.
+    - 영상 저장소가 둘이다. `media_assets` 는 `media_entity_links` 로 제품 연결이 이미 되고, `signage_media` 는 연결이 없다.
+- **겹칠 수 있는 PR:** #1049(상담 태블릿) — 화면 세트와 무관하다. 겹치는 파일은 `App.tsx` · `store-workspace.test.tsx` 이고, 이 둘은 T2 에만 해당한다.
 
 ## 2026-11-13 · 상담 태블릿별 음성 자동 감지 언어 (branch `claude/wizardly-bardeen-ldq332`)
 

@@ -482,7 +482,7 @@ export default function O4OHomePage() {
               </li>
             );
           })}
-          <li className="self-center text-xs text-slate-400">이번 요청에서만 사용 · 저장되지 않음</li>
+          <li className="self-center text-xs text-slate-400">일반 질문은 저장하지 않음 · 거래장 입력은 서버 보관 동의 후 초안·사진 보관</li>
         </ul>
       )}
       {attachError && (
@@ -559,7 +559,7 @@ export default function O4OHomePage() {
             <div className="rounded-2xl border border-slate-200 bg-slate-50 px-5 py-4 text-[0.95rem] leading-relaxed text-slate-800">
               {answer.split('\n').map((line, i) => (
                 <p key={i} className="m-0 whitespace-pre-wrap">
-                  {line || <br />}
+                  {/^https:\/\/neture\.co\.kr\/work\/ledger(?:\/[a-f0-9-]{36})?\?organizationId=[a-f0-9-]{36}$/.test(line) ? <Link to={line.slice("https://neture.co.kr".length)}>거래명세서 확인·수정</Link> : line || <br />}
                 </p>
               ))}
               {attachmentsUsed.length > 0 && (

@@ -2,6 +2,7 @@
 import { authClient } from '@o4o/auth-client';
 import { toast } from 'react-hot-toast';
 import type { MediaAssetAdmin } from '@/api/media-library.api';
+import { ProductMasterPicker, PRODUCT_VIDEO_PURPOSE } from './ProductMasterPicker';
 
 const enums: Record<string, string[]> = {
   originType: ['original', 'edited', 'ai_generated', 'external'],
@@ -421,6 +422,14 @@ export function MediaCatalogPanel({
             />
           </label>
         </div>
+        {link.entityType === 'product' && (
+          <ProductMasterPicker
+            disabled={busy}
+            onPick={(product) =>
+              setLink((v) => ({ ...v, entityId: product.id, purpose: v.purpose.trim() || PRODUCT_VIDEO_PURPOSE }))
+            }
+          />
+        )}
         <button
           disabled={busy || !link.entityId.trim() || !link.purpose.trim()}
           className="border rounded px-3 py-2 mt-2 disabled:opacity-50"

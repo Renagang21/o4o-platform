@@ -1,3 +1,5 @@
+import {ledgerToolSchemas} from '../../../services/transaction-ledger/contracts.js';
+import {executeLedgerTool} from '../../../services/transaction-ledger/ledger-tools.js';
 import { randomUUID } from "node:crypto";
 import { PersonalMailToolService } from "../../personal-mail/tool.service.js";
 import {
@@ -29,7 +31,7 @@ export class ExternalAiToolService {
   readonly registry: AdapterRegistry;
   constructor(
     readonly db: DataSource,
-    webOrigin: URL,
+    readonly webOrigin: URL,
     readonly mailProviderFactory?: ProviderFactory,
     storeOrigin?: URL,
   ) {
@@ -40,6 +42,7 @@ export class ExternalAiToolService {
     raw: unknown,
     connectionId: string,
   ): Promise<unknown> {
+    if(Object.prototype.hasOwnProperty.call(ledgerToolSchemas,name)) return executeLedgerTool(this.db,name as keyof typeof ledgerToolSchemas,raw,connectionId,this.webOrigin);
     if (Object.prototype.hasOwnProperty.call(mailToolSchemas, name))
       return new PersonalMailToolService(
         this.db,

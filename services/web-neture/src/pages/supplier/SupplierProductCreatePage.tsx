@@ -112,6 +112,8 @@ export default function SupplierProductCreatePage() {
     form,
     submitError,
     handleApplyDraft,
+    handleUndoApplyDraft,
+    canUndoApplyDraft,
     goNext,
     goBack,
     goToSourceImport,
@@ -130,9 +132,11 @@ export default function SupplierProductCreatePage() {
     return <SupplierProductImportPage
       onCancel={() => formState.setSourceImportOpen(false)}
       onApplyDraft={(draft) => {
-        formState.applySourceImport(draft);
+        const descriptionSkipped = formState.applySourceImport(draft);
         media.applyImportImages(draft);
         toast.success('빈 입력란과 이미지를 보완했습니다. 기존 입력과 선택한 이미지는 유지됩니다. 확인 후 검토 요청을 제출하시기 바랍니다.');
+        if (descriptionSkipped)
+          toast.error('가져온 상세 설명이 간이 설명 한도(500자)를 넘어 넣지 않았습니다. 요약해 직접 입력해 주시기 바랍니다.');
       }}
     />;
   }
@@ -233,18 +237,19 @@ export default function SupplierProductCreatePage() {
                 originCountry: form.originCountry || null,
                 regulatoryName: form.regulatoryName || null,
                 mfdsPermitNumber: form.mfdsPermitNumber || null,
+                // 가격·추천 표시는 Candidate 에 보내지 않는 숨은 값이라 요청문에 넣지 않는다(외부 전송 최소화).
                 offerDraft: {
-                  priceGeneral: form.priceGeneral ? Number(form.priceGeneral) : null,
-                  consumerReferencePrice: form.consumerReferencePrice
-                    ? Number(form.consumerReferencePrice)
-                    : null,
+                  priceGeneral: null,
+                  consumerReferencePrice: null,
                   consumerShortDescription: null,
                   consumerDetailDescription: null,
-                  isFeatured: form.isFeatured,
+                  isFeatured: false,
                 },
               },
             }}
             onApplyDraft={handleApplyDraft}
+            onUndoApply={handleUndoApplyDraft}
+            canUndoApply={canUndoApplyDraft}
             onNotify={(message, kind) =>
               kind === 'error' ? toast.error(message) : toast.success(message)
             }
