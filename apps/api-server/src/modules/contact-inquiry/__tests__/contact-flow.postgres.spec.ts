@@ -642,6 +642,26 @@ suite("isolated local PostgreSQL public inquiry flow", () => {
       ).status,
     ).toBe(403);
   });
+  it("answers inbox access with allowed:false instead of 403 and the same count when allowed", async () => {
+    const allowed = await request(app)
+      .get("/admin/services/supplier/contact-inquiries/inbox-access")
+      .set("x-test-user", supplier);
+    expect(allowed.status).toBe(200);
+    expect(Object.keys(allowed.body.data).sort()).toEqual(["allowed", "newCount"]);
+    expect(allowed.body.data.allowed).toBe(true);
+    const summary = await request(app)
+      .get("/admin/services/supplier/contact-inquiries/summary")
+      .set("x-test-user", supplier);
+    expect(allowed.body.data.newCount).toBe(summary.body.data.newCount);
+    const denied = await request(app)
+      .get("/admin/services/funding/contact-inquiries/inbox-access")
+      .set("x-test-user", supplier);
+    expect(denied.status).toBe(200);
+    expect(denied.body.data).toEqual({ allowed: false });
+    expect(
+      (await request(app).get("/admin/services/not-a-service/contact-inquiries/inbox-access").set("x-test-user", supplier)).status,
+    ).toBe(404);
+  });
   it("does not expose or reply to a different service inquiry even when its id is known", async () => {
     const response = await request(app)
       .post("/public/services/funding/contact-inquiries")

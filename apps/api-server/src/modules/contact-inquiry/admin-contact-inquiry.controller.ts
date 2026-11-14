@@ -2,7 +2,7 @@ import { apiLimiter } from '../../middleware/rateLimiter.js';
 import { ContactReplyService } from './contact-reply.service.js';
 import { dispatchContactInquiry } from './contact-delivery.js';
 import { OperationError } from '../../services/operations/operation-audit.js';
-import { contactService, requireContactScope } from './contact-service-scope.js';
+import { contactService, probeGuard, requireContactScope } from './contact-service-scope.js';
 /**
  * Admin Contact Inquiry Controller
  *
@@ -96,6 +96,19 @@ export function createAdminContactInquiryController(dataSource: DataSource): Rou
   router.get('/:serviceKey/contact-inquiries/summary', authenticate, manageGuard, async (req,res,next) => {
     try { const newCount=await repo.count({where:{service_key:req.params.serviceKey,organization_id:IsNull(),status:'received'}});res.json({success:true,data:{newCount}}); }
     catch(error){next(error);}
+  });
+  // 머리글 「문의 관리」 표시용. 권한 판정은 manageGuard 그대로이고, 권한이 없으면 403 대신 allowed:false 로 답한다
+  // (모든 로그인 화면이 부르므로 일반 회원에게 매번 403 이 남지 않게 — 2026-11-14).
+  router.get('/:serviceKey/contact-inquiries/inbox-access', authenticate, async (req,res,next) => {
+    try {
+      const probe = await probeGuard(manageGuard, req);
+      if ('status' in probe) {
+        if (probe.status === 403) return res.json({success:true,data:{allowed:false}});
+        return res.status(probe.status).json(probe.body);
+      }
+      const newCount=await repo.count({where:{service_key:req.params.serviceKey,organization_id:IsNull(),status:'received'}});
+      res.json({success:true,data:{allowed:true,newCount}});
+    } catch(error){next(error);}
   });
 
   router.get('/:serviceKey/contact-inquiries/:id/replies', authenticate, manageGuard, apiLimiter, async (req,res,next) => {

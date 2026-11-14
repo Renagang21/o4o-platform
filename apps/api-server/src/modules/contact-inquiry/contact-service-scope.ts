@@ -2,7 +2,7 @@ import { CENTRAL_CONTACT_MENUS, assertCentralContactAccess } from './central-con
 import { centralRequestAuthMethod } from '../../middleware/central-operation-menu.middleware.js';
 import { OperationError } from '../../services/operations/operation-audit.js';
 import { centralOperationRequest } from '../../middleware/central-operation-menu.middleware.js';
-import type { RequestHandler } from "express";
+import type { Request, RequestHandler, Response } from "express";
 import type { DataSource } from "typeorm";
 import {
   requireServiceLegalScope,
@@ -192,4 +192,33 @@ export function requireContactScope(
       next(error);
     }
   };
+}
+
+export type GuardProbe = { allowed: true } | { allowed: false; status: number; body: unknown };
+
+/**
+ * 가드를 응답을 보내지 않고 실행해 통과 여부만 본다. 판정은 가드가 그대로 한다.
+ * 화면이 「문의 관리」를 보여 줄지 묻는 조회에서, 권한 없는 계정에 403 을 보내지 않기 위해 쓴다.
+ */
+export function probeGuard(guard: RequestHandler, req: Request): Promise<GuardProbe> {
+  return new Promise((resolve, reject) => {
+    let status = 200;
+    const deny = (body: unknown) => resolve({ allowed: false, status, body });
+    const shim = {
+      locals: {},
+      status(code: number) { status = code; return shim; },
+      json(body: unknown) { deny(body); return shim; },
+      send(body: unknown) { deny(body); return shim; },
+      sendStatus(code: number) { status = code; deny(undefined); return shim; },
+      end() { deny(undefined); return shim; },
+      set() { return shim; },
+      setHeader() { return shim; },
+    };
+    try {
+      Promise.resolve(guard(req, shim as unknown as Response, (error?: unknown) => (error ? reject(error) : resolve({ allowed: true }))))
+        .catch(reject);
+    } catch (error) {
+      reject(error);
+    }
+  });
 }
