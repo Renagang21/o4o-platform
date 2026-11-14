@@ -23,9 +23,11 @@ export function ProductVideos({ videos, onPlayingChange }: Readonly<{
   onPlayingChange?: (playing: boolean) => void;
 }>) {
   const [playing, setPlaying] = useState<ProductVideoItem | null>(null);
+  // 재생에 실패한 영상(로딩 실패 · 퍼가기 차단)은 오류 안내를 보여 주되 「재생 중」으로 치지 않는다 — 대기화면 복귀를 막지 않기 위해서다.
+  const [failedId, setFailedId] = useState<string | null>(null);
   const notify = useRef(onPlayingChange);
   notify.current = onPlayingChange;
-  const isPlaying = playing !== null;
+  const isPlaying = playing !== null && failedId !== playing.id;
   useEffect(() => {
     notify.current?.(isPlaying);
   }, [isPlaying]);
@@ -36,14 +38,14 @@ export function ProductVideos({ videos, onPlayingChange }: Readonly<{
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
         {videos.map(video => (
           <button key={video.id} type="button" style={playing?.id === video.id ? { ...button, background: '#0f766e', color: '#fff' } : button}
-            onClick={() => setPlaying(current => current?.id === video.id ? null : video)}>
+            onClick={() => { setFailedId(null); setPlaying(current => current?.id === video.id ? null : video); }}>
             {playing?.id === video.id ? '■ 영상 닫기' : videos.length === 1 ? '▶ 영상 보기' : `▶ ${video.title}`}
           </button>
         ))}
       </div>
       {playing && (
         <div style={{ marginTop: 12, aspectRatio: '16 / 9', width: '100%', background: '#000', borderRadius: 12, overflow: 'hidden' }}>
-          <VideoPlayback key={playing.id} url={playing.url} kind={playing.kind} title={playing.title} onEnded={() => setPlaying(null)} style={{ width: '100%', height: '100%' }} />
+          <VideoPlayback key={playing.id} url={playing.url} kind={playing.kind} title={playing.title} onEnded={() => setPlaying(null)} onError={() => setFailedId(playing.id)} style={{ width: '100%', height: '100%' }} />
         </div>
       )}
     </section>

@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 
 import { ProductVideos, readProductVideos, type ProductVideoItem } from '@o4o/tablet-kiosk-core';
@@ -25,5 +25,20 @@ describe('태블릿 제품 [영상 보기] (WO-O4O-STORE-QR-TABLET-CHANNEL-SEPAR
     expect(screen.getByRole('button', { name: '■ 영상 닫기' })).toBeTruthy();
     fireEvent.click(screen.getByRole('button', { name: '■ 영상 닫기' }));
     expect(screen.queryByRole('button', { name: '■ 영상 닫기' })).toBeNull();
+  });
+  it('reports playing while a video is open and stops reporting it when playback fails', () => {
+    // jsdom 에는 미디어 재생이 없다 — 재생 시작만 성공으로 둔다.
+    const play = vi.spyOn(HTMLMediaElement.prototype, 'play').mockResolvedValue(undefined);
+    const onPlayingChange = vi.fn();
+    render(<ProductVideos videos={[video('a', 'video')]} onPlayingChange={onPlayingChange} />);
+    expect(onPlayingChange).toHaveBeenLastCalledWith(false);
+    fireEvent.click(screen.getByRole('button', { name: '▶ 영상 보기' }));
+    expect(onPlayingChange).toHaveBeenLastCalledWith(true);
+    const player = document.querySelector('video');
+    expect(player).toBeTruthy();
+    fireEvent.error(player as HTMLVideoElement);
+    expect(onPlayingChange).toHaveBeenLastCalledWith(false);
+    expect(screen.getByRole('button', { name: '■ 영상 닫기' })).toBeTruthy();
+    play.mockRestore();
   });
 });
