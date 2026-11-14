@@ -45,6 +45,14 @@
 - **검증:**
   - 새 `qr/qrListFilter.test.ts` 3 · web-store `vitest src/pages` 84 files / 905 · `tsc` 0
   - 배포 후 Demo 「매장 경영자」로 `/store/marketing/qr?workspace=studio` 에서 확인할 것: 「매장 QR」 개수와 「태블릿 코너」 개수의 합이 예전 「전체」와 같은지.
+## 2026-11-14 · 운영 Demo smoke · 제품 진열 설정 빈 화면 수정 (branch `claude/wizardly-bardeen-ldq332`)
+
+- **PR 묶음:** 단독 PR(web-store `App.tsx` 한 파일 · 버그 수정). 빨리 병합 · 배포 권장.
+- **한 일:** 운영(store.neture.co.kr) Demo smoke(조회만 · 저장 · 추가 없음). 상담 화면(경영자 · 직원 · 모바일) · 약사 / 근무자 태블릿 · 예전 경로 이동 · 키오스크 연결 화면 정상, API 4xx/5xx 없음. **발견:** `/store/product-settings` 가 빈 화면 — `No QueryClient set`(web-store 에 `QueryClientProvider` 가 없는데 `@o4o/store-products-ui` 가 react-query 사용, 기존 결함). `App` 을 `QueryClientProvider` 로 감쌈(web-neture 와 같은 설정). 의존성 변경 없음(이미 선언됨).
+- **검증:** store-web type-check(`tsc -b`) · build 통과. vitest 107 files / 1016 통과(첫 전체 실행은 부하로 1건 실패 · 재실행 전부 통과 — 기존 불안정 테스트 유형).
+- **확인하지 못한 것 / 배포 후:** 매장 경영자 Demo 로 「제품 진열 설정」이 보이는지, 「이미지 관리」 창에서 공용 이미지에 「공용」 표시 · 본인 이미지만 순서 · 삭제 가능한지(빈 화면 때문에 smoke 못 함). My Home(neture.co.kr) 약사 확인 체크 제거와 관리자 화면은 smoke 하지 않음.
+- **문서 정합:** 해당 없음.
+
 ## 2026-11-13 · 내 매장 개선 이어서 — P1 일부 · P2 일부 (branch `claude/wizardly-bardeen-ldq332`)
 
 - **PR 묶음:** 바로 아래 P0 보안 보강과 같은 PR 로 묶어도 되고, 화면 정리(`f0271f00` 이후)만 별도 PR 로 나눠도 된다. P0 보안 커밋은 먼저 병합 · 배포 권장.

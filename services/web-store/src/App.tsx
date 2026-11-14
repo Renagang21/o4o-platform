@@ -19,6 +19,7 @@ import CarePharmToolsPage from './pages/neture-pharmacy/CarePharmToolsPage';
  */
 import { Suspense, lazy, type ComponentType, type ReactElement } from 'react';
 import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { StoreProductsManagerPage } from '@o4o/store-products-ui';
 import { PharmacyMembershipReviewPage, configurePharmacyManagementClient } from '@o4o/operator-core-ui/modules/pharmacy-management';
 import { api } from './lib/apiClient';
@@ -225,14 +226,19 @@ function storeChildRoutes() {
   </>;
 }
 
+// 공용 패키지 화면(@o4o/store-products-ui 등)이 react-query 를 쓴다 — 없으면 제품 진열 설정이 빈 화면이 된다.
+const queryClient = new QueryClient({
+  defaultOptions: { queries: { refetchOnWindowFocus: false, retry: 1 } },
+});
+
 export default function App() {
-  return <BrowserRouter><Suspense fallback={Loading}><Routes>
+  return <QueryClientProvider client={queryClient}><BrowserRouter><Suspense fallback={Loading}><Routes>
     <Route path="/consultation/customer" element={<CustomerConsultationPage />} />
     <Route path="/consultation/kiosk" element={<KioskConsultationPage />} />
     <Route path="/tablet/setup" element={<TabletSetupPage />} />
     <Route path="/tablet/:slug" element={<TabletRunPage />} />
     <Route path="/*" element={<WorkspaceApp />} />
-  </Routes></Suspense></BrowserRouter>;
+  </Routes></Suspense></BrowserRouter></QueryClientProvider>;
 }
 export function WorkspaceApp() {
   return <AuthProvider><StoreProvider><TermsAcceptanceGate><Suspense fallback={Loading}><Routes>
