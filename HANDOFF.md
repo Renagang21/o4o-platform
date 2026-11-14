@@ -2,12 +2,13 @@
 
 ## 2026-11-14 · 운영자 배치 재정의 지시서 (branch `claude/ecstatic-mendel-2ohu27-operator-placement` · 문서만)
 
-> 다음 실행자: **통합 세션**(문서 PR — 지시서 + T1 기준 문서 개정) → **LOCAL** T2(read-only 건수 조회) → CLOUD T3~. T1 완료(2026-11-14). 지시서 [`WO-O4O-OPERATOR-PLACEMENT-REALIGNMENT-V1`](docs/work-orders/WO-O4O-OPERATOR-PLACEMENT-REALIGNMENT-V1.md).
+> 다음 실행자: **통합 세션**(문서 PR — 지시서 + T1 기준 문서 개정 + T3 설계) → **LOCAL** T2(read-only 건수 조회) → CLOUD PR-A(§10-6). T1 · T3 완료(2026-11-14). 지시서 [`WO-O4O-OPERATOR-PLACEMENT-REALIGNMENT-V1`](docs/work-orders/WO-O4O-OPERATOR-PLACEMENT-REALIGNMENT-V1.md).
 
 - **결정 사항(사용자 2026-11-14):** 지시서 §2 U1~U9 — 회원 관리는 중앙 한 곳 · 서비스 운영은 중앙 서비스별 메뉴(공급자 · 파트너 · 연합회 포함) · 중앙에 「분회 관리」 · 「O4O 회원약국」(pharmacy.neture.co.kr, 회원 관리 메뉴 없음) 추가 · 분회 · 협동조합은 가입 없이 중앙이 생성 · 수정 · 삭제 · Admin 지정 · 사이트 설정, 회원 대상 업무는 각 기관 소관 · 독립 운영은 drugstore · carepharm · 개별 조합 · 개별 분회 · 「상품 취급 승인」은 중앙 「공급자」 메뉴로.
 - **세션 판단:** 지시서 §3 P1~P6. 조합 affiliation(가입 신청) 흐름은 U5 와 맞지 않아 신규 진입 차단 방향 — 기존 pending/rejected 처리는 T2 결과로 정함.
 - **추가 사용자 확정(같은 날):** U10 O4O 회원약국 약관은 따로 두고 동의는 약국경영자 가입 때 · U11 협업체끼리 게시물 · 자료 분리(INDEPENDENCE D2) 유지.
 - **T1 기준 문서 개정(완료):** `O4O-ROLE-WORKSPACE-ARCHITECTURE-V2` 상단 2026-11-14 결정 + §3 행(공급자 · 협동조합 관리 · 개별 조합 · O4O 회원약국 · 분회 관리 · 개별 분회) + §8-1 해소 표기. `O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1` 상단 대체 범위 표기(admin 행 · 2026-10-08 결정). `O4O-CURRENT-ADMIN-ROLE-POLICY-V1` 현재 결정 보강. WO-PHARMACY-BUSINESS-INDEPENDENCE 는 기록물이라 본문 미수정(대체 관계는 지시서 §4).
+- **T3 설계(완료 · 지시서 §10):** 중앙 서비스 `kpa-branch`(분회 관리) · `pharmacy`(O4O 회원약국) 추가, `pharmcoop` 표시 이름 「협동조합 관리」. 역할: 분회 관리는 `kpa-branch:admin` 만(`kpa-branch:operator` 는 개별 분회 운영자라 중앙 매핑 제외), O4O 회원약국은 기존 `neture:pharmacy_*`, 제품 등록 승인은 `supplier.product-approvals` 신설(공급자 scope 경로 신설 · Neture scope 미확대). 메뉴 항목 · 서버 래핑 대상 · 소비처 · PR 분할(PR-A 추가만 → PR-B 서버 권한 → PR-C 화면 → PR-D 정리). 남은 사용자 확인 3건(§10-7): 분회 Admin = 기존 분회 운영자 지정으로 쓸지, 신상신고 서식 · 분회 서비스 회원 상태 위치, 조합 Admin 지정의 본인 수락 유지.
 - **검증:** 문서만(`check-doc-sensitive` 통과). SQL 의 표 · 열 이름은 코드에서 확인(`kpa_organizations` · `cooperatives.status` · `central_operation_menu_grants.menu_keys` · `role_assignments.is_active`).
 - **PR 묶음:** 지시서 + T1 기준 문서 개정을 한 문서 전용 PR(R6 — 기능 코드 없음).
 - **겹칠 수 있는 PR:** 미대조(통합 세션 확인). 미병합 branch `claude/ecstatic-mendel-2ohu27-login`(로그인 대기 안내 · AI 운영 리포트 안내)과 파일 겹침 없음(HANDOFF.md 제외).

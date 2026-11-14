@@ -1,7 +1,7 @@
 # 운영자 배치 재정의 — 중앙 회원 관리 · 서비스별 운영 · 분회 · 협동조합 관리 · O4O 회원약국
 
 > **상태**: DRAFT
-> **작성일**: 2026-11-14 · **최종 갱신**: 2026-11-14 (U10 · U11 추가)
+> **작성일**: 2026-11-14 · **최종 갱신**: 2026-11-14 (U10 · U11 추가 · T3 설계 §10)
 > **실행 위치**: BOTH
 > **인계**: `claude/ecstatic-mendel-2ohu27-operator-placement` · c92a7a1f · 다음 실행자 CLOUD(T1 기준 문서 개정안) → LOCAL(T2 조회)
 > **근거**: 사용자 확정(2026-11-14 · 아래 §2). 선행 기록 — [`O4O-ROLE-WORKSPACE-ARCHITECTURE-V2`](../baseline/O4O-ROLE-WORKSPACE-ARCHITECTURE-V2.md) §3 · [`O4O-CURRENT-ADMIN-ROLE-POLICY-V1`](../baseline/O4O-CURRENT-ADMIN-ROLE-POLICY-V1.md) · [`O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1`](../baseline/O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1.md) · [`WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1`](WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1.md)
@@ -68,7 +68,7 @@
 
 - [x] **T1 [CLOUD] 기준 문서 개정** (2026-11-14 — V2 상단 결정 · §3 행 · §8-1, SEMANTICS 상단 대체 표기, ADMIN-ROLE-POLICY 현재 결정 보강) — §4 표대로 V2 §3 개정(또는 V3) · SEMANTICS 대체 범위 표기 · ADMIN-ROLE-POLICY 보강. 문서 전용 PR. 사용자 확인 완료(U10 · U11): 데이터 분리 유지, 약관은 따로 두되 동의는 약국경영자 가입 때 받음.
 - [ ] **T2 [LOCAL] 운영 DB read-only 조회** — 아래 §7 SQL. 결과는 건수만 마스킹해 이 문서 §8 에 기록.
-- [ ] **T3 [CLOUD] 중앙 서비스 목록 · 역할 설계** — `CENTRAL_OPERATION_MENUS`(packages/types) · `centralOperationAreas` · `CENTRAL_SERVICE_PREFIXES` 에 분회 관리 · O4O 회원약국 추가 설계. 기존 역할(`kpa-branch:admin` · `neture:pharmacy_*`)과 위임 데이터 대조 후 key 확정. 공유 모듈 변경이므로 [`O4O-SHARED-MODULE-CHANGE-PROTOCOL-V1`](../baseline/O4O-SHARED-MODULE-CHANGE-PROTOCOL-V1.md) 소비처 식별 포함.
+- [x] **T3 [CLOUD] 중앙 서비스 목록 · 역할 설계** (2026-11-14 — §10. §10-7 사용자 확인 3건 남음) — `CENTRAL_OPERATION_MENUS`(packages/types) · `centralOperationAreas` · `CENTRAL_SERVICE_PREFIXES` 에 분회 관리 · O4O 회원약국 추가 설계. 기존 역할(`kpa-branch:admin` · `neture:pharmacy_*`)과 위임 데이터 대조 후 key 확정. 공유 모듈 변경이므로 [`O4O-SHARED-MODULE-CHANGE-PROTOCOL-V1`](../baseline/O4O-SHARED-MODULE-CHANGE-PROTOCOL-V1.md) 소비처 식별 포함.
 - [ ] **T4 [CLOUD] 서버 권한(§5 승인 필요)** — ① 분회 생성 · 수정 · 삭제 API 를 중앙 분회 관리 위임자에게 열지 ② 협동조합 생성 · 수정 · 삭제 API 신설 · affiliation 신규 진입 차단 ③ O4O 회원약국 운영 API 의 중앙 위임 적용 ④ 상품 취급 승인 API 의 공급자 scope 허용과 `neture.product-approvals` 위임 이전. 각 항목 통합 담당 승인 후 진행. 위임 데이터 이전이 필요하면 별도 단계(운영 DB write — 통합 담당 명시 승인).
 - [ ] **T5 [CLOUD] 중앙 화면** — 「분회 관리」(목록 · 생성 · 수정 · 삭제 · Admin 지정 · 사이트 설정, §3-1 표준 리스트) · 「협동조합 관리」(같은 구성) · 「O4O 회원약국」(사업 운영 · 서비스 설정) · 「공급자 → 상품 취급 승인」. 서비스당 1 PR.
 - [ ] **T6 [CLOUD] 정리** — 분회 사이트 `/service-admin` 의 분회 생성 · 수정 · 삭제를 중앙 안내 링크로 교체, pharmacy 서브도메인 운영 화면 · Admin `/admin/semi-franchises`(pharmacy 분) · `/admin/pharmacy-service-settings` 를 중앙으로 안내, 조합 affiliation 신청 화면 정리, 옛 메뉴 key 제거(expand → migrate → contract).
@@ -114,6 +114,72 @@ GROUP BY role ORDER BY 1;
 - 약국경영자 가입 시 O4O 회원약국 약관 동의가 함께 기록되는지(U10), drugstore · carepharm 게시물 · 자료가 O4O 회원약국 화면에 보이지 않는지(U11).
 - 상품 취급 승인: 중앙 공급자 담당 운영자가 승인 가능, Neture 상품 정비 위임만 있는 운영자는 메뉴가 보이지 않음.
 - 운영자 · 관리자 화면은 Demo 계정 권한 밖이다 — 통합 담당이 운영 계정으로 확인한다.
+
+## 10. T3 설계 (2026-11-14 · CLOUD)
+
+> 코드는 바꾸지 않았다. 아래 「기존」은 코드에서 확인한 것, 「신설」은 T4 · T5 에서 만들 것이다.
+
+### 10-1. 중앙 서비스 목록 (`packages/types/src/central-operation-menu.ts` `CENTRAL_OPERATION_SERVICES`)
+
+| 서비스 key | 표시 이름 | 변경 |
+|---|---|---|
+| neture · supplier · funding · lecture · community · partner-support | 기존 그대로 | 없음 |
+| `pharmcoop` | 「협동조합 연합회」 → **「협동조합 관리」** | 표시 이름만. key 유지(저장된 위임 보존) |
+| `kpa-branch` | **「분회 관리」** | 신설 |
+| `pharmacy` | **「O4O 회원약국」** | 신설 |
+
+### 10-2. 역할 매핑 (`centralServiceForRole` · 서버 `CENTRAL_OPERATION_ROLES`)
+
+| 중앙 서비스 | 중앙 역할 | 판단 |
+|---|---|---|
+| `kpa-branch` | `kpa-branch:admin` 만 | `kpa-branch:operator` 는 **개별 분회 운영자**(역할 + 본인 활성 분회 소속, `branch_memberships`)라 중앙으로 매핑하지 않는다. 분회 관리 메뉴는 모두 admin 등급. 중앙에서 분회 관리를 맡길 사람은 `kpa-branch:admin` 으로 지정한다(새 역할 없음) |
+| `pharmacy` | `neture:pharmacy_admin` · `neture:pharmacy_operator` | 기존 사업 역할 재사용. `pharmcoop` 과 같은 특수 매핑. `CENTRAL_OPERATION_ROLES` 에 추가되므로 서비스 Admin 의 자체 운영자 지정은 서버가 막는다(`CENTRAL_ADMIN_REQUIRED`) — 중앙이 지정한다는 U7 과 일치. drugstore · carepharm 역할은 추가하지 않는다(U8) |
+| `supplier` (상품 취급 승인) | `supplier:operator` · `supplier:admin` | 기존 역할 |
+
+### 10-3. 메뉴 항목
+
+| key | 이름 | 등급 | 화면 | API | 상태 |
+|---|---|---|---|---|---|
+| `kpa-branch.branches` | 분회 목록·생성·수정·삭제 | admin | 신설(§3-1 표준 리스트) | `POST/PATCH/DELETE /kpa-branch/admin/branches` 기존(**`platform:super_admin` 전용** → T4①에서 `kpa-branch:admin` + 중앙 위임으로). 비활성 포함 관리용 목록 API 는 없음 → 신설 | API 일부 기존 |
+| `kpa-branch.branch-admins` | 분회 Admin 지정 | admin | 분회 사이트 `/service-admin`(ServiceAdminPage)의 지정 화면을 중앙으로 이전 | `/kpa-branch/admin/branches/:branchId/operators` 기존(`kpa-branch:admin`) | 기존 |
+| `kpa-branch.domains` | 분회 사이트 주소 연결 | admin | 이전 | `/kpa-branch/admin/domains` 기존 | 기존 |
+| `kpa-branch.site` | 분회 사이트 설정 | admin | 신설 | 현재 `/branches/:slug/operator/site` 는 **그 분회 운영자 전용** → 중앙 접근 경로 신설(T4①) | 신설 |
+| (닫음) 분회 개설 신청 승인 | — | — | — | `/kpa-branch/branch-requests` · `/admin/branch-requests/*` 기존 — U5 와 맞지 않아 **신규 신청 진입 차단**. 대기 건 처리는 T2 결과로 | 정리 |
+| `pharmacy.business` | 사업 운영(홈 소개·공급 제안·행사·모집·콘텐츠) | operator | `OperatorSemiFranchisePage`(`@o4o/operator-core-ui/modules/pharmacy-management`, key=`pharmacy`) 재사용. **가입 신청(memberships) 탭은 숨김**(U7) | `/neture/operator/semi-franchises/pharmacy/*` 기존(`cooperativeBusinessGuard` · 중앙 래핑 없음 → T4③) | 화면 재사용 |
+| `pharmacy.inbox` | 문의 접수·처리 | operator | 기존 업무함 재사용 | `/operator/inbox/business/pharmacy` 계열 기존 | 기존 |
+| `pharmacy.settings` | 서비스 설정 | admin | Admin `/admin/pharmacy-service-settings`(AdminPharmacyServiceSettingsPage, `neture:admin`)를 이전 | 기존 | 이전 |
+| `pharmacy.legal` | 약관(U10) | admin | 현재 사업 약관 편집 위치 T4 전에 확인 | 확인 필요 | 확인 |
+| `pharmcoop.federation` | **협동조합 관리**(목록·생성·수정·삭제·조합 Admin 지정) | members→business | 기존 FederationManagement 확장 | 목록·상태 변경·역할 조회 기존(`/federation*`). **생성·수정·삭제 API 없음 → 신설**(T4②). 조합 Admin 지정은 기존 `assignRole`(초대 · 본인 수락) 재사용. 가입 신청 `POST /affiliations` 은 신규 진입 차단 | 일부 신설 |
+| `supplier.product-approvals` | 제품 등록 승인 | operator | `OperatorProductApprovalPage` 재사용 | 현재 `/neture/operator/products{,/:id/approve,/:id/reject,/batch-*}`(Neture scope). Neture scope 를 넓히지 않고 **공급자 scope 경로를 신설**해 같은 서비스 함수를 호출(T4④) | 신설 |
+| `neture.product-approvals` | (이전 기간 유지) | — | — | — | expand→contract: 새 메뉴 정착 · 위임 이전(Q3) 후 제거 |
+
+### 10-4. 서버 연결 (`central-operation-menu.middleware.ts` · scope guard)
+
+- `centralApiMenus` 에 `kpa-branch` · `pharmacy` · `supplier.product-approvals` 경로 분류를 추가한다.
+- 중앙 래핑(`withCentralOperationMenus`) 적용 대상: `kpa-branch` 의 **서비스 관리자 guard 만**(`adminGuards` · `branchServiceAdminGuards`). 분회 운영자 guard(`operatorGuards`)는 래핑하지 않는다(개별 분회 독립 운영 · U6).
+- `pharmacy` 사업 API 는 `key=pharmacy` 일 때만 중앙 위임을 확인한다. drugstore · carepharm 은 지금처럼 래핑 없음(U8).
+- 중앙 위임이 있는 사람만 제한받는 현재 동작(`scope_type='o4o-direct'` 일 때만 메뉴 · Google 강제)은 유지한다.
+
+### 10-5. 공유 모듈 소비처 (protocol 1단계)
+
+- `CENTRAL_OPERATION_SERVICES` · `CENTRAL_OPERATION_MENUS` · `centralServiceForRole` · `centralMenusForRole`:
+  admin-dashboard `AdminOperationsDutySelection.tsx` · `CentralMenuGrants.tsx` · `CentralOperationsPage.tsx` · `central-operation-groups.ts` · `central-operation-navigation.ts` · 테스트 3개(`CentralOperationDirectory` · `CentralOperationLayout` · `central-operation-coverage`),
+  api-server `central-operation-menu.middleware.ts` · `member-management-policy.middleware.ts` · `partner-support-scope.middleware.ts` · `subdomain-operator-scope.ts` · `operator-action-queue.controller.ts` · `service-legal-scope.ts` · `central-operation-access.routes.ts` · `admin-operations-operator-contract.ts` · `admin-operations-operators.ts` · `central-operation-menu-grants.ts` · `central-operation-overview.ts` · `service-operator-invitation.service.ts`.
+- `CENTRAL_SERVICE_PREFIXES` · `CENTRAL_OPERATION_ROLES`: api-server `operator-role-catalog.ts` · `AdminUserController.ts` · `role-assignment.service.ts` · `central-operation-access.ts` · `service-operator-management.service.ts` · `service-tenant.resolver.ts`, admin-dashboard `lib/operator-role-catalog.ts` · `tests/operator-role-catalog.test.ts`.
+- 구현 PR 에서 `node scripts/quality/check-literal-consumers.mjs --source <파일>` 로 문자열 소비처를 다시 확인한다(식별자 검색만으로 0 선언 금지).
+
+### 10-6. PR 분할 (`AGENTS.md` §4-3 R2 · R1)
+
+1. **PR-A 추가만(expand)** — types 메뉴 · 서비스 추가, 역할 매핑, `centralApiMenus` 분류. 화면 없음 · 기존 동작 불변. lane `shared-package:types` + `core-hub`.
+2. **PR-B 서버 권한(T4 · 항목별 통합 담당 승인)** — ① 분회 관리 API(`kpa-branch:admin` + 중앙 위임, 관리용 목록 · 사이트 설정 경로) ② 협동조합 생성·수정·삭제 API · affiliation 신규 차단 ③ O4O 회원약국 사업 API 중앙 위임 ④ 공급자 scope 제품 승인 경로. migration 필요 시 별도 PR(`migration` lane).
+3. **PR-C 화면(서비스당 1 PR)** — 분회 관리 · 협동조합 관리 · O4O 회원약국 · 공급자 제품 등록 승인.
+4. **PR-D 정리(contract)** — 분회 사이트 `/service-admin` 이전분 · Admin `/admin/pharmacy-service-settings` · pharmacy 서브도메인 운영 화면 안내 · `neture.product-approvals` 제거(위임 이전 후).
+
+### 10-7. 사용자 확인 필요 (T4 전)
+
+1. **분회 「Admin」.** 현재 분회별 Admin 역할은 없고 분회 운영자 하나(`kpa-branch:operator` + 본인 분회 소속)만 있다. 제안: 1단계는 「분회 Admin 지정」 = 기존 분회 운영자 지정으로 쓰고, 분회 안에서 Admin · Operator 구분이 필요해지면 별도 결정(새 역할은 RBAC Freeze F9 변경). 또 지정 대상은 **그 분회에 소속된 회원**이어야 한다.
+2. **분회 서비스 전체 설정 2가지의 위치.** 신상신고 연도 서식 열기(`/kpa-branch/admin/annual-report-templates`)와 분회 서비스 회원 상태(`/kpa-branch/admin/service-members`). 제안: 서식은 중앙 「분회 관리」, 회원 상태는 U2 에 따라 중앙 회원 관리로 합칠지 확인.
+3. **조합 Admin 지정의 본인 수락.** 기존 조합 Admin 지정은 초대 → 본인 수락이다. 제안: 중앙이 지정해도 본인 수락은 유지.
 
 ## 문서 정합
 
