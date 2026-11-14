@@ -19,6 +19,8 @@ import CarePharmToolsPage from './pages/neture-pharmacy/CarePharmToolsPage';
  */
 import { Suspense, lazy, type ComponentType, type ReactElement } from 'react';
 import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom';
+import { QueryClientProvider } from '@tanstack/react-query';
+import { StoreScopedQueryClient, createStoreQueryClient } from './lib/StoreScopedQueryClient';
 import { StoreProductsManagerPage } from '@o4o/store-products-ui';
 import { PharmacyMembershipReviewPage, configurePharmacyManagementClient } from '@o4o/operator-core-ui/modules/pharmacy-management';
 import { api } from './lib/apiClient';
@@ -225,17 +227,21 @@ function storeChildRoutes() {
   </>;
 }
 
+// 공용 패키지 화면(@o4o/store-products-ui 등)이 react-query 를 쓴다 — 없으면 제품 진열 설정이 빈 화면이 된다.
+// 매장 업무 화면은 WorkspaceApp 의 StoreScopedQueryClient 가 매장별 캐시로 다시 감싼다. 여기는 매장 밖 공개 화면용이다.
+const queryClient = createStoreQueryClient();
+
 export default function App() {
-  return <BrowserRouter><Suspense fallback={Loading}><Routes>
+  return <QueryClientProvider client={queryClient}><BrowserRouter><Suspense fallback={Loading}><Routes>
     <Route path="/consultation/customer" element={<CustomerConsultationPage />} />
     <Route path="/consultation/kiosk" element={<KioskConsultationPage />} />
     <Route path="/tablet/setup" element={<TabletSetupPage />} />
     <Route path="/tablet/:slug" element={<TabletRunPage />} />
     <Route path="/*" element={<WorkspaceApp />} />
-  </Routes></Suspense></BrowserRouter>;
+  </Routes></Suspense></BrowserRouter></QueryClientProvider>;
 }
 export function WorkspaceApp() {
-  return <AuthProvider><StoreProvider><TermsAcceptanceGate><Suspense fallback={Loading}><Routes>
+  return <AuthProvider><StoreProvider><StoreScopedQueryClient><TermsAcceptanceGate><Suspense fallback={Loading}><Routes>
     <Route path="/consultation/staff" element={gated(<StoreMultilingualConsultationPage />)} />
     <Route path={WORKSPACE_PATHS.handoff} element={<HandoffPage />} />
     {/* 사이니지 재생은 chrome-free (KPA 와 동일하게 layout 밖) */}
@@ -341,7 +347,7 @@ export function WorkspaceApp() {
 
       <Route path="*" element={NotFound} />
     </Route>
-  </Routes></Suspense></TermsAcceptanceGate></StoreProvider></AuthProvider>;
+  </Routes></Suspense></TermsAcceptanceGate></StoreScopedQueryClient></StoreProvider></AuthProvider>;
 }
 
 function LegacyHubRedirect() {

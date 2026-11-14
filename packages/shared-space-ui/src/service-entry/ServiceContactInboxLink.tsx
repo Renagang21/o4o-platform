@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 type Client = { get(path: string): Promise<unknown> };
 /** Server-confirmed inbox access: null is unconfirmed/denied; zero is allowed.
- * Scoped to the current account/service. A 403 pauses polling until a focus recheck
- * or a scope change; allowed accounts still refresh every 30 seconds. */
+ * Scoped to the current account/service. The access endpoint answers `allowed:false`
+ * (not 403) for accounts without inbox rights; a denial pauses polling until a focus
+ * recheck or a scope change; allowed accounts still refresh every 30 seconds. */
 export function useServiceContactCount({
   client,
   serviceKey,
@@ -28,11 +29,12 @@ export function useServiceContactCount({
       const request = ++sequence;
       try {
         const response = (await client.get(
-          `/admin/services/${encodeURIComponent(serviceKey)}/contact-inquiries/summary`,
-        )) as { data?: { data?: { newCount?: number } } };
-        const count = response.data?.data?.newCount;
+          `/admin/services/${encodeURIComponent(serviceKey)}/contact-inquiries/inbox-access`,
+        )) as { data?: { data?: { allowed?: boolean; newCount?: number } } };
         if (!active || request !== sequence) return;
-        pollingDenied = false;
+        const allowed = response.data?.data?.allowed === true;
+        pollingDenied = !allowed;
+        const count = allowed ? response.data?.data?.newCount : undefined;
         if (typeof count === "number" && Number.isInteger(count) && count >= 0)
           setValue({ scope, count });
         else setValue(null);

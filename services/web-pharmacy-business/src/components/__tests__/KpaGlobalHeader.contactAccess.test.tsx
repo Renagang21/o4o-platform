@@ -76,7 +76,7 @@ it.each(["neture:operator", "neture:admin"])(
   "shows the 드럭스토어형 약국 inbox for server-confirmed legacy %s",
   async (role) => {
     state.user!.roles = [role];
-    state.get.mockResolvedValue({ data: { data: { newCount: 4 } } });
+    state.get.mockResolvedValue({ data: { data: { allowed: true, newCount: 4 } } });
     render(
       <MemoryRouter>
         <KpaGlobalHeader />
@@ -92,6 +92,8 @@ it.each(["neture:operator", "neture:admin"])(
 );
 it("hides an apparently eligible local role when the server denies access", async () => {
   state.user!.roles = ["neture:drugstore_operator"];
+  // inbox-access 는 권한이 없으면 403 대신 allowed:false 를 200 으로 답한다.
+  state.get.mockResolvedValue({ data: { data: { allowed: false } } });
   render(
     <MemoryRouter>
       <KpaGlobalHeader />

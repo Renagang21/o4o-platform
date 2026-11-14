@@ -25,6 +25,11 @@ type GoogleStage = 'loading' | 'disabled' | 'ready';
 
 /** admin 호스트의 '/' 는 admin 앱 자신이다 — 메인 사이트는 O4O 대표 호스트. */
 const MAIN_SITE_URL = 'https://neture.co.kr/';
+/** 이 시간이 지나도 설정을 못 받으면 서버가 켜지는 중이라고 안내한다. */
+const GOOGLE_SLOW_NOTICE_MS = 5_000;
+/** 설정 요청 최대 횟수(처음 1회 포함)와 다시 묻기 전 대기 시간. */
+const GOOGLE_CONFIG_ATTEMPTS = 3;
+const GOOGLE_RETRY_DELAY_MS = 3_000;
 
 const Login: FC = () => {
   
@@ -43,19 +48,43 @@ const Login: FC = () => {
   // AuthProvider 는 렌더마다 새 getGoogleAuthConfig 함수를 만든다. deps 에 넣으면 세션 확인이 끝나 다시 그려질 때
   // 설정 요청이 처음부터 다시 시작돼 Google 버튼이 늦게 뜬다 — 화면이 뜰 때 한 번만 요청한다.
   const getGoogleAuthConfigRef = useRef(getGoogleAuthConfig);
+  // API 서버는 한동안 요청이 없으면 내려가 있다가 첫 요청에 다시 켜진다(Cloud Run min-instances=0).
+  // 그동안 화면이 멈춘 것처럼 보이지 않게 5초가 넘으면 이유를 보이고, 실패하면 자동으로 다시 묻는다(2026-11-14).
+  const [googleSlow, setGoogleSlow] = useState(false);
+  const [googleAttempt, setGoogleAttempt] = useState(1);
+  const [googleReload, setGoogleReload] = useState(0);
   useEffect(() => {
     let alive = true;
     // Google 스크립트는 설정 응답을 기다리지 않고 바로 받기 시작한다(실패해도 버튼 렌더 단계에서 다시 시도·안내).
     void loadGoogleIdentityScript().catch(() => undefined);
-    getGoogleAuthConfigRef.current()
-      .then((cfg) => {
+    const slowTimer = setTimeout(() => { if (alive) setGoogleSlow(true); }, GOOGLE_SLOW_NOTICE_MS);
+    void (async () => {
+      for (let attempt = 1; attempt <= GOOGLE_CONFIG_ATTEMPTS; attempt += 1) {
+        if (attempt > 1) {
+          setGoogleAttempt(attempt);
+          await new Promise((resolve) => setTimeout(resolve, GOOGLE_RETRY_DELAY_MS));
+          if (!alive) return;
+        }
+        // getGoogleAuthConfig 는 실패를 { enabled: false } 로 돌려준다 — 미설정과 구분되지 않으므로 같은 횟수만큼 다시 묻는다.
+        const cfg = await getGoogleAuthConfigRef.current().catch(() => ({ enabled: false, clientId: null }));
         if (!alive) return;
-        setGoogleClientId(cfg.enabled ? cfg.clientId : null);
-        setGoogleStage(cfg.enabled && cfg.clientId ? 'ready' : 'disabled');
-      })
-      .catch(() => { if (alive) setGoogleStage('disabled'); });
-    return () => { alive = false; };
-  }, []);
+        if (cfg.enabled && cfg.clientId) {
+          setGoogleClientId(cfg.clientId);
+          setGoogleStage('ready');
+          return;
+        }
+      }
+      setGoogleClientId(null);
+      setGoogleStage('disabled');
+    })();
+    return () => { alive = false; clearTimeout(slowTimer); };
+  }, [googleReload]);
+  const retryGoogle = () => {
+    setGoogleSlow(false);
+    setGoogleAttempt(1);
+    setGoogleStage('loading');
+    setGoogleReload((value) => value + 1);
+  };
 
   useEffect(() => {
     if (googleStage !== 'ready' || !googleClientId || !googleContainerRef.current) return;
@@ -155,10 +184,21 @@ const Login: FC = () => {
           {/* Google 로 계속하기 — 기본 진입 */}
           <div className="mb-2">
             {googleStage === 'loading' && (
-              <p className="text-center text-sm text-slate-600">Google 로그인을 준비하고 있습니다…</p>
+              <div role="status" className="space-y-1 text-center text-sm text-slate-600">
+                <p>Google 로그인을 준비하고 있습니다…</p>
+                {googleSlow && (
+                  <p data-testid="google-continue-slow">서버를 깨우는 중입니다(최대 30초 정도). 한동안 사용이 없으면 첫 접속이 느릴 수 있습니다.</p>
+                )}
+                {googleAttempt > 1 && (
+                  <p data-testid="google-continue-retrying">연결이 되지 않아 다시 시도하고 있습니다 ({googleAttempt}/{GOOGLE_CONFIG_ATTEMPTS}).</p>
+                )}
+              </div>
             )}
             {googleStage === 'disabled' && (
-              <p className="text-center text-sm text-slate-600" data-testid="google-continue-disabled">Google 로그인은 준비 중입니다.</p>
+              <div className="space-y-2 text-center text-sm text-slate-600">
+                <p data-testid="google-continue-disabled">Google 로그인을 불러오지 못했습니다. 잠시 뒤 다시 시도해 주시기 바랍니다.</p>
+                <button type="button" onClick={retryGoogle} className="rounded border border-slate-300 bg-white px-3 py-1.5 text-slate-700 hover:bg-slate-50">다시 시도</button>
+              </div>
             )}
             {googleStage === 'ready' && (
               <div ref={googleContainerRef} className="flex justify-center min-h-[44px]" data-testid="google-continue-button" />

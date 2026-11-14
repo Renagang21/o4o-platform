@@ -7,7 +7,7 @@ afterEach(() => {
 });
 it("loads received-inquiry counts for the current service and never queries for guests", async () => {
   const client = {
-    get: vi.fn(async () => ({ data: { data: { newCount: 2 } } })),
+    get: vi.fn(async () => ({ data: { data: { allowed: true, newCount: 2 } } })),
   };
   const view = render(
     <ServiceContactInboxLink
@@ -29,7 +29,7 @@ it("loads received-inquiry counts for the current service and never queries for 
     await screen.findByRole("link", { name: "문의 관리 · 새 문의 2" }),
   ).toBeTruthy();
   expect(client.get).toHaveBeenCalledWith(
-    "/admin/services/supplier/contact-inquiries/summary",
+    "/admin/services/supplier/contact-inquiries/inbox-access",
   );
 });
 it("hides a previous account count and discards its delayed response after switching service", async () => {
@@ -59,9 +59,9 @@ it("hides a previous account count and discards its delayed response after switc
       enabled
     />,
   );
-  old({ data: { data: { newCount: 99 } } });
+  old({ data: { data: { allowed: true, newCount: 99 } } });
   await waitFor(() => expect(screen.queryByText(/99/)).toBeNull());
-  finish({ data: { data: { newCount: 3 } } });
+  finish({ data: { data: { allowed: true, newCount: 3 } } });
   expect(
     await screen.findByRole("link", { name: "문의 관리 · 새 문의 3" }),
   ).toHaveProperty("href", expect.stringContaining("/funding"));
@@ -85,12 +85,12 @@ it("does not show a link until server access is confirmed, including zero new in
     />,
   );
   expect(screen.queryByRole("link", { name: "문의 관리" })).toBeNull();
-  finish({ data: { data: { newCount: 0 } } });
+  finish({ data: { data: { allowed: true, newCount: 0 } } });
   expect(await screen.findByRole("link", { name: "문의 관리" })).toBeTruthy();
 });
 it("removes the link and count when the server revokes access", async () => {
   const client = {
-    get: vi.fn(async () => ({ data: { data: { newCount: 2 } } })),
+    get: vi.fn(async () => ({ data: { data: { allowed: true, newCount: 2 } } })),
   };
   render(
     <ServiceContactInboxLink
@@ -128,7 +128,7 @@ it("does not restore an older successful response after a newer denial", async (
   window.dispatchEvent(new Event("focus"));
   await waitFor(() => expect(client.get).toHaveBeenCalledTimes(2));
   await act(async () => {
-    old({ data: { data: { newCount: 99 } } });
+    old({ data: { data: { allowed: true, newCount: 99 } } });
   });
   expect(screen.queryByRole("link")).toBeNull();
 });
@@ -139,7 +139,7 @@ it("pauses denied polling, then rechecks on focus and resumes after access is gr
     get: vi
       .fn()
       .mockRejectedValueOnce({ response: { status: 403 } })
-      .mockResolvedValue({ data: { data: { newCount: 3 } } }),
+      .mockResolvedValue({ data: { data: { allowed: true, newCount: 3 } } }),
   };
   await act(async () => {
     render(
@@ -173,7 +173,7 @@ it("keeps polling after a temporary server failure", async () => {
     get: vi
       .fn()
       .mockRejectedValueOnce({ response: { status: 503 } })
-      .mockResolvedValue({ data: { data: { newCount: 0 } } }),
+      .mockResolvedValue({ data: { data: { allowed: true, newCount: 0 } } }),
   };
   await act(async () => {
     render(
@@ -197,7 +197,7 @@ it("does not carry a denial to a different account or service", async () => {
     get: vi
       .fn()
       .mockRejectedValueOnce({ response: { status: 403 } })
-      .mockResolvedValue({ data: { data: { newCount: 0 } } }),
+      .mockResolvedValue({ data: { data: { allowed: true, newCount: 0 } } }),
   };
   let view: ReturnType<typeof render>;
   await act(async () => {
@@ -225,7 +225,7 @@ it("does not carry a denial to a different account or service", async () => {
     );
   });
   expect(client.get).toHaveBeenLastCalledWith(
-    "/admin/services/funding/contact-inquiries/summary",
+    "/admin/services/funding/contact-inquiries/inbox-access",
   );
   expect(screen.getByRole("link", { name: "문의 관리" })).toBeTruthy();
   await act(async () => {
@@ -246,7 +246,7 @@ it("ignores a stale denial after a newer successful access check", async () => {
             denyOld = reject;
           }),
       )
-      .mockResolvedValue({ data: { data: { newCount: 1 } } }),
+      .mockResolvedValue({ data: { data: { allowed: true, newCount: 1 } } }),
   };
   await act(async () => {
     render(
@@ -271,4 +271,25 @@ it("ignores a stale denial after a newer successful access check", async () => {
     await vi.advanceTimersByTimeAsync(30000);
   });
   expect(client.get).toHaveBeenCalledTimes(3);
+});
+it("treats an allowed:false answer as denied without a 403 and pauses polling", async () => {
+  vi.useFakeTimers();
+  const client = {
+    get: vi.fn().mockResolvedValue({ data: { data: { allowed: false } } }),
+  };
+  await act(async () => {
+    render(
+      <ServiceContactInboxLink
+        client={client}
+        serviceKey="neture"
+        accountId="store-owner"
+        enabled
+      />,
+    );
+  });
+  expect(screen.queryByRole("link")).toBeNull();
+  await act(async () => {
+    await vi.advanceTimersByTimeAsync(90000);
+  });
+  expect(client.get).toHaveBeenCalledTimes(1);
 });
