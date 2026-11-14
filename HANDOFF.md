@@ -1,5 +1,28 @@
 # HANDOFF
 
+## 2026-11-14 · YouTube 운영 설정 보존 (branch `wo/youtube-production-settings`)
+
+- **요청:** 관리자 YouTube 설정의 OAuth/암호화 키 경고 해결. 현재 단계는 배포 설정 보존 수정이며 운영 연결 완료가 아니다.
+- **PR 묶음:** 이 branch의 workflow·회귀 검사·인계 기록 3파일. CI 보호 경로 변경이므로 통합 담당이 검토·병합하고 로컬 세션에서 운영 연결/배포한다(AGENTS.md §4·§9).
+- **한 일:** API 배포가 full plain-env replacement를 할 때 실제 serving revision의 YouTube OAuth client ID/redirect URI와 Tasks 설정 4개를 carry한다. 조회 실패·secret/plain 혼동은 배포 전에 실패한다. OAuth secret과 기존 암호화 키를 평문으로 읽거나 새 키로 교체하지 않는다. 기존 Secret Manager binding은 `--update-secrets` 경로에서 유지된다.
+- **운영 read-only 확인:** project `netureyoutube`, region `asia-northeast3`, service `o4o-core-api`. YouTube OAuth 3개와 Tasks 환경변수 4개 없음. 기존 `ENCRYPTION_KEY`는 Secret Manager 참조 있음(내용 미조회). YouTube Data API 활성, Cloud Tasks API 비활성. Secret Manager에 YouTube 전용 secret 없음. runtime SA `o4o-runtime@netureyoutube.iam.gserviceaccount.com`. 다른 조회 사이 latest ready revision이 바뀌어 공유 runtime 작업 여부를 사용자에게 확인 중.
+- **운영 적용 전:** 전용 Google OAuth Web client 유무와 다른 세션의 운영 변경 여부 확인. Google Auth Platform 콘솔에서 client를 준비하고 redirect URI `https://admin.neture.co.kr/settings/youtube/callback`, scopes `youtube.upload`·`youtube.readonly`를 확인한다. 일반 Google 로그인 client를 임의 변경하지 않는다. OAuth secret은 채팅·문서·명령 인자에 복사하지 말고 Secret Manager로 전달한다.
+- **로컬 적용안:** Cloud Tasks API 활성화 → 전용 worker SA와 `asia-northeast3` 전용 큐 준비(예정 이름 `o4o-youtube-upload`, concurrent=1) → 큐 범위 runtime SA enqueue 및 queue 조회 권한, worker SA 범위 runtime `actAs`, Cloud Tasks service agent token 발급 권한 확인 → OAuth secret에 runtime secretAccessor 연결 → 현재 운영 image/traffic을 보존하는 승인된 설정 적용/검증 → 관리자 Google 채널 동의. 기존 서비스/큐/IAM을 덮어쓰지 않는다. `roles/cloudtasks.enqueuer`에는 `cloudtasks.queues.get`이 없으며 현재 코드가 큐를 읽으므로 별도 queue 조회 권한이 필요하다. public worker/IAM owner 부여로 우회하지 않는다.
+- **검증:** `node --test scripts/ci/__tests__/cloud-run-env.test.mjs scripts/ci/__tests__/deploy-workflow-gates.test.mjs` 106/106 PASS. `git diff --check` PASS.
+- **확인하지 못한 것:** 실제 OAuth client/consent 승인 상태, Cloud Tasks/IAM 활성화, secret 실제 유효성, 배포, 관리자 status API/화면, 실제 채널 동의·업로드·알림. runtime 변경은 수행하지 않았다. 사용자 Google 인증은 CLI 접근 인증이며 YouTube 채널 동의를 대신하지 않는다.
+- **겹칠 수 있는 열린 PR:** 조회 시 #1069·#1070, 기능 경로 중복 없음. 공통 HANDOFF.md는 양쪽 기록을 보존한다.
+- **문서 정합:** 기존 운영 가이드는 runtime 연결이 별도라고 명시함. 기준 문서 변경 없음.
+
+### 후속 실행 결과
+
+- **OAuth 준비 후속:** 사용자가 전용 Web client를 생성하고 Secret Manager에 secret을 저장했다. client ID `117791934476-piugtg0r0a4s28ilduk15douaf1g8b52.apps.googleusercontent.com`, secret 이름 `o4o-youtube-oauth-client-secret`, version `1` enabled를 CLI로 확인(값 미조회). redirect URI는 위 고정 주소다. 사용자 제공 화면의 client 생성 입력값도 일치한다.
+- **로컬 운영 세션 적용값:** `YOUTUBE_OAUTH_CLIENT_ID=117791934476-piugtg0r0a4s28ilduk15douaf1g8b52.apps.googleusercontent.com`, `YOUTUBE_OAUTH_REDIRECT_URI=https://admin.neture.co.kr/settings/youtube/callback`, `GOOGLE_CLOUD_PROJECT=netureyoutube`, `YOUTUBE_TASKS_REGION=asia-northeast3`, `YOUTUBE_TASKS_QUEUE=o4o-youtube-upload`. 전용 worker SA 예정 `o4o-youtube-worker@netureyoutube.iam.gserviceaccount.com`는 존재를 확인하고 없으면 생성한다. `YOUTUBE_TASKS_SERVICE_ACCOUNT`에 이 worker SA를 사용한다. `YOUTUBE_OAUTH_CLIENT_SECRET`은 `o4o-youtube-oauth-client-secret:1` secret binding으로 주입한다. 기존 `ENCRYPTION_KEY` binding을 보존한다.
+- **권한 후속:** OAuth secret의 resource IAM binding은 없음. 확인한 project IAM에서 runtime SA는 Cloud SQL client/log writer이고 Tasks 권한 없음(상속/조건/그룹 접근까지 확정한 것은 아님). Cloud Tasks service agent role은 API 활성화 후 존재함. runtime에 secret 단위 secretAccessor, queue 단위 cloudtasks.enqueuer와 queue 조회 권한, worker SA 단위 serviceAccountUser를 필요한 것만 부여한다. service agent의 기존 token 발급 권한을 먼저 평가하고 중복 광역 권한을 추가하지 않는다.
+- 사용자에게 세션 상태를 재확인하도록 요구하지 않고 GitHub Actions와 Cloud Audit Logs를 직접 조회했다. 조회 시 진행 중 GitHub 실행 0개, 최근 Delivery 성공 완료, API Ready=True 및 단일 serving revision 100%를 확인했다. 이것이 다른 사람의 미래 변경을 잠그는 것은 아니다.
+- 사용자의 해결 지시 범위에서 Cloud Tasks API를 활성화했고, 큐 목록이 비어 있음을 확인한 뒤 `asia-northeast3/o4o-youtube-upload`를 생성했다. concurrent=1, dispatch/sec=1, max attempts=20, backoff=5s..300s. 영상 작업은 만들지 않았다.
+- 위 본문의 미실행 항목 중 Cloud Tasks API/큐 준비는 이제 수행됨. 서비스 계정 생성/IAM/WIF·서버 env/secret·운영 배포·Google 채널 연결은 미실행. AGENTS.md §4의 작업 세션 IAM 금지와 §9의 클라우드 운영 배포 금지에 따라 로컬 운영 세션이 이어야 한다.
+- 사용자도 기존 OAuth client 유무는 모르는 상태다. 현재 도구에는 콘솔 UI 제어가 없으며 Google Auth Platform 웹 client 목록/secret 생성은 일반 gcloud CLI 로그인만으로 해결되지 않는다. 콘솔에서 기존 목록을 확인하고 전용 Web client를 생성/확인하는 단계가 남았다. IAM workforce용 OAuth client를 YouTube용으로 대신 만들지 않는다.
+
 ## 2026-11-14 · 공급자 화면 버그 묶음 (branch `claude/supplier-ui-bugfix`)
 
 - **근거 / PR 묶음:** 2026-11-13 공급자 전반 조사의 화면 버그 묶음(사용자 지시 「진행해」). **이 branch 단독 1 PR**(web-neture 공급자 화면 · 서비스 PR). API · schema 변경 없음. PR 은 만들지 않았다.
