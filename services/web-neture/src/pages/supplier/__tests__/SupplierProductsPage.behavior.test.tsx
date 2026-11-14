@@ -139,10 +139,15 @@ const loaded = async () => {
 };
 const selectFirst = () =>
   fireEvent.click(within(screen.getByTestId('offer-1')).getByRole('checkbox'));
+// 등록 재검토 요청은 공용 확인 대화상자(@o4o/ui ConfirmActionDialog)로 묻는다
+const requestApproval = async (answer: '요청' | '취소' = '요청') => {
+  fireEvent.click(screen.getByRole('button', { name: '등록 재검토 요청' }));
+  const dialog = await screen.findByRole('dialog');
+  fireEvent.click(within(dialog).getByRole('button', { name: answer }));
+};
 
 beforeEach(() => {
   vi.resetAllMocks();
-  vi.spyOn(window, 'confirm').mockReturnValue(true);
   Element.prototype.scrollIntoView = vi.fn();
   api.getProductsPaginated.mockImplementation(async ({ page }) => ({
     data: products.map((p) => ({ ...p })),
@@ -199,11 +204,11 @@ describe('SupplierProductsPage existing workflow', () => {
   });
 
   it('does not send an approval request after confirmation is cancelled', async () => {
-    vi.mocked(window.confirm).mockReturnValue(false);
     mount();
     await loaded();
     selectFirst();
-    fireEvent.click(screen.getByRole('button', { name: '등록 재검토 요청' }));
+    await requestApproval('취소');
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
     expect(api.submitForApproval).not.toHaveBeenCalled();
     expect(screen.getByText('1개 선택')).toBeTruthy();
   });
@@ -250,7 +255,7 @@ describe('SupplierProductsPage existing workflow', () => {
     fireEvent.click(screen.getByRole('button', { name: '2페이지' }));
     await screen.findByText('현재 페이지 2');
     selectFirst();
-    fireEvent.click(screen.getByRole('button', { name: '등록 재검토 요청' }));
+    await requestApproval();
     await screen.findByText('1건 승인 요청 완료');
     await waitFor(() => expect(api.getProductsPaginated).toHaveBeenCalledTimes(3));
     expect(api.getProductsPaginated.mock.lastCall?.[0].page).toBe(2);
@@ -267,7 +272,7 @@ describe('SupplierProductsPage existing workflow', () => {
     mount();
     await loaded();
     selectFirst();
-    fireEvent.click(screen.getByRole('button', { name: '등록 재검토 요청' }));
+    await requestApproval();
     await screen.findByText('승인 요청 결과');
     expect(screen.getByText('승인 요청 제외: 1건')).toBeTruthy();
     expect(screen.getAllByText('검증 상품 1').length).toBeGreaterThan(1);
@@ -313,5 +318,74 @@ describe('SupplierProductsPage existing workflow', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Drawer 저장' }));
     await waitFor(() => expect(api.getProductsPaginated).toHaveBeenCalledTimes(2));
     expect(screen.queryByRole('dialog')).toBeNull();
+  });
+});
+
+// 선택 · 일괄 작업 회귀 — 노출 필터 · 전송 실패 · 중복 제출
+describe('SupplierProductsPage bulk selection safety', () => {
+  // offer-1 은 노출 가능(승인 + 공개), offer-2 는 노출 불가(검토 중)
+  const mixedVisibility = () =>
+    api.getProductsPaginated.mockImplementation(async ({ page }) => ({
+      data: [
+        { ...products[0], approvalStatus: 'APPROVED', isPublic: true },
+        { ...products[1], approvalStatus: 'PENDING' },
+      ],
+      pagination: { page, limit: 50, total: 2, totalPages: 1 },
+    }));
+
+  it('select-all under the visibility filter selects only the rows on screen', async () => {
+    mixedVisibility();
+    mount();
+    await loaded();
+    fireEvent.click(screen.getByRole('button', { name: '노출 가능' }));
+    await waitFor(() => expect(screen.queryByTestId('offer-2')).toBeNull());
+    fireEvent.click(screen.getByRole('button', { name: '전체 선택' }));
+    expect(screen.getByText('1개 선택')).toBeTruthy();
+    expect(screen.getByRole('button', { name: '전체 선택 해제' })).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: '일괄 삭제' }));
+    fireEvent.click(screen.getByRole('button', { name: '삭제', exact: true }));
+    await waitFor(() => expect(api.bulkDelete).toHaveBeenCalledWith(['offer-1']));
+  });
+
+  it('drops selections that the visibility filter hides', async () => {
+    mixedVisibility();
+    mount();
+    await loaded();
+    fireEvent.click(screen.getByRole('button', { name: '전체 선택' }));
+    expect(screen.getByText('2개 선택')).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: '노출 불가' }));
+    await waitFor(() => expect(screen.getByText('1개 선택')).toBeTruthy());
+    fireEvent.click(screen.getByRole('button', { name: '일괄 삭제' }));
+    fireEvent.click(screen.getByRole('button', { name: '삭제', exact: true }));
+    await waitFor(() => expect(api.bulkDelete).toHaveBeenCalledWith(['offer-2']));
+  });
+
+  it('does not report an unanswered delete request as success and reloads the list to show the real state', async () => {
+    api.bulkDelete.mockResolvedValue({ deleted: 0, failed: [{ id: 'all', error: 'NETWORK_ERROR' }] });
+    mount();
+    await loaded();
+    selectFirst();
+    fireEvent.click(screen.getByRole('button', { name: '일괄 삭제' }));
+    fireEvent.click(screen.getByRole('button', { name: '삭제', exact: true }));
+    await screen.findByText(/삭제 결과를 확인하지 못했습니다/);
+    expect(screen.queryByText(/삭제 완료/)).toBeNull();
+    expect(screen.queryByText(/아무 상품도 삭제되지 않았습니다/)).toBeNull();
+    // 서버가 응답 전에 지웠을 수 있으므로 목록을 다시 불러온다.
+    await waitFor(() => expect(api.getProductsPaginated).toHaveBeenCalledTimes(2));
+  });
+
+  it('sends one approval request even if the button is pressed again while it is in flight', async () => {
+    let resolve: (v: unknown) => void = () => {};
+    api.submitForApproval.mockImplementation(() => new Promise((r) => { resolve = r; }));
+    mount();
+    await loaded();
+    selectFirst();
+    await requestApproval();
+    const busy = await screen.findByRole('button', { name: '요청 중...' });
+    expect((busy as HTMLButtonElement).disabled).toBe(true);
+    fireEvent.click(busy);
+    expect(api.submitForApproval).toHaveBeenCalledTimes(1);
+    resolve({ success: true, data: { submitted: 1, skipped: [], errors: [] } });
+    await screen.findByText('1건 승인 요청 완료');
   });
 });

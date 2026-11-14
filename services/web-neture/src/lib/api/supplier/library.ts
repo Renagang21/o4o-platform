@@ -138,6 +138,7 @@ export const supplierLibraryApi = {
    * 대상 서비스는 backend 가 canonical catalog 에서 계산한다 (프론트 하드코딩 없음).
    * 제공 후 검토·수정·발행은 해당 서비스 운영자 업무 — 공급자 책임은 여기서 끝난다.
    */
+  //   조회 실패는 throw 한다 — 빈 배열로 바꾸면 '제공할 서비스 없음'과 구분되지 않아 버튼이 조용히 사라진다.
   async getLibraryHandoffTargets(): Promise<SupplierLibraryHandoffTarget[]> {
     try {
       const response = await api.get('/neture/library/handoff-targets');
@@ -148,7 +149,7 @@ export const supplierLibraryApi = {
         '[Supplier API] Failed to fetch library handoff targets:',
         extractApiError(error),
       );
-      return [];
+      throw error;
     }
   },
 

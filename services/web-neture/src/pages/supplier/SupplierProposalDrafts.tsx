@@ -16,6 +16,7 @@ import {
   type ProposalDraftFields as Terms,
   type ProposalDraft as Draft,
 } from "./proposalDraftStorage";
+import { useConfirmDialog } from "../../components/common/useConfirmDialog";
 const validMoney = (value: string) =>
   value !== "" &&
   Number.isInteger(Number(value)) &&
@@ -84,6 +85,7 @@ export default function SupplierProposalDrafts({
   proposals: SupplyProposal[];
   onSubmitted: () => Promise<void>;
 }) {
+  const { confirm, dialog: confirmDialog } = useConfirmDialog();
   const [restored] = useState(() => readProposalDrafts(storageScope));
   const [terms, setTerms] = useState(restored.terms);
   const [selected, setSelected] = useState<string[]>([]);
@@ -277,6 +279,7 @@ export default function SupplierProposalDrafts({
       className="space-y-4 rounded-lg border border-gray-200 bg-white p-4"
       aria-label="협업체별 공급 요청 초안"
     >
+      {confirmDialog}
       <h2 className="text-base font-semibold text-gray-900">
         같은 조건으로 여러 협업체에 요청
       </h2>
@@ -305,11 +308,15 @@ export default function SupplierProposalDrafts({
           type="button"
           disabled={busy}
           className="text-sm text-gray-600"
-          onClick={() => {
+          onClick={async () => {
             if (
-              window.confirm(
-                "작성 중인 초안을 모두 지우시겠습니까? 응답을 확인하지 못한 요청도 이미 접수됐을 수 있으니 목록에서 확인하시기 바랍니다. 초안을 지워도 접수한 제안은 종료되지 않습니다.",
-              )
+              await confirm({
+                title: "작성 초안 모두 지우기",
+                message:
+                  "작성 중인 초안을 모두 지우시겠습니까? 응답을 확인하지 못한 요청도 이미 접수됐을 수 있으니 목록에서 확인하시기 바랍니다. 초안을 지워도 접수한 제안은 종료되지 않습니다.",
+                confirmText: "모두 지우기",
+                variant: "warning",
+              })
             ) {
               setTerms({ ...EMPTY });
               setDrafts([]);
@@ -574,11 +581,15 @@ export default function SupplierProposalDrafts({
                 <button
                   type="button"
                   className="text-sm text-gray-600"
-                  onClick={() => {
+                  onClick={async () => {
                     if (
-                      window.confirm(
-                        "접수 목록을 확인했습니까? 이미 접수됐다면 먼저 기존 제안을 종료하시기 바랍니다. 확인한 내용을 새 초안으로 바꾸겠습니까?",
-                      )
+                      await confirm({
+                        title: "새 초안으로 바꾸기",
+                        message:
+                          "접수 목록을 확인했습니까? 이미 접수됐다면 먼저 기존 제안을 종료하시기 바랍니다. 확인한 내용을 새 초안으로 바꾸겠습니까?",
+                        confirmText: "새 초안으로",
+                        variant: "warning",
+                      })
                     ) {
                       setDrafts((prev) =>
                         prev.map((row) =>

@@ -79,6 +79,8 @@ function LibraryPage() {
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
   const [visibilityFilter, setVisibilityFilter] = useState<VisibilityFilter>('all');
 
   // WO-O4O-SUPPLIER-WORKSPACE-REALIGNMENT-AND-DISTRIBUTION-V1: Supplier → Service Operator 제공
@@ -88,13 +90,28 @@ function LibraryPage() {
   const [handoffSubmitting, setHandoffSubmitting] = useState(false);
   const [handoffError, setHandoffError] = useState<string | null>(null);
   const [handoffNotice, setHandoffNotice] = useState<string | null>(null);
-  useEffect(() => {
-    let cancelled = false;
-    supplierApi.getLibraryHandoffTargets().then((targets) => {
-      if (!cancelled) setHandoffTargets(targets);
-    });
-    return () => { cancelled = true; };
+  // 제공 대상 조회 실패는 '대상 없음'과 다르다 — 안내하고 다시 시도할 수 있게 한다.
+  const [handoffTargetsError, setHandoffTargetsError] = useState(false);
+  const handoffTargetsGeneration = useRef(0);
+  const loadHandoffTargets = useCallback(async () => {
+    const generation = ++handoffTargetsGeneration.current;
+    setHandoffTargetsError(false);
+    try {
+      const targets = await supplierApi.getLibraryHandoffTargets();
+      if (generation === handoffTargetsGeneration.current) setHandoffTargets(targets);
+    } catch {
+      if (generation === handoffTargetsGeneration.current) {
+        setHandoffTargets([]);
+        setHandoffTargetsError(true);
+      }
+    }
   }, []);
+  useEffect(() => {
+    const generation = handoffTargetsGeneration;
+    void loadHandoffTargets();
+    // 화면을 떠난 뒤 도착한 응답은 버린다
+    return () => { generation.current++; };
+  }, [loadHandoffTargets]);
 
   const openHandoff = (item: SupplierLibraryItem) => {
     setHandoffItem(item);
@@ -166,12 +183,27 @@ function LibraryPage() {
     fetchItems();
   }, [fetchItems]);
 
+  // 삭제 실패를 조용히 넘기지 않는다 — 창을 열어 둔 채 사유를 보여 주고, 처리 중에는 다시 누를 수 없다.
   const handleDelete = async (id: string) => {
-    const result = await supplierApi.deleteLibraryItem(id);
-    if (result.success) {
-      setDeleteConfirm(null);
-      fetchItems();
+    if (deleting) return;
+    setDeleting(true);
+    setDeleteError(null);
+    try {
+      const result = await supplierApi.deleteLibraryItem(id);
+      if (result.success) {
+        setDeleteConfirm(null);
+        fetchItems();
+      } else {
+        setDeleteError(result.error || '삭제하지 못했습니다. 잠시 후 다시 시도해 주시기 바랍니다.');
+      }
+    } finally {
+      setDeleting(false);
     }
+  };
+  const closeDeleteConfirm = () => {
+    if (deleting) return;
+    setDeleteConfirm(null);
+    setDeleteError(null);
   };
 
   // Client-side visibility filter (maps isPublic → ContentMeta visibility)
@@ -325,6 +357,34 @@ function LibraryPage() {
 
       {/* WO-O4O-SUPPLIER-WORKSPACE-REALIGNMENT-AND-DISTRIBUTION-V1:
           종전 KEEP_HIDDEN(개인 보관함) 안내 폐기. canonical 원천 + 공식 경로 2가지 안내. */}
+      {handoffTargetsError && (
+        <div
+          role="alert"
+          style={{
+            padding: '12px 16px',
+            marginBottom: '16px',
+            borderRadius: '8px',
+            border: '1px solid #fecaca',
+            backgroundColor: '#fef2f2',
+            color: '#991b1b',
+            fontSize: '13px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '12px',
+          }}
+        >
+          <span>다른 서비스에 제공할 대상을 불러오지 못했습니다. [기타 서비스에 제공] 버튼이 잠시 보이지 않습니다.</span>
+          <button
+            type="button"
+            onClick={() => void loadHandoffTargets()}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#991b1b', fontWeight: 600 }}
+          >
+            다시 시도
+          </button>
+        </div>
+      )}
+
       {handoffNotice && (
         <div style={{
           padding: '12px 16px',
@@ -518,7 +578,7 @@ function LibraryPage() {
             justifyContent: 'center',
             zIndex: 1000,
           }}
-          onClick={() => setDeleteConfirm(null)}
+          onClick={closeDeleteConfirm}
         >
           <div
             style={{
@@ -536,9 +596,15 @@ function LibraryPage() {
             <p style={{ fontSize: '14px', color: '#64748b', marginBottom: '20px' }}>
               정말 이 자료를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.
             </p>
+            {deleteError && (
+              <p role="alert" style={{ fontSize: '13px', color: '#dc2626', marginBottom: '16px' }}>
+                {deleteError}
+              </p>
+            )}
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
               <button
-                onClick={() => setDeleteConfirm(null)}
+                onClick={closeDeleteConfirm}
+                disabled={deleting}
                 style={{
                   padding: '8px 16px',
                   backgroundColor: '#f1f5f9',
@@ -553,6 +619,7 @@ function LibraryPage() {
               </button>
               <button
                 onClick={() => handleDelete(deleteConfirm)}
+                disabled={deleting}
                 style={{
                   padding: '8px 16px',
                   backgroundColor: '#dc2626',
@@ -561,10 +628,11 @@ function LibraryPage() {
                   borderRadius: '6px',
                   fontSize: '14px',
                   fontWeight: 500,
-                  cursor: 'pointer',
+                  cursor: deleting ? 'default' : 'pointer',
+                  opacity: deleting ? 0.6 : 1,
                 }}
               >
-                삭제
+                {deleting ? '삭제 중...' : '삭제'}
               </button>
             </div>
           </div>
