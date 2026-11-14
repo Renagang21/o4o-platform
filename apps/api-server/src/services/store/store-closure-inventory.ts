@@ -1,6 +1,8 @@
 import type { EntityManager } from "typeorm";
 // Full business closure only. Service-contract termination keeps its existing inventory.
 const DELETES: Readonly<Record<string, string>> = {
+  photo_transaction_requests: "organization_id",
+  photo_transaction_invoices: "organization_id",
   semi_franchise_memberships: "organization_id",
   notifications: "organizationId",
   store_ai_insights: "organization_id",

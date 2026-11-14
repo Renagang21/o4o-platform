@@ -1,3 +1,4 @@
+import {LedgerError} from '../../../services/transaction-ledger/contracts.js';
 import { Router } from "express";
 import type { DataSource } from "typeorm";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
@@ -20,6 +21,10 @@ import type { ProviderFactory } from "../../personal-mail/accounts.js";
 import { mailEnabled } from "../../personal-mail/config.js";
 
 const descriptions: Record<ToolName, string> = {
+ prepare_transaction_invoice: 'ChatGPT에서 사진을 읽어 정리한 거래명세서를 선택한 매장의 거래장 초안으로 서버에 저장하거나 수정합니다. 별도 거래장 조회·초안 작성 동의가 필요합니다. 사진 원본은 자동 전송되지 않습니다. 원본 상품명·규격·단위를 보존하고 불명확한 값은 null/미확정으로 남깁니다. 반환된 O4O 확인 주소에서 사용자가 직접 확인·수정·확정해야 거래장에 반영됩니다. 게시·결제·주문·상품 DB 등록을 하지 않습니다. 같은 명령 재시도만 동일 requestId를 사용합니다.',
+ get_transaction_invoice: '허용된 매장의 거래장 초안·확정 내역과 확인 주소를 조회합니다. 원본 사진 바이트는 외부 AI에 반환하지 않습니다. 미확정 표시는 사용자 확인이 필요한 값입니다.',
+ list_transaction_invoices: '별도 거래장 동의를 받은 매장의 명세서 초안·확정 상태를 조회합니다. 다른 매장 자료는 조회하지 않습니다.',
+
   list_mail_accounts:
     "확인 화면에서 명시적으로 연결한 내 메일 계정만 조회합니다. 콘텐츠 초안 권한은 메일 권한이 아닙니다.",
   list_mail_senders:
@@ -61,6 +66,11 @@ const descriptions: Record<ToolName, string> = {
     "내 매장의 비공개 상품 안내 HTML 초안만 수정합니다. get_product_content의 최신 revision이 필요합니다. 상품·언어를 바꾸거나 공개/사용 중인 자료를 수정하지 않습니다.",
 };
 const recovery: Record<string, string> = {
+ LEDGER_SCOPE_FORBIDDEN:'거래장은 자료함과 별도 권한입니다. 사용자에게 O4O 앱을 다시 연결하고 거래장 조회·초안 서버 저장을 직접 허용하도록 안내하세요.',
+ LEDGER_SERVER_STORAGE_CONSENT_REQUIRED:'매장 경영자가 https://neture.co.kr/work/ledger 에서 서버 보관을 먼저 선택해야 합니다. PC 자료 이전 중이면 완료한 뒤 다시 요청하세요.',
+ LEDGER_CONFLICT:'최신 초안을 다시 조회해 수정 사항을 비교해 주세요. 확인한 내용을 덮어쓰지 마세요.',
+ AUTH_REQUIRED:'연결이 만료되었거나 해제되었습니다. O4O를 다시 연결해 주세요.',
+
   DESTINATION_FORBIDDEN:
     "list_workspaces의 destinations에 표시된 저장처를 선택하세요.",
   PRODUCT_LINK_NOT_SUPPORTED:
@@ -210,7 +220,7 @@ export function createMcpRouter(
               };
             } catch (error) {
               const code =
-                error instanceof ExternalAiError || error instanceof MailError
+                error instanceof ExternalAiError || error instanceof MailError || error instanceof LedgerError
                   ? error.code
                   : "EXTERNAL_AI_OPERATION_FAILED";
               return {

@@ -31,6 +31,8 @@ function sample(): PhotoInvoice {
         quantity: "3",
         unit: "갑",
         unitPrice: "1200",
+        amountAdjustment: "0",
+        adjustmentReason: null,
         amount: "3600",
         lotNumber: null,
         expiresOn: null,
@@ -46,6 +48,8 @@ function sample(): PhotoInvoice {
         quantity: "2",
         unit: "박스",
         unitPrice: "2500",
+        amountAdjustment: "0",
+        adjustmentReason: null,
         amount: "5000",
         lotNumber: null,
         expiresOn: null,
@@ -285,4 +289,25 @@ it("does not issue a document duplicate fingerprint from an unresolved document 
     invoiceDuplicateHints("organization:synthetic", doc, sources)
       .documentFingerprint,
   ).toBeNull();
+});
+
+it("accepts explicit, explained line discounts without rewriting printed amounts", () => {
+  const doc = sample();
+  doc.rows[0].amount = "3500";
+  doc.rows[0].amountAdjustment = "-100";
+  doc.rows[0].adjustmentReason = "명세서에 표시된 할인";
+  doc.statedLineTotal = "8500";
+  expect(inspectPhotoInvoice(doc, sources)).toMatchObject({
+    readyForConfirmation: true,
+    lineTotal: "8500",
+  });
+  doc.rows[0].adjustmentReason = null;
+  expect(inspectPhotoInvoice(doc, sources).readyForConfirmation).toBe(false);
+});
+it("does not invent a photo identity when the source remains only in ChatGPT", () => {
+  expect(
+    invoiceDuplicateHints("organization:synthetic", sample(), [])
+      .photoFingerprint,
+  ).toBeNull();
+  expect(inspectPhotoInvoice(sample(), []).sources).toEqual([]);
 });

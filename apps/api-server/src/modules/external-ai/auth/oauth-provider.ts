@@ -296,6 +296,7 @@ export class ExternalAiOAuthProvider implements OAuthServerProvider {
     const values = input.length ? [...new Set(input)] : ["o4o:read"];
     if (
       !values.includes("o4o:read") ||
+      (values.includes("o4o:ledger:write") && !values.includes("o4o:ledger:read")) ||
       (values.some((v) => v.startsWith("o4o:mail:")) &&
         (!mailEnabled() || !values.includes("o4o:mail:read"))) ||
       values.some((v) => !(supportedScopes as readonly string[]).includes(v))
@@ -393,7 +394,7 @@ export class ExternalAiOAuthProvider implements OAuthServerProvider {
     return this.db.transaction(async (manager) => {
       await assertEnabled(
         manager,
-        allowedScopes.includes("o4o:draft:write"),
+        allowedScopes.includes("o4o:draft:write") || allowedScopes.includes("o4o:ledger:write"),
         true,
         "any",
       );
@@ -411,6 +412,7 @@ export class ExternalAiOAuthProvider implements OAuthServerProvider {
         !workspaces.some((id) => id.startsWith("mail:"))
       )
         throw new InvalidScopeError("허용할 개인 메일 계정을 선택해 주시기 바랍니다.");
+      if(chosen.includes("o4o:ledger:read")&&!workspaces.some(id=>id.startsWith("store:")))throw new InvalidScopeError("거래장을 이용할 매장을 선택해 주세요.");
       if (chosen.some((scope) => !pending.data.scopes.includes(scope)))
         throw new InvalidScopeError("요청 범위를 넘는 기능입니다.");
       if (
@@ -422,7 +424,7 @@ export class ExternalAiOAuthProvider implements OAuthServerProvider {
       await this.authorizeWorkspaces(
         userId,
         workspaces,
-        chosen.includes("o4o:draft:write"),
+        chosen.includes("o4o:draft:write") || chosen.includes("o4o:ledger:write"),
         manager,
       );
       const id = randomUUID(),

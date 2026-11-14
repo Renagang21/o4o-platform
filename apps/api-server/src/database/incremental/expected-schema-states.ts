@@ -359,6 +359,8 @@ export const EXPECTED_SCHEMA_STATES: readonly ExpectedSchemaState[] = [
   { appliedThrough: 'CreateCommunityNewsAutomation1794013771244', fingerprint: '1489bb64d223656c63cdf99e06f45f25a732276d976f58eeaaff84113da37bee', fingerprintLineCount: 7594 },
 
   { appliedThrough: 'AllowUsersWithoutEmail1794357598911', fingerprint: '34b34a48068eb01426d56e8687cdf94b4268bc06ba3994af56b63d9bab2a8acc', fingerprintLineCount: 7594 },
+  // Isolated PostgreSQL 15: baseline and every prior prefix verified before this append.
+  { appliedThrough: 'CreatePhotoTransactionLedger1794618000000', fingerprint: 'ba499ae891137259ee0375322a905a410248575f56d666ce098bb56214b7c66c', fingerprintLineCount: 7668 },
 ] as const;
 
 /** Expected state after `prefixLength` incremental migrations; undefined when not registered. */

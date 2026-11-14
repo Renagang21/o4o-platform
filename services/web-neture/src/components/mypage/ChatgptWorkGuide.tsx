@@ -2,6 +2,11 @@ import { useEffect, useRef, useState } from "react";
 
 const examples = [
   {
+    title: "거래장 입력 준비",
+    request:
+      "이 사진의 거래명세서를 O4O 거래장 초안으로 준비해 줘. 불명확한 값은 확인 필요로 남기고, 내가 검토·수정하고 거래장에 반영할 수 있는 주소를 알려 줘.",
+  },
+  {
     title: "O4O 자료 읽기",
     request:
       "O4O 내 매장 자료함에서 안내문을 찾아 읽고, 직원이 보기 쉽게 정리해 줘.",
@@ -70,9 +75,9 @@ export default function ChatgptWorkGuide() {
           </li>
         </ol>
         <p>
-          자료함 문서 저장과 거래장 원장 반영은 다릅니다. 현재 이 안내의 저장은
-          비공개 문서 보관이며, 거래 내역을 자동 반영하거나 주문을 확정하지
-          않습니다.
+          자료함 문서 저장과 거래장 원장 반영은 다릅니다. ‘확인한 결과 보관’은
+          비공개 문서 보관입니다. 거래장 입력은 별도 동의 후 초안을 준비하고 O4O
+          확인 화면에서 직접 반영합니다. 주문·결제는 실행하지 않습니다.
         </p>
         <div className="space-y-3">
           {examples.map((example) => (

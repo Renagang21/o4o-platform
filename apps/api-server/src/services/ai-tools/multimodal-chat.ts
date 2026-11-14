@@ -24,6 +24,7 @@ export interface MultimodalChatInput {
   userPrompt: string;
   parts: readonly AttachmentPart[];
   timeoutMs: number;
+  maxOutputTokens?: number;
   /** 테스트 주입용. */
   fetchImpl?: typeof fetch;
 }
@@ -40,10 +41,11 @@ export const INLINE_NOT_SUPPORTED_NOTE =
 
 /** Hosts own text-call admission/accounting; the native inline transport remains separate. */
 export async function executeMultimodalChat(input: MultimodalChatInput, invokeText: typeof execute, invokeNative: AiNativeInvocation): Promise<MultimodalChatResult> {
+  const outputLimit=Math.min(16384,Math.max(1,input.maxOutputTokens??2048));
   const inline = input.parts.filter((p): p is Extract<AttachmentPart, { kind: 'inline' }> => p.kind === 'inline');
   if (inline.length > 0 && input.provider === 'gemini') {
     if (!input.apiKey) throw new Error('AI_NOT_CONFIGURED');
-    return invokeNative({ kind: 'multimodal', provider: input.provider, model: input.model, textBytes: Buffer.byteLength(input.systemPrompt + input.userPrompt, 'utf8'), maxOutputTokens: 2048 }, async () => {
+    return invokeNative({ kind: 'multimodal', provider: input.provider, model: input.model, textBytes: Buffer.byteLength(input.systemPrompt + input.userPrompt, 'utf8'), maxOutputTokens: outputLimit }, async () => {
     const fetchImpl = input.fetchImpl ?? fetch;
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(input.model)}:generateContent?key=${encodeURIComponent(input.apiKey)}`;
     const controller = new AbortController();
@@ -63,7 +65,7 @@ export async function executeMultimodalChat(input: MultimodalChatInput, invokeTe
               ],
             },
           ],
-          generationConfig: { temperature: 0.5, maxOutputTokens: 2048 },
+          generationConfig: { temperature: 0.5, maxOutputTokens: outputLimit },
         }),
         signal: controller.signal,
       });
@@ -90,7 +92,7 @@ export async function executeMultimodalChat(input: MultimodalChatInput, invokeTe
       apiKey: input.apiKey,
       model: input.model,
       temperature: 0.5,
-      maxTokens: 2048,
+      maxTokens: outputLimit,
       responseMode: 'text',
       timeoutMs: input.timeoutMs,
     },

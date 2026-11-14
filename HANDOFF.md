@@ -1,11 +1,22 @@
 # HANDOFF
 
+## 2026-11-14 · 사진 거래장 실제 저장 · O4O/ChatGPT 연결 (branch `wo/photo-ledger-chat-integration`)
+
+- **다음 실행자:** 통합 담당 — 이 branch로 PR·계약/migration 검토·병합·배포. A 커밋을 포함했으므로 `wo/photo-ledger-review-core`는 별도 병합하지 않는다. main `c649e8bbf` 기준. 현재 열린 #1058(signage 제품 연결)과 겹치는 경로: `HANDOFF.md`, `apps/api-server/src/database/incremental/expected-schema-states.ts`, `apps/api-server/src/database/incremental/manifest.ts`. 공유 경로 충돌은 양쪽 내용을 유지하고 migration prefix를 다시 검증한다.
+- **한 일:** 실제 초안/사진/수정 이력/확정 저장, 동시 중복 차단과 후보 동시 전달, 거래장 별도 scope/동의, MCP 준비·조회·목록, O4O main의 사진 판독→초안, PC·모바일 검토/수정/직접 반영 화면. 서버 중단·탈퇴 attribution·폐업 분류/쓰기 fence 포함.
+- **Core 계약 변경:** migration `CreatePhotoTransactionLedger1794618000000`(신규 4테이블), manifest/측정한 expected state, REST/MCP additive API·ledger read/write scope 2개, multimodal 출력 한도 선택 인자(기존 기본값 유지). 운영 DB·시크릿·CI·dependency·Identity/Frozen·상품 정본은 수정하지 않았다. 운영 migration/배포는 실행하지 않았다.
+- **결정 사항:** 원본이 O4O에 전달되지 않는 ChatGPT 첨부는 미보관으로 표시하고 직접 확인 또는 사진 추가를 받는다. 최종 확정 MCP는 제공하지 않고 O4O 로그인+정식 Origin에서만 확인한다. 공통 상품 미등록도 허용하며 가격·사진을 제외한 상품 관찰만 기존 관리자 pending 후보로 보낸다. 프로그램 등록 상태를 기록하며 프로그램 수집본과 자동 합산하지 않는다(상품별 자동 대조는 후속). 기존 후보의 도메인별 승격 게이트를 유지한다.
+- **검증:** 거래장 6 suites/49 tests, 기존 외부 AI/server work 10 suites/99, UI 4 files/20. API·web-neture tsc·web-neture build·변경 ESLint·migration contract 통과. PostgreSQL 15 canonical 전체 prefix·빈 down/up 검증. PC 1280px·모바일 390px 실제 컴포넌트+API fixture로 수정/확인/반영·사진 추가·로그인/동의 오류 확인. 테스트 업무 행 0 확인. 실모델·실OAuth·운영 전체 사용은 미실행.
+- **배포 후:** migration 먼저 적용, API+web-neture 배포, Demo 경영자 서버 보관/승인 직원/타매장/철회/모바일 확인, ChatGPT 도구 갱신·새 ledger 동의로 재연결, 실제 전체 명세서의 사용자 확인 시험. 기존 main에 새 migration이 들어오면 prefix·fingerprint를 재측정할 것.
+- **문서 정합:** [사용 안내](docs/guides/O4O-CHATGPT-WORK-QUICKSTART-V1.md)·[WO](docs/work-orders/WO-O4O-PHOTO-TRANSACTION-LEDGER-V1.md) 현행화, [CHECK](docs/checks/CHECK-O4O-PHOTO-LEDGER-CHAT-INTEGRATION-V1.md)에 증거/미실행 범위 기록.
+
 ## 2026-11-14 · 사진 거래장 입력 공통 처리부 (branch `wo/photo-ledger-review-core`)
 
 - **범위:** 사용자 요청에 따라 QR 제외, 사진만 처리. 3차-A 공통 검증·현재 revision 확인 준비·중복 조회 힌트·관리자 상품 정비 후보 반환 함수를 구현했다. 실제 저장 API·인증·화면은 후속 B·C다. 저장 완료로 안내하지 않는다.
 - **결정 사항:** 기존 프로그램 origin·상품/포장 참조가 필요한 purchase 경로를 우회하지 않았다. 공통 상품이 없어도 확인 준비가 되며 상품 DB 자동 등록·수정은 없다. 실제 사용자 사진을 공개 저장소에 복사하지 않았다.
 - **검증:** 합성 명세서 Jest 20건·처리부 strict TypeScript·변경 파일 ESLint 통과. UI/route가 없어 브라우저 검증 해당 없음. 원본 프로그램 계약과 운영 DB는 변경하지 않았다.
 - **다음 실행자:** 통합 세션은 이 branch의 PR·검사·병합 담당. 개발 후속은 [사진 거래장 WO](docs/work-orders/WO-O4O-PHOTO-TRANSACTION-LEDGER-V1.md) B(원본·저장 계약·권한·중복 대조·상품 후보 연결), C(양쪽 채팅 연결). 할인·반올림 조정 근거를 먼저 확장할 것.
+- **문서 정합:** [사용 안내](docs/guides/O4O-CHATGPT-WORK-QUICKSTART-V1.md)에 사진만 입력·공통 상품 연결 비필수·미연결 범위 반영. 이전 체크는 당시 기록으로 유지.
 - **문서 정합:** [사용 안내](docs/guides/O4O-CHATGPT-WORK-QUICKSTART-V1.md)에 사진만 입력·공통 상품 연결 비필수·미연결 범위 반영 — 통합 세션이 AGENTS.md §4-3 R6 에 따라 문서 전용 branch `wo/chatgpt-quickstart-photo-ledger-docs` 로 분리. 이전 체크는 당시 기록으로 유지.
 
 ## 2026-11-14 · ChatGPT 연결 안내 · 거래명세서 문서 보관 시험 (branch `wo/chatgpt-entry-invoice-trial`)
