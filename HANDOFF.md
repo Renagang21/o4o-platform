@@ -1,5 +1,14 @@
 # HANDOFF
 
+## 2026-11-14 · 커뮤니티 기준 가이드 — 로그인한 회원만 이용 (branch `claude/intelligent-cray-o2p4u3-community-doc` · 문서 전용)
+
+> 다음 실행자: **통합 세션** — 문서 전용 PR. 기능 PR(branch `claude/intelligent-cray-o2p4u3-community-login`)과 같이 또는 뒤에 병합한다(§4-3 R7 · 문서 PR 은 마지막).
+
+- **결정 사항:** 통합 담당 결정(2026-11-14 「O4O 는 사용자가 아니면 이용을 하지 못한다」)을 기준 가이드 `docs/guides/O4O-COMMUNITY-CURRENT-IMPLEMENTATION-V1.md` 에 반영했다. 「공개 방문자는 명시적으로 공개된 항목만 열람」을 지우고 「이용 대상 — 로그인한 회원만」 절을 더했다. 다른 판정은 바꾸지 않았다.
+- **한 일:** 위 절 추가, 공개 열람 은퇴 · 글쓰기 게시판 선택 · 댓글 전체 · 고정/잠금 권한을 현행 설명에 맞췄다.
+- **검증:** `check-doc-sensitive` 0건.
+- **확인하지 못한 것:** 없음(문서 전용 · 배포 NOT_APPLICABLE).
+
 ## 2026-11-14 · 운영 「AI 운영 리포트」 빈 화면 → AI 운영 관리 안내 (branch `claude/ecstatic-mendel-2ohu27-login` · 로그인 수정과 같은 PR)
 
 - **조사:** `/operations/neture/ai-report` 는 `AiReportPage` 를 `mode:'empty'` 로 고정해 「분석 데이터 준비 중」만 보였다(데이터 호출 없음 — 배포 문제 아님). 원래 지표(AI 응답 카드 노출)는 `ai-card-exposure.service.ts` 가 서버 메모리 배열에만 쌓아 재시작 · 다중 인스턴스에서 사라진다. 실제 저장되는 AI 호출 · 오류 · 토큰 · 비용은 Admin 설정 「AI 운영 관리」(`/settings`, `/api/ai/admin/usage` · `/ops/summary`).
