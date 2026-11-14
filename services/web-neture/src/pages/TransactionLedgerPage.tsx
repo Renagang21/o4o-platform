@@ -41,6 +41,9 @@ const messages: Record<string, string> = {
   LEDGER_DUPLICATE_REVIEW_REQUIRED:
     "중복 가능성이 있는 명세서가 있습니다. 같은 거래인지 확인하고 처리 방법과 사유를 입력해 주세요.",
   LEDGER_SCOPE_FORBIDDEN: "거래장 이용 권한을 확인해 주세요.",
+  LEDGER_IMAGE_TOO_LARGE:
+    "사진은 한 장에 2MB 이하만 보관할 수 있습니다. 크기를 줄여 다시 추가해 주세요.",
+  LEDGER_IMAGE_LIMIT: "사진은 한 명세서에 8장까지 추가할 수 있습니다.",
   LEDGER_SERVER_STORAGE_CONSENT_REQUIRED:
     "매장 경영자가 서버 보관을 선택해야 합니다. PC 자료를 옮기는 중이라면 이전을 먼저 완료해 주세요.",
   LEDGER_REVIEW_REQUIRED:

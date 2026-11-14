@@ -18,6 +18,36 @@ import {
 type Db = Pick<DataSource | EntityManager, "query">;
 const sha = (v: string | Buffer) =>
   createHash("sha256").update(v).digest("hex");
+export const LEDGER_IMAGE_MAX_BYTES = 2 * 1024 * 1024;
+/** 거래장 사진 검사. 채팅은 모델 판독 전에 같은 검사를 먼저 실행해 저장할 수 없는 사진에 판독 비용을 쓰지 않는다. */
+export function validateLedgerImages(images: readonly unknown[]) {
+  if (images.length > 8) throw new LedgerError("LEDGER_IMAGE_LIMIT");
+  return images.map((value) => {
+    const base64 = (value as { base64?: unknown } | null)?.base64;
+    if (
+      typeof base64 === "string" &&
+      Math.floor((base64.length * 3) / 4) > LEDGER_IMAGE_MAX_BYTES + 2
+    )
+      throw new LedgerError("LEDGER_IMAGE_TOO_LARGE", 413);
+    const image = imageSchema.parse(value);
+    const bytes = Buffer.from(image.base64, "base64");
+    if (bytes.length > LEDGER_IMAGE_MAX_BYTES)
+      throw new LedgerError("LEDGER_IMAGE_TOO_LARGE", 413);
+    if (bytes.length === 0 || bytes.toString("base64") !== image.base64)
+      throw new LedgerError("LEDGER_IMAGE_INVALID");
+    const valid =
+      image.mimeType === "image/png"
+        ? bytes
+            .subarray(0, 8)
+            .equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]))
+        : image.mimeType === "image/jpeg"
+          ? bytes[0] === 255 && bytes[1] === 216
+          : bytes.toString("ascii", 0, 4) === "RIFF" &&
+            bytes.toString("ascii", 8, 12) === "WEBP";
+    if (!valid) throw new LedgerError("LEDGER_IMAGE_INVALID");
+    return { ...image, bytes, sha256: sha(bytes) };
+  });
+}
 export class PhotoLedgerService {
   constructor(
     readonly db: DataSource,
@@ -94,28 +124,7 @@ export class PhotoLedgerService {
   ) {
     const input = prepareInvoiceInput.parse(raw),
       org = input.workspaceId.slice(6);
-    const photos = images.map((value) => {
-      const image = imageSchema.parse(value);
-      const bytes = Buffer.from(image.base64, "base64");
-      if (
-        bytes.length === 0 ||
-        bytes.length > 2 * 1024 * 1024 ||
-        bytes.toString("base64") !== image.base64
-      )
-        throw new LedgerError("LEDGER_IMAGE_INVALID");
-      const valid =
-        image.mimeType === "image/png"
-          ? bytes
-              .subarray(0, 8)
-              .equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]))
-          : image.mimeType === "image/jpeg"
-            ? bytes[0] === 255 && bytes[1] === 216
-            : bytes.toString("ascii", 0, 4) === "RIFF" &&
-              bytes.toString("ascii", 8, 12) === "WEBP";
-      if (!valid) throw new LedgerError("LEDGER_IMAGE_INVALID");
-      return { ...image, bytes, sha256: sha(bytes) };
-    });
-    if (photos.length > 8) throw new LedgerError("LEDGER_IMAGE_LIMIT");
+    const photos = validateLedgerImages(images);
     return this.db.transaction(async (manager) => {
       await this.authorize(userId, org, true, manager);
       await manager.query(

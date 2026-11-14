@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto";
 import type { DataSource } from "typeorm";
 import type { UnifiedAttachment } from "../ai-tools/unified-request-contract.js";
 import { StoreAdapter } from "../../modules/external-ai/adapters/store.adapter.js";
-import { PhotoLedgerService } from "./ledger.service.js";
+import { PhotoLedgerService, validateLedgerImages } from "./ledger.service.js";
 import { LedgerError } from "./contracts.js";
 import { photoInvoiceSchema } from "./photo-invoice.js";
 export const isPhotoLedgerRequest = (text: string) =>
@@ -82,6 +82,8 @@ export async function runPhotoLedgerChat(
     };
   if (current && current.state !== "draft")
     throw new LedgerError("LEDGER_ALREADY_CONFIRMED", 409);
+  // 저장할 수 없는 사진(크기 · 형식 · 장수)은 유료 판독 전에 거른다.
+  validateLedgerImages(images);
   const content = await generate(
     INVOICE_EXTRACTION_PROMPT,
     JSON.stringify({ request: text, currentDraft: current?.invoice ?? null }),

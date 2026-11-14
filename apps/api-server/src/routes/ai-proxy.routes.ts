@@ -1710,7 +1710,7 @@ router.post('/request', authenticate, requireNetureMemberOrHospitalSurface, dyna
       const admission=normalizeAiError(error);
       if(isAiAccountingError(admission.code))return res.status(aiErrorHttpStatus(admission.code)).json({success:false,code:admission.code,error:aiErrorUserMessage(admission.code)});
       const code=(error as {code?:string})?.code;
-      const message=code==='LEDGER_SERVER_STORAGE_CONSENT_REQUIRED'?'매장 경영자가 거래장 서버 보관을 먼저 선택해 주세요. https://neture.co.kr/work/ledger':'거래명세서를 준비하지 못했습니다. 매장 권한·사진 전체·입력 상태를 확인하고 다시 요청해 주세요.';
+      const message=code==='LEDGER_SERVER_STORAGE_CONSENT_REQUIRED'?'매장 경영자가 거래장 서버 보관을 먼저 선택해 주세요. https://neture.co.kr/work/ledger':code==='LEDGER_IMAGE_TOO_LARGE'?'거래명세서 사진은 한 장에 2MB 이하만 보관할 수 있습니다. 사진 크기를 줄이거나 해상도를 낮춰 다시 첨부해 주세요.':code==='LEDGER_IMAGE_LIMIT'?'거래명세서 사진은 한 번에 8장까지 첨부할 수 있습니다.':'거래명세서를 준비하지 못했습니다. 매장 권한·사진 전체·입력 상태를 확인하고 다시 요청해 주세요.';
       return res.status((error as {status?:number})?.status??400).json({success:false,code:code??'LEDGER_EXTRACTION_INVALID',error:message});
     }
   }

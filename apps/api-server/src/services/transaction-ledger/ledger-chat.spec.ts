@@ -8,7 +8,10 @@ import { PhotoLedgerService } from "./ledger.service.js";
 jest.mock("../../modules/external-ai/adapters/store.adapter.js", () => ({
   StoreAdapter: jest.fn(),
 }));
-jest.mock("./ledger.service.js", () => ({ PhotoLedgerService: jest.fn() }));
+jest.mock("./ledger.service.js", () => ({
+  ...jest.requireActual("./ledger.service.js"),
+  PhotoLedgerService: jest.fn(),
+}));
 const workspaces = jest.fn(),
   authorize = jest.fn(),
   get = jest.fn(),
@@ -82,4 +85,26 @@ it("checks server storage permission before extraction and rejects incomplete JS
   ).rejects.toThrow("consent required");
   expect(generate).not.toHaveBeenCalled();
   expect(() => parseInvoiceExtraction('{"rows":[')).toThrow();
+});
+it("rejects a photo that cannot be stored before spending a model call", async () => {
+  const oversized = Buffer.alloc(2 * 1024 * 1024 + 1);
+  oversized[0] = 255;
+  oversized[1] = 216;
+  await expect(
+    runPhotoLedgerChat(
+      {} as never,
+      "actor",
+      "거래명세서 사진을 거래장에 입력해줘",
+      [
+        {
+          kind: "image",
+          mimeType: "image/jpeg",
+          base64: oversized.toString("base64"),
+        } as never,
+      ],
+      generate,
+    ),
+  ).rejects.toMatchObject({ code: "LEDGER_IMAGE_TOO_LARGE" });
+  expect(generate).not.toHaveBeenCalled();
+  expect(prepare).not.toHaveBeenCalled();
 });
