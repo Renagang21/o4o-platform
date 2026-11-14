@@ -360,17 +360,18 @@ describe('SupplierProductsPage bulk selection safety', () => {
     await waitFor(() => expect(api.bulkDelete).toHaveBeenCalledWith(['offer-2']));
   });
 
-  it('does not report a failed delete request as success and keeps the selection for retry', async () => {
+  it('does not report an unanswered delete request as success and reloads the list to show the real state', async () => {
     api.bulkDelete.mockResolvedValue({ deleted: 0, failed: [{ id: 'all', error: 'NETWORK_ERROR' }] });
     mount();
     await loaded();
     selectFirst();
     fireEvent.click(screen.getByRole('button', { name: '일괄 삭제' }));
     fireEvent.click(screen.getByRole('button', { name: '삭제', exact: true }));
-    await screen.findByText(/삭제 요청을 보내지 못했습니다/);
+    await screen.findByText(/삭제 결과를 확인하지 못했습니다/);
     expect(screen.queryByText(/삭제 완료/)).toBeNull();
-    expect(screen.getByText('1개 선택')).toBeTruthy();
-    expect(api.getProductsPaginated).toHaveBeenCalledTimes(1);
+    expect(screen.queryByText(/아무 상품도 삭제되지 않았습니다/)).toBeNull();
+    // 서버가 응답 전에 지웠을 수 있으므로 목록을 다시 불러온다.
+    await waitFor(() => expect(api.getProductsPaginated).toHaveBeenCalledTimes(2));
   });
 
   it('sends one approval request even if the button is pressed again while it is in flight', async () => {

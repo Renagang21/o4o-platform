@@ -130,7 +130,8 @@ export function useSupplierProducts() {
   // WO-O4O-NETURE-SUPPLIER-DELETE-POLICY-AND-REVIEW-ROUNDTRIP-BATCH-V1:
   // 서버가 hard delete → soft delete 로 바뀌었고, 매장 진열/서비스 상품이 남아 있으면 건별로 거부한다.
   // "N건 실패" 로 뭉뚱그리지 않고 사유를 그대로 보여준다.
-  //   전송 자체가 실패하면(NETWORK_ERROR) 아무것도 지워지지 않았다 — 성공 문구를 띄우지 않고 선택을 남겨 다시 시도할 수 있게 한다.
+  //   응답을 받지 못하면(NETWORK_ERROR) 서버가 이미 지웠는지 알 수 없다 — 서버는 응답 전에 상품별 soft delete 를 한다.
+  //   성공 문구를 띄우지 않고 「결과 미확인」으로 안내한 뒤 목록 · 개수를 다시 불러와 실제 상태를 보여 준다.
   const handleBulkDelete = async () => {
     if (bulkDeleting) return;
     setBulkDeleting(true);
@@ -138,7 +139,9 @@ export function useSupplierProducts() {
       const result = await supplierApi.bulkDelete(Array.from(selectedIds));
       setShowDeleteConfirm(false);
       if (result.failed.some((f) => f.id === 'all')) {
-        showToast('삭제 요청을 보내지 못했습니다. 아무 상품도 삭제되지 않았습니다. 잠시 후 다시 시도해 주시기 바랍니다.');
+        showToast('삭제 결과를 확인하지 못했습니다. 목록을 다시 불러왔으니 남아 있는 상품만 다시 선택해 주시기 바랍니다.');
+        await fetchProducts(pagination.page);
+        fetchTabCounts();
         return;
       }
       const failureNote = result.failed.length > 0 ? bulkDeleteFailureSummary(result.failed) : '';
