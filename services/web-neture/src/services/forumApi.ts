@@ -365,6 +365,9 @@ export async function fetchForumPostBySlug(slug: string): Promise<PostResponse |
 /**
  * Fetch comments for a post
  */
+const COMMENT_PAGE_SIZE = 100;
+const COMMENT_PAGE_LIMIT = 20;
+
 export async function fetchForumComments(postId: string): Promise<CommentsResponse> {
   if (!usesRealApi()) {
     // Mock response - find comments by post slug or id
@@ -383,10 +386,21 @@ export async function fetchForumComments(postId: string): Promise<CommentsRespon
     };
   }
 
-  // Real API call
+  // 서버는 한 번에 최대 100개를 준다. 글 화면은 댓글을 모두 보여 주므로 남은 쪽을 이어서 읽는다
+  // (2026-11-14 커뮤니티 점검 — 예전에는 첫 20개만 읽어 21번째부터 보이지 않았다). 지나치게 긴 글은 2,000개에서 멈춘다.
   try {
-    const response = await api.get(`${forumBase()}/posts/${postId}/comments`);
-    return response.data;
+    const all: CommentsResponse['data'] = [];
+    let first: CommentsResponse | null = null;
+    for (let page = 1; page <= COMMENT_PAGE_LIMIT; page += 1) {
+      const response = await api.get(`${forumBase()}/posts/${postId}/comments`, { params: { page, limit: COMMENT_PAGE_SIZE } });
+      const body = response.data as CommentsResponse;
+      if (!first) first = body;
+      if (!body?.success || !Array.isArray(body.data)) return body;
+      all.push(...body.data);
+      const totalPages = body.pagination?.totalPages ?? 1;
+      if (page >= totalPages || body.data.length < COMMENT_PAGE_SIZE) break;
+    }
+    return { ...first!, data: all, totalCount: first?.totalCount ?? all.length };
   } catch (error) {
     console.error('Error fetching forum comments:', error);
     throw error;

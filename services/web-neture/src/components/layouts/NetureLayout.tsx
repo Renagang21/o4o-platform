@@ -15,6 +15,7 @@ import { NetureBottomNav } from '../NetureBottomNav';
 // WO-O4O-CROSSSERVICE-DYNAMIC-LEGAL-FOOTER-V1
 import { CURRENT_HOST_PROFILE } from '../../lib/hostProfile';
 import { loadFooterLegal } from '../../lib/footerLegal';
+import { CommunityLoginGate } from '../auth/CommunityLoginGate';
 
 export default function NetureLayout() {
   return (
@@ -23,7 +24,10 @@ export default function NetureLayout() {
 
       {/* Main Content */}
       <main>
-        <Outlet />
+        {/* 2026-11-14: 커뮤니티 호스트는 로그인한 회원만 이용한다(다른 호스트는 그대로). */}
+        <CommunityLoginGate>
+          <Outlet />
+        </CommunityLoginGate>
       </main>
 
       {/* Footer */}

@@ -1,44 +1,27 @@
-import { centralOperationRequest } from '../middleware/central-operation-menu.middleware.js';
-import { Router, type Request, type RequestHandler } from 'express';
-import { AppDataSource } from '../database/connection.js';
-import { asyncHandler } from '../middleware/error-handler.js';
+import { Router, type RequestHandler } from 'express';
 import { apiLimiter } from '../middleware/rateLimiter.js';
-import type { CommunityAccessUser } from '../utils/community-access.resolver.js';
-import {
-  CommunityPublicReadError, listPublicCommunityPosts, getPublicCommunityPost,
-  listCommunityPublicReadSettings, setCommunityPublicRead,
-} from '../services/community/community-public-read.service.js';
 
-/** Separate guest reads never relax the authenticated forum mount or write guards. */
-export function createCommunityPublicReadRoutes(authenticate: RequestHandler, resolveUser: (req: Request) => Promise<CommunityAccessUser | null>) {
-  const router = Router({ mergeParams: true });
-  const restrict = centralOperationRequest('community', () => ['community.forums']);
-  const delegated: RequestHandler = (req,res,next) => req.params.communityKey === 'community' ? restrict(req,res,next) : next();
-  const handle = (run: (req: Request) => Promise<unknown>): RequestHandler => asyncHandler(async (req, res) => {
-    res.set('Cache-Control', 'no-store');
-    try { res.json({ success: true, data: await run(req) }); }
-    catch (error) {
-      if (!(error instanceof CommunityPublicReadError)) throw error;
-      res.status(error.status).json({ success: false, code: error.code, error: error.message });
-    }
+/**
+ * 비로그인 공개 읽기(공개 게시판 · 공개 글 지정) — 은퇴.
+ *
+ * 2026-11-14 통합 담당 결정: O4O 는 사용자(로그인한 회원)만 이용한다. 비로그인 방문자는 로그인 화면으로 가고,
+ * 계정이 없으면 회원가입한다. 그래서 공개 글 목록 · 상세와 운영자의 공개 지정 API 를 닫는다.
+ * 저장된 공개 지정 값(forum_category.metadata)은 지우지 않는다(데이터 변경 없음) — 읽는 경로만 닫는다.
+ * 회원의 게시판 · 글은 인증된 forum mount(/communities/:communityKey/forum)가 그대로 제공한다.
+ */
+const retired: RequestHandler = (_req, res) => {
+  res.set('Cache-Control', 'no-store').status(410).json({
+    success: false,
+    code: 'COMMUNITY_PUBLIC_READ_RETIRED',
+    error: '공개 열람 기능은 종료되었습니다. 로그인한 뒤 커뮤니티를 이용해 주시기 바랍니다.',
   });
-  router.get('/:communityKey/public/posts', apiLimiter, handle(req => {
-    const rawPage = String(req.query.page ?? '1');
-    if (!/^\d+$/.test(rawPage) || +rawPage < 1 || +rawPage > 10000) {
-      throw new CommunityPublicReadError(400, 'INVALID_PAGE', '유효한 페이지를 선택해 주시기 바랍니다.');
-    }
-    return listPublicCommunityPosts(AppDataSource, req.params.communityKey, +rawPage);
-  }));
-  router.get('/:communityKey/public/posts/:id', apiLimiter, handle(req => getPublicCommunityPost(AppDataSource, req.params.communityKey, req.params.id)));
-  router.get('/:communityKey/public-read-settings', apiLimiter, authenticate, delegated, handle(async req => {
-    const user = await resolveUser(req);
-    if (!user?.id) throw new CommunityPublicReadError(401, 'AUTH_REQUIRED', '로그인이 필요합니다.');
-    return listCommunityPublicReadSettings(AppDataSource, req.params.communityKey, user);
-  }));
-  router.put('/:communityKey/boards/:boardId/public-read', apiLimiter, authenticate, delegated, handle(async req => {
-    const user = await resolveUser(req);
-    if (!user?.id) throw new CommunityPublicReadError(401, 'AUTH_REQUIRED', '로그인이 필요합니다.');
-    return AppDataSource.transaction(m => setCommunityPublicRead(m, req.params.communityKey, user, req.params.boardId, req.body ?? {}));
-  }));
+};
+
+export function createCommunityPublicReadRoutes(): Router {
+  const router = Router({ mergeParams: true });
+  router.get('/:communityKey/public/posts', apiLimiter, retired);
+  router.get('/:communityKey/public/posts/:id', apiLimiter, retired);
+  router.get('/:communityKey/public-read-settings', apiLimiter, retired);
+  router.put('/:communityKey/boards/:boardId/public-read', apiLimiter, retired);
   return router;
 }

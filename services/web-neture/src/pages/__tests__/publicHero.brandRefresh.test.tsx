@@ -66,7 +66,7 @@ describe('community `/`', () => {
     renderAt(<CommunityHostHomePage />);
     expect(await screen.findByRole('heading', {name:'포럼'})).toBeTruthy();
     expect(h1Text()).toBe('커뮤니티');
-    expect(screen.getByRole('link', {name:'포럼 바로가기 →'}).getAttribute('href')).toBe('/communities/community/public');
+    expect(screen.getByRole('link', {name:'포럼 바로가기 →'}).getAttribute('href')).toBe('/communities/community/forum') // 공개 열람 은퇴(2026-11-14) — 홈은 회원만 본다;
     expect(screen.queryByText('약사 커뮤니티')).toBeNull();
     expect(screen.queryByText('사업 회원 게시판')).toBeNull();
   });

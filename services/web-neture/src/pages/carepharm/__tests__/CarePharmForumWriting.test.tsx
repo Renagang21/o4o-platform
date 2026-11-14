@@ -26,7 +26,7 @@ it('requires explicit board selection and posts to that board while guide change
   expect(screen.getByLabelText('본문 편집').textContent).toContain('약국 진열');
   expect(api.create).not.toHaveBeenCalled();
   fireEvent.click(screen.getByRole('button',{name:'등록하기'}));
-  await screen.findByText('현재 글을 등록할 수 있는 게시판이 없습니다. 잠시 후 다시 시도해 주시기 바랍니다.');
+  await screen.findByText('글을 올릴 게시판을 선택해 주시기 바랍니다.');
   expect(api.create).not.toHaveBeenCalled();
   fireEvent.change(screen.getByRole('combobox',{name:'게시할 게시판'}),{target:{value:'request-board'}});
   fireEvent.click(screen.getByRole('button',{name:'등록하기'}));

@@ -2,7 +2,6 @@ import { cooperationDestination } from '@o4o/shared-space-ui';
 import { CURRENT_HOST_PROFILE } from '../../lib/hostProfile';
 import { requestServiceHandoff } from '@o4o/auth-react';
 import CommunityBoardReview from './CommunityBoardReview';
-import CommunityPublicReadManager from './CommunityPublicReadManager';
 import CarePharmCommunityGuide from '../carepharm/CarePharmCommunityGuide';
 import MyPostsPage from '../forum/MyPostsPage';
 import ForumRequestPage from '../forum/ForumRequestPage';
@@ -106,7 +105,6 @@ function Workspace({ view }: { view: WorkspaceView }) {
     {nativeBusiness && workspace && !nativeAccess && <p role="alert">이 서비스의 사업 회원 공간을 확인하지 못했습니다.</p>}
     {workspace && (!nativeBusiness || nativeAccess) && !workspace.allowed && <section className="my-6 rounded-lg border bg-white p-6">
       <h1 className="text-2xl font-semibold">{workspace.name}</h1>
-      {!nativeBusiness && <Link to={`/communities/${encodeURIComponent(communityKey)}/public`} className="mt-3 inline-block text-sm text-blue-700">공개 게시글 보기 →</Link>}
       <p className="my-4">{nativeBusiness ? '이 사업의 참여 자격을 확인할 수 없습니다. 해당 사업 운영자에게 문의해 주시기 바랍니다.' : membershipMessage(workspace.membershipStatus, isAuthenticated)}</p>
       {!isAuthenticated && <Link to={`/login?returnUrl=${encodeURIComponent(basePath)}`}>로그인</Link>}
       {workspace.reason === 'ACCOUNT_NOT_ACTIVE' && <Link to="/mypage">내 계정 확인</Link>}
@@ -122,7 +120,6 @@ function Workspace({ view }: { view: WorkspaceView }) {
         {workspace.kind === 'independent' && <Link to="/operator/service-members/community">서비스 회원 관리</Link>}
       </section>}
       {workspace.canManage && <CommunityBoardReview communityKey={communityKey} />}
-      {workspace.canManage && workspace.kind === 'independent' && <CommunityPublicReadManager key={communityKey} communityKey={communityKey} />}
       {view === 'hub' && <ForumHubPage title={workspace.name} basePath={basePath} requestAction={<Link to={`${basePath}/request`}>게시판 개설 신청</Link>} description="회원들과 소식과 자료를 나누는 공간입니다." />}
       {view === 'posts' && <ForumPage title={workspace.name} description={nativeAccess ? '협업체 회원이 약국 운영 경험과 자료 활용 정보를 나누는 공간입니다.' : undefined} boardSlug={new URLSearchParams(window.location.search).get('board') || undefined} basePath={basePath} />}
       {view === 'write' && <ForumWritePage communityLabel={workspace.name} categorySlug="" backPath={basePath} writingContext={nativeAccess ? 'carepharm' : undefined} aiAssist={communityKey === 'community'} />}

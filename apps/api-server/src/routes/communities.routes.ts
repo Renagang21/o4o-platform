@@ -42,7 +42,7 @@ export function createCommunitiesRoutes(optionalAuth: RequestHandler, authentica
   router.use(createCommunityImprovementRoutes(optionalAuth, authenticate, currentCommunityUser));
   router.use(createCommunityHomeRoutes(optionalAuth, authenticate, req => currentCommunityUser(req as AuthRequest)));
   router.use(createCommunityManagementRoutes(authenticate));
-  router.use(createCommunityPublicReadRoutes(authenticate, req => currentCommunityUser(req as AuthRequest)));
+  router.use(createCommunityPublicReadRoutes());
   router.get('/', optionalAuth, asyncHandler(async (req, res) => {
     res.json({ success: true, data: { communities: await listCommunityWorkspaces(AppDataSource, await currentCommunityUser(req as AuthRequest)) } });
   }));

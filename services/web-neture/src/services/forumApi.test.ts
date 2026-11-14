@@ -70,3 +70,24 @@ it.each([
   expect(result.data).toEqual([{ id: 'server-row' }]);
   expect(result.totalCount).toBe(41);
 });
+
+describe('글 화면 댓글 — 20개를 넘어도 모두 읽는다 (2026-11-14 커뮤니티 점검)', () => {
+  it('reads every page of 100 comments and stops at the last page', async () => {
+    window.history.replaceState({}, '', '/communities/community/forum/post/hello');
+    const page = (n: number, count: number) => ({ data: { success: true, data: Array.from({ length: count }, (_, i) => ({ id: `c${n}-${i}` })), totalCount: 230, pagination: { page: n, limit: 100, totalPages: 3 } } });
+    get.mockResolvedValueOnce(page(1, 100)).mockResolvedValueOnce(page(2, 100)).mockResolvedValueOnce(page(3, 30));
+    const { fetchForumComments } = await import('./forumApi');
+    const result = await fetchForumComments('post-1');
+    expect(result.data).toHaveLength(230);
+    expect(result.totalCount).toBe(230);
+    expect(get).toHaveBeenCalledTimes(3);
+    expect(get).toHaveBeenNthCalledWith(2, '/communities/community/forum/posts/post-1/comments', { params: { page: 2, limit: 100 } });
+  });
+  it('a single short page makes one request', async () => {
+    window.history.replaceState({}, '', '/communities/community/forum/post/hello');
+    get.mockResolvedValueOnce({ data: { success: true, data: [{ id: 'only' }], totalCount: 1, pagination: { page: 1, limit: 100, totalPages: 1 } } });
+    const { fetchForumComments } = await import('./forumApi');
+    expect((await fetchForumComments('post-1')).data).toEqual([{ id: 'only' }]);
+    expect(get).toHaveBeenCalledTimes(1);
+  });
+});

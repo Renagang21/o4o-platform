@@ -52,7 +52,8 @@ const suggestion = {
   board: { id: 'second', name: '질문게시판', reason: '질문 글입니다' },
 };
 
-function mount(props: Record<string, unknown> = { aiAssist: true }, search = '') {
+// 커뮤니티 글쓰기는 게시판을 직접 고른다(2026-11-14) — 기본 픽스처는 게시판이 정해진 진입(?forum=first)이다.
+function mount(props: Record<string, unknown> = { aiAssist: true }, search = '?forum=first') {
   return render(
     <MemoryRouter initialEntries={[`${base}/write${search}`]}>
       <ForumWritePage communityLabel="커뮤니티" categorySlug="" backPath={base} {...props} />

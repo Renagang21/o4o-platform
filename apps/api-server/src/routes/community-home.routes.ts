@@ -23,6 +23,7 @@ import type { AuthRequest } from "../types/auth.js";
 import type { CommunityAccessUser } from "../utils/community-access.resolver.js";
 import { CommunityManagementError } from "../services/community/community-management.service.js";
 import { CommunityPublicReadError } from "../services/community/community-public-read.service.js";
+import { resolveCommunityWorkspace } from "../services/community/community-workspace.service.js";
 import {
   communityHome,
   homeKind,
@@ -41,6 +42,16 @@ export function createCommunityHomeRoutes(
   resolveUser: (req: Request) => Promise<CommunityAccessUser | null>,
 ) {
   const router = Router();
+  // 2026-11-14 통합 담당 결정: O4O 는 사용자(로그인한 회원)만 이용한다 — 홈 · 편집 콘텐츠는 비로그인에게 열지 않는다.
+  // 정지 · 탈퇴 등 이용할 수 없는 회원도 읽지 못한다.
+  const member: RequestHandler = asyncHandler(async (req, res, next) => {
+    const workspace = await resolveCommunityWorkspace(AppDataSource, await resolveUser(req), "community");
+    if (!workspace?.allowed) {
+      res.set("Cache-Control", "no-store").status(403).json({ success: false, code: "COMMUNITY_ACCESS_REQUIRED", error: "커뮤니티 이용 상태를 확인해 주시기 바랍니다." });
+      return;
+    }
+    next();
+  });
   const pageOf = (page: unknown = "1") => {
     if (
       typeof page !== "string" ||
@@ -78,13 +89,15 @@ export function createCommunityHomeRoutes(
   router.get(
     "/community/home",
     apiLimiter,
-    optionalAuth,
+    authenticate,
+    member,
     handle(async (req) => communityHome(AppDataSource, await resolveUser(req))),
   );
   router.get(
     "/community/editorial",
     apiLimiter,
-    optionalAuth,
+    authenticate,
+    member,
     handle(async (req) => {
       return listEditorial(
         AppDataSource,
@@ -97,7 +110,8 @@ export function createCommunityHomeRoutes(
   router.get(
     "/community/editorial/:id",
     apiLimiter,
-    optionalAuth,
+    authenticate,
+    member,
     handle(async (req) =>
       getEditorial(AppDataSource, await resolveUser(req), req.params.id),
     ),

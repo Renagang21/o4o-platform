@@ -12,6 +12,7 @@ import { ForumControllerBase } from './ForumControllerBase.js';
 import { CATALOG_FORUM_STORAGE_CODES } from '../../config/community-catalog.js';
 // WO-O4O-FORUM-AUTHOR-PII-GUARD-V1 (S2): author-or-platform-admin edit/delete check
 import { isPlatformAdmin } from '../../utils/role.utils.js';
+import { authorPostFields } from './forumAuthorFields.js';
 
 /**
  * ForumPostController
@@ -19,6 +20,12 @@ import { isPlatformAdmin } from '../../utils/role.utils.js';
  * Handles post CRUD and like toggle.
  */
 export class ForumPostController extends ForumControllerBase {
+  /** 고정 · 잠금 · 공지 유형을 정할 수 있는가 — 게시판 운영자(communityOperator: 커뮤니티 운영자 · 펀딩 개설자/운영자), 커뮤니티 밖 플랫폼 관리자. */
+  private canGovernPostFields(req: Request, roles: string[]): boolean {
+    const ctx = this.getForumContext(req);
+    return ctx?.communityOperator === true || (isPlatformAdmin(roles) && ctx?.communityKey !== 'community');
+  }
+
   /**
    * GET /forum/posts
    * List posts with filtering and pagination
@@ -301,7 +308,10 @@ export class ForumPostController extends ForumControllerBase {
         return;
       }
 
-      const { title, content, excerpt, type, tags, isPinned, allowComments, metadata, showContactOnPost, forumSlug, categorySlug, forumId: forumIdFromBody } = req.body;
+      const { title, content, excerpt, tags, allowComments, metadata, showContactOnPost, forumSlug, categorySlug, forumId: forumIdFromBody } = req.body;
+      // 고정 · 공지 유형은 글쓴이가 정하지 않는다(forumAuthorFields). 커뮤니티 밖 플랫폼 관리자만 기존대로.
+      const createRoles: string[] = (req as any).user?.roles || [];
+      const { type, isPinned } = authorPostFields(req.body ?? {}, this.canGovernPostFields(req, createRoles));
 
       // Generate slug from title
       const slug = this.generateSlug(title);
@@ -473,7 +483,9 @@ export class ForumPostController extends ForumControllerBase {
         return;
       }
 
-      const { title, content, excerpt, type, status, tags, isPinned, isLocked, allowComments, metadata } = req.body;
+      const { title, content, excerpt, tags, allowComments, metadata } = req.body;
+      // 고정 · 잠금 · 공지 유형 · 보관/승인 상태는 글쓴이가 바꾸지 않는다(forumAuthorFields).
+      const { type, status, isPinned, isLocked } = authorPostFields(req.body ?? {}, this.canGovernPostFields(req, userRoles));
 
       // Update slug if title changed
       if (title && title !== post.title) {

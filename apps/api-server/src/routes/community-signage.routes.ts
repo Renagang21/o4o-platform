@@ -15,15 +15,13 @@ export function createCommunitySignageRoutes(optionalAuth: RequestHandler, authe
     if (!workspace?.allowed) { res.status(403).json({ success:false, code:'COMMUNITY_ACCESS_REQUIRED', error:'커뮤니티 이용 상태를 확인해 주시기 바랍니다.' }); return; }
     next();
   });
-  router.get('/community/signage', apiLimiter, optionalAuth, asyncHandler(async (req, res) => {
-    const user = await resolveUser(req);
-    const workspace = await resolveCommunityWorkspace(AppDataSource, user, 'community');
-    if (user && !workspace?.allowed) { res.status(403).json({success:false,error:'커뮤니티 이용 상태를 확인해 주시기 바랍니다.'}); return; }
+  // 2026-11-14 통합 담당 결정: 영상 목록도 로그인한 회원만 본다(비로그인 공개 목록 은퇴).
+  router.get('/community/signage', apiLimiter, authenticate, access, asyncHandler(async (req, res) => {
     const page = typeof req.query.page === 'string' && /^\d{1,4}$/.test(req.query.page) ? Math.max(1,Number(req.query.page)) : 1;
     const items = await AppDataSource.query(`SELECT id,name,description,"sourceType","sourceUrl","thumbnailUrl",tags,"createdAt" FROM signage_media
       WHERE "serviceKey"='community' AND source='community' AND scope='global' AND status='active' AND "deletedAt" IS NULL
       ORDER BY "createdAt" DESC,id DESC LIMIT 25 OFFSET $1`, [(page-1)*24]);
-    res.set('Cache-Control','no-store').json({success:true,data:{items:items.slice(0,24),hasNext:items.length>24,canRegister:workspace?.allowed===true}});
+    res.set('Cache-Control','no-store').json({success:true,data:{items:items.slice(0,24),hasNext:items.length>24,canRegister:true}});
   }));
   router.get('/community/signage/:id', apiLimiter, authenticate, access, asyncHandler(async (req,res) => {
     const data = await new CommunitySignageResolver(AppDataSource).resolve(req.params.id, 'signage');

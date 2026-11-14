@@ -114,11 +114,7 @@ function HomeSection({
           {SECTION_NAMES[section]}
         </h2>
         <Link
-          to={
-            section === "forum" && !data.member
-              ? "/communities/community/public"
-              : SECTION_PATHS[section]
-          }
+          to={SECTION_PATHS[section]}
           className="min-h-11 content-center text-sm text-emerald-700"
         >
           {SECTION_NAMES[section]} 바로가기 →
@@ -185,8 +181,9 @@ export default function CommunityHostHomePage() {
       active = false;
     };
   }, [user?.id, retry]);
+  // 비로그인 방문자는 이 화면에 오지 않는다(CommunityLoginGate · 2026-11-14). 바깥 NetureLayout 이 <main> 이다.
   return (
-    <main>
+    <div>
       <h1 className="sr-only">커뮤니티</h1>
       <ServiceHomeHero surface="community" client={api} heading="h2" />
       <div className="mx-auto max-w-6xl space-y-6 px-4 py-6 sm:py-8">
@@ -223,21 +220,9 @@ export default function CommunityHostHomePage() {
             <aside aria-label="커뮤니티 안내·광고" className="space-y-4">
               <ServiceHomePromotion surface="community" client={api} />
             </aside>
-            {!data.member && (
-              <aside className="rounded-xl bg-slate-100 p-4 text-sm text-slate-700">
-                공개 항목을 둘러볼 수 있습니다. 회원 전용 자료와 글쓰기는{" "}
-                <Link
-                  to="/communities/community/forum"
-                  className="font-medium text-emerald-700 underline"
-                >
-                  로그인·이용 자격 확인
-                </Link>{" "}
-                후 이용해 주시기 바랍니다.
-              </aside>
-            )}
           </>
         )}
       </div>
-    </main>
+    </div>
   );
 }

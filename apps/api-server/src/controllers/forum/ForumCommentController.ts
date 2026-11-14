@@ -19,8 +19,9 @@ export class ForumCommentController extends ForumControllerBase {
     try {
       const { postId } = req.params;
       const ctx = this.getForumContext(req);
-      const page = parseInt(req.query.page as string) || 1;
-      const limit = parseInt(req.query.limit as string) || 20;
+      // 한 번에 최대 100개(2026-11-14 커뮤니티 점검 — 상한이 없어 limit 을 크게 보내면 한 요청으로 전부 읽었다).
+      const page = Math.max(1, parseInt(req.query.page as string) || 1);
+      const limit = Math.min(100, Math.max(1, parseInt(req.query.limit as string) || 20));
       const skip = (page - 1) * limit;
 
       // WO-FORUM-SECURITY-HARDENING-V1: verify parent post is within scope

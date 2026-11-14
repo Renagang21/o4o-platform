@@ -36,3 +36,12 @@ it('does not expose other services or store media through the detail resolver',a
   const sql=(AppDataSource.query as jest.Mock).mock.calls[0][0];
   expect(sql).toContain("source='community'");expect(sql).toContain("status='active'");expect(sql).toContain('"deletedAt" IS NULL');
 });
+// 2026-11-14 통합 담당 결정: 영상 목록도 로그인한 회원만 본다.
+it('refuses the video list to guests and to members who cannot use the community',async()=>{
+  const guestAuth=(_req:any,res:any)=>res.status(401).json({code:'AUTH_REQUIRED'});
+  const guest=express();guest.use(createCommunitySignageRoutes(guestAuth,guestAuth,async()=>null));
+  expect((await request(guest).get('/community/signage')).status).toBe(401);
+  (resolveCommunityWorkspace as jest.Mock).mockResolvedValue({allowed:false});
+  expect((await request(app()).get('/community/signage')).status).toBe(403);
+  expect(AppDataSource.query).not.toHaveBeenCalled();
+});

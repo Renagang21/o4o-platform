@@ -20,8 +20,10 @@ function app() {
   return a;
 }
 beforeEach(() => jest.clearAllMocks());
-it('allows guest public lists but refuses unauthenticated writes and management filters', async () => {
-  expect((await request(app()).get('/communities/community/improvements')).status).toBe(200);
+it('members only (2026-11-14): refuses guest reads, unauthenticated writes and management filters', async () => {
+  expect((await request(app()).get('/communities/community/improvements')).status).toBe(401);
+  expect((await request(app()).get('/communities/community/improvements/some-id')).status).toBe(401);
+  expect((await request(app()).get('/communities/community/improvements').set('x-user', 'yes')).status).toBe(200);
   expect((await request(app()).get('/communities/community/improvements?pending=true')).status).toBe(401);
   expect((await request(app()).post('/communities/community/improvements').send({})).status).toBe(401);
 });

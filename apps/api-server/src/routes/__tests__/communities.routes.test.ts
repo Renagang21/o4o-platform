@@ -47,5 +47,14 @@ it('preserves policy errors', async () => {
 });
 it.each(['pharmacy', 'cosmetics', 'o4o-general'])('does not serve retired %s access or public content', async key => {
  expect((await request(app()).get(`/communities/${key}/access`)).status).toBe(404);
- expect((await request(app()).get(`/communities/${key}/public/posts`)).status).toBe(404);
+ // 공개 열람은 모든 커뮤니티에서 은퇴했다(2026-11-14) — 은퇴한 키도 내용 없이 410 이다.
+ expect((await request(app()).get(`/communities/${key}/public/posts`)).status).toBe(410);
+});
+it.each(['/communities/community/public/posts', '/communities/community/public/posts/a-post', '/communities/community/public-read-settings'])('retires guest public reading at %s (members only, 2026-11-14)', async path => {
+ const res = await request(app()).get(path).set('x-test-user', 'yes');
+ expect(res.status).toBe(410); expect(res.body.code).toBe('COMMUNITY_PUBLIC_READ_RETIRED');
+});
+it('retires the operator public-read designation', async () => {
+ const res = await request(app()).put('/communities/community/boards/b/public-read').set('x-test-user', 'yes').send({ mode: 'all' });
+ expect(res.status).toBe(410); expect(res.body.code).toBe('COMMUNITY_PUBLIC_READ_RETIRED');
 });

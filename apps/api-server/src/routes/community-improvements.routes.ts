@@ -26,7 +26,7 @@ export function createCommunityImprovementRoutes(optional: RequestHandler, authe
     await assertCentralOperationRequest(AppDataSource, req.user!.id, 'community', ['community.forums'], centralRequestAuthMethod(req));
   };
   const prefix = '/community/improvements';
-  router.get(prefix, apiLimiter, optional, run(async req => {
+  router.get(prefix, apiLimiter, authenticate, run(async req => {
     if (req.query.pending === 'true') await manage(req);
     return listImprovements(AppDataSource, await currentUser(req), req.query.page, req.query.kind, req.query.pending === 'true');
   }));
@@ -34,7 +34,7 @@ export function createCommunityImprovementRoutes(optional: RequestHandler, authe
     await manage(req);
     return AppDataSource.transaction(async db => setupImprovements(db, (await currentUser(req))!));
   }, 201));
-  router.get(`${prefix}/:id`, apiLimiter, optional, run(async req => getImprovement(AppDataSource, await currentUser(req), req.params.id)));
+  router.get(`${prefix}/:id`, apiLimiter, authenticate, run(async req => getImprovement(AppDataSource, await currentUser(req), req.params.id)));
   router.post(prefix, apiLimiter, authenticate, run(async req => {
     if (req.body?.kind === 'update') await manage(req);
     const user = (await currentUser(req))!;

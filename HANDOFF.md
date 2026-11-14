@@ -1,5 +1,51 @@
 # HANDOFF
 
+## 2026-11-14 · 커뮤니티 로그인 필수 + 포럼 기본 보완 (branch `claude/intelligent-cray-o2p4u3-community-login` · API + web-neture + admin)
+
+> 다음 실행자: **통합 세션** — 이 branch 로 PR 하나. DB 변경 없음(migration 없음). 겹칠 수 있는 열린 PR: 같은 파일(`ForumPostController.ts` · `ForumWritePage.tsx` · `NetureLayout.tsx`)을 바꾸는 PR 이 있으면 PR 설명에 적는다.
+
+- **결정 사항:**
+  - 통합 담당 결정(2026-11-14): 「비로그인 접속자는 로그인하도록 하고, 가입하지 않은 사람은 회원가입하면 된다. O4O 는 사용자가 아니면 이용하지 못한다.」 이어서 「진행해」로 아래 권장안을 승인했다.
+    - 공개 지정 기능(운영자가 게시판 · 글을 비로그인 공개로 지정)은 서버와 화면에서 모두 끈다.
+    - 로그인 화면에는 커뮤니티 소개 한두 줄만 둔다.
+  - 세션 판단:
+    - 공개 열람 API 4개는 지우지 않고 410(`COMMUNITY_PUBLIC_READ_RETIRED`)으로 답한다. 저장된 공개 지정 값(forum_category.metadata)은 건드리지 않는다(데이터 변경 없음).
+    - 공용 패키지 `operator-core-ui` 의 `CommunityPublicReadManager` 컴포넌트와 export 는 이번에 지우지 않았다(§4-3 R2 — 소비처만 먼저 뺐다). 다음 정리 PR 에서 제거한다.
+    - 메뉴 이름 「게시판 개설·공개」(`packages/types/src/central-operation-menu.ts:88`)도 공용 패키지라 그대로 두었다. 후속 정리 대상.
+    - 고정 · 잠금 · 공지 유형은 게시판 운영자(`forumContext.communityOperator` — 커뮤니티 운영자, 펀딩 개설자 · 운영자)와 커뮤니티 밖 플랫폼 관리자만 정한다. 글쓴이 요청의 값은 거부하지 않고 무시한다(기존 화면이 `isPinned:false` 를 기본으로 보낸다).
+    - 댓글은 화면이 100개씩 이어 읽는다(최대 2,000개). 서버 `limit` 상한은 100이다.
+    - 커뮤니티 글쓰기는 게시판을 직접 고른다. `?forum=` 으로 들어왔거나 게시판이 하나뿐이면 그 게시판을 미리 고른다.
+- **한 일:**
+  - 서버:
+    - `/communities/community/home` · `/editorial` · `/editorial/:id` 는 인증과 함께 이용 가능한 회원(정지 · 탈퇴 아님)만 읽는다. 아니면 401 · 403 `COMMUNITY_ACCESS_REQUIRED`.
+    - 영상 목록 `/communities/community/signage` 도 인증과 이용 가능 확인을 거친다.
+    - 개선 · 업데이트 목록 · 상세는 인증이 필요하다.
+    - 공개 열람 · 공개 지정 API 는 410 이다.
+    - `ForumPostController`: 글쓴이가 요청한 고정 · 잠금 · 공지 · 보관/승인 상태를 무시한다(`forumAuthorFields.ts`).
+    - `ForumCommentController`: `limit` 을 1~100 으로 제한한다.
+  - web-neture:
+    - `CommunityLoginGate`(NetureLayout · community 호스트만): 비로그인으로 `/` 에 오면 소개 · [로그인] · [회원가입] 화면을 보여 주고 로그인 창을 연다. 다른 화면은 `/login` 으로 보내고, 로그인 뒤 원래 화면으로 돌아간다. `/terms` · `/privacy` · `/contact` 는 그대로 열린다.
+    - 옛 `/communities/:key/public[/post/:slug]` 주소는 회원 포럼의 같은 글로 보낸다.
+    - 운영 화면의 공개 지정 관리를 뺐다. 홈의 비회원 안내와 중첩된 `<main>` 을 정리했다.
+    - 댓글을 모두 읽고, 글쓰기 게시판을 고르게 했다.
+  - admin: 중앙 「커뮤니티 게시판」 화면에서 공개 지정 관리를 뺐다.
+- **검증:**
+  - api `tsc` 0
+  - api 관련 jest(커뮤니티 · 포럼 · 펀딩 포럼 route · controller 22 suites) 240 pass · 6 skip. 새 테스트: 홈 접근 · 공개 열람 410 · 글쓴이 칸 · 영상 목록 비로그인.
+  - api 전체 jest 3 shard — 아래 「API 전체 회귀」에 결과를 적는다.
+  - web-neture `tsc` 0 · 전체 vitest 192 files · 1619 tests pass(기대값 2건 갱신: 홈 포럼 바로가기 주소, 게시판 미선택 안내 문구) · `vite build` 성공
+  - admin `tsc` 0 · operators vitest 18 files · 153 pass
+  - `check-unsafe-routes` 위반 0
+- **확인하지 못한 것(배포 후 확인):**
+  - 비로그인으로 community.neture.co.kr 를 열면 소개 화면과 로그인 창이 뜨는지, 포럼 주소로 바로 들어가면 로그인 뒤 그 화면으로 돌아오는지. PC · 모바일 모두 확인한다.
+  - Demo 「매장 경영자」로 로그인한 뒤 홈 · 포럼 · 영상 · 개선 요청이 보이는지.
+  - 글쓰기에서 게시판 선택이 보이는지. 댓글이 21개 이상인 글이 있으면 모두 보이는지.
+  - 운영자 화면(admin.neture.co.kr 커뮤니티 게시판)에서 공개 지정 칸이 사라졌는지. Demo 권한 밖이므로 통합 담당이 확인한다.
+- **후속(별도 작업):**
+  - 기준 가이드 `docs/guides/O4O-COMMUNITY-CURRENT-IMPLEMENTATION-V1.md` 의 「공개 방문자는 명시적으로 공개된 항목만 본다」를 이번 결정으로 갱신한다(문서 전용 PR).
+  - `operator-core-ui` 의 `CommunityPublicReadManager` 와 메뉴 이름을 정리한다.
+  - 커뮤니티 점검의 남은 단계: 공통 계정 참여자 정지 · 탈퇴, 신고 · 중재 화면, 운영자 잠금 · 숨김 · 삭제 사유와 감사 로그, 포럼 알림, `/communities/join` 처리, 운영 리스트 표준화.
+
 
 ## 2026-11-14 · 태블릿 코너 제품 [영상 보기] (branch `claude/intelligent-cray-o2p4u3-tablet-video` · API + tablet-kiosk-core)
 

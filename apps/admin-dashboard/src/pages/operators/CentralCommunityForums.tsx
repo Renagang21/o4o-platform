@@ -3,7 +3,7 @@ import { ImprovementForum } from '@o4o/operator-core-ui';
 import { useAuth } from '@o4o/auth-context';
 import { useEffect, useRef, useState } from 'react';
 import { authClient } from '@o4o/auth-client';
-import { CommunityBoardReview, CommunityPublicReadManager } from '@o4o/operator-core-ui/modules/community-forums';
+import { CommunityBoardReview } from '@o4o/operator-core-ui/modules/community-forums';
 const client = authClient.api;
 export default function CentralCommunityForums() {
   const [name, setName] = useState('');
@@ -19,14 +19,14 @@ export default function CentralCommunityForums() {
     current.writing = true; setBusy(true); setError(''); setNotice('');
     try {
       await client.post('/communities/community/boards', { name: name.trim() });
-      if (current.mounted) { setName(''); setVersion(value => value + 1); setNotice('게시판을 만들었습니다. 공개 범위를 확인해 주시기 바랍니다.'); }
+      if (current.mounted) { setName(''); setVersion(value => value + 1); setNotice('게시판을 만들었습니다.'); }
     } catch { if (current.mounted) setError('게시판을 만들지 못했습니다. 현재 권한과 입력 내용을 확인해 주시기 바랍니다.'); }
     finally { current.writing = false; if (current.mounted) setBusy(false); }
   }
   const { user } = useAuth();
   const [search, setSearch] = useSearchParams();
   const showImprovements = search.get('tab') === 'improvements' || search.has('improvement');
-  return <section className="space-y-6"><h1 className="text-xl font-bold">커뮤니티 게시판 개설·공개 설정</h1>
+  return <section className="space-y-6"><h1 className="text-xl font-bold">커뮤니티 게시판 개설</h1>
     <nav aria-label="커뮤니티 포럼 업무" className="flex flex-wrap gap-3">
       <button type="button" aria-pressed={!showImprovements} className="rounded border bg-white px-3 py-2" onClick={() => setSearch(new URLSearchParams())}>포럼 개설 신청·관리</button>
       <button type="button" aria-pressed={showImprovements} className="rounded border bg-white px-3 py-2" onClick={() => setSearch(new URLSearchParams({ tab: 'improvements' }))}>O4O 개선 요청</button>
@@ -38,7 +38,7 @@ export default function CentralCommunityForums() {
     </form>
     {error && <p role="alert">{error}</p>}{notice && <p role="status">{notice}</p>}
     <CommunityBoardReview key={`requests:${version}`} communityKey="community" client={client} />
-    <CommunityPublicReadManager key={`public:${version}`} communityKey="community" client={client} publicOrigin="https://community.neture.co.kr" />
+    {/* 공개 열람 지정은 은퇴했다(2026-11-14 · 커뮤니티는 로그인한 회원만 이용). */}
     </>}
   </section>;
 }

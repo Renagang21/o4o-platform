@@ -98,6 +98,9 @@ function ForumWriter({
   const [libraryReady, setLibraryReady] = useState(false);
   const [publicationConfirmed, setPublicationConfirmed] = useState(false);
   const [availableForums, setAvailableForums] = useState<Array<{ id: string; slug: string; name: string; tags: string[] }>>([]);
+  // 게시판을 직접 고르는 화면 — 사업 회원 게시판(carepharm)과 커뮤니티(게시판을 정하지 않고 들어온 글쓰기).
+  // 예전에는 커뮤니티 글쓰기가 첫 번째 게시판에 자동으로 올라갔다(2026-11-14 커뮤니티 점검).
+  const chooseBoard = !isEditMode && !libraryId && (writingContext === 'carepharm' || (!!communityLabel && categorySlug === ''));
 
   // WO-O4O-COMMUNITY-CROSSSERVICE-FINAL-RECENSUS-AND-RESIDUAL-COMMONIZATION-AUDIT-V1 §7-C:
   //   categorySlug 만 보내면 실제 forum 이 확정되지 않아 글이 forum_id NULL 로 저장되고
@@ -120,9 +123,10 @@ function ForumWriter({
         if (libraryId) {
           setAvailableForums(items); setForumId(''); setTargetForum(null); return;
         }
-        if (writingContext === 'carepharm') {
+        if (chooseBoard) {
           setAvailableForums(items);
-          const selected = items.find(item => item.slug === forumSlugParam);
+          // `?forum=` 으로 정해져 왔거나 게시판이 하나뿐이면 그 게시판을 고른 상태로 연다.
+          const selected = items.find(item => item.slug === forumSlugParam) ?? (!forumSlugParam && items.length === 1 ? items[0] : undefined);
           if (selected?.id) {
             setForumId(String(selected.id));
             setTargetForum({ ...selected, id: String(selected.id), tags: Array.isArray(selected.tags) ? selected.tags : [] });
@@ -142,7 +146,7 @@ function ForumWriter({
       })
       .catch(() => { /* forum 확정 실패 시 제출 단계에서 안내 */ });
     return () => { alive = false; };
-  }, [isEditMode, categorySlug, forumSlugParam, libraryId, writingContext]);
+  }, [isEditMode, categorySlug, forumSlugParam, libraryId, writingContext, chooseBoard]);
 
   const postTypeOptions: ForumWriteFormPostTypeOption[] | undefined = allowAnnouncement ? [{ value: 'discussion', label: '토론' }, { value: 'announcement', label: '공지' }] : undefined;
   const heading = forumWriteHeading(isEditMode, communityLabel);
@@ -303,7 +307,7 @@ function ForumWriter({
       const blocks = htmlToBlocks(payload.editorHtml);
       const base = (backPath || '/forum').replace(/\/$/, '');
       if (!forumId) {
-        setError(forumSlugParam ? '지정한 게시판을 확인할 수 없습니다. 목록에서 게시판을 다시 선택해 주시기 바랍니다.' : '현재 글을 등록할 수 있는 게시판이 없습니다. 잠시 후 다시 시도해 주시기 바랍니다.');
+        setError(forumSlugParam ? '지정한 게시판을 확인할 수 없습니다. 목록에서 게시판을 다시 선택해 주시기 바랍니다.' : chooseBoard && availableForums.length ? '글을 올릴 게시판을 선택해 주시기 바랍니다.' : '현재 글을 등록할 수 있는 게시판이 없습니다. 잠시 후 다시 시도해 주시기 바랍니다.');
         return;
       }
       const response = await createForumPost({
@@ -397,14 +401,14 @@ function ForumWriter({
         <label className="flex gap-2"><input type="checkbox" checked={publicationConfirmed} onChange={e => setPublicationConfirmed(e.target.checked)} />선택한 커뮤니티의 공개 범위를 확인했으며, 거래 조건·비공개 자료를 제외했습니다.</label>
       </section>}
 
-      {writingContext === 'carepharm' && !isEditMode && <section aria-label="회원 게시판 선택" className="mb-4 space-y-3 rounded-lg border p-4 text-sm">
+      {chooseBoard && <section aria-label="회원 게시판 선택" className="mb-4 space-y-3 rounded-lg border p-4 text-sm">
         <label className="block">게시할 게시판<select aria-label="게시할 게시판" value={forumId} className="mt-2 block min-h-11 w-full rounded border p-2" onChange={event => {
           const selected = availableForums.find(forum => String(forum.id) === event.target.value);
           setForumId(selected ? String(selected.id) : '');
           setTargetForum(selected ? { ...selected, id: String(selected.id), tags: Array.isArray(selected.tags) ? selected.tags : [] } : null);
           setClassification('');
         }}><option value="">게시판을 선택하시기 바랍니다</option>{availableForums.map(forum => <option key={forum.id} value={forum.id}>{forum.name}</option>)}</select></label>
-        <p>운영 사례·자료 요청·제품 문의에 맞는 게시판을 선택해 주시기 바랍니다.</p>
+        <p>{writingContext === 'carepharm' ? '운영 사례·자료 요청·제품 문의에 맞는 게시판을 선택해 주시기 바랍니다.' : '글 내용에 맞는 게시판을 선택해 주시기 바랍니다.'}</p>
         {!availableForums.length && <p>이용 가능한 게시판이 없거나 목록을 불러오지 못했습니다. <Link className="underline" to={backPath || '/'}>회원 게시판으로 돌아가기</Link></p>}
       </section>}
 
