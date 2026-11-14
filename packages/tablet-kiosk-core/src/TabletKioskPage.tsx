@@ -448,6 +448,7 @@ export function TabletKioskPage({
   // Side-effect refs (reducer 외부에서 관리 — polling interval, auto-reset timeout)
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const idleRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [productVideoPlaying, setProductVideoPlaying] = useState(false);
 
   // Browse 자동 넘김 (WO-O4O-KPA-TABLET-BROWSE-AUTO-SLIDE-V1)
   //   displaySettings.autoSlideSeconds>0 + browse + 제품 2개+ 일 때만 현재 강조 카드를 순환.
@@ -704,7 +705,8 @@ export function TabletKioskPage({
 
     const armTimer = () => {
       if (timer) clearTimeout(timer);
-      if (isIdleEnterable) {
+      // 제품 영상 재생 중에는 대기화면으로 넘기지 않는다(가만히 시청하는 것은 터치 입력이 아니다).
+      if (isIdleEnterable && !productVideoPlaying) {
         timer = setTimeout(() => {
           setOpenContentCard(null); setQrModalOpen(false); setProductQrZoom(null);
           dispatch({ type: 'IDLE_ENTER' });
@@ -734,7 +736,7 @@ export function TabletKioskPage({
       window.removeEventListener('keydown', handleInteraction);
       window.removeEventListener('wheel', handleInteraction);
     };
-  }, [idleTimeoutMs, mode, screen?.mode, openContentCard, qrModalOpen, productQrZoom]);
+  }, [idleTimeoutMs, mode, screen?.mode, openContentCard, qrModalOpen, productQrZoom, productVideoPlaying]);
 
   const statusLabels: Record<string, { label: string; color: string; message: string }> = {
     REQUESTED: { label: '요청 접수됨', color: '#eab308', message: '직원이 곧 확인합니다. 잠시 기다려주시기 바랍니다.' },
@@ -859,7 +861,7 @@ export function TabletKioskPage({
             )}
 
             {/* WO-O4O-STORE-QR-TABLET-CHANNEL-SEPARATION-V1 T5: 이 제품의 영상이 있으면 [영상 보기]. */}
-            <ProductVideos videos={selectedProduct.videos} />
+            <ProductVideos videos={selectedProduct.videos} onPlayingChange={setProductVideoPlaying} />
 
             {/* WO-O4O-KPA-TABLET-DISPLAY-CONTENT-SELECTION-V1 (+ MULTILINGUAL BRIDGE):
                 우선순위 = 선택 언어 번역 → 기본 선택콘텐츠 → 기존 제품 description/summary.

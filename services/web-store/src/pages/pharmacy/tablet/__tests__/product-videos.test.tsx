@@ -1,10 +1,11 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 
-import { ProductVideos, readProductVideos } from '@o4o/tablet-kiosk-core';
+import { ProductVideos, readProductVideos, type ProductVideoItem } from '@o4o/tablet-kiosk-core';
 
 afterEach(cleanup);
-const video = (id: string, kind = 'youtube') => ({ id, title: `영상 ${id}`, kind, url: `https://www.youtube.com/watch?v=${id.padEnd(11, '0')}` });
+// 잘못된 kind 도 readProductVideos 가 걸러 내는지 보려고 string 으로 받는다.
+const video = (id: string, kind: string = 'youtube') => ({ id, title: `영상 ${id}`, kind, url: `https://www.youtube.com/watch?v=${id.padEnd(11, '0')}` }) as ProductVideoItem;
 
 describe('태블릿 제품 [영상 보기] (WO-O4O-STORE-QR-TABLET-CHANNEL-SEPARATION-V1 T5)', () => {
   it('reads only well-formed videos, at most three', () => {

@@ -3,7 +3,7 @@
  * 서버가 「이 영상의 제품」으로 찾아 준 영상(최대 3개)만 보인다. 근무자가 코너마다 짝짓지 않는다.
  * 누르기 전에는 재생기를 띄우지 않는다(자동 재생 · 데이터 사용 없음).
  */
-import { useState, type CSSProperties } from 'react';
+import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { VideoPlayback } from './VideoPlayback';
 
 export interface ProductVideoItem { id: string; title: string; kind: 'video' | 'youtube' | 'vimeo'; url: string }
@@ -17,8 +17,19 @@ export function readProductVideos(value: unknown): ProductVideoItem[] {
 
 const button: CSSProperties = { minHeight: 44, padding: '8px 14px', borderRadius: 10, border: '1px solid #0f766e', background: '#f0fdfa', color: '#0f766e', fontSize: 15, fontWeight: 600, cursor: 'pointer' };
 
-export function ProductVideos({ videos }: Readonly<{ videos?: ProductVideoItem[] | null }>) {
+export function ProductVideos({ videos, onPlayingChange }: Readonly<{
+  videos?: ProductVideoItem[] | null;
+  /** 재생 시작 · 종료(닫기 · 끝 · 화면 이탈)를 부모에 알린다 — 재생 중에는 대기화면 전환을 보류하기 위해서다. */
+  onPlayingChange?: (playing: boolean) => void;
+}>) {
   const [playing, setPlaying] = useState<ProductVideoItem | null>(null);
+  const notify = useRef(onPlayingChange);
+  notify.current = onPlayingChange;
+  const isPlaying = playing !== null;
+  useEffect(() => {
+    notify.current?.(isPlaying);
+  }, [isPlaying]);
+  useEffect(() => () => notify.current?.(false), []);
   if (!videos?.length) return null;
   return (
     <section aria-label="제품 영상" style={{ margin: '0 0 16px' }}>
