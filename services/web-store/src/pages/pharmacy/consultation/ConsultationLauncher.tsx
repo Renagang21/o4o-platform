@@ -32,7 +32,12 @@ function SpeechCandidates({ tablet, canEdit, busy, onSave }: Readonly<{
   tablet: ConsultationTablet; canEdit: boolean; busy: boolean; onSave: (languages: string[]) => void;
 }>) {
   const [draft, setDraft] = useState<string[]>(tablet.speechLanguages ?? []);
-  useEffect(() => setDraft(tablet.speechLanguages ?? []), [tablet.speechLanguages]);
+  // 저장값이 바뀌면 렌더 중에 바로 맞춘다. useEffect 로 맞추면 늦게 실행되는 effect 가 그 사이 사용자가 고른 값을 덮어쓴다.
+  const [syncedFrom, setSyncedFrom] = useState(tablet.speechLanguages);
+  if (syncedFrom !== tablet.speechLanguages) {
+    setSyncedFrom(tablet.speechLanguages);
+    setDraft(tablet.speechLanguages ?? []);
+  }
   const current = tablet.speechLanguages?.length ? tablet.speechLanguages.map(languageName).join(" · ") : "관리자 기본 후보";
   if (!canEdit) return <p className="w-full text-xs text-slate-500">음성 자동 감지 언어: {current}</p>;
   return (
