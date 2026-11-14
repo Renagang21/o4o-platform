@@ -8,6 +8,7 @@ const text = z
   .max(500)
   .refine((v) => v.trim().length > 0);
 const decimal = z.string().regex(/^(?:0|[1-9]\d{0,11})(?:\.\d{1,6})?$/);
+const signedDecimal = z.string().regex(/^-?(?:0|[1-9]\d{0,11})(?:\.\d{1,6})?$/);
 const date = z
   .string()
   .regex(/^\d{4}-\d{2}-\d{2}$/)
@@ -31,6 +32,8 @@ const rowSchema = z
     unit: text.nullable(),
     unitPrice: decimal.nullable(),
     amount: decimal.nullable(),
+    amountAdjustment: signedDecimal.default("0"),
+    adjustmentReason: text.nullable().default(null),
     lotNumber: text.nullable(),
     expiresOn: date.nullable(),
   })
@@ -100,7 +103,7 @@ export const photoSourcesSchema = z
       })
       .strict(),
   )
-  .min(1)
+  .min(0)
   .max(500)
   .superRefine((sources, ctx) => {
     if (new Set(sources.map((s) => s.page)).size !== sources.length)
@@ -120,8 +123,12 @@ const hash = (value: unknown) =>
   createHash("sha256").update(JSON.stringify(value)).digest("hex");
 const scale = 1000000n;
 function units(value: string): bigint {
-  const [whole, fraction = ""] = value.split(".");
-  return BigInt(whole) * scale + BigInt(fraction.padEnd(6, "0"));
+  const negative = value.startsWith("-");
+  const [whole, fraction = ""] = (negative ? value.slice(1) : value).split(".");
+  return (
+    (BigInt(whole) * scale + BigInt(fraction.padEnd(6, "0"))) *
+    (negative ? -1n : 1n)
+  );
 }
 function render(value: bigint): string {
   const fraction = String(value % scale)
@@ -138,6 +145,7 @@ export function inspectPhotoInvoice(raw: unknown, sourceInput: unknown) {
   const invoice = photoInvoiceSchema.parse(raw);
   const sources = sortedSources(sourceInput);
   const requiredPaths = new Set([
+    ...invoice.rows.map((row) => `rows.${row.id}.amountAdjustment`),
     "sellerName",
     "issuedOn",
     ...invoice.rows.flatMap((row) =>
@@ -157,6 +165,11 @@ export function inspectPhotoInvoice(raw: unknown, sourceInput: unknown) {
   let sum = 0n;
   let complete = true;
   for (const row of invoice.rows) {
+    if (units(row.amountAdjustment) !== 0n && !row.adjustmentReason)
+      issues.push({
+        path: `rows.${row.id}.adjustmentReason`,
+        code: "REQUIRED",
+      });
     for (const key of ["productName", "quantity", "unit", "amount"] as const)
       if (row[key] === null)
         issues.push({ path: `rows.${row.id}.${key}`, code: "REQUIRED" });
@@ -167,7 +180,9 @@ export function inspectPhotoInvoice(raw: unknown, sourceInput: unknown) {
       row.unitPrice !== null &&
       !invoice.unresolved.includes(`rows.${row.id}.unitPrice`) &&
       row.amount !== null &&
-      units(row.quantity) * units(row.unitPrice) !== units(row.amount) * scale
+      units(row.quantity) * units(row.unitPrice) +
+        units(row.amountAdjustment) * scale !==
+        units(row.amount) * scale
     ) {
       issues.push({
         path: `rows.${row.id}.amount`,
@@ -213,10 +228,9 @@ export function invoiceDuplicateHints(
   if (!ownerKey.trim()) throw new Error("INVOICE_OWNER_REQUIRED");
   const { invoice, sources } = inspectPhotoInvoice(raw, sourceInput);
   return {
-    photoFingerprint: hash([
-      ownerKey,
-      [...new Set(sources.map((s) => s.sha256))].sort(),
-    ]),
+    photoFingerprint: sources.length
+      ? hash([ownerKey, [...new Set(sources.map((s) => s.sha256))].sort()])
+      : null,
     documentFingerprint:
       invoice.sellerBusinessNumber &&
       invoice.buyerBusinessNumber &&
@@ -239,6 +253,31 @@ export function invoiceDuplicateHints(
             invoice.issuedOn,
           ])
         : null,
+    contentFingerprint: hash([
+      ownerKey,
+      invoice.documentType,
+      invoice.sellerName?.trim().replace(/\s+/g, " "),
+      invoice.sellerBusinessNumber,
+      invoice.buyerBusinessNumber,
+      invoice.documentNumber,
+      invoice.issuedOn,
+      invoice.rows
+        .map((row) => [
+          row.productName?.trim(),
+          row.supplierProductCode,
+          row.packageText,
+          row.unit,
+          row.quantity === null ? null : render(units(row.quantity)),
+          row.amount === null ? null : render(units(row.amount)),
+        ])
+        .sort((a, b) =>
+          JSON.stringify(a) < JSON.stringify(b)
+            ? -1
+            : JSON.stringify(a) > JSON.stringify(b)
+              ? 1
+              : 0,
+        ),
+    ]),
     needsDuplicateReview: true as const,
   };
 }

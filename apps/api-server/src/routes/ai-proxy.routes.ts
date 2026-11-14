@@ -1,3 +1,6 @@
+import {isPhotoLedgerRequest,runPhotoLedgerChat} from '../services/transaction-ledger/ledger-chat.js';
+import {extractNativeInvoice} from '../services/transaction-ledger/ledger-native-extraction.js';
+import {createTransactionLedgerRouter} from './ai-proxy/transaction-ledger.routes.js';
 import { WorkDataService, resolveWorkDataOwner } from '../services/work-data/work-data.service.js';
 import { isServerContentRequest, runServerContentWork } from '../services/work-data/server-work.js';
 import { createWorkDataRouter } from './ai-proxy/work-data.routes.js';
@@ -73,6 +76,7 @@ import { validateHomeChatMessage, homeChatValidationMessage, buildHomeChatSystem
 
 const router: Router = Router();
 router.use('/work-data', createWorkDataRouter(AppDataSource));
+router.use('/transaction-ledger',createTransactionLedgerRouter(AppDataSource));
 
 // Neture 메인 AI(통합 요청 · 홈 대화 · 작업 에이전트) = Neture 가입 승인 회원 전용 서버 판정
 // (CHECK-NETURE-PHARMACY-STORE-COMMERCE-LOCAL-BROWSER-V1 §10 E5). body.surface 로 Neture 자격을 얻을 수 없다.
@@ -1696,6 +1700,19 @@ router.post('/request', authenticate, requireNetureMemberOrHospitalSurface, dyna
   // 내려가지 않는다(CHECK §10 E5 — body.surface 로 Neture 자격을 얻을 수 없다). 위 분기와 같은 조건이라 도달하지 않는다.
   if (res.locals.hospitalSurfaceOnly === true) {
     return res.status(403).json({ success: false, error: NETURE_MAIN_MEMBERSHIP_MESSAGES.none, code: NETURE_MEMBERSHIP_REQUIRED });
+  }
+
+  if(!runId && isPhotoLedgerRequest(text)) {
+    try {
+      const outcome=await runPhotoLedgerChat(AppDataSource,userId,text,attachments,(system,user)=>extractNativeInvoice(AppDataSource,userId,body.provider,attachments,system,user),new URL(process.env.EXTERNAL_AI_WEB_ORIGIN??'https://neture.co.kr'));
+      return res.json({success:true,data:{kind:'chat',route:'server',reason:'photo_transaction_invoice',chat:{message:outcome.message,scope:{workspace:'server',serviceKey:'neture',storeStatus:null}}}});
+    } catch(error) {
+      const admission=normalizeAiError(error);
+      if(isAiAccountingError(admission.code))return res.status(aiErrorHttpStatus(admission.code)).json({success:false,code:admission.code,error:aiErrorUserMessage(admission.code)});
+      const code=(error as {code?:string})?.code;
+      const message=code==='LEDGER_SERVER_STORAGE_CONSENT_REQUIRED'?'매장 경영자가 거래장 서버 보관을 먼저 선택해 주세요. https://neture.co.kr/work/ledger':'거래명세서를 준비하지 못했습니다. 매장 권한·사진 전체·입력 상태를 확인하고 다시 요청해 주세요.';
+      return res.status((error as {status?:number})?.status??400).json({success:false,code:code??'LEDGER_EXTRACTION_INVALID',error:message});
+    }
   }
 
   if(!runId && attachments.length===0 && isServerContentRequest(text)) {

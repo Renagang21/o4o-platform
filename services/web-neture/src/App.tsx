@@ -489,6 +489,7 @@ const OperatorContactMessagesPage = lazy(() => import('./pages/operator/Operator
 // Content Library (WO-O4O-CONTENT-FRONTEND-ACTIVATION-V1)
 const ContentLibraryPage = lazy(() => import('./pages/library/ContentLibraryPage'));
 const ExternalAiConsentPage = lazy(() => import('./pages/ExternalAiConsentPage'));
+const TransactionLedgerPage = lazy(() => import('./pages/TransactionLedgerPage'));
 const PersonalMailPage = lazy(() => import('./pages/mail/PersonalMailPage'));
 const PersonalMailCallback = lazy(() => import('./pages/mail/PersonalMailCallback'));
 // Resources (O4O 공통 구조 — /resources)
@@ -692,6 +693,8 @@ function App() {
             <Route path="/operator-invite" element={<OperatorInvitePage />} />
             <Route path="/login" element={<LoginRedirect />} />
             <Route path="/external-ai/connect" element={<ExternalAiConsentPage />} />
+            <Route path="/work/ledger" element={<TransactionLedgerPage />} />
+            <Route path="/work/ledger/:id" element={<TransactionLedgerPage />} />
             <Route path="/mypage/mail/callback" element={<PersonalMailCallback />} />
             <Route path="/register" element={<RegisterRedirect />} />
             {/* WO-O4O-EMAIL-PASSWORD-AUTH-INTRODUCTION-V1: 이메일(로그인 ID)·비밀번호 — 단일 user_password_credentials 경로.

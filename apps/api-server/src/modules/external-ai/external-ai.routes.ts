@@ -252,7 +252,7 @@ export function createExternalAiRoutes(
               : available.some(
                   (w) =>
                     w.id === id &&
-                    (w.writable || !body.scopes.includes("o4o:draft:write")),
+                    (w.writable || (!body.scopes.includes("o4o:draft:write")&&!body.scopes.includes("o4o:ledger:write"))),
                 )),
         )
       )
