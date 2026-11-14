@@ -198,6 +198,52 @@
 - **배포 후 Demo 확인:** Demo 계정은 운영자 · 관리자 화면 권한이 없음 — 통합 담당이 운영자 화면에서 삭제 미완료 회원 선택 시 링크 · Admin 삭제 보류 시 빨간 안내를 확인.
 - **문서 정합:** 해당 없음.
 
+
+## 2026-11-13 · 이 영상의 제품 — 사이니지 영상 ↔ 제품 연결 (branch `claude/intelligent-cray-o2p4u3-product-video` · migration 포함)
+
+> 다음 실행자: **통합 세션** — 이 branch 로 PR. **migration lane**(AGENTS.md §4-3 R4): 다른 migration Ready PR 이 없을 때 Ready 로 둔다. 병합 뒤 **CLOUD** 가 [`WO-O4O-STORE-QR-TABLET-CHANNEL-SEPARATION-V1`](docs/work-orders/WO-O4O-STORE-QR-TABLET-CHANNEL-SEPARATION-V1.md) T5(태블릿 코너 제품 QR · 영상 보기)를 진행한다.
+
+- **결정 사항:**
+  - 2026-11-13 통합 담당이 `signage_media` 제품 열 migration 을 승인했다.
+  - 세션 판단:
+    - 외래 키를 두지 않는다. 쓰는 API 가 제품 존재와 범위를 확인한다.
+    - 매장은 자기 취급 제품(listing)으로만 연결한다.
+    - 운영자는 공용(HQ) 영상에, 공급자는 자기가 공급하는 제품만 연결한다.
+    - 매장이 가져온 사본(`parentMediaId`)은 원본의 연결을 「(원본)」으로 보이고 해제할 수 없다.
+    - 연결 제품 목록은 보조 정보라, 못 불러와도 영상 목록은 보인다.
+- **migration:**
+  - `1794550173646-AddSignageMediaProductMaster` — `ADD COLUMN "productMasterId" uuid NULL` + 부분 색인.
+  - 자동 판정(#1028 분류기)은 ADDITIVE 다. 따라서 Promote 승인 대상이 아니다.
+  - fingerprint `9611acea…`(7596 lines)는 격리 PostgreSQL 16 에서 baseline + incremental 1..62 를 실행해 얻었다. 직전 상태 `34b34a48…` 가 등록값과 일치하는 것을 먼저 확인했다. 실행 결과 `POST_MIGRATION_SCHEMA_ASSERTION = PASS`.
+- **검증:**
+  - api:
+    - `media-product-link.test.ts` 7/7(실제 schema · 다른 매장 · 공용 · 다른 서비스 영상 차단 포함)
+    - `signage-resource-id-validation.spec.ts` 93/93(UUID route census 30→32 · `/media/product-links` static route 회귀)
+    - schema 상태 jest 32 pass
+    - `tsc` 0
+  - `scripts/ci/__tests__/migration-safety.test.mjs` 31/31(새 migration 을 「알려진 추가형」 목록에 넣었다).
+  - web-store: `vitest src/pages` 83 files / 901 · `tsc` 0. 새 파일 ESLint 0.
+- **확인하지 못한 것:**
+  - `node scripts/db/check-migration-contract.mjs` — 이 세션의 명령 가드가 막았다. CI 가 같은 검사를 돈다.
+  - 배포 후 Demo 「매장 경영자」로 사이니지 → 동영상에서 확인할 것:
+    - 직접 등록한 영상 1개 → 「선택 영상 제품 연결」 → 취급 제품 선택 → 목록의 「연결 제품」 표시 → 해제.
+    - 공용 Demo 데이터이므로 확인 뒤 해제해 원복한다.
+- **2026-11-13 추가(같은 branch · 남은 부분 해소):**
+  - 운영자: 관리자 미디어 카탈로그의 제품 연결에 제품 이름 검색을 넣었다(용도 `product-video`). HQ 사이니지 영상 화면은 현재 쓰이지 않아 따로 만들지 않았다.
+  - 공급자:
+    - 「연결 상품」이 `productMasterId` 로도 저장된다. 서버가 공급 제품인지 확인한다(POST · PATCH).
+    - 기존 영상은 `metadata` 의 연결을 읽는다.
+  - 매장: 보관 영상 등록본과 가져온 사본도 원본의 연결 제품을 「(원본)」으로 보인다.
+  - 검증:
+    - api `media-product-link.test.ts` 8/8 · `signage-resource-id-validation` 93 · `tsc` 0
+    - web-store `vitest src/pages/pharmacy` 60 files / 695 · `tsc` 0
+    - web-neture vitest(CI config) 185 files / 1578 · `tsc` 0
+    - admin `ProductMasterPicker.test.tsx` 2/2 · `tsc` 오류 0
+    - 바뀐 파일 ESLint 0
+  - 배포 후 확인할 것:
+    - Admin 미디어 카탈로그 → 보관 영상 → 연결 유형 product → 제품 찾기 → 저장.
+    - neture 공급자 사이니지에서 연결 상품을 고른 뒤 저장한다. 그다음 매장 사이니지 목록의 「연결 제품」에 「(원본)」이 보이는지 확인한다(공급자 영상을 가져온 매장).
+- **겹칠 수 있는 PR:** #1049(상담 태블릿) — 겹치는 파일 없음.
 ## 2026-11-13 · 공급자 제품 등록 AI 보조 P1 검증·최소 보완 (branch `claude/focused-edison-ky4e3u`)
 
 - **근거 / PR 묶음:** [`WO-O4O-SUPPLIER-AI-ASSISTANCE-ROLLOUT-V1`](docs/work-orders/WO-O4O-SUPPLIER-AI-ASSISTANCE-ROLLOUT-V1.md) P1. 이 branch 단독 1 PR(web-neture 공급자 화면 · 서비스 PR). PR 은 만들지 않았다.
@@ -244,7 +290,13 @@
     - 콘텐츠 QR 은 출력하거나 담은 것만 목록에 올린다.
     - 제품 ↔ 영상은 `signage_media` 에 제품 열 하나를 둔다(설명서 본문에는 넣지 않는다).
 - **검증:** 문서만(`check-doc-sensitive` 통과).
-- **겹칠 수 있는 PR:** #1049(태블릿 구조 1단계) — 이 지시서는 코드를 바꾸지 않는다. T2 · T5 구현은 그 병합 뒤에 시작한다.
+- **2026-11-13 추가:**
+  - T4(`signage_media` 제품 열 migration)는 통합 담당이 승인했다.
+  - 현 상태 조사를 지시서 §7 에 넣었다.
+    - 태블릿 코너는 대부분 이미 있다.
+    - 빠진 것은 제품 QR 기본값(상품 대표 QR)과 제품 영상이다.
+    - 영상 저장소가 둘이다. `media_assets` 는 `media_entity_links` 로 제품 연결이 이미 되고, `signage_media` 는 연결이 없다.
+- **겹칠 수 있는 PR:** #1049(상담 태블릿) — 화면 세트와 무관하다. 겹치는 파일은 `App.tsx` · `store-workspace.test.tsx` 이고, 이 둘은 T2 에만 해당한다.
 
 ## 2026-11-13 · 상담 태블릿별 음성 자동 감지 언어 (branch `claude/wizardly-bardeen-ldq332`)
 

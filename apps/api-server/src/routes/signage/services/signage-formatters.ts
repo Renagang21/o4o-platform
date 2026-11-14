@@ -94,6 +94,7 @@ export function toMediaResponse(media: SignageMedia): MediaResponseDto {
     content: media.content || null,
     tags: media.tags || [],
     status: media.status,
+    productMasterId: media.productMasterId ?? null,
     createdAt: media.createdAt?.toISOString(),
     updatedAt: media.updatedAt?.toISOString(),
   };
