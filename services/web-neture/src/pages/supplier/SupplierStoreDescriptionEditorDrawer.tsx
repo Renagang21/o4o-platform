@@ -26,6 +26,7 @@ import {
 } from '../../lib/api';
 import { useContentTemplates } from '../../hooks/useContentTemplates';
 import { useAuth } from '../../contexts';
+import { useConfirmDialog } from '../../components/common/useConfirmDialog';
 
 interface Props {
   product: SupplierProduct;
@@ -125,6 +126,7 @@ function ReadOnlyDescriptionNotice({ published, hasWorkingDraft, onEdit }: Reado
 }
 
 export default function SupplierStoreDescriptionEditorDrawer({ product, open, onClose, onSaved, initialLanguage = DEFAULT_LANG, initialDescriptionId }: Readonly<Props>) {
+  const { confirm, dialog: confirmDialog } = useConfirmDialog();
   const { user } = useAuth();
   const tpl = useContentTemplates();
   const canCreatePublicTemplate =
@@ -146,9 +148,15 @@ export default function SupplierStoreDescriptionEditorDrawer({ product, open, on
   const readOnly = !!existing && !WITHDRAWABLE_STATUSES.has(existing.status);
   const workingRow = rows.find((r) => normLang(r.language) === language && WITHDRAWABLE_STATUSES.has(r.status));
 
-  const requestClose = () => {
+  const requestClose = async () => {
     if (saving || withdrawing) return;
-    if (dirty && !window.confirm('저장하지 않은 변경사항이 있습니다. 닫으면 현재 편집 내용이 사라집니다. 계속하시겠습니까?')) return;
+    if (dirty && !(await confirm({
+      title: '편집 닫기',
+      message: '저장하지 않은 변경사항이 있습니다. 닫으면 현재 편집 내용이 사라집니다. 계속하시겠습니까?',
+      confirmText: '닫기',
+      cancelText: '계속 편집',
+      variant: 'warning',
+    }))) return;
     onClose();
   };
 
@@ -198,15 +206,21 @@ export default function SupplierStoreDescriptionEditorDrawer({ product, open, on
   }, [open, product?.masterId, loadLanguageFrom, reloadKey, initialLanguage, initialDescriptionId]);
 
   // 언어 전환: 미저장 변경 보호 → 해당 언어 초안 로드(캐시).
-  const selectLanguage = useCallback((lang: SupportedLang) => {
+  const selectLanguage = useCallback(async (lang: SupportedLang) => {
     if (lang === language) return;
     if (saving || withdrawing) return;
-    if (dirty && !window.confirm(`저장하지 않은 변경사항이 있습니다.\n‘${LANG_LABELS[lang]}’ 로 전환하면 현재 편집 내용이 사라집니다. 계속하시겠습니까?`)) {
+    if (dirty && !(await confirm({
+      title: '언어 전환',
+      message: `저장하지 않은 변경사항이 있습니다.\n‘${LANG_LABELS[lang]}’ 로 전환하면 현재 편집 내용이 사라집니다. 계속하시겠습니까?`,
+      confirmText: '전환',
+      cancelText: '계속 편집',
+      variant: 'warning',
+    }))) {
       return;
     }
     setLanguage(lang);
     loadLanguageFrom(rows, lang);
-  }, [language, saving, withdrawing, dirty, rows, loadLanguageFrom]);
+  }, [language, saving, withdrawing, dirty, rows, loadLanguageFrom, confirm]);
 
   const editorImageUpload = useCallback(
     async (file: File): Promise<string> => {
@@ -268,7 +282,12 @@ export default function SupplierStoreDescriptionEditorDrawer({ product, open, on
   //   본인 소유·허용 상태의 작업행이 로드돼 있을 때만 노출. 철회 시 해당 언어 행만 제거(다른 언어·offer·master 무변경).
   const doWithdraw = async () => {
     if (!existing || withdrawing || saving) return;
-    if (!window.confirm(`‘${LANG_LABELS[language]}’ 매장용 설명서 작업본을 철회하시겠습니까?\n철회하면 이 작업본이 목록·검수 대기에서 제거됩니다. (매장에 노출 중인 검수 완료 설명서에는 영향이 없습니다.)`)) {
+    if (!(await confirm({
+      title: '작업본 철회',
+      message: `‘${LANG_LABELS[language]}’ 매장용 설명서 작업본을 철회하시겠습니까?\n철회하면 이 작업본이 목록·검수 대기에서 제거됩니다. (매장에 노출 중인 검수 완료 설명서에는 영향이 없습니다.)`,
+      confirmText: '철회',
+      variant: 'danger',
+    }))) {
       return;
     }
     setWithdrawing(true);
@@ -298,6 +317,7 @@ export default function SupplierStoreDescriptionEditorDrawer({ product, open, on
 
   return (
     <>
+      {confirmDialog}
       <button type="button" aria-label="설명서 편집창 닫기" className="fixed inset-0 bg-black/30 z-40" onClick={requestClose} disabled={saving || withdrawing} />
       <div className="fixed top-0 right-0 h-full w-full max-w-[720px] bg-white shadow-2xl z-50 flex flex-col">
         {/* Header */}

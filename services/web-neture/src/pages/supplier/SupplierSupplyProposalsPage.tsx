@@ -33,10 +33,12 @@ import { useSupplierPharmacyOptions } from "../../components/neture-pharmacy/use
 import SupplierProposalDrafts from "./SupplierProposalDrafts";
 import { useAuth } from "../../contexts";
 import { supplierProfileApi } from "../../lib/api";
+import { useConfirmDialog } from "../../components/common/useConfirmDialog";
 
 type Msg = { type: "success" | "error"; text: string } | null;
 
 export default function SupplierSupplyProposalsPage() {
+  const { confirm, dialog: confirmDialog } = useConfirmDialog();
   const options = useSupplierPharmacyOptions();
   const { user } = useAuth();
   const [scope, setScope] = useState<{
@@ -70,6 +72,9 @@ export default function SupplierSupplyProposalsPage() {
   const requestedProduct = params.get("offer");
   const [rows, setRows] = useState<SupplyProposal[]>([]);
   const [loading, setLoading] = useState(true);
+  // 목록 조회 실패는 '제안 없음'과 다르다 — 표 안에 실패와 다시 시도를 보여 준다.
+  //   작업 결과 문구(message)는 덮어쓰지 않는다(종료 성공 후 재조회가 실패해도 성공은 성공이다).
+  const [loadError, setLoadError] = useState(false);
   const loadVersion = useRef(0);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<Msg>(null);
@@ -83,12 +88,15 @@ export default function SupplierSupplyProposalsPage() {
   const load = useCallback(async () => {
     const version = ++loadVersion.current;
     setLoading(true);
+    setLoadError(false);
     try {
       const next = (await api.listProposals()) ?? [];
       if (version === loadVersion.current) setRows(next);
-    } catch (err) {
-      if (version === loadVersion.current)
-        setMessage({ type: "error", text: (err as Error).message });
+    } catch {
+      if (version === loadVersion.current) {
+        setRows([]);
+        setLoadError(true);
+      }
     } finally {
       if (version === loadVersion.current) setLoading(false);
     }
@@ -100,9 +108,12 @@ export default function SupplierSupplyProposalsPage() {
 
   const end = async (p: SupplyProposal) => {
     if (
-      !window.confirm(
-        `${p.productName} 제안(${formatWon(p.unitPrice)})을 종료하시겠습니까? 종료한 제안은 되살릴 수 없습니다.`,
-      )
+      !(await confirm({
+        title: "공급 제안 종료",
+        message: `${p.productName} 제안(${formatWon(p.unitPrice)})을 종료하시겠습니까? 종료한 제안은 되살릴 수 없습니다.`,
+        confirmText: "종료",
+        variant: "danger",
+      }))
     )
       return;
     setBusy(true);
@@ -120,6 +131,7 @@ export default function SupplierSupplyProposalsPage() {
 
   return (
     <div className="space-y-6 p-6">
+      {confirmDialog}
       {params.has("returnTo") && (
         <Link
           to={supplierReturnPath(params.get("returnTo"), "/supplier/products")}
@@ -174,6 +186,13 @@ export default function SupplierSupplyProposalsPage() {
           <tbody className="divide-y divide-gray-100">
             {loading ? (
               <EmptyRow colSpan={7} text="불러오는 중..." />
+            ) : loadError ? (
+              <EmptyRow
+                colSpan={7}
+                tone="error"
+                text="공급 제안 목록을 불러오지 못했습니다."
+                onRetry={() => void load()}
+              />
             ) : rows.length === 0 ? (
               <EmptyRow colSpan={7} text="낸 공급 제안이 없습니다." />
             ) : (

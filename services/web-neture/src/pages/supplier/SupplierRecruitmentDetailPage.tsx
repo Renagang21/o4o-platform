@@ -11,6 +11,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import RecruitmentSupplyPricePanel from '../../components/supplier/RecruitmentSupplyPricePanel';
 import { ArrowLeft, Loader2 } from 'lucide-react';
 import { supplierRecruitmentApi, SUPPLIER_RECRUITMENT_NOT_FOUND, type RecruitmentDetail } from '../../lib/api/supplier';
+import { useConfirmDialog } from '../../components/common/useConfirmDialog';
 
 const SERVICE_LABELS: Record<string, string> = {
   'kpa-society': 'KPA Society',
@@ -52,6 +53,7 @@ const EXPOSURE_NOTICE: Record<string, { cls: string; text: string }> = {
 };
 
 export default function SupplierRecruitmentDetailPage() {
+  const { confirm, prompt, dialog: confirmDialog } = useConfirmDialog();
   const { recruitmentId } = useParams<{ recruitmentId: string }>();
   const navigate = useNavigate();
   const [detail, setDetail] = useState<RecruitmentDetail | null>(null);
@@ -95,7 +97,16 @@ export default function SupplierRecruitmentDetailPage() {
   };
 
   const handleReject = async (applicationId: string) => {
-    const reason = window.prompt('반려 사유 (선택)') ?? undefined;
+    // [취소]하면 null — 반려하지 않는다(되돌릴 수 없는 동작).
+    const input = await prompt({
+      title: '신청 반려',
+      message: '이 판매자의 모집 신청을 반려합니다. 반려하면 모집 참여 대상에서 제외됩니다.',
+      reasonPlaceholder: '반려 사유 (선택)',
+      confirmText: '반려',
+      variant: 'danger',
+    });
+    if (input === null) return;
+    const reason = input || undefined;
     setBusyId(applicationId);
     setError(null);
     const result = await supplierRecruitmentApi.rejectApplication(applicationId, reason);
@@ -106,7 +117,12 @@ export default function SupplierRecruitmentDetailPage() {
 
   // WO-O4O-SELLER-RECRUITMENT-PARTICIPATION-TERMINATION-V1
   const handleTerminate = async (applicationId: string) => {
-    if (!window.confirm('이 판매자의 모집 참여를 해지하면 신규 조달 상품 노출이 중단됩니다.\n기존 주문 이력과 정산 이력은 유지됩니다.\n해지하시겠습니까?')) return;
+    if (!(await confirm({
+      title: '모집 참여 해지',
+      message: '이 판매자의 모집 참여를 해지하면 신규 조달 상품 노출이 중단됩니다.\n기존 주문 이력과 정산 이력은 유지됩니다.\n해지하시겠습니까?',
+      confirmText: '해지',
+      variant: 'danger',
+    }))) return;
     setBusyId(applicationId);
     setError(null);
     const result = await supplierRecruitmentApi.terminateApplication(applicationId);
@@ -118,7 +134,12 @@ export default function SupplierRecruitmentDetailPage() {
   // WO-O4O-SELLER-RECRUITMENT-CLOSE-ACTION-V1
   const handleCloseRecruitment = async () => {
     if (!recruitmentId) return;
-    if (!window.confirm('이 모집을 마감하면 신규 신청을 받을 수 없습니다.\n기존 신청자에 대한 승인/반려는 계속 처리할 수 있습니다.\n마감하시겠습니까?')) return;
+    if (!(await confirm({
+      title: '모집 마감',
+      message: '이 모집을 마감하면 신규 신청을 받을 수 없습니다.\n기존 신청자에 대한 승인/반려는 계속 처리할 수 있습니다.\n마감하시겠습니까?',
+      confirmText: '마감',
+      variant: 'warning',
+    }))) return;
     setError(null);
     const result = await supplierRecruitmentApi.close(recruitmentId);
     if (!result.success) setError(result.message || '마감에 실패했습니다.');
@@ -128,7 +149,11 @@ export default function SupplierRecruitmentDetailPage() {
   // WO-O4O-SELLER-RECRUITMENT-REOPEN-ACTION-V1
   const handleReopenRecruitment = async () => {
     if (!recruitmentId) return;
-    if (!window.confirm('재개하면 이 모집은 다시 신규 신청을 받을 수 있습니다.\n기존 신청 및 승인 이력은 그대로 유지됩니다.\n재개하시겠습니까?')) return;
+    if (!(await confirm({
+      title: '모집 재개',
+      message: '재개하면 이 모집은 다시 신규 신청을 받을 수 있습니다.\n기존 신청 및 승인 이력은 그대로 유지됩니다.\n재개하시겠습니까?',
+      confirmText: '재개',
+    }))) return;
     setError(null);
     const result = await supplierRecruitmentApi.reopen(recruitmentId);
     if (!result.success) setError(result.message || '재개에 실패했습니다.');
@@ -162,6 +187,7 @@ export default function SupplierRecruitmentDetailPage() {
 
   return (
     <div className="max-w-4xl">
+      {confirmDialog}
       <button type="button" onClick={() => navigate('/supplier/recruitments')} className="inline-flex items-center gap-1 text-sm text-slate-500 hover:text-slate-700 mb-4">
         <ArrowLeft className="w-4 h-4" /> 모집 현황
       </button>

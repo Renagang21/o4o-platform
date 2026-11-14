@@ -99,11 +99,43 @@ export function PageHeader({ title, description, children }: { title: string; de
   );
 }
 
-export function EmptyRow({ colSpan, text }: { colSpan: number; text: string }) {
+/**
+ * 표의 빈 상태 행.
+ * - 기본(tone 없음): 불러오는 중 · 0건 같은 안내.
+ * - tone="error": 조회 실패. '목록 없음'과 구분되게 붉은 글자 · role="alert" 로 보이고,
+ *   onRetry 를 주면 [다시 시도] 버튼을 함께 그린다.
+ * 기존 호출(colSpan · text 만)은 그대로 동작한다.
+ */
+export function EmptyRow({
+  colSpan,
+  text,
+  tone,
+  onRetry,
+  retryLabel = '다시 시도',
+}: {
+  colSpan: number;
+  text: string;
+  tone?: 'error';
+  onRetry?: () => void;
+  retryLabel?: string;
+}) {
+  const isError = tone === 'error';
   return (
     <tr>
-      <td colSpan={colSpan} className="px-4 py-10 text-center text-sm text-gray-400">
+      <td
+        colSpan={colSpan}
+        role={isError ? 'alert' : undefined}
+        className={`px-4 py-10 text-center text-sm ${isError ? 'text-red-700' : 'text-gray-400'}`}
+      >
         {text}
+        {onRetry && (
+          <>
+            {' '}
+            <button type="button" onClick={onRetry} className="font-medium underline">
+              {retryLabel}
+            </button>
+          </>
+        )}
       </td>
     </tr>
   );

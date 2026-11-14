@@ -164,7 +164,7 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
       {/* Dirty confirm dialog */}
       {showDirtyConfirm && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40">
-          <div className="bg-white rounded-xl shadow-xl p-6 w-[360px]">
+          <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-[360px] mx-4">
             <h3 className="text-base font-bold text-slate-900 mb-2">저장하지 않은 변경사항</h3>
             <p className="text-sm text-slate-600 mb-4">저장하지 않은 변경사항이 있습니다. 닫으시겠습니까?</p>
             <div className="flex justify-end gap-2">
