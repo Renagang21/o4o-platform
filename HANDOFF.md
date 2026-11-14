@@ -1,5 +1,16 @@
 # HANDOFF
 
+## 2026-11-14 · 운영 「AI 운영 리포트」 빈 화면 → AI 운영 관리 안내 (branch `claude/ecstatic-mendel-2ohu27-login` · 로그인 수정과 같은 PR)
+
+- **조사:** `/operations/neture/ai-report` 는 `AiReportPage` 를 `mode:'empty'` 로 고정해 「분석 데이터 준비 중」만 보였다(데이터 호출 없음 — 배포 문제 아님). 원래 지표(AI 응답 카드 노출)는 `ai-card-exposure.service.ts` 가 서버 메모리 배열에만 쌓아 재시작 · 다중 인스턴스에서 사라진다. 실제 저장되는 AI 호출 · 오류 · 토큰 · 비용은 Admin 설정 「AI 운영 관리」(`/settings`, `/api/ai/admin/usage` · `/ops/summary`).
+- **사용자 결정:** 안 A — 빈 리포트 대신 안내 · 링크. (B 운영자에게 사용량 표시 · C 카드 노출 DB 저장은 보류)
+- **한 일:** `CentralAiReportNotice.tsx` 신규(「설정 → AI 운영 관리」 안내 · `/settings` 링크 · 카드 노출 통계 미제공 안내). `central-operation-renderers.tsx` 의 `neture.ai-report` 가 이 화면을 렌더. 메뉴 · route 는 그대로(route 없는 메뉴 아님).
+- **결정 사항(§9):** 메뉴는 유지하고 안내로 바꿈 — 메뉴 제거는 운영자 메뉴 구성 변경이라 이번 범위 밖. `/settings` 는 `settings:read` 권한 화면이라 링크 옆에 「설정 조회 권한 필요」 표기.
+- **검증:** admin-dashboard vitest `src/pages/operators` 154 통과(신규 1건). `tsc --noEmit` · 변경 파일 ESLint 통과. 브라우저 확인 안 함.
+- **배포 후 확인:** `/operations/neture/ai-report` 에 안내와 링크가 보이고 링크가 AI 운영 관리로 열리는지.
+- **후속:** `@o4o/ui` 의 `AiReportPage` 는 다른 소비처가 있을 수 있어 그대로 둠. 서버 `/api/ai/card-report`(메모리 기반) 정리는 별도 판단.
+- **문서 정합:** 해당 없음.
+
 ## 2026-11-14 · Admin 로그인 「Google 로그인을 준비하고 있습니다…」 오래 걸림 — 화면 안내 · 자동 재시도 (branch `claude/ecstatic-mendel-2ohu27-login`)
 
 - **branch:** 앞 branch `claude/ecstatic-mendel-2ohu27` 는 #1056 으로 병합됨 → 최신 `origin/main` 에서 새 branch(AGENTS §4-1(e)).
