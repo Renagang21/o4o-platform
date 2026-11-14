@@ -58,6 +58,7 @@ export function useSupplierProducts() {
   // Bulk edit state
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [bulkDeleting, setBulkDeleting] = useState(false);
+  const [submittingApproval, setSubmittingApproval] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   // showApprovalModal 제거됨 — WO-NETURE-SUPPLIER-APPROVAL-REQUEST-USE-SAVED-DISTRIBUTION-POLICY-V1
   const [toast, setToast] = useState<string | null>(null);
@@ -122,29 +123,34 @@ export function useSupplierProducts() {
       return next;
     });
   }, []);
-  const toggleSelectAll = useCallback(() => {
-    if (selectedIds.size === products.length) {
-      setSelectedIds(new Set());
-    } else {
-      setSelectedIds(new Set(products.map((p) => p.id)));
-    }
-  }, [selectedIds, products]);
 
   // Bulk delete (WO-O4O-NETURE-SUPPLIER-PRODUCTS-UX-REFORM-V1)
   // WO-O4O-NETURE-SUPPLIER-DELETE-POLICY-AND-REVIEW-ROUNDTRIP-BATCH-V1:
   // 서버가 hard delete → soft delete 로 바뀌었고, 매장 진열/서비스 상품이 남아 있으면 건별로 거부한다.
   // "N건 실패" 로 뭉뚱그리지 않고 사유를 그대로 보여준다.
+  //   전송 자체가 실패하면(NETWORK_ERROR) 아무것도 지워지지 않았다 — 성공 문구를 띄우지 않고 선택을 남겨 다시 시도할 수 있게 한다.
   const handleBulkDelete = async () => {
+    if (bulkDeleting) return;
     setBulkDeleting(true);
-    const result = await supplierApi.bulkDelete(Array.from(selectedIds));
-    setBulkDeleting(false);
-    setShowDeleteConfirm(false);
-    showToast(
-      `${result.deleted}건 삭제 완료${result.failed.length > 0 ? ` · ${bulkDeleteFailureSummary(result.failed)}` : ''}`,
-    );
-    setSelectedIds(new Set());
-    await fetchProducts(pagination.page);
-    fetchTabCounts();
+    try {
+      const result = await supplierApi.bulkDelete(Array.from(selectedIds));
+      setShowDeleteConfirm(false);
+      if (result.failed.some((f) => f.id === 'all')) {
+        showToast('삭제 요청을 보내지 못했습니다. 아무 상품도 삭제되지 않았습니다. 잠시 후 다시 시도해 주시기 바랍니다.');
+        return;
+      }
+      const failureNote = result.failed.length > 0 ? bulkDeleteFailureSummary(result.failed) : '';
+      showToast(
+        result.deleted > 0
+          ? `${result.deleted}건 삭제 완료${failureNote ? ` · ${failureNote}` : ''}`
+          : `삭제된 상품이 없습니다${failureNote ? ` · ${failureNote}` : ''}`,
+      );
+      // 처리된 요청은 목록을 다시 불러온다(fetchProducts 가 선택을 비운다). 건별 거부 사유는 toast 로 남는다.
+      await fetchProducts(pagination.page);
+      fetchTabCounts();
+    } finally {
+      setBulkDeleting(false);
+    }
   };
 
   // WO-NETURE-SUPPLIER-PRODUCT-VISIBILITY-STATUS-UX-ALIGNMENT-V1: client-side visibility filter
@@ -155,6 +161,21 @@ export function useSupplierProducts() {
       return filterVisibility === 'visible' ? status === 'VISIBLE' : status !== 'VISIBLE';
     });
   }, [products, filterVisibility]);
+
+  // 전체 선택은 화면에 보이는 행(노출/비노출 필터 적용 후)만 대상으로 한다 —
+  // 숨은 행까지 선택되면 일괄 삭제 · 재검토 요청이 보이지 않는 상품에도 적용된다.
+  const allVisibleSelected =
+    filteredProducts.length > 0 && filteredProducts.every((p) => selectedIds.has(p.id));
+  const toggleSelectAll = useCallback(() => {
+    setSelectedIds(allVisibleSelected ? new Set() : new Set(filteredProducts.map((p) => p.id)));
+  }, [allVisibleSelected, filteredProducts]);
+  useEffect(() => {
+    const visible = new Set(filteredProducts.map((p) => p.id));
+    setSelectedIds((prev) => {
+      const kept = [...prev].filter((id) => visible.has(id));
+      return kept.length === prev.size ? prev : new Set(kept);
+    });
+  }, [filteredProducts]);
 
   // WO-NETURE-SUPPLIER-PRODUCT-LIST-APPROVAL-TAB-LABEL-AND-COUNT-ALIGN-V1
   const hasAnyFilter = !!(
@@ -280,7 +301,7 @@ export function useSupplierProducts() {
     setTimeout(() => setHighlightRowId(null), 2000);
 
     // Scroll to target row
-    const targetIdx = products.findIndex((p) => p.id === next!.id);
+    const targetIdx = filteredProducts.findIndex((p) => p.id === next!.id);
     setTimeout(() => {
       const rows = document.querySelectorAll('tbody tr');
       if (targetIdx >= 0 && rows[targetIdx]) {
@@ -297,7 +318,7 @@ export function useSupplierProducts() {
     ) {
       setTimeout(() => setDrawerProduct(next!), 400);
     }
-  }, [products, autoNext, loading]);
+  }, [products, filteredProducts, autoNext, loading]);
 
   const handleSearch = (value: string) => {
     // A pending SearchBar timer must not restore input discarded by reset or URL navigation.
@@ -343,13 +364,20 @@ export function useSupplierProducts() {
   };
 
   const handleSubmitApproval = async () => {
+    if (submittingApproval) return;
     if (
       !confirm(
         `선택한 ${selectedIds.size}개 상품 중 반려된 제품의 등록 재검토를 요청합니다.\n진행하시겠습니까?`,
       )
     )
       return;
-    const result = await supplierApi.submitForApproval(Array.from(selectedIds));
+    setSubmittingApproval(true);
+    let result: Awaited<ReturnType<typeof supplierApi.submitForApproval>>;
+    try {
+      result = await supplierApi.submitForApproval(Array.from(selectedIds));
+    } finally {
+      setSubmittingApproval(false);
+    }
     if (result.success && result.data) {
       // WO-NETURE-APPROVAL-REQUEST-TRUTH-ALIGNMENT-V1:
       // submitted=0 이거나 skipped가 있으면 그 이유를 사용자에게 명확히 알려야 한다.
@@ -389,6 +417,8 @@ export function useSupplierProducts() {
 
   return {
     products,
+    allVisibleSelected,
+    submittingApproval,
     pagination,
     keyword,
     setKeyword: updateKeyword,

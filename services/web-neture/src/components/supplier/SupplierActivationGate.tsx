@@ -123,8 +123,9 @@ export default function SupplierActivationGate({ mode, children }: Props) {
             <h2 className="text-lg font-bold">{notice.title}</h2>
             <p className="mt-2 text-sm">{notice.body}</p>
             <div className="mt-4 flex gap-2">
+              {/* /supplier 는 메인 호스트에서 공개 소개 페이지다 — 업무공간 대시보드로 보낸다 */}
               <Link
-                to="/supplier"
+                to="/supplier/dashboard"
                 className="rounded-lg bg-slate-100 px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-200"
               >
                 대시보드로

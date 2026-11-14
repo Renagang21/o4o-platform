@@ -95,7 +95,10 @@ export default function SupplierRecruitmentDetailPage() {
   };
 
   const handleReject = async (applicationId: string) => {
-    const reason = window.prompt('반려 사유 (선택)') ?? undefined;
+    // 입력창에서 [취소]를 누르면 prompt 는 null 을 돌려준다 — 반려하지 않는다(되돌릴 수 없는 동작).
+    const input = window.prompt('반려 사유 (선택)');
+    if (input === null) return;
+    const reason = input.trim() || undefined;
     setBusyId(applicationId);
     setError(null);
     const result = await supplierRecruitmentApi.rejectApplication(applicationId, reason);

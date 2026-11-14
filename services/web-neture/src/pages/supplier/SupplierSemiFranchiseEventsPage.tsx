@@ -6,7 +6,7 @@
  *   이벤트 가격은 수정할 수 없다 — 취소 후 다시 신청한다. 승인은 담당 운영자가 한다.
  */
 import SupplierEventNavigation from '../../components/supplier/SupplierEventNavigation';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import {
   neturePharmacySupplierApi as api,
@@ -39,6 +39,10 @@ export default function SupplierSemiFranchiseEventsPage() {
   const requestedProduct = params.get('offer');
   const [rows, setRows] = useState<SemiFranchiseEvent[]>([]);
   const [loading, setLoading] = useState(true);
+  // 목록 조회 실패는 '이벤트 없음'과 다르다 — 표 안에 실패와 다시 시도를 보여 준다.
+  //   작업 결과 문구(message)는 덮어쓰지 않고, 늦게 도착한 이전 응답은 버린다.
+  const [loadError, setLoadError] = useState(false);
+  const loadVersion = useRef(0);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<Msg>(null);
   const [form, setForm] = useState(EMPTY);
@@ -51,13 +55,19 @@ export default function SupplierSemiFranchiseEventsPage() {
   }, [requestedProduct, options.products, options.loading, options.error]);
 
   const load = useCallback(async () => {
+    const version = ++loadVersion.current;
     setLoading(true);
+    setLoadError(false);
     try {
-      setRows((await api.listEvents()) ?? []);
-    } catch (err) {
-      setMessage({ type: 'error', text: (err as Error).message });
+      const next = (await api.listEvents()) ?? [];
+      if (version === loadVersion.current) setRows(next);
+    } catch {
+      if (version === loadVersion.current) {
+        setRows([]);
+        setLoadError(true);
+      }
     } finally {
-      setLoading(false);
+      if (version === loadVersion.current) setLoading(false);
     }
   }, []);
 
@@ -210,6 +220,15 @@ export default function SupplierSemiFranchiseEventsPage() {
           <tbody className="divide-y divide-gray-100">
             {loading ? (
               <EmptyRow colSpan={7} text="불러오는 중..." />
+            ) : loadError ? (
+              <tr>
+                <td colSpan={7} className='px-4 py-8 text-center text-sm text-red-700' role='alert'>
+                  이벤트 목록을 불러오지 못했습니다.{' '}
+                  <button type='button' onClick={() => void load()} className='font-medium underline'>
+                    다시 시도
+                  </button>
+                </td>
+              </tr>
             ) : rows.length === 0 ? (
               <EmptyRow colSpan={7} text="신청한 이벤트가 없습니다." />
             ) : (
