@@ -215,7 +215,9 @@ export function invoiceDuplicateHints(
   return {
     photoFingerprint: hash([
       ownerKey,
-      [...new Set(sources.map((s) => s.sha256))].sort(),
+      [...new Set(sources.map((s) => s.sha256))].sort((a, b) =>
+        a.localeCompare(b, "en"),
+      ),
     ]),
     documentFingerprint:
       invoice.sellerBusinessNumber &&
