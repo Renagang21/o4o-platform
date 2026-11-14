@@ -13,6 +13,13 @@
 - **겹칠 수 있는 열린 PR:** 조회 시 #1069·#1070, 기능 경로 중복 없음. 공통 HANDOFF.md는 양쪽 기록을 보존한다.
 - **문서 정합:** 기존 운영 가이드는 runtime 연결이 별도라고 명시함. 기준 문서 변경 없음.
 
+### 후속 실행 결과
+
+- 사용자에게 세션 상태를 재확인하도록 요구하지 않고 GitHub Actions와 Cloud Audit Logs를 직접 조회했다. 조회 시 진행 중 GitHub 실행 0개, 최근 Delivery 성공 완료, API Ready=True 및 단일 serving revision 100%를 확인했다. 이것이 다른 사람의 미래 변경을 잠그는 것은 아니다.
+- 사용자의 해결 지시 범위에서 Cloud Tasks API를 활성화했고, 큐 목록이 비어 있음을 확인한 뒤 `asia-northeast3/o4o-youtube-upload`를 생성했다. concurrent=1, dispatch/sec=1, max attempts=20, backoff=5s..300s. 영상 작업은 만들지 않았다.
+- 위 본문의 미실행 항목 중 Cloud Tasks API/큐 준비는 이제 수행됨. 서비스 계정 생성/IAM/WIF·서버 env/secret·운영 배포·Google 채널 연결은 미실행. AGENTS.md §4의 작업 세션 IAM 금지와 §9의 클라우드 운영 배포 금지에 따라 로컬 운영 세션이 이어야 한다.
+- 사용자도 기존 OAuth client 유무는 모르는 상태다. 현재 도구에는 콘솔 UI 제어가 없으며 Google Auth Platform 웹 client 목록/secret 생성은 일반 gcloud CLI 로그인만으로 해결되지 않는다. 콘솔에서 기존 목록을 확인하고 전용 Web client를 생성/확인하는 단계가 남았다. IAM workforce용 OAuth client를 YouTube용으로 대신 만들지 않는다.
+
 ## 2026-11-14 · 음성 자동 감지 언어 선택이 늦은 effect 에 덮어써지는 문제 (branch `claude/epic-rubin-5g04vm`)
 
 - **다음 실행자:** 통합 세션 — 이 branch 로 PR · 병합. web-store 화면 1파일만 바뀐다.
