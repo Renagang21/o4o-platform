@@ -5,7 +5,7 @@ const auth = vi.hoisted(() => ({ user: null as null | { id: string; roles: strin
 vi.mock('../contexts/AuthContext',()=>({useAuth:()=>auth}));
 vi.mock('@o4o/auth-react',async importOriginal=>({...await importOriginal<typeof import('@o4o/auth-react')>(),MyHomeButton:({isAuthenticated}:{isAuthenticated:boolean})=>isAuthenticated ? <button>My Home</button> : null,O4OHomeButton:()=> <a href="https://neture.co.kr/">O4O 메인으로</a>,O4O_LOGOUT_LABEL:'로그아웃'}));
 vi.mock('@o4o/shared-space-ui',async importOriginal=>({...await importOriginal<typeof import('@o4o/shared-space-ui')>(),PublicLegalFooterInfo:()=>null}));
-vi.mock('../lib/apiClient',()=>({authClient:{api:{get:vi.fn(async()=>({data:{data:{newCount:0}}}))}}}));
+vi.mock('../lib/apiClient',()=>({authClient:{api:{get:vi.fn(async()=>({data:{data:{allowed:true,newCount:0}}}))}}}));
 vi.mock('../lib/footerLegal',()=>({loadFooterLegal:vi.fn()}));
 import SiteShell from './SiteShell';
 afterEach(()=>{cleanup();auth.user=null;auth.isAuthenticated=false;});

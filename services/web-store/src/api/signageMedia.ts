@@ -158,3 +158,43 @@ export function createYoutubeVideoApi(organizationId: string, current:()=>boolea
   }
   return {enqueue:input=>read(`${BASE}/youtube-jobs`,{method:'POST',body:JSON.stringify(input)}),list:async()=>{const value=await read(root);return{availability:value.availability,items:value.items.filter((row:{organizationId?:string})=>row.organizationId===organizationId)};},retry:id=>read(`${root}/${encodeURIComponent(id)}/retry`,{method:'POST',body:'{}'}),cancel:id=>read(`${root}/${encodeURIComponent(id)}/cancel`,{method:'POST',body:'{}'})};
 }
+
+/* ─── 이 영상의 제품 (WO-O4O-STORE-QR-TABLET-CHANNEL-SEPARATION-V1 T4) ─── */
+
+export interface SignageMediaProductLink {
+  /** 직접 등록한 영상이면 그 ID, 가져온 사본이면 null. */
+  mediaId: string | null;
+  /** 가져온 사본(asset snapshot)이면 그 ID — 원본 영상의 연결을 따른다. */
+  snapshotId: string | null;
+  productMasterId: string;
+  productName: string;
+  /** 원본(공용 · 공급자 영상, O4O 보관 영상)의 연결을 따르는 경우. 매장에서 해제할 수 없다. */
+  inherited: boolean;
+  /** 이 매장의 취급 제품 ID(다시 고를 때 선택 표시용). 없으면 null. */
+  listingId: string | null;
+}
+
+/** 이 매장 영상들의 연결 제품. */
+export async function fetchSignageMediaProductLinks(organizationId: string): Promise<SignageMediaProductLink[]> {
+  const res = await storeScopedFetch(`${BASE}/product-links`, { headers: headers(organizationId) });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  const json = await res.json();
+  if (json.success === false || !Array.isArray(json.data)) throw new Error('연결 제품을 확인하지 못했습니다.');
+  return json.data;
+}
+
+/** 매장 취급 제품(listingId)으로 연결한다. null 이면 연결을 해제한다. */
+export async function linkSignageMediaProduct(
+  organizationId: string,
+  mediaId: string,
+  listingId: string | null,
+): Promise<{ mediaId: string; productMasterId: string | null; productName: string | null }> {
+  const res = await storeScopedFetch(`${BASE}/${mediaId}/product`, {
+    method: 'PUT',
+    headers: headers(organizationId),
+    body: JSON.stringify({ listingId }),
+  });
+  const json = await res.json().catch(() => ({}));
+  if (!res.ok || json.success === false || !json.data) throw new Error(json.error || '제품을 연결하지 못했습니다. 다시 시도해 주시기 바랍니다.');
+  return json.data;
+}

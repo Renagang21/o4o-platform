@@ -20,6 +20,66 @@
 - **검증(후속 보완 포함 최종):** web-neture Vitest 195 files / 1633 PASS · operator-core-ui Vitest 37 files / 245 PASS · `tsc --noEmit` PASS(web-neture · web-pharmacy-business · web-pharmacy-coop · web-store) · 변경 파일 ESLint 0 · web-neture build PASS. 확인 대화상자로 바뀐 기존 테스트 6 파일은 대화상자 버튼을 누르도록 갱신. 첫 묶음 검증: web-neture Vitest 194 files / 1629 PASS(신규 5 파일 · 기존 1 파일 보강 — 신규 테스트는 고치기 전 코드에서 실패함을 확인: 반려 2/2 · 제품 목록 4/4 · 자료함 · 목록 실패 7/8, 나머지 1건은 '대상 0건' 대조군). `tsc --noEmit` PASS, 변경 파일 ESLint 0, `pnpm --filter @o4o/web-neture build` PASS.
 - **확인하지 못한 것 / 배포 후 Demo(공급자):** 브라우저 확인 미실행(로그인 · API 필요). PC/mobile 에서 내 제품 목록 노출 필터 → 전체 선택 → 선택 수 · 일괄 삭제 대상, 자료함 삭제 · 제공 대상, 공급 제안 · 이벤트 목록, 휴대폰 폭에서 대화상자 4개가 화면 안에 들어오는지, 활성화 안내 링크. 저장 · 삭제 · 반려처럼 운영 데이터를 바꾸는 동작은 Demo 에서 실행하지 않는다(§5).
 - **겹치는 PR / 문서 정합:** 조회하지 않음(통합 세션 확인). 문서 정합: 해당 없음.
+## 2026-11-14 · 운영 「AI 운영 리포트」 빈 화면 → AI 운영 관리 안내 (branch `claude/ecstatic-mendel-2ohu27-login` · 로그인 수정과 같은 PR)
+
+- **조사:** `/operations/neture/ai-report` 는 `AiReportPage` 를 `mode:'empty'` 로 고정해 「분석 데이터 준비 중」만 보였다(데이터 호출 없음 — 배포 문제 아님). 원래 지표(AI 응답 카드 노출)는 `ai-card-exposure.service.ts` 가 서버 메모리 배열에만 쌓아 재시작 · 다중 인스턴스에서 사라진다. 실제 저장되는 AI 호출 · 오류 · 토큰 · 비용은 Admin 설정 「AI 운영 관리」(`/settings`, `/api/ai/admin/usage` · `/ops/summary`).
+- **사용자 결정:** 안 A — 빈 리포트 대신 안내 · 링크. (B 운영자에게 사용량 표시 · C 카드 노출 DB 저장은 보류)
+- **한 일:** `CentralAiReportNotice.tsx` 신규(「설정 → AI 운영 관리」 안내 · `/settings` 링크 · 카드 노출 통계 미제공 안내). `central-operation-renderers.tsx` 의 `neture.ai-report` 가 이 화면을 렌더. 메뉴 · route 는 그대로(route 없는 메뉴 아님).
+- **결정 사항(§9):** 메뉴는 유지하고 안내로 바꿈 — 메뉴 제거는 운영자 메뉴 구성 변경이라 이번 범위 밖. `/settings` 는 `settings:read` 권한 화면이라 링크 옆에 「설정 조회 권한 필요」 표기.
+- **검증:** admin-dashboard vitest `src/pages/operators` 154 통과(신규 1건). `tsc --noEmit` · 변경 파일 ESLint 통과. 브라우저 확인 안 함.
+- **배포 후 확인:** `/operations/neture/ai-report` 에 안내와 링크가 보이고 링크가 AI 운영 관리로 열리는지.
+- **후속:** `@o4o/ui` 의 `AiReportPage` 는 다른 소비처가 있을 수 있어 그대로 둠. 서버 `/api/ai/card-report`(메모리 기반) 정리는 별도 판단.
+- **문서 정합:** 해당 없음.
+
+## 2026-11-14 · Admin 로그인 「Google 로그인을 준비하고 있습니다…」 오래 걸림 — 화면 안내 · 자동 재시도 (branch `claude/ecstatic-mendel-2ohu27-login`)
+
+- **branch:** 앞 branch `claude/ecstatic-mendel-2ohu27` 는 #1056 으로 병합됨 → 최신 `origin/main` 에서 새 branch(AGENTS §4-1(e)).
+- **조사:** 이 문구는 `/auth/google/config` 응답을 기다리는 단계(`apps/admin-dashboard/src/pages/auth/Login.tsx`). 브라우저 쪽 대기 · 직렬화 없음. warm 상태 응답 0.76~1.0초(`/health` 0.28초). API Cloud Run `--min-instances=0`(`deploy-api.yml`) → 유휴 후 첫 요청이 cold start 를 기다리는 것이 유력(운영 로그 미확인 — 클라우드 세션은 GCP 로그 불가).
+- **사용자 결정:** 안 A(화면 안내 · 자동 재시도)만 진행. 버튼 선표시(배포 설정 변경) · API 상시 1대(인프라 · 비용)는 통합 담당 결정 사항으로 보류.
+- **한 일 (`Login.tsx`):** 5초가 지나도 설정을 못 받으면 「서버를 깨우는 중입니다(최대 30초 정도)」 표시. 설정 요청은 최대 3회(실패 시 3초 뒤 다시 · 「다시 시도하고 있습니다 (n/3)」). 3회 모두 실패하면 「불러오지 못했습니다」 + 「다시 시도」 버튼.
+- **결정 사항(§9):** `getGoogleAuthConfig` 는 실패와 미설정을 모두 `{enabled:false}` 로 돌려줘 구분할 수 없으므로 두 경우 모두 같은 횟수만큼 다시 묻는다(미설정이면 약 6초 뒤 안내). 공용 `@o4o/auth-client` 는 바꾸지 않음.
+- **검증:** admin-dashboard vitest `src/pages/auth` · `admin-legacy-route-api-and-navigation-closure` 90 통과(신규 3건 — 5초 안내 · 자동 재시도 성공 · 3회 실패 후 수동 재시도). `tsc --noEmit` · 변경 파일 ESLint 통과. 실제 브라우저 · cold start 재현 안 함.
+- **배포 후 확인:** 한동안(15분 이상) 사용이 없던 뒤 `https://admin.neture.co.kr/login` 을 열어 5초 뒤 안내가 뜨는지, 버튼이 결국 뜨는지.
+- **PR 묶음:** 단독 1 PR(admin 화면 · lane 해당 없음). 겹칠 수 있는 PR 미대조.
+- **후속 제안:** 근본 해결은 API `--min-instances=1`(배포 인프라 · 비용 — 통합 담당). cold start 확정은 로컬 세션에서 Cloud Run 요청 지연 · 인스턴스 기동 로그 조회.
+- **문서 정합:** 해당 없음.
+
+## 2026-11-14 · 태블릿 코너 제품 [영상 보기] (branch `claude/intelligent-cray-o2p4u3-tablet-video` · API + tablet-kiosk-core)
+
+> 다음 실행자: **통합 세션** — 이 branch 로 PR. 선행 #1058(이 영상의 제품 · migration)은 2026-11-14 병합했다(`4ed07a6`). [`WO-O4O-STORE-QR-TABLET-CHANNEL-SEPARATION-V1`](docs/work-orders/WO-O4O-STORE-QR-TABLET-CHANNEL-SEPARATION-V1.md) T5 · D7.
+
+- **결정 사항:**
+  - 2026-11-14 통합 담당이 「#1058 해결」을 지시했다. 그에 따라 이 세션이 #1058 을 병합했다.
+    - 병합 전 확인 1: 통합 세션이 다시 매긴 epoch(`1794624815975`)와 fingerprint(`ed1759a…`, 7670 lines)를 격리 DB 에서 다시 확인했다(PASS).
+    - 병합 전 확인 2: main 이 PR 기준점 이후 움직이지 않았다.
+    - 병합 전 확인 3: PR CI(CI Gate 포함) 성공.
+  - 세션 판단:
+    - 제품당 영상은 최대 3개다. 순서는 이 매장이 등록한 영상이 먼저이고, 그다음 서비스 공용(운영자 · 공급자) 영상이며, 각각 최근 것이 먼저다.
+    - 매장이 가져온 사본은 원본 영상의 연결을 따른다.
+    - 활성(`active`) 영상만 보인다.
+    - 누르기 전에는 재생기를 띄우지 않는다.
+- **한 일:**
+  - API: 화면 세트 제품 목록(명시 선택)에 `videos` 를 싣는다(`resolveProductVideos`). 판정은 #1058 의 `effectiveProductSql` 을 그대로 쓴다. 공개 경로라 읽기 전용이다.
+  - tablet-kiosk-core: 새 `ProductVideos`(▶ 영상 보기 / 여러 개면 제목 · 기존 `VideoPlayback` 재사용). 태블릿 상품 상세와 코너 QR 모바일 상품 상세에 넣었다.
+- **검증:**
+  - api `store-public/__tests__`(영상 · 대표 QR) + 태블릿 계약 spec 36 pass. 실제 schema 에서 확인한 것:
+    - 다른 매장 · 초안 · 다른 서비스 · 다른 제품 영상 제외
+    - 3개 상한
+    - 쓰기 0
+  - api `tsc` 0
+  - web-store 태블릿 vitest 6 files / 81(새 3) · `tsc` 0 · ESLint 0
+- **배포 후 확인:**
+  - 준비: Demo 「매장 경영자」로 사이니지 동영상 하나를 취급 제품에 연결한다(#1058 화면). 공용 데이터라 확인 뒤 해제한다.
+  - 확인: 그 제품을 넣은 태블릿 코너(제품 진열형)의 상품 상세에 [▶ 영상 보기]가 보이고 재생되는지.
+## 2026-11-14 · 음성 자동 감지 언어 선택이 늦은 effect 에 덮어써지는 문제 (branch `claude/epic-rubin-5g04vm`)
+
+- **다음 실행자:** 통합 세션 — 이 branch 로 PR · 병합. web-store 화면 1파일만 바뀐다.
+- **배경:** main `4ed07a69`(#1058 병합) CI 의 `Web production build (affected)` 가 `ConsultationLauncher.test.tsx` 「up to three speech auto-detect languages」에서 attempt 1 · 2 모두 실패해 Delivery `BLOCKED_CI`. 같은 테스트가 오늘 #1061 PR CI 에서도 실패했다(54행 `영어` disabled 기대).
+- **원인:** `SpeechCandidates` 가 저장값 변경을 `useEffect(() => setDraft(...))` 로 맞춘다. 이 passive effect 가 늦게 실행되면 그 사이 사용자가 고른 체크(draft)를 저장값으로 덮어쓴다. CI 부하에서만 순서가 바뀌어 간헐 실패했고, 실제 화면에서도 저장 직후 빠르게 고르면 선택이 사라질 수 있다.
+- **한 일:** effect 대신 렌더 중 동기화(이전 저장값을 state 로 들고 바뀌면 그 렌더에서 draft 를 맞춤)로 바꿨다. `<details>` 열림 상태는 그대로 유지된다.
+- **검증:** web-store `src/pages/pharmacy/consultation/` 10 files · 65 tests, web-store 전체 `vitest run --maxWorkers=2` 107 files · 1016 tests, `tsc --noEmit` 0, ESLint 통과. 실패는 CI 부하에서만 재현돼 로컬에서 실패→통과를 재현하지는 못했다.
+- **확인하지 못한 것:** CI 부하에서의 재발 여부 — 병합 후 main CI 로 확인. #1058 배포(`BLOCKED_CI`)는 이 PR 병합 후 main CI 통과 → Delivery 판정(migration 포함이라 HOLD 예상) → promote 순서.
+- **결정 사항:** 이전 이 branch 의 작업(#1046 · #1047)은 병합돼 원격 branch 가 지워져 있어, 최신 `origin/main` 에서 같은 이름으로 다시 시작했다.
 
 ## 2026-11-14 · 사진 거래장 실제 저장 · O4O/ChatGPT 연결 (branch `wo/photo-ledger-chat-integration`)
 
@@ -66,6 +126,23 @@
 - **검증:**
   - 새 `qr/qrListFilter.test.ts` 3 · web-store `vitest src/pages` 84 files / 905 · `tsc` 0
   - 배포 후 Demo 「매장 경영자」로 `/store/marketing/qr?workspace=studio` 에서 확인할 것: 「매장 QR」 개수와 「태블릿 코너」 개수의 합이 예전 「전체」와 같은지.
+## 2026-11-14 · 운영 Demo smoke · 제품 진열 설정 빈 화면 수정 (branch `claude/wizardly-bardeen-ldq332`)
+
+- **PR 묶음:** 단독 PR(web-store `App.tsx` 한 파일 · 버그 수정). 빨리 병합 · 배포 권장.
+- **한 일:** 운영(store.neture.co.kr) Demo smoke(조회만 · 저장 · 추가 없음). 상담 화면(경영자 · 직원 · 모바일) · 약사 / 근무자 태블릿 · 예전 경로 이동 · 키오스크 연결 화면 정상, API 4xx/5xx 없음. **발견:** `/store/product-settings` 가 빈 화면 — `No QueryClient set`(web-store 에 `QueryClientProvider` 가 없는데 `@o4o/store-products-ui` 가 react-query 사용, 기존 결함). `App` 을 `QueryClientProvider` 로 감쌈(web-neture 와 같은 설정). 의존성 변경 없음(이미 선언됨).
+- **검증:** store-web type-check(`tsc -b`) · build 통과. vitest 107 files / 1016 통과(첫 전체 실행은 부하로 1건 실패 · 재실행 전부 통과 — 기존 불안정 테스트 유형).
+- **확인하지 못한 것 / 배포 후:** 매장 경영자 Demo 로 「제품 진열 설정」이 보이는지, 「이미지 관리」 창에서 공용 이미지에 「공용」 표시 · 본인 이미지만 순서 · 삭제 가능한지(빈 화면 때문에 smoke 못 함). My Home(neture.co.kr) 약사 확인 체크 제거와 관리자 화면은 smoke 하지 않음.
+- **문서 정합:** 해당 없음.
+
+### 이어서 (같은 날 · 사용자 지시) — 기본 키오스크 표시 · 문의함 403 제거
+
+- **PR 묶음:** ① 기본 키오스크(web-store `ConsultationLauncher` 한 파일 + 테스트) — 위 제품 진열 설정 수정과 같은 PR. ② 문의함 403 제거(API `contact-inquiry` + `packages/shared-space-ui`) — 서버 경로 추가가 있으므로 별도 PR 권장(권한 판정은 바뀌지 않음). **API 와 화면이 같이 배포돼야 한다**(화면만 먼저 나가면 운영자에게 「문의 관리」 메뉴가 잠시 안 보임).
+- **기본 키오스크:** 「Demo 매장에 소비자 태블릿이 없다」의 원인 — 화면은 있으나 한 번도 저장하지 않은 매장의 기본 목록에 약사 · 근무자만 있고 키오스크가 빠져 있었다. 기본 목록에 「키오스크 1」을 넣고, 저장 전 상태에서 연결 코드를 만들면 목록을 먼저 저장한 뒤 코드를 만든다(서버는 저장된 키오스크만 연결 코드를 준다). 한국어 함께 보기 설정도 바로 보인다.
+- **문의함 403:** neture 머리글이 로그인한 모든 계정에 대해 문의함 건수(`…/contact-inquiries/summary`)를 물어 권한 없는 계정은 403 이 남았다. `GET /api/v1/admin/services/:serviceKey/contact-inquiries/inbox-access` 추가 — 기존 가드(`requireContactScope`)를 그대로 실행하되 403 이면 `{allowed:false}` 를 200 으로 답하고, 그 밖의 거절(404 · 503 등)은 원래 응답 그대로. 공용 훅 `useServiceContactCount` 가 이 경로를 쓰고 `allowed:false` 면 주기 재조회를 멈춘다(kpa-branch · lecture · pharmacy-coop · neture 공용). 기존 `summary` 는 그대로 둠.
+- **결정 사항(§9):** 가드를 화면에서 역할로 미리 거르지 않았다 — 접근은 중앙 위임 · 사업 배정 등 서버만 아는 조건이라 화면 판정은 운영자를 놓친다. 판정은 서버 그대로, 응답 형식만 바꿈.
+- **검증:** 격리 로컬 PostgreSQL 로 `contact-flow.postgres.spec` 새 테스트(허용 · 거부 · 없는 서비스) 통과. 같은 파일의 Neture 수신자 8건은 기존 fixture 결함(`u.businessInfo` 열 없음 · main 동일)으로 실패 — 이번 변경 무관. 그 밖의 contact-inquiry 테스트 통과. shared-space-ui 24 files / 225 통과. web-store 107 files / 1017 통과 · type-check 통과. api type-check 통과(`digital-signage-core` 패키지 재빌드 후 — 낡은 빌드 산출물 때문). web-neture · kpa-branch · lecture · pharmacy-coop type-check 통과. `check-unsafe-routes` 위반 0.
+- **배포 후:** 매장 경영자 Demo 로 neture.co.kr 에서 `inbox-access` 가 200 `allowed:false` 이고 403 이 없는지. store 상담 화면 소비자 태블릿 칸에 「키오스크 1」 과 한국어 함께 보기 설정이 보이는지(연결 코드는 누르지 않는다 — 운영 데이터 생성).
+
 ## 2026-11-13 · 내 매장 개선 이어서 — P1 일부 · P2 일부 (branch `claude/wizardly-bardeen-ldq332`)
 
 - **PR 묶음:** 바로 아래 P0 보안 보강과 같은 PR 로 묶어도 되고, 화면 정리(`f0271f00` 이후)만 별도 PR 로 나눠도 된다. P0 보안 커밋은 먼저 병합 · 배포 권장.
@@ -219,6 +296,52 @@
 - **배포 후 Demo 확인:** Demo 계정은 운영자 · 관리자 화면 권한이 없음 — 통합 담당이 운영자 화면에서 삭제 미완료 회원 선택 시 링크 · Admin 삭제 보류 시 빨간 안내를 확인.
 - **문서 정합:** 해당 없음.
 
+
+## 2026-11-13 · 이 영상의 제품 — 사이니지 영상 ↔ 제품 연결 (branch `claude/intelligent-cray-o2p4u3-product-video` · migration 포함)
+
+> 다음 실행자: **통합 세션** — 이 branch 로 PR. **migration lane**(AGENTS.md §4-3 R4): 다른 migration Ready PR 이 없을 때 Ready 로 둔다. 병합 뒤 **CLOUD** 가 [`WO-O4O-STORE-QR-TABLET-CHANNEL-SEPARATION-V1`](docs/work-orders/WO-O4O-STORE-QR-TABLET-CHANNEL-SEPARATION-V1.md) T5(태블릿 코너 제품 QR · 영상 보기)를 진행한다.
+
+- **결정 사항:**
+  - 2026-11-13 통합 담당이 `signage_media` 제품 열 migration 을 승인했다.
+  - 세션 판단:
+    - 외래 키를 두지 않는다. 쓰는 API 가 제품 존재와 범위를 확인한다.
+    - 매장은 자기 취급 제품(listing)으로만 연결한다.
+    - 운영자는 공용(HQ) 영상에, 공급자는 자기가 공급하는 제품만 연결한다.
+    - 매장이 가져온 사본(`parentMediaId`)은 원본의 연결을 「(원본)」으로 보이고 해제할 수 없다.
+    - 연결 제품 목록은 보조 정보라, 못 불러와도 영상 목록은 보인다.
+- **migration:**
+  - `1794550173646-AddSignageMediaProductMaster` — `ADD COLUMN "productMasterId" uuid NULL` + 부분 색인.
+  - 자동 판정(#1028 분류기)은 ADDITIVE 다. 따라서 Promote 승인 대상이 아니다.
+  - fingerprint `9611acea…`(7596 lines)는 격리 PostgreSQL 16 에서 baseline + incremental 1..62 를 실행해 얻었다. 직전 상태 `34b34a48…` 가 등록값과 일치하는 것을 먼저 확인했다. 실행 결과 `POST_MIGRATION_SCHEMA_ASSERTION = PASS`.
+- **검증:**
+  - api:
+    - `media-product-link.test.ts` 7/7(실제 schema · 다른 매장 · 공용 · 다른 서비스 영상 차단 포함)
+    - `signage-resource-id-validation.spec.ts` 93/93(UUID route census 30→32 · `/media/product-links` static route 회귀)
+    - schema 상태 jest 32 pass
+    - `tsc` 0
+  - `scripts/ci/__tests__/migration-safety.test.mjs` 31/31(새 migration 을 「알려진 추가형」 목록에 넣었다).
+  - web-store: `vitest src/pages` 83 files / 901 · `tsc` 0. 새 파일 ESLint 0.
+- **확인하지 못한 것:**
+  - `node scripts/db/check-migration-contract.mjs` — 이 세션의 명령 가드가 막았다. CI 가 같은 검사를 돈다.
+  - 배포 후 Demo 「매장 경영자」로 사이니지 → 동영상에서 확인할 것:
+    - 직접 등록한 영상 1개 → 「선택 영상 제품 연결」 → 취급 제품 선택 → 목록의 「연결 제품」 표시 → 해제.
+    - 공용 Demo 데이터이므로 확인 뒤 해제해 원복한다.
+- **2026-11-13 추가(같은 branch · 남은 부분 해소):**
+  - 운영자: 관리자 미디어 카탈로그의 제품 연결에 제품 이름 검색을 넣었다(용도 `product-video`). HQ 사이니지 영상 화면은 현재 쓰이지 않아 따로 만들지 않았다.
+  - 공급자:
+    - 「연결 상품」이 `productMasterId` 로도 저장된다. 서버가 공급 제품인지 확인한다(POST · PATCH).
+    - 기존 영상은 `metadata` 의 연결을 읽는다.
+  - 매장: 보관 영상 등록본과 가져온 사본도 원본의 연결 제품을 「(원본)」으로 보인다.
+  - 검증:
+    - api `media-product-link.test.ts` 8/8 · `signage-resource-id-validation` 93 · `tsc` 0
+    - web-store `vitest src/pages/pharmacy` 60 files / 695 · `tsc` 0
+    - web-neture vitest(CI config) 185 files / 1578 · `tsc` 0
+    - admin `ProductMasterPicker.test.tsx` 2/2 · `tsc` 오류 0
+    - 바뀐 파일 ESLint 0
+  - 배포 후 확인할 것:
+    - Admin 미디어 카탈로그 → 보관 영상 → 연결 유형 product → 제품 찾기 → 저장.
+    - neture 공급자 사이니지에서 연결 상품을 고른 뒤 저장한다. 그다음 매장 사이니지 목록의 「연결 제품」에 「(원본)」이 보이는지 확인한다(공급자 영상을 가져온 매장).
+- **겹칠 수 있는 PR:** #1049(상담 태블릿) — 겹치는 파일 없음.
 ## 2026-11-13 · 공급자 제품 등록 AI 보조 P1 검증·최소 보완 (branch `claude/focused-edison-ky4e3u`)
 
 - **근거 / PR 묶음:** [`WO-O4O-SUPPLIER-AI-ASSISTANCE-ROLLOUT-V1`](docs/work-orders/WO-O4O-SUPPLIER-AI-ASSISTANCE-ROLLOUT-V1.md) P1. 이 branch 단독 1 PR(web-neture 공급자 화면 · 서비스 PR). PR 은 만들지 않았다.
@@ -265,7 +388,13 @@
     - 콘텐츠 QR 은 출력하거나 담은 것만 목록에 올린다.
     - 제품 ↔ 영상은 `signage_media` 에 제품 열 하나를 둔다(설명서 본문에는 넣지 않는다).
 - **검증:** 문서만(`check-doc-sensitive` 통과).
-- **겹칠 수 있는 PR:** #1049(태블릿 구조 1단계) — 이 지시서는 코드를 바꾸지 않는다. T2 · T5 구현은 그 병합 뒤에 시작한다.
+- **2026-11-13 추가:**
+  - T4(`signage_media` 제품 열 migration)는 통합 담당이 승인했다.
+  - 현 상태 조사를 지시서 §7 에 넣었다.
+    - 태블릿 코너는 대부분 이미 있다.
+    - 빠진 것은 제품 QR 기본값(상품 대표 QR)과 제품 영상이다.
+    - 영상 저장소가 둘이다. `media_assets` 는 `media_entity_links` 로 제품 연결이 이미 되고, `signage_media` 는 연결이 없다.
+- **겹칠 수 있는 PR:** #1049(상담 태블릿) — 화면 세트와 무관하다. 겹치는 파일은 `App.tsx` · `store-workspace.test.tsx` 이고, 이 둘은 T2 에만 해당한다.
 
 ## 2026-11-13 · 상담 태블릿별 음성 자동 감지 언어 (branch `claude/wizardly-bardeen-ldq332`)
 

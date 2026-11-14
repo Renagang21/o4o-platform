@@ -93,7 +93,7 @@ it.each(["main", "supplier", "funding"])(
   async (profile) => {
     state.profile = profile;
     state.user.roles = ["platform:super_admin"];
-    state.get.mockResolvedValue({ data: { data: { newCount: 0 } } });
+    state.get.mockResolvedValue({ data: { data: { allowed: true, newCount: 0 } } });
     render(
       <MemoryRouter>
         <NetureGlobalHeader />
@@ -105,7 +105,7 @@ it.each(["main", "supplier", "funding"])(
 it("exposes CarePharm inquiries for a server-confirmed legacy business assignee", async () => {
   state.profile = "carepharm";
   state.user.roles = ["neture:operator"];
-  state.get.mockImplementation(async(path:string)=>({data:{data:path.includes('/operator-inbox/')?{contact:{pending:3},tasks:[]}:{newCount:3}}}));
+  state.get.mockImplementation(async(path:string)=>({data:{data:path.includes('/operator-inbox/')?{contact:{pending:3},tasks:[]}:{allowed:true,newCount:3}}}));
   render(
     <MemoryRouter>
       <NetureGlobalHeader />

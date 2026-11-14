@@ -114,3 +114,20 @@ it('shows the Korean-alongside state to staff members as text without a control'
   expect(within(kiosk).getByText('외국어 화면에 한국어 함께 보기: 꺼짐')).toBeTruthy();
   expect(within(kiosk).queryByRole('checkbox')).toBeNull();
 });
+
+it('shows a default kiosk before the first save and saves the list before creating its code', async () => {
+  api.read.mockResolvedValue({ organizationId: 'store', canEdit: true, configured: false, tablets: [] });
+  render(<ConsultationLauncher />);
+  const kiosk = await screen.findByRole('region', { name: '소비자 태블릿(키오스크)' });
+  expect(within(kiosk).getByText('키오스크 1')).toBeTruthy();
+  expect(within(kiosk).getByLabelText('키오스크 1 외국어 화면에 한국어 함께 보기')).toBeTruthy();
+  fireEvent.click(within(kiosk).getByRole('button', { name: '키오스크 1 연결 코드 만들기' }));
+  expect(await within(kiosk).findByText('ABCDE-12345')).toBeTruthy();
+  expect(api.save.mock.calls[0][0]).toEqual([
+    { id: 'pharmacist-1', role: 'pharmacist', name: '약사 태블릿 1' },
+    { id: 'staff-1', role: 'staff', name: '근무자 태블릿 1' },
+    { id: 'consumer-1', role: 'consumer', name: '키오스크 1' },
+  ]);
+  expect(api.pair).toHaveBeenCalledWith('consumer-1');
+  expect(api.save.mock.invocationCallOrder[0]).toBeLessThan(api.pair.mock.invocationCallOrder[0]);
+});
