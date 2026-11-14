@@ -24,6 +24,7 @@
 
 import { useEffect, useState } from 'react';
 import { GuidanceDialog } from './GuidanceDialog';
+import { ProductVideos, readProductVideos } from './ProductVideos';
 import { ContentRenderer } from '@o4o/content-editor';
 // WO-O4O-SCREEN-SET-PRODUCT-QR-SELECTION-V1: 태블릿과 동일한 QR 렌더를 재사용(qrcode.react 재도입 없음).
 import type { QrScreenSet, QrScreenSetSection } from './types';
@@ -104,6 +105,8 @@ interface ProductCard {
   // WO-O4O-SCREEN-SET-PRODUCT-QR-SELECTION-V1: 매장이 이 상품에 직접 고른 기존 QR 의 공개 URL.
   //   태블릿과 **같은 resolver 결과**를 쓰므로 두 화면의 QR 표시가 항상 일치한다. 미선택·비활성이면 없음.
   qrUrl?: string | null;
+  // WO-O4O-STORE-QR-TABLET-CHANNEL-SEPARATION-V1 T5: 이 제품의 영상(최대 3개). 태블릿과 같은 resolver 결과다.
+  videos?: unknown;
 }
 
 
@@ -201,6 +204,8 @@ export function PublicScreenSetViewer({ screenSet }: { screenSet: QrScreenSet })
               <button onClick={() => setOpenProduct(null)} style={styles.modalClose} aria-label="닫기">✕</button>
             </div>
             <div style={styles.modalBody}>
+              {/* WO-O4O-STORE-QR-TABLET-CHANNEL-SEPARATION-V1 T5: 태블릿과 같은 [영상 보기]. */}
+              <ProductVideos videos={readProductVideos(openProduct.videos)} />
               {openProduct.description ? (
                 <ContentRenderer html={openProduct.description} variant="guide" />
               ) : openProduct.short_description ? (

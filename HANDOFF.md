@@ -1,5 +1,66 @@
 # HANDOFF
 
+## 2026-11-14 · 운영 「AI 운영 리포트」 빈 화면 → AI 운영 관리 안내 (branch `claude/ecstatic-mendel-2ohu27-login` · 로그인 수정과 같은 PR)
+
+- **조사:** `/operations/neture/ai-report` 는 `AiReportPage` 를 `mode:'empty'` 로 고정해 「분석 데이터 준비 중」만 보였다(데이터 호출 없음 — 배포 문제 아님). 원래 지표(AI 응답 카드 노출)는 `ai-card-exposure.service.ts` 가 서버 메모리 배열에만 쌓아 재시작 · 다중 인스턴스에서 사라진다. 실제 저장되는 AI 호출 · 오류 · 토큰 · 비용은 Admin 설정 「AI 운영 관리」(`/settings`, `/api/ai/admin/usage` · `/ops/summary`).
+- **사용자 결정:** 안 A — 빈 리포트 대신 안내 · 링크. (B 운영자에게 사용량 표시 · C 카드 노출 DB 저장은 보류)
+- **한 일:** `CentralAiReportNotice.tsx` 신규(「설정 → AI 운영 관리」 안내 · `/settings` 링크 · 카드 노출 통계 미제공 안내). `central-operation-renderers.tsx` 의 `neture.ai-report` 가 이 화면을 렌더. 메뉴 · route 는 그대로(route 없는 메뉴 아님).
+- **결정 사항(§9):** 메뉴는 유지하고 안내로 바꿈 — 메뉴 제거는 운영자 메뉴 구성 변경이라 이번 범위 밖. `/settings` 는 `settings:read` 권한 화면이라 링크 옆에 「설정 조회 권한 필요」 표기.
+- **검증:** admin-dashboard vitest `src/pages/operators` 154 통과(신규 1건). `tsc --noEmit` · 변경 파일 ESLint 통과. 브라우저 확인 안 함.
+- **배포 후 확인:** `/operations/neture/ai-report` 에 안내와 링크가 보이고 링크가 AI 운영 관리로 열리는지.
+- **후속:** `@o4o/ui` 의 `AiReportPage` 는 다른 소비처가 있을 수 있어 그대로 둠. 서버 `/api/ai/card-report`(메모리 기반) 정리는 별도 판단.
+- **문서 정합:** 해당 없음.
+
+## 2026-11-14 · Admin 로그인 「Google 로그인을 준비하고 있습니다…」 오래 걸림 — 화면 안내 · 자동 재시도 (branch `claude/ecstatic-mendel-2ohu27-login`)
+
+- **branch:** 앞 branch `claude/ecstatic-mendel-2ohu27` 는 #1056 으로 병합됨 → 최신 `origin/main` 에서 새 branch(AGENTS §4-1(e)).
+- **조사:** 이 문구는 `/auth/google/config` 응답을 기다리는 단계(`apps/admin-dashboard/src/pages/auth/Login.tsx`). 브라우저 쪽 대기 · 직렬화 없음. warm 상태 응답 0.76~1.0초(`/health` 0.28초). API Cloud Run `--min-instances=0`(`deploy-api.yml`) → 유휴 후 첫 요청이 cold start 를 기다리는 것이 유력(운영 로그 미확인 — 클라우드 세션은 GCP 로그 불가).
+- **사용자 결정:** 안 A(화면 안내 · 자동 재시도)만 진행. 버튼 선표시(배포 설정 변경) · API 상시 1대(인프라 · 비용)는 통합 담당 결정 사항으로 보류.
+- **한 일 (`Login.tsx`):** 5초가 지나도 설정을 못 받으면 「서버를 깨우는 중입니다(최대 30초 정도)」 표시. 설정 요청은 최대 3회(실패 시 3초 뒤 다시 · 「다시 시도하고 있습니다 (n/3)」). 3회 모두 실패하면 「불러오지 못했습니다」 + 「다시 시도」 버튼.
+- **결정 사항(§9):** `getGoogleAuthConfig` 는 실패와 미설정을 모두 `{enabled:false}` 로 돌려줘 구분할 수 없으므로 두 경우 모두 같은 횟수만큼 다시 묻는다(미설정이면 약 6초 뒤 안내). 공용 `@o4o/auth-client` 는 바꾸지 않음.
+- **검증:** admin-dashboard vitest `src/pages/auth` · `admin-legacy-route-api-and-navigation-closure` 90 통과(신규 3건 — 5초 안내 · 자동 재시도 성공 · 3회 실패 후 수동 재시도). `tsc --noEmit` · 변경 파일 ESLint 통과. 실제 브라우저 · cold start 재현 안 함.
+- **배포 후 확인:** 한동안(15분 이상) 사용이 없던 뒤 `https://admin.neture.co.kr/login` 을 열어 5초 뒤 안내가 뜨는지, 버튼이 결국 뜨는지.
+- **PR 묶음:** 단독 1 PR(admin 화면 · lane 해당 없음). 겹칠 수 있는 PR 미대조.
+- **후속 제안:** 근본 해결은 API `--min-instances=1`(배포 인프라 · 비용 — 통합 담당). cold start 확정은 로컬 세션에서 Cloud Run 요청 지연 · 인스턴스 기동 로그 조회.
+- **문서 정합:** 해당 없음.
+
+## 2026-11-14 · 태블릿 코너 제품 [영상 보기] (branch `claude/intelligent-cray-o2p4u3-tablet-video` · API + tablet-kiosk-core)
+
+> 다음 실행자: **통합 세션** — 이 branch 로 PR. 선행 #1058(이 영상의 제품 · migration)은 2026-11-14 병합했다(`4ed07a6`). [`WO-O4O-STORE-QR-TABLET-CHANNEL-SEPARATION-V1`](docs/work-orders/WO-O4O-STORE-QR-TABLET-CHANNEL-SEPARATION-V1.md) T5 · D7.
+
+- **결정 사항:**
+  - 2026-11-14 통합 담당이 「#1058 해결」을 지시했다. 그에 따라 이 세션이 #1058 을 병합했다.
+    - 병합 전 확인 1: 통합 세션이 다시 매긴 epoch(`1794624815975`)와 fingerprint(`ed1759a…`, 7670 lines)를 격리 DB 에서 다시 확인했다(PASS).
+    - 병합 전 확인 2: main 이 PR 기준점 이후 움직이지 않았다.
+    - 병합 전 확인 3: PR CI(CI Gate 포함) 성공.
+  - 세션 판단:
+    - 제품당 영상은 최대 3개다. 순서는 이 매장이 등록한 영상이 먼저이고, 그다음 서비스 공용(운영자 · 공급자) 영상이며, 각각 최근 것이 먼저다.
+    - 매장이 가져온 사본은 원본 영상의 연결을 따른다.
+    - 활성(`active`) 영상만 보인다.
+    - 누르기 전에는 재생기를 띄우지 않는다.
+- **한 일:**
+  - API: 화면 세트 제품 목록(명시 선택)에 `videos` 를 싣는다(`resolveProductVideos`). 판정은 #1058 의 `effectiveProductSql` 을 그대로 쓴다. 공개 경로라 읽기 전용이다.
+  - tablet-kiosk-core: 새 `ProductVideos`(▶ 영상 보기 / 여러 개면 제목 · 기존 `VideoPlayback` 재사용). 태블릿 상품 상세와 코너 QR 모바일 상품 상세에 넣었다.
+- **검증:**
+  - api `store-public/__tests__`(영상 · 대표 QR) + 태블릿 계약 spec 36 pass. 실제 schema 에서 확인한 것:
+    - 다른 매장 · 초안 · 다른 서비스 · 다른 제품 영상 제외
+    - 3개 상한
+    - 쓰기 0
+  - api `tsc` 0
+  - web-store 태블릿 vitest 6 files / 81(새 3) · `tsc` 0 · ESLint 0
+- **배포 후 확인:**
+  - 준비: Demo 「매장 경영자」로 사이니지 동영상 하나를 취급 제품에 연결한다(#1058 화면). 공용 데이터라 확인 뒤 해제한다.
+  - 확인: 그 제품을 넣은 태블릿 코너(제품 진열형)의 상품 상세에 [▶ 영상 보기]가 보이고 재생되는지.
+## 2026-11-14 · 음성 자동 감지 언어 선택이 늦은 effect 에 덮어써지는 문제 (branch `claude/epic-rubin-5g04vm`)
+
+- **다음 실행자:** 통합 세션 — 이 branch 로 PR · 병합. web-store 화면 1파일만 바뀐다.
+- **배경:** main `4ed07a69`(#1058 병합) CI 의 `Web production build (affected)` 가 `ConsultationLauncher.test.tsx` 「up to three speech auto-detect languages」에서 attempt 1 · 2 모두 실패해 Delivery `BLOCKED_CI`. 같은 테스트가 오늘 #1061 PR CI 에서도 실패했다(54행 `영어` disabled 기대).
+- **원인:** `SpeechCandidates` 가 저장값 변경을 `useEffect(() => setDraft(...))` 로 맞춘다. 이 passive effect 가 늦게 실행되면 그 사이 사용자가 고른 체크(draft)를 저장값으로 덮어쓴다. CI 부하에서만 순서가 바뀌어 간헐 실패했고, 실제 화면에서도 저장 직후 빠르게 고르면 선택이 사라질 수 있다.
+- **한 일:** effect 대신 렌더 중 동기화(이전 저장값을 state 로 들고 바뀌면 그 렌더에서 draft 를 맞춤)로 바꿨다. `<details>` 열림 상태는 그대로 유지된다.
+- **검증:** web-store `src/pages/pharmacy/consultation/` 10 files · 65 tests, web-store 전체 `vitest run --maxWorkers=2` 107 files · 1016 tests, `tsc --noEmit` 0, ESLint 통과. 실패는 CI 부하에서만 재현돼 로컬에서 실패→통과를 재현하지는 못했다.
+- **확인하지 못한 것:** CI 부하에서의 재발 여부 — 병합 후 main CI 로 확인. #1058 배포(`BLOCKED_CI`)는 이 PR 병합 후 main CI 통과 → Delivery 판정(migration 포함이라 HOLD 예상) → promote 순서.
+- **결정 사항:** 이전 이 branch 의 작업(#1046 · #1047)은 병합돼 원격 branch 가 지워져 있어, 최신 `origin/main` 에서 같은 이름으로 다시 시작했다.
+
 ## 2026-11-14 · 사진 거래장 실제 저장 · O4O/ChatGPT 연결 (branch `wo/photo-ledger-chat-integration`)
 
 - **다음 실행자:** 통합 담당 — 이 branch로 PR·계약/migration 검토·병합·배포. A 커밋을 포함했으므로 `wo/photo-ledger-review-core`는 별도 병합하지 않는다. main `c649e8bbf` 기준. 현재 열린 #1058(signage 제품 연결)과 겹치는 경로: `HANDOFF.md`, `apps/api-server/src/database/incremental/expected-schema-states.ts`, `apps/api-server/src/database/incremental/manifest.ts`. 공유 경로 충돌은 양쪽 내용을 유지하고 migration prefix를 다시 검증한다.

@@ -52,6 +52,7 @@ import { MediaSequence } from './MediaSequence';
  */
 
 import { GuidanceDialog } from './GuidanceDialog';
+import { ProductVideos, readProductVideos, type ProductVideoItem } from './ProductVideos';
 import { useEffect, useReducer, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 // WO-O4O-KPA-TABLET-PRODUCT-DESCRIPTION-RICH-RENDER-V1: canonical 상품설명 HTML 안전 렌더(DOMPurify)
@@ -111,6 +112,8 @@ type Mode = 'browse' | 'detail' | 'submitted' | 'error' | 'idle';
 
 /** idle 진입이 허용된 mode (polling/error 중 진입 금지) */
 const IDLE_ENTERABLE_MODES: ReadonlyArray<Mode> = ['browse', 'detail'];
+/** 제품 영상이 열려 있을 때 대기화면 전환까지 기다리는 상한(15분). 재생 · 일시정지 상태는 iframe 재생기마다 달라 상한으로 묶는다. */
+const PRODUCT_VIDEO_IDLE_MS = 15 * 60_000;
 
 /** image 항목 default 노출 시간 */
 const DEFAULT_IDLE_IMAGE_DURATION_MS = 5000;
@@ -136,6 +139,8 @@ interface DisplayProduct {
   selectedContentTranslations?: Record<string, TabletContentTranslation> | null;
   // WO-O4O-SCREEN-SET-PRODUCT-QR-SELECTION-V1: 매장이 이 상품에 직접 고른 기존 QR 의 공개 URL(미선택/비활성이면 없음).
   qrUrl?: string | null;
+  // WO-O4O-STORE-QR-TABLET-CHANNEL-SEPARATION-V1 T5: 이 제품의 영상(서버가 「이 영상의 제품」으로 찾아 준 것, 최대 3개).
+  videos?: ProductVideoItem[];
 }
 
 // ── Reducer (internal) ──
@@ -337,7 +342,7 @@ function mapSectionProduct(p: any): DisplayProduct {
       qrUrl,
     };
   }
-  return { ...mapSupplierProduct(p as TabletProduct), qrUrl };
+  return { ...mapSupplierProduct(p as TabletProduct), qrUrl, videos: readProductVideos(p?.videos) };
 }
 
 // ── Component ──
@@ -445,6 +450,7 @@ export function TabletKioskPage({
   // Side-effect refs (reducer 외부에서 관리 — polling interval, auto-reset timeout)
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const idleRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [productVideoPlaying, setProductVideoPlaying] = useState(false);
 
   // Browse 자동 넘김 (WO-O4O-KPA-TABLET-BROWSE-AUTO-SLIDE-V1)
   //   displaySettings.autoSlideSeconds>0 + browse + 제품 2개+ 일 때만 현재 강조 카드를 순환.
@@ -702,10 +708,13 @@ export function TabletKioskPage({
     const armTimer = () => {
       if (timer) clearTimeout(timer);
       if (isIdleEnterable) {
+        const reading = screen?.mode === 'screen_set' && (mode === 'detail' || openContentCard || qrModalOpen || productQrZoom);
+        const base = reading ? Math.max(idleTimeoutMs, 120_000) : idleTimeoutMs;
         timer = setTimeout(() => {
           setOpenContentCard(null); setQrModalOpen(false); setProductQrZoom(null);
           dispatch({ type: 'IDLE_ENTER' });
-        }, screen?.mode === 'screen_set' && (mode === 'detail' || openContentCard || qrModalOpen || productQrZoom) ? Math.max(idleTimeoutMs, 120_000) : idleTimeoutMs);
+          // 제품 영상이 열려 있으면 가만히 시청하는 것을 고려해 상한까지 기다린다. 일시정지 · 오류 상태로 떠나도 상한 뒤에는 돌아간다.
+        }, productVideoPlaying ? Math.max(base, PRODUCT_VIDEO_IDLE_MS) : base);
       }
     };
 
@@ -731,7 +740,7 @@ export function TabletKioskPage({
       window.removeEventListener('keydown', handleInteraction);
       window.removeEventListener('wheel', handleInteraction);
     };
-  }, [idleTimeoutMs, mode, screen?.mode, openContentCard, qrModalOpen, productQrZoom]);
+  }, [idleTimeoutMs, mode, screen?.mode, openContentCard, qrModalOpen, productQrZoom, productVideoPlaying]);
 
   const statusLabels: Record<string, { label: string; color: string; message: string }> = {
     REQUESTED: { label: '요청 접수됨', color: '#eab308', message: '직원이 곧 확인합니다. 잠시 기다려주시기 바랍니다.' },
@@ -854,6 +863,9 @@ export function TabletKioskPage({
                 ))}
               </div>
             )}
+
+            {/* WO-O4O-STORE-QR-TABLET-CHANNEL-SEPARATION-V1 T5: 이 제품의 영상이 있으면 [영상 보기]. */}
+            <ProductVideos videos={selectedProduct.videos} onPlayingChange={setProductVideoPlaying} />
 
             {/* WO-O4O-KPA-TABLET-DISPLAY-CONTENT-SELECTION-V1 (+ MULTILINGUAL BRIDGE):
                 우선순위 = 선택 언어 번역 → 기본 선택콘텐츠 → 기존 제품 description/summary.
