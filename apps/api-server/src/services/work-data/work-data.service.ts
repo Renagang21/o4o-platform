@@ -101,7 +101,13 @@ export class WorkDataService {
       const [row] = await db.query(`INSERT INTO assistant_work_data_consents(owner_key,user_id,organization_id,granted_by,epoch,enabled,storage_mode,source_device_id)
         VALUES($1,$2,$3,$4,$5,$6,$7,$8) ON CONFLICT(owner_key) DO UPDATE SET enabled=excluded.enabled,epoch=excluded.epoch,
         granted_by=excluded.granted_by,storage_mode=excluded.storage_mode,source_device_id=excluded.source_device_id,transfer_error=NULL,updated_at=now() RETURNING *`,[owner.key,owner.userId,owner.organizationId,userId,epoch,enabled,storageMode,source]);
-      if (!enabled || oldState.storageMode==='stopped') await db.query('DELETE FROM assistant_work_data_records WHERE owner_key=$1',[owner.key]);
+      if (!enabled || oldState.storageMode==='stopped') {
+        await db.query('DELETE FROM assistant_work_data_records WHERE owner_key=$1',[owner.key]);
+        if (owner.organizationId) {
+          await db.query("DELETE FROM product_candidates WHERE organization_id=$1 AND source_type='external_api' AND candidate_status='pending' AND source_id IN (SELECT id FROM photo_transaction_invoices WHERE organization_id=$1)",[owner.organizationId]);
+          await db.query('DELETE FROM photo_transaction_invoices WHERE organization_id=$1',[owner.organizationId]);
+        }
+      }
       return consentOf(row);
     });
   }

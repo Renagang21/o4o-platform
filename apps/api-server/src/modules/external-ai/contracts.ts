@@ -1,3 +1,4 @@
+import {ledgerScopes,ledgerToolSchemas} from '../../services/transaction-ledger/contracts.js';
 import { z } from "zod";
 import {
   mailScopes,
@@ -9,7 +10,7 @@ import {
   STORE_PRODUCT_TARGET_KINDS,
 } from "../../services/store/store-product-content.service.js";
 
-export const scopes = ["o4o:read", "o4o:draft:write", ...mailScopes] as const;
+export const scopes = ["o4o:read", "o4o:draft:write", ...mailScopes, ...ledgerScopes] as const;
 export const targetKinds = [
   "supplier",
   "store",
@@ -191,6 +192,7 @@ export const productContentTools = new Set<string>([
 ]);
 export const toolSchemas = {
   ...mailToolSchemas,
+  ...ledgerToolSchemas,
   list_workspaces: z.object({}).strict(),
   search_products: searchInput,
   get_product_context: productInput,
@@ -206,6 +208,7 @@ export const toolSchemas = {
 export type ToolName = keyof typeof toolSchemas;
 export const writeTools = new Set<ToolName>([
   ...mailWriteTools,
+  "prepare_transaction_invoice",
   "save_content_draft",
   "update_content_draft",
   "save_product_content_draft",

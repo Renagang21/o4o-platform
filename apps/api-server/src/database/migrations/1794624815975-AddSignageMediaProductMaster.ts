@@ -7,8 +7,8 @@ import type { MigrationInterface, QueryRunner } from 'typeorm';
  * 외래 키는 두지 않는다 — 쓰는 쪽(매장 · 운영자 · 공급자 API)이 제품 존재 · 범위를 확인하고,
  * 읽는 쪽은 product_masters 와 JOIN 해 없는 제품을 무시한다. 영상 삭제 · 제품 정리에 서로 묶이지 않는다.
  */
-export class AddSignageMediaProductMaster1794550173646 implements MigrationInterface {
-  name = 'AddSignageMediaProductMaster1794550173646';
+export class AddSignageMediaProductMaster1794624815975 implements MigrationInterface {
+  name = 'AddSignageMediaProductMaster1794624815975';
 
   async up(q: QueryRunner): Promise<void> {
     await q.query('ALTER TABLE signage_media ADD COLUMN IF NOT EXISTS "productMasterId" uuid NULL');

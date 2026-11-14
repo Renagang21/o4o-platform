@@ -164,3 +164,14 @@ describe("external AI consent", () => {
     ).toBe(true);
   });
 });
+
+it('keeps ledger grants opt-in and separate from ordinary drafts',async()=>{
+ vi.mocked(approveExternalConsent).mockResolvedValue('#connected');
+ vi.mocked(getExternalConsent).mockResolvedValue({clientName:'Fixture AI',scopes:['o4o:read','o4o:draft:write','o4o:ledger:read','o4o:ledger:write'],workspaces:[{id:'store:synthetic',name:'합성 매장',writable:true}]});
+ render(<MemoryRouter initialEntries={['/external-ai/connect?request=fixture-request']}><ExternalAiConsentPage/></MemoryRouter>);
+ await screen.findByLabelText('거래장 조회');
+ expect((screen.getByLabelText('거래장 조회') as HTMLInputElement).checked).toBe(false);
+ expect((screen.getByLabelText('거래명세서 초안 서버 저장·수정') as HTMLInputElement).disabled).toBe(true);
+ fireEvent.click(screen.getByLabelText('합성 매장'));fireEvent.click(screen.getByLabelText('거래장 조회'));fireEvent.click(screen.getByLabelText('거래명세서 초안 서버 저장·수정'));fireEvent.click(screen.getByText('선택한 범위로 연결'));
+ await waitFor(()=>expect(approveExternalConsent).toHaveBeenCalledWith('fixture-request',['store:synthetic'],['o4o:read','o4o:ledger:read','o4o:ledger:write'],false));
+});

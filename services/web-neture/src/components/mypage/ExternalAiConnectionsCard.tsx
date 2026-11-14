@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import ChatgptWorkGuide from "./ChatgptWorkGuide";
 import {
   listExternalConnections,
   revokeExternalConnection,
@@ -54,6 +55,7 @@ export default function ExternalAiConnectionsCard() {
       <p className="text-sm text-gray-600">
         외부 AI에서 허용한 O4O 자료를 조회하고 콘텐츠 초안을 저장할 수 있습니다.
       </p>
+      <ChatgptWorkGuide />
       {message && <p role="status">{message}</p>}
       {!items && !message && <p role="status">연결을 확인하는 중입니다.</p>}
       {items?.length === 0 && (

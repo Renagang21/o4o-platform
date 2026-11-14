@@ -1,5 +1,50 @@
 # HANDOFF
 
+## 2026-11-14 · 사진 거래장 실제 저장 · O4O/ChatGPT 연결 (branch `wo/photo-ledger-chat-integration`)
+
+- **다음 실행자:** 통합 담당 — 이 branch로 PR·계약/migration 검토·병합·배포. A 커밋을 포함했으므로 `wo/photo-ledger-review-core`는 별도 병합하지 않는다. main `c649e8bbf` 기준. 현재 열린 #1058(signage 제품 연결)과 겹치는 경로: `HANDOFF.md`, `apps/api-server/src/database/incremental/expected-schema-states.ts`, `apps/api-server/src/database/incremental/manifest.ts`. 공유 경로 충돌은 양쪽 내용을 유지하고 migration prefix를 다시 검증한다.
+- **한 일:** 실제 초안/사진/수정 이력/확정 저장, 동시 중복 차단과 후보 동시 전달, 거래장 별도 scope/동의, MCP 준비·조회·목록, O4O main의 사진 판독→초안, PC·모바일 검토/수정/직접 반영 화면. 서버 중단·탈퇴 attribution·폐업 분류/쓰기 fence 포함.
+- **Core 계약 변경:** migration `CreatePhotoTransactionLedger1794618000000`(신규 4테이블), manifest/측정한 expected state, REST/MCP additive API·ledger read/write scope 2개, multimodal 출력 한도 선택 인자(기존 기본값 유지). 운영 DB·시크릿·CI·dependency·Identity/Frozen·상품 정본은 수정하지 않았다. 운영 migration/배포는 실행하지 않았다.
+- **결정 사항:** 원본이 O4O에 전달되지 않는 ChatGPT 첨부는 미보관으로 표시하고 직접 확인 또는 사진 추가를 받는다. 최종 확정 MCP는 제공하지 않고 O4O 로그인+정식 Origin에서만 확인한다. 공통 상품 미등록도 허용하며 가격·사진을 제외한 상품 관찰만 기존 관리자 pending 후보로 보낸다. 프로그램 등록 상태를 기록하며 프로그램 수집본과 자동 합산하지 않는다(상품별 자동 대조는 후속). 기존 후보의 도메인별 승격 게이트를 유지한다.
+- **검증:** 거래장 6 suites/49 tests, 기존 외부 AI/server work 10 suites/99, UI 4 files/20. API·web-neture tsc·web-neture build·변경 ESLint·migration contract 통과. PostgreSQL 15 canonical 전체 prefix·빈 down/up 검증. PC 1280px·모바일 390px 실제 컴포넌트+API fixture로 수정/확인/반영·사진 추가·로그인/동의 오류 확인. 테스트 업무 행 0 확인. 실모델·실OAuth·운영 전체 사용은 미실행.
+- **배포 후:** migration 먼저 적용, API+web-neture 배포, Demo 경영자 서버 보관/승인 직원/타매장/철회/모바일 확인, ChatGPT 도구 갱신·새 ledger 동의로 재연결, 실제 전체 명세서의 사용자 확인 시험. 기존 main에 새 migration이 들어오면 prefix·fingerprint를 재측정할 것.
+- **문서 정합:** [사용 안내](docs/guides/O4O-CHATGPT-WORK-QUICKSTART-V1.md)·[WO](docs/work-orders/WO-O4O-PHOTO-TRANSACTION-LEDGER-V1.md) 현행화, [CHECK](docs/checks/CHECK-O4O-PHOTO-LEDGER-CHAT-INTEGRATION-V1.md)에 증거/미실행 범위 기록.
+
+## 2026-11-14 · 사진 거래장 입력 공통 처리부 (branch `wo/photo-ledger-review-core`)
+
+- **범위:** 사용자 요청에 따라 QR 제외, 사진만 처리. 3차-A 공통 검증·현재 revision 확인 준비·중복 조회 힌트·관리자 상품 정비 후보 반환 함수를 구현했다. 실제 저장 API·인증·화면은 후속 B·C다. 저장 완료로 안내하지 않는다.
+- **결정 사항:** 기존 프로그램 origin·상품/포장 참조가 필요한 purchase 경로를 우회하지 않았다. 공통 상품이 없어도 확인 준비가 되며 상품 DB 자동 등록·수정은 없다. 실제 사용자 사진을 공개 저장소에 복사하지 않았다.
+- **검증:** 합성 명세서 Jest 20건·처리부 strict TypeScript·변경 파일 ESLint 통과. UI/route가 없어 브라우저 검증 해당 없음. 원본 프로그램 계약과 운영 DB는 변경하지 않았다.
+- **다음 실행자:** 통합 세션은 이 branch의 PR·검사·병합 담당. 개발 후속은 [사진 거래장 WO](docs/work-orders/WO-O4O-PHOTO-TRANSACTION-LEDGER-V1.md) B(원본·저장 계약·권한·중복 대조·상품 후보 연결), C(양쪽 채팅 연결). 할인·반올림 조정 근거를 먼저 확장할 것.
+- **문서 정합:** [사용 안내](docs/guides/O4O-CHATGPT-WORK-QUICKSTART-V1.md)에 사진만 입력·공통 상품 연결 비필수·미연결 범위 반영. 이전 체크는 당시 기록으로 유지.
+- **문서 정합:** [사용 안내](docs/guides/O4O-CHATGPT-WORK-QUICKSTART-V1.md)에 사진만 입력·공통 상품 연결 비필수·미연결 범위 반영 — 통합 세션이 AGENTS.md §4-3 R6 에 따라 문서 전용 branch `wo/chatgpt-quickstart-photo-ledger-docs` 로 분리. 이전 체크는 당시 기록으로 유지.
+
+## 2026-11-14 · ChatGPT 연결 안내 · 거래명세서 문서 보관 시험 (branch `wo/chatgpt-entry-invoice-trial`)
+
+- **다음 실행자:** 통합 세션 — 이 branch로 PR·검사·병합·배포. 개발 세션은 PR·배포·운영 DB 쓰기를 실행하지 않았다.
+- **범위:** 사용자 요청의 새 1차·2차. 기존 비용 검증 회차와 구분한다. 설정의 외부 AI 연결 카드에 접이식 안내·요청 예제 3개·복사 기능, MCP 도구 설명 3개 보완. 새 분류기·모델 호출·권한/스키마 변경 없음.
+- **검증:** API 4 suites / 50, UI 3 files / 14, API·web-neture TypeScript, 변경 파일 ESLint 통과. 실제 컴포넌트 + 응답 fixture로 PC 1280px·모바일 390px의 연결 3상태 안내·복사·넘침을 확인했다. 전체 배포 UI 확인은 별도.
+- **명세서:** 합성 이미지의 불명확한 값을 남기고 사용자 정정을 가정한 표를 실제 dispatcher·store adapter·자료함 검증 함수로 저장·재조회했다. 메모리 저장소 대역과 모의 권한 resolver를 사용했으며 실제 SQL/ChatGPT 파일 판독/운영 저장 시험이 아니다. 실제 파일을 받으면 사용자 확인 후 목적 있는 실제 문서로 보관 시험을 진행한다. 운영 임시 자료 생성 없음.
+- **다음:** 배포 후 `/mypage/settings` Demo 경영자·근무자 PC·모바일 smoke. 실제 거래장 원장 반영은 3차, 주문 제안→수정→사이트별 장바구니는 4차, 사이트 방법 재사용은 5차. 기존 원장 입력의 원본 제한을 우회하지 않는다.
+- **통합 주의:** 현재 열려 있는 #1058은 signage 제품 연결로 변경 경로 겹침 없음. main `5590df0f`에서 시작. HANDOFF 상단 충돌은 양쪽 기록을 유지한다.
+- **문서 정합:** [사용 안내](docs/guides/O4O-CHATGPT-WORK-QUICKSTART-V1.md)와 [검증 기록](docs/checks/CHECK-O4O-CHATGPT-ENTRY-INVOICE-TRIAL-V1.md)을 새로 작성해 문서 보관과 원장 반영의 범위를 구분했다.
+
+
+
+## 2026-11-13 · QR 목록에서 태블릿 코너 QR 분리 (branch `claude/intelligent-cray-o2p4u3-qr-tab` · web-store 화면만)
+
+> 다음 실행자: **통합 세션** — 이 branch 로 PR. [`WO-O4O-STORE-QR-TABLET-CHANNEL-SEPARATION-V1`](docs/work-orders/WO-O4O-STORE-QR-TABLET-CHANNEL-SEPARATION-V1.md) T3 의 첫 부분(D3).
+
+- **한 일:**
+  - QR 목록의 기본 필터 「전체」를 「매장 QR」로 바꿨다. 매장이 직접 만든 QR 만 보인다.
+  - 태블릿 코너 QR(화면 세트 저장 시 자동 생성)은 「태블릿 코너」를 고를 때만 보인다.
+  - 업무 화면에서 특정 QR 을 열고 들어온 경우에는 코너 QR 도 그대로 보인다.
+  - 활성 · 보관 건수와 출력 · 데이터는 바꾸지 않았다.
+  - 직접 만든 QR 이 없고 코너 QR 만 있으면 빈 목록 대신 「태블릿 코너에서 볼 수 있습니다」라고 안내한다.
+- **남긴 것(T3 나머지):** 「콘텐츠 연결」 QR 만들기 제거와 콘텐츠 화면의 「QR 출력 · 목록에 담기」(D5). 콘텐츠별 고정 QR 이 먼저 필요해 다음 단계로 둔다.
+- **검증:**
+  - 새 `qr/qrListFilter.test.ts` 3 · web-store `vitest src/pages` 84 files / 905 · `tsc` 0
+  - 배포 후 Demo 「매장 경영자」로 `/store/marketing/qr?workspace=studio` 에서 확인할 것: 「매장 QR」 개수와 「태블릿 코너」 개수의 합이 예전 「전체」와 같은지.
 ## 2026-11-13 · 내 매장 개선 이어서 — P1 일부 · P2 일부 (branch `claude/wizardly-bardeen-ldq332`)
 
 - **PR 묶음:** 바로 아래 P0 보안 보강과 같은 PR 로 묶어도 되고, 화면 정리(`f0271f00` 이후)만 별도 PR 로 나눠도 된다. P0 보안 커밋은 먼저 병합 · 배포 권장.
