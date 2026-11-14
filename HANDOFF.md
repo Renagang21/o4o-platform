@@ -24,6 +24,43 @@
 - **후속 제안:** 근본 해결은 API `--min-instances=1`(배포 인프라 · 비용 — 통합 담당). cold start 확정은 로컬 세션에서 Cloud Run 요청 지연 · 인스턴스 기동 로그 조회.
 - **문서 정합:** 해당 없음.
 
+## 2026-11-14 · 태블릿 코너 제품 [영상 보기] (branch `claude/intelligent-cray-o2p4u3-tablet-video` · API + tablet-kiosk-core)
+
+> 다음 실행자: **통합 세션** — 이 branch 로 PR. 선행 #1058(이 영상의 제품 · migration)은 2026-11-14 병합했다(`4ed07a6`). [`WO-O4O-STORE-QR-TABLET-CHANNEL-SEPARATION-V1`](docs/work-orders/WO-O4O-STORE-QR-TABLET-CHANNEL-SEPARATION-V1.md) T5 · D7.
+
+- **결정 사항:**
+  - 2026-11-14 통합 담당이 「#1058 해결」을 지시했다. 그에 따라 이 세션이 #1058 을 병합했다.
+    - 병합 전 확인 1: 통합 세션이 다시 매긴 epoch(`1794624815975`)와 fingerprint(`ed1759a…`, 7670 lines)를 격리 DB 에서 다시 확인했다(PASS).
+    - 병합 전 확인 2: main 이 PR 기준점 이후 움직이지 않았다.
+    - 병합 전 확인 3: PR CI(CI Gate 포함) 성공.
+  - 세션 판단:
+    - 제품당 영상은 최대 3개다. 순서는 이 매장이 등록한 영상이 먼저이고, 그다음 서비스 공용(운영자 · 공급자) 영상이며, 각각 최근 것이 먼저다.
+    - 매장이 가져온 사본은 원본 영상의 연결을 따른다.
+    - 활성(`active`) 영상만 보인다.
+    - 누르기 전에는 재생기를 띄우지 않는다.
+- **한 일:**
+  - API: 화면 세트 제품 목록(명시 선택)에 `videos` 를 싣는다(`resolveProductVideos`). 판정은 #1058 의 `effectiveProductSql` 을 그대로 쓴다. 공개 경로라 읽기 전용이다.
+  - tablet-kiosk-core: 새 `ProductVideos`(▶ 영상 보기 / 여러 개면 제목 · 기존 `VideoPlayback` 재사용). 태블릿 상품 상세와 코너 QR 모바일 상품 상세에 넣었다.
+- **검증:**
+  - api `store-public/__tests__`(영상 · 대표 QR) + 태블릿 계약 spec 36 pass. 실제 schema 에서 확인한 것:
+    - 다른 매장 · 초안 · 다른 서비스 · 다른 제품 영상 제외
+    - 3개 상한
+    - 쓰기 0
+  - api `tsc` 0
+  - web-store 태블릿 vitest 6 files / 81(새 3) · `tsc` 0 · ESLint 0
+- **배포 후 확인:**
+  - 준비: Demo 「매장 경영자」로 사이니지 동영상 하나를 취급 제품에 연결한다(#1058 화면). 공용 데이터라 확인 뒤 해제한다.
+  - 확인: 그 제품을 넣은 태블릿 코너(제품 진열형)의 상품 상세에 [▶ 영상 보기]가 보이고 재생되는지.
+## 2026-11-14 · 음성 자동 감지 언어 선택이 늦은 effect 에 덮어써지는 문제 (branch `claude/epic-rubin-5g04vm`)
+
+- **다음 실행자:** 통합 세션 — 이 branch 로 PR · 병합. web-store 화면 1파일만 바뀐다.
+- **배경:** main `4ed07a69`(#1058 병합) CI 의 `Web production build (affected)` 가 `ConsultationLauncher.test.tsx` 「up to three speech auto-detect languages」에서 attempt 1 · 2 모두 실패해 Delivery `BLOCKED_CI`. 같은 테스트가 오늘 #1061 PR CI 에서도 실패했다(54행 `영어` disabled 기대).
+- **원인:** `SpeechCandidates` 가 저장값 변경을 `useEffect(() => setDraft(...))` 로 맞춘다. 이 passive effect 가 늦게 실행되면 그 사이 사용자가 고른 체크(draft)를 저장값으로 덮어쓴다. CI 부하에서만 순서가 바뀌어 간헐 실패했고, 실제 화면에서도 저장 직후 빠르게 고르면 선택이 사라질 수 있다.
+- **한 일:** effect 대신 렌더 중 동기화(이전 저장값을 state 로 들고 바뀌면 그 렌더에서 draft 를 맞춤)로 바꿨다. `<details>` 열림 상태는 그대로 유지된다.
+- **검증:** web-store `src/pages/pharmacy/consultation/` 10 files · 65 tests, web-store 전체 `vitest run --maxWorkers=2` 107 files · 1016 tests, `tsc --noEmit` 0, ESLint 통과. 실패는 CI 부하에서만 재현돼 로컬에서 실패→통과를 재현하지는 못했다.
+- **확인하지 못한 것:** CI 부하에서의 재발 여부 — 병합 후 main CI 로 확인. #1058 배포(`BLOCKED_CI`)는 이 PR 병합 후 main CI 통과 → Delivery 판정(migration 포함이라 HOLD 예상) → promote 순서.
+- **결정 사항:** 이전 이 branch 의 작업(#1046 · #1047)은 병합돼 원격 branch 가 지워져 있어, 최신 `origin/main` 에서 같은 이름으로 다시 시작했다.
+
 ## 2026-11-14 · 사진 거래장 실제 저장 · O4O/ChatGPT 연결 (branch `wo/photo-ledger-chat-integration`)
 
 - **다음 실행자:** 통합 담당 — 이 branch로 PR·계약/migration 검토·병합·배포. A 커밋을 포함했으므로 `wo/photo-ledger-review-core`는 별도 병합하지 않는다. main `c649e8bbf` 기준. 현재 열린 #1058(signage 제품 연결)과 겹치는 경로: `HANDOFF.md`, `apps/api-server/src/database/incremental/expected-schema-states.ts`, `apps/api-server/src/database/incremental/manifest.ts`. 공유 경로 충돌은 양쪽 내용을 유지하고 migration prefix를 다시 검증한다.
@@ -222,6 +259,52 @@
 - **배포 후 Demo 확인:** Demo 계정은 운영자 · 관리자 화면 권한이 없음 — 통합 담당이 운영자 화면에서 삭제 미완료 회원 선택 시 링크 · Admin 삭제 보류 시 빨간 안내를 확인.
 - **문서 정합:** 해당 없음.
 
+
+## 2026-11-13 · 이 영상의 제품 — 사이니지 영상 ↔ 제품 연결 (branch `claude/intelligent-cray-o2p4u3-product-video` · migration 포함)
+
+> 다음 실행자: **통합 세션** — 이 branch 로 PR. **migration lane**(AGENTS.md §4-3 R4): 다른 migration Ready PR 이 없을 때 Ready 로 둔다. 병합 뒤 **CLOUD** 가 [`WO-O4O-STORE-QR-TABLET-CHANNEL-SEPARATION-V1`](docs/work-orders/WO-O4O-STORE-QR-TABLET-CHANNEL-SEPARATION-V1.md) T5(태블릿 코너 제품 QR · 영상 보기)를 진행한다.
+
+- **결정 사항:**
+  - 2026-11-13 통합 담당이 `signage_media` 제품 열 migration 을 승인했다.
+  - 세션 판단:
+    - 외래 키를 두지 않는다. 쓰는 API 가 제품 존재와 범위를 확인한다.
+    - 매장은 자기 취급 제품(listing)으로만 연결한다.
+    - 운영자는 공용(HQ) 영상에, 공급자는 자기가 공급하는 제품만 연결한다.
+    - 매장이 가져온 사본(`parentMediaId`)은 원본의 연결을 「(원본)」으로 보이고 해제할 수 없다.
+    - 연결 제품 목록은 보조 정보라, 못 불러와도 영상 목록은 보인다.
+- **migration:**
+  - `1794550173646-AddSignageMediaProductMaster` — `ADD COLUMN "productMasterId" uuid NULL` + 부분 색인.
+  - 자동 판정(#1028 분류기)은 ADDITIVE 다. 따라서 Promote 승인 대상이 아니다.
+  - fingerprint `9611acea…`(7596 lines)는 격리 PostgreSQL 16 에서 baseline + incremental 1..62 를 실행해 얻었다. 직전 상태 `34b34a48…` 가 등록값과 일치하는 것을 먼저 확인했다. 실행 결과 `POST_MIGRATION_SCHEMA_ASSERTION = PASS`.
+- **검증:**
+  - api:
+    - `media-product-link.test.ts` 7/7(실제 schema · 다른 매장 · 공용 · 다른 서비스 영상 차단 포함)
+    - `signage-resource-id-validation.spec.ts` 93/93(UUID route census 30→32 · `/media/product-links` static route 회귀)
+    - schema 상태 jest 32 pass
+    - `tsc` 0
+  - `scripts/ci/__tests__/migration-safety.test.mjs` 31/31(새 migration 을 「알려진 추가형」 목록에 넣었다).
+  - web-store: `vitest src/pages` 83 files / 901 · `tsc` 0. 새 파일 ESLint 0.
+- **확인하지 못한 것:**
+  - `node scripts/db/check-migration-contract.mjs` — 이 세션의 명령 가드가 막았다. CI 가 같은 검사를 돈다.
+  - 배포 후 Demo 「매장 경영자」로 사이니지 → 동영상에서 확인할 것:
+    - 직접 등록한 영상 1개 → 「선택 영상 제품 연결」 → 취급 제품 선택 → 목록의 「연결 제품」 표시 → 해제.
+    - 공용 Demo 데이터이므로 확인 뒤 해제해 원복한다.
+- **2026-11-13 추가(같은 branch · 남은 부분 해소):**
+  - 운영자: 관리자 미디어 카탈로그의 제품 연결에 제품 이름 검색을 넣었다(용도 `product-video`). HQ 사이니지 영상 화면은 현재 쓰이지 않아 따로 만들지 않았다.
+  - 공급자:
+    - 「연결 상품」이 `productMasterId` 로도 저장된다. 서버가 공급 제품인지 확인한다(POST · PATCH).
+    - 기존 영상은 `metadata` 의 연결을 읽는다.
+  - 매장: 보관 영상 등록본과 가져온 사본도 원본의 연결 제품을 「(원본)」으로 보인다.
+  - 검증:
+    - api `media-product-link.test.ts` 8/8 · `signage-resource-id-validation` 93 · `tsc` 0
+    - web-store `vitest src/pages/pharmacy` 60 files / 695 · `tsc` 0
+    - web-neture vitest(CI config) 185 files / 1578 · `tsc` 0
+    - admin `ProductMasterPicker.test.tsx` 2/2 · `tsc` 오류 0
+    - 바뀐 파일 ESLint 0
+  - 배포 후 확인할 것:
+    - Admin 미디어 카탈로그 → 보관 영상 → 연결 유형 product → 제품 찾기 → 저장.
+    - neture 공급자 사이니지에서 연결 상품을 고른 뒤 저장한다. 그다음 매장 사이니지 목록의 「연결 제품」에 「(원본)」이 보이는지 확인한다(공급자 영상을 가져온 매장).
+- **겹칠 수 있는 PR:** #1049(상담 태블릿) — 겹치는 파일 없음.
 ## 2026-11-13 · 공급자 제품 등록 AI 보조 P1 검증·최소 보완 (branch `claude/focused-edison-ky4e3u`)
 
 - **근거 / PR 묶음:** [`WO-O4O-SUPPLIER-AI-ASSISTANCE-ROLLOUT-V1`](docs/work-orders/WO-O4O-SUPPLIER-AI-ASSISTANCE-ROLLOUT-V1.md) P1. 이 branch 단독 1 PR(web-neture 공급자 화면 · 서비스 PR). PR 은 만들지 않았다.
@@ -268,7 +351,13 @@
     - 콘텐츠 QR 은 출력하거나 담은 것만 목록에 올린다.
     - 제품 ↔ 영상은 `signage_media` 에 제품 열 하나를 둔다(설명서 본문에는 넣지 않는다).
 - **검증:** 문서만(`check-doc-sensitive` 통과).
-- **겹칠 수 있는 PR:** #1049(태블릿 구조 1단계) — 이 지시서는 코드를 바꾸지 않는다. T2 · T5 구현은 그 병합 뒤에 시작한다.
+- **2026-11-13 추가:**
+  - T4(`signage_media` 제품 열 migration)는 통합 담당이 승인했다.
+  - 현 상태 조사를 지시서 §7 에 넣었다.
+    - 태블릿 코너는 대부분 이미 있다.
+    - 빠진 것은 제품 QR 기본값(상품 대표 QR)과 제품 영상이다.
+    - 영상 저장소가 둘이다. `media_assets` 는 `media_entity_links` 로 제품 연결이 이미 되고, `signage_media` 는 연결이 없다.
+- **겹칠 수 있는 PR:** #1049(상담 태블릿) — 화면 세트와 무관하다. 겹치는 파일은 `App.tsx` · `store-workspace.test.tsx` 이고, 이 둘은 T2 에만 해당한다.
 
 ## 2026-11-13 · 상담 태블릿별 음성 자동 감지 언어 (branch `claude/wizardly-bardeen-ldq332`)
 

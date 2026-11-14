@@ -6,6 +6,7 @@ import { SignageTemplateController } from './controllers/template.controller.js'
 import { SignageContentController } from './controllers/content.controller.js';
 import { SignageGlobalContentController } from './controllers/global-content.controller.js';
 import { SignageForcedContentController } from './controllers/forced-content.controller.js';
+import { createMediaProductLinkHandlers } from './controllers/media-product-link.controller.js';
 import {
   requireSignageAdmin,
   requireSignageOperator,
@@ -42,6 +43,7 @@ export function createSignageRoutes(dataSource: DataSource): Router {
   const contentCtrl = new SignageContentController(dataSource);
   const globalCtrl = new SignageGlobalContentController(dataSource);
   const forcedCtrl = new SignageForcedContentController(dataSource);
+  const productLinks = createMediaProductLinkHandlers(dataSource);
 
   // Apply authentication and service key validation to all routes
   router.use(requireAuth);
@@ -103,12 +105,16 @@ export function createSignageRoutes(dataSource: DataSource): Router {
   // Guard 는 형제 media route 와 동일한 requireSignageOperatorOrStore 다
   // (shadowing 상태의 실제 production 계약과 동일 — 권한 완화 없음).
   router.get('/media/library', requireSignageOperatorOrStore, mediaCtrl.getMediaLibrary);
+  // 이 영상의 제품(WO-O4O-STORE-QR-TABLET-CHANNEL-SEPARATION-V1 T4) — static path 라 '/media/:id' 보다 먼저 둔다.
+  router.get('/media/product-links', requireSignageStore, productLinks.listStore);
 
   // GET /api/signage/:serviceKey/media/:id - Get media by ID
   router.get('/media/:id', requireSignageOperatorOrStore, validateUuidParams('id'), mediaCtrl.getMedia);
 
   // PATCH /api/signage/:serviceKey/media/:id - Update media
   router.patch('/media/:id', requireSignageStore, validateUuidParams('id'), mediaCtrl.updateMedia);
+  // PUT /api/signage/:serviceKey/media/:id/product — 매장 영상에 매장 취급 제품 연결 · 해제
+  router.put('/media/:id/product', requireSignageStore, validateUuidParams('id'), productLinks.linkStore);
 
   // DELETE /api/signage/:serviceKey/media/:id - Delete media (soft delete)
   router.delete('/media/:id', requireSignageStore, validateUuidParams('id'), mediaCtrl.deleteMedia);
@@ -189,6 +195,8 @@ export function createSignageRoutes(dataSource: DataSource): Router {
 
   // PATCH /api/signage/:serviceKey/hq/media/:id - Update HQ media
   router.patch('/hq/media/:id', requireSignageOperator, validateUuidParams('id'), globalCtrl.updateHqMedia);
+  // PUT /api/signage/:serviceKey/hq/media/:id/product — 서비스 공용 영상에 표준 제품 연결 · 해제
+  router.put('/hq/media/:id/product', requireSignageOperator, validateUuidParams('id'), productLinks.linkHq);
 
   // DELETE /api/signage/:serviceKey/hq/playlists/:id - Hard delete HQ playlist (Operator only)
   // WO-KPA-SOCIETY-OPERATOR-SIGNAGE-CONTENT-HARD-DELETE-POLICY-V1

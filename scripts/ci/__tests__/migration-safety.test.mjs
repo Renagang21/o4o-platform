@@ -309,6 +309,7 @@ describe('X repository migrations', () => {
       '1793750400000-AddTemporaryPasswordExpiry.ts',
       '1793857542325-AddStorePlaylistTags.ts',
       '1794357598911-AllowUsersWithoutEmail.ts',
+      '1794624815975-AddSignageMediaProductMaster.ts',
     ]) assert.equal(classifyMigrationSource(read(name)).verdict, ADDITIVE, name);
   });
 });

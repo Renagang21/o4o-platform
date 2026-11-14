@@ -33,6 +33,8 @@ export interface SupplierSignageMedia {
   scope: 'global';
   createdByUserId: string;
   metadata: Record<string, unknown>;
+  /** 이 영상의 제품(표준 제품 마스터). 매장 태블릿 코너에서 이 제품의 영상으로 보인다. */
+  productMasterId?: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -44,6 +46,8 @@ export interface SupplierSignageInput {
   thumbnailUrl?: string | null;
   tags?: string[];
   metadata?: Record<string, unknown>;
+  /** 내가 공급하는 제품의 표준 제품 마스터 ID — 서버가 공급 여부를 다시 확인한다. null 이면 연결 해제. */
+  productMasterId?: string | null;
 }
 
 function normalizeError(e: any): never {

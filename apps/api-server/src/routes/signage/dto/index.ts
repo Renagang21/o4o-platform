@@ -198,6 +198,8 @@ export interface MediaResponseDto {
   content: string | null;
   tags: string[];
   status: string;
+  /** 이 영상의 제품(표준 제품 마스터). 없으면 null. */
+  productMasterId: string | null;
   createdAt: string;
   updatedAt: string;
 }
