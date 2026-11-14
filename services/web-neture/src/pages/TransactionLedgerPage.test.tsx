@@ -142,9 +142,38 @@ it("blocks confirmation of unsaved changes and saves the corrected value first",
         rows: [expect.objectContaining({ quantity: "4" })],
       }),
       [],
+      expect.any(String),
     ),
   );
   expect(ledger.ledgerConfirm).not.toHaveBeenCalled();
+});
+it("retries an unanswered correction save with the same request id until the content changes", async () => {
+  vi.mocked(ledger.ledgerSave).mockRejectedValue(new Error("Network Error"));
+  mount();
+  await screen.findByDisplayValue("합성 거래처");
+  fireEvent.change(screen.getByLabelText("수량"), { target: { value: "4" } });
+  fireEvent.click(screen.getByRole("button", { name: "수정 저장" }));
+  await waitFor(() => expect(ledger.ledgerSave).toHaveBeenCalledTimes(1));
+  await waitFor(() =>
+    expect(
+      (screen.getByRole("button", { name: "수정 저장" }) as HTMLButtonElement)
+        .disabled,
+    ).toBe(false),
+  );
+  fireEvent.click(screen.getByRole("button", { name: "수정 저장" }));
+  await waitFor(() => expect(ledger.ledgerSave).toHaveBeenCalledTimes(2));
+  const [first, second] = vi.mocked(ledger.ledgerSave).mock.calls;
+  expect(second[3]).toBe(first[3]);
+  fireEvent.change(screen.getByLabelText("수량"), { target: { value: "5" } });
+  await waitFor(() =>
+    expect(
+      (screen.getByRole("button", { name: "수정 저장" }) as HTMLButtonElement)
+        .disabled,
+    ).toBe(false),
+  );
+  fireEvent.click(screen.getByRole("button", { name: "수정 저장" }));
+  await waitFor(() => expect(ledger.ledgerSave).toHaveBeenCalledTimes(3));
+  expect(vi.mocked(ledger.ledgerSave).mock.calls[2][3]).not.toBe(first[3]);
 });
 it("keeps a failed correction in the editor for recovery", async () => {
   vi.mocked(ledger.ledgerSave).mockRejectedValue(new Error("LEDGER_CONFLICT"));

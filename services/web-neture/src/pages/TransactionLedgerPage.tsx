@@ -83,7 +83,9 @@ export default function TransactionLedgerPage() {
     [duplicateReason, setDuplicateReason] = useState(""),
     [programStatus, setProgramStatus] = useState("unknown");
   const generation = useRef(0),
-    confirmRequest = useRef(crypto.randomUUID());
+    confirmRequest = useRef(crypto.randomUUID()),
+    // 같은 내용의 저장 재시도는 같은 requestId 로 보내 서버의 기존 요청 조회를 탄다.
+    saveRequest = useRef<{ key: string; id: string } | null>(null);
   function fail(error: unknown) {
     const code = error instanceof Error ? error.message : "";
     setMessage(
@@ -195,7 +197,16 @@ export default function TransactionLedgerPage() {
     setBusy(true);
     setMessage("");
     try {
-      const saved = await ledgerSave(row, draft, photos);
+      const key = JSON.stringify([row.id, row.version, draft, photos]);
+      if (saveRequest.current?.key !== key)
+        saveRequest.current = { key, id: crypto.randomUUID() };
+      const saved = await ledgerSave(
+        row,
+        draft,
+        photos,
+        saveRequest.current.id,
+      );
+      saveRequest.current = null;
       if (epoch === generation.current) {
         setRow(saved);
         setDraft(saved.invoice);

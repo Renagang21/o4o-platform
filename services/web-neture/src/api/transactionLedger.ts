@@ -52,13 +52,14 @@ export const ledgerSave = (
   row: LedgerInvoice,
   invoice: PhotoInvoice,
   images: Array<{ mimeType: string; base64: string }> = [],
+  requestId: string = crypto.randomUUID(),
 ) =>
   result<LedgerInvoice>(
     api.post(base + "/prepare", {
       input: {
         workspaceId: "store:" + row.organization_id,
         invoice,
-        requestId: crypto.randomUUID(),
+        requestId,
         invoiceId: row.id,
         expectedVersion: row.version,
       },
