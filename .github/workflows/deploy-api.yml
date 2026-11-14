@@ -724,6 +724,17 @@ jobs:
           --require-current true \
           --out "$RUNNER_TEMP/external-ai-env"
 
+    # YouTube activation is optional; preserve the serving revision across full plain-env replacement.
+    # Credentials stay in Secret Manager and existing bindings are retained by --update-secrets.
+    - name: Preserve YouTube connection env
+      if: inputs.migrate_only != 'true'
+      run: |
+        node scripts/ci/cloud-run-env.mjs optional \
+          --service ${{ env.SERVICE_NAME }} \
+          --names YOUTUBE_OAUTH_CLIENT_ID,YOUTUBE_OAUTH_REDIRECT_URI,GOOGLE_CLOUD_PROJECT,YOUTUBE_TASKS_REGION,YOUTUBE_TASKS_QUEUE,YOUTUBE_TASKS_SERVICE_ACCOUNT \
+          --serving-only true --require-plain true --require-current true \
+          --out "$RUNNER_TEMP/youtube-env"
+
     # WO-O4O-CICD-SAFE-AUTODEPLOY-AND-RISK-GATE-V1 Phase 4 — verified 모드에서만. 배포 전 traffic(pin/latest · 이전 revision)을 기록한다.
     - name: Record traffic before deploy (verified rollout)
       if: inputs.migrate_only != 'true' && inputs.rollout_mode == 'verified'
@@ -754,6 +765,8 @@ jobs:
         fi
         OPTIONAL_ENV=()
         if [ -s "$RUNNER_TEMP/optional-env" ]; then mapfile -d '' OPTIONAL_ENV < "$RUNNER_TEMP/optional-env"; fi
+        YOUTUBE_ENV=()
+        if [ -s "$RUNNER_TEMP/youtube-env" ]; then mapfile -d '' YOUTUBE_ENV < "$RUNNER_TEMP/youtube-env"; fi
         AI_PRICING_ENV=()
         if [ -s "$RUNNER_TEMP/ai-pricing-env" ]; then mapfile -d '' AI_PRICING_ENV < "$RUNNER_TEMP/ai-pricing-env"; fi
         CONSULTATION_CLEANUP_ENV=()
@@ -840,6 +853,7 @@ jobs:
           --set-env-vars="GOOGLE_WEB_CLIENT_ID=${{ vars.GOOGLE_WEB_CLIENT_ID }}" \
           "${KAKAO_ENV[@]}" \
           "${OPTIONAL_ENV[@]}" \
+          "${YOUTUBE_ENV[@]}" \
           "${AI_PRICING_ENV[@]}" \
           "${CONSULTATION_CLEANUP_ENV[@]}" \
           "${EXTERNAL_AI_ENV[@]}" \

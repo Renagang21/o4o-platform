@@ -16,6 +16,26 @@ const read = (p) => readFileSync(path.join(ROOT, p), 'utf-8');
 const DEPLOY = ['.github/workflows/deploy-api.yml', '.github/workflows/deploy-web-services.yml', '.github/workflows/deploy-admin.yml'];
 const count = (text, re) => (text.match(re) ?? []).length;
 
+describe('YouTube 운영 설정은 실제 서비스 revision에서 보존한다', () => {
+  it('조회 실패나 secret/plain 혼동을 거부하고 미설정 기능을 활성화하지 않는다', () => {
+    const wf = read(DEPLOY[0]);
+    const section = /- name: Preserve YouTube connection env([\s\S]*?)(?=\n {4}- name:)/.exec(wf)?.[1] ?? '';
+    assert.match(section, /if: inputs\.migrate_only != 'true'/);
+    assert.match(section, /--names YOUTUBE_OAUTH_CLIENT_ID,YOUTUBE_OAUTH_REDIRECT_URI,GOOGLE_CLOUD_PROJECT,YOUTUBE_TASKS_REGION,YOUTUBE_TASKS_QUEUE,YOUTUBE_TASKS_SERVICE_ACCOUNT/);
+    assert.match(section, /--serving-only true --require-plain true --require-current true/);
+    assert.doesNotMatch(section, /OPTENV_|YOUTUBE_OAUTH_CLIENT_SECRET|ENCRYPTION_KEY/);
+    assert.ok(wf.indexOf('Preserve YouTube connection env') < wf.indexOf('- name: Deploy to Cloud Run'));
+  });
+  it('보존한 설정을 실제 배포에 넘기며 OAuth secret을 평문으로 주입하지 않는다', () => {
+    const wf = read(DEPLOY[0]);
+    const deploy = /- name: Deploy to Cloud Run([\s\S]*?)(?=\n {4}- name:)/.exec(wf)?.[1] ?? '';
+    assert.match(wf, /--out "\$RUNNER_TEMP\/youtube-env"/);
+    assert.match(deploy, /mapfile -d '' YOUTUBE_ENV < "\$RUNNER_TEMP\/youtube-env"/);
+    assert.match(deploy, /gcloud run deploy[\s\S]*"\$\{YOUTUBE_ENV\[@\]\}"/);
+    assert.doesNotMatch(deploy, /--set-env-vars[^\n]*YOUTUBE_OAUTH_CLIENT_SECRET/);
+  });
+});
+
 describe('AI 가격 catalog는 현재 값을 보존하고 검증 후 기존 API 배포에만 전달한다', () => {
   it('가격 검증은 운영 image push·migration 전에 실행하며 migrate-only에는 적용하지 않는다', () => {
     const wf = read(DEPLOY[0]);
