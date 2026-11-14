@@ -112,6 +112,8 @@ type Mode = 'browse' | 'detail' | 'submitted' | 'error' | 'idle';
 
 /** idle 진입이 허용된 mode (polling/error 중 진입 금지) */
 const IDLE_ENTERABLE_MODES: ReadonlyArray<Mode> = ['browse', 'detail'];
+/** 제품 영상이 열려 있을 때 대기화면 전환까지 기다리는 상한(15분). 재생 · 일시정지 상태는 iframe 재생기마다 달라 상한으로 묶는다. */
+const PRODUCT_VIDEO_IDLE_MS = 15 * 60_000;
 
 /** image 항목 default 노출 시간 */
 const DEFAULT_IDLE_IMAGE_DURATION_MS = 5000;
@@ -705,12 +707,14 @@ export function TabletKioskPage({
 
     const armTimer = () => {
       if (timer) clearTimeout(timer);
-      // 제품 영상 재생 중에는 대기화면으로 넘기지 않는다(가만히 시청하는 것은 터치 입력이 아니다).
-      if (isIdleEnterable && !productVideoPlaying) {
+      if (isIdleEnterable) {
+        const reading = screen?.mode === 'screen_set' && (mode === 'detail' || openContentCard || qrModalOpen || productQrZoom);
+        const base = reading ? Math.max(idleTimeoutMs, 120_000) : idleTimeoutMs;
         timer = setTimeout(() => {
           setOpenContentCard(null); setQrModalOpen(false); setProductQrZoom(null);
           dispatch({ type: 'IDLE_ENTER' });
-        }, screen?.mode === 'screen_set' && (mode === 'detail' || openContentCard || qrModalOpen || productQrZoom) ? Math.max(idleTimeoutMs, 120_000) : idleTimeoutMs);
+          // 제품 영상이 열려 있으면 가만히 시청하는 것을 고려해 상한까지 기다린다. 일시정지 · 오류 상태로 떠나도 상한 뒤에는 돌아간다.
+        }, productVideoPlaying ? Math.max(base, PRODUCT_VIDEO_IDLE_MS) : base);
       }
     };
 

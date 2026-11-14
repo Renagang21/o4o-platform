@@ -36,3 +36,16 @@ it('does not drop to the idle screen while a product video is playing, and resum
   act(() => vi.advanceTimersByTime(121_000));
   expect(screen.getByText(/화면을 터치/)).toBeTruthy();
 });
+
+it('returns to the idle screen after the cap even if a product video is left open (paused or failed)', async () => {
+  vi.useFakeTimers();
+  render(<TabletKioskPage slug="fixture" api={api} previewScreen={tablet} idleTimeoutMs={1000} />);
+  await act(async () => undefined);
+  fireEvent.click(screen.getByRole('button', { name: /제품 A.*자세히 보기/ }));
+  fireEvent.click(screen.getByRole('button', { name: '▶ 영상 보기' }));
+  act(() => vi.advanceTimersByTime(14 * 60_000));
+  expect(screen.queryByText(/화면을 터치/)).toBeNull();
+  // 상한(15분)은 재생기 상태가 바뀐 시점부터 다시 센다 — 17분 안에는 대기화면으로 돌아간다.
+  act(() => vi.advanceTimersByTime(3 * 60_000));
+  expect(screen.getByText(/화면을 터치/)).toBeTruthy();
+});
