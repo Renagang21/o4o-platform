@@ -32,7 +32,7 @@
 - **검증:**
   - api `tsc` 0
   - api 관련 jest(커뮤니티 · 포럼 · 펀딩 포럼 route · controller 22 suites) 240 pass · 6 skip. 새 테스트: 홈 접근 · 공개 열람 410 · 글쓴이 칸 · 영상 목록 비로그인.
-  - api 전체 jest 3 shard — 아래 「API 전체 회귀」에 결과를 적는다.
+  - api 전체 jest 3 shard(첫 commit 기준 · CI 와 같은 `--maxWorkers=1 --shard=i/3`): 실패 0 — 3,288 + 3,451 + 3,814 pass, 1,317 skip(기존 DB 의존 skip). 중재 commit 은 포럼 controller/route 296 pass 로 확인.
   - web-neture `tsc` 0 · 전체 vitest 192 files · 1619 tests pass(기대값 2건 갱신: 홈 포럼 바로가기 주소, 게시판 미선택 안내 문구) · `vite build` 성공
   - admin `tsc` 0 · operators vitest 18 files · 153 pass
   - `check-unsafe-routes` 위반 0
