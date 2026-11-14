@@ -1,5 +1,13 @@
 # HANDOFF
 
+## 2026-11-14 · 내 매장 2차 재조사 (branch `claude/wizardly-bardeen-ldq332` · 문서 전용)
+
+- **PR 묶음:** 문서 전용 PR(조사 기록 1개). #1070 병합 뒤 main 을 합쳐 main 대비 이 문서만 남음.
+- **한 일:** [`IR-O4O-STORE-WORKSPACE-IMPROVEMENT-SURVEY-V2`](docs/investigations/IR-O4O-STORE-WORKSPACE-IMPROVEMENT-SURVEY-V2.md) — 코드 조사 3갈래 + 운영 Demo 화면 전수 조회(경영자 102 · 직원 100 · 모바일 102, 조회만).
+- **결정 사항(§9):** 수정은 하지 않음(사용자 지시가 「정리」). 진행 제안 1순위 A1(직원이 매장 정보 수정 가능) · A2(키오스크 검색 의약품 · 공개 조건 누락) · B1(web-store toast 미장착) · B3(창 전환 시 약국 기능 화면 다시 그림).
+- **확인하지 못한 것:** 운영 DB(1차 지시서 Q1~Q6 대기) · 직원 쓰기 실제 시도 안 함 · 관리자 · 운영자 화면.
+- **문서 정합:** 해당 없음.
+
 ## 2026-11-14 · 공급자 화면 버그 묶음 (branch `claude/supplier-ui-bugfix`)
 
 - **근거 / PR 묶음:** 2026-11-13 공급자 전반 조사의 화면 버그 묶음(사용자 지시 「진행해」). **이 branch 단독 1 PR**(web-neture 공급자 화면 · 서비스 PR). API · schema 변경 없음. PR 은 만들지 않았다.
