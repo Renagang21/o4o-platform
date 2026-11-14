@@ -23,6 +23,7 @@ export type { IdlePlaylistEditorProps } from './IdlePlaylistEditor';
 //   (판별 규칙을 소비처에 복제하지 않기 위해 export — 뷰어와 동일 규칙 보장)
 export { detectIdleMediaType, toIdleEmbedUrl } from './idleMedia';
 export { VideoPlayback } from './VideoPlayback';
+export { ProductVideos, readProductVideos, type ProductVideoItem } from './ProductVideos';
 export { MediaSequence, type SequenceMedia } from './MediaSequence';
 export { useMediaSequence } from './useMediaSequence';
 export type { IdleMediaType } from './idleMedia';
