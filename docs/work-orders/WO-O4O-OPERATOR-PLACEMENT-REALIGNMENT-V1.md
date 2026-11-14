@@ -3,7 +3,7 @@
 > **상태**: DRAFT
 > **작성일**: 2026-11-14 · **최종 갱신**: 2026-11-14
 > **실행 위치**: BOTH
-> **인계**: `claude/ecstatic-mendel-2ohu27-operator-placement` · push 전 · 다음 실행자 CLOUD(T1 기준 문서 개정안) → LOCAL(T2 조회)
+> **인계**: `claude/ecstatic-mendel-2ohu27-operator-placement` · c92a7a1f · 다음 실행자 CLOUD(T1 기준 문서 개정안) → LOCAL(T2 조회)
 > **근거**: 사용자 확정(2026-11-14 · 아래 §2). 선행 기록 — [`O4O-ROLE-WORKSPACE-ARCHITECTURE-V2`](../baseline/O4O-ROLE-WORKSPACE-ARCHITECTURE-V2.md) §3 · [`O4O-CURRENT-ADMIN-ROLE-POLICY-V1`](../baseline/O4O-CURRENT-ADMIN-ROLE-POLICY-V1.md) · [`O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1`](../baseline/O4O-SUBDOMAIN-SERVICE-SEMANTICS-V1.md) · [`WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1`](WO-O4O-PHARMACY-BUSINESS-INDEPENDENCE-V1.md)
 
 ## 1. 배경 — 현재 코드 · 정본 대조 (2026-11-14 조사)
