@@ -1,10 +1,10 @@
 import type {ReactNode} from 'react';
 import type {NavigateFunction} from 'react-router-dom';
 import {authClient} from '@o4o/auth-client';
-import {AiReportPage} from '@o4o/ui';
 import {CommunityHomeManagementPage,CommunityManagementWorkspace,createCommunityHomeApi} from '@o4o/operator-core-ui';
 import {ServiceMembersWorkspace} from '@o4o/operator-core-ui/modules/members';
 import {PharmacyMembershipReviewPage} from '@o4o/operator-core-ui/modules/pharmacy-management';
+import CentralAiReportNotice from './CentralAiReportNotice';
 import CentralSharedWork from './CentralSharedWork';
 import CentralOperatorInbox from './CentralOperatorInbox';
 import CentralPharmacistQualifications from './CentralPharmacistQualifications';
@@ -41,7 +41,7 @@ const renderers:Record<string,Renderer>={
  'neture.stores':()=> <CentralNetureStores />,
  'neture.analytics':()=> <CentralNetureAnalytics />,
  'neture.service-approval-management':()=> <AdminServiceApprovalPage api={serviceApprovalApi} />,
- 'neture.ai-report':()=> <AiReportPage config={{mode:'empty',theme:'green',assetTypes:[],infoBannerText:'실제 집계 데이터가 연결되면 운영 리포트를 제공합니다.',emptyStateDescription:'분석 인프라 연동 준비 중입니다.'}} />,
+ 'neture.ai-report':()=> <CentralAiReportNotice />,
  'funding.funding':c=><CentralFundingOperations detail={!!c.id} />,
  'supplier.suppliers':()=> <CentralSupplierOperations />,
  'supplier.governance':()=> <CentralSupplierOperations governance />,
