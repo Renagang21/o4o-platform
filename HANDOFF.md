@@ -15,6 +15,9 @@
 
 ### 후속 실행 결과
 
+- **OAuth 준비 후속:** 사용자가 전용 Web client를 생성하고 Secret Manager에 secret을 저장했다. client ID `117791934476-piugtg0r0a4s28ilduk15douaf1g8b52.apps.googleusercontent.com`, secret 이름 `o4o-youtube-oauth-client-secret`, version `1` enabled를 CLI로 확인(값 미조회). redirect URI는 위 고정 주소다. 사용자 제공 화면의 client 생성 입력값도 일치한다.
+- **로컬 운영 세션 적용값:** `YOUTUBE_OAUTH_CLIENT_ID=117791934476-piugtg0r0a4s28ilduk15douaf1g8b52.apps.googleusercontent.com`, `YOUTUBE_OAUTH_REDIRECT_URI=https://admin.neture.co.kr/settings/youtube/callback`, `GOOGLE_CLOUD_PROJECT=netureyoutube`, `YOUTUBE_TASKS_REGION=asia-northeast3`, `YOUTUBE_TASKS_QUEUE=o4o-youtube-upload`. 전용 worker SA 예정 `o4o-youtube-worker@netureyoutube.iam.gserviceaccount.com`는 존재를 확인하고 없으면 생성한다. `YOUTUBE_TASKS_SERVICE_ACCOUNT`에 이 worker SA를 사용한다. `YOUTUBE_OAUTH_CLIENT_SECRET`은 `o4o-youtube-oauth-client-secret:1` secret binding으로 주입한다. 기존 `ENCRYPTION_KEY` binding을 보존한다.
+- **권한 후속:** OAuth secret의 resource IAM binding은 없음. 확인한 project IAM에서 runtime SA는 Cloud SQL client/log writer이고 Tasks 권한 없음(상속/조건/그룹 접근까지 확정한 것은 아님). Cloud Tasks service agent role은 API 활성화 후 존재함. runtime에 secret 단위 secretAccessor, queue 단위 cloudtasks.enqueuer와 queue 조회 권한, worker SA 단위 serviceAccountUser를 필요한 것만 부여한다. service agent의 기존 token 발급 권한을 먼저 평가하고 중복 광역 권한을 추가하지 않는다.
 - 사용자에게 세션 상태를 재확인하도록 요구하지 않고 GitHub Actions와 Cloud Audit Logs를 직접 조회했다. 조회 시 진행 중 GitHub 실행 0개, 최근 Delivery 성공 완료, API Ready=True 및 단일 serving revision 100%를 확인했다. 이것이 다른 사람의 미래 변경을 잠그는 것은 아니다.
 - 사용자의 해결 지시 범위에서 Cloud Tasks API를 활성화했고, 큐 목록이 비어 있음을 확인한 뒤 `asia-northeast3/o4o-youtube-upload`를 생성했다. concurrent=1, dispatch/sec=1, max attempts=20, backoff=5s..300s. 영상 작업은 만들지 않았다.
 - 위 본문의 미실행 항목 중 Cloud Tasks API/큐 준비는 이제 수행됨. 서비스 계정 생성/IAM/WIF·서버 env/secret·운영 배포·Google 채널 연결은 미실행. AGENTS.md §4의 작업 세션 IAM 금지와 §9의 클라우드 운영 배포 금지에 따라 로컬 운영 세션이 이어야 한다.
