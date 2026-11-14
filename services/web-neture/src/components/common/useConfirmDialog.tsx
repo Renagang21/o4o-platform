@@ -16,7 +16,7 @@
  * - prompt: 확인 → 입력값(앞뒤 공백 제거, 비면 ''), 취소 → null
  * - 한 번에 하나만 연다. 열린 상태에서 다시 부르면 앞의 요청은 취소(false/null)로 끝난다.
  */
-import { useCallback, useRef, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import { ConfirmActionDialog } from '@o4o/ui';
 
 export interface ConfirmDialogOptions {
@@ -68,6 +68,40 @@ export function useConfirmDialog(): {
   );
 
   const close = useCallback(() => settle(null), [settle]);
+
+  // 키보드 흐름(브라우저 confirm/prompt 와 같게): 열리면 대화상자 안으로 포커스를 옮기고, 열린 동안 Tab 을 안에 가두며
+  // Esc 로 취소한다. 닫히면 원래 누른 버튼으로 포커스를 되돌린다. (ConfirmActionDialog 는 document.body 로 portal 한다.)
+  const isOpen = pending !== null;
+  useEffect(() => {
+    if (!isOpen || typeof document === 'undefined') return;
+    const opener = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    const dialogs = document.querySelectorAll<HTMLElement>('[role="dialog"][aria-modal="true"]');
+    const box = dialogs[dialogs.length - 1];
+    if (!box) return;
+    const focusables = () =>
+      Array.from(box.querySelectorAll<HTMLElement>('textarea, button:not([disabled]), input, select, [tabindex]:not([tabindex="-1"])'));
+    const first = box.querySelector<HTMLElement>('textarea') ?? focusables()[focusables().length - 1] ?? null;
+    first?.focus();
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        close();
+        return;
+      }
+      if (event.key !== 'Tab') return;
+      const items = focusables();
+      if (items.length === 0) return;
+      const index = items.indexOf(document.activeElement as HTMLElement);
+      const next = event.shiftKey ? (index <= 0 ? items.length - 1 : index - 1) : (index === items.length - 1 || index < 0 ? 0 : index + 1);
+      event.preventDefault();
+      items[next].focus();
+    };
+    document.addEventListener('keydown', onKeyDown, true);
+    return () => {
+      document.removeEventListener('keydown', onKeyDown, true);
+      if (opener && document.contains(opener)) opener.focus();
+    };
+  }, [isOpen, close]);
 
   const accept = useCallback(
     (reason?: string) => {

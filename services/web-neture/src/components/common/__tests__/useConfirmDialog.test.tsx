@@ -69,4 +69,37 @@ describe('useConfirmDialog', () => {
     fireEvent.click(within(await screen.findByRole('dialog')).getByRole('button', { name: '확인' }));
     await expect(second!).resolves.toBe(true);
   });
+
+  it('keyboard: 열리면 포커스가 대화상자 안으로 가고, Esc 로 취소하면 원래 버튼으로 돌아간다', async () => {
+    let answer: Promise<boolean> | undefined;
+    function Opener() {
+      const local = useConfirmDialog();
+      api = local;
+      return (
+        <>
+          <button type="button" onClick={() => { answer = local.confirm({ title: '모집 반려', message: '반려하시겠습니까?', confirmText: '반려' }); }}>반려 열기</button>
+          {local.dialog}
+        </>
+      );
+    }
+    render(<Opener />);
+    const opener = screen.getByRole('button', { name: '반려 열기' });
+    opener.focus();
+    fireEvent.click(opener);
+    const dialog = await screen.findByRole('dialog');
+    await waitFor(() => expect(dialog.contains(document.activeElement)).toBe(true));
+    fireEvent.keyDown(document.activeElement as Element, { key: 'Tab' });
+    expect(dialog.contains(document.activeElement)).toBe(true);
+    fireEvent.keyDown(document.activeElement as Element, { key: 'Escape' });
+    await expect(answer!).resolves.toBe(false);
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    expect(document.activeElement).toBe(opener);
+  });
+
+  it('keyboard: prompt 는 사유 입력칸에 바로 포커스를 준다', async () => {
+    render(<Harness />);
+    act(() => { void api.prompt({ title: '반려', message: '반려합니다', reasonPlaceholder: '사유' }); });
+    const dialog = await screen.findByRole('dialog');
+    await waitFor(() => expect(document.activeElement).toBe(within(dialog).getByPlaceholderText('사유')));
+  });
 });
