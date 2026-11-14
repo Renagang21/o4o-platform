@@ -17,7 +17,7 @@ import { ConsultationExpressionSettings } from './ConsultationExpressionSettings
 const ROLES: ReadonlyArray<{ role: ConsultationTabletRole; title: string; description: string; fallback: string }> = [
   { role: "pharmacist", title: "약사 태블릿", description: "약사와 고객이 함께 봅니다. 약사용 전문 상담 내용이 보입니다.", fallback: "약사 태블릿 1" },
   { role: "staff", title: "근무자 태블릿", description: "근무자와 고객이 함께 봅니다. 상품 찾기 · 위치 · 제품 설명 등 근무자용 내용만 보입니다.", fallback: "근무자 태블릿 1" },
-  { role: "consumer", title: "소비자 태블릿(키오스크)", description: "고객이 직접 사용합니다. 직원 로그인 없이 연결 코드로 한 번 연결하며, 상품 찾기 · 위치 · 게시된 제품 설명과 약사 연결 안내만 보입니다.", fallback: "" },
+  { role: "consumer", title: "소비자 태블릿(키오스크)", description: "고객이 직접 사용합니다. 직원 로그인 없이 연결 코드로 한 번 연결하며, 상품 찾기 · 위치 · 게시된 제품 설명과 약사 연결 안내만 보입니다.", fallback: "키오스크 1" },
 ];
 const KIOSK_PATH = "/consultation/kiosk";
 /** 상담 언어(서버 CONSULTATION_SCREEN_LANGUAGES 와 같은 순서). */
@@ -101,6 +101,13 @@ export function ConsultationLauncher() {
     const current = generation.current;
     lock.current = true; setBusy(true); setMessage(""); setPairing(null);
     try {
+      // 기본 목록(아직 저장 전)의 키오스크는 서버가 모르므로 목록을 먼저 저장한다.
+      if (!configured) {
+        const listed = await saveConsultationTablets(tablets);
+        if (generation.current !== current) return;
+        if (listed.organizationId !== organizationId) throw new Error("Store changed");
+        setSaved(listed.tablets); setConfigured(listed.configured); setCanEdit(listed.canEdit);
+      }
       const data = await createKioskPairing(tablet.id);
       if (generation.current === current) setPairing({ tabletId: tablet.id, ...data });
     } catch {
