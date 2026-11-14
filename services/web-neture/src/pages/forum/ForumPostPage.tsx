@@ -45,6 +45,7 @@ import {
   updateForumComment,
   deleteForumComment,
   deleteForumPost,
+  moderateForumPost,
   toggleForumPostLike,
   normalizePostType,
   getAuthorName,
@@ -268,12 +269,26 @@ function ForumPostDetail({ basePath = '/forum', canModerate = false, readOnly = 
     } finally { if (current()) { commentsReading.current = false; setCommentsLoading(false); } }
   }
 
+  /**
+   * 남의 글 · 댓글을 지우는 중재는 사유를 받는다(서버가 기록 · 2026-11-14). 본인 글은 확인만 묻는다.
+   * 취소하면 null, 본인 것이면 ''.
+   */
+  const askDeleteReason = (authorId: string | null | undefined, what: string): string | null => {
+    if (authorId && authorId === currentUserId) return confirm(`${what}을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.`) ? '' : null;
+    const input = prompt(`${what} 삭제 사유를 입력해 주시기 바랍니다(2자 이상 · 운영 기록에 남습니다).`);
+    if (input === null) return null;
+    if (input.trim().length < 2) { toast.error('삭제 사유를 2자 이상 입력해 주시기 바랍니다.'); return null; }
+    return input.trim().slice(0, 500);
+  };
+
   const handleDeletePost = async () => {
-    if (readOnly || interactionProcessing.current || pinProcessing.current || !post || !canEditForumContent(readOnly, isAdmin || canModerate, currentUserId, post.authorId) || !confirm('게시글을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) return;
+    if (readOnly || interactionProcessing.current || pinProcessing.current || !post || !canEditForumContent(readOnly, isAdmin || canModerate, currentUserId, post.authorId)) return;
+    const reason = askDeleteReason(post.authorId, '게시글');
+    if (reason === null) return;
     interactionProcessing.current = true; setMutationBusy(true);
     const current = beginInteraction();
     try {
-      const result = await deleteForumPost(post.id);
+      const result = await deleteForumPost(post.id, reason || undefined);
       if (!current()) return;
       if (result.success) navigate(basePath);
       else toast.error(result.error || '게시글 삭제에 실패했습니다.');
@@ -296,14 +311,32 @@ function ForumPostDetail({ basePath = '/forum', canModerate = false, readOnly = 
 
   const handleDeleteComment = async (commentId: string) => {
     const comment = comments.find(item => item.id === commentId);
-    if (readOnly || !comment || !canEditForumContent(readOnly, isAdmin || canModerate, currentUserId, comment.authorId) || interactionProcessing.current || pinProcessing.current || !confirm('댓글을 삭제하시겠습니까?')) return;
+    if (readOnly || !comment || !canEditForumContent(readOnly, isAdmin || canModerate, currentUserId, comment.authorId) || interactionProcessing.current || pinProcessing.current) return;
+    const reason = askDeleteReason(comment.authorId, '댓글');
+    if (reason === null) return;
     interactionProcessing.current = true; setMutationBusy(true);
     const current = beginInteraction();
     try {
-      const result = await deleteForumComment(commentId);
+      const result = await deleteForumComment(commentId, reason || undefined);
       if (!current()) return;
       if (!result.success) throw new Error(result.error || '댓글 삭제에 실패했습니다.');
       setComments(prev => prev.filter(c => c.id !== commentId));
+    } finally { if (current()) { interactionProcessing.current = false; setMutationBusy(false); } }
+  };
+
+  /** 운영자의 글 잠금 · 댓글 막기(2026-11-14). 서버 결과로 화면을 바꾼다. */
+  const handleModerate = async (patch: { isLocked?: boolean; allowComments?: boolean }) => {
+    if (readOnly || !post || !canModerate || interactionProcessing.current || pinProcessing.current) return;
+    interactionProcessing.current = true; setMutationBusy(true);
+    const current = beginInteraction();
+    try {
+      const result = await moderateForumPost(post.id, patch);
+      if (!current()) return;
+      if (result.success && result.data) {
+        const { isLocked, allowComments } = result.data;
+        setPost(prev => prev ? { ...prev, isLocked, allowComments } : prev);
+        toast.success(patch.isLocked !== undefined ? (isLocked ? '글을 잠갔습니다.' : '글 잠금을 풀었습니다.') : (allowComments ? '댓글을 다시 허용했습니다.' : '댓글을 막았습니다.'));
+      } else toast.error(result.error || '게시글 설정을 바꾸지 못했습니다.');
     } finally { if (current()) { interactionProcessing.current = false; setMutationBusy(false); } }
   };
 
@@ -363,6 +396,8 @@ function ForumPostDetail({ basePath = '/forum', canModerate = false, readOnly = 
   const canManagePost = canEditForumContent(readOnly, isAdmin, currentUserId, post.authorId);
   const canPinPost = Boolean((communityKey || pinPost) && canModerate && !readOnly);
   const canShowActions = (canManagePost || canModerate) && !readOnly;
+  // 운영자의 잠금 · 댓글 막기 — 서버(moderatePost)가 권한을 다시 확인한다.
+  const canModeratePost = canModerate && !readOnly;
 
   return (
     <div style={isMobile ? styles.containerMobile : styles.container}>
@@ -408,6 +443,8 @@ function ForumPostDetail({ basePath = '/forum', canModerate = false, readOnly = 
                 {showActionMenu && (
                   <div style={styles.moreMenuDropdown}>
                     {canPinPost && <button type="button" disabled={pinBusy || pinNeedsRefresh || mutationBusy} style={{ ...styles.moreMenuItem, minHeight: 44 }} onClick={() => { setShowActionMenu(false); void handlePin(); }}>{post.isPinned ? '공지 해제' : '공지로 고정'}</button>}
+                    {canModeratePost && <button type="button" disabled={mutationBusy} style={{ ...styles.moreMenuItem, minHeight: 44 }} onClick={() => { setShowActionMenu(false); void handleModerate({ isLocked: !post.isLocked }); }}>{post.isLocked ? '잠금 해제' : '글 잠금'}</button>}
+                    {canModeratePost && <button type="button" disabled={mutationBusy} style={{ ...styles.moreMenuItem, minHeight: 44 }} onClick={() => { setShowActionMenu(false); void handleModerate({ allowComments: post.allowComments === false }); }}>{post.allowComments === false ? '댓글 허용' : '댓글 막기'}</button>}
                     {canManagePost && <button
                       style={styles.moreMenuItem}
                       onClick={() => { setShowActionMenu(false); navigate(`${basePath}/write?edit=${post.id}`); }}
@@ -426,6 +463,8 @@ function ForumPostDetail({ basePath = '/forum', canModerate = false, readOnly = 
               /* Desktop: inline actions */
               <>
                 {canPinPost && <button type="button" disabled={pinBusy || pinNeedsRefresh || mutationBusy} style={{ ...styles.actionBtn, minHeight: 44 }} onClick={() => void handlePin()}>{post.isPinned ? '공지 해제' : '공지로 고정'}</button>}
+                {canModeratePost && <button type="button" disabled={mutationBusy} style={{ ...styles.actionBtn, minHeight: 44 }} onClick={() => void handleModerate({ isLocked: !post.isLocked })}>{post.isLocked ? '잠금 해제' : '글 잠금'}</button>}
+                {canModeratePost && <button type="button" disabled={mutationBusy} style={{ ...styles.actionBtn, minHeight: 44 }} onClick={() => void handleModerate({ allowComments: post.allowComments === false })}>{post.allowComments === false ? '댓글 허용' : '댓글 막기'}</button>}
                 {canManagePost && <button style={styles.actionBtn} onClick={() => navigate(`${basePath}/write?edit=${post.id}`)}>수정</button>}
                 <button style={{ ...styles.actionBtn, color: '#dc2626' }} disabled={mutationBusy || pinBusy} onClick={() => void handleDeletePost()}>삭제</button>
               </>

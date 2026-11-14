@@ -36,7 +36,17 @@
   - web-neture `tsc` 0 · 전체 vitest 192 files · 1619 tests pass(기대값 2건 갱신: 홈 포럼 바로가기 주소, 게시판 미선택 안내 문구) · `vite build` 성공
   - admin `tsc` 0 · operators vitest 18 files · 153 pass
   - `check-unsafe-routes` 위반 0
+- **추가 커밋 — 운영자 중재 보완 (같은 날 · 통합 담당 「다음 작업은 판단해서 진행」):**
+  - 게시판 운영자(`communityOperator`)가 **남의** 글 · 댓글을 지울 때 사유(2~500자)가 필요하다. 없으면 400 `MODERATION_REASON_REQUIRED`.
+    글쓴이 본인 삭제와 커뮤니티 밖 플랫폼 관리자의 기존 관리 화면은 사유를 요구하지 않는다(호환).
+  - 운영자 · 관리자가 남의 글 · 댓글을 지우거나 잠금 · 댓글 막기를 하면 `action_logs` 에 남긴다(`forum:post_moderate_delete` · `forum:comment_moderate_delete` · `forum:post_moderate_settings`, meta 에 대상 · 사유 · 전후 값). 새 테이블 없음.
+  - 새 API `PATCH /…/forum/posts/:id/moderation` `{ isLocked?, allowComments?, reason? }` — 운영자 · 커뮤니티 밖 플랫폼 관리자만. `service-forum.routes.ts` 에 한 줄 추가(공용 forum router · 모든 서비스 forum 에 같은 경로가 생기며 권한은 컨트롤러가 확인).
+  - 글 화면: 남의 글 · 댓글 삭제 때 사유 입력 창, 운영자에게 [글 잠금 / 잠금 해제] · [댓글 막기 / 댓글 허용] 버튼.
+  - 펀딩 포럼 개설자 · 운영자도 같은 규칙을 따른다(같은 `communityOperator`).
+  - 검증: api `tsc` 0 · 포럼 controller/route jest 14 suites · 296 pass(사유 · 기록 · 잠금 새 테스트 포함) · web-neture 글 화면 중재 테스트 4 pass · forum/community/funding/carepharm vitest 186 pass · `check-unsafe-routes` 0.
+  - 작성자 알림은 아직 없다(포럼 알림 생성 경로가 없음 — 후속).
 - **확인하지 못한 것(배포 후 확인):**
+  - 운영자 계정으로 남의 글 삭제 시 사유 창 · 잠금/댓글 막기 버튼 동작(Demo 권한 밖 — 통합 담당 확인).
   - 비로그인으로 community.neture.co.kr 를 열면 소개 화면과 로그인 창이 뜨는지, 포럼 주소로 바로 들어가면 로그인 뒤 그 화면으로 돌아오는지. PC · 모바일 모두 확인한다.
   - Demo 「매장 경영자」로 로그인한 뒤 홈 · 포럼 · 영상 · 개선 요청이 보이는지.
   - 글쓰기에서 게시판 선택이 보이는지. 댓글이 21개 이상인 글이 있으면 모두 보이는지.

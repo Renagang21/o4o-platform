@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { CommentStatus, PostStatus } from '@o4o/forum-core/entities';
+import { logForumModeration, moderationReason } from './forumModeration.js';
 import logger from '../../utils/logger.js';
 import { ForumControllerBase } from './ForumControllerBase.js';
 // WO-O4O-FORUM-AUTHOR-PII-GUARD-V1 (S2): author-or-platform-admin edit/delete check
@@ -317,6 +318,13 @@ export class ForumCommentController extends ForumControllerBase {
       // 이미 삭제된 댓글을 다시 삭제해도 commentCount 가 중복 차감되지 않게 한다
       // (WO-O4O-COMMUNITY-FORUM-INTERACTION-AND-WRITE-BOUNDARY-COMMONIZATION-V1 §5 — count 정합).
       const alreadyDeleted = comment.status === CommentStatus.DELETED;
+      // 남의 댓글을 지우는 중재는 사유를 받고 기록한다(forumModeration). 게시판 운영자는 사유 필수.
+      const moderating = comment.authorId !== userId;
+      const reason = moderationReason(req.body?.reason ?? req.query.reason);
+      if (moderating && this.getForumContext(req)?.communityOperator && !reason) {
+        res.status(400).json({ success: false, code: 'MODERATION_REASON_REQUIRED', error: '삭제 사유를 2자 이상 500자 이하로 입력해 주시기 바랍니다.' });
+        return;
+      }
 
       // Soft delete
       comment.status = CommentStatus.DELETED;
@@ -331,6 +339,10 @@ export class ForumCommentController extends ForumControllerBase {
         }
       }
 
+      if (moderating && !alreadyDeleted) {
+        await logForumModeration(this.commentRepository.manager, this.getForumContext(req)?.communityKey ?? this.getCanonicalServiceKey(this.getForumContext(req)), userId,
+          'forum:comment_moderate_delete', { commentId: comment.id, postId: comment.postId, authorId: comment.authorId, reason });
+      }
       res.status(200).json({ success: true, message: 'Comment deleted successfully' });
     } catch (error: any) {
       logger.error('Error deleting forum comment:', error);

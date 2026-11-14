@@ -740,10 +740,12 @@ export async function toggleForumPostLike(
 }
 
 export async function deleteForumPost(
-  postId: string
+  postId: string,
+  /** 운영자가 남의 글을 지울 때의 사유(2026-11-14 · 서버가 기록한다). */
+  reason?: string,
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    await api.delete(`${forumBase()}/posts/${postId}`);
+    await api.delete(`${forumBase()}/posts/${postId}`, reason ? { data: { reason } } : undefined);
     return { success: true };
   } catch (error: any) {
     const responseData = error?.response?.data;
@@ -773,11 +775,27 @@ export async function updateForumComment(
 /**
  * Delete a forum comment
  */
+/** 게시판 운영자의 글 잠금 · 댓글 막기(2026-11-14). */
+export async function moderateForumPost(
+  postId: string,
+  patch: { isLocked?: boolean; allowComments?: boolean; reason?: string },
+): Promise<{ success: boolean; data?: { id: string; isLocked: boolean; allowComments: boolean }; error?: string }> {
+  try {
+    const response = await api.patch(`${forumBase()}/posts/${postId}/moderation`, patch);
+    return { success: true, data: response.data?.data };
+  } catch (error: any) {
+    const responseData = error?.response?.data;
+    return { success: false, error: responseData?.message || responseData?.error || '게시글 설정을 바꾸지 못했습니다.' };
+  }
+}
+
 export async function deleteForumComment(
-  commentId: string
+  commentId: string,
+  /** 운영자가 남의 댓글을 지울 때의 사유(2026-11-14 · 서버가 기록한다). */
+  reason?: string,
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    await api.delete(`${forumBase()}/comments/${commentId}`);
+    await api.delete(`${forumBase()}/comments/${commentId}`, reason ? { data: { reason } } : undefined);
     return { success: true };
   } catch (error: any) {
     const responseData = error?.response?.data;

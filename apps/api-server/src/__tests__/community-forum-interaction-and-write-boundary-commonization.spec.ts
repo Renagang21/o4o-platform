@@ -752,15 +752,56 @@ describe('independent community daily moderation authority', () => {
  it.each([false,true])('post hiding requires community moderation authority, even for platform admin (%s)',async allowed=>{
   state.posts=[post('community-post','community-board')];
   const {res,out}=makeRes();
-  await new ScopedPost().deletePost(makeReq({user:{id:'moderator',roles:['platform:super_admin']},ctx:{scope:'community',communityKey:'community',communityOperator:allowed},params:{id:'community-post'}}),res);
+  await new ScopedPost().deletePost(makeReq({user:{id:'moderator',roles:['platform:super_admin']},ctx:{scope:'community',communityKey:'community',communityOperator:allowed},params:{id:'community-post'},body:{reason:'광고성 글'}}),res);
   expect(out.status).toBe(allowed?200:403);expect(state.savedPosts).toHaveLength(allowed?1:0);
   if(allowed)expect(state.savedPosts[0].status).toBe('archived');
  });
  it.each([false,true])('comment hiding follows the same community authority (%s)',async allowed=>{
   state.posts=[post('community-post','community-board')];state.comments=[{id:'comment',postId:'community-post',authorId:'author',status:'published'}];
   const {res,out}=makeRes();
-  await new ScopedComment().deleteComment(makeReq({user:{id:'moderator',roles:['platform:super_admin']},ctx:{scope:'community',communityKey:'community',communityOperator:allowed},params:{id:'comment'}}),res);
+  await new ScopedComment().deleteComment(makeReq({user:{id:'moderator',roles:['platform:super_admin']},ctx:{scope:'community',communityKey:'community',communityOperator:allowed},params:{id:'comment'},body:{reason:'욕설'}}),res);
   expect(out.status).toBe(allowed?200:403);expect(state.savedComments).toHaveLength(allowed?1:0);
+ });
+ // 2026-11-14 커뮤니티 점검: 운영자 중재는 사유를 받고 action_logs 에 남긴다. 운영자는 글을 잠그거나 댓글을 막을 수 있다.
+ const audits=()=>state.rawQueries.filter(q=>q.sql.includes('INSERT INTO action_logs'));
+ it('an operator deleting someone else\'s post or comment needs a reason, and the deletion is recorded',async()=>{
+  state.posts=[post('community-post','community-board')];state.comments=[{id:'comment',postId:'community-post',authorId:'author',status:'published'}];
+  const ctx={scope:'community',communityKey:'community',communityOperator:true} as ForumContext;
+  for (const reason of [undefined,' ','x'.repeat(501)]) {
+   const {res,out}=makeRes();
+   await new ScopedPost().deletePost(makeReq({user:{id:'moderator'},ctx,params:{id:'community-post'},body:{reason}}),res);
+   expect(out.status).toBe(400);expect(out.body.code).toBe('MODERATION_REASON_REQUIRED');
+  }
+  const c=makeRes();
+  await new ScopedComment().deleteComment(makeReq({user:{id:'moderator'},ctx,params:{id:'comment'}}),c.res);
+  expect(c.out.status).toBe(400);expect(state.savedPosts).toHaveLength(0);expect(state.savedComments).toHaveLength(0);expect(audits()).toHaveLength(0);
+  const p=makeRes();
+  await new ScopedPost().deletePost(makeReq({user:{id:'moderator'},ctx,params:{id:'community-post'},body:{reason:' 광고성 글 '}}),p.res);
+  expect(p.out.status).toBe(200);
+  const [log]=audits();
+  expect(log.params?.slice(0,3)).toEqual(['community','moderator','forum:post_moderate_delete']);
+  expect(JSON.parse(log.params![3])).toMatchObject({postId:'community-post',reason:'광고성 글'});
+ });
+ it('the author deletes their own post without a reason and nothing is recorded',async()=>{
+  state.posts=[{...post('community-post','community-board'),authorId:'moderator'}];
+  const {res,out}=makeRes();
+  await new ScopedPost().deletePost(makeReq({user:{id:'moderator'},ctx:{scope:'community',communityKey:'community',communityOperator:true},params:{id:'community-post'}}),res);
+  expect(out.status).toBe(200);expect(audits()).toHaveLength(0);
+ });
+ it('operators lock a post or block comments; members and platform-only admins cannot',async()=>{
+  state.posts=[{...post('community-post','community-board'),isLocked:false,allowComments:true}];
+  for (const ctx of [{scope:'community',communityKey:'community'},{scope:'community',communityKey:'community',communityOperator:false}] as ForumContext[]) {
+   const {res,out}=makeRes();
+   await new ScopedPost().moderatePost(makeReq({user:{id:'platform-admin',roles:['platform:super_admin']},ctx,params:{id:'community-post'},body:{isLocked:true}}),res);
+   expect(out.status).toBe(403);
+  }
+  const bad=makeRes();
+  await new ScopedPost().moderatePost(makeReq({user:{id:'moderator'},ctx:{scope:'community',communityKey:'community',communityOperator:true},params:{id:'community-post'},body:{isLocked:'yes'}}),bad.res);
+  expect(bad.out.status).toBe(400);expect(state.savedPosts).toHaveLength(0);
+  const {res,out}=makeRes();
+  await new ScopedPost().moderatePost(makeReq({user:{id:'moderator'},ctx:{scope:'community',communityKey:'community',communityOperator:true},params:{id:'community-post'},body:{isLocked:true,allowComments:false,reason:'분쟁'}}),res);
+  expect(out.status).toBe(200);expect(out.body.data).toEqual({id:'community-post',isLocked:true,allowComments:false});
+  expect(JSON.parse(audits()[0].params![3])).toMatchObject({before:{isLocked:false,allowComments:true},after:{isLocked:true,allowComments:false},reason:'분쟁'});
  });
  it('platform privilege alone cannot pin in the independent community',async()=>{
   state.forums.push({...KPA_FORUM,id:'community-board',service_code:'community'});state.posts=[post('community-post','community-board')];

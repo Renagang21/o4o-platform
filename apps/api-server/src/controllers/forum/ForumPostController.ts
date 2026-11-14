@@ -13,6 +13,7 @@ import { CATALOG_FORUM_STORAGE_CODES } from '../../config/community-catalog.js';
 // WO-O4O-FORUM-AUTHOR-PII-GUARD-V1 (S2): author-or-platform-admin edit/delete check
 import { isPlatformAdmin } from '../../utils/role.utils.js';
 import { authorPostFields } from './forumAuthorFields.js';
+import { logForumModeration, moderationReason } from './forumModeration.js';
 
 /**
  * ForumPostController
@@ -595,10 +596,22 @@ export class ForumPostController extends ForumControllerBase {
         return;
       }
 
+      // 남의 글을 지우는 중재는 사유를 받고 기록한다(forumModeration). 게시판 운영자는 사유 필수.
+      const moderating = post.authorId !== userId;
+      const reason = moderationReason(req.body?.reason ?? req.query.reason);
+      if (moderating && this.getForumContext(req)?.communityOperator && !reason) {
+        res.status(400).json({ success: false, code: 'MODERATION_REASON_REQUIRED', error: '삭제 사유를 2자 이상 500자 이하로 입력해 주시기 바랍니다.' });
+        return;
+      }
+
       // Only decrement postCount if post was previously published
       // Archive instead of hard delete
       post.status = PostStatus.ARCHIVED;
       await this.postRepository.save(post);
+      if (moderating) {
+        await logForumModeration(this.postRepository.manager, this.getForumContext(req)?.communityKey ?? this.getCanonicalServiceKey(this.getForumContext(req)), userId,
+          'forum:post_moderate_delete', { postId: post.id, forumId: post.forumId, authorId: post.authorId, title: post.title, reason });
+      }
 
       // forum_category_requests has no postCount — no-op after WO-O4O-FORUM-CATEGORY-CLEANUP-V1
 
@@ -612,6 +625,36 @@ export class ForumPostController extends ForumControllerBase {
         success: false,
         error: error.message || 'Failed to delete post',
       });
+    }
+  }
+
+  /**
+   * PATCH /forum/posts/:id/moderation — 게시판 운영자의 글 잠금 · 댓글 막기(2026-11-14).
+   * body: { isLocked?: boolean, allowComments?: boolean, reason?: string }. 운영자(communityOperator) ·
+   * 커뮤니티 밖 플랫폼 관리자만. 글쓴이 본인도 이 경로로는 바꾸지 않는다(글쓴이 칸은 forumAuthorFields).
+   */
+  async moderatePost(req: Request, res: Response): Promise<void> {
+    try {
+      const userId = (req as any).user?.id;
+      if (!userId) { res.status(401).json({ success: false, error: 'Unauthorized' }); return; }
+      const roles: string[] = (req as any).user?.roles || [];
+      if (!this.canGovernPostFields(req, roles)) { res.status(403).json({ success: false, code: 'FORUM_OPERATOR_REQUIRED', error: '게시판 운영자만 처리할 수 있습니다.' }); return; }
+      const { isLocked, allowComments } = req.body ?? {};
+      if ((isLocked !== undefined && typeof isLocked !== 'boolean') || (allowComments !== undefined && typeof allowComments !== 'boolean') || (isLocked === undefined && allowComments === undefined)) {
+        res.status(400).json({ success: false, code: 'VALIDATION_ERROR', error: '잠금 또는 댓글 허용 값을 확인해 주시기 바랍니다.' }); return;
+      }
+      const post = await this.resolveForumPostInServiceScope(req.params.id, this.getForumContext(req));
+      if (!post) { res.status(404).json({ success: false, error: 'Post not found' }); return; }
+      const before = { isLocked: post.isLocked, allowComments: post.allowComments };
+      if (isLocked !== undefined) post.isLocked = isLocked;
+      if (allowComments !== undefined) post.allowComments = allowComments;
+      await this.postRepository.save(post);
+      await logForumModeration(this.postRepository.manager, this.getForumContext(req)?.communityKey ?? this.getCanonicalServiceKey(this.getForumContext(req)), userId,
+        'forum:post_moderate_settings', { postId: post.id, forumId: post.forumId, authorId: post.authorId, before, after: { isLocked: post.isLocked, allowComments: post.allowComments }, reason: moderationReason(req.body?.reason) });
+      res.json({ success: true, data: { id: post.id, isLocked: post.isLocked, allowComments: post.allowComments } });
+    } catch (error: any) {
+      logger.error('Error moderating forum post:', error);
+      res.status(500).json({ success: false, error: 'Failed to update post settings' });
     }
   }
 

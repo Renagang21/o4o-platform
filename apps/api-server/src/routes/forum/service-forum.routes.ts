@@ -147,6 +147,7 @@ export function createServiceForumRouter(options: ServiceForumRouterOptions): Ro
   router.put('/posts/:id', ...write, postController.updatePost.bind(postController));
   router.delete('/posts/:id', ...write, postController.deletePost.bind(postController));
   router.post('/posts/:id/like', ...write, postController.toggleLike.bind(postController));
+  router.patch('/posts/:id/moderation', ...write, postController.moderatePost.bind(postController));
   router.patch('/posts/:id/pin', ...write, postController.pinPost.bind(postController));
 
   // Comments
