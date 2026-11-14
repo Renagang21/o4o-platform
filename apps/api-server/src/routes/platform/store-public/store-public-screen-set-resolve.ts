@@ -35,6 +35,7 @@ import type { ContentSourceAdapter } from './store-public-tablet-content-source.
 //   여기서는 이미 발급된 public_qr_slug 를 읽어 URL 로 변환만 한다(DB write 0).
 import { buildScreenSetQrUrl } from '../store-screen-set-qr.service.js';
 import { productLandingUrl } from '../../../modules/neture/services/product-landing.service.js';
+import { effectiveProductSql } from '../../signage/services/media-product-link.service.js';
 
 export interface ScreenSection {
   blockType: string;
@@ -202,6 +203,54 @@ export async function resolveProductLandingQrUrls(
   return map;
 }
 
+export interface ProductVideo { id: string; title: string; kind: 'video' | 'youtube' | 'vimeo'; url: string }
+/** 제품 하나에 보일 영상 수 상한. */
+export const PRODUCT_VIDEO_LIMIT = 3;
+
+/**
+ * 태블릿 코너 제품의 [영상 보기] — WO-O4O-STORE-QR-TABLET-CHANNEL-SEPARATION-V1 T5 · D7(2026-11-14).
+ * 「이 영상의 제품」(effectiveProductSql · #1058)이 이 매장 listing 의 제품 마스터와 같은 활성 영상.
+ *   - 이 매장이 등록한 영상(source='store' · organizationId) — 먼저 보인다
+ *   - 서비스 공용 영상(운영자 hq · 공급자 supplier · scope='global')
+ *   - 매장이 가져온 사본(parentMediaId)은 원본의 연결을 따른다
+ * 근무자가 코너마다 제품과 영상을 짝짓지 않는다. 공개 경로라 읽기 전용이다. 결과: listingId → 영상(최대 PRODUCT_VIDEO_LIMIT).
+ */
+export async function resolveProductVideos(
+  dataSource: Pick<DataSource, 'query'>,
+  organizationId: string,
+  serviceKeys: string[],
+  listingIds: string[],
+): Promise<Map<string, ProductVideo[]>> {
+  const ids = Array.from(new Set(listingIds.filter((id) => UUID_RE.test(id))));
+  const map = new Map<string, ProductVideo[]>();
+  if (ids.length === 0 || serviceKeys.length === 0) return map;
+  const rows = await dataSource.query(
+    `SELECT opl.id AS "listingId", v.id, v.name, v."sourceType", v."sourceUrl"
+       FROM organization_product_listings opl
+       CROSS JOIN LATERAL (
+         SELECT sm.id, sm.name, sm."sourceType", sm."sourceUrl"
+           FROM signage_media sm
+           LEFT JOIN signage_media parent ON parent.id = sm."parentMediaId" AND parent."deletedAt" IS NULL
+          WHERE sm."deletedAt" IS NULL AND sm.status = 'active' AND sm."mediaType" = 'video'
+            AND sm."serviceKey" = ANY($3::text[])
+            AND ((sm.source = 'store' AND sm."organizationId" = $1) OR (sm.source IN ('hq', 'supplier') AND sm.scope = 'global'))
+            AND COALESCE(${effectiveProductSql('sm')}, ${effectiveProductSql('parent')}) = opl.master_id::text
+          ORDER BY (sm.source = 'store') DESC, sm."updatedAt" DESC, sm.id
+          LIMIT ${PRODUCT_VIDEO_LIMIT}
+       ) v
+      WHERE opl.organization_id = $1 AND opl.id = ANY($2::uuid[])`,
+    [organizationId, ids, serviceKeys],
+  );
+  for (const r of rows ?? []) {
+    if (!r?.listingId || typeof r.sourceUrl !== 'string' || !r.sourceUrl) continue;
+    const kind: ProductVideo['kind'] = r.sourceType === 'youtube' || r.sourceType === 'vimeo' ? r.sourceType : 'video';
+    const list = map.get(String(r.listingId)) ?? [];
+    list.push({ id: String(r.id), title: String(r.name ?? '영상'), kind, url: r.sourceUrl });
+    map.set(String(r.listingId), list);
+  }
+  return map;
+}
+
 /**
  * WO-O4O-SCREEN-SET-PREVIEW-PRODUCT-PARITY-V1
  *   product_list **명시 선택** 상품 resolve 의 단일 소스.
@@ -272,6 +321,8 @@ export async function resolveSelectedProductListSection(
     ctx.organizationId,
     selected.filter((s) => s.productType === 'supplier' && !s.qrCodeId).map((s) => s.productId),
   );
+  // 이 제품의 영상(T5 · D7). 매장 자체 상품은 표준 제품 정보가 없어 대상이 아니다.
+  const videosByListing = await resolveProductVideos(dataSource, ctx.organizationId, resolveServiceKeys(ctx.serviceKey), selectedListingIds);
   // 저장된 선택 순서 그대로 출력(supplier/local 혼합 순서 보존).
   const ordered = selected
     .map((s) => {
@@ -281,7 +332,8 @@ export async function resolveSelectedProductListSection(
       // (매장이 의도한 QR 이 사라진 상태를 숨기지 않는다 — 소비처는 표시하지 않는다).
       const selectedQr = s.qrCodeId ? qrUrlById.get(s.qrCodeId) ?? null : null;
       const landingQr = !s.qrCodeId && s.productType === 'supplier' ? landingQrByListing.get(s.productId) ?? null : null;
-      return { ...base, qrUrl: selectedQr ?? landingQr, qrSource: selectedQr ? 'selected' : landingQr ? 'product' : null };
+      const videos = s.productType === 'supplier' ? videosByListing.get(s.productId) ?? [] : [];
+      return { ...base, qrUrl: selectedQr ?? landingQr, qrSource: selectedQr ? 'selected' : landingQr ? 'product' : null, videos };
     })
     .filter(Boolean);
 

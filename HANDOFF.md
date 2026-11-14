@@ -1,5 +1,34 @@
 # HANDOFF
 
+
+## 2026-11-14 · 태블릿 코너 제품 [영상 보기] (branch `claude/intelligent-cray-o2p4u3-tablet-video` · API + tablet-kiosk-core)
+
+> 다음 실행자: **통합 세션** — 이 branch 로 PR. 선행 #1058(이 영상의 제품 · migration)은 2026-11-14 병합했다(`4ed07a6`). [`WO-O4O-STORE-QR-TABLET-CHANNEL-SEPARATION-V1`](docs/work-orders/WO-O4O-STORE-QR-TABLET-CHANNEL-SEPARATION-V1.md) T5 · D7.
+
+- **결정 사항:**
+  - 2026-11-14 통합 담당이 「#1058 해결」을 지시했다. 그에 따라 이 세션이 #1058 을 병합했다.
+    - 병합 전 확인 1: 통합 세션이 다시 매긴 epoch(`1794624815975`)와 fingerprint(`ed1759a…`, 7670 lines)를 격리 DB 에서 다시 확인했다(PASS).
+    - 병합 전 확인 2: main 이 PR 기준점 이후 움직이지 않았다.
+    - 병합 전 확인 3: PR CI(CI Gate 포함) 성공.
+  - 세션 판단:
+    - 제품당 영상은 최대 3개다. 순서는 이 매장이 등록한 영상이 먼저이고, 그다음 서비스 공용(운영자 · 공급자) 영상이며, 각각 최근 것이 먼저다.
+    - 매장이 가져온 사본은 원본 영상의 연결을 따른다.
+    - 활성(`active`) 영상만 보인다.
+    - 누르기 전에는 재생기를 띄우지 않는다.
+- **한 일:**
+  - API: 화면 세트 제품 목록(명시 선택)에 `videos` 를 싣는다(`resolveProductVideos`). 판정은 #1058 의 `effectiveProductSql` 을 그대로 쓴다. 공개 경로라 읽기 전용이다.
+  - tablet-kiosk-core: 새 `ProductVideos`(▶ 영상 보기 / 여러 개면 제목 · 기존 `VideoPlayback` 재사용). 태블릿 상품 상세와 코너 QR 모바일 상품 상세에 넣었다.
+- **검증:**
+  - api `store-public/__tests__`(영상 · 대표 QR) + 태블릿 계약 spec 36 pass. 실제 schema 에서 확인한 것:
+    - 다른 매장 · 초안 · 다른 서비스 · 다른 제품 영상 제외
+    - 3개 상한
+    - 쓰기 0
+  - api `tsc` 0
+  - web-store 태블릿 vitest 6 files / 81(새 3) · `tsc` 0 · ESLint 0
+- **배포 후 확인:**
+  - 준비: Demo 「매장 경영자」로 사이니지 동영상 하나를 취급 제품에 연결한다(#1058 화면). 공용 데이터라 확인 뒤 해제한다.
+  - 확인: 그 제품을 넣은 태블릿 코너(제품 진열형)의 상품 상세에 [▶ 영상 보기]가 보이고 재생되는지.
+
 ## 2026-11-14 · 사진 거래장 실제 저장 · O4O/ChatGPT 연결 (branch `wo/photo-ledger-chat-integration`)
 
 - **다음 실행자:** 통합 담당 — 이 branch로 PR·계약/migration 검토·병합·배포. A 커밋을 포함했으므로 `wo/photo-ledger-review-core`는 별도 병합하지 않는다. main `c649e8bbf` 기준. 현재 열린 #1058(signage 제품 연결)과 겹치는 경로: `HANDOFF.md`, `apps/api-server/src/database/incremental/expected-schema-states.ts`, `apps/api-server/src/database/incremental/manifest.ts`. 공유 경로 충돌은 양쪽 내용을 유지하고 migration prefix를 다시 검증한다.

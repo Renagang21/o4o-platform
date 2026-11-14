@@ -52,6 +52,7 @@ import { MediaSequence } from './MediaSequence';
  */
 
 import { GuidanceDialog } from './GuidanceDialog';
+import { ProductVideos, readProductVideos, type ProductVideoItem } from './ProductVideos';
 import { useEffect, useReducer, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 // WO-O4O-KPA-TABLET-PRODUCT-DESCRIPTION-RICH-RENDER-V1: canonical 상품설명 HTML 안전 렌더(DOMPurify)
@@ -136,6 +137,8 @@ interface DisplayProduct {
   selectedContentTranslations?: Record<string, TabletContentTranslation> | null;
   // WO-O4O-SCREEN-SET-PRODUCT-QR-SELECTION-V1: 매장이 이 상품에 직접 고른 기존 QR 의 공개 URL(미선택/비활성이면 없음).
   qrUrl?: string | null;
+  // WO-O4O-STORE-QR-TABLET-CHANNEL-SEPARATION-V1 T5: 이 제품의 영상(서버가 「이 영상의 제품」으로 찾아 준 것, 최대 3개).
+  videos?: ProductVideoItem[];
 }
 
 // ── Reducer (internal) ──
@@ -337,7 +340,7 @@ function mapSectionProduct(p: any): DisplayProduct {
       qrUrl,
     };
   }
-  return { ...mapSupplierProduct(p as TabletProduct), qrUrl };
+  return { ...mapSupplierProduct(p as TabletProduct), qrUrl, videos: readProductVideos(p?.videos) };
 }
 
 // ── Component ──
@@ -854,6 +857,9 @@ export function TabletKioskPage({
                 ))}
               </div>
             )}
+
+            {/* WO-O4O-STORE-QR-TABLET-CHANNEL-SEPARATION-V1 T5: 이 제품의 영상이 있으면 [영상 보기]. */}
+            <ProductVideos videos={selectedProduct.videos} />
 
             {/* WO-O4O-KPA-TABLET-DISPLAY-CONTENT-SELECTION-V1 (+ MULTILINGUAL BRIDGE):
                 우선순위 = 선택 언어 번역 → 기본 선택콘텐츠 → 기존 제품 description/summary.
