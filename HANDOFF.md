@@ -17,6 +17,7 @@
 - **검증:** 합성 명세서 Jest 20건·처리부 strict TypeScript·변경 파일 ESLint 통과. UI/route가 없어 브라우저 검증 해당 없음. 원본 프로그램 계약과 운영 DB는 변경하지 않았다.
 - **다음 실행자:** 통합 세션은 이 branch의 PR·검사·병합 담당. 개발 후속은 [사진 거래장 WO](docs/work-orders/WO-O4O-PHOTO-TRANSACTION-LEDGER-V1.md) B(원본·저장 계약·권한·중복 대조·상품 후보 연결), C(양쪽 채팅 연결). 할인·반올림 조정 근거를 먼저 확장할 것.
 - **문서 정합:** [사용 안내](docs/guides/O4O-CHATGPT-WORK-QUICKSTART-V1.md)에 사진만 입력·공통 상품 연결 비필수·미연결 범위 반영. 이전 체크는 당시 기록으로 유지.
+- **문서 정합:** [사용 안내](docs/guides/O4O-CHATGPT-WORK-QUICKSTART-V1.md)에 사진만 입력·공통 상품 연결 비필수·미연결 범위 반영 — 통합 세션이 AGENTS.md §4-3 R6 에 따라 문서 전용 branch `wo/chatgpt-quickstart-photo-ledger-docs` 로 분리. 이전 체크는 당시 기록으로 유지.
 
 ## 2026-11-14 · ChatGPT 연결 안내 · 거래명세서 문서 보관 시험 (branch `wo/chatgpt-entry-invoice-trial`)
 

@@ -229,7 +229,12 @@ export function invoiceDuplicateHints(
   const { invoice, sources } = inspectPhotoInvoice(raw, sourceInput);
   return {
     photoFingerprint: sources.length
-      ? hash([ownerKey, [...new Set(sources.map((s) => s.sha256))].sort()])
+      ? hash([
+          ownerKey,
+          [...new Set(sources.map((s) => s.sha256))].sort((a, b) =>
+            a.localeCompare(b, "en"),
+          ),
+        ])
       : null,
     documentFingerprint:
       invoice.sellerBusinessNumber &&
