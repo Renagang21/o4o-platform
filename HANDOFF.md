@@ -1,5 +1,18 @@
 # HANDOFF
 
+## 2026-11-14 · Admin 로그인 「Google 로그인을 준비하고 있습니다…」 오래 걸림 — 화면 안내 · 자동 재시도 (branch `claude/ecstatic-mendel-2ohu27-login`)
+
+- **branch:** 앞 branch `claude/ecstatic-mendel-2ohu27` 는 #1056 으로 병합됨 → 최신 `origin/main` 에서 새 branch(AGENTS §4-1(e)).
+- **조사:** 이 문구는 `/auth/google/config` 응답을 기다리는 단계(`apps/admin-dashboard/src/pages/auth/Login.tsx`). 브라우저 쪽 대기 · 직렬화 없음. warm 상태 응답 0.76~1.0초(`/health` 0.28초). API Cloud Run `--min-instances=0`(`deploy-api.yml`) → 유휴 후 첫 요청이 cold start 를 기다리는 것이 유력(운영 로그 미확인 — 클라우드 세션은 GCP 로그 불가).
+- **사용자 결정:** 안 A(화면 안내 · 자동 재시도)만 진행. 버튼 선표시(배포 설정 변경) · API 상시 1대(인프라 · 비용)는 통합 담당 결정 사항으로 보류.
+- **한 일 (`Login.tsx`):** 5초가 지나도 설정을 못 받으면 「서버를 깨우는 중입니다(최대 30초 정도)」 표시. 설정 요청은 최대 3회(실패 시 3초 뒤 다시 · 「다시 시도하고 있습니다 (n/3)」). 3회 모두 실패하면 「불러오지 못했습니다」 + 「다시 시도」 버튼.
+- **결정 사항(§9):** `getGoogleAuthConfig` 는 실패와 미설정을 모두 `{enabled:false}` 로 돌려줘 구분할 수 없으므로 두 경우 모두 같은 횟수만큼 다시 묻는다(미설정이면 약 6초 뒤 안내). 공용 `@o4o/auth-client` 는 바꾸지 않음.
+- **검증:** admin-dashboard vitest `src/pages/auth` · `admin-legacy-route-api-and-navigation-closure` 90 통과(신규 3건 — 5초 안내 · 자동 재시도 성공 · 3회 실패 후 수동 재시도). `tsc --noEmit` · 변경 파일 ESLint 통과. 실제 브라우저 · cold start 재현 안 함.
+- **배포 후 확인:** 한동안(15분 이상) 사용이 없던 뒤 `https://admin.neture.co.kr/login` 을 열어 5초 뒤 안내가 뜨는지, 버튼이 결국 뜨는지.
+- **PR 묶음:** 단독 1 PR(admin 화면 · lane 해당 없음). 겹칠 수 있는 PR 미대조.
+- **후속 제안:** 근본 해결은 API `--min-instances=1`(배포 인프라 · 비용 — 통합 담당). cold start 확정은 로컬 세션에서 Cloud Run 요청 지연 · 인스턴스 기동 로그 조회.
+- **문서 정합:** 해당 없음.
+
 ## 2026-11-14 · 사진 거래장 실제 저장 · O4O/ChatGPT 연결 (branch `wo/photo-ledger-chat-integration`)
 
 - **다음 실행자:** 통합 담당 — 이 branch로 PR·계약/migration 검토·병합·배포. A 커밋을 포함했으므로 `wo/photo-ledger-review-core`는 별도 병합하지 않는다. main `c649e8bbf` 기준. 현재 열린 #1058(signage 제품 연결)과 겹치는 경로: `HANDOFF.md`, `apps/api-server/src/database/incremental/expected-schema-states.ts`, `apps/api-server/src/database/incremental/manifest.ts`. 공유 경로 충돌은 양쪽 내용을 유지하고 migration prefix를 다시 검증한다.

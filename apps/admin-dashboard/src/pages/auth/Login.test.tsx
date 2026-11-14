@@ -64,3 +64,50 @@ it('keeps the platform admin on the admin page', () => {
   view('/admin');
   expect(screen.getByText('admin home')).toBeTruthy();
 });
+
+it('explains a slow server start after 5 seconds and shows the button once the config arrives', async () => {
+  vi.useFakeTimers();
+  try {
+    let answer!: (value: { enabled: boolean; clientId: string | null }) => void;
+    auth.getGoogleAuthConfig.mockReturnValueOnce(new Promise((resolve) => { answer = resolve; }));
+    view('/login');
+    expect(screen.queryByTestId('google-continue-slow')).toBeNull();
+    await act(async () => { vi.advanceTimersByTime(5_000); });
+    expect(screen.getByTestId('google-continue-slow')).toHaveTextContent('서버를 깨우는 중입니다');
+    await act(async () => { answer({ enabled: true, clientId: 'synthetic-client' }); });
+    expect(screen.getByTestId('google-continue-button')).toBeTruthy();
+    expect(screen.queryByTestId('google-continue-slow')).toBeNull();
+  } finally { vi.useRealTimers(); }
+});
+
+it('retries the config automatically and shows the button when a later attempt succeeds', async () => {
+  vi.useFakeTimers();
+  try {
+    auth.getGoogleAuthConfig
+      .mockResolvedValueOnce({ enabled: false, clientId: null })
+      .mockResolvedValueOnce({ enabled: true, clientId: 'synthetic-client' });
+    view('/login');
+    await act(async () => { await Promise.resolve(); });
+    expect(screen.getByTestId('google-continue-retrying')).toHaveTextContent('(2/3)');
+    await act(async () => { vi.advanceTimersByTime(3_000); });
+    expect(auth.getGoogleAuthConfig).toHaveBeenCalledTimes(2);
+    expect(screen.getByTestId('google-continue-button')).toBeTruthy();
+  } finally { vi.useRealTimers(); }
+});
+
+it('after 3 failed attempts offers a manual retry that asks again', async () => {
+  vi.useFakeTimers();
+  try {
+    auth.getGoogleAuthConfig.mockResolvedValue({ enabled: false, clientId: null });
+    view('/login');
+    await act(async () => { await Promise.resolve(); });
+    await act(async () => { vi.advanceTimersByTime(3_000); });
+    await act(async () => { vi.advanceTimersByTime(3_000); });
+    expect(auth.getGoogleAuthConfig).toHaveBeenCalledTimes(3);
+    expect(screen.getByTestId('google-continue-disabled')).toBeTruthy();
+    auth.getGoogleAuthConfig.mockResolvedValue({ enabled: true, clientId: 'synthetic-client' });
+    await act(async () => { screen.getByRole('button', { name: '다시 시도' }).click(); });
+    expect(auth.getGoogleAuthConfig).toHaveBeenCalledTimes(4);
+    expect(screen.getByTestId('google-continue-button')).toBeTruthy();
+  } finally { vi.useRealTimers(); }
+});
