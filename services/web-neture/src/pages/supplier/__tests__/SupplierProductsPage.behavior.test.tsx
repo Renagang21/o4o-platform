@@ -139,10 +139,15 @@ const loaded = async () => {
 };
 const selectFirst = () =>
   fireEvent.click(within(screen.getByTestId('offer-1')).getByRole('checkbox'));
+// 등록 재검토 요청은 공용 확인 대화상자(@o4o/ui ConfirmActionDialog)로 묻는다
+const requestApproval = async (answer: '요청' | '취소' = '요청') => {
+  fireEvent.click(screen.getByRole('button', { name: '등록 재검토 요청' }));
+  const dialog = await screen.findByRole('dialog');
+  fireEvent.click(within(dialog).getByRole('button', { name: answer }));
+};
 
 beforeEach(() => {
   vi.resetAllMocks();
-  vi.spyOn(window, 'confirm').mockReturnValue(true);
   Element.prototype.scrollIntoView = vi.fn();
   api.getProductsPaginated.mockImplementation(async ({ page }) => ({
     data: products.map((p) => ({ ...p })),
@@ -199,11 +204,11 @@ describe('SupplierProductsPage existing workflow', () => {
   });
 
   it('does not send an approval request after confirmation is cancelled', async () => {
-    vi.mocked(window.confirm).mockReturnValue(false);
     mount();
     await loaded();
     selectFirst();
-    fireEvent.click(screen.getByRole('button', { name: '등록 재검토 요청' }));
+    await requestApproval('취소');
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
     expect(api.submitForApproval).not.toHaveBeenCalled();
     expect(screen.getByText('1개 선택')).toBeTruthy();
   });
@@ -250,7 +255,7 @@ describe('SupplierProductsPage existing workflow', () => {
     fireEvent.click(screen.getByRole('button', { name: '2페이지' }));
     await screen.findByText('현재 페이지 2');
     selectFirst();
-    fireEvent.click(screen.getByRole('button', { name: '등록 재검토 요청' }));
+    await requestApproval();
     await screen.findByText('1건 승인 요청 완료');
     await waitFor(() => expect(api.getProductsPaginated).toHaveBeenCalledTimes(3));
     expect(api.getProductsPaginated.mock.lastCall?.[0].page).toBe(2);
@@ -267,7 +272,7 @@ describe('SupplierProductsPage existing workflow', () => {
     mount();
     await loaded();
     selectFirst();
-    fireEvent.click(screen.getByRole('button', { name: '등록 재검토 요청' }));
+    await requestApproval();
     await screen.findByText('승인 요청 결과');
     expect(screen.getByText('승인 요청 제외: 1건')).toBeTruthy();
     expect(screen.getAllByText('검증 상품 1').length).toBeGreaterThan(1);
@@ -374,7 +379,7 @@ describe('SupplierProductsPage bulk selection safety', () => {
     mount();
     await loaded();
     selectFirst();
-    fireEvent.click(screen.getByRole('button', { name: '등록 재검토 요청' }));
+    await requestApproval();
     const busy = await screen.findByRole('button', { name: '요청 중...' });
     expect((busy as HTMLButtonElement).disabled).toBe(true);
     fireEvent.click(busy);

@@ -3,7 +3,7 @@
  *   표 안에 실패와 [다시 시도]를 보이고, 작업 결과 문구를 덮어쓰지 않는다.
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import SupplierSupplyProposalsPage from '../SupplierSupplyProposalsPage';
 import SupplierSemiFranchiseEventsPage from '../SupplierSemiFranchiseEventsPage';
@@ -57,11 +57,11 @@ describe('SupplierSupplyProposalsPage — 목록 조회 실패', () => {
   });
 
   it('종료 성공 후 재조회가 실패해도 성공 문구를 덮어쓰지 않는다', async () => {
-    vi.spyOn(window, 'confirm').mockReturnValue(true);
     mocks.listProposals.mockResolvedValueOnce([proposal]).mockRejectedValueOnce(new Error('network'));
     mocks.endProposal.mockResolvedValue({});
     show();
     fireEvent.click(await screen.findByRole('button', { name: /종료/ }));
+    fireEvent.click(within(await screen.findByRole('dialog')).getByRole('button', { name: '종료' }));
     await waitFor(() => expect(mocks.endProposal).toHaveBeenCalledWith('p-1'));
     expect(await screen.findByText('제안을 종료했습니다.')).toBeTruthy();
     expect(await screen.findByText(/공급 제안 목록을 불러오지 못했습니다/)).toBeTruthy();
@@ -81,7 +81,6 @@ describe('SupplierSemiFranchiseEventsPage — 목록 조회 실패', () => {
   });
 
   it('취소 성공 후 재조회가 실패해도 성공 문구를 덮어쓰지 않는다', async () => {
-    vi.spyOn(window, 'confirm').mockReturnValue(true);
     const event = {
       id: 'ev-1', productName: '이벤트 제품', createdAt: '2026-11-01T00:00:00Z', semiFranchiseName: '협업체 A',
       eventPrice: 900, priceGeneral: 1000, startAt: '2026-11-10T00:00:00Z', endAt: '2026-11-20T00:00:00Z',
@@ -91,6 +90,7 @@ describe('SupplierSemiFranchiseEventsPage — 목록 조회 실패', () => {
     mocks.cancelEvent.mockResolvedValue({});
     show();
     fireEvent.click(await screen.findByRole('button', { name: '취소' }));
+    fireEvent.click(within(await screen.findByRole('dialog')).getByRole('button', { name: '이벤트 취소' }));
     await waitFor(() => expect(mocks.cancelEvent).toHaveBeenCalledWith('ev-1'));
     expect(await screen.findByText('이벤트를 취소했습니다.')).toBeTruthy();
     expect(await screen.findByText(/이벤트 목록을 불러오지 못했습니다/)).toBeTruthy();

@@ -10,8 +10,14 @@
   - 공급 제안 · 약국 협력사업 이벤트 목록: 조회 실패를 「목록 없음」 대신 표 안 실패 + [다시 시도]로. 종료/취소 성공 뒤 재조회 실패가 성공 문구를 덮어쓰지 않음. 이벤트 목록에 늦은 응답 무시(조회 순번) 추가.
   - 활성화 안내의 「대시보드로」 → `/supplier/dashboard`(이전 `/supplier` 는 메인 호스트에서 공개 소개 페이지).
   - 휴대폰 화면을 넘던 고정 폭 대화상자 4개(내 제품 목록 3 · 상품 상세 1)를 `w-full max-w-[…] mx-4` 로.
-- **결정 사항:** 일괄 삭제가 건별로 거부된 경우는 기존대로 목록을 다시 불러오며 선택을 비운다(사유는 toast). 공용 `EmptyRow`(`@o4o/operator-core-ui`)는 바꾸지 않고 화면 안에 실패 행을 그렸다. 브라우저 `confirm`/`prompt` 를 공용 대화상자로 바꾸는 일은 이번 범위가 아니다(리스트 표준 적용 묶음).
-- **검증:** web-neture Vitest 194 files / 1629 PASS(신규 5 파일 · 기존 1 파일 보강 — 신규 테스트는 고치기 전 코드에서 실패함을 확인: 반려 2/2 · 제품 목록 4/4 · 자료함 · 목록 실패 7/8, 나머지 1건은 '대상 0건' 대조군). `tsc --noEmit` PASS, 변경 파일 ESLint 0, `pnpm --filter @o4o/web-neture build` PASS.
+- **결정 사항:** 일괄 삭제가 건별로 거부된 경우는 기존대로 목록을 다시 불러오며 선택을 비운다(사유는 toast).
+- **후속 보완(같은 branch · 사용자 지시 「해결해」):**
+  - 공급자 화면의 브라우저 `confirm`/`prompt` 18곳(10 파일)을 공용 확인 대화상자(`@o4o/ui` `ConfirmActionDialog`)로 교체. web-neture `components/common/useConfirmDialog.tsx` 가 `confirm()`/`prompt()` 를 Promise 로 제공한다. 되돌릴 수 없는 동작은 `danger`, 마감 · 편집 버리기는 `warning`, 버튼 문구는 동작 이름(반려 · 마감 · 종료 · 철회 · 삭제 등). 모집 신청 반려는 대화상자 안 사유 입력 칸(선택)으로 받는다.
+  - 공용 `EmptyRow`(`packages/operator-core-ui/.../PharmacyCommerceUi.tsx`)에 선택 prop `tone="error"` · `onRetry` · `retryLabel` 추가 — 조회 실패를 붉은 글자 · `role="alert"` · [다시 시도]로. 기존 호출은 그대로다. 공급 제안 · 이벤트 화면은 직접 그리던 실패 행을 이것으로 바꿨다.
+  - **lane 주의:** 이 PR 은 `shared-package:operator-core-ui` 와 web-neture 를 함께 바꾼다. 바뀐 공용 API 는 선택 prop 추가뿐이고 기존 호출 의미가 바뀌지 않아 한 PR 로 묶었다(§4-3 R2 예외 사유). 같은 lane 의 Ready PR 이 있으면 통합 세션이 순서를 정한다.
+  - **Consumer Impact Matrix(`EmptyRow`):** web-neture 공급 제안 · 이벤트(새 prop 사용 · 테스트) / operator-core-ui `OperatorSemiFranchisePage`(11곳, 기존 prop 만 — 동작 동일) / `PharmacyCommerceUi` 를 import 하는 web-pharmacy-business · web-pharmacy-coop · web-store(`EmptyRow` 미사용, 타입 검사 통과). 화면 smoke 는 배포 후 Demo 확인 항목.
+  - 공용 `ConfirmActionDialog` 에는 접근 가능한 이름(`aria-labelledby`)이 없다 — 이번에 바꾸지 않았다(`@o4o/ui` 공용 · 별도 묶음).
+- **검증(후속 보완 포함 최종):** web-neture Vitest 195 files / 1633 PASS · operator-core-ui Vitest 37 files / 245 PASS · `tsc --noEmit` PASS(web-neture · web-pharmacy-business · web-pharmacy-coop · web-store) · 변경 파일 ESLint 0 · web-neture build PASS. 확인 대화상자로 바뀐 기존 테스트 6 파일은 대화상자 버튼을 누르도록 갱신. 첫 묶음 검증: web-neture Vitest 194 files / 1629 PASS(신규 5 파일 · 기존 1 파일 보강 — 신규 테스트는 고치기 전 코드에서 실패함을 확인: 반려 2/2 · 제품 목록 4/4 · 자료함 · 목록 실패 7/8, 나머지 1건은 '대상 0건' 대조군). `tsc --noEmit` PASS, 변경 파일 ESLint 0, `pnpm --filter @o4o/web-neture build` PASS.
 - **확인하지 못한 것 / 배포 후 Demo(공급자):** 브라우저 확인 미실행(로그인 · API 필요). PC/mobile 에서 내 제품 목록 노출 필터 → 전체 선택 → 선택 수 · 일괄 삭제 대상, 자료함 삭제 · 제공 대상, 공급 제안 · 이벤트 목록, 휴대폰 폭에서 대화상자 4개가 화면 안에 들어오는지, 활성화 안내 링크. 저장 · 삭제 · 반려처럼 운영 데이터를 바꾸는 동작은 Demo 에서 실행하지 않는다(§5).
 - **겹치는 PR / 문서 정합:** 조회하지 않음(통합 세션 확인). 문서 정합: 해당 없음.
 

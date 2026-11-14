@@ -37,6 +37,7 @@ import { mediaApi } from '../../lib/api/media';
 import MediaPickerModal from '../../components/common/MediaPickerModal';
 import StoreMaterialUsageNote from '../../components/supplier/StoreMaterialUsageNote';
 import type { MediaInsert } from '@o4o/content-editor';
+import { useConfirmDialog } from '../../components/common/useConfirmDialog';
 
 // 공급자 원본은 매장 상품·공개 slug 가 없다. 미리보기(previewLayoutOnly)는 sections 만 렌더하고
 //   fetchProducts/fetchScreen 을 호출하지 않으므로, 빈 응답 stub + placeholder slug 로 충분하다.
@@ -69,6 +70,7 @@ function targetLabel(t: SupplierHubTargetStoreType | null | undefined): string {
 }
 
 export default function SupplierTabletScreenSetsPage() {
+  const { confirm, dialog: confirmDialog } = useConfirmDialog();
   const [params, setParams] = useSearchParams();
   const editId = params.get('edit');
   const openedId = useRef<string | null>(null);
@@ -172,7 +174,7 @@ export default function SupplierTabletScreenSetsPage() {
   });
 
   const handleArchive = (set: SupplierScreenSet) => guard(async () => {
-    if (!window.confirm(`“${set.name}” 을(를) 보관하시겠습니까?`)) return;
+    if (!(await confirm({ title: '화면 묶음 보관', message: `“${set.name}” 을(를) 보관하시겠습니까?`, confirmText: '보관' }))) return;
     try {
       await archiveSupplierScreenSet(set.id);
       setToast({ type: 'success', message: '보관했습니다.' });
@@ -193,7 +195,7 @@ export default function SupplierTabletScreenSetsPage() {
   });
 
   const handleRemove = (set: SupplierScreenSet) => guard(async () => {
-    if (!window.confirm(`“${set.name}” 을(를) 목록에서 제거하시겠습니까?`)) return;
+    if (!(await confirm({ title: '화면 묶음 제거', message: `“${set.name}” 을(를) 목록에서 제거하시겠습니까?`, confirmText: '제거', variant: 'danger' }))) return;
     try {
       await removeSupplierScreenSet(set.id);
       setToast({ type: 'success', message: '목록에서 제거했습니다.' });
@@ -268,6 +270,7 @@ export default function SupplierTabletScreenSetsPage() {
 
   return (
     <div className="p-4 lg:p-6 space-y-4">
+      {confirmDialog}
       <SupplierContentNavigation />
       {targetError && <p role="alert" className="mb-4 rounded-lg bg-amber-50 p-3 text-sm text-amber-800">요청한 태블릿 화면을 열 수 없습니다. 대상을 확인하거나 다시 시도해 주시기 바랍니다.</p>}
 

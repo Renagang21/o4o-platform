@@ -33,10 +33,12 @@ import { useSupplierPharmacyOptions } from "../../components/neture-pharmacy/use
 import SupplierProposalDrafts from "./SupplierProposalDrafts";
 import { useAuth } from "../../contexts";
 import { supplierProfileApi } from "../../lib/api";
+import { useConfirmDialog } from "../../components/common/useConfirmDialog";
 
 type Msg = { type: "success" | "error"; text: string } | null;
 
 export default function SupplierSupplyProposalsPage() {
+  const { confirm, dialog: confirmDialog } = useConfirmDialog();
   const options = useSupplierPharmacyOptions();
   const { user } = useAuth();
   const [scope, setScope] = useState<{
@@ -106,9 +108,12 @@ export default function SupplierSupplyProposalsPage() {
 
   const end = async (p: SupplyProposal) => {
     if (
-      !window.confirm(
-        `${p.productName} 제안(${formatWon(p.unitPrice)})을 종료하시겠습니까? 종료한 제안은 되살릴 수 없습니다.`,
-      )
+      !(await confirm({
+        title: "공급 제안 종료",
+        message: `${p.productName} 제안(${formatWon(p.unitPrice)})을 종료하시겠습니까? 종료한 제안은 되살릴 수 없습니다.`,
+        confirmText: "종료",
+        variant: "danger",
+      }))
     )
       return;
     setBusy(true);
@@ -126,6 +131,7 @@ export default function SupplierSupplyProposalsPage() {
 
   return (
     <div className="space-y-6 p-6">
+      {confirmDialog}
       {params.has("returnTo") && (
         <Link
           to={supplierReturnPath(params.get("returnTo"), "/supplier/products")}
@@ -181,14 +187,12 @@ export default function SupplierSupplyProposalsPage() {
             {loading ? (
               <EmptyRow colSpan={7} text="불러오는 중..." />
             ) : loadError ? (
-              <tr>
-                <td colSpan={7} className="px-4 py-8 text-center text-sm text-red-700" role="alert">
-                  공급 제안 목록을 불러오지 못했습니다.{' '}
-                  <button type="button" onClick={() => void load()} className="font-medium underline">
-                    다시 시도
-                  </button>
-                </td>
-              </tr>
+              <EmptyRow
+                colSpan={7}
+                tone="error"
+                text="공급 제안 목록을 불러오지 못했습니다."
+                onRetry={() => void load()}
+              />
             ) : rows.length === 0 ? (
               <EmptyRow colSpan={7} text="낸 공급 제안이 없습니다." />
             ) : (

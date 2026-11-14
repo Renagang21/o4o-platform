@@ -1,8 +1,8 @@
 /**
- * 판매자 모집 신청 반려 — 사유 입력창에서 [취소]를 누르면 반려하지 않는다(되돌릴 수 없는 동작).
+ * 판매자 모집 신청 반려 — 확인 대화상자에서 [취소]하면 반려하지 않는다(되돌릴 수 없는 동작).
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import SupplierRecruitmentDetailPage from '../SupplierRecruitmentDetailPage';
 
@@ -56,22 +56,29 @@ afterEach(() => {
 });
 
 describe('SupplierRecruitmentDetailPage — 반려', () => {
-  it('사유 입력창에서 [취소]하면 반려 API 를 부르지 않는다', async () => {
-    vi.spyOn(window, 'prompt').mockReturnValue(null);
-    mount();
+  // 반려는 공용 확인 대화상자(사유 입력 칸 포함)로 묻는다
+  const openReject = async () => {
     fireEvent.click(await screen.findByRole('button', { name: '반려' }));
-    expect(window.prompt).toHaveBeenCalledTimes(1);
+    return screen.findByRole('dialog');
+  };
+
+  it('대화상자에서 [취소]하면 반려 API 를 부르지 않는다', async () => {
+    mount();
+    const dialog = await openReject();
+    fireEvent.click(within(dialog).getByRole('button', { name: '취소' }));
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
     expect(mocks.api.rejectApplication).not.toHaveBeenCalled();
     expect(mocks.api.getApplications).toHaveBeenCalledTimes(1);
   });
 
-  it('사유를 비우고 확인하면 사유 없이 반려한다 · 사유는 앞뒤 공백을 지운다', async () => {
-    const prompt = vi.spyOn(window, 'prompt').mockReturnValueOnce('').mockReturnValueOnce('  재고 부족  ');
+  it('사유를 비우고 반려하면 사유 없이 · 사유를 적으면 앞뒤 공백을 지우고 보낸다', async () => {
     mount();
-    fireEvent.click(await screen.findByRole('button', { name: '반려' }));
+    let dialog = await openReject();
+    fireEvent.click(within(dialog).getByRole('button', { name: '반려' }));
     await waitFor(() => expect(mocks.api.rejectApplication).toHaveBeenCalledWith('app-1', undefined));
-    fireEvent.click(await screen.findByRole('button', { name: '반려' }));
+    dialog = await openReject();
+    fireEvent.change(within(dialog).getByPlaceholderText('반려 사유 (선택)'), { target: { value: '  재고 부족  ' } });
+    fireEvent.click(within(dialog).getByRole('button', { name: '반려' }));
     await waitFor(() => expect(mocks.api.rejectApplication).toHaveBeenLastCalledWith('app-1', '재고 부족'));
-    expect(prompt).toHaveBeenCalledTimes(2);
   });
 });

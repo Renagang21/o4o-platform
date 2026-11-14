@@ -309,12 +309,13 @@ describe("independent business proposal drafts", () => {
     fireEvent.click(a().getByRole("button", { name: "협업체 A 승인 요청" }));
     await a().findByRole("alert");
     const first = mocks.createProposal.mock.calls[0][0];
-    const confirm = vi.spyOn(window, "confirm").mockReturnValue(true);
     fireEvent.click(
       a().getByRole("button", { name: "접수 목록 확인 후 새 초안으로 변경" }),
     );
-    expect(confirm).toHaveBeenCalled();
-    confirm.mockRestore();
+    // 공용 확인 대화상자에서 확인해야 새 초안으로 바뀐다
+    const dialog = await screen.findByRole("dialog");
+    fireEvent.click(within(dialog).getByRole("button", { name: "새 초안으로" }));
+    await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
     fireEvent.change(a().getByLabelText("공급 가격 (원)"), {
       target: { value: "950" },
     });
@@ -366,14 +367,16 @@ describe("independent business proposal drafts", () => {
     mount([], 'user-a:supplier-a');create();
     fireEvent.click(a().getByRole('button',{name:'협업체 A 승인 요청'}));
     await a().findByRole('alert');
-    const confirm=vi.spyOn(window,'confirm').mockReturnValue(false);
+    // 공용 확인 대화상자 — [취소]하면 그대로, [모두 지우기]하면 지운다
     fireEvent.click(screen.getByRole('button',{name:'작성 초안 모두 지우기'}));
+    fireEvent.click(within(await screen.findByRole('dialog')).getByRole('button',{name:'취소'}));
+    await waitFor(()=>expect(screen.queryByRole('dialog')).toBeNull());
     expect(screen.getByRole('group',{name:'협업체 A 초안'})).toBeTruthy();
-    confirm.mockReturnValue(true);
     fireEvent.click(screen.getByRole('button',{name:'작성 초안 모두 지우기'}));
-    expect(screen.queryByRole('group',{name:'협업체 A 초안'})).toBeNull();
+    fireEvent.click(within(await screen.findByRole('dialog')).getByRole('button',{name:'모두 지우기'}));
+    await waitFor(()=>expect(screen.queryByRole('group',{name:'협업체 A 초안'})).toBeNull());
     expect(sessionStorage.getItem('neture:supply-proposals:v1:user-a:supplier-a')).toBeNull();
-    expect(mocks.createProposal).toHaveBeenCalledTimes(1);confirm.mockRestore();
+    expect(mocks.createProposal).toHaveBeenCalledTimes(1);
   });
 
 });

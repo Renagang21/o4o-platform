@@ -12,6 +12,7 @@ import {
   type ApprovalSkippedItem,
   type ApprovalTab,
 } from './productListFeedback';
+import { useConfirmDialog } from '../../../components/common/useConfirmDialog';
 
 export function useSupplierProducts() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -59,6 +60,7 @@ export function useSupplierProducts() {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [bulkDeleting, setBulkDeleting] = useState(false);
   const [submittingApproval, setSubmittingApproval] = useState(false);
+  const { confirm, dialog: confirmDialog } = useConfirmDialog();
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   // showApprovalModal 제거됨 — WO-NETURE-SUPPLIER-APPROVAL-REQUEST-USE-SAVED-DISTRIBUTION-POLICY-V1
   const [toast, setToast] = useState<string | null>(null);
@@ -366,9 +368,11 @@ export function useSupplierProducts() {
   const handleSubmitApproval = async () => {
     if (submittingApproval) return;
     if (
-      !confirm(
-        `선택한 ${selectedIds.size}개 상품 중 반려된 제품의 등록 재검토를 요청합니다.\n진행하시겠습니까?`,
-      )
+      !(await confirm({
+        title: '등록 재검토 요청',
+        message: `선택한 ${selectedIds.size}개 상품 중 반려된 제품의 등록 재검토를 요청합니다.\n진행하시겠습니까?`,
+        confirmText: '요청',
+      }))
     )
       return;
     setSubmittingApproval(true);
@@ -417,6 +421,7 @@ export function useSupplierProducts() {
 
   return {
     products,
+    confirmDialog,
     allVisibleSelected,
     submittingApproval,
     pagination,

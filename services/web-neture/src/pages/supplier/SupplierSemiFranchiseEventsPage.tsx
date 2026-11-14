@@ -17,6 +17,7 @@ import {
 import { EmptyRow, INPUT, Message, PageHeader, StatusBadge, TD, TH } from '../../components/neture-pharmacy/PharmacyCommerceUi';
 import { supplierReturnPath } from '../../lib/supplierNavigation';
 import { productLabel, useSupplierPharmacyOptions } from '../../components/neture-pharmacy/useSupplierPharmacyOptions';
+import { useConfirmDialog } from '../../components/common/useConfirmDialog';
 
 type Msg = { type: 'success' | 'error'; text: string } | null;
 const EMPTY = {
@@ -34,6 +35,7 @@ const digits = (v: string) => v.replace(/[^0-9]/g, '');
 const optionalInt = (v: string) => (v.trim() === '' ? undefined : Number(v));
 
 export default function SupplierSemiFranchiseEventsPage() {
+  const { confirm, dialog: confirmDialog } = useConfirmDialog();
   const options = useSupplierPharmacyOptions();
   const [params] = useSearchParams();
   const requestedProduct = params.get('offer');
@@ -106,7 +108,13 @@ export default function SupplierSemiFranchiseEventsPage() {
   };
 
   const cancel = async (ev: SemiFranchiseEvent) => {
-    if (!window.confirm(`${ev.productName} 이벤트를 취소하시겠습니까? 취소한 이벤트는 되살릴 수 없습니다.`)) return;
+    if (!(await confirm({
+      title: '이벤트 취소',
+      message: `${ev.productName} 이벤트를 취소하시겠습니까? 취소한 이벤트는 되살릴 수 없습니다.`,
+      confirmText: '이벤트 취소',
+      cancelText: '닫기',
+      variant: 'danger',
+    }))) return;
     setBusy(true);
     setMessage(null);
     try {
@@ -122,6 +130,7 @@ export default function SupplierSemiFranchiseEventsPage() {
 
   return (
     <div className="space-y-6 p-6">
+      {confirmDialog}
       <SupplierEventNavigation />
       {params.has('returnTo') && <Link to={supplierReturnPath(params.get('returnTo'), '/supplier/products')} className="inline-block text-sm text-blue-700 underline">상품 업무로 돌아가기</Link>}
       {selectionError && <p role="alert" className="rounded-lg bg-amber-50 p-3 text-sm text-amber-800">요청한 상품은 공급 가능한 승인 상품 목록에 없습니다. 다른 상품을 선택해 주시기 바랍니다.</p>}
@@ -221,14 +230,12 @@ export default function SupplierSemiFranchiseEventsPage() {
             {loading ? (
               <EmptyRow colSpan={7} text="불러오는 중..." />
             ) : loadError ? (
-              <tr>
-                <td colSpan={7} className='px-4 py-8 text-center text-sm text-red-700' role='alert'>
-                  이벤트 목록을 불러오지 못했습니다.{' '}
-                  <button type='button' onClick={() => void load()} className='font-medium underline'>
-                    다시 시도
-                  </button>
-                </td>
-              </tr>
+              <EmptyRow
+                colSpan={7}
+                tone='error'
+                text='이벤트 목록을 불러오지 못했습니다.'
+                onRetry={() => void load()}
+              />
             ) : rows.length === 0 ? (
               <EmptyRow colSpan={7} text="신청한 이벤트가 없습니다." />
             ) : (

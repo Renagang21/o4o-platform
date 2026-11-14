@@ -25,6 +25,7 @@ import {
 } from '../../lib/api/supplierSignage';
 import { supplierApi, type SupplierProduct } from '../../lib/api';
 import StoreMaterialUsageNote from '../../components/supplier/StoreMaterialUsageNote';
+import { useConfirmDialog } from '../../components/common/useConfirmDialog';
 
 const STATUS_META: Record<string, { label: string; cls: string }> = {
   active: { label: '게시 중', cls: 'bg-emerald-50 text-emerald-700' },
@@ -46,6 +47,7 @@ function linkedProductName(m: SupplierSignageMedia): string | null {
 }
 
 export default function SupplierSignagePage() {
+  const { confirm, dialog: confirmDialog } = useConfirmDialog();
   const [params, setParams] = useSearchParams();
   const editId = params.get('edit');
   const productId = params.get('product');
@@ -153,7 +155,12 @@ export default function SupplierSignagePage() {
   };
 
   const doAction = async (m: SupplierSignageMedia, action: 'publish' | 'archive' | 'unarchive' | 'remove') => {
-    if (action === 'remove' && !window.confirm(`"${m.name}" 을(를) 삭제하시겠습니까? 이미 매장이 가져간 사본은 영향받지 않습니다.`)) return;
+    if (action === 'remove' && !(await confirm({
+      title: '사이니지 자료 삭제',
+      message: `"${m.name}" 을(를) 삭제하시겠습니까? 이미 매장이 가져간 사본은 영향받지 않습니다.`,
+      confirmText: '삭제',
+      variant: 'danger',
+    }))) return;
     setBusyId(m.id);
     try {
       if (action === 'publish') { await publishSupplierSignage(m.id); setMessage({ type: 'success', text: '게시했습니다. 매장 HUB에 노출됩니다.' }); }
@@ -172,6 +179,7 @@ export default function SupplierSignagePage() {
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-8">
+      {confirmDialog}
       <SupplierContentNavigation />
       {targetError && <p role="alert" className="mb-4 rounded-lg bg-amber-50 p-3 text-sm text-amber-800">요청한 사이니지를 찾을 수 없습니다. 목록에서 대상을 확인해 주시기 바랍니다.</p>}
       <div className="mb-6 flex items-center justify-between gap-3">

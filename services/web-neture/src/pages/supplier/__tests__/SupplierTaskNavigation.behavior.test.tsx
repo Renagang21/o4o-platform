@@ -352,7 +352,6 @@ describe("supplier task navigation", () => {
   });
 
   it('keeps unsaved content after a failed save and cancelled close, then retries the same draft', async () => {
-    const confirm = vi.spyOn(window, 'confirm').mockReturnValue(false);
     api.saveDescription.mockRejectedValueOnce(new Error('Fixture save failure')).mockResolvedValueOnce({ id: 'current', masterId: 'master-a', descriptionType: 'STORE', language: 'en', status: 'draft' });
     mount('/supplier/store-descriptions?masterId=master-a&language=en');
     const body = await screen.findByLabelText('자료 본문') as HTMLTextAreaElement;
@@ -360,12 +359,13 @@ describe("supplier task navigation", () => {
     fireEvent.click(screen.getByRole('button', { name: '임시저장' }));
     await waitFor(() => expect((screen.getByRole('button', { name: '임시저장' }) as HTMLButtonElement).disabled).toBe(false));
     fireEvent.click(screen.getByRole('button', { name: '닫기' }));
-    expect(confirm).toHaveBeenCalledTimes(1);
+    // 저장하지 않은 변경 — 공용 확인 대화상자에서 [계속 편집]을 고르면 닫지 않는다
+    fireEvent.click(within(await screen.findByRole('dialog')).getByRole('button', { name: '계속 편집' }));
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
     expect(body.value).toBe('<p>Unsaved content</p>');
     fireEvent.click(screen.getByRole('button', { name: '임시저장' }));
     await waitFor(() => expect(api.saveDescription).toHaveBeenCalledTimes(2));
     expect(api.saveDescription.mock.calls[0]).toEqual(api.saveDescription.mock.calls[1]);
-    confirm.mockRestore();
   });
 
   it("opens the requested description language and returns to the filtered material list", async () => {
